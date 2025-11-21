@@ -9,6 +9,7 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { Filter, Mail, RefreshCw } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import type React from "react";
@@ -61,7 +62,7 @@ export function EmailsListClient({
             {t("app.admin.emails.list.admin.title")} {totalEmails}
           </CardTitle>
 
-          <Div className="flex items-center flex flex-row gap-2">
+          <Div className="flex items-center gap-2">
             {/* Refresh */}
             <Button
               variant="outline"
@@ -79,19 +80,21 @@ export function EmailsListClient({
       <CardContent>
         {/* Filter Form */}
         <Div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <Div className="flex items-center flex flex-row gap-2 mb-4">
+          <Div className="flex items-center gap-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <Span className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {t("app.admin.emails.list.admin.filters.title")}:
             </Span>
           </Div>
 
-          <Div className="flex flex-col gap-4">
-            <EmailsListFilters
-              form={emailsEndpoint.read.form}
-              locale={locale}
-            />
-          </Div>
+          <Form form={emailsEndpoint.read.form}>
+            <Div className="flex flex-col gap-4">
+              <EmailsListFilters
+                form={emailsEndpoint.read.form}
+                locale={locale}
+              />
+            </Div>
+          </Form>
         </Div>
 
         {/* Results */}

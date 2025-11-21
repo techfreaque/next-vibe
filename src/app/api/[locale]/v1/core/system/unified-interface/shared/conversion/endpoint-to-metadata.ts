@@ -50,7 +50,9 @@ export interface JsonSchemaObject {
  */
 export function zodSchemaToJsonSchema(schema: z.ZodTypeAny): JsonSchema {
   try {
-    return zodToJsonSchema(schema, {
+    // Type assertion needed due to Zod version compatibility
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return zodToJsonSchema(schema as any, {
       target: "jsonSchema7",
       $refStrategy: "none",
     });

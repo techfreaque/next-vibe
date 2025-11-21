@@ -16,6 +16,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { ApiSection } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
@@ -154,7 +155,7 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
   ): Promise<string[]> {
     try {
       const definition = (await import(defFile)) as {
-        default?: Record<string, unknown>;
+        default?: ApiSection;
       };
       const defaultExport = definition.default;
 

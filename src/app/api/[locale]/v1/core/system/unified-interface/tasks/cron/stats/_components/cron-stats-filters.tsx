@@ -59,7 +59,7 @@ export function CronStatsFiltersContainer({
   return (
     <Form form={form} onSubmit={noOpSubmit} className="flex flex-col gap-4">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-4">
+        <CardHeader className="flex flex-row items-center justify-between pb-4">
           <CardTitle className="text-lg font-semibold">
             {title || t("app.admin.common.filter")}
           </CardTitle>

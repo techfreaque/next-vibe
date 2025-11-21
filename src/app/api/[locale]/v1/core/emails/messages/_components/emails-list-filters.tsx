@@ -40,10 +40,6 @@ export function EmailsListFilters({
         search: undefined,
         status: EmailStatusFilter.ALL,
         type: EmailTypeFilter.ALL,
-        dateRange: {
-          dateFrom: undefined,
-          dateTo: undefined,
-        },
       },
       displayOptions: {
         page: 1,

@@ -107,7 +107,7 @@ export class RouteRegistry {
         };
       }
 
-      const routeModule = handler as RouteModule<TEndpoint>;
+      const routeModule = handler as unknown as RouteModule<TEndpoint>;
 
       logger.debug(`[Route Registry] Route module loaded successfully`, {
         hasTools: !!routeModule.tools,

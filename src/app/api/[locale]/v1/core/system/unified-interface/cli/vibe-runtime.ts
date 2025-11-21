@@ -18,8 +18,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import { createEndpointLogger } from "../shared/logger/endpoint";
 import { createDefaultCliUser } from "./auth/cli-user";
-import { cliEntryPoint,
-CliEntryPoint } from "./entry-point";
 import { ErrorHandler, setupGlobalErrorHandlers } from "./execution-errors";
 import { enableDebug } from "@/config/debug";
 
@@ -95,6 +93,7 @@ function loadEnvironment(): void {
 loadEnvironment();
 
 import { env } from "@/config/env";
+import { cliEntryPoint } from "./entry-point";
 
 /**
  * Try to parse a string as a number if it looks like one

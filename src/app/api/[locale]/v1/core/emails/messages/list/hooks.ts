@@ -9,6 +9,12 @@ import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-i
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
+import {
+  EmailSortField,
+  EmailStatusFilter,
+  EmailTypeFilter,
+  SortOrder,
+} from "../enum";
 import definitions from "./definition";
 
 /**
@@ -21,6 +27,26 @@ export function useEmailMessagesList(
     definitions,
     {
       persistForm: false,
+      queryOptions: {
+        enabled: true,
+        refetchOnWindowFocus: false,
+        staleTime: 1 * 60 * 1000, // 1 minute
+      },
+      filterOptions: {
+        initialFilters: {
+          filters: {
+            search: undefined,
+            status: EmailStatusFilter.ALL,
+            type: EmailTypeFilter.ALL,
+          },
+          displayOptions: {
+            sortBy: EmailSortField.CREATED_AT,
+            sortOrder: SortOrder.DESC,
+            page: 1,
+            limit: 20,
+          },
+        },
+      },
     },
     logger,
   );

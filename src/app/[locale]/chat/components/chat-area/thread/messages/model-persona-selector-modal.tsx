@@ -3,6 +3,7 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
 import { H3 } from "next-vibe-ui/ui/typography";
 import { P } from "next-vibe-ui/ui/typography";
 import { Textarea } from "next-vibe-ui/ui/textarea";
@@ -37,7 +38,7 @@ interface ModelPersonaSelectorModalProps {
   logger: EndpointLogger;
 }
 
-export function ModelPersonaSelectorModal({
+export function ModelPersonaSelectorBubble({
   titleKey,
   descriptionKey,
   onModelChange,
@@ -79,10 +80,10 @@ export function ModelPersonaSelectorModal({
   const isDisabled = isLoading || isSubmitting;
 
   return (
-    <Div className="w-full max-h-[80dvh] overflow-y-auto">
+    <Div className="w-full max-h-[80dvh] overflow-y-auto z-11">
       <Div
         className={cn(
-          "p-4 bg-card backdrop-blur",
+          "p-4 bg-background",
           "border border-border rounded-lg shadow-lg",
           "w-full",
         )}
@@ -101,51 +102,63 @@ export function ModelPersonaSelectorModal({
               onChange={(e) => onInputChange?.(e.target.value)}
               placeholder={inputPlaceholder}
               rows={3}
-              className="w-full min-h-[80px]"
+              className="w-full min-h-20"
             />
           </Div>
         )}
 
-        {/* Selectors */}
-        <Div className="flex flex-col gap-3 mb-4">
-          <Div className="flex items-center gap-2 flex-wrap">
+        {/* All controls in ONE ROW */}
+        <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 flex-nowrap">
+          {/* Left side: Model & Persona Selectors */}
+          <Div className="flex flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 flex-1 min-w-0">
+            {/* Model Selector - text hidden last (on smallest screens) */}
             <ModelSelector
               value={selectedModel}
               onChange={onModelChange}
               locale={locale}
               logger={logger}
+              buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
+              showTextAt="sm"
             />
+
+            {/* Persona Selector - text hidden first (on smaller screens) */}
             <PersonaSelector
               value={selectedPersona}
               onChange={onPersonaChange}
               locale={locale}
               logger={logger}
+              buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
+              showTextAt="md"
             />
           </Div>
-        </Div>
 
-        {/* Actions */}
-        <Div className="flex items-center gap-2 justify-end">
-          <Button
-            onClick={onCancel}
-            disabled={isDisabled}
-            size="sm"
-            variant="ghost"
-            className="h-10 min-h-[44px]"
-          >
-            <X className="h-4 w-4 mr-2" />
-            {t("app.chat.common.cancel")}
-          </Button>
-          <Button
-            onClick={handleConfirm}
-            disabled={isDisabled}
-            size="sm"
-            variant="default"
-            className="h-10 min-h-[44px]"
-          >
-            <Send className="h-4 w-4 mr-2" />
-            {isDisabled ? t("app.chat.common.sending") : finalConfirmLabel}
-          </Button>
+          {/* Right side: Action Buttons */}
+          <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 shrink-0">
+            <Button
+              onClick={onCancel}
+              disabled={isDisabled}
+              size="sm"
+              variant="ghost"
+              className="h-8 sm:h-9 px-2 sm:px-3 whitespace-nowrap"
+            >
+              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-2" />
+              <Span className="hidden sm:inline">
+                {t("app.chat.common.cancel")}
+              </Span>
+            </Button>
+            <Button
+              onClick={handleConfirm}
+              disabled={isDisabled}
+              size="sm"
+              variant="default"
+              className="h-8 sm:h-9 px-2 sm:px-3 whitespace-nowrap"
+            >
+              <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-2" />
+              <Span className="hidden sm:inline">
+                {isDisabled ? t("app.chat.common.sending") : finalConfirmLabel}
+              </Span>
+            </Button>
+          </Div>
         </Div>
       </Div>
     </Div>

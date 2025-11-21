@@ -4,7 +4,11 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-import { ChevronDown, ChevronRight, CornerDownRight } from "next-vibe-ui/ui/icons";
+import {
+  ChevronDown,
+  ChevronRight,
+  CornerDownRight,
+} from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -23,7 +27,7 @@ import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
 import { getVoteStatus } from "@/app/[locale]/chat/lib/utils/message-votes";
 import { getDirectReplies } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import { MessageEditor } from "../message-editor";
-import { ModelPersonaSelectorModal } from "../model-persona-selector-modal";
+import { ModelPersonaSelectorBubble } from "../model-persona-selector-modal";
 import { UserProfileCard } from "../user-profile-card";
 import { useMessageActions } from "../hooks/use-message-actions";
 import type { useCollapseState } from "../hooks/use-collapse-state";
@@ -216,7 +220,7 @@ export function ThreadedMessage({
               </Div>
             ) : isRetrying ? (
               <Div className="flex justify-end">
-                <ModelPersonaSelectorModal
+                <ModelPersonaSelectorBubble
                   titleKey="app.chat.threadedView.retryModal.title"
                   descriptionKey="app.chat.threadedView.retryModal.description"
                   onModelChange={
@@ -294,7 +298,7 @@ export function ThreadedMessage({
           {/* Show Answer-as-AI dialog below the message */}
           {isAnswering && (
             <Div className="mt-3">
-              <ModelPersonaSelectorModal
+              <ModelPersonaSelectorBubble
                 titleKey="app.chat.threadedView.answerModal.title"
                 descriptionKey="app.chat.threadedView.answerModal.description"
                 onModelChange={

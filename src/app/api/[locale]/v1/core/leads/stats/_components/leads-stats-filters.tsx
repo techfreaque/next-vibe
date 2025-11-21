@@ -15,6 +15,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
 import type { JSX, ReactNode } from "react";
 import type { Control } from "react-hook-form";
 
@@ -297,31 +298,33 @@ export function LeadsStatsFiltersContainer({
   children,
   onRefresh,
   title,
-  form: _form,
+  form,
 }: LeadsStatsFiltersContainerProps): JSX.Element {
   const { t } = simpleT(locale);
 
   return (
-    <Div className="flex flex-col gap-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-4">
-          <CardTitle className="text-lg font-semibold">
-            {title || t("app.admin.leads.leads.admin.stats.filter")}
-          </CardTitle>
-          {onRefresh && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onRefresh}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className="h-4 w-4" />
-              {t("app.admin.leads.leads.admin.stats.refresh")}
-            </Button>
-          )}
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">{children}</CardContent>
-      </Card>
-    </Div>
+    <Form form={form}>
+      <Div className="flex flex-col gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-4">
+            <CardTitle className="text-lg font-semibold">
+              {title || t("app.admin.leads.leads.admin.stats.filter")}
+            </CardTitle>
+            {onRefresh && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onRefresh}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                {t("app.admin.leads.leads.admin.stats.refresh")}
+              </Button>
+            )}
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">{children}</CardContent>
+        </Card>
+      </Div>
+    </Form>
   );
 }

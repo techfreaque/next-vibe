@@ -13,6 +13,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { P } from "next-vibe-ui/ui/typography";
 import React, { useState } from "react";
 
@@ -145,156 +146,129 @@ export function UsersListClient({
             </Span>
           </Div>
 
-          <Div className="flex flex-col gap-4">
-            <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {/* Search Field */}
-              <EndpointFormField
-                name="searchAndPagination.search"
-                config={{
-                  type: "text",
-                  label: undefined,
-                  placeholder: "app.admin.users.search.placeholder",
-                }}
-                control={usersEndpoint.read.form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              {/* Status Filter */}
-              <EndpointFormField
-                name="filters.status"
-                config={{
-                  type: "select",
-                  label: undefined,
-                  placeholder: "app.admin.users.status.placeholder",
-                  options: [
-                    {
-                      value: UserStatusFilter.ALL,
-                      label: "app.admin.users.status.all",
-                    },
-                    {
-                      value: UserStatusFilter.ACTIVE,
-                      label: "app.admin.users.status.active",
-                    },
-                    {
-                      value: UserStatusFilter.INACTIVE,
-                      label: "app.admin.users.status.inactive",
-                    },
-                    {
-                      value: UserStatusFilter.EMAIL_VERIFIED,
-                      label: "app.admin.users.status.email_verified",
-                    },
-                    {
-                      value: UserStatusFilter.EMAIL_UNVERIFIED,
-                      label: "app.admin.users.status.email_unverified",
-                    },
-                  ],
-                }}
-                control={usersEndpoint.read.form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              {/* Role Filter */}
-              <EndpointFormField
-                name="filters.role"
-                config={{
-                  type: "select",
-                  label: undefined,
-                  placeholder: "app.admin.users.role.placeholder",
-                  options: [
-                    {
-                      value: UserRoleFilter.ALL,
-                      label: "app.admin.users.role.all",
-                    },
-                    {
-                      value: UserRoleFilter.PUBLIC,
-                      label: "app.admin.users.role.public",
-                    },
-                    {
-                      value: UserRoleFilter.CUSTOMER,
-                      label: "app.admin.users.role.customer",
-                    },
-                    {
-                      value: UserRoleFilter.PARTNER_ADMIN,
-                      label: "app.admin.users.role.partner_admin",
-                    },
-                    {
-                      value: UserRoleFilter.PARTNER_EMPLOYEE,
-                      label: "app.admin.users.role.partner_employee",
-                    },
-                    {
-                      value: UserRoleFilter.ADMIN,
-                      label: "app.admin.users.role.admin",
-                    },
-                  ],
-                }}
-                control={usersEndpoint.read.form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              {/* Sort By */}
-              <EndpointFormField
-                name="sorting.sortBy"
-                config={{
-                  type: "select",
-                  label: undefined,
-                  placeholder: "app.admin.users.sort.placeholder",
-                  options: [
-                    {
-                      value: UserSortField.CREATED_AT,
-                      label: "app.admin.users.sort.created",
-                    },
-                    {
-                      value: UserSortField.UPDATED_AT,
-                      label: "app.admin.users.sort.updated",
-                    },
-                    {
-                      value: UserSortField.EMAIL,
-                      label: "app.admin.users.sort.email",
-                    },
-                    {
-                      value: UserSortField.PRIVATE_NAME,
-                      label: "app.admin.users.sort.privateName",
-                    },
-                    {
-                      value: UserSortField.PUBLIC_NAME,
-                      label: "app.admin.users.sort.publicName",
-                    },
-                  ],
-                }}
-                control={usersEndpoint.read.form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-            </Div>
-
-            {/* Sort Order and Actions */}
-            <Div className="flex items-center justify-between">
-              <Div className="flex items-center flex flex-row gap-4">
+          <Form form={usersEndpoint.read.form}>
+            <Div className="flex flex-col gap-4">
+              <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {/* Search Field */}
                 <EndpointFormField
-                  name="sorting.sortOrder"
+                  name="searchAndPagination.search"
+                  config={{
+                    type: "text",
+                    label: undefined,
+                    placeholder: "app.admin.users.search.placeholder",
+                  }}
+                  control={usersEndpoint.read.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+
+                {/* Status Filter */}
+                <EndpointFormField
+                  name="filters.status"
                   config={{
                     type: "select",
                     label: undefined,
-                    placeholder: "app.admin.users.sortOrder.placeholder",
+                    placeholder: "app.admin.users.status.placeholder",
                     options: [
                       {
-                        value: SortOrder.ASC,
-                        label: "app.admin.users.sortOrder.asc",
+                        value: UserStatusFilter.ALL,
+                        label: "app.admin.users.status.all",
                       },
                       {
-                        value: SortOrder.DESC,
-                        label: "app.admin.users.sortOrder.desc",
+                        value: UserStatusFilter.ACTIVE,
+                        label: "app.admin.users.status.active",
+                      },
+                      {
+                        value: UserStatusFilter.INACTIVE,
+                        label: "app.admin.users.status.inactive",
+                      },
+                      {
+                        value: UserStatusFilter.EMAIL_VERIFIED,
+                        label: "app.admin.users.status.email_verified",
+                      },
+                      {
+                        value: UserStatusFilter.EMAIL_UNVERIFIED,
+                        label: "app.admin.users.status.email_unverified",
+                      },
+                    ],
+                  }}
+                  control={usersEndpoint.read.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+
+                {/* Role Filter */}
+                <EndpointFormField
+                  name="filters.role"
+                  config={{
+                    type: "select",
+                    label: undefined,
+                    placeholder: "app.admin.users.role.placeholder",
+                    options: [
+                      {
+                        value: UserRoleFilter.ALL,
+                        label: "app.admin.users.role.all",
+                      },
+                      {
+                        value: UserRoleFilter.PUBLIC,
+                        label: "app.admin.users.role.public",
+                      },
+                      {
+                        value: UserRoleFilter.CUSTOMER,
+                        label: "app.admin.users.role.customer",
+                      },
+                      {
+                        value: UserRoleFilter.PARTNER_ADMIN,
+                        label: "app.admin.users.role.partner_admin",
+                      },
+                      {
+                        value: UserRoleFilter.PARTNER_EMPLOYEE,
+                        label: "app.admin.users.role.partner_employee",
+                      },
+                      {
+                        value: UserRoleFilter.ADMIN,
+                        label: "app.admin.users.role.admin",
+                      },
+                    ],
+                  }}
+                  control={usersEndpoint.read.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+
+                {/* Sort By */}
+                <EndpointFormField
+                  name="sorting.sortBy"
+                  config={{
+                    type: "select",
+                    label: undefined,
+                    placeholder: "app.admin.users.sort.placeholder",
+                    options: [
+                      {
+                        value: UserSortField.CREATED_AT,
+                        label: "app.admin.users.sort.created",
+                      },
+                      {
+                        value: UserSortField.UPDATED_AT,
+                        label: "app.admin.users.sort.updated",
+                      },
+                      {
+                        value: UserSortField.EMAIL,
+                        label: "app.admin.users.sort.email",
+                      },
+                      {
+                        value: UserSortField.PRIVATE_NAME,
+                        label: "app.admin.users.sort.privateName",
+                      },
+                      {
+                        value: UserSortField.PUBLIC_NAME,
+                        label: "app.admin.users.sort.publicName",
                       },
                     ],
                   }}
@@ -306,16 +280,45 @@ export function UsersListClient({
                 />
               </Div>
 
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleClearFilters}
-              >
-                {t("app.admin.users.list.filters.clear")}
-              </Button>
+              {/* Sort Order and Actions */}
+              <Div className="flex items-center justify-between">
+                <Div className="flex items-center flex flex-row gap-4">
+                  <EndpointFormField
+                    name="sorting.sortOrder"
+                    config={{
+                      type: "select",
+                      label: undefined,
+                      placeholder: "app.admin.users.sortOrder.placeholder",
+                      options: [
+                        {
+                          value: SortOrder.ASC,
+                          label: "app.admin.users.sortOrder.asc",
+                        },
+                        {
+                          value: SortOrder.DESC,
+                          label: "app.admin.users.sortOrder.desc",
+                        },
+                      ],
+                    }}
+                    control={usersEndpoint.read.form.control}
+                    theme={{
+                      style: "none",
+                      showAllRequired: false,
+                    }}
+                  />
+                </Div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearFilters}
+                >
+                  {t("app.admin.users.list.filters.clear")}
+                </Button>
+              </Div>
             </Div>
-          </Div>
+          </Form>
         </Div>
 
         {/* Results Summary */}

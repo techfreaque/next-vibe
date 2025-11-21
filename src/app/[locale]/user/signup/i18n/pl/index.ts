@@ -61,6 +61,7 @@ export const translations: typeof enTranslations = {
       confirmPasswordLabel: "Potwierdź hasło",
       confirmPasswordPlaceholder: "Potwierdź swoje hasło",
       newsletterSubscription: "Zapisz się do newslettera",
+      usingReferralCode: "Użyj kodu polecającego",
     },
   },
   post: {

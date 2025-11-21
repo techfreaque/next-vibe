@@ -18,18 +18,12 @@ import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
+  Chart,
   Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+  Bar,
+  Area,
+  Axis,
+} from "next-vibe-ui/ui/chart";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -103,7 +97,7 @@ export function EmailStatsChart({
     );
   }
 
-  // Transform data for recharts format
+  // Transform data for Victory charts format
   const chartData = transformDataForChart(data);
   const chartType = data.series[0]?.type || ChartType.LINE;
 
@@ -121,108 +115,76 @@ export function EmailStatsChart({
 
   const renderChart = (): JSX.Element => {
     const commonProps = {
-      data: chartData,
-      margin: { top: 5, right: 30, left: 20, bottom: 5 },
+      height,
+      width: 600,
+      padding: { top: 5, right: 30, left: 50, bottom: 40 },
     };
 
-    switch (chartType) {
-      case ChartType.BAR:
-        return (
-          <BarChart {...commonProps}>
-            <CartesianGrid strokeDasharray={CHART_CONSTANTS.STROKE_DASHARRAY} />
-            <XAxis
-              dataKey="date"
-              tickFormatter={(value: string) =>
-                formatDateForChart(value, locale)
-              }
-            />
-            <YAxis scale="log" domain={["dataMin", "dataMax"]} />
-            <Tooltip
-              labelFormatter={(value: string) =>
-                formatDateForTooltip(value, locale)
-              }
-              formatter={(value: number, name: string) => [
-                value.toLocaleString(),
-                name,
-              ]}
-            />
-            {data.series.map((series, index) => (
-              <Bar
-                key={index}
-                dataKey={series.name}
-                fill={getSeriesColor(series, index)}
-              />
-            ))}
-          </BarChart>
-        );
+    // For all chart types, map each series to separate chart components
+    const chartComponents = data.series.map((series, index) => {
+      const color = getSeriesColor(series, index);
 
-      case ChartType.AREA:
-        return (
-          <AreaChart {...commonProps}>
-            <CartesianGrid strokeDasharray={CHART_CONSTANTS.STROKE_DASHARRAY} />
-            <XAxis
-              dataKey="date"
-              tickFormatter={(value: string) =>
-                formatDateForChart(value, locale)
-              }
+      switch (chartType) {
+        case ChartType.BAR:
+          return (
+            <Bar
+              key={index}
+              data={chartData}
+              x="date"
+              y={series.name}
+              style={{ data: { fill: color } }}
             />
-            <YAxis scale="log" domain={["dataMin", "dataMax"]} />
-            <Tooltip
-              labelFormatter={(value: string) =>
-                formatDateForTooltip(value, locale)
-              }
-              formatter={(value: number, name: string) => [
-                value.toLocaleString(),
-                name,
-              ]}
+          );
+        case ChartType.AREA:
+          return (
+            <Area
+              key={index}
+              data={chartData}
+              x="date"
+              y={series.name}
+              interpolation="monotoneX"
+              style={{
+                data: { fill: color, fillOpacity: 0.6, stroke: color },
+              }}
             />
-            {data.series.map((series, index) => (
-              <Area
-                key={index}
-                type="monotone"
-                dataKey={series.name}
-                stackId="1"
-                stroke={getSeriesColor(series, index)}
-                fill={getSeriesColor(series, index)}
-                fillOpacity={0.6}
-              />
-            ))}
-          </AreaChart>
-        );
+          );
+        default:
+          return (
+            <Line
+              key={index}
+              data={chartData}
+              x="date"
+              y={series.name}
+              interpolation="monotoneX"
+              style={{ data: { stroke: color, strokeWidth: 2 } }}
+            />
+          );
+      }
+    });
 
-      default:
-        return (
-          <LineChart {...commonProps}>
-            <CartesianGrid strokeDasharray={CHART_CONSTANTS.STROKE_DASHARRAY} />
-            <XAxis
-              dataKey="date"
-              tickFormatter={(value: string) =>
-                formatDateForChart(value, locale)
-              }
-            />
-            <YAxis scale="log" domain={["dataMin", "dataMax"]} />
-            <Tooltip
-              labelFormatter={(value: string) =>
-                formatDateForTooltip(value, locale)
-              }
-              formatter={(value: number, name: string) => [
-                value.toLocaleString(),
-                name,
-              ]}
-            />
-            {data.series.map((series, index) => (
-              <Line
-                key={index}
-                type="monotone"
-                dataKey={series.name}
-                stroke={getSeriesColor(series, index)}
-                strokeWidth={2}
-                dot={{ r: 4 }}
-              />
-            ))}
-          </LineChart>
-        );
-    }
+    return (
+      <Chart {...commonProps}>
+        <Axis
+          tickFormat={(t: number | string) => {
+            return typeof t === "string"
+              ? formatDateForChart(t, locale)
+              : String(t);
+          }}
+        />
+        <Axis
+          dependentAxis
+          tickFormat={(value: number | string) => {
+            const val =
+              typeof value === "string" ? Number.parseFloat(value) : value;
+            if (val >= 1000) {
+              return `${(val / 1000).toFixed(1)}K`;
+            }
+            return val.toString();
+          }}
+        />
+        {chartComponents}
+      </Chart>
+    );
   };
 
   return (
@@ -237,16 +199,16 @@ export function EmailStatsChart({
         )}
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width={CHART_CONSTANTS.FULL_WIDTH} height={height}>
+        <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>
           {renderChart()}
-        </ResponsiveContainer>
+        </Div>
       </CardContent>
     </Card>
   );
 }
 
 /**
- * Transform chart data for recharts format
+ * Transform chart data for Victory charts format
  */
 interface ChartDataPoint {
   date: string;
@@ -275,7 +237,7 @@ function transformDataForChart(data: ChartDataType): ChartDataPoint[] {
   // Sort dates
   const sortedDates = [...allDates].toSorted();
 
-  // Transform to recharts format
+  // Transform to Victory charts format
   return sortedDates.map((date) => {
     const dataPoint: ChartDataPoint = { date };
 
@@ -318,21 +280,3 @@ function formatDateForChart(
   }
 }
 
-/**
- * Format date for tooltip display
- */
-function formatDateForTooltip(
-  dateString: string,
-  locale: CountryLanguage,
-): string {
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(locale, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  } catch {
-    return dateString;
-  }
-}

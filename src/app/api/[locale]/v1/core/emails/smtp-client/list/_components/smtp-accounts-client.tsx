@@ -18,6 +18,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
@@ -141,10 +142,11 @@ export function SmtpAccountsClient({
             </Span>
           </Div>
 
-          <Div className="flex flex-col gap-4">
-            <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {/* Search Field */}
-              <EndpointFormField
+          <Form form={smtpAccountsEndpoint.read?.form}>
+            <Div className="flex flex-col gap-4">
+              <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {/* Search Field */}
+                <EndpointFormField
                 name="search"
                 config={{
                   type: "text",
@@ -303,6 +305,7 @@ export function SmtpAccountsClient({
               </Div>
             </Div>
           </Div>
+          </Form>
         </Div>
 
         {/* SMTP Accounts Content - List or Table View */}

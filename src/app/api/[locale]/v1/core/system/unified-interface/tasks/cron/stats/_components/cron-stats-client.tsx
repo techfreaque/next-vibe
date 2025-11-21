@@ -413,7 +413,6 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             {/* Execution Trends */}
             {stats?.historicalData && (
               <CronStatsChart
-                locale={locale}
                 data={{
                   totalExecutions: stats.historicalData.totalExecutions,
                   successfulExecutions:
@@ -429,7 +428,6 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             {/* Success Rate Trends */}
             {stats?.historicalData && (
               <CronStatsChart
-                locale={locale}
                 data={{
                   successRate: stats.historicalData.successRate,
                   failureRate: stats.historicalData.failureRate,
@@ -497,7 +495,6 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             {/* Execution Time Trends */}
             {stats?.historicalData && (
               <CronStatsChart
-                locale={locale}
                 data={{
                   avgExecutionTime: stats.historicalData.avgExecutionTime,
                   medianExecutionTime: stats.historicalData.medianExecutionTime,
@@ -514,7 +511,6 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             {/* System Load Chart */}
             {stats?.historicalData && (
               <CronStatsChart
-                locale={locale}
                 data={{
                   systemLoad: stats.historicalData.systemLoad,
                   queueSize: stats.historicalData.queueSize,
@@ -528,7 +524,6 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
             {/* Task Health Chart */}
             {stats?.historicalData && (
               <CronStatsChart
-                locale={locale}
                 data={{
                   healthyTasks: stats.historicalData.healthyTasks,
                   activeTasks: stats.historicalData.activeTasks,

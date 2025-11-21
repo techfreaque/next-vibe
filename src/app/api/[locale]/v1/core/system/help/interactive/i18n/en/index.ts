@@ -1,22 +1,29 @@
 export default {
   post: {
-    summary: "Start Interactive Mode",
-    description: "Launch interactive command-line interface for exploring available commands",
-    response: {
-      success: {
-        title: "Interactive Mode Started",
-        description: "Interactive mode is now active",
-      },
+    title: "Interactive Mode",
+    description: "Start interactive file explorer mode for navigating and executing routes",
+    category: "System Help",
+    tags: {
+      system: "system",
+      help: "help",
     },
-    errors: {
-      unauthorized: {
-        title: "Authentication Required",
-        description: "You must be authenticated to use interactive mode",
-      },
-      server_error: {
-        title: "Failed to Start",
-        description: "Could not start interactive mode",
-      },
+    summary: "Start interactive mode",
+  },
+  response: {
+    started: "Interactive mode started successfully",
+  },
+  errors: {
+    unauthorized: {
+      title: "Unauthorized",
+      description: "Authentication required for interactive mode",
     },
+    server: {
+      title: "Server Error",
+      description: "Failed to start interactive mode",
+    },
+  },
+  success: {
+    title: "Success",
+    description: "Interactive mode started successfully",
   },
 };

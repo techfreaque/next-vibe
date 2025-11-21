@@ -119,12 +119,16 @@ export function useApiQueryForm<
   const debounceTimerRef = useRef<number | null>(null);
 
   // Get query params reactively using a memoized selector with stable default
+  // Use formOptions.defaultValues as the default query params instead of empty object
   const defaultQueryParams = useMemo(
     () =>
-      ({}) as ExtractOutput<
+      (restFormOptions.defaultValues as ExtractOutput<
         InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-      >,
-    [],
+      >) ||
+      ({} as ExtractOutput<
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+      >),
+    [restFormOptions.defaultValues],
   );
   const queryParamsSelector = useMemo(
     () =>

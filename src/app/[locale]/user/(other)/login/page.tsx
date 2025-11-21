@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: "app.user.other.login.meta.ogTitle",
         description: "app.user.other.login.meta.ogDescription",
-        url: `${translations.websiteUrl}/${locale}/login`,
+        url: `${translations.websiteUrl}/${locale}/user/login`,
         type: "website",
         images: [
           {

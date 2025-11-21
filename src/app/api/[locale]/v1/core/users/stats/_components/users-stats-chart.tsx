@@ -16,18 +16,12 @@ import { H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
+  Chart,
   Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+  Bar,
+  Area,
+  Axis,
+} from "next-vibe-ui/ui/chart";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -220,7 +214,7 @@ export function UsersStatsChart({
       visible: visibleSeries[series.name] || false,
     })) || [];
 
-  // Transform data for recharts
+  // Transform data for Victory charts
   const chartData =
     data.series[0]?.data.map((point, index) => {
       const dataPoint: Record<string, number | string> = {
@@ -239,152 +233,79 @@ export function UsersStatsChart({
       return dataPoint;
     }) || [];
 
-  // Custom tooltip component
-  const CustomTooltip = ({
-    active,
-    payload,
-    label,
-  }: {
-    active?: boolean;
-    payload?: Array<{
-      name: string;
-      value: number;
-      color: string;
-    }>;
-    label?: string;
-  }): JSX.Element | null => {
-    if (active && payload?.length) {
-      return (
-        <Div className="bg-background border border-border rounded-lg shadow-lg p-3 dark:bg-popover dark:border-border">
-          <P className="font-medium text-foreground mb-2">{label}</P>
-          {payload.map((entry, index: number) => {
-            // Find the series data to get translation parameters
-            const seriesData = data?.series?.find(
-              (series) => series.name === entry.name,
-            );
-            const translatedName = seriesData
-              ? t(seriesData.name, seriesData.nameParams)
-              : entry.name;
-
-            return (
-              <P key={index} style={{ color: entry.color }}>
-                <P className="text-sm">
-                  {`${translatedName}: ${new Intl.NumberFormat(language).format(entry.value)}`}
-                </P>
-              </P>
-            );
-          })}
-        </Div>
-      );
-    }
-    return null;
-  };
 
   // Determine chart type
   const chartType: ChartType = data.chartType || ChartType.LINE;
 
   const renderChart = (): JSX.Element => {
     const commonProps = {
-      data: chartData,
-      margin: { top: 5, right: 30, left: 20, bottom: 5 },
+      height,
+      width: 600,
+      padding: { top: 5, right: 30, left: 50, bottom: 40 },
     };
 
-    const commonAxisProps = {
-      tick: { fontSize: 12 },
-      tickLine: { stroke: "hsl(var(--border))" },
-      axisLine: { stroke: "hsl(var(--border))" },
-    };
+    const chartComponents = visibleSeriesData.map((series, index) => {
+      const color =
+        series.color ||
+        CHART_CONSTANTS.DEFAULT_COLORS[
+          index % CHART_CONSTANTS.DEFAULT_COLORS.length
+        ];
 
-    switch (chartType) {
-      case ChartType.BAR:
-        return (
-          <BarChart {...commonProps}>
-            <CartesianGrid
-              strokeDasharray={CHART_CONSTANTS.STROKE_DASHARRAY}
-              stroke="hsl(var(--border))"
+      switch (chartType) {
+        case ChartType.BAR:
+          return (
+            <Bar
+              key={series.name}
+              data={chartData}
+              x="date"
+              y={series.name}
+              style={{ data: { fill: color } }}
             />
-            <XAxis dataKey="date" {...commonAxisProps} />
-            <YAxis {...commonAxisProps} />
-            <Tooltip content={<CustomTooltip />} />
-            {visibleSeriesData.map((series, index) => (
-              <Bar
-                key={series.name}
-                dataKey={series.name}
-                fill={
-                  series.color ||
-                  CHART_CONSTANTS.DEFAULT_COLORS[
-                    index % CHART_CONSTANTS.DEFAULT_COLORS.length
-                  ]
-                }
-                radius={[2, 2, 0, 0]}
-              />
-            ))}
-          </BarChart>
-        );
+          );
+        case ChartType.AREA:
+          return (
+            <Area
+              key={series.name}
+              data={chartData}
+              x="date"
+              y={series.name}
+              interpolation="monotoneX"
+              style={{
+                data: { fill: color, fillOpacity: 0.3, stroke: color, strokeWidth: 2 },
+              }}
+            />
+          );
+        default:
+          return (
+            <Line
+              key={series.name}
+              data={chartData}
+              x="date"
+              y={series.name}
+              interpolation="monotoneX"
+              style={{ data: { stroke: color, strokeWidth: 2 } }}
+            />
+          );
+      }
+    });
 
-      case ChartType.AREA:
-        return (
-          <AreaChart {...commonProps}>
-            <CartesianGrid
-              strokeDasharray={CHART_CONSTANTS.STROKE_DASHARRAY}
-              stroke="hsl(var(--border))"
-            />
-            <XAxis dataKey="date" {...commonAxisProps} />
-            <YAxis {...commonAxisProps} />
-            <Tooltip content={<CustomTooltip />} />
-            {visibleSeriesData.map((series, index) => (
-              <Area
-                key={series.name}
-                type="monotone"
-                dataKey={series.name}
-                stroke={
-                  series.color ||
-                  CHART_CONSTANTS.DEFAULT_COLORS[
-                    index % CHART_CONSTANTS.DEFAULT_COLORS.length
-                  ]
-                }
-                fill={
-                  series.color ||
-                  CHART_CONSTANTS.DEFAULT_COLORS[
-                    index % CHART_CONSTANTS.DEFAULT_COLORS.length
-                  ]
-                }
-                fillOpacity={0.3}
-                strokeWidth={2}
-              />
-            ))}
-          </AreaChart>
-        );
-
-      default: // LINE
-        return (
-          <LineChart {...commonProps}>
-            <CartesianGrid
-              strokeDasharray={CHART_CONSTANTS.STROKE_DASHARRAY}
-              stroke="hsl(var(--border))"
-            />
-            <XAxis dataKey="date" {...commonAxisProps} />
-            <YAxis {...commonAxisProps} />
-            <Tooltip content={<CustomTooltip />} />
-            {visibleSeriesData.map((series, index) => (
-              <Line
-                key={series.name}
-                type="monotone"
-                dataKey={series.name}
-                stroke={
-                  series.color ||
-                  CHART_CONSTANTS.DEFAULT_COLORS[
-                    index % CHART_CONSTANTS.DEFAULT_COLORS.length
-                  ]
-                }
-                strokeWidth={2}
-                dot={{ r: 4 }}
-                activeDot={{ r: 6 }}
-              />
-            ))}
-          </LineChart>
-        );
-    }
+    return (
+      <Chart {...commonProps}>
+        <Axis />
+        <Axis
+          dependentAxis
+          tickFormat={(value: number | string) => {
+            const val =
+              typeof value === "string" ? Number.parseFloat(value) : value;
+            if (val >= 1000) {
+              return `${(val / 1000).toFixed(1)}K`;
+            }
+            return val.toString();
+          }}
+        />
+        {chartComponents}
+      </Chart>
+    );
   };
 
   return (
@@ -398,9 +319,9 @@ export function UsersStatsChart({
         )}
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width={CHART_CONSTANTS.FULL_WIDTH} height={height}>
+        <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>
           {renderChart()}
-        </ResponsiveContainer>
+        </Div>
         {legendData.length > 0 && (
           <ChartLegend
             series={legendData}

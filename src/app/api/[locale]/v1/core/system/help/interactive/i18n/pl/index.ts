@@ -1,22 +1,29 @@
 export default {
   post: {
+    title: "Tryb interaktywny",
+    description: "Uruchom interaktywny tryb eksploratora plików do nawigacji i wykonywania tras",
+    category: "Pomoc systemowa",
+    tags: {
+      system: "system",
+      help: "pomoc",
+    },
     summary: "Uruchom tryb interaktywny",
-    description: "Uruchom interaktywny interfejs wiersza poleceń do przeglądania dostępnych poleceń",
-    response: {
-      success: {
-        title: "Tryb interaktywny uruchomiony",
-        description: "Tryb interaktywny jest teraz aktywny",
-      },
+  },
+  response: {
+    started: "Tryb interaktywny uruchomiony pomyślnie",
+  },
+  errors: {
+    unauthorized: {
+      title: "Nieautoryzowany",
+      description: "Wymagana autentykacja dla trybu interaktywnego",
     },
-    errors: {
-      unauthorized: {
-        title: "Wymagana autoryzacja",
-        description: "Musisz być uwierzytelniony, aby korzystać z trybu interaktywnego",
-      },
-      server_error: {
-        title: "Nie udało się uruchomić",
-        description: "Nie można uruchomić trybu interaktywnego",
-      },
+    server: {
+      title: "Błąd serwera",
+      description: "Nie udało się uruchomić trybu interaktywnego",
     },
+  },
+  success: {
+    title: "Sukces",
+    description: "Tryb interaktywny uruchomiony pomyślnie",
   },
 };

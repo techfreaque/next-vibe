@@ -203,11 +203,59 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       // Add query parameters to URL for GET requests
       if (requestData && typeof requestData === "object") {
         const searchParams = new URLSearchParams();
-        for (const [key, value] of Object.entries(requestData)) {
-          if (value !== undefined && value !== null) {
-            searchParams.append(key, String(value));
+
+        // Helper function to flatten nested objects into dot notation
+        function flattenObject(
+          obj: Record<string, unknown>,
+          prefix = "",
+        ): void {
+          for (const [key, value] of Object.entries(obj)) {
+            const fullKey = prefix ? `${prefix}.${key}` : key;
+
+            if (value === undefined || value === null) {
+              continue;
+            } else if (Array.isArray(value)) {
+              // Handle arrays
+              if (value.length === 0) {
+                // Empty array - add placeholder
+                searchParams.append(`${fullKey}._placeholder`, "");
+              } else {
+                value.forEach((item, index) => {
+                  if (typeof item === "object" && item !== null) {
+                    flattenObject(
+                      item as Record<string, unknown>,
+                      `${fullKey}[${index}]`,
+                    );
+                  } else {
+                    searchParams.append(`${fullKey}[${index}]`, String(item));
+                  }
+                });
+              }
+            } else if (typeof value === "object") {
+              // Handle nested objects
+              const objEntries = Object.entries(
+                value as Record<string, unknown>,
+              );
+              const hasNonNullValues = objEntries.some(
+                ([, v]) => v !== undefined && v !== null,
+              );
+
+              if (!hasNonNullValues) {
+                // Empty object (all values are undefined/null) - add placeholder
+                searchParams.append(`${fullKey}._placeholder`, "");
+              } else {
+                // Recursively flatten non-empty object
+                flattenObject(value as Record<string, unknown>, fullKey);
+              }
+            } else {
+              // Handle primitives
+              searchParams.append(fullKey, String(value));
+            }
           }
         }
+
+        flattenObject(requestData as Record<string, unknown>);
+
         const queryString = searchParams.toString();
         if (queryString) {
           endpointUrl += `?${queryString}`;

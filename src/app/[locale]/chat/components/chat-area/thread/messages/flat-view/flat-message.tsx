@@ -23,7 +23,7 @@ import {
 import { formatPostNumber } from "@/app/[locale]/chat/lib/utils/post-numbers";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
-import { ModelPersonaSelectorModal } from "../model-persona-selector-modal";
+import { ModelPersonaSelectorBubble } from "../model-persona-selector-modal";
 import { ToolDisplay } from "../tool-display";
 import type { useCollapseState } from "../hooks/use-collapse-state";
 import type { useMessageActions } from "../hooks/use-message-actions";
@@ -319,11 +319,9 @@ export function FlatMessage({
         </Div>
       ) : messageActions.retryingMessageId === message.id ? (
         <Div className="my-2">
-          <ModelPersonaSelectorModal
+          <ModelPersonaSelectorBubble
             titleKey="app.chat.flatView.retryModal.title"
             descriptionKey="app.chat.flatView.retryModal.description"
-
-
             onModelChange={
               onModelChange ||
               ((model: ModelId): void => {
@@ -465,11 +463,9 @@ export function FlatMessage({
       {/* Show Answer-as-AI dialog below the message */}
       {messageActions.answeringMessageId === message.id && (
         <Div className="my-3">
-          <ModelPersonaSelectorModal
+          <ModelPersonaSelectorBubble
             titleKey="app.chat.flatView.answerModal.title"
             descriptionKey="app.chat.flatView.answerModal.description"
-
-
             onModelChange={
               onModelChange ||
               ((model: ModelId): void => {
@@ -601,7 +597,7 @@ export function FlatMessage({
             )}
 
             {/* Answer as AI - For both user and assistant messages */}
-            {(
+            {
               <Button
                 variant="ghost"
                 size="unset"
@@ -617,7 +613,7 @@ export function FlatMessage({
               >
                 [{t("app.chat.flatView.actions.answerAsAI")}]
               </Button>
-            )}
+            }
 
             {/* Copy Link */}
             <Button

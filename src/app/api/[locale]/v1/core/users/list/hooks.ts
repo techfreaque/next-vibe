@@ -6,6 +6,10 @@
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
+import {
+  SortOrder,
+  UserSortField,
+} from "../enum";
 import definitions from "./definition";
 
 /**
@@ -25,7 +29,21 @@ export function useUsersListEndpoint(
         staleTime: 1 * 60 * 1000, // 1 minute
       },
       filterOptions: {
-        initialFilters: undefined,
+        initialFilters: {
+          searchAndPagination: {
+            page: 1,
+            limit: 20,
+            search: undefined,
+          },
+          filters: {
+            status: undefined,
+            role: undefined,
+          },
+          sorting: {
+            sortBy: UserSortField.CREATED_AT,
+            sortOrder: SortOrder.DESC,
+          },
+        },
       },
     },
     logger,

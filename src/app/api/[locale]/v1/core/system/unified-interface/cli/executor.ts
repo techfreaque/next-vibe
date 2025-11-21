@@ -9,6 +9,7 @@ import {
   isStreamingResponse,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -70,8 +71,8 @@ export function createCliHandler<
       endpoint,
       {
         method: endpoint.method,
-        requestData: data,
-        urlParameters: urlPathParams,
+        requestData: data as z.input<typeof endpoint.requestSchema>,
+        urlParameters: urlPathParams as z.input<typeof endpoint.requestUrlPathParamsSchema>,
         locale,
       },
       logger,

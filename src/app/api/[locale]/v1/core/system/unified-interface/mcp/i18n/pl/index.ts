@@ -140,6 +140,38 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  serve: {
+    category: "Serwer MCP",
+    tags: {
+      mcp: "MCP",
+    },
+    post: {
+      title: "Uruchom serwer MCP",
+      description: "Uruchom serwer Model Context Protocol",
+      response: {
+        title: "Status serwera MCP",
+        description: "Status serwera MCP",
+      },
+      errors: {
+        validation: {
+          title: "Walidacja nie powiodła się",
+          description: "Nieprawidłowe parametry żądania",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Nie udało się uruchomić serwera MCP",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagane uwierzytelnienie",
+        },
+      },
+      success: {
+        title: "Sukces",
+        description: "Serwer MCP uruchomiony pomyślnie",
+      },
+    },
+  },
   registry: {
     toolNotFound: "Narzędzie nie znalezione",
     endpointNotFound: "Punkt końcowy nie znaleziony",

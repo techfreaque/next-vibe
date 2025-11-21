@@ -21,7 +21,7 @@ import { ErrorMessageBubble } from "../error-message-bubble";
 import { GroupedAssistantMessage } from "../grouped-assistant-message";
 import { MessageEditor } from "../message-editor";
 import { groupMessagesBySequence } from "../message-grouping";
-import { ModelPersonaSelectorModal } from "../model-persona-selector-modal";
+import { ModelPersonaSelectorBubble } from "../model-persona-selector-modal";
 import { UserMessageBubble } from "../user-message-bubble";
 
 interface LinearMessageViewProps {
@@ -143,11 +143,9 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                 </Div>
               ) : isRetrying ? (
                 <Div className="flex justify-end">
-                  <ModelPersonaSelectorModal
+                  <ModelPersonaSelectorBubble
                     titleKey="app.chat.linearMessageView.retryModal.title"
                     descriptionKey="app.chat.linearMessageView.retryModal.description"
-                    
-                    
                     onModelChange={
                       onModelChange ||
                       ((): void => {
@@ -209,7 +207,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
             {/* Show Answer-as-AI dialog below the message */}
             {isAnswering && (
               <Div className="my-3">
-                <ModelPersonaSelectorModal
+                <ModelPersonaSelectorBubble
                   titleKey="app.chat.linearMessageView.answerModal.title"
                   descriptionKey="app.chat.linearMessageView.answerModal.description"
                   onModelChange={
@@ -264,5 +262,4 @@ export const LinearMessageView = React.memo(function LinearMessageView({
       })}
     </>
   );
-}
-);
+});

@@ -14,20 +14,14 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
+  Chart,
   Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+  Bar,
+  Area,
+  Axis,
+} from "next-vibe-ui/ui/chart";
 
 import {
   type LeadSourceValues,
@@ -40,19 +34,6 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import { getLanguageFromLocale } from "@/i18n/core/translation-utils";
 
 import { LeadsSourceLegend } from "./leads-source-legend";
-
-// Type for YAxis props
-interface YAxisProps {
-  tick: { fontSize: number; fill: string };
-  tickLine: { stroke: string };
-  axisLine: { stroke: string };
-  scale: "log";
-  domain: [number, number] | ["dataMin", "dataMax"] | [number, "dataMax"];
-  allowDataOverflow: boolean;
-  tickCount?: number;
-  ticks?: number[];
-  tickFormatter?: (value: number) => string;
-}
 
 // Chart constants
 const CHART_CONSTANTS = {
@@ -249,7 +230,7 @@ export function LeadsStatsChart({
   // Create a map to store original values for tooltip display
   const originalValuesMap = new Map<string, Record<string, number>>();
 
-  // Transform data for recharts with log scale handling
+  // Transform data for Victory charts with log scale handling
   const chartData =
     data?.series?.[0]?.data.map((point, index) => {
       const dataPoint: Record<string, number | string> = {
@@ -322,195 +303,92 @@ export function LeadsStatsChart({
       })
     : [];
 
-  // Custom tooltip component
-  const CustomTooltip = ({
-    active,
-    payload,
-    label,
-  }: {
-    active?: boolean;
-    payload?: Array<{
-      name: string;
-      value: number;
-      color: string;
-      payload?: Record<string, number | string>;
-    }>;
-    label?: string;
-  }): JSX.Element | null => {
-    if (active && payload?.length) {
-      // Find the original values for this date point
-      const dateValue = payload[0]?.payload?.dateValue as string;
-      const originalValues = dateValue
-        ? originalValuesMap.get(dateValue)
-        : undefined;
-
-      return (
-        <Div className="bg-background border border-border rounded-lg shadow-lg p-3 dark:bg-popover dark:border-border">
-          <P className="font-medium text-foreground mb-2">{label}</P>
-          {payload.map((entry, index: number) => {
-            // Find the series data to get translation parameters
-            const seriesData = data?.series?.find(
-              (series) => series.name === entry.name,
-            );
-            const translatedName = seriesData
-              ? t(seriesData.name, seriesData.nameParams)
-              : entry.name;
-
-            // Use original value if available, otherwise use the display value
-            const originalValue = originalValues?.[entry.name];
-            const displayValue =
-              originalValue !== undefined ? originalValue : entry.value;
-
-            return (
-              <P key={index} style={{ color: entry.color }}>
-                <P className="text-sm">
-                  {`${translatedName}: ${new Intl.NumberFormat(locale.split("-")[0]).format(displayValue)}`}
-                </P>
-              </P>
-            );
-          })}
-        </Div>
-      );
-    }
-    return null;
-  };
 
   // Determine chart type
   const chartType: ChartType = data.chartType || ChartType.LINE;
 
   const renderChart = (): JSX.Element => {
     const commonProps = {
-      data: chartData,
-      margin: { top: 5, right: 30, left: 20, bottom: 5 },
+      height,
+      width: 600,
+      padding: { top: 5, right: 30, left: 50, bottom: 40 },
     };
 
-    const commonAxisProps = {
-      tick: { fontSize: 12, fill: "hsl(var(--foreground))" },
-      tickLine: { stroke: "hsl(var(--border))" },
-      axisLine: { stroke: "hsl(var(--border))" },
-    };
+    const formatYAxis = React.useCallback((value: number | string): string => {
+      const val = typeof value === "string" ? Number.parseFloat(value) : value;
+      if (val >= 1000000) {
+        return `${(val / 1000000).toFixed(1)}M`;
+      }
+      if (val >= 1000) {
+        return `${(val / 1000).toFixed(1)}K`;
+      }
+      if (val >= 1) {
+        return Math.round(val).toString();
+      }
+      if (val === 0.000001) {
+        return "0";
+      }
+      if (val >= 0.1) {
+        return val.toFixed(1);
+      }
+      if (val >= 0.01) {
+        return val.toFixed(2);
+      }
+      return val.toFixed(3);
+    }, []);
 
-    // Log scale that handles 0 values properly and divides into thirds
-    const getYAxisProps = (): YAxisProps => {
-      return {
-        ...commonAxisProps,
-        scale: "log" as const,
-        domain: [0.000001, "dataMax"] as const,
-        allowDataOverflow: false,
-        tickFormatter: (value: number): string => {
-          if (value >= 1000000) {
-            return `${(value / 1000000).toFixed(1)}M`;
-          }
-          if (value >= 1000) {
-            return `${(value / 1000).toFixed(1)}K`;
-          }
-          if (value >= 1) {
-            return Math.round(value).toString();
-          }
-          if (value === 0.000001) {
-            return "0"; // Show 0 for our converted zero values
-          }
-          if (value >= 0.1) {
-            return value.toFixed(1);
-          }
-          if (value >= 0.01) {
-            return value.toFixed(2);
-          }
-          return value.toFixed(3);
-        },
-      };
-    };
+    const chartComponents = activeSeries.map((series, index) => {
+      const color =
+        series.color ||
+        CHART_CONSTANTS.DEFAULT_COLORS[
+          index % CHART_CONSTANTS.DEFAULT_COLORS.length
+        ];
 
-    switch (chartType) {
-      case ChartType.BAR:
-        return (
-          <BarChart {...commonProps}>
-            <CartesianGrid
-              strokeDasharray={CHART_CONSTANTS.STROKE_DASHARRAY}
-              stroke="hsl(var(--border))"
+      switch (chartType) {
+        case ChartType.BAR:
+          return (
+            <Bar
+              key={series.name}
+              data={chartData}
+              x="date"
+              y={series.name}
+              style={{ data: { fill: color } }}
             />
-            <XAxis dataKey="date" {...commonAxisProps} />
-            <YAxis {...getYAxisProps()} />
-            <Tooltip content={<CustomTooltip />} />
-            {activeSeries.map((series, index) => (
-              <Bar
-                key={series.name}
-                dataKey={series.name}
-                fill={
-                  series.color ||
-                  CHART_CONSTANTS.DEFAULT_COLORS[
-                    index % CHART_CONSTANTS.DEFAULT_COLORS.length
-                  ]
-                }
-                radius={[2, 2, 0, 0]}
-              />
-            ))}
-          </BarChart>
-        );
-
-      case ChartType.AREA:
-        return (
-          <AreaChart {...commonProps}>
-            <CartesianGrid
-              strokeDasharray={CHART_CONSTANTS.STROKE_DASHARRAY}
-              stroke="hsl(var(--border))"
+          );
+        case ChartType.AREA:
+          return (
+            <Area
+              key={series.name}
+              data={chartData}
+              x="date"
+              y={series.name}
+              interpolation="monotoneX"
+              style={{
+                data: { fill: color, fillOpacity: 0.3, stroke: color, strokeWidth: 2 },
+              }}
             />
-            <XAxis dataKey="date" {...commonAxisProps} />
-            <YAxis {...getYAxisProps()} />
-            <Tooltip content={<CustomTooltip />} />
-            {activeSeries.map((series, index) => (
-              <Area
-                key={series.name}
-                type="monotone"
-                dataKey={series.name}
-                stroke={
-                  series.color ||
-                  CHART_CONSTANTS.DEFAULT_COLORS[
-                    index % CHART_CONSTANTS.DEFAULT_COLORS.length
-                  ]
-                }
-                fill={
-                  series.color ||
-                  CHART_CONSTANTS.DEFAULT_COLORS[
-                    index % CHART_CONSTANTS.DEFAULT_COLORS.length
-                  ]
-                }
-                fillOpacity={0.3}
-                strokeWidth={2}
-              />
-            ))}
-          </AreaChart>
-        );
-
-      default: // LINE
-        return (
-          <LineChart {...commonProps}>
-            <CartesianGrid
-              strokeDasharray={CHART_CONSTANTS.STROKE_DASHARRAY}
-              stroke="hsl(var(--border))"
+          );
+        default:
+          return (
+            <Line
+              key={series.name}
+              data={chartData}
+              x="date"
+              y={series.name}
+              interpolation="monotoneX"
+              style={{ data: { stroke: color, strokeWidth: 2 } }}
             />
-            <XAxis dataKey="date" {...commonAxisProps} />
-            <YAxis {...getYAxisProps()} />
-            <Tooltip content={<CustomTooltip />} />
-            {activeSeries.map((series, index) => (
-              <Line
-                key={series.name}
-                type="monotone"
-                dataKey={series.name}
-                stroke={
-                  series.color ||
-                  CHART_CONSTANTS.DEFAULT_COLORS[
-                    index % CHART_CONSTANTS.DEFAULT_COLORS.length
-                  ]
-                }
-                strokeWidth={2}
-                dot={{ r: 4 }}
-                activeDot={{ r: 6 }}
-              />
-            ))}
-          </LineChart>
-        );
-    }
+          );
+      }
+    });
+
+    return (
+      <Chart {...commonProps}>
+        <Axis />
+        <Axis dependentAxis tickFormat={formatYAxis} />
+        {chartComponents}
+      </Chart>
+    );
   };
 
   return (
@@ -526,12 +404,9 @@ export function LeadsStatsChart({
           )}
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer
-            width={CHART_CONSTANTS.FULL_WIDTH}
-            height={height}
-          >
+          <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>
             {renderChart()}
-          </ResponsiveContainer>
+          </Div>
           {legendData.length > 0 && (
             <Div className="border-t">
               <Div className="flex items-center justify-between p-4 border-b">

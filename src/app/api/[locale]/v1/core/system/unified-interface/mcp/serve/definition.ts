@@ -49,6 +49,7 @@ const { POST } = createEndpoint({
       status: responseField(
         {
           type: WidgetType.TEXT,
+          content: "app.api.v1.core.system.unifiedInterface.mcp.serve.post.response.title",
         },
         z.string(),
       ),
@@ -63,7 +64,7 @@ const { POST } = createEndpoint({
       description:
         "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.validation.description",
     },
-    [EndpointErrorTypes.SERVER_ERROR]: {
+    [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
         "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.server.title",
       description:
@@ -74,6 +75,42 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.unauthorized.title",
       description:
         "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title:
+        "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.unauthorized.title",
+      description:
+        "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title:
+        "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.server.title",
+      description:
+        "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.server.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title:
+        "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.server.title",
+      description:
+        "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title:
+        "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.server.title",
+      description:
+        "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.server.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title:
+        "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.server.title",
+      description:
+        "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.server.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title:
+        "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.server.title",
+      description:
+        "app.api.v1.core.system.unifiedInterface.mcp.serve.post.errors.server.description",
     },
   },
 

@@ -10,6 +10,7 @@ import { cn } from "next-vibe/shared/utils";
 import { Link } from "next-vibe-ui/ui/link";
 import { Div } from "next-vibe-ui/ui/div";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
@@ -219,343 +220,348 @@ export function LeadsListClient({
             </Span>
           </Div>
 
-          <Div className="flex flex-col gap-4">
-            <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {/* Search Field */}
-              <EndpointFormField
-                name="searchPagination.search"
-                config={{
-                  type: "text",
-                  label: undefined,
-                  placeholder: "app.admin.leads.leads.search.placeholder",
-                }}
-                control={leadsEndpoint.read.form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
+          <Form form={leadsEndpoint.read.form}>
+            <Div className="flex flex-col gap-4">
+              <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {/* Search Field */}
+                <EndpointFormField
+                  name="searchPagination.search"
+                  config={{
+                    type: "text",
+                    label: undefined,
+                    placeholder: "app.admin.leads.leads.search.placeholder",
+                  }}
+                  control={leadsEndpoint.read.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
 
-              {/* Status Filter */}
-              <EndpointFormField
-                name="statusFilters.status"
-                config={{
-                  type: "select",
-                  label: undefined,
-                  placeholder: "app.admin.leads.leads.filter.status",
-                  options: [
-                    {
-                      value: LeadStatusFilter.ALL,
-                      label: "app.admin.leads.leads.filter.all_statuses",
-                    },
-                    {
-                      value: LeadStatusFilter.NEW,
-                      label: "app.admin.leads.leads.admin.status.new",
-                    },
-                    {
-                      value: LeadStatusFilter.PENDING,
-                      label: "app.admin.leads.leads.admin.status.pending",
-                    },
-                    {
-                      value: LeadStatusFilter.CAMPAIGN_RUNNING,
-                      label:
-                        "app.admin.leads.leads.admin.status.campaign_running",
-                    },
-                    {
-                      value: LeadStatusFilter.WEBSITE_USER,
-                      label: "app.admin.leads.leads.admin.status.website_user",
-                    },
-                    {
-                      value: LeadStatusFilter.NEWSLETTER_SUBSCRIBER,
-                      label:
-                        "app.admin.leads.leads.admin.status.newsletter_subscriber",
-                    },
-                    {
-                      value: LeadStatusFilter.IN_CONTACT,
-                      label: "app.admin.leads.leads.admin.status.in_contact",
-                    },
-                    {
-                      value: LeadStatusFilter.SIGNED_UP,
-                      label: "app.admin.leads.leads.admin.status.signed_up",
-                    },
-                    {
-                      value: LeadStatusFilter.CONSULTATION_BOOKED,
-                      label:
-                        "app.admin.leads.leads.admin.status.consultation_booked",
-                    },
-                    {
-                      value: LeadStatusFilter.SUBSCRIPTION_CONFIRMED,
-                      label:
-                        "app.admin.leads.leads.admin.status.subscription_confirmed",
-                    },
-                    {
-                      value: LeadStatusFilter.UNSUBSCRIBED,
-                      label: "app.admin.leads.leads.admin.status.unsubscribed",
-                    },
-                    {
-                      value: LeadStatusFilter.BOUNCED,
-                      label: "app.admin.leads.leads.admin.status.bounced",
-                    },
-                    {
-                      value: LeadStatusFilter.INVALID,
-                      label: "app.admin.leads.leads.admin.status.invalid",
-                    },
-                  ],
-                }}
-                control={leadsEndpoint.read.form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
+                {/* Status Filter */}
+                <EndpointFormField
+                  name="statusFilters.status"
+                  config={{
+                    type: "select",
+                    label: undefined,
+                    placeholder: "app.admin.leads.leads.filter.status",
+                    options: [
+                      {
+                        value: LeadStatusFilter.ALL,
+                        label: "app.admin.leads.leads.filter.all_statuses",
+                      },
+                      {
+                        value: LeadStatusFilter.NEW,
+                        label: "app.admin.leads.leads.admin.status.new",
+                      },
+                      {
+                        value: LeadStatusFilter.PENDING,
+                        label: "app.admin.leads.leads.admin.status.pending",
+                      },
+                      {
+                        value: LeadStatusFilter.CAMPAIGN_RUNNING,
+                        label:
+                          "app.admin.leads.leads.admin.status.campaign_running",
+                      },
+                      {
+                        value: LeadStatusFilter.WEBSITE_USER,
+                        label:
+                          "app.admin.leads.leads.admin.status.website_user",
+                      },
+                      {
+                        value: LeadStatusFilter.NEWSLETTER_SUBSCRIBER,
+                        label:
+                          "app.admin.leads.leads.admin.status.newsletter_subscriber",
+                      },
+                      {
+                        value: LeadStatusFilter.IN_CONTACT,
+                        label: "app.admin.leads.leads.admin.status.in_contact",
+                      },
+                      {
+                        value: LeadStatusFilter.SIGNED_UP,
+                        label: "app.admin.leads.leads.admin.status.signed_up",
+                      },
+                      {
+                        value: LeadStatusFilter.CONSULTATION_BOOKED,
+                        label:
+                          "app.admin.leads.leads.admin.status.consultation_booked",
+                      },
+                      {
+                        value: LeadStatusFilter.SUBSCRIPTION_CONFIRMED,
+                        label:
+                          "app.admin.leads.leads.admin.status.subscription_confirmed",
+                      },
+                      {
+                        value: LeadStatusFilter.UNSUBSCRIBED,
+                        label:
+                          "app.admin.leads.leads.admin.status.unsubscribed",
+                      },
+                      {
+                        value: LeadStatusFilter.BOUNCED,
+                        label: "app.admin.leads.leads.admin.status.bounced",
+                      },
+                      {
+                        value: LeadStatusFilter.INVALID,
+                        label: "app.admin.leads.leads.admin.status.invalid",
+                      },
+                    ],
+                  }}
+                  control={leadsEndpoint.read.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
 
-              {/* Campaign Stage Filter */}
-              <EndpointFormField
-                name="statusFilters.currentCampaignStage"
-                config={{
-                  type: "select",
-                  label: undefined,
-                  placeholder: "app.admin.leads.leads.filter.campaign_stage",
-                  options: [
-                    {
-                      value: EmailCampaignStageFilter.ALL,
-                      label:
-                        "app.admin.leads.leads.admin.filters.campaign_stage.all",
-                    },
-                    {
-                      value: EmailCampaignStageFilter.INITIAL,
-                      label: "app.admin.leads.leads.admin.stage.initial",
-                    },
-                    {
-                      value: EmailCampaignStageFilter.FOLLOWUP_1,
-                      label: "app.admin.leads.leads.admin.stage.followup_1",
-                    },
-                    {
-                      value: EmailCampaignStageFilter.FOLLOWUP_2,
-                      label: "app.admin.leads.leads.admin.stage.followup_2",
-                    },
-                    {
-                      value: EmailCampaignStageFilter.FOLLOWUP_3,
-                      label: "app.admin.leads.leads.admin.stage.followup_3",
-                    },
-                    {
-                      value: EmailCampaignStageFilter.NURTURE,
-                      label: "app.admin.leads.leads.admin.stage.nurture",
-                    },
-                  ],
-                }}
-                control={leadsEndpoint.read.form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
+                {/* Campaign Stage Filter */}
+                <EndpointFormField
+                  name="statusFilters.currentCampaignStage"
+                  config={{
+                    type: "select",
+                    label: undefined,
+                    placeholder: "app.admin.leads.leads.filter.campaign_stage",
+                    options: [
+                      {
+                        value: EmailCampaignStageFilter.ALL,
+                        label:
+                          "app.admin.leads.leads.admin.filters.campaign_stage.all",
+                      },
+                      {
+                        value: EmailCampaignStageFilter.INITIAL,
+                        label: "app.admin.leads.leads.admin.stage.initial",
+                      },
+                      {
+                        value: EmailCampaignStageFilter.FOLLOWUP_1,
+                        label: "app.admin.leads.leads.admin.stage.followup_1",
+                      },
+                      {
+                        value: EmailCampaignStageFilter.FOLLOWUP_2,
+                        label: "app.admin.leads.leads.admin.stage.followup_2",
+                      },
+                      {
+                        value: EmailCampaignStageFilter.FOLLOWUP_3,
+                        label: "app.admin.leads.leads.admin.stage.followup_3",
+                      },
+                      {
+                        value: EmailCampaignStageFilter.NURTURE,
+                        label: "app.admin.leads.leads.admin.stage.nurture",
+                      },
+                    ],
+                  }}
+                  control={leadsEndpoint.read.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
 
-              {/* Country Filter */}
-              <EndpointFormField
-                name="locationFilters.country"
-                config={{
-                  type: "select",
-                  label: undefined,
-                  placeholder: "app.admin.leads.leads.filter.country",
-                  options: [
-                    {
-                      value: CountryFilter.ALL,
-                      label: "app.admin.leads.leads.filter.all_countries",
-                    },
-                    ...CountryFilterOptions.slice(1), // Skip the "ALL" option since we have a custom one above
-                  ],
-                }}
-                control={leadsEndpoint.read.form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
+                {/* Country Filter */}
+                <EndpointFormField
+                  name="locationFilters.country"
+                  config={{
+                    type: "select",
+                    label: undefined,
+                    placeholder: "app.admin.leads.leads.filter.country",
+                    options: [
+                      {
+                        value: CountryFilter.ALL,
+                        label: "app.admin.leads.leads.filter.all_countries",
+                      },
+                      ...CountryFilterOptions.slice(1), // Skip the "ALL" option since we have a custom one above
+                    ],
+                  }}
+                  control={leadsEndpoint.read.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+              </Div>
+
+              {/* Second row of filters */}
+              <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {/* Language Filter */}
+                <EndpointFormField
+                  name="locationFilters.language"
+                  config={{
+                    type: "select",
+                    label: undefined,
+                    placeholder: "app.admin.leads.leads.filter.language",
+                    options: LanguageFilterOptions,
+                  }}
+                  control={leadsEndpoint.read.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+
+                {/* Source Filter */}
+                <EndpointFormField
+                  name="statusFilters.source"
+                  config={{
+                    type: "select",
+                    label: undefined,
+                    placeholder: "app.admin.leads.leads.filter.source",
+                    options: [
+                      {
+                        value: LeadSourceFilter.ALL,
+                        label: "app.admin.leads.leads.filter.all_sources",
+                      },
+                      {
+                        value: LeadSourceFilter.WEBSITE,
+                        label: "app.admin.leads.leads.filter.sources.website",
+                      },
+                      {
+                        value: LeadSourceFilter.REFERRAL,
+                        label: "app.admin.leads.leads.filter.sources.referral",
+                      },
+                      {
+                        value: LeadSourceFilter.SOCIAL_MEDIA,
+                        label:
+                          "app.admin.leads.leads.filter.sources.social_media",
+                      },
+                      {
+                        value: LeadSourceFilter.EMAIL_CAMPAIGN,
+                        label:
+                          "app.admin.leads.leads.filter.sources.email_campaign",
+                      },
+                      {
+                        value: LeadSourceFilter.CSV_IMPORT,
+                        label:
+                          "app.admin.leads.leads.filter.sources.csv_import",
+                      },
+                      {
+                        value: LeadSourceFilter.API,
+                        label: "app.admin.leads.leads.filter.sources.api",
+                      },
+                    ],
+                  }}
+                  control={leadsEndpoint.read.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+
+                {/* Sort By */}
+                <EndpointFormField
+                  name="sortingOptions.sortBy"
+                  config={{
+                    type: "select",
+                    label: undefined,
+                    placeholder: "app.admin.leads.leads.sort.placeholder",
+                    options: [
+                      {
+                        value: LeadSortField.CREATED_AT,
+                        label: "app.admin.leads.leads.sort.created",
+                      },
+                      {
+                        value: LeadSortField.UPDATED_AT,
+                        label: "app.admin.leads.leads.sort.updated",
+                      },
+                      {
+                        value: LeadSortField.EMAIL,
+                        label: "app.admin.leads.leads.sort.email",
+                      },
+                      {
+                        value: LeadSortField.BUSINESS_NAME,
+                        label: "app.admin.leads.leads.sort.business",
+                      },
+                      {
+                        value: LeadSortField.LAST_ENGAGEMENT_AT,
+                        label: "app.admin.leads.leads.sort.last_engagement",
+                      },
+                    ],
+                  }}
+                  control={leadsEndpoint.read.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+
+                {/* Sort Order */}
+                <EndpointFormField
+                  name="sortingOptions.sortOrder"
+                  config={{
+                    type: "select",
+                    label: undefined,
+                    placeholder: "app.admin.leads.leads.sort.placeholder",
+                    options: [
+                      {
+                        value: SortOrder.DESC,
+                        label: "app.admin.leads.leads.sort.desc",
+                      },
+                      {
+                        value: SortOrder.ASC,
+                        label: "app.admin.leads.leads.sort.asc",
+                      },
+                    ],
+                  }}
+                  control={leadsEndpoint.read.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+              </Div>
+
+              {/* Quick filter buttons */}
+              <Div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                <Span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+                  {t("app.admin.leads.leads.filter.quick_filters")}:
+                </Span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    leadsEndpoint.read.form.setValue("statusFilters.status", [
+                      LeadStatusFilter.NEW,
+                    ]);
+                  }}
+                >
+                  {t("app.admin.leads.leads.filter.quick.new_leads")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    leadsEndpoint.read.form.setValue("statusFilters.status", [
+                      LeadStatusFilter.CAMPAIGN_RUNNING,
+                    ]);
+                  }}
+                >
+                  {t("app.admin.leads.leads.filter.quick.campaign_running")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    leadsEndpoint.read.form.setValue("statusFilters.source", [
+                      LeadSourceFilter.CSV_IMPORT,
+                    ]);
+                  }}
+                >
+                  {t("app.admin.leads.leads.filter.quick.imported")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearFilters}
+                >
+                  {t("app.admin.leads.leads.admin.filters.clear")}
+                </Button>
+              </Div>
+
+              {/* Form Alert for any filter errors */}
+              <FormAlert alert={leadsEndpoint.alert} />
             </Div>
-
-            {/* Second row of filters */}
-            <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {/* Language Filter */}
-              <EndpointFormField
-                name="locationFilters.language"
-                config={{
-                  type: "select",
-                  label: undefined,
-                  placeholder: "app.admin.leads.leads.filter.language",
-                  options: LanguageFilterOptions,
-                }}
-                control={leadsEndpoint.read.form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              {/* Source Filter */}
-              <EndpointFormField
-                name="statusFilters.source"
-                config={{
-                  type: "select",
-                  label: undefined,
-                  placeholder: "app.admin.leads.leads.filter.source",
-                  options: [
-                    {
-                      value: LeadSourceFilter.ALL,
-                      label: "app.admin.leads.leads.filter.all_sources",
-                    },
-                    {
-                      value: LeadSourceFilter.WEBSITE,
-                      label: "app.admin.leads.leads.filter.sources.website",
-                    },
-                    {
-                      value: LeadSourceFilter.REFERRAL,
-                      label: "app.admin.leads.leads.filter.sources.referral",
-                    },
-                    {
-                      value: LeadSourceFilter.SOCIAL_MEDIA,
-                      label:
-                        "app.admin.leads.leads.filter.sources.social_media",
-                    },
-                    {
-                      value: LeadSourceFilter.EMAIL_CAMPAIGN,
-                      label:
-                        "app.admin.leads.leads.filter.sources.email_campaign",
-                    },
-                    {
-                      value: LeadSourceFilter.CSV_IMPORT,
-                      label: "app.admin.leads.leads.filter.sources.csv_import",
-                    },
-                    {
-                      value: LeadSourceFilter.API,
-                      label: "app.admin.leads.leads.filter.sources.api",
-                    },
-                  ],
-                }}
-                control={leadsEndpoint.read.form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              {/* Sort By */}
-              <EndpointFormField
-                name="sortingOptions.sortBy"
-                config={{
-                  type: "select",
-                  label: undefined,
-                  placeholder: "app.admin.leads.leads.sort.placeholder",
-                  options: [
-                    {
-                      value: LeadSortField.CREATED_AT,
-                      label: "app.admin.leads.leads.sort.created",
-                    },
-                    {
-                      value: LeadSortField.UPDATED_AT,
-                      label: "app.admin.leads.leads.sort.updated",
-                    },
-                    {
-                      value: LeadSortField.EMAIL,
-                      label: "app.admin.leads.leads.sort.email",
-                    },
-                    {
-                      value: LeadSortField.BUSINESS_NAME,
-                      label: "app.admin.leads.leads.sort.business",
-                    },
-                    {
-                      value: LeadSortField.LAST_ENGAGEMENT_AT,
-                      label: "app.admin.leads.leads.sort.last_engagement",
-                    },
-                  ],
-                }}
-                control={leadsEndpoint.read.form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-
-              {/* Sort Order */}
-              <EndpointFormField
-                name="sortingOptions.sortOrder"
-                config={{
-                  type: "select",
-                  label: undefined,
-                  placeholder: "app.admin.leads.leads.sort.placeholder",
-                  options: [
-                    {
-                      value: SortOrder.DESC,
-                      label: "app.admin.leads.leads.sort.desc",
-                    },
-                    {
-                      value: SortOrder.ASC,
-                      label: "app.admin.leads.leads.sort.asc",
-                    },
-                  ],
-                }}
-                control={leadsEndpoint.read.form.control}
-                theme={{
-                  style: "none",
-                  showAllRequired: false,
-                }}
-              />
-            </Div>
-
-            {/* Quick filter buttons */}
-            <Div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-              <Span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-                {t("app.admin.leads.leads.filter.quick_filters")}:
-              </Span>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  leadsEndpoint.read.form.setValue("statusFilters.status", [
-                    LeadStatusFilter.NEW,
-                  ]);
-                }}
-              >
-                {t("app.admin.leads.leads.filter.quick.new_leads")}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  leadsEndpoint.read.form.setValue("statusFilters.status", [
-                    LeadStatusFilter.CAMPAIGN_RUNNING,
-                  ]);
-                }}
-              >
-                {t("app.admin.leads.leads.filter.quick.campaign_running")}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  leadsEndpoint.read.form.setValue("statusFilters.source", [
-                    LeadSourceFilter.CSV_IMPORT,
-                  ]);
-                }}
-              >
-                {t("app.admin.leads.leads.filter.quick.imported")}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleClearFilters}
-              >
-                {t("app.admin.leads.leads.admin.filters.clear")}
-              </Button>
-            </Div>
-
-            {/* Form Alert for any filter errors */}
-            <FormAlert alert={leadsEndpoint.alert} />
-          </Div>
+          </Form>
         </Div>
 
         {/* Batch Operations Toolbar */}

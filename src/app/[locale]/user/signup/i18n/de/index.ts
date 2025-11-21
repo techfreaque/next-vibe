@@ -63,6 +63,7 @@ export const translations: typeof enTranslations = {
       confirmPasswordLabel: "Passwort bestätigen",
       confirmPasswordPlaceholder: "Bestätigen Sie Ihr Passwort",
       newsletterSubscription: "Newsletter abonnieren",
+      usingReferralCode: "Empfehlungscode verwenden",
     },
   },
   post: {

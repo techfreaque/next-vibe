@@ -83,14 +83,14 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         toasts: state.toasts.map((t) =>
-          t.id === action.toast.id ? { ...t, ...action.toast } : t,
+          t.id === action.toast.id ? ({ ...t, ...action.toast } as ToasterToast) : t,
         ),
       };
 
     case "DISMISS_TOAST": {
       const { toastId } = action;
 
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
+      // ! Side effects ! - This should be extracted into a dismissToast() action,
       // but I'll keep it here for simplicity
       if (toastId) {
         addToRemoveQueue(toastId);
@@ -154,8 +154,11 @@ function toast(props: Toast): {
   const dismiss = (): void => dispatch({ type: "DISMISS_TOAST", toastId: id });
 
   const newToast: ToasterToast = {
-    ...props,
+    ...(props as ToastRootProps),
     id,
+    title: props.title,
+    description: props.description,
+    action: props.action,
     open: true,
     onOpenChange: (open) => {
       if (!open) {

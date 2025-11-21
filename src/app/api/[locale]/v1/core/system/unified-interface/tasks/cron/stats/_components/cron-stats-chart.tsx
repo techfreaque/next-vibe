@@ -7,36 +7,21 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import type { PieLabelRenderProps } from "recharts";
 import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  Cell,
-  Legend,
+  Chart,
   Line,
-  LineChart,
+  Bar,
+  Area,
   Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+  Axis,
+} from "next-vibe-ui/ui/chart";
 
 import type { CronStatsResponseType } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/stats/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 // Chart constants
 const CHART_CONSTANTS = {
   FULL_WIDTH: "100%",
-  PIE_CENTER_X: "50%",
-  PIE_CENTER_Y: "50%",
-  CELL_PREFIX: "cell-",
-  STROKE_DASHARRAY: "3 3",
   DEFAULT_COLORS: [
     "#3b82f6", // Blue
     "#10b981", // Green
@@ -62,7 +47,6 @@ function getSeriesColor(series: { color?: string }, index: number): string {
 }
 
 interface CronStatsChartProps {
-  locale: CountryLanguage;
   data: Partial<NonNullable<CronStatsResponseType["data"]["historicalData"]>>;
   title: string;
   type?: "line" | "area" | "bar";
@@ -70,19 +54,9 @@ interface CronStatsChartProps {
 }
 
 /**
- * Render label for pie chart segments
- */
-function renderPieLabel(props: PieLabelRenderProps): string {
-  const name = typeof props.name === "string" ? props.name : "";
-  const percent = typeof props.percent === "number" ? props.percent : 0;
-  return `${name} ${(percent * 100).toFixed(0)}%`;
-}
-
-/**
  * Main chart component for historical cron stats data
  */
 export function CronStatsChart({
-  locale,
   data,
   title,
   type = "line",
@@ -103,108 +77,76 @@ export function CronStatsChart({
       }
       return acc;
     },
-    [] as Array<Record<string, string | number | Date>>,
+    [] as Array<Record<string, string | number>>,
   );
 
-  // Format date for display - needs locale from props
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(locale, {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
 
   const renderChart = (): JSX.Element => {
     const commonProps = {
-      data: chartData,
-      margin: { top: 5, right: 30, left: 20, bottom: 5 },
+      height,
+      width: 600,
+      padding: { top: 5, right: 30, left: 50, bottom: 40 },
     };
 
-    switch (type) {
-      case "area":
-        return (
-          <AreaChart {...commonProps}>
-            <XAxis
-              dataKey="date"
-              tickFormatter={formatDate}
-              tick={{ fontSize: 12 }}
-            />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip content={<CustomDistributionTooltip />} />
-            <Legend />
-            {Object.keys(data).map((key, index) => (
-              <Area
-                key={key}
-                type="monotone"
-                dataKey={key}
-                stackId="1"
-                stroke={getSeriesColor({ color: undefined }, index)}
-                fill={getSeriesColor({ color: undefined }, index)}
-                fillOpacity={0.6}
-                name={key}
-              />
-            ))}
-          </AreaChart>
-        );
+    const dataKeys = Object.keys(data);
+    const chartComponents = dataKeys.map((key, index) => {
+      const color = getSeriesColor({ color: undefined }, index);
 
-      case "bar":
-        return (
-          <BarChart {...commonProps}>
-            <XAxis
-              dataKey="date"
-              tickFormatter={formatDate}
-              tick={{ fontSize: 12 }}
+      switch (type) {
+        case "area":
+          return (
+            <Area
+              key={key}
+              data={chartData}
+              x="date"
+              y={key}
+              interpolation="monotoneX"
+              style={{
+                data: { fill: color, fillOpacity: 0.6, stroke: color },
+              }}
             />
-            <YAxis
-              tick={{ fontSize: 12 }}
-              scale="log"
-              domain={["dataMin", "dataMax"]}
+          );
+        case "bar":
+          return (
+            <Bar
+              key={key}
+              data={chartData}
+              x="date"
+              y={key}
+              style={{ data: { fill: color } }}
             />
-            <Tooltip content={<CustomDistributionTooltip />} />
-            <Legend />
-            {Object.keys(data).map((key, index) => (
-              <Bar
-                key={key}
-                dataKey={key}
-                fill={getSeriesColor({ color: undefined }, index)}
-                name={key}
-              />
-            ))}
-          </BarChart>
-        );
+          );
+        default:
+          return (
+            <Line
+              key={key}
+              data={chartData}
+              x="date"
+              y={key}
+              interpolation="monotoneX"
+              style={{ data: { stroke: color, strokeWidth: 2 } }}
+            />
+          );
+      }
+    });
 
-      default:
-        return (
-          <LineChart {...commonProps}>
-            <XAxis
-              dataKey="date"
-              tickFormatter={formatDate}
-              tick={{ fontSize: 12 }}
-            />
-            <YAxis
-              tick={{ fontSize: 12 }}
-              scale="log"
-              domain={["dataMin", "dataMax"]}
-            />
-            <Tooltip content={<CustomDistributionTooltip />} />
-            <Legend />
-            {Object.keys(data).map((key, index) => (
-              <Line
-                key={key}
-                type="monotone"
-                dataKey={key}
-                stroke={getSeriesColor({ color: undefined }, index)}
-                strokeWidth={2}
-                dot={{ r: 4 }}
-                name={key}
-              />
-            ))}
-          </LineChart>
-        );
-    }
+    return (
+      <Chart {...commonProps}>
+        <Axis />
+        <Axis
+          dependentAxis
+          tickFormat={(value: number | string) => {
+            const val =
+              typeof value === "string" ? Number.parseFloat(value) : value;
+            if (val >= 1000) {
+              return `${(val / 1000).toFixed(1)}K`;
+            }
+            return val.toString();
+          }}
+        />
+        {chartComponents}
+      </Chart>
+    );
   };
 
   return (
@@ -213,9 +155,9 @@ export function CronStatsChart({
         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width={CHART_CONSTANTS.FULL_WIDTH} height={height}>
+        <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>
           {renderChart()}
-        </ResponsiveContainer>
+        </Div>
       </CardContent>
     </Card>
   );
@@ -225,30 +167,6 @@ export function CronStatsChart({
  * Distribution chart component for categorical data
  */
 
-interface DistributionTooltipPayload {
-  color: string;
-  value: string | number;
-  name: string;
-}
-
-const CustomDistributionTooltip = ({
-  active,
-  payload,
-}: {
-  active?: boolean;
-  payload?: DistributionTooltipPayload[];
-}): JSX.Element | null => {
-  if (active && payload?.length) {
-    const data = payload[0];
-    return (
-      <Div className="bg-background border border-border rounded-lg p-3 shadow-lg">
-        <P className="font-medium">{data.name}</P>
-        <P style={{ color: data.color }}>{data.value}</P>
-      </Div>
-    );
-  }
-  return null;
-};
 
 export function CronStatsDistributionChart({
   data,
@@ -272,43 +190,32 @@ export function CronStatsDistributionChart({
   const renderChart = (): JSX.Element => {
     if (type === "bar") {
       return (
-        <BarChart
-          data={data}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-        >
-          <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-          <YAxis
-            tick={{ fontSize: 12 }}
-            scale="log"
-            domain={["dataMin", "dataMax"]}
+        <Chart height={height} width={600} padding={{ top: 5, right: 30, left: 50, bottom: 40 }}>
+          <Axis />
+          <Axis
+            dependentAxis
+            tickFormat={(value: number | string) => {
+              const val =
+                typeof value === "string" ? Number.parseFloat(value) : value;
+              if (val >= 1000) {
+                return `${(val / 1000).toFixed(1)}K`;
+              }
+              return val.toString();
+            }}
           />
-          <Tooltip content={<CustomDistributionTooltip />} />
-          <Bar dataKey="value" fill="hsl(var(--chart-1))" />
-        </BarChart>
+          <Bar data={data} x="name" y="value" style={{ data: { fill: "hsl(var(--chart-1))" } }} />
+        </Chart>
       );
     }
 
     return (
-      <PieChart>
+      <Chart height={height} width={600} padding={{ top: 5, right: 30, left: 50, bottom: 40 }}>
         <Pie
-          data={data}
-          cx={CHART_CONSTANTS.PIE_CENTER_X}
-          cy={CHART_CONSTANTS.PIE_CENTER_Y}
-          labelLine={false}
-          label={renderPieLabel}
-          outerRadius={80}
-          fill="#8884d8"
-          dataKey="value"
-        >
-          {data.map((entry, index) => (
-            <Cell
-              key={CHART_CONSTANTS.CELL_PREFIX + index.toString()}
-              fill={entry.color || COLORS[index % COLORS.length]}
-            />
-          ))}
-        </Pie>
-        <Tooltip content={<CustomDistributionTooltip />} />
-      </PieChart>
+          data={data.map((entry) => ({ x: entry.name, y: entry.value }))}
+          colorScale={data.map((entry, index) => entry.color || COLORS[index % COLORS.length])}
+          innerRadius={0}
+        />
+      </Chart>
     );
   };
 
@@ -318,9 +225,9 @@ export function CronStatsDistributionChart({
         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width={CHART_CONSTANTS.FULL_WIDTH} height={height}>
+        <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>
           {renderChart()}
-        </ResponsiveContainer>
+        </Div>
       </CardContent>
     </Card>
   );

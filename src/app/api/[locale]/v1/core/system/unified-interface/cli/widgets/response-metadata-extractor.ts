@@ -52,7 +52,7 @@ function extractTranslationKey(
 ): TranslationKey | undefined {
   if (typeof value === "string") {
     // By architectural contract, strings in UI config are translation keys
-    return value;
+    return value as TranslationKey;
   }
   return undefined;
 }
@@ -225,7 +225,7 @@ export class ResponseMetadataExtractor {
         typeof candidateField.ui === "object"
       ) {
         return this.extractFromCreateEndpointStructure(
-          candidateField,
+          candidateField as Parameters<typeof this.extractFromCreateEndpointStructure>[0],
           responseData,
         );
       }
@@ -865,7 +865,7 @@ export class ResponseMetadataExtractor {
     // Extract UI configuration with proper typing
     const hasUi = "ui" in definition && typeof definition.ui === "object";
     const ui = hasUi && definition.ui !== null
-      ? definition.ui
+      ? (definition.ui as WidgetConfig | Record<string, unknown>)
       : null;
 
     const schema =

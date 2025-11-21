@@ -12,7 +12,7 @@ import type { CliHandlerReturnType } from "../../../cli/executor-types";
 import type { CreateApiEndpoint } from "../../endpoint/create";
 import type { NextHandlerReturnType } from "../../../next-api/types";
 import type { TrpcHandlerReturnType } from "../../../trpc/types";
-import { Methods } from "../../types/enums";
+import type { Methods } from "../../types/enums";
 import type {
   EndpointHandlerConfig,
   EndpointHandlerReturn,
@@ -21,6 +21,7 @@ import type {
 import { endpointHandler } from "./single";
 import type z from "zod";
 import {
+  type CreateApiEndpointAny,
   type UnifiedField,
 } from "../../types/endpoint";
 
@@ -30,9 +31,9 @@ export function endpointsHandler<const T>(
   const { endpoint: definitions, ...methodConfigs } = config;
 
   // Extract available methods from definitions
-  const availableMethods = Object.keys(definitions).filter((key) =>
-    Object.values(Methods).includes(key as Methods),
-  ) as Array<keyof T & Methods>;
+  const availableMethods = Object.keys(
+    definitions as CreateApiEndpointAny,
+  ) as Methods[];
 
   // Build handlers for each method
   // Type-safe handler entry using branded type

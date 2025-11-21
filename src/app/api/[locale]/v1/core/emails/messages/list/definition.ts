@@ -8,6 +8,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
   objectField,
+  objectOptionalField,
   requestDataField,
   responseArrayField,
   responseField,
@@ -63,7 +64,8 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.emails.messages.list.filters.title",
           description:
             "app.api.v1.core.emails.messages.list.filters.description",
-          layoutType: LayoutType.GRID, columns: 4,
+          layoutType: LayoutType.GRID,
+          columns: 4,
         },
         { request: "data" },
         {
@@ -110,7 +112,7 @@ const { GET } = createEndpoint({
             z.enum(EmailTypeFilter).default(EmailTypeFilter.ALL),
           ),
 
-          dateRange: objectField(
+          dateRange: objectOptionalField(
             {
               type: WidgetType.CONTAINER,
               title:
@@ -156,7 +158,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.emails.messages.list.displayOptions.title",
-          layoutType: LayoutType.GRID, columns: 4,
+          layoutType: LayoutType.GRID,
+          columns: 4,
         },
         { request: "data" },
         {
@@ -197,8 +200,8 @@ const { GET } = createEndpoint({
               description:
                 "app.api.v1.core.emails.messages.list.fields.page.description",
               placeholder:
-                "app.api.v1.core.emails.messages.list.fields.page.placeholder"
-},
+                "app.api.v1.core.emails.messages.list.fields.page.placeholder",
+            },
             z.coerce.number().int().min(1).default(1),
           ),
 
@@ -210,8 +213,8 @@ const { GET } = createEndpoint({
               description:
                 "app.api.v1.core.emails.messages.list.fields.limit.description",
               placeholder:
-                "app.api.v1.core.emails.messages.list.fields.limit.placeholder"
-},
+                "app.api.v1.core.emails.messages.list.fields.limit.placeholder",
+            },
             z.coerce.number().int().min(1).max(100).default(20),
           ),
         },
@@ -236,7 +239,8 @@ const { GET } = createEndpoint({
                 type: WidgetType.CONTAINER,
                 title:
                   "app.api.v1.core.emails.messages.list.response.emails.item.emailCore.title",
-                layoutType: LayoutType.GRID, columns: 3,
+                layoutType: LayoutType.GRID,
+                columns: 3,
               },
               { response: true },
               {
@@ -339,7 +343,8 @@ const { GET } = createEndpoint({
                 type: WidgetType.CONTAINER,
                 title:
                   "app.api.v1.core.emails.messages.list.response.emails.item.emailMetadata.title",
-                layoutType: LayoutType.GRID, columns: 4,
+                layoutType: LayoutType.GRID,
+                columns: 4,
               },
               { response: true },
               {
@@ -427,7 +432,8 @@ const { GET } = createEndpoint({
                 type: WidgetType.CONTAINER,
                 title:
                   "app.api.v1.core.emails.messages.list.response.emails.item.technicalDetails.title",
-                layoutType: LayoutType.GRID, columns: 3,
+                layoutType: LayoutType.GRID,
+                columns: 3,
               },
               { response: true },
               {
@@ -514,7 +520,8 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.messages.list.response.pagination.title",
           description:
             "app.api.v1.core.emails.messages.list.response.pagination.description",
-          layoutType: LayoutType.GRID, columns: 12,
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { response: true },
         {
@@ -618,10 +625,6 @@ const { GET } = createEndpoint({
           search: "",
           status: EmailStatusFilter.ALL,
           type: EmailTypeFilter.ALL,
-          dateRange: {
-            dateFrom: undefined,
-            dateTo: undefined,
-          },
         },
         displayOptions: {
           sortBy: EmailSortField.CREATED_AT,
@@ -635,10 +638,6 @@ const { GET } = createEndpoint({
           search: "welcome",
           status: EmailStatusFilter.SENT,
           type: EmailTypeFilter.TRANSACTIONAL,
-          dateRange: {
-            dateFrom: "2024-01-01T00:00:00.000Z",
-            dateTo: "2024-01-31T23:59:59.999Z",
-          },
         },
         displayOptions: {
           sortBy: EmailSortField.SENT_AT,

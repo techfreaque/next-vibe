@@ -84,7 +84,8 @@ class EmailsRepositoryImpl implements EmailsRepository {
       });
 
       // Extract filters and display options from nested structure
-      const { search, status, type, dateRange } = data.filters || {};
+      const { search, status, type } = data.filters || {};
+      const dateRange = (data.filters as { dateRange?: { dateFrom?: string; dateTo?: string } | null | undefined })?.dateRange;
 
       const {
         page = 1,
