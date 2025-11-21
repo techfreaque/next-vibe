@@ -107,6 +107,20 @@ export class DatabaseMigrationRepositoryImpl
         output += migrateResult.output;
         migrationsRun = migrateResult.count;
 
+        // Check if migration failed
+        if (!migrateResult.success) {
+          const duration = Date.now() - startTime;
+          return fail({
+            message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: {
+              error: migrateResult.output,
+              output: output.trim(),
+              duration,
+            },
+          });
+        }
+
         // Handle redo if requested
         if (data.redo && migrationsRun > 0) {
           const redoResult = this.redoLastMigration(locale);
@@ -193,7 +207,7 @@ export class DatabaseMigrationRepositoryImpl
   private async executeMigrations(
     schema = "public",
     locale: CountryLanguage,
-  ): Promise<{ output: string; count: number }> {
+  ): Promise<{ output: string; count: number; success: boolean }> {
     const { t } = simpleT(locale);
     try {
       const migrationsFolder = path.join(process.cwd(), "drizzle");
@@ -208,6 +222,7 @@ export class DatabaseMigrationRepositoryImpl
             "app.api.v1.core.system.db.migrate.messages.noMigrationsFolder",
           ),
           count: 0,
+          success: true, // Not an error, just no migrations to run
         };
       }
 
@@ -225,6 +240,7 @@ export class DatabaseMigrationRepositoryImpl
             "app.api.v1.core.system.db.migrate.messages.noMigrationFiles",
           ),
           count: 0,
+          success: true, // Not an error, just no migrations to run
         };
       }
 
@@ -239,9 +255,10 @@ export class DatabaseMigrationRepositoryImpl
           },
         ),
         count: migrationFiles.length,
+        success: true,
       };
     } catch (error) {
-      // Return error in output instead of throwing
+      // Catch error and return it in the response with success: false
       return {
         output: t(
           "app.api.v1.core.system.db.migrate.messages.failedToExecute",
@@ -250,6 +267,7 @@ export class DatabaseMigrationRepositoryImpl
           },
         ),
         count: 0,
+        success: false,
       };
     }
   }

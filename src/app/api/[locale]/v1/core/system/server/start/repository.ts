@@ -12,6 +12,10 @@ import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  fail,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { seedDatabase } from "@/app/api/[locale]/v1/core/system/db/seed/seed-manager";
@@ -50,7 +54,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<never> {
+  ): Promise<ResponseType<ServerStartResponseOutput>> {
     const startTime = Date.now();
     const output: string[] = [];
     const errors: string[] = [];
@@ -153,14 +157,32 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           if (migrateResult.success) {
             output.push("   ✅ Database migrations completed");
           } else {
-            const errorMsg = "Failed to run migrations";
+            const errorMsg = `Failed to run migrations: ${migrateResult.messageParams?.error || "Unknown error"}`;
             errors.push(errorMsg);
             output.push(`   ❌ ${errorMsg}`);
+            logger.error("Migration failed, cannot start server", {
+              error: migrateResult.messageParams,
+            });
+            return fail({
+              message: "app.api.v1.core.system.server.start.post.errors.migration.title",
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              messageParams: {
+                error: errorMsg,
+              },
+            });
           }
         } catch (error) {
           const errorMsg = `Failed to run migrations: ${parseError(error).message}`;
           errors.push(errorMsg);
           output.push(`   ❌ ${errorMsg}`);
+          logger.error("Migration error, cannot start server", { error: errorMsg });
+          return fail({
+            message: "app.api.v1.core.system.server.start.post.errors.migration.title",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: {
+              error: errorMsg,
+            },
+          });
         }
 
         // Seed database
