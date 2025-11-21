@@ -410,8 +410,8 @@ export interface ApiHandlerProps<
   /** Locale */
   locale: CountryLanguage;
 
-  /** Original request object (optional - only available in Next.js context) */
-  request?: NextRequest;
+  /** Original request object from Next.js context */
+  request: NextRequest;
 
   /** Logger instance for structured logging */
   logger: EndpointLogger;

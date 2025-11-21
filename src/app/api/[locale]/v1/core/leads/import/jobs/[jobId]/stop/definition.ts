@@ -42,7 +42,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.leads.import.jobs.jobId.stop.post.form.title",
       description:
         "app.api.v1.core.leads.import.jobs.jobId.stop.post.form.description",
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {
@@ -55,9 +55,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.import.jobs.jobId.stop.post.jobId.label",
           description:
             "app.api.v1.core.leads.import.jobs.jobId.stop.post.jobId.description",
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
         z.uuid(),
       ),
 
@@ -69,7 +67,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.import.jobs.jobId.stop.post.response.title",
           description:
             "app.api.v1.core.leads.import.jobs.jobId.stop.post.response.description",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {

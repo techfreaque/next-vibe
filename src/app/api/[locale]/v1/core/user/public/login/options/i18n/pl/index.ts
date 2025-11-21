@@ -54,6 +54,59 @@ export const translations: typeof enTranslations = {
   response: {
     title: "Odpowiedź Opcji Logowania",
     description: "Dostępne opcje konfiguracji logowania",
+    success: {
+      badge: "Sukces",
+    },
+    message: {
+      content: "Wiadomość statusu",
+    },
+    forUser: {
+      content: "Adres e-mail",
+    },
+    loginMethods: {
+      title: "Metody Logowania",
+      description: "Dostępne metody uwierzytelnienia",
+      password: {
+        title: "Logowanie hasłem",
+        description: "Standardowe uwierzytelnienie hasłem",
+        enabled: {
+          badge: "Włączone",
+        },
+      },
+      social: {
+        title: "Logowanie społecznościowe",
+        description: "Opcje uwierzytelnienia społecznościowego",
+        enabled: {
+          badge: "Włączone",
+        },
+        providers: {
+          item: {
+            title: "Dostawca Społecznościowy",
+            description: "Dostawca uwierzytelnienia społecznościowego",
+          },
+          name: {
+            content: "Nazwa dostawcy",
+          },
+          id: {
+            content: "ID dostawcy",
+          },
+          enabled: {
+            badge: "Dostępny",
+          },
+          description: "Opis dostawcy",
+        },
+      },
+    },
+    security: {
+      title: "Ustawienia bezpieczeństwa",
+      description: "Podsumowanie wymagań bezpieczeństwa",
+      maxAttempts: {
+        content: "Maksymalna liczba prób logowania",
+      },
+      requireTwoFactor: {
+        badge: "Wymagane 2FA",
+      },
+    },
   },
   errors: {
     validation: {

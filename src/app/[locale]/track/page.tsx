@@ -45,8 +45,22 @@ export default function TrackPage(): React.ReactElement {
         const stage = searchParams.get("stage");
         const source = searchParams.get("source") || "email";
         const url = searchParams.get("url");
+        const ref = searchParams.get("ref"); // Referral code
 
-        // Validate required id parameter
+        // Handle referral code if present
+        if (ref) {
+          logger.debug("Storing referral code in localStorage", { ref });
+          localStorage.setItem("referralCode", ref);
+
+          // If only referral code (no tracking id), redirect to incognito chat
+          if (!id) {
+            logger.debug("Referral code stored, redirecting to incognito chat");
+            router.push(`/${locale}/threads/incognito`);
+            return;
+          }
+        }
+
+        // Validate required id parameter for lead tracking
         if (!id) {
           logger.error("Missing tracking ID", {
             url: window.location.href,

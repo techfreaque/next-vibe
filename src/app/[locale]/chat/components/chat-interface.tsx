@@ -13,9 +13,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import React, { useEffect, useMemo } from "react";
 
-import {
-  DEFAULT_FOLDER_IDS,
-} from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
@@ -64,8 +62,8 @@ export function ChatInterface({
     // If user is not authenticated and tries to access PRIVATE or SHARED folder, redirect to incognito
     if (
       !isAuthenticated &&
-      currentRootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO &&
-      currentRootFolderId !== DEFAULT_FOLDER_IDS.PUBLIC
+      currentRootFolderId !== DefaultFolderId.INCOGNITO &&
+      currentRootFolderId !== DefaultFolderId.PUBLIC
     ) {
       logger.info(
         "Non-authenticated user attempted to access restricted folder, redirecting to incognito",
@@ -73,7 +71,7 @@ export function ChatInterface({
           attemptedFolder: currentRootFolderId,
         },
       );
-      window.location.href = `/${locale}/threads/${DEFAULT_FOLDER_IDS.INCOGNITO}/new`;
+      window.location.href = `/${locale}/threads/${DefaultFolderId.INCOGNITO}/new`;
     }
   }, [isAuthenticated, currentRootFolderId, locale, logger]);
 
@@ -87,23 +85,12 @@ export function ChatInterface({
         }
       >
         {/* Top Bar - Menu, Search, Settings */}
-        <TopBar
-          currentCountry={currentCountry}
-          locale={locale}
-        />
+        <TopBar currentCountry={currentCountry} locale={locale} />
 
         {/* Sidebar and Main Chat Area */}
-        <SidebarWrapper
-          user={user}
-          locale={locale}
-          logger={logger}
-        >
+        <SidebarWrapper user={user} locale={locale} logger={logger}>
           {/* Main Chat Area */}
-          <ChatArea
-            locale={locale}
-            logger={logger}
-            currentUserId={user?.id}
-          />
+          <ChatArea locale={locale} logger={logger} currentUserId={user?.id} />
         </SidebarWrapper>
       </Div>
 

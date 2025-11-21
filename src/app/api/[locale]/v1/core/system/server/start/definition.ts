@@ -36,7 +36,7 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.server.start.post.form.title",
       description: "app.api.v1.core.system.server.start.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -49,7 +49,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.server.start.post.fields.skipPre.title",
           description:
             "app.api.v1.core.system.server.start.post.fields.skipPre.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),
@@ -62,7 +62,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.server.start.post.fields.skipNextCommand.title",
           description:
             "app.api.v1.core.system.server.start.post.fields.skipNextCommand.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),
@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.server.start.post.fields.port.title",
           description:
             "app.api.v1.core.system.server.start.post.fields.port.description",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.union([z.number(), z.string()]).optional(),
       ),
@@ -87,7 +87,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.server.start.post.fields.skipTaskRunner.title",
           description:
             "app.api.v1.core.system.server.start.post.fields.skipTaskRunner.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),

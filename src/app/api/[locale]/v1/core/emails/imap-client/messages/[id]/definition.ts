@@ -42,7 +42,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.emails.imapClient.messages.id.get.container.title",
       description:
         "app.api.v1.core.emails.imapClient.messages.id.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "urlPathParams", response: true },
     {
@@ -202,7 +202,7 @@ const { PATCH } = createEndpoint({
         "app.api.v1.core.emails.imapClient.messages.id.patch.container.title",
       description:
         "app.api.v1.core.emails.imapClient.messages.id.patch.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data&urlPathParams", response: true },
     {

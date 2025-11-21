@@ -141,6 +141,30 @@ export const translations = {
       label: "Metadata",
       description: "Additional folder metadata",
     },
+    rolesView: {
+      label: "View Roles",
+      description: "Roles that can view this folder",
+    },
+    rolesManage: {
+      label: "Manage Roles",
+      description: "Roles that can manage folder settings",
+    },
+    rolesCreateThread: {
+      label: "Create Thread Roles",
+      description: "Roles that can create threads in this folder",
+    },
+    rolesPost: {
+      label: "Post Roles",
+      description: "Roles that can post messages",
+    },
+    rolesModerate: {
+      label: "Moderate Roles",
+      description: "Roles that can moderate content",
+    },
+    rolesAdmin: {
+      label: "Admin Roles",
+      description: "Roles with full administrative access",
+    },
     response: {
       title: "Updated Folder",
       description: "The updated folder details",

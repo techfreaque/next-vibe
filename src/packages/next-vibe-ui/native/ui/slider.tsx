@@ -32,6 +32,7 @@ export function Slider({
   step = 1,
   disabled = false,
   style,
+  className,
   children,
 }: SliderRootProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -52,7 +53,7 @@ export function Slider({
       max={max}
       step={step}
       disabled={disabled}
-      {...applyStyleType({ nativeStyle })}
+      {...applyStyleType({ nativeStyle, className })}
     >
       {children}
     </SliderPrimitive.Root>

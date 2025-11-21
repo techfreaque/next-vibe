@@ -25,8 +25,7 @@ import { useResetPasswordConfirm } from "@/app/api/[locale]/v1/core/user/public/
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { PasswordStrengthIndicator } from "../../../../_components/password-strength-indicator";
+import { PasswordStrengthIndicator } from "../../../signup/_components/password-strength-indicator";
 
 interface ResetPasswordConfirmFormProps {
   locale: CountryLanguage;

@@ -44,7 +44,7 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.user.private.me.get.response.title" as const,
       description:
         "app.api.v1.core.user.private.me.get.response.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { response: true },
     {
@@ -177,7 +177,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.user.private.me.update.title" as const,
       description:
         "app.api.v1.core.user.private.me.update.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -189,7 +189,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.private.me.update.groups.basicInfo.title" as const,
           description:
             "app.api.v1.core.user.private.me.update.groups.basicInfo.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { request: "data" },
         {
@@ -203,10 +203,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.private.me.update.fields.privateName.description" as const,
               placeholder:
                 "app.api.v1.core.user.private.me.update.fields.privateName.placeholder" as const,
-              required: false,
-              layout: { columns: 6 },
-              helpText:
-                "app.api.v1.core.user.private.me.update.fields.privateName.description" as const,
+              columns: 6,
             },
             z
               .string()
@@ -231,10 +228,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.private.me.update.fields.publicName.description" as const,
               placeholder:
                 "app.api.v1.core.user.private.me.update.fields.publicName.placeholder" as const,
-              required: false,
-              layout: { columns: 6 },
-              helpText:
-                "app.api.v1.core.user.private.me.update.fields.publicName.description" as const,
+              columns: 6,
             },
             z
               .string()
@@ -259,10 +253,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.private.me.update.fields.email.description" as const,
               placeholder:
                 "app.api.v1.core.user.private.me.update.fields.email.placeholder" as const,
-              required: false,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.private.me.update.fields.email.description" as const,
+              columns: 12,
             },
             z
               .string()
@@ -283,7 +274,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.private.me.update.groups.privacySettings.title" as const,
           description:
             "app.api.v1.core.user.private.me.update.groups.privacySettings.description" as const,
-          layout: { type: LayoutType.VERTICAL },
+          layoutType: LayoutType.VERTICAL,
         },
         { request: "data" },
         {
@@ -295,12 +286,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.private.me.update.fields.marketingConsent.label" as const,
               description:
                 "app.api.v1.core.user.private.me.update.fields.marketingConsent.description" as const,
-              placeholder:
-                "app.api.v1.core.user.private.me.update.fields.marketingConsent.placeholder" as const,
-              required: false,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.private.me.update.fields.marketingConsent.description" as const,
+              columns: 12,
             },
             z.boolean().optional(),
           ),
@@ -315,7 +301,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.private.me.update.response.title" as const,
           description:
             "app.api.v1.core.user.private.me.update.response.description" as const,
-          layout: { type: LayoutType.VERTICAL },
+          layoutType: LayoutType.VERTICAL,
         },
         { response: true },
         {
@@ -349,7 +335,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.private.me.update.response.changesSummary.title" as const,
               description:
                 "app.api.v1.core.user.private.me.update.response.changesSummary.description" as const,
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID, columns: 12,
             },
             { response: true },
             {
@@ -593,7 +579,7 @@ const { DELETE } = createEndpoint({
       title: "app.api.v1.core.user.private.me.delete.response.title" as const,
       description:
         "app.api.v1.core.user.private.me.delete.response.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { response: true },
     {

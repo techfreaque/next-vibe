@@ -21,6 +21,27 @@ export const translations: typeof enTranslations = {
         description: "Eindeutige Kennung für den Guard",
         placeholder: "guard-123",
       },
+      username: {
+        title: "Benutzername",
+      },
+      status: {
+        title: "Status",
+      },
+      createdAt: {
+        title: "Erstellt am",
+      },
+      securityLevel: {
+        title: "Sicherheitsstufe",
+      },
+      isolationMethod: {
+        title: "Isolationsmethode",
+      },
+      isRunning: {
+        title: "Läuft",
+      },
+      userHome: {
+        title: "Benutzerverzeichnis",
+      },
       listAll: {
         title: "Alle Guards auflisten",
         description: "Alle Guard-Umgebungen auflisten",

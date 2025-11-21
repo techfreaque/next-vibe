@@ -7,9 +7,11 @@ export type StyleType =
       style?: never;
     };
 
-export function applyStyleType(props: {
-  nativeStyle?: ViewStyle | TextStyle | ImageStyle;
-  className?: string;
+export function applyStyleType<
+  TViewStyle extends ViewStyle | TextStyle | ImageStyle | undefined,
+>(props: {
+  nativeStyle: TViewStyle;
+  className: string | undefined;
 }): {
   style?: ViewStyle | TextStyle | ImageStyle;
   className?: string;

@@ -3,6 +3,7 @@
  * Functions for creating CLI handlers from endpoint configurations using unified core logic
  */
 
+import { NextRequest } from "next/server";
 import {
   ErrorResponseTypes,
   isStreamingResponse,
@@ -69,8 +70,8 @@ export function createCliHandler<
       endpoint,
       {
         method: endpoint.method,
-        requestData: data as never,
-        urlParameters: urlPathParams as never,
+        requestData: data,
+        urlParameters: urlPathParams,
         locale,
       },
       logger,
@@ -81,13 +82,18 @@ export function createCliHandler<
     }
 
     // Type guard ensures data exists after success check
-    const validatedData = validationResult.data.requestData as TRequestOutput;
-    const validatedUrlParams = validationResult.data
-      .urlPathParams as TUrlVariablesOutput;
+    const validatedData = validationResult.data.requestData;
+    const validatedUrlParams = validationResult.data.urlPathParams;
     const validatedLocale = validationResult.data.locale;
 
+    // Create minimal NextRequest for CLI context
+    const url = new URL(endpoint.path.join('/'), 'http://localhost');
+    const mockRequest = new NextRequest(url, {
+      method: endpoint.method,
+      headers: new Headers(),
+    });
+
     // Execute handler using unified core
-    // CLI doesn't have a NextRequest - request is optional for non-web platforms
     const result = await executeHandler({
       endpoint,
       handler,
@@ -97,7 +103,7 @@ export function createCliHandler<
       t,
       locale: validatedLocale,
       logger,
-      request: undefined,
+      request: mockRequest,
     });
 
     // CLI doesn't support streaming responses

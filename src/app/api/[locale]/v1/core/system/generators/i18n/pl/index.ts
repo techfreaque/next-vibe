@@ -1,5 +1,6 @@
 import { translations as endpointTranslations } from "../../endpoint/i18n/pl";
 import { translations as endpointsTranslations } from "../../endpoints/i18n/pl";
+import { translations as endpointsIndexTranslations } from "../../endpoints-index/i18n/pl";
 import { translations as generateAllTranslations } from "../../generate-all/i18n/pl";
 import { translations as generateTrpcRouterTranslations } from "../../generate-trpc-router/i18n/pl";
 import { translations as routeHandlersTranslations } from "../../route-handlers/i18n/pl";
@@ -11,6 +12,7 @@ export const translations: typeof enTranslations = {
   category: "Generatory",
   endpoint: endpointTranslations,
   endpoints: endpointsTranslations,
+  endpointsIndex: endpointsIndexTranslations,
   generateAll: generateAllTranslations,
   generateTrpcRouter: generateTrpcRouterTranslations,
   "route-handlers": routeHandlersTranslations,

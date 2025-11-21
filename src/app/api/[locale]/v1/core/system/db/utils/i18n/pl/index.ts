@@ -22,9 +22,15 @@ export const translations: typeof enTranslations = {
   },
   connections: {
     title: "Status połączenia",
+    primary: "Połączenie główne",
+    replica: "Połączenie repliki",
   },
   details: {
     title: "Szczegóły bazy danych",
+    version: "Wersja",
+    uptime: "Czas działania (sekundy)",
+    activeConnections: "Aktywne połączenia",
+    maxConnections: "Maksymalna liczba połączeń",
   },
   errors: {
     health_check_failed: "Sprawdzenie stanu bazy danych nie powiodło się",

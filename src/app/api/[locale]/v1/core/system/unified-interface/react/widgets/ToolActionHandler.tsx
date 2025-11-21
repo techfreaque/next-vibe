@@ -7,7 +7,7 @@ import {
   type WidgetActionType,
   type WidgetAction,
 } from "../../shared/ui/types";
-import { ensureError } from "../../shared/utils/error";
+import { ensureError } from "../../shared/utils/error-utils";
 /**
  * Tool Action Handler Props
  */

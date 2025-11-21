@@ -52,7 +52,8 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.emails.imapClient.folders.list.container.title",
       description:
         "app.api.v1.core.emails.imapClient.folders.list.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -175,10 +176,8 @@ const { GET } = createEndpoint({
       folders: responseArrayField(
         {
           type: WidgetType.GROUPED_LIST,
-          groupBy: "specialUseType",
           sortBy: "name",
-          showGroupSummary: true,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          columns: 12,
         },
         objectField(
           {
@@ -187,7 +186,8 @@ const { GET } = createEndpoint({
               "app.api.v1.core.emails.imapClient.folders.list.response.folder.title",
             description:
               "app.api.v1.core.emails.imapClient.folders.list.response.folder.description",
-            layout: { type: LayoutType.GRID, columns: 12 },
+            layoutType: LayoutType.GRID,
+            columns: 12,
           },
           { response: true },
           {
@@ -286,7 +286,8 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.folders.list.response.pagination.title",
           description:
             "app.api.v1.core.emails.imapClient.folders.list.response.pagination.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { response: true },
         {

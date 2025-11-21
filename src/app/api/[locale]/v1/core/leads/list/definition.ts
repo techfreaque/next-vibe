@@ -65,7 +65,7 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.leads.list.get.form.title" as const,
       description: "app.api.v1.core.leads.list.get.form.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -77,7 +77,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.leads.list.get.searchPagination.title" as const,
           description:
             "app.api.v1.core.leads.list.get.searchPagination.description" as const,
-          layout: { type: LayoutType.GRID, columns: 3 },
+          layoutType: LayoutType.GRID, columns: 3,
         },
         { request: "data" },
         {
@@ -90,7 +90,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.leads.list.get.search.description" as const,
               placeholder:
                 "app.api.v1.core.leads.list.get.search.placeholder" as const,
-              layout: { columns: 8 },
+              columns: 8,
             },
             z.string().optional(),
           ),
@@ -103,9 +103,8 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.leads.list.get.page.description" as const,
               placeholder:
                 "app.api.v1.core.leads.list.get.page.placeholder" as const,
-              layout: { columns: 2 },
-              validation: { min: 1 },
-            },
+              columns: 2
+},
             z.number().min(1).optional().default(1),
           ),
           limit: requestDataField(
@@ -117,9 +116,8 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.leads.list.get.limit.description" as const,
               placeholder:
                 "app.api.v1.core.leads.list.get.limit.placeholder" as const,
-              layout: { columns: 2 },
-              validation: { min: 1, max: 100 },
-            },
+              columns: 2
+},
             z.number().min(1).max(100).optional().default(20),
           ),
         },
@@ -132,7 +130,7 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.leads.list.get.statusFilters.title" as const,
           description:
             "app.api.v1.core.leads.list.get.statusFilters.description" as const,
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { request: "data" },
         {
@@ -146,7 +144,7 @@ const { GET } = createEndpoint({
               placeholder:
                 "app.api.v1.core.leads.list.get.status.placeholder" as const,
               options: LeadStatusFilterOptions,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.array(z.enum(LeadStatusFilter)).optional(),
           ),
@@ -161,7 +159,7 @@ const { GET } = createEndpoint({
               placeholder:
                 "app.api.v1.core.leads.list.get.currentCampaignStage.placeholder" as const,
               options: EmailCampaignStageFilterOptions,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.array(z.enum(EmailCampaignStageFilter)).optional(),
           ),
@@ -175,7 +173,7 @@ const { GET } = createEndpoint({
               placeholder:
                 "app.api.v1.core.leads.list.get.source.placeholder" as const,
               options: LeadSourceFilterOptions,
-              layout: { columns: 12 },
+              columns: 12,
             },
             z.array(z.enum(LeadSourceFilter)).optional(),
           ),
@@ -190,7 +188,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.leads.list.get.locationFilters.title" as const,
           description:
             "app.api.v1.core.leads.list.get.locationFilters.description" as const,
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { request: "data" },
         {
@@ -204,7 +202,7 @@ const { GET } = createEndpoint({
               placeholder:
                 "app.api.v1.core.leads.list.get.country.placeholder" as const,
               options: CountriesOptions,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.array(z.enum(Countries)).optional(),
           ),
@@ -218,7 +216,7 @@ const { GET } = createEndpoint({
               placeholder:
                 "app.api.v1.core.leads.list.get.language.placeholder" as const,
               options: LanguagesOptions,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.array(z.enum(Languages)).optional(),
           ),
@@ -232,7 +230,7 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.leads.list.get.sortingOptions.title" as const,
           description:
             "app.api.v1.core.leads.list.get.sortingOptions.description" as const,
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { request: "data" },
         {
@@ -246,7 +244,7 @@ const { GET } = createEndpoint({
               placeholder:
                 "app.api.v1.core.leads.list.get.sortBy.placeholder" as const,
               options: LeadSortFieldOptions,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z
               .nativeEnum(LeadSortField)
@@ -263,7 +261,7 @@ const { GET } = createEndpoint({
               placeholder:
                 "app.api.v1.core.leads.list.get.sortOrder.placeholder" as const,
               options: SortOrderOptions,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.enum(SortOrder).optional().default(SortOrder.DESC),
           ),
@@ -277,7 +275,7 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.leads.list.get.response.title" as const,
           description:
             "app.api.v1.core.leads.list.get.response.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {
@@ -286,8 +284,7 @@ const { GET } = createEndpoint({
               type: WidgetType.GROUPED_LIST,
               groupBy: "status",
               sortBy: "createdAt",
-              showGroupSummary: true,
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID, columns: 12,
             },
             objectField(
               {
@@ -296,7 +293,7 @@ const { GET } = createEndpoint({
                   "app.api.v1.core.leads.list.get.response.leads.title" as const,
                 description:
                   "app.api.v1.core.leads.list.get.response.leads.description" as const,
-                layout: { type: LayoutType.GRID, columns: 12 },
+                layoutType: LayoutType.GRID, columns: 12,
               },
               { response: true },
               {

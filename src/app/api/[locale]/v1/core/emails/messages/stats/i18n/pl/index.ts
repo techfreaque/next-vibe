@@ -1,6 +1,22 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  dateRange: {
+    today: "Dzisiaj",
+    yesterday: "Wczoraj",
+    last7Days: "Ostatnie 7 Dni",
+    last30Days: "Ostatnie 30 Dni",
+    last90Days: "Ostatnie 90 Dni",
+    thisWeek: "Ten Tydzień",
+    lastWeek: "Ostatni Tydzień",
+    thisMonth: "Ten Miesiąc",
+    lastMonth: "Ostatni Miesiąc",
+    thisQuarter: "Ten Kwartał",
+    lastQuarter: "Ostatni Kwartał",
+    thisYear: "Ten Rok",
+    lastYear: "Ostatni Rok",
+    custom: "Niestandardowy Zakres",
+  },
   get: {
     title: "Pobierz Statystyki E-maili",
     description: "Pobierz kompleksowe statystyki i metryki e-maili",
@@ -57,6 +73,12 @@ export const translations: typeof enTranslations = {
     timePeriod: {
       label: "Okres Czasu",
       description: "Granularność okresu czasu dla danych historycznych",
+      hour: "Godzina",
+      day: "Dzień",
+      week: "Tydzień",
+      month: "Miesiąc",
+      quarter: "Kwartał",
+      year: "Rok",
     },
     dateRangePreset: {
       label: "Ustawienie Zakresu Dat",
@@ -73,6 +95,11 @@ export const translations: typeof enTranslations = {
     chartType: {
       label: "Typ Wykresu",
       description: "Typ wizualizacji dla wykresów",
+      line: "Wykres Liniowy",
+      bar: "Wykres Słupkowy",
+      area: "Wykres Obszarowy",
+      pie: "Wykres Kołowy",
+      donut: "Wykres Pierścieniowy",
     },
     includeComparison: {
       label: "Uwzględnij Porównanie",

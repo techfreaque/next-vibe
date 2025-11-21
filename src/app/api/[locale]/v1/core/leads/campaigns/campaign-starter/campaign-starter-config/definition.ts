@@ -57,8 +57,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.form.title" as const,
       description:
         "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.form.description" as const,
-      layout: { type: LayoutType.STACKED },
-      children: [],
+      layoutType: LayoutType.STACKED,
     },
     { response: true },
     {
@@ -70,8 +69,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.title" as const,
           description:
             "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.description" as const,
-          layout: { type: LayoutType.STACKED },
-          children: [],
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -100,16 +98,35 @@ const { GET } = createEndpoint({
             },
             z.array(z.number().min(1).max(7)),
           ),
-          enabledHours: responseField(
+          enabledHours: objectField(
             {
-              type: WidgetType.TEXT,
-              content:
+              type: WidgetType.CONTAINER,
+              title:
                 "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
+              layoutType: LayoutType.GRID,
+              columns: 2,
             },
-            z.object({
-              start: z.number().min(0).max(23),
-              end: z.number().min(0).max(23),
-            }),
+            { response: true },
+            {
+              start: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
+                  fieldType: FieldDataType.NUMBER,
+                },
+                z.number().min(0).max(23),
+              ),
+              end: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
+                  fieldType: FieldDataType.NUMBER,
+                },
+                z.number().min(0).max(23),
+              ),
+            },
           ),
           leadsPerWeek: responseField(
             {
@@ -296,8 +313,7 @@ const { PUT } = createEndpoint({
         "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.form.title" as const,
       description:
         "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.form.description" as const,
-      layout: { type: LayoutType.STACKED },
-      children: [],
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -320,9 +336,8 @@ const { PUT } = createEndpoint({
           label:
             "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.minAgeHours.label" as const,
           description:
-            "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.minAgeHours.description" as const,
-          validation: { min: 0, max: 168 },
-        },
+            "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.minAgeHours.description" as const
+},
         z.number().min(0).max(168),
       ),
       enabledDays: requestDataField(
@@ -380,8 +395,8 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.label" as const,
           description:
             "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
-          children: [],
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
         { request: "data" },
         {
@@ -392,9 +407,8 @@ const { PUT } = createEndpoint({
               label:
                 "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.start.label" as const,
               description:
-                "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.start.description" as const,
-              validation: { min: 0, max: 23 },
-            },
+                "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.start.description" as const
+},
             z.number().min(0).max(23),
           ),
           end: requestDataField(
@@ -404,9 +418,8 @@ const { PUT } = createEndpoint({
               label:
                 "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.end.label" as const,
               description:
-                "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.end.description" as const,
-              validation: { min: 0, max: 23 },
-            },
+                "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.end.description" as const
+},
             z.number().min(0).max(23),
           ),
         },
@@ -452,9 +465,8 @@ const { PUT } = createEndpoint({
           label:
             "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.timeout.label" as const,
           description:
-            "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.timeout.description" as const,
-          validation: { min: 1000, max: 3600000 },
-        },
+            "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.timeout.description" as const
+},
         z.number().min(1000).max(3600000).default(300000),
       ),
       retries: requestDataField(
@@ -464,9 +476,8 @@ const { PUT } = createEndpoint({
           label:
             "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.retries.label" as const,
           description:
-            "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.retries.description" as const,
-          validation: { min: 0, max: 10 },
-        },
+            "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.retries.description" as const
+},
         z.number().min(0).max(10).default(3),
       ),
       retryDelay: requestDataField(
@@ -476,9 +487,8 @@ const { PUT } = createEndpoint({
           label:
             "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.retryDelay.label" as const,
           description:
-            "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.retryDelay.description" as const,
-          validation: { min: 1000, max: 300000 },
-        },
+            "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.retryDelay.description" as const
+},
         z.number().min(1000).max(300000).default(30000),
       ),
       leadsPerWeek: requestDataField(
@@ -500,8 +510,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.response.title" as const,
           description:
             "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.post.response.description" as const,
-          layout: { type: LayoutType.STACKED },
-          children: [],
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -529,16 +538,35 @@ const { PUT } = createEndpoint({
             },
             z.array(z.number().min(1).max(7)),
           ),
-          enabledHours: responseField(
+          enabledHours: objectField(
             {
-              type: WidgetType.TEXT,
-              content:
+              type: WidgetType.CONTAINER,
+              title:
                 "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
+              layoutType: LayoutType.GRID,
+              columns: 2,
             },
-            z.object({
-              start: z.number().min(0).max(23),
-              end: z.number().min(0).max(23),
-            }),
+            { response: true },
+            {
+              start: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
+                  fieldType: FieldDataType.NUMBER,
+                },
+                z.number().min(0).max(23),
+              ),
+              end: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.v1.core.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
+                  fieldType: FieldDataType.NUMBER,
+                },
+                z.number().min(0).max(23),
+              ),
+            },
           ),
           leadsPerWeek: responseField(
             {

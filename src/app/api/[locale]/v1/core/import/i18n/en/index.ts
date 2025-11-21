@@ -154,6 +154,8 @@ export const translations = {
         },
 
         errors: {
+          title: "Error Details",
+
           row: {
             label: "Row",
           },
@@ -166,8 +168,10 @@ export const translations = {
         },
 
         nextSteps: {
+          title: "Next Steps",
+
           item: {
-            label: "Next Steps",
+            label: "Next Step",
           },
         },
       },
@@ -263,6 +267,106 @@ export const translations = {
       response: {
         title: "Import Jobs",
         description: "Your import job history and current status",
+
+        jobs: {
+          title: "Jobs List",
+        },
+
+        job: {
+          title: "Job Details",
+
+          id: {
+            label: "Job ID",
+          },
+
+          fileName: {
+            label: "File Name",
+          },
+
+          domain: {
+            label: "Domain",
+          },
+
+          status: {
+            label: "Status",
+          },
+
+          progress: {
+            title: "Progress Information",
+
+            totalRows: {
+              label: "Total Rows",
+            },
+
+            processedRows: {
+              label: "Processed Rows",
+            },
+
+            currentBatchStart: {
+              label: "Current Batch Start",
+            },
+
+            batchSize: {
+              label: "Batch Size",
+            },
+
+            percentComplete: {
+              label: "Percent Complete",
+            },
+          },
+
+          results: {
+            title: "Results",
+
+            successfulImports: {
+              label: "Successful Imports",
+            },
+
+            failedImports: {
+              label: "Failed Imports",
+            },
+
+            duplicateEmails: {
+              label: "Duplicate Emails",
+            },
+          },
+
+          timing: {
+            title: "Timing Information",
+
+            createdAt: {
+              label: "Created At",
+            },
+
+            updatedAt: {
+              label: "Updated At",
+            },
+
+            startedAt: {
+              label: "Started At",
+            },
+
+            completedAt: {
+              label: "Completed At",
+            },
+          },
+
+          errorInfo: {
+            title: "Error Information",
+
+            error: {
+              label: "Error Message",
+            },
+
+            retryCount: {
+              label: "Retry Count",
+            },
+
+            maxRetries: {
+              label: "Max Retries",
+            },
+          },
+        },
       },
 
       errors: {

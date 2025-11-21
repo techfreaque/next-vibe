@@ -12,6 +12,7 @@ import {
   objectField,
   requestDataField,
   responseField,
+  responseArrayField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 
 import { UserRole } from "../../../user-roles/enum";
@@ -44,7 +45,8 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.user.public.login.options.container.title",
       description:
         "app.api.v1.core.user.public.login.options.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -58,88 +60,211 @@ const { GET } = createEndpoint({
             "app.api.v1.core.user.public.login.options.fields.email.description",
           placeholder:
             "app.api.v1.core.user.public.login.options.fields.email.placeholder",
-          required: false,
         },
         z.email().optional(),
       ),
 
       // === RESPONSE FIELDS ===
-      response: responseField(
+      response: objectField(
         {
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.user.public.login.options.response.title",
           description:
             "app.api.v1.core.user.public.login.options.response.description",
-          layout: { type: LayoutType.VERTICAL },
+          layoutType: LayoutType.VERTICAL,
         },
-        z.object({
-          success: z
-            .boolean()
-            .describe("Whether login options were retrieved successfully"),
-          message: z.string().describe("Human-readable status message"),
-          forUser: z
-            .string()
-            .optional()
-            .describe("Email address these options are specific to"),
-          loginMethods: z
-            .object({
-              password: z
-                .object({
-                  enabled: z
-                    .boolean()
-                    .describe("Whether password login is allowed"),
-                  description: z
-                    .string()
-                    .describe("Human-readable description"),
-                })
-                .describe("Password authentication options"),
-              social: z
-                .object({
-                  enabled: z
-                    .boolean()
-                    .describe("Whether social login is allowed"),
-                  description: z
-                    .string()
-                    .describe("Human-readable description"),
-                  providers: z
-                    .array(
-                      z.object({
-                        name: z
-                          .string()
-                          .describe(
-                            "Provider display name (e.g., 'Google', 'GitHub')",
-                          ),
-                        id: z.string().describe("Provider identifier"),
-                        enabled: z
-                          .boolean()
-                          .describe("Whether this provider is available"),
-                        description: z
-                          .string()
-                          .describe("Human-readable provider description"),
-                      }),
-                    )
-                    .describe("Available social login providers"),
-                })
-                .describe("Social authentication options"),
-            })
-            .describe("Available login methods and their configurations"),
-          security: z
-            .object({
-              maxAttempts: z
-                .number()
-                .optional()
-                .describe("Maximum login attempts allowed"),
-              requireTwoFactor: z
-                .boolean()
-                .optional()
-                .describe("Whether 2FA is required for this user"),
-              description: z.string().describe("Security requirements summary"),
-            })
-            .describe("Security requirements and limitations"),
-          recommendations: z
-            .array(z.string())
-            .describe("Recommended login methods for this user"),
-        }),
+        { response: true },
+        {
+          success: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.v1.core.user.public.login.options.response.success.badge",
+            },
+            z
+              .boolean()
+              .describe("Whether login options were retrieved successfully"),
+          ),
+          message: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.user.public.login.options.response.message.content",
+            },
+            z.string().describe("Human-readable status message"),
+          ),
+          forUser: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.user.public.login.options.response.forUser.content",
+            },
+            z
+              .string()
+              .optional()
+              .describe("Email address these options are specific to"),
+          ),
+          loginMethods: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title: "app.api.v1.core.user.public.login.options.response.loginMethods.title",
+              description: "app.api.v1.core.user.public.login.options.response.loginMethods.description",
+              layoutType: LayoutType.VERTICAL,
+            },
+            { response: true },
+            {
+              password: objectField(
+                {
+                  type: WidgetType.CONTAINER,
+                  title: "app.api.v1.core.user.public.login.options.response.loginMethods.password.title",
+                  description: "app.api.v1.core.user.public.login.options.response.loginMethods.password.description",
+                  layoutType: LayoutType.HORIZONTAL,
+                },
+                { response: true },
+                {
+                  enabled: responseField(
+                    {
+                      type: WidgetType.BADGE,
+                      text: "app.api.v1.core.user.public.login.options.response.loginMethods.password.enabled.badge",
+                    },
+                    z
+                      .boolean()
+                      .describe("Whether password login is allowed"),
+                  ),
+                  passwordDescription: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.v1.core.user.public.login.options.response.loginMethods.password.description",
+                    },
+                    z
+                      .string()
+                      .describe("Human-readable description"),
+                  ),
+                },
+              ),
+              social: objectField(
+                {
+                  type: WidgetType.CONTAINER,
+                  title: "app.api.v1.core.user.public.login.options.response.loginMethods.social.title",
+                  description: "app.api.v1.core.user.public.login.options.response.loginMethods.social.description",
+                  layoutType: LayoutType.VERTICAL,
+                },
+                { response: true },
+                {
+                  enabled: responseField(
+                    {
+                      type: WidgetType.BADGE,
+                      text: "app.api.v1.core.user.public.login.options.response.loginMethods.social.enabled.badge",
+                    },
+                    z
+                      .boolean()
+                      .describe("Whether social login is allowed"),
+                  ),
+                  socialDescription: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.v1.core.user.public.login.options.response.loginMethods.social.description",
+                    },
+                    z
+                      .string()
+                      .describe("Human-readable description"),
+                  ),
+                  providers: responseArrayField(
+                    {
+                      type: WidgetType.DATA_LIST,
+                    },
+                    objectField(
+                      {
+                        type: WidgetType.CONTAINER,
+                        layoutType: LayoutType.HORIZONTAL,
+                      },
+                      { response: true },
+                      {
+                        name: responseField(
+                          {
+                            type: WidgetType.TEXT,
+                            content: "app.api.v1.core.user.public.login.options.response.loginMethods.social.providers.name.content",
+                          },
+                          z
+                            .string()
+                            .describe(
+                              "Provider display name (e.g., 'Google', 'GitHub')",
+                            ),
+                        ),
+                        id: responseField(
+                          {
+                            type: WidgetType.TEXT,
+                            content: "app.api.v1.core.user.public.login.options.response.loginMethods.social.providers.id.content",
+                          },
+                          z.string().describe("Provider identifier"),
+                        ),
+                        enabled: responseField(
+                          {
+                            type: WidgetType.BADGE,
+                            text: "app.api.v1.core.user.public.login.options.response.loginMethods.social.providers.enabled.badge",
+                          },
+                          z
+                            .boolean()
+                            .describe("Whether this provider is available"),
+                        ),
+                        description: responseField(
+                          {
+                            type: WidgetType.TEXT,
+                            content: "app.api.v1.core.user.public.login.options.response.loginMethods.social.providers.description",
+                          },
+                          z
+                            .string()
+                            .describe("Human-readable provider description"),
+                        ),
+                      },
+                    ),
+                  ),
+                },
+              ),
+            },
+          ),
+          security: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              title: "app.api.v1.core.user.public.login.options.response.security.title",
+              description: "app.api.v1.core.user.public.login.options.response.security.description",
+              layoutType: LayoutType.HORIZONTAL,
+            },
+            { response: true },
+            {
+              maxAttempts: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.v1.core.user.public.login.options.response.security.maxAttempts.content",
+                },
+                z
+                  .number()
+                  .optional()
+                  .describe("Maximum login attempts allowed"),
+              ),
+              requireTwoFactor: responseField(
+                {
+                  type: WidgetType.BADGE,
+                  text: "app.api.v1.core.user.public.login.options.response.security.requireTwoFactor.badge",
+                },
+                z
+                  .boolean()
+                  .optional()
+                  .describe("Whether 2FA is required for this user"),
+              ),
+              securityDescription: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.v1.core.user.public.login.options.response.security.description",
+                },
+                z.string().describe("Security requirements summary"),
+              ),
+            },
+          ),
+          recommendations: responseArrayField(
+            {
+              type: WidgetType.LINK_LIST,
+            },
+            z.string(),
+          ),
+        },
       ),
     },
   ),
@@ -223,29 +348,29 @@ const { GET } = createEndpoint({
           loginMethods: {
             password: {
               enabled: true,
-              description: "Log in with your email and password",
+              passwordDescription: "Log in with your email and password",
             },
             social: {
               enabled: true,
-              description: "Log in with your social media accounts",
+              socialDescription: "Log in with your social media accounts",
               providers: [
                 {
                   name: "Google",
                   id: SocialProviders.GOOGLE,
                   enabled: true,
-                  description: "Continue with Google account",
+                  description: "Sign in with your Google account",
                 },
                 {
                   name: "GitHub",
                   id: SocialProviders.GITHUB,
                   enabled: true,
-                  description: "Continue with GitHub account",
+                  description: "Sign in with your GitHub account",
                 },
                 {
                   name: "Facebook",
                   id: SocialProviders.FACEBOOK,
                   enabled: true,
-                  description: "Continue with Facebook account",
+                  description: "Sign in with your Facebook account",
                 },
               ],
             },
@@ -253,7 +378,7 @@ const { GET } = createEndpoint({
           security: {
             maxAttempts: 5,
             requireTwoFactor: false,
-            description: "Standard security requirements",
+            securityDescription: "Standard security requirements",
           },
           recommendations: [
             "Try password login first",
@@ -268,17 +393,17 @@ const { GET } = createEndpoint({
           loginMethods: {
             password: {
               enabled: true,
-              description: "Log in with your email and password",
+              passwordDescription: "Log in with your email and password",
             },
             social: {
               enabled: true,
-              description: "Log in with your social media accounts",
+              socialDescription: "Log in with your social media accounts",
               providers: [
                 {
                   name: "Google",
                   id: SocialProviders.GOOGLE,
                   enabled: true,
-                  description: "Continue with Google account",
+                  description: "Sign in with your Google account",
                 },
               ],
             },
@@ -286,7 +411,7 @@ const { GET } = createEndpoint({
           security: {
             maxAttempts: 5,
             requireTwoFactor: false,
-            description: "Standard security requirements",
+            securityDescription: "Standard security requirements",
           },
           recommendations: [
             "Enter your email to see personalized login options",
@@ -301,18 +426,18 @@ const { GET } = createEndpoint({
           loginMethods: {
             password: {
               enabled: true,
-              description: "Log in with your email and password (2FA required)",
+              passwordDescription: "Log in with your email and password (2FA required)",
             },
             social: {
               enabled: false,
-              description: "Social login disabled for admin accounts",
+              socialDescription: "Social login disabled for admin accounts",
               providers: [],
             },
           },
           security: {
             maxAttempts: 3,
             requireTwoFactor: true,
-            description: "Enhanced security: 2FA required, limited attempts",
+            securityDescription: "Enhanced security: 2FA required, limited attempts",
           },
           recommendations: [
             "Use password login with 2FA",

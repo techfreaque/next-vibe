@@ -21,6 +21,27 @@ export const translations: typeof enTranslations = {
         description: "Unikalny identyfikator strażnika",
         placeholder: "guard-123",
       },
+      username: {
+        title: "Nazwa użytkownika",
+      },
+      status: {
+        title: "Status",
+      },
+      createdAt: {
+        title: "Utworzono",
+      },
+      securityLevel: {
+        title: "Poziom bezpieczeństwa",
+      },
+      isolationMethod: {
+        title: "Metoda izolacji",
+      },
+      isRunning: {
+        title: "Działa",
+      },
+      userHome: {
+        title: "Katalog użytkownika",
+      },
       listAll: {
         title: "Wyświetl Wszystkich Strażników",
         description: "Wyświetl wszystkie środowiska strażników",

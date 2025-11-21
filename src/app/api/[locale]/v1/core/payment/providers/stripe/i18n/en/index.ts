@@ -38,6 +38,12 @@ export const translations = {
         label: "Webhook Events",
         description: "Select Stripe events to listen for",
         placeholder: "Select events to monitor...",
+        paymentIntentSucceeded: "Payment Intent Succeeded",
+        paymentIntentFailed: "Payment Intent Failed",
+        subscriptionCreated: "Subscription Created",
+        subscriptionUpdated: "Subscription Updated",
+        invoicePaymentSucceeded: "Invoice Payment Succeeded",
+        invoicePaymentFailed: "Invoice Payment Failed",
       },
       forwardTo: {
         label: "Forward To URL",

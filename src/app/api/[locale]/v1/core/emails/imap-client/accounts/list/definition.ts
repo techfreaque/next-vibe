@@ -53,7 +53,8 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.emails.imapClient.accounts.list.container.title",
       description:
         "app.api.v1.core.emails.imapClient.accounts.list.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -68,7 +69,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.list.fields.page.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.accounts.list.fields.page.placeholder",
-          layout: { columns: 2 },
+          columns: 2,
         },
         z.coerce.number().min(1).default(1),
       ),
@@ -83,7 +84,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.list.fields.limit.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.accounts.list.fields.limit.placeholder",
-          layout: { columns: 2 },
+          columns: 2,
         },
         z.coerce.number().min(1).max(100).default(20),
       ),
@@ -98,7 +99,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.list.fields.search.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.accounts.list.fields.search.placeholder",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.string().optional(),
       ),
@@ -114,7 +115,7 @@ const { GET } = createEndpoint({
           placeholder:
             "app.api.v1.core.emails.imapClient.accounts.list.fields.status.placeholder",
           options: ImapAccountStatusFilterOptions,
-          layout: { columns: 2 },
+          columns: 2,
         },
         z
           .nativeEnum(ImapAccountStatusFilter)
@@ -129,7 +130,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.list.fields.enabled.label",
           description:
             "app.api.v1.core.emails.imapClient.accounts.list.fields.enabled.description",
-          layout: { columns: 2 },
+          columns: 2,
         },
         z.boolean().optional(),
       ),
@@ -145,7 +146,7 @@ const { GET } = createEndpoint({
           placeholder:
             "app.api.v1.core.emails.imapClient.accounts.list.fields.sortBy.placeholder",
           options: ImapAccountSortFieldOptions,
-          layout: { columns: 2 },
+          columns: 2,
         },
         z
           .nativeEnum(ImapAccountSortField)
@@ -163,7 +164,7 @@ const { GET } = createEndpoint({
           placeholder:
             "app.api.v1.core.emails.imapClient.accounts.list.fields.sortOrder.placeholder",
           options: SortOrderOptions,
-          layout: { columns: 2 },
+          columns: 2,
         },
         z.nativeEnum(SortOrder).default(SortOrder.DESC),
       ),
@@ -172,19 +173,14 @@ const { GET } = createEndpoint({
       accounts: responseArrayField(
         {
           type: WidgetType.GROUPED_LIST,
-          groupBy: "status",
           sortBy: "name",
-          showGroupSummary: true,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          columns: 12,
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
-            title:
-              "app.api.v1.core.emails.imapClient.accounts.list.response.accounts.item.title",
-            description:
-              "app.api.v1.core.emails.imapClient.accounts.list.response.accounts.item.description",
-            layout: { type: LayoutType.GRID, columns: 12 },
+            layoutType: LayoutType.GRID,
+            columns: 12,
           },
           { response: true },
           {
@@ -353,7 +349,8 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.list.response.pagination.title",
           description:
             "app.api.v1.core.emails.imapClient.accounts.list.response.pagination.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { response: true },
         {

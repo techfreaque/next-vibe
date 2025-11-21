@@ -81,6 +81,14 @@ export const translations = {
       label: "Lead-ID",
       description: "Zugehörige Lead-Kennung",
     },
+    country: {
+      label: "Land",
+      description: "Wohnsitzland des Benutzers",
+    },
+    language: {
+      label: "Sprache",
+      description: "Bevorzugte Sprache des Benutzers",
+    },
     response: {
       title: "Benutzer erstellt",
       description: "Details des neu erstellten Benutzers",
@@ -90,6 +98,14 @@ export const translations = {
       leadId: {
         content: "Zugehörige Lead-ID",
       },
+    country: {
+      label: "Land",
+      description: "Wohnsitzland des Benutzers",
+    },
+    language: {
+      label: "Sprache",
+      description: "Bevorzugte Sprache des Benutzers",
+    },
       email: {
         content: "E-Mail-Adresse",
       },

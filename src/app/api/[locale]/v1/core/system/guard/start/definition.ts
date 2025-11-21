@@ -28,7 +28,12 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.guard.start.description",
   category: "app.api.v1.core.system.guard.category",
   tags: ["app.api.v1.core.system.guard.start.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["guard", "guard:start", "guard-start"],
 
   fields: objectField(
@@ -36,7 +41,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.guard.start.container.title",
       description: "app.api.v1.core.system.guard.start.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -50,7 +56,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.guard.start.fields.projectPath.description",
           placeholder:
             "app.api.v1.core.system.guard.start.fields.projectPath.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -62,7 +68,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.guard.start.fields.startAll.title",
           description:
             "app.api.v1.core.system.guard.start.fields.startAll.description",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.boolean().optional().default(false),
       ),
@@ -76,32 +82,54 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.guard.start.fields.guardId.description",
           placeholder:
             "app.api.v1.core.system.guard.start.fields.guardId.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
 
       // === RESPONSE FIELDS ===
-      summary: responseField(
+      summary: objectField(
         {
-          type: WidgetType.METRIC_CARD,
-          title: "app.api.v1.core.system.guard.start.fields.totalStarted.title",
-          value: "totalStarted",
-          format: "number",
-          icon: "🛡️",
+          type: WidgetType.CONTAINER,
+          title: "app.api.v1.core.system.guard.start.fields.summary.title",
+          layoutType: LayoutType.GRID,
+          columns: 3,
         },
-        z.object({
-          totalStarted: z.number(),
-          status: z.string(),
-          hasIssues: z.boolean(),
-        }),
+        { response: true },
+        {
+          totalStarted: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.system.guard.start.fields.totalStarted.title",
+              fieldType: FieldDataType.NUMBER,
+            },
+            z.number(),
+          ),
+          status: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.system.guard.start.fields.status.title",
+              fieldType: FieldDataType.TEXT,
+            },
+            z.string(),
+          ),
+          hasIssues: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.system.guard.start.fields.hasIssues.title",
+              fieldType: FieldDataType.BOOLEAN,
+            },
+            z.boolean(),
+          ),
+        },
       ),
 
       output: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.v1.core.system.guard.start.fields.output.title",
-          variant: "subtitle",
         },
         z.string(),
       ),

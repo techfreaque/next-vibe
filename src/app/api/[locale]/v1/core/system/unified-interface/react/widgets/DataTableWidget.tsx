@@ -118,7 +118,7 @@ export const DataTableWidget = ({
                     ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                     : ""
                 }`}
-                style={{ width: column.width }}
+                width={column.width}
                 onClick={(): void => {
                   if (column.sortable) {
                     handleSort(column.key);

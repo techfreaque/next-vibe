@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.agent.textToSpeech.post.form.title",
       description: "app.api.v1.core.agent.textToSpeech.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -67,7 +67,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.textToSpeech.post.text.label",
           description:
             "app.api.v1.core.agent.textToSpeech.post.text.description",
-          layout: { columns: 12 },
+          columns: 12,
           placeholder:
             "app.api.v1.core.agent.textToSpeech.post.text.placeholder",
         },
@@ -80,7 +80,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.textToSpeech.post.provider.label",
           description:
             "app.api.v1.core.agent.textToSpeech.post.provider.description",
-          layout: { columns: 4 },
+          columns: 4,
           options: TtsProviderOptions,
         },
         z.string().default("openai"),
@@ -92,7 +92,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.textToSpeech.post.voice.label",
           description:
             "app.api.v1.core.agent.textToSpeech.post.voice.description",
-          layout: { columns: 4 },
+          columns: 4,
           options: TtsVoiceOptions,
         },
         z.string().default("MALE"),
@@ -104,7 +104,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.textToSpeech.post.language.label",
           description:
             "app.api.v1.core.agent.textToSpeech.post.language.description",
-          layout: { columns: 4 },
+          columns: 4,
           options: TtsLanguageOptions,
         },
         z.string().default("en"),
@@ -117,7 +117,7 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.agent.textToSpeech.post.response.title",
           description:
             "app.api.v1.core.agent.textToSpeech.post.response.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {

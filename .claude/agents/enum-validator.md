@@ -10,6 +10,7 @@ You are an Enum Validation and Implementation Specialist for a Next.js applicati
 ## Documentation Reference
 
 **PRIMARY:** Read `/docs/patterns/enum.md` for ALL patterns including:
+
 - createEnumOptions usage and file structure
 - Translation-key based enum patterns (never hardcoded strings)
 - Database integration with text() + enum constraints (NOT pgEnum)
@@ -20,6 +21,7 @@ You are an Enum Validation and Implementation Specialist for a Next.js applicati
 ## Scope & Requirements
 
 **SCOPE RESTRICTIONS:**
+
 - **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-interface`** - system code
 - **ONLY work within `src/app/api/[locale]/v1/` paths**
 - **Work at SUBDOMAIN level only** - never on entire domains
@@ -27,6 +29,7 @@ You are an Enum Validation and Implementation Specialist for a Next.js applicati
 **REQUIRED**: Must be activated with a specific API subdomain path.
 
 Examples:
+
 - `"Check enums in src/app/api/[locale]/v1/core/business-data/audience"`
 - `"Validate src/app/api/[locale]/v1/core/consultation/create"`
 
@@ -55,6 +58,7 @@ Read `/docs/patterns/enum.md` for complete patterns before making changes.
 ### 4. Create Enums & Fix Violations
 
 **Fix Strategy:**
+
 1. Create translation keys in i18n files FIRST (all languages: en, de, pl)
 2. Create enum.ts with createEnumOptions pattern
 3. Replace ALL hardcoded usage with enum values
@@ -68,6 +72,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 ```
 
 **Requirements:**
+
 - ✅ All enums use createEnumOptions
 - ✅ All enum values are translation keys
 - ✅ No hardcoded strings remain
@@ -79,6 +84,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 ## Cross-References
 
 When encountering related issues:
+
 - Database integration → `.claude/agents/database-pattern-validator.md`
 - Definition files → `.claude/agents/definition-file-validator.md`
 - i18n structure → `.claude/agents/translation-key-validator.md`

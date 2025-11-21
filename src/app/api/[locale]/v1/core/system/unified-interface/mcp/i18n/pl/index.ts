@@ -77,18 +77,23 @@ export const translations: typeof enTranslations = {
         name: {
           title: "Nazwa narzędzia",
           description: "Nazwa narzędzia do wykonania (np. core:system:db:ping)",
+          placeholder: "core:system:db:ping",
         },
         arguments: {
           title: "Argumenty",
           description: "Argumenty narzędzia jako pary klucz-wartość",
+          placeholder: "{}",
         },
       },
       response: {
         title: "Wynik wykonania narzędzia",
         description: "Wynik wykonania narzędzia",
-        content: {
-          type: "Typ zawartości",
-          text: "Zawartość",
+        result: {
+          content: {
+            type: "Typ zawartości",
+            text: "Zawartość"
+          },
+          isError: "Czy błąd",
         },
       },
       errors: {

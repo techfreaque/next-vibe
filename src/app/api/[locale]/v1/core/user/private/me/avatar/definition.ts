@@ -33,14 +33,10 @@ const { POST } = createEndpoint({
   category: "app.api.v1.core.user.category" as const,
   tags: ["app.api.v1.core.user.private.me.avatar.tag" as const],
   allowedRoles: [
-    UserRole.PUBLIC,
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
-    UserRole.CLI_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.WEB_OFF,
   ] as const,
   fields: objectField(
     {
@@ -48,7 +44,8 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.user.private.me.avatar.upload.title" as const,
       description:
         "app.api.v1.core.user.private.me.avatar.upload.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -60,7 +57,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.private.me.avatar.upload.groups.fileUpload.title" as const,
           description:
             "app.api.v1.core.user.private.me.avatar.upload.groups.fileUpload.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { request: "data" },
         {
@@ -74,8 +72,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.private.me.avatar.upload.fields.file.description" as const,
               placeholder:
                 "app.api.v1.core.user.private.me.avatar.upload.fields.file.placeholder" as const,
-              required: true,
-              layout: { columns: 12 },
+              columns: 12,
               helpText:
                 "app.api.v1.core.user.private.me.avatar.upload.fields.file.help" as const,
             },
@@ -116,7 +113,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.private.me.avatar.upload.response.title" as const,
           description:
             "app.api.v1.core.user.private.me.avatar.upload.response.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { response: true },
         {
@@ -304,14 +302,10 @@ const { DELETE } = createEndpoint({
   category: "app.api.v1.core.user.category" as const,
   tags: ["app.api.v1.core.user.private.me.avatar.tag" as const],
   allowedRoles: [
-    UserRole.PUBLIC,
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
-    UserRole.CLI_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.WEB_OFF,
   ] as const,
   fields: objectField(
     {
@@ -320,7 +314,8 @@ const { DELETE } = createEndpoint({
         "app.api.v1.core.user.private.me.avatar.delete.response.title" as const,
       description:
         "app.api.v1.core.user.private.me.avatar.delete.response.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { response: true },
     {

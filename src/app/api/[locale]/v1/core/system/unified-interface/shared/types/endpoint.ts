@@ -18,34 +18,10 @@ import type {
   InterfaceContext,
   Methods,
 } from "./enums";
-import { FieldUsage } from "./enums";
+import type { FieldUsage } from "./enums";
+import type { WidgetConfig } from "./widget-configs";
 import type { CreateApiEndpoint } from "../endpoint/create";
 import { type UserRoleValue } from "../../../../user/user-roles/enum";
-
-// Re-export FieldUsage for convenience
-export { FieldUsage };
-
-/**
- * Recursive type for UI configuration values
- * Includes TranslationKey to properly type label/title/description fields
- */
-export type FieldUIConfigValue =
-  | string
-  | TranslationKey
-  | number
-  | boolean
-  | null
-  | undefined
-  | readonly FieldUIConfigValue[]
-  | { readonly [K in PropertyKey]?: FieldUIConfigValue };
-
-/**
- * Constraint for UI configuration - accepts objects with any structure
- * The actual type is preserved through generics in PrimitiveField/ObjectField/ArrayField
- */
-export type FieldUIConfig = {
-  readonly [K in PropertyKey]?: FieldUIConfigValue;
-};
 
 // ============================================================================
 // ENDPOINT REGISTRY TYPES
@@ -262,10 +238,25 @@ export type InferSchemaFromField<F, Usage extends FieldUsage> =
               >
             : z.ZodNever
           : z.ZodNever
-        : // Fallback: If F is not a UnifiedField but is a ZodTypeAny, return it directly
-          F extends z.ZodTypeAny
-          ? F
-          : z.ZodNever;
+        : // Handle ArrayOptionalField
+          F extends ArrayOptionalField<infer TChild, FieldUsageConfig>
+          ? F extends { usage: infer TUsage }
+            ? MatchesUsage<TUsage, Usage> extends true
+              ? z.ZodNullable<
+                  z.ZodArray<
+                    TChild extends UnifiedField<z.ZodTypeAny>
+                      ? InferSchemaFromField<TChild, Usage>
+                      : TChild extends z.ZodTypeAny
+                        ? TChild
+                        : z.ZodNever
+                  >
+                >
+              : z.ZodNever
+            : z.ZodNever
+          : // Fallback: If F is not a UnifiedField but is a ZodTypeAny, return it directly
+            F extends z.ZodTypeAny
+            ? F
+            : z.ZodNever;
 
 /**
  * Infer the exact input type from a field structure for a specific usage
@@ -290,7 +281,6 @@ export type InferOutputFromField<
 /**
  * METHOD-SPECIFIC USAGE MATCHING: Check if usage matches for a specific method
  * This is the core logic that enables method-specific type inference
- * ✅ VERIFIED: Working correctly for message field filtering
  */
 type MatchesUsageForMethod<
   TUsage,
@@ -391,7 +381,27 @@ export type InferSchemaFromFieldForMethod<
               >
             : z.ZodNever
           : z.ZodNever
-        : z.ZodNever;
+        : // Handle ArrayOptionalField
+          F extends ArrayOptionalField<infer TChild, FieldUsageConfig>
+          ? F extends { usage: infer TUsage }
+            ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
+              ? z.ZodNullable<
+                  z.ZodArray<
+                    TChild extends UnifiedField<z.ZodTypeAny>
+                      ? InferSchemaFromFieldForMethod<
+                          TChild,
+                          Method,
+                          Usage,
+                          z.ZodTypeAny
+                        >
+                      : TChild extends z.ZodTypeAny
+                        ? TChild
+                        : z.ZodNever
+                  >
+                >
+              : z.ZodNever
+            : z.ZodNever
+          : z.ZodNever;
 
 /**
  * METHOD-SPECIFIC INPUT TYPE INFERENCE
@@ -742,7 +752,7 @@ export interface BulkAction {
 export interface PrimitiveField<
   TSchema extends z.ZodTypeAny,
   TUsage extends FieldUsageConfig,
-  TUIConfig extends FieldUIConfig = FieldUIConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
 > {
   type: "primitive";
   schema: TSchema;
@@ -762,9 +772,26 @@ export interface PrimitiveField<
 export interface ObjectField<
   TChildren,
   TUsage extends FieldUsageConfig,
-  TUIConfig extends FieldUIConfig = FieldUIConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
 > {
   type: "object";
+  schema?: z.ZodObject<Record<string, z.ZodTypeAny>>;
+  usage: TUsage;
+  cache?: CacheStrategy;
+  ui: TUIConfig;
+  children: TChildren;
+}
+
+/**
+ * Optional object field type - same as ObjectField but marked as optional
+ * TUIConfig preserves the exact UI configuration type passed in
+ */
+export interface ObjectOptionalField<
+  TChildren,
+  TUsage extends FieldUsageConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
+> {
+  type: "object-optional";
   schema?: z.ZodObject<Record<string, z.ZodTypeAny>>;
   usage: TUsage;
   cache?: CacheStrategy;
@@ -779,9 +806,26 @@ export interface ObjectField<
 export interface ArrayField<
   TChild,
   TUsage extends FieldUsageConfig,
-  TUIConfig extends FieldUIConfig = FieldUIConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
 > {
   type: "array";
+  schema?: z.ZodArray<z.ZodTypeAny>;
+  usage: TUsage;
+  cache?: CacheStrategy;
+  ui: TUIConfig;
+  child: TChild;
+}
+
+/**
+ * Optional array field type - same as ArrayField but marked as optional
+ * TUIConfig preserves the exact UI configuration type passed in
+ */
+export interface ArrayOptionalField<
+  TChild,
+  TUsage extends FieldUsageConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
+> {
+  type: "array-optional";
   schema?: z.ZodArray<z.ZodTypeAny>;
   usage: TUsage;
   cache?: CacheStrategy;
@@ -797,4 +841,12 @@ export interface ArrayField<
 export type UnifiedField<TSchema extends z.ZodTypeAny = z.ZodTypeAny> =
   | PrimitiveField<TSchema, FieldUsageConfig>
   | ObjectField<Record<string, UnifiedField<z.ZodTypeAny>>, FieldUsageConfig>
-  | ArrayField<UnifiedField<z.ZodTypeAny> | z.ZodTypeAny, FieldUsageConfig>;
+  | ObjectOptionalField<
+      Record<string, UnifiedField<z.ZodTypeAny>>,
+      FieldUsageConfig
+    >
+  | ArrayField<UnifiedField<z.ZodTypeAny> | z.ZodTypeAny, FieldUsageConfig>
+  | ArrayOptionalField<
+      UnifiedField<z.ZodTypeAny> | z.ZodTypeAny,
+      FieldUsageConfig
+    >;

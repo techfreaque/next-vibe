@@ -22,6 +22,12 @@ export const translations = {
     response: {
       title: "Folders Response",
       description: "List of all folders",
+      rootFolderPermissions: {
+        title: "Root Folder Permissions",
+        description: "Permissions for the requested root folder",
+        canCreateThread: { content: "Can Create Thread" },
+        canCreateFolder: { content: "Can Create Folder" },
+      },
       folders: {
         title: "Folders",
         description: "Array of folder objects",
@@ -40,6 +46,11 @@ export const translations = {
           metadata: { content: "Metadata" },
           createdAt: { content: "Created At" },
           updatedAt: { content: "Updated At" },
+          canManage: { content: "Can Manage" },
+          canCreateThread: { content: "Can Create Thread" },
+          canModerate: { content: "Can Moderate" },
+          canDelete: { content: "Can Delete" },
+          canManagePermissions: { content: "Can Manage Permissions" },
         },
       },
     },

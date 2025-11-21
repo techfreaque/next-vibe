@@ -191,10 +191,7 @@ class RouteHandlersGeneratorRepositoryImpl
       const importPath = pathMap[path];
       // eslint-disable-next-line i18next/no-literal-string
       cases.push(`    case "${path}":
-      return await loadRouteModule(
-        () => import("${importPath}"),
-        "${path}"
-      );`);
+      return await import("${importPath}");`);
     }
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -211,37 +208,12 @@ class RouteHandlersGeneratorRepositoryImpl
 /* eslint-disable prettier/prettier */
 /* eslint-disable i18next/no-literal-string */
 
-import type { RouteModule } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/handler";
-
 /**
- * Helper function to load and validate route modules
- * Accepts any import function and validates the result at runtime
- */
-async function loadRouteModule<T>(
-  importFn: () => Promise<T>,
-  path: string
-): Promise<RouteModule | null> {
-  try {
-    const routeModule = await importFn();
-    // Basic validation that it's a route module
-    if (routeModule && typeof routeModule === "object") {
-      return routeModule as RouteModule;
-    }
-    return null;
-  } catch (err) {
-    // eslint-disable-next-line no-console -- Required for debugging route module loading errors
-    console.error(\`Failed to load route module for path: \${path}\`, err);
-    return null;
-  }
-}
-
-/**
- * Dynamically import route handler by path with runtime validation
+ * Dynamically import route handler by path
  * @param path - The route path (e.g., "core/agent/chat/threads")
- * @returns The validated route module or null if not found
- * @throws {TypeError} If the imported module is not a valid RouteModule
+ * @returns The route module or null if not found
  */
-export async function getRouteHandler(path: string): Promise<RouteModule | null> {
+export async function getRouteHandler(path: string) {
   switch (path) {
 ${cases.join("\n")}
     default:

@@ -12,14 +12,10 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { isErrorResponseType } from "next-vibe/shared/utils/parse-error";
 import { storage } from "next-vibe-ui/lib/storage";
-import type { FormEvent } from "react";
 import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { useApiStore } from "./store";
 import type {
@@ -30,6 +26,7 @@ import type {
   SubmitFormFunctionOptions,
 } from "./types";
 import { useApiMutation } from "./use-api-mutation";
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 
 /**
  * Creates a form integrated with API mutation based on the endpoint's request schema
@@ -46,15 +43,7 @@ import { useApiMutation } from "./use-api-mutation";
  * @param mutationOptions - API mutation options
  * @returns Form and mutation for API interaction with enhanced error handling
  */
-export function useApiForm<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
->(
+export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   logger: EndpointLogger,
   options: ApiFormOptions<TEndpoint["TRequestOutput"]> = {},
@@ -89,6 +78,19 @@ export function useApiForm<
     ...options,
     resolver: zodResolver(endpoint.requestSchema),
   };
+
+  logger.debug("Form config for useForm", {
+    endpoint: endpoint.path.join("/"),
+    defaultValues: options.defaultValues,
+    hasDefaultValues: !!options.defaultValues,
+    defaultValuesKeys: options.defaultValues
+      ? Object.keys(options.defaultValues)
+      : [],
+    requestSchema: endpoint.requestSchema,
+    requestSchemaShape: endpoint.requestSchema?.shape
+      ? Object.keys(endpoint.requestSchema.shape)
+      : "no shape",
+  });
 
   // Extract persistence options
   const { persistForm = true, persistenceKey } = options;
@@ -209,7 +211,6 @@ export function useApiForm<
 
   // Create a submit handler that validates and submits the form
   const submitForm = ((
-    event: FormEvent<HTMLFormElement> | undefined,
     options: TEndpoint["TUrlVariablesOutput"] extends undefined
       ? undefined
       : SubmitFormFunctionOptions<
@@ -220,22 +221,14 @@ export function useApiForm<
   ): void => {
     logger.debug("submitForm called", {
       endpoint: endpoint.path.join("/"),
-      eventType: event?.type,
-      hasEvent: !!event,
     });
-
-    // Prevent default form submission behavior
-    if (event) {
-      logger.debug("Preventing default form submission", {
-        endpoint: endpoint.path.join("/"),
-      });
-      event.preventDefault();
-    }
 
     const _submitForm = async (validatedData: FormData): Promise<void> => {
       logger.debug("_submitForm called with validated data", {
         endpoint: endpoint.path.join("/"),
         validatedData,
+        validatedDataKeys: Object.keys(validatedData),
+        validatedDataValues: Object.values(validatedData),
       });
       try {
         // Clear any previous errors
@@ -325,7 +318,7 @@ export function useApiForm<
         requestData: formMethods.getValues(),
         pathParams: options?.urlParamVariables,
       });
-    })(event);
+    })();
   }) as SubmitFormFunction<
     TEndpoint["TRequestOutput"],
     TEndpoint["TResponseOutput"],

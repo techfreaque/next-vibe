@@ -14,6 +14,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interf
 import {
   objectField,
   requestDataField,
+  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
@@ -108,8 +109,8 @@ const groupedStatsSchema = z.object({
   byConversionFunnel: z.array(groupedStatsItemSchema),
 });
 
-// Top performing campaign schema
-const topPerformingCampaignSchema = z.object({
+// Top performing campaign schema (unused - kept for reference)
+const _topPerformingCampaignSchema = z.object({
   campaignId: z.string(),
   campaignName: z.string(),
   leadsGenerated: z.number(),
@@ -118,8 +119,8 @@ const topPerformingCampaignSchema = z.object({
   clickRate: z.number(),
 });
 
-// Top performing source schema
-const topPerformingSourceSchema = z.object({
+// Top performing source schema (unused - kept for reference)
+const _topPerformingSourceSchema = z.object({
   source: z.enum(LeadSource),
   leadsGenerated: z.number(),
   conversionRate: z.number(),
@@ -138,8 +139,8 @@ const recentActivityDetailsSchema = z.object({
   isConverted: z.boolean(),
 });
 
-// Recent activity item schema
-const recentActivitySchema = z.object({
+// Recent activity item schema (unused - kept for reference)
+const _recentActivitySchema = z.object({
   id: z.string(),
   leadEmail: z.string(),
   leadBusinessName: z.string(),
@@ -324,7 +325,8 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.leads.stats.container.title",
       description: "app.api.v1.core.leads.stats.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -338,7 +340,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.timePeriod.label",
           description: "app.api.v1.core.leads.stats.timePeriod.description",
           options: TimePeriodOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.enum(TimePeriod).default(TimePeriod.DAY),
       ),
@@ -351,7 +353,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.leads.stats.dateRangePreset.description",
           options: DateRangePresetOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.enum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
       ),
@@ -362,7 +364,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.DATE,
           label: "app.api.v1.core.leads.stats.dateFrom.label",
           description: "app.api.v1.core.leads.stats.dateFrom.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.date().optional(),
       ),
@@ -373,7 +375,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.DATE,
           label: "app.api.v1.core.leads.stats.dateTo.label",
           description: "app.api.v1.core.leads.stats.dateTo.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.date().optional(),
       ),
@@ -385,7 +387,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.chartType.label",
           description: "app.api.v1.core.leads.stats.chartType.description",
           options: ChartTypeOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.enum(ChartType).default(ChartType.LINE),
       ),
@@ -397,7 +399,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.includeComparison.label",
           description:
             "app.api.v1.core.leads.stats.includeComparison.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.boolean().default(false),
       ),
@@ -410,7 +412,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.leads.stats.comparisonPeriod.description",
           options: DateRangePresetOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(DateRangePreset).optional(),
       ),
@@ -423,7 +425,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.status.label",
           description: "app.api.v1.core.leads.stats.status.description",
           options: LeadStatusFilterOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.enum(LeadStatusFilter).default(LeadStatusFilter.ALL),
       ),
@@ -435,7 +437,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.source.label",
           description: "app.api.v1.core.leads.stats.source.description",
           options: LeadSourceFilterOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.enum(LeadSourceFilter).default(LeadSourceFilter.ALL),
       ),
@@ -447,7 +449,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.country.label",
           description: "app.api.v1.core.leads.stats.country.description",
           options: CountryFilterOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.enum(CountryFilter).default(CountryFilter.ALL),
       ),
@@ -459,7 +461,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.language.label",
           description: "app.api.v1.core.leads.stats.language.description",
           options: LanguageFilterOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.enum(LanguageFilter).default(LanguageFilter.ALL),
       ),
@@ -471,7 +473,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.campaignStage.label",
           description: "app.api.v1.core.leads.stats.campaignStage.description",
           options: EmailCampaignStageFilterOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
         z
           .nativeEnum(EmailCampaignStageFilter)
@@ -485,7 +487,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.v1.core.leads.stats.hasEngagement.label",
           description: "app.api.v1.core.leads.stats.hasEngagement.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.coerce.boolean().optional(),
       ),
@@ -497,7 +499,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.minEmailsOpened.label",
           description:
             "app.api.v1.core.leads.stats.minEmailsOpened.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.coerce.number().optional(),
       ),
@@ -509,7 +511,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.minEmailsClicked.label",
           description:
             "app.api.v1.core.leads.stats.minEmailsClicked.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.coerce.number().optional(),
       ),
@@ -521,7 +523,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.v1.core.leads.stats.isConverted.label",
           description: "app.api.v1.core.leads.stats.isConverted.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.boolean().optional(),
       ),
@@ -532,7 +534,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.v1.core.leads.stats.hasSignedUp.label",
           description: "app.api.v1.core.leads.stats.hasSignedUp.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.boolean().optional(),
       ),
@@ -544,7 +546,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.hasBookedConsultation.label",
           description:
             "app.api.v1.core.leads.stats.hasBookedConsultation.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.boolean().optional(),
       ),
@@ -556,7 +558,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.hasConfirmedSubscription.label",
           description:
             "app.api.v1.core.leads.stats.hasConfirmedSubscription.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.boolean().optional(),
       ),
@@ -569,7 +571,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.hasBusinessName.label",
           description:
             "app.api.v1.core.leads.stats.hasBusinessName.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.boolean().optional(),
       ),
@@ -580,7 +582,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.v1.core.leads.stats.hasContactName.label",
           description: "app.api.v1.core.leads.stats.hasContactName.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.boolean().optional(),
       ),
@@ -591,7 +593,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.v1.core.leads.stats.hasPhone.label",
           description: "app.api.v1.core.leads.stats.hasPhone.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.boolean().optional(),
       ),
@@ -602,7 +604,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.v1.core.leads.stats.hasWebsite.label",
           description: "app.api.v1.core.leads.stats.hasWebsite.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.boolean().optional(),
       ),
@@ -613,7 +615,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.v1.core.leads.stats.hasNotes.label",
           description: "app.api.v1.core.leads.stats.hasNotes.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.boolean().optional(),
       ),
@@ -625,7 +627,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.v1.core.leads.stats.hasUserId.label",
           description: "app.api.v1.core.leads.stats.hasUserId.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.boolean().optional(),
       ),
@@ -636,7 +638,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.v1.core.leads.stats.emailVerified.label",
           description: "app.api.v1.core.leads.stats.emailVerified.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.boolean().optional(),
       ),
@@ -648,7 +650,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label: "app.api.v1.core.leads.stats.journeyVariant.label",
           description: "app.api.v1.core.leads.stats.journeyVariant.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(EmailJourneyVariant).optional(),
       ),
@@ -659,7 +661,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.NUMBER,
           label: "app.api.v1.core.leads.stats.minEmailsSent.label",
           description: "app.api.v1.core.leads.stats.minEmailsSent.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.number().optional(),
       ),
@@ -671,7 +673,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.DATE,
           label: "app.api.v1.core.leads.stats.createdAfter.label",
           description: "app.api.v1.core.leads.stats.createdAfter.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.date().optional(),
       ),
@@ -682,7 +684,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.DATE,
           label: "app.api.v1.core.leads.stats.createdBefore.label",
           description: "app.api.v1.core.leads.stats.createdBefore.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.date().optional(),
       ),
@@ -693,7 +695,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.DATE,
           label: "app.api.v1.core.leads.stats.updatedAfter.label",
           description: "app.api.v1.core.leads.stats.updatedAfter.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.date().optional(),
       ),
@@ -704,7 +706,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.DATE,
           label: "app.api.v1.core.leads.stats.updatedBefore.label",
           description: "app.api.v1.core.leads.stats.updatedBefore.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.date().optional(),
       ),
@@ -717,7 +719,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.search.label",
           description: "app.api.v1.core.leads.stats.search.description",
           placeholder: "app.api.v1.core.leads.stats.search.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().optional(),
       ),
@@ -730,7 +732,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.sortBy.label",
           description: "app.api.v1.core.leads.stats.sortBy.description",
           options: LeadSortFieldOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(LeadSortField).default(LeadSortField.CREATED_AT),
       ),
@@ -742,7 +744,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.stats.sortOrder.label",
           description: "app.api.v1.core.leads.stats.sortOrder.description",
           options: SortOrderOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(SortOrder).default(SortOrder.DESC),
       ),
@@ -1200,30 +1202,231 @@ const { GET } = createEndpoint({
       ),
 
       // Top performers with proper Zod schemas
-      topPerformingCampaigns: responseField(
+      topPerformingCampaigns: responseArrayField(
         {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.leads.stats.response.topPerformingCampaigns",
+          type: WidgetType.DATA_LIST,
+          title: "app.api.v1.core.leads.stats.response.topPerformingCampaigns",
+          description: "app.api.v1.core.leads.stats.response.topPerformingCampaigns",
         },
-        z.array(topPerformingCampaignSchema),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 12,
+          },
+          { response: true },
+          {
+            campaignId: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.topPerformingCampaigns",
+              },
+              z.string(),
+            ),
+            campaignName: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.topPerformingCampaigns",
+              },
+              z.string(),
+            ),
+            leadsGenerated: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.topPerformingCampaigns",
+              },
+              z.number(),
+            ),
+            conversionRate: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.conversionRate",
+              },
+              z.number(),
+            ),
+            openRate: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.averageOpenRate",
+              },
+              z.number(),
+            ),
+            clickRate: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.averageClickRate",
+              },
+              z.number(),
+            ),
+          },
+        ),
       ),
 
-      topPerformingSources: responseField(
+      topPerformingSources: responseArrayField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.v1.core.leads.stats.response.topPerformingSources",
+          type: WidgetType.DATA_LIST,
+          title: "app.api.v1.core.leads.stats.response.topPerformingSources",
+          description: "app.api.v1.core.leads.stats.response.topPerformingSources",
         },
-        z.array(topPerformingSourceSchema),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 12,
+          },
+          { response: true },
+          {
+            source: responseField(
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.leads.stats.response.leadsBySource",
+              },
+              z.enum(LeadSource),
+            ),
+            leadsGenerated: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.topPerformingSources",
+              },
+              z.number(),
+            ),
+            conversionRate: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.conversionRate",
+              },
+              z.number(),
+            ),
+            qualityScore: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.topPerformingSources",
+              },
+              z.number(),
+            ),
+          },
+        ),
       ),
 
       // Recent activity with proper Zod schema
-      recentActivity: responseField(
+      recentActivity: responseArrayField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.v1.core.leads.stats.response.recentActivity",
+          type: WidgetType.DATA_LIST,
+          title: "app.api.v1.core.leads.stats.response.recentActivity",
+          description: "app.api.v1.core.leads.stats.response.recentActivity",
         },
-        z.array(recentActivitySchema),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 12,
+          },
+          { response: true },
+          {
+            id: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.recentActivity",
+              },
+              z.string(),
+            ),
+            leadEmail: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.recentActivity",
+              },
+              z.string(),
+            ),
+            leadBusinessName: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.recentActivity",
+              },
+              z.string(),
+            ),
+            timestamp: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.stats.response.generatedAt",
+              },
+              z.string(),
+            ),
+            type: responseField(
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.leads.stats.response.recentActivity",
+              },
+              z.enum(ActivityType),
+            ),
+            details: objectField(
+              {
+                type: WidgetType.CONTAINER,
+                title: "app.api.v1.core.leads.stats.response.recentActivity",
+                layoutType: LayoutType.GRID,
+      columns: 12,
+              },
+              { response: true },
+              {
+                status: responseField(
+                  {
+                    type: WidgetType.BADGE,
+                    text: "app.api.v1.core.leads.stats.response.leadsByStatus",
+                  },
+                  z.enum(LeadStatus),
+                ),
+                source: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.stats.response.leadsBySource",
+                  },
+                  z.string(),
+                ),
+                country: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.stats.response.leadsByCountry",
+                  },
+                  z.string(),
+                ),
+                emailsSent: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.stats.response.totalEmailsSent",
+                  },
+                  z.number(),
+                ),
+                emailsOpened: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.stats.response.totalEmailsOpened",
+                  },
+                  z.number(),
+                ),
+                emailsClicked: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.stats.response.totalEmailsClicked",
+                  },
+                  z.number(),
+                ),
+                daysSinceCreated: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.stats.response.recentActivity",
+                  },
+                  z.number(),
+                ),
+                isConverted: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.stats.response.convertedLeads",
+                  },
+                  z.boolean(),
+                ),
+              },
+            ),
+          },
+        ),
       ),
 
       // Metadata

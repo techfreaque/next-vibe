@@ -10,6 +10,7 @@ import { env } from "@/config/env";
 import * as agentChatSchema from "../../agent/chat/db";
 import * as creditSchema from "../../credits/db";
 import * as leadsSchema from "../../leads/db";
+import * as referralSchema from "../../referral/db";
 import * as userSchema from "../../user/db";
 
 /**
@@ -36,6 +37,7 @@ export const db = drizzle(pool, {
     ...agentChatSchema,
     ...creditSchema,
     ...leadsSchema,
+    ...referralSchema,
   },
 });
 

@@ -5,8 +5,7 @@
 
 import {
   DEFAULT_FOLDER_CONFIGS,
-  DEFAULT_FOLDER_IDS,
-  type DefaultFolderId,
+  DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
@@ -189,7 +188,7 @@ export function getRootFolderIdForFolder(
   // Find the folder and get its rootFolderId
   const folder = folders[folderId];
   if (!folder) {
-    return DEFAULT_FOLDER_IDS.PRIVATE;
+    return DefaultFolderId.PRIVATE;
   }
 
   return folder.rootFolderId;

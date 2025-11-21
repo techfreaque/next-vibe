@@ -1,0 +1,171 @@
+"use client";
+
+import { cn } from "next-vibe/shared/utils";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { Kbd } from "next-vibe-ui/ui/kbd";
+import { Textarea } from "next-vibe-ui/ui/textarea";
+import { GitBranch, X } from "next-vibe-ui/ui/icons";
+import type { JSX } from "react";
+import React from "react";
+
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { getLocaleString } from "@/i18n/core/localization-utils";
+import { simpleT } from "@/i18n/core/shared";
+
+import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
+import { ModelSelector } from "@/app/api/[locale]/v1/core/agent/chat/threads/_components/chat-input/model-selector";
+import { SpeechInputButton } from "@/app/api/[locale]/v1/core/agent/chat/threads/_components/chat-input/speech-input-button";
+import { PersonaSelector } from "@/app/api/[locale]/v1/core/agent/chat/personas/_components/persona-selector";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
+import { useMessageEditor } from "./hooks/use-message-editor";
+
+interface MessageEditorProps {
+  message: ChatMessage;
+  onBranch: (messageId: string, content: string) => Promise<void>;
+  onCancel: () => void;
+  onModelChange?: (model: ModelId) => void;
+  onPersonaChange?: (persona: string) => void;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+}
+
+export function MessageEditor({
+  message,
+  onBranch,
+  onCancel,
+  onModelChange,
+  onPersonaChange,
+  locale,
+  logger,
+}: MessageEditorProps): JSX.Element {
+  // Get props from context instead of prop drilling
+  const { selectedModel, selectedPersona } = useChatContext();
+
+  const speechLang = getLocaleString(locale);
+  const { t } = simpleT(locale);
+
+  // Use custom hook for editor logic
+  const editor = useMessageEditor({
+    message,
+    onBranch,
+    onCancel,
+    logger,
+  });
+
+  return (
+    <Div ref={editor.editorRef} className="w-full">
+      <Form
+        onSubmit={editor.handleBranch}
+        className={cn(
+          "p-4 bg-card backdrop-blur",
+          "border border-border rounded-lg shadow-lg",
+          "w-full",
+        )}
+      >
+        {/* Textarea */}
+        <Div className="relative mb-3">
+          <Textarea
+            ref={editor.textareaRef}
+            value={editor.content}
+            onChange={(e): void => editor.setContent(e.target.value)}
+            onKeyDown={editor.handleKeyDown}
+            placeholder=""
+            disabled={editor.isLoading}
+            className="px-0 text-base"
+            variant="ghost"
+            rows={3}
+          />
+
+          {/* Hint Text - Shows when textarea is empty - Hidden on mobile */}
+          {!editor.content && (
+            <Div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden sm:block">
+              {t("app.chat.input.keyboardShortcuts.press")}{" "}
+              <Kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+                {t("app.chat.input.keyboardShortcuts.enter")}
+              </Kbd>{" "}
+              {t("app.chat.messageEditor.hint.branch")},{" "}
+              <Kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
+                {t("app.chat.input.keyboardShortcuts.shiftEnter")}
+              </Kbd>{" "}
+              {t("app.chat.input.keyboardShortcuts.forNewLine")}
+            </Div>
+          )}
+        </Div>
+
+        {/* Controls */}
+        <Div className="flex flex-col gap-2">
+          {/* Model and Tone Selectors */}
+          <Div className="flex items-center gap-2 flex-wrap">
+            {onModelChange && (
+              <ModelSelector
+                value={selectedModel}
+                onChange={onModelChange}
+                locale={locale}
+                logger={logger}
+              />
+            )}
+            {onPersonaChange && (
+              <PersonaSelector
+                value={selectedPersona}
+                onChange={onPersonaChange}
+                locale={locale}
+                logger={logger}
+              />
+            )}
+          </Div>
+
+          {/* Action Buttons */}
+          <Div className="flex items-center gap-2 flex-wrap">
+            {/* Speech Input Button */}
+            <SpeechInputButton
+              onTranscript={(text): void => {
+                // Append transcript to existing content
+                const newContent = editor.content
+                  ? `${editor.content} ${text}`.trim()
+                  : text;
+                editor.setContent(newContent);
+              }}
+              disabled={editor.isLoading}
+              lang={speechLang}
+              locale={locale}
+              logger={logger}
+            />
+
+            {/* Branch Button - Now the primary action */}
+            <Button
+              type="submit"
+              disabled={!editor.content.trim() || editor.isLoading}
+              size="sm"
+              variant="default"
+              className="flex-1 sm:flex-none h-9"
+              title={t("app.chat.messageEditor.titles.branch")}
+            >
+              <GitBranch className="h-3.5 w-3.5 mr-2" />
+              {editor.isLoading && editor.actionType === "branch"
+                ? t("app.chat.messageEditor.buttons.branching")
+                : t("app.chat.messageEditor.buttons.branch")}
+            </Button>
+
+            {/* Cancel Button */}
+            <Button
+              type="button"
+              onClick={editor.handleCancel}
+              disabled={editor.isLoading}
+              size="sm"
+              variant="ghost"
+              className="shrink-0 h-9"
+              title={t("app.chat.messageEditor.titles.cancel")}
+            >
+              <X className="h-3.5 w-3.5 mr-2" />
+              {t("app.chat.messageEditor.buttons.cancel")}
+            </Button>
+          </Div>
+        </Div>
+      </Form>
+    </Div>
+  );
+}

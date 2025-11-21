@@ -27,7 +27,11 @@ import { UserDetailLevel } from "../../enum";
 import { sessionRepository } from "../../private/session/repository";
 import { userRepository } from "../../repository";
 import type { StandardUserType } from "../../types";
-import { UserRole, type UserRoleValue } from "../../user-roles/enum";
+import {
+  UserRole,
+  type UserRoleValue,
+  isUserPermissionRole,
+} from "../../user-roles/enum";
 import { userRolesRepository } from "../../user-roles/repository";
 import type {
   SignupGetRequestOutput,
@@ -163,6 +167,30 @@ export class SignupRepositoryImpl implements SignupRepository {
       await leadAuthRepository.linkLeadToUser(
         user.leadId,
         userData.id,
+        locale,
+        logger,
+      );
+
+      // Link referral code if provided manually in form
+      const { referralRepository } =
+        await import("../../../referral/repository");
+      if (data.referralCode) {
+        logger.debug("Linking manual referral code to lead", {
+          referralCode: data.referralCode,
+          leadId: user.leadId,
+        });
+        await referralRepository.linkReferralToLead(
+          user.leadId,
+          data.referralCode,
+          locale,
+          logger,
+        );
+      }
+
+      // Convert lead referral to user referral (Phase 2: make referral permanent)
+      await referralRepository.convertLeadReferralToUser(
+        userData.id,
+        user.leadId,
         locale,
         logger,
       );
@@ -415,13 +443,22 @@ export class SignupRepositoryImpl implements SignupRepository {
         return userResponse;
       }
 
-      await userRolesRepository.addRole(
-        {
-          userId: userResponse.data.id,
-          role,
-        },
-        logger,
-      );
+      // Only assign permission roles to users, never platform markers
+      // Platform markers (CLI_OFF, CLI_AUTH_BYPASS, etc.) are config-only markers
+      if (isUserPermissionRole(role)) {
+        await userRolesRepository.addRole(
+          {
+            userId: userResponse.data.id,
+            role,
+          },
+          logger,
+        );
+      } else {
+        logger.debug(
+          "Skipping platform marker assignment - markers are never stored in database",
+          { role },
+        );
+      }
 
       // Note: Free credits are automatically created for the lead when it's first accessed
       // No need to manually add credits here - the lead already has 20 free credits

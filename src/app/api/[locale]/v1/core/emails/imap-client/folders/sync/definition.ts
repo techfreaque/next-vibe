@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.emails.imapClient.folders.sync.container.title",
       description:
         "app.api.v1.core.emails.imapClient.folders.sync.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {

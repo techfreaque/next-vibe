@@ -55,7 +55,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "urlPathParams", response: true },
     {
@@ -213,7 +213,7 @@ const { PUT } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -241,7 +241,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.description",
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().min(1),
       ),
@@ -256,7 +256,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.description.description",
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.description.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().optional(),
       ),
@@ -271,7 +271,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.description",
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().min(1),
       ),
@@ -284,7 +284,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.enabled.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.enabled.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean(),
       ),
@@ -300,7 +300,7 @@ const { PUT } = createEndpoint({
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.placeholder",
           options: CronTaskPriorityOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(CronTaskPriorityDB),
       ),
@@ -315,7 +315,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.description",
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().optional(),
       ),
@@ -330,7 +330,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.description",
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().optional(),
       ),
@@ -496,7 +496,7 @@ const { DELETE } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.task.delete.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "urlPathParams", response: true },
     {

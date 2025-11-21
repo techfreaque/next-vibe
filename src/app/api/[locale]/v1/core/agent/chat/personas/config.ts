@@ -49,12 +49,12 @@ export interface PersonaCategory {
  * Default persona categories
  */
 export const DEFAULT_CATEGORIES = [
-  { id: "general" as const, name: "General", icon: "🤖" },
-  { id: "creative" as const, name: "Creative", icon: "🎨" },
-  { id: "technical" as const, name: "Technical", icon: "💻" },
-  { id: "education" as const, name: "Education", icon: "📚" },
-  { id: "controversial" as const, name: "Controversial", icon: "🔥" },
-  { id: "lifestyle" as const, name: "Lifestyle", icon: "🌟" },
+  { id: "general" as const, name: "app.api.v1.core.agent.chat.personas.category.general" as const, icon: "🤖" },
+  { id: "creative" as const, name: "app.api.v1.core.agent.chat.personas.category.creative" as const, icon: "🎨" },
+  { id: "technical" as const, name: "app.api.v1.core.agent.chat.personas.category.technical" as const, icon: "💻" },
+  { id: "education" as const, name: "app.api.v1.core.agent.chat.personas.category.education" as const, icon: "📚" },
+  { id: "controversial" as const, name: "app.api.v1.core.agent.chat.personas.category.controversial" as const, icon: "🔥" },
+  { id: "lifestyle" as const, name: "app.api.v1.core.agent.chat.personas.category.lifestyle" as const, icon: "🌟" },
 ] as const satisfies readonly PersonaCategory[];
 
 export type PersonaCategoryId = (typeof DEFAULT_CATEGORIES)[number]["id"];

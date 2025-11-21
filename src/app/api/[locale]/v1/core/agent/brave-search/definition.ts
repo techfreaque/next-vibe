@@ -64,12 +64,14 @@ const { GET } = createEndpoint({
 
   fields: objectField(
     {
-      type: WidgetType.CONTAINER,
+      type: WidgetType.DATA_CARD,
+      linkable: true,
       title:
         "app.api.v1.core.agent.chat.tools.braveSearch.get.form.title" as const,
       description:
         "app.api.v1.core.agent.chat.tools.braveSearch.get.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -84,9 +86,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.query.description" as const,
           placeholder:
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.query.placeholder" as const,
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
         z.string().min(1).max(400),
       ),
 
@@ -98,9 +98,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.maxResults.title" as const,
           description:
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.maxResults.description" as const,
-          layout: { columns: 6 },
-          validation: { required: false },
-        },
+          columns: 6},
         z.number().min(1).max(10).optional().default(5),
       ),
 
@@ -112,9 +110,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.includeNews.title" as const,
           description:
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.includeNews.description" as const,
-          layout: { columns: 6 },
-          validation: { required: false },
-        },
+          columns: 6},
         z.boolean().optional().default(false),
       ),
 
@@ -148,9 +144,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.freshness.options.year" as const,
             },
           ],
-          layout: { columns: 6 },
-          validation: { required: false },
-        },
+          columns: 6},
         z.enum(FRESHNESS_OPTIONS).optional(),
       ),
 
@@ -176,16 +170,15 @@ const { GET } = createEndpoint({
       results: responseArrayField(
         {
           type: WidgetType.LINK_LIST,
-          layout: { type: LayoutType.GRID, columns: 1 },
+          layoutType: LayoutType.GRID,
+          columns: 1,
         },
         objectField(
           {
-            type: WidgetType.LINK_CARD,
-            title:
-              "app.api.v1.core.agent.chat.tools.braveSearch.get.response.results.item.title" as const,
-            description:
-              "app.api.v1.core.agent.chat.tools.braveSearch.get.response.results.item.description" as const,
-            layout: { type: LayoutType.GRID, columns: 12 },
+            type: WidgetType.DATA_CARD,
+            linkable: true,
+            layoutType: LayoutType.GRID,
+            columns: 12,
           },
           { response: true },
           {
@@ -193,15 +186,16 @@ const { GET } = createEndpoint({
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.v1.core.agent.chat.tools.braveSearch.get.response.results.item.title" as const,
+                  "app.api.v1.core.agent.chat.tools.braveSearch.get.response.results.title" as const,
               },
               z.string(),
             ),
             url: responseField(
               {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.tools.braveSearch.get.response.results.item.url" as const,
+                type: WidgetType.LINK,
+                href: "/{url}",
+                text: "app.api.v1.core.agent.chat.tools.braveSearch.get.response.results.item.url" as const,
+                external: true,
               },
               z.string(),
             ),

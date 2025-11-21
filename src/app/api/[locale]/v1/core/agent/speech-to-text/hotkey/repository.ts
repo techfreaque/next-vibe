@@ -284,12 +284,12 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
     });
 
     // Deduct credits AFTER successful completion
-    await creditRepository.deductCreditsForFeature({
+    await creditRepository.deductCreditsForFeature(
       user,
-      cost: FEATURE_COSTS.STT,
-      feature: "stt-hotkey",
+      FEATURE_COSTS.STT,
+      "stt-hotkey",
       logger,
-    });
+    );
 
     return success({
       response: {

@@ -7,7 +7,7 @@ import React, { useCallback, useState } from "react";
 
 import {
   DEFAULT_FOLDER_CONFIGS,
-  DEFAULT_FOLDER_IDS,
+  DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
@@ -92,8 +92,8 @@ export function RootFolderBar({
       }
       // Public users can only access PUBLIC and INCOGNITO folders
       return (
-        folderId === DEFAULT_FOLDER_IDS.PUBLIC ||
-        folderId === DEFAULT_FOLDER_IDS.INCOGNITO
+        folderId === DefaultFolderId.PUBLIC ||
+        folderId === DefaultFolderId.INCOGNITO
       );
     },
     [isAuthenticated],

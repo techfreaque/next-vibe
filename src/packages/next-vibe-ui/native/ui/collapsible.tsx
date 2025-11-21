@@ -83,6 +83,7 @@ export function CollapsibleContent({
         exiting={FadeOut.duration(200)}
         {...applyStyleType({
           nativeStyle,
+          className,
         })}
       >
         {children}

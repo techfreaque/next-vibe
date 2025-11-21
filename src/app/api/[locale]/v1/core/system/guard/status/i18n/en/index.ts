@@ -19,6 +19,27 @@ export const translations = {
         description: "Unique identifier for the guard",
         placeholder: "guard-123",
       },
+      username: {
+        title: "Username",
+      },
+      status: {
+        title: "Status",
+      },
+      createdAt: {
+        title: "Created At",
+      },
+      securityLevel: {
+        title: "Security Level",
+      },
+      isolationMethod: {
+        title: "Isolation Method",
+      },
+      isRunning: {
+        title: "Is Running",
+      },
+      userHome: {
+        title: "User Home",
+      },
       listAll: {
         title: "List All Guards",
         description: "List all guard environments",

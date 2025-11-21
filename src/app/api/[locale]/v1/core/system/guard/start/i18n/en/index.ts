@@ -34,6 +34,15 @@ export const translations = {
         projectPath: "Project Path",
       },
     },
+    summary: {
+      title: "Summary",
+    },
+    status: {
+      title: "Status",
+    },
+    hasIssues: {
+      title: "Has Issues",
+    },
   },
   errors: {
     unauthorized: {

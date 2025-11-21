@@ -26,18 +26,19 @@ export type NumberInputProps = {
   name?: string;
 } & StyleType;
 
-export function NumberInput({
-  value = 1,
-  onChange,
-  onBlur,
-  min = 1,
-  max = 10,
-  step = 1,
-  disabled = false,
-  className,
-  style,
-  name,
-}: NumberInputProps): JSX.Element {
+export function NumberInput(props: NumberInputProps): JSX.Element {
+  const {
+    value = 1,
+    onChange,
+    onBlur,
+    min = 1,
+    max = 10,
+    step = 1,
+    disabled = false,
+    className,
+    name,
+  } = props;
+
   // Call onChange with initial value on mount to register the field
   useEffect(() => {
     onChange?.(value);
@@ -65,7 +66,7 @@ export function NumberInput({
   };
 
   return (
-    <Div className={cn("flex items-center gap-3", className)} style={style}>
+    <Div className={cn("flex items-center gap-3", className)}>
       <Button
         type="button"
         variant="outline"

@@ -20,7 +20,9 @@ import type {
 } from "../../types/handler";
 import { endpointHandler } from "./single";
 import type z from "zod";
-import { type UnifiedField } from "../../types/endpoint";
+import {
+  type UnifiedField,
+} from "../../types/endpoint";
 
 export function endpointsHandler<const T>(
   config: EndpointHandlerConfig<T>,
@@ -28,19 +30,9 @@ export function endpointsHandler<const T>(
   const { endpoint: definitions, ...methodConfigs } = config;
 
   // Extract available methods from definitions
-  const availableMethods = Object.keys(
-    definitions as Record<
-      string,
-      CreateApiEndpoint<
-        string,
-        Methods,
-        readonly UserRoleValue[],
-        UnifiedField<z.ZodTypeAny>
-      >
-    >,
-  ).filter((key) => Object.values(Methods).includes(key as Methods)) as Array<
-    keyof T & Methods
-  >;
+  const availableMethods = Object.keys(definitions).filter((key) =>
+    Object.values(Methods).includes(key as Methods),
+  ) as Array<keyof T & Methods>;
 
   // Build handlers for each method
   // Type-safe handler entry using branded type

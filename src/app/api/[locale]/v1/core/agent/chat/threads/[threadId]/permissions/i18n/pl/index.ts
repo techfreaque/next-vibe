@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
     description: "Pobierz listę moderatorów dla konkretnego wątku",
     container: {
       title: "Uprawnienia wątku",
+      description: "Wyświetl i zarządzaj uprawnieniami dostępu do wątku",
     },
     threadId: {
       label: "ID wątku",
@@ -13,6 +14,26 @@ export const translations: typeof enTranslations = {
     },
     response: {
       title: "Uprawnienia wątku",
+      rolesView: {
+        label: "Role wyświetlania",
+        description: "Role, które mogą wyświetlać ten wątek",
+      },
+      rolesEdit: {
+        label: "Role edycji",
+        description: "Role, które mogą edytować ustawienia wątku",
+      },
+      rolesPost: {
+        label: "Role publikowania",
+        description: "Role, które mogą publikować wiadomości",
+      },
+      rolesModerate: {
+        label: "Role moderacyjne",
+        description: "Role, które mogą moderować treści",
+      },
+      rolesAdmin: {
+        label: "Role administratora",
+        description: "Role z pełnym dostępem administracyjnym",
+      },
       moderatorIds: {
         title: "ID moderatorów",
         description:
@@ -68,10 +89,31 @@ export const translations: typeof enTranslations = {
     description: "Aktualizuj listę moderatorów dla konkretnego wątku",
     container: {
       title: "Aktualizuj uprawnienia wątku",
+      description: "Modyfikuj uprawnienia dostępu do wątku",
     },
     threadId: {
       label: "ID wątku",
       description: "Unikalny identyfikator wątku do aktualizacji",
+    },
+    rolesView: {
+      label: "Role wyświetlania",
+      description: "Role, które mogą wyświetlać ten wątek",
+    },
+    rolesEdit: {
+      label: "Role edycji",
+      description: "Role, które mogą edytować ustawienia wątku",
+    },
+    rolesPost: {
+      label: "Role publikowania",
+      description: "Role, które mogą publikować wiadomości",
+    },
+    rolesModerate: {
+      label: "Role moderacyjne",
+      description: "Role, które mogą moderować treści",
+    },
+    rolesAdmin: {
+      label: "Role administratora",
+      description: "Role z pełnym dostępem administracyjnym",
     },
     permissions: {
       title: "Aktualizacja uprawnień",
@@ -79,13 +121,30 @@ export const translations: typeof enTranslations = {
         label: "ID moderatorów",
         description:
           "Lista identyfikatorów użytkowników, którzy mogą moderować ten wątek",
-        item: {
-          label: "ID użytkownika",
-        },
       },
     },
     response: {
       title: "Zaktualizowane uprawnienia",
+      rolesView: {
+        label: "Role wyświetlania",
+        description: "Role, które mogą wyświetlać ten wątek",
+      },
+      rolesEdit: {
+        label: "Role edycji",
+        description: "Role, które mogą edytować ustawienia wątku",
+      },
+      rolesPost: {
+        label: "Role publikowania",
+        description: "Role, które mogą publikować wiadomości",
+      },
+      rolesModerate: {
+        label: "Role moderacyjne",
+        description: "Role, które mogą moderować treści",
+      },
+      rolesAdmin: {
+        label: "Role administratora",
+        description: "Role z pełnym dostępem administracyjnym",
+      },
       message: {
         content: "Uprawnienia wątku zostały pomyślnie zaktualizowane",
       },

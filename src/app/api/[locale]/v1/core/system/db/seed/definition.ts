@@ -9,6 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interf
 import {
   objectField,
   requestDataField,
+  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
@@ -28,7 +29,12 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.db.seed.post.description",
   category: "app.api.v1.core.system.db.category",
   tags: ["app.api.v1.core.system.db.seed.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["seed", "db:seed"],
 
   fields: objectField(
@@ -36,7 +42,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.db.seed.post.form.title",
       description: "app.api.v1.core.system.db.seed.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -48,7 +55,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.seed.fields.verbose.title",
           description:
             "app.api.v1.core.system.db.seed.fields.verbose.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -60,7 +67,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.seed.fields.dryRun.title",
           description:
             "app.api.v1.core.system.db.seed.fields.dryRun.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -90,36 +97,45 @@ const { POST } = createEndpoint({
         z.number(),
       ),
 
-      collections: responseField(
+      collections: responseArrayField(
         {
           type: WidgetType.DATA_TABLE,
-          columns: [
-            {
-              key: "name",
-              label:
-                "app.api.v1.core.system.db.seed.fields.collections.name.title",
-              type: FieldDataType.TEXT,
-            },
-            {
-              key: "status",
-              label:
-                "app.api.v1.core.system.db.seed.fields.collections.status.title",
-              type: FieldDataType.TEXT,
-            },
-            {
-              key: "recordsCreated",
-              label:
-                "app.api.v1.core.system.db.seed.fields.collections.recordsCreated.title",
-              type: FieldDataType.NUMBER,
-            },
-          ],
+          title: "app.api.v1.core.system.db.seed.fields.collections.title",
         },
-        z.array(
-          z.object({
-            name: z.string(),
-            status: z.enum(["success", "skipped", "failed"]),
-            recordsCreated: z.number(),
-          }),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 3,
+          },
+          { response: true },
+          {
+            name: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.db.seed.fields.collections.name.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+            status: responseField(
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.system.db.seed.fields.collections.status.title",
+              },
+              z.enum(["success", "skipped", "failed"]),
+            ),
+            recordsCreated: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.db.seed.fields.collections.recordsCreated.title",
+                fieldType: FieldDataType.NUMBER,
+              },
+              z.number(),
+            ),
+          },
         ),
       ),
 

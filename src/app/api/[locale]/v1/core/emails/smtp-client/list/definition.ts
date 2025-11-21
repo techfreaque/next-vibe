@@ -50,7 +50,7 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.emails.smtpClient.list.container.title",
       description:
         "app.api.v1.core.emails.smtpClient.list.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -63,7 +63,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.smtpClient.list.fields.campaignType.label",
           description:
             "app.api.v1.core.emails.smtpClient.list.fields.campaignType.description",
-          layout: { columns: 3 },
+          columns: 3,
           options: CampaignTypeFilterOptions,
         },
         z.enum(CampaignTypeFilter).optional(),
@@ -76,7 +76,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.emails.smtpClient.list.fields.status.label",
           description:
             "app.api.v1.core.emails.smtpClient.list.fields.status.description",
-          layout: { columns: 3 },
+          columns: 3,
           options: SmtpAccountStatusFilterOptions,
         },
         z.enum(SmtpAccountStatusFilter).optional(),
@@ -90,7 +90,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.smtpClient.list.fields.healthStatus.label",
           description:
             "app.api.v1.core.emails.smtpClient.list.fields.healthStatus.description",
-          layout: { columns: 3 },
+          columns: 3,
           options: SmtpHealthStatusFilterOptions,
         },
         z.enum(SmtpHealthStatusFilter).optional(),
@@ -105,7 +105,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.smtpClient.list.fields.search.description",
           placeholder:
             "app.api.v1.core.emails.smtpClient.list.fields.search.placeholder",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional(),
       ),
@@ -117,7 +117,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.emails.smtpClient.list.fields.sortBy.label",
           description:
             "app.api.v1.core.emails.smtpClient.list.fields.sortBy.description",
-          layout: { columns: 3 },
+          columns: 3,
           options: SmtpAccountSortFieldOptions,
         },
         z.enum(SmtpAccountSortField).optional(),
@@ -131,7 +131,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.smtpClient.list.fields.sortOrder.label",
           description:
             "app.api.v1.core.emails.smtpClient.list.fields.sortOrder.description",
-          layout: { columns: 3 },
+          columns: 3,
           options: SortOrderOptions,
         },
         z.enum(SortOrder).optional(),
@@ -144,7 +144,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.emails.smtpClient.list.fields.page.label",
           description:
             "app.api.v1.core.emails.smtpClient.list.fields.page.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.number().int().min(1).optional(),
       ),
@@ -156,7 +156,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.emails.smtpClient.list.fields.limit.label",
           description:
             "app.api.v1.core.emails.smtpClient.list.fields.limit.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.number().int().min(1).max(100).optional(),
       ),
@@ -174,7 +174,7 @@ const { GET } = createEndpoint({
               "app.api.v1.core.emails.smtpClient.list.response.account.title",
             description:
               "app.api.v1.core.emails.smtpClient.list.response.account.description",
-            layout: { type: LayoutType.GRID, columns: 12 },
+            layoutType: LayoutType.GRID, columns: 12,
           },
           { response: true },
           {
@@ -251,7 +251,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.smtpClient.list.response.pagination.title",
           description:
             "app.api.v1.core.emails.smtpClient.list.response.pagination.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {

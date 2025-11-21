@@ -2,10 +2,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
+  field,
   objectField,
-  requestDataField,
+  requestDataArrayField,
   requestUrlPathParamsField,
-  responseField,
+  responseArrayOptionalField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -44,7 +45,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.folders.id.permissions.get.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.folders.id.permissions.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {
@@ -62,77 +63,83 @@ const { GET } = createEndpoint({
       ),
 
       // === RESPONSE FIELDS ===
-      rolesView: responseField(
+      rolesView: responseArrayOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label:
-            "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesView.label" as const,
-          description:
-            "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesView.description" as const,
-          options: UserRoleDB.map((role) => ({ value: role, label: role })),
+          type: WidgetType.DATA_LIST,
         },
-        z.array(z.enum(UserRoleDB)).nullable(),
+        field(
+          z.enum(UserRoleDB),
+          { response: true },
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesView.label" as const,
+          },
+        ),
       ),
-      rolesManage: responseField(
+      rolesManage: responseArrayOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label:
-            "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesManage.label" as const,
-          description:
-            "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesManage.description" as const,
-          options: UserRoleDB.map((role) => ({ value: role, label: role })),
+          type: WidgetType.DATA_LIST,
         },
-        z.array(z.enum(UserRoleDB)).nullable(),
+        field(
+          z.enum(UserRoleDB),
+          { response: true },
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesManage.label" as const,
+          },
+        ),
       ),
-      rolesCreateThread: responseField(
+      rolesCreateThread: responseArrayOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label:
-            "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesCreateThread.label" as const,
-          description:
-            "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesCreateThread.description" as const,
-          options: UserRoleDB.map((role) => ({ value: role, label: role })),
+          type: WidgetType.DATA_LIST,
         },
-        z.array(z.enum(UserRoleDB)).nullable(),
+        field(
+          z.enum(UserRoleDB),
+          { response: true },
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesCreateThread.label" as const,
+          },
+        ),
       ),
-      rolesPost: responseField(
+      rolesPost: responseArrayOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label:
-            "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesPost.label" as const,
-          description:
-            "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesPost.description" as const,
-          options: UserRoleDB.map((role) => ({ value: role, label: role })),
+          type: WidgetType.DATA_LIST,
         },
-        z.array(z.enum(UserRoleDB)).nullable(),
+        field(
+          z.enum(UserRoleDB),
+          { response: true },
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesPost.label" as const,
+          },
+        ),
       ),
-      rolesModerate: responseField(
+      rolesModerate: responseArrayOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label:
-            "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesModerate.label" as const,
-          description:
-            "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesModerate.description" as const,
-          options: UserRoleDB.map((role) => ({ value: role, label: role })),
+          type: WidgetType.DATA_LIST,
         },
-        z.array(z.enum(UserRoleDB)).nullable(),
+        field(
+          z.enum(UserRoleDB),
+          { response: true },
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesModerate.label" as const,
+          },
+        ),
       ),
-      rolesAdmin: responseField(
+      rolesAdmin: responseArrayOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
-          label:
-            "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesAdmin.label" as const,
-          description:
-            "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesAdmin.description" as const,
-          options: UserRoleDB.map((role) => ({ value: role, label: role })),
+          type: WidgetType.DATA_LIST,
         },
-        z.array(z.enum(UserRoleDB)).nullable(),
+        field(
+          z.enum(UserRoleDB),
+          { response: true },
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.agent.chat.folders.id.permissions.get.response.rolesAdmin.label" as const,
+          },
+        ),
       ),
     },
   ),
@@ -245,7 +252,7 @@ const { PATCH } = createEndpoint({
         "app.api.v1.core.agent.chat.folders.id.permissions.patch.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.folders.id.permissions.patch.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -263,7 +270,7 @@ const { PATCH } = createEndpoint({
       ),
 
       // === REQUEST DATA ===
-      rolesView: requestDataField(
+      rolesView: requestDataArrayField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
@@ -271,12 +278,19 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesView.label" as const,
           description:
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesView.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.array(z.enum(UserRoleDB)).nullable().optional(),
+        field(
+          z.enum(UserRoleDB),
+          { request: "data" },
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesView.label" as const,
+          },
+        ),
       ),
-      rolesManage: requestDataField(
+      rolesManage: requestDataArrayField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
@@ -284,12 +298,19 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesManage.label" as const,
           description:
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesManage.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.array(z.enum(UserRoleDB)).nullable().optional(),
+        field(
+          z.enum(UserRoleDB),
+          { request: "data" },
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesManage.label" as const,
+          },
+        ),
       ),
-      rolesCreateThread: requestDataField(
+      rolesCreateThread: requestDataArrayField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
@@ -297,12 +318,19 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesCreateThread.label" as const,
           description:
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesCreateThread.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.array(z.enum(UserRoleDB)).nullable().optional(),
+        field(
+          z.enum(UserRoleDB),
+          { request: "data" },
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesCreateThread.label" as const,
+          },
+        ),
       ),
-      rolesPost: requestDataField(
+      rolesPost: requestDataArrayField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
@@ -310,12 +338,19 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesPost.label" as const,
           description:
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesPost.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.array(z.enum(UserRoleDB)).nullable().optional(),
+        field(
+          z.enum(UserRoleDB),
+          { request: "data" },
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesPost.label" as const,
+          },
+        ),
       ),
-      rolesModerate: requestDataField(
+      rolesModerate: requestDataArrayField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
@@ -323,12 +358,19 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesModerate.label" as const,
           description:
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesModerate.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.array(z.enum(UserRoleDB)).nullable().optional(),
+        field(
+          z.enum(UserRoleDB),
+          { request: "data" },
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesModerate.label" as const,
+          },
+        ),
       ),
-      rolesAdmin: requestDataField(
+      rolesAdmin: requestDataArrayField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
@@ -336,10 +378,17 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesAdmin.label" as const,
           description:
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesAdmin.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
-        z.array(z.enum(UserRoleDB)).nullable().optional(),
+        field(
+          z.enum(UserRoleDB),
+          { request: "data" },
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.agent.chat.folders.id.permissions.patch.rolesAdmin.label" as const,
+          },
+        ),
       ),
 
       // === RESPONSE ===
@@ -348,83 +397,87 @@ const { PATCH } = createEndpoint({
           type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.title" as const,
-          description:
-            "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.description" as const,
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
-          rolesView: responseField(
+          rolesView: responseArrayOptionalField(
             {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesView.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesView.description" as const,
-              options: UserRoleDB.map((role) => ({ value: role, label: role })),
+              type: WidgetType.DATA_LIST,
             },
-            z.array(z.enum(UserRoleDB)).nullable(),
+            field(
+              z.enum(UserRoleDB),
+              { response: true },
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesView.label" as const,
+              },
+            ),
           ),
-          rolesManage: responseField(
+          rolesManage: responseArrayOptionalField(
             {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesManage.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesManage.description" as const,
-              options: UserRoleDB.map((role) => ({ value: role, label: role })),
+              type: WidgetType.DATA_LIST,
             },
-            z.array(z.enum(UserRoleDB)).nullable(),
+            field(
+              z.enum(UserRoleDB),
+              { response: true },
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesManage.label" as const,
+              },
+            ),
           ),
-          rolesCreateThread: responseField(
+          rolesCreateThread: responseArrayOptionalField(
             {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesCreateThread.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesCreateThread.description" as const,
-              options: UserRoleDB.map((role) => ({ value: role, label: role })),
+              type: WidgetType.DATA_LIST,
             },
-            z.array(z.enum(UserRoleDB)).nullable(),
+            field(
+              z.enum(UserRoleDB),
+              { response: true },
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesCreateThread.label" as const,
+              },
+            ),
           ),
-          rolesPost: responseField(
+          rolesPost: responseArrayOptionalField(
             {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesPost.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesPost.description" as const,
-              options: UserRoleDB.map((role) => ({ value: role, label: role })),
+              type: WidgetType.DATA_LIST,
             },
-            z.array(z.enum(UserRoleDB)).nullable(),
+            field(
+              z.enum(UserRoleDB),
+              { response: true },
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesPost.label" as const,
+              },
+            ),
           ),
-          rolesModerate: responseField(
+          rolesModerate: responseArrayOptionalField(
             {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesModerate.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesModerate.description" as const,
-              options: UserRoleDB.map((role) => ({ value: role, label: role })),
+              type: WidgetType.DATA_LIST,
             },
-            z.array(z.enum(UserRoleDB)).nullable(),
+            field(
+              z.enum(UserRoleDB),
+              { response: true },
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesModerate.label" as const,
+              },
+            ),
           ),
-          rolesAdmin: responseField(
+          rolesAdmin: responseArrayOptionalField(
             {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesAdmin.label" as const,
-              description:
-                "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesAdmin.description" as const,
-              options: UserRoleDB.map((role) => ({ value: role, label: role })),
+              type: WidgetType.DATA_LIST,
             },
-            z.array(z.enum(UserRoleDB)).nullable(),
+            field(
+              z.enum(UserRoleDB),
+              { response: true },
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.agent.chat.folders.id.permissions.patch.response.rolesAdmin.label" as const,
+              },
+            ),
           ),
         },
       ),

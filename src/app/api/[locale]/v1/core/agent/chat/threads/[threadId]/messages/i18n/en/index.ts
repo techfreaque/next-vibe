@@ -54,6 +54,15 @@ export const translations = {
           tokens: {
             content: "Tokens",
           },
+          sequenceId: {
+            content: "Sequence ID",
+          },
+          sequenceIndex: {
+            content: "Sequence Index",
+          },
+          toolCalls: {
+            content: "Tool Calls",
+          },
           createdAt: {
             content: "Created At",
           },

@@ -102,6 +102,12 @@ export const translations = {
       placeholder: "Enter image URL",
       help: "Optional: Provide a URL for your profile picture",
     },
+    referralCode: {
+      label: "Referral Code",
+      description: "Optional referral code from a friend",
+      placeholder: "Enter referral code (optional)",
+      help: "If you have a referral code, enter it here to get started",
+    },
   },
   groups: {
     personalInfo: {

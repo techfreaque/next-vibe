@@ -57,7 +57,7 @@ const sideTasksPostEndpoint = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -112,9 +112,7 @@ const sideTasksPostEndpoint = createEndpoint({
                 "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionHealthCheck",
             },
           ],
-          layout: { columns: 3 },
-          required: true,
-        },
+          columns: 3},
         sideTaskActionSchema,
       ),
 
@@ -126,7 +124,7 @@ const sideTasksPostEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdLabel",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdDescription",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional(),
       ),
@@ -139,7 +137,7 @@ const sideTasksPostEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameLabel",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameDescription",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional(),
       ),
@@ -152,7 +150,7 @@ const sideTasksPostEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitLabel",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitDescription",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.number().optional().default(50),
       ),
@@ -165,7 +163,7 @@ const sideTasksPostEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataLabel",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataDescription",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.record(z.string(), z.unknown()).optional(),
       ),
@@ -324,7 +322,7 @@ const sideTasksGetEndpoint = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.sideTasks.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { response: true },
     {

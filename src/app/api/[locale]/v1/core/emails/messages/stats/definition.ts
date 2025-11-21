@@ -3,12 +3,7 @@
  * Defines the API endpoint for email statistics and analytics with historical charts
  */
 
-import {
-  chartDataSchema,
-  ChartType,
-  DateRangePreset,
-  TimePeriod,
-} from "next-vibe/shared/types/stats-filtering.schema";
+import { chartDataSchema } from "next-vibe/shared/types/stats-filtering.schema";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
@@ -26,7 +21,7 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { SortOrder } from "../../imap-client/enum";
+import { SortOrder, SortOrderOptions } from "../../imap-client/enum";
 import {
   EmailSortField,
   EmailSortFieldOptions,
@@ -35,133 +30,15 @@ import {
   EmailTypeFilter,
   EmailTypeFilterOptions,
 } from "../enum";
+import {
+  ChartType,
+  ChartTypeOptions,
+  DateRangePreset,
+  DateRangePresetOptions,
+  TimePeriod,
+  TimePeriodOptions,
+} from "./enum";
 
-// Create options arrays for enums that don't have them
-const TimePeriodOptions = [
-  {
-    value: TimePeriod.HOUR,
-    label: "app.api.v1.core.emails.messages.stats.get.timePeriod.hour" as const,
-  },
-  {
-    value: TimePeriod.DAY,
-    label: "app.api.v1.core.emails.messages.stats.get.timePeriod.day" as const,
-  },
-  {
-    value: TimePeriod.WEEK,
-    label: "app.api.v1.core.emails.messages.stats.get.timePeriod.week" as const,
-  },
-  {
-    value: TimePeriod.MONTH,
-    label:
-      "app.api.v1.core.emails.messages.stats.get.timePeriod.month" as const,
-  },
-  {
-    value: TimePeriod.QUARTER,
-    label:
-      "app.api.v1.core.emails.messages.stats.get.timePeriod.quarter" as const,
-  },
-  {
-    value: TimePeriod.YEAR,
-    label: "app.api.v1.core.emails.messages.stats.get.timePeriod.year" as const,
-  },
-];
-
-const DateRangePresetOptions = [
-  {
-    value: DateRangePreset.TODAY,
-    label: "app.api.v1.core.emails.messages.stats.dateRange.today" as const,
-  },
-  {
-    value: DateRangePreset.YESTERDAY,
-    label: "app.api.v1.core.emails.messages.stats.dateRange.yesterday" as const,
-  },
-  {
-    value: DateRangePreset.LAST_7_DAYS,
-    label: "app.api.v1.core.emails.messages.stats.dateRange.last7Days" as const,
-  },
-  {
-    value: DateRangePreset.LAST_30_DAYS,
-    label:
-      "app.api.v1.core.emails.messages.stats.dateRange.last30Days" as const,
-  },
-  {
-    value: DateRangePreset.LAST_90_DAYS,
-    label:
-      "app.api.v1.core.emails.messages.stats.dateRange.last90Days" as const,
-  },
-  {
-    value: DateRangePreset.THIS_WEEK,
-    label: "app.api.v1.core.emails.messages.stats.dateRange.thisWeek" as const,
-  },
-  {
-    value: DateRangePreset.LAST_WEEK,
-    label: "app.api.v1.core.emails.messages.stats.dateRange.lastWeek" as const,
-  },
-  {
-    value: DateRangePreset.THIS_MONTH,
-    label: "app.api.v1.core.emails.messages.stats.dateRange.thisMonth" as const,
-  },
-  {
-    value: DateRangePreset.LAST_MONTH,
-    label: "app.api.v1.core.emails.messages.stats.dateRange.lastMonth" as const,
-  },
-  {
-    value: DateRangePreset.THIS_QUARTER,
-    label:
-      "app.api.v1.core.emails.messages.stats.dateRange.thisQuarter" as const,
-  },
-  {
-    value: DateRangePreset.LAST_QUARTER,
-    label:
-      "app.api.v1.core.emails.messages.stats.dateRange.lastQuarter" as const,
-  },
-  {
-    value: DateRangePreset.THIS_YEAR,
-    label: "app.api.v1.core.emails.messages.stats.dateRange.thisYear" as const,
-  },
-  {
-    value: DateRangePreset.LAST_YEAR,
-    label: "app.api.v1.core.emails.messages.stats.dateRange.lastYear" as const,
-  },
-  {
-    value: DateRangePreset.CUSTOM,
-    label: "app.api.v1.core.emails.messages.stats.dateRange.custom" as const,
-  },
-];
-
-const ChartTypeOptions = [
-  {
-    value: ChartType.LINE,
-    label: "app.api.v1.core.emails.messages.stats.get.chartType.line" as const,
-  },
-  {
-    value: ChartType.BAR,
-    label: "app.api.v1.core.emails.messages.stats.get.chartType.bar" as const,
-  },
-  {
-    value: ChartType.AREA,
-    label: "app.api.v1.core.emails.messages.stats.get.chartType.area" as const,
-  },
-  {
-    value: ChartType.PIE,
-    label: "app.api.v1.core.emails.messages.stats.get.chartType.pie" as const,
-  },
-  {
-    value: ChartType.DONUT,
-    label: "app.api.v1.core.emails.messages.stats.get.chartType.donut" as const,
-  },
-];
-
-const SortOrderOptions = [
-  {
-    value: SortOrder.ASC,
-    label: "app.api.v1.core.emails.messages.stats.get.sortOrder.asc" as const,
-  },
-  {
-    value: SortOrder.DESC,
-    label: "app.api.v1.core.emails.messages.stats.get.sortOrder.desc" as const,
-  },
-];
 
 /**
  * Get Email Stats Endpoint (GET)
@@ -185,7 +62,8 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.emails.messages.stats.get.form.title",
       description: "app.api.v1.core.emails.messages.stats.get.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -200,9 +78,9 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.emails.messages.stats.get.timePeriod.description",
           options: TimePeriodOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
-        z.enum(TimePeriod).default(TimePeriod.DAY),
+        z.enum(Object.values(TimePeriod) as [string, ...string[]]).default(TimePeriod.day),
       ),
 
       dateRangePreset: requestDataField(
@@ -214,9 +92,9 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.emails.messages.stats.get.dateRangePreset.description",
           options: DateRangePresetOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
-        z.enum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
+        z.enum(Object.values(DateRangePreset) as [string, ...string[]]).default(DateRangePreset.last_30_days),
       ),
 
       dateFrom: requestDataField(
@@ -226,7 +104,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.emails.messages.stats.get.dateFrom.label",
           description:
             "app.api.v1.core.emails.messages.stats.get.dateFrom.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.date().optional(),
       ),
@@ -238,7 +116,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.emails.messages.stats.get.dateTo.label",
           description:
             "app.api.v1.core.emails.messages.stats.get.dateTo.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.date().optional(),
       ),
@@ -251,9 +129,9 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.emails.messages.stats.get.chartType.description",
           options: ChartTypeOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
-        z.enum(ChartType).default(ChartType.LINE),
+        z.enum(Object.values(ChartType) as [string, ...string[]]).default(ChartType.line),
       ),
 
       includeComparison: requestDataField(
@@ -264,7 +142,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.messages.stats.get.includeComparison.label",
           description:
             "app.api.v1.core.emails.messages.stats.get.includeComparison.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.coerce.boolean().default(false),
       ),
@@ -277,10 +155,10 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.emails.messages.stats.get.status.label",
           description:
             "app.api.v1.core.emails.messages.stats.get.status.description",
-          layout: { columns: 3 },
+          columns: 3,
           options: EmailStatusFilterOptions,
         },
-        z.enum(EmailStatusFilter).default(EmailStatusFilter.ALL),
+        z.enum(Object.values(EmailStatusFilter) as [string, ...string[]]).default(EmailStatusFilter.ALL),
       ),
 
       type: requestDataField(
@@ -290,10 +168,10 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.emails.messages.stats.get.type.label",
           description:
             "app.api.v1.core.emails.messages.stats.get.type.description",
-          layout: { columns: 3 },
+          columns: 3,
           options: EmailTypeFilterOptions,
         },
-        z.enum(EmailTypeFilter).default(EmailTypeFilter.ALL),
+        z.enum(Object.values(EmailTypeFilter) as [string, ...string[]]).default(EmailTypeFilter.ALL),
       ),
 
       search: requestDataField(
@@ -303,7 +181,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.emails.messages.stats.get.search.label",
           description:
             "app.api.v1.core.emails.messages.stats.get.search.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -317,9 +195,9 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.emails.messages.stats.get.sortBy.description",
           options: EmailSortFieldOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
-        z.enum(EmailSortField).default(EmailSortField.CREATED_AT),
+        z.enum(Object.values(EmailSortField) as [string, ...string[]]).default(EmailSortField.CREATED_AT),
       ),
 
       sortOrder: requestDataField(
@@ -330,9 +208,9 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.emails.messages.stats.get.sortOrder.description",
           options: SortOrderOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
-        z.enum(SortOrder).default(SortOrder.DESC),
+        z.enum(Object.values(SortOrder) as [string, ...string[]]).default(SortOrder.DESC),
       ),
 
       // === RESPONSE FIELDS ===
@@ -695,9 +573,9 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
-        timePeriod: TimePeriod.DAY,
-        dateRangePreset: DateRangePreset.LAST_30_DAYS,
-        chartType: ChartType.LINE,
+        timePeriod: TimePeriod.day,
+        dateRangePreset: DateRangePreset.last_30_days,
+        chartType: ChartType.line,
       },
     },
     responses: {

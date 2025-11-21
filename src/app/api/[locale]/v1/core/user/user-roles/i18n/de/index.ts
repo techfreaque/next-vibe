@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   errors: {
     find_failed: "Benutzerrollen konnten nicht gefunden werden",
+    batch_find_failed: "Batch-Suche nach Benutzerrollen fehlgeschlagen",
     not_found: "Benutzerrolle nicht gefunden",
     lookup_failed: "Benutzerrolle konnte nicht abgerufen werden",
     add_failed: "Rolle konnte nicht zum Benutzer hinzugefügt werden",

@@ -147,6 +147,12 @@ export const translations: typeof enTranslations = {
     get: {
       title: "Authentifizierung prüfen",
       description: "Aktuellen Authentifizierungsstatus prüfen",
+      response: {
+        title: "Authentifizierungsstatus",
+        description: "Aktueller Authentifizierungszustand",
+        authenticated: "Authentifiziert",
+        tokenValid: "Token gültig",
+      },
     },
   },
   enums: {

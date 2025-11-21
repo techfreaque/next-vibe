@@ -24,6 +24,12 @@ export const translations: typeof enTranslations = {
     response: {
       title: "Ordner-Antwort",
       description: "Liste aller Ordner",
+      rootFolderPermissions: {
+        title: "Stammordner-Berechtigungen",
+        description: "Berechtigungen für den angeforderten Stammordner",
+        canCreateThread: { content: "Kann Thread erstellen" },
+        canCreateFolder: { content: "Kann Ordner erstellen" },
+      },
       folders: {
         title: "Ordner",
         description: "Array von Ordnerobjekten",
@@ -42,6 +48,11 @@ export const translations: typeof enTranslations = {
           metadata: { content: "Metadaten" },
           createdAt: { content: "Erstellt am" },
           updatedAt: { content: "Aktualisiert am" },
+          canManage: { content: "Kann verwalten" },
+          canCreateThread: { content: "Kann Thread erstellen" },
+          canModerate: { content: "Kann moderieren" },
+          canDelete: { content: "Kann löschen" },
+          canManagePermissions: { content: "Kann Berechtigungen verwalten" },
         },
       },
     },

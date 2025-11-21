@@ -8,6 +8,7 @@ import "server-only";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { stepCountIs, streamText } from "ai";
 import { eq } from "drizzle-orm";
+import type { NextRequest } from "next/server";
 import {
   createStreamingResponse,
   ErrorResponseTypes,
@@ -72,7 +73,7 @@ export interface IAiStreamRepository {
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
-    request: Request;
+    request: NextRequest;
   }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse>;
 }
 
@@ -148,7 +149,7 @@ function toAiSdkMessages(
  */
 function extractUserIdentifiers(
   user: JwtPayloadType,
-  request: Request,
+  request: NextRequest,
   logger: EndpointLogger,
 ): {
   userId?: string;
@@ -949,7 +950,7 @@ class AiStreamRepository implements IAiStreamRepository {
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
-    request: Request;
+    request: NextRequest;
   }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse> {
     const { userId, leadId, ipAddress } = extractUserIdentifiers(
       user,

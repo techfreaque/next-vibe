@@ -11,6 +11,7 @@ import {
   objectField,
   requestDataField,
   responseArrayField,
+  responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
@@ -22,19 +23,11 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import {
   UserRoleDB,
-  UserRoleOptions,
   UserRole,
+  UserPermissionRoleOptions,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { DEFAULT_FOLDER_IDS } from "../config";
-
-// Create Zod enum from DEFAULT_FOLDER_IDS values
-const RootFolderIdValues = [
-  DEFAULT_FOLDER_IDS.PRIVATE,
-  DEFAULT_FOLDER_IDS.SHARED,
-  DEFAULT_FOLDER_IDS.PUBLIC,
-  DEFAULT_FOLDER_IDS.INCOGNITO,
-] as const;
+import { DefaultFolderId } from "../config";
 
 /**
  * Get Folders List Endpoint (GET)
@@ -59,7 +52,7 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.agent.chat.folders.get.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.folders.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -72,74 +65,84 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.get.rootFolderId.label" as const,
           description:
             "app.api.v1.core.agent.chat.folders.get.rootFolderId.description" as const,
-          layout: { columns: 12 },
-          validation: { required: false },
+          columns: 12,
           options: [
             {
-              value: DEFAULT_FOLDER_IDS.PRIVATE,
+              value: DefaultFolderId.PRIVATE,
               label:
                 "app.api.v1.core.agent.chat.config.folders.private" as const,
             },
             {
-              value: DEFAULT_FOLDER_IDS.SHARED,
+              value: DefaultFolderId.SHARED,
               label:
                 "app.api.v1.core.agent.chat.config.folders.shared" as const,
             },
             {
-              value: DEFAULT_FOLDER_IDS.PUBLIC,
+              value: DefaultFolderId.PUBLIC,
               label:
                 "app.api.v1.core.agent.chat.config.folders.public" as const,
             },
             {
-              value: DEFAULT_FOLDER_IDS.INCOGNITO,
+              value: DefaultFolderId.INCOGNITO,
               label:
                 "app.api.v1.core.agent.chat.config.folders.incognito" as const,
             },
           ],
         },
-        z
-          .enum([
-            DEFAULT_FOLDER_IDS.PRIVATE,
-            DEFAULT_FOLDER_IDS.SHARED,
-            DEFAULT_FOLDER_IDS.PUBLIC,
-            DEFAULT_FOLDER_IDS.INCOGNITO,
-          ])
-          .optional(),
+        z.enum(DefaultFolderId).optional(),
       ),
 
       // === RESPONSE ===
       // Root folder permissions - computed server-side for the requested root folder
-      rootFolderPermissions: responseField(
+      rootFolderPermissions: objectField(
         {
           type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.agent.chat.folders.get.response.rootFolderPermissions.title" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          description:
+            "app.api.v1.core.agent.chat.folders.get.response.rootFolderPermissions.description" as const,
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
-        z.object({
-          canCreateThread: z
-            .boolean()
-            .describe(
-              "Whether the current user can create threads in the root folder",
-            ),
-          canCreateFolder: z
-            .boolean()
-            .describe(
-              "Whether the current user can create folders in the root folder",
-            ),
-        }),
+        { response: true },
+        {
+          canCreateThread: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.folders.get.response.rootFolderPermissions.canCreateThread.content" as const,
+            },
+            z
+              .boolean()
+              .describe(
+                "Whether the current user can create threads in the root folder",
+              ),
+          ),
+          canCreateFolder: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.agent.chat.folders.get.response.rootFolderPermissions.canCreateFolder.content" as const,
+            },
+            z
+              .boolean()
+              .describe(
+                "Whether the current user can create folders in the root folder",
+              ),
+          ),
+        },
       ),
       folders: responseArrayField(
         {
           type: WidgetType.DATA_CARDS,
-          layout: { type: LayoutType.STACKED },
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
             title:
               "app.api.v1.core.agent.chat.folders.get.response.folders.folder.title" as const,
-            layout: { type: LayoutType.GRID, columns: 2 },
+            layoutType: LayoutType.GRID,
+            columns: 2,
           },
           { response: true },
           {
@@ -165,7 +168,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.folders.get.response.folders.folder.rootFolderId.content" as const,
               },
-              z.enum(RootFolderIdValues),
+              z.enum(DefaultFolderId),
             ),
             name: responseField(
               {
@@ -215,95 +218,81 @@ const { GET } = createEndpoint({
               },
               z.number(),
             ),
-            metadata: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.folders.get.response.folders.folder.metadata.content" as const,
-              },
-              z.record(z.string(), z.never()),
-            ),
-            rolesView: responseArrayField(
+            rolesView: responseArrayOptionalField(
               {
                 type: WidgetType.DATA_LIST,
-                layout: "inline",
               },
               field(
                 z.enum(UserRoleDB),
                 { response: true },
                 {
                   type: WidgetType.BADGE,
-                  options: UserRoleOptions,
+                  enumOptions: UserPermissionRoleOptions,
                 },
               ),
             ),
-            rolesManage: responseArrayField(
+            rolesManage: responseArrayOptionalField(
               {
                 type: WidgetType.DATA_LIST,
-                layout: "inline",
               },
               field(
                 z.enum(UserRoleDB),
                 { response: true },
                 {
                   type: WidgetType.BADGE,
-                  options: UserRoleOptions,
+                  enumOptions: UserPermissionRoleOptions,
                 },
               ),
             ),
-            rolesCreateThread: responseArrayField(
+            rolesCreateThread: responseArrayOptionalField(
               {
                 type: WidgetType.DATA_LIST,
-                layout: "inline",
               },
               field(
                 z.enum(UserRoleDB),
                 { response: true },
                 {
                   type: WidgetType.BADGE,
-                  options: UserRoleOptions,
+                  enumOptions: UserPermissionRoleOptions,
                 },
               ),
             ),
-            rolesPost: responseArrayField(
+            rolesPost: responseArrayOptionalField(
               {
                 type: WidgetType.DATA_LIST,
-                layout: "inline",
               },
               field(
                 z.enum(UserRoleDB),
                 { response: true },
                 {
                   type: WidgetType.BADGE,
-                  options: UserRoleOptions,
+                  enumOptions: UserPermissionRoleOptions,
                 },
               ),
             ),
-            rolesModerate: responseArrayField(
+            rolesModerate: responseArrayOptionalField(
               {
                 type: WidgetType.DATA_LIST,
-                layout: "inline",
               },
               field(
                 z.enum(UserRoleDB),
                 { response: true },
                 {
                   type: WidgetType.BADGE,
-                  options: UserRoleOptions,
+                  enumOptions: UserPermissionRoleOptions,
                 },
               ),
             ),
-            rolesAdmin: responseArrayField(
+            rolesAdmin: responseArrayOptionalField(
               {
                 type: WidgetType.DATA_LIST,
-                layout: "inline",
               },
               field(
                 z.enum(UserRoleDB),
                 { response: true },
                 {
                   type: WidgetType.BADGE,
-                  options: UserRoleOptions,
+                  enumOptions: UserPermissionRoleOptions,
                 },
               ),
             ),
@@ -445,7 +434,7 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
-        rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+        rootFolderId: DefaultFolderId.PRIVATE,
       },
     },
     responses: {
@@ -480,7 +469,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.agent.chat.folders.post.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.folders.post.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -492,7 +481,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.post.sections.folder.title" as const,
           description:
             "app.api.v1.core.agent.chat.folders.post.sections.folder.description" as const,
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { request: "data" },
         {
@@ -504,37 +493,31 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.folders.post.sections.folder.rootFolderId.label" as const,
               description:
                 "app.api.v1.core.agent.chat.folders.post.sections.folder.rootFolderId.description" as const,
-              layout: { columns: 12 },
-              validation: { required: true },
+              columns: 12,
               options: [
                 {
-                  value: DEFAULT_FOLDER_IDS.PRIVATE,
+                  value: DefaultFolderId.PRIVATE,
                   label:
                     "app.api.v1.core.agent.chat.config.folders.private" as const,
                 },
                 {
-                  value: DEFAULT_FOLDER_IDS.SHARED,
+                  value: DefaultFolderId.SHARED,
                   label:
                     "app.api.v1.core.agent.chat.config.folders.shared" as const,
                 },
                 {
-                  value: DEFAULT_FOLDER_IDS.PUBLIC,
+                  value: DefaultFolderId.PUBLIC,
                   label:
                     "app.api.v1.core.agent.chat.config.folders.public" as const,
                 },
                 {
-                  value: DEFAULT_FOLDER_IDS.INCOGNITO,
+                  value: DefaultFolderId.INCOGNITO,
                   label:
                     "app.api.v1.core.agent.chat.config.folders.incognito" as const,
                 },
               ],
             },
-            z.enum([
-              DEFAULT_FOLDER_IDS.PRIVATE,
-              DEFAULT_FOLDER_IDS.SHARED,
-              DEFAULT_FOLDER_IDS.PUBLIC,
-              DEFAULT_FOLDER_IDS.INCOGNITO,
-            ]),
+            z.enum(DefaultFolderId),
           ),
           name: requestDataField(
             {
@@ -544,8 +527,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.folders.post.sections.folder.name.label" as const,
               description:
                 "app.api.v1.core.agent.chat.folders.post.sections.folder.name.description" as const,
-              layout: { columns: 12 },
-              validation: { required: true },
+              columns: 12,
             },
             z.string().min(1).max(255),
           ),
@@ -557,8 +539,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.folders.post.sections.folder.icon.label" as const,
               description:
                 "app.api.v1.core.agent.chat.folders.post.sections.folder.icon.description" as const,
-              layout: { columns: 6 },
-              validation: { required: false },
+              columns: 6,
             },
             z.string().optional(),
           ),
@@ -570,8 +551,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.folders.post.sections.folder.color.label" as const,
               description:
                 "app.api.v1.core.agent.chat.folders.post.sections.folder.color.description" as const,
-              layout: { columns: 6 },
-              validation: { required: false },
+              columns: 6,
             },
             z.string().optional(),
           ),
@@ -583,8 +563,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.folders.post.sections.folder.parentId.label" as const,
               description:
                 "app.api.v1.core.agent.chat.folders.post.sections.folder.parentId.description" as const,
-              layout: { columns: 12 },
-              validation: { required: false },
+              columns: 12,
             },
             z.uuid().optional(),
           ),
@@ -599,7 +578,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.post.response.title" as const,
           description:
             "app.api.v1.core.agent.chat.folders.post.response.description" as const,
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -608,7 +587,8 @@ const { POST } = createEndpoint({
               type: WidgetType.CONTAINER,
               title:
                 "app.api.v1.core.agent.chat.folders.post.response.folder.title" as const,
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID,
+              columns: 2,
             },
             { response: true },
             {
@@ -634,7 +614,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.post.response.folder.rootFolderId.content" as const,
                 },
-                z.enum(RootFolderIdValues),
+                z.enum(DefaultFolderId),
               ),
               name: responseField(
                 {
@@ -684,95 +664,81 @@ const { POST } = createEndpoint({
                 },
                 z.number(),
               ),
-              metadata: responseField(
-                {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.v1.core.agent.chat.folders.post.response.folder.metadata.content" as const,
-                },
-                z.record(z.string(), z.never()),
-              ),
-              rolesView: responseArrayField(
+              rolesView: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
-                  layout: "inline",
                 },
                 field(
                   z.enum(UserRoleDB),
                   { response: true },
                   {
                     type: WidgetType.BADGE,
-                    options: UserRoleOptions,
+                    enumOptions: UserPermissionRoleOptions,
                   },
                 ),
               ),
-              rolesManage: responseArrayField(
+              rolesManage: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
-                  layout: "inline",
                 },
                 field(
                   z.enum(UserRoleDB),
                   { response: true },
                   {
                     type: WidgetType.BADGE,
-                    options: UserRoleOptions,
+                    enumOptions: UserPermissionRoleOptions,
                   },
                 ),
               ),
-              rolesCreateThread: responseArrayField(
+              rolesCreateThread: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
-                  layout: "inline",
                 },
                 field(
                   z.enum(UserRoleDB),
                   { response: true },
                   {
                     type: WidgetType.BADGE,
-                    options: UserRoleOptions,
+                    enumOptions: UserPermissionRoleOptions,
                   },
                 ),
               ),
-              rolesPost: responseArrayField(
+              rolesPost: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
-                  layout: "inline",
                 },
                 field(
                   z.enum(UserRoleDB),
                   { response: true },
                   {
                     type: WidgetType.BADGE,
-                    options: UserRoleOptions,
+                    enumOptions: UserPermissionRoleOptions,
                   },
                 ),
               ),
-              rolesModerate: responseArrayField(
+              rolesModerate: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
-                  layout: "inline",
                 },
                 field(
                   z.enum(UserRoleDB),
                   { response: true },
                   {
                     type: WidgetType.BADGE,
-                    options: UserRoleOptions,
+                    enumOptions: UserPermissionRoleOptions,
                   },
                 ),
               ),
-              rolesAdmin: responseArrayField(
+              rolesAdmin: responseArrayOptionalField(
                 {
                   type: WidgetType.DATA_LIST,
-                  layout: "inline",
                 },
                 field(
                   z.enum(UserRoleDB),
                   { response: true },
                   {
                     type: WidgetType.BADGE,
-                    options: UserRoleOptions,
+                    enumOptions: UserPermissionRoleOptions,
                   },
                 ),
               ),
@@ -858,7 +824,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         folder: {
-          rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+          rootFolderId: DefaultFolderId.PRIVATE,
           name: "Work",
           icon: "folder",
           color: "#3b82f6",
@@ -871,14 +837,13 @@ const { POST } = createEndpoint({
           folder: {
             id: "123e4567-e89b-12d3-a456-426614174000",
             userId: "123e4567-e89b-12d3-a456-426614174001",
-            rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+            rootFolderId: DefaultFolderId.PRIVATE,
             name: "Work",
             icon: "folder",
             color: "#3b82f6",
             parentId: null,
             expanded: true,
             sortOrder: 0,
-            metadata: {},
             rolesView: [],
             rolesManage: [],
             rolesCreateThread: [],

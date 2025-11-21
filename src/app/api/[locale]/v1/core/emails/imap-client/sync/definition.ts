@@ -40,7 +40,8 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.emails.imapClient.sync.container.title",
       description:
         "app.api.v1.core.emails.imapClient.sync.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -54,7 +55,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.sync.accountIds.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.sync.accountIds.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.array(z.uuid()).optional(),
       ),
@@ -66,7 +67,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.imapClient.sync.force.label",
           description:
             "app.api.v1.core.emails.imapClient.sync.force.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().default(false),
       ),
@@ -78,7 +79,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.imapClient.sync.dryRun.label",
           description:
             "app.api.v1.core.emails.imapClient.sync.dryRun.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().default(false),
       ),
@@ -92,7 +93,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.sync.maxMessages.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.sync.maxMessages.placeholder",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.number().min(1).max(10000).default(1000),
       ),
@@ -161,7 +162,6 @@ const { POST } = createEndpoint({
           type: WidgetType.GROUPED_LIST,
           groupBy: "code",
           sortBy: "message",
-          showGroupSummary: false,
         },
         objectField(
           {
@@ -170,7 +170,8 @@ const { POST } = createEndpoint({
               "app.api.v1.core.emails.imapClient.sync.post.response.errors.error.title",
             description:
               "app.api.v1.core.emails.imapClient.sync.post.response.errors.error.description",
-            layout: { type: LayoutType.GRID, columns: 12 },
+            layoutType: LayoutType.GRID,
+      columns: 12,
           },
           { response: true },
           {

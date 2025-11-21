@@ -1,6 +1,6 @@
 import { redirect } from "next-vibe-ui/lib/redirect";
 
-import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
@@ -38,8 +38,8 @@ export default async function ChatPage({
 
   // Redirect to appropriate default folder
   const defaultFolder = isAuthenticated
-    ? DEFAULT_FOLDER_IDS.PRIVATE
-    : DEFAULT_FOLDER_IDS.INCOGNITO;
+    ? DefaultFolderId.PRIVATE
+    : DefaultFolderId.INCOGNITO;
 
   redirect(`/${locale}/threads/${defaultFolder}`);
 }

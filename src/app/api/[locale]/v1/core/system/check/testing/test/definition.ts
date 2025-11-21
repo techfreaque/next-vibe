@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.system.check.testing.test.container.title",
       description:
         "app.api.v1.core.system.check.testing.test.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -61,7 +61,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.testing.test.fields.path.description",
           placeholder:
             "app.api.v1.core.system.check.testing.test.fields.path.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional().default("src/"),
       ),
@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.testing.test.fields.verbose.label",
           description:
             "app.api.v1.core.system.check.testing.test.fields.verbose.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.boolean().default(false),
       ),
@@ -86,7 +86,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.check.testing.test.fields.watch.label",
           description:
             "app.api.v1.core.system.check.testing.test.fields.watch.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.boolean().default(false),
       ),
@@ -99,7 +99,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.testing.test.fields.coverage.label",
           description:
             "app.api.v1.core.system.check.testing.test.fields.coverage.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.boolean().default(false),
       ),

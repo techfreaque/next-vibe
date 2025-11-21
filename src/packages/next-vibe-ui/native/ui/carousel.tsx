@@ -43,7 +43,6 @@ function useCarousel(): CarouselContextProps {
 
 function Carousel({
   className,
-  style,
   children,
   orientation = "horizontal",
   opts: _opts,
@@ -53,7 +52,6 @@ function Carousel({
   const scrollViewRef = React.useRef<RNScrollView>(null);
   const [canScrollPrev, _setCanScrollPrev] = React.useState(false);
   const [canScrollNext, _setCanScrollNext] = React.useState(true);
-  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Expose setApi if provided
   React.useEffect(() => {
@@ -95,13 +93,10 @@ function Carousel({
         horizontal={orientation === "horizontal"}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
-        {...applyStyleType({
-          nativeStyle,
-          className: cn(
-            orientation === "horizontal" ? "flex flex-row" : "flex flex-col",
-            className,
-          ),
-        })}
+        className={cn(
+          orientation === "horizontal" ? "flex flex-row" : "flex flex-col",
+          className,
+        )}
       >
         {children}
       </StyledScrollView>
@@ -145,12 +140,10 @@ function CarouselPrevious({
   className,
   variant = "outline",
   size = "icon",
-  style,
   ...restProps
 }: CarouselButtonProps): React.JSX.Element {
   const { scrollPrev, canScrollPrev } = useCarousel();
   const { t } = useTranslation();
-  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Accept props for API compatibility but don't use them in native
   void variant;
@@ -161,10 +154,7 @@ function CarouselPrevious({
     <Pressable
       onPress={scrollPrev}
       disabled={!canScrollPrev}
-      {...applyStyleType({
-        nativeStyle,
-        className: cn("absolute", className),
-      })}
+      className={cn("absolute", className)}
       accessibilityLabel={t(
         "packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide",
       )}
@@ -180,12 +170,10 @@ function CarouselNext({
   className,
   variant = "outline",
   size = "icon",
-  style,
   ...restProps
 }: CarouselButtonProps): React.JSX.Element {
   const { scrollNext, canScrollNext } = useCarousel();
   const { t } = useTranslation();
-  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Accept props for API compatibility but don't use them in native
   void variant;
@@ -196,10 +184,7 @@ function CarouselNext({
     <Pressable
       onPress={scrollNext}
       disabled={!canScrollNext}
-      {...applyStyleType({
-        nativeStyle,
-        className: cn("absolute", className),
-      })}
+      className={cn("absolute", className)}
       accessibilityLabel={t(
         "packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide",
       )}

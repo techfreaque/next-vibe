@@ -9,6 +9,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
   objectField,
+  objectOptionalField,
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
@@ -30,7 +31,12 @@ const { GET } = createEndpoint({
   description: "app.api.v1.core.system.db.utils.description",
   category: "app.api.v1.core.system.db.category",
   tags: ["app.api.v1.core.system.db.utils.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["db:utils", "dbutils"],
   method: Methods.GET,
   path: ["v1", "core", "system", "db", "utils"],
@@ -54,12 +60,6 @@ const { GET } = createEndpoint({
           primary: true,
           replica: true,
         },
-        details: {
-          version: "15.4",
-          uptime: 86400,
-          activeConnections: 10,
-          maxConnections: 100,
-        },
       },
       detailed: {
         status: "healthy",
@@ -67,12 +67,6 @@ const { GET } = createEndpoint({
         connections: {
           primary: true,
           replica: true,
-        },
-        details: {
-          version: "15.4",
-          uptime: 86400,
-          activeConnections: 10,
-          maxConnections: 100,
         },
       },
     },
@@ -83,7 +77,8 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.db.utils.title",
       description: "app.api.v1.core.system.db.utils.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -95,7 +90,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.system.db.utils.includeDetails.title",
           description:
             "app.api.v1.core.system.db.utils.includeDetails.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -107,7 +102,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.system.db.utils.checkConnections.title",
           description:
             "app.api.v1.core.system.db.utils.checkConnections.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(true),
       ),
@@ -129,30 +124,77 @@ const { GET } = createEndpoint({
         z.string(),
       ),
 
-      connections: responseField(
+      connections: objectField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.db.utils.connections.title",
+          type: WidgetType.CONTAINER,
+          title: "app.api.v1.core.system.db.utils.connections.title",
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
-        z.object({
-          primary: z.boolean(),
-          replica: z.boolean().optional(),
-        }),
+        { response: true },
+        {
+          primary: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.system.db.utils.connections.primary",
+              fieldType: FieldDataType.BOOLEAN,
+            },
+            z.boolean(),
+          ),
+          replica: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.system.db.utils.connections.replica",
+              fieldType: FieldDataType.BOOLEAN,
+            },
+            z.boolean().optional(),
+          ),
+        },
       ),
 
-      details: responseField(
+      details: objectOptionalField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.db.utils.details.title",
+          type: WidgetType.CONTAINER,
+          title: "app.api.v1.core.system.db.utils.details.title",
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
-        z
-          .object({
-            version: z.string().optional(),
-            uptime: z.number().optional(),
-            activeConnections: z.number().optional(),
-            maxConnections: z.number().optional(),
-          })
-          .optional(),
+        { response: true },
+        {
+          version: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.system.db.utils.details.version",
+              fieldType: FieldDataType.TEXT,
+            },
+            z.string().optional(),
+          ),
+          uptime: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.system.db.utils.details.uptime",
+              fieldType: FieldDataType.NUMBER,
+            },
+            z.number().optional(),
+          ),
+          activeConnections: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.v1.core.system.db.utils.details.activeConnections",
+              fieldType: FieldDataType.NUMBER,
+            },
+            z.number().optional(),
+          ),
+          maxConnections: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.system.db.utils.details.maxConnections",
+              fieldType: FieldDataType.NUMBER,
+            },
+            z.number().optional(),
+          ),
+        },
       ),
     },
   ),

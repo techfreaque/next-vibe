@@ -126,6 +126,8 @@ export const translations: typeof enTranslations = {
     endsAt: "Kończy się o",
     createdAt: "Utworzono o",
     updatedAt: "Zaktualizowano o",
+    provider: "Dostawca płatności",
+    providerSubscriptionId: "ID subskrypcji dostawcy",
   },
 
   // Error types

@@ -10,7 +10,14 @@ import { Section } from "next-vibe-ui/ui/section";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 
-const sampleData = [
+interface SampleData {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
+const sampleData: SampleData[] = [
   { id: 1, name: "Alice", email: "alice@example.com", role: "Admin" },
   { id: 2, name: "Bob", email: "bob@example.com", role: "User" },
   { id: 3, name: "Charlie", email: "charlie@example.com", role: "User" },
@@ -20,17 +27,17 @@ const columns = [
   {
     accessorKey: "name",
     header: (): React.ReactElement => <P className="font-medium">Name</P>,
-    cell: ({ getValue }: { getValue: () => unknown }): React.ReactElement => <P>{String(getValue())}</P>,
+    cell: ({ getValue }: { getValue: () => string }): React.ReactElement => <P>{getValue()}</P>,
   },
   {
     accessorKey: "email",
     header: (): React.ReactElement => <P className="font-medium">Email</P>,
-    cell: ({ getValue }: { getValue: () => unknown }): React.ReactElement => <P>{String(getValue())}</P>,
+    cell: ({ getValue }: { getValue: () => string }): React.ReactElement => <P>{getValue()}</P>,
   },
   {
     accessorKey: "role",
     header: (): React.ReactElement => <P className="font-medium">Role</P>,
-    cell: ({ getValue }: { getValue: () => unknown }): React.ReactElement => <P>{String(getValue())}</P>,
+    cell: ({ getValue }: { getValue: () => string }): React.ReactElement => <P>{getValue()}</P>,
   },
 ];
 

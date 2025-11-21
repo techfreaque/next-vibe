@@ -18,6 +18,34 @@ export const translations = {
     warning: "Warning",
     info: "Info",
   },
+  fields: {
+    operation: {
+      label: "Operation",
+      description: "Select validation operation to perform",
+      placeholder: "Choose operation",
+    },
+    filePath: {
+      label: "File Path",
+      description: "Specific route file path to validate",
+      placeholder: "Enter file path",
+    },
+    options: {
+      label: "Options",
+      description: "Validation options",
+      placeholder: "Enter options",
+    },
+  },
+  response: {
+    operation: {
+      label: "Operation",
+    },
+    success: {
+      label: "Success",
+    },
+    result: {
+      label: "Result",
+    },
+  },
   success: {
     title: "TRPC Validation Successful",
     description: "TRPC validation completed successfully",

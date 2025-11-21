@@ -80,6 +80,7 @@ export enum WidgetType {
 
   // Data display widgets
   DATA_TABLE = "data_table",
+  DATA_CARD = "data_card",
   DATA_CARDS = "data_cards",
   DATA_LIST = "data_list",
   DATA_GRID = "data_grid",

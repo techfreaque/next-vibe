@@ -29,7 +29,12 @@ const { POST } = createEndpoint({
   tags: [
     "app.api.v1.core.system.generators.route-handlers.post.title" as const,
   ],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF] as const,
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ] as const,
 
   fields: objectField(
     {
@@ -37,7 +42,7 @@ const { POST } = createEndpoint({
       fieldType: FieldDataType.TEXT,
       label:
         "app.api.v1.core.system.generators.route-handlers.post.container.title" as const,
-      layout: { columns: 12 },
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -50,7 +55,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.route-handlers.post.fields.outputFile.label" as const,
           description:
             "app.api.v1.core.system.generators.route-handlers.post.fields.outputFile.description" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z
           .string()
@@ -67,7 +72,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.route-handlers.post.fields.dryRun.label" as const,
           description:
             "app.api.v1.core.system.generators.route-handlers.post.fields.dryRun.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),

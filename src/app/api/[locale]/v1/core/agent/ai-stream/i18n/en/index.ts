@@ -52,6 +52,20 @@ export const translations = {
       label: "Parent Message ID",
       description: "Parent message ID for branching/threading",
     },
+    messageHistory: {
+      label: "Message History",
+      description: "Optional message history for incognito mode",
+      item: {
+        title: "Message",
+        description: "Chat message in history",
+        role: {
+          label: "Role",
+        },
+        content: {
+          label: "Content",
+        },
+      },
+    },
     content: {
       label: "Message Content",
       description: "Content of the message to send",

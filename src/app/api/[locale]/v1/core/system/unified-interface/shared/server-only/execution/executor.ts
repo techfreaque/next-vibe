@@ -14,7 +14,7 @@ import type { TFunction } from "@/i18n/core/static-types";
 import { getDiscoveredEndpoints } from "../registry/endpoint-adapter";
 import type { DiscoveredEndpoint } from "../types/registry";
 import { type Platform } from "../../types/platform";
-import { getErrorMessage } from "../../utils/error";
+import { getErrorMessage } from "../../utils/error-utils";
 import { extractEndpointPath } from "../../conversion/endpoint-to-metadata";
 
 /**

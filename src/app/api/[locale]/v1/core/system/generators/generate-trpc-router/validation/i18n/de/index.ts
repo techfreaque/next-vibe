@@ -20,6 +20,34 @@ export const translations: typeof enTranslations = {
     warning: "Warnung",
     info: "Info",
   },
+  fields: {
+    operation: {
+      label: "Operation",
+      description: "Validierungsoperation auswählen",
+      placeholder: "Operation wählen",
+    },
+    filePath: {
+      label: "Dateipfad",
+      description: "Spezifischer Routendateipfad zur Validierung",
+      placeholder: "Dateipfad eingeben",
+    },
+    options: {
+      label: "Optionen",
+      description: "Validierungsoptionen",
+      placeholder: "Optionen eingeben",
+    },
+  },
+  response: {
+    operation: {
+      label: "Operation",
+    },
+    success: {
+      label: "Erfolg",
+    },
+    result: {
+      label: "Ergebnis",
+    },
+  },
   success: {
     title: "TRPC-Validierung erfolgreich",
     description: "TRPC-Validierung erfolgreich abgeschlossen",

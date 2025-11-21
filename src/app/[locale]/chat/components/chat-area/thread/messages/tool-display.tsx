@@ -5,6 +5,7 @@ import type { JSX } from "react";
 
 import type { ToolCall } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { ToolCallRenderer } from "@/app/api/[locale]/v1/core/system/unified-interface/react/widgets/ToolCallRenderer";
+import { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/platform";
 import type { WidgetRenderContext } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/ui/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -78,7 +79,7 @@ export function ToolDisplay({
     locale,
     isInteractive: true,
     permissions: [],
-    platform: "web",
+    platform: Platform.WEB,
   };
 
   // Tool calls should always start collapsed

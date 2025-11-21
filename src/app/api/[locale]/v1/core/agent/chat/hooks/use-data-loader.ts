@@ -241,7 +241,6 @@ async function loadFoldersFromServer(
             parentId: folder.parentId,
             expanded: folder.expanded,
             sortOrder: folder.sortOrder,
-            metadata: folder.metadata,
             rolesView: folder.rolesView || [],
             rolesManage: folder.rolesManage || [],
             rolesCreateThread: folder.rolesCreateThread || [],

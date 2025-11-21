@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -60,7 +60,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),
@@ -73,7 +73,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.description",
-          layout: { columns: 6 },
+          columns: 6,
           options: [],
         },
         z.array(z.string()).optional(),
@@ -87,7 +87,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),
@@ -126,7 +126,11 @@ const { POST } = createEndpoint({
         z.number(),
       ),
       results: responseArrayField(
-        {},
+        {
+          type: WidgetType.DATA_LIST,
+          title:
+            "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.results",
+        },
         objectField(
           {
             type: WidgetType.CONTAINER,
@@ -134,7 +138,7 @@ const { POST } = createEndpoint({
               "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.results",
             description:
               "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.response.resultsDescription",
-            layout: { type: LayoutType.GRID, columns: 4 },
+            layoutType: LayoutType.GRID, columns: 4,
           },
           { response: true },
           {

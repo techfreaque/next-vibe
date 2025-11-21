@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
       "Die Liste der Moderatoren für einen bestimmten Thread abrufen",
     container: {
       title: "Thread-Berechtigungen",
+      description: "Thread-Zugriffsberechtigungen anzeigen und verwalten",
     },
     threadId: {
       label: "Thread-ID",
@@ -14,6 +15,26 @@ export const translations: typeof enTranslations = {
     },
     response: {
       title: "Thread-Berechtigungen",
+      rolesView: {
+        label: "Ansichtsrollen",
+        description: "Rollen, die diesen Thread ansehen können",
+      },
+      rolesEdit: {
+        label: "Bearbeitungsrollen",
+        description: "Rollen, die Thread-Einstellungen bearbeiten können",
+      },
+      rolesPost: {
+        label: "Beitragsrollen",
+        description: "Rollen, die Nachrichten posten können",
+      },
+      rolesModerate: {
+        label: "Moderationsrollen",
+        description: "Rollen, die Inhalte moderieren können",
+      },
+      rolesAdmin: {
+        label: "Admin-Rollen",
+        description: "Rollen mit vollem Administratorzugriff",
+      },
       moderatorIds: {
         title: "Moderator-IDs",
         description:
@@ -74,10 +95,31 @@ export const translations: typeof enTranslations = {
       "Die Liste der Moderatoren für einen bestimmten Thread aktualisieren",
     container: {
       title: "Thread-Berechtigungen aktualisieren",
+      description: "Thread-Zugriffsberechtigungen ändern",
     },
     threadId: {
       label: "Thread-ID",
       description: "Die eindeutige Kennung des zu aktualisierenden Threads",
+    },
+    rolesView: {
+      label: "Ansichtsrollen",
+      description: "Rollen, die diesen Thread ansehen können",
+    },
+    rolesEdit: {
+      label: "Bearbeitungsrollen",
+      description: "Rollen, die Thread-Einstellungen bearbeiten können",
+    },
+    rolesPost: {
+      label: "Beitragsrollen",
+      description: "Rollen, die Nachrichten posten können",
+    },
+    rolesModerate: {
+      label: "Moderationsrollen",
+      description: "Rollen, die Inhalte moderieren können",
+    },
+    rolesAdmin: {
+      label: "Admin-Rollen",
+      description: "Rollen mit vollem Administratorzugriff",
     },
     permissions: {
       title: "Berechtigungsaktualisierung",
@@ -85,13 +127,30 @@ export const translations: typeof enTranslations = {
         label: "Moderator-IDs",
         description:
           "Liste der Benutzer-IDs, die diesen Thread moderieren können",
-        item: {
-          label: "Benutzer-ID",
-        },
       },
     },
     response: {
       title: "Aktualisierte Berechtigungen",
+      rolesView: {
+        label: "Ansichtsrollen",
+        description: "Rollen, die diesen Thread ansehen können",
+      },
+      rolesEdit: {
+        label: "Bearbeitungsrollen",
+        description: "Rollen, die Thread-Einstellungen bearbeiten können",
+      },
+      rolesPost: {
+        label: "Beitragsrollen",
+        description: "Rollen, die Nachrichten posten können",
+      },
+      rolesModerate: {
+        label: "Moderationsrollen",
+        description: "Rollen, die Inhalte moderieren können",
+      },
+      rolesAdmin: {
+        label: "Admin-Rollen",
+        description: "Rollen mit vollem Administratorzugriff",
+      },
       message: {
         content: "Thread-Berechtigungen erfolgreich aktualisiert",
       },

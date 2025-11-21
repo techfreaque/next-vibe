@@ -45,7 +45,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.permissions.get.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.permissions.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {
@@ -232,7 +232,7 @@ const { PATCH } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -258,7 +258,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesView.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesView.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
         z.array(z.enum(UserRoleDB)).nullable().optional(),
@@ -271,7 +271,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesEdit.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesEdit.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
         z.array(z.enum(UserRoleDB)).nullable().optional(),
@@ -284,7 +284,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesPost.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesPost.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
         z.array(z.enum(UserRoleDB)).nullable().optional(),
@@ -297,7 +297,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesModerate.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesModerate.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
         z.array(z.enum(UserRoleDB)).nullable().optional(),
@@ -310,7 +310,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesAdmin.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.rolesAdmin.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: UserRoleDB.map((role) => ({ value: role, label: role })),
         },
         z.array(z.enum(UserRoleDB)).nullable().optional(),
@@ -322,9 +322,7 @@ const { PATCH } = createEndpoint({
           type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.title" as const,
-          description:
-            "app.api.v1.core.agent.chat.threads.threadId.permissions.patch.response.description" as const,
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {

@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
     "app.api.v1.core.stripe.tags.cli" as const,
     "app.api.v1.core.stripe.tags.webhook" as const,
   ],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
   aliases: ["stripe", "stripe-cli"],
 
   cli: {
@@ -47,7 +47,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.stripe.form.title" as const,
       description: "app.api.v1.core.stripe.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -61,9 +62,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.stripe.form.fields.operation.description" as const,
           placeholder:
             "app.api.v1.core.stripe.form.fields.operation.placeholder" as const,
-          layout: { columns: 6 },
-          validation: { required: true },
-          options: [
+          columns: 6,
+              options: [
             {
               value: "check",
               label: "app.api.v1.core.stripe.operations.check" as const,
@@ -98,9 +98,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.stripe.form.fields.port.description" as const,
           placeholder:
             "app.api.v1.core.stripe.form.fields.port.placeholder" as const,
-          layout: { columns: 6 },
-          validation: { required: false, min: 1000, max: 65535 },
-        },
+          columns: 6
+},
         z.number().optional(),
       ),
 
@@ -113,33 +112,31 @@ const { POST } = createEndpoint({
             "app.api.v1.core.stripe.form.fields.events.description" as const,
           placeholder:
             "app.api.v1.core.stripe.form.fields.events.placeholder" as const,
-          layout: { columns: 12 },
-          validation: { required: false },
-          behavior: { searchable: true, clearable: true },
+          columns: 12,
           options: [
             {
               value: "payment_intent.succeeded",
-              label: "Payment Intent Succeeded",
+              label: "app.api.v1.core.stripe.form.fields.events.paymentIntentSucceeded" as const,
             },
             {
               value: "payment_intent.payment_failed",
-              label: "Payment Intent Failed",
+              label: "app.api.v1.core.stripe.form.fields.events.paymentIntentFailed" as const,
             },
             {
               value: "customer.subscription.created",
-              label: "Subscription Created",
+              label: "app.api.v1.core.stripe.form.fields.events.subscriptionCreated" as const,
             },
             {
               value: "customer.subscription.updated",
-              label: "Subscription Updated",
+              label: "app.api.v1.core.stripe.form.fields.events.subscriptionUpdated" as const,
             },
             {
               value: "invoice.payment_succeeded",
-              label: "Invoice Payment Succeeded",
+              label: "app.api.v1.core.stripe.form.fields.events.invoicePaymentSucceeded" as const,
             },
             {
               value: "invoice.payment_failed",
-              label: "Invoice Payment Failed",
+              label: "app.api.v1.core.stripe.form.fields.events.invoicePaymentFailed" as const,
             },
           ],
         },
@@ -155,9 +152,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.stripe.form.fields.forwardTo.description" as const,
           placeholder:
             "app.api.v1.core.stripe.form.fields.forwardTo.placeholder" as const,
-          layout: { columns: 6 },
-          validation: { required: false },
-        },
+          columns: 6},
         z.string().optional(),
       ),
 
@@ -169,9 +164,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.stripe.form.fields.skipSslVerify.label" as const,
           description:
             "app.api.v1.core.stripe.form.fields.skipSslVerify.description" as const,
-          layout: { columns: 6 },
-          validation: { required: false },
-        },
+          columns: 6},
         z.boolean().default(false),
       ),
 

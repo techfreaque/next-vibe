@@ -49,7 +49,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.newsletter.unsubscribe.post.form.title" as const,
       description:
         "app.api.v1.core.newsletter.unsubscribe.post.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -63,7 +63,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.newsletter.unsubscribe.email.description" as const,
           placeholder:
             "app.api.v1.core.newsletter.unsubscribe.email.placeholder" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().email(),
       ),

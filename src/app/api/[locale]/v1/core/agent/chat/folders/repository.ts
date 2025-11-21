@@ -9,6 +9,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { chatFolders } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import {
   canCreateFolder,
@@ -108,7 +109,7 @@ export class ChatFoldersRepositoryImpl
       } else {
         // No rootFolderId specified: fetch all PUBLIC folders + user's own folders from other root folders
         whereConditions = or(
-          eq(chatFolders.rootFolderId, "public"), // All PUBLIC folders
+          eq(chatFolders.rootFolderId, DefaultFolderId.PUBLIC), // All PUBLIC folders
           eq(chatFolders.userId, userIdentifier), // User's own folders from any root folder
         );
       }
@@ -162,18 +163,13 @@ export class ChatFoldersRepositoryImpl
           return {
             id: folder.id,
             userId: folder.userId,
-            rootFolderId: folder.rootFolderId as
-              | "incognito"
-              | "private"
-              | "public"
-              | "shared",
+            rootFolderId: folder.rootFolderId,
             name: folder.name,
             icon: folder.icon,
             color: folder.color,
             parentId: folder.parentId,
             expanded: folder.expanded,
             sortOrder: folder.sortOrder,
-            metadata: folder.metadata || {},
             rolesView: folder.rolesView || [],
             rolesManage: folder.rolesManage || [],
             rolesCreateThread: folder.rolesCreateThread || [],
@@ -338,7 +334,6 @@ export class ChatFoldersRepositoryImpl
           parentId: folderData.parentId || null,
           expanded: true,
           sortOrder: nextSortOrder,
-          metadata: {},
           // rolesView, rolesManage, rolesCreateThread, rolesPost, rolesModerate, rolesAdmin are NOT set
           // They default to null which means inherit from parent folder
         })
@@ -370,18 +365,13 @@ export class ChatFoldersRepositoryImpl
           folder: {
             id: newFolder.id,
             userId: newFolder.userId,
-            rootFolderId: newFolder.rootFolderId as
-              | "incognito"
-              | "private"
-              | "public"
-              | "shared",
+            rootFolderId: newFolder.rootFolderId,
             name: newFolder.name,
             icon: newFolder.icon,
             color: newFolder.color,
             parentId: newFolder.parentId,
             expanded: newFolder.expanded,
             sortOrder: newFolder.sortOrder,
-            metadata: newFolder.metadata || {},
             rolesView: newFolder.rolesView || [],
             rolesManage: newFolder.rolesManage || [],
             rolesCreateThread: newFolder.rolesCreateThread || [],

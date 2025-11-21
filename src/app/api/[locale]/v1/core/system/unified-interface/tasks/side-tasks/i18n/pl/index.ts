@@ -43,6 +43,20 @@ export const translations: typeof enTranslations = {
       title: "Szczegóły zadania pobocznego",
       description: "Wyświetl szczegóły zadania pobocznego",
     },
+    response: {
+      healthyTasks: {
+        title: "Zdrowe zadania",
+      },
+      unhealthyTasks: {
+        title: "Niezdrowe zadania",
+      },
+      runningTasks: {
+        title: "Uruchomione zadania",
+      },
+      totalTasks: {
+        title: "Wszystkie zadania",
+      },
+    },
     errors: {
       validation: {
         title: "Błąd walidacji",

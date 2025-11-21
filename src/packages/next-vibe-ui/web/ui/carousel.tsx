@@ -36,7 +36,7 @@ export type CarouselItemProps = {
   children?: React.ReactNode;
 } & StyleType;
 
-interface CarouselContextProps {
+type CarouselContextProps = {
   carouselRef: ReturnType<typeof useEmblaCarousel>[0];
   api: ReturnType<typeof useEmblaCarousel>[1];
   scrollPrev: () => void;
@@ -48,9 +48,7 @@ interface CarouselContextProps {
   orientation?: "horizontal" | "vertical";
   setApi?: (api: CarouselApi) => void;
   children?: React.ReactNode;
-  className?: string;
-  style?: Record<string, string | number>;
-}
+} & StyleType;
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null);
 
@@ -209,101 +207,82 @@ function CarouselItem({
   );
 }
 
-import type { ButtonProps } from "./button";
+export interface CarouselButtonProps {
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  size?: "default" | "sm" | "lg" | "icon" | "unset";
+  className?: string;
+  suppressHydrationWarning?: boolean;
+  role?:
+    | "button"
+    | "link"
+    | "menuitem"
+    | "tab"
+    | "switch"
+    | "checkbox"
+    | "radio"
+    | "combobox";
+  title?: string;
+  type?: "button" | "submit" | "reset";
+}
 
-export type CarouselButtonProps = Omit<
-  ButtonProps,
-  | "onClick"
-  | "disabled"
-  | "onMouseEnter"
-  | "onMouseLeave"
-  | "tabIndex"
-  | "asChild"
-  | "children"
->;
-
-function CarouselPrevious({
-  className,
-  variant = "outline",
-  size = "icon",
-  role,
-  style,
-  suppressHydrationWarning,
-  title,
-  type,
-}: CarouselButtonProps): React.JSX.Element {
+function CarouselPrevious(props: CarouselButtonProps): React.JSX.Element {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
   const { t } = useTranslation();
 
   return (
     <Button
-      variant={variant ?? "outline"}
-      size={size ?? "icon"}
+      variant={props.variant}
+      size={props.size}
       className={cn(
         "absolute  h-8 w-8 rounded-full",
         orientation === "horizontal"
           ? "-left-12 top-1/2 -translate-y-1/2"
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
-        className,
+        props.className,
       )}
-      role={role}
-      style={style}
-      suppressHydrationWarning={suppressHydrationWarning}
-      title={title}
-      type={type}
+      role={props.role}
+      suppressHydrationWarning={props.suppressHydrationWarning}
+      title={props.title}
+      type={props.type}
       disabled={!canScrollPrev}
       onClick={scrollPrev}
     >
-      <>
-        <ArrowLeftIcon className="h-4 w-4" />
-        <span className="sr-only">
-          {t(
-            "packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide",
-          )}
-        </span>
-      </>
+      <ArrowLeftIcon className="h-4 w-4" />
+      <span className="sr-only">
+        {t(
+          "packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide",
+        )}
+      </span>
     </Button>
   );
 }
 
-function CarouselNext({
-  className,
-  variant = "outline",
-  size = "icon",
-  role,
-  style,
-  suppressHydrationWarning,
-  title,
-  type,
-}: CarouselButtonProps): React.JSX.Element {
+function CarouselNext(props: CarouselButtonProps): React.JSX.Element {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
   const { t } = useTranslation();
 
   return (
     <Button
-      variant={variant ?? "outline"}
-      size={size ?? "icon"}
-      role={role}
-      style={style}
-      suppressHydrationWarning={suppressHydrationWarning}
-      title={title}
-      type={type}
+      variant={props.variant}
+      size={props.size}
       className={cn(
         "absolute h-8 w-8 rounded-full",
         orientation === "horizontal"
           ? "-right-12 top-1/2 -translate-y-1/2"
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
-        className,
+        props.className,
       )}
+      role={props.role}
+      suppressHydrationWarning={props.suppressHydrationWarning}
+      title={props.title}
+      type={props.type}
       disabled={!canScrollNext}
       onClick={scrollNext}
     >
-      <>
-        <ArrowRightIcon className="h-4 w-4" />
-        <span className="sr-only">
-          {t("packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide")}
-        </span>
-      </>
+      <ArrowRightIcon className="h-4 w-4" />
+      <span className="sr-only">
+        {t("packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide")}
+      </span>
     </Button>
   );
 }

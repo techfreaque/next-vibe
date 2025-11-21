@@ -67,7 +67,7 @@ const { GET, POST } = createFormEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.payment.form.title",
       description: "app.api.v1.core.payment.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     {
       GET: { response: true },
@@ -87,9 +87,7 @@ const { GET, POST } = createFormEndpoint({
           label: "app.api.v1.core.payment.priceId.label",
           description: "app.api.v1.core.payment.priceId.description",
           placeholder: "app.api.v1.core.payment.priceId.placeholder",
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
       ),
 
       // Checkout mode field
@@ -105,9 +103,7 @@ const { GET, POST } = createFormEndpoint({
           label: "app.api.v1.core.payment.mode.label",
           description: "app.api.v1.core.payment.mode.description",
           options: CheckoutModeOptions,
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
       ),
 
       // Payment method types field
@@ -124,7 +120,7 @@ const { GET, POST } = createFormEndpoint({
           description:
             "app.api.v1.core.payment.create.paymentMethodTypes.description",
           options: PaymentMethodTypeOptions,
-          layout: { columns: 12 },
+          columns: 12,
         },
       ),
 
@@ -141,7 +137,7 @@ const { GET, POST } = createFormEndpoint({
           label: "app.api.v1.core.payment.create.successUrl.label",
           description: "app.api.v1.core.payment.create.successUrl.description",
           placeholder: "app.api.v1.core.payment.create.successUrl.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
       ),
 
@@ -158,7 +154,7 @@ const { GET, POST } = createFormEndpoint({
           label: "app.api.v1.core.payment.create.cancelUrl.label",
           description: "app.api.v1.core.payment.create.cancelUrl.description",
           placeholder: "app.api.v1.core.payment.create.cancelUrl.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
       ),
 
@@ -177,7 +173,7 @@ const { GET, POST } = createFormEndpoint({
             "app.api.v1.core.payment.create.customerEmail.description",
           placeholder:
             "app.api.v1.core.payment.create.customerEmail.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
       ),
 

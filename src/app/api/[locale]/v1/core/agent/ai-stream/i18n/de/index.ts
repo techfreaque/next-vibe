@@ -34,6 +34,20 @@ export const translations: typeof enTranslations = {
       label: "Eltern-Nachrichten-ID",
       description: "Eltern-Nachrichten-ID für Verzweigung/Threading",
     },
+    messageHistory: {
+      label: "Nachrichtenverlauf",
+      description: "Optionaler Nachrichtenverlauf für Inkognito-Modus",
+      item: {
+        title: "Nachricht",
+        description: "Chat-Nachricht im Verlauf",
+        role: {
+          label: "Rolle",
+        },
+        content: {
+          label: "Inhalt",
+        },
+      },
+    },
     content: {
       label: "Nachrichteninhalt",
       description: "Inhalt der zu sendenden Nachricht",

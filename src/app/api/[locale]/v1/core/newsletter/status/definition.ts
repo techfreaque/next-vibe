@@ -44,7 +44,8 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.newsletter.status.form.title" as const,
       description:
         "app.api.v1.core.newsletter.status.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -59,13 +60,8 @@ const { GET } = createEndpoint({
           placeholder:
             "app.api.v1.core.newsletter.status.email.placeholder" as const,
           helpText: "app.api.v1.core.newsletter.status.email.helpText" as const,
-          validation: {
-            required: true,
-          },
-          layout: {
-            columns: 12,
-            order: 1,
-          },
+          columns: 12,
+          order: 1,
         },
         z.string().email(),
       ),

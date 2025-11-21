@@ -37,6 +37,12 @@ export const translations: typeof enTranslations = {
         label: "Webhook-Events",
         description: "Wählen Sie Stripe-Events zum Abhören",
         placeholder: "Wählen Sie zu überwachende Events...",
+        paymentIntentSucceeded: "Zahlungsabsicht erfolgreich",
+        paymentIntentFailed: "Zahlungsabsicht fehlgeschlagen",
+        subscriptionCreated: "Abonnement erstellt",
+        subscriptionUpdated: "Abonnement aktualisiert",
+        invoicePaymentSucceeded: "Rechnungszahlung erfolgreich",
+        invoicePaymentFailed: "Rechnungszahlung fehlgeschlagen",
       },
       forwardTo: {
         label: "Weiterleiten an URL",

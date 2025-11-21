@@ -15,6 +15,12 @@ export const translations = {
     executing: "Executing",
     listCommands: "List all available commands",
     output: "Output format",
+    utils: {
+      debug: {
+        executionSummary:
+          "Execution: {{executionSeconds}}s | Overhead: {{overheadSeconds}}s | Total: {{totalSeconds}}s",
+      },
+    },
     help: {
       title: "Vibe CLI Help",
       description: "Vibe CLI - Next-generation API execution tool",

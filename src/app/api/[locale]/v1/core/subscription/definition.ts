@@ -56,7 +56,7 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.subscription.get.title" as const,
       description: "app.api.v1.core.subscription.get.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { response: true },
     {
@@ -123,7 +123,7 @@ const { GET } = createEndpoint({
       cancelAt: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.v1.core.subscription.response.cancelAt" as const,
+          content: "app.api.v1.core.subscription.response.canceledAt" as const,
         },
         z.string().optional(),
       ),
@@ -259,7 +259,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.subscription.post.form.title" as const,
       description:
         "app.api.v1.core.subscription.post.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -275,7 +275,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.subscription.form.fields.planId.description" as const,
           options: SubscriptionPlanOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
       ),
       billingInterval: field(
@@ -289,7 +289,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.subscription.form.fields.billingInterval.description" as const,
           options: BillingIntervalOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
       ),
       cancelAtPeriodEnd: field(
@@ -302,7 +302,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.subscription.form.fields.cancelAtPeriodEnd.label" as const,
           description:
             "app.api.v1.core.subscription.form.fields.cancelAtPeriodEnd.description" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
       ),
 
@@ -495,7 +495,7 @@ const { PUT } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.subscription.put.form.title" as const,
       description: "app.api.v1.core.subscription.put.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -509,7 +509,7 @@ const { PUT } = createEndpoint({
           description:
             "app.api.v1.core.subscription.form.fields.planId.description" as const,
           options: SubscriptionPlanOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(SubscriptionPlan),
       ),
@@ -522,7 +522,7 @@ const { PUT } = createEndpoint({
           description:
             "app.api.v1.core.subscription.form.fields.billingInterval.description" as const,
           options: BillingIntervalOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(BillingInterval),
       ),
@@ -534,7 +534,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.subscription.form.fields.cancelAtPeriodEnd.label" as const,
           description:
             "app.api.v1.core.subscription.form.fields.cancelAtPeriodEnd.description" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.boolean(),
       ),
@@ -734,7 +734,7 @@ const { DELETE } = createEndpoint({
       title: "app.api.v1.core.subscription.delete.form.title" as const,
       description:
         "app.api.v1.core.subscription.delete.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -747,7 +747,7 @@ const { DELETE } = createEndpoint({
             "app.api.v1.core.subscription.form.fields.cancelAtPeriodEnd.label" as const,
           description:
             "app.api.v1.core.subscription.form.fields.cancelAtPeriodEnd.description" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.boolean(),
       ),
@@ -759,7 +759,7 @@ const { DELETE } = createEndpoint({
             "app.api.v1.core.subscription.form.fields.reason.label" as const,
           description:
             "app.api.v1.core.subscription.form.fields.reason.description" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().optional(),
       ),

@@ -79,6 +79,14 @@ export const translations = {
       label: "Lead ID",
       description: "Associated lead identifier",
     },
+    country: {
+      label: "Country",
+      description: "User's country of residence",
+    },
+    language: {
+      label: "Language",
+      description: "User's preferred language",
+    },
     response: {
       title: "User Created",
       description: "Details of the newly created user",

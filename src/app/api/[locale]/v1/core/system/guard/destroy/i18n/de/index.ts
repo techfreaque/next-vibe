@@ -47,6 +47,18 @@ export const translations: typeof enTranslations = {
     totalDestroyed: {
       title: "Gesamt zerstört",
     },
+    username: {
+      title: "Benutzername",
+    },
+    wasRunning: {
+      title: "War aktiv",
+    },
+    filesRemoved: {
+      title: "Dateien entfernt",
+    },
+    userRemoved: {
+      title: "Benutzer entfernt",
+    },
   },
   form: {
     title: "Konfiguration",

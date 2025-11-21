@@ -38,6 +38,12 @@ export const translations: typeof enTranslations = {
     placeholder: "Potwierdź nowe hasło",
     help: "Ponownie wprowadź nowe hasło, aby upewnić się, że zostało wpisane poprawnie",
   },
+  twoFactorCode: {
+    label: "Kod Dwuskładnikowy",
+    description:
+      "Wprowadź kod uwierzytelniania dwuskładnikowego, jeśli jest włączony",
+    placeholder: "Wprowadź kod 2FA",
+  },
   response: {
     title: "Odpowiedź Zmiany Hasła",
     description: "Odpowiedź na operację zmiany hasła",

@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.db.migrateSync.post.description",
   category: "app.api.v1.core.system.db.category",
   tags: ["app.api.v1.core.system.db.migrateSync.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: ["migrate-sync", "db:migrate-sync"],
 
   fields: objectField(
@@ -37,7 +37,8 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.system.db.migrateSync.post.form.title",
       description:
         "app.api.v1.core.system.db.migrateSync.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -49,7 +50,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.migrateSync.fields.force.title",
           description:
             "app.api.v1.core.system.db.migrateSync.fields.force.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),
@@ -61,7 +62,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.migrateSync.fields.dryRun.title",
           description:
             "app.api.v1.core.system.db.migrateSync.fields.dryRun.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),

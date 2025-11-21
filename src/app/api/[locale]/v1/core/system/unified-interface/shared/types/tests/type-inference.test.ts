@@ -31,9 +31,15 @@ import type {
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
   objectField,
+  requestDataArrayField,
+  requestDataField,
+  responseArrayField,
   responseField,
+  type InferFieldType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
+  type FieldUsage,
+  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
@@ -126,7 +132,7 @@ const testPublicEndpoint = createEndpoint({
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
-    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
+    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
     {},
     {},
   ),
@@ -151,7 +157,7 @@ const testAdminEndpoint = createEndpoint({
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
   fields: objectField(
-    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
+    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
     {},
     {},
   ),
@@ -196,15 +202,15 @@ const testResponseEndpoint = createEndpoint({
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
-    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
+    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
     { response: true },
     {
       userId: responseField(
-        { type: WidgetType.TEXT, content: "test" },
+        { type: WidgetType.TEXT, content: "test" as TranslationKey },
         z.string(),
       ),
       count: responseField(
-        { type: WidgetType.TEXT, content: "test" },
+        { type: WidgetType.TEXT, content: "test" as TranslationKey },
         z.number(),
       ),
     },
@@ -688,7 +694,7 @@ const testPublicOnlyEndpoint = createEndpoint({
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
-    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
+    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
     {},
     {},
   ),
@@ -714,7 +720,7 @@ const testAdminOnlyEndpoint = createEndpoint({
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
   fields: objectField(
-    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
+    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
     {},
     {},
   ),
@@ -740,7 +746,7 @@ const testMixedRolesEndpoint = createEndpoint({
   tags: [],
   allowedRoles: [UserRole.PUBLIC, UserRole.ADMIN] as const,
   fields: objectField(
-    { type: WidgetType.CONTAINER, layout: { type: LayoutType.STACKED } },
+    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
     {},
     {},
   ),
@@ -1043,3 +1049,395 @@ type MixedRolesHandlerUserFromParams = MixedRolesHandlerParams extends {
 // type MixedRolesHandlerUserFromParamsCheck = Expect<
 //   Equal<MixedRolesHandlerUserFromParams, JwtPayloadType>
 // >;
+
+/**
+ * TEST: Optional array field type inference
+ * Tests that array fields with `optional: true` in UI config are properly typed as `T | null | undefined`
+ */
+const optionalArrayField = requestDataArrayField(
+  {
+    type: WidgetType.DATA_LIST,
+    title: "app.admin.common.actions.back",
+    description: "app.admin.common.actions.back",
+    optional: true,
+  } as const,
+  objectField(
+    {
+      type: WidgetType.DATA_CARD,
+      title: "test" as TranslationKey,
+      description: "test" as TranslationKey,
+    },
+    { request: "data" },
+    {
+      role: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "test" as TranslationKey,
+        },
+        z.string(),
+      ),
+      content: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "test" as TranslationKey,
+        },
+        z.string(),
+      ),
+    },
+  ),
+);
+
+type OptionalArrayFieldInferredType = InferFieldType<
+  typeof optionalArrayField,
+  FieldUsage.RequestData
+>;
+
+// Diagnostic: Check what the UI type is
+type OptionalArrayFieldUIType = typeof optionalArrayField extends {
+  ui: infer UI;
+}
+  ? UI
+  : never;
+type OptionalArrayFieldOptionalValue = OptionalArrayFieldUIType extends {
+  optional: infer O;
+}
+  ? O
+  : "no optional property";
+
+// Force a type error to see what the types actually are
+const _diagnostic1: OptionalArrayFieldUIType = null as any;
+const _diagnostic2: OptionalArrayFieldOptionalValue = null as any;
+
+// Test 1: Check that the inferred type includes null and undefined
+// Use assignability test instead of strict equality - allows for slight type variations
+type OptionalArrayFieldCheck = Expect<
+  OptionalArrayFieldInferredType extends
+    | Array<{ role: string; content: string }>
+    | null
+    | undefined
+    ? true
+    : false
+>;
+
+// Test 2: Non-optional array field should NOT include null/undefined
+const nonOptionalArrayField = requestDataArrayField(
+  {
+    type: WidgetType.DATA_LIST,
+    title: "app.admin.common.actions.back",
+    description: "app.admin.common.actions.back",
+  } as const,
+  objectField(
+    {
+      type: WidgetType.DATA_CARD,
+      title: "test" as TranslationKey,
+      description: "test" as TranslationKey,
+    },
+    { request: "data" },
+    {
+      role: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "test" as TranslationKey,
+        },
+        z.string(),
+      ),
+      content: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "test" as TranslationKey,
+        },
+        z.string(),
+      ),
+    },
+  ),
+);
+
+type NonOptionalArrayFieldInferredType = InferFieldType<
+  typeof nonOptionalArrayField,
+  FieldUsage.RequestData
+>;
+
+type NonOptionalArrayFieldCheck = Expect<
+  NonOptionalArrayFieldInferredType extends Array<{
+    role: string;
+    content: string;
+  }>
+    ? true
+    : false
+>;
+
+// Test 3: Explicitly set optional: false should NOT include null/undefined
+const explicitlyNonOptionalArrayField = requestDataArrayField(
+  {
+    type: WidgetType.DATA_LIST,
+    title: "app.admin.common.actions.back",
+    description: "app.admin.common.actions.back",
+    optional: false,
+  } as const,
+  objectField(
+    {
+      type: WidgetType.DATA_CARD,
+      title: "test" as TranslationKey,
+      description: "test" as TranslationKey,
+    },
+    { request: "data" },
+    {
+      role: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "test" as TranslationKey,
+        },
+        z.string(),
+      ),
+      content: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "test" as TranslationKey,
+        },
+        z.string(),
+      ),
+    },
+  ),
+);
+
+type ExplicitlyNonOptionalArrayFieldInferredType = InferFieldType<
+  typeof explicitlyNonOptionalArrayField,
+  FieldUsage.RequestData
+>;
+
+type ExplicitlyNonOptionalArrayFieldCheck = Expect<
+  ExplicitlyNonOptionalArrayFieldInferredType extends Array<{
+    role: string;
+    content: string;
+  }>
+    ? true
+    : false
+>;
+
+// Test 4: Actual usage test - should be able to assign undefined to optional field
+const testOptionalAssignment: OptionalArrayFieldInferredType = undefined;
+const testOptionalAssignmentNull: OptionalArrayFieldInferredType = null;
+const testOptionalAssignmentArray: OptionalArrayFieldInferredType = [
+  { role: "test", content: "test" },
+];
+
+// Test 5: Non-optional should NOT accept undefined (this should error if uncommented)
+// const testNonOptionalAssignment: NonOptionalArrayFieldInferredType = undefined;
+
+// ============================================================================
+// TESTS FOR OPTIONAL FIELD TYPES (object-optional and array-optional)
+// ============================================================================
+
+import {
+  arrayOptionalField,
+  objectOptionalField,
+  requestDataArrayOptionalField,
+  responseArrayOptionalField,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+
+/**
+ * Test 1: responseArrayOptionalField should create array-optional type
+ */
+const testResponseArrayOptional = responseArrayOptionalField(
+  {
+    type: WidgetType.DATA_TABLE,
+    title: "app.test.optional.array.title" as TranslationKey,
+  },
+  objectField(
+    {
+      type: WidgetType.CONTAINER,
+      layoutType: LayoutType.GRID,
+      columns: 2,
+    },
+    { response: true },
+    {
+      id: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.test.id" as TranslationKey,
+          fieldType: FieldDataType.TEXT,
+        },
+        z.string(),
+      ),
+      name: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.test.name" as TranslationKey,
+          fieldType: FieldDataType.TEXT,
+        },
+        z.string(),
+      ),
+    },
+  ),
+);
+
+// Verify type is array-optional
+type TestResponseArrayOptionalType = typeof testResponseArrayOptional.type;
+type TestResponseArrayOptionalCheck = Expect<
+  Equal<TestResponseArrayOptionalType, "array-optional">
+>;
+
+// Verify inferred schema includes undefined/null
+type TestResponseArrayOptionalInferred = InferFieldType<
+  typeof testResponseArrayOptional,
+  FieldUsage.Response
+>;
+type TestResponseArrayOptionalAssignable = Expect<
+  TestResponseArrayOptionalInferred extends
+    | Array<{ id: string; name: string }>
+    | undefined
+    | null
+    ? true
+    : false
+>;
+
+/**
+ * Test 2: objectOptionalField should create object-optional type
+ */
+const testObjectOptional = objectOptionalField(
+  {
+    type: WidgetType.CONTAINER,
+    title: "app.test.optional.object.title" as TranslationKey,
+    layoutType: LayoutType.GRID,
+    columns: 2,
+  },
+  { response: true },
+  {
+    firstName: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.test.firstName" as TranslationKey,
+        fieldType: FieldDataType.TEXT,
+      },
+      z.string(),
+    ),
+    lastName: responseField(
+      {
+        type: WidgetType.TEXT,
+        content: "app.test.lastName" as TranslationKey,
+        fieldType: FieldDataType.TEXT,
+      },
+      z.string(),
+    ),
+  },
+);
+
+// Verify type is object-optional
+type TestObjectOptionalType = typeof testObjectOptional.type;
+type TestObjectOptionalCheck = Expect<
+  Equal<TestObjectOptionalType, "object-optional">
+>;
+
+// Verify inferred schema includes undefined/null
+type TestObjectOptionalInferred = InferFieldType<
+  typeof testObjectOptional,
+  FieldUsage.Response
+>;
+type TestObjectOptionalAssignable = Expect<
+  TestObjectOptionalInferred extends
+    | { firstName: string; lastName: string }
+    | undefined
+    | null
+    ? true
+    : false
+>;
+
+/**
+ * Test 3: requestDataArrayOptionalField for request data
+ */
+const testRequestArrayOptional = requestDataArrayOptionalField(
+  {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.TEXT_ARRAY,
+    label: "app.test.tags.label" as TranslationKey,
+  },
+  responseField(
+    {
+      type: WidgetType.TEXT,
+      content: "app.test.tag" as TranslationKey,
+      fieldType: FieldDataType.TEXT,
+    },
+    z.string(),
+  ),
+);
+
+// Verify type is array-optional
+type TestRequestArrayOptionalType = typeof testRequestArrayOptional.type;
+type TestRequestArrayOptionalTypeCheck = Expect<
+  Equal<TestRequestArrayOptionalType, "array-optional">
+>;
+
+// Verify usage is request: data
+type TestRequestArrayOptionalUsage = typeof testRequestArrayOptional.usage;
+type TestRequestArrayOptionalUsageCheck = Expect<
+  Equal<TestRequestArrayOptionalUsage, { request: "data" }>
+>;
+
+/**
+ * Test 4: Runtime value assignment tests
+ */
+// Should accept undefined
+const testOptionalArrayUndefined: TestResponseArrayOptionalInferred = undefined;
+// Should accept null
+const testOptionalArrayNull: TestResponseArrayOptionalInferred = null;
+// Should accept array
+const testOptionalArrayValue: TestResponseArrayOptionalInferred = [
+  { id: "1", name: "test" },
+];
+
+// Should accept undefined
+const testOptionalObjectUndefined: TestObjectOptionalInferred = undefined;
+// Should accept null
+const testOptionalObjectNull: TestObjectOptionalInferred = null;
+// Should accept object
+const testOptionalObjectValue: TestObjectOptionalInferred = {
+  firstName: "John",
+  lastName: "Doe",
+};
+
+/**
+ * Test 5: Compare optional vs non-optional
+ */
+const testNonOptionalArray = responseArrayField(
+  {
+    type: WidgetType.DATA_TABLE,
+    title: "app.test.array.title" as TranslationKey,
+  },
+  objectField(
+    {
+      type: WidgetType.CONTAINER,
+      layoutType: LayoutType.GRID,
+    },
+    { response: true },
+    {
+      id: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.test.id" as TranslationKey,
+          fieldType: FieldDataType.TEXT,
+        },
+        z.string(),
+      ),
+    },
+  ),
+);
+
+// Non-optional should have type "array"
+type TestNonOptionalArrayType = typeof testNonOptionalArray.type;
+type TestNonOptionalArrayTypeCheck = Expect<
+  Equal<TestNonOptionalArrayType, "array">
+>;
+
+// Non-optional should NOT include undefined/null in inferred type
+type TestNonOptionalArrayInferred = InferFieldType<
+  typeof testNonOptionalArray,
+  FieldUsage.Response
+>;
+// This should error if uncommented (non-optional doesn't accept undefined)
+// const testNonOptionalError: TestNonOptionalArrayInferred = undefined;

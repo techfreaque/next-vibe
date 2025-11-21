@@ -153,10 +153,9 @@ export type InputProps<
   name?: string;
   id?: string;
   "aria-label"?: string;
-  ref?: React.RefObject<InputRefObject | null>;
 } & StyleType;
 
-const Input = <
+function InputInner<
   T extends
     | "text"
     | "email"
@@ -169,43 +168,69 @@ const Input = <
     | "file"
     | "hidden"
     | undefined = undefined,
->({
-  className,
-  style,
-  type,
-  value,
-  defaultValue,
-  placeholder,
-  disabled,
-  readOnly,
-  required,
-  min,
-  max,
-  step,
-  maxLength,
-  autoComplete,
-  autoCorrect: _autoCorrect,
-  spellCheck,
-  accept,
-  onChange,
-  onChangeText,
-  onBlur,
-  onFocus,
-  onClick,
-  onKeyPress,
-  onKeyDown,
-  autoCapitalize: _autoCapitalize,
-  secureTextEntry: _secureTextEntry,
-  keyboardType: _keyboardType,
-  editable: _editable,
-  name,
-  id,
-  "aria-label": ariaLabel,
-  ref,
-}: InputProps<T>): React.JSX.Element => {
+>(
+  {
+    className,
+    style,
+    type,
+    value,
+    defaultValue,
+    placeholder,
+    disabled,
+    readOnly,
+    required,
+    min,
+    max,
+    step,
+    maxLength,
+    autoComplete,
+    autoCorrect: _autoCorrect,
+    spellCheck,
+    accept,
+    onChange,
+    onChangeText,
+    onBlur,
+    onFocus,
+    onClick,
+    onKeyPress,
+    onKeyDown,
+    autoCapitalize: _autoCapitalize,
+    secureTextEntry: _secureTextEntry,
+    keyboardType: _keyboardType,
+    editable: _editable,
+    name,
+    id,
+    "aria-label": ariaLabel,
+  }: InputProps<T>,
+  ref: React.ForwardedRef<InputRefObject>,
+): React.JSX.Element {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useImperativeHandle(
+    ref,
+    (): InputRefObject => {
+      const element = inputRef.current;
+      if (!element) {
+        return {
+          focus: (): void => undefined,
+          blur: (): void => undefined,
+          select: (): void => undefined,
+          value: "",
+        };
+      }
+      return {
+        focus: (): void => element.focus(),
+        blur: (): void => element.blur(),
+        select: (): void => element.select(),
+        value: element.value,
+      };
+    },
+    [],
+  );
+
   return (
     <input
-      ref={ref}
+      ref={inputRef}
       type={type}
       value={value !== undefined ? String(value) : undefined}
       defaultValue={
@@ -696,6 +721,23 @@ const Input = <
       }
     />
   );
-};
+}
+
+const Input = React.forwardRef(InputInner) as <
+  T extends
+    | "text"
+    | "email"
+    | "tel"
+    | "url"
+    | "password"
+    | "number"
+    | "date"
+    | "time"
+    | "file"
+    | "hidden"
+    | undefined = undefined,
+>(
+  props: InputProps<T> & { ref?: React.ForwardedRef<InputRefObject> },
+) => React.JSX.Element;
 
 export { Input };

@@ -152,7 +152,10 @@ export function ChartTooltipContent({
     <View
       {...applyStyleType({
         nativeStyle,
-        className: cn("rounded-lg border bg-background p-2 shadow-md", className),
+        className: cn(
+          "rounded-lg border bg-background p-2 shadow-md",
+          className,
+        ),
       })}
       {...props}
     >
@@ -467,17 +470,39 @@ export function Pie({
   }
   const { Pie: VictoryPie } = components;
   const pieProps: VictoryPropsType = {};
-  if (data !== undefined) pieProps.data = data;
-  if (x !== undefined) pieProps.x = x;
-  if (y !== undefined) pieProps.y = y;
-  if (colorScale !== undefined) pieProps.colorScale = colorScale;
-  if (innerRadius !== undefined) pieProps.innerRadius = innerRadius;
-  if (padAngle !== undefined) pieProps.padAngle = padAngle;
-  if (startAngle !== undefined) pieProps.startAngle = startAngle;
-  if (endAngle !== undefined) pieProps.endAngle = endAngle;
-  if (animate !== undefined) pieProps.animate = animate;
-  if (style !== undefined) pieProps.style = style;
-  if (labels !== undefined) pieProps.labels = labels;
+  if (data !== undefined) {
+    pieProps.data = data;
+  }
+  if (x !== undefined) {
+    pieProps.x = x;
+  }
+  if (y !== undefined) {
+    pieProps.y = y;
+  }
+  if (colorScale !== undefined) {
+    pieProps.colorScale = colorScale;
+  }
+  if (innerRadius !== undefined) {
+    pieProps.innerRadius = innerRadius;
+  }
+  if (padAngle !== undefined) {
+    pieProps.padAngle = padAngle;
+  }
+  if (startAngle !== undefined) {
+    pieProps.startAngle = startAngle;
+  }
+  if (endAngle !== undefined) {
+    pieProps.endAngle = endAngle;
+  }
+  if (animate !== undefined) {
+    pieProps.animate = animate;
+  }
+  if (style !== undefined) {
+    pieProps.style = style;
+  }
+  if (labels !== undefined) {
+    pieProps.labels = labels;
+  }
   return <VictoryPie {...pieProps} />;
 }
 
@@ -500,19 +525,39 @@ export function Axis({
   }
   const { CartesianAxis } = components;
   const axisProps: VictoryPropsType = {};
-  if (label !== undefined) axisProps.label = label;
-  if (tickValues !== undefined) axisProps.tickValues = tickValues;
-  if (tickFormat !== undefined) axisProps.tickFormat = tickFormat;
-  if (tickLabelComponent !== undefined)
+  if (label !== undefined) {
+    axisProps.label = label;
+  }
+  if (tickValues !== undefined) {
+    axisProps.tickValues = tickValues;
+  }
+  if (tickFormat !== undefined) {
+    axisProps.tickFormat = tickFormat;
+  }
+  if (tickLabelComponent !== undefined) {
     axisProps.tickLabelComponent = tickLabelComponent;
-  if (axisLabelComponent !== undefined)
+  }
+  if (axisLabelComponent !== undefined) {
     axisProps.axisLabelComponent = axisLabelComponent;
-  if (gridComponent !== undefined) axisProps.gridComponent = gridComponent;
-  if (orientation !== undefined) axisProps.orientation = orientation;
-  if (dependentAxis !== undefined) axisProps.dependentAxis = dependentAxis;
-  if (standalone !== undefined) axisProps.standalone = standalone;
-  if (style !== undefined) axisProps.style = style;
-  if (domain !== undefined) axisProps.domain = domain;
+  }
+  if (gridComponent !== undefined) {
+    axisProps.gridComponent = gridComponent;
+  }
+  if (orientation !== undefined) {
+    axisProps.orientation = orientation;
+  }
+  if (dependentAxis !== undefined) {
+    axisProps.dependentAxis = dependentAxis;
+  }
+  if (standalone !== undefined) {
+    axisProps.standalone = standalone;
+  }
+  if (style !== undefined) {
+    axisProps.style = style;
+  }
+  if (domain !== undefined) {
+    axisProps.domain = domain;
+  }
   return <CartesianAxis {...axisProps} />;
 }
 
@@ -522,7 +567,6 @@ export const Theme = {
   clean: {},
 } as const;
 
-// Re-export all types from web (web is source of truth)
 export type {
   ChartBaseProps,
   ChartConfig,

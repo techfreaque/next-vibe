@@ -62,18 +62,27 @@ export const translations = {
     },
     success: {
       title: "Success Status",
+      content: "Success",
     },
     isAccessible: {
       title: "Database Accessible",
+      content: "Accessible",
     },
     output: {
       title: "Output Message",
+      content: "Output",
     },
     connectionInfo: {
       title: "Connection Information",
-      totalConnections: "Total Connections",
-      idleConnections: "Idle Connections",
-      waitingClients: "Waiting Clients",
+      totalConnections: {
+        content: "Total Connections",
+      },
+      idleConnections: {
+        content: "Idle Connections",
+      },
+      waitingClients: {
+        content: "Waiting Clients",
+      },
     },
   },
   status: {

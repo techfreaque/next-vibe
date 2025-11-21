@@ -35,7 +35,12 @@ const { POST } = createEndpoint({
     "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.description",
   category: "app.api.v1.core.system.sideTasks.category",
   tags: ["app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
 
   fields: objectField(
     {
@@ -44,7 +49,8 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.container.title",
       description:
         "app.api.v1.core.system.sideTasks.generators.generateTrpcRouter.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -55,7 +61,7 @@ const { POST } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label: "app.api.v1.core.system.dev.typecheck.title",
           description: "app.api.v1.core.system.dev.typecheck.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional().default("src/app/api"),
       ),
@@ -66,7 +72,7 @@ const { POST } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label: "app.api.v1.core.system.dev.typecheck.title",
           description: "app.api.v1.core.system.dev.typecheck.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z
           .string()
@@ -80,7 +86,7 @@ const { POST } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.v1.core.system.dev.typecheck.title",
           description: "app.api.v1.core.system.dev.typecheck.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),
@@ -91,7 +97,7 @@ const { POST } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.v1.core.system.dev.typecheck.title",
           description: "app.api.v1.core.system.dev.typecheck.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),
@@ -102,7 +108,7 @@ const { POST } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label: "app.api.v1.core.system.dev.typecheck.title",
           description: "app.api.v1.core.system.dev.typecheck.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.array(z.string()).optional(),
       ),

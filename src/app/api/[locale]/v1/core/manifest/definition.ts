@@ -49,7 +49,7 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.manifest.form.title",
       description: "app.api.v1.core.manifest.form.description",
-      layout: { type: LayoutType.FULL_WIDTH },
+      layoutType: LayoutType.FULL_WIDTH,
     },
     { response: true },
     {
@@ -59,7 +59,7 @@ const { GET } = createEndpoint({
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.manifest.response.title",
           description: "app.api.v1.core.manifest.response.description",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -156,7 +156,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.CONTAINER,
                 title: "app.api.v1.core.manifest.response.title",
                 description: "app.api.v1.core.manifest.response.description",
-                layout: { type: LayoutType.STACKED },
+                layoutType: LayoutType.STACKED,
               },
               { response: true },
               {

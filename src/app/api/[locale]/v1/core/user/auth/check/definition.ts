@@ -36,12 +36,26 @@ const { GET } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      layout: { type: LayoutType.VERTICAL },
+      title: "app.api.v1.core.user.auth.check.get.response.title" as const,
+      description: "app.api.v1.core.user.auth.check.get.response.description" as const,
+      layoutType: LayoutType.VERTICAL,
     },
     { response: true },
     {
-      authenticated: responseField({}, z.boolean()),
-      tokenValid: responseField({}, z.boolean()),
+      authenticated: responseField(
+        {
+          type: WidgetType.BADGE,
+          text: "app.api.v1.core.user.auth.check.get.response.authenticated" as const,
+        },
+        z.boolean()
+      ),
+      tokenValid: responseField(
+        {
+          type: WidgetType.BADGE,
+          text: "app.api.v1.core.user.auth.check.get.response.tokenValid" as const,
+        },
+        z.boolean()
+      ),
     },
   ),
   errorTypes: {

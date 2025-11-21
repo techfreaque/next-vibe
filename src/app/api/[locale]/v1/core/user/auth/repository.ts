@@ -58,7 +58,7 @@ import type {
 export type { AuthContext, AuthPlatform };
 
 export type InferUserType<
-  TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
+  TRoles extends readonly UserRoleValue[],
 > =
   Exclude<TRoles[number], "PUBLIC"> extends never
     ? JWTPublicPayloadType
@@ -70,7 +70,7 @@ export type InferUserType<
  * Helper to create public user payload
  */
 function createPublicUser<
-  TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
+  TRoles extends readonly UserRoleValue[],
 >(leadId: string): InferUserType<TRoles> {
   return { isPublic: true, leadId } as InferUserType<TRoles>;
 }
@@ -79,7 +79,7 @@ function createPublicUser<
  * Helper to create private user payload
  */
 function createPrivateUser<
-  TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
+  TRoles extends readonly UserRoleValue[],
 >(userId: string, leadId: string): InferUserType<TRoles> {
   return { isPublic: false, id: userId, leadId } as InferUserType<TRoles>;
 }
@@ -126,7 +126,7 @@ export interface AuthRepository {
    * Get authenticated user with role checking (platform-aware) - returns generic type
    */
   getAuthMinimalUser<
-    TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[],
   >(
     roles: TRoles,
     context: AuthContext,
@@ -137,10 +137,10 @@ export interface AuthRepository {
    * Get user roles (platform-aware)
    */
   getUserRoles(
-    requiredRoles: readonly UserRoleValue[keyof UserRoleValue][],
+    requiredRoles: readonly UserRoleValue[],
     context: AuthContext,
     logger: EndpointLogger,
-  ): Promise<UserRoleValue[keyof UserRoleValue][]>;
+  ): Promise<UserRoleValue[]>;
 
   /**
    * Store authentication token using platform-specific handler
@@ -349,9 +349,9 @@ class AuthRepositoryImpl implements AuthRepository {
    */
   private async getUserRolesInternal(
     userId: string,
-    requiredRoles: readonly UserRoleValue[keyof UserRoleValue][],
+    requiredRoles: readonly UserRoleValue[],
     logger: EndpointLogger,
-  ): Promise<UserRoleValue[keyof UserRoleValue][]> {
+  ): Promise<UserRoleValue[]> {
     try {
       // Public role is always allowed
       if (requiredRoles.includes(UserRole.PUBLIC)) {
@@ -359,7 +359,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // Customer role is allowed for any authenticated user
-      const roles: UserRoleValue[keyof UserRoleValue][] = [];
+      const roles: UserRoleValue[] = [];
       if (requiredRoles.includes(UserRole.CUSTOMER)) {
         roles.push(UserRole.CUSTOMER);
       }
@@ -374,7 +374,7 @@ class AuthRepositoryImpl implements AuthRepository {
           .map((r) => r.role)
           .filter((role) =>
             requiredRoles.includes(role),
-          ) as UserRoleValue[keyof UserRoleValue][];
+          ) as UserRoleValue[];
         for (const role of dbRoles) {
           roles.push(role);
         }
@@ -891,7 +891,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Get authenticated user with role checking (platform-aware) - generic return type
    */
   async getAuthMinimalUser<
-    TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[],
   >(
     roles: TRoles,
     context: AuthContext,
@@ -909,7 +909,7 @@ class AuthRepositoryImpl implements AuthRepository {
           platform: context.platform,
           error: authResult.message,
         });
-        const leadId = await authHandler.getLeadIdFromDb(
+        const leadId = await this.getLeadIdFromDb(
           undefined,
           context.locale,
           logger,
@@ -978,7 +978,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * @returns Authenticated user
    */
   private async authenticateWithPayload<
-    TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[],
   >(
     jwtPayload: JwtPrivatePayloadType,
     roles: TRoles,
@@ -1057,7 +1057,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Returns the correct user type based on the allowed roles
    */
   async getTypedAuthMinimalUser<
-    TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[],
   >(
     roles: TRoles,
     context: AuthContext,
@@ -1073,10 +1073,10 @@ class AuthRepositoryImpl implements AuthRepository {
    * Delegates to platform handlers for authentication
    */
   async getUserRoles(
-    requiredRoles: readonly UserRoleValue[keyof UserRoleValue][],
+    requiredRoles: readonly UserRoleValue[],
     context: AuthContext,
     logger: EndpointLogger,
-  ): Promise<UserRoleValue[keyof UserRoleValue][]> {
+  ): Promise<UserRoleValue[]> {
     try {
       // Locale is required for lead creation
       if (!context.locale) {
@@ -1108,16 +1108,21 @@ class AuthRepositoryImpl implements AuthRepository {
 
   /**
    * Store authentication token using platform-specific handler
-   * Platform is explicitly passed from the caller context
+   * Automatically detects platform from request context
    */
   async storeAuthTokenForPlatform(
     token: string,
     userId: string,
     leadId: string,
-    platform: Platform,
+    request: NextRequest,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
+      // Detect platform from request headers (x-platform) or default to WEB
+      const platformHeader = request.headers.get("x-platform");
+      const platform =
+        (platformHeader as Platform | null) || Platform.WEB;
+
       logger.debug("Storing auth token for platform", { platform, userId });
 
       // Get platform-specific handler
@@ -1137,13 +1142,18 @@ class AuthRepositoryImpl implements AuthRepository {
 
   /**
    * Clear authentication token using platform-specific handler
-   * Platform is explicitly passed from the caller context
+   * Automatically detects platform from request context
    */
   async clearAuthTokenForPlatform(
-    platform: Platform,
+    request: NextRequest,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
+      // Detect platform from request headers (x-platform) or default to WEB
+      const platformHeader = request.headers.get("x-platform");
+      const platform =
+        (platformHeader as Platform | null) || Platform.WEB;
+
       logger.debug("Clearing auth token for platform", { platform });
 
       // Get platform-specific handler

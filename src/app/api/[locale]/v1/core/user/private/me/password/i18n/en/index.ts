@@ -36,6 +36,11 @@ export const translations = {
     placeholder: "Confirm new password",
     help: "Re-enter your new password to ensure it was typed correctly",
   },
+  twoFactorCode: {
+    label: "Two-Factor Code",
+    description: "Enter your two-factor authentication code if enabled",
+    placeholder: "Enter 2FA code",
+  },
   response: {
     title: "Password Change Response",
     description: "Response for password change operation",

@@ -139,12 +139,12 @@ export class ReleaseExecutor {
         this.logger.info(
           t("app.api.v1.core.system.launchpad.releaseExecutor.state.noState"),
         );
-        state = this.stateManager.initializeState(targets);
+        state = this.stateManager.initializeState(targets, this.logger);
       }
     } else {
       // Clear any existing state and start fresh
       this.stateManager.clearState(this.logger);
-      state = this.stateManager.initializeState(targets);
+      state = this.stateManager.initializeState(targets, this.logger);
     }
 
     // Get targets to process
@@ -176,7 +176,7 @@ export class ReleaseExecutor {
       ])) as { retryFailed: boolean };
 
       if (retryFailed) {
-        this.stateManager.resetFailedTargets(state);
+        this.stateManager.resetFailedTargets(state, this.logger);
       }
     }
 
@@ -185,7 +185,7 @@ export class ReleaseExecutor {
 
     for (let i = 0; i < targetsToProcess.length; i++) {
       const target = targetsToProcess[i];
-      this.stateManager.updateCurrentIndex(state, i);
+      this.stateManager.updateCurrentIndex(state, i, this.logger);
 
       this.logger.info(
         `\n📦 Processing ${i + 1}/${targetsToProcess.length}: ${target.directory}`,
@@ -227,7 +227,7 @@ export class ReleaseExecutor {
         const { action } = response;
 
         if (action === "skip") {
-          this.stateManager.markSkipped(state, target.directory);
+          this.stateManager.markSkipped(state, target.directory, this.logger);
           this.logger.info(
             t(
               "app.api.v1.core.system.launchpad.releaseExecutor.actions.skipped",
@@ -253,9 +253,9 @@ export class ReleaseExecutor {
       const success = this.executeReleaseTarget(target, options, t);
 
       if (success) {
-        this.stateManager.markCompleted(state, target.directory);
+        this.stateManager.markCompleted(state, target.directory, this.logger);
       } else {
-        this.stateManager.markFailed(state, target.directory);
+        this.stateManager.markFailed(state, target.directory, this.logger);
 
         if (!options.ciMode) {
           const failureResponse: ContinueAfterFailureResponse =

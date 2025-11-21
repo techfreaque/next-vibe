@@ -91,6 +91,21 @@ export const translations = {
           updatedAt: {
             content: "Updated At",
           },
+          canEdit: {
+            content: "Can Edit",
+          },
+          canPost: {
+            content: "Can Post",
+          },
+          canModerate: {
+            content: "Can Moderate",
+          },
+          canDelete: {
+            content: "Can Delete",
+          },
+          canManagePermissions: {
+            content: "Can Manage Permissions",
+          },
         },
       },
       totalCount: {
@@ -214,6 +229,21 @@ export const translations = {
         },
         updatedAt: {
           content: "Updated At",
+        },
+        canEdit: {
+          content: "Can Edit",
+        },
+        canPost: {
+          content: "Can Post",
+        },
+        canModerate: {
+          content: "Can Moderate",
+        },
+        canDelete: {
+          content: "Can Delete",
+        },
+        canManagePermissions: {
+          content: "Can Manage Permissions",
         },
       },
     },

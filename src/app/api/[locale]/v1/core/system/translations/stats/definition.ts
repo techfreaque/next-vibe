@@ -50,7 +50,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.translations.stats.get.container.title" as const,
       description:
         "app.api.v1.core.system.translations.stats.get.container.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { response: true },
     {
@@ -66,11 +66,12 @@ const { GET } = createEndpoint({
 
       stats: objectField(
         {
-          type: WidgetType.STATS_GRID,
+          type: WidgetType.CONTAINER,
           title: "app.api.v1.core.system.translations.stats.get.response.title",
           description:
             "app.api.v1.core.system.translations.stats.get.response.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { response: true },
         {

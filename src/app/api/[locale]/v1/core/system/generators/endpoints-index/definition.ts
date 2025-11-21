@@ -21,18 +21,25 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "generators", "endpoints-index"],
-  title: "app.api.v1.core.system.generators.endpoints.post.title",
-  description: "app.api.v1.core.system.generators.endpoints.post.description",
+  title: "app.api.v1.core.system.generators.endpointsIndex.post.title",
+  description:
+    "app.api.v1.core.system.generators.endpointsIndex.post.description",
   category: "app.api.v1.core.system.generators.category",
-  tags: ["app.api.v1.core.system.generators.endpoints.post.title"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  tags: ["app.api.v1.core.system.generators.endpointsIndex.post.title"],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
 
   fields: objectField(
     {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
-      label: "app.api.v1.core.system.generators.endpoints.post.container.title",
-      layout: { columns: 12 },
+      label:
+        "app.api.v1.core.system.generators.endpointsIndex.post.container.title",
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -42,10 +49,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.v1.core.system.generators.endpoints.post.fields.outputFile.label",
+            "app.api.v1.core.system.generators.endpointsIndex.post.fields.outputFile.label",
           description:
-            "app.api.v1.core.system.generators.endpoints.post.fields.outputFile.description",
-          layout: { columns: 12 },
+            "app.api.v1.core.system.generators.endpointsIndex.post.fields.outputFile.description",
+          columns: 12,
         },
         z
           .string()
@@ -59,10 +66,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label:
-            "app.api.v1.core.system.generators.endpoints.post.fields.dryRun.label",
+            "app.api.v1.core.system.generators.endpointsIndex.post.fields.dryRun.label",
           description:
-            "app.api.v1.core.system.generators.endpoints.post.fields.dryRun.description",
-          layout: { columns: 6 },
+            "app.api.v1.core.system.generators.endpointsIndex.post.fields.dryRun.description",
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),
@@ -72,7 +79,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.generators.endpoints.post.fields.success.title",
+            "app.api.v1.core.system.generators.endpointsIndex.post.fields.success.title",
         },
         z.boolean(),
       ),
@@ -80,7 +87,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.generators.endpoints.post.fields.message.title",
+            "app.api.v1.core.system.generators.endpointsIndex.post.fields.message.title",
         },
         z.string(),
       ),
@@ -88,7 +95,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.generators.endpoints.post.fields.endpointsFound.title",
+            "app.api.v1.core.system.generators.endpointsIndex.post.fields.endpointsFound.title",
         },
         z.number(),
       ),
@@ -96,7 +103,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.system.generators.endpoints.post.fields.duration.title",
+            "app.api.v1.core.system.generators.endpointsIndex.post.fields.duration.title",
         },
         z.number(),
       ),
@@ -125,64 +132,65 @@ const { POST } = createEndpoint({
   errorTypes: {
     validation_failed: {
       title:
-        "app.api.v1.core.system.generators.endpoints.post.errors.validation.title",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.validation.title",
       description:
-        "app.api.v1.core.system.generators.endpoints.post.errors.validation.description",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.validation.description",
     },
     unauthorized: {
       title:
-        "app.api.v1.core.system.generators.endpoints.post.errors.unauthorized.title",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.unauthorized.title",
       description:
-        "app.api.v1.core.system.generators.endpoints.post.errors.unauthorized.description",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.unauthorized.description",
     },
     server_error: {
       title:
-        "app.api.v1.core.system.generators.endpoints.post.errors.server.title",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.server.title",
       description:
-        "app.api.v1.core.system.generators.endpoints.post.errors.server.description",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.server.description",
     },
     unknown_error: {
       title:
-        "app.api.v1.core.system.generators.endpoints.post.errors.unknown.title",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.unknown.title",
       description:
-        "app.api.v1.core.system.generators.endpoints.post.errors.unknown.description",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.unknown.description",
     },
     network_error: {
       title:
-        "app.api.v1.core.system.generators.endpoints.post.errors.network.title",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.network.title",
       description:
-        "app.api.v1.core.system.generators.endpoints.post.errors.network.description",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.network.description",
     },
     forbidden: {
       title:
-        "app.api.v1.core.system.generators.endpoints.post.errors.forbidden.title",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.forbidden.title",
       description:
-        "app.api.v1.core.system.generators.endpoints.post.errors.forbidden.description",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.forbidden.description",
     },
     not_found: {
       title:
-        "app.api.v1.core.system.generators.endpoints.post.errors.notFound.title",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.notFound.title",
       description:
-        "app.api.v1.core.system.generators.endpoints.post.errors.notFound.description",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.notFound.description",
     },
     conflict: {
       title:
-        "app.api.v1.core.system.generators.endpoints.post.errors.conflict.title",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.conflict.title",
       description:
-        "app.api.v1.core.system.generators.endpoints.post.errors.conflict.description",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.conflict.description",
     },
     unsaved_changes: {
       title:
-        "app.api.v1.core.system.generators.endpoints.post.errors.conflict.title",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.conflict.title",
       description:
-        "app.api.v1.core.system.generators.endpoints.post.errors.conflict.description",
+        "app.api.v1.core.system.generators.endpointsIndex.post.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.v1.core.system.generators.endpoints.post.success.title",
+    title:
+      "app.api.v1.core.system.generators.endpointsIndex.post.success.title",
     description:
-      "app.api.v1.core.system.generators.endpoints.post.success.description",
+      "app.api.v1.core.system.generators.endpointsIndex.post.success.description",
   },
 });
 

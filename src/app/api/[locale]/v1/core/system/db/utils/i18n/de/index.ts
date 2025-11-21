@@ -22,9 +22,15 @@ export const translations: typeof enTranslations = {
   },
   connections: {
     title: "Verbindungsstatus",
+    primary: "Primärverbindung",
+    replica: "Replikaverbindung",
   },
   details: {
     title: "Datenbankdetails",
+    version: "Version",
+    uptime: "Betriebszeit (Sekunden)",
+    activeConnections: "Aktive Verbindungen",
+    maxConnections: "Maximale Verbindungen",
   },
   errors: {
     health_check_failed: "Datenbank-Gesundheitscheck fehlgeschlagen",

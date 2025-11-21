@@ -37,6 +37,22 @@ export const translations = {
       description: "Search users for statistics",
       placeholder: "Enter search term...",
     },
+    chartType: {
+      label: "Chart Type",
+      description: "Select the type of chart to display",
+    },
+    dateRangePreset: {
+      label: "Date Range Preset",
+      description: "Select a predefined date range",
+    },
+    includeComparison: {
+      label: "Include Comparison",
+      description: "Include comparison with previous period",
+    },
+    timePeriod: {
+      label: "Time Period",
+      description: "Select the time period for statistics",
+    },
   },
   response: {
     overviewStats: {

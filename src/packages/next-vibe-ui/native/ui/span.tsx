@@ -1,84 +1,198 @@
+import type { JSX } from "react";
 import * as React from "react";
-import { Text as RNText } from "react-native";
-import type { TextStyle } from "react-native";
+import { Text as RNText, Pressable } from "react-native";
+import { styled } from "nativewind";
 
 import type {
-  SpanProps,
+  SpanProps as SpanBaseProps,
   SpanRefObject,
+  SpanMouseEvent,
+  SpanGenericTarget,
 } from "@/packages/next-vibe-ui/web/ui/span";
-import { cn } from "../lib/utils";
-import { styled } from "nativewind";
+import type { StyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
+import { applyStyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
 import { convertCSSToTextStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 
-const StyledText = styled(RNText, { className: "style" });
+const StyledText = styled(RNText);
+const StyledPressable = styled(Pressable, { className: "style" });
 
-// Convert web ref to native ref
-function convertRefToNative(
-  webRef:
-    | React.RefObject<SpanRefObject | null>
-    | ((node: SpanRefObject | null) => void)
-    | undefined,
-): React.RefObject<RNText> | ((node: RNText | null) => void) | undefined {
-  if (!webRef) {
-    return undefined;
-  }
+export type SpanProps = SpanBaseProps & StyleType;
 
-  if (typeof webRef === "function") {
-    return (node: RNText | null) => {
-      if (node) {
-        // Type-safe conversion: RNText implements subset of SpanRefObject interface
-        const spanRefObject = node as RNText & SpanRefObject;
-        webRef(spanRefObject);
-      } else {
-        webRef(null);
+// Create compatibility layer functions
+function createSpanRefObject(_text: RNText | null): SpanRefObject | null {
+  // React Native doesn't have DOM refs, return null for compatibility
+  // The web version returns actual DOM Element refs
+  return null;
+}
+
+function createSpanGenericTarget(): SpanGenericTarget {
+  return {
+    addEventListener: (): void => {
+      // No-op for React Native
+    },
+    removeEventListener: (): void => {
+      // No-op for React Native
+    },
+    dispatchEvent: (): boolean => false,
+    closest: (): Element | null => null,
+    getBoundingClientRect: (): {
+      left: number;
+      top: number;
+      right: number;
+      bottom: number;
+      width: number;
+      height: number;
+      x: number;
+      y: number;
+    } => ({
+      left: 0,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      width: 0,
+      height: 0,
+      x: 0,
+      y: 0,
+    }),
+  };
+}
+
+function createSpanMouseEvent(): SpanMouseEvent {
+  const target = createSpanGenericTarget();
+  return {
+    currentTarget: target,
+    target: target,
+    preventDefault: (): void => {
+      // No-op for React Native
+    },
+    stopPropagation: (): void => {
+      // No-op for React Native
+    },
+    isDefaultPrevented: (): boolean => false,
+    isPropagationStopped: (): boolean => false,
+    persist: (): void => {
+      // No-op for React Native
+    },
+    button: 0,
+    buttons: 0,
+    clientX: 0,
+    clientY: 0,
+    bubbles: true,
+    cancelable: true,
+    defaultPrevented: false,
+    eventPhase: 0,
+    isTrusted: true,
+    timeStamp: Date.now(),
+    type: "press",
+  };
+}
+
+export const Span = React.forwardRef<SpanRefObject, Omit<SpanProps, "ref">>(
+  (
+    {
+      className,
+      style,
+      children,
+      role: _role,
+      ariaLabel,
+      id,
+      title,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
+      onTouchStart,
+      onTouchEnd,
+      onDrop,
+      onDragOver,
+      onDragLeave,
+      suppressHydrationWarning: _suppressHydrationWarning,
+      dangerouslySetInnerHTML: _dangerouslySetInnerHTML,
+      tabIndex: _tabIndex,
+      onKeyDown,
+    },
+    ref,
+  ): JSX.Element => {
+    const textRef = React.useRef<RNText>(null);
+
+    React.useImperativeHandle(
+      ref,
+      (): SpanRefObject | null => {
+        const node = textRef.current;
+        return createSpanRefObject(node);
+      },
+      [],
+    );
+
+    const handlePress = React.useCallback((): void => {
+      if (onClick) {
+        const event = createSpanMouseEvent();
+        onClick(event);
       }
-    };
-  }
+    }, [onClick]);
 
-  // Convert RefObject - RNText implements subset of SpanRefObject interface
-  return webRef as React.RefObject<RNText> & React.RefObject<SpanRefObject>;
-}
+    const handlePressIn = React.useCallback((): void => {
+      if (onMouseEnter) {
+        const event = createSpanMouseEvent();
+        onMouseEnter(event);
+      }
+    }, [onMouseEnter]);
 
-// Native: Use Text component (inline text in React Native)
-export function Span({
-  className,
-  style,
-  children,
-  ref,
-  role: _role,
-  ariaLabel,
-  id,
-  title,
-  onClick: _onClick,
-  onMouseEnter: _onMouseEnter,
-  onMouseLeave: _onMouseLeave,
-  onTouchStart: _onTouchStart,
-  onTouchEnd: _onTouchEnd,
-  onDrop: _onDrop,
-  onDragOver: _onDragOver,
-  onDragLeave: _onDragLeave,
-  suppressHydrationWarning: _suppressHydrationWarning,
-  dangerouslySetInnerHTML: _dangerouslySetInnerHTML,
-  tabIndex: _tabIndex,
-  onKeyDown: _onKeyDown,
-}: SpanProps): React.JSX.Element {
-  const nativeRef = convertRefToNative(ref);
-  const nativeStyle: TextStyle | undefined = style
-    ? convertCSSToTextStyle(style)
-    : undefined;
+    const handlePressOut = React.useCallback((): void => {
+      if (onMouseLeave) {
+        const event = createSpanMouseEvent();
+        onMouseLeave(event);
+      }
+    }, [onMouseLeave]);
 
-  return (
-    <StyledText
-      ref={nativeRef}
-      nativeID={id}
-      accessibilityLabel={ariaLabel || title}
-      {...applyStyleType({
-        nativeStyle,
-        className: cn("text-base text-foreground", className),
-      })}
-    >
-      {children}
-    </StyledText>
-  );
-}
+    // Use Pressable wrapper if any interaction handlers are present
+    if (
+      onClick ||
+      onMouseEnter ||
+      onMouseLeave ||
+      onTouchStart ||
+      onTouchEnd ||
+      onDrop ||
+      onDragOver ||
+      onDragLeave ||
+      onKeyDown
+    ) {
+      return (
+        <StyledPressable
+          onPress={handlePress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
+          <StyledText
+            {...applyStyleType({
+              nativeStyle: style ? convertCSSToTextStyle(style) : undefined,
+              className: className,
+            })}
+            ref={textRef}
+            nativeID={id}
+            accessibilityLabel={ariaLabel || title}
+          >
+            {children}
+          </StyledText>
+        </StyledPressable>
+      );
+    }
+
+    return (
+      <StyledText
+        ref={textRef}
+        {...applyStyleType({
+          nativeStyle: style ? convertCSSToTextStyle(style) : undefined,
+          className: className,
+        })}
+        nativeID={id}
+        accessibilityLabel={ariaLabel || title}
+      >
+        {children}
+      </StyledText>
+    );
+  },
+);
+
+Span.displayName = "Span";

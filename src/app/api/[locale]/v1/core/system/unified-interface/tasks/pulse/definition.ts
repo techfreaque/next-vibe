@@ -108,7 +108,7 @@ const pulseExecuteEndpoint = createEndpoint({
       fieldType: FieldDataType.TEXT,
       label:
         "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.container.title",
-      layout: { columns: 12 },
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -121,7 +121,7 @@ const pulseExecuteEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),
@@ -134,7 +134,7 @@ const pulseExecuteEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),
@@ -147,7 +147,7 @@ const pulseExecuteEndpoint = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.array(z.string()).optional(),
       ),
@@ -224,7 +224,7 @@ const pulseStatusEndpoint = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.pulseSystem.status.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { response: true },
     {

@@ -159,6 +159,8 @@ export const translations: typeof enTranslations = {
         },
 
         errors: {
+          title: "Szczegóły Błędów",
+
           row: {
             label: "Wiersz",
           },
@@ -171,8 +173,10 @@ export const translations: typeof enTranslations = {
         },
 
         nextSteps: {
+          title: "Następne Kroki",
+
           item: {
-            label: "Następne Kroki",
+            label: "Następny Krok",
           },
         },
       },
@@ -267,6 +271,106 @@ export const translations: typeof enTranslations = {
       response: {
         title: "Joby Importu",
         description: "Historia twoich jobów importu i aktualny status",
+
+        jobs: {
+          title: "Lista Jobów",
+        },
+
+        job: {
+          title: "Szczegóły Joba",
+
+          id: {
+            label: "ID Joba",
+          },
+
+          fileName: {
+            label: "Nazwa Pliku",
+          },
+
+          domain: {
+            label: "Domena",
+          },
+
+          status: {
+            label: "Status",
+          },
+
+          progress: {
+            title: "Informacje o Postępie",
+
+            totalRows: {
+              label: "Całkowita liczba wierszy",
+            },
+
+            processedRows: {
+              label: "Przetworzone Wiersze",
+            },
+
+            currentBatchStart: {
+              label: "Początek Bieżącej Partii",
+            },
+
+            batchSize: {
+              label: "Rozmiar Partii",
+            },
+
+            percentComplete: {
+              label: "Procent Ukończenia",
+            },
+          },
+
+          results: {
+            title: "Wyniki",
+
+            successfulImports: {
+              label: "Udane Importy",
+            },
+
+            failedImports: {
+              label: "Nieudane Importy",
+            },
+
+            duplicateEmails: {
+              label: "Zduplikowane E-maile",
+            },
+          },
+
+          timing: {
+            title: "Informacje o Czasie",
+
+            createdAt: {
+              label: "Utworzono",
+            },
+
+            updatedAt: {
+              label: "Zaktualizowano",
+            },
+
+            startedAt: {
+              label: "Rozpoczęto",
+            },
+
+            completedAt: {
+              label: "Zakończono",
+            },
+          },
+
+          errorInfo: {
+            title: "Informacje o Błędach",
+
+            error: {
+              label: "Komunikat Błędu",
+            },
+
+            retryCount: {
+              label: "Liczba Ponownych Prób",
+            },
+
+            maxRetries: {
+              label: "Maksymalna Liczba Ponownych Prób",
+            },
+          },
+        },
       },
 
       errors: {

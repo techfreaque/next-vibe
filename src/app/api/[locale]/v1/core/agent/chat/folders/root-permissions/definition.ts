@@ -20,15 +20,7 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { DEFAULT_FOLDER_IDS } from "../../config";
-
-// Schema for default folder IDs
-const DefaultFolderIdSchema = z.enum([
-  DEFAULT_FOLDER_IDS.PRIVATE,
-  DEFAULT_FOLDER_IDS.SHARED,
-  DEFAULT_FOLDER_IDS.PUBLIC,
-  DEFAULT_FOLDER_IDS.INCOGNITO,
-]);
+import { DefaultFolderId } from "../../config";
 
 /**
  * Get Root Folder Permissions Endpoint (GET)
@@ -53,7 +45,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.folders.rootPermissions.get.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.folders.rootPermissions.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -66,10 +58,9 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.rootPermissions.get.rootFolderId.label" as const,
           description:
             "app.api.v1.core.agent.chat.folders.rootPermissions.get.rootFolderId.description" as const,
-          layout: { columns: 12 },
-          validation: { required: true },
+          columns: 12,
         },
-        DefaultFolderIdSchema,
+        z.enum(DefaultFolderId),
       ),
 
       // === RESPONSE ===
@@ -162,7 +153,7 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
-        rootFolderId: "private",
+        rootFolderId: DefaultFolderId.PRIVATE,
       },
     },
     responses: {

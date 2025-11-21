@@ -9,6 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interf
 import {
   objectField,
   requestDataField,
+  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
@@ -77,7 +78,8 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.leads.search.get.form.title" as const,
       description: "app.api.v1.core.leads.search.get.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -89,7 +91,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.search.get.search.label" as const,
           description:
             "app.api.v1.core.leads.search.get.search.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           placeholder:
             "app.api.v1.core.leads.search.get.search.placeholder" as const,
         },
@@ -102,7 +104,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.search.get.limit.label" as const,
           description:
             "app.api.v1.core.leads.search.get.limit.description" as const,
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.number().min(1).max(50).default(10),
       ),
@@ -113,25 +115,54 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.leads.search.get.offset.label" as const,
           description:
             "app.api.v1.core.leads.search.get.offset.description" as const,
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.number().min(0).default(0),
       ),
 
       // === RESPONSE FIELDS ===
-      response: responseField(
+      response: objectField(
         {
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.leads.search.get.response.title" as const,
           description:
             "app.api.v1.core.leads.search.get.response.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+      columns: 12,
         },
-        z.object({
-          leads: z.array(leadResponseSchema),
-          total: z.number(),
-          hasMore: z.boolean(),
-        }),
+        { response: true },
+        {
+          leads: responseArrayField(
+            {
+              type: WidgetType.DATA_TABLE,
+              title: "app.api.v1.core.leads.search.get.response.leads.title" as const,
+            },
+            responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.search.get.response.leads.item" as const,
+                fieldType: FieldDataType.TEXT,
+              },
+              leadResponseSchema,
+            ),
+          ),
+          total: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.leads.search.get.response.total" as const,
+              fieldType: FieldDataType.NUMBER,
+            },
+            z.number(),
+          ),
+          hasMore: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.leads.search.get.response.hasMore" as const,
+              fieldType: FieldDataType.BOOLEAN,
+            },
+            z.boolean(),
+          ),
+        },
       ),
     },
   ),

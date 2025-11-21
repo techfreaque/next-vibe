@@ -29,24 +29,24 @@ export const translations: typeof enTranslations = {
         title: "Najczęściej zadawane pytania",
         questions: {
           q1: {
-            question: "Czym jest {{appName}}?",
+            question: "Co to jest {{appName}}?",
             answer:
-              "{{appName}} to platforma czatu AI bez cenzury z dostępem do {{modelCount}} modeli AI. Łączymy szczere rozmowy z AI z zaawansowanymi funkcjami, takimi jak zarządzanie folderami, niestandardowe persony i obsługa wielu modeli.",
+              "{{appName}} to platforma czatu AI bez cenzury z dostępem do {{modelCount}} modeli AI. Łączymy uczciwe rozmowy AI z zaawansowanymi funkcjami, takimi jak zarządzanie folderami, niestandardowe persony i wsparcie wielu modeli.",
           },
           q2: {
             question: "Jakie metody płatności akceptujecie?",
             answer:
-              "Akceptujemy karty kredytowe przez Stripe oraz płatności kryptowalutowe (Bitcoin, Ethereum, stablecoiny) przez NowPayments. Subskrypcja {{subPrice}}/miesiąc zawiera {{subCredits}} kredytów/miesiąc. Możesz również kupić pakiety kredytowe ({{packPrice}} za {{packCredits}} kredytów), jeśli potrzebujesz więcej kredytów. Pakiety kredytowe nigdy nie wygasają, nawet po zakończeniu subskrypcji.",
+              "Akceptujemy karty kredytowe przez Stripe oraz płatności kryptowalutami (Bitcoin, Ethereum, stablecoiny) przez NowPayments. Subskrypcja {{subPrice}}/miesiąc obejmuje {{subCredits}} kredytów/miesiąc. Możesz również kupić pakiety kredytów ({{packPrice}} za {{packCredits}} kredytów), jeśli potrzebujesz więcej kredytów. Pakiety kredytów nigdy nie wygasają, nawet po zakończeniu subskrypcji.",
           },
           q3: {
-            question: "Jak działa system kredytów?",
+            question: "Jak działa system kredytowy?",
             answer:
-              "Potrzebujesz subskrypcji {{subPrice}}/miesiąc, aby uzyskać dostęp do czatu AI, która zawiera {{subCredits}} kredytów/miesiąc. Jeśli potrzebujesz więcej kredytów, możesz kupić pakiety kredytowe ({{packPrice}} za {{packCredits}} kredytów). Pakiety kredytowe nigdy nie wygasają, nawet po zakończeniu subskrypcji, więc działają ze wszystkimi {{modelCount}} modelami AI, gdy ponownie aktywujesz konto.",
+              "Potrzebujesz subskrypcji {{subPrice}}/miesiąc, aby uzyskać dostęp do czatu AI, która obejmuje {{subCredits}} kredytów/miesiąc. Jeśli potrzebujesz więcej kredytów, możesz kupić pakiety kredytów ({{packPrice}} za {{packCredits}} kredytów). Pakiety kredytów nigdy nie wygasają, nawet po zakończeniu subskrypcji, więc działają ze wszystkimi {{modelCount}} modelami AI, gdy ponownie aktywujesz.",
           },
           q4: {
             question: "Czy moje dane są prywatne i bezpieczne?",
             answer:
-              "Tak! Oferujemy szyfrowanie end-to-end dla prywatnych folderów, tryb incognito dla czatów tylko w sesji i pełną zgodność z RODO. Twoje rozmowy należą do Ciebie - nigdy nie sprzedajemy Twoich danych.",
+              "Tak! Oferujemy szyfrowanie end-to-end dla prywatnych folderów, tryb incognito dla czatów tylko sesyjnych i pełną zgodność z RODO. Twoje rozmowy są Twoje - nigdy nie sprzedajemy Twoich danych.",
           },
         },
       },

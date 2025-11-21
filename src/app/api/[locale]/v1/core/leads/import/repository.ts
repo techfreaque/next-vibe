@@ -550,7 +550,7 @@ export class LeadsImportRepository implements ILeadsImportRepository {
     const response = await importRepository.listImportJobs(
       userId,
       {
-        status: filters.status,
+        status: filters.status as typeof CsvImportJobStatusValue | undefined,
         limit: filters.limit || 50,
         offset: filters.offset || 0,
       },

@@ -24,7 +24,7 @@ import {
   UserRoleDB,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { DEFAULT_FOLDER_IDS } from "../config";
+import { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStatusOptions } from "../enum";
 import { ModelId } from "../model-access/models";
 
@@ -51,7 +51,7 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.agent.chat.threads.get.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -63,7 +63,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.agent.chat.threads.get.page.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.get.page.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().min(1).optional().default(1),
       ),
@@ -74,7 +74,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.agent.chat.threads.get.limit.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.get.limit.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().min(1).max(100).optional().default(20),
       ),
@@ -88,38 +88,31 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.get.rootFolderId.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.get.rootFolderId.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: [
             {
-              value: DEFAULT_FOLDER_IDS.PRIVATE,
+              value: DefaultFolderId.PRIVATE,
               label:
                 "app.api.v1.core.agent.chat.config.folders.private" as const,
             },
             {
-              value: DEFAULT_FOLDER_IDS.SHARED,
+              value: DefaultFolderId.SHARED,
               label:
                 "app.api.v1.core.agent.chat.config.folders.shared" as const,
             },
             {
-              value: DEFAULT_FOLDER_IDS.PUBLIC,
+              value: DefaultFolderId.PUBLIC,
               label:
                 "app.api.v1.core.agent.chat.config.folders.public" as const,
             },
             {
-              value: DEFAULT_FOLDER_IDS.INCOGNITO,
+              value: DefaultFolderId.INCOGNITO,
               label:
                 "app.api.v1.core.agent.chat.config.folders.incognito" as const,
             },
           ],
         },
-        z
-          .enum([
-            DEFAULT_FOLDER_IDS.PRIVATE,
-            DEFAULT_FOLDER_IDS.SHARED,
-            DEFAULT_FOLDER_IDS.PUBLIC,
-            DEFAULT_FOLDER_IDS.INCOGNITO,
-          ])
-          .optional(),
+        z.enum(DefaultFolderId).optional(),
       ),
       subFolderId: requestDataField(
         {
@@ -129,7 +122,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.get.subFolderId.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.get.subFolderId.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.uuid().optional().nullable(),
       ),
@@ -140,7 +133,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.agent.chat.threads.get.status.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.get.status.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: ThreadStatusOptions,
         },
         z.enum(ThreadStatus).optional(),
@@ -152,7 +145,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.agent.chat.threads.get.search.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.get.search.description" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().optional(),
       ),
@@ -164,7 +157,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.get.isPinned.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.get.isPinned.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional(),
       ),
@@ -176,7 +169,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.get.dateFrom.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.get.dateFrom.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().datetime().optional(),
       ),
@@ -187,7 +180,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.agent.chat.threads.get.dateTo.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.get.dateTo.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().datetime().optional(),
       ),
@@ -200,21 +193,21 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.get.response.title" as const,
           description:
             "app.api.v1.core.agent.chat.threads.get.response.description" as const,
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
           threads: responseArrayField(
             {
               type: WidgetType.DATA_CARDS,
-              layout: "list",
             },
             objectField(
               {
                 type: WidgetType.CONTAINER,
                 title:
                   "app.api.v1.core.agent.chat.threads.get.response.threads.thread.title" as const,
-                layout: { type: LayoutType.GRID, columns: 2 },
+                layoutType: LayoutType.GRID,
+                columns: 2,
               },
               { response: true },
               {
@@ -240,12 +233,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.v1.core.agent.chat.threads.get.response.threads.thread.rootFolderId.content" as const,
                   },
-                  z.enum([
-                    DEFAULT_FOLDER_IDS.PRIVATE,
-                    DEFAULT_FOLDER_IDS.SHARED,
-                    DEFAULT_FOLDER_IDS.PUBLIC,
-                    DEFAULT_FOLDER_IDS.INCOGNITO,
-                  ]),
+                  z.enum(DefaultFolderId),
                 ),
                 folderId: responseField(
                   {
@@ -282,7 +270,6 @@ const { GET } = createEndpoint({
                 rolesView: responseField(
                   {
                     type: WidgetType.DATA_LIST,
-                    layout: "inline",
                   },
                   z
                     .array(z.enum(UserRoleDB))
@@ -294,7 +281,6 @@ const { GET } = createEndpoint({
                 rolesEdit: responseField(
                   {
                     type: WidgetType.DATA_LIST,
-                    layout: "inline",
                   },
                   z
                     .array(z.enum(UserRoleDB))
@@ -306,7 +292,6 @@ const { GET } = createEndpoint({
                 rolesPost: responseField(
                   {
                     type: WidgetType.DATA_LIST,
-                    layout: "inline",
                   },
                   z
                     .array(z.enum(UserRoleDB))
@@ -318,7 +303,6 @@ const { GET } = createEndpoint({
                 rolesModerate: responseField(
                   {
                     type: WidgetType.DATA_LIST,
-                    layout: "inline",
                   },
                   z
                     .array(z.enum(UserRoleDB))
@@ -330,7 +314,6 @@ const { GET } = createEndpoint({
                 rolesAdmin: responseField(
                   {
                     type: WidgetType.DATA_LIST,
-                    layout: "inline",
                   },
                   z
                     .array(z.enum(UserRoleDB))
@@ -515,7 +498,7 @@ const { GET } = createEndpoint({
       default: {
         page: 1,
         limit: 20,
-        rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+        rootFolderId: DefaultFolderId.PRIVATE,
       },
     },
     responses: {
@@ -552,7 +535,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.agent.chat.threads.post.form.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.post.form.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -564,7 +547,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.post.sections.thread.title" as const,
           description:
             "app.api.v1.core.agent.chat.threads.post.sections.thread.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
         { request: "data" },
         {
@@ -576,7 +560,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.post.threadTitle.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.post.threadTitle.description" as const,
-              layout: { columns: 12 },
+              columns: 12,
             },
             z.string().min(1).max(255).optional().default("New Chat"),
           ),
@@ -588,38 +572,33 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.post.rootFolderId.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.post.rootFolderId.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
               options: [
                 {
-                  value: DEFAULT_FOLDER_IDS.PRIVATE,
+                  value: DefaultFolderId.PRIVATE,
                   label:
                     "app.api.v1.core.agent.chat.config.folders.private" as const,
                 },
                 {
-                  value: DEFAULT_FOLDER_IDS.SHARED,
+                  value: DefaultFolderId.SHARED,
                   label:
                     "app.api.v1.core.agent.chat.config.folders.shared" as const,
                 },
                 {
-                  value: DEFAULT_FOLDER_IDS.PUBLIC,
+                  value: DefaultFolderId.PUBLIC,
                   label:
                     "app.api.v1.core.agent.chat.config.folders.public" as const,
                 },
                 {
-                  value: DEFAULT_FOLDER_IDS.INCOGNITO,
+                  value: DefaultFolderId.INCOGNITO,
                   label:
                     "app.api.v1.core.agent.chat.config.folders.incognito" as const,
                 },
               ],
             },
             z
-              .enum([
-                DEFAULT_FOLDER_IDS.PRIVATE,
-                DEFAULT_FOLDER_IDS.SHARED,
-                DEFAULT_FOLDER_IDS.PUBLIC,
-                DEFAULT_FOLDER_IDS.INCOGNITO,
-              ])
-              .refine((val) => val !== DEFAULT_FOLDER_IDS.INCOGNITO, {
+              .enum(DefaultFolderId)
+              .refine((val) => val !== DefaultFolderId.INCOGNITO, {
                 message:
                   "app.api.v1.core.agent.chat.threads.post.errors.forbidden.incognitoNotAllowed",
               }),
@@ -632,7 +611,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.post.subFolderId.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.post.subFolderId.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.uuid().optional().nullable(),
           ),
@@ -644,7 +623,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.post.defaultModel.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.post.defaultModel.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.nativeEnum(ModelId),
           ),
@@ -656,7 +635,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.post.defaultTone.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.post.defaultTone.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.string().nullable(),
           ),
@@ -668,7 +647,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.post.systemPrompt.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.post.systemPrompt.description" as const,
-              layout: { columns: 12 },
+              columns: 12,
             },
             z.string().optional(),
           ),
@@ -683,7 +662,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.post.response.title" as const,
           description:
             "app.api.v1.core.agent.chat.threads.post.response.description" as const,
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -692,7 +671,8 @@ const { POST } = createEndpoint({
               type: WidgetType.CONTAINER,
               title:
                 "app.api.v1.core.agent.chat.threads.post.response.thread.title" as const,
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID,
+              columns: 2,
             },
             { response: true },
             {
@@ -718,12 +698,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.threads.post.response.thread.rootFolderId.content" as const,
                 },
-                z.enum([
-                  DEFAULT_FOLDER_IDS.PRIVATE,
-                  DEFAULT_FOLDER_IDS.SHARED,
-                  DEFAULT_FOLDER_IDS.PUBLIC,
-                  DEFAULT_FOLDER_IDS.INCOGNITO,
-                ]),
+                z.enum(DefaultFolderId),
               ),
               subFolderId: responseField(
                 {
@@ -823,7 +798,7 @@ const { POST } = createEndpoint({
       default: {
         thread: {
           title: "New Chat",
-          rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+          rootFolderId: DefaultFolderId.PRIVATE,
           subFolderId: null,
           model: ModelId.GPT_5_NANO,
           persona: "default",
@@ -836,7 +811,7 @@ const { POST } = createEndpoint({
           thread: {
             id: "550e8400-e29b-41d4-a716-446655440000",
             title: "New Chat",
-            rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+            rootFolderId: DefaultFolderId.PRIVATE,
             subFolderId: null,
             status: ThreadStatus.ACTIVE,
             createdAt: new Date().toISOString(),

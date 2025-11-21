@@ -7,6 +7,7 @@ import { translations as manifestTranslations } from "../../manifest/i18n/pl";
 import { translations as newsletterTranslations } from "../../newsletter/i18n/pl";
 import { translations as paymentTranslations } from "../../payment/i18n/pl";
 import { translations as productsTranslations } from "../../products/i18n/pl";
+import { translations as referralTranslations } from "../../referral/i18n/pl";
 import { translations as sharedTranslations } from "../../shared/i18n/pl";
 import { translations as sharedUtilsTranslations } from "../../shared/utils/i18n/pl";
 import { translations as smsTranslations } from "../../sms/i18n/pl";
@@ -26,6 +27,7 @@ export const translations = {
   newsletter: newsletterTranslations,
   payment: paymentTranslations,
   products: productsTranslations,
+  referral: referralTranslations,
   shared: {
     ...sharedTranslations,
     utils: sharedUtilsTranslations,

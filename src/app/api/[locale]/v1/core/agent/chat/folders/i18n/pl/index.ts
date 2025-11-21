@@ -24,6 +24,12 @@ export const translations: typeof enTranslations = {
     response: {
       title: "Odpowiedź folderów",
       description: "Lista wszystkich folderów",
+      rootFolderPermissions: {
+        title: "Uprawnienia folderu głównego",
+        description: "Uprawnienia dla żądanego folderu głównego",
+        canCreateThread: { content: "Może tworzyć wątki" },
+        canCreateFolder: { content: "Może tworzyć foldery" },
+      },
       folders: {
         title: "Foldery",
         description: "Tablica obiektów folderów",
@@ -42,6 +48,11 @@ export const translations: typeof enTranslations = {
           metadata: { content: "Metadane" },
           createdAt: { content: "Utworzono" },
           updatedAt: { content: "Zaktualizowano" },
+          canManage: { content: "Może zarządzać" },
+          canCreateThread: { content: "Może tworzyć wątki" },
+          canModerate: { content: "Może moderować" },
+          canDelete: { content: "Może usuwać" },
+          canManagePermissions: { content: "Może zarządzać uprawnieniami" },
         },
       },
     },

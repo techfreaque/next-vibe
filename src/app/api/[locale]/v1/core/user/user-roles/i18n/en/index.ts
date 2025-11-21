@@ -1,6 +1,7 @@
 export const translations = {
   errors: {
     find_failed: "Failed to find user roles",
+    batch_find_failed: "Failed to batch find user roles",
     not_found: "User role not found",
     lookup_failed: "Failed to lookup user role",
     add_failed: "Failed to add role to user",

@@ -25,14 +25,19 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.generators.taskIndex.post.description",
   category: "app.api.v1.core.system.generators.category",
   tags: ["app.api.v1.core.system.generators.taskIndex.post.title"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
 
   fields: objectField(
     {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
       label: "app.api.v1.core.system.generators.taskIndex.post.container.title",
-      layout: { columns: 12 },
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -45,7 +50,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.taskIndex.post.fields.outputDir.label",
           description:
             "app.api.v1.core.system.generators.taskIndex.post.fields.outputDir.description",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z
           .string()
@@ -62,7 +67,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.taskIndex.post.fields.verbose.label",
           description:
             "app.api.v1.core.system.generators.taskIndex.post.fields.verbose.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),

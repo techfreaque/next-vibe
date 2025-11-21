@@ -56,6 +56,7 @@ export const translations = {
     },
     header: {
       title: "Header",
+      description: "Header Description",
     },
     title: {
       label: "Title",
@@ -65,7 +66,9 @@ export const translations = {
     },
     usage: {
       title: "Usage",
-      patterns: "Usage Patterns",
+      patterns: {
+        item: "Pattern",
+      },
     },
     commonCommands: {
       title: "Common Commands",
@@ -87,10 +90,18 @@ export const translations = {
     },
     details: {
       title: "Details",
-      category: "Category",
-      path: "Path",
-      method: "Method",
-      aliases: "Aliases",
+      category: {
+        content: "Category",
+      },
+      path: {
+        content: "Path",
+      },
+      method: {
+        content: "Method",
+      },
+      aliases: {
+        content: "Aliases",
+      },
     },
   },
   list: {
@@ -175,6 +186,14 @@ export const translations = {
       commandsText: {
         label: "Available Commands",
         description: "Formatted list of all available commands",
+      },
+      commands: {
+        alias: "Command Alias",
+        message: "Command Message",
+        description: "Command Description",
+        category: "Command Category",
+        aliases: "Command Aliases",
+        rule: "Command Rule",
       },
     },
     response: {

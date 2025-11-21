@@ -220,12 +220,9 @@ export async function dev(
       if (createdUsers[0]) {
         // First user is admin user - assign admin and CLI_AUTH_BYPASS roles
         const adminUserId = createdUsers[0].id;
-        const adminRoles = [
-          UserRole.ADMIN,
-          UserRole.CLI_AUTH_BYPASS,
-          UserRole.CLI_OFF,
-          UserRole.AI_TOOL_OFF,
-        ];
+        // Only assign permission roles, never platform markers
+        // Platform markers (CLI_OFF, CLI_AUTH_BYPASS, etc.) are NEVER stored in database
+        const adminRoles = [UserRole.ADMIN];
 
         for (const role of adminRoles) {
           try {
@@ -292,6 +289,37 @@ export async function dev(
     logger.error("Error creating user roles", parseError(error));
     // Don't throw the error, just log it and continue
     // This allows the seed to complete even if roles can't be created
+  }
+
+  // Create referral codes for admin user
+  if (createdUsers.length > 0 && createdUsers[0]) {
+    const adminUserId = createdUsers[0].id;
+    try {
+      const { referralRepository } = await import("../referral/repository");
+
+      // Create a test referral code
+      const referralResult = await referralRepository.createReferralCode(
+        adminUserId,
+        {
+          code: "FRIEND2024",
+          label: "Test Referral Code",
+        },
+        locale,
+        logger,
+      );
+
+      if (referralResult.success) {
+        logger.debug(
+          `Created referral code FRIEND2024 for admin user ${adminUserId}`,
+        );
+      } else {
+        logger.debug(
+          `Referral code FRIEND2024 already exists or failed to create`,
+        );
+      }
+    } catch (error) {
+      logger.error("Error creating referral code", parseError(error));
+    }
   }
 
   // Create CLI token and session for admin user (first user)

@@ -36,7 +36,7 @@ export default function ContactForm({
   // Type assertion: contactResult.create is always defined because definition has POST
   if (!contactResult.create) {
     logger.error("Contact form endpoint not properly configured");
-    return <Div>{t("app.help.components.pages.help.form.error")}</Div>;
+    return <Div>{t("app.api.v1.core.contact._components.pages.help.form.error")}</Div>;
   }
 
   const form = contactResult.create.form;
@@ -49,7 +49,7 @@ export default function ContactForm({
     return (
       <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
         <H2 className="text-2xl font-bold mb-6">
-          {t("app.help.components.pages.help.form.title")}
+          {t("app.api.v1.core.contact._components.pages.help.form.title")}
         </H2>
         <FormAlert alert={contactResult.alert} className="mb-6" />
       </Div>
@@ -59,7 +59,7 @@ export default function ContactForm({
   return (
     <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
       <H2 className="text-2xl font-bold mb-6">
-        {t("app.help.components.pages.help.form.title")}
+        {t("app.api.v1.core.contact._components.pages.help.form.title")}
       </H2>
       {/* Show form alert if any */}
       <FormAlert alert={contactResult.alert} className="mb-6" />
@@ -124,10 +124,10 @@ export default function ContactForm({
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {t("app.help.components.pages.help.form.sending")}
+              {t("app.api.v1.core.contact._components.pages.help.form.sending")}
             </>
           ) : (
-            t("app.help.components.pages.help.form.submit")
+            t("app.api.v1.core.contact._components.pages.help.form.submit")
           )}
         </Button>
       </Form>

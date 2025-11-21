@@ -1,0 +1,299 @@
+"use client";
+
+import { parseError } from "next-vibe/shared/utils";
+import { storage } from "next-vibe-ui/lib/storage";
+import type { JSX } from "react";
+import React, { useEffect, useState } from "react";
+
+import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
+import { type IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
+import {
+  DEFAULT_CATEGORIES,
+  DEFAULT_PERSONAS,
+  type Persona,
+  type PersonaCategory,
+  type PersonaCategoryId,
+} from "@/app/api/[locale]/v1/core/agent/chat/personas/config";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+import { SelectorBase, type SelectorOption } from "@/app/api/[locale]/v1/core/agent/chat/threads/_components/chat-input/selector-base";
+import { useFavorites } from "@/app/api/[locale]/v1/core/agent/chat/threads/_components/chat-input/use-favorites";
+import { AddPersonaDialog } from "./add-persona-dialog";
+import { AddCategoryDialog } from "./add-category-dialog";
+
+interface PersonaSelectorProps {
+  value: string;
+  onChange: (value: string) => void;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+  className?: string;
+  buttonClassName?: string;
+  triggerSize?: "default" | "sm" | "lg" | "icon";
+  showTextAt?: "always" | "sm" | "md" | "lg" | "never";
+}
+
+const STORAGE_KEY_PERSONAS = "chat-personas";
+const STORAGE_KEY_FAVORITES = "chat-favorite-personas";
+const STORAGE_KEY_CATEGORIES = "chat-persona-categories";
+
+const DEFAULT_FAVORITES = ["professional", "creative", "technical"];
+
+export function PersonaSelector({
+  value,
+  onChange,
+  locale,
+  logger,
+  className,
+  buttonClassName,
+  triggerSize,
+  showTextAt,
+}: PersonaSelectorProps): JSX.Element {
+  const { handleModelChange: onModelChange } = useChatContext();
+  const { t } = simpleT(locale);
+  const defaultIcon = t("app.chat.personaSelector.defaultIcon");
+  const [personas, setPersonas] = useState<Persona[]>([...DEFAULT_PERSONAS]);
+  const [categories, setCategories] = useState<PersonaCategory[]>([
+    ...DEFAULT_CATEGORIES,
+  ]);
+  const [favorites, toggleFavorite, setFavorites] = useFavorites(
+    STORAGE_KEY_FAVORITES,
+    DEFAULT_FAVORITES,
+    logger,
+  );
+  const [addPersonaOpen, setAddPersonaOpen] = useState(false);
+  const [addCategoryOpen, setAddCategoryOpen] = useState(false);
+  const [newPersona, setNewPersona] = useState<{
+    name: string;
+    description: string;
+    icon: string;
+    systemPrompt: string;
+    category: PersonaCategoryId;
+    suggestedPrompts: string[];
+  }>({
+    name: "",
+    description: "",
+    icon: defaultIcon,
+    systemPrompt: "",
+    category: "general",
+    suggestedPrompts: ["", "", "", ""],
+  });
+  const [newCategory, setNewCategory] = useState({
+    name: "",
+    icon: defaultIcon,
+  });
+
+  // Load personas from storage
+  useEffect(() => {
+    async function loadPersonas(): Promise<void> {
+      const storedPersonas = await storage.getItem(STORAGE_KEY_PERSONAS);
+      if (storedPersonas) {
+        try {
+          const parsed = JSON.parse(storedPersonas) as Persona[];
+          if (Array.isArray(parsed)) {
+            setPersonas([...DEFAULT_PERSONAS, ...parsed]);
+          }
+        } catch (e) {
+          logger.error("Storage", "Failed to load personas", parseError(e));
+        }
+      }
+    }
+    void loadPersonas();
+  }, [logger]);
+
+  // Load custom categories from storage
+  useEffect(() => {
+    async function loadCategories(): Promise<void> {
+      const storedCategories = await storage.getItem(STORAGE_KEY_CATEGORIES);
+      if (storedCategories) {
+        try {
+          const parsed = JSON.parse(storedCategories) as PersonaCategory[];
+          if (Array.isArray(parsed)) {
+            setCategories([...DEFAULT_CATEGORIES, ...parsed]);
+          }
+        } catch (e) {
+          logger.error("Storage", "Failed to load categories", parseError(e));
+        }
+      }
+    }
+    void loadCategories();
+  }, [logger]);
+
+  // Save custom personas to storage
+  const savePersonas = (newPersonas: Persona[]): void => {
+    const customPersonas = newPersonas.filter(
+      (p) => !DEFAULT_PERSONAS.find((dp) => dp.id === p.id),
+    );
+    async function save(): Promise<void> {
+      await storage.setItem(
+        STORAGE_KEY_PERSONAS,
+        JSON.stringify(customPersonas),
+      );
+    }
+    void save();
+    setPersonas(newPersonas);
+  };
+
+  // Save custom categories to storage
+  const saveCustomCategories = (newCategories: PersonaCategory[]): void => {
+    const customCategories = newCategories.filter(
+      (c) => !DEFAULT_CATEGORIES.find((dc) => dc.id === c.id),
+    );
+    async function save(): Promise<void> {
+      await storage.setItem(
+        STORAGE_KEY_CATEGORIES,
+        JSON.stringify(customCategories),
+      );
+    }
+    void save();
+    setCategories(newCategories);
+  };
+
+  const handleAddCategory = (): void => {
+    if (!newCategory.name.trim()) {
+      return;
+    }
+
+    const category: PersonaCategory = {
+      id: `custom-${Date.now()}`,
+      name: newCategory.name,
+      icon: newCategory.icon,
+    };
+
+    saveCustomCategories([...categories, category]);
+    setNewCategory({
+      name: "",
+      icon: t("app.chat.personaSelector.defaultIcon"),
+    });
+    setAddCategoryOpen(false);
+  };
+
+  const handleAddPersona = (): void => {
+    if (!newPersona.name.trim()) {
+      return;
+    }
+
+    const persona: Persona = {
+      id: `custom-${Date.now()}`,
+      name: newPersona.name,
+      description: newPersona.description,
+      icon: newPersona.icon,
+      systemPrompt: newPersona.systemPrompt,
+      category: newPersona.category,
+      source: "my",
+      suggestedPrompts: newPersona.suggestedPrompts.filter((p) => p.trim()),
+    };
+
+    savePersonas([...personas, persona]);
+    setFavorites([...favorites, persona.id]);
+    onChange(persona.id);
+    setAddPersonaOpen(false);
+    setNewPersona({
+      name: "",
+      description: "",
+      icon: defaultIcon,
+      systemPrompt: "",
+      category: "general",
+      suggestedPrompts: ["", "", "", ""],
+    });
+  };
+
+  // Handle persona change - switch model if persona has preferred model
+  const handlePersonaChange = (personaId: string): void => {
+    onChange(personaId);
+
+    // If persona has a preferred model, switch to it
+    const selectedPersona = personas.find((p) => p.id === personaId);
+    if (selectedPersona?.preferredModel) {
+      onModelChange(selectedPersona.preferredModel);
+    }
+  };
+
+  // Get source group info (for "provider" mode in SelectorBase)
+  const getSourceGroupInfo = (
+    persona: Persona,
+  ): { group: string; groupIcon: IconValue } => {
+    const sourceLabels = {
+      "built-in": t("app.chat.personaSelector.grouping.sourceLabels.builtIn"),
+      my: t("app.chat.personaSelector.grouping.sourceLabels.my"),
+      community: t("app.chat.personaSelector.grouping.sourceLabels.community"),
+    };
+    const sourceIcons = {
+      "built-in": t("app.chat.personaSelector.grouping.sourceIcons.builtIn"),
+      my: t("app.chat.personaSelector.grouping.sourceIcons.my"),
+      community: t("app.chat.personaSelector.grouping.sourceIcons.community"),
+    };
+    return {
+      group: sourceLabels[persona.source],
+      groupIcon: sourceIcons[persona.source],
+    };
+  };
+
+  // Build utility icons map for category grouping (for "utility" mode in SelectorBase)
+  const categoryUtilityIcons: Record<string, IconValue> = {};
+  categories.forEach((cat) => {
+    categoryUtilityIcons[cat.id] = cat.icon;
+  });
+
+  // Convert personas to selector options
+  const options: SelectorOption<string>[] = personas.map((persona) => {
+    const sourceInfo = getSourceGroupInfo(persona);
+    return {
+      id: persona.id,
+      name: persona.name,
+      description: persona.description,
+      icon: persona.icon,
+      group: sourceInfo.group,
+      groupIcon: sourceInfo.groupIcon,
+      utilities: [persona.category], // Category as utility for "utility" mode
+      utilityIcons: categoryUtilityIcons,
+    };
+  });
+
+  return (
+    <>
+      <SelectorBase
+        value={value}
+        onChange={handlePersonaChange}
+        options={options}
+        favorites={favorites}
+        onToggleFavorite={toggleFavorite}
+        onAddNew={() => setAddPersonaOpen(true)}
+        placeholder={t("app.chat.personaSelector.placeholder")}
+        addNewLabel={t("app.chat.personaSelector.addNewLabel")}
+        locale={locale}
+        groupModeLabels={{
+          provider: t("app.chat.personaSelector.grouping.bySource"),
+          utility: t("app.chat.personaSelector.grouping.byCategory"),
+        }}
+        className={className}
+        buttonClassName={buttonClassName}
+        triggerSize={triggerSize}
+        showTextAt={showTextAt}
+      />
+
+      {/* Add Custom Persona Dialog */}
+      <AddPersonaDialog
+        open={addPersonaOpen}
+        onOpenChange={setAddPersonaOpen}
+        newPersona={newPersona}
+        setNewPersona={setNewPersona}
+        categories={categories}
+        onAddPersona={handleAddPersona}
+        onAddCategoryClick={() => setAddCategoryOpen(true)}
+        locale={locale}
+      />
+
+      {/* Create Category Dialog */}
+      <AddCategoryDialog
+        open={addCategoryOpen}
+        onOpenChange={setAddCategoryOpen}
+        newCategory={newCategory}
+        setNewCategory={setNewCategory}
+        onAddCategory={handleAddCategory}
+        locale={locale}
+      />
+    </>
+  );
+}

@@ -46,7 +46,7 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.check.lint.container.title",
       description: "app.api.v1.core.system.check.lint.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -60,7 +60,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.lint.fields.path.description",
           placeholder:
             "app.api.v1.core.system.check.lint.fields.path.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional().default("./"),
       ),
@@ -72,7 +72,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.check.lint.fields.verbose.label",
           description:
             "app.api.v1.core.system.check.lint.fields.verbose.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.boolean().default(false),
       ),
@@ -84,7 +84,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.check.lint.fields.fix.label",
           description:
             "app.api.v1.core.system.check.lint.fields.fix.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         // fix is false by default as it makes it way slower
         z.boolean().default(false),
@@ -98,7 +98,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.lint.fields.timeoutSeconds.label",
           description:
             "app.api.v1.core.system.check.lint.fields.timeoutSeconds.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.number().min(1).max(3600).default(3600),
       ),
@@ -110,7 +110,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.check.lint.fields.cacheDir.label",
           description:
             "app.api.v1.core.system.check.lint.fields.cacheDir.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional().default("./.tmp"),
       ),
@@ -130,17 +130,15 @@ const { POST } = createEndpoint({
           groupBy: "file",
           sortBy: "severity",
           showSummary: true,
-          layout: {
-            type: LayoutType.GRID,
-            columns: 1,
-          },
+          layoutType: LayoutType.GRID,
+          columns: 1,
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
             title: "app.api.v1.core.system.check.lint.title",
             description: "app.api.v1.core.system.check.lint.description",
-            layout: { type: LayoutType.GRID, columns: 12 },
+            layoutType: LayoutType.GRID, columns: 12,
           },
           { response: true },
           {
@@ -196,7 +194,7 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.v1.core.system.check.lint.response.errors.item.title",
+                  "app.api.v1.core.system.check.lint.response.errors.item.type",
               },
               z.literal("lint"),
             ),

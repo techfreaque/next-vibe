@@ -40,7 +40,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.user.public.resetPassword.validate.title" as const,
       description:
         "app.api.v1.core.user.public.resetPassword.validate.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -52,7 +52,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.user.public.resetPassword.validate.groups.tokenInput.title" as const,
           description:
             "app.api.v1.core.user.public.resetPassword.validate.groups.tokenInput.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { request: "data" },
         {
@@ -66,8 +66,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.user.public.resetPassword.validate.fields.token.description" as const,
               placeholder:
                 "app.api.v1.core.user.public.resetPassword.validate.fields.token.placeholder" as const,
-              required: true,
-              layout: { columns: 12 },
+              columns: 12,
               helpText:
                 "app.api.v1.core.user.public.resetPassword.validate.fields.token.help" as const,
             },
@@ -87,7 +86,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.user.public.resetPassword.validate.response.title" as const,
           description:
             "app.api.v1.core.user.public.resetPassword.validate.response.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {

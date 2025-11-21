@@ -52,7 +52,8 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.form.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -87,7 +88,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.period.month",
             },
           ],
-          layout: { columns: 3 },
+          columns: 3,
         },
         statsPeriodSchema.default("day"),
       ),
@@ -122,7 +123,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.type.trends",
             },
           ],
-          layout: { columns: 3 },
+          columns: 3,
         },
         statsTypeSchema.default("overview"),
       ),
@@ -135,7 +136,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskId.title",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskId.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional(),
       ),
@@ -148,7 +149,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.limit.title",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.limit.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.number().optional().default(100),
       ),
@@ -160,7 +161,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.timePeriod.title",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional(),
       ),
@@ -171,7 +172,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.dateRangePreset.title",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional(),
       ),
@@ -182,7 +183,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskName.title",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional(),
       ),
@@ -193,7 +194,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskStatus.title",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional(),
       ),
@@ -204,7 +205,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskPriority.title",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional(),
       ),
@@ -215,7 +216,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.healthStatus.title",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional(),
       ),
@@ -226,7 +227,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.NUMBER,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.minDuration.title",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.number().optional(),
       ),
@@ -237,7 +238,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.NUMBER,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.maxDuration.title",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.number().optional(),
       ),
@@ -248,7 +249,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.includeDisabled.title",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.boolean().optional(),
       ),
@@ -259,7 +260,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.includeSystemTasks.title",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.boolean().optional(),
       ),
@@ -270,7 +271,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.hasRecentFailures.title",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.boolean().optional(),
       ),
@@ -281,7 +282,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.BOOLEAN,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.hasTimeout.title",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.boolean().optional(),
       ),
@@ -292,7 +293,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.stats.get.fields.search.title",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().optional(),
       ),

@@ -106,7 +106,14 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
         // Add replica check if needed
       };
 
-      let details;
+      let details:
+        | {
+            version?: string;
+            uptime?: number;
+            activeConnections?: number;
+            maxConnections?: number;
+          }
+        | undefined;
       if (request.includeDetails) {
         logger.debug("Including detailed health information");
         const statsResult = await this.getStats(logger);
@@ -124,7 +131,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
         status,
         timestamp,
         connections,
-        details,
+        ...(details !== undefined && { details }),
       };
 
       logger.info(`Database health check completed with status: ${status}`);

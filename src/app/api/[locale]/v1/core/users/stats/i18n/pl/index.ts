@@ -39,6 +39,22 @@ export const translations: typeof enTranslations = {
       description: "Wyszukaj użytkowników do statystyk",
       placeholder: "Wprowadź wyszukiwany termin...",
     },
+    chartType: {
+      label: "Typ wykresu",
+      description: "Wybierz typ wykresu do wyświetlenia",
+    },
+    dateRangePreset: {
+      label: "Szablon zakresu dat",
+      description: "Wybierz predefiniowany zakres dat",
+    },
+    includeComparison: {
+      label: "Uwzględnij porównanie",
+      description: "Uwzględnij porównanie z poprzednim okresem",
+    },
+    timePeriod: {
+      label: "Okres czasu",
+      description: "Wybierz okres czasu dla statystyk",
+    },
   },
   response: {
     overviewStats: {

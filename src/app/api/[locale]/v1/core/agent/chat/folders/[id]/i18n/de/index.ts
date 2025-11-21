@@ -144,6 +144,30 @@ export const translations: typeof enTranslations = {
       label: "Metadaten",
       description: "Zusätzliche Ordnermetadaten",
     },
+    rolesView: {
+      label: "Ansichtsrollen",
+      description: "Rollen, die diesen Ordner ansehen können",
+    },
+    rolesManage: {
+      label: "Verwaltungsrollen",
+      description: "Rollen, die Ordnereinstellungen verwalten können",
+    },
+    rolesCreateThread: {
+      label: "Thread-Erstellungsrollen",
+      description: "Rollen, die Threads in diesem Ordner erstellen können",
+    },
+    rolesPost: {
+      label: "Beitragsrollen",
+      description: "Rollen, die Nachrichten posten können",
+    },
+    rolesModerate: {
+      label: "Moderationsrollen",
+      description: "Rollen, die Inhalte moderieren können",
+    },
+    rolesAdmin: {
+      label: "Admin-Rollen",
+      description: "Rollen mit vollem Administratorzugriff",
+    },
     response: {
       title: "Aktualisierter Ordner",
       description: "Die aktualisierten Ordnerdetails",

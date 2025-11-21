@@ -32,6 +32,7 @@ import {
   EmailCampaignStageOptions,
   EmailJourneyVariant,
   LeadSource,
+  LeadSourceOptions,
   LeadStatus,
   LeadStatusOptions,
 } from "../../enum";
@@ -57,7 +58,7 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.leads.lead.id.get.form.title",
       description: "app.api.v1.core.leads.lead.id.get.form.description",
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {
@@ -68,9 +69,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.UUID,
           label: "app.api.v1.core.leads.lead.id.get.id.label",
           description: "app.api.v1.core.leads.lead.id.get.id.description",
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
         z.uuid(),
       ),
 
@@ -80,7 +79,7 @@ const { GET } = createEndpoint({
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.leads.lead.id.get.response.title",
           description: "app.api.v1.core.leads.lead.id.get.response.description",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -92,7 +91,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.get.response.basicInfo.title",
               description:
                 "app.api.v1.core.leads.lead.id.get.response.basicInfo.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -146,7 +145,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.get.response.contactDetails.title",
               description:
                 "app.api.v1.core.leads.lead.id.get.response.contactDetails.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -193,7 +192,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.get.response.campaignTracking.title",
               description:
                 "app.api.v1.core.leads.lead.id.get.response.campaignTracking.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -246,7 +245,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.get.response.engagement.title",
               description:
                 "app.api.v1.core.leads.lead.id.get.response.engagement.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -293,7 +292,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.get.response.conversion.title",
               description:
                 "app.api.v1.core.leads.lead.id.get.response.conversion.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -348,7 +347,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.get.response.metadata.title",
               description:
                 "app.api.v1.core.leads.lead.id.get.response.metadata.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -518,7 +517,7 @@ const { PATCH } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.leads.lead.id.patch.form.title",
       description: "app.api.v1.core.leads.lead.id.patch.form.description",
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -529,9 +528,7 @@ const { PATCH } = createEndpoint({
           fieldType: FieldDataType.UUID,
           label: "app.api.v1.core.leads.lead.id.patch.id.label",
           description: "app.api.v1.core.leads.lead.id.patch.id.description",
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
         z.uuid(),
       ),
 
@@ -542,7 +539,7 @@ const { PATCH } = createEndpoint({
           title: "app.api.v1.core.leads.lead.id.patch.updates.title",
           description:
             "app.api.v1.core.leads.lead.id.patch.updates.description",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { request: "data" },
         {
@@ -553,7 +550,7 @@ const { PATCH } = createEndpoint({
               title: "app.api.v1.core.leads.lead.id.patch.basicInfo.title",
               description:
                 "app.api.v1.core.leads.lead.id.patch.basicInfo.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { request: "data" },
             {
@@ -566,7 +563,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.email.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.email.placeholder",
-                  layout: { columns: 6 },
+                  columns: 6,
                 },
                 z.string().email().optional(),
               ),
@@ -580,9 +577,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.businessName.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.businessName.placeholder",
-                  layout: { columns: 6 },
-                  validation: { maxLength: 255 },
-                },
+                  columns: 6},
                 z.string().min(1).max(255).optional(),
               ),
               contactName: requestDataField(
@@ -595,9 +590,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.contactName.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.contactName.placeholder",
-                  layout: { columns: 6 },
-                  validation: { maxLength: 255 },
-                },
+                  columns: 6},
                 z.string().optional().nullable(),
               ),
               status: requestDataField(
@@ -609,7 +602,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.status.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.status.placeholder",
-                  layout: { columns: 6 },
+                  columns: 6,
                   options: LeadStatusOptions,
                 },
                 z.enum(LeadStatus).optional(),
@@ -624,7 +617,7 @@ const { PATCH } = createEndpoint({
               title: "app.api.v1.core.leads.lead.id.patch.contactDetails.title",
               description:
                 "app.api.v1.core.leads.lead.id.patch.contactDetails.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { request: "data" },
             {
@@ -637,9 +630,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.phone.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.phone.placeholder",
-                  layout: { columns: 6 },
-                  validation: { pattern: "^\\+?[1-9]\\d{1,14}$" },
-                },
+                  columns: 6},
                 z
                   .string()
                   .regex(/^\+?[1-9]\d{1,14}$/)
@@ -654,7 +645,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.website.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.website.placeholder",
-                  layout: { columns: 6 },
+                  columns: 6,
                 },
                 z.string().url().optional().or(z.literal("")),
               ),
@@ -667,7 +658,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.country.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.country.placeholder",
-                  layout: { columns: 6 },
+                  columns: 6,
                   options: CountriesOptions,
                 },
                 z.enum(Countries).optional(),
@@ -681,7 +672,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.language.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.language.placeholder",
-                  layout: { columns: 6 },
+                  columns: 6,
                   options: LanguagesOptions,
                 },
                 z.enum(Languages).optional(),
@@ -697,7 +688,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.patch.campaignManagement.title",
               description:
                 "app.api.v1.core.leads.lead.id.patch.campaignManagement.description",
-              layout: { type: LayoutType.STACKED },
+              layoutType: LayoutType.STACKED,
             },
             { request: "data" },
             {
@@ -710,11 +701,8 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.source.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.source.placeholder",
-                  layout: { columns: 12 },
-                  options: Object.values(LeadSource).map((source) => ({
-                    value: source,
-                    label: `app.api.v1.core.leads.enums.source.${String(source).toLowerCase()}`,
-                  })),
+                  columns: 12,
+                  options: LeadSourceOptions,
                 },
                 z.enum(LeadSource).optional(),
               ),
@@ -728,7 +716,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.currentCampaignStage.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.currentCampaignStage.placeholder",
-                  layout: { columns: 12 },
+                  columns: 12,
                   options: EmailCampaignStageOptions,
                 },
                 z.enum(EmailCampaignStage).optional(),
@@ -744,7 +732,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.patch.additionalDetails.title",
               description:
                 "app.api.v1.core.leads.lead.id.patch.additionalDetails.description",
-              layout: { type: LayoutType.STACKED },
+              layoutType: LayoutType.STACKED,
             },
             { request: "data" },
             {
@@ -757,9 +745,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.notes.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.notes.placeholder",
-                  layout: { columns: 12 },
-                  validation: { maxLength: 2000 },
-                },
+                  columns: 12},
                 z.string().optional(),
               ),
               metadata: requestDataField(
@@ -771,7 +757,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.metadata.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.metadata.placeholder",
-                  layout: { columns: 12 },
+                  columns: 12,
                 },
                 z
                   .record(z.string(), z.string().or(z.number()).or(z.boolean()))
@@ -787,7 +773,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.convertedUserId.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.convertedUserId.placeholder",
-                  layout: { columns: 12 },
+                  columns: 12,
                 },
                 z.uuid().nullable().optional(),
               ),
@@ -801,7 +787,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.consultationBookedAt.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.consultationBookedAt.placeholder",
-                  layout: { columns: 12 },
+                  columns: 12,
                 },
                 z.coerce.date().nullable().optional(),
               ),
@@ -815,7 +801,7 @@ const { PATCH } = createEndpoint({
                     "app.api.v1.core.leads.lead.id.patch.subscriptionConfirmedAt.description",
                   placeholder:
                     "app.api.v1.core.leads.lead.id.patch.subscriptionConfirmedAt.placeholder",
-                  layout: { columns: 12 },
+                  columns: 12,
                 },
                 z.coerce.date().nullable().optional(),
               ),
@@ -831,7 +817,7 @@ const { PATCH } = createEndpoint({
           title: "app.api.v1.core.leads.lead.id.patch.response.title",
           description:
             "app.api.v1.core.leads.lead.id.patch.response.description",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -843,7 +829,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.patch.response.basicInfo.title",
               description:
                 "app.api.v1.core.leads.lead.id.patch.response.basicInfo.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -896,7 +882,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.patch.response.contactDetails.title",
               description:
                 "app.api.v1.core.leads.lead.id.patch.response.contactDetails.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -942,7 +928,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.patch.response.campaignTracking.title",
               description:
                 "app.api.v1.core.leads.lead.id.patch.response.campaignTracking.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -994,7 +980,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.patch.response.engagement.title",
               description:
                 "app.api.v1.core.leads.lead.id.patch.response.engagement.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -1040,7 +1026,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.patch.response.conversion.title",
               description:
                 "app.api.v1.core.leads.lead.id.patch.response.conversion.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -1094,7 +1080,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.lead.id.patch.response.metadata.title",
               description:
                 "app.api.v1.core.leads.lead.id.patch.response.metadata.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {

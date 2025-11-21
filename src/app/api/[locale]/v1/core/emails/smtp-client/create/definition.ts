@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.emails.smtpClient.create.container.title",
       description:
         "app.api.v1.core.emails.smtpClient.create.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -56,7 +56,7 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.emails.smtpClient.create.container.title",
           description:
             "app.api.v1.core.emails.smtpClient.create.container.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { request: "data" },
         {
@@ -69,9 +69,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.create.name.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.create.name.placeholder",
-              layout: { columns: 12 },
-              validation: { required: true },
-            },
+              columns: 12},
             z.string().min(1),
           ),
 
@@ -85,7 +83,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.create.accountDescription.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.create.accountDescription.placeholder",
-              layout: { columns: 12 },
+              columns: 12,
             },
             z.string().optional(),
           ),
@@ -99,7 +97,7 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.emails.smtpClient.create.container.title",
           description:
             "app.api.v1.core.emails.smtpClient.create.container.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { request: "data" },
         {
@@ -112,9 +110,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.create.host.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.create.host.placeholder",
-              layout: { columns: 12 },
-              validation: { required: true },
-            },
+              columns: 12},
             z.string().min(1),
           ),
 
@@ -127,9 +123,8 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.create.port.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.create.port.placeholder",
-              layout: { columns: 6 },
-              validation: { required: true, min: 1, max: 65535 },
-            },
+              columns: 6
+},
             z.number().min(1).max(65535),
           ),
 
@@ -143,10 +138,8 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.create.securityType.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.create.securityType.placeholder",
-              layout: { columns: 6 },
-              options: SmtpSecurityTypeOptions,
-              validation: { required: true },
-            },
+              columns: 6,
+              options: SmtpSecurityTypeOptions},
             z.enum(SmtpSecurityType),
           ),
         },
@@ -159,7 +152,7 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.emails.smtpClient.create.container.title",
           description:
             "app.api.v1.core.emails.smtpClient.create.container.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { request: "data" },
         {
@@ -172,9 +165,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.create.username.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.create.username.placeholder",
-              layout: { columns: 6 },
-              validation: { required: true },
-            },
+              columns: 6},
             z.string().min(1),
           ),
 
@@ -187,9 +178,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.create.password.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.create.password.placeholder",
-              layout: { columns: 6 },
-              validation: { required: true },
-            },
+              columns: 6},
             z.string().min(1),
           ),
         },
@@ -201,7 +190,7 @@ const { POST } = createEndpoint({
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.emails.smtpClient.create.title",
           description: "app.api.v1.core.emails.smtpClient.create.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { request: "data" },
         {
@@ -214,9 +203,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.create.fromEmail.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.create.fromEmail.placeholder",
-              layout: { columns: 12 },
-              validation: { required: true },
-            },
+              columns: 12},
             z.email(),
           ),
         },
@@ -230,7 +217,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.smtpClient.create.response.account.title",
           description:
             "app.api.v1.core.emails.smtpClient.create.response.account.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {
@@ -242,7 +229,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.create.response.accountSummary.title",
               description:
                 "app.api.v1.core.emails.smtpClient.create.response.accountSummary.description",
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID, columns: 12,
             },
             { response: true },
             {
@@ -288,7 +275,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.create.response.connectionDetails.title",
               description:
                 "app.api.v1.core.emails.smtpClient.create.response.connectionDetails.description",
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID, columns: 12,
             },
             { response: true },
             {
@@ -349,7 +336,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.create.response.performanceMetrics.title",
               description:
                 "app.api.v1.core.emails.smtpClient.create.response.performanceMetrics.description",
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID, columns: 12,
             },
             { response: true },
             {

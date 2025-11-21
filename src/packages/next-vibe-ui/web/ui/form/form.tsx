@@ -91,10 +91,7 @@ export interface FormDatePickerProps {
 function Form<TRequest extends FieldValues>(
   props: FormProps<TRequest>,
 ): React.JSX.Element {
-  const handleSubmit = (e: {
-    preventDefault: () => void;
-    stopPropagation: () => void;
-  }): void => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     e.stopPropagation();
     void props.onSubmit?.();

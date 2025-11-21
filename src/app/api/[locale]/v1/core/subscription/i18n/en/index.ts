@@ -125,6 +125,8 @@ export const translations = {
     endsAt: "Ends At",
     createdAt: "Created At",
     updatedAt: "Updated At",
+    provider: "Payment Provider",
+    providerSubscriptionId: "Provider Subscription ID",
   },
 
   // Error types

@@ -76,6 +76,7 @@ export const translations = {
   },
 
   status: {
+    statusItem: "Status item",
     pending: "Oczekujący",
     running: "Uruchomiony",
     completed: "Ukończony",
@@ -86,6 +87,7 @@ export const translations = {
     success: "Narzędzie wykonane pomyślnie",
     result: "Wynik wykonania",
     status: "Aktualny status wykonania",
+    statusItem: "Status item",
     executionId: "ID wykonania do śledzenia",
   },
 

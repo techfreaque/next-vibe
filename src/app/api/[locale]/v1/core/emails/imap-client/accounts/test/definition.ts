@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.emails.imapClient.accounts.test.container.title",
       description:
         "app.api.v1.core.emails.imapClient.accounts.test.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -56,7 +56,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.test.accountId.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.accounts.test.accountId.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.uuid(),
       ),
@@ -94,7 +94,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.test.response.details.title",
           description:
             "app.api.v1.core.emails.imapClient.accounts.test.response.details.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {

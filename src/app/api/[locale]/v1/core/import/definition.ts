@@ -25,7 +25,6 @@ import { CountriesOptions, LanguagesOptions } from "@/i18n/core/config";
 
 import {
   CsvImportJobStatus,
-  CsvImportJobStatusDB,
   CsvImportJobStatusOptions,
 } from "../leads/import/enum";
 import { ImportDomain, ImportDomainOptions } from "./enum";
@@ -54,7 +53,7 @@ const { POST: ImportCsvPost } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.import.csv.post.form.title",
       description: "app.api.v1.core.import.csv.post.form.description",
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -65,7 +64,7 @@ const { POST: ImportCsvPost } = createEndpoint({
           title: "app.api.v1.core.import.csv.post.fileSection.title",
           description:
             "app.api.v1.core.import.csv.post.fileSection.description",
-          layout: { type: LayoutType.FULL_WIDTH },
+          layoutType: LayoutType.STACKED,
         },
         { request: "data" },
         {
@@ -76,9 +75,6 @@ const { POST: ImportCsvPost } = createEndpoint({
               label: "app.api.v1.core.import.csv.post.file.label",
               description: "app.api.v1.core.import.csv.post.file.description",
               placeholder: "app.api.v1.core.import.csv.post.file.placeholder",
-              validation: {
-                required: true,
-              },
             },
             z.string().min(1),
           ),
@@ -92,7 +88,6 @@ const { POST: ImportCsvPost } = createEndpoint({
                 "app.api.v1.core.import.csv.post.fileName.description",
               placeholder:
                 "app.api.v1.core.import.csv.post.fileName.placeholder",
-              validation: { required: true },
             },
             z.string().min(1),
           ),
@@ -105,7 +100,6 @@ const { POST: ImportCsvPost } = createEndpoint({
               description: "app.api.v1.core.import.csv.post.domain.description",
               placeholder: "app.api.v1.core.import.csv.post.domain.placeholder",
               options: ImportDomainOptions,
-              validation: { required: true },
             },
             z.enum(ImportDomain),
           ),
@@ -115,11 +109,12 @@ const { POST: ImportCsvPost } = createEndpoint({
       // === PROCESSING OPTIONS SECTION ===
       processingSection: objectField(
         {
-          type: WidgetType.SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.v1.core.import.csv.post.processingSection.title",
           description:
             "app.api.v1.core.import.csv.post.processingSection.description",
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
         { request: "data" },
         {
@@ -166,10 +161,6 @@ const { POST: ImportCsvPost } = createEndpoint({
                 "app.api.v1.core.import.csv.post.batchSize.description",
               placeholder:
                 "app.api.v1.core.import.csv.post.batchSize.placeholder",
-              validation: {
-                min: 10,
-                max: 1000,
-              },
             },
             z.number().min(10).max(1000).default(100),
           ),
@@ -179,13 +170,12 @@ const { POST: ImportCsvPost } = createEndpoint({
       // === DEFAULT VALUES SECTION ===
       defaultsSection: objectField(
         {
-          type: WidgetType.SECTION,
+          type: WidgetType.CONTAINER,
           title: "app.api.v1.core.import.csv.post.defaultsSection.title",
           description:
             "app.api.v1.core.import.csv.post.defaultsSection.description",
-          layout: { type: LayoutType.GRID, columns: 2 },
-          collapsible: true,
-          defaultExpanded: false,
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
         { request: "data" },
         {
@@ -225,7 +215,7 @@ const { POST: ImportCsvPost } = createEndpoint({
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.import.csv.post.response.title",
           description: "app.api.v1.core.import.csv.post.response.description",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -237,7 +227,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                 "app.api.v1.core.import.csv.post.response.basicResults.title",
               description:
                 "app.api.v1.core.import.csv.post.response.basicResults.description",
-              layout: { type: LayoutType.STACKED },
+              layoutType: LayoutType.STACKED,
             },
             { response: true },
             {
@@ -284,7 +274,8 @@ const { POST: ImportCsvPost } = createEndpoint({
                 "app.api.v1.core.import.csv.post.response.statistics.title",
               description:
                 "app.api.v1.core.import.csv.post.response.statistics.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID,
+              columns: 2,
             },
             { response: true },
             {
@@ -330,7 +321,8 @@ const { POST: ImportCsvPost } = createEndpoint({
               title: "app.api.v1.core.import.csv.post.response.summary.title",
               description:
                 "app.api.v1.core.import.csv.post.response.summary.description",
-              layout: { type: LayoutType.GRID, columns: 3 },
+              layoutType: LayoutType.GRID,
+              columns: 3,
             },
             { response: true },
             {
@@ -370,7 +362,8 @@ const { POST: ImportCsvPost } = createEndpoint({
             objectField(
               {
                 type: WidgetType.CONTAINER,
-                layout: { type: LayoutType.STACKED },
+                title: "app.api.v1.core.import.csv.post.response.errors.title",
+                layoutType: LayoutType.STACKED,
               },
               { response: true },
               {
@@ -404,9 +397,13 @@ const { POST: ImportCsvPost } = createEndpoint({
 
           // === NEXT STEPS ===
           nextSteps: responseArrayField(
-            {},
+            {
+              type: WidgetType.DATA_LIST,
+              title: "app.api.v1.core.import.csv.post.response.nextSteps.title",
+            },
             responseField(
               {
+                type: WidgetType.TEXT,
                 content:
                   "app.api.v1.core.import.csv.post.response.nextSteps.item.label",
               },
@@ -549,7 +546,8 @@ const { GET: ListImportJobsGet } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.import.jobs.get.form.title",
       description: "app.api.v1.core.import.jobs.get.form.description",
-      layout: { type: LayoutType.GRID, columns: 2 },
+      layoutType: LayoutType.GRID,
+      columns: 2,
     },
     { request: "data", response: true },
     {
@@ -561,12 +559,9 @@ const { GET: ListImportJobsGet } = createEndpoint({
           label: "app.api.v1.core.import.jobs.get.status.label",
           description: "app.api.v1.core.import.jobs.get.status.description",
           placeholder: "app.api.v1.core.import.jobs.get.status.placeholder",
-          options: [
-            { label: "All Statuses", value: "all" },
-            ...CsvImportJobStatusOptions,
-          ],
+          options: CsvImportJobStatusOptions,
         },
-        z.union([z.enum(CsvImportJobStatusDB), z.literal("all")]).optional(),
+        z.enum(CsvImportJobStatus).optional(),
       ),
 
       limit: requestDataField(
@@ -576,10 +571,6 @@ const { GET: ListImportJobsGet } = createEndpoint({
           label: "app.api.v1.core.import.jobs.get.limit.label",
           description: "app.api.v1.core.import.jobs.get.limit.description",
           placeholder: "app.api.v1.core.import.jobs.get.limit.placeholder",
-          validation: {
-            min: 1,
-            max: 100,
-          },
         },
         z.number().min(1).max(100).default(20),
       ),
@@ -591,80 +582,210 @@ const { GET: ListImportJobsGet } = createEndpoint({
           label: "app.api.v1.core.import.jobs.get.offset.label",
           description: "app.api.v1.core.import.jobs.get.offset.description",
           placeholder: "app.api.v1.core.import.jobs.get.offset.placeholder",
-          validation: {
-            min: 0,
-          },
         },
         z.number().min(0).default(0),
       ),
 
       // === RESPONSE DATA ===
       jobs: responseArrayField(
-        {},
-        z.object({
-          id: z.uuid().describe("Unique job identifier"),
-          fileName: z.string().describe("Original CSV file name"),
-          domain: z.string().describe("Import domain (leads, contacts, etc.)"),
-          status: z
-            .nativeEnum(CsvImportJobStatus)
-            .describe("Current job status"),
+        {
+          type: WidgetType.DATA_TABLE,
+          title: "app.api.v1.core.import.jobs.get.response.jobs.title",
+        },
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            title: "app.api.v1.core.import.jobs.get.response.job.title",
+            layoutType: LayoutType.STACKED,
+          },
+          { response: true },
+          {
+            id: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.import.jobs.get.response.job.id.label",
+              },
+              z.uuid(),
+            ),
+            fileName: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.import.jobs.get.response.job.fileName.label",
+              },
+              z.string(),
+            ),
+            domain: responseField(
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.import.jobs.get.response.job.domain.label",
+              },
+              z.string(),
+            ),
+            status: responseField(
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.import.jobs.get.response.job.status.label",
+              },
+              z.enum(CsvImportJobStatus),
+            ),
 
-          // === PROGRESS INFORMATION ===
-          progress: z
-            .object({
-              totalRows: z.number().describe("Total number of rows to process"),
-              processedRows: z
-                .number()
-                .describe("Number of rows already processed"),
-              currentBatchStart: z
-                .number()
-                .describe("Starting position of current batch"),
-              batchSize: z.number().describe("Number of rows per batch"),
-              percentComplete: z
-                .number()
-                .describe("Completion percentage (0-100)"),
-            })
-            .describe("Job progress information"),
+            // === PROGRESS INFORMATION ===
+            progress: objectField(
+              {
+                type: WidgetType.CONTAINER,
+                title: "app.api.v1.core.import.jobs.get.response.job.progress.title",
+                layoutType: LayoutType.GRID,
+              columns: 2,
+              },
+              { response: true },
+              {
+                totalRows: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.progress.totalRows.label",
+                  },
+                  z.number(),
+                ),
+                processedRows: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.progress.processedRows.label",
+                  },
+                  z.number(),
+                ),
+                currentBatchStart: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.progress.currentBatchStart.label",
+                  },
+                  z.number(),
+                ),
+                batchSize: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.progress.batchSize.label",
+                  },
+                  z.number(),
+                ),
+                percentComplete: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.progress.percentComplete.label",
+                  },
+                  z.number(),
+                ),
+              },
+            ),
 
-          // === RESULTS ===
-          results: z
-            .object({
-              successfulImports: z
-                .number()
-                .describe("Successfully imported records"),
-              failedImports: z.number().describe("Failed import attempts"),
-              duplicateEmails: z.number().describe("Duplicate emails found"),
-            })
-            .describe("Import results summary"),
+            // === RESULTS ===
+            results: objectField(
+              {
+                type: WidgetType.CONTAINER,
+                title: "app.api.v1.core.import.jobs.get.response.job.results.title",
+                layoutType: LayoutType.GRID,
+              columns: 3,
+              },
+              { response: true },
+              {
+                successfulImports: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.results.successfulImports.label",
+                  },
+                  z.number(),
+                ),
+                failedImports: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.results.failedImports.label",
+                  },
+                  z.number(),
+                ),
+                duplicateEmails: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.results.duplicateEmails.label",
+                  },
+                  z.number(),
+                ),
+              },
+            ),
 
-          // === TIMING INFORMATION ===
-          timing: z
-            .object({
-              createdAt: z.string().describe("When the job was created"),
-              updatedAt: z.string().describe("When the job was last updated"),
-              startedAt: z
-                .string()
-                .nullable()
-                .describe("When processing started"),
-              completedAt: z
-                .string()
-                .nullable()
-                .describe("When processing completed"),
-            })
-            .describe("Job timing information"),
+            // === TIMING INFORMATION ===
+            timing: objectField(
+              {
+                type: WidgetType.CONTAINER,
+                title: "app.api.v1.core.import.jobs.get.response.job.timing.title",
+                layoutType: LayoutType.GRID,
+              columns: 2,
+              },
+              { response: true },
+              {
+                createdAt: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.timing.createdAt.label",
+                  },
+                  z.string(),
+                ),
+                updatedAt: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.timing.updatedAt.label",
+                  },
+                  z.string(),
+                ),
+                startedAt: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.timing.startedAt.label",
+                  },
+                  z.string().nullable(),
+                ),
+                completedAt: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.timing.completedAt.label",
+                  },
+                  z.string().nullable(),
+                ),
+              },
+            ),
 
-          // === ERROR HANDLING ===
-          errorInfo: z
-            .object({
-              error: z
-                .string()
-                .nullable()
-                .describe("Last error message if any"),
-              retryCount: z.number().describe("Number of retry attempts"),
-              maxRetries: z.number().describe("Maximum allowed retries"),
-            })
-            .describe("Error and retry information"),
-        }),
+            // === ERROR HANDLING ===
+            errorInfo: objectField(
+              {
+                type: WidgetType.CONTAINER,
+                title: "app.api.v1.core.import.jobs.get.response.job.errorInfo.title",
+                layoutType: LayoutType.STACKED,
+              },
+              { response: true },
+              {
+                error: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.errorInfo.error.label",
+                  },
+                  z.string().nullable(),
+                ),
+                retryCount: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.errorInfo.retryCount.label",
+                  },
+                  z.number(),
+                ),
+                maxRetries: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.import.jobs.get.response.job.errorInfo.maxRetries.label",
+                  },
+                  z.number(),
+                ),
+              },
+            ),
+          },
+        ),
       ),
     },
   ),

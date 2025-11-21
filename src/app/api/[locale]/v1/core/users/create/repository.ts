@@ -91,7 +91,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
         await db.insert(userRoles).values(
           data.adminSettings.roles.map((role) => ({
             userId: createdUser.id,
-            role,
+            role: role as (typeof userRoles.$inferInsert)["role"],
             assignedBy: user.id,
           })),
         );

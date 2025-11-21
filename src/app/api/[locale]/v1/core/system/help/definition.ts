@@ -29,7 +29,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.help.post.description",
   category: "app.api.v1.core.system.help.category",
   tags: ["app.api.v1.core.system.help.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
   aliases: ["help", "h"],
   cli: {
     firstCliArgKey: "command",
@@ -38,7 +38,7 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.help.fields.command.label",
           description: "app.api.v1.core.system.help.fields.command.description",
           placeholder: "app.api.v1.core.system.help.fields.command.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().optional(),
       ),
@@ -60,21 +60,23 @@ const { POST } = createEndpoint({
       header: objectField(
         {
           type: WidgetType.SECTION,
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
           title: responseField(
             {
               type: WidgetType.TITLE,
-              fieldType: FieldDataType.TEXT,
+              content:
+                "app.api.v1.core.system.help.fields.header.title" as const,
             },
             z.string(),
           ),
           description: responseField(
             {
               type: WidgetType.TEXT,
-              fieldType: FieldDataType.TEXT,
+              content:
+                "app.api.v1.core.system.help.fields.header.description" as const,
             },
             z.string().optional(),
           ),
@@ -86,7 +88,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.SECTION,
           title: "app.api.v1.core.system.help.fields.usage.title",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -97,7 +99,8 @@ const { POST } = createEndpoint({
             responseField(
               {
                 type: WidgetType.TEXT,
-                fieldType: FieldDataType.TEXT,
+                content:
+                  "app.api.v1.core.system.help.fields.usage.patterns.item" as const,
               },
               z.string(),
             ),
@@ -110,7 +113,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.SECTION,
           title: "app.api.v1.core.system.help.fields.options.title",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -121,21 +124,23 @@ const { POST } = createEndpoint({
             objectField(
               {
                 type: WidgetType.CONTAINER,
-                layout: { type: LayoutType.HORIZONTAL },
+                layoutType: LayoutType.HORIZONTAL,
               },
               { response: true },
               {
                 flag: responseField(
                   {
                     type: WidgetType.TEXT,
-                    fieldType: FieldDataType.TEXT,
+                    content:
+                      "app.api.v1.core.system.help.fields.options.flag" as const,
                   },
                   z.string(),
                 ),
                 description: responseField(
                   {
                     type: WidgetType.TEXT,
-                    fieldType: FieldDataType.TEXT,
+                    content:
+                      "app.api.v1.core.system.help.fields.options.description" as const,
                   },
                   z.string(),
                 ),
@@ -150,7 +155,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.SECTION,
           title: "app.api.v1.core.system.help.fields.examples.title",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -161,21 +166,23 @@ const { POST } = createEndpoint({
             objectField(
               {
                 type: WidgetType.CONTAINER,
-                layout: { type: LayoutType.HORIZONTAL },
+                layoutType: LayoutType.HORIZONTAL,
               },
               { response: true },
               {
                 command: responseField(
                   {
                     type: WidgetType.TEXT,
-                    fieldType: FieldDataType.TEXT,
+                    content:
+                      "app.api.v1.core.system.help.fields.examples.command" as const,
                   },
                   z.string(),
                 ),
                 description: responseField(
                   {
                     type: WidgetType.TEXT,
-                    fieldType: FieldDataType.TEXT,
+                    content:
+                      "app.api.v1.core.system.help.fields.examples.description" as const,
                   },
                   z.string().optional(),
                 ),
@@ -190,7 +197,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.SECTION,
           title: "app.api.v1.core.system.help.fields.commonCommands.title",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -201,21 +208,23 @@ const { POST } = createEndpoint({
             objectField(
               {
                 type: WidgetType.CONTAINER,
-                layout: { type: LayoutType.HORIZONTAL },
+                layoutType: LayoutType.HORIZONTAL,
               },
               { response: true },
               {
                 command: responseField(
                   {
                     type: WidgetType.TEXT,
-                    fieldType: FieldDataType.TEXT,
+                    content:
+                      "app.api.v1.core.system.help.fields.examples.command" as const,
                   },
                   z.string(),
                 ),
                 description: responseField(
                   {
                     type: WidgetType.TEXT,
-                    fieldType: FieldDataType.TEXT,
+                    content:
+                      "app.api.v1.core.system.help.fields.options.description" as const,
                   },
                   z.string(),
                 ),
@@ -230,43 +239,46 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.SECTION,
           title: "app.api.v1.core.system.help.fields.details.title",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
         },
         { response: true },
         {
           category: responseField(
             {
               type: WidgetType.TEXT,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.v1.core.system.help.fields.details.category",
-              layout: { columns: 6 },
+              content:
+                "app.api.v1.core.system.help.fields.details.category.content" as const,
+              label:
+                "app.api.v1.core.system.help.fields.details.category.content",
             },
             z.string().optional(),
           ),
           path: responseField(
             {
               type: WidgetType.TEXT,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.v1.core.system.help.fields.details.path",
-              layout: { columns: 6 },
+              content:
+                "app.api.v1.core.system.help.fields.details.path.content" as const,
+              label: "app.api.v1.core.system.help.fields.details.path.content",
             },
             z.string().optional(),
           ),
           method: responseField(
             {
               type: WidgetType.TEXT,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.v1.core.system.help.fields.details.method",
-              layout: { columns: 6 },
+              content:
+                "app.api.v1.core.system.help.fields.details.method.content" as const,
+              label:
+                "app.api.v1.core.system.help.fields.details.method.content",
             },
             z.string().optional(),
           ),
           aliases: responseField(
             {
               type: WidgetType.TEXT,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.v1.core.system.help.fields.details.aliases",
-              layout: { columns: 6 },
+              content:
+                "app.api.v1.core.system.help.fields.details.aliases.content" as const,
+              label:
+                "app.api.v1.core.system.help.fields.details.aliases.content",
             },
             z.string().optional(),
           ),

@@ -66,7 +66,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.agent.speechToText.hotkey.post.form.title" as const,
       description:
         "app.api.v1.core.agent.speechToText.hotkey.post.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -79,10 +79,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.speechToText.hotkey.post.action.label" as const,
           description:
             "app.api.v1.core.agent.speechToText.hotkey.post.action.description" as const,
-          layout: { columns: 12 },
-          options: HotkeyActionOptions,
-          validation: { required: false },
-        },
+          columns: 12,
+          options: HotkeyActionOptions},
         z.enum(HotkeyAction).optional(),
       ),
 
@@ -94,7 +92,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.speechToText.hotkey.post.provider.label" as const,
           description:
             "app.api.v1.core.agent.speechToText.hotkey.post.provider.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: SttProviderOptions,
         },
         z.enum(SttProvider).default(SttProvider.OPENAI),
@@ -108,7 +106,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.speechToText.hotkey.post.language.label" as const,
           description:
             "app.api.v1.core.agent.speechToText.hotkey.post.language.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: SttLanguageOptions,
         },
         z.enum(SttLanguage).default(SttLanguage.EN),
@@ -122,7 +120,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.speechToText.hotkey.post.insertPrefix.label" as const,
           description:
             "app.api.v1.core.agent.speechToText.hotkey.post.insertPrefix.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           placeholder:
             "app.api.v1.core.agent.speechToText.hotkey.post.insertPrefix.placeholder" as const,
         },
@@ -137,7 +135,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.speechToText.hotkey.post.insertSuffix.label" as const,
           description:
             "app.api.v1.core.agent.speechToText.hotkey.post.insertSuffix.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
           placeholder:
             "app.api.v1.core.agent.speechToText.hotkey.post.insertSuffix.placeholder" as const,
         },
@@ -152,7 +150,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.speechToText.hotkey.post.response.title" as const,
           description:
             "app.api.v1.core.agent.speechToText.hotkey.post.response.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {

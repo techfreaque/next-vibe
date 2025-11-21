@@ -12,6 +12,7 @@ import {
   requestResponseField,
   requestUrlPathParamsField,
   responseField,
+  responseArrayField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 // // leadId schema not needed - using z.uuid() directly // TODO: Remove if not needed
 import {
@@ -41,7 +42,7 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.users.user.id.id.get.container.title" as const,
       description:
         "app.api.v1.core.users.user.id.id.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {
@@ -55,7 +56,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.user.id.id.get.id.description" as const,
           placeholder:
             "app.api.v1.core.users.user.id.id.get.id.placeholder" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().uuid("usersErrors.validation.id.invalid"),
       ),
@@ -68,7 +69,8 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.user.id.id.get.response.userProfile.title" as const,
           description:
             "app.api.v1.core.users.user.id.id.get.response.userProfile.description" as const,
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
         { response: true },
         {
@@ -79,7 +81,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.users.user.id.id.get.response.userProfile.basicInfo.title" as const,
               description:
                 "app.api.v1.core.users.user.id.id.get.response.userProfile.basicInfo.description" as const,
-              layout: { type: LayoutType.VERTICAL },
+              layoutType: LayoutType.VERTICAL,
             },
             { response: true },
             {
@@ -128,7 +130,8 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.user.id.id.get.response.accountStatus.title" as const,
           description:
             "app.api.v1.core.users.user.id.id.get.response.accountStatus.description" as const,
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
         { response: true },
         {
@@ -154,19 +157,33 @@ const { GET } = createEndpoint({
             },
             z.string().nullable().describe("Stripe customer ID"),
           ),
-          userRoles: responseField(
+          userRoles: responseArrayField(
             {
-              type: WidgetType.BADGE,
-              text: "app.api.v1.core.users.user.id.id.get.response.accountStatus.userRoles.content" as const,
+              type: WidgetType.DATA_LIST,
             },
-            z
-              .array(
-                z.object({
-                  id: z.uuid().describe("Role ID"),
-                  role: z.string().describe("Role name"),
-                }),
-              )
-              .describe("User roles"),
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+                layoutType: LayoutType.HORIZONTAL,
+              },
+              { response: true },
+              {
+                id: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.users.user.id.id.get.response.accountStatus.userRoles.content" as const,
+                  },
+                  z.uuid().describe("Role ID"),
+                ),
+                role: responseField(
+                  {
+                    type: WidgetType.BADGE,
+                    text: "app.api.v1.core.users.user.id.id.get.response.accountStatus.userRoles.content" as const,
+                  },
+                  z.string().describe("Role name"),
+                ),
+              },
+            ),
           ),
         },
       ),
@@ -179,7 +196,8 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.user.id.id.get.response.timestamps.title" as const,
           description:
             "app.api.v1.core.users.user.id.id.get.response.timestamps.description" as const,
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
         { response: true },
         {
@@ -256,16 +274,32 @@ const { GET } = createEndpoint({
         },
         z.string().nullable(),
       ),
-      userRoles: responseField(
+      userRoles: responseArrayField(
         {
-          type: WidgetType.BADGE,
-          text: "app.api.v1.core.users.user.id.id.get.response.userRoles.content" as const,
+          type: WidgetType.DATA_LIST,
         },
-        z.array(
-          z.object({
-            id: z.uuid(),
-            role: z.string(),
-          }),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.HORIZONTAL,
+          },
+          { response: true },
+          {
+            id: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.users.user.id.id.get.response.userRoles.content" as const,
+              },
+              z.uuid(),
+            ),
+            role: responseField(
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.users.user.id.id.get.response.userRoles.content" as const,
+              },
+              z.string(),
+            ),
+          },
         ),
       ),
       createdAt: responseField(
@@ -419,7 +453,7 @@ const { PUT } = createEndpoint({
       title: "app.api.v1.core.users.user.id.id.put.container.title" as const,
       description:
         "app.api.v1.core.users.user.id.id.put.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -433,7 +467,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.users.user.id.id.put.id.description" as const,
           placeholder:
             "app.api.v1.core.users.user.id.id.put.id.placeholder" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().uuid("usersErrors.validation.id.invalid"),
         undefined,
@@ -448,7 +482,8 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.users.user.id.id.put.sections.basicInfo.title" as const,
           description:
             "app.api.v1.core.users.user.id.id.put.sections.basicInfo.description" as const,
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
         { request: "data" },
         {
@@ -462,7 +497,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.users.user.id.id.put.email.description" as const,
               placeholder:
                 "app.api.v1.core.users.user.id.id.put.email.placeholder" as const,
-              layout: { columns: 12 },
+              columns: 12,
             },
             z
               .string()
@@ -478,7 +513,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.users.user.id.id.put.privateName.label" as const,
               description:
                 "app.api.v1.core.users.user.id.id.put.privateName.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z
               .string()
@@ -495,7 +530,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.users.user.id.id.put.publicName.label" as const,
               description:
                 "app.api.v1.core.users.user.id.id.put.publicName.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z
               .string()
@@ -515,7 +550,8 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.users.user.id.id.put.sections.adminSettings.title" as const,
           description:
             "app.api.v1.core.users.user.id.id.put.sections.adminSettings.description" as const,
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
         { request: "data" },
         {
@@ -527,7 +563,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.users.user.id.id.put.emailVerified.label" as const,
               description:
                 "app.api.v1.core.users.user.id.id.put.emailVerified.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.boolean().optional(),
           ),
@@ -539,7 +575,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.users.user.id.id.put.isActive.label" as const,
               description:
                 "app.api.v1.core.users.user.id.id.put.isActive.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.boolean().optional(),
           ),
@@ -551,7 +587,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.users.user.id.id.put.leadId.label" as const,
               description:
                 "app.api.v1.core.users.user.id.id.put.leadId.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.uuid().nullable().optional(),
           ),
@@ -613,16 +649,32 @@ const { PUT } = createEndpoint({
         },
         z.string().nullable(),
       ),
-      userRoles: responseField(
+      userRoles: responseArrayField(
         {
-          type: WidgetType.BADGE,
-          text: "app.api.v1.core.users.user.id.id.put.response.userRoles.content" as const,
+          type: WidgetType.DATA_LIST,
         },
-        z.array(
-          z.object({
-            id: z.uuid(),
-            role: z.string(),
-          }),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.HORIZONTAL,
+          },
+          { response: true },
+          {
+            id: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.users.user.id.id.put.response.userRoles.content" as const,
+              },
+              z.uuid(),
+            ),
+            role: responseField(
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.users.user.id.id.put.response.userRoles.content" as const,
+              },
+              z.string(),
+            ),
+          },
         ),
       ),
       createdAt: responseField(
@@ -763,7 +815,7 @@ const { DELETE } = createEndpoint({
       title: "app.api.v1.core.users.user.id.id.delete.container.title" as const,
       description:
         "app.api.v1.core.users.user.id.id.delete.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {
@@ -779,7 +831,7 @@ const { DELETE } = createEndpoint({
             "app.api.v1.core.users.user.id.id.delete.id.placeholder" as const,
           helpText:
             "app.api.v1.core.users.user.id.id.delete.id.helpText" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().uuid("usersErrors.validation.id.invalid"),
       ),

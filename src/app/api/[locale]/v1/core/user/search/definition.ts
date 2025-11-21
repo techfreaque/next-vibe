@@ -40,7 +40,8 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.user.search.container.title" as const,
       description: "app.api.v1.core.user.search.container.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -52,7 +53,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.user.search.groups.searchCriteria.title" as const,
           description:
             "app.api.v1.core.user.search.groups.searchCriteria.description" as const,
-          layout: { type: LayoutType.VERTICAL, columns: 12 },
+          layoutType: LayoutType.VERTICAL,
         },
         { request: "data" },
         {
@@ -65,7 +66,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.user.search.fields.search.description" as const,
               placeholder:
                 "app.api.v1.core.user.search.fields.search.placeholder" as const,
-              layout: { columns: 12 },
+              columns: 12,
               helpText:
                 "app.api.v1.core.user.search.fields.search.help" as const,
             },
@@ -87,7 +88,7 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.user.search.groups.filters.title" as const,
           description:
             "app.api.v1.core.user.search.groups.filters.description" as const,
-          layout: { type: LayoutType.VERTICAL, columns: 12 },
+          layoutType: LayoutType.VERTICAL,
         },
         { request: "data" },
         {
@@ -101,7 +102,7 @@ const { GET } = createEndpoint({
               placeholder:
                 "app.api.v1.core.user.search.fields.roles.placeholder" as const,
               options: UserRoleOptions,
-              layout: { columns: 12 },
+              columns: 12,
               helpText:
                 "app.api.v1.core.user.search.fields.roles.help" as const,
             },
@@ -118,7 +119,7 @@ const { GET } = createEndpoint({
               placeholder:
                 "app.api.v1.core.user.search.fields.status.placeholder" as const,
               options: UserSearchStatusOptions,
-              layout: { columns: 12 },
+              columns: 12,
               helpText:
                 "app.api.v1.core.user.search.fields.status.help" as const,
             },
@@ -134,7 +135,7 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.user.search.groups.pagination.title" as const,
           description:
             "app.api.v1.core.user.search.groups.pagination.description" as const,
-          layout: { type: LayoutType.VERTICAL, columns: 12 },
+          layoutType: LayoutType.VERTICAL,
         },
         { request: "data" },
         {
@@ -145,7 +146,7 @@ const { GET } = createEndpoint({
               label: "app.api.v1.core.user.search.fields.limit.label" as const,
               description:
                 "app.api.v1.core.user.search.fields.limit.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
               helpText:
                 "app.api.v1.core.user.search.fields.limit.help" as const,
             },
@@ -159,7 +160,7 @@ const { GET } = createEndpoint({
               label: "app.api.v1.core.user.search.fields.offset.label" as const,
               description:
                 "app.api.v1.core.user.search.fields.offset.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
               helpText:
                 "app.api.v1.core.user.search.fields.offset.help" as const,
             },
@@ -175,7 +176,7 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.user.search.response.title" as const,
           description:
             "app.api.v1.core.user.search.response.description" as const,
-          layout: { type: LayoutType.VERTICAL, columns: 12 },
+          layoutType: LayoutType.VERTICAL,
         },
         { response: true },
         {
@@ -201,7 +202,8 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.user.search.response.searchInfo.title" as const,
               description:
                 "app.api.v1.core.user.search.response.searchInfo.description" as const,
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID,
+              columns: 12,
             },
             { response: true },
             {
@@ -247,35 +249,28 @@ const { GET } = createEndpoint({
                   key: "privateName",
                   label:
                     "app.api.v1.core.user.search.columns.privateName" as const,
-                  type: FieldDataType.TEXT,
                 },
                 {
                   key: "publicName",
                   label:
                     "app.api.v1.core.user.search.columns.publicName" as const,
-                  type: FieldDataType.TEXT,
                 },
                 {
                   key: "email",
                   label: "app.api.v1.core.user.search.columns.email" as const,
-                  type: FieldDataType.TEXT,
                 },
                 {
                   key: "userRoles",
                   label:
                     "app.api.v1.core.user.search.columns.userRoles" as const,
-                  type: FieldDataType.TEXT,
                 },
               ],
             },
             objectField(
               {
                 type: WidgetType.CONTAINER,
-                title:
-                  "app.api.v1.core.user.search.response.users.item.title" as const,
-                description:
-                  "app.api.v1.core.user.search.response.users.item.description" as const,
-                layout: { type: LayoutType.GRID, columns: 12 },
+                layoutType: LayoutType.GRID,
+                columns: 12,
               },
               { response: true },
               {
@@ -358,16 +353,11 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.GROUPED_LIST,
                     groupBy: "role",
-                    layout: { type: LayoutType.VERTICAL },
                   },
                   objectField(
                     {
                       type: WidgetType.CONTAINER,
-                      title:
-                        "app.api.v1.core.user.search.response.users.userRoles.item.title" as const,
-                      description:
-                        "app.api.v1.core.user.search.response.users.userRoles.item.description" as const,
-                      layout: { type: LayoutType.HORIZONTAL },
+                      layoutType: LayoutType.HORIZONTAL,
                     },
                     { response: true },
                     {
@@ -415,7 +405,8 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.user.search.response.pagination.title" as const,
               description:
                 "app.api.v1.core.user.search.response.pagination.description" as const,
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID,
+              columns: 12,
             },
             { response: true },
             {
@@ -466,26 +457,6 @@ const { GET } = createEndpoint({
                 z.boolean().describe("Whether there are previous pages"),
               ),
             },
-          ),
-          actions: responseField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.v1.core.user.search.response.actions.title" as const,
-              description:
-                "app.api.v1.core.user.search.response.actions.description" as const,
-              layout: { type: LayoutType.GRID, columns: 12 },
-            },
-            z
-              .array(
-                z.object({
-                  action: z.string().describe("Action identifier"),
-                  label: z.string().describe("Human-readable action label"),
-                  description: z.string().describe("Action description"),
-                }),
-              )
-              .optional()
-              .describe("Available actions for the search results"),
           ),
         },
       ),
@@ -645,13 +616,6 @@ const { GET } = createEndpoint({
             hasMore: false,
             hasPrevious: false,
           },
-          actions: [
-            {
-              action: "view-details",
-              label: "View Details",
-              description: "View full user profile",
-            },
-          ],
         },
       },
       withPagination: {

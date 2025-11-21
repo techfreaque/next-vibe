@@ -20,6 +20,34 @@ export const translations: typeof enTranslations = {
     warning: "Ostrzeżenie",
     info: "Informacja",
   },
+  fields: {
+    operation: {
+      label: "Operacja",
+      description: "Wybierz operację walidacji",
+      placeholder: "Wybierz operację",
+    },
+    filePath: {
+      label: "Ścieżka pliku",
+      description: "Konkretna ścieżka pliku trasy do walidacji",
+      placeholder: "Wprowadź ścieżkę pliku",
+    },
+    options: {
+      label: "Opcje",
+      description: "Opcje walidacji",
+      placeholder: "Wprowadź opcje",
+    },
+  },
+  response: {
+    operation: {
+      label: "Operacja",
+    },
+    success: {
+      label: "Sukces",
+    },
+    result: {
+      label: "Wynik",
+    },
+  },
   success: {
     title: "Walidacja TRPC zakończona sukcesem",
     description: "Walidacja TRPC zakończona pomyślnie",

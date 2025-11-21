@@ -27,7 +27,7 @@ You are a Non-Standard File Migration Specialist for a Next.js application with 
 
 ## Documentation Reference
 
-**PRIMARY REFERENCE:** `/docs/development/file-migration-patterns.md`
+**PRIMARY REFERENCE:** `/docs/patterns/file-migration.md`
 
 Read this documentation for:
 

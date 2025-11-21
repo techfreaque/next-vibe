@@ -81,6 +81,14 @@ export const translations = {
       label: "ID leada",
       description: "Powiązany identyfikator leada",
     },
+    country: {
+      label: "Kraj",
+      description: "Kraj zamieszkania użytkownika",
+    },
+    language: {
+      label: "Język",
+      description: "Preferowany język użytkownika",
+    },
     response: {
       title: "Użytkownik utworzony",
       description: "Szczegóły nowo utworzonego użytkownika",
@@ -90,6 +98,14 @@ export const translations = {
       leadId: {
         content: "Powiązane ID leada",
       },
+    country: {
+      label: "Kraj",
+      description: "Kraj zamieszkania użytkownika",
+    },
+    language: {
+      label: "Język",
+      description: "Preferowany język użytkownika",
+    },
       email: {
         content: "Adres e-mail",
       },

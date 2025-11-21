@@ -91,10 +91,25 @@ export const translations: typeof enTranslations = {
             content: "Erstellt am",
           },
           updatedAt: {
-            content: "Aktualisiert am",
-          },
+          content: "Aktualisiert am",
+        },
+        canEdit: {
+          content: "Kann bearbeiten",
+        },
+        canPost: {
+          content: "Kann posten",
+        },
+        canModerate: {
+          content: "Kann moderieren",
+        },
+        canDelete: {
+          content: "Kann löschen",
+        },
+        canManagePermissions: {
+          content: "Kann Berechtigungen verwalten",
         },
       },
+    },
       totalCount: {
         content: "Gesamtanzahl",
       },
@@ -216,6 +231,21 @@ export const translations: typeof enTranslations = {
         },
         updatedAt: {
           content: "Aktualisiert am",
+        },
+        canEdit: {
+          content: "Kann bearbeiten",
+        },
+        canPost: {
+          content: "Kann posten",
+        },
+        canModerate: {
+          content: "Kann moderieren",
+        },
+        canDelete: {
+          content: "Kann löschen",
+        },
+        canManagePermissions: {
+          content: "Kann Berechtigungen verwalten",
         },
       },
     },

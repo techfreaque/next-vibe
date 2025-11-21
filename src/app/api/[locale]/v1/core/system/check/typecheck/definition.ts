@@ -48,7 +48,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.system.check.typecheck.container.title",
       description:
         "app.api.v1.core.system.check.typecheck.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -62,7 +62,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.typecheck.fields.path.description",
           placeholder:
             "app.api.v1.core.system.check.typecheck.fields.path.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -75,7 +75,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.typecheck.fields.disableFilter.label",
           description:
             "app.api.v1.core.system.check.typecheck.fields.disableFilter.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().default(false),
       ),
@@ -96,10 +96,8 @@ const { POST } = createEndpoint({
           groupBy: "file",
           sortBy: "severity",
           showSummary: true,
-          layout: {
-            type: LayoutType.GRID,
-            columns: 1,
-          },
+          layoutType: LayoutType.GRID,
+          columns: 1,
         },
         objectField(
           {
@@ -108,7 +106,7 @@ const { POST } = createEndpoint({
               "app.api.v1.core.system.check.typecheck.response.issue.title",
             description:
               "app.api.v1.core.system.check.typecheck.response.issue.description",
-            layout: { type: LayoutType.GRID, columns: 12 },
+            layoutType: LayoutType.GRID, columns: 12,
           },
           { response: true },
           {
@@ -147,7 +145,7 @@ const { POST } = createEndpoint({
             severity: responseField(
               {
                 type: WidgetType.BADGE,
-                variant: ComponentVariant.SEVERITY,
+                variant: ComponentVariant.WARNING,
                 text: "app.api.v1.core.system.check.typecheck.response.issue.severity",
               },
               z.enum(["error", "warning", "info"]),
@@ -163,7 +161,7 @@ const { POST } = createEndpoint({
             type: responseField(
               {
                 type: WidgetType.BADGE,
-                variant: ComponentVariant.TYPE,
+                variant: ComponentVariant.DEFAULT,
                 text: "app.api.v1.core.system.check.typecheck.response.issue.type",
               },
               z.literal("type"),

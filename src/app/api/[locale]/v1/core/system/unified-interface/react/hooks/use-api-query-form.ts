@@ -13,9 +13,9 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import type { FieldUsage } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type {
   ExtractOutput,
-  FieldUsage,
   InferSchemaFromField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
@@ -293,7 +293,7 @@ export function useApiQueryForm<
     const persistDebounceMs = 500; // 500ms debounce for persistence
 
     const subscription = formMethods.watch((formValues) => {
-      if (Object.keys(formValues).length) {
+      if (formValues && Object.keys(formValues).length) {
         // Clear any existing timer
         if (persistDebounceTimer !== null) {
           window.clearTimeout(persistDebounceTimer);
@@ -438,14 +438,7 @@ export function useApiQueryForm<
 
             if (formData) {
               lastSubmitTime = Date.now();
-              setQueryParams(
-                formData as ExtractOutput<
-                  InferSchemaFromField<
-                    TEndpoint["fields"],
-                    FieldUsage.RequestData
-                  >
-                >,
-              );
+              setQueryParams(formData);
             }
           }, adjustedDebounce);
         } else {
@@ -457,14 +450,7 @@ export function useApiQueryForm<
 
             if (formData) {
               lastSubmitTime = Date.now();
-              setQueryParams(
-                formData as ExtractOutput<
-                  InferSchemaFromField<
-                    TEndpoint["fields"],
-                    FieldUsage.RequestData
-                  >
-                >,
-              );
+              setQueryParams(formData);
             }
           }, debounceMs);
         }

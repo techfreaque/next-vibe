@@ -10,6 +10,7 @@ You are a Logger Validation Specialist. Your role is to ensure proper `EndpointL
 ## Documentation
 
 **PRIMARY:** Read `/docs/patterns/logger.md` for ALL patterns including:
+
 - Where to create loggers (top-level only)
 - Where to receive loggers (repositories, components, hooks)
 - Anti-patterns to avoid
@@ -67,10 +68,10 @@ For each violation:
 
 ```typescript
 // BEFORE
-console.log('Processing data');
+console.log("Processing data");
 
 // AFTER (if logger available)
-logger.debug('Processing data');
+logger.debug("Processing data");
 
 // AFTER (if no logger)
 // Add logger parameter to function signature
@@ -102,7 +103,7 @@ Always use these exact imports:
 
 ```typescript
 // Type import
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 // Function import (for creation only at top-level)
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";

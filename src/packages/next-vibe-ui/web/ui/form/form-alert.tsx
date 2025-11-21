@@ -26,11 +26,8 @@ export type FormAlertProps = {
  * 1. New alert prop from useEndpoint: <FormAlert alert={endpoint.alert} />
  * 2. Legacy individual props: <FormAlert variant="success" title="..." message="..." />
  */
-export function FormAlert({
-  alert,
-  className,
-  style,
-}: FormAlertProps): JSX.Element | null {
+export function FormAlert(props: FormAlertProps): JSX.Element | null {
+  const { alert, className } = props;
   const { t } = useTranslation();
 
   // Use alert prop if provided, otherwise fall back to legacy props
@@ -64,7 +61,6 @@ export function FormAlert({
       variant={alert.variant}
       icon={Icon}
       className={cn("my-4", className)}
-      style={style}
     >
       {alert.title && (
         <AlertTitle>

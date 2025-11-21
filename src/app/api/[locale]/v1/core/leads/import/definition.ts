@@ -9,6 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interf
 import {
   objectField,
   requestDataField,
+  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
@@ -64,8 +65,8 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.leads.import.post.form.title" as const,
       description:
         "app.api.v1.core.leads.import.post.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
-      children: [],
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     {
       [Methods.POST]: { request: "data", response: true },
@@ -82,7 +83,7 @@ const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.leads.import.post.file.placeholder" as const,
           helpText: "app.api.v1.core.leads.import.post.file.helpText" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().min(1),
       ),
@@ -97,7 +98,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.import.post.fileName.placeholder" as const,
           helpText:
             "app.api.v1.core.leads.import.post.fileName.helpText" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().min(1),
       ),
@@ -111,7 +112,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.import.post.skipDuplicates.description" as const,
           helpText:
             "app.api.v1.core.leads.import.post.skipDuplicates.helpText" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(true),
       ),
@@ -125,7 +126,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.import.post.updateExisting.description" as const,
           helpText:
             "app.api.v1.core.leads.import.post.updateExisting.helpText" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -139,7 +140,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.import.post.defaultCountry.description" as const,
           helpText:
             "app.api.v1.core.leads.import.post.defaultCountry.helpText" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: CountriesOptions,
         },
         z.enum(Countries),
@@ -154,7 +155,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.import.post.defaultLanguage.description" as const,
           helpText:
             "app.api.v1.core.leads.import.post.defaultLanguage.helpText" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: LanguagesOptions,
         },
         z.enum(Languages),
@@ -169,7 +170,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.import.post.defaultStatus.description" as const,
           helpText:
             "app.api.v1.core.leads.import.post.defaultStatus.helpText" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: LeadStatusOptions,
         },
         z.enum(LeadStatus).default(LeadStatus.NEW),
@@ -184,7 +185,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.import.post.defaultCampaignStage.description" as const,
           helpText:
             "app.api.v1.core.leads.import.post.defaultCampaignStage.helpText" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: EmailCampaignStageOptions,
         },
         z
@@ -201,7 +202,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.import.post.defaultSource.description" as const,
           helpText:
             "app.api.v1.core.leads.import.post.defaultSource.helpText" as const,
-          layout: { columns: 6 },
+          columns: 6,
           options: LeadSourceOptions,
         },
         z.enum(LeadSource).default(LeadSource.CSV_IMPORT),
@@ -216,7 +217,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.import.post.useChunkedProcessing.description" as const,
           helpText:
             "app.api.v1.core.leads.import.post.useChunkedProcessing.helpText" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -229,7 +230,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.import.post.batchSize.description" as const,
           helpText:
             "app.api.v1.core.leads.import.post.batchSize.helpText" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().min(10).max(1000).default(2000),
       ),
@@ -275,30 +276,81 @@ const { POST } = createEndpoint({
         },
         z.number(),
       ),
-      errors: responseField(
+      errors: responseArrayField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.v1.core.leads.import.post.response.errors" as const,
+          type: WidgetType.DATA_TABLE,
+          title: "app.api.v1.core.leads.import.post.response.errors" as const,
         },
-        z.array(
-          z.object({
-            row: z.number(),
-            email: z.string().optional(),
-            error: z.string(),
-          }),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 3,
+          },
+          { response: true },
+          {
+            row: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.import.post.response.errors" as const,
+                fieldType: FieldDataType.NUMBER,
+              },
+              z.number(),
+            ),
+            email: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.import.post.response.errors" as const,
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string().optional(),
+            ),
+            error: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.leads.import.post.response.errors" as const,
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+          },
         ),
       ),
-      summary: responseField(
+      summary: objectField(
         {
-          type: WidgetType.TEXT,
-          content:
+          type: WidgetType.CONTAINER,
+          title:
             "app.api.v1.core.leads.import.post.response.summary" as const,
+          layoutType: LayoutType.GRID,
+          columns: 3,
         },
-        z.object({
-          newLeads: z.number(),
-          updatedLeads: z.number(),
-          skippedDuplicates: z.number(),
-        }),
+        { response: true },
+        {
+          newLeads: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.leads.import.post.response.summary" as const,
+              fieldType: FieldDataType.NUMBER,
+            },
+            z.number(),
+          ),
+          updatedLeads: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.leads.import.post.response.summary" as const,
+              fieldType: FieldDataType.NUMBER,
+            },
+            z.number(),
+          ),
+          skippedDuplicates: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.leads.import.post.response.summary" as const,
+              fieldType: FieldDataType.NUMBER,
+            },
+            z.number(),
+          ),
+        },
       ),
       isChunkedProcessing: responseField(
         {

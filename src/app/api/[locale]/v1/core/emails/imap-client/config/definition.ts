@@ -41,7 +41,7 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.emails.imapClient.config.form.title" as const,
       description:
         "app.api.v1.core.emails.imapClient.config.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { response: true },
     {
@@ -464,7 +464,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.emails.imapClient.config.form.title" as const,
       description:
         "app.api.v1.core.emails.imapClient.config.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -478,7 +478,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.serverEnabled.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.accounts.create.host.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().min(1),
       ),
@@ -494,7 +494,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.maxConnections.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.accounts.create.port.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1).max(65535),
       ),
@@ -510,7 +510,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.create.username.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.accounts.create.username.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().min(1),
       ),
@@ -526,7 +526,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.create.password.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.accounts.create.password.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().min(1),
       ),
@@ -540,7 +540,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.create.secure.label",
           description:
             "app.api.v1.core.emails.imapClient.accounts.create.secure.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean(),
       ),
@@ -554,7 +554,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.create.keepAlive.label",
           description:
             "app.api.v1.core.emails.imapClient.accounts.create.keepAlive.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean(),
       ),
@@ -568,7 +568,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.emails.imapClient.config.loggingLevel.description",
           options: ImapLoggingLevelOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(ImapLoggingLevel),
       ),
@@ -581,7 +581,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.imapClient.config.serverEnabled.label",
           description:
             "app.api.v1.core.emails.imapClient.config.serverEnabled.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean(),
       ),
@@ -594,7 +594,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.response.maxConnections",
           description:
             "app.api.v1.core.emails.imapClient.config.maxConnections.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -607,7 +607,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.response.connectionTimeout",
           description:
             "app.api.v1.core.emails.imapClient.config.connectionTimeout.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -620,7 +620,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.response.poolIdleTimeout",
           description:
             "app.api.v1.core.emails.imapClient.config.serverEnabled.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -632,7 +632,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.imapClient.config.response.keepAlive",
           description:
             "app.api.v1.core.emails.imapClient.config.serverEnabled.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean(),
       ),
@@ -645,7 +645,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.imapClient.config.syncEnabled.label",
           description:
             "app.api.v1.core.emails.imapClient.config.syncEnabled.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean(),
       ),
@@ -657,7 +657,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.imapClient.config.syncInterval.label",
           description:
             "app.api.v1.core.emails.imapClient.config.syncInterval.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -670,7 +670,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.response.maxMessages",
           description:
             "app.api.v1.core.emails.imapClient.sync.maxMessages.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -682,7 +682,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.imapClient.config.response.batchSize",
           description:
             "app.api.v1.core.emails.imapClient.config.batchSize.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -695,7 +695,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.response.concurrentAccounts",
           description:
             "app.api.v1.core.emails.imapClient.sync.accountIds.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -709,7 +709,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.response.cacheEnabled",
           description:
             "app.api.v1.core.emails.imapClient.config.serverEnabled.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean(),
       ),
@@ -722,7 +722,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.response.cacheMaxSize",
           description:
             "app.api.v1.core.emails.imapClient.config.batchSize.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -734,7 +734,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.imapClient.config.response.cacheTtl",
           description:
             "app.api.v1.core.emails.imapClient.config.form.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -747,7 +747,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.response.memoryThreshold",
           description:
             "app.api.v1.core.emails.imapClient.config.form.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -760,7 +760,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.imapClient.config.response.maxRetries",
           description:
             "app.api.v1.core.emails.imapClient.config.response.maxRetries",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(0),
       ),
@@ -772,7 +772,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.imapClient.config.response.retryDelay",
           description:
             "app.api.v1.core.emails.imapClient.config.response.retryDelay",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -785,7 +785,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.response.circuitBreakerThreshold",
           description:
             "app.api.v1.core.emails.imapClient.config.response.circuitBreakerThreshold",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -798,7 +798,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.response.circuitBreakerTimeout",
           description:
             "app.api.v1.core.emails.imapClient.config.response.circuitBreakerTimeout",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -812,7 +812,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.response.healthCheckInterval",
           description:
             "app.api.v1.core.emails.imapClient.config.syncInterval.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.number().int().min(1),
       ),
@@ -825,7 +825,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.imapClient.config.response.metricsEnabled",
           description:
             "app.api.v1.core.emails.imapClient.config.serverEnabled.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean(),
       ),
@@ -838,7 +838,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.imapClient.config.response.debugMode",
           description:
             "app.api.v1.core.emails.imapClient.config.debugMode.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean(),
       ),
@@ -850,7 +850,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.imapClient.config.response.testMode",
           description:
             "app.api.v1.core.emails.imapClient.config.debugMode.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean(),
       ),

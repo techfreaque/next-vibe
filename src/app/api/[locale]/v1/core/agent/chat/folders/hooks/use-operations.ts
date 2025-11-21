@@ -11,7 +11,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { DefaultFolderId } from "../../config";
+import { DefaultFolderId } from "../../config";
 import type { IconValue } from "../../model-access/icons";
 import type { ChatFolder } from "../../hooks/store";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -85,7 +85,7 @@ export function useFolderOperations(
       });
 
       // Handle incognito folder creation
-      if (rootFolderId === "incognito") {
+      if (rootFolderId === DefaultFolderId.INCOGNITO) {
         logger.debug(
           "Folder operations: Creating incognito folder (localStorage only)",
           { name, rootFolderId, parentId },
@@ -104,7 +104,6 @@ export function useFolderOperations(
           parentId,
           expanded: true,
           sortOrder: 0,
-          metadata: {},
           rolesView: [],
           rolesManage: [],
           rolesCreateThread: [],

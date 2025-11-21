@@ -143,6 +143,30 @@ export const translations: typeof enTranslations = {
       label: "Metadane",
       description: "Dodatkowe metadane folderu",
     },
+    rolesView: {
+      label: "Role wyświetlania",
+      description: "Role, które mogą wyświetlać ten folder",
+    },
+    rolesManage: {
+      label: "Role zarządzania",
+      description: "Role, które mogą zarządzać ustawieniami folderu",
+    },
+    rolesCreateThread: {
+      label: "Role tworzenia wątków",
+      description: "Role, które mogą tworzyć wątki w tym folderze",
+    },
+    rolesPost: {
+      label: "Role publikowania",
+      description: "Role, które mogą publikować wiadomości",
+    },
+    rolesModerate: {
+      label: "Role moderacyjne",
+      description: "Role, które mogą moderować treści",
+    },
+    rolesAdmin: {
+      label: "Role administratora",
+      description: "Role z pełnym dostępem administracyjnym",
+    },
     response: {
       title: "Zaktualizowany folder",
       description: "Szczegóły zaktualizowanego folderu",

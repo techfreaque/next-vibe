@@ -56,7 +56,7 @@ export interface HandlerContext<
   user: InferJwtPayloadTypeFromRoles<TUserRoleValue>;
   t: TFunction;
   locale: CountryLanguage;
-  request: NextRequest | undefined;
+  request: NextRequest;
   logger: EndpointLogger;
 }
 

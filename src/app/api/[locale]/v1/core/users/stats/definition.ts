@@ -50,7 +50,7 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.users.stats.container.title" as const,
       description: "app.api.v1.core.users.stats.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -62,7 +62,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.users.stats.fields.status.description" as const,
           options: UserStatusFilterOptions,
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.enum(UserStatusFilter).default(UserStatusFilter.ALL),
       ),
@@ -74,7 +74,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.users.stats.fields.role.description" as const,
           options: UserRoleFilterOptions,
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.enum(UserRoleFilter).default(UserRoleFilter.ALL),
       ),
@@ -87,7 +87,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.stats.fields.country.description" as const,
           placeholder:
             "app.api.v1.core.users.stats.fields.country.placeholder" as const,
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.enum(Countries).optional(),
       ),
@@ -100,7 +100,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.stats.fields.language.description" as const,
           placeholder:
             "app.api.v1.core.users.stats.fields.language.placeholder" as const,
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.enum(Languages).optional(),
       ),
@@ -113,7 +113,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.stats.fields.search.description" as const,
           placeholder:
             "app.api.v1.core.users.stats.fields.search.placeholder" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().optional(),
       ),
@@ -127,7 +127,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.users.stats.fields.timePeriod.description" as const,
           options: TimePeriodOptions,
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.nativeEnum(TimePeriod).default(TimePeriod.DAY),
       ),
@@ -140,7 +140,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.users.stats.fields.dateRangePreset.description" as const,
           options: DateRangePresetOptions,
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.nativeEnum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
       ),
@@ -152,7 +152,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.users.stats.fields.chartType.description" as const,
           options: ChartTypeOptions,
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.nativeEnum(ChartType).default(ChartType.LINE),
       ),
@@ -164,7 +164,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.stats.fields.includeComparison.label" as const,
           description:
             "app.api.v1.core.users.stats.fields.includeComparison.description" as const,
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.coerce.boolean().default(false),
       ),
@@ -177,7 +177,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.stats.response.overviewStats.title" as const,
           description:
             "app.api.v1.core.users.stats.response.overviewStats.description" as const,
-          layout: { type: LayoutType.GRID, columns: 4 },
+          layoutType: LayoutType.GRID, columns: 4,
         },
         { response: true },
         {
@@ -224,7 +224,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.stats.response.emailStats.title" as const,
           description:
             "app.api.v1.core.users.stats.response.emailStats.description" as const,
-          layout: { type: LayoutType.GRID, columns: 3 },
+          layoutType: LayoutType.GRID, columns: 3,
         },
         { response: true },
         {
@@ -263,7 +263,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.stats.response.integrationStats.title" as const,
           description:
             "app.api.v1.core.users.stats.response.integrationStats.description" as const,
-          layout: { type: LayoutType.GRID, columns: 3 },
+          layoutType: LayoutType.GRID, columns: 3,
         },
         { response: true },
         {
@@ -326,7 +326,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.users.stats.response.roleStats.title" as const,
           description:
             "app.api.v1.core.users.stats.response.roleStats.description" as const,
-          layout: { type: LayoutType.GRID, columns: 3 },
+          layoutType: LayoutType.GRID, columns: 3,
         },
         { response: true },
         {
@@ -381,7 +381,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.users.stats.response.growthMetrics.description" as const,
           type: WidgetType.CONTAINER,
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { response: true },
         {
@@ -392,7 +392,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.users.stats.response.timeStats.title" as const,
               description:
                 "app.api.v1.core.users.stats.response.timeStats.description" as const,
-              layout: { type: LayoutType.VERTICAL },
+              layoutType: LayoutType.VERTICAL,
             },
             { response: true },
             {
@@ -437,7 +437,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.users.stats.response.performanceRates.title" as const,
               description:
                 "app.api.v1.core.users.stats.response.performanceRates.description" as const,
-              layout: { type: LayoutType.VERTICAL },
+              layoutType: LayoutType.VERTICAL,
             },
             { response: true },
             {
@@ -478,7 +478,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.users.stats.response.businessInsights.description" as const,
           type: WidgetType.CONTAINER,
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {

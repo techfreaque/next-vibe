@@ -16,6 +16,12 @@ export const translations = {
     executing: "Wykonywanie",
     listCommands: "Lista wszystkich dostępnych poleceń",
     output: "Format wyjściowy",
+    utils: {
+      debug: {
+        executionSummary:
+          "Wykonanie: {{executionSeconds}}s | Narzut: {{overheadSeconds}}s | Całkowity: {{totalSeconds}}s",
+      },
+    },
     help: {
       title: "Pomoc Vibe CLI",
       description: "Vibe CLI - Narzędzie do wykonywania API nowej generacji",

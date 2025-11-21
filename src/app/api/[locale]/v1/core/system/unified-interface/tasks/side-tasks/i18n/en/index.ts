@@ -38,6 +38,20 @@ export const translations = {
       title: "Side Task Details",
       description: "View side task details",
     },
+    response: {
+      healthyTasks: {
+        title: "Healthy Tasks",
+      },
+      unhealthyTasks: {
+        title: "Unhealthy Tasks",
+      },
+      runningTasks: {
+        title: "Running Tasks",
+      },
+      totalTasks: {
+        title: "Total Tasks",
+      },
+    },
     errors: {
       validation: {
         title: "Validation Error",

@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.system.db.migrateRepair.post.form.title",
       description:
         "app.api.v1.core.system.db.migrateRepair.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -49,7 +49,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.migrateRepair.fields.force.title",
           description:
             "app.api.v1.core.system.db.migrateRepair.fields.force.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),
@@ -61,7 +61,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.migrateRepair.fields.dryRun.title",
           description:
             "app.api.v1.core.system.db.migrateRepair.fields.dryRun.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),
@@ -73,7 +73,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.migrateRepair.fields.reset.title",
           description:
             "app.api.v1.core.system.db.migrateRepair.fields.reset.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),

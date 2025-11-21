@@ -97,7 +97,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.leads.tracking.engagement.post.form.title" as const,
       description:
         "app.api.v1.core.leads.tracking.engagement.post.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -114,7 +114,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.tracking.engagement.post.leadId.placeholder" as const,
           helpText:
             "app.api.v1.core.leads.tracking.engagement.post.leadId.helpText" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.uuid().nullable().optional(),
       ),
@@ -131,7 +131,7 @@ const { POST } = createEndpoint({
           helpText:
             "app.api.v1.core.leads.tracking.engagement.post.engagementType.helpText" as const,
           options: EngagementTypesOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(EngagementTypes),
       ),
@@ -147,7 +147,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.tracking.engagement.post.campaignId.placeholder" as const,
           helpText:
             "app.api.v1.core.leads.tracking.engagement.post.campaignId.helpText" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.uuid().optional(),
       ),
@@ -163,7 +163,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.tracking.engagement.post.metadata.placeholder" as const,
           helpText:
             "app.api.v1.core.leads.tracking.engagement.post.metadata.helpText" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         engagementMetadataSchema,
       ),
@@ -179,7 +179,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.tracking.engagement.post.userId.placeholder" as const,
           helpText:
             "app.api.v1.core.leads.tracking.engagement.post.userId.helpText" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.uuid().optional(),
       ),
@@ -434,7 +434,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.leads.tracking.engagement.get.form.title" as const,
       description:
         "app.api.v1.core.leads.tracking.engagement.get.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -451,7 +451,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.leads.tracking.engagement.get.id.placeholder" as const,
           helpText:
             "app.api.v1.core.leads.tracking.engagement.get.id.helpText" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.uuid(),
       ),
@@ -467,7 +467,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.leads.tracking.engagement.post.campaignId.placeholder" as const,
           helpText:
             "app.api.v1.core.leads.tracking.engagement.post.campaignId.helpText" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.uuid().optional(),
       ),
@@ -484,7 +484,7 @@ const { GET } = createEndpoint({
           helpText:
             "app.api.v1.core.leads.tracking.engagement.get.stage.helpText" as const,
           options: EmailCampaignStageOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(EmailCampaignStage).optional(),
       ),
@@ -501,7 +501,7 @@ const { GET } = createEndpoint({
           helpText:
             "app.api.v1.core.leads.tracking.engagement.get.source.helpText" as const,
           options: LeadSourceOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(LeadSource).default(LeadSource.EMAIL_CAMPAIGN),
       ),
@@ -517,7 +517,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.leads.tracking.engagement.get.url.placeholder" as const,
           helpText:
             "app.api.v1.core.leads.tracking.engagement.get.url.helpText" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().url(),
       ),

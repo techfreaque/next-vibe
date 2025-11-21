@@ -52,7 +52,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.emails.imapClient.messages.list.get.container.title",
       description:
         "app.api.v1.core.emails.imapClient.messages.list.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -65,7 +65,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.messages.list.get.page.label",
           description:
             "app.api.v1.core.emails.imapClient.messages.list.get.page.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.number().int().positive().default(1),
       ),
@@ -78,7 +78,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.messages.list.get.limit.label",
           description:
             "app.api.v1.core.emails.imapClient.messages.list.get.limit.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.number().int().positive().max(100).default(20),
       ),
@@ -93,7 +93,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.messages.list.get.accountId.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.messages.list.get.accountId.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.uuid(),
       ),
@@ -108,7 +108,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.messages.list.get.folderId.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.messages.list.get.folderId.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.uuid().optional(),
       ),
@@ -123,7 +123,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.messages.list.get.search.description",
           placeholder:
             "app.api.v1.core.emails.imapClient.messages.list.get.search.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().optional(),
       ),
@@ -137,7 +137,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.emails.imapClient.messages.list.get.status.description",
           options: ImapMessageStatusFilterOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.nativeEnum(ImapMessageStatusFilter).optional(),
       ),
@@ -151,7 +151,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.emails.imapClient.messages.list.get.sortBy.description",
           options: ImapMessageSortFieldOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
         z
           .nativeEnum(ImapMessageSortField)
@@ -167,7 +167,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.emails.imapClient.messages.list.get.sortOrder.description",
           options: SortOrderOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.nativeEnum(SortOrder).default(SortOrder.DESC),
       ),
@@ -180,7 +180,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.messages.list.get.dateFrom.label",
           description:
             "app.api.v1.core.emails.imapClient.messages.list.get.dateFrom.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -193,7 +193,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.messages.list.get.dateTo.label",
           description:
             "app.api.v1.core.emails.imapClient.messages.list.get.dateTo.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -211,7 +211,7 @@ const { GET } = createEndpoint({
               "app.api.v1.core.emails.imapClient.messages.list.get.response.message.title",
             description:
               "app.api.v1.core.emails.imapClient.messages.list.get.response.message.description",
-            layout: { type: LayoutType.GRID, columns: 12 },
+            layoutType: LayoutType.GRID, columns: 12,
           },
           { response: true },
           {

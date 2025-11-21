@@ -9,6 +9,7 @@ import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { useEffect } from "react";
 
@@ -90,17 +91,11 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
     logger,
     options: {
       enabled: queryEnabled, // Enable based on auth status
-      onError: ({ error }: { error: { message: string } }) => {
+      onError: ({ error }: { error: ErrorResponseType }) => {
         // Only show toast for client errors, not connection errors
         // as those are already handled by the hooks
         // Suppress toast for unauthorized errors (403) when JWT token contains non-existent user ID
-        if (
-          [
-            "app.error.unauthorized",
-            "app.api.errors.authentication_required",
-            "app.api.v1.core.user.private.me.get.errors.unauthorized.title",
-          ].includes(error.message)
-        ) {
+        if (error.errorType === ErrorResponseTypes.UNAUTHORIZED) {
           return;
         }
         toast({

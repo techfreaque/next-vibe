@@ -43,7 +43,7 @@ import {
 } from "../permissions/permissions";
 import { ThreadStatus } from "../enum";
 import { validateNotIncognito } from "../validation";
-import type { DefaultFolderId } from "../config";
+import { DefaultFolderId } from "../config";
 import type {
   ThreadCreateRequestOutput,
   ThreadCreateResponseOutput,
@@ -224,7 +224,7 @@ export async function ensureThread({
       }
 
       // Any authenticated user can create threads in their private/shared root folders
-      if (rootFolderId === "public") {
+      if (rootFolderId === DefaultFolderId.PUBLIC) {
         const hasPermission = await hasRolePermission(
           user,
           rootConfig.rolesCreateThread,
@@ -402,13 +402,13 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       // If no rootFolderId specified, show threads from all folders (filtered by permissions later)
       const conditions = [];
 
-      if (rootFolderId === "public") {
+      if (rootFolderId === DefaultFolderId.PUBLIC) {
         // PUBLIC folder: Show all threads in public folder (from all users)
-        conditions.push(eq(chatThreads.rootFolderId, "public"));
-      } else if (rootFolderId === "shared") {
+        conditions.push(eq(chatThreads.rootFolderId, DefaultFolderId.PUBLIC));
+      } else if (rootFolderId === DefaultFolderId.SHARED) {
         // SHARED folder: Show user's own threads
         // Permission filtering happens later via canViewThread
-        conditions.push(eq(chatThreads.rootFolderId, "shared"));
+        conditions.push(eq(chatThreads.rootFolderId, DefaultFolderId.SHARED));
         // For public users, filter by leadId; for authenticated users, filter by userId
         if (user.isPublic) {
           conditions.push(eq(chatThreads.leadId, userIdentifier));
@@ -431,13 +431,13 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         // Permission filtering happens later via canViewThread
         if (user.isPublic) {
           // Public users: Show all threads from public folder
-          conditions.push(eq(chatThreads.rootFolderId, "public"));
+          conditions.push(eq(chatThreads.rootFolderId, DefaultFolderId.PUBLIC));
         } else {
           // Authenticated users: Show their own threads from all folders + all threads from public folder
           conditions.push(
             or(
               eq(chatThreads.userId, userIdentifier),
-              eq(chatThreads.rootFolderId, "public"),
+              eq(chatThreads.rootFolderId, DefaultFolderId.PUBLIC),
             )!,
           );
         }
@@ -603,11 +603,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
           return {
             id: thread.id,
             title: thread.title,
-            rootFolderId: thread.rootFolderId as
-              | "incognito"
-              | "private"
-              | "public"
-              | "shared",
+            rootFolderId: thread.rootFolderId,
             folderId: thread.folderId,
             status: thread.status,
             preview: thread.preview,
@@ -727,21 +723,20 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         }
 
         folder = folderResult;
-      } else if (data.thread?.rootFolderId === "public") {
+      } else if (data.thread?.rootFolderId === DefaultFolderId.PUBLIC) {
         // Creating thread in PUBLIC root - need to check ADMIN permission
         // Create a virtual folder object for permission check
         folder = {
           id: "public-root",
           userId: null, // Root folders have no owner
           leadId: null,
-          rootFolderId: "public" as const,
+          rootFolderId: DefaultFolderId.PUBLIC as const,
           name: "Public",
           icon: null,
           color: null,
           parentId: null, // This is the key - null means root level
           expanded: true,
           sortOrder: 0,
-          metadata: {},
           rolesView: [],
           rolesManage: [],
           rolesCreateThread: [],
@@ -788,7 +783,6 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         archived: false,
         tags: [],
         preview: null,
-        metadata: {},
         // rolesView, rolesEdit, rolesPost, rolesModerate, rolesAdmin are NOT set
         // They default to null which means inherit from parent folder
       } satisfies typeof chatThreads.$inferInsert;

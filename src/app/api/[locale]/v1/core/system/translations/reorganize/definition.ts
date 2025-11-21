@@ -58,7 +58,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.translations.reorganize.post.container.title",
       description:
         "app.api.v1.core.system.translations.reorganize.post.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -71,7 +71,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.translations.reorganize.post.fields.removeUnused.title" as const,
           description:
             "app.api.v1.core.system.translations.reorganize.post.fields.removeUnused.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -84,7 +84,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.translations.reorganize.post.fields.dryRun.title" as const,
           description:
             "app.api.v1.core.system.translations.reorganize.post.fields.dryRun.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(true),
       ),
@@ -97,7 +97,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.translations.reorganize.post.fields.backup.title" as const,
           description:
             "app.api.v1.core.system.translations.reorganize.post.fields.backup.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(true),
       ),
@@ -110,7 +110,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.translations.reorganize.post.fields.regenerateStructure.title" as const,
           description:
             "app.api.v1.core.system.translations.reorganize.post.fields.regenerateStructure.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -123,7 +123,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.translations.reorganize.post.fields.regenerateKeys.title" as const,
           description:
             "app.api.v1.core.system.translations.reorganize.post.fields.regenerateKeys.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -136,7 +136,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.translations.reorganize.post.success.title" as const,
           description:
             "app.api.v1.core.system.translations.reorganize.post.success.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {
@@ -151,12 +151,12 @@ const { POST } = createEndpoint({
 
           summary: objectField(
             {
-              type: WidgetType.STATS_GRID,
+              type: WidgetType.CONTAINER,
               title:
                 "app.api.v1.core.system.translations.reorganize.post.fields.summary.title" as const,
               description:
                 "app.api.v1.core.system.translations.reorganize.post.description" as const,
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID, columns: 12,
             },
             { response: true },
             {
@@ -258,7 +258,7 @@ const { POST } = createEndpoint({
                   "app.api.v1.core.system.translations.reorganize.post.fields.changes.title" as const,
                 description:
                   "app.api.v1.core.system.translations.reorganize.post.description" as const,
-                layout: { type: LayoutType.GRID, columns: 12 },
+                layoutType: LayoutType.GRID, columns: 12,
               },
               { response: true },
               {

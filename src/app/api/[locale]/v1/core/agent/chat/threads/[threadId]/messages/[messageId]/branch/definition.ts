@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -149,9 +149,7 @@ const { POST } = createEndpoint({
           label:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.content.label" as const,
           description:
-            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.content.description" as const,
-          validation: { required: true },
-        },
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.content.description" as const},
         z.string().min(1),
       ),
       role: requestDataField(
@@ -162,9 +160,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.role.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.role.description" as const,
-          options: ChatMessageRoleOptions,
-          validation: { required: true },
-        },
+          options: ChatMessageRoleOptions},
         z.enum(ChatMessageRole),
       ),
       model: requestDataField(
@@ -185,7 +181,7 @@ const { POST } = createEndpoint({
           type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.title" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { response: true },
         {

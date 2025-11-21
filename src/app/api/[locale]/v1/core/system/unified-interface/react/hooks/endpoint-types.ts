@@ -12,9 +12,9 @@ import type { ZodTypeDef } from "zod/v3";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type {
   ExtractOutput,
-  FieldUsage,
   InferSchemaFromField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
+import type { FieldUsage } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import type {
   ApiFormOptions,

@@ -45,7 +45,10 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      title: "app.api.v1.core.system.check.vibeCheck.title",
+      description: "app.api.v1.core.system.check.vibeCheck.description",
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -57,20 +60,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.check.vibeCheck.fields.fix.label",
           description:
             "app.api.v1.core.system.check.vibeCheck.fields.fix.description",
-          layout: { columns: 4 },
-        },
-        z.boolean().optional().default(false),
-      ),
-
-      skipOxlint: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.v1.core.system.check.vibeCheck.fields.skipOxlint.label",
-          description:
-            "app.api.v1.core.system.check.vibeCheck.fields.skipOxlint.description",
-          layout: { columns: 3 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),
@@ -82,9 +72,9 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.check.vibeCheck.fields.skipLint.label",
           description:
             "app.api.v1.core.system.check.vibeCheck.fields.skipLint.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
-        z.boolean().optional().default(true),
+        z.boolean().optional().default(false),
       ),
 
       skipTypecheck: requestDataField(
@@ -95,7 +85,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.vibeCheck.fields.skipTypecheck.label",
           description:
             "app.api.v1.core.system.check.vibeCheck.fields.skipTypecheck.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.boolean().optional().default(false),
       ),
@@ -108,7 +98,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.vibeCheck.fields.timeoutSeconds.label",
           description:
             "app.api.v1.core.system.check.vibeCheck.fields.timeoutSeconds.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.number().min(1).max(3600).default(3600),
       ),
@@ -122,7 +112,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.vibeCheck.fields.paths.description",
           placeholder:
             "app.api.v1.core.system.check.vibeCheck.fields.paths.placeholder",
-          layout: { columns: 8 },
+          columns: 8,
           options: [
             {
               value: "src/",
@@ -169,10 +159,8 @@ const { POST } = createEndpoint({
           groupBy: "file",
           sortBy: "severity",
           showSummary: true,
-          layout: {
-            type: LayoutType.GRID,
-            columns: 1,
-          },
+          layoutType: LayoutType.GRID,
+          columns: 1,
         },
         objectField(
           {
@@ -181,7 +169,8 @@ const { POST } = createEndpoint({
               "app.api.v1.core.system.check.vibeCheck.response.issues.title",
             description:
               "app.api.v1.core.system.check.vibeCheck.response.issues.emptyState.description",
-            layout: { type: LayoutType.GRID, columns: 12 },
+            layoutType: LayoutType.GRID,
+            columns: 12,
           },
           { response: true },
           {

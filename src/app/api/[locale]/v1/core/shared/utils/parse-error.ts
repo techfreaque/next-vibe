@@ -84,6 +84,8 @@ export function parseError(error: ParseableError): Error {
 
   // Handle other objects
   if (typeof error === "object" && error !== null) {
+    // eslint-disable-next-line no-console
+    console.error("FULL ERROR OBJECT:", JSON.stringify(error, null, 2));
     return new Error("An unknown error occurred");
   }
 

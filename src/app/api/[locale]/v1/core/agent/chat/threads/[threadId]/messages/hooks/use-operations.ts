@@ -13,7 +13,7 @@ import { getCookie } from "next-vibe-ui/lib/cookies";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DEFAULT_FOLDER_IDS, type DefaultFolderId } from "../../../../config";
+import { DefaultFolderId } from "../../../../config";
 import { ChatMessageRole } from "../../../../enum";
 import type { ModelId } from "../../../../model-access/models";
 import type { ChatMessage } from "../../../../hooks/store";
@@ -152,14 +152,14 @@ export function useMessageOperations(
         let parentMessageId: string | null = null;
         let messageHistory:
           | Array<{ role: ChatMessageRole; content: string }>
+          | null
           | undefined;
 
         if (threadIdToUse) {
           let threadMessages: ChatMessage[] = [];
           if (currentRootFolderId === "incognito") {
-            const { getMessagesForThread } = await import(
-              "../../../../incognito/storage"
-            );
+            const { getMessagesForThread } =
+              await import("../../../../incognito/storage");
             threadMessages = await getMessagesForThread(threadIdToUse);
           } else {
             threadMessages = chatStore.getThreadMessages(threadIdToUse);
@@ -174,7 +174,7 @@ export function useMessageOperations(
               isIncognito: currentRootFolderId === "incognito",
             });
 
-            if (currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+            if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
               messageHistory = threadMessages;
               logger.debug(
                 "Message operations: Built message history for incognito mode",
@@ -197,7 +197,7 @@ export function useMessageOperations(
 
         await aiStream.startStream(
           {
-            operation: "send",
+            operation: "send" as const,
             rootFolderId: currentRootFolderId,
             subFolderId: currentSubFolderId,
             threadId: threadIdToUse,
@@ -209,7 +209,7 @@ export function useMessageOperations(
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,
             tools: settings.enabledToolIds,
-            messageHistory,
+            messageHistory: messageHistory ?? null,
           },
           {
             onThreadCreated: (data) => {
@@ -273,9 +273,10 @@ export function useMessageOperations(
       try {
         let messageHistory:
           | Array<{ role: ChatMessageRole; content: string }>
+          | null
           | undefined;
 
-        if (currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+        if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
           const threadMessages = Object.values(chatStore.messages)
             .filter((msg) => msg.threadId === message.threadId)
             .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
@@ -298,7 +299,7 @@ export function useMessageOperations(
 
         await aiStream.startStream(
           {
-            operation: "retry",
+            operation: "retry" as const,
             rootFolderId: currentRootFolderId,
             subFolderId: currentSubFolderId,
             threadId: message.threadId,
@@ -310,7 +311,7 @@ export function useMessageOperations(
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,
             tools: settings.enabledToolIds,
-            messageHistory,
+            messageHistory: messageHistory ?? null,
           },
           {
             onContentDone: createCreditUpdateCallback(
@@ -357,11 +358,12 @@ export function useMessageOperations(
       try {
         let messageHistory:
           | Array<{ role: ChatMessageRole; content: string }>
+          | null
           | undefined;
 
         const branchParentId = message.parentId;
 
-        if (currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+        if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
           const threadMessages = Object.values(chatStore.messages)
             .filter((msg) => msg.threadId === message.threadId)
             .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
@@ -379,7 +381,7 @@ export function useMessageOperations(
 
         await aiStream.startStream(
           {
-            operation: "edit",
+            operation: "edit" as const,
             rootFolderId: currentRootFolderId,
             subFolderId: currentSubFolderId,
             threadId: message.threadId,
@@ -391,7 +393,7 @@ export function useMessageOperations(
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,
             tools: settings.enabledToolIds,
-            messageHistory,
+            messageHistory: messageHistory ?? null,
           },
           {
             onContentDone: createCreditUpdateCallback(
@@ -438,9 +440,10 @@ export function useMessageOperations(
       try {
         let messageHistory:
           | Array<{ role: ChatMessageRole; content: string }>
+          | null
           | undefined;
 
-        if (currentRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO) {
+        if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
           const threadMessages = Object.values(chatStore.messages)
             .filter((msg) => msg.threadId === message.threadId)
             .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
@@ -456,7 +459,7 @@ export function useMessageOperations(
 
         await aiStream.startStream(
           {
-            operation: "answer-as-ai",
+            operation: "answer-as-ai" as const,
             rootFolderId: currentRootFolderId,
             subFolderId: currentSubFolderId,
             threadId: message.threadId,
@@ -468,7 +471,7 @@ export function useMessageOperations(
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,
             tools: settings.enabledToolIds,
-            messageHistory,
+            messageHistory: messageHistory ?? null,
           },
           {
             onContentDone: createCreditUpdateCallback(
@@ -542,9 +545,8 @@ export function useMessageOperations(
         }
 
         try {
-          const { deleteMessage: deleteIncognitoMessage } = await import(
-            "../../../../incognito/storage"
-          );
+          const { deleteMessage: deleteIncognitoMessage } =
+            await import("../../../../incognito/storage");
           deleteIncognitoMessage(messageId);
           logger.debug(
             "Message operations: Deleted incognito message from localStorage",

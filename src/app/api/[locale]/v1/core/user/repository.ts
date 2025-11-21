@@ -186,7 +186,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   ): Promise<ResponseType<UserType<T>>> {
     try {
       const {
-        roles = [UserRole.CUSTOMER] as UserRoleValue[keyof UserRoleValue][],
+        roles = [UserRole.CUSTOMER] as readonly UserRoleValue[],
         detailLevel = UserDetailLevel.MINIMAL,
       } = options;
 

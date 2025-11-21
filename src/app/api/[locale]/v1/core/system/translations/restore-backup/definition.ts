@@ -31,7 +31,12 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "translations", "restore-backup"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
 
   title: "app.api.v1.core.system.translations.restoreBackup.post.title",
   description:
@@ -56,7 +61,8 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.translations.restoreBackup.post.container.title" as const,
       description:
         "app.api.v1.core.system.translations.restoreBackup.post.container.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -69,8 +75,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.translations.restoreBackup.post.fields.backupPath.title" as const,
           description:
             "app.api.v1.core.system.translations.restoreBackup.post.fields.backupPath.description" as const,
-          layout: { columns: 12 },
-          required: true,
+          columns: 12,
         },
         z.string().min(1, "Backup path is required"),
       ),
@@ -83,7 +88,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.translations.restoreBackup.post.fields.validateOnly.title" as const,
           description:
             "app.api.v1.core.system.translations.restoreBackup.post.fields.validateOnly.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -96,7 +101,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.translations.restoreBackup.post.fields.createBackupBeforeRestore.title" as const,
           description:
             "app.api.v1.core.system.translations.restoreBackup.post.fields.createBackupBeforeRestore.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(true),
       ),
@@ -122,12 +127,13 @@ const { POST } = createEndpoint({
 
       backupInfo: objectField(
         {
-          type: WidgetType.STATS_GRID,
+          type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.system.translations.restoreBackup.post.response.backupInfo.title",
           description:
             "app.api.v1.core.system.translations.restoreBackup.post.response.backupInfo.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { response: true },
         {
@@ -242,11 +248,6 @@ const { POST } = createEndpoint({
         validateOnly: false,
         createBackupBeforeRestore: true,
       },
-      validation: {
-        backupPath: "/path/to/backup/translations-2024-01-15T10-30-00-000Z",
-        validateOnly: true,
-        createBackupBeforeRestore: false,
-      },
       restore: {
         backupPath: "/path/to/backup/translations-2024-01-15T10-30-00-000Z",
         validateOnly: false,
@@ -268,16 +269,6 @@ const { POST } = createEndpoint({
           filesRestored: 42,
           newBackupCreated:
             "/path/to/new/backup/translations-2024-01-15T11-00-00-000Z",
-        },
-      },
-      validation: {
-        success: true,
-        message:
-          "Backup validation successful - backup is valid and can be restored",
-        backupInfo: {
-          backupPath: "/path/to/backup/translations-2024-01-15T10-30-00-000Z",
-          backupDate: "2024-01-15T10:30:00.000Z",
-          filesRestored: 0,
         },
       },
       restore: {

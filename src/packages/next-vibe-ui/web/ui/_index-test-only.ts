@@ -412,7 +412,7 @@ export {
 } from "./sheet";
 
 // sidebar
-export { SidebarLayout, SidebarWrapper } from "./sidebar";
+export { SidebarLayout } from "./sidebar";
 
 // skeleton
 export { Skeleton } from "./skeleton";

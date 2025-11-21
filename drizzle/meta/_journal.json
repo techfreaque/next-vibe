@@ -15,6 +15,13 @@
       "when": 1763382867395,
       "tag": "20251117123427_shiny_vin_gonzales",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763723406789,
+      "tag": "20251121111006_oval_swordsman",
+      "breakpoints": true
     }
   ]
 }

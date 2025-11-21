@@ -19,6 +19,21 @@ export const translations = {
       description: "Specific guard ID to stop",
       placeholder: "guard_project_abc123",
     },
+    username: {
+      title: "Username",
+    },
+    wasRunning: {
+      title: "Was Running",
+    },
+    nowRunning: {
+      title: "Now Running",
+    },
+    pid: {
+      title: "Process ID",
+    },
+    forceStopped: {
+      title: "Force Stopped",
+    },
     stopAll: {
       title: "Stop All Guards",
       description: "Stop all running guard environments",

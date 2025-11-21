@@ -113,7 +113,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -147,14 +147,13 @@ const { GET } = createEndpoint({
       messages: responseArrayField(
         {
           type: WidgetType.DATA_CARDS,
-          layout: "list",
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
             title:
               "app.api.v1.core.agent.chat.threads.threadId.messages.path.get.response.messages.message.title" as const,
-            layout: { type: LayoutType.GRID, columns: 2 },
+            layoutType: LayoutType.GRID, columns: 2,
           },
           { response: true },
           {

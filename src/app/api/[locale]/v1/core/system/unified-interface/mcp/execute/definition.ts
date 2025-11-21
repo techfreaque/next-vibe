@@ -49,29 +49,33 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.title" as const,
       description:
         "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
       name: requestDataField(
         {
-          type: WidgetType.TEXT,
-          title:
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label:
             "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.name.title" as const,
           description:
             "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.name.description" as const,
-          placeholder: "core:system:db:ping",
+          placeholder:
+            "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.name.placeholder" as const,
         },
         z.string().min(1),
       ),
       arguments: requestDataField(
         {
-          type: WidgetType.TEXT,
-          title:
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.JSON,
+          label:
             "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.arguments.title" as const,
           description:
             "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.arguments.description" as const,
-          placeholder: "{}",
+          placeholder:
+            "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.arguments.placeholder" as const,
         },
         z.record(z.string(), z.unknown()).optional().default({}),
       ),
@@ -82,33 +86,45 @@ const { POST } = createEndpoint({
             {
               key: "type",
               label:
-                "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.result.content.type" as const,
-              type: FieldDataType.TEXT,
+                "app.api.v1.core.system.unifiedInterface.mcp.execute.post.response.result.content.type" as const,
             },
             {
               key: "text",
               label:
-                "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.result.content.text" as const,
-              type: FieldDataType.TEXT,
+                "app.api.v1.core.system.unifiedInterface.mcp.execute.post.response.result.content.text" as const,
             },
           ],
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
-            layout: { type: LayoutType.VERTICAL },
+            layoutType: LayoutType.VERTICAL,
           },
           { response: true },
           {
-            type: responseField({ type: WidgetType.TEXT }, z.literal("text")),
-            text: responseField({ type: WidgetType.TEXT }, z.string()),
+            type: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.unifiedInterface.mcp.execute.post.response.result.content.type" as const,
+              },
+              z.literal("text"),
+            ),
+            text: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.unifiedInterface.mcp.execute.post.response.result.content.text" as const,
+              },
+              z.string(),
+            ),
           },
         ),
       ),
       isError: responseField(
         {
           type: WidgetType.BADGE,
-          text: "app.api.v1.core.system.unifiedInterface.mcp.execute.post.fields.result.isError" as const,
+          text: "app.api.v1.core.system.unifiedInterface.mcp.execute.post.response.result.isError" as const,
         },
         z.boolean(),
       ),

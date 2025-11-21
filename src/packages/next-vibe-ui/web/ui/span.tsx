@@ -119,9 +119,6 @@ export type SpanRefObject = Element & {
 
 export type SpanProps = {
   children?: React.ReactNode;
-  ref?:
-    | React.RefObject<SpanRefObject | null>
-    | ((node: SpanRefObject | null) => void);
   role?: string;
   ariaLabel?: string;
   id?: string;
@@ -142,54 +139,108 @@ export type SpanProps = {
 
 /**
  * Platform-agnostic Span component for web
- * On web, this is a div element
+ * On web, this is a span element
  * Alias for View to provide more traditional web naming
  */
-export function Span({
-  className,
-  style,
-  children,
-  role,
-  ariaLabel,
-  id,
-  title,
-  onClick,
-  onMouseEnter,
-  onMouseLeave,
-  onTouchStart,
-  onTouchEnd,
-  onDrop,
-  onDragOver,
-  onDragLeave,
-  suppressHydrationWarning,
-  dangerouslySetInnerHTML,
-  tabIndex,
-  onKeyDown,
-  ref,
-}: SpanProps): JSX.Element {
-  return (
-    <span
-      ref={ref}
-      className={className}
-      style={style}
-      role={role}
-      aria-label={ariaLabel}
-      id={id}
-      title={title}
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-      onDrop={onDrop}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      suppressHydrationWarning={suppressHydrationWarning}
-      dangerouslySetInnerHTML={dangerouslySetInnerHTML}
-      tabIndex={tabIndex}
-      onKeyDown={onKeyDown}
-    >
-      {children}
-    </span>
-  );
-}
+export const Span = React.forwardRef<SpanRefObject, SpanProps>(
+  (
+    {
+      className,
+      style,
+      children,
+      role,
+      ariaLabel,
+      id,
+      title,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
+      onTouchStart,
+      onTouchEnd,
+      onDrop,
+      onDragOver,
+      onDragLeave,
+      suppressHydrationWarning,
+      dangerouslySetInnerHTML,
+      tabIndex,
+      onKeyDown,
+    },
+    ref,
+  ): JSX.Element => {
+    const spanRef = React.useRef<HTMLSpanElement>(null);
+
+    React.useImperativeHandle(
+      ref,
+      (): SpanRefObject => {
+        const element = spanRef.current;
+        if (!element) {
+          return {
+            ...document.createElement("span"),
+            focus: (): void => undefined,
+            blur: (): void => undefined,
+            scrollIntoView: (): void => undefined,
+            scrollTop: 0,
+            scrollHeight: 0,
+            clientHeight: 0,
+            addEventListener: (): void => undefined,
+            removeEventListener: (): void => undefined,
+          } as SpanRefObject;
+        }
+        return {
+          ...element,
+          focus: (): void => element.focus(),
+          blur: (): void => element.blur(),
+          scrollIntoView: (
+            options?: {
+              behavior?: "auto" | "smooth";
+              block?: "start" | "center" | "end" | "nearest";
+              inline?: "start" | "center" | "end" | "nearest";
+            },
+          ): void => element.scrollIntoView(options),
+          scrollTop: element.scrollTop,
+          scrollHeight: element.scrollHeight,
+          clientHeight: element.clientHeight,
+          addEventListener: (
+            type: string,
+            listener: (event: Event) => void,
+            options?: boolean | AddEventListenerOptions,
+          ): void => element.addEventListener(type, listener, options),
+          removeEventListener: (
+            type: string,
+            listener: (event: Event) => void,
+            options?: boolean | EventListenerOptions,
+          ): void => element.removeEventListener(type, listener, options),
+        } as SpanRefObject;
+      },
+      [],
+    );
+
+    return (
+      <span
+        ref={spanRef}
+        className={className}
+        style={style}
+        role={role}
+        aria-label={ariaLabel}
+        id={id}
+        title={title}
+        onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        suppressHydrationWarning={suppressHydrationWarning}
+        dangerouslySetInnerHTML={dangerouslySetInnerHTML}
+        tabIndex={tabIndex}
+        onKeyDown={onKeyDown}
+      >
+        {children}
+      </span>
+    );
+  },
+);
+
+Span.displayName = "Span";

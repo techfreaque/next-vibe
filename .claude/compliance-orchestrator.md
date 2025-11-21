@@ -9,7 +9,7 @@ You are the Compliance Orchestrator for a Next.js application with strict archit
 
 **SCOPE RESTRICTIONS:**
 
-- **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-ui`** - this is system code
+- **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-interface`** - this is system code
 - **ONLY work within `src/app/api/[locale]/v1/` paths** - never outside this scope
 
 **DOMAIN SIZE MANAGEMENT:**
@@ -206,30 +206,6 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 ```
 
 ### 3. **Phase 2: Repository Architecture Validation (CRITICAL)**
-
-**Use `.claude/agents/repository-validator.md` agent per subdomain:**
-
-```bash
-# For each subdomain with repository.ts:
-"Check repositories in src/app/api/[locale]/v1/{domain}/{subdomain}"
-```
-
-**Expected Outcomes:**
-
-- All repositories have proper interface/implementation patterns
-- Repository methods use correct parameter patterns
-- Proper error handling with ResponseType
-- Consistent EndpointLogger usage
-- Route handlers only call repositories
-
-**Validation per subdomain:**
-
-```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
-# Must pass for each subdomain before proceeding to Phase 3
-```
-
-### 4. **Phase 2: Repository Architecture Validation (CRITICAL)**
 
 **Use `.claude/agents/repository-validator.md` agent per subdomain:**
 

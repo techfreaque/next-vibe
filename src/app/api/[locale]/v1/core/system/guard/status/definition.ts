@@ -9,6 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interf
 import {
   objectField,
   requestDataField,
+  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
@@ -27,7 +28,12 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.guard.status.post.description",
   category: "app.api.v1.core.system.guard.category",
   tags: ["app.api.v1.core.system.guard.status.post.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["guard:status", "guard-status"],
 
   fields: objectField(
@@ -36,7 +42,8 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.system.guard.status.post.container.title",
       description:
         "app.api.v1.core.system.guard.status.post.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -51,7 +58,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.guard.status.post.fields.projectPath.description",
           placeholder:
             "app.api.v1.core.system.guard.status.post.fields.projectPath.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -66,7 +73,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.guard.status.post.fields.guardId.description",
           placeholder:
             "app.api.v1.core.system.guard.status.post.fields.guardId.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -79,7 +86,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.guard.status.post.fields.listAll.title",
           description:
             "app.api.v1.core.system.guard.status.post.fields.listAll.description",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.boolean().optional().default(false),
       ),
@@ -103,27 +110,102 @@ const { POST } = createEndpoint({
         z.string(),
       ),
 
-      guards: responseField(
+      guards: responseArrayField(
         {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.system.guard.status.post.fields.guards.title",
+          type: WidgetType.DATA_TABLE,
+          title: "app.api.v1.core.system.guard.status.post.fields.guards.title",
         },
-        z
-          .array(
-            z.object({
-              guardId: z.string(),
-              username: z.string(),
-              projectPath: z.string(),
-              status: z.string(),
-              createdAt: z.string(),
-              securityLevel: z.string(),
-              isolationMethod: z.string(),
-              isRunning: z.boolean(),
-              userHome: z.string().optional(),
-            }),
-          )
-          .optional(),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 4,
+          },
+          { response: true },
+          {
+            guardId: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.status.post.fields.guardId.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+            username: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.status.post.fields.username.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+            projectPath: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.status.post.fields.projectPath.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+            status: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.status.post.fields.status.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+            createdAt: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.status.post.fields.createdAt.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+            securityLevel: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.status.post.fields.securityLevel.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+            isolationMethod: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.status.post.fields.isolationMethod.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+            isRunning: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.status.post.fields.isRunning.title",
+                fieldType: FieldDataType.BOOLEAN,
+              },
+              z.boolean(),
+            ),
+            userHome: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.status.post.fields.userHome.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string().optional(),
+            ),
+          },
+        ),
       ),
 
       totalGuards: responseField(

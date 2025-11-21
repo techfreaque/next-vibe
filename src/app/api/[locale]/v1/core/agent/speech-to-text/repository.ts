@@ -166,12 +166,12 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
       });
 
       // Deduct credits AFTER successful completion
-      await creditRepository.deductCreditsForFeature({
+      await creditRepository.deductCreditsForFeature(
         user,
-        cost: FEATURE_COSTS.STT,
-        feature: "stt",
+        FEATURE_COSTS.STT,
+        "stt",
         logger,
-      });
+      );
 
       return success({
         response: {

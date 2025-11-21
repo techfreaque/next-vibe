@@ -38,6 +38,11 @@ export const translations: typeof enTranslations = {
     placeholder: "Neues Passwort bestätigen",
     help: "Geben Sie Ihr neues Passwort erneut ein, um sicherzustellen, dass es korrekt eingegeben wurde",
   },
+  twoFactorCode: {
+    label: "Zwei-Faktor-Code",
+    description: "Geben Sie Ihren Zwei-Faktor-Authentifizierungscode ein, falls aktiviert",
+    placeholder: "2FA-Code eingeben",
+  },
   response: {
     title: "Passwort-Änderungsantwort",
     description: "Antwort für die Passwort-Änderungsoperation",

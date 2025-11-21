@@ -15,7 +15,7 @@ import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 import { translations } from "@/config/i18n/en";
 
-import { LoginFormNew } from "@/app/api/[locale]/v1/core/user/public/login/_components/login-form-new";
+import { LoginForm } from "@/app/api/[locale]/v1/core/user/public/login/_components/login-form";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -128,10 +128,7 @@ export default async function LoginPage({
             </P>
           </Div>
         </Div>
-        <LoginFormNew
-          locale={locale}
-          loginOptions={loginOptionsResponse.data}
-        />
+        <LoginForm locale={locale} loginOptions={loginOptionsResponse.data} />
       </Div>
     </>
   );

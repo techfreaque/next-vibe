@@ -9,6 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interf
 import {
   objectField,
   requestDataField,
+  responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
@@ -57,7 +58,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.contact.form.label",
       description: "app.api.v1.core.contact.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -68,8 +70,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.contact.form.fields.name.label",
           description: "app.api.v1.core.contact.form.fields.name.description",
           placeholder: "app.api.v1.core.contact.form.fields.name.placeholder",
-          layout: { columns: 6 },
-          validation: { required: true, minLength: 2 },
+          columns: 6,
         },
         z.string().min(2),
       ),
@@ -80,8 +81,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.contact.form.fields.email.label",
           description: "app.api.v1.core.contact.form.fields.email.description",
           placeholder: "app.api.v1.core.contact.form.fields.email.placeholder",
-          layout: { columns: 6 },
-          validation: { required: true },
+          columns: 6,
         },
         z.string().email(),
       ),
@@ -94,8 +94,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.contact.form.fields.company.description",
           placeholder:
             "app.api.v1.core.contact.form.fields.company.placeholder",
-          layout: { columns: 12 },
-          validation: { required: false },
+          columns: 12,
         },
         z.string().optional(),
       ),
@@ -109,9 +108,7 @@ const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.contact.form.fields.subject.placeholder",
           options: ContactSubjectOptions,
-          layout: { columns: 12 },
-          validation: { required: true },
-          behavior: { searchable: false, clearable: false },
+          columns: 12,
         },
         z.enum(ContactSubject),
       ),
@@ -124,8 +121,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.contact.form.fields.message.description",
           placeholder:
             "app.api.v1.core.contact.form.fields.message.placeholder",
-          layout: { columns: 12 },
-          validation: { required: true, minLength: 10 },
+          columns: 12,
         },
         z.string().min(10),
       ),
@@ -139,9 +135,7 @@ const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.contact.form.fields.priority.placeholder",
           options: ContactPriorityOptions,
-          layout: { columns: 12 },
-          validation: { required: false },
-          behavior: { searchable: false, clearable: true },
+          columns: 12,
         },
         z.enum(ContactPriority).optional(),
       ),
@@ -162,12 +156,19 @@ const { POST } = createEndpoint({
         },
         z.string().optional(),
       ),
-      status: responseField(
+      status: responseArrayOptionalField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.v1.core.contact.response.status",
+          type: WidgetType.DATA_LIST,
+          title: "app.api.v1.core.contact.response.status",
+          description: "app.api.v1.core.contact.response.description",
         },
-        z.array(z.string()).optional(),
+        responseField(
+          {
+            type: WidgetType.TEXT,
+            content: "app.api.v1.core.contact.response.status",
+          },
+          z.string(),
+        ),
       ),
     },
   ),

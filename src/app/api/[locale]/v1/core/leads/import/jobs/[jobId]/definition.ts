@@ -45,7 +45,7 @@ const { PATCH } = createEndpoint({
       title: "app.api.v1.core.leads.import.jobs.jobId.patch.form.title",
       description:
         "app.api.v1.core.leads.import.jobs.jobId.patch.form.description",
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -57,9 +57,7 @@ const { PATCH } = createEndpoint({
           label: "app.api.v1.core.leads.import.jobs.jobId.patch.jobId.label",
           description:
             "app.api.v1.core.leads.import.jobs.jobId.patch.jobId.description",
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
         z.uuid(),
       ),
 
@@ -70,7 +68,7 @@ const { PATCH } = createEndpoint({
           title: "app.api.v1.core.leads.import.jobs.jobId.patch.settings.title",
           description:
             "app.api.v1.core.leads.import.jobs.jobId.patch.settings.description",
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { request: "data" },
         {
@@ -84,9 +82,8 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.import.jobs.jobId.patch.batchSize.description",
               placeholder:
                 "app.api.v1.core.leads.import.jobs.jobId.patch.batchSize.placeholder",
-              layout: { columns: 6 },
-              validation: { min: 10, max: 1000 },
-            },
+              columns: 6
+},
             z.number().min(10).max(1000).optional(),
           ),
           maxRetries: requestDataField(
@@ -99,9 +96,8 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.import.jobs.jobId.patch.maxRetries.description",
               placeholder:
                 "app.api.v1.core.leads.import.jobs.jobId.patch.maxRetries.placeholder",
-              layout: { columns: 6 },
-              validation: { min: 0, max: 10 },
-            },
+              columns: 6
+},
             z.number().min(0).max(10).optional(),
           ),
         },
@@ -114,7 +110,7 @@ const { PATCH } = createEndpoint({
           title: "app.api.v1.core.leads.import.jobs.jobId.patch.response.title",
           description:
             "app.api.v1.core.leads.import.jobs.jobId.patch.response.description",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -125,7 +121,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.import.jobs.jobId.patch.response.info.title",
               description:
                 "app.api.v1.core.leads.import.jobs.jobId.patch.response.info.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -162,7 +158,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.import.jobs.jobId.patch.response.progress.title",
               description:
                 "app.api.v1.core.leads.import.jobs.jobId.patch.response.progress.description",
-              layout: { type: LayoutType.GRID, columns: 3 },
+              layoutType: LayoutType.GRID, columns: 3,
             },
             { response: true },
             {
@@ -216,7 +212,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.import.jobs.jobId.patch.response.configuration.title",
               description:
                 "app.api.v1.core.leads.import.jobs.jobId.patch.response.configuration.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -270,7 +266,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.leads.import.jobs.jobId.patch.response.timestamps.title",
               description:
                 "app.api.v1.core.leads.import.jobs.jobId.patch.response.timestamps.description",
-              layout: { type: LayoutType.GRID, columns: 2 },
+              layoutType: LayoutType.GRID, columns: 2,
             },
             { response: true },
             {
@@ -439,7 +435,7 @@ const { DELETE } = createEndpoint({
       title: "app.api.v1.core.leads.import.jobs.jobId.delete.form.title",
       description:
         "app.api.v1.core.leads.import.jobs.jobId.delete.form.description",
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {
@@ -451,9 +447,7 @@ const { DELETE } = createEndpoint({
           label: "app.api.v1.core.leads.import.jobs.jobId.delete.jobId.label",
           description:
             "app.api.v1.core.leads.import.jobs.jobId.delete.jobId.description",
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
         z.uuid(),
       ),
 
@@ -465,7 +459,7 @@ const { DELETE } = createEndpoint({
             "app.api.v1.core.leads.import.jobs.jobId.delete.response.title",
           description:
             "app.api.v1.core.leads.import.jobs.jobId.delete.response.description",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {

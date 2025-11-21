@@ -6,7 +6,7 @@
  */
 
 import { zodToJsonSchema } from "zod-to-json-schema";
-import { z } from "zod";
+import type { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -48,11 +48,8 @@ export interface JsonSchemaObject {
 /**
  * Convert Zod schema to JSON Schema
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Zod schema type compatibility
-export function zodSchemaToJsonSchema(schema: z.ZodType<any, any, any>): JsonSchema {
+export function zodSchemaToJsonSchema(schema: z.ZodTypeAny): JsonSchema {
   try {
-    // Cast to the type expected by zodToJsonSchema - zod v4 type mismatch
-    // @ts-expect-error - Zod v4 type incompatibility with zod-to-json-schema
     return zodToJsonSchema(schema, {
       target: "jsonSchema7",
       $refStrategy: "none",

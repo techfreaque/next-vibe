@@ -54,6 +54,59 @@ export const translations: typeof enTranslations = {
   response: {
     title: "Login-Optionen-Antwort",
     description: "Verfügbare Login-Konfigurationsoptionen",
+    success: {
+      badge: "Erfolgreich",
+    },
+    message: {
+      content: "Statusnachricht",
+    },
+    forUser: {
+      content: "E-Mail-Adresse",
+    },
+    loginMethods: {
+      title: "Login-Methoden",
+      description: "Verfügbare Authentifizierungsmethoden",
+      password: {
+        title: "Passwort-Login",
+        description: "Standard-Passwort-Authentifizierung",
+        enabled: {
+          badge: "Aktiviert",
+        },
+      },
+      social: {
+        title: "Social-Login",
+        description: "Social-Media-Authentifizierungsoptionen",
+        enabled: {
+          badge: "Aktiviert",
+        },
+        providers: {
+          item: {
+            title: "Social-Media-Anbieter",
+            description: "Social-Authentifizierungsanbieter",
+          },
+          name: {
+            content: "Anbieter-Name",
+          },
+          id: {
+            content: "Anbieter-ID",
+          },
+          enabled: {
+            badge: "Verfügbar",
+          },
+          description: "Anbieter-Beschreibung",
+        },
+      },
+    },
+    security: {
+      title: "Sicherheitseinstellungen",
+      description: "Sicherheitsanforderungs-Zusammenfassung",
+      maxAttempts: {
+        content: "Maximale Login-Versuche",
+      },
+      requireTwoFactor: {
+        badge: "2FA erforderlich",
+      },
+    },
   },
   errors: {
     validation: {

@@ -36,7 +36,7 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.db.sql.post.form.title",
       description: "app.api.v1.core.system.db.sql.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -47,11 +47,8 @@ const { POST } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label: "app.api.v1.core.system.db.sql.fields.query.title",
           description: "app.api.v1.core.system.db.sql.fields.query.description",
-          layout: { columns: 12 },
-          validation: {
-            required: true,
-          },
-        },
+          columns: 12
+},
         z.string().min(1),
       ),
 
@@ -62,7 +59,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.sql.fields.dryRun.title",
           description:
             "app.api.v1.core.system.db.sql.fields.dryRun.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),
@@ -74,7 +71,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.sql.fields.verbose.title",
           description:
             "app.api.v1.core.system.db.sql.fields.verbose.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),
@@ -85,12 +82,8 @@ const { POST } = createEndpoint({
           fieldType: FieldDataType.NUMBER,
           label: "app.api.v1.core.system.db.sql.fields.limit.title",
           description: "app.api.v1.core.system.db.sql.fields.limit.description",
-          layout: { columns: 4 },
-          validation: {
-            min: 1,
-            max: 1000,
-          },
-        },
+          columns: 4
+},
         z.number().optional().default(100),
       ),
 

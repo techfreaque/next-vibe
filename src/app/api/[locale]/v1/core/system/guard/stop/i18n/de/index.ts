@@ -21,6 +21,21 @@ export const translations: typeof enTranslations = {
       description: "Spezifische Guard-ID zum Stoppen",
       placeholder: "guard_projekt_abc123",
     },
+    username: {
+      title: "Benutzername",
+    },
+    wasRunning: {
+      title: "War aktiv",
+    },
+    nowRunning: {
+      title: "Jetzt aktiv",
+    },
+    pid: {
+      title: "Prozess-ID",
+    },
+    forceStopped: {
+      title: "Erzwungener Stopp",
+    },
     stopAll: {
       title: "Alle Guards Stoppen",
       description: "Alle laufenden Guard-Umgebungen stoppen",

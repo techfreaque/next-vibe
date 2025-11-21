@@ -33,7 +33,13 @@ export const { GET, PATCH, tools } = endpointsHandler({
         });
       }
 
-      return success({ persona });
+      // Ensure suggestedPrompts is always defined as an array
+      return success({
+        persona: {
+          ...persona,
+          suggestedPrompts: persona.suggestedPrompts ?? [],
+        },
+      });
     },
   },
   [Methods.PATCH]: {

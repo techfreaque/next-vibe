@@ -49,7 +49,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.payment.invoice.post.form.title" as const,
       description:
         "app.api.v1.core.payment.invoice.post.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -63,9 +63,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.payment.invoice.customerId.description" as const,
           placeholder:
             "app.api.v1.core.payment.invoice.customerId.placeholder" as const,
-          layout: { columns: 12 },
-          validation: { required: false },
-        },
+          columns: 12},
         z.string().optional(),
       ),
 
@@ -78,11 +76,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.payment.invoice.amount.description" as const,
           placeholder:
             "app.api.v1.core.payment.invoice.amount.placeholder" as const,
-          validation: {
-            required: true,
-            min: 0.01,
-          },
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.number().min(0.01),
       ),
@@ -110,8 +104,7 @@ const { POST } = createEndpoint({
               label: "app.api.v1.core.payment.currency.pln" as const,
             },
           ],
-          validation: { required: true },
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.enum(["USD", "EUR", "PLN"]),
       ),
@@ -125,9 +118,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.payment.invoice.description.description" as const,
           placeholder:
             "app.api.v1.core.payment.invoice.description.placeholder" as const,
-          layout: { columns: 12 },
-          validation: { required: false },
-        },
+          columns: 12},
         z.string().optional(),
       ),
 
@@ -140,9 +131,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.payment.invoice.dueDate.description" as const,
           placeholder:
             "app.api.v1.core.payment.invoice.dueDate.placeholder" as const,
-          layout: { columns: 12 },
-          validation: { required: false },
-        },
+          columns: 12},
         z.string().optional(),
       ),
 
@@ -155,9 +144,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.payment.invoice.metadata.description" as const,
           placeholder:
             "app.api.v1.core.payment.invoice.metadata.placeholder" as const,
-          layout: { columns: 12 },
-          validation: { required: false },
-        },
+          columns: 12},
         z.record(z.string(), z.string()).optional(),
       ),
 
@@ -187,7 +174,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.payment.invoice.post.response.invoice.title" as const,
           description:
             "app.api.v1.core.payment.invoice.post.response.invoice.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {

@@ -64,7 +64,7 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
           const promises = [];
 
           // Run oxlint if not skipped (fast Rust linter)
-          if (!data.skipOxlint) {
+          if (!data.skipLint) {
             logger.info("Starting Oxlint check...");
             promises.push(
               oxlintRepository

@@ -21,9 +21,9 @@ You are an Import Path Standardization Specialist for a Next.js application with
 
 ## Documentation Reference
 
-**PRIMARY:** Read `/docs/development/import-patterns.md` for ALL patterns including:
+**PRIMARY:** Read `/docs/patterns/imports.md` for ALL patterns including:
 
-- System import patterns (NEW shared namespace paths)
+- System import patterns (shared namespace paths)
 - Package import standards
 - Database import patterns
 - Translation import patterns
@@ -58,7 +58,7 @@ Use `vibe` directly (globally available). Fix critical import errors before proc
 
 ### 2. Read Documentation
 
-Read `/docs/development/import-patterns.md` for complete patterns before making changes.
+Read `/docs/patterns/imports.md` for complete patterns before making changes.
 
 ### 3. Identify Import Issues
 
@@ -77,7 +77,7 @@ grep -r "EndpointLogger" src/app/api/[locale]/v1/{domain}/{subdomain}
 
 ### 4. Apply Standard Patterns
 
-Follow patterns from `/docs/development/import-patterns.md`:
+Follow patterns from `/docs/patterns/imports.md`:
 
 - Use NEW shared namespace paths (not cli/vibe)
 - Import types from types.ts (not schema.ts)
@@ -109,13 +109,13 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 ## Quality Checks
 
-Verify against `/docs/development/import-patterns.md`:
+Verify against `/docs/patterns/imports.md`:
 
 - System imports use shared namespace (not cli/vibe)
-- Types imported from types.ts (not schema.ts)
+- Types imported from types.ts or definition.ts (not schema.ts)
 - Node.js modules use node: prefix
 - Correct import ordering
-- Package imports use next-vibe/shared/*
+- Package imports use next-vibe/shared/\*
 - Database imports properly structured
 
 ## Cross-References
@@ -127,4 +127,4 @@ When encountering related issues:
 - Translation keys → `.claude/agents/translation-key-validator.md`
 - Enum imports → `.claude/agents/enum-validator.md`
 
-**Remember:** All detailed patterns are in `/docs/development/import-patterns.md`. Reference it, don't duplicate it.
+**Remember:** All detailed patterns are in `/docs/patterns/imports.md`. Reference it, don't duplicate it.

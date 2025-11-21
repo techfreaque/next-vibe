@@ -30,25 +30,25 @@ export const ChatMessageRoleDB = [
 export const ChatMessageRoleOptions = [
   {
     value: ChatMessageRole.USER,
-    label: "app.api.v1.core.agent.chat.enums.role.user",
+    label: "app.api.v1.core.agent.chat.enums.role.user" as const,
   },
   {
     value: ChatMessageRole.ASSISTANT,
-    label: "app.api.v1.core.agent.chat.enums.role.assistant",
+    label: "app.api.v1.core.agent.chat.enums.role.assistant" as const,
   },
   {
     value: ChatMessageRole.SYSTEM,
-    label: "app.api.v1.core.agent.chat.enums.role.system",
+    label: "app.api.v1.core.agent.chat.enums.role.system" as const,
   },
   {
     value: ChatMessageRole.TOOL,
-    label: "app.api.v1.core.agent.chat.enums.role.tool",
+    label: "app.api.v1.core.agent.chat.enums.role.tool" as const,
   },
   {
     value: ChatMessageRole.ERROR,
-    label: "app.api.v1.core.agent.chat.enums.role.error",
+    label: "app.api.v1.core.agent.chat.enums.role.error" as const,
   },
-] as const;
+];
 
 /**
  * Thread status enum

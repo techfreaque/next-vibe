@@ -36,6 +36,15 @@ export const translations: typeof enTranslations = {
         projectPath: "Ścieżka projektu",
       },
     },
+    summary: {
+      title: "Podsumowanie",
+    },
+    status: {
+      title: "Status",
+    },
+    hasIssues: {
+      title: "Ma problemy",
+    },
   },
   errors: {
     unauthorized: {

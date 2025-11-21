@@ -1,4 +1,20 @@
 export const translations = {
+  dateRange: {
+    today: "Today",
+    yesterday: "Yesterday",
+    last7Days: "Last 7 Days",
+    last30Days: "Last 30 Days",
+    last90Days: "Last 90 Days",
+    thisWeek: "This Week",
+    lastWeek: "Last Week",
+    thisMonth: "This Month",
+    lastMonth: "Last Month",
+    thisQuarter: "This Quarter",
+    lastQuarter: "Last Quarter",
+    thisYear: "This Year",
+    lastYear: "Last Year",
+    custom: "Custom Range",
+  },
   get: {
     title: "Get Email Statistics",
     description: "Retrieve comprehensive email statistics and metrics",
@@ -55,6 +71,12 @@ export const translations = {
     timePeriod: {
       label: "Time Period",
       description: "Time period granularity for historical data",
+      hour: "Hour",
+      day: "Day",
+      week: "Week",
+      month: "Month",
+      quarter: "Quarter",
+      year: "Year",
     },
     dateRangePreset: {
       label: "Date Range Preset",
@@ -71,6 +93,11 @@ export const translations = {
     chartType: {
       label: "Chart Type",
       description: "Visualization type for charts",
+      line: "Line Chart",
+      bar: "Bar Chart",
+      area: "Area Chart",
+      pie: "Pie Chart",
+      donut: "Donut Chart",
     },
     includeComparison: {
       label: "Include Comparison",

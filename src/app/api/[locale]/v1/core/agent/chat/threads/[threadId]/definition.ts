@@ -46,7 +46,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.get.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {
@@ -59,9 +59,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.get.id.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.get.id.description" as const,
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
         z.uuid(),
       ),
 
@@ -73,7 +71,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.get.response.thread.title" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.get.response.thread.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { response: true },
         {
@@ -315,7 +313,7 @@ const { PATCH } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.patch.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.patch.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -328,9 +326,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.patch.id.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.patch.id.description" as const,
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
         z.uuid(),
       ),
 
@@ -342,7 +338,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.patch.sections.updates.title" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.patch.sections.updates.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { request: "data" },
         {
@@ -354,7 +350,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.threadTitle.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.threadTitle.description" as const,
-              layout: { columns: 12 },
+              columns: 12,
             },
             z.string().min(1).max(255).optional(),
           ),
@@ -366,7 +362,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.folderId.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.folderId.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.uuid().optional().nullable(),
           ),
@@ -378,7 +374,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.status.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.status.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
               options: ThreadStatusOptions,
             },
             z.enum(ThreadStatus).optional(),
@@ -391,7 +387,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.defaultModel.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.defaultModel.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.nativeEnum(ModelId).nullable().optional(),
           ),
@@ -403,7 +399,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.defaultTone.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.defaultTone.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.string().nullable().optional(),
           ),
@@ -415,7 +411,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.systemPrompt.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.systemPrompt.description" as const,
-              layout: { columns: 12 },
+              columns: 12,
             },
             z.string().optional(),
           ),
@@ -427,7 +423,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.pinned.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.pinned.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.boolean().optional(),
           ),
@@ -439,7 +435,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.archived.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.archived.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.boolean().optional(),
           ),
@@ -451,7 +447,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.tags.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.tags.description" as const,
-              layout: { columns: 12 },
+              columns: 12,
             },
             z.array(z.string()).optional(),
           ),
@@ -463,7 +459,7 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.patch.published.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.threadId.patch.published.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.boolean().optional(),
           ),
@@ -478,7 +474,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.patch.response.thread.title" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.patch.response.thread.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { response: true },
         {
@@ -736,7 +732,7 @@ const { DELETE } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.delete.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.delete.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {
@@ -749,9 +745,7 @@ const { DELETE } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.delete.id.label" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.delete.id.description" as const,
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
         z.uuid(),
       ),
 

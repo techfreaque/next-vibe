@@ -94,7 +94,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.title",
       description:
         "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -107,7 +107,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.title",
           description:
             "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -120,7 +120,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.title",
           description:
             "app.api.v1.core.system.unifiedInterface.cli.setup.install.post.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),

@@ -62,8 +62,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.leads.campaigns.emails.testMail.post.form.title",
       description:
         "app.api.v1.core.leads.campaigns.emails.testMail.post.form.description",
-      layout: { type: LayoutType.STACKED },
-      children: [],
+      layoutType: LayoutType.STACKED,
     },
     {
       [Methods.POST]: { request: "data", response: true },
@@ -80,7 +79,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.campaigns.emails.testMail.post.campaignType.description",
           placeholder:
             "app.api.v1.core.leads.campaigns.emails.testMail.post.campaignType.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
           options: CampaignTypeOptions,
         },
         z.enum(CampaignType).optional(),
@@ -95,7 +94,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.campaigns.emails.testMail.post.emailJourneyVariant.description",
           placeholder:
             "app.api.v1.core.leads.campaigns.emails.testMail.post.emailJourneyVariant.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
           options: EmailJourneyVariantOptions,
         },
         z.enum(EmailJourneyVariant),
@@ -110,7 +109,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.campaigns.emails.testMail.post.emailCampaignStage.description",
           placeholder:
             "app.api.v1.core.leads.campaigns.emails.testMail.post.emailCampaignStage.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
           options: EmailCampaignStageOptions,
         },
         z.enum(EmailCampaignStage),
@@ -127,9 +126,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.campaigns.emails.testMail.post.testEmail.description",
           placeholder:
             "app.api.v1.core.leads.campaigns.emails.testMail.post.testEmail.placeholder",
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
         z
           .string()
           .email()
@@ -144,8 +141,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.title",
           description:
             "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.description",
-          layout: { type: LayoutType.GRID, columns: 2 },
-          children: [],
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { request: "data" },
         {
@@ -159,9 +155,8 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.businessName.description",
               placeholder:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.businessName.placeholder",
-              layout: { columns: 6 },
-              validation: { required: true, maxLength: 255 },
-            },
+              columns: 6
+},
             z
               .string()
               .min(1)
@@ -178,9 +173,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.contactName.description",
               placeholder:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.contactName.placeholder",
-              layout: { columns: 6 },
-              validation: { maxLength: 255 },
-            },
+              columns: 6},
             z
               .string()
               .max(255)
@@ -198,7 +191,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.website.description",
               placeholder:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.website.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
             },
             z
               .string()
@@ -218,8 +211,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.country.description",
               placeholder:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.country.placeholder",
-              layout: { columns: 6 },
-              validation: { required: true },
+              columns: 6,
               options: CountriesOptions,
             },
             z.enum(Countries),
@@ -234,8 +226,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.language.description",
               placeholder:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.language.placeholder",
-              layout: { columns: 6 },
-              validation: { required: true },
+              columns: 6,
               options: LanguagesOptions,
             },
             z.enum(Languages),
@@ -250,8 +241,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.status.description",
               placeholder:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.status.placeholder",
-              layout: { columns: 6 },
-              validation: { required: true },
+              columns: 6,
               options: LeadStatusOptions,
             },
             z.enum(LeadStatus),
@@ -266,7 +256,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.source.description",
               placeholder:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.source.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
               options: LeadSourceOptions,
             },
             z.enum(LeadSource).optional().nullable(),
@@ -281,9 +271,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.notes.description",
               placeholder:
                 "app.api.v1.core.leads.campaigns.emails.testMail.post.leadData.notes.placeholder",
-              layout: { columns: 12 },
-              validation: { maxLength: 1000 },
-            },
+              columns: 12},
             z
               .string()
               .max(1000)
@@ -302,8 +290,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.leads.campaigns.emails.testMail.post.response.title",
           description:
             "app.api.v1.core.leads.campaigns.emails.testMail.post.response.description",
-          layout: { type: LayoutType.STACKED },
-          children: [],
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {

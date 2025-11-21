@@ -59,6 +59,7 @@ export const translations: typeof enTranslations = {
         severity: "Schweregrad",
         message: "Nachricht",
         title: "Lint-Problem",
+        type: "Typ",
       },
     },
   },

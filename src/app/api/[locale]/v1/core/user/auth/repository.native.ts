@@ -112,7 +112,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
   }
 
   getAuthMinimalUser<
-    TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[],
   >(
     roles: TRoles,
     context: AuthContext,
@@ -129,7 +129,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
   }
 
   getTypedAuthMinimalUser<
-    TRoles extends readonly UserRoleValue[keyof UserRoleValue][],
+    TRoles extends readonly UserRoleValue[],
   >(
     roles: TRoles,
     context: AuthContext,
@@ -142,10 +142,10 @@ class AuthRepositoryNativeImpl implements AuthRepository {
   }
 
   getUserRoles(
-    requiredRoles: readonly UserRoleValue[keyof UserRoleValue][],
+    requiredRoles: readonly UserRoleValue[],
     context: AuthContext,
     logger: EndpointLogger,
-  ): Promise<UserRoleValue[keyof UserRoleValue][]> {
+  ): Promise<UserRoleValue[]> {
     logger.warn(
       "getUserRoles not implemented on native - not used in page.tsx",
     );

@@ -86,6 +86,7 @@ export const translations = {
     success: "Tool executed successfully",
     result: "Execution result",
     status: "Current execution status",
+    statusItem: "Status item",
     executionId: "Execution ID for tracking",
   },
 

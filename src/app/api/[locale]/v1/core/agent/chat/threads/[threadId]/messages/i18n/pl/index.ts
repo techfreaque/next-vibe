@@ -55,6 +55,15 @@ export const translations: typeof enTranslations = {
           tokens: {
             content: "Tokens",
           },
+          sequenceId: {
+            content: "ID sekwencji",
+          },
+          sequenceIndex: {
+            content: "Indeks sekwencji",
+          },
+          toolCalls: {
+            content: "Wywołania narzędzi",
+          },
           createdAt: {
             content: "Created At",
           },

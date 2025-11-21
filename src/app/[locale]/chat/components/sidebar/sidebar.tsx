@@ -17,10 +17,7 @@ import type { JSX } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
-import {
-  type DefaultFolderId,
-  DEFAULT_FOLDER_IDS,
-} from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { useCredits } from "@/app/api/[locale]/v1/core/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -109,13 +106,13 @@ export function ChatSidebar({
   // Get color for the active root folder - using simple color mapping
   const rootFolderColor = useMemo(
     () =>
-      activeRootFolderId === DEFAULT_FOLDER_IDS.PRIVATE
+      activeRootFolderId === DefaultFolderId.PRIVATE
         ? "sky"
-        : activeRootFolderId === DEFAULT_FOLDER_IDS.INCOGNITO
+        : activeRootFolderId === DefaultFolderId.INCOGNITO
           ? "purple"
-          : activeRootFolderId === DEFAULT_FOLDER_IDS.SHARED
+          : activeRootFolderId === DefaultFolderId.SHARED
             ? "teal"
-            : activeRootFolderId === DEFAULT_FOLDER_IDS.PUBLIC
+            : activeRootFolderId === DefaultFolderId.PUBLIC
               ? "amber"
               : "zinc",
     [activeRootFolderId],
@@ -128,8 +125,8 @@ export function ChatSidebar({
       // If user is not authenticated and tries to access private/shared folders, redirect to public
       if (
         !isAuthenticated &&
-        rootFolderId !== DEFAULT_FOLDER_IDS.PUBLIC &&
-        rootFolderId !== DEFAULT_FOLDER_IDS.INCOGNITO
+        rootFolderId !== DefaultFolderId.PUBLIC &&
+        rootFolderId !== DefaultFolderId.INCOGNITO
       ) {
         logger.info(
           "Non-authenticated user attempted to access private/shared folder, redirecting to public",
@@ -137,7 +134,7 @@ export function ChatSidebar({
             attemptedFolder: rootFolderId,
           },
         );
-        const url = buildFolderUrl(locale, DEFAULT_FOLDER_IDS.PUBLIC, null);
+        const url = buildFolderUrl(locale, DefaultFolderId.PUBLIC, null);
         router.push(url);
         return;
       }

@@ -9,6 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interf
 import {
   objectField,
   requestDataField,
+  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
@@ -27,7 +28,12 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.guard.stop.description",
   category: "app.api.v1.core.system.guard.category",
   tags: ["app.api.v1.core.system.guard.stop.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+    UserRole.WEB_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["guard:stop", "guard-stop"],
 
   fields: objectField(
@@ -35,7 +41,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.guard.stop.container.title",
       description: "app.api.v1.core.system.guard.stop.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -49,7 +56,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.guard.stop.fields.projectPath.description",
           placeholder:
             "app.api.v1.core.system.guard.stop.fields.projectPath.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -63,7 +70,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.guard.stop.fields.guardId.description",
           placeholder:
             "app.api.v1.core.system.guard.stop.fields.guardId.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -75,7 +82,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.guard.stop.fields.stopAll.title",
           description:
             "app.api.v1.core.system.guard.stop.fields.stopAll.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),
@@ -87,7 +94,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.guard.stop.fields.force.title",
           description:
             "app.api.v1.core.system.guard.stop.fields.force.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),
@@ -109,25 +116,83 @@ const { POST } = createEndpoint({
         z.string(),
       ),
 
-      stoppedGuards: responseField(
+      stoppedGuards: responseArrayField(
         {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.system.guard.stop.fields.stoppedGuards.title",
+          type: WidgetType.DATA_TABLE,
+          title: "app.api.v1.core.system.guard.stop.fields.stoppedGuards.title",
         },
-        z
-          .array(
-            z.object({
-              guardId: z.string(),
-              username: z.string(),
-              projectPath: z.string(),
-              wasRunning: z.boolean(),
-              nowRunning: z.boolean(),
-              pid: z.number().optional(),
-              forceStopped: z.boolean().optional(),
-            }),
-          )
-          .optional(),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 4,
+          },
+          { response: true },
+          {
+            guardId: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.stop.fields.guardId.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+            username: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.stop.fields.username.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+            projectPath: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.stop.fields.projectPath.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+            wasRunning: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.stop.fields.wasRunning.title",
+                fieldType: FieldDataType.BOOLEAN,
+              },
+              z.boolean(),
+            ),
+            nowRunning: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.stop.fields.nowRunning.title",
+                fieldType: FieldDataType.BOOLEAN,
+              },
+              z.boolean(),
+            ),
+            pid: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.v1.core.system.guard.stop.fields.pid.title",
+                fieldType: FieldDataType.NUMBER,
+              },
+              z.number().optional(),
+            ),
+            forceStopped: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.guard.stop.fields.forceStopped.title",
+                fieldType: FieldDataType.BOOLEAN,
+              },
+              z.boolean().optional(),
+            ),
+          },
+        ),
       ),
 
       totalStopped: responseField(

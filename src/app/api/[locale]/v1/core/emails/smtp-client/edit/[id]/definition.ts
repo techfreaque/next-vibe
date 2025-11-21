@@ -166,7 +166,7 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.emails.smtpClient.edit.id.get.container.title",
       description:
         "app.api.v1.core.emails.smtpClient.edit.id.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "urlPathParams", response: true },
     {
@@ -178,7 +178,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.emails.smtpClient.edit.id.fields.id.label",
           description:
             "app.api.v1.core.emails.smtpClient.edit.id.fields.id.description",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.uuid(),
       ),
@@ -191,7 +191,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.smtpClient.edit.id.response.account.title",
           description:
             "app.api.v1.core.emails.smtpClient.edit.id.response.account.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         accountResponseFields,
@@ -309,7 +309,7 @@ const { PUT } = createEndpoint({
       title: "app.api.v1.core.emails.smtpClient.edit.id.put.container.title",
       description:
         "app.api.v1.core.emails.smtpClient.edit.id.put.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -321,7 +321,7 @@ const { PUT } = createEndpoint({
           label: "app.api.v1.core.emails.smtpClient.edit.id.fields.id.label",
           description:
             "app.api.v1.core.emails.smtpClient.edit.id.fields.id.description",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.uuid(),
       ),
@@ -333,7 +333,7 @@ const { PUT } = createEndpoint({
           title: "app.api.v1.core.emails.smtpClient.edit.id.put.updates.title",
           description:
             "app.api.v1.core.emails.smtpClient.edit.id.put.updates.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { request: "data" },
         {
@@ -347,9 +347,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.name.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.name.placeholder",
-              layout: { columns: 6 },
-              validation: { required: false },
-            },
+              columns: 6},
             z.string().min(1).optional(),
           ),
 
@@ -363,9 +361,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.description.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.description.placeholder",
-              layout: { columns: 12 },
-              validation: { required: false },
-            },
+              columns: 12},
             z.string().optional(),
           ),
 
@@ -379,7 +375,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.host.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.host.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.string().min(1).optional(),
           ),
@@ -394,7 +390,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.port.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.port.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.number().min(1).max(65535).optional(),
           ),
@@ -409,7 +405,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.securityType.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.securityType.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
               options: SmtpSecurityTypeOptions,
             },
             z.enum(SmtpSecurityType).optional(),
@@ -425,7 +421,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.username.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.username.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.string().min(1).optional(),
           ),
@@ -440,7 +436,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.password.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.password.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.string().min(1).optional(),
           ),
@@ -455,7 +451,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.fromEmail.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.fromEmail.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.email().optional(),
           ),
@@ -470,7 +466,7 @@ const { PUT } = createEndpoint({
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.priority.description",
               placeholder:
                 "app.api.v1.core.emails.smtpClient.edit.id.fields.priority.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.number().int().min(1).max(100).optional(),
           ),
@@ -485,7 +481,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.emails.smtpClient.edit.id.response.account.title",
           description:
             "app.api.v1.core.emails.smtpClient.edit.id.response.account.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         accountResponseFields,

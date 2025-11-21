@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.agent.chat.credits.history.get.container.title",
       description:
         "app.api.v1.core.agent.chat.credits.history.get.container.description",
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -58,9 +58,7 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.INT,
           label: "app.api.v1.core.agent.chat.credits.history.get.limit.label",
           description:
-            "app.api.v1.core.agent.chat.credits.history.get.limit.description",
-          validation: { required: false },
-        },
+            "app.api.v1.core.agent.chat.credits.history.get.limit.description"},
         z.coerce.number().int().min(1).max(100).default(50),
       ),
 
@@ -70,19 +68,19 @@ const { GET } = createEndpoint({
           fieldType: FieldDataType.INT,
           label: "app.api.v1.core.agent.chat.credits.history.get.offset.label",
           description:
-            "app.api.v1.core.agent.chat.credits.history.get.offset.description",
-          validation: { required: false },
-        },
+            "app.api.v1.core.agent.chat.credits.history.get.offset.description"},
         z.coerce.number().int().min(0).default(0),
       ),
 
       // === RESPONSE FIELDS ===
       transactions: responseArrayField(
-        {},
+        {
+          type: WidgetType.DATA_LIST,
+        },
         objectField(
           {
             type: WidgetType.CONTAINER,
-            layout: { type: LayoutType.STACKED },
+            layoutType: LayoutType.STACKED,
           },
           { response: true },
           {

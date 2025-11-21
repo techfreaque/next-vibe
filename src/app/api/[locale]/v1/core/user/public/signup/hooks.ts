@@ -65,6 +65,9 @@ export function useRegister(): SignupFormReturn & {
       // Clear lead tracking data on successful signup
       logger.info("app.api.v1.core.user.public.signup.success.processing");
 
+      // Clear referral code from localStorage after successful signup
+      localStorage.removeItem("referralCode");
+
       const setTokenResponse = await authClientRepository.setAuthStatus(logger);
       if (!setTokenResponse.success) {
         toast({

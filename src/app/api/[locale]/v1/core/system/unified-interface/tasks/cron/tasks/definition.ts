@@ -56,7 +56,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -72,7 +72,7 @@ const { GET } = createEndpoint({
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.status.placeholder",
           options: CronTaskStatusOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.array(z.enum(CronTaskStatusDB)).optional(),
       ),
@@ -87,7 +87,7 @@ const { GET } = createEndpoint({
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.priority.placeholder",
           options: CronTaskPriorityOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.array(z.enum(CronTaskPriorityDB)).optional(),
       ),
@@ -102,7 +102,7 @@ const { GET } = createEndpoint({
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.category.placeholder",
           options: TaskCategoryOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.array(z.enum(TaskCategoryDB)).optional(),
       ),
@@ -114,7 +114,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.enabled.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.enabled.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional(),
       ),
@@ -126,7 +126,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.limit.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.limit.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional(),
       ),
@@ -138,7 +138,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.offset.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.offset.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.string().optional(),
       ),
@@ -152,37 +152,31 @@ const { GET } = createEndpoint({
               key: "name",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.name",
-              type: FieldDataType.TEXT,
             },
             {
               key: "status",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.status",
-              type: FieldDataType.BADGE,
             },
             {
               key: "priority",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.priority",
-              type: FieldDataType.BADGE,
             },
             {
               key: "category",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.category",
-              type: FieldDataType.TEXT,
             },
             {
               key: "lastRun",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.lastRun",
-              type: FieldDataType.DATETIME,
             },
             {
               key: "nextRun",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.nextRun",
-              type: FieldDataType.DATETIME,
             },
           ],
         },
@@ -193,7 +187,7 @@ const { GET } = createEndpoint({
               "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.title",
             description:
               "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.description",
-            layout: { type: LayoutType.GRID, columns: 12 },
+            layoutType: LayoutType.GRID, columns: 12,
           },
           { response: true },
           {
@@ -412,7 +406,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -427,7 +421,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.name.description",
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.name.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().min(1),
       ),
@@ -441,7 +435,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.description.description",
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.description.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().optional(),
       ),
@@ -455,7 +449,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.schedule.description",
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.schedule.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().min(1),
       ),
@@ -468,7 +462,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.priority.description",
           options: CronTaskPriorityOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(CronTaskPriorityDB).default(CronTaskPriority.MEDIUM),
       ),
@@ -481,7 +475,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.category.description",
           options: TaskCategoryOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(TaskCategoryDB).default(TaskCategory.SYSTEM),
       ),
@@ -493,7 +487,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.enabled.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.enabled.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(true),
       ),
@@ -505,7 +499,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.timeout.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.timeout.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.number().default(300000),
       ),
@@ -517,7 +511,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.retries.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.retries.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.number().default(3),
       ),
@@ -529,7 +523,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.retryDelay.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.retryDelay.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.number().default(5000),
       ),
@@ -537,7 +531,8 @@ const { POST } = createEndpoint({
       // Response - return the created task
       task: responseField(
         {
-          title:
+          type: WidgetType.TEXT,
+          content:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.tasks.post.response.task.title",
         },
         z.object({

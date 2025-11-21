@@ -57,6 +57,7 @@ export const translations = {
       confirmPasswordLabel: "Confirm Password",
       confirmPasswordPlaceholder: "Confirm your password",
       newsletterSubscription: "Subscribe to newsletter",
+      usingReferralCode: "Using referral code",
     },
   },
   post: {

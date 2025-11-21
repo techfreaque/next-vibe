@@ -9,7 +9,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
-import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -32,7 +32,7 @@ export function MessagePreview({
   shortId,
   position,
   locale,
-  rootFolderId = "private",
+  rootFolderId = DefaultFolderId.PRIVATE,
 }: MessagePreviewProps): JSX.Element {
   const { t } = simpleT(locale);
   const idColor = getIdColor(shortId);

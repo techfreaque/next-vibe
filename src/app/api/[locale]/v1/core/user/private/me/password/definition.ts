@@ -40,7 +40,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.user.private.me.password.title" as const,
       description:
         "app.api.v1.core.user.private.me.password.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.private.me.password.groups.currentCredentials.title" as const,
           description:
             "app.api.v1.core.user.private.me.password.groups.currentCredentials.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { request: "data" },
         {
@@ -66,8 +66,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.private.me.password.currentPassword.description" as const,
               placeholder:
                 "app.api.v1.core.user.private.me.password.currentPassword.placeholder" as const,
-              required: true,
-              layout: { columns: 12 },
+              columns: 12,
               helpText:
                 "app.api.v1.core.user.private.me.password.currentPassword.description" as const,
             },
@@ -87,7 +86,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.private.me.password.groups.newCredentials.title" as const,
           description:
             "app.api.v1.core.user.private.me.password.groups.newCredentials.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { request: "data" },
         {
@@ -101,8 +100,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.private.me.password.newPassword.description" as const,
               placeholder:
                 "app.api.v1.core.user.private.me.password.newPassword.placeholder" as const,
-              required: true,
-              layout: { columns: 12 },
+              columns: 12,
               helpText:
                 "app.api.v1.core.user.private.me.password.newPassword.description" as const,
             },
@@ -122,8 +120,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.private.me.password.confirmPassword.description" as const,
               placeholder:
                 "app.api.v1.core.user.private.me.password.confirmPassword.placeholder" as const,
-              required: true,
-              layout: { columns: 12 },
+              columns: 12,
               helpText:
                 "app.api.v1.core.user.private.me.password.confirmPassword.description" as const,
             },
@@ -146,8 +143,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.private.me.password.twoFactorCode.description" as const,
           placeholder:
             "app.api.v1.core.user.private.me.password.twoFactorCode.placeholder" as const,
-          required: false,
-          layout: { columns: 12 },
+              columns: 12,
           helpText:
             "app.api.v1.core.user.private.me.password.twoFactorCode.description" as const,
         },
@@ -162,7 +158,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.private.me.password.response.title" as const,
           description:
             "app.api.v1.core.user.private.me.password.response.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {

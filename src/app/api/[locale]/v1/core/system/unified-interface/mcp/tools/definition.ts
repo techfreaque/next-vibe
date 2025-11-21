@@ -12,7 +12,6 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
-  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
@@ -44,7 +43,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.mcp.tools.get.response.title" as const,
       description:
         "app.api.v1.core.system.unifiedInterface.mcp.tools.get.response.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { response: true },
     {
@@ -56,19 +55,16 @@ const { GET } = createEndpoint({
               key: "name",
               label:
                 "app.api.v1.core.system.unifiedInterface.mcp.tools.get.fields.name" as const,
-              type: FieldDataType.TEXT,
             },
             {
               key: "description",
               label:
                 "app.api.v1.core.system.unifiedInterface.mcp.tools.get.fields.description" as const,
-              type: FieldDataType.TEXT,
             },
             {
               key: "inputSchema",
               label:
                 "app.api.v1.core.system.unifiedInterface.mcp.tools.get.fields.inputSchema" as const,
-              type: FieldDataType.TEXT,
             },
           ],
         },

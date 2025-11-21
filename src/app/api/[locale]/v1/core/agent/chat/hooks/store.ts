@@ -87,7 +87,6 @@ export interface ChatFolder {
   parentId: string | null;
   expanded: boolean;
   sortOrder: number;
-  metadata: Record<string, string | number | boolean | null>;
   rolesView?: UserRoleValue[] | null; // Roles that can view/read this folder
   rolesManage?: UserRoleValue[] | null; // Roles that can edit folder and create subfolders
   rolesCreateThread?: UserRoleValue[] | null; // Roles that can create threads in this folder

@@ -29,13 +29,14 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.help.list.post.description",
   category: "app.api.v1.core.system.help.category",
   tags: ["app.api.v1.core.system.help.list.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
   aliases: ["list", "ls", "commands"],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -49,7 +50,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.help.list.fields.category.description",
           placeholder:
             "app.api.v1.core.system.help.list.fields.category.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -61,7 +62,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.help.list.fields.format.label",
           description:
             "app.api.v1.core.system.help.list.fields.format.description",
-          layout: { columns: 6 },
+          columns: 6,
           options: [
             {
               value: "tree",
@@ -90,7 +91,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.help.list.fields.showAliases.label",
           description:
             "app.api.v1.core.system.help.list.fields.showAliases.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(true),
       ),
@@ -103,7 +104,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.help.list.fields.showDescriptions.label",
           description:
             "app.api.v1.core.system.help.list.fields.showDescriptions.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(true),
       ),
@@ -117,55 +118,60 @@ const { POST } = createEndpoint({
           type: WidgetType.GROUPED_LIST,
           groupBy: "category",
           sortBy: "alias",
-          showGroupSummary: false,
           hierarchical: true,
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
-            layout: { type: LayoutType.HORIZONTAL },
+            layoutType: LayoutType.HORIZONTAL,
           },
           { response: true },
           {
             alias: responseField(
               {
                 type: WidgetType.TEXT,
-                fieldType: FieldDataType.TEXT,
+                content:
+                  "app.api.v1.core.system.help.list.fields.commands.alias" as const,
               },
               z.string(),
             ),
             message: responseField(
               {
                 type: WidgetType.TEXT,
-                fieldType: FieldDataType.TEXT,
+                content:
+                  "app.api.v1.core.system.help.list.fields.commands.message" as const,
               },
               z.string(),
             ),
             description: responseField(
               {
                 type: WidgetType.TEXT,
-                fieldType: FieldDataType.TEXT,
+                content:
+                  "app.api.v1.core.system.help.list.fields.commands.description" as const,
               },
               z.string().optional(),
             ),
             category: responseField(
               {
                 type: WidgetType.TEXT,
-                fieldType: FieldDataType.TEXT,
+                content:
+                  "app.api.v1.core.system.help.list.fields.commands.category" as const,
               },
               z.string(),
             ),
             aliases: responseField(
               {
                 type: WidgetType.TEXT,
-                fieldType: FieldDataType.TEXT,
+                content:
+                  "app.api.v1.core.system.help.list.fields.commands.aliases" as const,
               },
               z.string().optional(),
             ),
             rule: responseField(
               {
                 type: WidgetType.TEXT,
-                fieldType: FieldDataType.TEXT,
+                content:
+                  "app.api.v1.core.system.help.list.fields.commands.rule" as const,
               },
               z.string(),
             ),

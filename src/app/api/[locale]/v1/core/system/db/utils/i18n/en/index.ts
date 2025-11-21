@@ -21,9 +21,15 @@ export const translations = {
   },
   connections: {
     title: "Connection Status",
+    primary: "Primary Connection",
+    replica: "Replica Connection",
   },
   details: {
     title: "Database Details",
+    version: "Version",
+    uptime: "Uptime (seconds)",
+    activeConnections: "Active Connections",
+    maxConnections: "Max Connections",
   },
   errors: {
     health_check_failed: "Database health check failed",

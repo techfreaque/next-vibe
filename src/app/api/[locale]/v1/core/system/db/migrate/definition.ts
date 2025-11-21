@@ -36,7 +36,7 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.db.migrate.post.form.title",
       description: "app.api.v1.core.system.db.migrate.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -48,7 +48,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.migrate.fields.generate.title",
           description:
             "app.api.v1.core.system.db.migrate.fields.generate.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -60,7 +60,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.migrate.fields.redo.title",
           description:
             "app.api.v1.core.system.db.migrate.fields.redo.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -72,7 +72,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.migrate.fields.schema.title",
           description:
             "app.api.v1.core.system.db.migrate.fields.schema.description",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().default("public"),
       ),
@@ -84,7 +84,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.migrate.fields.dryRun.title",
           description:
             "app.api.v1.core.system.db.migrate.fields.dryRun.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),

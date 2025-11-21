@@ -9,6 +9,8 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interf
 import {
   objectField,
   requestDataField,
+  responseArrayField,
+  responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
@@ -59,8 +61,7 @@ const { PATCH } = createEndpoint({
       title: "app.api.v1.core.leads.batch.patch.form.title" as const,
       description:
         "app.api.v1.core.leads.batch.patch.form.description" as const,
-      layout: { type: LayoutType.STACKED },
-      children: [],
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -144,9 +145,8 @@ const { PATCH } = createEndpoint({
           fieldType: FieldDataType.NUMBER,
           label: "app.api.v1.core.leads.batch.patch.maxRecords.label" as const,
           description:
-            "app.api.v1.core.leads.batch.patch.maxRecords.description" as const,
-          validation: { min: 1, max: 10000 },
-        },
+            "app.api.v1.core.leads.batch.patch.maxRecords.description" as const
+},
         z.number().min(1).max(10000).optional().default(1000),
       ),
       // Update data
@@ -156,8 +156,7 @@ const { PATCH } = createEndpoint({
           title: "app.api.v1.core.leads.batch.patch.updates.title" as const,
           description:
             "app.api.v1.core.leads.batch.patch.updates.description" as const,
-          layout: { type: LayoutType.GRID_2_COLUMNS },
-          children: [],
+          layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { request: "data" },
         {
@@ -217,8 +216,7 @@ const { PATCH } = createEndpoint({
           title: "app.api.v1.core.leads.batch.patch.response.title" as const,
           description:
             "app.api.v1.core.leads.batch.patch.response.description" as const,
-          layout: { type: LayoutType.STACKED },
-          children: [],
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -254,37 +252,91 @@ const { PATCH } = createEndpoint({
             },
             z.number(),
           ),
-          preview: responseField(
+          preview: responseArrayOptionalField(
             {
-              type: WidgetType.TEXT,
-              content:
+              type: WidgetType.DATA_LIST,
+              title: "app.api.v1.core.leads.batch.patch.response.preview" as const,
+              description:
                 "app.api.v1.core.leads.batch.patch.response.preview" as const,
             },
-            z
-              .array(
-                z.object({
-                  id: z.string(),
-                  email: z.string().nullable(),
-                  businessName: z.string(),
-                  currentStatus: z.enum(LeadStatus),
-                  currentCampaignStage: z
-                    .nativeEnum(EmailCampaignStage)
-                    .nullable(),
-                }),
-              )
-              .optional(),
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+                title: "app.api.v1.core.leads.batch.patch.response.preview" as const,
+                layoutType: LayoutType.GRID,
+                columns: 12,
+              },
+              { response: true },
+              {
+                id: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.batch.patch.response.preview" as const,
+                  },
+                  z.string(),
+                ),
+                email: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.batch.patch.response.preview" as const,
+                  },
+                  z.string().nullable(),
+                ),
+                businessName: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.batch.patch.response.preview" as const,
+                  },
+                  z.string(),
+                ),
+                currentStatus: responseField(
+                  {
+                    type: WidgetType.BADGE,
+                    text: "app.api.v1.core.leads.batch.patch.response.preview" as const,
+                  },
+                  z.enum(LeadStatus),
+                ),
+                currentCampaignStage: responseField(
+                  {
+                    type: WidgetType.BADGE,
+                    text: "app.api.v1.core.leads.batch.patch.response.preview" as const,
+                  },
+                  z.nativeEnum(EmailCampaignStage).nullable(),
+                ),
+              },
+            ),
           ),
-          errors: responseField(
+          errors: responseArrayField(
             {
-              type: WidgetType.TEXT,
-              content:
+              type: WidgetType.DATA_LIST,
+              title: "app.api.v1.core.leads.batch.patch.response.errors" as const,
+              description:
                 "app.api.v1.core.leads.batch.patch.response.errors" as const,
             },
-            z.array(
-              z.object({
-                leadId: z.string(),
-                error: z.string(),
-              }),
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+                title: "app.api.v1.core.leads.batch.patch.response.errors" as const,
+                layoutType: LayoutType.GRID,
+                columns: 12,
+              },
+              { response: true },
+              {
+                leadId: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.batch.patch.response.errors" as const,
+                  },
+                  z.string(),
+                ),
+                error: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.batch.patch.response.errors" as const,
+                  },
+                  z.string(),
+                ),
+              },
             ),
           ),
         },
@@ -375,6 +427,7 @@ const { PATCH } = createEndpoint({
           totalMatched: 50,
           totalProcessed: 45,
           totalUpdated: 45,
+          preview: [],
           errors: [],
         },
       },
@@ -404,8 +457,7 @@ const { DELETE } = createEndpoint({
       title: "app.api.v1.core.leads.batch.delete.form.title" as const,
       description:
         "app.api.v1.core.leads.batch.delete.form.description" as const,
-      layout: { type: LayoutType.STACKED },
-      children: [],
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -460,9 +512,8 @@ const { DELETE } = createEndpoint({
           fieldType: FieldDataType.NUMBER,
           label: "app.api.v1.core.leads.batch.delete.maxRecords.label" as const,
           description:
-            "app.api.v1.core.leads.batch.delete.maxRecords.description" as const,
-          validation: { min: 1, max: 10000 },
-        },
+            "app.api.v1.core.leads.batch.delete.maxRecords.description" as const
+},
         z.number().min(1).max(10000).optional().default(1000),
       ),
       // Response fields
@@ -472,8 +523,7 @@ const { DELETE } = createEndpoint({
           title: "app.api.v1.core.leads.batch.delete.response.title" as const,
           description:
             "app.api.v1.core.leads.batch.delete.response.description" as const,
-          layout: { type: LayoutType.STACKED },
-          children: [],
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -509,37 +559,91 @@ const { DELETE } = createEndpoint({
             },
             z.number(),
           ),
-          preview: responseField(
+          preview: responseArrayOptionalField(
             {
-              type: WidgetType.TEXT,
-              content:
+              type: WidgetType.DATA_LIST,
+              title: "app.api.v1.core.leads.batch.delete.response.preview" as const,
+              description:
                 "app.api.v1.core.leads.batch.delete.response.preview" as const,
             },
-            z
-              .array(
-                z.object({
-                  id: z.string(),
-                  email: z.string().nullable(),
-                  businessName: z.string(),
-                  currentStatus: z.enum(LeadStatus),
-                  currentCampaignStage: z
-                    .nativeEnum(EmailCampaignStage)
-                    .nullable(),
-                }),
-              )
-              .optional(),
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+                title: "app.api.v1.core.leads.batch.delete.response.preview" as const,
+                layoutType: LayoutType.GRID,
+                columns: 12,
+              },
+              { response: true },
+              {
+                id: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.batch.delete.response.preview" as const,
+                  },
+                  z.string(),
+                ),
+                email: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.batch.delete.response.preview" as const,
+                  },
+                  z.string().nullable(),
+                ),
+                businessName: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.batch.delete.response.preview" as const,
+                  },
+                  z.string(),
+                ),
+                currentStatus: responseField(
+                  {
+                    type: WidgetType.BADGE,
+                    text: "app.api.v1.core.leads.batch.delete.response.preview" as const,
+                  },
+                  z.enum(LeadStatus),
+                ),
+                currentCampaignStage: responseField(
+                  {
+                    type: WidgetType.BADGE,
+                    text: "app.api.v1.core.leads.batch.delete.response.preview" as const,
+                  },
+                  z.nativeEnum(EmailCampaignStage).nullable(),
+                ),
+              },
+            ),
           ),
-          errors: responseField(
+          errors: responseArrayField(
             {
-              type: WidgetType.TEXT,
-              content:
+              type: WidgetType.DATA_LIST,
+              title: "app.api.v1.core.leads.batch.delete.response.errors" as const,
+              description:
                 "app.api.v1.core.leads.batch.delete.response.errors" as const,
             },
-            z.array(
-              z.object({
-                leadId: z.string(),
-                error: z.string(),
-              }),
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+                title: "app.api.v1.core.leads.batch.delete.response.errors" as const,
+                layoutType: LayoutType.GRID,
+                columns: 12,
+              },
+              { response: true },
+              {
+                leadId: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.batch.delete.response.errors" as const,
+                  },
+                  z.string(),
+                ),
+                error: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.v1.core.leads.batch.delete.response.errors" as const,
+                  },
+                  z.string(),
+                ),
+              },
             ),
           ),
         },
@@ -624,6 +728,7 @@ const { DELETE } = createEndpoint({
           totalMatched: 10,
           totalProcessed: 10,
           totalDeleted: 10,
+          preview: [],
           errors: [],
         },
       },

@@ -44,19 +44,12 @@ import type { z } from "zod";
 
 import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { type UserPermissionRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import { DEFAULT_FOLDER_IDS, type DefaultFolderId } from "./config";
+import type { DefaultFolderId } from "./config";
 import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
 
-// Create array of root folder IDs for Drizzle enum
-const RootFolderIdDB = [
-  DEFAULT_FOLDER_IDS.PRIVATE,
-  DEFAULT_FOLDER_IDS.SHARED,
-  DEFAULT_FOLDER_IDS.PUBLIC,
-  DEFAULT_FOLDER_IDS.INCOGNITO,
-] as const;
 import type { ModelId } from "./model-access/models";
 import {
   type CustomPersona,
@@ -65,12 +58,6 @@ import {
   type NewCustomPersona,
 } from "./personas/db";
 import { leads } from "@/app/api/[locale]/v1/core/leads/db";
-
-/**
- * Folder metadata structure
- * Currently empty, can be extended with specific fields in the future
- */
-type FolderMetadata = Record<string, never>;
 
 /**
  * Thread metadata structure
@@ -225,10 +212,7 @@ export const chatFolders = pgTable(
     leadId: uuid("lead_id").references(() => leads.id, { onDelete: "cascade" }),
 
     // Root folder (constant: private, shared, public, incognito)
-    rootFolderId: text("root_folder_id", { enum: RootFolderIdDB })
-      .$type<DefaultFolderId>()
-      .notNull()
-      .default("private"),
+    rootFolderId: text("root_folder_id").$type<DefaultFolderId>().notNull(),
 
     // Folder details
     name: text("name").notNull(),
@@ -244,9 +228,6 @@ export const chatFolders = pgTable(
     expanded: boolean("expanded").default(true).notNull(),
     sortOrder: integer("sort_order").default(0).notNull(),
 
-    // Metadata
-    metadata: jsonb("metadata").$type<FolderMetadata>().default({}),
-
     // Permission roles - 6-Role Model for Folders
     // null = inherit from parent folder
     // [] = no roles allowed (explicit deny)
@@ -256,27 +237,32 @@ export const chatFolders = pgTable(
     // rolesView: Who can view/read the folder and its existence
     // Inherits to: subfolders, threads
     // Note: .$type<T[]> without | null, nullability inferred
-    rolesView: jsonb("roles_view").$type<UserRoleValue[]>(),
+    rolesView: jsonb("roles_view").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // rolesManage: Who can edit/rename folder AND create subfolders
     // Inherits to: subfolders only (not threads)
-    rolesManage: jsonb("roles_manage").$type<UserRoleValue[]>(),
+    rolesManage:
+      jsonb("roles_manage").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // rolesCreateThread: Who can create new threads in this folder
     // Inherits to: subfolders, threads
-    rolesCreateThread: jsonb("roles_create_thread").$type<UserRoleValue[]>(),
+    rolesCreateThread: jsonb("roles_create_thread").$type<
+      (typeof UserPermissionRoleValue)[]
+    >(),
 
     // rolesPost: Who can post messages in threads within this folder
     // Inherits to: subfolders, threads
-    rolesPost: jsonb("roles_post").$type<UserRoleValue[]>(),
+    rolesPost: jsonb("roles_post").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // rolesModerate: Who can moderate/hide content (messages, threads)
     // Inherits to: subfolders, threads
-    rolesModerate: jsonb("roles_moderate").$type<UserRoleValue[]>(),
+    rolesModerate:
+      jsonb("roles_moderate").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // rolesAdmin: Who can delete content and manage permissions
     // Inherits to: subfolders, threads
-    rolesAdmin: jsonb("roles_admin").$type<UserRoleValue[]>(),
+    rolesAdmin:
+      jsonb("roles_admin").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -367,19 +353,21 @@ export const chatThreads = pgTable(
 
     // rolesView: Who can view/read the thread and its messages
     // Note: .$type<T[]> without | null, nullability inferred
-    rolesView: jsonb("roles_view").$type<UserRoleValue[]>(),
+    rolesView: jsonb("roles_view").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // rolesEdit: Who can edit the thread (title, settings, etc.)
-    rolesEdit: jsonb("roles_edit").$type<UserRoleValue[]>(),
+    rolesEdit: jsonb("roles_edit").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // rolesPost: Who can post messages in this thread
-    rolesPost: jsonb("roles_post").$type<UserRoleValue[]>(),
+    rolesPost: jsonb("roles_post").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // rolesModerate: Who can moderate/hide messages in this thread
-    rolesModerate: jsonb("roles_moderate").$type<UserRoleValue[]>(),
+    rolesModerate:
+      jsonb("roles_moderate").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // rolesAdmin: Who can delete the thread and manage permissions
-    rolesAdmin: jsonb("roles_admin").$type<UserRoleValue[]>(),
+    rolesAdmin:
+      jsonb("roles_admin").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // Published status (for SHARED folders - allows public read access via link)
     published: boolean("published").default(false).notNull(),

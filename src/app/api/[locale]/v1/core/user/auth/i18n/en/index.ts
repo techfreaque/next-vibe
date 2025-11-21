@@ -183,6 +183,12 @@ export const translations = {
     get: {
       title: "Check Authentication",
       description: "Check current authentication status",
+      response: {
+        title: "Authentication Status",
+        description: "Current authentication state",
+        authenticated: "Authenticated",
+        tokenValid: "Token Valid",
+      },
     },
   },
   enums: {

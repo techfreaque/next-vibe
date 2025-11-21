@@ -111,7 +111,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -164,9 +164,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.vote.post.vote.options.remove" as const,
               value: "remove",
             },
-          ],
-          validation: { required: true },
-        },
+          ]},
         z.enum(["up", "down", "remove"]),
       ),
 

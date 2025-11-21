@@ -39,7 +39,7 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.server.health.get.form.title",
       description: "app.api.v1.core.system.server.health.get.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -127,7 +127,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.system.server.health.get.response.environment.title",
           description:
             "app.api.v1.core.system.server.health.get.response.environment.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {
@@ -175,7 +175,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.system.server.health.get.response.database.title",
           description:
             "app.api.v1.core.system.server.health.get.response.database.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {
@@ -213,7 +213,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.system.server.health.get.response.tasks.title",
           description:
             "app.api.v1.core.system.server.health.get.response.tasks.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {
@@ -267,7 +267,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.system.server.health.get.response.system.title",
           description:
             "app.api.v1.core.system.server.health.get.response.system.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {
@@ -278,7 +278,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.system.server.health.get.response.system.memory.title",
               description:
                 "app.api.v1.core.system.server.health.get.response.system.memory.description",
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID, columns: 12,
             },
             { response: true },
             {
@@ -315,7 +315,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.system.server.health.get.response.system.cpu.title",
               description:
                 "app.api.v1.core.system.server.health.get.response.system.cpu.description",
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID, columns: 12,
             },
             { response: true },
             {
@@ -344,7 +344,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.system.server.health.get.response.system.disk.title",
               description:
                 "app.api.v1.core.system.server.health.get.response.system.disk.description",
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID, columns: 12,
             },
             { response: true },
             {
@@ -384,16 +384,13 @@ const { GET } = createEndpoint({
             "app.api.v1.core.system.server.health.get.response.checks.title",
           description:
             "app.api.v1.core.system.server.health.get.response.checks.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
-            title:
-              "app.api.v1.core.system.server.health.get.response.checks.item.title",
-            description:
-              "app.api.v1.core.system.server.health.get.response.checks.item.description",
-            layout: { type: LayoutType.GRID, columns: 12 },
+            layoutType: LayoutType.GRID,
+            columns: 12,
           },
           { response: true },
           {

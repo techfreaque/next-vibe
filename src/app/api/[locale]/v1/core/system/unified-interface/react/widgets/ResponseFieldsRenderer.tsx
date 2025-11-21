@@ -78,7 +78,6 @@ function transformDataForWidget(
       const columns = Object.keys(firstRow).map((key) => ({
         key,
         label: key,
-        type: FieldDataType.TEXT,
       }));
       return {
         rows: value,

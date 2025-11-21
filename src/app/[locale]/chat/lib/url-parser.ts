@@ -4,8 +4,7 @@
  */
 
 import {
-  type DefaultFolderId,
-  DEFAULT_FOLDER_IDS,
+  DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 
@@ -34,7 +33,7 @@ export function isUUID(str: string): boolean {
 export function parseChatUrl(urlPath: string[] | undefined): ParsedChatUrl {
   // Default values
   const defaultResult: ParsedChatUrl = {
-    initialRootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+    initialRootFolderId: DefaultFolderId.PRIVATE,
     initialSubFolderId: null,
     initialThreadId: null,
   };

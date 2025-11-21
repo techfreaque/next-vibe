@@ -32,7 +32,12 @@ const { POST } = createEndpoint({
     "app.api.v1.core.system.db.utils.dockerOperations.tags.docker",
     "app.api.v1.core.system.db.utils.dockerOperations.tags.utils",
   ],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["docker", "docker-utils"],
   method: Methods.POST,
   path: ["v1", "core", "system", "db", "utils", "docker-operations"],
@@ -95,7 +100,8 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.system.db.utils.dockerOperations.container.title",
       description:
         "app.api.v1.core.system.db.utils.dockerOperations.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -110,7 +116,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.db.utils.dockerOperations.fields.command.description",
           placeholder:
             "app.api.v1.core.system.db.utils.dockerOperations.fields.command.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().min(1).describe("Docker command to execute"),
       ),
@@ -124,7 +130,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.db.utils.dockerOperations.fields.options.description",
           placeholder:
             "app.api.v1.core.system.db.utils.dockerOperations.fields.options.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z
           .object({

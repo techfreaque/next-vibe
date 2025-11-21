@@ -29,7 +29,7 @@ import type {
   LifecycleActions,
   UnifiedField,
 } from "../types/endpoint";
-import { FieldUsage } from "../types/endpoint";
+import { FieldUsage } from "../types/enums";
 import type { EndpointErrorTypes, Methods } from "../types/enums";
 
 // Extract schema type directly from field, bypassing complex field structure

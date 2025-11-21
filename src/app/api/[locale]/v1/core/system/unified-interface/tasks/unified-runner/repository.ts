@@ -9,7 +9,7 @@
 import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
-import { ensureError } from "../../shared/utils/error";
+import { ensureError } from "../../shared/utils/error-utils";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {

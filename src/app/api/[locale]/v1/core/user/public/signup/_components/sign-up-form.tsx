@@ -11,15 +11,16 @@ import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { FormField, FormItem } from "next-vibe-ui/ui/form/form";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
+import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
+import { useEffect, useState } from "react";
 
 import signupDefinitions from "@/app/api/[locale]/v1/core/user/public/signup/definition";
 import { useRegister } from "@/app/api/[locale]/v1/core/user/public/signup/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction } from "@/i18n/core/static-types";
-
-import { PasswordStrengthIndicator } from "@/app/[locale]/user/_components/password-strength-indicator";
+import { PasswordStrengthIndicator } from "./password-strength-indicator";
 
 interface SignUpFormProps {
   locale: CountryLanguage;
@@ -53,8 +54,52 @@ export default function SignUpForm({
 }: SignUpFormProps): React.ReactElement {
   const { t } = simpleT(locale);
   const signupResult = useRegister();
-  const { form, submitForm, isSubmitting } = signupResult.create
+  const { form, submitForm, isSubmitting } = signupResult.create;
   const { alert } = signupResult;
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [referralLinked, setReferralLinked] = useState(false);
+
+  // Check localStorage for referral code on mount and link to lead
+  useEffect(() => {
+    const storedCode = localStorage.getItem("referralCode");
+    if (storedCode && !referralLinked) {
+      setReferralCode(storedCode);
+
+      // Link referral to lead
+      const linkReferral = async (): Promise<void> => {
+        try {
+          const response = await fetch(
+            `/api/${locale}/v1/core/referral/link-to-lead`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ referralCode: storedCode }),
+            },
+          );
+
+          if (response.ok) {
+            setReferralLinked(true);
+            signupResult.logger.debug("Referral code linked to lead", {
+              code: storedCode,
+            });
+          } else {
+            // Invalid code - remove from localStorage
+            localStorage.removeItem("referralCode");
+            setReferralCode(null);
+            signupResult.logger.warn("Invalid referral code", {
+              code: storedCode,
+            });
+          }
+        } catch (error) {
+          signupResult.logger.error("Failed to link referral code", {
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      };
+
+      void linkReferral();
+    }
+  }, [locale, referralLinked, signupResult.logger]);
 
   return (
     <MotionDiv
@@ -156,12 +201,33 @@ export default function SignUpForm({
                   }}
                 />
               </Div>
+
+              {/* Show referral code if present, otherwise show input */}
+              {referralCode ? (
+                <Div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+                  <P className="text-sm text-blue-700 dark:text-blue-300">
+                    {t("app.user.signup.auth.signup.usingReferralCode")}:{" "}
+                    <Span className="font-semibold">{referralCode}</Span>
+                  </P>
+                </Div>
+              ) : (
+                <EndpointFormField
+                  name="referralCode"
+                  control={form.control}
+                  endpointFields={signupDefinitions.POST.fields}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+              )}
+
               {/* Show form alert if any */}
               {alert && <FormAlert alert={alert} className="mb-6" />}
 
               <Button
                 type="submit"
-                className="w-full bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+                className="w-full bg-blue-600 bg-linear-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (

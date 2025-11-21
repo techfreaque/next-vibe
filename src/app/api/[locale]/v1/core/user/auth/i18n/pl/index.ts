@@ -139,6 +139,12 @@ export const translations: typeof enTranslations = {
     get: {
       title: "Sprawdź uwierzytelnianie",
       description: "Sprawdź aktualny status uwierzytelniania",
+      response: {
+        title: "Status uwierzytelniania",
+        description: "Aktualny stan uwierzytelniania",
+        authenticated: "Uwierzytelniony",
+        tokenValid: "Token ważny",
+      },
     },
   },
   enums: {

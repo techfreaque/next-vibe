@@ -69,7 +69,6 @@ export async function getFolder(
           parentId: folder.parentId,
           expanded: folder.expanded,
           sortOrder: folder.sortOrder,
-          metadata: folder.metadata || {},
           rolesView: folder.rolesView,
           rolesManage: folder.rolesManage,
           rolesCreateThread: folder.rolesCreateThread,
@@ -162,9 +161,6 @@ export async function updateFolder(
     if (updates.sortOrder !== undefined) {
       updateData.sortOrder = updates.sortOrder;
     }
-    if (updates.metadata !== undefined) {
-      updateData.metadata = updates.metadata;
-    }
     if (updates.rolesView !== undefined) {
       updateData.rolesView = updates.rolesView;
     }
@@ -212,7 +208,6 @@ export async function updateFolder(
           parentId: updatedFolder.parentId,
           expanded: updatedFolder.expanded,
           sortOrder: updatedFolder.sortOrder,
-          metadata: updatedFolder.metadata || {},
           rolesView: updatedFolder.rolesView,
           rolesManage: updatedFolder.rolesManage,
           rolesCreateThread: updatedFolder.rolesCreateThread,

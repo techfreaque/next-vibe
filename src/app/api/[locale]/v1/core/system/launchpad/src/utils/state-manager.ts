@@ -2,11 +2,10 @@
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { parseError } from "next-vibe/shared/utils";
-
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { parseError } from "@/app/api/[locale]/v1/core/shared/utils/parse-error";
 
-import type { ReleaseState, ReleaseTarget } from "../types/types.js";
+import type { ReleaseState, ReleaseTarget } from "../types/types";
 
 interface ParsedState {
   targets?: Array<ReleaseTarget>;
@@ -50,7 +49,10 @@ export class StateManager {
   /**
    * Initialize a new release state
    */
-  initializeState(targets: ReleaseTarget[]): ReleaseState {
+  initializeState(
+    targets: ReleaseTarget[],
+    logger: EndpointLogger,
+  ): ReleaseState {
     const state: ReleaseState = {
       targets,
       completed: [],
@@ -61,7 +63,7 @@ export class StateManager {
       lastUpdated: new Date().toISOString(),
     };
 
-    this.saveState(state);
+    this.saveState(state, logger);
     return state;
   }
 
@@ -109,41 +111,57 @@ export class StateManager {
   /**
    * Mark a target as completed
    */
-  markCompleted(state: ReleaseState, directory: string): void {
+  markCompleted(
+    state: ReleaseState,
+    directory: string,
+    logger: EndpointLogger,
+  ): void {
     if (!state.completed.includes(directory)) {
       state.completed.push(directory);
     }
     // Remove from failed if it was there
     state.failed = state.failed.filter((dir) => dir !== directory);
-    this.saveState(state);
+    this.saveState(state, logger);
   }
 
   /**
    * Mark a target as failed
    */
-  markFailed(state: ReleaseState, directory: string): void {
+  markFailed(
+    state: ReleaseState,
+    directory: string,
+    logger: EndpointLogger,
+  ): void {
     if (!state.failed.includes(directory)) {
       state.failed.push(directory);
     }
-    this.saveState(state);
+    this.saveState(state, logger);
   }
 
   /**
    * Mark a target as skipped
    */
-  markSkipped(state: ReleaseState, directory: string): void {
+  markSkipped(
+    state: ReleaseState,
+    directory: string,
+    logger: EndpointLogger,
+  ): void {
     if (!state.skipped.includes(directory)) {
       state.skipped.push(directory);
     }
-    this.saveState(state);
+    this.saveState(state, logger);
   }
 
   /**
    * Update current index
    */
-  updateCurrentIndex(state: ReleaseState, index: number): void {
+  updateCurrentIndex(
+    state: ReleaseState,
+    index: number,
+    logger: EndpointLogger,
+  ): void {
     state.currentIndex = index;
-    this.saveState(state);
+    this.saveState(state, logger);
   }
 
   /**
@@ -186,9 +204,9 @@ export class StateManager {
   /**
    * Reset failed targets for retry
    */
-  resetFailedTargets(state: ReleaseState): void {
+  resetFailedTargets(state: ReleaseState, logger: EndpointLogger): void {
     state.failed = [];
-    this.saveState(state);
+    this.saveState(state, logger);
   }
 
   /**

@@ -64,7 +64,7 @@ export async function getFolderPermissions(
       });
     }
 
-    // Return permissions as-is (null, [], or [roles...])
+    // Return permissions as-is (null or array)
     const responseData: FolderPermissionsGetResponseOutput = {
       rolesView: folder.rolesView,
       rolesManage: folder.rolesManage,
@@ -199,8 +199,7 @@ export async function updateFolderPermissions(
       response: {
         rolesView: rolesView ?? existingFolder.rolesView,
         rolesManage: rolesManage ?? existingFolder.rolesManage,
-        rolesCreateThread:
-          rolesCreateThread ?? existingFolder.rolesCreateThread,
+        rolesCreateThread: rolesCreateThread ?? existingFolder.rolesCreateThread,
         rolesPost: rolesPost ?? existingFolder.rolesPost,
         rolesModerate: rolesModerate ?? existingFolder.rolesModerate,
         rolesAdmin: rolesAdmin ?? existingFolder.rolesAdmin,

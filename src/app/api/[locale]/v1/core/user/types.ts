@@ -83,7 +83,7 @@ export type ExtendedUserDetailLevel =
  */
 export interface UserFetchOptions {
   includeInactive?: boolean;
-  roles?: UserRoleValue[keyof UserRoleValue][];
+  roles?: readonly UserRoleValue[];
   detailLevel?: UserDetailLevelType;
 }
 

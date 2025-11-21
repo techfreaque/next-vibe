@@ -40,7 +40,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.types.get.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.types.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -70,9 +70,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.system.unifiedInterface.tasks.types.get.operation.export",
             },
           ],
-          layout: { columns: 4 },
-          required: true,
-        },
+          columns: 4},
         z.enum(["list", "validate", "export"]),
       ),
 
@@ -106,7 +104,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.system.unifiedInterface.tasks.types.get.category.execution",
             },
           ],
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.enum(["cron", "side", "config", "execution"]).optional(),
       ),
@@ -136,7 +134,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.system.unifiedInterface.tasks.types.get.format.schema",
             },
           ],
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.enum(["json", "typescript", "schema"]).default("json"),
       ),

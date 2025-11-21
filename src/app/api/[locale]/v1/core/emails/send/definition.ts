@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.emails.send.container.title",
       description: "app.api.v1.core.emails.send.container.description",
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -51,7 +51,7 @@ const { POST } = createEndpoint({
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.emails.send.recipient.title",
           description: "app.api.v1.core.emails.send.recipient.description",
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { request: "data" },
         {
@@ -62,9 +62,7 @@ const { POST } = createEndpoint({
               label: "app.api.v1.core.emails.send.to.label",
               description: "app.api.v1.core.emails.send.to.description",
               placeholder: "app.api.v1.core.emails.send.to.placeholder",
-              layout: { columns: 12 },
-              validation: { required: true },
-            },
+              columns: 12},
             z.email(),
           ),
 
@@ -75,7 +73,7 @@ const { POST } = createEndpoint({
               label: "app.api.v1.core.emails.send.toName.label",
               description: "app.api.v1.core.emails.send.toName.description",
               placeholder: "app.api.v1.core.emails.send.toName.placeholder",
-              layout: { columns: 12 },
+              columns: 12,
             },
             z.string().optional(),
           ),
@@ -88,7 +86,7 @@ const { POST } = createEndpoint({
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.emails.send.emailContent.title",
           description: "app.api.v1.core.emails.send.emailContent.description",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { request: "data" },
         {
@@ -99,9 +97,7 @@ const { POST } = createEndpoint({
               label: "app.api.v1.core.emails.send.subject.label",
               description: "app.api.v1.core.emails.send.subject.description",
               placeholder: "app.api.v1.core.emails.send.subject.placeholder",
-              layout: { columns: 12 },
-              validation: { required: true },
-            },
+              columns: 12},
             z.string().min(1),
           ),
 
@@ -112,9 +108,7 @@ const { POST } = createEndpoint({
               label: "app.api.v1.core.emails.send.html.label",
               description: "app.api.v1.core.emails.send.html.description",
               placeholder: "app.api.v1.core.emails.send.html.placeholder",
-              layout: { columns: 12 },
-              validation: { required: true },
-            },
+              columns: 12},
             z.string().min(1),
           ),
 
@@ -125,9 +119,7 @@ const { POST } = createEndpoint({
               label: "app.api.v1.core.emails.send.text.label",
               description: "app.api.v1.core.emails.send.text.description",
               placeholder: "app.api.v1.core.emails.send.text.placeholder",
-              layout: { columns: 12 },
-              validation: { required: false },
-            },
+              columns: 12},
             z.string().optional(),
           ),
         },
@@ -139,7 +131,7 @@ const { POST } = createEndpoint({
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.emails.send.senderSettings.title",
           description: "app.api.v1.core.emails.send.senderSettings.description",
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { request: "data" },
         {
@@ -150,9 +142,7 @@ const { POST } = createEndpoint({
               label: "app.api.v1.core.emails.send.senderName.label",
               description: "app.api.v1.core.emails.send.senderName.description",
               placeholder: "app.api.v1.core.emails.send.senderName.placeholder",
-              layout: { columns: 6 },
-              validation: { required: true },
-            },
+              columns: 6},
             z.string().min(1),
           ),
 
@@ -163,7 +153,7 @@ const { POST } = createEndpoint({
               label: "app.api.v1.core.emails.send.replyTo.label",
               description: "app.api.v1.core.emails.send.replyTo.description",
               placeholder: "app.api.v1.core.emails.send.replyTo.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.email().optional(),
           ),
@@ -177,7 +167,7 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.emails.send.groups.campaignTracking.title",
           description:
             "app.api.v1.core.emails.send.groups.campaignTracking.description",
-          layout: { type: LayoutType.GRID_2_COLUMNS },
+          layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { request: "data" },
         {
@@ -190,7 +180,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.send.campaignType.description",
               placeholder:
                 "app.api.v1.core.emails.send.campaignType.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
               options: CampaignTypeOptions,
             },
             z.enum(CampaignType).optional(),
@@ -203,7 +193,7 @@ const { POST } = createEndpoint({
               label: "app.api.v1.core.emails.send.leadId.label",
               description: "app.api.v1.core.emails.send.leadId.description",
               placeholder: "app.api.v1.core.emails.send.leadId.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.string().optional(),
           ),
@@ -217,7 +207,7 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.emails.send.groups.smsNotifications.title",
           description:
             "app.api.v1.core.emails.send.groups.smsNotifications.description",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { request: "data" },
         {
@@ -228,7 +218,7 @@ const { POST } = createEndpoint({
               label: "app.api.v1.core.emails.send.sendSmsNotification.label",
               description:
                 "app.api.v1.core.emails.send.sendSmsNotification.description",
-              layout: { columns: 12 },
+              columns: 12,
             },
             z.boolean().default(false),
           ),
@@ -242,7 +232,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.emails.send.smsPhoneNumber.description",
               placeholder:
                 "app.api.v1.core.emails.send.smsPhoneNumber.placeholder",
-              layout: { columns: 12 },
+              columns: 12,
             },
             z.string().optional(),
           ),
@@ -254,9 +244,7 @@ const { POST } = createEndpoint({
               label: "app.api.v1.core.emails.send.smsMessage.label",
               description: "app.api.v1.core.emails.send.smsMessage.description",
               placeholder: "app.api.v1.core.emails.send.smsMessage.placeholder",
-              layout: { columns: 12 },
-              validation: { maxLength: 160 },
-            },
+              columns: 12},
             z.string().max(160).optional(),
           ),
         },
@@ -268,7 +256,7 @@ const { POST } = createEndpoint({
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.emails.send.response.title",
           description: "app.api.v1.core.emails.send.response.description",
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { response: true },
         {
@@ -278,7 +266,7 @@ const { POST } = createEndpoint({
               type: WidgetType.CONTAINER,
               title:
                 "app.api.v1.core.emails.send.response.deliveryStatus.title",
-              layout: { type: LayoutType.GRID_2_COLUMNS },
+              layoutType: LayoutType.GRID_2_COLUMNS,
             },
             { response: true },
             {
@@ -320,7 +308,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.v1.core.emails.send.response.accountInfo.title",
-              layout: { type: LayoutType.GRID_2_COLUMNS },
+              layoutType: LayoutType.GRID_2_COLUMNS,
             },
             { response: true },
             {
@@ -349,7 +337,7 @@ const { POST } = createEndpoint({
               type: WidgetType.CONTAINER,
               title:
                 "app.api.v1.core.emails.send.response.deliveryResults.title",
-              layout: { type: LayoutType.GRID_2_COLUMNS },
+              layoutType: LayoutType.GRID_2_COLUMNS,
             },
             { response: true },
             {
@@ -379,7 +367,7 @@ const { POST } = createEndpoint({
               title: "app.api.v1.core.emails.send.response.smsResult.title",
               description:
                 "app.api.v1.core.emails.send.response.smsResult.description",
-              layout: { type: LayoutType.GRID_2_COLUMNS },
+              layoutType: LayoutType.GRID_2_COLUMNS,
             },
             { response: true },
             {

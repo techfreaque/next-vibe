@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.emails.imapClient.accounts.id.get.container.title",
       description:
         "app.api.v1.core.emails.imapClient.accounts.id.get.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "urlPathParams", response: true },
     {
@@ -71,7 +71,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.id.get.response.account.title",
           description:
             "app.api.v1.core.emails.imapClient.accounts.id.get.response.account.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {
@@ -347,7 +347,7 @@ const { PUT } = createEndpoint({
       title: "app.api.v1.core.emails.imapClient.accounts.id.post.form.title",
       description:
         "app.api.v1.core.emails.imapClient.accounts.id.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -459,7 +459,7 @@ const { PUT } = createEndpoint({
           placeholder:
             "app.api.v1.core.emails.imapClient.accounts.id.post.form.authMethod.label",
           options: ImapAuthMethodOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(ImapAuthMethod),
       ),
@@ -544,7 +544,7 @@ const { PUT } = createEndpoint({
             "app.api.v1.core.emails.imapClient.accounts.id.post.response.title",
           description:
             "app.api.v1.core.emails.imapClient.accounts.id.post.response.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {
@@ -761,7 +761,7 @@ const { DELETE } = createEndpoint({
         "app.api.v1.core.emails.imapClient.accounts.id.delete.container.title",
       description:
         "app.api.v1.core.emails.imapClient.accounts.id.delete.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "urlPathParams", response: true },
     {

@@ -78,18 +78,23 @@ export const translations: typeof enTranslations = {
           title: "Tool-Name",
           description:
             "Name des auszuführenden Tools (z.B. core:system:db:ping)",
+          placeholder: "core:system:db:ping",
         },
         arguments: {
           title: "Argumente",
           description: "Tool-Argumente als Schlüssel-Wert-Paare",
+          placeholder: "{}",
         },
       },
       response: {
         title: "Tool-Ausführungsergebnis",
         description: "Ergebnis der Tool-Ausführung",
-        content: {
-          type: "Inhaltstyp",
-          text: "Inhalt",
+        result: {
+          content: {
+            type: "Inhaltstyp",
+            text: "Inhalt"
+          },
+          isError: "Ist Fehler",
         },
       },
       errors: {

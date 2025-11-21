@@ -3,6 +3,14 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   id: idTranslations,
+  category: {
+    general: "Allgemein",
+    creative: "Kreativ",
+    technical: "Technisch",
+    education: "Bildung",
+    controversial: "Kontrovers",
+    lifestyle: "Lebensstil",
+  },
   get: {
     title: "Personas auflisten",
     description:

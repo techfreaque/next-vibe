@@ -10,6 +10,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interf
 import {
   objectField,
   requestDataField,
+  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
@@ -30,7 +31,12 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.db.reset.post.description",
   category: "app.api.v1.core.system.db.category",
   tags: ["app.api.v1.core.system.db.reset.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["reset", "db:reset"],
   method: Methods.POST,
   path: ["v1", "core", "system", "db", "reset"],
@@ -222,7 +228,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.db.reset.post.form.title",
       description: "app.api.v1.core.system.db.reset.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -235,7 +242,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.reset.fields.force.title",
           description:
             "app.api.v1.core.system.db.reset.fields.force.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -247,7 +254,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.reset.fields.skipMigrations.title",
           description:
             "app.api.v1.core.system.db.reset.fields.skipMigrations.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -259,7 +266,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.reset.fields.skipSeeds.title",
           description:
             "app.api.v1.core.system.db.reset.fields.skipSeeds.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -271,7 +278,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.reset.fields.dryRun.title",
           description:
             "app.api.v1.core.system.db.reset.fields.dryRun.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -285,18 +292,54 @@ const { POST } = createEndpoint({
         z.boolean(),
       ),
 
-      operations: responseField(
+      operations: responseArrayField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.v1.core.system.db.reset.fields.operations.title",
+          type: WidgetType.DATA_TABLE,
+          title: "app.api.v1.core.system.db.reset.fields.operations.title",
         },
-        z.array(
-          z.object({
-            type: z.enum(["truncate", "migrate", "seed"]),
-            status: z.enum(["success", "skipped", "failed", "pending"]),
-            details: z.string(),
-            count: z.number(),
-          }),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 4,
+          },
+          { response: true },
+          {
+            type: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.db.reset.fields.operations.type.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.enum(["truncate", "migrate", "seed"]),
+            ),
+            status: responseField(
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.v1.core.system.db.reset.fields.operations.status.title",
+              },
+              z.enum(["success", "skipped", "failed", "pending"]),
+            ),
+            details: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.db.reset.fields.operations.details.title",
+                fieldType: FieldDataType.TEXT,
+              },
+              z.string(),
+            ),
+            count: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.system.db.reset.fields.operations.count.title",
+                fieldType: FieldDataType.NUMBER,
+              },
+              z.number(),
+            ),
+          },
         ),
       ),
 

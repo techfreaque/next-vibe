@@ -27,7 +27,12 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.generators.generateAll.post.description",
   category: "app.api.v1.core.system.generators.category",
   tags: ["app.api.v1.core.system.generators.generateAll.post.title"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["generate-all", "ga"],
 
   fields: objectField(
@@ -36,7 +41,7 @@ const { POST } = createEndpoint({
       fieldType: FieldDataType.TEXT,
       label:
         "app.api.v1.core.system.generators.generateAll.post.container.title",
-      layout: { columns: 12 },
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -49,7 +54,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.generateAll.post.fields.rootDir.label",
           description:
             "app.api.v1.core.system.generators.generateAll.post.fields.rootDir.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -62,7 +67,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.generateAll.post.fields.outputDir.label",
           description:
             "app.api.v1.core.system.generators.generateAll.post.fields.outputDir.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z
           .string()
@@ -78,7 +83,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.generateAll.post.fields.verbose.label",
           description:
             "app.api.v1.core.system.generators.generateAll.post.fields.verbose.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),
@@ -91,7 +96,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.generateAll.post.fields.skipEndpoints.label",
           description:
             "app.api.v1.core.system.generators.generateAll.post.fields.skipEndpoints.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),
@@ -104,7 +109,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.generateAll.post.fields.skipSeeds.label",
           description:
             "app.api.v1.core.system.generators.generateAll.post.fields.skipSeeds.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),
@@ -117,7 +122,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.generateAll.post.fields.skipTaskIndex.label",
           description:
             "app.api.v1.core.system.generators.generateAll.post.fields.skipTaskIndex.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.boolean().optional().default(false),
       ),

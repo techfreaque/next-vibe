@@ -34,7 +34,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.user.public.login.title",
       description: "app.api.v1.core.user.public.login.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -45,7 +46,7 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.user.public.login.groups.credentials.title",
           description:
             "app.api.v1.core.user.public.login.groups.credentials.description",
-          layout: { type: LayoutType.VERTICAL },
+          layoutType: LayoutType.VERTICAL,
         },
         { request: "data" },
         {
@@ -58,8 +59,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.login.fields.email.description",
               placeholder:
                 "app.api.v1.core.user.public.login.fields.email.placeholder",
-              required: true,
-              layout: { columns: 12 },
+              columns: 12,
               helpText:
                 "app.api.v1.core.user.public.login.fields.email.description",
             },
@@ -81,8 +81,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.login.fields.password.description",
               placeholder:
                 "app.api.v1.core.user.public.login.fields.password.placeholder",
-              required: true,
-              layout: { columns: 12 },
+              columns: 12,
               helpText:
                 "app.api.v1.core.user.public.login.fields.password.description",
             },
@@ -101,7 +100,7 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.user.public.login.groups.options.title",
           description:
             "app.api.v1.core.user.public.login.groups.options.description",
-          layout: { type: LayoutType.HORIZONTAL },
+          layoutType: LayoutType.HORIZONTAL,
         },
         { request: "data" },
         {
@@ -111,10 +110,7 @@ const { POST } = createEndpoint({
               fieldType: FieldDataType.BOOLEAN,
               label:
                 "app.api.v1.core.user.public.login.fields.rememberMe.label",
-              placeholder:
-                "app.api.v1.core.user.public.login.fields.rememberMe.placeholder",
-              required: false,
-              layout: { columns: 12 },
+              columns: 12,
               helpText:
                 "app.api.v1.core.user.public.login.fields.rememberMe.description",
             },
@@ -144,7 +140,8 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.user.public.login.response.user.title",
           description:
             "app.api.v1.core.user.public.login.response.user.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { response: true },
         {
@@ -186,7 +183,8 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.user.public.login.response.sessionInfo.title",
           description:
             "app.api.v1.core.user.public.login.response.sessionInfo.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { response: true },
         {

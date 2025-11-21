@@ -43,14 +43,14 @@ export const { GET, tools } = endpointsHandler({
             loginMethods: {
               password: {
                 enabled: options.allowPasswordAuth,
-                description: translateKey(
+                passwordDescription: translateKey(
                   "app.api.v1.core.user.public.login.options.messages.passwordAuthDescription",
                   language,
                 ),
               },
               social: {
                 enabled: options.allowSocialAuth,
-                description: translateKey(
+                socialDescription: translateKey(
                   "app.api.v1.core.user.public.login.options.messages.socialAuthDescription",
                   language,
                 ),
@@ -70,7 +70,7 @@ export const { GET, tools } = endpointsHandler({
             security: {
               maxAttempts: options.maxAttempts,
               requireTwoFactor: options.requireTwoFactor,
-              description: options.requireTwoFactor
+              securityDescription: options.requireTwoFactor
                 ? translateKey(
                     "app.api.v1.core.user.public.login.options.messages.twoFactorRequired",
                     language,

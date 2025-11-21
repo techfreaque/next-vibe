@@ -44,8 +44,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.leads.create.post.title",
       description: "app.api.v1.core.leads.create.post.description",
-      layout: { type: LayoutType.STACKED },
-      children: [],
+      layoutType: LayoutType.STACKED,
+      
     },
     {
       [Methods.POST]: { request: "data", response: true },
@@ -58,8 +58,8 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.leads.create.post.contactInfo.title",
           description:
             "app.api.v1.core.leads.create.post.contactInfo.description",
-          layout: { type: LayoutType.GRID_2_COLUMNS },
-          children: [],
+          layoutType: LayoutType.GRID_2_COLUMNS,
+          
         },
         { request: "data" },
         {
@@ -72,9 +72,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.create.post.email.description",
               placeholder:
                 "app.api.v1.core.leads.create.post.email.placeholder",
-              layout: { columns: 12 },
-              validation: { required: true },
-            },
+              columns: 12},
             z.email(),
           ),
 
@@ -87,8 +85,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.create.post.businessName.description",
               placeholder:
                 "app.api.v1.core.leads.create.post.businessName.placeholder",
-              layout: { columns: 12 },
-              validation: { required: true, maxLength: 255 },
+              columns: 12,
             },
             z.string().min(1).max(255),
           ),
@@ -102,8 +99,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.create.post.phone.description",
               placeholder:
                 "app.api.v1.core.leads.create.post.phone.placeholder",
-              layout: { columns: 6 },
-              validation: { pattern: /^\+?[1-9]\d{1,14}$/.source },
+              columns: 6,
             },
             z
               .string()
@@ -120,7 +116,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.create.post.website.description",
               placeholder:
                 "app.api.v1.core.leads.create.post.website.placeholder",
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.string().url().optional(),
           ),
@@ -134,8 +130,8 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.leads.create.post.locationPreferences.title",
           description:
             "app.api.v1.core.leads.create.post.locationPreferences.description",
-          layout: { type: LayoutType.GRID_2_COLUMNS },
-          children: [],
+          layoutType: LayoutType.GRID_2_COLUMNS,
+          
         },
         { request: "data" },
         {
@@ -148,10 +144,8 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.create.post.country.description",
               placeholder:
                 "app.api.v1.core.leads.create.post.country.placeholder",
-              layout: { columns: 6 },
-              options: CountriesOptions,
-              validation: { required: true },
-            },
+              columns: 6,
+              options: CountriesOptions},
             z.string(),
           ),
 
@@ -164,10 +158,8 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.create.post.language.description",
               placeholder:
                 "app.api.v1.core.leads.create.post.language.placeholder",
-              layout: { columns: 6 },
-              options: LanguagesOptions,
-              validation: { required: true },
-            },
+              columns: 6,
+              options: LanguagesOptions},
             z.string(),
           ),
         },
@@ -180,8 +172,8 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.leads.create.post.leadDetails.title",
           description:
             "app.api.v1.core.leads.create.post.leadDetails.description",
-          layout: { type: LayoutType.STACKED },
-          children: [],
+          layoutType: LayoutType.STACKED,
+          
         },
         { request: "data" },
         {
@@ -194,7 +186,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.create.post.source.description",
               placeholder:
                 "app.api.v1.core.leads.create.post.source.placeholder",
-              layout: { columns: 12 },
+              columns: 12,
               options: LeadSourceOptions,
             },
             z.enum(LeadSource).optional(),
@@ -209,9 +201,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.leads.create.post.notes.description",
               placeholder:
                 "app.api.v1.core.leads.create.post.notes.placeholder",
-              layout: { columns: 12 },
-              validation: { maxLength: 1000 },
-            },
+              columns: 12},
             z.string().max(1000).optional(),
           ),
         },
@@ -223,8 +213,8 @@ const { POST } = createEndpoint({
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.leads.create.post.response.title",
           description: "app.api.v1.core.leads.create.post.response.description",
-          layout: { type: LayoutType.STACKED },
-          children: [],
+          layoutType: LayoutType.STACKED,
+          
         },
         { response: true },
         {
@@ -233,8 +223,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.v1.core.leads.create.post.response.summary.title",
-              layout: { type: LayoutType.GRID_2_COLUMNS },
-              children: [],
+              layoutType: LayoutType.GRID_2_COLUMNS,
+              
             },
             { response: true },
             {
@@ -278,8 +268,8 @@ const { POST } = createEndpoint({
               type: WidgetType.CONTAINER,
               title:
                 "app.api.v1.core.leads.create.post.response.contactDetails.title",
-              layout: { type: LayoutType.GRID_2_COLUMNS },
-              children: [],
+              layoutType: LayoutType.GRID_2_COLUMNS,
+              
             },
             { response: true },
             {
@@ -324,8 +314,8 @@ const { POST } = createEndpoint({
               type: WidgetType.CONTAINER,
               title:
                 "app.api.v1.core.leads.create.post.response.trackingInfo.title",
-              layout: { type: LayoutType.GRID },
-              children: [],
+              layoutType: LayoutType.GRID,
+              
             },
             { response: true },
             {
@@ -361,8 +351,8 @@ const { POST } = createEndpoint({
               type: WidgetType.CONTAINER,
               title:
                 "app.api.v1.core.leads.create.post.response.metadata.title",
-              layout: { type: LayoutType.GRID_2_COLUMNS },
-              children: [],
+              layoutType: LayoutType.GRID_2_COLUMNS,
+              
             },
             { response: true },
             {

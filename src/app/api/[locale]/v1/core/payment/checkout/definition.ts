@@ -54,7 +54,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.subscription.checkout.form.title" as const,
       description:
         "app.api.v1.core.subscription.checkout.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -69,12 +69,11 @@ const { POST } = createEndpoint({
             "app.api.v1.core.subscription.checkout.form.fields.planId.description" as const,
           placeholder:
             "app.api.v1.core.subscription.checkout.form.fields.planId.placeholder" as const,
-          layout: { columns: 6 },
-          validation: { required: true },
+          columns: 6,
           options: [
             {
               value: SubscriptionPlan.SUBSCRIPTION,
-              label: "app.api.v1.core.subscription.plans.starter" as const,
+              label: "app.api.v1.core.subscription.plans.starter.title" as const,
             },
           ],
         },
@@ -91,9 +90,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.subscription.checkout.form.fields.billingInterval.description" as const,
           placeholder:
             "app.api.v1.core.subscription.checkout.form.fields.billingInterval.placeholder" as const,
-          layout: { columns: 6 },
-          validation: { required: false },
-          options: [
+          columns: 6,
+              options: [
             {
               value: BillingInterval.MONTHLY,
               label: "app.api.v1.core.subscription.billing.monthly" as const,
@@ -117,9 +115,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.subscription.checkout.form.fields.provider.description" as const,
           placeholder:
             "app.api.v1.core.subscription.checkout.form.fields.provider.placeholder" as const,
-          layout: { columns: 12 },
-          validation: { required: false },
-          options: PaymentProviderOptions,
+          columns: 12,
+              options: PaymentProviderOptions,
         },
         z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
       ),
@@ -134,9 +131,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.subscription.checkout.form.fields.metadata.description" as const,
           placeholder:
             "app.api.v1.core.subscription.checkout.form.fields.metadata.placeholder" as const,
-          layout: { columns: 12 },
-          validation: { required: false },
-        },
+          columns: 12},
         z.record(z.string(), z.string()).optional(),
       ),
 

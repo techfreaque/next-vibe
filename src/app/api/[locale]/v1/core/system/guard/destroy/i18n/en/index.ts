@@ -45,6 +45,18 @@ export const translations = {
     totalDestroyed: {
       title: "Total Destroyed",
     },
+    username: {
+      title: "Username",
+    },
+    wasRunning: {
+      title: "Was Running",
+    },
+    filesRemoved: {
+      title: "Files Removed",
+    },
+    userRemoved: {
+      title: "User Removed",
+    },
   },
   form: {
     title: "Destroy Configuration",

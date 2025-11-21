@@ -5,7 +5,7 @@
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 import {
-  type UserRoleValue,
+  type UserPermissionRoleValue,
   UserRole,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
@@ -16,25 +16,19 @@ import type { IconValue } from "./model-access/icons";
  * These are special system folder IDs that exist outside the database
  * They use simple string IDs (not UUIDs) for easy reference
  */
-export const DEFAULT_FOLDER_IDS = {
+export enum DefaultFolderId {
   /** Private folder - user-only access, server-stored */
-  PRIVATE: "private",
+  PRIVATE = "private",
 
   /** Shared folder - link-based sharing */
-  SHARED: "shared",
+  SHARED = "shared",
 
   /** Public folder - forum-style with moderation */
-  PUBLIC: "public",
+  PUBLIC = "public",
 
   /** Incognito folder - localStorage only, never sent to server */
-  INCOGNITO: "incognito",
-} as const;
-
-/**
- * Type for default folder IDs
- */
-export type DefaultFolderId =
-  (typeof DEFAULT_FOLDER_IDS)[keyof typeof DEFAULT_FOLDER_IDS];
+  INCOGNITO = "incognito",
+}
 
 /**
  * Default folder configuration with all metadata
@@ -61,17 +55,17 @@ export interface DefaultFolderConfig {
 
   /** Default permission roles for folders in this root folder */
   /** Roles that can view/read this folder and its contents */
-  rolesView: UserRoleValue[];
+  rolesView: (typeof UserPermissionRoleValue)[];
   /** Roles that can edit folder and create subfolders */
-  rolesManage: UserRoleValue[];
+  rolesManage: (typeof UserPermissionRoleValue)[];
   /** Roles that can create threads in this folder */
-  rolesCreateThread: UserRoleValue[];
+  rolesCreateThread: (typeof UserPermissionRoleValue)[];
   /** Roles that can post messages in threads */
-  rolesPost: UserRoleValue[];
+  rolesPost: (typeof UserPermissionRoleValue)[];
   /** Roles that can moderate/hide content in this folder */
-  rolesModerate: UserRoleValue[];
+  rolesModerate: (typeof UserPermissionRoleValue)[];
   /** Roles that can delete content and manage permissions */
-  rolesAdmin: UserRoleValue[];
+  rolesAdmin: (typeof UserPermissionRoleValue)[];
 }
 
 /**
@@ -80,7 +74,7 @@ export interface DefaultFolderConfig {
  */
 export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
   {
-    id: DEFAULT_FOLDER_IDS.PRIVATE,
+    id: DefaultFolderId.PRIVATE,
     translationKey: "app.chat.common.privateChats",
     icon: "lock",
     descriptionKey: "app.chat.folders.privateDescription",
@@ -94,7 +88,7 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     rolesAdmin: [], // Owner only
   },
   {
-    id: DEFAULT_FOLDER_IDS.INCOGNITO,
+    id: DefaultFolderId.INCOGNITO,
     translationKey: "app.chat.common.incognitoChats",
     icon: "shield-plus",
     descriptionKey: "app.chat.folders.incognitoDescription",
@@ -108,7 +102,7 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     rolesAdmin: [], // Local only
   },
   {
-    id: DEFAULT_FOLDER_IDS.SHARED,
+    id: DefaultFolderId.SHARED,
     translationKey: "app.chat.common.sharedChats",
     icon: "users",
     descriptionKey: "app.chat.folders.sharedDescription",
@@ -122,7 +116,7 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     rolesAdmin: [], // Will be set via share links
   },
   {
-    id: DEFAULT_FOLDER_IDS.PUBLIC,
+    id: DefaultFolderId.PUBLIC,
     translationKey: "app.chat.common.publicChats",
     icon: "1a",
     descriptionKey: "app.chat.folders.publicDescription",
@@ -145,9 +139,7 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
 export function isDefaultFolderId(
   folderId: string,
 ): folderId is DefaultFolderId {
-  return Object.values(DEFAULT_FOLDER_IDS).includes(
-    folderId as DefaultFolderId,
-  );
+  return Object.values(DefaultFolderId).includes(folderId as DefaultFolderId);
 }
 
 /**
@@ -167,7 +159,7 @@ export function getDefaultFolderConfig(
  * @returns True if the folder is incognito
  */
 export function isIncognitoFolder(folderId: string): boolean {
-  return folderId === DEFAULT_FOLDER_IDS.INCOGNITO;
+  return folderId === DefaultFolderId.INCOGNITO;
 }
 
 /**

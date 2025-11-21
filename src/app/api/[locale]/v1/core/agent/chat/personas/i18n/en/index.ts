@@ -2,6 +2,14 @@ import { translations as idTranslations } from "../../[id]/i18n/en";
 
 export const translations = {
   id: idTranslations,
+  category: {
+    general: "General",
+    creative: "Creative",
+    technical: "Technical",
+    education: "Education",
+    controversial: "Controversial",
+    lifestyle: "Lifestyle",
+  },
   get: {
     title: "List Personas",
     description: "Get all available personas (default + custom)",

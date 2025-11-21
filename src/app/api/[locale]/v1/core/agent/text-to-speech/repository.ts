@@ -18,6 +18,7 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../user/auth/types";
+import { creditRepository } from "../../credits/repository";
 import { FEATURE_COSTS } from "../chat/model-access/costs";
 import type { TextToSpeechPostRequestOutput } from "./definition";
 
@@ -216,12 +217,12 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
       });
 
       // Deduct credits AFTER successful completion
-      await creditRepository.deductCreditsForFeature({
+      await creditRepository.deductCreditsForFeature(
         user,
-        cost: FEATURE_COSTS.TTS,
-        feature: "tts",
+        FEATURE_COSTS.TTS,
+        "tts",
         logger,
-      });
+      );
 
       return success({
         response: {

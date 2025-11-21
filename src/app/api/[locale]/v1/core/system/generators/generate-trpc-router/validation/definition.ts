@@ -68,7 +68,12 @@ export const { POST } = createEndpoint({
     "app.api.v1.core.system.generators.generateTrpcRouter.validation.tags.trpc",
     "app.api.v1.core.system.generators.generateTrpcRouter.validation.tags.validation",
   ],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["trpc-validate", "validate-trpc"],
   method: Methods.POST,
   path: [
@@ -82,7 +87,8 @@ export const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.FORM_GROUP,
-      layout: { type: LayoutType.GRID, columns: 1 },
+      layoutType: LayoutType.GRID,
+      columns: 1,
     },
     { request: "data", response: true },
     {
@@ -98,7 +104,7 @@ export const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.operation.placeholder",
           options: TRPCValidationOperationTypeOptions,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z
           .array(z.string())
@@ -115,7 +121,7 @@ export const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.filePath.description",
           placeholder:
             "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.filePath.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().optional().describe("Specific route file path to validate"),
       ),
@@ -129,7 +135,7 @@ export const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.options.description",
           placeholder:
             "app.api.v1.core.system.generators.generateTrpcRouter.validation.fields.options.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z
           .object({

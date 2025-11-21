@@ -4,8 +4,7 @@
  */
 
 import {
-  DEFAULT_FOLDER_IDS,
-  type DefaultFolderId,
+  DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -23,7 +22,7 @@ export function getRootFolderId(
   folderId: string | null | undefined,
 ): DefaultFolderId {
   if (!folderId) {
-    return DEFAULT_FOLDER_IDS.PRIVATE;
+    return DefaultFolderId.PRIVATE;
   }
 
   // Check if this is already a root folder
@@ -34,7 +33,7 @@ export function getRootFolderId(
   // Find the folder and traverse up to root
   const folder = folders[folderId];
   if (!folder) {
-    return DEFAULT_FOLDER_IDS.PRIVATE;
+    return DefaultFolderId.PRIVATE;
   }
 
   return folder.rootFolderId;
@@ -67,13 +66,13 @@ export function getNewChatTranslationKey(
   rootFolderId: DefaultFolderId,
 ): TranslationKey {
   switch (rootFolderId) {
-    case DEFAULT_FOLDER_IDS.PRIVATE:
+    case DefaultFolderId.PRIVATE:
       return "app.chat.common.newPrivateChat";
-    case DEFAULT_FOLDER_IDS.SHARED:
+    case DefaultFolderId.SHARED:
       return "app.chat.common.newSharedChat";
-    case DEFAULT_FOLDER_IDS.PUBLIC:
+    case DefaultFolderId.PUBLIC:
       return "app.chat.common.newPublicChat";
-    case DEFAULT_FOLDER_IDS.INCOGNITO:
+    case DefaultFolderId.INCOGNITO:
       return "app.chat.common.newIncognitoChat";
     default:
       return "app.chat.common.newChat";
@@ -89,13 +88,13 @@ export function getNewFolderTranslationKey(
   rootFolderId: DefaultFolderId,
 ): TranslationKey {
   switch (rootFolderId) {
-    case DEFAULT_FOLDER_IDS.PRIVATE:
+    case DefaultFolderId.PRIVATE:
       return "app.chat.common.newPrivateFolder";
-    case DEFAULT_FOLDER_IDS.SHARED:
+    case DefaultFolderId.SHARED:
       return "app.chat.common.newSharedFolder";
-    case DEFAULT_FOLDER_IDS.PUBLIC:
+    case DefaultFolderId.PUBLIC:
       return "app.chat.common.newPublicFolder";
-    case DEFAULT_FOLDER_IDS.INCOGNITO:
+    case DefaultFolderId.INCOGNITO:
       return "app.chat.common.newIncognitoFolder";
     default:
       return "app.chat.folderList.newFolder";
@@ -111,13 +110,13 @@ export function getCreateFolderTranslationKey(
   rootFolderId: DefaultFolderId,
 ): TranslationKey {
   switch (rootFolderId) {
-    case DEFAULT_FOLDER_IDS.PRIVATE:
+    case DefaultFolderId.PRIVATE:
       return "app.chat.common.createNewPrivateFolder";
-    case DEFAULT_FOLDER_IDS.SHARED:
+    case DefaultFolderId.SHARED:
       return "app.chat.common.createNewSharedFolder";
-    case DEFAULT_FOLDER_IDS.PUBLIC:
+    case DefaultFolderId.PUBLIC:
       return "app.chat.common.createNewPublicFolder";
-    case DEFAULT_FOLDER_IDS.INCOGNITO:
+    case DefaultFolderId.INCOGNITO:
       return "app.chat.common.createNewIncognitoFolder";
     default:
       return "app.chat.newFolder.title";

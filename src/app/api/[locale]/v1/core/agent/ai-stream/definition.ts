@@ -8,6 +8,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
   objectField,
+  requestDataArrayOptionalField,
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
@@ -20,17 +21,9 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import { DEFAULT_FOLDER_IDS } from "../chat/config";
+import { DefaultFolderId } from "../chat/config";
 import { ModelId, ModelIdOptions } from "../chat/model-access/models";
 import { ChatMessageRoleOptions, ChatMessageRole } from "../chat/enum";
-
-/**
- * Chat message schema
- */
-const chatMessageSchema = z.object({
-  role: z.enum(ChatMessageRole),
-  content: z.string().min(1).max(10000),
-});
 
 /**
  * AI Stream Endpoint (POST)
@@ -60,7 +53,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.agent.chat.aiStream.post.form.title",
       description: "app.api.v1.core.agent.chat.aiStream.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -72,7 +66,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.aiStream.post.operation.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.operation.description",
-          layout: { columns: 3 },
+          columns: 3,
           options: [
             {
               value: "send",
@@ -105,36 +99,31 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.aiStream.post.rootFolderId.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.rootFolderId.description",
-          layout: { columns: 3 },
+          columns: 3,
           options: [
             {
-              value: DEFAULT_FOLDER_IDS.PRIVATE,
+              value: DefaultFolderId.PRIVATE,
               label:
                 "app.api.v1.core.agent.chat.config.folders.private" as const,
             },
             {
-              value: DEFAULT_FOLDER_IDS.SHARED,
+              value: DefaultFolderId.SHARED,
               label:
                 "app.api.v1.core.agent.chat.config.folders.shared" as const,
             },
             {
-              value: DEFAULT_FOLDER_IDS.PUBLIC,
+              value: DefaultFolderId.PUBLIC,
               label:
                 "app.api.v1.core.agent.chat.config.folders.public" as const,
             },
             {
-              value: DEFAULT_FOLDER_IDS.INCOGNITO,
+              value: DefaultFolderId.INCOGNITO,
               label:
                 "app.api.v1.core.agent.chat.config.folders.incognito" as const,
             },
           ],
         },
-        z.enum([
-          DEFAULT_FOLDER_IDS.PRIVATE,
-          DEFAULT_FOLDER_IDS.SHARED,
-          DEFAULT_FOLDER_IDS.PUBLIC,
-          DEFAULT_FOLDER_IDS.INCOGNITO,
-        ]),
+        z.nativeEnum(DefaultFolderId),
       ),
       subFolderId: requestDataField(
         {
@@ -143,9 +132,9 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.aiStream.post.subFolderId.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.subFolderId.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
-        z.string().nullable().optional(),
+        z.string().nullable(),
       ),
       threadId: requestDataField(
         {
@@ -154,13 +143,12 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.aiStream.post.threadId.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.threadId.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z
           .string()
           .uuid()
           .nullable()
-          .optional()
           .transform((val) => {
             // Transform "new" to null - client should send null but this provides safety
             if (val === "new") {
@@ -177,9 +165,9 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.aiStream.post.parentMessageId.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.parentMessageId.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
-        z.uuid().nullable().optional(),
+        z.uuid().nullable(),
       ),
 
       // === MESSAGE CONTENT ===
@@ -190,7 +178,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.aiStream.post.content.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.content.description",
-          layout: { columns: 12 },
+          columns: 12,
           placeholder:
             "app.api.v1.core.agent.chat.aiStream.post.content.placeholder",
         },
@@ -205,7 +193,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.aiStream.post.role.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.role.description",
-          layout: { columns: 4 },
+          columns: 4,
           options: ChatMessageRoleOptions,
         },
         z.nativeEnum(ChatMessageRole).default(ChatMessageRole.USER),
@@ -220,7 +208,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.aiStream.post.model.description",
           options: ModelIdOptions,
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.nativeEnum(ModelId),
       ),
@@ -231,7 +219,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.aiStream.post.persona.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.persona.description",
-          layout: { columns: 4 },
+          columns: 4,
         },
         z.string(),
       ),
@@ -242,7 +230,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.aiStream.post.temperature.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.temperature.description",
-          layout: { columns: 2 },
+          columns: 2,
         },
         z.coerce.number().min(0).max(2).default(0.7),
       ),
@@ -253,7 +241,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.aiStream.post.maxTokens.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.maxTokens.description",
-          layout: { columns: 2 },
+          columns: 2,
         },
         z.coerce.number().min(1).max(10000).default(1000),
       ),
@@ -264,7 +252,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.aiStream.post.tools.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.tools.description",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z
           .array(z.string())
@@ -276,23 +264,42 @@ const { POST } = createEndpoint({
       ),
 
       // === MESSAGE HISTORY (for incognito mode) ===
-      messageHistory: requestDataField(
+      messageHistory: requestDataArrayOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label:
+          type: WidgetType.DATA_LIST,
+          title:
             "app.api.v1.core.agent.chat.aiStream.post.messageHistory.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.messageHistory.description",
-          layout: { columns: 12 },
-        },
-        z
-          .array(chatMessageSchema)
-          .nullable()
-          .optional()
-          .describe(
-            "Optional message history for incognito mode. For non-incognito mode, history is fetched from database. For incognito mode (answer-as-ai operation), client must provide the conversation history.",
-          ),
+          optional: true,
+        } as const,
+        objectField(
+          {
+            type: WidgetType.DATA_CARD,
+          },
+          { request: "data" },
+          {
+            role: requestDataField(
+              {
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.SELECT,
+                label:
+                  "app.api.v1.core.agent.chat.aiStream.post.messageHistory.item.role.label",
+                options: ChatMessageRoleOptions,
+              },
+              z.enum(ChatMessageRole),
+            ),
+            content: requestDataField(
+              {
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.TEXTAREA,
+                label:
+                  "app.api.v1.core.agent.chat.aiStream.post.messageHistory.item.content.label",
+              },
+              z.string().min(1).max(10000),
+            ),
+          },
+        ),
       ),
 
       // === RESUMABLE STREAM SUPPORT ===
@@ -303,7 +310,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.aiStream.post.resumeToken.label",
           description:
             "app.api.v1.core.agent.chat.aiStream.post.resumeToken.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().nullable().optional(),
       ),
@@ -402,7 +409,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         operation: "send",
-        rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+        rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
         threadId: null,
         parentMessageId: null,
@@ -412,10 +419,11 @@ const { POST } = createEndpoint({
         persona: "default",
         temperature: 0.7,
         maxTokens: 1000,
+        messageHistory: [],
       },
       withPersona: {
         operation: "send",
-        rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+        rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
         threadId: null,
         parentMessageId: null,
@@ -425,10 +433,11 @@ const { POST } = createEndpoint({
         persona: "professional",
         temperature: 0.8,
         maxTokens: 1500,
+        messageHistory: [],
       },
       retry: {
         operation: "retry",
-        rootFolderId: DEFAULT_FOLDER_IDS.PRIVATE,
+        rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
         threadId: "550e8400-e29b-41d4-a716-446655440000",
         parentMessageId: "660e8400-e29b-41d4-a716-446655440001",
@@ -438,6 +447,7 @@ const { POST } = createEndpoint({
         persona: "default",
         temperature: 0.7,
         maxTokens: 1200,
+        messageHistory: [],
       },
     },
     responses: {
@@ -477,5 +487,5 @@ const definitions = {
   POST,
 };
 
-export { chatMessageSchema, POST };
+export { POST };
 export default definitions;

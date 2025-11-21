@@ -168,7 +168,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.system.db.migrate.taskManagement.container.title",
       description:
         "app.api.v1.core.system.db.migrate.taskManagement.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -184,7 +184,7 @@ const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.system.db.migrate.taskManagement.fields.operation.placeholder",
           options: MigrationTaskOperationTypeOptions,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z
           .array(z.string())
@@ -201,7 +201,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.db.migrate.taskManagement.fields.taskName.description",
           placeholder:
             "app.api.v1.core.system.db.migrate.taskManagement.fields.taskName.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z
           .string()
@@ -218,7 +218,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.db.migrate.taskManagement.fields.options.description",
           placeholder:
             "app.api.v1.core.system.db.migrate.taskManagement.fields.options.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z
           .object({

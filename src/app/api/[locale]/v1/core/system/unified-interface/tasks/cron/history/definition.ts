@@ -44,7 +44,7 @@ export const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.history.get.request.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.history.get.request.description",
-      layout: { type: LayoutType.GRID, columns: 6 },
+      layoutType: LayoutType.GRID, columns: 6,
     },
     { request: "data", response: true },
     {
@@ -85,7 +85,7 @@ export const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.history.get.fields.status.description",
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.history.get.fields.status.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -99,7 +99,7 @@ export const { GET } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.history.get.fields.priority.description",
           placeholder:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.history.get.fields.priority.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),

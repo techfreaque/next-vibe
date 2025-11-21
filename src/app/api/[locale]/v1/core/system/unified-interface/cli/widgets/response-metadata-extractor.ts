@@ -9,7 +9,6 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import type {
   ExtractOutput,
-  FieldUIConfigValue,
   FieldUsageConfig,
   ObjectField,
   UnifiedField,
@@ -49,11 +48,11 @@ type ZodShape = Record<string, z.ZodTypeAny>;
  * UI config strings are expected to be translation keys by architectural contract
  */
 function extractTranslationKey(
-  value: FieldUIConfigValue | undefined,
+  value: unknown,
 ): TranslationKey | undefined {
   if (typeof value === "string") {
     // By architectural contract, strings in UI config are translation keys
-    return value as TranslationKey;
+    return value;
   }
   return undefined;
 }
@@ -865,9 +864,8 @@ export class ResponseMetadataExtractor {
 
     // Extract UI configuration with proper typing
     const hasUi = "ui" in definition && typeof definition.ui === "object";
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- UI config can be various widget types
-    const ui = hasUi
-      ? (definition.ui as Record<string, FieldUIConfigValue>)
+    const ui = hasUi && definition.ui !== null
+      ? definition.ui
       : null;
 
     const schema =

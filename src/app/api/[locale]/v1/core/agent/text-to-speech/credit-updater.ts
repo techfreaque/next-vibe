@@ -24,25 +24,29 @@ export function updateCreditBalanceForTTS(logger: EndpointLogger): void {
     return;
   }
 
-  apiClient.updateEndpointData(creditsDefinition.GET, (oldData) => {
-    if (!oldData?.success) {
-      return oldData;
-    }
+  apiClient.updateEndpointData(
+    creditsDefinition.GET,
+    logger,
+    (oldData) => {
+      if (!oldData?.success) {
+        return oldData;
+      }
 
-    const data = oldData.data as CreditsGetResponseOutput;
-    const newTotal = Math.max(0, data.total - creditCost);
+      const data = oldData.data as CreditsGetResponseOutput;
+      const newTotal = Math.max(0, data.total - creditCost);
 
-    return {
-      success: true,
-      data: {
-        total: newTotal,
-        expiring: data.expiring,
-        permanent: data.permanent,
-        free: data.free,
-        expiresAt: data.expiresAt,
-      },
-    };
-  });
+      return {
+        success: true,
+        data: {
+          total: newTotal,
+          expiring: data.expiring,
+          permanent: data.permanent,
+          free: data.free,
+          expiresAt: data.expiresAt,
+        },
+      };
+    },
+  );
 
   logger.debug("Credit balance updated in cache after TTS", {
     creditCost,

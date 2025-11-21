@@ -30,6 +30,12 @@ export const translations: typeof enTranslations = {
     response: {
       title: "Wyniki wyszukiwania",
       description: "Stronicowane wyniki wyszukiwania z danymi leadów",
+      leads: {
+        title: "Leady",
+        item: "Lead",
+      },
+      total: "Całkowita liczba wyników",
+      hasMore: "Więcej wyników dostępnych",
     },
     errors: {
       unauthorized: {

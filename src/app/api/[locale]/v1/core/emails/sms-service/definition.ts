@@ -40,7 +40,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.emails.smsService.send.container.title",
       description:
         "app.api.v1.core.emails.smsService.send.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.emails.smsService.send.to.label",
           description: "app.api.v1.core.emails.smsService.send.to.description",
           placeholder: "app.api.v1.core.emails.smsService.send.to.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().min(1),
       ),
@@ -66,7 +66,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.smsService.send.message.description",
           placeholder:
             "app.api.v1.core.emails.smsService.send.message.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().min(1).max(1600),
       ),
@@ -80,7 +80,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.smsService.send.campaignType.description",
           placeholder:
             "app.api.v1.core.emails.smsService.send.campaignType.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
           options: CampaignTypeOptions,
         },
         z.enum(CampaignType).optional(),
@@ -95,7 +95,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.smsService.send.leadId.description",
           placeholder:
             "app.api.v1.core.emails.smsService.send.leadId.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -109,7 +109,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.emails.smsService.send.templateName.description",
           placeholder:
             "app.api.v1.core.emails.smsService.send.templateName.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -121,7 +121,7 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.emails.smsService.send.response.result.title",
           description:
             "app.api.v1.core.emails.smsService.send.response.result.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {

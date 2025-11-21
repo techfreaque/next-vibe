@@ -106,7 +106,7 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -119,7 +119,7 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.taskName",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.taskNamesDescription",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().optional(),
       ),
@@ -132,7 +132,7 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.detailed",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.detailedDescription",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),
@@ -191,37 +191,31 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
               key: "id",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.id",
-              type: FieldDataType.TEXT,
             },
             {
               key: "name",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.taskName",
-              type: FieldDataType.TEXT,
             },
             {
               key: "status",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.status",
-              type: FieldDataType.TEXT,
             },
             {
               key: "lastRun",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.lastRun",
-              type: FieldDataType.TEXT,
             },
             {
               key: "nextRun",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.nextRun",
-              type: FieldDataType.TEXT,
             },
             {
               key: "schedule",
               label:
                 "app.api.v1.core.system.unifiedInterface.tasks.cronSystem.status.common.schedule",
-              type: FieldDataType.TEXT,
             },
           ],
         },

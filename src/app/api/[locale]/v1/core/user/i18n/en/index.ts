@@ -56,6 +56,7 @@ export const translations = {
     auth_retrieval_failed: "Failed to retrieve authentication",
     not_found: "User not found",
     roles_lookup_failed: "Failed to lookup user roles",
+    roles_batch_fetch_failed: "Failed to batch fetch user roles",
     id_lookup_failed: "Failed to lookup user by ID",
     email_lookup_failed: "Failed to lookup user by email",
     email_check_failed: "Failed to check email",

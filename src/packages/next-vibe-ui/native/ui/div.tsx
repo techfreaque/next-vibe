@@ -1,129 +1,179 @@
+import type { JSX } from "react";
 import * as React from "react";
 import { View, Text as RNText, Pressable } from "react-native";
-import type { ViewStyle } from "react-native";
 import { styled } from "nativewind";
 
-import { cn } from "next-vibe/shared/utils/utils";
 import type {
-  DivProps,
+  DivProps as DivBaseProps,
   DivRefObject,
   DivMouseEvent,
   DivGenericTarget,
 } from "@/packages/next-vibe-ui/web/ui/div";
+import type { StyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
+import { applyStyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 
-const StyledView = styled(View, { className: "style" });
+const StyledView = styled(View);
 const StyledPressable = styled(Pressable, { className: "style" });
 
-// Convert web ref to native ref
-function convertRefToNative(
-  webRef:
-    | React.RefObject<DivRefObject | null>
-    | ((node: DivRefObject | null) => void)
-    | undefined,
-): React.RefObject<View> | ((node: View | null) => void) | undefined {
-  if (!webRef) {
-    return undefined;
-  }
+export type DivProps = DivBaseProps & StyleType;
 
-  if (typeof webRef === "function") {
-    // Convert callback ref
-    return (node: View | null) => {
-      // Create a proxy object that matches DivRefObject interface
-      if (node) {
-        // Type-safe conversion: View implements subset of DivRefObject interface
-        const divRefObject = node as View & DivRefObject;
-        webRef(divRefObject);
-      } else {
-        webRef(null);
-      }
-    };
-  }
-
-  // Convert RefObject - View implements subset of DivRefObject interface
-  return webRef as React.RefObject<View> & React.RefObject<DivRefObject>;
+// Create compatibility layer functions
+function createDivRefObject(_view: View | null): DivRefObject | null {
+  // React Native doesn't have DOM refs, return null for compatibility
+  // The web version returns actual DOM Element refs
+  return null;
 }
 
-export function Div({
-  className,
-  style,
-  children,
-  ref,
-  role,
-  ariaLabel,
-  id,
-  title,
-  onClick,
-  onTouchStart,
-  onTouchEnd,
-}: DivProps): React.JSX.Element {
-  // Helper to wrap text strings in Text components for React Native
-  const renderChildren = (content: React.ReactNode): React.ReactNode => {
-    if (typeof content === "string" || typeof content === "number") {
-      return <RNText>{content}</RNText>;
-    }
-
-    if (Array.isArray(content)) {
-      return content.map((child, index) => (
-        <React.Fragment key={index}>{renderChildren(child)}</React.Fragment>
-      ));
-    }
-
-    // Check if it's a React element with children
-    if (React.isValidElement(content)) {
-      const props = content.props as { children?: React.ReactNode };
-      if (props?.children) {
-        return React.cloneElement(content, {
-          ...props,
-          children: renderChildren(props.children),
-        } as React.Attributes);
-      }
-    }
-
-    return content;
+function createDivGenericTarget(): DivGenericTarget {
+  return {
+    addEventListener: (): void => {
+      // No-op for React Native
+    },
+    removeEventListener: (): void => {
+      // No-op for React Native
+    },
+    dispatchEvent: (): boolean => false,
+    closest: (): Element | null => null,
+    getBoundingClientRect: (): {
+      left: number;
+      top: number;
+      right: number;
+      bottom: number;
+      width: number;
+      height: number;
+      x: number;
+      y: number;
+    } => ({
+      left: 0,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      width: 0,
+      height: 0,
+      x: 0,
+      y: 0,
+    }),
   };
+}
 
-  // Convert web types to native types
-  const nativeRef = convertRefToNative(ref);
-  const nativeStyle: ViewStyle | undefined = style
-    ? convertCSSToViewStyle(style)
-    : undefined;
+function createDivMouseEvent(): DivMouseEvent {
+  const target = createDivGenericTarget();
+  return {
+    currentTarget: target,
+    target: target,
+    preventDefault: (): void => {
+      // No-op for React Native
+    },
+    stopPropagation: (): void => {
+      // No-op for React Native
+    },
+    isDefaultPrevented: (): boolean => false,
+    isPropagationStopped: (): boolean => false,
+    persist: (): void => {
+      // No-op for React Native
+    },
+    button: 0,
+    buttons: 0,
+    clientX: 0,
+    clientY: 0,
+    bubbles: true,
+    cancelable: true,
+    defaultPrevented: false,
+    eventPhase: 0,
+    isTrusted: true,
+    timeStamp: Date.now(),
+    type: "press",
+  };
+}
 
-  // Convert event handlers for React Native
-  const handlePress = onClick
-    ? (): void => {
-        const event: DivMouseEvent = {
-          currentTarget: {} as DivGenericTarget,
-          target: {} as DivGenericTarget,
-          preventDefault: (): void => {
-            // No-op for React Native
-          },
-          stopPropagation: (): void => {
-            // No-op for React Native
-          },
-          isDefaultPrevented: () => false,
-          isPropagationStopped: () => false,
-          persist: (): void => {
-            // No-op for React Native
-          },
-          button: 0,
-          buttons: 0,
-          clientX: 0,
-          clientY: 0,
-          bubbles: true,
-          cancelable: true,
-          defaultPrevented: false,
-          eventPhase: 0,
-          isTrusted: true,
-          timeStamp: Date.now(),
-          type: "press",
-        };
-        onClick(event);
-      }
-    : undefined;
+function wrapTextChildren(children: React.ReactNode): React.ReactNode {
+  if (typeof children === "string" || typeof children === "number") {
+    return <RNText>{children}</RNText>;
+  }
 
-  const accessibilityRoleValue = role as
+  if (Array.isArray(children)) {
+    return children.map((child, index) => (
+      <React.Fragment key={index}>{wrapTextChildren(child)}</React.Fragment>
+    ));
+  }
+
+  if (React.isValidElement(children)) {
+    const props = children.props as { children?: React.ReactNode };
+    if (props?.children) {
+      return React.cloneElement(children, {
+        ...props,
+        children: wrapTextChildren(props.children),
+      } as React.Attributes);
+    }
+  }
+
+  return children;
+}
+
+export const Div = React.forwardRef<DivRefObject, Omit<DivProps, "ref">>(
+  (
+    {
+      className,
+      style,
+      children,
+      role,
+      ariaLabel,
+      id,
+      title,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
+      onTouchStart,
+      onTouchEnd,
+      onDrop,
+      onDragOver,
+      onDragLeave,
+      suppressHydrationWarning: _suppressHydrationWarning,
+      dangerouslySetInnerHTML: _dangerouslySetInnerHTML,
+      tabIndex: _tabIndex,
+      onKeyDown,
+    },
+    ref,
+  ): JSX.Element => {
+  const wrappedChildren = React.useMemo(
+    () => wrapTextChildren(children),
+    [children],
+  );
+
+  const viewRef = React.useRef<View>(null);
+
+  React.useImperativeHandle(
+    ref,
+    (): DivRefObject | null => {
+      const node = viewRef.current;
+      return createDivRefObject(node);
+    },
+    [],
+  );
+
+  const handlePress = React.useCallback((): void => {
+    if (onClick) {
+      const event = createDivMouseEvent();
+      onClick(event);
+    }
+  }, [onClick]);
+
+  const handlePressIn = React.useCallback((): void => {
+    if (onMouseEnter) {
+      const event = createDivMouseEvent();
+      onMouseEnter(event);
+    }
+  }, [onMouseEnter]);
+
+  const handlePressOut = React.useCallback((): void => {
+    if (onMouseLeave) {
+      const event = createDivMouseEvent();
+      onMouseLeave(event);
+    }
+  }, [onMouseLeave]);
+
+  const accessibilityRole = role as
     | "none"
     | "button"
     | "link"
@@ -152,41 +202,52 @@ export function Div({
     | "toolbar"
     | undefined;
 
-  // Support both className and style together
-  if (handlePress || onTouchStart || onTouchEnd) {
+  // Use Pressable if any interaction handlers are present
+  if (
+    onClick ||
+    onMouseEnter ||
+    onMouseLeave ||
+    onTouchStart ||
+    onTouchEnd ||
+    onDrop ||
+    onDragOver ||
+    onDragLeave ||
+    onKeyDown
+  ) {
     return (
       <StyledPressable
-        ref={nativeRef}
         {...applyStyleType({
-          nativeStyle,
-          className: cn(className),
+          nativeStyle: style ? convertCSSToViewStyle(style) : undefined,
+          className: className,
         })}
+        ref={viewRef}
         nativeID={id}
         accessibilityLabel={ariaLabel || title}
-        accessibilityRole={accessibilityRoleValue}
+        accessibilityRole={accessibilityRole}
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
-        onPress={handlePress}
       >
-        {renderChildren(children)}
+        {wrappedChildren}
       </StyledPressable>
     );
   }
 
   return (
     <StyledView
-      ref={nativeRef}
+      ref={viewRef}
       {...applyStyleType({
-        nativeStyle,
-        className: cn(className),
+        nativeStyle: style ? convertCSSToViewStyle(style) : undefined,
+        className: className,
       })}
       nativeID={id}
       accessibilityLabel={ariaLabel || title}
-      accessibilityRole={accessibilityRoleValue}
+      accessibilityRole={accessibilityRole}
     >
-      {renderChildren(children)}
+      {wrappedChildren}
     </StyledView>
   );
-}
-
-Div.displayName = "Div";
+  },
+);

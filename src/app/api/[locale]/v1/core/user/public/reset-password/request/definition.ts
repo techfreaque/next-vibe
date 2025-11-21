@@ -15,6 +15,7 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import {
   objectField,
+  objectOptionalField,
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
@@ -39,7 +40,8 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.user.public.resetPassword.request.title" as const,
       description:
         "app.api.v1.core.user.public.resetPassword.request.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -51,7 +53,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.public.resetPassword.request.groups.emailInput.title" as const,
           description:
             "app.api.v1.core.user.public.resetPassword.request.groups.emailInput.description" as const,
-          layout: { type: LayoutType.VERTICAL },
+          layoutType: LayoutType.VERTICAL,
         },
         { request: "data" },
         {
@@ -65,8 +67,6 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.resetPassword.request.fields.email.description" as const,
               placeholder:
                 "app.api.v1.core.user.public.resetPassword.request.fields.email.placeholder" as const,
-              required: true,
-              layout: { columns: 12 },
               helpText:
                 "app.api.v1.core.user.public.resetPassword.request.fields.email.help" as const,
             },
@@ -82,64 +82,44 @@ const { POST } = createEndpoint({
       ),
 
       // === RESPONSE FIELDS ===
-      response: responseField(
+      response: objectField(
         {
           type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.user.public.resetPassword.request.response.title" as const,
           description:
             "app.api.v1.core.user.public.resetPassword.request.response.description" as const,
-          layout: { type: LayoutType.VERTICAL },
+          layoutType: LayoutType.VERTICAL,
         },
-        z.object({
-          success: z
-            .boolean()
-            .describe("Whether the reset request was processed successfully"),
-          message: z
-            .string()
-            .describe("Human-readable status message explaining the result"),
-          deliveryInfo: z
-            .object({
-              emailSent: z
-                .boolean()
-                .describe("Whether the reset email was sent"),
-              estimatedDelivery: z
-                .string()
-                .describe(
-                  "Estimated time for email delivery (e.g., 'within 5 minutes')",
-                ),
-              expiresAt: z
-                .string()
-                .describe("When the reset link expires (human-readable)"),
-              checkSpamFolder: z
-                .boolean()
-                .describe("Whether user should check spam folder"),
-            })
-            .optional()
-            .describe("Email delivery details and timing information"),
-          securityInfo: z
-            .object({
-              accountExists: z
-                .boolean()
-                .optional()
-                .describe(
-                  "Whether an account exists (may be hidden for security)",
-                ),
-              rateLimitRemaining: z
-                .number()
-                .optional()
-                .describe("Number of reset requests remaining"),
-              cooldownPeriod: z
-                .string()
-                .optional()
-                .describe("Time to wait before next request"),
-            })
-            .optional()
-            .describe("Security-related information about the request"),
-          nextSteps: z
-            .array(z.string())
-            .describe("Step-by-step instructions for the user to follow"),
-        }),
+        { response: true },
+        {
+          success: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.v1.core.user.public.resetPassword.request.success.title" as const,
+            },
+            z
+              .boolean()
+              .describe("Whether the reset request was processed successfully"),
+          ),
+          message: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.user.public.resetPassword.request.response.success.message" as const,
+            },
+            z
+              .string()
+              .describe("Human-readable status message explaining the result"),
+          ),
+          nextSteps: responseField(
+            {
+              type: WidgetType.LINK_LIST,
+            },
+            z
+              .array(z.string())
+              .describe("Step-by-step instructions for the user to follow"),
+          ),
+        },
       ),
     },
   ),
@@ -235,12 +215,6 @@ const { POST } = createEndpoint({
         response: {
           success: true,
           message: "Password reset link sent successfully",
-          deliveryInfo: {
-            emailSent: true,
-            estimatedDelivery: "within 5 minutes",
-            expiresAt: "24 hours from now",
-            checkSpamFolder: true,
-          },
           nextSteps: [
             "Check your email inbox and spam folder",
             "Click the reset link in the email",

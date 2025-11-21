@@ -40,7 +40,7 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.agent.chat.credits.get.response.title",
       description:
         "app.api.v1.core.agent.chat.credits.get.response.description",
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { response: true },
     {

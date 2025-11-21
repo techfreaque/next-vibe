@@ -29,7 +29,7 @@ import type {
 
 // Singleton Stripe instance for direct access (legacy webhook support)
 export const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-10-29.clover",
+  apiVersion: "2025-11-17.clover",
 });
 
 export class StripeProvider implements PaymentProvider {
@@ -38,7 +38,7 @@ export class StripeProvider implements PaymentProvider {
 
   constructor() {
     this.stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-      apiVersion: "2025-10-29.clover",
+      apiVersion: "2025-11-17.clover",
     });
   }
 

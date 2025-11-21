@@ -89,11 +89,13 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailStatsGetResponseTypeOutput>> {
-    const timePeriod = data.timePeriod ?? TimePeriod.DAY;
-    const dateRangePreset =
-      data.dateRangePreset ?? DateRangePreset.LAST_30_DAYS;
-    const type = data.type ?? EmailTypeFilter.ALL;
-    const status = data.status ?? EmailStatusFilter.ALL;
+    const timePeriod = (data.timePeriod ?? TimePeriod.DAY) as TimePeriod;
+    const dateRangePreset = (data.dateRangePreset ??
+      DateRangePreset.LAST_30_DAYS) as DateRangePreset;
+    const type = (data.type ?? EmailTypeFilter.ALL) as
+      | (typeof EmailTypeFilter)[keyof typeof EmailTypeFilter];
+    const status = (data.status ?? EmailStatusFilter.ALL) as
+      | (typeof EmailStatusFilter)[keyof typeof EmailStatusFilter];
     const search = data.search;
     const dateFrom = data.dateFrom;
     const dateTo = data.dateTo;

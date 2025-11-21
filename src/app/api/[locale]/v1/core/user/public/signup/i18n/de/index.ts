@@ -104,6 +104,12 @@ export const translations: typeof enTranslations = {
       placeholder: "Bild-URL eingeben",
       help: "Optional: Geben Sie eine URL für Ihr Profilbild an",
     },
+    referralCode: {
+      label: "Empfehlungscode",
+      description: "Optionaler Empfehlungscode von einem Freund",
+      placeholder: "Empfehlungscode eingeben (optional)",
+      help: "Wenn Sie einen Empfehlungscode haben, geben Sie ihn hier ein",
+    },
   },
   groups: {
     personalInfo: {

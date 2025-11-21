@@ -27,7 +27,12 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.server.build.post.description",
   category: "app.api.v1.core.system.server.category",
   tags: ["app.api.v1.core.system.server.build.tags.build"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF, UserRole.WEB_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+    UserRole.WEB_OFF,
+    UserRole.CLI_AUTH_BYPASS,
+  ],
   aliases: ["build", "b"],
 
   fields: objectField(
@@ -35,7 +40,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.server.build.post.form.title",
       description: "app.api.v1.core.system.server.build.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {

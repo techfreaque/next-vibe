@@ -112,7 +112,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {
@@ -146,7 +146,7 @@ const { GET } = createEndpoint({
           type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.get.response.message.title" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { response: true },
         {
@@ -376,7 +376,7 @@ const { PATCH } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -412,9 +412,7 @@ const { PATCH } = createEndpoint({
           label:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.content.label" as const,
           description:
-            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.content.description" as const,
-          validation: { required: true },
-        },
+            "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.content.description" as const},
         z.string().min(1),
       ),
       role: requestDataField(
@@ -436,7 +434,7 @@ const { PATCH } = createEndpoint({
           type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.patch.response.message.title" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { response: true },
         {
@@ -599,7 +597,7 @@ const { DELETE } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.delete.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {

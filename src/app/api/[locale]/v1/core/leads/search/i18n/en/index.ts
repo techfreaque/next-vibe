@@ -28,6 +28,12 @@ export const translations = {
     response: {
       title: "Search Results",
       description: "Paginated search results with lead data",
+      leads: {
+        title: "Leads",
+        item: "Lead",
+      },
+      total: "Total Results",
+      hasMore: "Has More Results",
     },
     errors: {
       unauthorized: {

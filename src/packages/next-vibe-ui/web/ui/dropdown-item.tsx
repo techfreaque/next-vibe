@@ -15,16 +15,16 @@ export type DropdownItemProps = {
   disabled?: boolean;
 } & StyleType;
 
-export function DropdownItem({
-  isSelected = false,
-  onClick,
-  icon,
-  label,
-  description,
-  disabled = false,
-  className,
-  style,
-}: DropdownItemProps): JSX.Element {
+export function DropdownItem(props: DropdownItemProps): JSX.Element {
+  const {
+    isSelected = false,
+    onClick,
+    icon,
+    label,
+    description,
+    disabled = false,
+    className,
+  } = props;
   const [isHovered, setIsHovered] = useState(false);
   const shouldShowRainbow = isSelected || isHovered;
 
@@ -48,7 +48,6 @@ export function DropdownItem({
     <Button
       variant={shouldShowRainbow ? "default" : "ghost"}
       size="sm"
-      style={style}
       className={`w-full justify-start font-medium rounded-md px-3 py-2.5 min-h-fit h-auto ${
         shouldShowRainbow
           ? "border-2 border-blue-500/50 bg-blue-500/10"

@@ -20,7 +20,7 @@ import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import type { NewUserRole, UserRole } from "../db";
-import type { UserRole as UserRoleEnum } from "./enum";
+import type { UserRole as UserRoleEnum, UserPermissionRoleValue } from "./enum";
 // Import interface for type compatibility
 import type { UserRolesRepository } from "./repository";
 
@@ -46,6 +46,18 @@ class UserRolesRepositoryNativeImpl implements UserRolesRepository {
     );
     return await Promise.resolve(
       this.createNotImplementedError<UserRole[]>("findByUserId"),
+    );
+  }
+
+  async findByUserIds(
+    userIds: DbId[],
+    logger: EndpointLogger,
+  ): Promise<ResponseType<Map<DbId, UserRole[]>>> {
+    logger.warn(
+      "findByUserIds not implemented on native - not used in page.tsx",
+    );
+    return await Promise.resolve(
+      this.createNotImplementedError<Map<DbId, UserRole[]>>("findByUserIds"),
     );
   }
 
@@ -109,12 +121,12 @@ class UserRolesRepositoryNativeImpl implements UserRolesRepository {
   async getUserRoles(
     userId: DbId,
     logger: EndpointLogger,
-  ): Promise<ResponseType<string[]>> {
+  ): Promise<ResponseType<(typeof UserPermissionRoleValue)[]>> {
     logger.warn(
       "getUserRoles not implemented on native - not used in page.tsx",
     );
     return await Promise.resolve(
-      this.createNotImplementedError<string[]>("getUserRoles"),
+      this.createNotImplementedError<(typeof UserPermissionRoleValue)[]>("getUserRoles"),
     );
   }
 }

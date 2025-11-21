@@ -60,16 +60,13 @@ export interface TRPCContext<
  * Create tRPC context from Next.js request
  * Extracts locale from URL path, authenticates user, and sets up translation
  */
-export async function createTRPCContext<
-  TUrlParams,
-  TUserRoleValue extends readonly UserRoleValue[],
->(opts: {
+export async function createTRPCContext<TUrlParams>(opts: {
   req: NextRequest;
   urlPathParams?: TUrlParams;
   logger: EndpointLogger;
   locale: CountryLanguage;
-}): Promise<TRPCContext<TUrlParams, TUserRoleValue>> {
-  const { req, urlPathParams = {} } = opts;
+}): Promise<TRPCContext<TUrlParams, readonly UserRoleValue[]>> {
+  const { req, urlPathParams = {} as TUrlParams } = opts;
 
   // Extract locale from URL path
   // Expected format: /api/[locale]/trpc/[...trpc]
@@ -86,11 +83,11 @@ export async function createTRPCContext<
   // Validate and set locale
   const localeValidation = validateData(
     localeSegment as keyof typeof CountryLanguageValues,
-    z.string(),
+    z.string() as z.Schema<CountryLanguage>,
     opts.logger,
   );
-  const locale = localeValidation.success
-    ? localeValidation.data
+  const locale: CountryLanguage = localeValidation.success
+    ? (localeValidation.data as CountryLanguage)
     : defaultLocale;
 
   // Get translation function for locale
@@ -106,7 +103,7 @@ export async function createTRPCContext<
   // Authenticate user using the existing auth system
   // Use getAuthMinimalUser which properly handles PUBLIC role with leadId creation
   let user: JwtPayloadType;
-  let userRoles: TUserRoleValue = [] as never as TUserRoleValue;
+  let userRoles: readonly UserRoleValue[] = [];
 
   try {
     // Try to get authenticated user first
@@ -137,9 +134,9 @@ export async function createTRPCContext<
 
           // Build roles array properly instead of mutating
           if (adminUser && !adminUser.isPublic) {
-            userRoles = [UserRole.CUSTOMER, UserRole.ADMIN] as never as TUserRoleValue;
+            userRoles = [UserRole.CUSTOMER, UserRole.ADMIN] as const;
           } else {
-            userRoles = [UserRole.CUSTOMER] as never as TUserRoleValue;
+            userRoles = [UserRole.CUSTOMER] as const;
           }
         }
       }
@@ -150,7 +147,7 @@ export async function createTRPCContext<
         { platform: Platform.WEB, request: req, locale: opts.locale },
         opts.logger,
       );
-      userRoles = [UserRole.PUBLIC] as never as TUserRoleValue;
+      userRoles = [UserRole.PUBLIC] as const;
     }
   } catch (error) {
     // Authentication failed - get public user with proper leadId
@@ -162,16 +159,16 @@ export async function createTRPCContext<
       { platform: Platform.WEB, request: req, locale: opts.locale },
       opts.logger,
     );
-    userRoles = [UserRole.PUBLIC] as never as TUserRoleValue;
+    userRoles = [UserRole.PUBLIC] as const;
   }
 
   return {
-    user: user as InferJwtPayloadTypeFromRoles<TUserRoleValue>,
-    locale: locale as CountryLanguage,
+    user,
+    locale,
     t,
     request: req,
-    urlPathParams: urlPathParams as TUrlParams,
-    userRoles: userRoles as never as TUserRoleValue,
+    urlPathParams,
+    userRoles,
     logger: opts.logger,
   };
 }

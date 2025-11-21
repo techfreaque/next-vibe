@@ -210,18 +210,8 @@ export function generateCacheKey(
   const baseKey = `typecheck_${pathType}`;
 
   if (!targetPath) {
-    // For no-path scenario, create a cache key based on tsconfig.json modification time
-    try {
-      const tsconfigPath = resolve("tsconfig.json");
-      const stat = statSync(tsconfigPath);
-      // eslint-disable-next-line i18next/no-literal-string
-      return `${baseKey}_project`;
-    } catch {
-      // eslint-disable-next-line i18next/no-literal-string
-      return `${baseKey}_project`;
-    }
+    return `${baseKey}_project`;
   }
-
   // Create hash of the path for consistent cache keys
   // eslint-disable-next-line i18next/no-literal-string
   const pathHash = createHash("md5")
@@ -230,16 +220,7 @@ export function generateCacheKey(
     .slice(0, 8);
 
   if (pathType === PathType.SINGLE_FILE) {
-    // For single files, include file modification time in cache key
-    try {
-      const stat = statSync(resolve(targetPath));
-      const mtime = stat.mtime.getTime();
-      // eslint-disable-next-line i18next/no-literal-string
-      return `${baseKey}_file_${pathHash}_${mtime}`;
-    } catch {
-      // eslint-disable-next-line i18next/no-literal-string
-      return `${baseKey}_file_${pathHash}`;
-    }
+    return `${baseKey}_file_${pathHash}`;
   }
 
   if (pathType === PathType.FOLDER) {
@@ -249,10 +230,8 @@ export function generateCacheKey(
       const fileHashes = files
         .map((file) => {
           try {
-            const stat = statSync(file);
             const relativePath = relative(process.cwd(), file);
-
-            return `${relativePath}:${stat.mtime.getTime()}`;
+            return `${relativePath}`;
           } catch {
             return file;
           }
@@ -297,7 +276,9 @@ export function createTypecheckConfig(path?: string): TypecheckConfig {
     buildInfoFile: join(
       pathType === PathType.NO_PATH ? "." : tmpDir,
       // eslint-disable-next-line i18next/no-literal-string
-      `tsconfig.${cacheKey}.tsbuildinfo`,
+      pathType === PathType.NO_PATH
+        ? "tsconfig.tsbuildinfo"
+        : `tsconfig.${cacheKey}.tsbuildinfo`,
     ),
   };
 

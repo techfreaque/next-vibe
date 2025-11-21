@@ -9,6 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interf
 import {
   objectField,
   requestDataField,
+  responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
@@ -55,7 +56,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.browser.form.label",
       description: "app.api.v1.core.browser.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -67,9 +69,7 @@ const { POST } = createEndpoint({
           description: "app.api.v1.core.browser.form.fields.tool.description",
           placeholder: "app.api.v1.core.browser.form.fields.tool.placeholder",
           options: BrowserToolOptions,
-          layout: { columns: 12 },
-          validation: { required: true },
-          behavior: { searchable: true, clearable: false },
+          columns: 12,
         },
         z.enum(BrowserTool),
       ),
@@ -82,8 +82,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.browser.form.fields.arguments.description",
           placeholder:
             "app.api.v1.core.browser.form.fields.arguments.placeholder",
-          layout: { columns: 12 },
-          validation: { required: false },
+          columns: 12,
         },
         z.string().optional(),
       ),
@@ -103,12 +102,18 @@ const { POST } = createEndpoint({
         },
         z.any().optional(),
       ),
-      status: responseField(
+      status: responseArrayOptionalField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.v1.core.browser.response.status",
+          type: WidgetType.DATA_LIST,
+          title: "app.api.v1.core.browser.response.status",
         },
-        z.array(z.string()).optional(),
+        responseField(
+          {
+            type: WidgetType.BADGE,
+            text: "app.api.v1.core.browser.response.statusItem",
+          },
+          z.string(),
+        ),
       ),
       executionId: responseField(
         {

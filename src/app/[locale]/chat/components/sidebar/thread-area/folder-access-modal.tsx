@@ -15,7 +15,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { P } from "next-vibe-ui/ui/typography";
 import React from "react";
 
-import { DEFAULT_FOLDER_IDS } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -38,25 +38,25 @@ function getFolderContent(
   folderName: string;
 } {
   switch (folderId) {
-    case DEFAULT_FOLDER_IDS.PRIVATE:
+    case DefaultFolderId.PRIVATE:
       return {
         title: t("app.chat.folders.accessModal.privateTitle"),
         explanation: t("app.chat.folders.accessModal.privateExplanation"),
         folderName: t("app.chat.common.privateChats"),
       };
-    case DEFAULT_FOLDER_IDS.SHARED:
+    case DefaultFolderId.SHARED:
       return {
         title: t("app.chat.folders.accessModal.sharedTitle"),
         explanation: t("app.chat.folders.accessModal.sharedExplanation"),
         folderName: t("app.chat.common.sharedChats"),
       };
-    case DEFAULT_FOLDER_IDS.PUBLIC:
+    case DefaultFolderId.PUBLIC:
       return {
         title: t("app.chat.folders.accessModal.publicTitle"),
         explanation: t("app.chat.folders.accessModal.publicExplanation"),
         folderName: t("app.chat.common.publicChats"),
       };
-    case DEFAULT_FOLDER_IDS.INCOGNITO:
+    case DefaultFolderId.INCOGNITO:
       return {
         title: t("app.chat.folders.accessModal.incognitoTitle"),
         explanation: t("app.chat.folders.accessModal.incognitoExplanation"),

@@ -42,6 +42,20 @@ export const translations: typeof enTranslations = {
       title: "Side Task Details",
       description: "Side Task Details anzeigen",
     },
+    response: {
+      healthyTasks: {
+        title: "Gesunde Tasks",
+      },
+      unhealthyTasks: {
+        title: "Ungesunde Tasks",
+      },
+      runningTasks: {
+        title: "Laufende Tasks",
+      },
+      totalTasks: {
+        title: "Gesamt Tasks",
+      },
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",

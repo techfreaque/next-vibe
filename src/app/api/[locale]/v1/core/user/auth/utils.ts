@@ -84,7 +84,7 @@ export async function requireUser(
     // Check if user is public (not authenticated)
     if (minimalUser.isPublic || !minimalUser.id) {
       redirect(
-        `/${locale}/login?redirect=${encodeURIComponent(redirectPath || `/${locale}`)}`,
+        `/${locale}/user/login?redirect=${encodeURIComponent(redirectPath || `/${locale}`)}`,
       );
     }
 
@@ -98,7 +98,7 @@ export async function requireUser(
 
     if (!userResult.success) {
       redirect(
-        `/${locale}/login?redirect=${encodeURIComponent(redirectPath || `/${locale}`)}`,
+        `/${locale}/user/login?redirect=${encodeURIComponent(redirectPath || `/${locale}`)}`,
       );
     }
 
@@ -106,7 +106,7 @@ export async function requireUser(
   } catch (error) {
     logger.error("Error in requireUser", parseError(error));
     redirect(
-      `/${locale}/login?redirect=${encodeURIComponent(redirectPath || `/${locale}`)}`,
+      `/${locale}/user/login?redirect=${encodeURIComponent(redirectPath || `/${locale}`)}`,
     );
   }
 }

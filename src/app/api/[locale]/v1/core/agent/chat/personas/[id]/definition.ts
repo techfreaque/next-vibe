@@ -7,9 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
+  field,
   objectField,
   requestDataField,
   requestUrlPathParamsField,
+  responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
@@ -46,7 +48,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.personas.id.get.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.personas.id.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {
@@ -68,7 +70,7 @@ const { GET } = createEndpoint({
           type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.agent.chat.personas.id.get.response.persona.title" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { response: true },
         {
@@ -136,13 +138,19 @@ const { GET } = createEndpoint({
             },
             z.enum(ModelId).optional(),
           ),
-          suggestedPrompts: responseField(
+          suggestedPrompts: responseArrayOptionalField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.v1.core.agent.chat.personas.id.get.response.persona.suggestedPrompts.content" as const,
+              type: WidgetType.DATA_LIST,
             },
-            z.array(z.string()).optional(),
+            field(
+              z.string(),
+              { response: true },
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.v1.core.agent.chat.personas.id.get.response.persona.suggestedPrompts.content" as const,
+              },
+            ),
           ),
         },
       ),
@@ -270,7 +278,7 @@ const { PATCH } = createEndpoint({
         "app.api.v1.core.agent.chat.personas.id.patch.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.personas.id.patch.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -296,7 +304,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.personas.id.patch.name.label" as const,
           description:
             "app.api.v1.core.agent.chat.personas.id.patch.name.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().min(1).max(100).optional(),
       ),
@@ -308,7 +316,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.personas.id.patch.personaDescription.label" as const,
           description:
             "app.api.v1.core.agent.chat.personas.id.patch.personaDescription.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().min(1).max(500).optional(),
       ),
@@ -320,7 +328,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.personas.id.patch.icon.label" as const,
           description:
             "app.api.v1.core.agent.chat.personas.id.patch.icon.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().min(1).max(10).optional(),
       ),
@@ -332,7 +340,7 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.personas.id.patch.systemPrompt.label" as const,
           description:
             "app.api.v1.core.agent.chat.personas.id.patch.systemPrompt.description" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().min(1).max(5000).optional(),
       ),
@@ -345,7 +353,7 @@ const { PATCH } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.personas.id.patch.category.description" as const,
           options: CategoryOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(DEFAULT_CATEGORIES.map((c) => c.id)).optional(),
       ),
@@ -358,7 +366,7 @@ const { PATCH } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.personas.id.patch.preferredModel.description" as const,
           options: ModelIdOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(ModelId).optional(),
       ),

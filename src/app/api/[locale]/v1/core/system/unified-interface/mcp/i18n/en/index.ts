@@ -75,18 +75,23 @@ export const translations = {
           title: "Tool Name",
           description:
             "Name of the tool to execute (e.g., core:system:db:ping)",
+          placeholder: "core:system:db:ping",
         },
         arguments: {
           title: "Arguments",
           description: "Tool arguments as key-value pairs",
+          placeholder: "{}",
         },
       },
       response: {
         title: "Tool Execution Result",
         description: "Result of tool execution",
-        content: {
-          type: "Content Type",
-          text: "Content",
+        result: {
+          content: {
+            type: "Content Type",
+            text: "Content",
+          },
+          isError: "Is Error",
         },
       },
       errors: {

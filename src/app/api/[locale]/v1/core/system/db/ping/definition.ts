@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.db.ping.post.description",
   category: "app.api.v1.core.system.db.category",
   tags: ["app.api.v1.core.system.db.ping.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: ["ping", "db:ping"],
 
   fields: objectField(
@@ -36,7 +36,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.db.ping.post.form.title",
       description: "app.api.v1.core.system.db.ping.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -48,7 +49,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.ping.fields.silent.title",
           description:
             "app.api.v1.core.system.db.ping.fields.silent.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),
@@ -61,7 +62,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.db.ping.fields.keepConnectionOpen.title",
           description:
             "app.api.v1.core.system.db.ping.fields.keepConnectionOpen.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),
@@ -70,7 +71,8 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          fieldType: FieldDataType.BOOLEAN,
+          content:
+            "app.api.v1.core.system.db.ping.fields.success.content" as const,
           label: "app.api.v1.core.system.db.ping.fields.success.title",
         },
         z.boolean(),
@@ -79,7 +81,8 @@ const { POST } = createEndpoint({
       isAccessible: responseField(
         {
           type: WidgetType.TEXT,
-          fieldType: FieldDataType.BOOLEAN,
+          content:
+            "app.api.v1.core.system.db.ping.fields.isAccessible.content" as const,
           label: "app.api.v1.core.system.db.ping.fields.isAccessible.title",
         },
         z.boolean(),
@@ -88,6 +91,8 @@ const { POST } = createEndpoint({
       output: responseField(
         {
           type: WidgetType.TEXT,
+          content:
+            "app.api.v1.core.system.db.ping.fields.output.content" as const,
           label: "app.api.v1.core.system.db.ping.fields.output.title",
         },
         z.string(),
@@ -96,9 +101,10 @@ const { POST } = createEndpoint({
       totalConnections: responseField(
         {
           type: WidgetType.TEXT,
-          fieldType: FieldDataType.NUMBER,
+          content:
+            "app.api.v1.core.system.db.ping.fields.connectionInfo.totalConnections.content" as const,
           label:
-            "app.api.v1.core.system.db.ping.fields.connectionInfo.totalConnections",
+            "app.api.v1.core.system.db.ping.fields.connectionInfo.totalConnections.content",
         },
         z.number(),
       ),
@@ -106,9 +112,10 @@ const { POST } = createEndpoint({
       idleConnections: responseField(
         {
           type: WidgetType.TEXT,
-          fieldType: FieldDataType.NUMBER,
+          content:
+            "app.api.v1.core.system.db.ping.fields.connectionInfo.idleConnections.content" as const,
           label:
-            "app.api.v1.core.system.db.ping.fields.connectionInfo.idleConnections",
+            "app.api.v1.core.system.db.ping.fields.connectionInfo.idleConnections.content",
         },
         z.number(),
       ),
@@ -116,9 +123,10 @@ const { POST } = createEndpoint({
       waitingClients: responseField(
         {
           type: WidgetType.TEXT,
-          fieldType: FieldDataType.NUMBER,
+          content:
+            "app.api.v1.core.system.db.ping.fields.connectionInfo.waitingClients.content" as const,
           label:
-            "app.api.v1.core.system.db.ping.fields.connectionInfo.waitingClients",
+            "app.api.v1.core.system.db.ping.fields.connectionInfo.waitingClients.content",
         },
         z.number(),
       ),

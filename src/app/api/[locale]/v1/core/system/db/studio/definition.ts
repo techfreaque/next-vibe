@@ -28,7 +28,13 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.db.studio.post.description",
   category: "app.api.v1.core.system.db.category",
   tags: ["app.api.v1.core.system.db.studio.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.CLI_AUTH_BYPASS,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["studio", "db:studio"],
 
   fields: objectField(
@@ -36,7 +42,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.db.studio.post.form.title",
       description: "app.api.v1.core.system.db.studio.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -48,11 +55,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.studio.fields.port.title",
           description:
             "app.api.v1.core.system.db.studio.fields.port.description",
-          layout: { columns: 6 },
-          validation: {
-            min: 3000,
-            max: 9999,
-          },
+          columns: 6,
         },
         z.string().optional().default("5555"),
       ),
@@ -64,7 +67,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.studio.fields.openBrowser.title",
           description:
             "app.api.v1.core.system.db.studio.fields.openBrowser.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(true),
       ),

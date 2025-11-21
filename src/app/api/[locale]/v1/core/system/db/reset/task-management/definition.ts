@@ -64,7 +64,12 @@ const { POST } = createEndpoint({
     "app.api.v1.core.system.db.reset.taskManagement.tags.tasks",
     "app.api.v1.core.system.db.reset.taskManagement.tags.management",
   ],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["reset-tasks", "db-reset-tasks"],
   method: Methods.POST,
   path: ["v1", "core", "system", "db", "reset", "task-management"],
@@ -159,7 +164,8 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.system.db.reset.taskManagement.container.title",
       description:
         "app.api.v1.core.system.db.reset.taskManagement.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -175,7 +181,7 @@ const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.system.db.reset.taskManagement.fields.operation.placeholder",
           options: TaskOperationTypeOptions,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.array(z.string()).min(1).describe("Task operations to execute"),
       ),
@@ -189,7 +195,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.db.reset.taskManagement.fields.options.description",
           placeholder:
             "app.api.v1.core.system.db.reset.taskManagement.fields.options.placeholder",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z
           .object({

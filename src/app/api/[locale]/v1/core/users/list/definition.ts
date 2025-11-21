@@ -51,7 +51,7 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.users.list.container.title" as const,
       description: "app.api.v1.core.users.list.container.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -62,7 +62,7 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.users.list.container.title" as const,
           description:
             "app.api.v1.core.users.list.container.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { request: "data" },
         {
@@ -75,7 +75,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.users.list.fields.page.description" as const,
               placeholder:
                 "app.api.v1.core.users.list.fields.page.placeholder" as const,
-              layout: { columns: 3 },
+              columns: 3,
             },
             z.number().min(1).optional().default(1),
           ),
@@ -88,7 +88,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.users.list.fields.limit.description" as const,
               placeholder:
                 "app.api.v1.core.users.list.fields.limit.placeholder" as const,
-              layout: { columns: 3 },
+              columns: 3,
             },
             z.number().min(1).max(100).optional().default(20),
           ),
@@ -102,7 +102,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.users.list.fields.search.description" as const,
               placeholder:
                 "app.api.v1.core.users.list.fields.search.placeholder" as const,
-              layout: { columns: 12 },
+              columns: 12,
             },
             z.string().optional(),
           ),
@@ -116,7 +116,7 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.users.list.container.title" as const,
           description:
             "app.api.v1.core.users.list.container.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { request: "data" },
         {
@@ -128,7 +128,7 @@ const { GET } = createEndpoint({
               description:
                 "app.api.v1.core.users.list.fields.status.description" as const,
               options: UserStatusFilterOptions,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.array(z.enum(UserStatusFilter)).optional(),
           ),
@@ -140,7 +140,7 @@ const { GET } = createEndpoint({
               description:
                 "app.api.v1.core.users.list.fields.role.description" as const,
               options: UserRoleFilterOptions,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.array(z.enum(UserRoleFilter)).optional(),
           ),
@@ -154,7 +154,7 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.users.list.container.title" as const,
           description:
             "app.api.v1.core.users.list.container.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { request: "data" },
         {
@@ -166,7 +166,7 @@ const { GET } = createEndpoint({
               description:
                 "app.api.v1.core.users.list.fields.sortBy.description" as const,
               options: UserSortFieldOptions,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z
               .nativeEnum(UserSortField)
@@ -184,7 +184,7 @@ const { GET } = createEndpoint({
               placeholder:
                 "app.api.v1.core.users.list.fields.sortOrder.placeholder" as const,
               options: SortOrderOptions,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.enum(SortOrder).optional().default(SortOrder.DESC),
           ),
@@ -198,7 +198,7 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.users.list.response.summary.title" as const,
           description:
             "app.api.v1.core.users.list.response.summary.description" as const,
-          layout: { type: LayoutType.VERTICAL },
+          layoutType: LayoutType.VERTICAL,
         },
         { response: true },
         {
@@ -237,13 +237,10 @@ const { GET } = createEndpoint({
           users: responseArrayField(
             {
               type: WidgetType.DATA_CARDS,
-              layout: "grid",
-              cardConfig: {
-                title: "email",
-                subtitle: "publicName",
-                content: ["privateName"],
-                metadata: ["isActive", "emailVerified"],
-              },
+              cardTitle: "email",
+              cardSubtitle: "publicName",
+              cardContent: ["privateName"],
+              cardMetadata: ["isActive", "emailVerified"],
             },
             objectField(
               {
@@ -252,7 +249,7 @@ const { GET } = createEndpoint({
                   "app.api.v1.core.users.list.response.user.title" as const,
                 description:
                   "app.api.v1.core.users.list.response.summary.description" as const,
-                layout: { type: LayoutType.GRID, columns: 3 },
+                layoutType: LayoutType.GRID, columns: 3,
               },
               { response: true },
               {

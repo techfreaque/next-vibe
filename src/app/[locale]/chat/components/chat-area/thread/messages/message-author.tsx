@@ -5,7 +5,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import { getModelById, type ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { getPersonaById } from "@/app/api/[locale]/v1/core/agent/chat/personas/config";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -40,7 +40,7 @@ export function MessageAuthorInfo({
   className,
   persona,
   locale,
-  rootFolderId = "private",
+  rootFolderId = DefaultFolderId.PRIVATE,
 }: MessageAuthorProps): JSX.Element {
   const { t } = simpleT(locale);
 

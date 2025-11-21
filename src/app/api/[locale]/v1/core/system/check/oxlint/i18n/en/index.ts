@@ -57,6 +57,7 @@ export const translations = {
         severity: "Severity",
         message: "Message",
         title: "Lint Issue",
+        type: "Type",
       },
     },
   },

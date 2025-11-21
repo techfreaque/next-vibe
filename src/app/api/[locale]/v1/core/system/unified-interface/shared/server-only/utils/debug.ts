@@ -343,9 +343,7 @@ function formatExecutionSummary(
     // eslint-disable-next-line prefer-template
     "\n" +
     t(
-      "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.executionSummary" as Parameters<
-        typeof t
-      >[0],
+      "app.api.v1.core.system.unifiedInterface.cli.vibe.utils.debug.executionSummary",
       {
         executionSeconds,
         overheadSeconds,

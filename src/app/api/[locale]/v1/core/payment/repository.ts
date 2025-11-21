@@ -678,6 +678,46 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           type,
         });
       }
+
+      // Apply referral payout after successful checkout
+      const userId =
+        metadata && typeof metadata === "object" && "userId" in metadata
+          ? String(metadata.userId)
+          : undefined;
+      const amountTotal =
+        "amount_total" in data && typeof data.amount_total === "number"
+          ? data.amount_total
+          : undefined;
+      const currency =
+        "currency" in data && typeof data.currency === "string"
+          ? data.currency.toUpperCase()
+          : undefined;
+
+      if (userId && amountTotal && currency) {
+        // Find transaction by session ID
+        const [transaction] = await db
+          .select()
+          .from(paymentTransactions)
+          .where(eq(paymentTransactions.providerSessionId, sessionId))
+          .limit(1);
+
+        if (transaction) {
+          const { referralRepository } = await import("../referral/repository");
+          await referralRepository.applyReferralPayoutOnPayment(
+            transaction.id,
+            userId,
+            amountTotal,
+            currency,
+            "en-GLOBAL", // TODO: Get locale from metadata
+            logger,
+          );
+        } else {
+          logger.warn("No transaction found for referral payout", {
+            sessionId,
+            userId,
+          });
+        }
+      }
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {
         logger.error("Failed to process checkout session completed", {

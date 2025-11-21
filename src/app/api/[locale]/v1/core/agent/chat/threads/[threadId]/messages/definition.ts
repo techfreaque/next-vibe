@@ -107,7 +107,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.messages.get.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.messages.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
     {
@@ -128,14 +128,13 @@ const { GET } = createEndpoint({
       messages: responseArrayField(
         {
           type: WidgetType.DATA_CARDS,
-          layout: "list",
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
             title:
               "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.title" as const,
-            layout: { type: LayoutType.GRID, columns: 2 },
+            layoutType: LayoutType.GRID, columns: 2,
           },
           { response: true },
           {
@@ -413,7 +412,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.threadId.messages.post.form.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.threadId.messages.post.form.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
     {
@@ -436,7 +435,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.threadId.messages.post.sections.message.title" as const,
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.post.sections.message.description" as const,
-          layout: { type: LayoutType.STACKED },
+          layoutType: LayoutType.STACKED,
         },
         { request: "data" },
         {

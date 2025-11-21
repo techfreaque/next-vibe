@@ -21,9 +21,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 
 import type { NewUserRole, UserRole } from "../db";
 import { insertUserRoleSchema, userRoles } from "../db";
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports -- UserRoleDB is used in typeof expressions
 import {
   type UserRole as UserRoleEnum,
   type UserPermissionRoleValue,
+  UserRoleDB,
 } from "./enum";
 
 /**
@@ -100,7 +102,7 @@ export interface UserRolesRepository {
   getUserRoles(
     userId: DbId,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UserPermissionRoleValue[]>>;
+  ): Promise<ResponseType<(typeof UserPermissionRoleValue)[]>>;
 }
 
 /**
@@ -270,7 +272,12 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
       const results = await db
         .select()
         .from(userRoles)
-        .where(and(eq(userRoles.userId, userId), eq(userRoles.role, role)));
+        .where(
+          and(
+            eq(userRoles.userId, userId),
+            eq(userRoles.role, role as (typeof UserRoleDB)[number]),
+          ),
+        );
 
       if (results.length === 0) {
         return fail({
@@ -374,7 +381,12 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       const results = await db
         .delete(userRoles)
-        .where(and(eq(userRoles.userId, userId), eq(userRoles.role, role)))
+        .where(
+          and(
+            eq(userRoles.userId, userId),
+            eq(userRoles.role, role as (typeof UserRoleDB)[number]),
+          ),
+        )
         .returning({ id: userRoles.id });
 
       return success(results.length > 0);
@@ -452,7 +464,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
   async getUserRoles(
     userId: DbId,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UserPermissionRoleValue[]>> {
+  ): Promise<ResponseType<(typeof UserPermissionRoleValue)[]>> {
     try {
       logger.debug("Getting user permission roles", { userId });
 
@@ -469,7 +481,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
       // Database only contains permission roles (platform markers are never stored)
       // Safe to cast as UserPermissionRoleValue since UserRoleDB only contains permission roles
       const roleValues = rolesResult.data.map(
-        (r) => r.role as UserPermissionRoleValue,
+        (r) => r.role as typeof UserPermissionRoleValue,
       );
       return success(roleValues);
     } catch (error) {

@@ -64,18 +64,27 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Status sukcesu",
+      content: "Sukces",
     },
     isAccessible: {
       title: "Baza danych dostępna",
+      content: "Dostępna",
     },
     output: {
       title: "Komunikat wyjściowy",
+      content: "Wyjście",
     },
     connectionInfo: {
       title: "Informacje o połączeniu",
-      totalConnections: "Wszystkie połączenia",
-      idleConnections: "Bezczynne połączenia",
-      waitingClients: "Oczekujący klienci",
+      totalConnections: {
+        content: "Wszystkie połączenia",
+      },
+      idleConnections: {
+        content: "Bezczynne połączenia",
+      },
+      waitingClients: {
+        content: "Oczekujący klienci",
+      },
     },
   },
   status: {

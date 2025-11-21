@@ -20,6 +20,7 @@ import { cva } from "class-variance-authority";
 import type {
   TextareaProps,
   TextareaChangeEvent,
+  TextareaRefObject,
 } from "@/packages/next-vibe-ui/web/ui/textarea";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
@@ -53,30 +54,46 @@ export const textareaVariants = cva(
   },
 );
 
-function Textarea({
-  className,
-  style,
-  variant,
-  onChangeText,
-  onChange,
-  onBlur,
-  onFocus,
-  minRows = 4,
-  maxRows: _maxRows,
-  disabled,
-  placeholder,
-  value,
-  defaultValue,
-  readOnly,
-  maxLength,
-  rows,
-  required: _required,
-  name: _name,
-  id: _id,
-  title: _title,
-  onKeyDown: _onKeyDown,
-  ref: _ref,
-}: TextareaProps): React.JSX.Element {
+const TextareaInner = (
+  {
+    className,
+    style,
+    variant,
+    onChangeText,
+    onChange,
+    onBlur,
+    onFocus,
+    minRows = 4,
+    maxRows: _maxRows,
+    disabled,
+    placeholder,
+    value,
+    defaultValue,
+    readOnly,
+    maxLength,
+    rows,
+    required: _required,
+    name: _name,
+    id: _id,
+    title: _title,
+    onKeyDown: _onKeyDown,
+  }: Omit<TextareaProps, "ref">,
+  ref: React.ForwardedRef<TextareaRefObject>,
+): React.JSX.Element => {
+  const textInputRef = React.useRef<TextInput>(null);
+
+  React.useImperativeHandle(
+    ref,
+    (): TextareaRefObject => ({
+      focus: (): void => textInputRef.current?.focus(),
+      blur: (): void => textInputRef.current?.blur(),
+      select: (): void => {
+        // React Native doesn't support select
+      },
+      value: value ?? "",
+    }),
+    [value],
+  );
   // Use rows or minRows as numberOfLines
   const numberOfLines = rows ?? minRows;
 
@@ -288,6 +305,7 @@ function Textarea({
       pointerEvents="box-none"
     >
       <StyledTextInput
+        ref={textInputRef}
         className="flex-1 text-base text-foreground"
         placeholderTextColor="hsl(var(--muted-foreground))"
         placeholder={placeholder}
@@ -304,6 +322,6 @@ function Textarea({
       />
     </StyledView>
   );
-}
+};
 
-export { Textarea };
+export const Textarea = React.forwardRef(TextareaInner);

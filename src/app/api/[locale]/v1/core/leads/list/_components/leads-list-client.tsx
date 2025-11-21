@@ -42,11 +42,11 @@ import {
 } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { CsvImportButton } from "../../_components/csv-import-button";
-import { BatchOperationsDialog } from "../../_components/shared/batch-operations-dialog";
-import { BatchOperationsToolbar } from "../../_components/shared/batch-operations-toolbar";
 import { LeadsPagination } from "./leads-pagination";
 import { LeadsTable } from "./leads-table";
+import { CsvImportButton } from "@/app/api/[locale]/v1/core/leads/_components/csv-import-button";
+import { BatchOperationsToolbar } from "@/app/api/[locale]/v1/core/leads/_components/shared/batch-operations-toolbar";
+import { BatchOperationsDialog } from "@/app/api/[locale]/v1/core/leads/_components/shared/batch-operations-dialog";
 
 interface LeadsListClientProps {
   locale: CountryLanguage;
@@ -171,7 +171,7 @@ export function LeadsListClient({
             })}
           </CardTitle>
 
-          <Div className="flex items-center flex flex-row gap-2">
+          <Div className="flex items-center flex-row gap-2">
             {/* View Toggle */}
             <Div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg">
               <Button
@@ -212,7 +212,7 @@ export function LeadsListClient({
       <CardContent>
         {/* Filter Form */}
         <Div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <Div className="flex items-center flex flex-row gap-2 mb-4">
+          <Div className="flex items-center flex-row gap-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <Span className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {t("app.admin.leads.leads.list.filters.title")}:
@@ -605,7 +605,7 @@ export function LeadsListClient({
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 <Div className="flex items-center justify-between">
-                  <Div className="flex items-center flex flex-row gap-4">
+                  <Div className="flex items-center flex-row gap-4">
                     <Div>
                       <Link
                         href={`/${locale}/admin/leads/${lead.id}/edit`}
@@ -619,7 +619,7 @@ export function LeadsListClient({
                     </Div>
                   </Div>
 
-                  <Div className="flex items-center flex flex-row gap-4">
+                  <Div className="flex items-center flex-row gap-4">
                     <Div className="text-right">
                       <Div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {lead.status}

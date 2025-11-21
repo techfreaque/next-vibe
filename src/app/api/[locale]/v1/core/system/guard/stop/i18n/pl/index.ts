@@ -21,6 +21,21 @@ export const translations: typeof enTranslations = {
       description: "Określone ID guard do zatrzymania",
       placeholder: "guard_projekt_abc123",
     },
+    username: {
+      title: "Nazwa użytkownika",
+    },
+    wasRunning: {
+      title: "Był uruchomiony",
+    },
+    nowRunning: {
+      title: "Teraz uruchomiony",
+    },
+    pid: {
+      title: "ID procesu",
+    },
+    forceStopped: {
+      title: "Wymuszone zatrzymanie",
+    },
     stopAll: {
       title: "Zatrzymaj Wszystkie Guards",
       description: "Zatrzymaj wszystkie działające środowiska guard",

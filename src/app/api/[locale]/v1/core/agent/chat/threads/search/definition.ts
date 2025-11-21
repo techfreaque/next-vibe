@@ -45,7 +45,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.agent.chat.threads.search.get.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.threads.search.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -59,9 +59,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.search.get.query.description" as const,
           placeholder:
-            "app.api.v1.core.agent.chat.threads.search.get.query.placeholder" as const,
-          required: true,
-        },
+            "app.api.v1.core.agent.chat.threads.search.get.query.placeholder" as const},
         z.string().min(1).max(500),
       ),
 
@@ -73,7 +71,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.search.get.sections.pagination.title" as const,
           description:
             "app.api.v1.core.agent.chat.threads.search.get.sections.pagination.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID, columns: 2,
         },
         { request: "data" },
         {
@@ -85,7 +83,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.search.get.page.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.search.get.page.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.number().min(1).optional().default(1),
           ),
@@ -97,7 +95,7 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.agent.chat.threads.search.get.limit.label" as const,
               description:
                 "app.api.v1.core.agent.chat.threads.search.get.limit.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.number().min(1).max(100).optional().default(20),
           ),
@@ -150,7 +148,7 @@ const { GET } = createEndpoint({
         objectField(
           {
             type: WidgetType.CONTAINER,
-            layout: { type: LayoutType.STACKED },
+            layoutType: LayoutType.STACKED,
           },
           { response: true },
           {

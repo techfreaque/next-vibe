@@ -9,15 +9,17 @@ import { z } from "zod";
 
 import type {
   ArrayField,
-  FieldUIConfig,
+  ArrayOptionalField,
   FieldUsageConfig,
   InferSchemaFromField,
   ObjectField,
+  ObjectOptionalField,
   PrimitiveField,
   UnifiedField,
 } from "../types/endpoint";
 import type { CacheStrategy } from "../types/enums";
 import { FieldUsage } from "../types/enums";
+import type { WidgetConfig } from "../types/widget-configs";
 
 // ============================================================================
 // TYPE GUARDS
@@ -43,7 +45,7 @@ export function field<
 >(
   schema: TSchema,
   usage: TUsage,
-  ui: FieldUIConfig,
+  ui: WidgetConfig,
   cache?: CacheStrategy,
 ): PrimitiveField<TSchema, TUsage> {
   return {
@@ -59,7 +61,7 @@ export function field<
  * Create a field that can be both request and response
  */
 export function requestResponseField<TSchema extends z.ZodTypeAny>(
-  ui: FieldUIConfig,
+  ui: WidgetConfig,
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: false,
@@ -72,7 +74,7 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
 >;
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<TSchema extends z.ZodTypeAny>(
-  ui: FieldUIConfig,
+  ui: WidgetConfig,
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: true,
@@ -85,7 +87,7 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
 >;
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<TSchema extends z.ZodTypeAny>(
-  ui: FieldUIConfig,
+  ui: WidgetConfig,
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: boolean,
@@ -111,7 +113,7 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
  */
 export function requestDataField<
   TSchema extends z.ZodTypeAny,
-  TUIConfig extends FieldUIConfig = FieldUIConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
 >(
   ui: TUIConfig,
   schema: TSchema,
@@ -131,7 +133,7 @@ export function requestDataField<
  */
 export function requestUrlPathParamsField<
   TSchema extends z.ZodTypeAny,
-  TUIConfig extends FieldUIConfig = FieldUIConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
 >(
   ui: TUIConfig,
   schema: TSchema,
@@ -155,7 +157,7 @@ export function requestUrlPathParamsField<
  */
 export function responseField<
   TSchema extends z.ZodTypeAny,
-  TUIConfig extends FieldUIConfig = FieldUIConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
 >(
   ui: TUIConfig,
   schema: TSchema,
@@ -177,7 +179,7 @@ export function responseField<
 export function objectField<
   C,
   U extends FieldUsageConfig,
-  TUIConfig extends FieldUIConfig = FieldUIConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
 >(
   ui: TUIConfig,
   usage: U,
@@ -198,7 +200,7 @@ export function objectField<
  */
 export function arrayField<
   Child,
-  TUIConfig extends FieldUIConfig = FieldUIConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
 >(
   usage: FieldUsageConfig,
   ui: TUIConfig,
@@ -219,7 +221,7 @@ export function arrayField<
  */
 export function requestDataArrayField<
   Child,
-  TUIConfig extends FieldUIConfig = FieldUIConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
 >(
   ui: TUIConfig,
   child: Child,
@@ -239,7 +241,7 @@ export function requestDataArrayField<
  */
 export function responseArrayField<
   Child,
-  TUIConfig extends FieldUIConfig = FieldUIConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
 >(
   ui: TUIConfig,
   child: Child,
@@ -247,6 +249,91 @@ export function responseArrayField<
 ): ArrayField<Child, { response: true }, TUIConfig> {
   return {
     type: "array" as const,
+    child,
+    usage: { response: true },
+    ui,
+    cache,
+  };
+}
+
+/**
+ * Create an optional object field containing other fields
+ * Use when the entire object can be absent/null/undefined
+ */
+export function objectOptionalField<
+  C,
+  U extends FieldUsageConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
+>(
+  ui: TUIConfig,
+  usage: U,
+  children: C,
+  cache?: CacheStrategy,
+): ObjectOptionalField<C, U, TUIConfig> {
+  return {
+    type: "object-optional" as const,
+    children,
+    usage,
+    ui,
+    cache,
+  };
+}
+
+/**
+ * Create an optional array field containing repeated items
+ * Use when the entire array can be absent/null/undefined
+ */
+export function arrayOptionalField<
+  Child,
+  TUIConfig extends WidgetConfig = WidgetConfig,
+>(
+  usage: FieldUsageConfig,
+  ui: TUIConfig,
+  child: Child,
+  cache?: CacheStrategy,
+): ArrayOptionalField<Child, FieldUsageConfig, TUIConfig> {
+  return {
+    type: "array-optional" as const,
+    child,
+    usage,
+    ui,
+    cache,
+  };
+}
+
+/**
+ * Create an optional request array field with specific request usage
+ */
+export function requestDataArrayOptionalField<
+  Child,
+  TUIConfig extends WidgetConfig = WidgetConfig,
+>(
+  ui: TUIConfig,
+  child: Child,
+  cache?: CacheStrategy,
+): ArrayOptionalField<Child, { request: "data" }, TUIConfig> {
+  return {
+    type: "array-optional" as const,
+    child,
+    usage: { request: "data" },
+    ui,
+    cache,
+  };
+}
+
+/**
+ * Create an optional response array field with specific response usage
+ */
+export function responseArrayOptionalField<
+  Child,
+  TUIConfig extends WidgetConfig = WidgetConfig,
+>(
+  ui: TUIConfig,
+  child: Child,
+  cache?: CacheStrategy,
+): ArrayOptionalField<Child, { response: true }, TUIConfig> {
+  return {
+    type: "array-optional" as const,
     child,
     usage: { response: true },
     ui,
@@ -306,6 +393,35 @@ export type FieldCore<F> = F extends {
         ? { type: T }
         : never;
 /**
+ * Check if a field has optional flag in UI config
+ * This type checks at the VALUE level, not just the type level
+ * It preserves literal types when the UI config is passed with proper inference
+ */
+type IsOptionalField<F> =
+  // Check if field type is explicitly optional (array-optional, object-optional)
+  F extends { type: "array-optional" | "object-optional" }
+    ? true
+    : // Otherwise check ui.optional flag
+      F extends {
+          ui: infer UI;
+        }
+      ? UI extends { optional?: infer O }
+        ? [O] extends [true]
+          ? true
+          : [O] extends [false]
+            ? false
+            : false
+        : false
+      : false;
+
+/**
+ * Make type optional with nullable support (T | null | undefined)
+ */
+type MakeOptional<T, IsOptional extends boolean> = IsOptional extends true
+  ? T | null | undefined
+  : T;
+
+/**
  * Infer field type based on usage
  */
 export type InferFieldType<F, Usage extends FieldUsage> =
@@ -328,56 +444,65 @@ export type InferFieldType<F, Usage extends FieldUsage> =
               : never
             : never
       : F extends {
-            type: "array";
+            type: "array" | "array-optional";
             child: infer Child;
             usage: infer U;
           }
         ? Usage extends FieldUsage.Response
           ? HasResponseUsage<U> extends true
-            ? Array<InferFieldType<Child, Usage>>
+            ? MakeOptional<Array<InferFieldType<Child, Usage>>, IsOptionalField<F>>
             : never
           : Usage extends FieldUsage.RequestData
             ? HasRequestDataUsage<U> extends true
-              ? Array<InferFieldType<Child, Usage>>
+              ? MakeOptional<Array<InferFieldType<Child, Usage>>, IsOptionalField<F>>
               : never
             : Usage extends FieldUsage.RequestUrlParams
               ? HasRequestUrlParamsUsage<U> extends true
-                ? Array<InferFieldType<Child, Usage>>
+                ? MakeOptional<Array<InferFieldType<Child, Usage>>, IsOptionalField<F>>
                 : never
               : never
         : F extends {
-              type: "object";
+              type: "object" | "object-optional";
               children: infer C;
               usage: infer U;
             }
           ? Usage extends FieldUsage.Response
             ? HasResponseUsage<U> extends true
-              ? InferObjectType<C, Usage>
+              ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
               : never
             : Usage extends FieldUsage.RequestData
               ? HasRequestDataUsage<U> extends true
-                ? InferObjectType<C, Usage>
+                ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
                 : never
               : Usage extends FieldUsage.RequestUrlParams
                 ? HasRequestUrlParamsUsage<U> extends true
-                  ? InferObjectType<C, Usage>
+                  ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
                   : never
                 : never
-          : F extends { type: "object"; children: infer C }
-            ? InferObjectType<C, Usage>
+          : F extends { type: "object" | "object-optional"; children: infer C }
+            ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
             : never
     : never;
 
 /**
  * Infer object type from children fields
  * Uses flexible constraint that accepts both readonly and mutable properties
+ * Checks each field's optional flag to make properties optional in the resulting type
  */
 export type InferObjectType<C, Usage extends FieldUsage> =
   C extends Record<string, UnifiedField<z.ZodTypeAny>>
     ? {
         -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
           ? never
-          : K]: InferFieldType<C[K], Usage>;
+          : IsOptionalField<C[K]> extends true
+            ? never
+            : K]: InferFieldType<C[K], Usage>;
+      } & {
+        -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
+          ? never
+          : IsOptionalField<C[K]> extends true
+            ? K
+            : never]?: InferFieldType<C[K], Usage>;
       }
     : never;
 
@@ -426,11 +551,12 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
   };
 
   interface FieldWithType {
-    type: "primitive" | "object" | "array";
+    type: "primitive" | "object" | "array" | "array-optional";
     usage?: FieldUsageConfig;
     schema?: z.ZodTypeAny;
     children?: Record<string, UnifiedField<z.ZodTypeAny>>;
     child?: UnifiedField<z.ZodTypeAny>;
+    ui?: WidgetConfig;
   }
 
   const typedField = field as F & FieldWithType;
@@ -506,7 +632,13 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
     // Create the object schema and let TypeScript infer the exact type
     // This preserves the specific field types instead of collapsing to ZodTypeAny
-    const objectSchema = z.object(shape);
+    let objectSchema = z.object(shape);
+
+    // Apply optional modifier if specified in UI config
+    if (typedField.ui && "optional" in typedField.ui && typedField.ui.optional) {
+      return objectSchema.nullable().optional() as unknown as InferSchemaFromField<F, Usage>;
+    }
+
     return objectSchema as InferSchemaFromField<F, Usage>;
   }
 
@@ -530,7 +662,42 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         }
       }
 
-      return z.array(childSchema) as InferSchemaFromField<F, Usage>;
+      let arraySchema = z.array(childSchema);
+
+      // Apply optional modifier if specified in UI config
+      if (typedField.ui && "optional" in typedField.ui && typedField.ui.optional) {
+        return arraySchema.nullable().optional() as unknown as InferSchemaFromField<F, Usage>;
+      }
+
+      return arraySchema as InferSchemaFromField<F, Usage>;
+    }
+    return z.never() as InferSchemaFromField<F, Usage>;
+  }
+
+  if (typedField.type === "array-optional") {
+    if (hasUsage(typedField.usage)) {
+      // Check if child exists
+      if (!typedField.child) {
+        return z.never() as InferSchemaFromField<F, Usage>;
+      }
+
+      let childSchema: z.ZodTypeAny;
+      if (isZodSchema(typedField.child)) {
+        // Child is already a Zod schema, use it directly
+        childSchema = typedField.child;
+      } else {
+        // Child is a UnifiedField, generate schema from it
+        childSchema = generateSchemaForUsage(typedField.child, targetUsage);
+        // Check if schema is z.never() using instanceof check
+        if (childSchema instanceof z.ZodNever) {
+          return z.never() as InferSchemaFromField<F, Usage>;
+        }
+      }
+
+      // For array-optional, always apply nullable and optional
+      const arraySchema = z.array(childSchema).nullable().optional();
+
+      return arraySchema as unknown as InferSchemaFromField<F, Usage>;
     }
     return z.never() as InferSchemaFromField<F, Usage>;
   }

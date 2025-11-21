@@ -165,6 +165,8 @@ export const translations: typeof enTranslations = {
         },
 
         errors: {
+          title: "Fehlerdetails",
+
           row: {
             label: "Zeile",
           },
@@ -177,8 +179,10 @@ export const translations: typeof enTranslations = {
         },
 
         nextSteps: {
+          title: "Nächste Schritte",
+
           item: {
-            label: "Nächste Schritte",
+            label: "Nächster Schritt",
           },
         },
       },
@@ -275,6 +279,106 @@ export const translations: typeof enTranslations = {
       response: {
         title: "Import-Jobs",
         description: "Ihr Import-Job Verlauf und aktueller Status",
+
+        jobs: {
+          title: "Jobs-Liste",
+        },
+
+        job: {
+          title: "Job-Details",
+
+          id: {
+            label: "Job-ID",
+          },
+
+          fileName: {
+            label: "Dateiname",
+          },
+
+          domain: {
+            label: "Domäne",
+          },
+
+          status: {
+            label: "Status",
+          },
+
+          progress: {
+            title: "Fortschrittsinformationen",
+
+            totalRows: {
+              label: "Gesamtzeilen",
+            },
+
+            processedRows: {
+              label: "Verarbeitete Zeilen",
+            },
+
+            currentBatchStart: {
+              label: "Aktueller Batch-Start",
+            },
+
+            batchSize: {
+              label: "Batch-Größe",
+            },
+
+            percentComplete: {
+              label: "Prozent Abgeschlossen",
+            },
+          },
+
+          results: {
+            title: "Ergebnisse",
+
+            successfulImports: {
+              label: "Erfolgreiche Importe",
+            },
+
+            failedImports: {
+              label: "Fehlgeschlagene Importe",
+            },
+
+            duplicateEmails: {
+              label: "Doppelte E-Mails",
+            },
+          },
+
+          timing: {
+            title: "Zeitinformationen",
+
+            createdAt: {
+              label: "Erstellt Am",
+            },
+
+            updatedAt: {
+              label: "Aktualisiert Am",
+            },
+
+            startedAt: {
+              label: "Gestartet Am",
+            },
+
+            completedAt: {
+              label: "Abgeschlossen Am",
+            },
+          },
+
+          errorInfo: {
+            title: "Fehlerinformationen",
+
+            error: {
+              label: "Fehlermeldung",
+            },
+
+            retryCount: {
+              label: "Wiederholungsanzahl",
+            },
+
+            maxRetries: {
+              label: "Max. Wiederholungen",
+            },
+          },
+        },
       },
 
       errors: {

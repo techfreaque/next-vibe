@@ -83,7 +83,6 @@ export type TextareaProps = {
   minRows?: number;
   maxRows?: number;
   onKeyDown?: (e: TextareaKeyboardEvent) => void;
-  ref?: React.RefObject<TextareaRefObject | null>;
   variant?: VariantProps<typeof textareaVariants>["variant"];
 } & StyleType;
 
@@ -104,40 +103,55 @@ export const textareaVariants = cva(
   },
 );
 
-function Textarea({
-  className,
-  style,
-  variant,
-  minRows = 2,
-  maxRows = 10,
-  onChange,
-  onChangeText,
-  ref,
-  onBlur,
-  onFocus,
-  defaultValue,
-  disabled,
-  id,
-  name,
-  maxLength,
-  onKeyDown,
-  placeholder,
-  readOnly,
-  required,
-  rows,
-  title,
-  value,
-}: TextareaProps): React.JSX.Element {
+const TextareaInner = (
+  {
+    className,
+    style,
+    variant,
+    minRows = 2,
+    maxRows = 10,
+    onChange,
+    onChangeText,
+    onBlur,
+    onFocus,
+    defaultValue,
+    disabled,
+    id,
+    name,
+    maxLength,
+    onKeyDown,
+    placeholder,
+    readOnly,
+    required,
+    rows,
+    title,
+    value,
+  }: TextareaProps,
+  ref: React.ForwardedRef<TextareaRefObject>,
+): React.JSX.Element => {
   const internalRef = React.useRef<HTMLTextAreaElement | null>(null);
 
-  React.useEffect(() => {
-    if (ref && typeof ref === "object" && internalRef.current) {
-      if ("current" in ref) {
-        const mutableRef = ref;
-        mutableRef.current = internalRef.current;
+  React.useImperativeHandle(
+    ref,
+    (): TextareaRefObject => {
+      const element = internalRef.current;
+      if (!element) {
+        return {
+          focus: (): void => undefined,
+          blur: (): void => undefined,
+          select: (): void => undefined,
+          value: "",
+        };
       }
-    }
-  }, [ref]);
+      return {
+        focus: (): void => element.focus(),
+        blur: (): void => element.blur(),
+        select: (): void => element.select(),
+        value: element.value,
+      };
+    },
+    [],
+  );
 
   const adjustHeight = React.useCallback(() => {
     const textarea = internalRef.current;
@@ -230,6 +244,9 @@ function Textarea({
   }
 
   return content;
-}
+};
+
+const Textarea = React.forwardRef(TextareaInner);
+Textarea.displayName = "Textarea";
 
 export { Textarea };

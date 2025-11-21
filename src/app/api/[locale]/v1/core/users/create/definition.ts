@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.users.create.post.form.title" as const,
       description:
         "app.api.v1.core.users.create.post.form.description" as const,
-      layout: { type: LayoutType.VERTICAL },
+      layoutType: LayoutType.VERTICAL,
     },
     { request: "data", response: true },
     {
@@ -63,7 +63,8 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.users.create.post.form.title" as const,
           description:
             "app.api.v1.core.users.create.post.form.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID,
+      columns: 2,
         },
         { request: "data" },
         {
@@ -76,7 +77,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.users.create.post.email.description" as const,
               placeholder:
                 "app.api.v1.core.users.create.post.email.label" as const,
-              layout: { columns: 12 },
+              columns: 12,
             },
             z
               .string()
@@ -93,7 +94,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.users.create.post.password.description" as const,
               helpText:
                 "app.api.v1.core.users.create.post.password.description" as const,
-              layout: { columns: 12 },
+              columns: 12,
             },
             z
               .string()
@@ -108,7 +109,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.users.create.post.privateName.label" as const,
               description:
                 "app.api.v1.core.users.create.post.privateName.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z
               .string()
@@ -124,7 +125,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.users.create.post.publicName.label" as const,
               description:
                 "app.api.v1.core.users.create.post.publicName.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z
               .string()
@@ -141,7 +142,7 @@ const { POST } = createEndpoint({
               description:
                 "app.api.v1.core.users.create.post.country.description",
               options: CountriesOptions,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.enum(CountriesArr),
           ),
@@ -154,7 +155,7 @@ const { POST } = createEndpoint({
               description:
                 "app.api.v1.core.users.create.post.language.description",
               options: LanguagesOptions,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.enum(LanguagesArr),
           ),
@@ -168,7 +169,8 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.users.create.post.roles.label" as const,
           description:
             "app.api.v1.core.users.create.post.roles.description" as const,
-          layout: { type: LayoutType.GRID, columns: 3 },
+          layoutType: LayoutType.GRID,
+      columns: 3,
         },
         { request: "data" },
         {
@@ -181,7 +183,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.users.create.post.roles.description" as const,
               helpText:
                 "app.api.v1.core.users.create.post.roles.description" as const,
-              layout: { columns: 12 },
+              columns: 12,
               options: UserRoleOptions,
             },
             z.array(z.enum(UserRole)).optional(),
@@ -194,7 +196,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.users.create.post.emailVerified.label" as const,
               description:
                 "app.api.v1.core.users.create.post.emailVerified.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.boolean().optional(),
           ),
@@ -206,7 +208,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.users.create.post.isActive.label" as const,
               description:
                 "app.api.v1.core.users.create.post.isActive.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             z.boolean().optional(),
           ),
@@ -219,7 +221,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.users.create.post.leadId.description" as const,
               helpText:
                 "app.api.v1.core.users.create.post.leadId.description" as const,
-              layout: { columns: 6 },
+              columns: 6,
             },
             leadId.nullable().optional(),
           ),
@@ -233,7 +235,8 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.users.create.post.success.title" as const,
           description:
             "app.api.v1.core.users.create.post.success.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID,
+      columns: 2,
         },
         { response: true },
         {
@@ -260,7 +263,8 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.users.create.post.response.title" as const,
           description:
             "app.api.v1.core.users.create.post.response.description" as const,
-          layout: { type: LayoutType.GRID, columns: 3 },
+          layoutType: LayoutType.GRID,
+      columns: 3,
         },
         { response: true },
         {

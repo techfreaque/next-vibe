@@ -289,13 +289,13 @@ export interface LeadsRepository {
       totalProcessed: number;
       totalUpdated: number;
       errors: Array<{ leadId: string; error: string }>;
-      preview?: Array<{
+      preview: Array<{
         id: string;
         email: string | null;
         businessName: string;
         currentStatus: LeadStatusType;
         currentCampaignStage: EmailCampaignStageType | null;
-      }>;
+      }> | null;
     }>
   >;
 
@@ -328,13 +328,13 @@ export interface LeadsRepository {
       totalProcessed: number;
       totalDeleted: number;
       errors: Array<{ leadId: string; error: string }>;
-      preview?: Array<{
+      preview: Array<{
         id: string;
         email: string | null;
         businessName: string;
         currentStatus: LeadStatusType;
         currentCampaignStage: EmailCampaignStageType | null;
-      }>;
+      }> | null;
     }>
   >;
 }
@@ -1836,13 +1836,13 @@ class LeadsRepositoryImpl implements LeadsRepository {
       totalProcessed: number;
       totalUpdated: number;
       errors: Array<{ leadId: string; error: string }>;
-      preview?: Array<{
+      preview: Array<{
         id: string;
         email: string | null;
         businessName: string;
         currentStatus: LeadStatusType;
         currentCampaignStage: EmailCampaignStageType | null;
-      }>;
+      }> | null;
     }>
   > {
     try {
@@ -2145,6 +2145,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         totalProcessed: matchingLeads.length,
         totalUpdated,
         errors,
+        preview: null,
       });
     } catch (error) {
       logger.error("Error in batch update", parseError(error));
@@ -2186,13 +2187,13 @@ class LeadsRepositoryImpl implements LeadsRepository {
       totalProcessed: number;
       totalDeleted: number;
       errors: Array<{ leadId: string; error: string }>;
-      preview?: Array<{
+      preview: Array<{
         id: string;
         email: string | null;
         businessName: string;
         currentStatus: LeadStatusType;
         currentCampaignStage: EmailCampaignStageType | null;
-      }>;
+      }> | null;
     }>
   > {
     try {
@@ -2502,6 +2503,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         totalProcessed: matchingLeads.length,
         totalDeleted,
         errors,
+        preview: null,
       });
     } catch (error) {
       logger.error("Error in batch delete", parseError(error));

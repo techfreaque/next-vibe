@@ -44,7 +44,7 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.emails.imapClient.health.health.get.form.title",
       description:
         "app.api.v1.core.emails.imapClient.health.health.get.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: undefined, response: true },
     {
@@ -103,7 +103,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.imapClient.health.health.get.response.data.syncStats.title",
           description:
             "app.api.v1.core.emails.imapClient.health.health.get.response.data.syncStats.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {

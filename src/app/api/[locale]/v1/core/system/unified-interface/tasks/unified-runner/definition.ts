@@ -44,7 +44,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.container.title",
       description:
         "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -79,7 +79,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.restart",
             },
           ],
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(["start", "stop", "status", "restart"]),
       ),
@@ -109,7 +109,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.options.side",
             },
           ],
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(["all", "cron", "side"]).optional(),
       ),
@@ -122,7 +122,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.fields.dryRun.label",
           description:
             "app.api.v1.core.system.unifiedInterface.tasks.unifiedRunner.post.fields.dryRun.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().default(false),
       ),

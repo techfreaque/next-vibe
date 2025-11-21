@@ -32,8 +32,8 @@ import {
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "credits", "purchase"],
-  title: "app.api.v1.core.agent.chat.credits.purchase.post.title",
-  description: "app.api.v1.core.agent.chat.credits.purchase.post.description",
+  title: "app.api.v1.core.credits.purchase.post.title",
+  description: "app.api.v1.core.credits.purchase.post.description",
   category: "app.api.v1.core.agent.chat.category",
   tags: [
     "app.api.v1.core.agent.chat.tags.credits",
@@ -44,10 +44,10 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.agent.chat.credits.purchase.post.container.title",
+      title: "app.api.v1.core.credits.purchase.post.container.title",
       description:
-        "app.api.v1.core.agent.chat.credits.purchase.post.container.description",
-      layout: { type: LayoutType.STACKED },
+        "app.api.v1.core.credits.purchase.post.container.description",
+      layoutType: LayoutType.STACKED,
     },
     {
       request: "data",
@@ -60,12 +60,11 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.INT,
           label:
-            "app.api.v1.core.agent.chat.credits.purchase.post.quantity.label",
+            "app.api.v1.core.credits.purchase.post.quantity.label",
           description:
-            "app.api.v1.core.agent.chat.credits.purchase.post.quantity.description",
+            "app.api.v1.core.credits.purchase.post.quantity.description",
           placeholder:
-            "app.api.v1.core.agent.chat.credits.purchase.post.quantity.placeholder",
-          validation: { required: true, min: 1, max: 10 },
+            "app.api.v1.core.credits.purchase.post.quantity.placeholder",
         },
         z.number().int().min(1).max(10),
       ),
@@ -75,12 +74,11 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label:
-            "app.api.v1.core.agent.chat.credits.purchase.post.provider.label",
+            "app.api.v1.core.credits.purchase.post.provider.label",
           description:
-            "app.api.v1.core.agent.chat.credits.purchase.post.provider.description",
+            "app.api.v1.core.credits.purchase.post.provider.description",
           placeholder:
-            "app.api.v1.core.agent.chat.credits.purchase.post.provider.placeholder",
-          validation: { required: false },
+            "app.api.v1.core.credits.purchase.post.provider.placeholder",
           options: PaymentProviderOptions,
         },
         z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
@@ -91,7 +89,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.agent.chat.credits.purchase.post.checkoutUrl.content",
+            "app.api.v1.core.credits.purchase.post.checkoutUrl.content",
         },
         z.string().url(),
       ),
@@ -100,7 +98,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.agent.chat.credits.purchase.post.sessionId.content",
+            "app.api.v1.core.credits.purchase.post.sessionId.content",
         },
         z.string(),
       ),
@@ -109,7 +107,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.agent.chat.credits.purchase.post.totalAmount.content",
+            "app.api.v1.core.credits.purchase.post.totalAmount.content",
         },
         z.number().int(),
       ),
@@ -118,7 +116,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.v1.core.agent.chat.credits.purchase.post.totalCredits.content",
+            "app.api.v1.core.credits.purchase.post.totalCredits.content",
         },
         z.number().int(),
       ),
@@ -127,66 +125,66 @@ const { POST } = createEndpoint({
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.v1.core.agent.chat.credits.purchase.post.success.title",
+    title: "app.api.v1.core.credits.purchase.post.success.title",
     description:
-      "app.api.v1.core.agent.chat.credits.purchase.post.success.description",
+      "app.api.v1.core.credits.purchase.post.success.description",
   },
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.validation.title",
+        "app.api.v1.core.credits.purchase.post.errors.validation.title",
       description:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.validation.description",
+        "app.api.v1.core.credits.purchase.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.network.title",
+        "app.api.v1.core.credits.purchase.post.errors.network.title",
       description:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.network.description",
+        "app.api.v1.core.credits.purchase.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.unauthorized.title",
+        "app.api.v1.core.credits.purchase.post.errors.unauthorized.title",
       description:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.unauthorized.description",
+        "app.api.v1.core.credits.purchase.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.forbidden.title",
+        "app.api.v1.core.credits.purchase.post.errors.forbidden.title",
       description:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.forbidden.description",
+        "app.api.v1.core.credits.purchase.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.notFound.title",
+        "app.api.v1.core.credits.purchase.post.errors.notFound.title",
       description:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.notFound.description",
+        "app.api.v1.core.credits.purchase.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.server.title",
+        "app.api.v1.core.credits.purchase.post.errors.server.title",
       description:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.server.description",
+        "app.api.v1.core.credits.purchase.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.unknown.title",
+        "app.api.v1.core.credits.purchase.post.errors.unknown.title",
       description:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.unknown.description",
+        "app.api.v1.core.credits.purchase.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.unsavedChanges.title",
+        "app.api.v1.core.credits.purchase.post.errors.unsavedChanges.title",
       description:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.unsavedChanges.description",
+        "app.api.v1.core.credits.purchase.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.conflict.title",
+        "app.api.v1.core.credits.purchase.post.errors.conflict.title",
       description:
-        "app.api.v1.core.agent.chat.credits.purchase.post.errors.conflict.description",
+        "app.api.v1.core.credits.purchase.post.errors.conflict.description",
     },
   },
 

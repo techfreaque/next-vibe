@@ -37,7 +37,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.user.public.signup.title" as const,
       description: "app.api.v1.core.user.public.signup.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -49,7 +50,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.public.signup.groups.personalInfo.title" as const,
           description:
             "app.api.v1.core.user.public.signup.groups.personalInfo.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
         { request: "data" },
         {
@@ -63,10 +65,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.signup.fields.privateName.description" as const,
               placeholder:
                 "app.api.v1.core.user.public.signup.fields.privateName.placeholder" as const,
-              required: true,
-              layout: { columns: 6 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.privateName.description" as const,
+              columns: 6,
             },
             z
               .string()
@@ -90,10 +89,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.signup.fields.publicName.description" as const,
               placeholder:
                 "app.api.v1.core.user.public.signup.fields.publicName.placeholder" as const,
-              required: true,
-              layout: { columns: 6 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.publicName.description" as const,
+              columns: 6,
             },
             z
               .string()
@@ -117,10 +113,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.signup.fields.email.description" as const,
               placeholder:
                 "app.api.v1.core.user.public.signup.fields.email.placeholder" as const,
-              required: true,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.email.description" as const,
+              columns: 12,
             },
             z
               .string()
@@ -141,7 +134,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.public.signup.groups.security.title" as const,
           description:
             "app.api.v1.core.user.public.signup.groups.security.description" as const,
-          layout: { type: LayoutType.VERTICAL },
+          layoutType: LayoutType.VERTICAL,
         },
         { request: "data" },
         {
@@ -155,10 +148,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.signup.fields.password.description" as const,
               placeholder:
                 "app.api.v1.core.user.public.signup.fields.password.placeholder" as const,
-              required: true,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.password.help" as const,
+              columns: 12,
             },
             z
               .string()
@@ -182,10 +172,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.signup.fields.confirmPassword.description" as const,
               placeholder:
                 "app.api.v1.core.user.public.signup.fields.confirmPassword.placeholder" as const,
-              required: true,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.confirmPassword.description" as const,
+              columns: 12,
             },
             z.string().min(8, {
               message:
@@ -203,7 +190,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.public.signup.groups.consent.title" as const,
           description:
             "app.api.v1.core.user.public.signup.groups.consent.description" as const,
-          layout: { type: LayoutType.VERTICAL },
+          layoutType: LayoutType.VERTICAL,
         },
         { request: "data" },
         {
@@ -215,12 +202,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.signup.fields.acceptTerms.label" as const,
               description:
                 "app.api.v1.core.user.public.signup.fields.acceptTerms.description" as const,
-              placeholder:
-                "app.api.v1.core.user.public.signup.fields.acceptTerms.placeholder" as const,
-              required: true,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.acceptTerms.help" as const,
+              columns: 12,
             },
             z.boolean().refine((val) => val === true, {
               message:
@@ -236,16 +218,27 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.signup.fields.subscribeToNewsletter.label" as const,
               description:
                 "app.api.v1.core.user.public.signup.fields.subscribeToNewsletter.description" as const,
-              placeholder:
-                "app.api.v1.core.user.public.signup.fields.subscribeToNewsletter.placeholder" as const,
-              required: false,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.subscribeToNewsletter.help" as const,
+              columns: 12,
             },
             z.boolean().optional().default(false),
           ),
         },
+      ),
+
+      // === REFERRAL CODE (OPTIONAL) ===
+      referralCode: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label:
+            "app.api.v1.core.user.public.signup.fields.referralCode.label" as const,
+          description:
+            "app.api.v1.core.user.public.signup.fields.referralCode.description" as const,
+          placeholder:
+            "app.api.v1.core.user.public.signup.fields.referralCode.placeholder" as const,
+          columns: 12,
+        },
+        z.string().optional(),
       ),
 
       // === ADVANCED OPTIONS (PROGRESSIVE DISCLOSURE) ===
@@ -256,7 +249,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.public.signup.groups.advanced.title" as const,
           description:
             "app.api.v1.core.user.public.signup.groups.advanced.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { request: "data" },
         {
@@ -270,10 +264,7 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.signup.fields.leadId.description" as const,
               placeholder:
                 "app.api.v1.core.user.public.signup.fields.leadId.placeholder" as const,
-              required: false,
-              layout: { columns: 12 },
-              helpText:
-                "app.api.v1.core.user.public.signup.fields.leadId.description" as const,
+              columns: 12,
             },
             z
               .string()
@@ -293,7 +284,7 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.user.public.signup.response.title" as const,
           description:
             "app.api.v1.core.user.public.signup.response.description" as const,
-          layout: { type: LayoutType.VERTICAL },
+          layoutType: LayoutType.VERTICAL,
         },
         { response: true },
         {
@@ -319,7 +310,8 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.signup.response.title" as const,
               description:
                 "app.api.v1.core.user.public.signup.response.description" as const,
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID,
+              columns: 12,
             },
             { response: true },
             {
@@ -371,7 +363,8 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.signup.response.verificationInfo.title" as const,
               description:
                 "app.api.v1.core.user.public.signup.response.verificationInfo.description" as const,
-              layout: { type: LayoutType.GRID, columns: 12 },
+              layoutType: LayoutType.GRID,
+              columns: 12,
             },
             { response: true },
             {
@@ -623,7 +616,8 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.user.public.signup.emailCheck.title" as const,
       description:
         "app.api.v1.core.user.public.signup.emailCheck.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -638,7 +632,6 @@ const { GET } = createEndpoint({
             "app.api.v1.core.user.public.signup.emailCheck.fields.email.description" as const,
           placeholder:
             "app.api.v1.core.user.public.signup.emailCheck.fields.email.placeholder" as const,
-          required: true,
         },
         z.string().email({
           message:
@@ -654,7 +647,8 @@ const { GET } = createEndpoint({
             "app.api.v1.core.user.public.signup.emailCheck.response.title" as const,
           description:
             "app.api.v1.core.user.public.signup.emailCheck.response.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { response: true },
         {

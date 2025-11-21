@@ -28,7 +28,12 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.db.schemaVerify.post.description",
   category: "app.api.v1.core.system.db.category",
   tags: ["app.api.v1.core.system.db.schemaVerify.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["schema-verify", "db:schema-verify"],
 
   fields: objectField(
@@ -37,7 +42,8 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.system.db.schemaVerify.post.form.title",
       description:
         "app.api.v1.core.system.db.schemaVerify.post.form.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -50,7 +56,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.db.schemaVerify.fields.fixIssues.title",
           description:
             "app.api.v1.core.system.db.schemaVerify.fields.fixIssues.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),
@@ -62,7 +68,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.db.schemaVerify.fields.silent.title",
           description:
             "app.api.v1.core.system.db.schemaVerify.fields.silent.description",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.boolean().optional().default(false),
       ),

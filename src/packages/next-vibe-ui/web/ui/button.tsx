@@ -69,7 +69,7 @@ export interface ButtonMouseEvent {
   stopPropagation: () => void;
 }
 
-type ButtonBaseProps = {
+export type ButtonProps = {
   suppressHydrationWarning?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -92,19 +92,9 @@ type ButtonBaseProps = {
     | "radio"
     | "combobox";
   tabIndex?: number;
+  asChild?: boolean;
+  key?: React.Key;
 } & StyleType;
-
-export type AsChildButtonProps = ButtonBaseProps & {
-  asChild: true;
-  children?: JSX.Element | string;
-};
-
-export type RegularButtonProps = ButtonBaseProps & {
-  asChild?: false;
-  children?: ReactNode;
-};
-
-export type ButtonProps = AsChildButtonProps | RegularButtonProps;
 
 export function Button({
   className,

@@ -25,12 +25,11 @@ import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import imapAccountsListDefinition, {
+import { type ImapSyncStatusValue, ImapSyncStatus } from "../enum";
+import imapAccountsListDefinitions, {
   type ImapAccountsListResponseOutput,
-} from "../../../../../api/[locale]/v1/core/emails/imap-client/accounts/list/definition";
-import imapAccountTestDefinition from "../../../../../api/[locale]/v1/core/emails/imap-client/accounts/test/definition";
-import { ImapSyncStatus } from "../../../../../api/[locale]/v1/core/emails/imap-client/enum";
+} from "../accounts/list/definition";
+import imapAccountTestDefinition from "../accounts/test/definition";
 
 interface ImapAccountsListProps {
   locale: CountryLanguage;
@@ -49,7 +48,7 @@ export function ImapAccountsList({
 
   // All state managed through useEndpoint - no local useState
   const accountsEndpoint = useEndpoint(
-    imapAccountsListDefinition,
+    imapAccountsListDefinitions,
     {
       queryOptions: {
         enabled: true,
@@ -85,9 +84,7 @@ export function ImapAccountsList({
   const currentPage = form.watch("page") || 1;
   const limit = form.watch("limit") || 20;
 
-  const getStatusBadge = (
-    status: (typeof ImapSyncStatus)[keyof typeof ImapSyncStatus],
-  ): JSX.Element => {
+  const getStatusBadge = (status: typeof ImapSyncStatusValue): JSX.Element => {
     switch (status) {
       case ImapSyncStatus.SYNCED:
         return (
@@ -205,7 +202,7 @@ export function ImapAccountsList({
                   </TableCell>
                   <TableCell>{account.maxMessages}</TableCell>
                   <TableCell>
-                    <Div className="flex items-center flex flex-row gap-2">
+                    <Div className="flex items-center flex-row gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -249,7 +246,7 @@ export function ImapAccountsList({
               total: totalAccounts,
             })}
           </Div>
-          <Div className="flex items-center flex flex-row gap-2">
+          <Div className="flex items-center flex-row gap-2">
             <Button
               variant="outline"
               size="sm"

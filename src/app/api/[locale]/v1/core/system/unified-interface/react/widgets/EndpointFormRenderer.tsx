@@ -15,14 +15,17 @@ import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 /**
  * Extract all request field paths from endpoint definition
  * Recursively walks the field structure to find all data fields
- * Returns strings that are valid field paths for the form
+ * Returns field info including path and widget type
  */
-function extractRequestFieldPaths(fields: unknown, parentPath = ""): string[] {
+function extractRequestFieldPaths(
+  fields: unknown,
+  parentPath = "",
+): string[] {
   if (!fields || typeof fields !== "object") {
     return [];
   }
 
-  const paths: string[] = [];
+  const fieldPaths: string[] = [];
 
   // Type assertion for the fields structure
   const fieldsObj = fields as Record<string, unknown>;
@@ -32,6 +35,7 @@ function extractRequestFieldPaths(fields: unknown, parentPath = ""): string[] {
     type?: string;
     usage?: { request?: string };
     children?: Record<string, unknown>;
+    ui?: Record<string, unknown>;
   };
 
   // If this is an object field with children, recurse into children
@@ -39,7 +43,7 @@ function extractRequestFieldPaths(fields: unknown, parentPath = ""): string[] {
     for (const [key, childField] of Object.entries(fieldWithUsage.children)) {
       const fullPath = parentPath ? `${parentPath}.${key}` : key;
       const childPaths = extractRequestFieldPaths(childField, fullPath);
-      paths.push(...childPaths);
+      fieldPaths.push(...childPaths);
     }
   }
 
@@ -49,7 +53,7 @@ function extractRequestFieldPaths(fields: unknown, parentPath = ""): string[] {
     fieldWithUsage.usage?.request === "data"
   ) {
     if (parentPath) {
-      paths.push(parentPath);
+      fieldPaths.push(parentPath);
     }
   }
 
@@ -57,11 +61,11 @@ function extractRequestFieldPaths(fields: unknown, parentPath = ""): string[] {
   if (!parentPath) {
     for (const [key, value] of Object.entries(fieldsObj)) {
       const childPaths = extractRequestFieldPaths(value, key);
-      paths.push(...childPaths);
+      fieldPaths.push(...childPaths);
     }
   }
 
-  return paths;
+  return fieldPaths;
 }
 
 /**

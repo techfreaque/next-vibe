@@ -35,18 +35,18 @@ export type MultiSelectProps = {
   searchable?: boolean;
 } & StyleType;
 
-export function MultiSelect({
-  options,
-  value = [],
-  onChange,
-  placeholder,
-  emptyMessage,
-  disabled = false,
-  className,
-  style,
-  maxSelections,
-  searchable = true,
-}: MultiSelectProps): React.JSX.Element {
+export function MultiSelect(props: MultiSelectProps): React.JSX.Element {
+  const {
+    options,
+    value = [],
+    onChange,
+    placeholder,
+    emptyMessage,
+    disabled = false,
+    className,
+    maxSelections,
+    searchable = true,
+  } = props;
   const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
 
@@ -83,7 +83,6 @@ export function MultiSelect({
             !value.length && "text-muted-foreground",
             className,
           )}
-          style={style}
           disabled={disabled}
         >
           <div className="flex gap-1 flex-wrap">

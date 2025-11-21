@@ -35,6 +35,20 @@ export const translations: typeof enTranslations = {
       label: "ID wiadomości nadrzędnej",
       description: "ID wiadomości nadrzędnej dla rozgałęzienia/wątku",
     },
+    messageHistory: {
+      label: "Historia wiadomości",
+      description: "Opcjonalna historia wiadomości dla trybu incognito",
+      item: {
+        title: "Wiadomość",
+        description: "Wiadomość czatu w historii",
+        role: {
+          label: "Rola",
+        },
+        content: {
+          label: "Treść",
+        },
+      },
+    },
     content: {
       label: "Treść wiadomości",
       description: "Treść wiadomości do wysłania",

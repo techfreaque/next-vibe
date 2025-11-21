@@ -17,6 +17,12 @@ export const translations: typeof enTranslations = {
     executing: "Wird ausgeführt",
     listCommands: "Alle verfügbaren Befehle auflisten",
     output: "Ausgabeformat",
+    utils: {
+      debug: {
+        executionSummary:
+          "Ausführung: {{executionSeconds}}s | Overhead: {{overheadSeconds}}s | Gesamt: {{totalSeconds}}s",
+      },
+    },
     help: {
       title: "Vibe CLI Hilfe",
       description: "Vibe CLI - API-Ausführungstool der nächsten Generation",

@@ -52,7 +52,7 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.emails.messages.list.container.title",
       description: "app.api.v1.core.emails.messages.list.container.description",
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -63,7 +63,7 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.emails.messages.list.filters.title",
           description:
             "app.api.v1.core.emails.messages.list.filters.description",
-          layout: { type: LayoutType.GRID, columns: 4 },
+          layoutType: LayoutType.GRID, columns: 4,
         },
         { request: "data" },
         {
@@ -115,7 +115,7 @@ const { GET } = createEndpoint({
               type: WidgetType.CONTAINER,
               title:
                 "app.api.v1.core.emails.messages.list.fields.dateRange.title",
-              layout: { type: LayoutType.GRID_2_COLUMNS },
+              layoutType: LayoutType.GRID_2_COLUMNS,
             },
             { request: "data" },
             {
@@ -156,7 +156,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.v1.core.emails.messages.list.displayOptions.title",
-          layout: { type: LayoutType.GRID, columns: 4 },
+          layoutType: LayoutType.GRID, columns: 4,
         },
         { request: "data" },
         {
@@ -197,9 +197,8 @@ const { GET } = createEndpoint({
               description:
                 "app.api.v1.core.emails.messages.list.fields.page.description",
               placeholder:
-                "app.api.v1.core.emails.messages.list.fields.page.placeholder",
-              validation: { min: 1 },
-            },
+                "app.api.v1.core.emails.messages.list.fields.page.placeholder"
+},
             z.coerce.number().int().min(1).default(1),
           ),
 
@@ -211,9 +210,8 @@ const { GET } = createEndpoint({
               description:
                 "app.api.v1.core.emails.messages.list.fields.limit.description",
               placeholder:
-                "app.api.v1.core.emails.messages.list.fields.limit.placeholder",
-              validation: { min: 1, max: 100 },
-            },
+                "app.api.v1.core.emails.messages.list.fields.limit.placeholder"
+},
             z.coerce.number().int().min(1).max(100).default(20),
           ),
         },
@@ -228,11 +226,7 @@ const { GET } = createEndpoint({
         objectField(
           {
             type: WidgetType.CONTAINER,
-            title:
-              "app.api.v1.core.emails.messages.list.response.emails.item.title",
-            description:
-              "app.api.v1.core.emails.messages.list.response.emails.item.description",
-            layout: { type: LayoutType.HORIZONTAL },
+            layoutType: LayoutType.HORIZONTAL,
           },
           { response: true },
           {
@@ -242,7 +236,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.CONTAINER,
                 title:
                   "app.api.v1.core.emails.messages.list.response.emails.item.emailCore.title",
-                layout: { type: LayoutType.GRID, columns: 3 },
+                layoutType: LayoutType.GRID, columns: 3,
               },
               { response: true },
               {
@@ -278,7 +272,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.CONTAINER,
                 title:
                   "app.api.v1.core.emails.messages.list.response.emails.item.emailParties.title",
-                layout: { type: LayoutType.GRID_2_COLUMNS },
+                layoutType: LayoutType.GRID_2_COLUMNS,
               },
               { response: true },
               {
@@ -287,7 +281,7 @@ const { GET } = createEndpoint({
                     type: WidgetType.CONTAINER,
                     title:
                       "app.api.v1.core.emails.messages.list.response.emails.item.recipientEmail",
-                    layout: { type: LayoutType.STACKED },
+                    layoutType: LayoutType.STACKED,
                   },
                   { response: true },
                   {
@@ -314,7 +308,7 @@ const { GET } = createEndpoint({
                     type: WidgetType.CONTAINER,
                     title:
                       "app.api.v1.core.emails.messages.list.response.emails.item.senderEmail",
-                    layout: { type: LayoutType.STACKED },
+                    layoutType: LayoutType.STACKED,
                   },
                   { response: true },
                   {
@@ -345,7 +339,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.CONTAINER,
                 title:
                   "app.api.v1.core.emails.messages.list.response.emails.item.emailMetadata.title",
-                layout: { type: LayoutType.GRID, columns: 4 },
+                layoutType: LayoutType.GRID, columns: 4,
               },
               { response: true },
               {
@@ -388,7 +382,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.CONTAINER,
                 title:
                   "app.api.v1.core.emails.messages.list.response.emails.item.emailEngagement.title",
-                layout: { type: LayoutType.VERTICAL },
+                layoutType: LayoutType.VERTICAL,
               },
               { response: true },
               {
@@ -433,7 +427,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.CONTAINER,
                 title:
                   "app.api.v1.core.emails.messages.list.response.emails.item.technicalDetails.title",
-                layout: { type: LayoutType.GRID, columns: 3 },
+                layoutType: LayoutType.GRID, columns: 3,
               },
               { response: true },
               {
@@ -458,7 +452,7 @@ const { GET } = createEndpoint({
                     type: WidgetType.CONTAINER,
                     title:
                       "app.api.v1.core.emails.messages.list.response.emails.item.associatedIds.title",
-                    layout: { type: LayoutType.HORIZONTAL },
+                    layoutType: LayoutType.HORIZONTAL,
                   },
                   { response: true },
                   {
@@ -485,7 +479,7 @@ const { GET } = createEndpoint({
                     type: WidgetType.CONTAINER,
                     title:
                       "app.api.v1.core.emails.messages.list.response.emails.item.timestamps.title",
-                    layout: { type: LayoutType.GRID_2_COLUMNS },
+                    layoutType: LayoutType.GRID_2_COLUMNS,
                   },
                   { response: true },
                   {
@@ -520,7 +514,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.emails.messages.list.response.pagination.title",
           description:
             "app.api.v1.core.emails.messages.list.response.pagination.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {

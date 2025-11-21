@@ -52,6 +52,59 @@ export const translations = {
   response: {
     title: "Login Options Response",
     description: "Available login configuration options",
+    success: {
+      badge: "Success",
+    },
+    message: {
+      content: "Status Message",
+    },
+    forUser: {
+      content: "Email Address",
+    },
+    loginMethods: {
+      title: "Login Methods",
+      description: "Available authentication methods",
+      password: {
+        title: "Password Login",
+        description: "Standard password authentication",
+        enabled: {
+          badge: "Enabled",
+        },
+      },
+      social: {
+        title: "Social Login",
+        description: "Social media authentication options",
+        enabled: {
+          badge: "Enabled",
+        },
+        providers: {
+          item: {
+            title: "Social Provider",
+            description: "Social authentication provider",
+          },
+          name: {
+            content: "Provider Name",
+          },
+          id: {
+            content: "Provider ID",
+          },
+          enabled: {
+            badge: "Available",
+          },
+          description: "Provider Description",
+        },
+      },
+    },
+    security: {
+      title: "Security Settings",
+      description: "Authentication security requirements",
+      maxAttempts: {
+        content: "Maximum Login Attempts",
+      },
+      requireTwoFactor: {
+        badge: "2FA Required",
+      },
+    },
   },
   errors: {
     validation: {

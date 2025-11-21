@@ -57,6 +57,7 @@ export const translations: typeof enTranslations = {
     auth_retrieval_failed: "Authentifizierung konnte nicht abgerufen werden",
     not_found: "Benutzer nicht gefunden",
     roles_lookup_failed: "Benutzerrollen konnten nicht abgerufen werden",
+    roles_batch_fetch_failed: "Batch-Abruf der Benutzerrollen fehlgeschlagen",
     id_lookup_failed: "Benutzer konnte nicht über ID gefunden werden",
     email_lookup_failed: "Benutzer konnte nicht über E-Mail gefunden werden",
     email_check_failed: "E-Mail-Prüfung fehlgeschlagen",

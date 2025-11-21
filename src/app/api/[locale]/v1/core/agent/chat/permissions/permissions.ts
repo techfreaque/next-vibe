@@ -29,7 +29,7 @@ import "server-only";
 import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { UserRole, type UserPermissionRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { userRolesRepository } from "@/app/api/[locale]/v1/core/user/user-roles/repository";
 
 import { type DefaultFolderConfig, getDefaultFolderConfig } from "../config";
@@ -82,7 +82,7 @@ function getFolderPermissionValue(
     | "rolesPost"
     | "rolesModerate"
     | "rolesAdmin",
-): string[] | null {
+): (typeof UserPermissionRoleValue)[] | null {
   return folder[permissionType] ?? null;
 }
 
@@ -94,7 +94,7 @@ function getThreadPermissionValue(
     | "rolesPost"
     | "rolesModerate"
     | "rolesAdmin",
-): string[] | null {
+): (typeof UserPermissionRoleValue)[] | null {
   return thread[permissionType] ?? null;
 }
 
@@ -108,7 +108,7 @@ function getPermissionValue(
     | "rolesPost"
     | "rolesModerate"
     | "rolesAdmin",
-): string[] | null {
+): (typeof UserPermissionRoleValue)[] | null {
   if ("parentId" in resource) {
     if (permissionType === "rolesEdit") {
       return null;
@@ -135,7 +135,7 @@ function getDefaultConfigValue(
     | "rolesPost"
     | "rolesModerate"
     | "rolesAdmin",
-): string[] {
+): (typeof UserPermissionRoleValue)[] {
   if (!config) {
     return [];
   }
@@ -158,7 +158,7 @@ export function getEffectiveRoles(
     | "rolesModerate"
     | "rolesAdmin",
   allFolders: Record<string, ChatFolder>,
-): string[] {
+): (typeof UserPermissionRoleValue)[] {
   // Get the permission value
   const roles = getPermissionValue(resource, permissionType);
 
@@ -196,7 +196,7 @@ export function getEffectiveRoles(
  */
 export async function hasRolePermission(
   user: JwtPayloadType,
-  effectiveRoles: string[],
+  effectiveRoles: (typeof UserPermissionRoleValue)[],
   logger: EndpointLogger,
 ): Promise<boolean> {
   // Empty roles = owner only (already checked before this function)

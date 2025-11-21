@@ -57,7 +57,7 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.ai.tools.get.response.title" as const,
       description:
         "app.api.v1.core.system.unifiedInterface.ai.tools.get.response.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { response: true },
     {

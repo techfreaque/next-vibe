@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.payment.refund.form.title" as const,
       description: "app.api.v1.core.payment.refund.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "data", response: true },
     {
@@ -62,9 +62,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.payment.refund.form.fields.transactionId.description" as const,
           placeholder:
             "app.api.v1.core.payment.refund.form.fields.transactionId.placeholder" as const,
-          layout: { columns: 12 },
-          validation: { required: true },
-        },
+          columns: 12},
         z.uuid(),
       ),
 
@@ -78,9 +76,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.payment.refund.form.fields.amount.description" as const,
           placeholder:
             "app.api.v1.core.payment.refund.form.fields.amount.placeholder" as const,
-          layout: { columns: 12 },
-          validation: { required: false, min: 0.01 },
-        },
+          columns: 12
+},
         z.number().positive().optional(),
       ),
 
@@ -94,9 +91,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.payment.refund.form.fields.reason.description" as const,
           placeholder:
             "app.api.v1.core.payment.refund.form.fields.reason.placeholder" as const,
-          layout: { columns: 12 },
-          validation: { required: false, maxLength: 500 },
-        },
+          columns: 12
+},
         z.string().optional(),
       ),
 
@@ -110,9 +106,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.payment.refund.form.fields.metadata.description" as const,
           placeholder:
             "app.api.v1.core.payment.refund.form.fields.metadata.placeholder" as const,
-          layout: { columns: 12 },
-          validation: { required: false },
-        },
+          columns: 12},
         z.record(z.string(), z.string()).optional(),
       ),
 
@@ -142,7 +136,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.payment.refund.post.response.refund.title" as const,
           description:
             "app.api.v1.core.payment.refund.post.response.refund.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {

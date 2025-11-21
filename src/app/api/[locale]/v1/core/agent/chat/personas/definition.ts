@@ -44,7 +44,7 @@ const { GET } = createEndpoint({
       title: "app.api.v1.core.agent.chat.personas.get.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.personas.get.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { response: true },
     {
@@ -52,14 +52,13 @@ const { GET } = createEndpoint({
       personas: responseArrayField(
         {
           type: WidgetType.DATA_CARDS,
-          layout: "grid",
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
             title:
               "app.api.v1.core.agent.chat.personas.get.response.personas.persona.title" as const,
-            layout: { type: LayoutType.GRID, columns: 2 },
+            layoutType: LayoutType.GRID, columns: 2,
           },
           { response: true },
           {
@@ -268,7 +267,7 @@ const { POST } = createEndpoint({
         "app.api.v1.core.agent.chat.personas.post.container.title" as const,
       description:
         "app.api.v1.core.agent.chat.personas.post.container.description" as const,
-      layout: { type: LayoutType.STACKED },
+      layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
     {
@@ -280,7 +279,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.personas.post.name.label" as const,
           description:
             "app.api.v1.core.agent.chat.personas.post.name.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().min(1).max(100),
       ),
@@ -292,7 +291,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.personas.post.personaDescription.label" as const,
           description:
             "app.api.v1.core.agent.chat.personas.post.personaDescription.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().min(1).max(500),
       ),
@@ -303,7 +302,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.chat.personas.post.icon.label" as const,
           description:
             "app.api.v1.core.agent.chat.personas.post.icon.description" as const,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.string().min(1).max(10),
       ),
@@ -315,7 +314,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.personas.post.systemPrompt.label" as const,
           description:
             "app.api.v1.core.agent.chat.personas.post.systemPrompt.description" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().min(1).max(5000),
       ),
@@ -328,7 +327,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.personas.post.category.description" as const,
           options: CategoryOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum([
           "general",
@@ -348,7 +347,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.personas.post.preferredModel.description" as const,
           options: ModelIdOptions,
-          layout: { columns: 6 },
+          columns: 6,
         },
         z.enum(ModelId).optional(),
       ),
@@ -360,7 +359,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.personas.post.suggestedPrompts.label" as const,
           description:
             "app.api.v1.core.agent.chat.personas.post.suggestedPrompts.description" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.array(z.string()).max(4).optional(),
       ),

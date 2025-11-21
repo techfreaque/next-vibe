@@ -1,3 +1,5 @@
+"use client";
+
 import type { JSX } from "react";
 import * as React from "react";
 import type { StyleType } from "../utils/style-type";
@@ -118,9 +120,6 @@ export type DivRefObject = Element & {
 
 export type DivProps = {
   children?: React.ReactNode;
-  ref?:
-    | React.RefObject<DivRefObject | null>
-    | ((node: DivRefObject | null) => void);
   role?: string;
   ariaLabel?: string;
   id?: string;
@@ -139,51 +138,57 @@ export type DivProps = {
   onKeyDown?: (e: DivKeyboardEvent) => void;
 } & StyleType;
 
-export function Div({
-  className,
-  style,
-  children,
-  role,
-  ariaLabel,
-  id,
-  title,
-  onClick,
-  onMouseEnter,
-  onMouseLeave,
-  onTouchStart,
-  onTouchEnd,
-  onDrop,
-  onDragOver,
-  onDragLeave,
-  suppressHydrationWarning,
-  dangerouslySetInnerHTML,
-  tabIndex,
-  onKeyDown,
-  ref,
-}: DivProps): JSX.Element {
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={style}
-      role={role}
-      aria-label={ariaLabel}
-      id={id}
-      title={title}
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-      onDrop={onDrop}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      suppressHydrationWarning={suppressHydrationWarning}
-      dangerouslySetInnerHTML={dangerouslySetInnerHTML}
-      tabIndex={tabIndex}
-      onKeyDown={onKeyDown}
-    >
-      {children}
-    </div>
-  );
-}
+export const Div = React.forwardRef<DivRefObject, DivProps>(
+  (
+    {
+      className,
+      style,
+      children,
+      role,
+      ariaLabel,
+      id,
+      title,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
+      onTouchStart,
+      onTouchEnd,
+      onDrop,
+      onDragOver,
+      onDragLeave,
+      suppressHydrationWarning,
+      dangerouslySetInnerHTML,
+      tabIndex,
+      onKeyDown,
+    },
+    ref,
+  ): JSX.Element => {
+    return (
+      <div
+        ref={ref}
+        className={className}
+        style={style}
+        role={role}
+        aria-label={ariaLabel}
+        id={id}
+        title={title}
+        onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        suppressHydrationWarning={suppressHydrationWarning}
+        dangerouslySetInnerHTML={dangerouslySetInnerHTML}
+        tabIndex={tabIndex}
+        onKeyDown={onKeyDown}
+      >
+        {children}
+      </div>
+    );
+  },
+);
+
+Div.displayName = "Div";

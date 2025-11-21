@@ -46,7 +46,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.check.oxlint.container.title",
       description: "app.api.v1.core.system.check.oxlint.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -60,7 +61,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.oxlint.fields.path.description",
           placeholder:
             "app.api.v1.core.system.check.oxlint.fields.path.placeholder",
-          layout: { columns: 6 },
+          columns: 6,
         },
         z
           .union([z.string(), z.array(z.string())])
@@ -75,7 +76,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.check.oxlint.fields.verbose.label",
           description:
             "app.api.v1.core.system.check.oxlint.fields.verbose.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.boolean().default(false),
       ),
@@ -87,7 +88,7 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.system.check.oxlint.fields.fix.label",
           description:
             "app.api.v1.core.system.check.oxlint.fields.fix.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         // fix is false by default as it makes it way slower
         z.boolean().default(false),
@@ -101,7 +102,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.check.oxlint.fields.timeoutSeconds.label",
           description:
             "app.api.v1.core.system.check.oxlint.fields.timeoutSeconds.description",
-          layout: { columns: 3 },
+          columns: 3,
         },
         z.number().min(1).max(3600).default(3600),
       ),
@@ -121,17 +122,16 @@ const { POST } = createEndpoint({
           groupBy: "file",
           sortBy: "severity",
           showSummary: true,
-          layout: {
-            type: LayoutType.GRID,
-            columns: 1,
-          },
+          layoutType: LayoutType.GRID,
+          columns: 1,
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
             title: "app.api.v1.core.system.check.oxlint.title",
             description: "app.api.v1.core.system.check.oxlint.description",
-            layout: { type: LayoutType.GRID, columns: 12 },
+            layoutType: LayoutType.GRID,
+            columns: 12,
           },
           { response: true },
           {
@@ -187,15 +187,13 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.v1.core.system.check.oxlint.response.errors.item.title",
+                  "app.api.v1.core.system.check.oxlint.response.errors.item.type",
               },
               z.literal("lint"),
             ),
           },
         ),
       ),
-
-      // Summary is now handled by the grouped list widget - no separate container needed
     },
   ),
 

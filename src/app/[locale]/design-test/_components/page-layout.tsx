@@ -37,7 +37,7 @@ export function DesignTestPageLayout({
   locale,
 }: {
   locale: CountryLanguage;
-}): JSX.Element {
+}): React.JSX.Element {
   const [collapsed, setCollapsed] = useState(true);
 
   return (

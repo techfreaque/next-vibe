@@ -36,7 +36,7 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.emails.messages.id.container.title",
       description: "app.api.v1.core.emails.messages.id.container.description",
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID, columns: 12,
     },
     { request: "urlPathParams", response: true },
     {
@@ -48,7 +48,7 @@ const { GET } = createEndpoint({
           label: "app.api.v1.core.emails.messages.id.fields.id.label",
           description:
             "app.api.v1.core.emails.messages.id.fields.id.description",
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.uuid(),
       ),
@@ -60,7 +60,7 @@ const { GET } = createEndpoint({
           title: "app.api.v1.core.emails.messages.id.response.email.title",
           description:
             "app.api.v1.core.emails.messages.id.response.email.description",
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID, columns: 12,
         },
         { response: true },
         {

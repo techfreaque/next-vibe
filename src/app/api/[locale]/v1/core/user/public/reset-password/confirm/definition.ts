@@ -39,7 +39,8 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.user.public.resetPassword.confirm.title" as const,
       description:
         "app.api.v1.core.user.public.resetPassword.confirm.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -51,7 +52,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.public.resetPassword.confirm.groups.verification.title" as const,
           description:
             "app.api.v1.core.user.public.resetPassword.confirm.groups.verification.description" as const,
-          layout: { type: LayoutType.GRID, columns: 2 },
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
         { request: "data" },
         {
@@ -65,8 +67,6 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.resetPassword.confirm.fields.token.description" as const,
               placeholder:
                 "app.api.v1.core.user.public.resetPassword.confirm.fields.token.placeholder" as const,
-              required: true,
-              layout: { columns: 6 },
               helpText:
                 "app.api.v1.core.user.public.resetPassword.confirm.fields.token.help" as const,
             },
@@ -86,8 +86,6 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.resetPassword.confirm.fields.email.description" as const,
               placeholder:
                 "app.api.v1.core.user.public.resetPassword.confirm.fields.email.placeholder" as const,
-              required: true,
-              layout: { columns: 6 },
             },
             z
               .string()
@@ -108,7 +106,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.user.public.resetPassword.confirm.groups.newPassword.title" as const,
           description:
             "app.api.v1.core.user.public.resetPassword.confirm.groups.newPassword.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { request: "data" },
         {
@@ -122,8 +121,6 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.resetPassword.confirm.fields.password.description" as const,
               placeholder:
                 "app.api.v1.core.user.public.resetPassword.confirm.fields.password.placeholder" as const,
-              required: true,
-              layout: { columns: 12 },
               helpText:
                 "app.api.v1.core.user.public.resetPassword.confirm.fields.password.help" as const,
             },
@@ -143,8 +140,6 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.user.public.resetPassword.confirm.fields.confirmPassword.description" as const,
               placeholder:
                 "app.api.v1.core.user.public.resetPassword.confirm.fields.confirmPassword.placeholder" as const,
-              required: true,
-              layout: { columns: 12 },
             },
             z.string().min(8, {
               message:
@@ -155,28 +150,53 @@ const { POST } = createEndpoint({
       ),
 
       // === RESPONSE FIELDS ===
-      response: responseField(
+      response: objectField(
         {
           type: WidgetType.CONTAINER,
           title:
             "app.api.v1.core.user.public.resetPassword.confirm.response.title" as const,
           description:
             "app.api.v1.core.user.public.resetPassword.confirm.response.description" as const,
-          layout: { type: LayoutType.GRID, columns: 12 },
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
-        z.object({
-          success: z
-            .boolean()
-            .describe("Whether the password reset was successful"),
-          message: z.string().describe("Human-readable status message"),
-          securityTip: z
-            .string()
-            .optional()
-            .describe("Optional security recommendation"),
-          nextSteps: z
-            .array(z.string())
-            .describe("Recommended actions after password reset"),
-        }),
+        { response: true },
+        {
+          success: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.v1.core.user.public.resetPassword.confirm.success.title" as const,
+            },
+            z
+              .boolean()
+              .describe("Whether the password reset was successful"),
+          ),
+          message: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.user.public.resetPassword.confirm.response.message.label" as const,
+            },
+            z.string().describe("Human-readable status message"),
+          ),
+          securityTip: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.v1.core.user.public.resetPassword.confirm.response.securityTip" as const,
+            },
+            z
+              .string()
+              .optional()
+              .describe("Optional security recommendation"),
+          ),
+          nextSteps: responseField(
+            {
+              type: WidgetType.LINK_LIST,
+            },
+            z
+              .array(z.string())
+              .describe("Recommended actions after password reset"),
+          ),
+        },
       ),
     },
   ),

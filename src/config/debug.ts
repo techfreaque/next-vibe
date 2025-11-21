@@ -1,4 +1,4 @@
-export let enableDebugLogger = false;
+export let enableDebugLogger = true;
 export let debugCli = false;
 export let debugCron = false;
 export let debugMiddleware = false;

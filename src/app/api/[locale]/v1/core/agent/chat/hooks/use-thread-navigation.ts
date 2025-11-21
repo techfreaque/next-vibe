@@ -7,9 +7,8 @@ import { useRouter } from "next-vibe-ui/hooks";
 import { useCallback } from "react";
 
 import {
-  DEFAULT_FOLDER_IDS,
+  DefaultFolderId,
   isDefaultFolderId,
-  type DefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -78,7 +77,7 @@ export function useThreadNavigation({
           subFolderId = folderId;
         } else {
           // Fallback if folder not found
-          rootFolderId = DEFAULT_FOLDER_IDS.PRIVATE;
+          rootFolderId = DefaultFolderId.PRIVATE;
           subFolderId = null;
         }
       }

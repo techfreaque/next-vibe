@@ -53,7 +53,8 @@ const { POST } = createEndpoint({
       title: "app.api.v1.core.newsletter.subscribe.post.form.title" as const,
       description:
         "app.api.v1.core.newsletter.subscribe.post.form.description" as const,
-      layout: { type: LayoutType.GRID, columns: 12 },
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -69,7 +70,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.newsletter.subscribe.email.placeholder" as const,
           helpText:
             "app.api.v1.core.newsletter.subscribe.email.helpText" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().email(),
       ),
@@ -84,7 +85,7 @@ const { POST } = createEndpoint({
             "app.api.v1.core.newsletter.subscribe.name.placeholder" as const,
           helpText:
             "app.api.v1.core.newsletter.subscribe.name.helpText" as const,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.string().optional(),
       ),
@@ -101,7 +102,7 @@ const { POST } = createEndpoint({
           helpText:
             "app.api.v1.core.newsletter.subscribe.preferences.helpText" as const,
           options: NewsletterPreferenceOptions,
-          layout: { columns: 12 },
+          columns: 12,
         },
         z.array(z.enum(NewsletterPreference)).optional(),
       ),
