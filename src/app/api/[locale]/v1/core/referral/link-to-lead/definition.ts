@@ -6,9 +6,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
 import {
-  field,
   objectField,
-  responseField,
+  requestResponseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -44,7 +43,7 @@ export const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      referralCode: field(
+      referralCode: requestResponseField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -55,25 +54,19 @@ export const { POST } = createEndpoint({
         },
         z.string().min(1),
       ),
-      success: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.v1.core.referral.form.fields.success.label",
-        },
-        z.boolean(),
-      ),
-      message: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.v1.core.referral.form.fields.message.label",
-        },
-        z.string().optional(),
-      ),
     },
   ),
 
   examples: {
     requests: {
+      default: {
+        referralCode: "FRIEND2024",
+      },
+      success: {
+        referralCode: "FRIEND2024",
+      },
+    },
+    responses: {
       default: {
         referralCode: "FRIEND2024",
       },

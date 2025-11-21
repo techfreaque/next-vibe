@@ -42,8 +42,6 @@ const { POST } = createEndpoint({
   aliases: ["chrome"],
 
   allowedRoles: [
-    UserRole.PUBLIC,
-    UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,

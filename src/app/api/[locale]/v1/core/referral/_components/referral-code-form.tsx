@@ -80,8 +80,8 @@ export function ReferralCodeForm({
       <Div className="flex justify-end">
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting
-            ? t("app.user.other.referral.createCode.creating")
-            : t("app.user.other.referral.createCode.create")}
+            ? t("app.user.referral.createCode.creating")
+            : t("app.user.referral.createCode.create")}
         </Button>
       </Div>
     </Form>

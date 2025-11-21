@@ -36,7 +36,7 @@ export async function requireAdminUser(
     // Check if user is public (not authenticated)
     if (minimalUser.isPublic) {
       redirect(
-        `/${locale}/login?redirect=${encodeURIComponent(redirectPath || `/${locale}/admin`)}`,
+        `/${locale}/user/login?callbackUrl=${encodeURIComponent(redirectPath || `/${locale}/admin`)}`,
       );
     }
 
@@ -50,7 +50,7 @@ export async function requireAdminUser(
 
     if (!userResult.success) {
       redirect(
-        `/${locale}/login?redirect=${encodeURIComponent(redirectPath || `/${locale}/admin`)}`,
+        `/${locale}/user/login?callbackUrl=${encodeURIComponent(redirectPath || `/${locale}/admin`)}`,
       );
     }
 
@@ -58,7 +58,7 @@ export async function requireAdminUser(
   } catch (error) {
     logger.error("Error in requireAdminUser", parseError(error));
     redirect(
-      `/${locale}/login?redirect=${encodeURIComponent(redirectPath || `/${locale}/admin`)}`,
+      `/${locale}/user/login?callbackUrl=${encodeURIComponent(redirectPath || `/${locale}/admin`)}`,
     );
   }
 }
@@ -84,7 +84,7 @@ export async function requireUser(
     // Check if user is public (not authenticated)
     if (minimalUser.isPublic || !minimalUser.id) {
       redirect(
-        `/${locale}/user/login?redirect=${encodeURIComponent(redirectPath || `/${locale}`)}`,
+        `/${locale}/user/login?callbackUrl=${encodeURIComponent(redirectPath || `/${locale}`)}`,
       );
     }
 
@@ -98,7 +98,7 @@ export async function requireUser(
 
     if (!userResult.success) {
       redirect(
-        `/${locale}/user/login?redirect=${encodeURIComponent(redirectPath || `/${locale}`)}`,
+        `/${locale}/user/login?callbackUrl=${encodeURIComponent(redirectPath || `/${locale}`)}`,
       );
     }
 
@@ -106,7 +106,7 @@ export async function requireUser(
   } catch (error) {
     logger.error("Error in requireUser", parseError(error));
     redirect(
-      `/${locale}/user/login?redirect=${encodeURIComponent(redirectPath || `/${locale}`)}`,
+      `/${locale}/user/login?callbackUrl=${encodeURIComponent(redirectPath || `/${locale}`)}`,
     );
   }
 }

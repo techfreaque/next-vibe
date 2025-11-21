@@ -163,6 +163,7 @@ export const translations: typeof enTranslations = {
     navigation: {
       profile: "Profil",
       subscription: "Subskrypcja",
+      referral: "Program poleceń",
       about: "O nas",
       help: "Pomoc",
     },

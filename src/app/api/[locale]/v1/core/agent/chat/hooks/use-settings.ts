@@ -46,7 +46,7 @@ interface SettingsDeps {
   chatStore: {
     settings: ChatSettings;
     updateSettings: (updates: Partial<ChatSettings>) => void;
-    hydrateSettings: () => void;
+    hydrateSettings: () => Promise<void>;
   };
 }
 
@@ -59,7 +59,7 @@ export function useSettings(deps: SettingsDeps): SettingsOperations {
 
   // Hydrate settings from localStorage after mount
   useEffect(() => {
-    chatStore.hydrateSettings();
+    void chatStore.hydrateSettings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

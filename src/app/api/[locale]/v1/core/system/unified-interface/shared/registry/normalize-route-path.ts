@@ -17,6 +17,16 @@
  * @returns Normalized path in format "core/segment1/segment2"
  */
 export function normalizeRoutePath(routePath: string): string {
+  // Remove leading slash: /core/system/help -> core/system/help, /c -> c
+  if (routePath.startsWith("/")) {
+    routePath = routePath.slice(1);
+  }
+
+  // If it doesn't start with "core/", it's likely an alias - return as-is
+  if (!routePath.startsWith("core/") && !routePath.includes("/v1/")) {
+    return routePath;
+  }
+
   // Already in correct format (starts with "core/" and has no other markers)
   if (routePath.startsWith("core/") && !routePath.includes("/v1/")) {
     return routePath;
@@ -28,11 +38,6 @@ export function normalizeRoutePath(routePath: string): string {
   );
   if (match) {
     return match[1];
-  }
-
-  // If no /v1/ found but starts with "core/", return as-is
-  if (routePath.startsWith("core/")) {
-    return routePath;
   }
 
   // Fallback: return as-is and let generated index handle it

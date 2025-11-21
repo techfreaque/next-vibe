@@ -30,63 +30,69 @@ export function ReferralStats({
   const currency = currencyByCountry[country] as Currencies;
 
   if (endpoint.read.isLoading) {
-    return <P>{t("app.user.other.referral.stats.loading")}</P>;
+    return <P>{t("app.user.referral.stats.loading")}</P>;
   }
 
   if (!endpoint.read.data) {
-    return <P>{t("app.user.other.referral.stats.error")}</P>;
+    return <P>{t("app.user.referral.stats.error")}</P>;
   }
 
   const stats = endpoint.read.data;
 
   return (
-    <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            {t("app.user.other.referral.stats.totalReferrals")}
+    <Div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <Card className="border border-border/60 bg-linear-to-b from-background to-background/80">
+        <CardHeader className="pb-1">
+          <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t("app.user.referral.stats.totalReferrals")}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <P className="text-2xl font-bold">{stats.totalReferrals}</P>
+          <P className="font-mono text-3xl font-semibold tabular-nums">
+            {stats.totalReferrals}
+          </P>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            {t("app.user.other.referral.stats.totalEarnings")}
+      <Card className="border border-blue-500/40 bg-linear-to-b from-blue-500/10 to-background/40">
+        <CardHeader className="pb-1">
+          <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t("app.user.referral.stats.totalEarnings")}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <P className="text-2xl font-bold">
+          <P className="font-mono text-3xl font-semibold tabular-nums text-blue-300">
             {formatCurrency(stats.totalEarningsCents / 100, currency, locale)}
           </P>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            {t("app.user.other.referral.stats.pendingEarnings")}
+      <Card className="border border-amber-500/40 bg-linear-to-b from-amber-500/10 to-background/40">
+        <CardHeader className="pb-1">
+          <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t("app.user.referral.stats.pendingEarnings")}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <P className="text-2xl font-bold">
+          <P className="font-mono text-3xl font-semibold tabular-nums text-amber-200">
             {formatCurrency(stats.pendingEarningsCents / 100, currency, locale)}
           </P>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            {t("app.user.other.referral.stats.confirmedEarnings")}
+      <Card className="border border-emerald-500/40 bg-linear-to-b from-emerald-500/10 to-background/40">
+        <CardHeader className="pb-1">
+          <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t("app.user.referral.stats.confirmedEarnings")}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <P className="text-2xl font-bold">
-            {formatCurrency(stats.confirmedEarningsCents / 100, currency, locale)}
+          <P className="font-mono text-3xl font-semibold tabular-nums text-emerald-200">
+            {formatCurrency(
+              stats.confirmedEarningsCents / 100,
+              currency,
+              locale,
+            )}
           </P>
         </CardContent>
       </Card>

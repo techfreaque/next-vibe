@@ -183,7 +183,7 @@ export function useLogin(
 
         // Get redirect info from URL
         const redirectParam = new URL(window.location.href).searchParams.get(
-          "redirectTo",
+          "callbackUrl",
         );
         const redirectTo: Route = (redirectParam ||
           `/${locale}/`) satisfies Route;

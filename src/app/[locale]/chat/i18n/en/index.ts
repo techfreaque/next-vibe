@@ -160,6 +160,7 @@ export const translations = {
     navigation: {
       profile: "Profile",
       subscription: "Subscription",
+      referral: "Referral Program",
       about: "About",
       help: "Help",
     },

@@ -361,59 +361,9 @@ export class MemoryMonitor {
 
     return `${size.toFixed(2)} ${units[unitIndex]}`;
   }
-
-  /**
-   * Check for memory leaks
-   */
-  checkMemoryLeak(): {
-    hasLeak: boolean;
-    trend: "increasing" | "decreasing" | "stable";
-    message: string;
-  } {
-    if (this.snapshots.length < 10) {
-      return {
-        hasLeak: false,
-        trend: "stable",
-        message: "Not enough data to detect memory leaks",
-      };
-    }
-
-    const recent = this.snapshots.slice(-10);
-    const first = recent[0].usage.heapUsed;
-    const last = recent[recent.length - 1].usage.heapUsed;
-    const growth = last - first;
-    const growthPercent = (growth / first) * 100;
-
-    if (growthPercent > 50) {
-      return {
-        hasLeak: true,
-        trend: "increasing",
-        message: `Memory usage increased by ${growthPercent.toFixed(2)}% in recent operations`,
-      };
-    }
-
-    if (growthPercent < -20) {
-      return {
-        hasLeak: false,
-        trend: "decreasing",
-        message: `Memory usage decreased by ${Math.abs(growthPercent).toFixed(2)}%`,
-      };
-    }
-
-    return {
-      hasLeak: false,
-      trend: "stable",
-      message: "Memory usage is stable",
-    };
-  }
 }
 
 /**
  * Default performance monitor instance
  */
 export const performanceMonitor = new PerformanceMonitor();
-
-/**
- * Default memory monitor instance
- */
-export const memoryMonitor = new MemoryMonitor();

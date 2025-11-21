@@ -1,8 +1,10 @@
 import { translations as componentsTranslations } from "../../_components/i18n/en";
 import { translations as otherTranslations } from "../../(other)/i18n/en";
 import { translations as signupTranslations } from "../../signup/i18n/en";
+import { translations as referralTranslations } from "../../referral/i18n/en";
 
 export const translations = {
+  referral: referralTranslations,
   components: componentsTranslations,
   other: otherTranslations,
   signup: signupTranslations,

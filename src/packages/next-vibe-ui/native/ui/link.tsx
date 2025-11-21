@@ -2,11 +2,8 @@ import { Link as ExpoLink } from "expo-router";
 import { Text as RNText, View } from "react-native";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
-import * as React from "react";
-
-import { convertCSSToViewStyle } from "@/packages/next-vibe-ui/native/utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 import type { LinkProps } from "@/packages/next-vibe-ui/web/ui/link";
+import { type ReactNode, Children, isValidElement } from "react";
 
 const StyledText = styled(RNText, {
   className: "style",
@@ -20,16 +17,21 @@ const StyledView = styled(View, {
  * Checks if children contain interactive elements (Button, Pressable, etc.)
  * that need to be rendered in a View instead of Text
  */
-function hasInteractiveChildren(children: React.ReactNode): boolean {
+function hasInteractiveChildren(children: ReactNode): boolean {
   let hasInteractive = false;
 
-  React.Children.forEach(children, (child) => {
-    if (React.isValidElement(child)) {
+  Children.forEach(children, (child) => {
+    if (isValidElement(child)) {
       // Check if it's a Button or other pressable component
       const componentType = child.type;
-      if (typeof componentType === "function" || typeof componentType === "object") {
+      if (
+        typeof componentType === "function" ||
+        typeof componentType === "object"
+      ) {
         const displayName =
-          ("displayName" in componentType ? componentType.displayName : undefined) ??
+          ("displayName" in componentType
+            ? componentType.displayName
+            : undefined) ??
           ("name" in componentType ? componentType.name : undefined);
         if (displayName === "Button" || displayName === "Pressable") {
           hasInteractive = true;
@@ -44,14 +46,7 @@ function hasInteractiveChildren(children: React.ReactNode): boolean {
   return hasInteractive;
 }
 
-export function Link({
-  className,
-  style,
-  children,
-  href,
-}: LinkProps): React.JSX.Element {
-  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
-
+export function Link({ className, children, href }: LinkProps): JSX.Element {
   const textClassName = cn(
     "text-primary underline-offset-4 active:underline",
     className,
@@ -63,12 +58,7 @@ export function Link({
   if (useView) {
     return (
       <ExpoLink href={href} asChild>
-        <StyledView
-          {...applyStyleType({
-            nativeStyle,
-            className: cn(textClassName, "self-start"),
-          })}
-        >
+        <StyledView className={cn(textClassName, "self-start")}>
           {children}
         </StyledView>
       </ExpoLink>
@@ -77,14 +67,7 @@ export function Link({
 
   return (
     <ExpoLink href={href}>
-      <StyledText
-        {...applyStyleType({
-          nativeStyle,
-          className: textClassName,
-        })}
-      >
-        {children}
-      </StyledText>
+      <StyledText className={textClassName}>{children}</StyledText>
     </ExpoLink>
   );
 }

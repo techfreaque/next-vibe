@@ -10,57 +10,36 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { env } from "@/config/env";
-
 import { MCP_CONFIG } from "../config";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
-import { createEndpointLogger } from "../../shared/logger/endpoint";
 import { createMCPProtocolHandler } from "./protocol-handler";
 import { StdioTransport } from "./stdio-transport";
-
-/**
- * MCP Server Options
- */
-export interface MCPServerOptions {
-  locale: CountryLanguage;
-  debug?: boolean;
-}
 
 /**
  * MCP Server
  */
 export class MCPServer {
-  private logger: EndpointLogger;
-  private locale: CountryLanguage;
   private transport?: StdioTransport;
   private running = false;
-
-  constructor(options: MCPServerOptions = { locale: env.VIBE_CLI_LOCALE }) {
-    this.locale = options.locale || env.VIBE_CLI_LOCALE;
-    const isDebug =
-      options.debug ??
-      (process.env.DEBUG === "true" || process.env.VIBE_LOG_LEVEL === "debug");
-    this.logger = createEndpointLogger(isDebug, Date.now(), this.locale);
-  }
 
   /**
    * Start the MCP server
    */
-  async start(): Promise<void> {
+  async start(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
     if (this.running) {
-      this.logger.warn("[MCP Server] Server already running");
+      logger.warn("[MCP Server] Server already running");
       return;
     }
 
     const isMCPServerEnabled = process.env.VIBE_MCP_DISABLED !== "true";
     if (!isMCPServerEnabled) {
-      this.logger.error("[MCP Server] MCP server is disabled");
+      logger.error("[MCP Server] MCP server is disabled");
       // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for disabled server
       throw new Error("MCP server is disabled");
     }
 
     try {
-      this.logger.info("[MCP Server] Starting...");
+      logger.info("[MCP Server] Starting...");
 
       const capabilities = MCP_CONFIG.platformSpecific?.capabilities || {
         tools: true,
@@ -68,23 +47,20 @@ export class MCPServer {
         resources: false,
       };
 
-      this.logger.info("[MCP Server] Configuration", {
+      logger.info("[MCP Server] Configuration", {
         // eslint-disable-next-line i18next/no-literal-string
         name: "Vibe MCP Server",
         version: "1.0.0",
-        locale: this.locale,
-        debug: this.logger.isDebugEnabled,
+        locale: locale,
+        debug: logger.isDebugEnabled,
         capabilities,
       });
 
       // Create protocol handler
-      const protocolHandler = await createMCPProtocolHandler(
-        this.logger,
-        this.locale,
-      );
+      const protocolHandler = await createMCPProtocolHandler(logger, locale);
 
       // Create transport
-      this.transport = new StdioTransport(this.logger);
+      this.transport = new StdioTransport(logger);
 
       // Connect transport to protocol handler
       this.transport.onMessage(async (request) => {
@@ -96,15 +72,15 @@ export class MCPServer {
       await this.transport.start();
 
       this.running = true;
-      this.logger.info("[MCP Server] Server started successfully");
+      logger.info("[MCP Server] Server started successfully");
 
       // Setup graceful shutdown
-      this.setupShutdownHandlers();
+      this.setupShutdownHandlers(logger);
 
       // Keep process alive
       await this.keepAlive();
     } catch (error) {
-      this.logger.error("[MCP Server] Failed to start", {
+      logger.error("[MCP Server] Failed to start", {
         error: parseError(error).message,
       });
       // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Re-throw MCP server startup errors for caller to handle
@@ -115,12 +91,12 @@ export class MCPServer {
   /**
    * Stop the MCP server
    */
-  async stop(): Promise<void> {
+  async stop(logger: EndpointLogger): Promise<void> {
     if (!this.running) {
       return;
     }
 
-    this.logger.info("[MCP Server] Stopping...");
+    logger.info("[MCP Server] Stopping...");
 
     if (this.transport) {
       await this.transport.stop();
@@ -128,7 +104,7 @@ export class MCPServer {
     }
 
     this.running = false;
-    this.logger.info("[MCP Server] Server stopped");
+    logger.info("[MCP Server] Server stopped");
   }
 
   /**
@@ -141,10 +117,10 @@ export class MCPServer {
   /**
    * Setup graceful shutdown handlers
    */
-  private setupShutdownHandlers(): void {
+  private setupShutdownHandlers(logger: EndpointLogger): void {
     const shutdown = async (signal: string): Promise<void> => {
-      this.logger.info(`[MCP Server] Received ${signal}, shutting down...`);
-      await this.stop();
+      logger.info(`[MCP Server] Received ${signal}, shutting down...`);
+      await this.stop(logger);
       process.exit(0);
     };
 
@@ -153,7 +129,7 @@ export class MCPServer {
 
     // Handle uncaught errors
     process.on("uncaughtException", (error) => {
-      this.logger.error("[MCP Server] Uncaught exception", {
+      logger.error("[MCP Server] Uncaught exception", {
         error: error.message,
         stack: error.stack,
       });
@@ -161,7 +137,7 @@ export class MCPServer {
     });
 
     process.on("unhandledRejection", (reason) => {
-      this.logger.error("[MCP Server] Unhandled rejection", {
+      logger.error("[MCP Server] Unhandled rejection", {
         reason: String(reason),
       });
       void shutdown("unhandledRejection");

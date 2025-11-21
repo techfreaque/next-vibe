@@ -17,9 +17,9 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import { createEndpointLogger } from "../shared/logger/endpoint";
-import { memoryMonitor } from "../shared/server-only/utils/performance";
 import { createDefaultCliUser } from "./auth/cli-user";
-import { CliEntryPoint } from "./entry-point";
+import { cliEntryPoint,
+CliEntryPoint } from "./entry-point";
 import { ErrorHandler, setupGlobalErrorHandlers } from "./execution-errors";
 import { enableDebug } from "@/config/debug";
 
@@ -431,9 +431,7 @@ program
       try {
         // Initialize performance monitoring
         performanceMonitor.mark("initStart");
-        memoryMonitor.snapshot();
 
-        const cli = new CliEntryPoint(logger, t, options.locale);
         performanceMonitor.mark("initEnd");
 
         // If no command provided, start interactive mode
@@ -441,17 +439,23 @@ program
           logger.info(
             t("app.api.v1.core.system.unifiedInterface.cli.vibe.startingUp"),
           );
-          await cli.executeCommand("interactive", {
-            user: createDefaultCliUser(),
-            locale: options.locale,
-            output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
-              | "table"
-              | "pretty"
-              | "json",
-            verbose: debug ?? false,
-            interactive: options.interactive ?? false,
-            dryRun: options.dryRun ?? false,
-          });
+          await cliEntryPoint.executeCommand(
+            "interactive",
+            {
+              user: createDefaultCliUser(),
+              locale: options.locale,
+              output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
+                | "table"
+                | "pretty"
+                | "json",
+              verbose: debug ?? false,
+              interactive: options.interactive ?? false,
+              dryRun: options.dryRun ?? false,
+            },
+            logger,
+            t,
+            options.locale,
+          );
           return;
         }
 
@@ -485,22 +489,28 @@ program
         performanceMonitor.mark("parseEnd");
 
         performanceMonitor.mark("routeStart");
-        const result = await cli.executeCommand(command, {
-          data: parsedData,
-          cliArgs: {
-            positionalArgs: parsedArgs.positionalArgs,
-            namedArgs: parsedArgs.namedArgs,
+        const result = await cliEntryPoint.executeCommand(
+          command,
+          {
+            data: parsedData,
+            cliArgs: {
+              positionalArgs: parsedArgs.positionalArgs,
+              namedArgs: parsedArgs.namedArgs,
+            },
+            user: createDefaultCliUser(),
+            locale: options.locale,
+            output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
+              | "table"
+              | "pretty"
+              | "json",
+            verbose: debug ?? false,
+            interactive: options.interactive ?? false,
+            dryRun: options.dryRun ?? false,
           },
-          user: createDefaultCliUser(),
-          locale: options.locale,
-          output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
-            | "table"
-            | "pretty"
-            | "json",
-          verbose: debug ?? false,
-          interactive: options.interactive ?? false,
-          dryRun: options.dryRun ?? false,
-        });
+          logger,
+          t,
+          options.locale,
+        );
         performanceMonitor.mark("routeEnd");
 
         performanceMonitor.mark("renderStart");
@@ -525,12 +535,6 @@ program
               "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.executionFailed",
             ),
             error as Error,
-          );
-          logger.info(
-            t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.options"),
-            {
-              memoryUsage: memoryMonitor.getFormattedUsage(),
-            },
           );
         }
 

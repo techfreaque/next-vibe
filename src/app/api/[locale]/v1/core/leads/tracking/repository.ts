@@ -1188,6 +1188,26 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
               userId: user.id,
               currentLeadId,
             });
+
+            // Merge tracking lead wallet into user wallet immediately
+            // This ensures user gets credits from tracking lead
+            const { creditRepository } =
+              await import("../../credits/repository");
+            const mergeResult = await creditRepository.mergePendingLeadWallets(
+              user.id,
+              [trackingLeadId],
+              logger,
+            );
+            if (!mergeResult.success) {
+              logger.error(
+                "Failed to merge tracking lead wallet",
+                parseError(mergeResult).message,
+                {
+                  userId: user.id,
+                  trackingLeadId,
+                },
+              );
+            }
           } else {
             // For anonymous users, log the lead-to-lead relationship in engagement metadata
             // (Lead-to-lead linking table removed in wallet-based system)

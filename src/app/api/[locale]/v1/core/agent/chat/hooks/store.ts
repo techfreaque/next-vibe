@@ -149,7 +149,7 @@ interface ChatState {
   getThreadMessages: (threadId: string) => ChatMessage[];
 
   // Settings actions
-  hydrateSettings: () => void;
+  hydrateSettings: () => Promise<void>;
   updateSettings: (updates: Partial<ChatSettings>) => void;
 
   // Folder actions
@@ -200,42 +200,46 @@ const migrateToolIds = (toolIds: string[]): string[] => {
 };
 
 // Helper to load settings from localStorage (client-only, called after mount)
-const loadSettings = (): ChatSettings => {
+const loadSettings = async (): Promise<ChatSettings> => {
   const defaults = getDefaultSettings();
 
   if (typeof window === "undefined") {
     return defaults;
   }
 
-  // Load settings asynchronously
-  void (async (): Promise<void> => {
-    try {
-      const stored = await storage.getItem("chat-settings");
-      if (stored) {
-        const parsed = JSON.parse(stored) as Partial<ChatSettings>;
+  try {
+    const stored = await storage.getItem("chat-settings");
+    if (stored) {
+      const parsed = JSON.parse(stored) as Partial<ChatSettings>;
 
-        // Migrate old tool IDs to new format
-        if (parsed.enabledToolIds && Array.isArray(parsed.enabledToolIds)) {
-          const migratedToolIds = migrateToolIds(parsed.enabledToolIds);
+      // Migrate old tool IDs to new format
+      if (parsed.enabledToolIds && Array.isArray(parsed.enabledToolIds)) {
+        const migratedToolIds = migrateToolIds(parsed.enabledToolIds);
 
-          // If migration happened, save the migrated version back to storage
-          if (
-            JSON.stringify(migratedToolIds) !==
-            JSON.stringify(parsed.enabledToolIds)
-          ) {
-            const migratedSettings = {
-              ...defaults,
-              ...parsed,
-              enabledToolIds: migratedToolIds,
-            };
-            void saveSettings(migratedSettings);
-          }
+        // If migration happened, save the migrated version back to storage
+        if (
+          JSON.stringify(migratedToolIds) !==
+          JSON.stringify(parsed.enabledToolIds)
+        ) {
+          const migratedSettings = {
+            ...defaults,
+            ...parsed,
+            enabledToolIds: migratedToolIds,
+          };
+          await saveSettings(migratedSettings);
+          return migratedSettings;
         }
       }
-    } catch {
-      // Silently fail and return defaults
+
+      // Return merged settings
+      return {
+        ...defaults,
+        ...parsed,
+      };
     }
-  })();
+  } catch {
+    // Silently fail and return defaults
+  }
 
   return defaults;
 };
@@ -387,8 +391,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }),
 
   // Settings actions
-  hydrateSettings: (): void => {
-    const settings = loadSettings();
+  hydrateSettings: async (): Promise<void> => {
+    const settings = await loadSettings();
     set({ settings });
   },
 

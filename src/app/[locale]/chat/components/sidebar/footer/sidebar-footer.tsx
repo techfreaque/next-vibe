@@ -12,6 +12,7 @@ import {
 import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
+import { Handshake } from "next-vibe-ui/ui/icons/Handshake";
 import { HelpCircle } from "next-vibe-ui/ui/icons/HelpCircle";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import type { JSX } from "react";
@@ -146,6 +147,16 @@ export function SidebarFooter({
                 >
                   <Coins className="h-3.5 w-3.5 mr-2" />
                   {t("app.chat.credits.navigation.subscription")}
+                </Button>
+              </Link>
+              <Link href={`/${locale}/user/referral`}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start h-8 px-2 text-xs"
+                >
+                  <Handshake className="h-3.5 w-3.5 mr-2" />
+                  {t("app.chat.credits.navigation.referral")}
                 </Button>
               </Link>
               <Link href={`/${locale}/story`}>

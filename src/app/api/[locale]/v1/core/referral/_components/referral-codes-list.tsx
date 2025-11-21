@@ -42,17 +42,17 @@ export function ReferralCodesList({
   };
 
   if (endpoint.read.isLoading) {
-    return <P>{t("app.user.other.referral.myCodes.loading")}</P>;
+    return <P>{t("app.user.referral.myCodes.loading")}</P>;
   }
 
   if (!endpoint.read.data) {
-    return <P>{t("app.user.other.referral.myCodes.error")}</P>;
+    return <P>{t("app.user.referral.myCodes.error")}</P>;
   }
 
   const codes = endpoint.read.data.codes;
 
   if (codes.length === 0) {
-    return <P>{t("app.user.other.referral.myCodes.empty")}</P>;
+    return <P>{t("app.user.referral.myCodes.empty")}</P>;
   }
 
   return (
@@ -62,9 +62,7 @@ export function ReferralCodesList({
           <Div className="flex flex-col gap-2">
             <Div className="flex items-center justify-between">
               <Div className="flex items-center gap-2">
-                <Span className="font-mono font-bold text-lg">
-                  {code.code}
-                </Span>
+                <Span className="font-mono font-bold text-lg">{code.code}</Span>
                 {code.label && (
                   <Span className="text-sm text-muted-foreground">
                     ({code.label})
@@ -79,12 +77,12 @@ export function ReferralCodesList({
                 {copiedCode === code.code ? (
                   <>
                     <Check className="h-4 w-4 mr-2" />
-                    {t("app.user.other.referral.myCodes.copied")}
+                    {t("app.user.referral.myCodes.copied")}
                   </>
                 ) : (
                   <>
                     <Copy className="h-4 w-4 mr-2" />
-                    {t("app.user.other.referral.myCodes.copy")}
+                    {t("app.user.referral.myCodes.copy")}
                   </>
                 )}
               </Button>
@@ -93,7 +91,7 @@ export function ReferralCodesList({
             <Div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <Div>
                 <P className="text-muted-foreground">
-                  {t("app.user.other.referral.myCodes.uses")}
+                  {t("app.user.referral.myCodes.uses")}
                 </P>
                 <P className="font-semibold">
                   {code.currentUses}
@@ -102,31 +100,39 @@ export function ReferralCodesList({
               </Div>
               <Div>
                 <P className="text-muted-foreground">
-                  {t("app.user.other.referral.myCodes.signups")}
+                  {t("app.user.referral.myCodes.signups")}
                 </P>
                 <P className="font-semibold">{code.totalSignups}</P>
               </Div>
               <Div>
                 <P className="text-muted-foreground">
-                  {t("app.user.other.referral.myCodes.revenue")}
+                  {t("app.user.referral.myCodes.revenue")}
                 </P>
                 <P className="font-semibold">
-                  {formatCurrency(code.totalRevenueCents / 100, currency, locale)}
+                  {formatCurrency(
+                    code.totalRevenueCents / 100,
+                    currency,
+                    locale,
+                  )}
                 </P>
               </Div>
               <Div>
                 <P className="text-muted-foreground">
-                  {t("app.user.other.referral.myCodes.earnings")}
+                  {t("app.user.referral.myCodes.earnings")}
                 </P>
                 <P className="font-semibold">
-                  {formatCurrency(code.totalEarningsCents / 100, currency, locale)}
+                  {formatCurrency(
+                    code.totalEarningsCents / 100,
+                    currency,
+                    locale,
+                  )}
                 </P>
               </Div>
             </Div>
 
             {!code.isActive && (
               <P className="text-sm text-red-500">
-                {t("app.user.other.referral.myCodes.inactive")}
+                {t("app.user.referral.myCodes.inactive")}
               </P>
             )}
           </Div>

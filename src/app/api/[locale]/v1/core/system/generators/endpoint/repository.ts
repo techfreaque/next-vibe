@@ -147,8 +147,37 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
   }
 
   /**
+   * Extract methods from definition file (async)
+   */
+  private async extractMethodsFromDefinition(
+    defFile: string,
+  ): Promise<string[]> {
+    try {
+      const definition = (await import(defFile)) as {
+        default?: Record<string, unknown>;
+      };
+      const defaultExport = definition.default;
+
+      if (!defaultExport) {
+        return [];
+      }
+
+      // Get all HTTP methods from the definition
+      const methods = Object.keys(defaultExport).filter((key) =>
+        ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(
+          key,
+        ),
+      );
+      return methods;
+    } catch {
+      return [];
+    }
+  }
+
+  /**
    * Generate endpoint content with dynamic imports and real aliases from definitions
-   * No duplicate parameter format aliases - only [id] format and real definition aliases
+   * Main paths include method suffix (e.g., "core/agent/ai-stream:POST")
+   * Aliases don't include method
    */
   private async generateContent(definitionFiles: string[]): Promise<string> {
     const pathMap: Record<string, string> = {};
@@ -159,13 +188,19 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       const { path } = extractPathKey(defFile);
       const importPath = generateAbsoluteImportPath(defFile, "definition");
 
-      // Add main path (with [id] format only) if not already added
-      if (!pathMap[path]) {
-        pathMap[path] = importPath;
-        allPaths.push(path);
+      // Get methods for this endpoint
+      const methods = await this.extractMethodsFromDefinition(defFile);
+
+      // Add main path with method suffix for each method (e.g., "core/agent/ai-stream:POST")
+      for (const method of methods) {
+        const pathWithMethod = `${path}:${method}`;
+        if (!pathMap[pathWithMethod]) {
+          pathMap[pathWithMethod] = importPath;
+          allPaths.push(pathWithMethod);
+        }
       }
 
-      // Extract and add real aliases from definition file
+      // Extract and add real aliases from definition file (no method suffix)
       const definitionAliases =
         await this.extractAliasesFromDefinition(defFile);
       for (const alias of definitionAliases) {

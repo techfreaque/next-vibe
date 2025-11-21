@@ -9,7 +9,7 @@
  * - All transactions are immutable audit logs
  */
 
-import { and, desc, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNull, lt, or, sql } from "drizzle-orm";
 import {
   success,
   ErrorResponseTypes,
@@ -537,9 +537,36 @@ class CreditRepository implements CreditRepositoryInterface {
       let walletResult: ResponseType<CreditWallet>;
 
       if (identifier.userId) {
-        walletResult = await this.getOrCreateUserWallet(identifier.userId, logger);
+        // Use shared wallet for authenticated users
+        walletResult = await this.getOrCreateSharedWallet(
+          identifier.userId,
+          logger,
+        );
       } else if (identifier.leadId) {
-        walletResult = await this.getOrCreateLeadWallet(identifier.leadId, logger);
+        // Check if this lead is linked to a user
+        const [leadLink] = await db
+          .select()
+          .from(userLeadLinks)
+          .where(eq(userLeadLinks.leadId, identifier.leadId))
+          .limit(1);
+
+        if (leadLink) {
+          // Lead is linked to a user - fetch from user's shared wallet
+          logger.debug("Lead is linked to user, fetching from shared wallet", {
+            leadId: identifier.leadId,
+            userId: leadLink.userId,
+          });
+          walletResult = await this.getOrCreateSharedWallet(
+            leadLink.userId,
+            logger,
+          );
+        } else {
+          // Lead is not linked - use lead wallet
+          walletResult = await this.getOrCreateLeadWallet(
+            identifier.leadId,
+            logger,
+          );
+        }
       } else {
         return fail({
           message: "app.api.v1.core.credits.errors.invalidIdentifier",
@@ -567,13 +594,36 @@ class CreditRepository implements CreditRepositoryInterface {
   /**
    * Get lead's credit balance (simplified)
    * Uses getWalletBalance for consistency with other balance calculations
+   * If lead is linked to a user, fetches from the user's shared wallet instead
    */
   async getLeadBalance(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<number>> {
     try {
-      const walletResult = await this.getOrCreateLeadWallet(leadId, logger);
+      // Check if this lead is linked to a user
+      const [leadLink] = await db
+        .select()
+        .from(userLeadLinks)
+        .where(eq(userLeadLinks.leadId, leadId))
+        .limit(1);
+
+      let walletResult: ResponseType<CreditWallet>;
+      if (leadLink) {
+        // Lead is linked to a user - fetch from user's shared wallet
+        logger.debug("Lead is linked to user, fetching from shared wallet", {
+          leadId,
+          userId: leadLink.userId,
+        });
+        walletResult = await this.getOrCreateSharedWallet(
+          leadLink.userId,
+          logger,
+        );
+      } else {
+        // Lead is not linked - use lead wallet
+        walletResult = await this.getOrCreateLeadWallet(leadId, logger);
+      }
+
       if (!walletResult.success) {
         return walletResult;
       }
@@ -591,7 +641,7 @@ class CreditRepository implements CreditRepositoryInterface {
 
   /**
    * Get credit balance for user
-   * Handles wallet merging if user has multiple linked leads
+   * Uses shared wallet system: one wallet per pool (user + all linked leads)
    */
   async getCreditBalanceForUser(
     user: JwtPayloadType,
@@ -599,8 +649,41 @@ class CreditRepository implements CreditRepositoryInterface {
   ): Promise<ResponseType<CreditBalance>> {
     try {
       if (user.isPublic) {
-        // Public user: use lead wallet
-        const walletResult = await this.getOrCreateLeadWallet(user.leadId, logger);
+        // Check if this lead is linked to a user
+        const [leadLink] = await db
+          .select()
+          .from(userLeadLinks)
+          .where(eq(userLeadLinks.leadId, user.leadId))
+          .limit(1);
+
+        if (leadLink) {
+          // Lead is linked to a user - fetch from user's shared wallet
+          logger.debug(
+            "Public user's lead is linked, fetching from shared wallet",
+            {
+              leadId: user.leadId,
+              userId: leadLink.userId,
+            },
+          );
+          const walletResult = await this.getOrCreateSharedWallet(
+            leadLink.userId,
+            logger,
+          );
+          if (!walletResult.success) {
+            return walletResult;
+          }
+          const balance = await this.getWalletBalance(
+            walletResult.data,
+            logger,
+          );
+          return success(balance);
+        }
+
+        // Lead is not linked - use lead wallet
+        const walletResult = await this.getOrCreateLeadWallet(
+          user.leadId,
+          logger,
+        );
         if (!walletResult.success) {
           return walletResult;
         }
@@ -608,24 +691,10 @@ class CreditRepository implements CreditRepositoryInterface {
         return success(balance);
       }
 
-      // Private user: use user wallet
-      const walletResult = await this.getOrCreateUserWallet(user.id, logger);
+      // Private user: get the shared wallet for this pool
+      const walletResult = await this.getOrCreateSharedWallet(user.id, logger);
       if (!walletResult.success) {
         return walletResult;
-      }
-
-      // Check for linked leads and merge their wallets if needed
-      const linkedLeads = await db
-        .select({ leadId: userLeadLinks.leadId })
-        .from(userLeadLinks)
-        .where(eq(userLeadLinks.userId, user.id));
-
-      if (linkedLeads.length > 0) {
-        await this.mergeLeadWalletsIntoUser(
-          user.id,
-          linkedLeads.map((l) => l.leadId),
-          logger,
-        );
       }
 
       const balance = await this.getWalletBalance(walletResult.data, logger);
@@ -643,130 +712,303 @@ class CreditRepository implements CreditRepositoryInterface {
   }
 
   /**
-   * Merge lead wallets into user wallet (transfer packs and preserve history)
-   * ATOMIC: Each lead wallet merge is wrapped in a transaction for data integrity
+   * Get or create shared wallet for user pool
+   * Strategy: Use oldest lead wallet if exists, otherwise create user wallet
+   * CRITICAL: Delete all other lead wallets to ensure max 20 free credits per pool
+   */
+  private async getOrCreateSharedWallet(
+    userId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditWallet>> {
+    // Check if user already has a wallet
+    const [userWallet] = await db
+      .select()
+      .from(creditWallets)
+      .where(eq(creditWallets.userId, userId))
+      .limit(1);
+
+    if (userWallet) {
+      // User wallet exists - delete any orphaned lead wallets
+      await this.deleteOrphanedLeadWallets(userId, logger);
+      return success(userWallet);
+    }
+
+    // Get all linked lead IDs
+    const { leadAuthRepository } = await import("../leads/auth/repository");
+    const leadIds = await leadAuthRepository.getUserLeadIds(userId, logger);
+
+    if (leadIds.length === 0) {
+      // No leads linked - create new user wallet
+      return await this.getOrCreateUserWallet(userId, logger);
+    }
+
+    // Get all lead wallets (by lead creation date)
+    const leadWallets = await db
+      .select({
+        walletId: creditWallets.id,
+        leadId: creditWallets.leadId,
+        wallet: creditWallets,
+        leadCreatedAt: leads.createdAt,
+      })
+      .from(creditWallets)
+      .innerJoin(leads, eq(creditWallets.leadId, leads.id))
+      .where(inArray(creditWallets.leadId, leadIds))
+      .orderBy(leads.createdAt); // Oldest first
+
+    if (leadWallets.length === 0) {
+      // No lead wallets exist - create new user wallet
+      return await this.getOrCreateUserWallet(userId, logger);
+    }
+
+    // Use transaction to ensure atomicity
+    return await withTransaction(logger, async (tx) => {
+      const oldestWallet = leadWallets[0];
+      const newerWallets = leadWallets.slice(1);
+
+      // Convert oldest lead wallet to shared wallet FIRST
+      await tx
+        .update(creditWallets)
+        .set({
+          userId,
+          leadId: null, // Clear leadId - it's now a shared wallet
+          updatedAt: new Date(),
+        })
+        .where(eq(creditWallets.id, oldestWallet.walletId));
+
+      // Merge spending transactions from newer wallets to shared wallet
+      if (newerWallets.length > 0) {
+        const newerWalletIds = newerWallets.map((w) => w.walletId);
+
+        // Get all USAGE transactions from newer wallets (spending only)
+        const spendingTransactions = await tx
+          .select()
+          .from(creditTransactions)
+          .where(
+            and(
+              inArray(creditTransactions.walletId, newerWalletIds),
+              eq(creditTransactions.type, CreditTransactionType.USAGE),
+            ),
+          );
+
+        // Transfer spending transactions to shared wallet
+        if (spendingTransactions.length > 0) {
+          for (const transaction of spendingTransactions) {
+            const originalMetadata = transaction.metadata as UsageMetadata;
+            await tx.insert(creditTransactions).values({
+              walletId: oldestWallet.walletId,
+              amount: transaction.amount, // Negative amount (spending)
+              balanceAfter: transaction.balanceAfter,
+              type: transaction.type,
+              modelId: transaction.modelId,
+              messageId: transaction.messageId,
+              metadata: {
+                feature: originalMetadata.feature,
+                cost: originalMetadata.cost,
+                modelId: originalMetadata.modelId,
+                messageId: originalMetadata.messageId,
+                freeCreditsUsed: originalMetadata.freeCreditsUsed,
+                packCreditsUsed: originalMetadata.packCreditsUsed,
+                transferredFrom: transaction.walletId,
+                reason: "wallet_merge" as const,
+              },
+              createdAt: transaction.createdAt, // Preserve original timestamp
+            });
+          }
+
+          logger.info("Transferred spending transactions to shared wallet", {
+            userId,
+            sharedWalletId: oldestWallet.walletId,
+            transactionCount: spendingTransactions.length,
+          });
+        }
+
+        // Delete ALL transactions for newer wallets (including FREE_GRANT)
+        await tx
+          .delete(creditTransactions)
+          .where(inArray(creditTransactions.walletId, newerWalletIds));
+
+        // Delete packs for newer wallets
+        await tx
+          .delete(creditPacks)
+          .where(inArray(creditPacks.walletId, newerWalletIds));
+
+        // Delete newer wallets
+        await tx
+          .delete(creditWallets)
+          .where(inArray(creditWallets.id, newerWalletIds));
+
+        logger.info(
+          "Deleted newer lead wallets after merging spending transactions",
+          {
+            userId,
+            deletedCount: newerWallets.length,
+            deletedWalletIds: newerWalletIds,
+          },
+        );
+      }
+
+      logger.info("Converted oldest lead wallet to shared user wallet", {
+        userId,
+        walletId: oldestWallet.walletId,
+        totalLeadCount: leadIds.length,
+        mergedNewerWallets: newerWallets.length,
+      });
+
+      // Return the updated wallet
+      const [sharedWallet] = await tx
+        .select()
+        .from(creditWallets)
+        .where(eq(creditWallets.id, oldestWallet.walletId))
+        .limit(1);
+
+      return success(sharedWallet!);
+    });
+  }
+
+  /**
+   * Delete orphaned lead wallets for a user
+   * Called when user already has a shared wallet but new leads were linked
+   * CRITICAL: Transfer spending transactions before deleting
+   */
+  private async deleteOrphanedLeadWallets(
+    userId: string,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    // Get all linked lead IDs
+    const { leadAuthRepository } = await import("../leads/auth/repository");
+    const leadIds = await leadAuthRepository.getUserLeadIds(userId, logger);
+
+    if (leadIds.length === 0) {
+      return;
+    }
+
+    // Get all lead wallets for these leads
+    const leadWallets = await db
+      .select({ id: creditWallets.id })
+      .from(creditWallets)
+      .where(inArray(creditWallets.leadId, leadIds));
+
+    if (leadWallets.length === 0) {
+      return;
+    }
+
+    const walletIds = leadWallets.map((w) => w.id);
+
+    // Get user's shared wallet
+    const [userWallet] = await db
+      .select({ id: creditWallets.id })
+      .from(creditWallets)
+      .where(eq(creditWallets.userId, userId))
+      .limit(1);
+
+    if (!userWallet) {
+      logger.error(
+        "User wallet not found when deleting orphaned lead wallets",
+        {
+          userId,
+        },
+      );
+      return;
+    }
+
+    // Delete orphaned lead wallets after transferring spending transactions
+    await withTransaction(logger, async (tx) => {
+      // Get all USAGE transactions from orphaned wallets (spending only)
+      const spendingTransactions = await tx
+        .select()
+        .from(creditTransactions)
+        .where(
+          and(
+            inArray(creditTransactions.walletId, walletIds),
+            eq(creditTransactions.type, CreditTransactionType.USAGE),
+          ),
+        );
+
+      // Transfer spending transactions to user's shared wallet
+      if (spendingTransactions.length > 0) {
+        for (const transaction of spendingTransactions) {
+          const originalMetadata = transaction.metadata as UsageMetadata;
+          await tx.insert(creditTransactions).values({
+            walletId: userWallet.id,
+            amount: transaction.amount, // Negative amount (spending)
+            balanceAfter: transaction.balanceAfter,
+            type: transaction.type,
+            modelId: transaction.modelId,
+            messageId: transaction.messageId,
+            metadata: {
+              feature: originalMetadata.feature,
+              cost: originalMetadata.cost,
+              modelId: originalMetadata.modelId,
+              messageId: originalMetadata.messageId,
+              freeCreditsUsed: originalMetadata.freeCreditsUsed,
+              packCreditsUsed: originalMetadata.packCreditsUsed,
+              transferredFrom: transaction.walletId,
+              reason: "orphaned_wallet_cleanup" as const,
+            },
+            createdAt: transaction.createdAt, // Preserve original timestamp
+          });
+        }
+
+        logger.info("Transferred spending transactions from orphaned wallets", {
+          userId,
+          userWalletId: userWallet.id,
+          transactionCount: spendingTransactions.length,
+        });
+      }
+
+      // Delete ALL transactions for orphaned wallets
+      await tx
+        .delete(creditTransactions)
+        .where(inArray(creditTransactions.walletId, walletIds));
+
+      // Delete packs
+      await tx
+        .delete(creditPacks)
+        .where(inArray(creditPacks.walletId, walletIds));
+
+      // Delete wallets
+      await tx
+        .delete(creditWallets)
+        .where(inArray(creditWallets.id, walletIds));
+
+      logger.info("Deleted orphaned lead wallets after merging spending", {
+        userId,
+        deletedCount: leadWallets.length,
+        walletIds,
+      });
+    });
+  }
+
+  /**
+   * Merge lead wallets into shared user wallet
+   * Strategy: Convert oldest lead wallet to shared wallet, delete others
+   * This ensures one wallet per pool with max 20 free credits
    */
   private async mergeLeadWalletsIntoUser(
     userId: string,
     leadIds: string[],
     logger: EndpointLogger,
   ): Promise<void> {
-    const userWalletResult = await this.getOrCreateUserWallet(userId, logger);
-    if (!userWalletResult.success) {
+    if (leadIds.length === 0) {
       return;
     }
 
-    for (const leadId of leadIds) {
-      // Wrap each lead wallet merge in a transaction for atomicity
-      await withTransaction(logger, async (tx) => {
-        const [leadWallet] = await tx
-          .select()
-          .from(creditWallets)
-          .where(eq(creditWallets.leadId, leadId))
-          .limit(1);
-
-        if (!leadWallet) {
-          return; // No wallet to merge
-        }
-
-        // Check if already merged (idempotency)
-        const [existingTransfer] = await tx
-          .select()
-          .from(creditTransactions)
-          .where(
-            and(
-              eq(creditTransactions.walletId, userWalletResult.data.id),
-              eq(creditTransactions.type, CreditTransactionType.TRANSFER),
-              sql`${creditTransactions.metadata}->>'fromLeadWallet' = ${leadWallet.id}`,
-            ),
-          )
-          .limit(1);
-
-        if (existingTransfer) {
-          logger.debug("Lead wallet already merged", {
-            leadId,
-            leadWalletId: leadWallet.id,
-            userWalletId: userWalletResult.data.id,
-          });
-          return; // Already processed
-        }
-
-        // Transfer any remaining free credits to user wallet (take the max)
-        const maxFreeCredits = Math.max(
-          userWalletResult.data.freeCreditsRemaining,
-          leadWallet.freeCreditsRemaining,
-        );
-
-        // Update user wallet with merged free credits
-        await tx
-          .update(creditWallets)
-          .set({
-            freeCreditsRemaining: maxFreeCredits,
-            updatedAt: new Date(),
-          })
-          .where(eq(creditWallets.id, userWalletResult.data.id));
-
-        // Transfer all packs from lead wallet to user wallet
-        await tx
-          .update(creditPacks)
-          .set({ walletId: userWalletResult.data.id, updatedAt: new Date() })
-          .where(eq(creditPacks.walletId, leadWallet.id));
-
-        // Update all transactions to point to user wallet (preserve history)
-        await tx
-          .update(creditTransactions)
-          .set({ walletId: userWalletResult.data.id })
-          .where(eq(creditTransactions.walletId, leadWallet.id));
-
-        // Calculate new balance after pack transfer (sum of all pack remaining credits)
-        const packsAfterMerge = await tx
-          .select({ remaining: creditPacks.remaining })
-          .from(creditPacks)
-          .where(eq(creditPacks.walletId, userWalletResult.data.id));
-
-        const newBalance = packsAfterMerge.reduce(
-          (sum, pack) => sum + pack.remaining,
-          0,
-        );
-
-        // Update user wallet balance to reflect merged packs
-        await tx
-          .update(creditWallets)
-          .set({
-            balance: newBalance,
-            updatedAt: new Date(),
-          })
-          .where(eq(creditWallets.id, userWalletResult.data.id));
-
-        // Create transfer transaction for audit trail
-        await tx.insert(creditTransactions).values({
-          walletId: userWalletResult.data.id,
-          amount: leadWallet.balance, // Amount transferred from lead wallet
-          balanceAfter: newBalance, // FIXED: Uses recalculated balance
-          type: CreditTransactionType.TRANSFER,
-          metadata: {
-            fromLeadWallet: leadWallet.id,
-            fromLeadId: leadId,
-            mergedFreeCredits: leadWallet.freeCreditsRemaining,
-            mergedPackCredits: leadWallet.balance,
-            reason: "lead_to_user_merge",
-          },
-        });
-
-        // Delete the lead wallet (no longer needed)
-        await tx
-          .delete(creditWallets)
-          .where(eq(creditWallets.id, leadWallet.id));
-
-        logger.info("Merged lead wallet into user wallet", {
-          userId,
-          leadId,
-          leadWalletId: leadWallet.id,
-          userWalletId: userWalletResult.data.id,
-          mergedFreeCredits: leadWallet.freeCreditsRemaining,
-        });
+    // Trigger shared wallet creation/conversion
+    // This will convert the oldest lead wallet to a shared wallet
+    const walletResult = await this.getOrCreateSharedWallet(userId, logger);
+    if (!walletResult.success) {
+      logger.error("Failed to create shared wallet during merge", {
+        userId,
+        leadIds,
       });
+      return;
     }
+
+    logger.info("Shared wallet ready for user pool", {
+      userId,
+      walletId: walletResult.data.id,
+      leadCount: leadIds.length,
+    });
   }
 
   /**
@@ -826,7 +1068,8 @@ class CreditRepository implements CreditRepositoryInterface {
       if (!walletResult.success) {
         return walletResult;
       }
-      const credits = walletResult.data.freeCreditsRemaining + walletResult.data.balance;
+      const credits =
+        walletResult.data.freeCreditsRemaining + walletResult.data.balance;
 
       logger.debug("Created new lead with wallet", {
         leadId: newLead.id,
@@ -878,9 +1121,36 @@ class CreditRepository implements CreditRepositoryInterface {
       let walletResult: ResponseType<CreditWallet>;
 
       if (identifier.userId) {
-        walletResult = await this.getOrCreateUserWallet(identifier.userId, logger);
+        // Use shared wallet for authenticated users
+        walletResult = await this.getOrCreateSharedWallet(
+          identifier.userId,
+          logger,
+        );
       } else {
-        walletResult = await this.getOrCreateLeadWallet(identifier.leadId!, logger);
+        // Check if this lead is linked to a user
+        const [leadLink] = await db
+          .select()
+          .from(userLeadLinks)
+          .where(eq(userLeadLinks.leadId, identifier.leadId!))
+          .limit(1);
+
+        if (leadLink) {
+          // Lead is linked to a user - use user's shared wallet
+          logger.debug("Lead is linked to user, using shared wallet", {
+            leadId: identifier.leadId,
+            userId: leadLink.userId,
+          });
+          walletResult = await this.getOrCreateSharedWallet(
+            leadLink.userId,
+            logger,
+          );
+        } else {
+          // Lead is not linked - use lead wallet
+          walletResult = await this.getOrCreateLeadWallet(
+            identifier.leadId!,
+            logger,
+          );
+        }
       }
 
       if (!walletResult.success) {
@@ -981,7 +1251,8 @@ class CreditRepository implements CreditRepositoryInterface {
     sessionId?: string,
   ): Promise<ResponseType<void>> {
     try {
-      const walletResult = await this.getOrCreateUserWallet(userId, logger);
+      // Use shared wallet for authenticated users
+      const walletResult = await this.getOrCreateSharedWallet(userId, logger);
       if (!walletResult.success) {
         return walletResult;
       }
@@ -1087,9 +1358,36 @@ class CreditRepository implements CreditRepositoryInterface {
       // Get wallet outside transaction for monthly credit check
       let walletResult: ResponseType<CreditWallet>;
       if (identifier.userId) {
-        walletResult = await this.getOrCreateUserWallet(identifier.userId, logger);
+        // Use shared wallet for authenticated users
+        walletResult = await this.getOrCreateSharedWallet(
+          identifier.userId,
+          logger,
+        );
       } else {
-        walletResult = await this.getOrCreateLeadWallet(identifier.leadId!, logger);
+        // Check if this lead is linked to a user
+        const [leadLink] = await db
+          .select()
+          .from(userLeadLinks)
+          .where(eq(userLeadLinks.leadId, identifier.leadId!))
+          .limit(1);
+
+        if (leadLink) {
+          // Lead is linked to a user - use user's shared wallet
+          logger.debug("Lead is linked to user, using shared wallet", {
+            leadId: identifier.leadId,
+            userId: leadLink.userId,
+          });
+          walletResult = await this.getOrCreateSharedWallet(
+            leadLink.userId,
+            logger,
+          );
+        } else {
+          // Lead is not linked - use lead wallet
+          walletResult = await this.getOrCreateLeadWallet(
+            identifier.leadId!,
+            logger,
+          );
+        }
       }
 
       if (!walletResult.success) {
@@ -1097,7 +1395,10 @@ class CreditRepository implements CreditRepositoryInterface {
       }
 
       // Ensure monthly credits are current (outside transaction - separate concern)
-      let wallet = await this.ensureMonthlyFreeCredits(walletResult.data, logger);
+      let wallet = await this.ensureMonthlyFreeCredits(
+        walletResult.data,
+        logger,
+      );
 
       // Execute deduction within a transaction for atomicity
       const result = await withTransaction(logger, async (tx) => {
@@ -1265,7 +1566,8 @@ class CreditRepository implements CreditRepositoryInterface {
     }>
   > {
     try {
-      const walletResult = await this.getOrCreateUserWallet(userId, logger);
+      // Use shared wallet for authenticated users
+      const walletResult = await this.getOrCreateSharedWallet(userId, logger);
       if (!walletResult.success) {
         return walletResult;
       }
@@ -1306,6 +1608,7 @@ class CreditRepository implements CreditRepositoryInterface {
 
   /**
    * Get transactions by lead ID
+   * If lead is linked to a user, fetches from the user's shared wallet instead
    */
   async getTransactionsByLeadId(
     leadId: string,
@@ -1319,6 +1622,28 @@ class CreditRepository implements CreditRepositoryInterface {
     }>
   > {
     try {
+      // Check if this lead is linked to a user
+      const [leadLink] = await db
+        .select()
+        .from(userLeadLinks)
+        .where(eq(userLeadLinks.leadId, leadId))
+        .limit(1);
+
+      if (leadLink) {
+        // Lead is linked to a user - fetch from user's shared wallet
+        logger.debug("Lead is linked to user, fetching from shared wallet", {
+          leadId,
+          userId: leadLink.userId,
+        });
+        return await this.getTransactions(
+          leadLink.userId,
+          limit,
+          offset,
+          logger,
+        );
+      }
+
+      // Lead is not linked - fetch from lead wallet
       const walletResult = await this.getOrCreateLeadWallet(leadId, logger);
       if (!walletResult.success) {
         return walletResult;

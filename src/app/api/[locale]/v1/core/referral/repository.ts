@@ -24,7 +24,6 @@ import {
   leadReferrals,
   userReferrals,
   referralEarnings,
-  insertReferralCodeSchema,
 } from "./db";
 import type {
   ReferralPostRequestOutput,
@@ -152,7 +151,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
           ownerUserId: userId,
           label: data.label ?? null,
           maxUses: data.maxUses ?? null,
-          expiresAt: data.expiresAt ?? null,
+          expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
           isActive: true,
           currentUses: 0,
         })
@@ -330,8 +329,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
         logger.debug("Lead already has referral", { leadId });
         return success({
           referralCode,
-          success: true,
-          message: "Referral code already linked",
         });
       }
 
@@ -345,8 +342,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
 
       return success({
         referralCode,
-        success: true,
-        message: "Referral code linked successfully",
       });
     } catch (error) {
       logger.error("Failed to link referral to lead", parseError(error));

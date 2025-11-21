@@ -138,6 +138,38 @@ export const translations = {
       },
     },
   },
+  serve: {
+    category: "MCP Server",
+    tags: {
+      mcp: "MCP",
+    },
+    post: {
+      title: "Start MCP Server",
+      description: "Start the Model Context Protocol server",
+      response: {
+        title: "MCP Server Status",
+        description: "Status of the MCP server",
+      },
+      errors: {
+        validation: {
+          title: "Validation Failed",
+          description: "Invalid request parameters",
+        },
+        server: {
+          title: "Server Error",
+          description: "Failed to start MCP server",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+      },
+      success: {
+        title: "Success",
+        description: "MCP server started successfully",
+      },
+    },
+  },
   registry: {
     toolNotFound: "Tool not found",
     endpointNotFound: "Endpoint not found",

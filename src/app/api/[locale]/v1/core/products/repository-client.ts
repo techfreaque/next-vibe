@@ -101,9 +101,9 @@ const productDefinitions = {
     name: "app.api.v1.core.products.subscription.name" as const,
     description: "app.api.v1.core.products.subscription.description" as const,
     priceByCountry: {
-      DE: { price: 10, currency: "EUR" as const },
-      PL: { price: 70, currency: "PLN" as const },
-      US: { price: 10, currency: "USD" as const },
+      DE: { price: 8, currency: "EUR" as const },
+      PL: { price: 30, currency: "PLN" as const },
+      US: { price: 8, currency: "USD" as const },
       GLOBAL: { price: 10, currency: "USD" as const },
     },
     yearlyPriceByCountry: {
@@ -112,7 +112,7 @@ const productDefinitions = {
       US: { price: 100, currency: "USD" as const },
       GLOBAL: { price: 100, currency: "USD" as const },
     },
-    credits: 1000,
+    credits: 800,
     isSubscription: true,
     allowedIntervals: ["month" as const, "year" as const],
     status: "active" as const,

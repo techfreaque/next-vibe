@@ -387,6 +387,23 @@ export class LoginRepositoryImpl implements LoginRepository {
           locale,
           logger,
         );
+
+        // Merge lead wallet into user wallet immediately
+        // This ensures user gets their pre-login credits from this device
+        const { creditRepository } =
+          await import("../../../credits/repository");
+        const mergeResult = await creditRepository.mergePendingLeadWallets(
+          userId,
+          [cookieLeadId],
+          logger,
+        );
+        if (!mergeResult.success) {
+          logger.error("Failed to merge lead wallet during login", {
+            userId,
+            leadId: cookieLeadId,
+            error: mergeResult.message,
+          });
+        }
       }
 
       // Get primary leadId for user (now that we've linked the cookie leadId)
