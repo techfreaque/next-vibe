@@ -28,7 +28,12 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.db.migrate.post.description",
   category: "app.api.v1.core.system.db.category",
   tags: ["app.api.v1.core.system.db.migrate.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.CLI_AUTH_BYPASS,
+  ],
   aliases: ["migrate", "db:migrate"],
 
   fields: objectField(
@@ -36,7 +41,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.db.migrate.post.form.title",
       description: "app.api.v1.core.system.db.migrate.post.form.description",
-      layoutType: LayoutType.GRID, columns: 12,
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
