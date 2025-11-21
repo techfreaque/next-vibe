@@ -3,12 +3,9 @@
  * Handles database migration operations
  */
 
-import { existsSync, readdirSync } from "node:fs";
-import * as path from "node:path";
-
 import { spawnSync } from "node:child_process";
+
 import { sql } from "drizzle-orm";
-import { migrate as drizzleMigrate } from "drizzle-orm/node-postgres/migrator";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
@@ -86,214 +83,101 @@ export class DatabaseMigrationRepositoryImpl
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateResponseType>> {
     const startTime = Date.now();
-    let output = "";
-    let migrationsRun = 0;
-    let migrationsGenerated = 0;
+    const { t } = simpleT(locale);
 
     try {
       // Generate migrations if requested
       if (data.generate) {
-        logger.info("Generating migrations");
-        const generateResult = this.generateMigrations(locale);
-        output += generateResult.output;
-        migrationsGenerated = generateResult.count;
-      }
+        logger.info("Generating migrations using drizzle-kit");
+        const generateResult = spawnSync("bunx", ["drizzle-kit", "generate"], {
+          encoding: "utf8",
+          cwd: process.cwd(),
+        });
 
-      // Run migrations
-      if (data.dryRun) {
-        output += "\nDry run - migrations not executed\n";
-      } else {
-        const migrateResult = await this.executeMigrations(data.schema, locale);
-        output += migrateResult.output;
-        migrationsRun = migrateResult.count;
+        if (generateResult.error) {
+          throw generateResult.error;
+        }
 
-        // Check if migration failed
-        if (!migrateResult.success) {
-          const duration = Date.now() - startTime;
+        if (generateResult.status !== 0) {
+          const errorOutput = generateResult.stderr || generateResult.stdout || "Unknown error";
           return fail({
             message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
-              error: migrateResult.output,
-              output: output.trim(),
-              duration,
+              error: `Generation failed with exit code ${generateResult.status}: ${errorOutput}`,
             },
           });
         }
+      }
 
-        // Handle redo if requested
-        if (data.redo && migrationsRun > 0) {
-          const redoResult = this.redoLastMigration(locale);
-          output += redoResult.output;
-        }
+      // Run migrations
+      if (data.dryRun) {
+        const duration = Date.now() - startTime;
+        return success({
+          success: true,
+          migrationsRun: 0,
+          migrationsGenerated: 0,
+          output: "Dry run - migrations not executed",
+          duration,
+        });
+      }
+
+      // Use drizzle-kit push for direct schema sync
+      logger.info("Running migrations using drizzle-kit push");
+      const pushResult = spawnSync(
+        "bunx",
+        ["drizzle-kit", "push", "--force"],
+        {
+          encoding: "utf8",
+          cwd: process.cwd(),
+        },
+      );
+
+      if (pushResult.error) {
+        throw pushResult.error;
+      }
+
+      const output = [pushResult.stdout, pushResult.stderr].filter(Boolean).join("\n");
+
+      if (pushResult.status !== 0) {
+        logger.error("Migration failed", { output });
+        return fail({
+          message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
+            error: `Migration failed with exit code ${pushResult.status}`,
+            output,
+          },
+        });
       }
 
       const duration = Date.now() - startTime;
+      logger.info("Migrations completed successfully", { duration });
 
-      const response: MigrateResponseType = {
+      return success({
         success: true,
-        migrationsRun,
-        migrationsGenerated,
+        migrationsRun: 1,
+        migrationsGenerated: data.generate ? 1 : 0,
         output: output.trim(),
         duration,
-      };
-
-      return success(response);
+      });
     } catch (error) {
       const duration = Date.now() - startTime;
       const parsedError = parseError(error);
+
+      logger.error("Migration error", { error: parsedError.message });
 
       return fail({
         message: "app.api.v1.core.system.db.migrate.post.errors.network.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,
-          output: output.trim(),
           duration,
         },
       });
     }
   }
 
-  /**
-   * Generate new migration files
-   */
-  private generateMigrations(locale: CountryLanguage): {
-    output: string;
-    count: number;
-  } {
-    const { t } = simpleT(locale);
-    try {
-      const result = spawnSync("bunx", ["drizzle-kit", "generate"], {
-        encoding: "utf8",
-        cwd: process.cwd(),
-      });
-
-      let output = "";
-      if (result.stdout) {
-        output += result.stdout;
-      }
-      if (result.stderr) {
-        output += result.stderr;
-      }
-
-      // Count generated migrations (simple heuristic)
-      const generatedCount = (output.match(/generated/gi) || []).length;
-
-      return {
-        output: t(
-          "app.api.v1.core.system.db.migrate.messages.generatingMigrations",
-          { output },
-        ),
-        count: generatedCount,
-      };
-    } catch (error) {
-      // Return error in output instead of throwing
-      return {
-        output: t(
-          "app.api.v1.core.system.db.migrate.messages.failedToGenerate",
-          {
-            error: parseError(error).message,
-          },
-        ),
-        count: 0,
-      };
-    }
-  }
-
-  /**
-   * Execute pending migrations
-   */
-  private async executeMigrations(
-    schema = "public",
-    locale: CountryLanguage,
-  ): Promise<{ output: string; count: number; success: boolean }> {
-    const { t } = simpleT(locale);
-    try {
-      const migrationsFolder = path.join(process.cwd(), "drizzle");
-      // Use schema for validation or logging
-      if (schema !== "public") {
-        // Custom schema handling would go here
-      }
-
-      if (!existsSync(migrationsFolder)) {
-        return {
-          output: t(
-            "app.api.v1.core.system.db.migrate.messages.noMigrationsFolder",
-          ),
-          count: 0,
-          success: true, // Not an error, just no migrations to run
-        };
-      }
-
-      // Get migration files
-      const migrationFiles = readdirSync(migrationsFolder)
-        .filter((file) => {
-          const SQL_EXTENSION = ".sql";
-          return file.endsWith(SQL_EXTENSION);
-        })
-        .toSorted();
-
-      if (migrationFiles.length === 0) {
-        return {
-          output: t(
-            "app.api.v1.core.system.db.migrate.messages.noMigrationFiles",
-          ),
-          count: 0,
-          success: true, // Not an error, just no migrations to run
-        };
-      }
-
-      // Run migrations using Drizzle
-      await drizzleMigrate(db, { migrationsFolder });
-
-      return {
-        output: t(
-          "app.api.v1.core.system.db.migrate.messages.executedMigrations",
-          {
-            count: migrationFiles.length,
-          },
-        ),
-        count: migrationFiles.length,
-        success: true,
-      };
-    } catch (error) {
-      // Catch error and return it in the response with success: false
-      return {
-        output: t(
-          "app.api.v1.core.system.db.migrate.messages.failedToExecute",
-          {
-            error: parseError(error).message,
-          },
-        ),
-        count: 0,
-        success: false,
-      };
-    }
-  }
-
-  /**
-   * Redo the last migration (rollback and re-run)
-   */
-  private redoLastMigration(locale: CountryLanguage): { output: string } {
-    const { t } = simpleT(locale);
-    try {
-      // This is a simplified implementation
-      // In a real scenario, you'd need proper rollback logic
-      return {
-        output: t(
-          "app.api.v1.core.system.db.migrate.messages.redoNotImplemented",
-        ),
-      };
-    } catch (error) {
-      // Return error in output instead of throwing
-      return {
-        output: t("app.api.v1.core.system.db.migrate.messages.failedToRedo", {
-          error: parseError(error).message,
-        }),
-      };
-    }
-  }
 
   /**
    * Repair migration tracking (merged from migrate-repair.ts)

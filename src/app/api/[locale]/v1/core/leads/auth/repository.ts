@@ -361,7 +361,34 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
       return fallbackLead.id;
     }
 
-    // Create lead with user email
+    // Check if a lead already exists with this email
+    const [existingLead] = await db
+      .select({ id: leads.id })
+      .from(leads)
+      .where(eq(leads.email, user.email))
+      .limit(1);
+
+    if (existingLead) {
+      logger.debug("Lead already exists for user email, linking it", {
+        userId,
+        leadId: existingLead.id,
+        email: user.email,
+      });
+
+      // Link existing lead to user (use onConflictDoNothing to handle race conditions)
+      await db
+        .insert(userLeadLinks)
+        .values({
+          userId,
+          leadId: existingLead.id,
+          linkReason: "existing_lead_linked",
+        })
+        .onConflictDoNothing();
+
+      return existingLead.id;
+    }
+
+    // Create new lead with user email
     const [newLead] = await db
       .insert(leads)
       .values({
@@ -375,11 +402,14 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
       .returning();
 
     // Link to user
-    await db.insert(userLeadLinks).values({
-      userId,
-      leadId: newLead.id,
-      linkReason: "user_creation",
-    });
+    await db
+      .insert(userLeadLinks)
+      .values({
+        userId,
+        leadId: newLead.id,
+        linkReason: "user_creation",
+      })
+      .onConflictDoNothing();
 
     logger.debug("Created lead for user", { userId, leadId: newLead.id });
     return newLead.id;
