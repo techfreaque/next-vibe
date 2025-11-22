@@ -78,13 +78,13 @@ NextVibe supports two types of background tasks:
 import "server-only";
 
 import {
-  createErrorResponse,
-  createSuccessResponse,
+  fail,
+  success,
   ErrorResponseTypes,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
@@ -163,7 +163,7 @@ export default tasks;
 // ✅ CORRECT - Side task pattern
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import { sideTaskRepository } from "./repository";
@@ -206,16 +206,17 @@ Follow [Repository Patterns](repository.md) with task-specific considerations:
 // ✅ CORRECT - Task repository pattern
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { createErrorResponse, createSuccessResponse, ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import {
+  fail,
+  success,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type {
-  TaskRequestOutput,
-  TaskResponseOutput,
-} from "./types";
+import type { TaskRequestOutput, TaskResponseOutput } from "./types";
 
 /**
  * Task Repository Interface
@@ -245,22 +246,23 @@ export class TaskRepositoryImpl implements TaskRepository {
       // Task business logic here
       const result = await this.performTaskWork(logger);
 
-      return createSuccessResponse({
+      return success({
         success: true,
         message: "Task completed successfully",
         processedItems: result.count,
       });
     } catch (error) {
       logger.error("Task execution failed", error);
-      return createErrorResponse(
-        "app.api.v1.core.tasks.execution.errors.failed",
-        ErrorResponseTypes.INTERNAL_ERROR,
-        error,
-      );
+      return fail({
+        message: "app.api.v1.core.tasks.execution.errors.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
-  private async performTaskWork(logger: EndpointLogger): Promise<{ count: number }> {
+  private async performTaskWork(
+    logger: EndpointLogger,
+  ): Promise<{ count: number }> {
     // Actual task work implementation
     logger.debug("Performing task work");
     return { count: 42 };
@@ -286,7 +288,9 @@ export const taskRepository = new TaskRepositoryImpl();
 export const taskConfig = {
   name: "data-processing-task",
   schedule: CRON_SCHEDULES.HOURLY, // Every hour
-  enabled: process.env.NODE_ENV === "production" || process.env.ENABLE_TASKS === "true",
+  enabled:
+    process.env.NODE_ENV === "production" ||
+    process.env.ENABLE_TASKS === "true",
   maxConcurrent: 1,
   timeout: TASK_TIMEOUTS.LONG, // 10 minutes
 };
@@ -339,10 +343,10 @@ export const sideTaskConfig = {
 
 ```typescript
 // ❌ WRONG - Incorrect path pattern (missing path segments)
-"app.api.v1.core.consultation.admin.new.errors.email_send_failed.title"
+"app.api.v1.core.consultation.admin.new.errors.email_send_failed.title";
 
 // ✅ CORRECT - Proper path pattern matching file structure
-"app.api.v1.core.consultation.admin.consultation.new.post.errors.email_send_failed.title"
+"app.api.v1.core.consultation.admin.consultation.new.post.errors.email_send_failed.title";
 ```
 
 **Path Structure Mapping Rules** (from [i18n Patterns](i18n.md)):
@@ -391,8 +395,8 @@ export const taskConfig = {
 export async function executeTask(logger: EndpointLogger) {
   // Don't put logic here!
   const users = await db.select().from(usersTable);
-  const results = users.map(u => processUser(u));
-  return createSuccessResponse({ processed: results.length });
+  const results = users.map((u) => processUser(u));
+  return success({ processed: results.length });
 }
 
 // ✅ CORRECT - Call repository
@@ -454,18 +458,18 @@ export async function executeTask(logger: EndpointLogger) {
 ### Common Cron Schedules
 
 ```typescript
-CRON_SCHEDULES.EVERY_MINUTE    // "0 * * * * *"
-CRON_SCHEDULES.HOURLY          // "0 0 * * * *"
-CRON_SCHEDULES.DAILY_6AM       // "0 0 6 * * *"
-CRON_SCHEDULES.WEEKLY_MONDAY   // "0 0 0 * * 1"
+CRON_SCHEDULES.EVERY_MINUTE; // "0 * * * * *"
+CRON_SCHEDULES.HOURLY; // "0 0 * * * *"
+CRON_SCHEDULES.DAILY_6AM; // "0 0 6 * * *"
+CRON_SCHEDULES.WEEKLY_MONDAY; // "0 0 0 * * 1"
 ```
 
 ### Common Timeouts
 
 ```typescript
-TASK_TIMEOUTS.SHORT   // 2 minutes
-TASK_TIMEOUTS.MEDIUM  // 5 minutes
-TASK_TIMEOUTS.LONG    // 10 minutes
+TASK_TIMEOUTS.SHORT; // 2 minutes
+TASK_TIMEOUTS.MEDIUM; // 5 minutes
+TASK_TIMEOUTS.LONG; // 10 minutes
 ```
 
 ---

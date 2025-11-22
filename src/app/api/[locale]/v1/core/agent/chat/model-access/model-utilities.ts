@@ -25,6 +25,7 @@ export enum ModelUtility {
   FAST = "fast",
   VISION = "vision",
   IMAGE_GEN = "imageGen",
+  LEGACY = "legacy",
 }
 
 export interface ModelUtilityConfig {
@@ -92,6 +93,12 @@ export const MODEL_UTILITIES: Record<ModelUtility, ModelUtilityConfig> = {
     titleKey: "app.chat.modelUtilities.imageGen",
     icon: Image,
     order: 8,
+  },
+  [ModelUtility.LEGACY]: {
+    id: ModelUtility.LEGACY,
+    titleKey: "app.chat.modelUtilities.legacy",
+    icon: Image,
+    order: 9,
   },
 };
 

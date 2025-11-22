@@ -9,6 +9,7 @@
 ## Overview
 
 **Primary debugging tools:**
+
 - `vibe check` - Type and lint errors
 - EndpointLogger - logging across server/client enable debug via src/config/debug.ts
 - Chrome DevTools MCP - Client-side debugging
@@ -77,16 +78,19 @@ vibe user:create --name="Test" --verbose          # Detailed errors
 **Common Issues:**
 
 **"Endpoint not found" (404)**
+
 1. Check folder structure: `/api/en-GLOBAL/v1/core/user/create` → `src/app/api/[locale]/v1/core/user/create/route.ts`
 2. Verify exports: `export const { POST } = endpointsHandler({ ... });`
 3. Check path array: `path: ["v1", "core", "user", "create"]` matches folders
 
 **"Validation failed" (Zod errors)**
+
 1. Check schema in `definition.ts`: `email: requestDataField({}, z.string().email())`
 2. Test with CLI: `vibe user:create --email="invalid" --name="Test"`
 3. Fix request data to match schema
 
 **"Unauthorized" (401/403)**
+
 1. Check `allowedRoles` in definition: `allowedRoles: [UserRole.ADMIN]`
 2. Verify JWT: `logger.debug("User role", { role: user.role });`
 3. Test with correct user role
@@ -96,12 +100,14 @@ vibe user:create --name="Test" --verbose          # Detailed errors
 ## 4. Database Errors
 
 **Connection:**
+
 ```bash
 vibe db:status              # Check database
 docker ps | grep postgres   # If using Docker
 ```
 
 **Migrations:**
+
 ```bash
 vibe migrate:status         # Check pending
 vibe migrate                # Run migrations
@@ -109,6 +115,7 @@ vibe migrate:generate       # Regenerate after schema changes
 ```
 
 **Query Debugging:**
+
 ```typescript
 logger.debug("Query params", { userId: user.id });
 const result = await db.query.users.findFirst({ where: eq(users.id, user.id) });
@@ -122,17 +129,20 @@ logger.debug("Query result", { found: !!result });
 **Server-Side:**
 
 ```typescript
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 async function processData(data, user, locale, logger: EndpointLogger) {
   logger.info("Processing started", { userId: user.id });
   try {
     const result = await doSomething(data);
     logger.info("Processing complete", { resultId: result.id });
-    return createSuccessResponse(result);
+    return success(result);
   } catch (error) {
     logger.error("Processing failed", error, { data });
-    return createErrorResponse(...);
+    return fail({
+      message: "error.translation.key",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 }
 ```
@@ -140,8 +150,12 @@ async function processData(data, user, locale, logger: EndpointLogger) {
 **Client-Side:**
 
 ```typescript
-const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
-const handleClick = () => logger.debug("Button clicked", { timestamp: Date.now() });
+const logger = useMemo(
+  () => createEndpointLogger(false, Date.now(), locale),
+  [locale],
+);
+const handleClick = () =>
+  logger.debug("Button clicked", { timestamp: Date.now() });
 ```
 
 **Log Levels:** `debug()` (dev only), `info()` (important events), `warn()` (warnings), `error()` (failures), `vibe()` (CLI/framework)
@@ -193,7 +207,7 @@ rm -rf .next node_modules/.cache && vibe build  # Clean rebuild
 
 ```typescript
 import { Button } from "../../components/ui/button"; // ❌ Relative
-import { Button } from "@/path/to/button";                // ✅ Use alias
+import { Button } from "@/path/to/button"; // ✅ Use alias
 ```
 
 ---
@@ -212,7 +226,9 @@ const time = Date.now();
 
 // ✅ Client-only
 const [time, setTime] = useState<number>();
-useEffect(() => { setTime(Date.now()); }, []);
+useEffect(() => {
+  setTime(Date.now());
+}, []);
 ```
 
 ---

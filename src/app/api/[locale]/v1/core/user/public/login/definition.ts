@@ -87,7 +87,7 @@ const { POST } = createEndpoint({
             },
             z.string().min(1, {
               message:
-                "app.api.v1.core.user.public.login.fields.password.validation.required",
+                "app.api.v1.core.user.public.login.fields.password.validation.required" satisfies TranslationKey,
             }),
           ),
         },

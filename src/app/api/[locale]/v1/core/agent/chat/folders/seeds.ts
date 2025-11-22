@@ -27,12 +27,12 @@ interface CategoryConfig {
   color: string;
   sortOrder: number;
   description?: string;
-  rolesView: UserPermissionRoleValue[];
-  rolesManage: UserPermissionRoleValue[];
-  rolesCreateThread: UserPermissionRoleValue[];
-  rolesPost: UserPermissionRoleValue[];
-  rolesModerate: UserPermissionRoleValue[];
-  rolesAdmin: UserPermissionRoleValue[];
+  rolesView: (typeof UserPermissionRoleValue)[];
+  rolesManage: (typeof UserPermissionRoleValue)[];
+  rolesCreateThread: (typeof UserPermissionRoleValue)[];
+  rolesPost: (typeof UserPermissionRoleValue)[];
+  rolesModerate: (typeof UserPermissionRoleValue)[];
+  rolesAdmin: (typeof UserPermissionRoleValue)[];
 }
 
 /**

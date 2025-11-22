@@ -88,15 +88,19 @@ vibe olint --verbose=true
 ### API Usage
 
 ```typescript
-import { oxlintRepository } from './repository';
+import { oxlintRepository } from "./repository";
 
-const result = await oxlintRepository.execute({
-  path: './src',
-  fix: false,
-  verbose: false,
-  timeout: 3600,
-  cacheDir: './.tmp'
-}, locale, logger);
+const result = await oxlintRepository.execute(
+  {
+    path: "./src",
+    fix: false,
+    verbose: false,
+    timeout: 3600,
+    cacheDir: "./.tmp",
+  },
+  locale,
+  logger,
+);
 ```
 
 ## Performance
@@ -164,7 +168,7 @@ If you're seeing thousands of errors:
 
    ```typescript
    const enablePedanticRules = false; // Reduce noise
-   const strictMode = false;          // Use warnings
+   const strictMode = false; // Use warnings
    ```
 
 2. **Disable specific rules**:

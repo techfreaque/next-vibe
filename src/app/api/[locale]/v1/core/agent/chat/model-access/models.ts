@@ -22,8 +22,10 @@ import { ModelUtility } from "./model-utilities";
 export enum ModelId {
   CLAUDE_SONNET_4_5 = "claude-sonnet-4.5",
   GPT_5 = "gpt-5",
+  GPT_5_1 = "gpt-51",
   GTP_5_PRO = "gpt-5-pro",
   GPT_5_CODEX = "gpt-5-codex",
+  GPT_5_1_CODEX = "gpt-51-codex",
   GPT_5_MINI = "gpt-5-mini",
   GPT_5_NANO = "gpt-5-nano",
   GEMINI_3_PRO = "gemini-3-pro",
@@ -300,6 +302,32 @@ export const modelOptions: ModelOption[] = [
     icon: SiOpenai,
     openRouterModel: "openai/gpt-5-codex",
     creditCost: 10, // Premium model
+    utilities: [ModelUtility.LEGACY],
+    supportsTools: true,
+  },
+  {
+    id: ModelId.GPT_5_1_CODEX,
+    name: "GPT-5.1 Codex",
+    provider: "openAI",
+    description: "app.chat.models.descriptions.gpt51Codex",
+    parameterCount: undefined,
+    contextWindow: 400000,
+    icon: SiOpenai,
+    openRouterModel: "openai/gpt-5.1-codex",
+    creditCost: 10, // Premium model
+    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
+    supportsTools: true,
+  },
+  {
+    id: ModelId.GPT_5_1,
+    name: "GPT-5.1",
+    provider: "openAI",
+    description: "app.chat.models.descriptions.gpt51",
+    parameterCount: undefined,
+    contextWindow: 400000,
+    icon: SiOpenai,
+    openRouterModel: "openai/gpt-5.1",
+    creditCost: 10, // Premium model
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
     supportsTools: true,
   },
@@ -313,7 +341,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiOpenai,
     openRouterModel: "openai/gpt-5",
     creditCost: 10, // Premium model
-    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
+    utilities: [ModelUtility.LEGACY],
     supportsTools: true,
   },
   {
@@ -428,7 +456,7 @@ export const modelOptions: ModelOption[] = [
     icon: SiGooglegemini,
     openRouterModel: "google/gemini-2.5-flash-pro",
     creditCost: 10,
-    utilities: [ModelUtility.SMART, ModelUtility.CODING],
+    utilities: [ModelUtility.LEGACY],
     supportsTools: true,
   },
   {

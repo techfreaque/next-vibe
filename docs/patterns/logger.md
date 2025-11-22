@@ -18,7 +18,7 @@ This document defines strict logger patterns for the codebase. The `EndpointLogg
 
 ```typescript
 // route.ts
-import { endpointsHandler } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi';
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
 
 export const { GET, POST } = endpointsHandler({
   endpoint: definitions,
@@ -29,7 +29,7 @@ export const { GET, POST } = endpointsHandler({
         data,
         user,
         locale,
-        logger,  // <-- Pass it down
+        logger, // <-- Pass it down
       );
     },
   },
@@ -48,14 +48,14 @@ export const { GET, POST } = endpointsHandler({
 
 ```typescript
 // repository.ts
-import type { EndpointLogger } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger';
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 export interface MyRepositoryInterface {
   getData(
     data: DataInput,
     user: JwtPayloadType,
     locale: CountryLanguage,
-    logger: EndpointLogger,  // <-- Required parameter
+    logger: EndpointLogger, // <-- Required parameter
   ): Promise<ResponseType<DataOutput>>;
 }
 
@@ -64,22 +64,22 @@ export class MyRepositoryImpl implements MyRepositoryInterface {
     data: DataInput,
     user: JwtPayloadType,
     locale: CountryLanguage,
-    logger: EndpointLogger,  // <-- Receive it
+    logger: EndpointLogger, // <-- Receive it
   ): Promise<ResponseType<DataOutput>> {
     try {
-      logger.debug('Processing data', { userId: user.id });
+      logger.debug("Processing data", { userId: user.id });
 
       // ... business logic ...
 
-      logger.info('Data processed successfully', { count: result.length });
-      return createSuccessResponse({ data: result });
+      logger.info("Data processed successfully", { count: result.length });
+      return success({ data: result });
     } catch (error) {
-      logger.error('Failed to process data', error);
-      return createErrorResponse(
-        'app.api.errors.internal',
-        ErrorResponseTypes.INTERNAL_ERROR,
-        { error: parseError(error).message },
-      );
+      logger.error("Failed to process data", error);
+      return fail({
+        message: "app.api.errors.internal",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 }
@@ -129,7 +129,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
 // components/message-editor.tsx
 'use client';
 
-import type { EndpointLogger } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger';
+import type { EndpointLogger } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint';
 
 interface MessageEditorProps {
   message: ChatMessage;
@@ -157,15 +157,19 @@ export function MessageEditor({ message, logger }: MessageEditorProps) {
 export interface UseMessageEditorOptions {
   message: ChatMessage;
   onSave: (id: string, content: string) => Promise<void>;
-  logger: EndpointLogger;  // <-- Required parameter
+  logger: EndpointLogger; // <-- Required parameter
 }
 
-export function useMessageEditor({ message, onSave, logger }: UseMessageEditorOptions) {
+export function useMessageEditor({
+  message,
+  onSave,
+  logger,
+}: UseMessageEditorOptions) {
   const handleSave = async () => {
     try {
       await onSave(message.id, content);
     } catch (error) {
-      logger.error('Failed to overwrite message', error);  // <-- Use it
+      logger.error("Failed to overwrite message", error); // <-- Use it
       throw error;
     }
   };
@@ -210,7 +214,7 @@ export function MessageEditor() {
     try {
       await save();
     } catch (error) {
-      console.error('Failed to save', error);  // ❌ NO! Use logger prop
+      console.error("Failed to save", error); // ❌ NO! Use logger prop
     }
   };
 }
@@ -221,7 +225,7 @@ export function MessageEditor() {
 ```typescript
 // ❌ WRONG
 export function ChildComponent() {
-  const logger = createEndpointLogger(false, Date.now(), locale);  // ❌ NO! Get from context/props
+  const logger = createEndpointLogger(false, Date.now(), locale); // ❌ NO! Get from context/props
 }
 ```
 
@@ -246,19 +250,19 @@ interface EndpointLogger {
 
 ```typescript
 // Info logging
-logger.info('Processing user data', { userId: user.id, count: 10 });
+logger.info("Processing user data", { userId: user.id, count: 10 });
 
 // Error logging
-logger.error('Failed to process data', error);
+logger.error("Failed to process data", error);
 
 // Warning logging
-logger.warn('Deprecated API used', { endpoint: '/old-api' });
+logger.warn("Deprecated API used", { endpoint: "/old-api" });
 
 // Debug logging (only in development)
-logger.debug('Cache hit', { key: 'user:123' });
+logger.debug("Cache hit", { key: "user:123" });
 
 // Vibe logging (special formatting)
-logger.vibe('Server started successfully', { port: 3000 });
+logger.vibe("Server started successfully", { port: 3000 });
 ```
 
 ---
@@ -269,7 +273,7 @@ Always use these exact imports:
 
 ```typescript
 // Type import
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 // Function import (for creation only at top-level)
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -293,13 +297,13 @@ Before committing code, verify:
 
 ## Summary
 
-| Component Type | Logger Pattern |
-|---|---|
-| **API Routes** | Receive from `props.logger` |
-| **Repositories** | Receive as parameter |
-| **Client Components (Top)** | Create with `createEndpointLogger(false, Date.now(), locale)` |
-| **Client Components (Child)** | Receive from props/context |
-| **Hooks** | Receive as parameter |
+| Component Type                | Logger Pattern                                                |
+| ----------------------------- | ------------------------------------------------------------- |
+| **API Routes**                | Receive from `props.logger`                                   |
+| **Repositories**              | Receive as parameter                                          |
+| **Client Components (Top)**   | Create with `createEndpointLogger(false, Date.now(), locale)` |
+| **Client Components (Child)** | Receive from props/context                                    |
+| **Hooks**                     | Receive as parameter                                          |
 
 ---
 

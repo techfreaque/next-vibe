@@ -22,6 +22,7 @@ import { SmtpSecurityTypeOptions } from "@/app/api/[locale]/v1/core/emails/smtp-
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import createDefinition from "@/app/api/[locale]/v1/core/emails/smtp-client/create/definition";
 
 interface CreateSmtpAccountFormProps {
   locale: CountryLanguage;
@@ -74,15 +75,7 @@ export function CreateSmtpAccountForm({
               >
                 <EndpointFormField
                   name="accountInfo.name"
-                  config={{
-                    type: "text",
-                    label:
-                      "app.api.v1.core.emails.smtpClient.create.name.label",
-                    description:
-                      "app.api.v1.core.emails.smtpClient.create.name.description",
-                    placeholder:
-                      "app.api.v1.core.emails.smtpClient.create.name.placeholder",
-                  }}
+                  endpointFields={createDefinition.POST.fields}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "asterisk",
@@ -93,16 +86,7 @@ export function CreateSmtpAccountForm({
 
                 <EndpointFormField
                   name="accountInfo.description"
-                  config={{
-                    type: "textarea",
-                    label:
-                      "app.api.v1.core.emails.smtpClient.create.accountDescription.label",
-                    description:
-                      "app.api.v1.core.emails.smtpClient.create.accountDescription.description",
-                    placeholder:
-                      "app.api.v1.core.emails.smtpClient.create.accountDescription.placeholder",
-                    rows: 2,
-                  }}
+                  endpointFields={createDefinition.POST.fields}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -119,15 +103,7 @@ export function CreateSmtpAccountForm({
                 <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <EndpointFormField
                     name="serverConfig.host"
-                    config={{
-                      type: "text",
-                      label:
-                        "app.api.v1.core.emails.smtpClient.create.host.label",
-                      description:
-                        "app.api.v1.core.emails.smtpClient.create.host.description",
-                      placeholder:
-                        "app.api.v1.core.emails.smtpClient.create.host.placeholder",
-                    }}
+                    endpointFields={createDefinition.POST.fields}
                     control={endpoint.create.form.control}
                     theme={{
                       style: "asterisk",
@@ -138,15 +114,7 @@ export function CreateSmtpAccountForm({
 
                   <EndpointFormField
                     name="serverConfig.port"
-                    config={{
-                      type: "number",
-                      label:
-                        "app.api.v1.core.emails.smtpClient.create.port.label",
-                      description:
-                        "app.api.v1.core.emails.smtpClient.create.port.description",
-                      placeholder:
-                        "app.api.v1.core.emails.smtpClient.create.port.placeholder",
-                    }}
+                    endpointFields={createDefinition.POST.fields}
                     control={endpoint.create.form.control}
                     theme={{
                       style: "asterisk",
@@ -157,16 +125,7 @@ export function CreateSmtpAccountForm({
 
                   <EndpointFormField
                     name="serverConfig.securityType"
-                    config={{
-                      type: "select",
-                      label:
-                        "app.api.v1.core.emails.smtpClient.create.securityType.label",
-                      description:
-                        "app.api.v1.core.emails.smtpClient.create.securityType.description",
-                      placeholder:
-                        "app.api.v1.core.emails.smtpClient.create.securityType.placeholder",
-                      options: SmtpSecurityTypeOptions,
-                    }}
+                    endpointFields={createDefinition.POST.fields}
                     control={endpoint.create.form.control}
                     theme={{
                       style: "asterisk",
@@ -185,15 +144,7 @@ export function CreateSmtpAccountForm({
                 <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EndpointFormField
                     name="authentication.username"
-                    config={{
-                      type: "text",
-                      label:
-                        "app.api.v1.core.emails.smtpClient.create.username.label",
-                      description:
-                        "app.api.v1.core.emails.smtpClient.create.username.description",
-                      placeholder:
-                        "app.api.v1.core.emails.smtpClient.create.username.placeholder",
-                    }}
+                    endpointFields={createDefinition.POST.fields}
                     control={endpoint.create.form.control}
                     theme={{
                       style: "asterisk",
@@ -204,15 +155,7 @@ export function CreateSmtpAccountForm({
 
                   <EndpointFormField
                     name="authentication.password"
-                    config={{
-                      type: "password",
-                      label:
-                        "app.api.v1.core.emails.smtpClient.create.password.label",
-                      description:
-                        "app.api.v1.core.emails.smtpClient.create.password.description",
-                      placeholder:
-                        "app.api.v1.core.emails.smtpClient.create.password.placeholder",
-                    }}
+                    endpointFields={createDefinition.POST.fields}
                     control={endpoint.create.form.control}
                     theme={{
                       style: "asterisk",
@@ -230,15 +173,7 @@ export function CreateSmtpAccountForm({
               >
                 <EndpointFormField
                   name="emailConfig.fromEmail"
-                  config={{
-                    type: "email",
-                    label:
-                      "app.api.v1.core.emails.smtpClient.create.fromEmail.label",
-                    description:
-                      "app.api.v1.core.emails.smtpClient.create.fromEmail.description",
-                    placeholder:
-                      "app.api.v1.core.emails.smtpClient.create.fromEmail.placeholder",
-                  }}
+                  endpointFields={createDefinition.POST.fields}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "asterisk",

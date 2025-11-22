@@ -168,11 +168,7 @@ import type { z } from "zod";
 
 // Import types and enums
 import { users } from "../user/db";
-import {
-  LeadStatus,
-  LeadStatusDB,
-  LeadSourceDB,
-} from "./enum";
+import { LeadStatus, LeadStatusDB, LeadSourceDB } from "./enum";
 
 /**
  * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys
@@ -241,43 +237,43 @@ import {
 } from "drizzle-orm/pg-core";
 
 // UUID primary key (standard pattern)
-id: uuid("id").primaryKey().defaultRandom()
+id: uuid("id").primaryKey().defaultRandom();
 
 // Text columns
-name: text("name").notNull()
-description: text("description") // nullable
+name: text("name").notNull();
+description: text("description"); // nullable
 
 // Varchar with length
-email: varchar("email", { length: 255 }).notNull().unique()
+email: varchar("email", { length: 255 }).notNull().unique();
 
 // Integer
-count: integer("count").default(0)
-emailsSent: integer("emails_sent").notNull().default(0)
+count: integer("count").default(0);
+emailsSent: integer("emails_sent").notNull().default(0);
 
 // Boolean
-isActive: boolean("is_active").default(true)
-published: boolean("published").default(false).notNull()
+isActive: boolean("is_active").default(true);
+published: boolean("published").default(false).notNull();
 
 // JSONB (typed)
-metadata: jsonb("metadata").$type<Record<string, unknown>>().default({})
+metadata: jsonb("metadata").$type<Record<string, unknown>>().default({});
 
 // Timestamps
-createdAt: timestamp("created_at").defaultNow().notNull()
-updatedAt: timestamp("updated_at").defaultNow().notNull()
-deletedAt: timestamp("deleted_at") // soft delete
+createdAt: timestamp("created_at").defaultNow().notNull();
+updatedAt: timestamp("updated_at").defaultNow().notNull();
+deletedAt: timestamp("deleted_at"); // soft delete
 
 // Enum (text with constraint)
-status: text("status", { enum: StatusDB }).notNull().default(Status.ACTIVE)
+status: text("status", { enum: StatusDB }).notNull().default(Status.ACTIVE);
 
 // Foreign key
 userId: uuid("user_id")
   .notNull()
-  .references(() => users.id, { onDelete: "cascade" })
+  .references(() => users.id, { onDelete: "cascade" });
 
 // Self-referencing foreign key (requires AnyPgColumn)
 parentId: uuid("parent_id").references((): AnyPgColumn => chatFolders.id, {
   onDelete: "cascade",
-})
+});
 ```
 
 ### JSONB Type Safety
@@ -294,7 +290,7 @@ interface ThreadMetadata {
 }
 
 // Use in table definition
-metadata: jsonb("metadata").$type<ThreadMetadata>().default({})
+metadata: jsonb("metadata").$type<ThreadMetadata>().default({});
 ```
 
 ---
@@ -374,15 +370,12 @@ export const leadsRelations = relations(leads, ({ one, many }) => ({
   engagements: many(leadEngagements),
 }));
 
-export const emailCampaignsRelations = relations(
-  emailCampaigns,
-  ({ one }) => ({
-    lead: one(leads, {
-      fields: [emailCampaigns.leadId],
-      references: [leads.id],
-    }),
+export const emailCampaignsRelations = relations(emailCampaigns, ({ one }) => ({
+  lead: one(leads, {
+    fields: [emailCampaigns.leadId],
+    references: [leads.id],
   }),
-);
+}));
 ```
 
 ### Self-Referencing Relations
@@ -483,7 +476,8 @@ await db.insert(leads).values([
 ]);
 
 // Insert with returning
-const [newLead] = await db.insert(leads)
+const [newLead] = await db
+  .insert(leads)
   .values({ email: "test@example.com", businessName: "Test" })
   .returning();
 ```
@@ -557,10 +551,9 @@ updatedAt: timestamp("updated_at").defaultNow().notNull(),
 ### Soft Delete Pattern
 
 ```typescript
-deletedAt: timestamp("deleted_at"),
-
-// In queries - filter out deleted records
-query = query.where(isNull(leads.deletedAt));
+deletedAt: (timestamp("deleted_at"),
+  // In queries - filter out deleted records
+  (query = query.where(isNull(leads.deletedAt))));
 ```
 
 ### Indexes Pattern
@@ -653,11 +646,11 @@ export const leads = pgTable("leads", {
 
 ```typescript
 // ❌ WRONG
-status: text("status", { enum: ["NEW", "PENDING"] })
+status: text("status", { enum: ["NEW", "PENDING"] });
 
 // ✅ CORRECT - Import from enum.ts
 import { LeadStatusDB } from "./enum";
-status: text("status", { enum: LeadStatusDB })
+status: text("status", { enum: LeadStatusDB });
 ```
 
 ### ❌ Don't Mix Database and API Schemas
@@ -691,10 +684,7 @@ const user = await db.query.users.findFirst({
 });
 
 // ✅ CORRECT - Use query builder
-const [user] = await db
-  .select()
-  .from(users)
-  .where(eq(users.id, userId));
+const [user] = await db.select().from(users).where(eq(users.id, userId));
 ```
 
 ---

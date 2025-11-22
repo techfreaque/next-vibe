@@ -65,14 +65,24 @@ export function LoginForm({
             }
             submitButtonText="app.user.other.login.auth.login.signInButton"
           >
-            <Div className="text-center text-sm text-gray-500 dark:text-gray-400">
-              {t("app.user.other.login.login.dontHaveAccount")}{" "}
-              <Link
-                href={`/${locale}/user/signup`}
-                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-              >
-                {t("app.user.other.login.auth.login.createAccount")}
-              </Link>
+            <Div className="space-y-4">
+              <Div className="text-center">
+                <Link
+                  href={`/${locale}/user/reset-password`}
+                  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline"
+                >
+                  {t("app.user.other.login.auth.login.forgotPassword")}
+                </Link>
+              </Div>
+              <Div className="text-center text-sm text-gray-500 dark:text-gray-400">
+                {t("app.user.other.login.login.dontHaveAccount")}{" "}
+                <Link
+                  href={`/${locale}/user/signup`}
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                >
+                  {t("app.user.other.login.auth.login.createAccount")}
+                </Link>
+              </Div>
             </Div>
           </EndpointFormRenderer>
         </CardContent>

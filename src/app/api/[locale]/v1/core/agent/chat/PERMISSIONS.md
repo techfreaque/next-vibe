@@ -12,6 +12,7 @@ The chat system supports four folder types with different permission models:
 ## Folder Types
 
 ### PRIVATE (Default)
+
 - **Storage**: Server-side database
 - **Access**: Only the folder owner
 - **Use Case**: Personal conversations, private notes
@@ -20,6 +21,7 @@ The chat system supports four folder types with different permission models:
   - Others: No access
 
 ### SHARED
+
 - **Storage**: Server-side database
 - **Access**: Anyone with the share link, optionally restricted to specific users
 - **Use Case**: Collaborative conversations, team discussions
@@ -33,6 +35,7 @@ The chat system supports four folder types with different permission models:
   - `allowedUserIds`: Optional array to restrict access to specific users
 
 ### PUBLIC
+
 - **Storage**: Server-side database
 - **Access**: All authenticated users (read), moderated write access
 - **Use Case**: Community forums, public discussions, Q&A
@@ -46,6 +49,7 @@ The chat system supports four folder types with different permission models:
   - `moderatorIds`: Array of user IDs with moderator privileges
 
 ### INCOGNITO
+
 - **Storage**: localStorage only (never sent to server)
 - **Access**: Only the current browser session
 - **Use Case**: Sensitive conversations, temporary testing
@@ -59,23 +63,23 @@ The chat system supports four folder types with different permission models:
 
 ## Permission Matrix
 
-| Action | PRIVATE | SHARED (Owner) | SHARED (Link Holder) | PUBLIC (Owner) | PUBLIC (Moderator) | PUBLIC (User) | INCOGNITO |
-|--------|---------|----------------|----------------------|----------------|-------------------|---------------|-----------|
-| Read folder | Owner only | Owner | Link holders | Owner | Moderators | All authenticated | Local only |
-| Read threads | Owner only | Owner | Link holders | Owner | Moderators | All authenticated | Local only |
-| Read messages | Owner only | Owner | Link holders | Owner | Moderators | All authenticated | Local only |
-| Create thread | Owner only | Owner | Link holders | Owner | Moderators | All authenticated | Local only |
-| Create message | Owner only | Owner | Link holders | Owner | Moderators | All authenticated | Local only |
-| Edit own message | Owner only | Owner | Link holders | Owner | Moderators | Message author | Local only |
-| Edit others' message | Owner only | Owner | No | Owner | Moderators | No | Local only |
-| Delete own message | Owner only | Owner | Link holders | Owner | Moderators | Message author | Local only |
-| Delete others' message | Owner only | Owner | No | Owner | Moderators | No | Local only |
-| Delete thread | Owner only | Owner | No | Owner | Moderators | No | Local only |
-| Delete folder | Owner only | Owner | No | Owner | No | No | Local only |
-| Manage permissions | Owner only | Owner | No | Owner | No | No | Local only |
-| Add moderators | N/A | N/A | N/A | Owner | No | No | N/A |
-| Generate share link | N/A | Owner | No | N/A | N/A | N/A | N/A |
-| Vote on messages | Owner only | Owner + Link holders | Link holders | All authenticated | All authenticated | All authenticated | Local only |
+| Action                 | PRIVATE    | SHARED (Owner)       | SHARED (Link Holder) | PUBLIC (Owner)    | PUBLIC (Moderator) | PUBLIC (User)     | INCOGNITO  |
+| ---------------------- | ---------- | -------------------- | -------------------- | ----------------- | ------------------ | ----------------- | ---------- |
+| Read folder            | Owner only | Owner                | Link holders         | Owner             | Moderators         | All authenticated | Local only |
+| Read threads           | Owner only | Owner                | Link holders         | Owner             | Moderators         | All authenticated | Local only |
+| Read messages          | Owner only | Owner                | Link holders         | Owner             | Moderators         | All authenticated | Local only |
+| Create thread          | Owner only | Owner                | Link holders         | Owner             | Moderators         | All authenticated | Local only |
+| Create message         | Owner only | Owner                | Link holders         | Owner             | Moderators         | All authenticated | Local only |
+| Edit own message       | Owner only | Owner                | Link holders         | Owner             | Moderators         | Message author    | Local only |
+| Edit others' message   | Owner only | Owner                | No                   | Owner             | Moderators         | No                | Local only |
+| Delete own message     | Owner only | Owner                | Link holders         | Owner             | Moderators         | Message author    | Local only |
+| Delete others' message | Owner only | Owner                | No                   | Owner             | Moderators         | No                | Local only |
+| Delete thread          | Owner only | Owner                | No                   | Owner             | Moderators         | No                | Local only |
+| Delete folder          | Owner only | Owner                | No                   | Owner             | No                 | No                | Local only |
+| Manage permissions     | Owner only | Owner                | No                   | Owner             | No                 | No                | Local only |
+| Add moderators         | N/A        | N/A                  | N/A                  | Owner             | No                 | No                | N/A        |
+| Generate share link    | N/A        | Owner                | No                   | N/A               | N/A                | N/A               | N/A        |
+| Vote on messages       | Owner only | Owner + Link holders | Link holders         | All authenticated | All authenticated  | All authenticated | Local only |
 
 ## Permission Checking Functions
 
@@ -132,27 +136,32 @@ canVoteMessage(userId: string | null, message: ChatMessage, folder: ChatFolder):
 ## Implementation Notes
 
 ### Share Token Generation
+
 - Use cryptographically secure random tokens (e.g., `crypto.randomBytes(32).toString('base64url')`)
 - Store in `shareToken` field
 - Share links format: `/chat/shared/{shareToken}`
 
 ### Moderator Management
+
 - Only folder owner can add/remove moderators
 - Moderators stored in `moderatorIds` array
 - Moderators have elevated permissions but cannot delete the folder or change ownership
 
 ### Incognito Mode
+
 - All operations check `storageType` parameter
 - If `storageType === 'local'`, skip all database operations
 - Return success responses without persisting data
 - Client handles all storage in localStorage
 
 ### Permission Inheritance
+
 - Threads inherit permissions from their parent folder
 - Messages inherit permissions from their parent thread
 - Child folders can have different types than parent folders
 
 ### Security Considerations
+
 1. Always validate `userId` from JWT token, never trust client input
 2. Check permissions at every API endpoint
 3. Use database transactions for permission-sensitive operations
@@ -163,6 +172,7 @@ canVoteMessage(userId: string | null, message: ChatMessage, folder: ChatFolder):
 ## Database Schema
 
 ### chat_folders Table
+
 ```sql
 folder_type TEXT NOT NULL DEFAULT 'app.api.v1.core.agent.chat.enums.folderType.private'
 is_public BOOLEAN NOT NULL DEFAULT false
@@ -172,6 +182,7 @@ allowed_user_ids JSONB DEFAULT '[]' -- Array of user IDs for restricted shared f
 ```
 
 ### chat_messages Table
+
 ```sql
 upvotes INTEGER NOT NULL DEFAULT 0
 downvotes INTEGER NOT NULL DEFAULT 0
@@ -208,4 +219,3 @@ All endpoints must implement permission checks:
 5. Audit logs for permission changes
 6. Invite-only shared folders
 7. Read-only share links
-

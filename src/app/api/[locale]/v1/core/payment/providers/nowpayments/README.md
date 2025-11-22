@@ -54,7 +54,11 @@ The `NOWPaymentsProvider` class implements the `PaymentProvider` interface with 
 interface PaymentProvider {
   name: string;
   ensureCustomer(userId, email, name, logger): Promise<CustomerResult>;
-  createCheckoutSession(params, customerId, logger): Promise<CheckoutSessionResult>;
+  createCheckoutSession(
+    params,
+    customerId,
+    logger,
+  ): Promise<CheckoutSessionResult>;
   verifyWebhook(body, signature, logger): Promise<WebhookEvent>;
   retrieveSubscription(subscriptionId, logger): Promise<SubscriptionResult>;
   cancelSubscription(subscriptionId, logger): Promise<void>;
@@ -157,6 +161,7 @@ if (subscriptionResult.success) {
 ```
 
 **How Subscriptions Work**:
+
 1. System creates a subscription plan with billing interval (30 or 365 days)
 2. System creates an email subscription for the user
 3. User receives initial payment link via email
@@ -180,10 +185,7 @@ if (subscription.success) {
 }
 
 // Cancel subscription
-const cancelResult = await provider.cancelSubscription(
-  subscriptionId,
-  logger,
-);
+const cancelResult = await provider.cancelSubscription(subscriptionId, logger);
 
 // List all subscriptions
 const subscriptions = await provider.listSubscriptions(
@@ -202,10 +204,11 @@ Webhooks are automatically processed through the unified payment repository:
 
 ```typescript
 // Webhook route automatically calls paymentRepository.handleWebhook()
-POST /api/[locale]/v1/core/payment/providers/nowpayments/webhook
+POST / api / [locale] / v1 / core / payment / providers / nowpayments / webhook;
 ```
 
 The webhook handler:
+
 1. Verifies HMAC-SHA512 signature
 2. Checks for duplicate events (idempotency)
 3. Maps NOWPayments status to generic event types
@@ -214,17 +217,17 @@ The webhook handler:
 
 ### Payment Status Mapping
 
-| NOWPayments Status | One-Time Payment Event           | Subscription Payment Event    | Description                    |
-|--------------------|----------------------------------|-------------------------------|--------------------------------|
-| `waiting`          | `payment_intent.created`         | `payment_intent.created`      | Waiting for crypto payment     |
-| `confirming`       | `payment_intent.processing`      | `payment_intent.processing`   | Confirming blockchain tx       |
-| `confirmed`        | `payment_intent.processing`      | `payment_intent.processing`   | Blockchain confirmed           |
-| `sending`          | `payment_intent.processing`      | `payment_intent.processing`   | Sending funds to merchant      |
-| `finished`         | `checkout.session.completed`     | `invoice.payment_succeeded`   | Payment complete               |
-| `partially_paid`   | `payment_intent.processing`      | `payment_intent.processing`   | Underpaid (waiting for more)   |
-| `failed`           | `payment_intent.payment_failed`  | `payment_intent.payment_failed` | Payment failed              |
-| `refunded`         | `charge.refunded`                | `charge.refunded`             | Payment refunded               |
-| `expired`          | `payment_intent.canceled`        | `payment_intent.canceled`     | Payment session expired        |
+| NOWPayments Status | One-Time Payment Event          | Subscription Payment Event      | Description                  |
+| ------------------ | ------------------------------- | ------------------------------- | ---------------------------- |
+| `waiting`          | `payment_intent.created`        | `payment_intent.created`        | Waiting for crypto payment   |
+| `confirming`       | `payment_intent.processing`     | `payment_intent.processing`     | Confirming blockchain tx     |
+| `confirmed`        | `payment_intent.processing`     | `payment_intent.processing`     | Blockchain confirmed         |
+| `sending`          | `payment_intent.processing`     | `payment_intent.processing`     | Sending funds to merchant    |
+| `finished`         | `checkout.session.completed`    | `invoice.payment_succeeded`     | Payment complete             |
+| `partially_paid`   | `payment_intent.processing`     | `payment_intent.processing`     | Underpaid (waiting for more) |
+| `failed`           | `payment_intent.payment_failed` | `payment_intent.payment_failed` | Payment failed               |
+| `refunded`         | `charge.refunded`               | `charge.refunded`               | Payment refunded             |
+| `expired`          | `payment_intent.canceled`       | `payment_intent.canceled`       | Payment session expired      |
 
 ## API Reference
 
@@ -241,6 +244,7 @@ Ensures customer exists. Since NOWPayments doesn't have customer objects, this r
 Creates a crypto payment invoice or subscription via NOWPayments API.
 
 **Parameters**:
+
 - `params.userId`: User ID
 - `params.productId`: Product identifier
 - `params.interval`: "one_time", "month", or "year"
@@ -253,12 +257,14 @@ Creates a crypto payment invoice or subscription via NOWPayments API.
 **Returns**: `ResponseType<CheckoutSessionResult>`
 
 **For One-Time Payments**:
+
 - Gets product pricing from products repository
 - Creates invoice with NOWPayments API
 - Returns checkout URL for user redirection
 - Stores metadata for webhook processing
 
 **For Subscriptions**:
+
 - Creates a subscription plan with the specified interval
 - Creates an email subscription for the user
 - User receives payment links via email before each billing cycle
@@ -269,6 +275,7 @@ Creates a crypto payment invoice or subscription via NOWPayments API.
 Verifies webhook signature using HMAC-SHA512.
 
 **Parameters**:
+
 - `body`: Raw request body (string)
 - `signature`: `x-nowpayments-sig` header value
 - `logger`: Endpoint logger
@@ -276,6 +283,7 @@ Verifies webhook signature using HMAC-SHA512.
 **Returns**: `ResponseType<WebhookEvent>`
 
 **Security Features**:
+
 - HMAC-SHA512 signature verification
 - Constant-time string comparison
 - Prevents timing attacks
@@ -285,12 +293,14 @@ Verifies webhook signature using HMAC-SHA512.
 Retrieves subscription information from NOWPayments.
 
 **Parameters**:
+
 - `subscriptionId`: NOWPayments subscription ID
 - `logger`: Endpoint logger
 
 **Returns**: `ResponseType<{ userId, currentPeriodStart?, currentPeriodEnd? }>`
 
 **Features**:
+
 - Fetches subscription details and plan information
 - Calculates current billing period dates
 - Returns subscription status and next payment date
@@ -300,6 +310,7 @@ Retrieves subscription information from NOWPayments.
 Cancels a NOWPayments subscription (deletes recurring payment).
 
 **Parameters**:
+
 - `subscriptionId`: NOWPayments subscription ID
 - `logger`: Endpoint logger
 
@@ -312,6 +323,7 @@ Cancels a NOWPayments subscription (deletes recurring payment).
 Lists all subscriptions with optional filtering.
 
 **Parameters**:
+
 - `filters.status`: Filter by status ("PAID", "UNPAID", "ACTIVE", "INACTIVE", "CANCELLED")
 - `filters.subscription_plan_id`: Filter by plan ID
 - `filters.is_active`: Filter by active status
@@ -322,6 +334,7 @@ Lists all subscriptions with optional filtering.
 **Returns**: `ResponseType<NOWPaymentsSubscription[]>`
 
 **Use Cases**:
+
 - Monitoring active subscriptions
 - Finding subscriptions by status
 - Administrative subscription management
@@ -331,12 +344,14 @@ Lists all subscriptions with optional filtering.
 Gets current payment status from NOWPayments API.
 
 **Parameters**:
+
 - `paymentId`: NOWPayments payment ID
 - `logger`: Endpoint logger
 
 **Returns**: `ResponseType<NOWPaymentsPaymentStatus>`
 
 **Use Cases**:
+
 - Manual status checks
 - Debugging payment issues
 - Status polling (if webhooks fail)
@@ -368,42 +383,45 @@ All errors follow the i18n translation pattern:
 
 ```typescript
 // English (en)
-"app.api.v1.core.payment.providers.nowpayments.errors.invoiceCreationFailed.title"
+"app.api.v1.core.payment.providers.nowpayments.errors.invoiceCreationFailed.title";
 
 // German (de)
-"app.api.v1.core.payment.providers.nowpayments.errors.invoiceCreationFailed.title"
+"app.api.v1.core.payment.providers.nowpayments.errors.invoiceCreationFailed.title";
 
 // Polish (pl)
-"app.api.v1.core.payment.providers.nowpayments.errors.invoiceCreationFailed.title"
+"app.api.v1.core.payment.providers.nowpayments.errors.invoiceCreationFailed.title";
 ```
 
 ### Common Error Types
 
-| Error Type                     | Description                          |
-|-------------------------------|--------------------------------------|
-| `userNotFound`                | User does not exist                  |
-| `customerCreationFailed`      | Failed to ensure customer            |
-| `productNotFound`             | Product not found in repository      |
-| `subscriptionsNotSupported`   | Attempted recurring subscription     |
-| `invoiceCreationFailed`       | Failed to create NOWPayments invoice |
-| `webhookVerificationFailed`   | Invalid webhook signature            |
-| `paymentStatusFailed`         | Failed to get payment status         |
+| Error Type                  | Description                          |
+| --------------------------- | ------------------------------------ |
+| `userNotFound`              | User does not exist                  |
+| `customerCreationFailed`    | Failed to ensure customer            |
+| `productNotFound`           | Product not found in repository      |
+| `subscriptionsNotSupported` | Attempted recurring subscription     |
+| `invoiceCreationFailed`     | Failed to create NOWPayments invoice |
+| `webhookVerificationFailed` | Invalid webhook signature            |
+| `paymentStatusFailed`       | Failed to get payment status         |
 
 ## Testing
 
 ### Local Testing with Webhooks
 
 1. Start your development server:
+
    ```bash
    npm run dev
    ```
 
 2. Use ngrok to expose your local server:
+
    ```bash
    ngrok http 3000
    ```
 
 3. Configure webhook URL in NOWPayments dashboard:
+
    ```
    https://your-ngrok-url.ngrok.io/api/en-GLOBAL/v1/core/payment/providers/nowpayments/webhook
    ```
@@ -414,7 +432,11 @@ All errors follow the i18n translation pattern:
 
 ```typescript
 // 1. Create checkout session
-const session = await provider.createCheckoutSession(params, customerId, logger);
+const session = await provider.createCheckoutSession(
+  params,
+  customerId,
+  logger,
+);
 
 // 2. User completes payment on NOWPayments checkout page
 // 3. Webhook is triggered
@@ -450,20 +472,20 @@ const session = await provider.createCheckoutSession(params, customerId, logger)
 
 ## Comparison: NOWPayments vs Stripe
 
-| Feature                | Stripe | NOWPayments |
-|-----------------------|--------|-------------|
-| Payment Methods       | Cards, Bank Transfer, Digital Wallets | Cryptocurrency (150+ coins) |
-| Recurring Subscriptions | ✅ Yes (Automatic) | ✅ Yes (Email-based) |
-| One-Time Payments     | ✅ Yes | ✅ Yes |
-| Subscription Management | ✅ Full API | ✅ Full API |
-| Customer Portal       | ✅ Yes | ❌ No (Email links) |
-| Refunds              | ✅ Yes | ⚠️ Manual |
-| Invoice Creation      | ✅ Yes | ✅ Yes |
-| Webhook Support       | ✅ Yes | ✅ Yes (IPN) |
-| Multi-Currency        | ✅ Yes (Fiat) | ✅ Yes (Crypto + Fiat) |
-| Transaction Fees      | 2.9% + $0.30 | 0.4% - 1.0% |
-| Settlement Time       | 2-7 days | Same day (< 5 min avg) |
-| Payment Flow          | On-site checkout | Invoice URL or Email link |
+| Feature                 | Stripe                                | NOWPayments                 |
+| ----------------------- | ------------------------------------- | --------------------------- |
+| Payment Methods         | Cards, Bank Transfer, Digital Wallets | Cryptocurrency (150+ coins) |
+| Recurring Subscriptions | ✅ Yes (Automatic)                    | ✅ Yes (Email-based)        |
+| One-Time Payments       | ✅ Yes                                | ✅ Yes                      |
+| Subscription Management | ✅ Full API                           | ✅ Full API                 |
+| Customer Portal         | ✅ Yes                                | ❌ No (Email links)         |
+| Refunds                 | ✅ Yes                                | ⚠️ Manual                   |
+| Invoice Creation        | ✅ Yes                                | ✅ Yes                      |
+| Webhook Support         | ✅ Yes                                | ✅ Yes (IPN)                |
+| Multi-Currency          | ✅ Yes (Fiat)                         | ✅ Yes (Crypto + Fiat)      |
+| Transaction Fees        | 2.9% + $0.30                          | 0.4% - 1.0%                 |
+| Settlement Time         | 2-7 days                              | Same day (< 5 min avg)      |
+| Payment Flow            | On-site checkout                      | Invoice URL or Email link   |
 
 ## Troubleshooting
 
@@ -541,6 +563,7 @@ const session = await provider.createCheckoutSession(params, customerId, logger)
 ## Support
 
 For issues specific to:
+
 - **NOWPayments API**: Contact NOWPayments support
 - **Implementation**: Check logs and webhook events
 - **Integration**: Review this documentation and test with small amounts

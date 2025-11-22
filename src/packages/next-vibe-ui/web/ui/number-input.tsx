@@ -31,9 +31,9 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
     value = 1,
     onChange,
     onBlur,
-    min = 1,
-    max = 10,
-    step = 1,
+    min,
+    max,
+    step,
     disabled = false,
     className,
     name,
@@ -46,12 +46,14 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
   }, []); // Only on mount
 
   const handleDecrement = (): void => {
-    const newValue = Math.max(min, (value || min) - step);
+    const newValue =
+      min !== undefined ? Math.max(min, value - step) : value - step;
     onChange?.(newValue);
   };
 
   const handleIncrement = (): void => {
-    const newValue = Math.min(max, (value || min) + step);
+    const newValue =
+      max !== undefined ? Math.min(max, value + step) : value - step;
     onChange?.(newValue);
   };
 
@@ -61,8 +63,19 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
       onChange?.(min);
       return;
     }
-    const clampedValue = Math.max(min, Math.min(max, inputValue));
-    onChange?.(clampedValue);
+    if (min === undefined && max === undefined) {
+      onChange?.(inputValue);
+      return;
+    }
+    if (min !== undefined && inputValue < min) {
+      onChange?.(min);
+      return;
+    }
+    if (max !== undefined && inputValue > max) {
+      onChange?.(max);
+      return;
+    }
+    onChange?.(inputValue);
   };
 
   return (

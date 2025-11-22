@@ -130,9 +130,9 @@ app.api.v1.{domain}.{subdomain}.enums.{enumName}.{value}
 **Examples:**
 
 ```typescript
-"app.api.v1.core.consultation.enums.consultationStatus.pending"
-"app.api.v1.core.leads.enums.leadStatus.new"
-"app.api.v1.core.user.enums.userRole.admin"
+"app.api.v1.core.consultation.enums.consultationStatus.pending";
+"app.api.v1.core.leads.enums.leadStatus.new";
+"app.api.v1.core.user.enums.userRole.admin";
 ```
 
 ### Creating Translations
@@ -204,7 +204,10 @@ consultation/
 ### In definition.ts
 
 ```typescript
-import { WidgetType, FieldDataType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import {
+  WidgetType,
+  FieldDataType,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { requestResponseField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field";
 import { z } from "zod";
 import { ConsultationStatus, ConsultationStatusOptions } from "./enum";
@@ -215,9 +218,9 @@ export const createConsultationRequest = objectField({
     {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.SELECT,
-      options: ConsultationStatusOptions,  // ✅ Use Options
+      options: ConsultationStatusOptions, // ✅ Use Options
     },
-    z.enum(ConsultationStatus).optional(),  // ✅ Use z.enum(EnumName)
+    z.enum(ConsultationStatus).optional(), // ✅ Use z.enum(EnumName)
   ),
 });
 
@@ -225,7 +228,7 @@ export const createConsultationRequest = objectField({
 export const examples = {
   requests: {
     default: {
-      status: ConsultationStatus.PENDING,  // ✅ Use enum value
+      status: ConsultationStatus.PENDING, // ✅ Use enum value
     },
   },
 };
@@ -248,7 +251,7 @@ import { ConsultationStatus, ConsultationStatusValue } from "./enum";
 
 // Use EnumValue for type annotations
 export async function getByStatus(
-  status: ConsultationStatusValue
+  status: ConsultationStatusValue,
 ): Promise<Consultation[]> {
   return await db
     .select()
@@ -260,13 +263,16 @@ export async function getByStatus(
 export async function markCompleted(id: string): Promise<void> {
   await db
     .update(consultations)
-    .set({ status: ConsultationStatus.COMPLETED })  // ✅ Enum value
+    .set({ status: ConsultationStatus.COMPLETED }) // ✅ Enum value
     .where(eq(consultations.id, id));
 }
 
 // Filtering logic
-export function filterByStatus(items: Consultation[], status: ConsultationStatusValue) {
-  return items.filter(item => item.status === status);
+export function filterByStatus(
+  items: Consultation[],
+  status: ConsultationStatusValue,
+) {
+  return items.filter((item) => item.status === status);
 }
 ```
 
@@ -344,7 +350,7 @@ export const consultations = pgTable("consultations", {
   // ✅ CORRECT - text() with enum constraint
   status: text("status", { enum: ConsultationStatusDB })
     .notNull()
-    .default(ConsultationStatus.PENDING),  // Use enum value for default
+    .default(ConsultationStatus.PENDING), // Use enum value for default
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -369,10 +375,10 @@ PostgreSQL enum labels have a 63-byte limit. Translation keys like `app.api.v1.c
 // ❌ WRONG - Don't use pgEnum
 import { pgEnum } from "drizzle-orm/pg-core";
 
-export const statusEnum = pgEnum("status", ConsultationStatusDB);  // NO!
+export const statusEnum = pgEnum("status", ConsultationStatusDB); // NO!
 
 export const consultations = pgTable("consultations", {
-  status: statusEnum("status"),  // NO!
+  status: statusEnum("status"), // NO!
 });
 
 // ✅ CORRECT - Use text() with enum constraint
@@ -403,7 +409,8 @@ const statusOptions = ["pending", "completed", "cancelled"];
 type Status = "pending" | "completed";
 
 // ❌ Hardcoded string comparisons
-if (status === "pending") { }
+if (status === "pending") {
+}
 
 // ❌ Hardcoded options in fields
 Field.Enum(["option1", "option2", "option3"]);
@@ -416,7 +423,7 @@ z.object({ gender: GenderSchema });
 export const StatusDB = Object.values(Status);
 
 // ❌ Hardcoded defaults in database
-status: text("status").default("pending")
+status: text("status").default("pending");
 
 // ❌ pgEnum usage
 export const statusEnum = pgEnum("status", StatusDB);
@@ -429,22 +436,23 @@ export const statusEnum = pgEnum("status", StatusDB);
 import { Status, StatusOptions, StatusValue } from "./enum";
 
 // ✅ Enum value comparisons
-if (status === Status.PENDING) { }
+if (status === Status.PENDING) {
+}
 
 // ✅ Options for UI
 Field.Enum(StatusOptions);
 
 // ✅ z.enum() for validation
-z.enum(Gender)
+z.enum(Gender);
 
 // ✅ Manual DB arrays
 export const StatusDB = [Status.PENDING, Status.COMPLETED] as const;
 
 // ✅ Enum value defaults
-status: text("status", { enum: StatusDB }).default(Status.PENDING)
+status: text("status", { enum: StatusDB }).default(Status.PENDING);
 
 // ✅ text() with enum constraint
-status: text("status", { enum: StatusDB })
+status: text("status", { enum: StatusDB });
 ```
 
 ---
@@ -508,25 +516,23 @@ export const {
   AUTO: "app.api.v1.user.enums.theme.auto",
 });
 
-export const ThemeDB = [
-  Theme.LIGHT,
-  Theme.DARK,
-  Theme.AUTO,
-] as const;
+export const ThemeDB = [Theme.LIGHT, Theme.DARK, Theme.AUTO] as const;
 ```
 
 **Step 3: Replace ALL Hardcoded Usage**
 
 ```typescript
 // Before
-if (theme === "light") { }
+if (theme === "light") {
+}
 const options = ["light", "dark"];
 type Theme = "light" | "dark";
 
 // After
 import { Theme, ThemeOptions, ThemeValue } from "./enum";
 
-if (theme === Theme.LIGHT) { }
+if (theme === Theme.LIGHT) {
+}
 const options = ThemeOptions;
 type ThemeType = ThemeValue;
 ```
@@ -535,7 +541,10 @@ type ThemeType = ThemeValue;
 
 ```typescript
 // Before
-enum Theme { LIGHT = "light", DARK = "dark" }
+enum Theme {
+  LIGHT = "light",
+  DARK = "dark",
+}
 export const themeEnum = pgEnum("theme", ["light", "dark"]);
 export const users = pgTable("users", {
   theme: themeEnum("theme").default("light"),
@@ -544,9 +553,7 @@ export const users = pgTable("users", {
 // After
 import { Theme, ThemeDB } from "./enum";
 export const users = pgTable("users", {
-  theme: text("theme", { enum: ThemeDB })
-    .notNull()
-    .default(Theme.LIGHT),
+  theme: text("theme", { enum: ThemeDB }).notNull().default(Theme.LIGHT),
 });
 ```
 
@@ -577,10 +584,7 @@ export const {
   USER: "app.api.v1.core.user.enums.userRole.user",
 });
 
-export const UserRoleDB = [
-  UserRole.ADMIN,
-  UserRole.USER,
-] as const;
+export const UserRoleDB = [UserRole.ADMIN, UserRole.USER] as const;
 ```
 
 #### Fix Import Statements
@@ -592,19 +596,19 @@ import { StatusSchema } from "./enum";
 
 // After
 import { UserRole, UserRoleValue } from "./enum";
-import { Status } from "./enum";  // Import enum object, not schema
+import { Status } from "./enum"; // Import enum object, not schema
 ```
 
 #### Update Database Defaults
 
 ```typescript
 // Before
-status: text("status").default("pending")
-status: pgEnum("status", ["PENDING"]).default("PENDING")
+status: text("status").default("pending");
+status: pgEnum("status", ["PENDING"]).default("PENDING");
 
 // After
 import { Status, StatusDB } from "./enum";
-status: text("status", { enum: StatusDB }).default(Status.PENDING)
+status: text("status", { enum: StatusDB }).default(Status.PENDING);
 ```
 
 ---

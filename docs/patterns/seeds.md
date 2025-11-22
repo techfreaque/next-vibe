@@ -72,7 +72,7 @@ src/app/api/[locale]/v1/
  */
 
 import { registerSeed } from "next-vibe/server/db/seed-manager";
-import type { EndpointLogger } from "../system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "../system/unified-interface/shared/logger/endpoint";
 
 import type { NewEntity } from "./db";
 import { entityRepository } from "./repository";
@@ -145,15 +145,15 @@ registerSeed(
 
 ```typescript
 // Basic signature (most common)
-export async function dev(logger: EndpointLogger): Promise<void>
-export async function test(logger: EndpointLogger): Promise<void>
-export async function prod(logger: EndpointLogger): Promise<void>
+export async function dev(logger: EndpointLogger): Promise<void>;
+export async function test(logger: EndpointLogger): Promise<void>;
+export async function prod(logger: EndpointLogger): Promise<void>;
 
 // With locale parameter (only if actually used in function body)
 export async function dev(
   logger: EndpointLogger,
-  locale: CountryLanguage
-): Promise<void>
+  locale: CountryLanguage,
+): Promise<void>;
 ```
 
 ### When to Include Locale
@@ -180,7 +180,7 @@ export async function dev(
 
 ```typescript
 // ✅ CORRECT - EndpointLogger
-import type { EndpointLogger } from "../system/unified-interface/shared/types/logger";
+import type { EndpointLogger } from "../system/unified-interface/shared/logger/endpoint";
 
 export async function dev(logger: EndpointLogger): Promise<void> {
   logger.debug("Starting seed operation");
@@ -296,7 +296,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
   try {
     // Check if data already exists
-    const existing = await userRepository.findByEmail("admin@example.com", logger);
+    const existing = await userRepository.findByEmail(
+      "admin@example.com",
+      logger,
+    );
 
     if (existing.success && existing.data) {
       logger.debug("✅ Admin user already exists, skipping");
@@ -336,7 +339,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
         successCount++;
       } else {
         failCount++;
-        logger.error(`Failed to create user ${userData.email}:`, result.message);
+        logger.error(
+          `Failed to create user ${userData.email}:`,
+          result.message,
+        );
       }
     } catch (error) {
       failCount++;
@@ -392,7 +398,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
 ```typescript
 export async function dev(
   logger: EndpointLogger,
-  locale: CountryLanguage
+  locale: CountryLanguage,
 ): Promise<void> {
   logger.debug(`🌱 Seeding localized data for ${locale}`);
 
@@ -404,7 +410,7 @@ export async function dev(
         content: getLocalizedContent(locale),
       },
       logger,
-      locale
+      locale,
     );
 
     if (result.success) {
@@ -424,7 +430,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
   try {
     // First, get required user
-    const userResult = await userRepository.findByEmail("admin@example.com", logger);
+    const userResult = await userRepository.findByEmail(
+      "admin@example.com",
+      logger,
+    );
 
     if (!userResult.success || !userResult.data) {
       logger.error("Required user not found, skipping consultation seed");
@@ -474,7 +483,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 // ❌ WRONG - Locale parameter not used
 export async function dev(
   logger: EndpointLogger,
-  locale: CountryLanguage
+  locale: CountryLanguage,
 ): Promise<void> {
   logger.debug("Seeding data");
   // Locale is never used

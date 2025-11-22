@@ -149,13 +149,36 @@ export class SchemaUIHandler {
     const fieldType = this.getFieldType(currentSchema);
     const choices = this.getFieldChoices(currentSchema);
 
+    // For number fields, use coercion schema for validation
+    let validationSchema = currentSchema;
+    if (currentSchema instanceof z.ZodNumber) {
+      validationSchema = z.coerce.number();
+      // Copy constraints from original schema if possible
+      if (hasZodDef(currentSchema)) {
+        const checks = (currentSchema._def as { checks?: unknown[] }).checks;
+        if (Array.isArray(checks)) {
+          for (const check of checks) {
+            if (check && typeof check === 'object' && 'kind' in check) {
+              const checkKind = (check as { kind: string; value?: number }).kind;
+              const checkValue = (check as { kind: string; value?: number }).value;
+              if (checkKind === 'min' && typeof checkValue === 'number') {
+                validationSchema = validationSchema.min(checkValue);
+              } else if (checkKind === 'max' && typeof checkValue === 'number') {
+                validationSchema = validationSchema.max(checkValue);
+              }
+            }
+          }
+        }
+      }
+    }
+
     return {
       name,
       type: fieldType,
       required,
       defaultValue,
       choices,
-      validation: schema,
+      validation: validationSchema,
       description: this.getFieldDescription(currentSchema),
     };
   }
@@ -397,13 +420,54 @@ export class SchemaUIHandler {
   }
 
   /**
-   * Convert field value to appropriate type
+   * Convert field value to appropriate type based on Zod schema
    */
   private convertFieldValue(
     value: FormFieldValue,
     field: SchemaFieldMetadata,
   ): FormFieldValue {
-    // Handle number fields
+    // Use the validation schema to determine the actual type
+    if (field.validation) {
+      let schema = field.validation;
+
+      // Unwrap optional and default schemas to get to the core type
+      while (schema instanceof z.ZodOptional || schema instanceof z.ZodDefault) {
+        if (hasZodDef(schema)) {
+          const innerType = schema._def.innerType;
+          if (innerType) {
+            schema = innerType;
+          } else {
+            break;
+          }
+        } else {
+          break;
+        }
+      }
+
+      // Check if schema is a ZodNumber
+      if (schema instanceof z.ZodNumber) {
+        if (typeof value === "number") {
+          return value;
+        }
+        if (typeof value === "string") {
+          const parsed = parseFloat(value);
+          return isNaN(parsed) ? undefined : parsed;
+        }
+        return undefined;
+      }
+
+      // Check if schema is a ZodBoolean
+      if (schema instanceof z.ZodBoolean) {
+        return Boolean(value);
+      }
+
+      // Check if schema is a ZodArray
+      if (schema instanceof z.ZodArray && Array.isArray(value)) {
+        return value.filter((item): item is string => typeof item === "string");
+      }
+    }
+
+    // Fallback to field type
     if (field.type === "number") {
       if (typeof value === "number") {
         return value;
@@ -415,12 +479,10 @@ export class SchemaUIHandler {
       return undefined;
     }
 
-    // Handle boolean fields
     if (field.type === "confirm") {
       return Boolean(value);
     }
 
-    // Handle checkbox (multi-select) fields - returns string[]
     if (field.type === "checkbox" && Array.isArray(value)) {
       return value.filter((item): item is string => typeof item === "string");
     }

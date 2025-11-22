@@ -48,6 +48,7 @@ subdomain/
 ```
 
 **When to use `email.tsx`:**
+
 - Email templates don't need repository imports
 - Simple transactional or notification emails
 - Most common pattern
@@ -69,7 +70,7 @@ export const renderCompanyMail: EmailFunctionType<
   never
 > = ({ requestData, responseData, locale, t, user, logger }) => {
   // Return success or error response
-  return createSuccessResponse({
+  return success({
     toEmail: "recipient@example.com",
     toName: "Recipient Name",
     subject: t("app.api.v1.core.module.email.subject"),
@@ -95,8 +96,9 @@ export const renderCompanyMail: EmailFunctionType<
 ### Return Types
 
 **Success Response:**
+
 ```typescript
-return createSuccessResponse({
+return success({
   toEmail: "recipient@example.com",      // Required
   toName: "Recipient Name",              // Required
   subject: "Email Subject",              // Required
@@ -107,11 +109,12 @@ return createSuccessResponse({
 ```
 
 **Error Response:**
+
 ```typescript
-return createErrorResponse(
-  "app.api.v1.core.module.error.email_send_failed",
-  ErrorResponseTypes.INTERNAL_ERROR,
-);
+return fail({
+  message: "app.api.v1.core.module.error.email_send_failed",
+  errorType: ErrorResponseTypes.INTERNAL_ERROR,
+});
 ```
 
 ---
@@ -228,11 +231,11 @@ export const { POST, tools } = endpointsHandler({
     email: [
       {
         render: renderCompanyMail,
-        ignoreErrors: false,  // Email failure blocks the request
+        ignoreErrors: false, // Email failure blocks the request
       },
       {
         render: renderPartnerMail,
-        ignoreErrors: false,  // Email failure blocks the request
+        ignoreErrors: false, // Email failure blocks the request
       },
     ],
     handler: async ({ data, user, locale, logger }) => {
@@ -249,21 +252,23 @@ export const { POST, tools } = endpointsHandler({
 email: [
   {
     render: renderEmailFunction,
-    ignoreErrors: false,  // Email failure blocks the request (default)
+    ignoreErrors: false, // Email failure blocks the request (default)
   },
   {
     render: renderOptionalEmail,
-    ignoreErrors: true,   // Email failure doesn't block the request
+    ignoreErrors: true, // Email failure doesn't block the request
   },
-]
+];
 ```
 
 **When to use `ignoreErrors: true`:**
+
 - Non-critical notification emails
 - Admin notifications that shouldn't block user actions
 - Optional confirmation emails
 
 **When to use `ignoreErrors: false`:**
+
 - Password reset emails (critical for user)
 - Email verification (required for signup)
 - Order confirmations (critical for business)
@@ -278,15 +283,15 @@ All email text must use translation keys following the path-to-key formula:
 
 ```typescript
 // Email subjects
-t("app.api.v1.core.module.email.subject", { name: "John" })
+t("app.api.v1.core.module.email.subject", { name: "John" });
 
 // Email content
-t("app.api.v1.core.module.email.greeting")
-t("app.api.v1.core.module.email.content")
-t("app.api.v1.core.module.email.button")
+t("app.api.v1.core.module.email.greeting");
+t("app.api.v1.core.module.email.content");
+t("app.api.v1.core.module.email.button");
 
 // Common translations
-t("config.appName")
+t("config.appName");
 ```
 
 ### Example i18n Structure
@@ -314,14 +319,14 @@ Always wrap email rendering in try-catch:
 ```typescript
 export const renderEmail: EmailFunctionType<...> = ({ ... }) => {
   try {
-    return createSuccessResponse({
+    return success({
       // Email config
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.module.error.email_failed",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+      message: "app.api.v1.core.module.error.email_failed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };
 ```
@@ -333,9 +338,9 @@ Include tracking for analytics:
 ```typescript
 const tracking = createTrackingContext(
   locale,
-  leadId,      // From form submission
-  userId,      // From JWT if logged in
-  campaignId,  // For campaign emails (optional)
+  leadId, // From form submission
+  userId, // From JWT if logged in
+  campaignId, // For campaign emails (optional)
 );
 ```
 
@@ -427,6 +432,7 @@ POST /api/v1/core/leads/campaigns/emails/test-mail
 Contact form confirmations, password resets, account verification, order confirmations, subscription updates.
 
 **Example:**
+
 ```typescript
 export const renderConfirmationMail: EmailFunctionType<
   ContactRequestOutput,
@@ -434,7 +440,7 @@ export const renderConfirmationMail: EmailFunctionType<
   never
 > = ({ requestData, locale, t, user }) => {
   try {
-    return createSuccessResponse({
+    return success({
       toEmail: requestData.email,
       toName: requestData.name,
       subject: t("app.api.v1.core.contact.email.partner.subject"),
@@ -443,10 +449,10 @@ export const renderConfirmationMail: EmailFunctionType<
       jsx: ContactEmailContent({ requestData, t, locale, userId: user?.id }),
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.contact.error.email_failed",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+      message: "app.api.v1.core.contact.error.email_failed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };
 ```
@@ -456,6 +462,7 @@ export const renderConfirmationMail: EmailFunctionType<
 Admin notifications, status updates, system alerts, activity summaries.
 
 **Example:**
+
 ```typescript
 export const renderAdminNotificationMail: EmailFunctionType<
   LeadCreateType,
@@ -463,18 +470,22 @@ export const renderAdminNotificationMail: EmailFunctionType<
   never
 > = ({ responseData, locale, t }) => {
   try {
-    return createSuccessResponse({
+    return success({
       toEmail: contactClientRepository.getSupportEmail(locale),
       toName: t("config.appName"),
       subject: t("app.api.v1.core.leads.create.email.admin.newLead.subject"),
       replyToEmail: responseData.lead.summary.email,
-      jsx: AdminNotificationEmailContent({ lead: responseData.lead, t, locale }),
+      jsx: AdminNotificationEmailContent({
+        lead: responseData.lead,
+        t,
+        locale,
+      }),
     });
   } catch {
-    return createErrorResponse(
-      "app.api.v1.core.leads.create.email.error.general",
-      ErrorResponseTypes.INTERNAL_ERROR,
-    );
+    return fail({
+      message: "app.api.v1.core.leads.create.email.error.general",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 };
 ```
@@ -482,6 +493,7 @@ export const renderAdminNotificationMail: EmailFunctionType<
 ### Welcome Emails
 
 **Example:**
+
 ```typescript
 export const renderWelcomeMail: EmailFunctionType<
   SignupPostRequestOutput,
@@ -496,13 +508,14 @@ export const renderWelcomeMail: EmailFunctionType<
   );
 
   if (!userResponse.success) {
-    return createErrorResponse(
-      "app.api.v1.core.user.errors.not_found",
-      ErrorResponseTypes.NOT_FOUND,
-    );
+    return fail({
+      message: "app.api.v1.core.user.errors.not_found",
+      errorType: ErrorResponseTypes.NOT_FOUND,
+      cause: userResponse,
+    });
   }
 
-  return createSuccessResponse({
+  return success({
     toEmail: userResponse.data.email,
     toName: userResponse.data.privateName,
     subject: t("app.api.v1.core.user.public.signup.email.subject"),

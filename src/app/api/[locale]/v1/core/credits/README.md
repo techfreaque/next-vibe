@@ -138,7 +138,7 @@ import { useCredits } from '@/app/api/[locale]/v1/core/credits/hooks';
 
 function MyComponent() {
   const { data: credits, isLoading } = useCredits();
-  
+
   return (
     <div>
       <p>Balance: {credits?.total} credits</p>

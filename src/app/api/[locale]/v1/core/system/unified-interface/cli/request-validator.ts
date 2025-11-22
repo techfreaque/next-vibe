@@ -8,7 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import type { z } from "zod";
+import { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -21,6 +21,60 @@ import {
   validateLocale,
   isNeverSchema,
 } from "../shared/validation/schema";
+
+/**
+ * Coerce data types to match schema expectations
+ * Handles CLI form inputs where strings need to be converted to numbers/booleans
+ */
+function coerceDataTypes(
+  data: unknown,
+  schema: z.ZodTypeAny,
+): unknown {
+  if (!data || typeof data !== 'object') {
+    return data;
+  }
+
+  // Handle ZodObject - traverse fields
+  if (schema instanceof z.ZodObject) {
+    const shape = schema.shape as Record<string, z.ZodTypeAny>;
+    const coercedData: Record<string, unknown> = { ...(data as Record<string, unknown>) };
+
+    for (const [key, fieldSchema] of Object.entries(shape)) {
+      if (key in coercedData) {
+        const value = coercedData[key];
+
+        // Unwrap optional/default schemas
+        let unwrappedSchema = fieldSchema;
+        while (unwrappedSchema instanceof z.ZodOptional || unwrappedSchema instanceof z.ZodDefault) {
+          const def = (unwrappedSchema as z.ZodOptional | z.ZodDefault)._def;
+          if ('innerType' in def && def.innerType) {
+            unwrappedSchema = def.innerType;
+          } else {
+            break;
+          }
+        }
+
+        // Coerce based on schema type
+        if (unwrappedSchema instanceof z.ZodNumber && typeof value === 'string') {
+          const parsed = parseFloat(value);
+          if (!isNaN(parsed)) {
+            coercedData[key] = parsed;
+          }
+        } else if (unwrappedSchema instanceof z.ZodBoolean && typeof value === 'string') {
+          const lower = value.toLowerCase();
+          if (lower === 'true') coercedData[key] = true;
+          else if (lower === 'false') coercedData[key] = false;
+        } else if (unwrappedSchema instanceof z.ZodObject) {
+          coercedData[key] = coerceDataTypes(value, unwrappedSchema);
+        }
+      }
+    }
+
+    return coercedData;
+  }
+
+  return data;
+}
 
 /**
  * CLI validation context
@@ -114,11 +168,14 @@ export function validateCliRequestData<
     }
 
     // For CLI, we need to preserve explicitly provided arguments and only apply defaults for missing fields
-    // First, validate without applying defaults to see what was actually provided
-    const rawValidation = endpoint.requestSchema.safeParse(context.requestData);
+    // First, coerce data types to match schema expectations (e.g., string "1" -> number 1)
+    const coercedRequestData = coerceDataTypes(context.requestData, endpoint.requestSchema);
+
+    // Then validate without applying defaults to see what was actually provided
+    const rawValidation = endpoint.requestSchema.safeParse(coercedRequestData);
 
     let finalRequestData: z.output<TRequestSchema> =
-      context.requestData as z.output<TRequestSchema>;
+      coercedRequestData as z.output<TRequestSchema>;
     if (rawValidation.success) {
       // Use the validated data which includes defaults
       finalRequestData = rawValidation.data;
@@ -129,13 +186,13 @@ export function validateCliRequestData<
         defaultsResult.success &&
         typeof defaultsResult.data === "object" &&
         defaultsResult.data !== null &&
-        typeof context.requestData === "object" &&
-        context.requestData !== null
+        typeof coercedRequestData === "object" &&
+        coercedRequestData !== null
       ) {
         // Merge defaults with CLI data, but preserve CLI values
         finalRequestData = {
           ...defaultsResult.data,
-          ...context.requestData,
+          ...(coercedRequestData as Record<string, unknown>),
         };
       }
     }

@@ -67,6 +67,7 @@ The system automatically handles failed leads (BOUNCED, INVALID, UNSUBSCRIBED) b
 - `../db` - Lead database schema
 - `../enum` - Lead status and campaign stage enums
 - `@/app/api/cron/*` - Cron task framework
+
 # Lead Email System
 
 A comprehensive, production-ready email system with A/B testing and multiple journey variants.
