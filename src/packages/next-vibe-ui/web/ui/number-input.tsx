@@ -33,7 +33,7 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
     onBlur,
     min,
     max,
-    step,
+    step = 1,
     disabled = false,
     className,
     name,
@@ -53,14 +53,14 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
 
   const handleIncrement = (): void => {
     const newValue =
-      max !== undefined ? Math.min(max, value + step) : value - step;
+      max !== undefined ? Math.min(max, value + step) : value + step;
     onChange?.(newValue);
   };
 
   const handleInputChange = (e: InputChangeEvent<"number">): void => {
     const inputValue = e.target.value;
     if (inputValue === 0 || !inputValue) {
-      onChange?.(min);
+      onChange?.(min || 0);
       return;
     }
     if (min === undefined && max === undefined) {
@@ -79,14 +79,20 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
   };
 
   return (
-    <Div className={cn("flex items-center gap-3", className)}>
+    <Div
+      className={cn(
+        "flex justify-between gap-3 border-input rounded",
+        className,
+      )}
+    >
       <Button
         type="button"
-        variant="outline"
+        variant="ghost"
         size="sm"
         onClick={handleDecrement}
-        disabled={disabled || value <= min}
+        disabled={disabled || (min ? value <= min : false)}
         tabIndex={-1}
+        className="border-r rounded-r-none"
       >
         <Minus className="h-4 w-4" />
       </Button>
@@ -100,15 +106,16 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
         max={max}
         step={step}
         disabled={disabled}
-        className="text-center w-20"
+        className="text-center w-full border-none"
       />
       <Button
         type="button"
-        variant="outline"
+        variant="ghost"
         size="sm"
         onClick={handleIncrement}
-        disabled={disabled || value >= max}
+        disabled={disabled || (max ? value >= max : false)}
         tabIndex={-1}
+        className="border-l rounded-l-none"
       >
         <Plus className="h-4 w-4" />
       </Button>
