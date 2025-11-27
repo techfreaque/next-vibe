@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -20,6 +20,7 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
 
 import { UserRole } from "../../user-roles/enum";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 const { POST } = createEndpoint({
   method: Methods.POST,
@@ -67,7 +68,7 @@ const { POST } = createEndpoint({
               .string()
               .email({
                 message:
-                  "app.api.v1.core.user.public.login.fields.email.validation.invalid",
+                  "app.api.v1.core.user.public.login.fields.email.validation.invalid" satisfies TranslationKey,
               })
               .transform((val) => val.toLowerCase().trim()),
           ),
@@ -125,14 +126,14 @@ const { POST } = createEndpoint({
           type: WidgetType.BADGE,
           text: "app.api.v1.core.user.public.login.response.success",
         },
-        z.boolean().describe("Whether the login was successful"),
+        z.boolean(),
       ),
       message: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.v1.core.user.public.login.response.message",
         },
-        z.string().describe("Human-readable login status message"),
+        z.string(),
       ),
       user: objectField(
         {
@@ -150,7 +151,7 @@ const { POST } = createEndpoint({
               type: WidgetType.TEXT,
               content: "app.api.v1.core.user.public.login.response.user.id",
             },
-            z.string().describe("User unique identifier"),
+            z.string(),
           ),
           email: responseField(
             {
@@ -165,7 +166,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.v1.core.user.public.login.response.user.privateName",
             },
-            z.string().describe("User private name"),
+            z.string(),
           ),
           publicName: responseField(
             {
@@ -173,7 +174,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.v1.core.user.public.login.response.user.publicName",
             },
-            z.string().describe("User public name"),
+            z.string(),
           ),
         },
       ),

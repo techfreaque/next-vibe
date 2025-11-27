@@ -54,12 +54,13 @@ import {
 } from "../tooltip";
 import { Info } from "../icons/Info";
 import type {
-  EndpointFormFieldProps as EndpointFormFieldPropsType,
   FieldConfig,
   FieldStyleClassName,
   FieldValidationState,
   RequiredFieldTheme,
-} from "./endpoint-form-field-types";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field-config/field-config-types";
+import { getFieldConfig } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field-config/infer-field-config";
+import type { EndpointFieldStructure } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field-config/endpoint-field-types";
 import {
   FormControl,
   FormField,
@@ -67,8 +68,6 @@ import {
   FormLabel,
   FormMessage,
 } from "./form";
-import { getFieldConfig } from "./infer-field-config";
-import type { EndpointFieldStructure } from "./endpoint-field-types";
 
 // Default theme for required fields
 const DEFAULT_THEME: RequiredFieldTheme = {
@@ -97,9 +96,9 @@ function getFieldValidationState<T>(
 ): FieldValidationState {
   const hasValue = Boolean(
     fieldValue !== undefined &&
-      fieldValue !== null &&
-      fieldValue !== "" &&
-      (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
+    fieldValue !== null &&
+    fieldValue !== "" &&
+    (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
   );
 
   return {
@@ -601,10 +600,7 @@ export interface EndpointFormFieldProps<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
   TFields extends EndpointFieldStructure = EndpointFieldStructure,
-> extends Omit<
-    EndpointFormFieldPropsType<TFieldValues, TName>,
-    "requiredFields"
-  > {
+> extends Omit<EndpointFormFieldProps<TFieldValues, TName>, "requiredFields"> {
   schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
   endpointFields?: TFields; // Endpoint fields for auto-inference (from definition.POST.fields) - now fully typed
 }

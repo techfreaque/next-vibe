@@ -80,7 +80,3 @@ export interface UpdateEmailEngagementRequestOutput {
 export interface UpdateEmailEngagementResponseOutput {
   success: boolean;
 }
-
-const definitions = {};
-
-export default definitions;

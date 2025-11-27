@@ -23,6 +23,7 @@ export const translations = {
       placeholder: "Enter your password",
       help: "Enter your account password",
       validation: {
+        required: "Password is required",
         minLength: "Password must be at least 8 characters long",
       },
     },

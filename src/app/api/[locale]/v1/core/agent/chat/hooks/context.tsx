@@ -68,7 +68,7 @@ export function ChatProvider({
   rootFolderPermissions,
 }: ChatProviderProps): JSX.Element {
   // Create logger
-  const logger = createEndpointLogger(true, Date.now(), locale);
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Get chat hook with URL-derived navigation state
   const chat = useChat(

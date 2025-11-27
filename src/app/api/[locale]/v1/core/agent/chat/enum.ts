@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
+export const NEW_MESSAGE_ID = "new";
+
 /**
  * Chat Message Role enum
  * IMPORTANT: Using regular TypeScript enum to be compatible with AI SDK

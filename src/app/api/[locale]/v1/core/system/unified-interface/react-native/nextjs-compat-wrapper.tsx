@@ -106,7 +106,7 @@ export function createPageWrapperWithImport(
     const [content, setContent] = useState<JSX.Element | null>(null);
     const [error, setError] = useState<Error | null>(null);
     const logger = useMemo(
-      () => createEndpointLogger(true, Date.now(), params.locale),
+      () => createEndpointLogger(false, Date.now(), params.locale),
       [params.locale],
     );
     const { t } = useMemo(() => simpleT(params.locale), [params.locale]);
@@ -230,7 +230,7 @@ export function createPageWrapper(
     const [content, setContent] = useState<JSX.Element | null>(null);
     const [error, setError] = useState<Error | null>(null);
     const logger = useMemo(
-      () => createEndpointLogger(true, Date.now(), params.locale),
+      () => createEndpointLogger(false, Date.now(), params.locale),
       [params.locale],
     );
     const { t } = simpleT(params.locale);
@@ -355,7 +355,7 @@ export function createLayoutWrapper(
     const params = useLocalSearchParams<PageRouterParams>();
     const [content, setContent] = useState<React.ReactElement | null>(null);
     const logger = useMemo(
-      () => createEndpointLogger(true, Date.now(), params.locale),
+      () => createEndpointLogger(false, Date.now(), params.locale),
       [params.locale],
     );
 
@@ -419,7 +419,7 @@ export function createLayoutWrapperWithImport(
     const params = useLocalSearchParams<PageRouterParams>();
     const [content, setContent] = useState<React.ReactElement | null>(null);
     const logger = useMemo(
-      () => createEndpointLogger(true, Date.now(), params.locale),
+      () => createEndpointLogger(false, Date.now(), params.locale),
       [params.locale],
     );
 
@@ -487,4 +487,3 @@ function isAsyncComponent(
   // TODO figure out a way to check if component is async
   // return typeof PageComponent.then === "function";
 }
-

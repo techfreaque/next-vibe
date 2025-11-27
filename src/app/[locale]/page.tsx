@@ -22,7 +22,7 @@ export default async function ChatPage({
   params,
 }: ChatPageProps): Promise<never> {
   const { locale } = await params;
-  const logger = createEndpointLogger(true, Date.now(), locale);
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   const userResponse = await userRepository.getUserByAuth(
     {

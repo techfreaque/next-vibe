@@ -31,12 +31,9 @@ import { leadAuthRepository } from "../../leads/auth/repository";
 import { leads, userLeadLinks } from "../../leads/db";
 import { LeadSource, LeadStatus } from "../../leads/enum";
 import { db } from "../../system/db";
-import {
-  type AuthContext,
-  type AuthPlatform,
-} from "../../system/unified-interface/shared/server-only/auth/base-auth-handler";
+import { type AuthContext } from "../../system/unified-interface/shared/server-only/auth/base-auth-handler";
 import { getPlatformAuthHandler } from "../../system/unified-interface/shared/server-only/auth/factory";
-import { Platform } from "../../system/unified-interface/shared/types/platform";
+import type { Platform } from "../../system/unified-interface/shared/types/platform";
 import { users } from "../db";
 import { UserDetailLevel } from "../enum";
 import { sessionRepository } from "../private/session/repository";
@@ -55,11 +52,7 @@ import type {
   JWTPublicPayloadType,
 } from "./types";
 
-export type { AuthContext, AuthPlatform };
-
-export type InferUserType<
-  TRoles extends readonly UserRoleValue[],
-> =
+export type InferUserType<TRoles extends readonly UserRoleValue[]> =
   Exclude<TRoles[number], "PUBLIC"> extends never
     ? JWTPublicPayloadType
     : Extract<TRoles[number], "PUBLIC"> extends never
@@ -69,18 +62,19 @@ export type InferUserType<
 /**
  * Helper to create public user payload
  */
-function createPublicUser<
-  TRoles extends readonly UserRoleValue[],
->(leadId: string): InferUserType<TRoles> {
+function createPublicUser<TRoles extends readonly UserRoleValue[]>(
+  leadId: string,
+): InferUserType<TRoles> {
   return { isPublic: true, leadId } as InferUserType<TRoles>;
 }
 
 /**
  * Helper to create private user payload
  */
-function createPrivateUser<
-  TRoles extends readonly UserRoleValue[],
->(userId: string, leadId: string): InferUserType<TRoles> {
+function createPrivateUser<TRoles extends readonly UserRoleValue[]>(
+  userId: string,
+  leadId: string,
+): InferUserType<TRoles> {
   return { isPublic: false, id: userId, leadId } as InferUserType<TRoles>;
 }
 
@@ -125,9 +119,7 @@ export interface AuthRepository {
   /**
    * Get authenticated user with role checking (platform-aware) - returns generic type
    */
-  getAuthMinimalUser<
-    TRoles extends readonly UserRoleValue[],
-  >(
+  getAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
     roles: TRoles,
     context: AuthContext,
     logger: EndpointLogger,
@@ -150,16 +142,15 @@ export interface AuthRepository {
     token: string,
     userId: string,
     leadId: string,
-    request: NextRequest,
+    platform: Platform,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>>;
 
   /**
    * Clear authentication token using platform-specific handler
-   * Automatically detects platform from request context
    */
   clearAuthTokenForPlatform(
-    request: NextRequest,
+    platform: Platform,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>>;
 
@@ -372,9 +363,7 @@ class AuthRepositoryImpl implements AuthRepository {
       if (userRolesResponse.success) {
         const dbRoles = userRolesResponse.data
           .map((r) => r.role)
-          .filter((role) =>
-            requiredRoles.includes(role),
-          ) as UserRoleValue[];
+          .filter((role) => requiredRoles.includes(role)) as UserRoleValue[];
         for (const role of dbRoles) {
           roles.push(role);
         }
@@ -877,11 +866,8 @@ class AuthRepositoryImpl implements AuthRepository {
         });
       }
 
-      // Default to Web platform for backward compatibility
-      const platform = context.platform || Platform.WEB;
-
       // Get platform-specific auth handler
-      const authHandler = getPlatformAuthHandler(platform);
+      const authHandler = getPlatformAuthHandler(context.platform);
 
       // Authenticate using platform handler
       const authResult = await authHandler.authenticate(context, logger);
@@ -922,9 +908,7 @@ class AuthRepositoryImpl implements AuthRepository {
   /**
    * Get authenticated user with role checking (platform-aware) - generic return type
    */
-  async getAuthMinimalUser<
-    TRoles extends readonly UserRoleValue[],
-  >(
+  async getAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
     roles: TRoles,
     context: AuthContext,
     logger: EndpointLogger,
@@ -1088,9 +1072,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Type-safe authentication based on endpoint roles
    * Returns the correct user type based on the allowed roles
    */
-  async getTypedAuthMinimalUser<
-    TRoles extends readonly UserRoleValue[],
-  >(
+  async getTypedAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
     roles: TRoles,
     context: AuthContext,
     logger: EndpointLogger,
@@ -1146,15 +1128,10 @@ class AuthRepositoryImpl implements AuthRepository {
     token: string,
     userId: string,
     leadId: string,
-    request: NextRequest,
+    platform: Platform,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
-      // Detect platform from request headers (x-platform) or default to WEB
-      const platformHeader = request.headers.get("x-platform");
-      const platform =
-        (platformHeader as Platform | null) || Platform.WEB;
-
       logger.debug("Storing auth token for platform", { platform, userId });
 
       // Get platform-specific handler
@@ -1174,18 +1151,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
   /**
    * Clear authentication token using platform-specific handler
-   * Automatically detects platform from request context
    */
   async clearAuthTokenForPlatform(
-    request: NextRequest,
+    platform: Platform,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
-      // Detect platform from request headers (x-platform) or default to WEB
-      const platformHeader = request.headers.get("x-platform");
-      const platform =
-        (platformHeader as Platform | null) || Platform.WEB;
-
       logger.debug("Clearing auth token for platform", { platform });
 
       // Get platform-specific handler

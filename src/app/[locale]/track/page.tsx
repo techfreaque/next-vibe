@@ -52,10 +52,10 @@ export default function TrackPage(): React.ReactElement {
           logger.debug("Storing referral code in localStorage", { ref });
           localStorage.setItem("referralCode", ref);
 
-          // If only referral code (no tracking id), redirect to incognito chat
+          // If only referral code (no tracking id) - redirect to home page
           if (!id) {
-            logger.debug("Referral code stored, redirecting to incognito chat");
-            router.push(`/${locale}/threads/incognito`);
+            logger.debug("Referral code stored, redirecting to home page");
+            router.push(`/${locale}`);
             return;
           }
         }

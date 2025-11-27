@@ -257,7 +257,3 @@ export const imapMessageResponseSchema = objectField(
     ),
   },
 );
-
-const definitions = {};
-
-export default definitions;

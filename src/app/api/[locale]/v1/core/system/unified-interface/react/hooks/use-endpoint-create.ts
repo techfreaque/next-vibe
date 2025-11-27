@@ -6,7 +6,7 @@
 import { useEffect, useMemo } from "react";
 import type { z } from "zod";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import type { CreateApiEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
@@ -47,20 +47,20 @@ export function useEndpointCreate<
   primaryEndpoint: TEndpoint | null,
   logger: EndpointLogger,
   options: {
-    formOptions?: ApiFormOptions<TEndpoint["TRequestOutput"]>;
+    formOptions?: ApiFormOptions<TEndpoint["types"]["RequestOutput"]>;
     mutationOptions?: ApiMutationOptions<
-      TEndpoint["TRequestOutput"],
-      TEndpoint["TResponseOutput"],
-      TEndpoint["TUrlVariablesOutput"]
+      TEndpoint["types"]["RequestOutput"],
+      TEndpoint["types"]["ResponseOutput"],
+      TEndpoint["types"]["UrlVariablesOutput"]
     >;
-    urlPathParams?: TEndpoint["TUrlVariablesOutput"];
-    autoPrefillData?: Partial<TEndpoint["TRequestOutput"]>;
-    initialState?: Partial<TEndpoint["TRequestOutput"]>;
+    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
+    autoPrefillData?: Partial<TEndpoint["types"]["RequestOutput"]>;
+    initialState?: Partial<TEndpoint["types"]["RequestOutput"]>;
   } = {},
 ): ApiFormReturn<
-  TEndpoint["TRequestOutput"],
-  TEndpoint["TResponseOutput"],
-  TEndpoint["TUrlVariablesOutput"]
+  TEndpoint["types"]["RequestOutput"],
+  TEndpoint["types"]["ResponseOutput"],
+  TEndpoint["types"]["UrlVariablesOutput"]
 > | null {
   // Return null if endpoint is not provided
   if (!primaryEndpoint) {
@@ -91,7 +91,7 @@ export function useEndpointCreate<
     return {
       ...formOptions,
       defaultValues: mergedDefaultValues,
-    } as ApiFormOptions<TEndpoint["TRequestOutput"]>;
+    } as ApiFormOptions<TEndpoint["types"]["RequestOutput"]>;
   }, [formOptions, autoPrefillData, initialState, primaryEndpoint]);
 
   // Use the existing mutation form hook with enhanced options

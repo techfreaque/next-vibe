@@ -85,9 +85,11 @@ export function createMockUser(): {
 }
 
 /**
- * Get CLI user from database by email - STRICT mode
- * If VIBE_CLI_USER_EMAIL is not set, returns public user
- * If email is set but user doesn't exist, returns error
+ * Get CLI user with proper authentication flow:
+ * 1. Check for session user (from .vibe.session file)
+ * 2. Check VIBE_CLI_USER_EMAIL from .env and authenticate from DB
+ * 3. If VIBE_CLI_USER_EMAIL is empty → return public user
+ * 4. If email is set but not found in DB → return error
  *
  * @param logger - Logger instance for debugging
  * @param locale - Locale for database queries
@@ -99,24 +101,96 @@ export async function getCliUser(
 ): Promise<
   ResponseType<InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>>
 > {
+  // Step 1: Check for existing session from .vibe.session file
+  try {
+    const { readSessionFile } = await import("./session-file");
+    const sessionResult = await readSessionFile(logger);
+
+    if (sessionResult.success && sessionResult.data) {
+      logger.debug("Found existing CLI session", {
+        userId: sessionResult.data.userId,
+        leadId: sessionResult.data.leadId,
+      });
+
+      // Verify the token is still valid
+      const { authRepository } = await import("@/app/api/[locale]/v1/core/user/auth/repository");
+      const verifyResult = await authRepository.verifyJwt(sessionResult.data.token, logger);
+
+      if (verifyResult.success && verifyResult.data) {
+        logger.debug("Session token is valid, using session user");
+        return {
+          success: true,
+          data: createCliUserFromDb(verifyResult.data.id, verifyResult.data.leadId),
+        };
+      } else {
+        logger.debug("Session token is invalid or expired, falling back to email auth");
+      }
+    }
+  } catch (error) {
+    logger.debug("No valid session found, falling back to email auth", {
+      error: parseError(error).message,
+    });
+  }
+
+  // Step 2: Check VIBE_CLI_USER_EMAIL environment variable
   const cliUserEmail = getCliUserEmail();
 
-  // If VIBE_CLI_USER_EMAIL is not set, return public user
+  // Step 3: If VIBE_CLI_USER_EMAIL is not set, return public user
   if (!cliUserEmail) {
     logger.debug("CLI user email not configured, using public user", {
       envVar: "VIBE_CLI_USER_EMAIL",
     });
 
-    return {
-      success: true,
-      data: createPublicCliUser(),
-    };
+    // Create a public user with a new lead directly from database
+    // We can't use getLeadIdFromDb() here because it tries to access cookies
+    try {
+      const { getLanguageAndCountryFromLocale } = await import("@/i18n/core/language-utils");
+      const { language, country } = getLanguageAndCountryFromLocale(locale);
+      const { db } = await import("@/app/api/[locale]/v1/core/system/db");
+      const { leads } = await import("@/app/api/[locale]/v1/core/leads/db");
+      const { LeadStatus, LeadSource } = await import("@/app/api/[locale]/v1/core/leads/enum");
+
+      const [newLead] = await db
+        .insert(leads)
+        .values({
+          email: null,
+          businessName: "",
+          status: LeadStatus.NEW,
+          source: LeadSource.WEBSITE,
+          country,
+          language,
+        })
+        .returning();
+
+      logger.debug("Created public lead for CLI", { leadId: newLead.id });
+
+      return {
+        success: true,
+        data: {
+          isPublic: true,
+          leadId: newLead.id,
+        } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
+      };
+    } catch (error) {
+      logger.error("Failed to create public lead for CLI", {
+        error: parseError(error).message,
+      });
+
+      // Fallback to default ID if database fails
+      return {
+        success: true,
+        data: {
+          isPublic: true,
+          leadId: DEFAULT_CLI_USER_ID,
+        } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
+      };
+    }
   }
 
+  // Step 4: Email is set, authenticate from database
   logger.debug("Getting CLI user from database", { email: cliUserEmail });
 
   try {
-    // Delegate to authRepository for business logic
     const { authRepository } =
       await import("@/app/api/[locale]/v1/core/user/auth/repository");
 
@@ -140,7 +214,7 @@ export async function getCliUser(
       };
     }
 
-    // User not found in database - this is an error
+    // User not found in database - this is an ERROR
     logger.error("CLI user not found in database", {
       email: cliUserEmail,
     });

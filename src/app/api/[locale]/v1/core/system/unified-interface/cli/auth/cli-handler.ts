@@ -30,19 +30,14 @@ import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { authRepository } from "@/app/api/[locale]/v1/core/user/auth/repository";
 
 /**
- * Default CLI user email for development
- */
-const DEFAULT_CLI_USER_EMAIL = "cli@local";
-
-/**
  * CLI/MCP Authentication Handler
  *
  * Authentication strategy:
- * 1. Check VIBE_CLI_USER_EMAIL environment variable
- * 2. If set, try to get user by email from database
- * 3. If not found, seed cli@local user in development
- * 4. Store JWT in .vibe.session file
- * 5. For public users, create lead ID from database
+ * 1. Check for existing JWT token in Authorization header or .vibe.session file
+ * 2. If no token found, check VIBE_CLI_USER_EMAIL environment variable
+ * 3. If VIBE_CLI_USER_EMAIL is set, authenticate user by email from database
+ * 4. If VIBE_CLI_USER_EMAIL is not set, fall back to public user with lead ID
+ * 5. Store JWT in .vibe.session file for authenticated users
  */
 export class CliAuthHandler extends BaseAuthHandler {
   private secretKey: Uint8Array;
@@ -281,8 +276,8 @@ export class CliAuthHandler extends BaseAuthHandler {
   /**
    * Get CLI user email from environment
    */
-  private getCliUserEmail(): string {
-    return env.VIBE_CLI_USER_EMAIL || DEFAULT_CLI_USER_EMAIL;
+  private getCliUserEmail(): string | null {
+    return env.VIBE_CLI_USER_EMAIL || null;
   }
 
   /**

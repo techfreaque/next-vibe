@@ -1,5 +1,3 @@
-export type { LucideProps } from "lucide-react";
-
 export { Activity } from "./Activity";
 export { AlertCircle } from "./AlertCircle";
 export { AlertTriangle } from "./AlertTriangle";

@@ -191,5 +191,3 @@ export function initializeTaskRunnerShutdown(): void {
     return await Promise.resolve();
   });
 }
-
-export { getGracefulShutdown as gracefulShutdown };

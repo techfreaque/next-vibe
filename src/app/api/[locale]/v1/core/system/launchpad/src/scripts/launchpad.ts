@@ -53,7 +53,9 @@ program
   .command("interactive", { isDefault: true })
   .description("Run in interactive mode (legacy behavior)")
   .action(async () => {
-    await runInteractiveMode();
+    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+
+    await runInteractiveMode(logger);
   });
 
 // Release orchestration commands
@@ -66,7 +68,7 @@ program
     "Git tag to determine target (overrides auto-detection)",
   )
   .action(async (options: CIReleaseOptions) => {
-    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
       await ciReleaseCommand(logger, rootDir, options.target, options.tag);
@@ -79,7 +81,7 @@ program
   .command("force-update-all")
   .description("Force update dependencies for all packages")
   .action(() => {
-    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
       forceUpdateAllCommand(logger, rootDir);
@@ -92,7 +94,7 @@ program
   .command("release-all")
   .description("Release all packages sequentially with state persistence")
   .action(async () => {
-    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
       await releaseAllCommand(logger, rootDir);
@@ -109,7 +111,7 @@ program
     "Version bump type (patch|minor|major|init)",
   )
   .action(async (options: ForceReleaseOptions) => {
-    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
 
@@ -143,7 +145,7 @@ program
   .command("continue")
   .description("Continue release from previous state")
   .action(async () => {
-    const logger = createEndpointLogger(true, Date.now(), locale);
+    const logger = createEndpointLogger(false, Date.now(), locale);
     const { t } = simpleT(locale);
     try {
       const rootDir = process.cwd();
@@ -157,7 +159,7 @@ program
   .command("status")
   .description("Show current release status")
   .action(() => {
-    const logger = createEndpointLogger(true, Date.now(), locale);
+    const logger = createEndpointLogger(false, Date.now(), locale);
     const { t } = simpleT(locale);
     try {
       const rootDir = process.cwd();
@@ -172,7 +174,7 @@ program
   .description("Weekly dependency update with branch creation and PR")
   .option("--branch <branch>", "Target branch name", "next_version_candidates")
   .action(async (options: WeeklyUpdateOptions) => {
-    const logger = createEndpointLogger(true, Date.now(), defaultLocale);
+    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
       await weeklyUpdateCommand(logger, rootDir, options.branch);
@@ -191,8 +193,7 @@ function handleError(
   process.exit(1);
 }
 
-async function runInteractiveMode(): Promise<void> {
-  const logger = createEndpointLogger(true, Date.now(), defaultLocale);
+async function runInteractiveMode(logger: EndpointLogger): Promise<void> {
   const { t } = simpleT(defaultLocale);
   logger.info("🚀 PWE Launchpad");
 
@@ -289,8 +290,8 @@ program.parse();
 
 // If no command was provided, run interactive mode
 if (!process.argv.slice(2).length) {
-  const logger = createEndpointLogger(true, Date.now(), defaultLocale);
-  runInteractiveMode().catch((error) => {
+  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  runInteractiveMode(logger).catch((error) => {
     handleError(logger, "An unexpected error occurred:", error);
   });
 }

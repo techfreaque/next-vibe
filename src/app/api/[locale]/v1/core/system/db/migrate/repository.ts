@@ -94,7 +94,14 @@ export class DatabaseMigrationRepositoryImpl
         });
 
         if (generateResult.error) {
-          throw generateResult.error;
+          return fail({
+            message:
+              "app.api.v1.core.system.db.migrate.post.errors.network.title",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: {
+              error: `Generation failed: ${generateResult.error.message}`,
+            },
+          });
         }
 
         if (generateResult.status !== 0) {
@@ -131,7 +138,14 @@ export class DatabaseMigrationRepositoryImpl
       });
 
       if (pushResult.error) {
-        throw pushResult.error;
+        return fail({
+          message:
+            "app.api.v1.core.system.db.migrate.post.errors.network.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
+            error: `Migration failed: ${pushResult.error.message}`,
+          },
+        });
       }
 
       const output = [pushResult.stdout, pushResult.stderr]

@@ -123,7 +123,7 @@ Write your endpoint once, get everything:
 
 ```typescript
 // definition.ts - The single source of truth
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   Methods,
   WidgetType,
@@ -481,7 +481,7 @@ cd src/app/api/[locale]/v1/core/products/create
 ```typescript
 // definition.ts
 import { z } from "zod";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   Methods,
   WidgetType,
@@ -570,7 +570,7 @@ export const productRepository = new ProductRepository();
 ```typescript
 // route.ts
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
+import { endpointsHandler } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/multi';
 import definitions from "./definition";
 import { productRepository } from "./repository";
 

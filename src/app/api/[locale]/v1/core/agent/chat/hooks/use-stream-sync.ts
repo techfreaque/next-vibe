@@ -70,7 +70,6 @@ export function useStreamSync(deps: StreamSyncDeps): void {
           upvotes: null,
           downvotes: null,
           sequenceId: streamMsg.sequenceId ?? null,
-          sequenceIndex: streamMsg.sequenceIndex ?? 0,
           createdAt: new Date(),
           updatedAt: new Date(),
         });

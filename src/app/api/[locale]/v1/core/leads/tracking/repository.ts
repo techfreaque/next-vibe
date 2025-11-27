@@ -90,7 +90,7 @@ const getMetadataNumber = (
  * Lead Tracking Repository Interface
  */
 export interface ILeadTrackingRepository {
-  extractClientInfo(request: NextRequest): ClientInfo;
+  extractClientInfo(request: NextRequest | undefined): ClientInfo;
 
   validateTrackingParams(searchParams: URLSearchParams): {
     leadId?: string;
@@ -227,7 +227,16 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Extract client information from request
    */
-  extractClientInfo(request: NextRequest): ClientInfo {
+  extractClientInfo(request: NextRequest | undefined): ClientInfo {
+    if (!request) {
+      return {
+        userAgent: "cli",
+        referer: "",
+        ipAddress: "cli",
+        timestamp: new Date().toISOString(),
+      };
+    }
+
     const userAgent = request.headers.get("user-agent") || "";
     const referer = request.headers.get("referer") || "";
     const ip =

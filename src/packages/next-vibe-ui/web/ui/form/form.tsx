@@ -88,7 +88,7 @@ export interface FormDatePickerProps {
   onChange?: (value: string) => void;
 }
 
-function Form<TRequest extends FieldValues>(
+export function Form<TRequest extends FieldValues>(
   props: FormProps<TRequest>,
 ): React.JSX.Element {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
@@ -120,7 +120,7 @@ const FormFieldContext = React.createContext<
   FormFieldContextValue<FieldValues, FieldPath<FieldValues>> | undefined
 >(undefined);
 
-const FormField = <
+export const FormField = <
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
 >({
@@ -137,7 +137,7 @@ const FormItemContext = React.createContext<FormItemContextValue | undefined>(
   undefined,
 );
 
-const useFormField = (): UseFormFieldReturn => {
+export const useFormField = (): UseFormFieldReturn => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
   const { getFieldState, formState } = useFormContext();
@@ -166,7 +166,10 @@ const useFormField = (): UseFormFieldReturn => {
   };
 };
 
-function FormItem({ className, ...props }: FormItemProps): React.JSX.Element {
+export function FormItem({
+  className,
+  ...props
+}: FormItemProps): React.JSX.Element {
   const id = React.useId();
 
   return (
@@ -177,7 +180,10 @@ function FormItem({ className, ...props }: FormItemProps): React.JSX.Element {
 }
 FormItem.displayName = "FormItem";
 
-function FormLabel({ className, ...props }: FormLabelProps): React.JSX.Element {
+export function FormLabel({
+  className,
+  ...props
+}: FormLabelProps): React.JSX.Element {
   const { error, formItemId } = useFormField();
 
   return (
@@ -192,7 +198,7 @@ function FormLabel({ className, ...props }: FormLabelProps): React.JSX.Element {
 }
 FormLabel.displayName = "FormLabel";
 
-function FormControl({ ...props }: FormControlProps): React.JSX.Element {
+export function FormControl({ ...props }: FormControlProps): React.JSX.Element {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
@@ -209,7 +215,7 @@ function FormControl({ ...props }: FormControlProps): React.JSX.Element {
 }
 FormControl.displayName = "FormControl";
 
-function FormDescription({
+export function FormDescription({
   className,
   ...props
 }: FormDescriptionProps): React.JSX.Element {
@@ -225,7 +231,7 @@ function FormDescription({
 }
 FormDescription.displayName = "FormDescription";
 
-function FormMessage({
+export function FormMessage({
   className,
   children,
   ...props
@@ -251,14 +257,3 @@ function FormMessage({
   );
 }
 FormMessage.displayName = "FormMessage";
-
-export {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  useFormField,
-};

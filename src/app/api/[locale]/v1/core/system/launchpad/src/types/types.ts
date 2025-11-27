@@ -46,7 +46,3 @@ export interface ReleaseOrchestrationOptions {
   ciMode?: boolean;
   targetDirectory?: string;
 }
-
-const definitions = {};
-
-export default definitions;

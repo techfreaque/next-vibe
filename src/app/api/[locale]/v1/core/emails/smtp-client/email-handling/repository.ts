@@ -17,9 +17,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { EmailProvider, EmailStatus, EmailType } from "../../messages/enum";
 import { emailMetadataRepository } from "../email-metadata/repository";
@@ -35,8 +33,6 @@ import type {
 export interface EmailHandlingRepository {
   handleEmails<TRequest, TResponse, TUrlVariables>(
     data: EmailHandleRequestOutput<TRequest, TResponse, TUrlVariables>,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailHandleResponseOutput>>;
 }
@@ -47,8 +43,6 @@ export interface EmailHandlingRepository {
 export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
   async handleEmails<TRequest, TResponse, TUrlVariables>(
     data: EmailHandleRequestOutput<TRequest, TResponse, TUrlVariables>,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailHandleResponseOutput>> {
     const errors: ErrorResponseType[] = [];
@@ -110,8 +104,8 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                       templateData.smtpSelectionCriteria,
                   },
                 },
-                user,
-                locale,
+                data.user,
+                data.locale,
                 logger,
               );
 
@@ -168,7 +162,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                       templateName: null,
                       status: EmailStatus.FAILED,
                       error: parsedError.message,
-                      userId: user.isPublic ? null : user.id,
+                      userId: data.user.isPublic ? null : data.user.id,
                       leadId: null,
                       metadata: {
                         locale: data.locale,
@@ -187,14 +181,14 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                       externalId: null,
                     },
                   },
-                  user,
-                  locale,
+                  data.user,
+                  data.locale,
                   logger,
                 );
 
                 logger.debug("Email metadata stored for exception", {
                   error: parsedError.message,
-                  userId: user.id,
+                  userId: data.user.id,
                 });
               } catch (metadataError) {
                 logger.error(

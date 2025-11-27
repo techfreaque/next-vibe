@@ -2,8 +2,9 @@
  * Uncensored.ai API Handler
  *
  * Clean implementation following the official API docs.
- * The API is OpenAI-compatible but does NOT support streaming.
- * We convert the complete response to a streaming format for our frontend.
+ * Automatically detects and handles both streaming and non-streaming responses:
+ * - When API supports streaming: passes through real-time SSE/JSON stream
+ * - When API doesn't support streaming: converts complete response to simulated stream
  */
 
 import "server-only";
@@ -21,26 +22,7 @@ interface UncensoredRequest {
   messages: UncensoredMessage[];
   temperature?: number;
   max_tokens?: number;
-}
-
-interface UncensoredResponse {
-  id: string;
-  object: string;
-  created: number;
-  model: string;
-  choices: Array<{
-    index: number;
-    message: {
-      role: string;
-      content: string;
-    };
-    finish_reason: string;
-  }>;
-  usage: {
-    prompt_tokens: number;
-    completion_tokens: number;
-    total_tokens: number;
-  };
+  stream?: boolean;
 }
 
 /**
@@ -61,16 +43,18 @@ export async function handleUncensoredAI(
   locale: CountryLanguage,
 ): Promise<Response> {
   const { t } = simpleT(locale);
-  // Make API call per official docs
+
+  // Request streaming - the API will automatically switch to streaming when supported
   const requestBody: UncensoredRequest = {
     model: "uncensored-lm",
     messages: messages,
     temperature: temperature,
     max_tokens: maxTokens,
+    stream: true, // Always request streaming
   };
 
   const response = await fetch(
-    "https://mkstqjtsujvcaobdksxs.functions.supabase.co/functions/v1/uncensoredlm-api",
+    "https://mkstqjtsujvcaobdksxs.functions.supabase.co/functions/v1/chat-backup",
     {
       method: "POST",
       headers: {
@@ -96,39 +80,132 @@ export async function handleUncensoredAI(
     );
   }
 
-  const data = (await response.json()) as UncensoredResponse;
-  const content = data.choices?.[0]?.message?.content || "";
-
-  // Convert complete response to streaming format
-  // This simulates streaming for consistent frontend handling
-  return createStreamingResponse(content);
+  // Auto-detect streaming vs non-streaming response
+  return transformResponseToStream(response);
 }
 
 /**
- * Convert complete text to streaming response
- * Uses Vercel AI SDK text stream format: "0:\"text\"\n"
+ * Auto-detect and transform response to Vercel AI SDK streaming format
+ * Intelligently handles:
+ * 1. True streaming (SSE format with "data:" prefix)
+ * 2. Newline-delimited JSON streaming
+ * 3. Complete JSON response (auto-converts to simulated stream)
  *
- * @param content - Complete text content
- * @returns Response with streaming text
+ * @param response - Fetch response (streaming or complete)
+ * @returns Response with Vercel AI SDK format stream
  */
-function createStreamingResponse(content: string): Response {
+function transformResponseToStream(response: Response): Response {
+  const reader = response.body?.getReader();
+  const decoder = new TextDecoder();
   const encoder = new TextEncoder();
 
+  if (!reader) {
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Internal helper throws, caught by caller
+    throw new Error("Response body is not readable");
+  }
+
   const stream = new ReadableStream({
-    start(controller): void {
-      // Send in small chunks to simulate streaming
-      const chunkSize = 20;
+    async start(controller): Promise<void> {
+      let buffer = "";
+      let isStreamingMode = false; // Auto-detect streaming vs complete response
+      let hasProcessedStreamingData = false;
 
-      for (let i = 0; i < content.length; i += chunkSize) {
-        const chunk = content.slice(i, i + chunkSize);
-        // Use JSON.stringify to properly escape the chunk
-        const escaped = JSON.stringify(chunk).slice(1, -1);
-        // Vercel AI SDK format
-        // eslint-disable-next-line i18next/no-literal-string
-        controller.enqueue(encoder.encode(`0:"${escaped}"\n`));
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) {
+            // Handle any remaining buffered data as complete JSON response
+            if (buffer.trim() && !hasProcessedStreamingData) {
+              try {
+                const parsed = JSON.parse(buffer);
+                const content = parsed.choices?.[0]?.message?.content;
+                if (content) {
+                  // Convert complete response to streaming format
+                  const chunkSize = 20;
+                  for (let i = 0; i < content.length; i += chunkSize) {
+                    const chunk = content.slice(i, i + chunkSize);
+                    const escaped = JSON.stringify(chunk).slice(1, -1);
+                    // eslint-disable-next-line i18next/no-literal-string
+                    controller.enqueue(encoder.encode(`0:"${escaped}"\n`));
+                  }
+                }
+              } catch {
+                // Not valid JSON, ignore
+              }
+            }
+            break;
+          }
+
+          const chunk = decoder.decode(value, { stream: true });
+          buffer += chunk;
+
+          // Detect streaming mode: check if we have SSE or newline-delimited JSON
+          if (!isStreamingMode && buffer.includes("\n")) {
+            const firstLine = buffer.split("\n")[0].trim();
+            isStreamingMode =
+              firstLine.startsWith("data:") || firstLine.startsWith("{");
+          }
+
+          // If not in streaming mode yet, continue buffering
+          if (!isStreamingMode) {
+            continue;
+          }
+
+          // Process streaming data line-by-line
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || ""; // Keep incomplete line in buffer
+
+          for (const line of lines) {
+            const trimmedLine = line.trim();
+
+            if (!trimmedLine) {
+              continue;
+            }
+
+            let jsonData: string | null = null;
+
+            // Handle SSE format: "data: {json}"
+            if (trimmedLine.startsWith("data: ")) {
+              jsonData = trimmedLine.slice(6);
+            }
+            // Handle newline-delimited JSON streaming
+            else if (trimmedLine.startsWith("{")) {
+              jsonData = trimmedLine;
+            }
+
+            if (!jsonData || jsonData === "[DONE]") {
+              continue;
+            }
+
+            try {
+              const parsed = JSON.parse(jsonData);
+
+              // Check for streaming format (delta.content - OpenAI streaming format)
+              const deltaContent = parsed.choices?.[0]?.delta?.content;
+
+              // Check for non-streaming format (message.content - complete format)
+              const messageContent = parsed.choices?.[0]?.message?.content;
+
+              const content = deltaContent || messageContent;
+
+              if (content) {
+                hasProcessedStreamingData = true;
+                // Immediately forward content to frontend
+                const escaped = JSON.stringify(content).slice(1, -1);
+                // eslint-disable-next-line i18next/no-literal-string
+                controller.enqueue(encoder.encode(`0:"${escaped}"\n`));
+              }
+            } catch {
+              // Skip invalid JSON lines
+            }
+          }
+        }
+
+        controller.close();
+      } catch (error) {
+        controller.error(error);
       }
-
-      controller.close();
     },
   });
 

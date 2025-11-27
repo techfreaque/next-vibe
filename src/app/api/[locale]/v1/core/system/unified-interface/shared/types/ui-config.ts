@@ -17,7 +17,7 @@ import type {
   LayoutConfig,
   MetricCardWidgetConfig,
   WidgetConfig,
-} from "../ui/widgets";
+} from "../widgets/configs";
 import type {
   ActionConfig,
   BulkAction,

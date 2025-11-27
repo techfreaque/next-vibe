@@ -8,7 +8,3 @@
  * Can be a string (UUID) or number
  */
 export type DbId = string;
-
-const definitions = {};
-
-export default definitions;

@@ -259,7 +259,6 @@ export function useIncognitoChat(
         upvotes: null,
         downvotes: null,
         sequenceId: null,
-        sequenceIndex: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       };

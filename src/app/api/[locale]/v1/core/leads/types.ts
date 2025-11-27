@@ -13,13 +13,6 @@ import type { LeadListGetResponseTypeOutput } from "./list/definition";
 // Define leadId here so it can be used by both server and client code
 export const leadId = z.uuid();
 
-// Re-export commonly used cross-repository types
-export type { JwtPayloadType } from "../user/auth/types";
-
-// Import subdomain endpoint types for consolidation
-export type { LeadCreatePostRequestOutput as LeadCreateType } from "./create/definition";
-export type { LeadListGetRequestTypeOutput as LeadQueryType } from "./list/definition";
-
 // Export the full list response type
 export type LeadListResponseType = LeadListGetResponseTypeOutput;
 
@@ -62,7 +55,3 @@ export interface UnsubscribeType {
   leadId?: string;
   email?: string;
 }
-
-const definitions = {};
-
-export default definitions;

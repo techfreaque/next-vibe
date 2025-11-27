@@ -31,14 +31,14 @@ export const chatColors = {
   // Sidebar colors
   sidebar: {
     bg: "bg-slate-50 dark:bg-slate-950",
-    hover: "hover:bg-blue-50/50 dark:hover:bg-blue-950/20",
-    active: "bg-blue-100/70 dark:bg-blue-900/30",
+    hover: "hover:bg-blue-200 dark:hover:bg-blue-950",
+    active: "bg-blue-200 dark:bg-blue-950",
     border: "border-slate-200 dark:border-slate-800",
   },
 
   // Message bubbles
   message: {
-    user: "bg-blue-100 dark:bg-blue-950",
+    user: "bg-blue-200 dark:bg-blue-950",
     assistant: "bg-white dark:bg-slate-900",
     error: "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900",
   },

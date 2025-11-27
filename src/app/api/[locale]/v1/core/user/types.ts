@@ -117,7 +117,3 @@ export interface UserSearchOptions {
   offset?: number;
   roles?: UserRoleValue[keyof UserRoleValue][];
 }
-
-const definitions = {};
-
-export default definitions;

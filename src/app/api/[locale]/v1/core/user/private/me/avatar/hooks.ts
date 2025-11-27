@@ -1,9 +1,4 @@
 import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/types";
-import type { EnhancedMutationResult } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
-import {
-  useApiForm,
-  useApiMutation,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import avatarEndpoints, {
@@ -11,6 +6,11 @@ import avatarEndpoints, {
   type AvatarPostRequestOutput,
   type AvatarPostResponseOutput,
 } from "./definition";
+import { useApiForm } from "../../../../system/unified-interface/react/hooks/use-api-mutation-form";
+import {
+  type EnhancedMutationResult,
+  useApiMutation,
+} from "../../../../system/unified-interface/react/hooks/use-api-mutation";
 
 /**
  * Hook for uploading user avatar

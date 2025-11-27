@@ -3,22 +3,22 @@ import "server-only";
 import type { BaseAuthHandler } from "./base-auth-handler";
 import { Platform } from "../../types/platform";
 import { cliAuthHandler } from "../../../cli/auth/cli-handler";
-import { webAuthHandler } from "../../../next-api/auth/handler";
+import { webAuthHandler } from "../../../next-api/auth-handler";
 
 /**
  * Platform Authentication Handler Factory
  * Returns the appropriate auth handler based on platform
  *
  * Platform mapping:
- * - WEB, EMAIL -> WebAuthHandler (cookies)
+ * - TRPC, NEXT_PAGE, NEXT_API -> WebAuthHandler (cookies)
  * - CLI, AI, MCP -> CliAuthHandler (.vibe.session file)
  */
 export function getPlatformAuthHandler(platform: Platform): BaseAuthHandler {
   switch (platform) {
-    case Platform.WEB:
+    case Platform.TRPC:
+    case Platform.NEXT_PAGE:
+    case Platform.NEXT_API:
     case Platform.AI:
-    case Platform.MOBILE:
-    case Platform.EMAIL:
       return webAuthHandler;
 
     case Platform.CLI:
@@ -48,12 +48,10 @@ export function usesSessionFile(platform: Platform): boolean {
  * Check if platform uses cookie storage
  */
 export function usesCookies(platform: Platform): boolean {
-  return platform === Platform.WEB || platform === Platform.EMAIL;
-}
-
-/**
- * Check if platform uses AsyncStorage
- */
-export function usesAsyncStorage(platform: Platform): boolean {
-  return platform === Platform.MOBILE;
+  return (
+    platform === Platform.TRPC ||
+    platform === Platform.NEXT_PAGE ||
+    platform === Platform.NEXT_API ||
+    platform === Platform.AI
+  );
 }

@@ -17,7 +17,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { findFilesByName } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/filesystem/scanner";
+import { findFilesByName } from "@/app/api/[locale]/v1/core/system/translations/reorganize/repository/scanner";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

@@ -42,21 +42,15 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import type { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import type { ToolResultWidgetConfig } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/widgets/types";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { DefaultFolderId } from "./config";
 import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
 
 import type { ModelId } from "./model-access/models";
-import {
-  type CustomPersona,
-  customPersonas,
-  customPersonasRelations,
-  type NewCustomPersona,
-} from "./personas/db";
+
 import { leads } from "@/app/api/[locale]/v1/core/leads/db";
 
 /**
@@ -86,25 +80,6 @@ export type ToolCallResult =
   | ToolCallResult[];
 
 /**
- * Widget metadata for tool result rendering
- * Compatible with unified-interface/ai/types version
- */
-export interface ToolCallWidgetMetadata {
-  endpointId: string;
-  responseFields: Array<{
-    name: TranslationKey;
-    widgetType: WidgetType;
-    label?: TranslationKey;
-    description?: TranslationKey;
-    layout?: Record<string, string | number | boolean>;
-    validation?: Record<string, string | number | boolean>;
-    options?: Array<{ value: string; label: TranslationKey }>;
-  }>;
-  creditsUsed?: number;
-  executionTime?: number;
-}
-
-/**
  * Tool call information
  */
 export interface ToolCall {
@@ -115,7 +90,7 @@ export interface ToolCall {
   result?: ToolCallResult;
   error?: string;
   executionTime?: number;
-  widgetMetadata?: ToolCallWidgetMetadata;
+  widgetMetadata?: ToolResultWidgetConfig;
   creditsUsed?: number;
 }
 
@@ -147,7 +122,7 @@ export interface ToolCallMetadata {
   result?: ToolCallResult;
   error?: string;
   executionTime?: number;
-  widgetMetadata?: ToolCallWidgetMetadata;
+  widgetMetadata?: ToolResultWidgetConfig;
   creditsUsed?: number;
 }
 
@@ -179,7 +154,7 @@ export interface MessageMetadata {
   result?: ToolCallResult;
   error?: string;
   executionTime?: number;
-  widgetMetadata?: ToolCallWidgetMetadata;
+  widgetMetadata?: ToolResultWidgetConfig;
   creditsUsed?: number;
 
   // Attachments
@@ -443,7 +418,6 @@ export const chatMessages = pgTable(
     // Message sequencing - links messages that are part of the same AI response
     // All messages in a sequence share the same sequenceId (first message's ID)
     sequenceId: uuid("sequence_id"),
-    sequenceIndex: integer("sequence_index").default(0).notNull(), // Order within sequence
 
     // Author information (for multi-user support)
     authorId: text("author_id"), // User ID or "local"
@@ -565,12 +539,3 @@ export type NewChatThread = z.infer<typeof insertChatThreadSchema>;
 
 export type ChatMessage = z.infer<typeof selectChatMessageSchema>;
 export type NewChatMessage = z.infer<typeof insertChatMessageSchema>;
-
-/**
- * Re-export custom personas table, relations and types
- * Note: Relations are also defined in personas/db.ts but re-exported here
- * for Drizzle's query API to work properly
- */
-export { customPersonas };
-export { customPersonasRelations };
-export type { CustomPersona, NewCustomPersona };

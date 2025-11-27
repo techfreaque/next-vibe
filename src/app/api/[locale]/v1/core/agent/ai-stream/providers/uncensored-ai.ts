@@ -38,7 +38,7 @@ export function createUncensoredAI(
 ): (modelId: string) => ReturnType<ReturnType<typeof createOpenAI>["chat"]> {
   const {
     apiKey,
-    baseURL = "https://mkstqjtsujvcaobdksxs.functions.supabase.co/functions/v1",
+    baseURL = "https://mkstqjtsujvcaobdksxs.functions.supabase.co/functions/v1/chat-backup",
   } = config;
 
   // Use OpenAI provider with custom base URL for Uncensored.ai

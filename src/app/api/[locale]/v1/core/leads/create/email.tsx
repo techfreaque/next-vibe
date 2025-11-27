@@ -23,8 +23,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { LeadSourceOptions, LeadStatusOptions } from "../enum";
-import type { LeadCreateType } from "../types";
-import type { LeadCreatePostResponseOutput } from "./definition";
+import type {
+  LeadCreatePostResponseOutput,
+  LeadCreateRequestTypeOutput,
+} from "./definition";
 
 /**
  * Welcome Email Template Component for New Leads
@@ -442,7 +444,7 @@ function AdminNotificationEmailContent({
  * Sends welcome email to leads when they are created (if email provided)
  */
 export const renderWelcomeMail: EmailFunctionType<
-  LeadCreateType,
+  LeadCreateRequestTypeOutput,
   LeadCreatePostResponseOutput,
   never
 > = ({ responseData, locale, t, user }) => {
@@ -487,7 +489,7 @@ export const renderWelcomeMail: EmailFunctionType<
  * Notifies admin team when a new lead is created
  */
 export const renderAdminNotificationMail: EmailFunctionType<
-  LeadCreateType,
+  LeadCreateRequestTypeOutput,
   LeadCreatePostResponseOutput,
   never
 > = ({ responseData, locale, t, user }) => {

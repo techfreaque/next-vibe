@@ -46,16 +46,16 @@ import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   logger: EndpointLogger,
-  options: ApiFormOptions<TEndpoint["TRequestOutput"]> = {},
+  options: ApiFormOptions<TEndpoint["types"]["RequestOutput"]> = {},
   mutationOptions: ApiMutationOptions<
-    TEndpoint["TRequestOutput"],
-    TEndpoint["TResponseOutput"],
-    TEndpoint["TUrlVariablesOutput"]
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"]
   > = {},
 ): ApiFormReturn<
-  TEndpoint["TRequestOutput"],
-  TEndpoint["TResponseOutput"],
-  TEndpoint["TUrlVariablesOutput"]
+  TEndpoint["types"]["RequestOutput"],
+  TEndpoint["types"]["ResponseOutput"],
+  TEndpoint["types"]["UrlVariablesOutput"]
 > {
   const { getFormId } = useApiStore();
   const formId = getFormId(endpoint);
@@ -73,7 +73,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   const setFormErrorStore = useApiStore((state) => state.setFormError);
   const clearFormErrorStore = useApiStore((state) => state.clearFormError);
   // Create base configuration with resolver
-  type FormData = TEndpoint["TRequestOutput"];
+  type FormData = TEndpoint["types"]["RequestOutput"];
   const formConfig = {
     ...options,
     resolver: zodResolver(endpoint.requestSchema),
@@ -114,8 +114,8 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
         await storage.removeItem(storageKey);
         // Reset the form to default values if available, otherwise empty
         const resetData =
-          (options.defaultValues as TEndpoint["TRequestOutput"]) ||
-          ({} as TEndpoint["TRequestOutput"]);
+          (options.defaultValues as TEndpoint["types"]["RequestOutput"]) ||
+          ({} as TEndpoint["types"]["RequestOutput"]);
         formMethods.reset(resetData);
       } catch (error) {
         logger.error(
@@ -138,7 +138,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
         if (savedFormData) {
           const parsedData = JSON.parse(
             savedFormData,
-          ) as TEndpoint["TRequestOutput"];
+          ) as TEndpoint["types"]["RequestOutput"];
           formMethods.reset(parsedData);
         }
       } catch (error) {
@@ -211,12 +211,12 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
 
   // Create a submit handler that validates and submits the form
   const submitForm = ((
-    options: TEndpoint["TUrlVariablesOutput"] extends undefined
+    options: TEndpoint["types"]["UrlVariablesOutput"] extends undefined
       ? undefined
       : SubmitFormFunctionOptions<
-          TEndpoint["TRequestOutput"],
-          TEndpoint["TResponseOutput"],
-          TEndpoint["TUrlVariablesOutput"]
+          TEndpoint["types"]["RequestOutput"],
+          TEndpoint["types"]["ResponseOutput"],
+          TEndpoint["types"]["UrlVariablesOutput"]
         >,
   ): void => {
     logger.debug("submitForm called", {
@@ -236,8 +236,8 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
 
         // Call the API with the validated form data using React Query mutation
         const urlPathParams =
-          (options?.urlParamVariables as TEndpoint["TUrlVariablesOutput"]) ||
-          ({} as TEndpoint["TUrlVariablesOutput"]);
+          (options?.urlParamVariables as TEndpoint["types"]["UrlVariablesOutput"]) ||
+          ({} as TEndpoint["types"]["UrlVariablesOutput"]);
 
         const result = await mutation.mutateAsync({
           requestData: validatedData,
@@ -254,11 +254,11 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
         // Extract the data from the ResponseType
         const responseData = result.success
           ? result.data
-          : (undefined as TEndpoint["TResponseOutput"]);
+          : (undefined as TEndpoint["types"]["ResponseOutput"]);
 
         // Cast the result to TResponse to satisfy the type system
         const onSuccessResult = options?.onSuccess?.({
-          responseData: responseData as TEndpoint["TResponseOutput"],
+          responseData: responseData as TEndpoint["types"]["ResponseOutput"],
           pathParams: options?.urlParamVariables,
           requestData: validatedData,
         });
@@ -320,13 +320,13 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
       });
     })();
   }) as SubmitFormFunction<
-    TEndpoint["TRequestOutput"],
-    TEndpoint["TResponseOutput"],
-    TEndpoint["TUrlVariablesOutput"]
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"]
   >;
 
   // Create the response object from mutation data
-  const response: ResponseType<TEndpoint["TResponseOutput"]> | undefined =
+  const response: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined =
     mutation.data
       ? mutation.data
       : mutation.error

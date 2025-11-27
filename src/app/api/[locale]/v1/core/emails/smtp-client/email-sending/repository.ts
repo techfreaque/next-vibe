@@ -26,10 +26,6 @@ import type {
   SendEmailResponseTypeOutput,
 } from "./types";
 
-// Type aliases for consistency
-type SendEmailRequestOutput = SendEmailRequestTypeOutput;
-type SendEmailResponseOutput = SendEmailResponseTypeOutput;
-
 /**
  * Type guard to validate if a string is a valid Languages type
  */
@@ -78,11 +74,11 @@ function mapLocaleToSelectionCriteria(locale: CountryLanguage): {
  */
 export interface EmailSendingRepository {
   sendEmail(
-    data: SendEmailRequestOutput,
+    data: SendEmailRequestTypeOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SendEmailResponseOutput>>;
+  ): Promise<ResponseType<SendEmailResponseTypeOutput>>;
 }
 
 /**
@@ -94,11 +90,11 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
    * This is the single place where all email rendering happens
    */
   async sendEmail(
-    data: SendEmailRequestOutput,
+    data: SendEmailRequestTypeOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SendEmailResponseOutput>> {
+  ): Promise<ResponseType<SendEmailResponseTypeOutput>> {
     try {
       logger.debug("Enhanced email sending initiated", {
         toEmail: data.params.toEmail,

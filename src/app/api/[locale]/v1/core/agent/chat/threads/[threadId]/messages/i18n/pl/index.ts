@@ -58,9 +58,6 @@ export const translations: typeof enTranslations = {
           sequenceId: {
             content: "ID sekwencji",
           },
-          sequenceIndex: {
-            content: "Indeks sekwencji",
-          },
           toolCalls: {
             content: "Wywołania narzędzi",
           },

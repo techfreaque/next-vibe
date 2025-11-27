@@ -8,10 +8,8 @@ import "server-only";
 import type {
   PlatformCapabilities,
   PlatformDetector as IPlatformDetector,
-  PlatformType,
-  RecorderBackendType,
-  TyperBackendType,
 } from "../types";
+import type { PlatformType,RecorderBackendType,TyperBackendType } from "../enum";
 import { Platform, RecorderBackend, TyperBackend } from "../enum";
 import { dependencyChecker } from "./dependencies";
 
@@ -160,7 +158,8 @@ export async function getPlatformCapabilities(): Promise<PlatformCapabilities> {
 
       return {
         platform,
-        availableRecorders: availableRecorders as readonly RecorderBackendType[],
+        availableRecorders:
+          availableRecorders as readonly RecorderBackendType[],
         availableTypers: availableTypers as readonly TyperBackendType[],
         recommendedRecorder:
           availableRecorders[0] || RecorderBackend.WF_RECORDER,
@@ -194,7 +193,8 @@ export async function getPlatformCapabilities(): Promise<PlatformCapabilities> {
 
       return {
         platform,
-        availableRecorders: availableRecorders as readonly RecorderBackendType[],
+        availableRecorders:
+          availableRecorders as readonly RecorderBackendType[],
         availableTypers: availableTypers as readonly TyperBackendType[],
         recommendedRecorder:
           availableRecorders[0] || RecorderBackend.FFMPEG_PULSE,

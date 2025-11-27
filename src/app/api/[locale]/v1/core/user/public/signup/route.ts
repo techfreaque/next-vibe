@@ -1,4 +1,4 @@
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import signupEndpoints from "./definition";
@@ -18,13 +18,14 @@ export const { GET, POST, tools } = endpointsHandler({
         ignoreErrors: true, // Don't fail signup if admin notification fails
       },
     ],
-    handler: async ({ data, user, locale, logger, request }) => {
+    handler: async ({ data, user, locale, logger, request, platform }) => {
       return await signupRepository.registerUser(
         data,
         user,
         locale,
         logger,
         request,
+        platform,
       );
     },
   },

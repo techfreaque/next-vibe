@@ -106,14 +106,14 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   logger: EndpointLogger,
   options: ApiMutationOptions<
-    TEndpoint["TRequestOutput"],
-    TEndpoint["TResponseOutput"],
-    TEndpoint["TUrlVariablesOutput"]
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"]
   > = {},
 ): EnhancedMutationResult<
-  TEndpoint["TResponseOutput"],
-  TEndpoint["TRequestOutput"],
-  TEndpoint["TUrlVariablesOutput"]
+  TEndpoint["types"]["ResponseOutput"],
+  TEndpoint["types"]["RequestOutput"],
+  TEndpoint["types"]["UrlVariablesOutput"]
 > {
   const { locale } = useTranslation();
 
@@ -122,15 +122,15 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
 
   // Use React Query's useMutation
   const mutation = useMutation<
-    ResponseType<TEndpoint["TResponseOutput"]>,
+    ResponseType<TEndpoint["types"]["ResponseOutput"]>,
     ErrorResponseType,
     MutationVariables<
-      TEndpoint["TRequestOutput"],
-      TEndpoint["TUrlVariablesOutput"]
+      TEndpoint["types"]["RequestOutput"],
+      TEndpoint["types"]["UrlVariablesOutput"]
     >,
     MutationContext<
-      TEndpoint["TRequestOutput"],
-      TEndpoint["TUrlVariablesOutput"]
+      TEndpoint["types"]["RequestOutput"],
+      TEndpoint["types"]["UrlVariablesOutput"]
     >
   >({
     mutationFn: async (variables) => {
@@ -141,11 +141,11 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
       const requestData =
         "requestData" in variables
           ? variables.requestData
-          : ({} as TEndpoint["TRequestOutput"]);
+          : ({} as TEndpoint["types"]["RequestOutput"]);
       const urlPathParams =
         "urlPathParams" in variables
           ? variables.urlPathParams
-          : ({} as TEndpoint["TUrlVariablesOutput"]);
+          : ({} as TEndpoint["types"]["UrlVariablesOutput"]);
 
       // Call mutation executor
       const response = await executeMutation({

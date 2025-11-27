@@ -24,12 +24,16 @@ import { ensureThread } from "../../chat/threads/repository";
 import {
   calculateMessageDepth,
   createUserMessage,
+  fetchMessageHistory,
   handleEditOperation,
   handleRetryOperation,
-  handleAnswerAsAiOperation,
 } from "../../chat/threads/[threadId]/messages/repository";
 import type { AiStreamPostRequestOutput } from "../definition";
 import { buildSystemPrompt } from "../system-prompt-builder";
+import { CONTINUE_CONVERSATION_PROMPT } from "../system-prompt";
+import { chatMessages } from "../../chat/db";
+import { eq } from "drizzle-orm";
+import { db } from "../../../system/db";
 
 export interface StreamSetupResult {
   userId: string | undefined;
@@ -48,24 +52,6 @@ export interface StreamSetupResult {
   aiMessageId: string;
   messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
   systemPrompt: string;
-}
-
-interface HandleSendOperationResult {
-  threadId: string | null | undefined;
-  parentMessageId: string | null | undefined;
-  content: string;
-  role: ChatMessageRole;
-}
-
-function handleSendOperation(
-  data: AiStreamPostRequestOutput,
-): HandleSendOperationResult {
-  return {
-    threadId: data.threadId,
-    parentMessageId: data.parentMessageId,
-    content: data.content,
-    role: data.role,
-  };
 }
 
 function toChatMessageRole(
@@ -89,22 +75,6 @@ export async function setupAiStream(params: {
   userId: string | undefined;
   leadId: string | undefined;
   ipAddress: string | undefined;
-  buildMessageContext: (contextParams: {
-    operation: "send" | "retry" | "edit" | "answer-as-ai";
-    threadId: string | null | undefined;
-    parentMessageId: string | null | undefined;
-    content: string;
-    role: ChatMessageRole;
-    userId: string | undefined;
-    isIncognito: boolean;
-    messageHistory: Array<{
-      role: ChatMessageRole;
-      content: string;
-    }> | null;
-    logger: EndpointLogger;
-  }) => Promise<
-    Array<{ role: "user" | "assistant" | "system"; content: string }>
-  >;
 }): Promise<
   | { success: false; error: ResponseType<never> }
   | { success: true; data: StreamSetupResult }
@@ -237,7 +207,7 @@ export async function setupAiStream(params: {
 
   switch (data.operation) {
     case "send":
-      operationResult = handleSendOperation(data);
+      operationResult = data;
       break;
 
     case "retry":
@@ -245,7 +215,7 @@ export async function setupAiStream(params: {
         logger.info("Retry operation in incognito mode", {
           parentMessageId: data.parentMessageId,
         });
-        operationResult = handleSendOperation(data);
+        operationResult = data;
       } else {
         const retryResult = await handleRetryOperation(data, userId, logger);
         if (!retryResult) {
@@ -265,12 +235,23 @@ export async function setupAiStream(params: {
     case "edit":
       if (isIncognito) {
         operationResult = {
-          threadId: data.threadId!,
+          threadId: data.threadId,
           parentMessageId: data.parentMessageId,
           content: data.content,
           role: data.role,
         };
       } else {
+        if (!userId) {
+          logger.error("Edit operation requires user ID");
+          return {
+            success: false,
+            error: fail({
+              message:
+                "app.api.v1.core.agent.chat.aiStream.post.errors.forbidden.title",
+              errorType: ErrorResponseTypes.FORBIDDEN,
+            }),
+          };
+        }
         const editResult = await handleEditOperation(data, userId, logger);
         if (!editResult) {
           return {
@@ -287,7 +268,7 @@ export async function setupAiStream(params: {
       break;
 
     case "answer-as-ai":
-      operationResult = handleAnswerAsAiOperation(data);
+      operationResult = data;
       logger.info("Answer-as-AI operation", {
         threadId: data.threadId,
         parentMessageId: data.parentMessageId,
@@ -387,7 +368,7 @@ export async function setupAiStream(params: {
     hasPersona: !!data.persona,
   });
 
-  const messages = await params.buildMessageContext({
+  const messages = await buildMessageContext({
     operation: data.operation,
     threadId: effectiveThreadId,
     parentMessageId: data.parentMessageId,
@@ -441,4 +422,181 @@ export async function setupAiStream(params: {
       systemPrompt,
     },
   };
+}
+
+/**
+ * Build message context for AI
+ */
+async function buildMessageContext(params: {
+  operation: "send" | "retry" | "edit" | "answer-as-ai";
+  threadId: string | null | undefined;
+  parentMessageId: string | null | undefined;
+  content: string;
+  role: ChatMessageRole;
+  userId: string | undefined;
+  isIncognito: boolean;
+  messageHistory?: Array<{
+    role: ChatMessageRole;
+    content: string;
+  }> | null;
+  logger: EndpointLogger;
+}): Promise<Array<{ role: "user" | "assistant" | "system"; content: string }>> {
+  // SECURITY: Reject messageHistory for non-incognito threads
+  // Non-incognito threads must fetch history from database to prevent manipulation
+  if (!params.isIncognito && params.messageHistory) {
+    params.logger.error(
+      "Security violation: messageHistory provided for non-incognito thread",
+      {
+        operation: params.operation,
+        threadId: params.threadId,
+        isIncognito: params.isIncognito,
+      },
+    );
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Security violation should throw immediately
+    throw new Error(
+      "messageHistory is only allowed for incognito mode. Server-side threads fetch history from database.",
+    );
+  }
+
+  if (params.operation === "answer-as-ai") {
+    // For incognito mode, use provided message history
+    if (params.isIncognito && params.messageHistory) {
+      const messages = toAiSdkMessages(params.messageHistory);
+      if (params.content.trim()) {
+        messages.push({ role: "user", content: params.content });
+      } else {
+        messages.push({
+          role: "user",
+          content: CONTINUE_CONVERSATION_PROMPT,
+        });
+      }
+      return messages;
+    }
+
+    // For non-incognito mode, fetch from database
+    if (
+      !params.isIncognito &&
+      params.userId &&
+      params.threadId &&
+      params.parentMessageId
+    ) {
+      const allMessages = await db
+        .select()
+        .from(chatMessages)
+        .where(eq(chatMessages.threadId, params.threadId))
+        .orderBy(chatMessages.createdAt);
+
+      const parentIndex = allMessages.findIndex(
+        (msg) => msg.id === params.parentMessageId,
+      );
+
+      if (parentIndex !== -1) {
+        const contextMessages = allMessages.slice(0, parentIndex + 1);
+        const messages = toAiSdkMessages(contextMessages);
+
+        if (params.content.trim()) {
+          messages.push({ role: "user", content: params.content });
+        } else {
+          messages.push({
+            role: "user",
+            content: CONTINUE_CONVERSATION_PROMPT,
+          });
+        }
+        return messages;
+      } else {
+        params.logger.error("Parent message not found in thread", {
+          parentMessageId: params.parentMessageId,
+          threadId: params.threadId,
+        });
+        return params.content.trim()
+          ? [{ role: "user", content: params.content }]
+          : [];
+      }
+    } else if (params.content.trim()) {
+      return [{ role: "user", content: params.content }];
+    } else {
+      return [];
+    }
+  } else if (!params.isIncognito && params.userId && params.threadId) {
+    // Non-incognito mode: fetch history from database filtered by branch
+    const history = await fetchMessageHistory(
+      params.threadId,
+      params.userId,
+      params.logger,
+      params.parentMessageId ?? null, // Pass parent message ID for branch filtering, convert undefined to null
+    );
+    const historyMessages = toAiSdkMessages(history);
+    const currentMessage = toAiSdkMessage({
+      role: params.role,
+      content: params.content,
+    });
+    if (!currentMessage) {
+      return historyMessages;
+    }
+    return [...historyMessages, currentMessage];
+  } else if (params.isIncognito && params.messageHistory) {
+    // Incognito mode with message history: use provided history from client
+    params.logger.debug("Using provided message history for incognito mode", {
+      operation: params.operation,
+      historyLength: params.messageHistory.length,
+    });
+    const historyMessages = toAiSdkMessages(params.messageHistory);
+    const currentMessage = toAiSdkMessage({
+      role: params.role,
+      content: params.content,
+    });
+    if (!currentMessage) {
+      return historyMessages;
+    }
+    return [...historyMessages, currentMessage];
+  } else {
+    // Fallback: no thread or no history (new conversation)
+    const currentMessage = toAiSdkMessage({
+      role: params.role,
+      content: params.content,
+    });
+    if (!currentMessage) {
+      return [];
+    }
+    return [currentMessage];
+  }
+}
+
+/**
+ * Convert ChatMessageRole enum to AI SDK compatible role
+ * Skips TOOL messages (they have empty content and are not needed in AI context)
+ * Converts ERROR -> ASSISTANT (so errors stay in chain)
+ */
+function toAiSdkMessage(message: { role: ChatMessageRole; content: string }): {
+  role: "user" | "assistant" | "system";
+  content: string;
+} | null {
+  switch (message.role) {
+    case ChatMessageRole.USER:
+      return { content: message.content, role: "user" };
+    case ChatMessageRole.ASSISTANT:
+      return { content: message.content, role: "assistant" };
+    case ChatMessageRole.SYSTEM:
+      return { content: message.content, role: "system" };
+    case ChatMessageRole.TOOL:
+      // Skip TOOL messages - they have empty content and are not needed in AI context
+      // The AI already knows about tool calls from the previous ASSISTANT message
+      return null;
+    case ChatMessageRole.ERROR:
+      // Error messages become ASSISTANT messages so they stay in the chain
+      return { content: message.content, role: "assistant" };
+  }
+}
+
+function toAiSdkMessages(
+  messages: Array<{ role: ChatMessageRole; content: string }>,
+): Array<{ role: "user" | "assistant" | "system"; content: string }> {
+  return messages
+    .map((msg) => toAiSdkMessage(msg))
+    .filter(
+      (
+        msg,
+      ): msg is { role: "user" | "assistant" | "system"; content: string } =>
+        msg !== null,
+    );
 }

@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   objectField,
   requestDataField,
@@ -29,7 +29,7 @@ const { POST } = createEndpoint({
   description: "app.api.v1.core.system.help.list.post.description",
   category: "app.api.v1.core.system.help.category",
   tags: ["app.api.v1.core.system.help.list.tag"],
-  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
   aliases: ["list", "ls", "commands"],
 
   fields: objectField(

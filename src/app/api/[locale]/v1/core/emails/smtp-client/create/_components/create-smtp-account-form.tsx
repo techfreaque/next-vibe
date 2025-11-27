@@ -18,7 +18,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import React from "react";
 
 import { useSmtpAccountCreateEndpoint } from "@/app/api/[locale]/v1/core/emails/smtp-client/create/hooks";
-import { SmtpSecurityTypeOptions } from "@/app/api/[locale]/v1/core/emails/smtp-client/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

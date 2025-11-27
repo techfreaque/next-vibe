@@ -16,11 +16,12 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { JwtPayloadType } from "../../../user/auth/types";
+import {
+  type EndpointLogger,
+  createEndpointLogger,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type endpoints from "./definition";
+import { defaultLocale } from "@/i18n/core/config";
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 type GenerateAllResponseType = typeof endpoints.POST.types.ResponseOutput;
@@ -31,8 +32,6 @@ type GenerateAllResponseType = typeof endpoints.POST.types.ResponseOutput;
 interface GenerateAllRepository {
   generateAll(
     data: RequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<GenerateAllResponseType>>;
 }
@@ -43,8 +42,6 @@ interface GenerateAllRepository {
 class GenerateAllRepositoryImpl implements GenerateAllRepository {
   async generateAll(
     data: RequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<GenerateAllResponseType>> {
     const GENERATING_VIBE = "🚀 Generating some vibe...";
@@ -69,9 +66,8 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("📝 Generating endpoints index (singleton)...");
-              const { endpointsIndexGeneratorRepository } = await import(
-                "../endpoints-index/repository"
-              );
+              const { endpointsIndexGeneratorRepository } =
+                await import("../endpoints-index/repository");
 
               const result =
                 await endpointsIndexGeneratorRepository.generateEndpointsIndex(
@@ -80,8 +76,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                       "src/app/api/[locale]/v1/core/system/generated/endpoints.ts",
                     dryRun: false,
                   },
-                  user,
-                  locale,
                   logger,
                 );
 
@@ -113,9 +107,8 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("📝 Generating endpoint (dynamic imports)...");
-              const { endpointGeneratorRepository } = await import(
-                "../endpoint/repository"
-              );
+              const { endpointGeneratorRepository } =
+                await import("../endpoint/repository");
 
               const result = await endpointGeneratorRepository.generateEndpoint(
                 {
@@ -123,8 +116,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                     "src/app/api/[locale]/v1/core/system/generated/endpoint.ts",
                   dryRun: false,
                 },
-                user,
-                locale,
                 logger,
               );
 
@@ -156,9 +147,8 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               outputLines.push(
                 "📝 Generating route handlers (dynamic imports)...",
               );
-              const { routeHandlersGeneratorRepository } = await import(
-                "../route-handlers/repository"
-              );
+              const { routeHandlersGeneratorRepository } =
+                await import("../route-handlers/repository");
 
               const result =
                 await routeHandlersGeneratorRepository.generateRouteHandlers(
@@ -167,8 +157,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                       "src/app/api/[locale]/v1/core/system/generated/route-handlers.ts",
                     dryRun: false,
                   },
-                  user,
-                  locale,
                   logger,
                 );
 
@@ -198,9 +186,8 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("🌱 Generating seeds...");
-              const { seedsGeneratorRepository } = await import(
-                "../seeds/repository"
-              );
+              const { seedsGeneratorRepository } =
+                await import("../seeds/repository");
 
               const result = await seedsGeneratorRepository.generateSeeds(
                 {
@@ -210,8 +197,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                   verbose: false,
                   dryRun: false,
                 },
-                user,
-                locale,
                 logger,
               );
 
@@ -243,9 +228,8 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("📋 Generating task index...");
-              const { taskIndexGeneratorRepository } = await import(
-                "../task-index/repository"
-              );
+              const { taskIndexGeneratorRepository } =
+                await import("../task-index/repository");
 
               const result =
                 await taskIndexGeneratorRepository.generateTaskIndex(
@@ -254,8 +238,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                       "src/app/api/[locale]/v1/core/system/generated/tasks-index.ts",
                     dryRun: false,
                   },
-                  user,
-                  locale,
                   logger,
                 );
 
@@ -330,3 +312,25 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
 }
 
 export const generateAllRepository = new GenerateAllRepositoryImpl();
+
+if (import.meta.main && Bun.main === import.meta.path) {
+  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+  void generateAllRepository
+    .generateAll(
+      {
+        skipEndpoints: false,
+        skipSeeds: false,
+        skipTaskIndex: false,
+        skipTrpcRouter: false,
+        outputDir: "src/app/api/[locale]/v1/core/system/generated",
+      },
+      logger,
+    )
+    .then((result) => {
+      logger.info(result.data.output);
+      return;
+    })
+    .catch((error) => {
+      logger.error("❌ Generation failed:", error);
+    });
+}

@@ -25,6 +25,7 @@ export const translations: typeof enTranslations = {
       placeholder: "Passwort eingeben",
       help: "Geben Sie Ihr Kontopasswort ein",
       validation: {
+        required: "Passwort ist erforderlich",
         minLength: "Passwort muss mindestens 8 Zeichen lang sein",
       },
     },

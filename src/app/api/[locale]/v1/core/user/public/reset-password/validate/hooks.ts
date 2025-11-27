@@ -5,10 +5,10 @@
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { useApiQuery } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
-import { resetPasswordValidateEndpoint } from "./definition";
+import resetPasswordValidateEndpoint from "./definition";
+import { useApiQuery } from "../../../../system/unified-interface/react/hooks/use-api-query";
 
 /**
  * Hook for validating a password reset token

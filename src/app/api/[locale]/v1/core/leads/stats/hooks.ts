@@ -12,10 +12,6 @@ import {
 } from "next-vibe/shared/types/stats-filtering.schema";
 import { useCallback, useMemo } from "react";
 
-import type {
-  EndpointReturn,
-  FormAlertState,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
@@ -34,6 +30,10 @@ import {
 } from "../enum";
 import type { LeadsStatsResponseOutput } from "./definition";
 import definitions from "./definition";
+import type {
+  EndpointReturn,
+  FormAlertState,
+} from "../../system/unified-interface/react/hooks/endpoint-types";
 
 /**
  * Basic endpoint hook for leads statistics

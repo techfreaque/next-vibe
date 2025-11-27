@@ -1,1 +1,4 @@
-export type IconComponent = React.ComponentType<{ className?: string }>;
+export interface IconComponentProps {
+  className?: string;
+}
+export type IconComponent = React.ComponentType<IconComponentProps>;

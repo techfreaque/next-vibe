@@ -4,7 +4,7 @@
 
 import { useMemo } from "react";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import type { CreateApiEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -44,19 +44,19 @@ export function useEndpointFilter<
   filterEndpoint: TEndpoint | null,
   logger: EndpointLogger,
   options: {
-    formOptions?: ApiQueryFormOptions<TEndpoint["TRequestOutput"]>;
+    formOptions?: ApiQueryFormOptions<TEndpoint["types"]["RequestOutput"]>;
     queryOptions?: ApiQueryOptions<
-      TEndpoint["TRequestOutput"],
-      TEndpoint["TResponseOutput"],
-      TEndpoint["TUrlVariablesOutput"]
+      TEndpoint["types"]["RequestOutput"],
+      TEndpoint["types"]["ResponseOutput"],
+      TEndpoint["types"]["UrlVariablesOutput"]
     >;
-    urlPathParams?: TEndpoint["TUrlVariablesOutput"];
-    initialFilters?: Partial<TEndpoint["TRequestOutput"]>;
+    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
+    initialFilters?: Partial<TEndpoint["types"]["RequestOutput"]>;
   } = {},
 ): ApiQueryFormReturn<
-  TEndpoint["TRequestOutput"],
-  TEndpoint["TResponseOutput"],
-  TEndpoint["TUrlVariablesOutput"]
+  TEndpoint["types"]["RequestOutput"],
+  TEndpoint["types"]["ResponseOutput"],
+  TEndpoint["types"]["UrlVariablesOutput"]
 > | null {
   // Return null if endpoint is not provided
   if (!filterEndpoint) {
@@ -65,7 +65,7 @@ export function useEndpointFilter<
   const {
     formOptions = { persistForm: true, autoSubmit: true, debounceMs: 300 },
     queryOptions = {},
-    urlPathParams = {} as TEndpoint["TUrlVariablesOutput"],
+    urlPathParams = {} as TEndpoint["types"]["UrlVariablesOutput"],
     initialFilters,
   } = options;
 
@@ -80,7 +80,7 @@ export function useEndpointFilter<
       defaultValues: {
         ...formOptions.defaultValues,
         ...initialFilters,
-      } as Partial<TEndpoint["TRequestInput"]>, // Type assertion for form defaults
+      } as Partial<TEndpoint["types"]["RequestInput"]>, // Type assertion for form defaults
       // Generate storage key for form persistence
       persistenceKey:
         formOptions.persistenceKey ||
@@ -106,7 +106,7 @@ export function useEndpointFilter<
     urlPathParams: urlPathParams,
     queryOptions: enhancedQueryOptions,
     formOptions: enhancedFormOptions as ApiQueryFormOptions<
-      TEndpoint["TRequestOutput"]
+      TEndpoint["types"]["RequestOutput"]
     >,
     logger: logger,
   });

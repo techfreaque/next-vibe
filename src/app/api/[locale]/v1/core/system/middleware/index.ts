@@ -14,8 +14,6 @@ import { detectLocale } from "./language";
 import { checkLeadId, createLeadId } from "./lead-id";
 import { extractLocaleFromPath, shouldSkipPath } from "./utils";
 
-export type { LanguageMiddlewareOptions } from "./language";
-
 /**
  * Main middleware function that handles both language detection and leadId tracking
  *

@@ -22,12 +22,12 @@ import { smtpRepository } from "../smtp-client/repository";
 import type {
   SmtpSelectionCriteria,
   SmtpSendParams,
-  SmtpSendResult,
 } from "../smtp-client/sending/types";
 import type {
   EmailServiceSendPostRequestOutput,
   EmailServiceSendPostResponseOutput,
 } from "./definition";
+import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 // Define the proper type for locale to match SMTP repository expectations
 type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
@@ -64,18 +64,15 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
       });
 
       // Prepare selection criteria - data is already validated
-      const [langPart, countryPart] = locale.split("-") as [
-        Languages,
-        Countries,
-      ];
+      const { language, country } = getLanguageAndCountryFromLocale(locale);
 
       const selectionCriteria: SmtpSelectionCriteria = {
         campaignType:
           data.campaignSettings.campaignType || CampaignType.NOTIFICATION,
         emailJourneyVariant: data.campaignSettings.emailJourneyVariant || null,
         emailCampaignStage: data.campaignSettings.emailCampaignStage || null,
-        country: countryPart || "GLOBAL",
-        language: langPart || "en",
+        country,
+        language,
       };
 
       const smtpSendData: SmtpSendParams = {
@@ -96,7 +93,7 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
       const result = await smtpRepository.sendEmail(
         smtpSendData,
         user,
-        countryPart || "GLOBAL",
+        locale,
         logger,
       );
 
@@ -122,26 +119,24 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
         });
       }
 
-      const smtpResult: SmtpSendResult = result.data;
-
       logger.debug("Email service: Email sent successfully", {
-        messageId: smtpResult.messageId,
-        accountId: smtpResult.accountId,
+        messageId: result.data.messageId,
+        accountId: result.data.accountId,
         to: data.recipientInfo.to,
       });
 
       return success({
         result: {
           success: true,
-          messageId: smtpResult.messageId,
-          accountId: smtpResult.accountId,
-          accountName: smtpResult.accountName,
-          response: smtpResult.response,
+          messageId: result.data.messageId,
+          accountId: result.data.accountId,
+          accountName: result.data.accountName,
+          response: result.data.response,
           sentAt: new Date().toISOString(),
         },
         deliveryStatus: {
-          accepted: smtpResult.accepted,
-          rejected: smtpResult.rejected,
+          accepted: result.data.accepted,
+          rejected: result.data.rejected,
         },
       });
     } catch (error) {

@@ -19,8 +19,8 @@ import type {
   Methods,
 } from "./enums";
 import type { FieldUsage } from "./enums";
-import type { WidgetConfig } from "./widget-configs";
-import type { CreateApiEndpoint } from "../endpoint/create";
+import type { WidgetConfig } from "../widgets/configs";
+import type { CreateApiEndpoint } from "../endpoints/definition/create";
 import { type UserRoleValue } from "../../../../user/user-roles/enum";
 
 // ============================================================================
@@ -775,7 +775,6 @@ export interface ObjectField<
   TUIConfig extends WidgetConfig = WidgetConfig,
 > {
   type: "object";
-  schema?: z.ZodObject<Record<string, z.ZodTypeAny>>;
   usage: TUsage;
   cache?: CacheStrategy;
   ui: TUIConfig;
@@ -792,7 +791,6 @@ export interface ObjectOptionalField<
   TUIConfig extends WidgetConfig = WidgetConfig,
 > {
   type: "object-optional";
-  schema?: z.ZodObject<Record<string, z.ZodTypeAny>>;
   usage: TUsage;
   cache?: CacheStrategy;
   ui: TUIConfig;
@@ -809,7 +807,6 @@ export interface ArrayField<
   TUIConfig extends WidgetConfig = WidgetConfig,
 > {
   type: "array";
-  schema?: z.ZodArray<z.ZodTypeAny>;
   usage: TUsage;
   cache?: CacheStrategy;
   ui: TUIConfig;
@@ -826,7 +823,6 @@ export interface ArrayOptionalField<
   TUIConfig extends WidgetConfig = WidgetConfig,
 > {
   type: "array-optional";
-  schema?: z.ZodArray<z.ZodTypeAny>;
   usage: TUsage;
   cache?: CacheStrategy;
   ui: TUIConfig;

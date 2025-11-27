@@ -12,7 +12,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types"
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { Platform } from "../../shared/types/platform";
-import { getMCPRegistry } from "../registry";
+import { mcpRegistry } from "../registry";
 import type {
   MCPExecuteRequestOutput,
   MCPExecuteResponseOutput,
@@ -56,24 +56,25 @@ export class MCPExecuteRepositoryImpl implements MCPExecuteRepository {
       argumentKeys: Object.keys(data.arguments),
     });
 
-    // Get MCP registry
-    const registry = getMCPRegistry(locale);
-
     // Ensure initialized
-    if (!registry.isInitialized()) {
-      await registry.initialize();
+    if (!mcpRegistry.isInitialized()) {
+      await mcpRegistry.initialize(logger, locale);
     }
 
     // Execute tool
-    const result = await registry.executeTool({
-      toolName: data.name,
-      data: (data.arguments || {}) as { [key: string]: never },
-      user,
-      locale,
-      requestId: Date.now(),
+    const result = await mcpRegistry.executeTool(
+      {
+        toolName: data.name,
+        data: (data.arguments || {}) as { [key: string]: never },
+        user,
+        locale,
+        requestId: Date.now(),
+        timestamp: Date.now(),
+        logger,
+        platform: Platform.MCP,
+      },
       logger,
-      platform: Platform.MCP,
-    });
+    );
 
     logger.info("[MCP Execute Repository] Tool execution complete", {
       toolName: data.name,

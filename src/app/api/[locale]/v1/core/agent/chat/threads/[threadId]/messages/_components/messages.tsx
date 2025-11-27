@@ -33,7 +33,6 @@ import { FlatMessageView } from "./flat-view/view";
 import { LinearMessageView } from "./linear-view/view";
 import { LoadingIndicator } from "./loading-indicator";
 import { groupMessagesBySequence } from "./message-grouping";
-import { SuggestedPrompts } from "./suggested-prompts";
 import { ThreadedMessage } from "./threaded-view/view";
 
 interface ChatMessagesProps {
@@ -123,7 +122,6 @@ export function ChatMessages({
           updatedAt: new Date(),
           toolCalls: streamMsg.toolCalls,
           sequenceId: streamMsg.sequenceId ?? null,
-          sequenceIndex: streamMsg.sequenceIndex ?? 0,
           // Required fields with defaults
           authorId: null,
           authorName: null,
@@ -356,7 +354,7 @@ export function ChatMessages({
           {mergedMessages.length === 0 && !isLoading ? (
             <Div style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}>
               <Div className="flex items-center justify-center h-full">
-                <SuggestedPrompts locale={locale} />
+                {/* TODO add loading indicator */}
               </Div>
             </Div>
           ) : viewMode === "flat" ? (

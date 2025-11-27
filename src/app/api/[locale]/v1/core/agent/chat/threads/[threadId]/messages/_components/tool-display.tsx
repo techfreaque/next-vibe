@@ -4,9 +4,9 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import type { ToolCall } from "@/app/api/[locale]/v1/core/agent/chat/db";
-import { ToolCallRenderer } from "@/app/api/[locale]/v1/core/system/unified-interface/react/widgets/ToolCallRenderer";
+import { ToolCallRenderer } from "@/app/api/[locale]/v1/core/system/unified-interface/react/widgets/renderers/ToolCallRenderer";
 import { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/platform";
-import type { WidgetRenderContext } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/ui/types";
+import type { WidgetRenderContext } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/widgets/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 /**

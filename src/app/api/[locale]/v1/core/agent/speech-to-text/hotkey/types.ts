@@ -14,9 +14,6 @@ import type {
   TyperBackendType,
 } from "./enum";
 
-// Re-export types from enum for external use
-export type { PlatformType, RecorderBackendType, TyperBackendType };
-
 /**
  * Audio recorder interface
  * Handles platform-specific audio recording

@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   objectField,
   requestDataArrayOptionalField,
@@ -23,7 +23,11 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { DefaultFolderId } from "../chat/config";
 import { ModelId, ModelIdOptions } from "../chat/model-access/models";
-import { ChatMessageRoleOptions, ChatMessageRole } from "../chat/enum";
+import {
+  ChatMessageRoleOptions,
+  ChatMessageRole,
+  NEW_MESSAGE_ID,
+} from "../chat/enum";
 
 /**
  * AI Stream Endpoint (POST)
@@ -151,7 +155,7 @@ const { POST } = createEndpoint({
           .nullable()
           .transform((val) => {
             // Transform "new" to null - client should send null but this provides safety
-            if (val === "new") {
+            if (val === NEW_MESSAGE_ID) {
               return null;
             }
             return val;

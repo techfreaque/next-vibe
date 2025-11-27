@@ -20,9 +20,6 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { JwtPayloadType } from "../../../user/auth/types";
 import {
   findFilesRecursively,
   generateFileHeader,
@@ -40,8 +37,6 @@ type TaskIndexResponseType = typeof endpoints.POST.types.ResponseOutput;
 interface TaskIndexGeneratorRepository {
   generateTaskIndex(
     data: RequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<TaskIndexResponseType>>;
 }
@@ -52,8 +47,6 @@ interface TaskIndexGeneratorRepository {
 class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
   async generateTaskIndex(
     data: RequestType,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<TaskIndexResponseType>> {
     const startTime = Date.now();

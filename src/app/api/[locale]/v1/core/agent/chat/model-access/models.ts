@@ -175,7 +175,7 @@ export const modelOptions: ModelOption[] = [
       ModelUtility.CREATIVE,
       ModelUtility.SMART,
     ],
-    supportsTools: true,
+    supportsTools: false,
   },
   {
     id: ModelId.VENICE_UNCENSORED,

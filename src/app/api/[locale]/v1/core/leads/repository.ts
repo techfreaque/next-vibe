@@ -68,15 +68,15 @@ import {
 import type { ExportQueryType, ExportResponseType } from "./export/definition";
 import type { LeadEngagementResponseOutput } from "./tracking/engagement/definition";
 import type {
-  LeadCreateType,
   LeadDetailResponse,
   LeadListResponseType,
-  LeadQueryType,
   LeadResponseType,
   LeadUpdateType,
   LeadWithEmailType,
   UnsubscribeType,
 } from "./types";
+import type { LeadCreateRequestTypeOutput } from "./create/definition";
+import type { LeadListGetRequestTypeOutput } from "./list/definition";
 
 // Type aliases for enum values
 type LeadSortFieldType = typeof LeadSortFieldValues;
@@ -99,7 +99,7 @@ const INVALID_STATUS_TRANSITION_ERROR = "Invalid status transition";
  */
 export interface LeadsRepository {
   createLead(
-    data: LeadCreateType,
+    data: LeadCreateRequestTypeOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -162,7 +162,7 @@ export interface LeadsRepository {
   ): Promise<ResponseType<LeadDetailResponse>>;
 
   listLeads(
-    query: Partial<LeadQueryType>,
+    query: Partial<LeadListGetRequestTypeOutput>,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -380,7 +380,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * Create a new lead with business logic
    */
   async createLead(
-    data: LeadCreateType,
+    data: LeadCreateRequestTypeOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -663,7 +663,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * List leads with filtering and pagination with business logic
    */
   async listLeads(
-    query: Partial<LeadQueryType>,
+    query: Partial<LeadListGetRequestTypeOutput>,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,

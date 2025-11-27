@@ -1,10 +1,10 @@
 import type { ApiFormReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/types";
-import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 
 import passwordEndpoints from "./definition";
+import { useApiForm } from "../../../../system/unified-interface/react/hooks/use-api-mutation-form";
 
 /**
  * Hook for updating user password
@@ -14,9 +14,9 @@ import passwordEndpoints from "./definition";
 export function useUpdatePassword(
   logger: EndpointLogger,
 ): ApiFormReturn<
-  (typeof passwordEndpoints.POST)["TRequestOutput"],
-  (typeof passwordEndpoints.POST)["TResponseOutput"],
-  (typeof passwordEndpoints.POST)["TUrlVariablesOutput"]
+  (typeof passwordEndpoints.POST)["types"]["RequestOutput"],
+  (typeof passwordEndpoints.POST)["types"]["ResponseOutput"],
+  (typeof passwordEndpoints.POST)["types"]["UrlVariablesOutput"]
 > {
   const { toast } = useToast();
   const { t } = useTranslation();

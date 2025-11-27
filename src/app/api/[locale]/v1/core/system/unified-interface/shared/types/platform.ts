@@ -11,7 +11,7 @@ export enum Platform {
   CLI = "cli",
   AI = "ai",
   MCP = "mcp",
-  WEB = "web",
-  MOBILE = "mobile",
-  EMAIL = "email",
+  TRPC = "trpc",
+  NEXT_PAGE = "next-page",
+  NEXT_API = "next-api",
 }

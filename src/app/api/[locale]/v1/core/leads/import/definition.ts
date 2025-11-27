@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   objectField,
   requestDataField,
@@ -292,7 +292,8 @@ const { POST } = createEndpoint({
             row: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.v1.core.leads.import.post.response.errors" as const,
+                content:
+                  "app.api.v1.core.leads.import.post.response.errors" as const,
                 fieldType: FieldDataType.NUMBER,
               },
               z.number(),
@@ -300,7 +301,8 @@ const { POST } = createEndpoint({
             email: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.v1.core.leads.import.post.response.errors" as const,
+                content:
+                  "app.api.v1.core.leads.import.post.response.errors" as const,
                 fieldType: FieldDataType.TEXT,
               },
               z.string().optional(),
@@ -308,7 +310,8 @@ const { POST } = createEndpoint({
             error: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.v1.core.leads.import.post.response.errors" as const,
+                content:
+                  "app.api.v1.core.leads.import.post.response.errors" as const,
                 fieldType: FieldDataType.TEXT,
               },
               z.string(),
@@ -319,8 +322,7 @@ const { POST } = createEndpoint({
       summary: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.v1.core.leads.import.post.response.summary" as const,
+          title: "app.api.v1.core.leads.import.post.response.summary" as const,
           layoutType: LayoutType.GRID,
           columns: 3,
         },
@@ -329,7 +331,8 @@ const { POST } = createEndpoint({
           newLeads: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.v1.core.leads.import.post.response.summary" as const,
+              content:
+                "app.api.v1.core.leads.import.post.response.summary" as const,
               fieldType: FieldDataType.NUMBER,
             },
             z.number(),
@@ -337,7 +340,8 @@ const { POST } = createEndpoint({
           updatedLeads: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.v1.core.leads.import.post.response.summary" as const,
+              content:
+                "app.api.v1.core.leads.import.post.response.summary" as const,
               fieldType: FieldDataType.NUMBER,
             },
             z.number(),
@@ -345,7 +349,8 @@ const { POST } = createEndpoint({
           skippedDuplicates: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.v1.core.leads.import.post.response.summary" as const,
+              content:
+                "app.api.v1.core.leads.import.post.response.summary" as const,
               fieldType: FieldDataType.NUMBER,
             },
             z.number(),
@@ -523,11 +528,6 @@ export type LeadsImportRequestInput = typeof POST.types.RequestInput;
 export type LeadsImportRequestOutput = typeof POST.types.RequestOutput;
 export type LeadsImportResponseInput = typeof POST.types.ResponseInput;
 export type LeadsImportResponseOutput = typeof POST.types.ResponseOutput;
-
-// Re-export types needed by generic import system
-export type { NewCsvImportJob, NewImportBatch } from "./db";
-export { CsvImportJobStatus } from "./enum";
-export type { CsvImportConfig, DomainImportRepository } from "./repository";
 
 // Export job-related types from specific endpoints
 export interface ImportJobUpdateResponseType {

@@ -14,7 +14,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../../../../config";
-import { ChatMessageRole } from "../../../../enum";
+import { ChatMessageRole, NEW_MESSAGE_ID } from "../../../../enum";
 import type { ModelId } from "../../../../model-access/models";
 import type { ChatMessage } from "../../../../hooks/store";
 import type { UseAIStreamReturn } from "../../../../../ai-stream/hooks/use-ai-stream";
@@ -120,7 +120,8 @@ export function useMessageOperations(
         // If activeThreadId is set but doesn't exist in threads store, it's likely a folder ID
         // In that case, treat it as null to create a new thread
         // Also handle "new" from URL parser - convert to null for API
-        let threadIdToUse = activeThreadId === "new" ? null : activeThreadId;
+        let threadIdToUse =
+          activeThreadId === NEW_MESSAGE_ID ? null : activeThreadId;
 
         logger.debug("Message operations: Checking activeThreadId", {
           activeThreadId: threadIdToUse,

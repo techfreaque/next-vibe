@@ -1,5 +1,3 @@
-export type { LucideProps } from "lucide-react";
-
 // Type compatibility checks with web icons
 import * as Activity from "./Activity";
 import type * as webActivity from "../../../web/ui/icons/Activity";
@@ -313,7 +311,8 @@ void testDotsHorizontalIcon;
 
 import * as DragHandleDots2Icon from "./DragHandleDots2Icon";
 import type * as webDragHandleDots2Icon from "../../../web/ui/icons/DragHandleDots2Icon";
-const testDragHandleDots2Icon: typeof webDragHandleDots2Icon = DragHandleDots2Icon;
+const testDragHandleDots2Icon: typeof webDragHandleDots2Icon =
+  DragHandleDots2Icon;
 void testDragHandleDots2Icon;
 
 import * as Download from "./Download";
@@ -588,7 +587,8 @@ void testMailOpen;
 
 import * as MagnifyingGlassIcon from "./MagnifyingGlassIcon";
 import type * as webMagnifyingGlassIcon from "../../../web/ui/icons/MagnifyingGlassIcon";
-const testMagnifyingGlassIcon: typeof webMagnifyingGlassIcon = MagnifyingGlassIcon;
+const testMagnifyingGlassIcon: typeof webMagnifyingGlassIcon =
+  MagnifyingGlassIcon;
 void testMagnifyingGlassIcon;
 
 import * as Map from "./Map";

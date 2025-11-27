@@ -22,8 +22,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { envClient } from "@/config/env-client";
 import { type CreateApiEndpointAny } from "../shared/types/endpoint";
@@ -33,41 +31,31 @@ import { type CountryLanguage } from "@/i18n/core/config";
  * Type helpers to extract input/output types from endpoint definitions
  */
 
-type InferRequestInput<T> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends CreateApiEndpoint<any, any, any, any>
-    ? T["types"]["RequestInput"]
-    : never;
+export type InferRequestInput<T> = T extends CreateApiEndpointAny
+  ? T["types"]["RequestInput"]
+  : never;
 
-type InferRequestOutput<T> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends CreateApiEndpoint<any, any, any, any>
-    ? T["types"]["RequestOutput"]
-    : never;
+export type InferRequestOutput<T> = T extends CreateApiEndpointAny
+  ? T["types"]["RequestOutput"]
+  : never;
 
-type InferResponseOutput<T> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends CreateApiEndpoint<any, any, any, any>
-    ? T["types"]["ResponseOutput"]
-    : never;
+export type InferResponseOutput<T> = T extends CreateApiEndpointAny
+  ? T["types"]["ResponseOutput"]
+  : never;
 
-type InferUrlVariablesInput<T> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends CreateApiEndpoint<any, any, any, any>
-    ? T["types"]["UrlVariablesInput"]
-    : never;
+export type InferUrlVariablesInput<T> = T extends CreateApiEndpointAny
+  ? T["types"]["UrlVariablesInput"]
+  : never;
 
-type InferUrlVariablesOutput<T> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends CreateApiEndpoint<any, any, any, any>
-    ? T["types"]["UrlVariablesOutput"]
-    : never;
+export type InferUrlVariablesOutput<T> = T extends CreateApiEndpointAny
+  ? T["types"]["UrlVariablesOutput"]
+  : never;
 
 /**
  * Combined parameters for endpoint calls
  * Merges request data and URL parameters into a single object
  */
-type EndpointParams<TEndpoint> =
+export type EndpointParams<TEndpoint> =
   (InferRequestOutput<TEndpoint> extends undefined
     ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
       {}
@@ -81,10 +69,7 @@ type EndpointParams<TEndpoint> =
  * Construct URL path from endpoint definition and parameters
  * Uses envClientNative.API_BASE_URL for clean configuration
  */
-function constructUrl<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TEndpoint extends CreateApiEndpoint<any, Methods, any, any>,
->(
+function constructUrl<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   params: EndpointParams<TEndpoint>,
   locale: string,
@@ -312,15 +297,3 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
     });
   }
 }
-
-/**
- * Type-only exports for external use
- */
-export type {
-  EndpointParams,
-  InferRequestInput,
-  InferRequestOutput,
-  InferResponseOutput,
-  InferUrlVariablesInput,
-  InferUrlVariablesOutput,
-};

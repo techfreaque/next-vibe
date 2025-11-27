@@ -59,43 +59,71 @@ export async function calculateMessageDepth(
 }
 
 /**
- * Fetch message history for a thread
+ * Fetch message history for a thread, optionally filtered by branch
  * Returns messages in chronological order for AI context
+ *
+ * Branch filtering logic:
+ * - If parentMessageId is null/undefined: Return empty array (new thread root)
+ * - If parentMessageId is provided: Traverse UP the tree from that message to root
+ *   and return all ancestors in chronological order
+ *
+ * @param threadId - The thread ID to fetch messages from
+ * @param userId - The user ID (for permission filtering - currently not used)
+ * @param logger - Logger instance
+ * @param parentMessageId - Optional parent message ID to filter by branch
+ * @returns Array of messages in AI SDK format
  */
 export async function fetchMessageHistory(
   threadId: string,
   userId: string,
   logger: EndpointLogger,
-): Promise<Array<{ role: "user" | "assistant" | "system"; content: string }>> {
-  const messages = await db
+  parentMessageId: string | null,
+): Promise<Array<{ role: ChatMessageRole; content: string }>> {
+  // If no parent message, this is a new root message - return empty history
+  if (!parentMessageId) {
+    logger.info("No parent message - returning empty history (new root)", {
+      threadId,
+    });
+    return [];
+  }
+
+  // Fetch all messages in the thread to build the tree
+  const allMessages = await db
     .select()
     .from(chatMessages)
-    .where(
-      and(
-        eq(chatMessages.threadId, threadId),
-        eq(chatMessages.authorId, userId),
-      ),
-    )
+    .where(eq(chatMessages.threadId, threadId))
     .orderBy(chatMessages.createdAt);
 
-  logger.info("Fetched message history", {
+  logger.debug("Fetched all thread messages for branch filtering", {
     threadId,
-    messageCount: messages.length,
+    totalMessageCount: allMessages.length,
+    parentMessageId,
   });
 
-  return messages.map((msg) => {
-    const roleLowercase = msg.role.toLowerCase();
-    const validRole: "user" | "assistant" | "system" =
-      roleLowercase === "user" ||
-      roleLowercase === "assistant" ||
-      roleLowercase === "system"
-        ? roleLowercase
-        : "user";
-    return {
-      role: validRole,
-      content: msg.content,
-    };
+  // Build ancestry chain by traversing UP from parent to root
+  const messageMap = new Map(allMessages.map((msg) => [msg.id, msg]));
+  const ancestorIds = new Set<string>();
+
+  let currentId: string | null = parentMessageId;
+  while (currentId) {
+    ancestorIds.add(currentId);
+    const currentMessage = messageMap.get(currentId);
+    currentId = currentMessage?.parentId ?? null;
+  }
+
+  // Filter messages to only include ancestors and maintain chronological order
+  const branchMessages = allMessages.filter((msg) => ancestorIds.has(msg.id));
+
+  logger.info("Fetched message history (branch filtered)", {
+    threadId,
+    parentMessageId,
+    totalMessages: allMessages.length,
+    branchMessages: branchMessages.length,
+    ancestorCount: ancestorIds.size,
   });
+
+  // Map to role+content format (keep ERROR messages in chain)
+  return branchMessages;
 }
 
 /**
@@ -105,7 +133,7 @@ export async function fetchMessageHistory(
  */
 export async function getParentMessage(
   messageId: string,
-  userId: string,
+  userId: string | undefined,
   logger: EndpointLogger,
 ): Promise<{
   id: string;
@@ -123,7 +151,10 @@ export async function getParentMessage(
     .limit(1);
 
   if (!message) {
-    logger.error("Parent message not found", { messageId, userId });
+    logger.error("Parent message not found", {
+      messageId,
+      userId: userId ?? "public",
+    });
     return null;
   }
 
@@ -184,7 +215,6 @@ export async function createAiMessagePlaceholder(params: {
   model: string;
   persona: string | null | undefined;
   sequenceId: string | null;
-  sequenceIndex: number;
   logger: EndpointLogger;
 }): Promise<void> {
   await db.insert(chatMessages).values({
@@ -196,17 +226,15 @@ export async function createAiMessagePlaceholder(params: {
     depth: params.depth,
     authorId: params.userId ?? null,
     sequenceId: params.sequenceId,
-    sequenceIndex: params.sequenceIndex,
     isAI: true,
     model: params.model,
-    persona: params.persona ?? undefined,
+    persona: params.persona ?? null,
   });
 
   params.logger.info("Created AI message placeholder", {
     messageId: params.messageId,
     threadId: params.threadId,
     sequenceId: params.sequenceId,
-    sequenceIndex: params.sequenceIndex,
     userId: params.userId ?? "public",
   });
 }
@@ -221,7 +249,6 @@ export async function createErrorMessage(params: {
   errorType: string;
   errorDetails?: Record<string, string | number | boolean | null>;
   sequenceId?: string | null;
-  sequenceIndex?: number;
   logger: EndpointLogger;
 }): Promise<void> {
   const metadata: Record<
@@ -249,7 +276,6 @@ export async function createErrorMessage(params: {
     authorId: params.userId ?? null,
     isAI: false,
     sequenceId: params.sequenceId ?? null,
-    sequenceIndex: params.sequenceIndex ?? 0,
     metadata,
   });
 
@@ -269,33 +295,40 @@ export async function createTextMessage(params: {
   depth: number;
   userId: string | undefined;
   model: string;
-  persona: string | null | undefined;
+  persona: string;
   sequenceId: string | null;
-  sequenceIndex: number;
   logger: EndpointLogger;
 }): Promise<void> {
-  await db.insert(chatMessages).values({
-    id: params.messageId,
-    threadId: params.threadId,
-    role: ChatMessageRole.ASSISTANT,
-    content: params.content,
-    parentId: params.parentId,
-    depth: params.depth,
-    authorId: params.userId ?? null,
-    sequenceId: params.sequenceId,
-    sequenceIndex: params.sequenceIndex,
-    isAI: true,
-    model: params.model,
-    persona: params.persona ?? undefined,
-  });
+  try {
+    await db.insert(chatMessages).values({
+      id: params.messageId,
+      threadId: params.threadId,
+      role: ChatMessageRole.ASSISTANT,
+      content: params.content,
+      parentId: params.parentId,
+      depth: params.depth,
+      authorId: params.userId ?? null,
+      sequenceId: params.sequenceId,
+      isAI: true,
+      model: params.model,
+      persona: params.persona,
+    });
 
-  params.logger.debug("Created text message", {
-    messageId: params.messageId,
-    threadId: params.threadId,
-    sequenceId: params.sequenceId,
-    sequenceIndex: params.sequenceIndex,
-    userId: params.userId ?? "public",
-  });
+    params.logger.debug("Created text message", {
+      messageId: params.messageId,
+      threadId: params.threadId,
+      sequenceId: params.sequenceId,
+      userId: params.userId ?? "public",
+    });
+  } catch (error) {
+    params.logger.error("Failed to insert chat message", parseError(error), {
+      messageId: params.messageId,
+      persona: params.persona,
+      model: params.model,
+    });
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Internal helper throws, caught by caller
+    throw error;
+  }
 }
 
 export async function updateMessageContent(params: {
@@ -322,7 +355,6 @@ export async function createToolMessage(params: {
   depth: number;
   userId: string | undefined;
   sequenceId: string | null;
-  sequenceIndex: number;
   model: string;
   persona: string;
   logger: EndpointLogger;
@@ -348,7 +380,6 @@ export async function createToolMessage(params: {
     depth: params.depth,
     authorId: params.userId ?? null,
     sequenceId: params.sequenceId,
-    sequenceIndex: params.sequenceIndex,
     isAI: true,
     model: params.model,
     persona: params.persona,
@@ -360,7 +391,6 @@ export async function createToolMessage(params: {
     threadId: params.threadId,
     toolName: params.toolCall.toolName,
     sequenceId: params.sequenceId,
-    sequenceIndex: params.sequenceIndex,
     userId: params.userId ?? "public",
   });
 }
@@ -407,11 +437,10 @@ export async function handleEditOperation<
     };
   }
 
-  const parentMessage = await getParentMessage(
-    data.parentMessageId,
-    userId ?? "",
-    logger,
-  );
+  // At this point, parentMessageId is guaranteed to be a non-empty string
+  const parentMessageId: string = data.parentMessageId;
+
+  const parentMessage = await getParentMessage(parentMessageId, userId, logger);
 
   if (!parentMessage) {
     return null;
@@ -622,7 +651,6 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
           persona: msg.persona ?? null,
           tokens: msg.tokens,
           sequenceId: msg.sequenceId ?? null,
-          sequenceIndex: msg.sequenceIndex ?? 0,
           toolCalls: toolCalls ?? null,
           createdAt: msg.createdAt.toISOString(),
           updatedAt: msg.updatedAt.toISOString(),

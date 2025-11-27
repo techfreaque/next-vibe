@@ -164,7 +164,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
               error: migrateResult.messageParams,
             });
             return fail({
-              message: "app.api.v1.core.system.server.start.post.errors.migration.title",
+              message: "app.api.v1.core.system.server.start.post.errors.server.title",
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
               messageParams: {
                 error: errorMsg,
@@ -177,7 +177,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           output.push(`   ❌ ${errorMsg}`);
           logger.error("Migration error, cannot start server", { error: errorMsg });
           return fail({
-            message: "app.api.v1.core.system.server.start.post.errors.migration.title",
+            message: "app.api.v1.core.system.server.start.post.errors.server.title",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
               error: errorMsg,

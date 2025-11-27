@@ -3,7 +3,7 @@ import { Text as RNText, View } from "react-native";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import type { LinkProps } from "@/packages/next-vibe-ui/web/ui/link";
-import { type ReactNode, Children, isValidElement } from "react";
+import { type ReactNode, Children, isValidElement, type JSX } from "react";
 
 const StyledText = styled(RNText, {
   className: "style",
@@ -75,3 +75,4 @@ export function Link({
 }
 
 Link.displayName = "Link";
+export type { LinkProps };

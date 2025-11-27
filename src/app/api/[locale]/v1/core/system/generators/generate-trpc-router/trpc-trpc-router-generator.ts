@@ -14,7 +14,7 @@ declare const process: {
 import fs from "node:fs";
 import path from "node:path";
 
-import { findRouteFiles } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/filesystem/scanner";
+import { findRouteFiles } from "@/app/api/[locale]/v1/core/system/translations/reorganize/repository/scanner";
 
 // RouteFileStructure represents a route module with HTTP method handlers
 interface RouteFileStructure {

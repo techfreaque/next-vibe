@@ -7,6 +7,7 @@ import {
   DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { NEW_MESSAGE_ID } from "@/app/api/[locale]/v1/core/agent/chat/enum";
 
 /**
  * Parsed URL result
@@ -54,13 +55,13 @@ export function parseChatUrl(urlPath: string[] | undefined): ParsedChatUrl {
   const lastSegment = urlPath[urlPath.length - 1];
 
   // Check if last segment is "new" (new thread)
-  if (lastSegment === "new") {
+  if (lastSegment === NEW_MESSAGE_ID) {
     // URL is /rootId/new or /rootId/subfolderId/new
     const subFolderId = urlPath.length >= 3 ? urlPath[1] : null;
     return {
       initialRootFolderId: rootId,
       initialSubFolderId: subFolderId,
-      initialThreadId: "new",
+      initialThreadId: NEW_MESSAGE_ID,
     };
   }
 

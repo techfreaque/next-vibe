@@ -29,7 +29,6 @@ export interface StreamingMessage {
   error?: string;
   toolCalls?: ToolCall[];
   sequenceId?: string | null; // Links messages in the same AI response sequence
-  sequenceIndex?: number; // Order within sequence
 }
 
 /**

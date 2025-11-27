@@ -91,7 +91,6 @@ export function useMessageLoader(
                 upvotes: null,
                 downvotes: null,
                 sequenceId: message.sequenceId ?? null,
-                sequenceIndex: message.sequenceIndex ?? 0,
                 createdAt: new Date(message.createdAt),
                 updatedAt: new Date(message.updatedAt),
               });

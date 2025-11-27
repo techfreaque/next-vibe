@@ -18,7 +18,7 @@ import {
   type UserRoleValue,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import type { ApiEndpoint, CreateApiEndpoint } from "../../endpoint/create";
+import type { ApiEndpoint, CreateApiEndpoint } from "../../endpoints/definition/create";
 import type {
   ArrayField,
   CreateApiEndpointAny,
@@ -323,7 +323,7 @@ type Test8_1_Result = Test8_1_UseApiFormCurrent extends (
 const test8_1: Test8_1_Result = "✓ PASS";
 
 // Test 8.2: Test that we can infer types from the endpoint
-type Test8_2_InferredRequest = Test5_2_LoginEndpoint["TRequestOutput"];
+type Test8_2_InferredRequest = Test5_2_LoginEndpoint["types"]["RequestOutput"];
 
 // Check that inferred types are not 'never'
 type Test8_2_RequestResult = Test8_2_InferredRequest extends never
@@ -508,7 +508,7 @@ type Test12_1_Result =
 const test12_1: Test12_1_Result = "✓ PASS";
 
 // Test 12.2: Verify type inference works with custom fields
-type Test12_2_CustomRequest = Test12_1_CustomEndpoint["TRequestOutput"];
+type Test12_2_CustomRequest = Test12_1_CustomEndpoint["types"]["RequestOutput"];
 type Test12_2_Result = Test12_2_CustomRequest extends {
   customProp1: string;
   customProp2: number;
@@ -543,7 +543,7 @@ type Test13_2_OptionalEndpoint = CreateApiEndpoint<
   readonly UserRoleValue[],
   Test13_1_OptionalFields
 >;
-type Test13_2_Request = Test13_2_OptionalEndpoint["TRequestOutput"];
+type Test13_2_Request = Test13_2_OptionalEndpoint["types"]["RequestOutput"];
 type Test13_2_Result = Test13_2_Request extends {
   required: string;
   optional?: string;
@@ -715,7 +715,7 @@ const test16_2: Test16_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 17.1: Verify request type has expected properties
-type Test17_1_LoginRequest = Test5_2_LoginEndpoint["TRequestOutput"];
+type Test17_1_LoginRequest = Test5_2_LoginEndpoint["types"]["RequestOutput"];
 type Test17_1_Result = Test17_1_LoginRequest extends {
   credentials: any;
   options: any;
@@ -725,7 +725,7 @@ type Test17_1_Result = Test17_1_LoginRequest extends {
 const test17_1: Test17_1_Result = "✓ PASS";
 
 // Test 17.2: Verify response type is not never
-type Test17_2_LoginResponse = Test5_2_LoginEndpoint["TResponseOutput"];
+type Test17_2_LoginResponse = Test5_2_LoginEndpoint["types"]["ResponseOutput"];
 type Test17_2_HasUser = Test17_2_LoginResponse extends never
   ? "✗ FAIL"
   : "✓ PASS";

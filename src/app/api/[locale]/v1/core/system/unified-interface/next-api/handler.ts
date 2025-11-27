@@ -1,217 +1,136 @@
 /**
  * Next.js Handler Creation
- * Creates Next.js route handlers from API handler options using unified core logic
+ * Thin adapter that extracts Next.js request data and delegates to shared generic handler
+ * Handles ONLY Next.js-specific concerns: NextRequest parsing, NextResponse wrapping, streaming
  */
 
-import type { NextRequest } from "next/server";
+import type { NextRequest, NextResponse } from "next/server";
 import {
-  success,
-  ErrorResponseTypes,
   isStreamingResponse,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import type { z } from "zod";
-
-import { EmailHandlingRepositoryImpl } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/repository";
-import type {
-  EmailHandleRequestOutput,
-  EmailHandleResponseOutput,
-} from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/types";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import {
-  createHTTPErrorResponse,
-  createHTTPSuccessResponse,
-} from "../../unified-interface/react/next-endpoint-response";
-import { validateNextRequestData } from "../../unified-interface/react/next-validation";
-import type { EndpointLogger } from "../shared/logger/endpoint";
+  wrapSuccessResponse,
+  wrapErrorResponse,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/next-api/next-endpoint-response";
+import {
+  parseRequestBody,
+  parseSearchParams,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/next-api/request-parser";
 import { createEndpointLogger } from "../shared/logger/endpoint";
-import {
-  authenticateUser,
-  executeHandler,
-} from "../shared/server-only/execution/core";
 import { Platform } from "../shared/types/platform";
-import type { Methods } from "../shared/types/enums";
-import type {
-  ApiHandlerOptions,
-  NextHandlerReturnType,
-} from "../shared/types/handler";
-import { type UnifiedField } from "../shared/types/endpoint";
+import { Methods } from "../shared/types/enums";
+import type { CreateApiEndpointAny } from "../shared/types/endpoint";
+import {
+  type ApiHandlerOptions,
+  createGenericHandler,
+} from "../shared/endpoints/route/handler";
 
-// Create email handling repository instance
-const emailHandlingRepository = new EmailHandlingRepositoryImpl();
-
-// Utility function to handle emails after successful API response
-async function handleEmails<
-  TRequestOutput,
-  TResponseOutput,
-  TUrlVariablesOutput,
->(
-  data: EmailHandleRequestOutput<
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput
-  >,
-  logger: EndpointLogger,
-): Promise<ResponseType<EmailHandleResponseOutput>> {
-  return await emailHandlingRepository.handleEmails(
-    data,
-    data.user,
-    data.locale,
-    logger,
-  );
-}
+/**
+ * API handler return type
+ * Supports both standard JSON responses (NextResponse) and streaming responses (Response)
+ */
+export type NextHandlerReturnType<TResponseOutput, TUrlVariablesInput> = (
+  request: NextRequest,
+  {
+    params,
+  }: { params: Promise<TUrlVariablesInput & { locale: CountryLanguage }> },
+) => Promise<NextResponse<ResponseType<TResponseOutput>> | Response>;
 
 /**
  * Create a Next.js route handler
+ * Thin wrapper that extracts NextRequest data and delegates to shared generic handler
  * @param options - API handler options
  * @returns Next.js route handler function
  */
-export function createNextHandler<
-  TRequestOutput,
-  TResponseOutput,
-  TUrlVariablesOutput,
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
->(
+export function createNextHandler<T extends CreateApiEndpointAny>(
   options: ApiHandlerOptions<
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TFields
+    T["types"]["RequestOutput"],
+    T["types"]["ResponseOutput"],
+    T["types"]["UrlVariablesOutput"],
+    T["allowedRoles"],
+    T
   >,
-): NextHandlerReturnType<TResponseOutput, TUrlVariablesOutput> {
-  const { endpoint, handler, email } = options;
+): NextHandlerReturnType<
+  T["types"]["ResponseOutput"],
+  T["types"]["UrlVariablesOutput"]
+> {
+  const { endpoint } = options;
+
+  // Create the shared generic handler (handles auth, permissions, validation, business logic, email)
+  const genericHandler = createGenericHandler(options);
 
   return async (
     request: NextRequest,
     {
       params,
     }: {
-      params: Promise<TUrlVariablesOutput & { locale: CountryLanguage }>;
+      params: Promise<
+        T["types"]["UrlVariablesOutput"] & { locale: CountryLanguage }
+      >;
     },
   ) => {
-    // Get locale and translation function
+    // Extract Next.js-specific data
     const { locale, ...resolvedParams } = await params;
-    const urlParameters = resolvedParams as TUrlVariablesOutput;
+    const urlPathParams =
+      resolvedParams as unknown as T["types"]["UrlVariablesOutput"];
     const logger = createEndpointLogger(false, Date.now(), locale);
-    const { t } = simpleT(locale);
+
     try {
-      // Authenticate user using unified core with Next.js context
-      const authResult = await authenticateUser(
-        endpoint,
-        { platform: Platform.WEB, locale },
-        logger,
-      );
-      if (!authResult.success) {
-        return createHTTPErrorResponse({
-          message: authResult.message,
-          errorType: authResult.errorType,
-          messageParams: authResult.messageParams,
-          cause: authResult.cause,
-          logger,
-        });
-      }
+      // Extract raw request data WITHOUT validation
+      // genericHandler will handle all validation
+      const requestData =
+        endpoint.method === Methods.GET
+          ? parseSearchParams(request.nextUrl.searchParams)
+          : await parseRequestBody(request, logger);
 
-      // Validate request data using unified core
-      const validationResult = await validateNextRequestData(
-        endpoint,
-        {
-          method: endpoint.method,
-          urlParameters: urlParameters as Record<string, string>,
-          request,
-          locale,
-        },
+      // Call shared generic handler (does auth, permissions, validation, business logic, email, SMS)
+      const result = await genericHandler({
+        data: requestData as T["types"]["RequestOutput"],
+        urlPathParams,
+        locale,
         logger,
-      );
-
-      if (!validationResult.success) {
-        return createHTTPErrorResponse({
-          message: validationResult.message,
-          errorType: validationResult.errorType,
-          messageParams: validationResult.messageParams,
-          cause: validationResult.cause,
-          logger,
-        });
-      }
-
-      // Execute handler using unified core
-      const result = await executeHandler({
-        endpoint,
-        handler,
-        validatedData: validationResult.data.requestData as TRequestOutput,
-        urlPathParams: validationResult.data
-          .urlPathParams as TUrlVariablesOutput,
-        user: authResult.data,
-        t,
-        locale: validationResult.data.locale,
-        request,
-        logger,
+        platform: Platform.NEXT_API,
+        request, // Pass NextRequest for auth context
       });
 
-      // Check if this is a streaming response
+      // Handle streaming responses (Next.js-specific)
       if (isStreamingResponse(result)) {
-        // Return the streaming response directly without wrapping
         logger.info("Returning streaming response");
         return result.response;
       }
 
+      // Handle errors - wrap in NextResponse
       if (!result.success) {
-        return createHTTPErrorResponse({
-          message: result.message,
-          errorType: result.errorType,
-          messageParams: result.messageParams,
-          cause: result.cause,
-          logger,
-        });
+        return wrapErrorResponse(result, locale, logger);
       }
 
-      // Create success response with email handling
-      return await createHTTPSuccessResponse<TResponseOutput>({
-        data: result.data as TResponseOutput,
-        schema: endpoint.responseSchema as z.ZodType<TResponseOutput>,
-        status: 200,
-        onSuccess: async (data) => {
-          await handleEmails<
-            TRequestOutput,
-            TResponseOutput,
-            TUrlVariablesOutput
-          >(
-            {
-              email,
-              user: authResult.data,
-              responseData: data,
-              urlPathParams: validationResult.data
-                .urlPathParams as TUrlVariablesOutput,
-              requestData: validationResult.data.requestData as TRequestOutput,
-              t,
-              locale: validationResult.data.locale,
-            },
-            logger,
-          );
-          return success(undefined);
-        },
-        logger,
-      });
+      // Wrap validated success result in NextResponse
+      return wrapSuccessResponse(
+        result.data as T["types"]["ResponseOutput"],
+        200,
+      );
     } catch (error) {
       // Handle unexpected errors
-      // Handle unexpected errors - error details are included in messageParams
-      return createHTTPErrorResponse({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: parseError(error).message,
+      logger.error("Unexpected error in Next.js handler", parseError(error));
+      return wrapErrorResponse(
+        {
+          success: false,
+          message: "app.api.v1.core.shared.errorTypes.internal_error",
+          errorType: {
+            errorKey: "app.api.v1.core.shared.errorTypes.internal_error",
+            errorCode: 500,
+          },
+          messageParams: {
+            error: parseError(error).message,
+          },
         },
+        locale,
         logger,
-      });
+      );
     }
   };
 }

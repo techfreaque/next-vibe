@@ -9,22 +9,12 @@ import type { FSWatcher } from "node:fs";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { createMockUser } from "@/app/api/[locale]/v1/core/system/unified-interface/cli/auth/cli-user";
 
 import { generateAllRepository } from "../../../generators/generate-all/repository";
 import { CronTaskPriority, TaskCategory } from "../enum";
 import type { TaskRunner } from "../types/repository";
-
-/**
- * Helper to safely access environment variables
- */
-const getEnvVar = (key: string): string | undefined => {
-  try {
-    return process.env[key];
-  } catch {
-    return undefined;
-  }
-};
+import { Environment } from "../../../../shared/utils";
+import { env } from "@/config/env";
 
 /**
  * Determine if a file change should trigger generator execution
@@ -72,7 +62,7 @@ const devWatcherTaskRunner: TaskRunner = {
   description:
     "app.api.v1.core.system.unifiedInterface.tasks.devWatcher.description",
   category: TaskCategory.DEVELOPMENT,
-  enabled: getEnvVar("NODE_ENV") === "development",
+  enabled: env.NODE_ENV === Environment.DEVELOPMENT,
   priority: CronTaskPriority.MEDIUM,
 
   async run({
@@ -83,7 +73,7 @@ const devWatcherTaskRunner: TaskRunner = {
     signal: AbortSignal;
   }): Promise<void> {
     // Only run in development
-    if (getEnvVar("NODE_ENV") !== "development") {
+    if (env.NODE_ENV !== Environment.DEVELOPMENT) {
       logger.debug("Dev watcher skipped (not in development mode)");
       return;
     }
@@ -149,9 +139,6 @@ const startSmartFileWatcher = async (
         `📁 File changes detected - Running generators (change #${changeCount})...`,
       );
 
-      // Run generators with change detection
-      const mockUser = createMockUser();
-
       await generateAllRepository.generateAll(
         {
           outputDir: "src/app/api/[locale]/v1/core/system/generated",
@@ -159,9 +146,8 @@ const startSmartFileWatcher = async (
           skipEndpoints: false,
           skipSeeds: true, // Seeds don't need frequent regeneration
           skipTaskIndex: false, // Keep task index updated
+          skipTrpc: false,
         },
-        mockUser,
-        "en-GLOBAL",
         logger,
       );
 
@@ -263,14 +249,10 @@ const startPollingWatcher = async (
       watchCount++;
 
       // Import generators dynamically
-      const { generateAllRepository } = await import(
-        "@/app/api/[locale]/v1/core/system/generators/generate-all/repository"
-      );
+      const { generateAllRepository } =
+        await import("@/app/api/[locale]/v1/core/system/generators/generate-all/repository");
 
       logger.info(`⏰ Polling cycle #${watchCount} - Running generators...`);
-
-      // Run generators
-      const mockUser = createMockUser();
 
       await generateAllRepository.generateAll(
         {
@@ -279,9 +261,8 @@ const startPollingWatcher = async (
           skipEndpoints: false,
           skipSeeds: true,
           skipTaskIndex: false,
+          skipTrpc: false,
         },
-        mockUser,
-        "en-GLOBAL",
         logger,
       );
 

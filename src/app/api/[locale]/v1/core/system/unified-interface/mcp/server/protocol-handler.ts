@@ -11,11 +11,10 @@ import { getCliUser } from "@/app/api/[locale]/v1/core/system/unified-interface/
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { ParameterValue } from "../../shared/server-only/execution/executor";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { Platform } from "../../shared/types/platform";
-import { MCP_CONFIG } from "../config";
-import { getMCPRegistry, toolMetadataToMCPTool } from "../registry";
+import { toolMetadataToMCPTool } from "../converter";
+import { mcpRegistry } from "../registry";
 import type {
   IMCPProtocolHandler,
   JsonRpcError,
@@ -27,8 +26,9 @@ import type {
   MCPToolCallResult,
   MCPToolsListParams,
   MCPToolsListResult,
+  ParameterValue,
 } from "../types";
-import { MCPErrorCode, MCPMethod } from "./types";
+import { MCPErrorCode, MCPMethod } from "../types";
 
 /**
  * MCP Protocol Handler Implementation
@@ -155,10 +155,9 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     });
 
     // Initialize registry
-    const registry = getMCPRegistry(this.locale);
-    await registry.initialize();
+    await mcpRegistry.initialize(this.logger, this.locale);
 
-    const capabilities = MCP_CONFIG.platformSpecific?.capabilities || {
+    const capabilities = {
       tools: true,
       prompts: false,
       resources: false,
@@ -188,8 +187,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   ): Promise<MCPToolsListResult> {
     this.logger.info("[MCP Protocol] Listing tools");
 
-    const registry = getMCPRegistry(this.locale);
-    const toolMetadata = await registry.getTools(this.user);
+    const toolMetadata = mcpRegistry.getTools(this.user, this.logger);
 
     // Convert to MCP tool format
     const tools = toolMetadata.map((meta) =>
@@ -214,18 +212,20 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       toolName: params.name,
     });
 
-    const registry = getMCPRegistry(this.locale);
-
     // Execute tool - params.arguments is already properly typed from MCPToolCallParams
-    const result = await registry.executeTool({
-      toolName: params.name,
-      data: params.arguments || {},
-      user: this.user,
-      locale: this.locale,
-      requestId: Date.now(),
-      logger: this.logger,
-      platform: Platform.MCP,
-    });
+    const result = await mcpRegistry.executeTool(
+      {
+        toolName: params.name,
+        data: params.arguments || {},
+        user: this.user,
+        locale: this.locale,
+        requestId: Date.now(),
+        timestamp: Date.now(),
+        logger: this.logger,
+        platform: Platform.MCP,
+      },
+      this.logger,
+    );
 
     this.logger.info("[MCP Protocol] Tool call complete", {
       toolName: params.name,
@@ -295,9 +295,7 @@ export async function createMCPProtocolHandler(
 
   if (!cliUserResult.success) {
     // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for invalid CLI user state
-    throw new Error(
-      `CLI user authentication failed: ${cliUserResult.message}`,
-    );
+    throw new Error(`CLI user authentication failed: ${cliUserResult.message}`);
   }
 
   const cliUser = cliUserResult.data;

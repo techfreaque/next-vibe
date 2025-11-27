@@ -76,11 +76,8 @@ export function GroupedAssistantMessage({
     ? getModelById(primary.model).name
     : t("app.chat.messages.assistant");
 
-  // NEW ARCHITECTURE: Sort all messages by sequenceIndex
   // Each message is already a separate entity (reasoning, text, tool, error)
-  const allMessages = [primary, ...continuations].toSorted(
-    (a, b) => (a.sequenceIndex ?? 0) - (b.sequenceIndex ?? 0),
-  );
+  const allMessages = [primary, ...continuations];
 
   // Check if there's any content
   const hasContent = allMessages.some((msg) => msg.content.trim().length > 0);

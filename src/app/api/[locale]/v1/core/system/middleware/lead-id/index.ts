@@ -14,6 +14,8 @@ import { env } from "@/config/env";
 import { Environment } from "next-vibe/shared/utils";
 
 import { isApiRoute, shouldSkipPath } from "../utils";
+import { createEndpointLogger } from "../../unified-interface/shared/logger/endpoint";
+import { leadAuthRepository } from "../../../leads/auth/repository";
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -56,15 +58,7 @@ export async function createLeadId(
   request: NextRequest,
   locale: CountryLanguage,
 ): Promise<NextResponse> {
-  // Import here to avoid circular dependencies
-  const { leadAuthRepository } = await import(
-    "@/app/api/[locale]/v1/core/leads/auth/repository"
-  );
-  const { createEndpointLogger } = await import(
-    "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint"
-  );
-
-  const logger = createEndpointLogger(true, Date.now(), locale);
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   const clientInfo = {
     userAgent: request.headers.get("user-agent") || undefined,

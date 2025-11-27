@@ -8,7 +8,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   objectField,
   responseArrayField,
@@ -29,7 +29,12 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["v1", "core", "system", "translations", "stats"],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
 
   title: "app.api.v1.core.system.translations.stats.get.title",
   description: "app.api.v1.core.system.translations.stats.get.description",
@@ -50,7 +55,8 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.translations.stats.get.container.title" as const,
       description:
         "app.api.v1.core.system.translations.stats.get.container.description" as const,
-      layoutType: LayoutType.GRID, columns: 12,
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { response: true },
     {

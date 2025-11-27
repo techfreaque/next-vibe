@@ -3,7 +3,7 @@
  * /api/v1/core/agent/chat/credits
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";

@@ -19,15 +19,16 @@ import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import { csvImportJobs, importBatches } from "../leads/import/db";
+import {
+type NewCsvImportJob,
+  type NewImportBatch,
+  csvImportJobs,
+  importBatches,
+} from "../leads/import/db";
 import type {
-  CsvImportConfig,
-  DomainImportRepository,
   ImportJobsListResponseType,
   ImportJobUpdateResponseType,
   LeadsImportResponseOutput,
-  NewCsvImportJob,
-  NewImportBatch,
 } from "../leads/import/definition";
 import { CsvImportJobStatus } from "../leads/import/enum";
 import type {
@@ -36,6 +37,10 @@ import type {
   ListImportJobsResponseOutput,
 } from "./definition";
 import type { DomainRecord, ImportRepository } from "./types";
+import type {
+  CsvImportConfig,
+  DomainImportRepository,
+} from "../leads/import/repository";
 
 /**
  * Generic Import Repository Implementation

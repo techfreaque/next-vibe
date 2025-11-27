@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   objectField,
   requestDataField,
@@ -35,7 +35,12 @@ const { POST } = createEndpoint({
     "app.api.v1.core.stripe.tags.cli" as const,
     "app.api.v1.core.stripe.tags.webhook" as const,
   ],
-  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["stripe", "stripe-cli"],
 
   cli: {
@@ -63,7 +68,7 @@ const { POST } = createEndpoint({
           placeholder:
             "app.api.v1.core.stripe.form.fields.operation.placeholder" as const,
           columns: 6,
-              options: [
+          options: [
             {
               value: "check",
               label: "app.api.v1.core.stripe.operations.check" as const,
@@ -98,8 +103,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.stripe.form.fields.port.description" as const,
           placeholder:
             "app.api.v1.core.stripe.form.fields.port.placeholder" as const,
-          columns: 6
-},
+          columns: 6,
+        },
         z.number().optional(),
       ),
 
@@ -116,27 +121,33 @@ const { POST } = createEndpoint({
           options: [
             {
               value: "payment_intent.succeeded",
-              label: "app.api.v1.core.stripe.form.fields.events.paymentIntentSucceeded" as const,
+              label:
+                "app.api.v1.core.stripe.form.fields.events.paymentIntentSucceeded" as const,
             },
             {
               value: "payment_intent.payment_failed",
-              label: "app.api.v1.core.stripe.form.fields.events.paymentIntentFailed" as const,
+              label:
+                "app.api.v1.core.stripe.form.fields.events.paymentIntentFailed" as const,
             },
             {
               value: "customer.subscription.created",
-              label: "app.api.v1.core.stripe.form.fields.events.subscriptionCreated" as const,
+              label:
+                "app.api.v1.core.stripe.form.fields.events.subscriptionCreated" as const,
             },
             {
               value: "customer.subscription.updated",
-              label: "app.api.v1.core.stripe.form.fields.events.subscriptionUpdated" as const,
+              label:
+                "app.api.v1.core.stripe.form.fields.events.subscriptionUpdated" as const,
             },
             {
               value: "invoice.payment_succeeded",
-              label: "app.api.v1.core.stripe.form.fields.events.invoicePaymentSucceeded" as const,
+              label:
+                "app.api.v1.core.stripe.form.fields.events.invoicePaymentSucceeded" as const,
             },
             {
               value: "invoice.payment_failed",
-              label: "app.api.v1.core.stripe.form.fields.events.invoicePaymentFailed" as const,
+              label:
+                "app.api.v1.core.stripe.form.fields.events.invoicePaymentFailed" as const,
             },
           ],
         },
@@ -152,7 +163,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.stripe.form.fields.forwardTo.description" as const,
           placeholder:
             "app.api.v1.core.stripe.form.fields.forwardTo.placeholder" as const,
-          columns: 6},
+          columns: 6,
+        },
         z.string().optional(),
       ),
 
@@ -164,7 +176,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.stripe.form.fields.skipSslVerify.label" as const,
           description:
             "app.api.v1.core.stripe.form.fields.skipSslVerify.description" as const,
-          columns: 6},
+          columns: 6,
+        },
         z.boolean().default(false),
       ),
 

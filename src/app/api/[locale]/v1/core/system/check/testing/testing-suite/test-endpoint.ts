@@ -5,7 +5,7 @@ import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { describe, expect, it } from "vitest";
 import type { z } from "zod";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import type { CreateApiEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";

@@ -10,7 +10,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   objectField,
   requestDataField,
@@ -24,7 +24,6 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
  * Translation Reorganization POST Endpoint
@@ -33,7 +32,10 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["v1", "core", "system", "translations", "reorganize"],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [
+    // still a bit buggy - disabled to prevent AI from calling it
+    // UserRole.ADMIN,
+  ],
 
   title: "app.api.v1.core.system.translations.reorganize.post.title",
   description:
@@ -58,7 +60,8 @@ const { POST } = createEndpoint({
         "app.api.v1.core.system.translations.reorganize.post.container.title",
       description:
         "app.api.v1.core.system.translations.reorganize.post.container.description",
-      layoutType: LayoutType.GRID, columns: 12,
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -136,7 +139,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.translations.reorganize.post.success.title" as const,
           description:
             "app.api.v1.core.system.translations.reorganize.post.success.description" as const,
-          layoutType: LayoutType.GRID, columns: 12,
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { response: true },
         {
@@ -156,7 +160,8 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.system.translations.reorganize.post.fields.summary.title" as const,
               description:
                 "app.api.v1.core.system.translations.reorganize.post.description" as const,
-              layoutType: LayoutType.GRID, columns: 12,
+              layoutType: LayoutType.GRID,
+              columns: 12,
             },
             { response: true },
             {
@@ -258,7 +263,8 @@ const { POST } = createEndpoint({
                   "app.api.v1.core.system.translations.reorganize.post.fields.changes.title" as const,
                 description:
                   "app.api.v1.core.system.translations.reorganize.post.description" as const,
-                layoutType: LayoutType.GRID, columns: 12,
+                layoutType: LayoutType.GRID,
+                columns: 12,
               },
               { response: true },
               {

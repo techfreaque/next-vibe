@@ -61,7 +61,7 @@ export function CsvImportDialog({
 }: CsvImportDialogProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = React.useMemo(
-    () => createEndpointLogger(true, Date.now(), locale),
+    () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
 

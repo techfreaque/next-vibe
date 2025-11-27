@@ -6,13 +6,11 @@
 
 "use client";
 
-import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
+import type { EndpointReturn } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import {
-  pulseExecuteEndpoint,
-  pulseStatusEndpoint,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/pulse/definition";
+import pulseExecuteEndpoint from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/pulse/definition";
+import pulseStatusEndpoint from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/pulse/status/definition";
 
 /**
  * Hook for executing pulse cycles

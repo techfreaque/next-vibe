@@ -577,6 +577,7 @@ export const translations = {
     vision: "Vision & Image Understanding",
     imageGen: "Image Generation",
     uncensored: "Uncensored",
+    legacy: "Legacy Models",
     // Persona categories
     technical: "Technical",
     education: "Education",
@@ -588,8 +589,10 @@ export const translations = {
       claudeHaiku45: "Latest Claude model with excellent performance",
       claudeSonnet45: "Latest Claude model with excellent performance",
       gpt5: "Latest GPT model with excellent performance",
+      gpt51: "Latest GPT 5.1 model with improved reasoning",
       gpt5Pro: "Latest GPT model with excellent performance for coding tasks",
       gpt5Codex: "Latest GPT model with excellent performance",
+      gpt51Codex: "Latest GPT 5.1 Codex model optimized for coding",
       gpt5Mini: "Latest mini model with excellent performance-to-cost ratio",
       gpt5Nano: "Latest nano model with excellent performance-to-cost ratio",
       gptOss120b: "Open-source GPT model with 120B parameters",

@@ -6,8 +6,8 @@
 import "server-only";
 
 import type { Typer } from "../../types";
-import type { TyperBackendType } from "../../types";
 import { TyperError } from "../../types";
+import type { TyperBackendType } from "../../enum";
 
 /**
  * Abstract base typer class
@@ -29,11 +29,7 @@ export abstract class BaseTyper implements Typer {
   async insertText(text: string): Promise<void> {
     if (!text || text.length === 0) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Typer validation error
-      throw new TyperError(
-        "Cannot insert empty text",
-        "EMPTY_TEXT",
-        { text },
-      );
+      throw new TyperError("Cannot insert empty text", "EMPTY_TEXT", { text });
     }
 
     // Check dependencies before attempting insertion

@@ -16,9 +16,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { JwtPayloadType } from "../../../user/auth/types";
+import type { ApiSection } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import {
   extractNestedPath,
   findFilesRecursively,
@@ -47,8 +45,6 @@ interface EndpointsResponseType {
 interface EndpointsIndexGeneratorRepository {
   generateEndpointsIndex(
     data: EndpointsRequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<EndpointsResponseType>>;
 }
@@ -56,13 +52,9 @@ interface EndpointsIndexGeneratorRepository {
 /**
  * Endpoints Index Generator Repository Implementation
  */
-class EndpointsIndexGeneratorRepositoryImpl
-  implements EndpointsIndexGeneratorRepository
-{
+class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRepository {
   async generateEndpointsIndex(
     data: EndpointsRequestType,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<EndpointsResponseType>> {
     const startTime = Date.now();
@@ -120,6 +112,34 @@ class EndpointsIndexGeneratorRepositoryImpl
   }
 
   /**
+   * Extract HTTP methods from definition file (async)
+   */
+  private async extractMethodsFromDefinition(
+    defFile: string,
+  ): Promise<string[]> {
+    try {
+      const definition = (await import(defFile)) as {
+        default?: ApiSection;
+      };
+      const defaultExport = definition.default;
+
+      if (!defaultExport) {
+        return [];
+      }
+
+      // Get all HTTP methods from the definition
+      const methods = Object.keys(defaultExport).filter((key) =>
+        ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(
+          key,
+        ),
+      );
+      return methods;
+    } catch {
+      return [];
+    }
+  }
+
+  /**
    * Extract aliases from definition file (async)
    */
   private async extractAliasesFromDefinition(
@@ -166,7 +186,10 @@ class EndpointsIndexGeneratorRepositoryImpl
   }
 
   /**
-   * Generate endpoints content with singleton pattern and full alias support
+   * Generate endpoints content with singleton pattern
+   * Each path includes method suffix (e.g., ["core", "agent", "ai-stream", "POST"])
+   * Each import includes method in the name (e.g., endpointDefinition_POST_0)
+   * No aliases generated
    */
   private async generateContent(
     definitionFiles: string[],
@@ -174,40 +197,38 @@ class EndpointsIndexGeneratorRepositoryImpl
   ): Promise<string> {
     const imports: string[] = [];
     const setNestedPathCalls: string[] = [];
+    let importCounter = 0;
 
-    for (let i = 0; i < definitionFiles.length; i++) {
-      const defFile = definitionFiles[i];
+    for (const defFile of definitionFiles) {
       const relativePath = getRelativeImportPath(defFile, outputFile);
       const nestedPath = extractNestedPath(defFile);
 
-      // eslint-disable-next-line i18next/no-literal-string
-      const importStatement = `import { default as endpointDefinition${i} } from "${relativePath}";`;
-      imports.push(importStatement);
+      // Get methods for this endpoint
+      const methods = await this.extractMethodsFromDefinition(defFile);
 
-      // Helper function to add setNestedPath call
-      const addSetNestedPathCall = (pathSegments: string[]): void => {
-        const arrayStr = this.formatPathArray(pathSegments);
+      // Add separate import and path for each method
+      for (const method of methods) {
         // eslint-disable-next-line i18next/no-literal-string
-        const singleLine = `  setNestedPath(endpoints, ${arrayStr}, endpointDefinition${i});`;
+        const importName = `endpointDefinition_${method}_${importCounter}`;
+        // eslint-disable-next-line i18next/no-literal-string
+        const importStatement = `import { default as ${importName} } from "${relativePath}";`;
+        imports.push(importStatement);
+
+        // Add path with method suffix (e.g., ["core", "agent", "ai-stream", "POST"])
+        const pathWithMethod = [...nestedPath, method];
+        const arrayStr = this.formatPathArray(pathWithMethod);
+
+        // eslint-disable-next-line i18next/no-literal-string
+        const singleLine = `  setNestedPath(endpoints, ${arrayStr}, ${importName}.${method});`;
         if (singleLine.length > 80 || arrayStr.includes("\n")) {
           // eslint-disable-next-line i18next/no-literal-string
-          const multiLine = `  setNestedPath(\n    endpoints,\n    ${arrayStr},\n    endpointDefinition${i},\n  );`;
+          const multiLine = `  setNestedPath(\n    endpoints,\n    ${arrayStr},\n    ${importName}.${method},\n  );`;
           setNestedPathCalls.push(multiLine);
         } else {
           setNestedPathCalls.push(singleLine);
         }
-      };
 
-      // Add main path (with [id] format only)
-      addSetNestedPathCall(nestedPath);
-
-      // Extract and add real aliases from definition file
-      const definitionAliases =
-        await this.extractAliasesFromDefinition(defFile);
-      for (const alias of definitionAliases) {
-        // Treat single-word aliases as standalone, multi-segment aliases as paths
-        const aliasSegments = alias.includes("/") ? alias.split("/") : [alias];
-        addSetNestedPathCall(aliasSegments);
+        importCounter++;
       }
     }
 

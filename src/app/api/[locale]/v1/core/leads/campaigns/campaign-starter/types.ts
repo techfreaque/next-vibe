@@ -76,7 +76,3 @@ export interface LocaleProcessingInfo {
   failedLeadsCount: number;
   adjustedLeadsPerRun: number;
 }
-
-const definitions = {};
-
-export default definitions;

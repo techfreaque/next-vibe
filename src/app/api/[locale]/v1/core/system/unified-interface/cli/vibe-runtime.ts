@@ -17,7 +17,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import { createEndpointLogger } from "../shared/logger/endpoint";
-import { createDefaultCliUser } from "./auth/cli-user";
 import { ErrorHandler, setupGlobalErrorHandlers } from "./execution-errors";
 import { enableDebug } from "@/config/debug";
 
@@ -441,7 +440,7 @@ program
           await cliEntryPoint.executeCommand(
             "interactive",
             {
-              user: createDefaultCliUser(),
+              user: undefined, // Let route executor handle authentication via getCliUser()
               locale: options.locale,
               output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
                 | "table"
@@ -496,7 +495,7 @@ program
               positionalArgs: parsedArgs.positionalArgs,
               namedArgs: parsedArgs.namedArgs,
             },
-            user: createDefaultCliUser(),
+            user: undefined, // Let route executor handle authentication via getCliUser()
             locale: options.locale,
             output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
               | "table"

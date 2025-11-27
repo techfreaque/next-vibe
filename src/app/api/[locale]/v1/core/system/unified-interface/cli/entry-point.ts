@@ -13,10 +13,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { EndpointLogger } from "../shared/logger/endpoint";
-import type { ParameterValue } from "../shared/server-only/execution/executor";
+import type { ParameterValue } from "../shared/endpoints/route/executor";
 import type { InferJwtPayloadTypeFromRoles } from "../shared/types/handler";
 import { Platform } from "../shared/types/platform";
-import { getEndpoint } from "../../generated/endpoint";
 import type {
   CliRequestData,
   RouteExecutionContext,
@@ -62,14 +61,6 @@ class CliEntryPoint {
     // Default to interactive mode if no command provided
     const resolvedCommand = !command ? "interactive" : command;
 
-    // Create discovered route - let route-executor handle everything via generated index
-    const discoveredRoute = {
-      alias: resolvedCommand,
-      path: resolvedCommand,
-      method: "POST",
-      routePath: resolvedCommand,
-    };
-
     // Get CLI user for authentication if not provided
     let cliUser = options.user;
 
@@ -101,39 +92,12 @@ class CliEntryPoint {
     try {
       // Execute using route delegation handler
       const result = await routeDelegationHandler.executeRoute(
-        discoveredRoute,
+        resolvedCommand,
         context,
         logger,
         locale,
         t,
       );
-
-      // Skip rendering for MCP mode and interactive mode
-      const skipRendering =
-        resolvedCommand === "mcp" ||
-        resolvedCommand === "mcp:serve" ||
-        resolvedCommand === "mcp:start" ||
-        resolvedCommand === "start-mcp" ||
-        resolvedCommand === "interactive" ||
-        resolvedCommand === "i";
-
-      if (!skipRendering) {
-        // Get endpoint definition for formatting
-        const endpointDefinition = await getEndpoint(resolvedCommand);
-        const method = discoveredRoute.method;
-
-        // Format and display result
-        const formattedResult = routeDelegationHandler.formatResult(
-          result,
-          options.output || "pretty",
-          endpointDefinition?.[method],
-          options.locale,
-          logger.isDebugEnabled || false,
-          logger,
-        );
-
-        process.stdout.write(`\n${formattedResult}\n`);
-      }
 
       return result;
     } catch (error) {

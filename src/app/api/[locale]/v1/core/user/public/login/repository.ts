@@ -5,9 +5,7 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { cookies, headers } from "next/headers";
 import type { NextRequest } from "next/server";
-import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   success,
@@ -35,6 +33,7 @@ import type {
   LoginPostResponseOutput,
 } from "./definition";
 import { SocialProviders } from "./options/enum";
+import type { Platform } from "../../../system/unified-interface/shared/types/platform";
 
 export interface SocialProvidersOptions {
   enabled: boolean;
@@ -82,6 +81,7 @@ export interface LoginRepository {
     locale: CountryLanguage,
     request: NextRequest,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<LoginPostResponseOutput>>;
 
   /**
@@ -124,11 +124,10 @@ export class LoginRepositoryImpl implements LoginRepository {
     data: LoginPostRequestOutput,
     user: JWTPublicPayloadType,
     locale: CountryLanguage,
-    request: NextRequest,
+    request: NextRequest | undefined,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
-    const headersList = await headers();
-
     // Extract data from request
     const { email, password } = data.credentials;
     const { rememberMe } = data.options;
@@ -136,11 +135,13 @@ export class LoginRepositoryImpl implements LoginRepository {
     // Get leadId from user prop (JWT payload) - always present
     const leadId = user.leadId;
 
-    // Get client IP for security monitoring
-    const ipAddress =
-      headersList.get("x-forwarded-for") ||
-      headersList.get("x-real-ip") ||
-      "unknown";
+    // Get client IP for security monitoring from request headers
+    // In CLI context, request may be undefined
+    const ipAddress = request
+      ? request.headers.get("x-forwarded-for") ||
+        request.headers.get("x-real-ip") ||
+        "unknown"
+      : "cli";
     try {
       logger.debug("Login attempt", { email });
 
@@ -248,7 +249,9 @@ export class LoginRepositoryImpl implements LoginRepository {
         rememberMe,
         locale,
         request,
+        platform,
         logger,
+        user, // Pass entire user object from route handler
       );
       if (!sessionResponse.success) {
         return sessionResponse;
@@ -284,14 +287,17 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param locale - Locale for lead tracking
    * @param request - Next.js request object for platform detection
    * @param logger - Logger instance
+   * @param handlerUser - User object from route handler containing leadId
    * @returns Login response with user session
    */
   private async createSessionAndGetUser(
     userId: string,
     rememberMe = false,
     locale: CountryLanguage,
-    request: NextRequest,
+    request: NextRequest | undefined,
+    platform: Platform,
     logger: EndpointLogger,
+    handlerUser: JWTPublicPayloadType,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     return await this.createOrRenewSession(
       userId,
@@ -299,7 +305,9 @@ export class LoginRepositoryImpl implements LoginRepository {
       rememberMe,
       locale,
       request,
+      platform,
       logger,
+      handlerUser,
     );
   }
 
@@ -310,14 +318,17 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param locale - Locale for lead tracking
    * @param request - Next.js request object for platform detection
    * @param logger - Logger instance
+   * @param handlerUser - User object from route handler containing leadId
    * @returns Login response with renewed session
    */
   private async renewSession(
     userId: string,
     rememberMe = false,
     locale: CountryLanguage,
-    request: NextRequest,
+    request: NextRequest | undefined,
+    platform: Platform,
     logger: EndpointLogger,
+    handlerUser: JWTPublicPayloadType,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     return await this.createOrRenewSession(
       userId,
@@ -325,7 +336,9 @@ export class LoginRepositoryImpl implements LoginRepository {
       rememberMe,
       locale,
       request,
+      platform,
       logger,
+      handlerUser,
     );
   }
 
@@ -337,6 +350,7 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param rememberMe - Whether to extend session duration
    * @param locale - Locale for lead tracking
    * @param request - Next.js request object for platform detection
+   * @param handlerUser - User object from route handler containing leadId
    * @returns Login response with session data
    */
   private async createOrRenewSession(
@@ -344,8 +358,10 @@ export class LoginRepositoryImpl implements LoginRepository {
     isRenewal = false,
     rememberMe = false,
     locale: CountryLanguage,
-    request: NextRequest,
+    request: NextRequest | undefined,
+    platform: Platform,
     logger: EndpointLogger,
+    handlerUser: JWTPublicPayloadType,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     try {
       // Create session and get user data
@@ -374,45 +390,35 @@ export class LoginRepositoryImpl implements LoginRepository {
         });
       }
 
-      // Get leadId from cookie (the one the user had before logging in)
-      const cookieStore = await cookies();
-      const cookieLeadId = cookieStore.get(LEAD_ID_COOKIE_NAME)?.value;
+      // Use leadId directly from handler user object
+      const leadId = handlerUser.leadId;
+      logger.debug("Using leadId from route handler", { leadId });
 
-      // Link the cookie leadId to the user if it exists
+      // Link the leadId to the user
       // This ensures the userLeads table has the relationship for credit lookups
-      if (cookieLeadId) {
-        await leadAuthRepository.linkLeadToUser(
-          cookieLeadId,
-          userId,
-          locale,
-          logger,
-        );
-
-        // Merge lead wallet into user wallet immediately
-        // This ensures user gets their pre-login credits from this device
-        const { creditRepository } =
-          await import("../../../credits/repository");
-        const mergeResult = await creditRepository.mergePendingLeadWallets(
-          userId,
-          [cookieLeadId],
-          logger,
-        );
-        if (!mergeResult.success) {
-          logger.error("Failed to merge lead wallet during login", {
-            userId,
-            leadId: cookieLeadId,
-            error: mergeResult.message,
-          });
-        }
-      }
-
-      // Get primary leadId for user (now that we've linked the cookie leadId)
-      const leadIdResult = await leadAuthRepository.getAuthenticatedUserLeadId(
+      await leadAuthRepository.linkLeadToUser(
+        leadId,
         userId,
-        cookieLeadId,
         locale,
         logger,
       );
+
+      // Merge lead wallet into user wallet immediately
+      // This ensures user gets their pre-login credits
+      const { creditRepository } =
+        await import("../../../credits/repository");
+      const mergeResult = await creditRepository.mergePendingLeadWallets(
+        userId,
+        [leadId],
+        logger,
+      );
+      if (!mergeResult.success) {
+        logger.error("Failed to merge lead wallet during login", {
+          userId,
+          leadId,
+          error: mergeResult.message,
+        });
+      }
 
       // Set session duration based on rememberMe flag
       // Remember me: 30 days, Regular session: 7 days
@@ -422,7 +428,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       // Create JWT payload with proper structure including leadId
       const tokenPayload = {
         id: userResponse.data.id,
-        leadId: leadIdResult.leadId,
+        leadId: leadId,
         isPublic: false as const,
       };
 
@@ -433,11 +439,6 @@ export class LoginRepositoryImpl implements LoginRepository {
       }
 
       const expiresAt = new Date(Date.now() + sessionDurationSeconds * 1000);
-
-      if (isRenewal) {
-        // For renewal, delete existing sessions and create a new one
-        await sessionRepository.deleteByUserId(userId);
-      }
 
       // Create a session in the database
       const sessionData = {
@@ -471,8 +472,8 @@ export class LoginRepositoryImpl implements LoginRepository {
       const storeResult = await authRepository.storeAuthTokenForPlatform(
         tokenResponse.data,
         userId,
-        leadIdResult.leadId,
-        request,
+        leadId,
+        platform,
         logger,
       );
       if (storeResult.success) {

@@ -53,7 +53,3 @@ export const sessionCleanupResponseSchema = sessionCleanupResultSchema;
 export type SessionCleanupResponseOutput = z.output<
   typeof sessionCleanupResponseSchema
 >;
-
-const definitions = {};
-
-export default definitions;

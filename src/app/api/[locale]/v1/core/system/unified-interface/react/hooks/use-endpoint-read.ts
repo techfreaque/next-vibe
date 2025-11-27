@@ -5,7 +5,7 @@
 
 import { useMemo } from "react";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import type { CreateApiEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -47,22 +47,22 @@ export function useEndpointRead<
   primaryEndpoint: TEndpoint | null,
   logger: EndpointLogger,
   options: {
-    formOptions?: ApiQueryFormOptions<TEndpoint["TRequestOutput"]>;
+    formOptions?: ApiQueryFormOptions<TEndpoint["types"]["RequestOutput"]>;
     queryOptions?: ApiQueryOptions<
-      TEndpoint["TRequestOutput"],
-      TEndpoint["TResponseOutput"],
-      TEndpoint["TUrlVariablesOutput"]
+      TEndpoint["types"]["RequestOutput"],
+      TEndpoint["types"]["ResponseOutput"],
+      TEndpoint["types"]["UrlVariablesOutput"]
     >;
-    urlPathParams?: TEndpoint["TUrlVariablesOutput"];
-    autoPrefillData?: Partial<TEndpoint["TRequestOutput"]>;
-    initialState?: Partial<TEndpoint["TRequestOutput"]>;
-    initialData?: TEndpoint["TResponseOutput"];
+    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
+    autoPrefillData?: Partial<TEndpoint["types"]["RequestOutput"]>;
+    initialState?: Partial<TEndpoint["types"]["RequestOutput"]>;
+    initialData?: TEndpoint["types"]["ResponseOutput"];
     autoPrefillConfig?: AutoPrefillConfig;
   } = {},
 ): ApiQueryFormReturn<
-  TEndpoint["TRequestOutput"],
-  TEndpoint["TResponseOutput"],
-  TEndpoint["TUrlVariablesOutput"]
+  TEndpoint["types"]["RequestOutput"],
+  TEndpoint["types"]["ResponseOutput"],
+  TEndpoint["types"]["UrlVariablesOutput"]
 > | null {
   // Return null if endpoint is not provided
   if (!primaryEndpoint) {
@@ -71,7 +71,7 @@ export function useEndpointRead<
   const {
     formOptions = { persistForm: true, autoSubmit: true, debounceMs: 500 },
     queryOptions = {},
-    urlPathParams = {} as TEndpoint["TUrlVariablesOutput"],
+    urlPathParams = {} as TEndpoint["types"]["UrlVariablesOutput"],
     autoPrefillData,
     initialState,
     initialData,
@@ -85,13 +85,13 @@ export function useEndpointRead<
   // Merge all form data sources with proper priority handling
   const enhancedFormOptions = useMemo(() => {
     // Prepare data sources
-    const dataSources: FormDataSources<TEndpoint["TResponseOutput"]> = {
+    const dataSources: FormDataSources<TEndpoint["types"]["ResponseOutput"]> = {
       defaultValues: formOptions.defaultValues as Partial<
-        TEndpoint["TResponseOutput"]
+        TEndpoint["types"]["ResponseOutput"]
       >,
-      serverData: autoPrefillData as TEndpoint["TResponseOutput"],
+      serverData: autoPrefillData as TEndpoint["types"]["ResponseOutput"],
       localStorageData: undefined,
-      initialState: initialState as Partial<TEndpoint["TResponseOutput"]>,
+      initialState: initialState as Partial<TEndpoint["types"]["ResponseOutput"]>,
     };
 
     // Determine final data with proper priority
@@ -106,8 +106,8 @@ export function useEndpointRead<
       // Store additional metadata for unsaved changes detection
       _dataSources: dataSources,
       _autoPrefillConfig: autoPrefillConfig,
-    } as ApiQueryFormOptions<TEndpoint["TRequestOutput"]> & {
-      _dataSources: FormDataSources<TEndpoint["TResponseOutput"]>;
+    } as ApiQueryFormOptions<TEndpoint["types"]["RequestOutput"]> & {
+      _dataSources: FormDataSources<TEndpoint["types"]["ResponseOutput"]>;
       _autoPrefillConfig: AutoPrefillConfig;
     };
   }, [formOptions, autoPrefillData, initialState, autoPrefillConfig]);
@@ -130,7 +130,7 @@ export function useEndpointRead<
   // Use the existing query form hook with enhanced options
   const queryFormResult = useApiQueryForm({
     endpoint: primaryEndpoint,
-    urlPathParams: urlPathParams || ({} as TEndpoint["TUrlVariablesOutput"]),
+    urlPathParams: urlPathParams || ({} as TEndpoint["types"]["UrlVariablesOutput"]),
     formOptions: enhancedFormOptions,
     queryOptions: enhancedQueryOptions,
     logger,

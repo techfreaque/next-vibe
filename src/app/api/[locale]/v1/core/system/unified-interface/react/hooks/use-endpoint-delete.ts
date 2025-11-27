@@ -8,7 +8,7 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import { useCallback } from "react";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import type { CreateApiEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -39,15 +39,15 @@ export function useEndpointDelete<
   logger: EndpointLogger,
   options: {
     mutationOptions?: ApiMutationOptions<
-      TEndpoint["TRequestOutput"],
-      TEndpoint["TResponseOutput"],
-      TEndpoint["TUrlVariablesOutput"]
+      TEndpoint["types"]["RequestOutput"],
+      TEndpoint["types"]["ResponseOutput"],
+      TEndpoint["types"]["UrlVariablesOutput"]
     >;
-    urlPathParams?: TEndpoint["TUrlVariablesOutput"];
+    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
   } = {},
 ): {
   /** The complete response including success/error state */
-  response: ResponseType<TEndpoint["TResponseOutput"]> | undefined;
+  response: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined;
 
   // Backward compatibility properties
   /** @deprecated Use response?.success === true instead */
@@ -55,7 +55,7 @@ export function useEndpointDelete<
   /** @deprecated Use response?.success === false ? response : null instead */
   error: ErrorResponseType | null;
 
-  submit: (data?: TEndpoint["TRequestOutput"]) => Promise<void>;
+  submit: (data?: TEndpoint["types"]["RequestOutput"]) => Promise<void>;
   isSubmitting: boolean;
 } | null {
   // Return null if endpoint is not provided
@@ -65,7 +65,7 @@ export function useEndpointDelete<
 
   const {
     mutationOptions = {},
-    urlPathParams = {} as TEndpoint["TUrlVariablesOutput"],
+    urlPathParams = {} as TEndpoint["types"]["UrlVariablesOutput"],
   } = options;
 
   // Use the existing mutation hook for consistency
@@ -73,9 +73,9 @@ export function useEndpointDelete<
 
   // Create a submit function that calls the mutation
   const submit = useCallback(
-    async (data?: TEndpoint["TRequestOutput"]): Promise<void> => {
+    async (data?: TEndpoint["types"]["RequestOutput"]): Promise<void> => {
       const mutationVariables = {
-        requestData: data || ({} as TEndpoint["TRequestOutput"]),
+        requestData: data || ({} as TEndpoint["types"]["RequestOutput"]),
         urlPathParams: urlPathParams,
       };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

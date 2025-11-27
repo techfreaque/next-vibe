@@ -4,6 +4,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   hooks: hooksTranslations,
   widgets: {
+    endpointRenderer: {
+      submit: "Absenden",
+      submitting: "Wird gesendet...",
+    },
     container: {
       noContent: "Kein Inhalt",
     },
@@ -11,6 +15,12 @@ export const translations: typeof enTranslations = {
       showing: "Zeige",
       of: "von",
       results: "Ergebnisse",
+      noData: "Keine Daten verfügbar",
+    },
+    dataList: {
+      noData: "Keine Daten verfügbar",
+      showMore: "{{count}} weitere anzeigen",
+      showLess: "Weniger anzeigen",
     },
     linkList: {
       noResults: "Keine Ergebnisse gefunden",
@@ -25,6 +35,10 @@ export const translations: typeof enTranslations = {
       title: "Widget-Fehler",
       errorDetails: "Fehlerdetails",
       defaultMessage: "Beim Rendern dieses Widgets ist ein Fehler aufgetreten",
+    },
+    formField: {
+      requiresContext:
+        "Formularfeld erfordert Formularkontext und Feldkonfiguration",
     },
     toolCall: {
       status: {
@@ -44,6 +58,16 @@ export const translations: typeof enTranslations = {
         metadataNotAvailable:
           "Widget-Metadaten nicht verfügbar. Zeige Rohdaten.",
       },
+    },
+    codeQualityList: {
+      noData: "Keine Code-Qualitätsprobleme gefunden",
+      rule: "Regel: {{rule}}",
+    },
+    section: {
+      noData: "Keine Abschnittsdaten verfügbar",
+    },
+    title: {
+      noData: "Keine Titeldaten verfügbar",
     },
   },
 };

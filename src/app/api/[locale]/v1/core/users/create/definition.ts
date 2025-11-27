@@ -6,7 +6,7 @@
 import { z } from "zod";
 
 import { leadId } from "@/app/api/[locale]/v1/core/leads/types";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   objectField,
   requestDataField,

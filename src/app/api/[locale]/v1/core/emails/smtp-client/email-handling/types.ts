@@ -99,7 +99,3 @@ export interface EmailHandleRequestOutput<TRequest, TResponse, TUrlVariables> {
 export interface EmailHandleResponseOutput {
   success: boolean;
 }
-
-const definitions = {};
-
-export default definitions;

@@ -17,9 +17,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { ApiSection } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { JwtPayloadType } from "../../../user/auth/types";
 import {
   extractPathKey,
   findFilesRecursively,
@@ -48,8 +45,6 @@ interface EndpointResponseType {
 interface EndpointGeneratorRepository {
   generateEndpoint(
     data: EndpointRequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<EndpointResponseType>>;
 }
@@ -60,8 +55,6 @@ interface EndpointGeneratorRepository {
 class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
   async generateEndpoint(
     data: EndpointRequestType,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<EndpointResponseType>> {
     const startTime = Date.now();
@@ -123,7 +116,7 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
    */
   private async extractAliasesFromDefinition(
     defFile: string,
-  ): Promise<string[]> {
+  ): Promise<Array<{ alias: string; method: string }>> {
     try {
       const definition = (await import(defFile)) as {
         default?: Record<string, { aliases?: string[] }>;
@@ -134,13 +127,19 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
         return [];
       }
 
-      // Get aliases from any method (usually POST)
+      const aliasesWithMethods: Array<{ alias: string; method: string }> = [];
+
+      // Get aliases from each method
       for (const method of Object.keys(defaultExport)) {
         const methodDef = defaultExport[method];
         if (methodDef?.aliases && Array.isArray(methodDef.aliases)) {
-          return methodDef.aliases;
+          for (const alias of methodDef.aliases) {
+            aliasesWithMethods.push({ alias, method });
+          }
         }
       }
+
+      return aliasesWithMethods;
     } catch {
       // Definition file doesn't exist or can't be loaded
     }
@@ -177,11 +176,11 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
 
   /**
    * Generate endpoint content with dynamic imports and real aliases from definitions
-   * Main paths include method suffix (e.g., "core/agent/ai-stream:POST")
-   * Aliases don't include method
+   * Main paths include method suffix (e.g., "core/agent/ai-stream/POST")
+   * Aliases also include method from their definition
    */
   private async generateContent(definitionFiles: string[]): Promise<string> {
-    const pathMap: Record<string, string> = {};
+    const pathMap: Record<string, { importPath: string; method: string }> = {};
     const allPaths: string[] = [];
 
     // Build path map with real aliases (deduplicate)
@@ -192,22 +191,22 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       // Get methods for this endpoint
       const methods = await this.extractMethodsFromDefinition(defFile);
 
-      // Add main path with method suffix for each method (e.g., "core/agent/ai-stream:POST")
+      // Add main path with method suffix for each method (e.g., "core/agent/ai-stream/POST")
       for (const method of methods) {
-        const pathWithMethod = `${path}:${method}`;
+        const pathWithMethod = `${path}/${method}`;
         if (!pathMap[pathWithMethod]) {
-          pathMap[pathWithMethod] = importPath;
+          pathMap[pathWithMethod] = { importPath, method };
           allPaths.push(pathWithMethod);
         }
       }
 
-      // Extract and add real aliases from definition file (no method suffix)
+      // Extract and add real aliases from definition file (with their method)
       const definitionAliases =
         await this.extractAliasesFromDefinition(defFile);
-      for (const alias of definitionAliases) {
+      for (const { alias, method } of definitionAliases) {
         // Only add if not already present (first wins)
         if (!pathMap[alias]) {
-          pathMap[alias] = importPath;
+          pathMap[alias] = { importPath, method };
           allPaths.push(alias);
         }
       }
@@ -219,10 +218,10 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
     // Generate getEndpoint function cases
     const cases: string[] = [];
     for (const path of allPaths) {
-      const importPath = pathMap[path];
+      const { importPath, method } = pathMap[path];
       // eslint-disable-next-line i18next/no-literal-string
       cases.push(`    case "${path}":
-      return (await import("${importPath}")).default;`);
+      return (await import("${importPath}")).default.${method};`);
     }
 
     // eslint-disable-next-line i18next/no-literal-string

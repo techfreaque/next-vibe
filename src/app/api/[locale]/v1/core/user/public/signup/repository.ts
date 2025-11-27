@@ -18,6 +18,7 @@ import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository"
 import { leadAuthRepository } from "@/app/api/[locale]/v1/core/leads/auth/repository";
 import { leadsRepository } from "@/app/api/[locale]/v1/core/leads/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -50,7 +51,8 @@ export interface SignupRepository {
    * @param user - User from JWT (public user for signup)
    * @param locale - User locale
    * @param logger - Logger instance for debugging and monitoring
-   * @param request - Next.js request object for platform detection
+   * @param request - Next.js request object (optional for CLI context)
+   * @param platform - Platform context (web, cli, ai-tool, etc.)
    * @returns Success or error result
    */
   registerUser(
@@ -58,7 +60,8 @@ export interface SignupRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    request: NextRequest,
+    request: NextRequest | undefined,
+    platform: Platform,
   ): Promise<ResponseType<SignupPostResponseOutput>>;
 
   /**
@@ -95,7 +98,8 @@ export class SignupRepositoryImpl implements SignupRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    request: NextRequest,
+    request: NextRequest | undefined,
+    platform: Platform,
   ): Promise<ResponseType<SignupPostResponseOutput>> {
     const { t } = simpleT(locale);
 
@@ -254,7 +258,7 @@ export class SignupRepositoryImpl implements SignupRepository {
           tokenResponse.data,
           userData.id,
           leadIdResult.leadId,
-          request,
+          platform,
           logger,
         );
         if (storeResult.success) {

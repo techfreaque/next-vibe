@@ -86,9 +86,7 @@ export function FlatMessage({
 
   // Get all messages in the sequence (primary + continuations)
   const allMessagesInSequence = messageGroup
-    ? [messageGroup.primary, ...messageGroup.continuations].toSorted(
-        (a, b) => (a.sequenceIndex ?? 0) - (b.sequenceIndex ?? 0),
-      )
+    ? [messageGroup.primary, ...messageGroup.continuations]
     : [message];
 
   // User ID logic
@@ -322,8 +320,6 @@ export function FlatMessage({
           <ModelPersonaSelectorModal
             titleKey="app.chat.flatView.retryModal.title"
             descriptionKey="app.chat.flatView.retryModal.description"
-
-
             onModelChange={
               onModelChange ||
               ((model: ModelId): void => {
@@ -468,8 +464,6 @@ export function FlatMessage({
           <ModelPersonaSelectorModal
             titleKey="app.chat.flatView.answerModal.title"
             descriptionKey="app.chat.flatView.answerModal.description"
-
-
             onModelChange={
               onModelChange ||
               ((model: ModelId): void => {
@@ -601,23 +595,22 @@ export function FlatMessage({
             )}
 
             {/* Answer as AI - For both user and assistant messages */}
-            {(
-              <Button
-                variant="ghost"
-                size="unset"
-                onClick={(): void => {
-                  messageActions.startAnswer(message.id);
-                }}
-                className="text-primary hover:text-primary/80 hover:underline transition-colors"
-                title={
-                  isAssistant
-                    ? t("app.chat.threadedView.actions.respondToAI")
-                    : t("app.chat.flatView.actions.generateAIResponse")
-                }
-              >
-                [{t("app.chat.flatView.actions.answerAsAI")}]
-              </Button>
-            )}
+
+            <Button
+              variant="ghost"
+              size="unset"
+              onClick={(): void => {
+                messageActions.startAnswer(message.id);
+              }}
+              className="text-primary hover:text-primary/80 hover:underline transition-colors"
+              title={
+                isAssistant
+                  ? t("app.chat.threadedView.actions.respondToAI")
+                  : t("app.chat.flatView.actions.generateAIResponse")
+              }
+            >
+              [{t("app.chat.flatView.actions.answerAsAI")}]
+            </Button>
 
             {/* Copy Link */}
             <Button

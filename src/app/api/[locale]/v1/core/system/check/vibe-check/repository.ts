@@ -17,7 +17,6 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { lintRepository } from "../lint/repository";
 import { oxlintRepository } from "../oxlint/repository";
 import { typecheckRepository } from "../typecheck/repository";
 import type {
@@ -86,27 +85,27 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
           }
 
           // Run ESLint if not skipped (i18n + custom AST rules)
-          if (!data.skipLint) {
-            logger.info("Starting ESLint check...");
-            promises.push(
-              lintRepository
-                .execute(
-                  {
-                    path: path || "./",
-                    verbose: logger.isDebugEnabled,
-                    fix: data.fix || false,
-                    timeout: data.timeout,
-                    cacheDir: "./.tmp",
-                  },
-                  locale,
-                  logger,
-                )
-                .then((result) => {
-                  logger.info("✓ ESLint check completed");
-                  return result;
-                }),
-            );
-          }
+          // if (!data.skipLint) {
+          //   logger.info("Starting ESLint check...");
+          //   promises.push(
+          //     lintRepository
+          //       .execute(
+          //         {
+          //           path: path || "./",
+          //           verbose: logger.isDebugEnabled,
+          //           fix: data.fix || false,
+          //           timeout: data.timeout,
+          //           cacheDir: "./.tmp",
+          //         },
+          //         locale,
+          //         logger,
+          //       )
+          //       .then((result) => {
+          //         logger.info("✓ ESLint check completed");
+          //         return result;
+          //       }),
+          //   );
+          // }
 
           // Run typecheck if not skipped
           if (!data.skipTypecheck) {

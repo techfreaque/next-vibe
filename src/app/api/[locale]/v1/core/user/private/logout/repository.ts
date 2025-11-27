@@ -15,6 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/platform";
 
 import { authRepository } from "../../auth/repository";
 import type { JwtPrivatePayloadType } from "../../auth/types";
@@ -32,15 +33,17 @@ export interface LogoutRepository {
    * Logout a user
    * @param data - Request data (empty for logout)
    * @param user - User from JWT
-   * @param request - Next.js request object for platform detection
+   * @param request - Next.js request object (optional for CLI context)
    * @param logger - Logger instance for debugging and monitoring
+   * @param platform - Platform context (web, cli, ai-tool, etc.)
    * @returns Success message
    */
   logout(
     data: LogoutPostRequestOutput,
     user: JwtPrivatePayloadType,
-    request: NextRequest,
+    request: NextRequest | undefined,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<LogoutPostResponseOutput>>;
 }
 
@@ -52,15 +55,17 @@ export class LogoutRepositoryImpl implements LogoutRepository {
    * Logout a user
    * @param data - Request data (empty for logout)
    * @param user - User from JWT
-   * @param request - Next.js request object for platform detection
+   * @param request - Next.js request object (optional for CLI context)
    * @param logger - Logger instance for debugging and monitoring
+   * @param platform - Platform context (web, cli, ai-tool, etc.)
    * @returns Success message
    */
   async logout(
     data: LogoutPostRequestOutput,
     user: JwtPrivatePayloadType,
-    request: NextRequest,
+    request: NextRequest | undefined,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<LogoutPostResponseOutput>> {
     // Removed locale parameter - translation keys handled by client
 
@@ -79,7 +84,7 @@ export class LogoutRepositoryImpl implements LogoutRepository {
 
       // Clear auth token using platform-specific handler
       const clearResult = await authRepository.clearAuthTokenForPlatform(
-        request,
+        platform,
         logger,
       );
       if (clearResult.success) {

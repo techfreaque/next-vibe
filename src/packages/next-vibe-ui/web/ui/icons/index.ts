@@ -3,9 +3,6 @@
  * Re-exports from lucide-react for web platform
  */
 
-// Export types
-export type { LucideProps } from "lucide-react";
-
 export { Activity } from "./Activity";
 export { AlertCircle } from "./AlertCircle";
 export { AlertTriangle } from "./AlertTriangle";

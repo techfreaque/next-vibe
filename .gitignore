@@ -22,7 +22,7 @@ src/app/api/[locale]/v1/core/system/check/oxlint/types.d.ts.map
 .tmp
 code-server
 .vibe-guard-instance/
-src/app/api/[locale]/v1/core/agent/chat/tools/
 
 # react native
 .expo
+.vibe.session

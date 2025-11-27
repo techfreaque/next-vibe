@@ -12,6 +12,7 @@ import { envClient } from "@/config/env-client";
 
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 import { useInputHeight } from "@/app/api/[locale]/v1/core/agent/chat/hooks/use-input-height";
+import { NEW_MESSAGE_ID } from "@/app/api/[locale]/v1/core/agent/chat/enum";
 import { AIToolsModal } from "@/app/api/[locale]/v1/core/agent/chat/threads/_components/chat-input/ai-tools-modal";
 import { ChatMessages } from "@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/_components/messages";
 import { PublicFeed } from "@/app/api/[locale]/v1/core/agent/chat/threads/_components/public-feed/public-feed";
@@ -37,6 +38,7 @@ export function ChatArea({
     activeThreadMessages: messages,
     viewMode,
     currentRootFolderId: rootFolderId,
+    activeThreadId,
   } = chat;
 
   const inputContainerRef = useRef<DivRefObject>(null);
@@ -51,6 +53,8 @@ export function ChatArea({
     !chat.currentSubFolderId &&
     !thread
   );
+
+  const isLoadingThread = !!activeThreadId && activeThreadId !== NEW_MESSAGE_ID;
 
   return (
     <KeyboardAvoidingView
@@ -91,8 +95,11 @@ export function ChatArea({
             ) : rootFolderId === "public" && !chat.currentSubFolderId ? (
               // Public folder root (no subfolder) - show feed view
               <PublicFeed locale={locale} />
+            ) : isLoadingThread ? (
+              <Div className="flex-1 flex flex-col gap-5">
+                <Div className="h-10" />
+              </Div>
             ) : (
-              // Empty state for new threads - show suggestions
               <ChatEmptyState locale={locale} inputHeight={inputHeight} />
             )}
           </Div>

@@ -3,6 +3,10 @@ import { translations as hooksTranslations } from "../../hooks/i18n/en";
 export const translations = {
   hooks: hooksTranslations,
   widgets: {
+    endpointRenderer: {
+      submit: "Submit",
+      submitting: "Submitting...",
+    },
     container: {
       noContent: "No content",
     },
@@ -10,6 +14,12 @@ export const translations = {
       showing: "Showing",
       of: "of",
       results: "results",
+      noData: "No data available",
+    },
+    dataList: {
+      noData: "No data available",
+      showMore: "Show {{count}} more",
+      showLess: "Show less",
     },
     linkList: {
       noResults: "No results found",
@@ -24,6 +34,10 @@ export const translations = {
       title: "Widget Error",
       errorDetails: "Error Details",
       defaultMessage: "An error occurred while rendering this widget",
+    },
+    formField: {
+      requiresContext:
+        "Form field requires form context and field configuration",
     },
     toolCall: {
       status: {
@@ -43,6 +57,16 @@ export const translations = {
         metadataNotAvailable:
           "Widget metadata not available. Showing raw result.",
       },
+    },
+    codeQualityList: {
+      noData: "No code quality issues found",
+      rule: "Rule: {{rule}}",
+    },
+    section: {
+      noData: "No section data available",
+    },
+    title: {
+      noData: "No title data available",
     },
   },
 };

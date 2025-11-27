@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   objectField,
   responseArrayField,
@@ -149,7 +149,10 @@ const { GET } = createEndpoint({
               cardConfig: {
                 title: "app.api.v1.core.manifest.response.title",
               },
-              layout: "grid",
+              layout: {
+                type: LayoutType.GRID,
+                columns: 2,
+              },
             },
             objectField(
               {

@@ -22,6 +22,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { endpoints } from "../../generated/endpoints";
+import type { ApiSection } from "../../unified-interface/shared/types/endpoint";
 import type {
   DiscoveredRoute,
   RouteExecutionContext,
@@ -120,35 +121,42 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       const routesArray: DiscoveredRoute[] = [];
 
       // Helper function to recursively extract routes from nested structure
-      const extractRoutes = (obj: any, pathParts: string[] = []): void => {
+      const extractRoutes = (obj: ApiSection, pathParts: string[] = []): void => {
         for (const [key, value] of Object.entries(obj)) {
-          if (!value || typeof value !== 'object') continue;
+          if (!value || typeof value !== "object") {
+            continue;
+          }
 
-          // Check if this is an API section (has HTTP methods)
-          const methods = Object.keys(value).filter(k =>
-            ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(k)
-          );
+          // Check if this is an endpoint (has 'path' property) or a section (nested structure)
+          // If it has HTTP method keys AND those methods have 'path', it's an endpoint section
+          const hasMethod = "GET" in value || "POST" in value || "PUT" in value || "PATCH" in value || "DELETE" in value;
 
-          if (methods.length > 0) {
-            // This is an endpoint - extract route info
-            const fullPath = [...pathParts, key].join('/');
-            for (const method of methods) {
-              const endpoint = value[method];
-              if (endpoint && endpoint.path) {
-                const pathArray = Array.isArray(endpoint.path) ? endpoint.path : [endpoint.path];
-                const routePath = pathArray.join('/');
+          if (hasMethod) {
+            // This is an endpoint section - extract route info from each method
+            const fullPath = [...pathParts, key].join("/");
+            const httpMethods = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const;
 
-                routesArray.push({
-                  alias: endpoint.aliases?.[0] || fullPath,
-                  path: `/api/[locale]/${routePath}`,
-                  method: method,
-                  routePath: fullPath,
-                  description: typeof endpoint.description === 'string' ? endpoint.description : undefined,
-                });
+            for (const method of httpMethods) {
+              if (method in value) {
+                const endpoint = value[method];
+                // Check if this is actually an endpoint by checking for 'path' property
+                if (endpoint && typeof endpoint === "object" && "path" in endpoint) {
+                  const pathValue = endpoint.path;
+                  const pathArray = Array.isArray(pathValue) ? pathValue : [pathValue];
+                  const routePath = pathArray.join("/");
+
+                  routesArray.push({
+                    alias: ("aliases" in endpoint && Array.isArray(endpoint.aliases) ? endpoint.aliases[0] : undefined) || fullPath,
+                    path: `/api/[locale]/${routePath}`,
+                    method: method,
+                    routePath: fullPath,
+                    description: "description" in endpoint && typeof endpoint.description === "string" ? endpoint.description : undefined,
+                  });
+                }
               }
             }
-          } else {
-            // Continue traversing nested structure
+          } else if (!("path" in value)) {
+            // No HTTP methods and no 'path' property - must be nested ApiSection structure
             extractRoutes(value, [...pathParts, key]);
           }
         }

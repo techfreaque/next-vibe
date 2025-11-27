@@ -13,7 +13,7 @@ export async function release(
   ciMode = false,
   forceUpdate = false,
 ): Promise<void> {
-  const logger = createEndpointLogger(true, Date.now(), "en-GLOBAL");
+  const logger = createEndpointLogger(false, Date.now(), "en-GLOBAL");
 
   if (ciMode) {
     await ciRelease(configPath, logger);

@@ -13,7 +13,7 @@ import type { SessionData } from "../../shared/server-only/auth/base-auth-handle
 
 /**
  * Session file path
- * Stored in user's home directory or current working directory
+ * Stored in project root directory
  */
 const SESSION_FILE_NAME = ".vibe.session";
 
@@ -27,13 +27,9 @@ const FILE_NOT_FOUND_ERROR_PATTERNS = {
 
 /**
  * Get session file path
- * Tries home directory first, falls back to current working directory
+ * Always uses project root (current working directory)
  */
 function getSessionFilePath(): string {
-  const homeDir = process.env.HOME || process.env.USERPROFILE;
-  if (homeDir) {
-    return join(homeDir, SESSION_FILE_NAME);
-  }
   return join(process.cwd(), SESSION_FILE_NAME);
 }
 

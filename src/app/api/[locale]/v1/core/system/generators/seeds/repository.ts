@@ -16,9 +16,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../../user/auth/types";
 import {
   extractModuleName,
   findFilesRecursively,
@@ -50,8 +48,6 @@ interface SeedsResponseType {
 interface SeedsGeneratorRepository {
   generateSeeds(
     data: SeedsRequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<SeedsResponseType>>;
 }
@@ -62,8 +58,6 @@ interface SeedsGeneratorRepository {
 class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
   async generateSeeds(
     data: SeedsRequestType,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<SeedsResponseType>> {
     const startTime = Date.now();

@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   objectField,
   requestDataField,
@@ -134,7 +134,8 @@ const { GET } = createEndpoint({
             type: WidgetType.CONTAINER,
             title:
               "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.title" as const,
-            layoutType: LayoutType.GRID, columns: 2,
+            layoutType: LayoutType.GRID,
+            columns: 2,
           },
           { response: true },
           {
@@ -234,14 +235,6 @@ const { GET } = createEndpoint({
               },
               z.uuid().nullable(),
             ),
-            sequenceIndex: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.sequenceIndex.content" as const,
-              },
-              z.number(),
-            ),
             toolCalls: responseField(
               {
                 type: WidgetType.TEXT,
@@ -300,7 +293,6 @@ const { GET } = createEndpoint({
             persona: null,
             tokens: null,
             sequenceId: null,
-            sequenceIndex: 0,
             toolCalls: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -318,7 +310,6 @@ const { GET } = createEndpoint({
             persona: null,
             tokens: 150,
             sequenceId: null,
-            sequenceIndex: 0,
             toolCalls: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),

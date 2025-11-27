@@ -5,8 +5,7 @@
 
 import "server-only";
 
-import { Platform } from "../enum";
-import type { PlatformType } from "../types";
+import { type PlatformType, Platform } from "../enum";
 import type {
   Recorder,
   RecorderFactoryOptions,
@@ -15,9 +14,7 @@ import type {
 } from "../types";
 import { platformDetector } from "../utils/platform";
 import { createMacRecorder } from "./recorder/mac";
-import {
-  createLinuxWaylandRecorder,
-} from "./recorder/linux-wayland";
+import { createLinuxWaylandRecorder } from "./recorder/linux-wayland";
 import { createLinuxX11Recorder } from "./recorder/linux-x11";
 import { createWindowsRecorder } from "./recorder/windows";
 import { createMacTyper } from "./typer/mac";
@@ -82,20 +79,14 @@ export function createTyper(options?: TyperFactoryOptions): Typer {
       return createMacTyper();
 
     case Platform.LINUX_WAYLAND:
-      return createLinuxWaylandTyper(
-        options?.preferClipboard,
-        {
-          typingDelay: options?.typingDelay,
-        },
-      );
+      return createLinuxWaylandTyper(options?.preferClipboard, {
+        typingDelay: options?.typingDelay,
+      });
 
     case Platform.LINUX_X11:
-      return createLinuxX11Typer(
-        options?.preferClipboard,
-        {
-          typingDelay: options?.typingDelay,
-        },
-      );
+      return createLinuxX11Typer(options?.preferClipboard, {
+        typingDelay: options?.typingDelay,
+      });
 
     case Platform.WINDOWS:
       return createWindowsTyper();

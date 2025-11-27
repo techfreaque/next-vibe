@@ -13,7 +13,6 @@
  * Storage methods (setAuthCookies/clearAuthCookies) use AsyncStorage on native.
  */
 
-import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
@@ -25,13 +24,14 @@ import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/platform";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UserRoleValue } from "../user-roles/enum";
-// Import the interface from the server implementation to ensure type compatibility
-import type { AuthContext, AuthRepository, InferUserType } from "./repository";
+import type { AuthRepository, InferUserType } from "./repository";
+import type { AuthContext } from "../../system/unified-interface/shared/server-only/auth/base-auth-handler";
 
 /**
  * Storage keys for auth tokens
@@ -111,9 +111,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     );
   }
 
-  getAuthMinimalUser<
-    TRoles extends readonly UserRoleValue[],
-  >(
+  getAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
     roles: TRoles,
     context: AuthContext,
     logger: EndpointLogger,
@@ -128,9 +126,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     return Promise.reject(new Error(JSON.stringify(error)));
   }
 
-  getTypedAuthMinimalUser<
-    TRoles extends readonly UserRoleValue[],
-  >(
+  getTypedAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
     roles: TRoles,
     context: AuthContext,
     logger: EndpointLogger,
@@ -213,7 +209,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     token: string,
     userId: string,
     leadId: string,
-    _request: NextRequest,
+    _platform: Platform,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     // On native, we always use AsyncStorage (no platform detection needed)
@@ -226,7 +222,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
    * For native, this delegates to clearAuthCookies which uses AsyncStorage
    */
   async clearAuthTokenForPlatform(
-    _request: NextRequest,
+    _platform: Platform,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     // On native, we always use AsyncStorage (no platform detection needed)

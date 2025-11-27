@@ -540,9 +540,10 @@ export class RouteDelegationHandler {
       if (
         missingRequired.length &&
         context.options?.interactive &&
+        !contextData &&
         endpoint
       ) {
-        // Some required fields missing, use interactive mode
+        // Some required fields missing AND no data was provided, use interactive mode
         logger.info("📝 Request Data:");
         logger.warn(
           `⚠️  Missing required fields: ${missingRequired.join(", ")}`,

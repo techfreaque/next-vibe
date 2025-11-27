@@ -361,7 +361,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       // Extract userId safely - only exists for authenticated users
       const userId = !user.isPublic && user.id;
 
-      logger.info("Listing threads - START", {
+      logger.debug("Listing threads - START", {
         userId,
         leadId: user.leadId,
         isPublic: user.isPublic,
@@ -382,7 +382,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       // For authenticated users, use userId
       const userIdentifier = user.isPublic ? user.leadId : userId;
 
-      logger.info("Listing threads - User identifier", {
+      logger.debug("Listing threads - User identifier", {
         userIdentifier,
         isPublic: user.isPublic,
       });
@@ -541,18 +541,6 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
           ? allFolders[thread.folderId] || null
           : null;
 
-        logger.info("Checking thread visibility", {
-          threadId: thread.id,
-          threadTitle: thread.title,
-          folderId: thread.folderId,
-          hasFolder: !!folder,
-          folderName: folder?.name,
-          threadRolesView: thread.rolesView,
-          folderRolesView: folder?.rolesView,
-          userId: user.id,
-          isPublic: user.isPublic,
-        });
-
         const canView = await canViewThread(
           user,
           thread,
@@ -560,11 +548,6 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
           logger,
           allFolders,
         );
-
-        logger.info("Thread visibility result", {
-          threadId: thread.id,
-          canView,
-        });
 
         if (canView) {
           visibleThreads.push(thread);
@@ -627,15 +610,6 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       );
 
       const pageCount = Math.ceil(total / limit);
-
-      logger.info("Threads listed successfully", {
-        total,
-        page,
-        limit,
-        pageCount,
-        resultsCount: threads.length,
-        threadIds: threads.map((t) => t.id),
-      });
 
       return success({
         response: {

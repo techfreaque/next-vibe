@@ -558,6 +558,7 @@ export const translations: typeof enTranslations = {
     vision: "Sehen & Bildverständnis",
     imageGen: "Bildgenerierung",
     uncensored: "Unzensiert",
+    legacy: "Legacy-Modelle",
     // Persona categories
     technical: "Technisch",
     education: "Bildung",
@@ -569,9 +570,11 @@ export const translations: typeof enTranslations = {
       claudeHaiku45: "Neuestes Claude-Modell mit hervorragender Leistung",
       claudeSonnet45: "Neuestes Claude-Modell mit hervorragender Leistung",
       gpt5: "Neuestes GPT-Modell mit hervorragender Leistung",
+      gpt51: "Neuestes GPT 5.1-Modell mit verbessertem Denkvermögen",
       gpt5Pro:
         "Neuestes GPT-Modell mit hervorragender Leistung für Programmieraufgaben",
       gpt5Codex: "Neuestes GPT-Modell mit hervorragender Leistung",
+      gpt51Codex: "Neuestes GPT 5.1 Codex-Modell optimiert für Programmierung",
       gpt5Mini:
         "Neuestes Mini-Modell mit hervorragendem Preis-Leistungs-Verhältnis",
       gpt5Nano:

@@ -153,7 +153,3 @@ export interface ImapConnectionCloseResponseOutput {
   success: boolean;
   message: TranslationKey;
 }
-
-const definitions = {};
-
-export default definitions;

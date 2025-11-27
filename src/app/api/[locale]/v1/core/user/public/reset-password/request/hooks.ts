@@ -37,9 +37,9 @@ import resetPasswordRequestEndpoint from "./definition";
  * @returns Enhanced form and submission handler for requesting a password reset
  */
 export function useResetPasswordRequest(logger: EndpointLogger): ApiFormReturn<
-  (typeof resetPasswordRequestEndpoint.POST)["TRequestOutput"],
-  (typeof resetPasswordRequestEndpoint.POST)["TResponseOutput"],
-  (typeof resetPasswordRequestEndpoint.POST)["TUrlVariablesOutput"]
+  (typeof resetPasswordRequestEndpoint.POST)["types"]["RequestOutput"],
+  (typeof resetPasswordRequestEndpoint.POST)["types"]["ResponseOutput"],
+  (typeof resetPasswordRequestEndpoint.POST)["types"]["UrlVariablesOutput"]
 > & {
   isSuccess: boolean;
   alert: FormAlertState | null;

@@ -12,13 +12,6 @@ import type {
 import { parseError } from "next-vibe/shared/utils";
 import { useEffect } from "react";
 
-import {
-  createCustomStateKey,
-  type EnhancedMutationResult,
-  useApiMutation,
-  useApiQuery,
-  useCustomState,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
@@ -31,6 +24,15 @@ import meEndpoints, {
   type MePostRequestOutput,
   type MePostResponseOutput,
 } from "./definition";
+import {
+  createCustomStateKey,
+  useCustomState,
+} from "../../../system/unified-interface/react/hooks/store";
+import { useApiQuery } from "../../../system/unified-interface/react/hooks/use-api-query";
+import {
+  type EnhancedMutationResult,
+  useApiMutation,
+} from "../../../system/unified-interface/react/hooks/use-api-mutation";
 
 /****************************
  * STATE KEYS

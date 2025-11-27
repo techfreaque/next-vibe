@@ -15,6 +15,7 @@ import { simpleT } from "@/i18n/core/shared";
 import { useAIStream } from "../../ai-stream/hooks/use-ai-stream";
 import { useAIStreamStore } from "../../ai-stream/hooks/store";
 import type { DefaultFolderId } from "../config";
+import { NEW_MESSAGE_ID } from "../enum";
 import type { ModelId } from "../model-access/models";
 import type { PersonaListResponseOutput } from "../personas/definition";
 import { usePersonasList } from "../personas/hooks";
@@ -324,7 +325,7 @@ export function useChat(
 
   // Compute active thread messages
   const activeThreadMessages = useMemo(() => {
-    if (!activeThreadId || activeThreadId === "new") {
+    if (!activeThreadId || activeThreadId === NEW_MESSAGE_ID) {
       logger.debug("Chat: activeThreadMessages - no active thread", {
         activeThreadId,
       });

@@ -16,9 +16,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { JwtPayloadType } from "../../../user/auth/types";
+import type { ApiSection } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import {
   extractPathKey,
   findFilesRecursively,
@@ -47,8 +45,6 @@ interface RouteHandlersResponseType {
 interface RouteHandlersGeneratorRepository {
   generateRouteHandlers(
     data: RouteHandlersRequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<RouteHandlersResponseType>>;
 }
@@ -56,13 +52,9 @@ interface RouteHandlersGeneratorRepository {
 /**
  * Route Handlers Generator Repository Implementation
  */
-class RouteHandlersGeneratorRepositoryImpl
-  implements RouteHandlersGeneratorRepository
-{
+class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepository {
   async generateRouteHandlers(
     data: RouteHandlersRequestType,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<RouteHandlersResponseType>> {
     const startTime = Date.now();
@@ -122,11 +114,41 @@ class RouteHandlersGeneratorRepositoryImpl
   }
 
   /**
+   * Extract HTTP methods from definition file (async)
+   * We extract from definition instead of route because route files have server-only dependencies
+   */
+  private async extractMethodsFromDefinition(
+    routeFile: string,
+  ): Promise<string[]> {
+    const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
+    try {
+      const definition = (await import(definitionPath)) as {
+        default?: ApiSection;
+      };
+      const defaultExport = definition.default;
+
+      if (!defaultExport) {
+        return [];
+      }
+
+      // Get all HTTP methods from the definition
+      const methods = Object.keys(defaultExport).filter((key) =>
+        ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(
+          key,
+        ),
+      );
+      return methods;
+    } catch {
+      return [];
+    }
+  }
+
+  /**
    * Extract aliases from definition file (async)
    */
   private async extractAliasesFromDefinition(
     routeFile: string,
-  ): Promise<string[]> {
+  ): Promise<Array<{ alias: string; method: string }>> {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
     try {
       const definition = (await import(definitionPath)) as {
@@ -138,13 +160,19 @@ class RouteHandlersGeneratorRepositoryImpl
         return [];
       }
 
-      // Get aliases from any method (usually POST)
+      const aliasesWithMethods: Array<{ alias: string; method: string }> = [];
+
+      // Get aliases from each method
       for (const method of Object.keys(defaultExport)) {
         const methodDef = defaultExport[method];
         if (methodDef?.aliases && Array.isArray(methodDef.aliases)) {
-          return methodDef.aliases;
+          for (const alias of methodDef.aliases) {
+            aliasesWithMethods.push({ alias, method });
+          }
         }
       }
+
+      return aliasesWithMethods;
     } catch {
       // Definition file doesn't exist or can't be loaded
     }
@@ -153,30 +181,37 @@ class RouteHandlersGeneratorRepositoryImpl
 
   /**
    * Generate route handlers content with dynamic imports and real aliases from definitions
-   * No duplicate parameter format aliases - only [id] format and real definition aliases
+   * Main paths include method suffix (e.g., "core/agent/ai-stream/POST")
+   * Aliases also include method from their definition
    */
   private async generateContent(routeFiles: string[]): Promise<string> {
-    const pathMap: Record<string, string> = {};
+    const pathMap: Record<string, { importPath: string; method: string }> = {};
     const allPaths: string[] = [];
 
-    // Build path map with aliases (deduplicate)
+    // Build path map with method suffixes and aliases (deduplicate)
     for (const routeFile of routeFiles) {
       const { path } = extractPathKey(routeFile);
       const importPath = generateAbsoluteImportPath(routeFile, "route");
 
-      // Add main path (with [id] format only) if not already added
-      if (!pathMap[path]) {
-        pathMap[path] = importPath;
-        allPaths.push(path);
+      // Get methods for this route from definition file
+      const methods = await this.extractMethodsFromDefinition(routeFile);
+
+      // Add main path with method suffix for each method (e.g., "core/agent/ai-stream/POST")
+      for (const method of methods) {
+        const pathWithMethod = `${path}/${method}`;
+        if (!pathMap[pathWithMethod]) {
+          pathMap[pathWithMethod] = { importPath, method };
+          allPaths.push(pathWithMethod);
+        }
       }
 
-      // Extract and add real aliases from definition file
+      // Extract and add real aliases from definition file (with their method)
       const definitionAliases =
         await this.extractAliasesFromDefinition(routeFile);
-      for (const alias of definitionAliases) {
+      for (const { alias, method } of definitionAliases) {
         // Only add if not already present (first wins)
         if (!pathMap[alias]) {
-          pathMap[alias] = importPath;
+          pathMap[alias] = { importPath, method };
           allPaths.push(alias);
         }
       }
@@ -188,7 +223,8 @@ class RouteHandlersGeneratorRepositoryImpl
     // Generate getRouteHandler function cases with type-safe loading
     const cases: string[] = [];
     for (const path of allPaths) {
-      const importPath = pathMap[path];
+      const { importPath } = pathMap[path];
+      // Return the whole module so executor can access definition and tools
       // eslint-disable-next-line i18next/no-literal-string
       cases.push(`    case "${path}":
       return await import("${importPath}");`);

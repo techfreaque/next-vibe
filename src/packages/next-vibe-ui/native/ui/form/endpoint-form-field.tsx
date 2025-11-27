@@ -23,13 +23,13 @@ import type {
   FieldStyleClassName,
   FieldValidationState,
   RequiredFieldTheme,
-} from "../../../web/ui/form/endpoint-form-field-types";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field-config/field-config-types";
+import { getFieldConfig } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field-config/infer-field-config";
 import type {
   EndpointFormFieldProps,
   EndpointFormFieldsProps,
   FormFieldError,
 } from "../../../web/ui/form/endpoint-form-field";
-import { getFieldConfig } from "../../../web/ui/form/infer-field-config";
 
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
@@ -95,9 +95,9 @@ function getFieldValidationState<T>(
 ): FieldValidationState {
   const hasValue = Boolean(
     fieldValue !== undefined &&
-      fieldValue !== null &&
-      fieldValue !== "" &&
-      (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
+    fieldValue !== null &&
+    fieldValue !== "" &&
+    (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
   );
 
   return {
@@ -430,16 +430,12 @@ function renderFieldInput<
             disabled={disabled || config.disabled}
             className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
           />
-          {(config.checkboxLabel || config.checkboxLabelJsx) && (
+          {config.checkboxLabel && (
             <Label
               htmlFor={field.name}
               className="text-sm font-normal cursor-pointer leading-relaxed"
             >
-              {config.checkboxLabelJsx
-                ? config.checkboxLabelJsx
-                : config.checkboxLabel
-                  ? t(config.checkboxLabel)
-                  : null}
+              {t(config.checkboxLabel)}
             </Label>
           )}
         </Div>

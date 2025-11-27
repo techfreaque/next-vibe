@@ -49,9 +49,7 @@ export function ThreadedMessageContent({
 
   // Get all messages in the sequence (primary + continuations)
   const allMessagesInSequence = messageGroup
-    ? [messageGroup.primary, ...messageGroup.continuations].toSorted(
-        (a, b) => (a.sequenceIndex ?? 0) - (b.sequenceIndex ?? 0),
-      )
+    ? [messageGroup.primary, ...messageGroup.continuations]
     : [message];
 
   return (

@@ -7,7 +7,7 @@ import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
-import { EndpointFormRenderer } from "@/app/api/[locale]/v1/core/system/unified-interface/react/widgets/EndpointFormRenderer";
+import { EndpointRenderer } from "@/app/api/[locale]/v1/core/system/unified-interface/react/widgets/renderers/EndpointRenderer";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { useLogin } from "@/app/api/[locale]/v1/core/user/public/login/hooks";
 import type { LoginOptions } from "@/app/api/[locale]/v1/core/user/public/login/repository";
@@ -41,7 +41,7 @@ export function LoginForm({
   },
 }: LoginFormNewProps): JSX.Element {
   const { t } = simpleT(locale);
-  const logger = createEndpointLogger(true, Date.now(), locale);
+  const logger = createEndpointLogger(false, Date.now(), locale);
   const loginResult = useLogin(initialLoginOptions, logger);
   const { form, onSubmit, isSubmitting } = loginResult.create || {};
   const { isAccountLocked, loginOptions, alert } = loginResult;
@@ -55,7 +55,7 @@ export function LoginForm({
       <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
         <CardContent className="mt-6">
           {alert && <FormAlert alert={alert} className="mb-6" />}
-          <EndpointFormRenderer
+          <EndpointRenderer
             endpoint={loginEndpoints.POST}
             form={form}
             onSubmit={onSubmit}
@@ -84,7 +84,7 @@ export function LoginForm({
                 </Link>
               </Div>
             </Div>
-          </EndpointFormRenderer>
+          </EndpointRenderer>
         </CardContent>
       </Card>
     </MotionDiv>

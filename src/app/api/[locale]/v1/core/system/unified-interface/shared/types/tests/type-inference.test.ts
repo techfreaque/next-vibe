@@ -28,7 +28,7 @@ import type {
   GetEndpointTypes,
   PrimaryMutationTypes,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/endpoint-types";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   requestDataArrayField,
@@ -56,7 +56,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import type {
   InferJwtPayloadTypeFromRoles,
   MethodHandlerConfig,
-} from "../../types/handler";
+} from "../../endpoints/route/handler";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;
@@ -795,7 +795,7 @@ type MixedRolesUserTypeCheck = Expect<
 >;
 
 // Test that handler props receive the correct user type
-import type { ApiHandlerProps } from "../../types/handler";
+import type { ApiHandlerProps } from "../../endpoints/route/handler";
 
 // Simulate handler props for PUBLIC-only endpoint
 type PublicOnlyHandlerProps = ApiHandlerProps<
@@ -889,7 +889,7 @@ type NarrowedPrivateCheck = Expect<
  */
 
 // Import the actual endpointsHandler to test real-world usage
-import type { EndpointHandlerConfig } from "../../types/handler";
+import type { EndpointHandlerConfig } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/multi";
 
 // Create test endpoint definitions (simulating what's in definition.ts files)
 const testPublicOnlyDefinitions = {

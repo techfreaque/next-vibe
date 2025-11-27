@@ -8,7 +8,7 @@
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import React from "react";
+import React, { useCallback } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -48,6 +48,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     handleModelChange: onModelChange,
     setSelectedPersona: onPersonaChange,
     handleSwitchBranch: onSwitchBranch,
+    branchMessage,
     // Editor actions
     editingMessageId,
     retryingMessageId,
@@ -62,6 +63,14 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     // Collapse state
     collapseState,
   } = useChatContext();
+
+  // Wrap handleBranchEdit to pass branchMessage as the third parameter
+  const handleBranch = useCallback(
+    async (messageId: string, content: string) => {
+      await onBranchEdit(messageId, content, branchMessage);
+    },
+    [onBranchEdit, branchMessage],
+  );
 
   // Group messages by sequence for proper display
   const messageGroups = groupMessagesBySequence(messages);
@@ -133,7 +142,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                 <Div className="flex justify-end">
                   <MessageEditor
                     message={message}
-                    onBranch={onBranchEdit}
+                    onBranch={handleBranch}
                     onCancel={onCancelAction}
                     onModelChange={onModelChange}
                     onPersonaChange={onPersonaChange}
@@ -146,8 +155,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   <ModelPersonaSelectorModal
                     titleKey="app.chat.linearMessageView.retryModal.title"
                     descriptionKey="app.chat.linearMessageView.retryModal.description"
-                    
-                    
                     onModelChange={
                       onModelChange ||
                       ((): void => {
@@ -264,5 +271,4 @@ export const LinearMessageView = React.memo(function LinearMessageView({
       })}
     </>
   );
-}
-);
+});

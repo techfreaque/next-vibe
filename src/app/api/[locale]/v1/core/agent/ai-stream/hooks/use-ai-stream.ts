@@ -95,7 +95,6 @@ function handleMessageCreatedEvent(params: {
     persona: eventData.persona,
     isStreaming: eventData.role === ChatMessageRole.ASSISTANT,
     sequenceId: eventData.sequenceId,
-    sequenceIndex: eventData.sequenceIndex,
   });
 
   const streamThread = useAIStreamStore.getState().threads[eventData.threadId];
@@ -148,7 +147,6 @@ function handleMessageCreatedEvent(params: {
           upvotes: null,
           downvotes: null,
           sequenceId: eventData.sequenceId ?? null,
-          sequenceIndex: eventData.sequenceIndex ?? 0,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -181,7 +179,6 @@ function handleMessageCreatedEvent(params: {
               upvotes: null,
               downvotes: null,
               sequenceId: eventData.sequenceId ?? null,
-              sequenceIndex: eventData.sequenceIndex ?? 0,
               createdAt: new Date(),
               updatedAt: new Date(),
             });
@@ -443,7 +440,6 @@ export function useAIStream(
                     persona: null,
                     isStreaming: true,
                     sequenceId: null,
-                    sequenceIndex: 0,
                   });
 
                   // Get the message we just created
@@ -463,9 +459,8 @@ export function useAIStream(
                   // Save to localStorage incrementally for incognito mode
                   void (async (): Promise<void> => {
                     try {
-                      const { useChatStore } = await import(
-                        "../../chat/hooks/store"
-                      );
+                      const { useChatStore } =
+                        await import("../../chat/hooks/store");
                       const chatThread =
                         useChatStore.getState().threads[
                           currentMessage.threadId
@@ -474,9 +469,8 @@ export function useAIStream(
                         chatThread?.rootFolderId === "incognito";
 
                       if (isIncognito) {
-                        const { saveMessage } = await import(
-                          "../../chat/incognito/storage"
-                        );
+                        const { saveMessage } =
+                          await import("../../chat/incognito/storage");
                         saveMessage({
                           id: eventData.messageId,
                           threadId: currentMessage.threadId,
@@ -498,7 +492,6 @@ export function useAIStream(
                           upvotes: null,
                           downvotes: null,
                           sequenceId: currentMessage.sequenceId ?? null,
-                          sequenceIndex: currentMessage.sequenceIndex ?? 0,
                           createdAt: new Date(),
                           updatedAt: new Date(),
                         });
@@ -551,9 +544,8 @@ export function useAIStream(
                   // Also update chat store and localStorage for incognito mode
                   void (async (): Promise<void> => {
                     try {
-                      const { useChatStore } = await import(
-                        "../../chat/hooks/store"
-                      );
+                      const { useChatStore } =
+                        await import("../../chat/hooks/store");
                       const chatMessage =
                         useChatStore.getState().messages[eventData.messageId];
 
@@ -573,9 +565,8 @@ export function useAIStream(
                           chatThread?.rootFolderId === "incognito";
 
                         if (isIncognito) {
-                          const { saveMessage } = await import(
-                            "../../chat/incognito/storage"
-                          );
+                          const { saveMessage } =
+                            await import("../../chat/incognito/storage");
                           saveMessage({
                             id: eventData.messageId,
                             threadId: currentMessage.threadId,
@@ -597,7 +588,6 @@ export function useAIStream(
                             upvotes: null,
                             downvotes: null,
                             sequenceId: currentMessage.sequenceId ?? null,
-                            sequenceIndex: currentMessage.sequenceIndex ?? 0,
                             createdAt: new Date(),
                             updatedAt: new Date(),
                           });
@@ -639,9 +629,8 @@ export function useAIStream(
                   // Also update chat store so reasoning content is persisted
                   void (async (): Promise<void> => {
                     try {
-                      const { useChatStore } = await import(
-                        "../../chat/hooks/store"
-                      );
+                      const { useChatStore } =
+                        await import("../../chat/hooks/store");
                       const chatMessage =
                         useChatStore.getState().messages[eventData.messageId];
 
@@ -806,9 +795,8 @@ export function useAIStream(
                 if (message) {
                   void (async (): Promise<void> => {
                     try {
-                      const { useChatStore } = await import(
-                        "../../chat/hooks/store"
-                      );
+                      const { useChatStore } =
+                        await import("../../chat/hooks/store");
                       const chatThread =
                         useChatStore.getState().threads[message.threadId];
                       const isIncognito =
@@ -818,9 +806,8 @@ export function useAIStream(
                       if (isIncognito) {
                         // Save to localStorage
                         try {
-                          const { saveMessage } = await import(
-                            "../../chat/incognito/storage"
-                          );
+                          const { saveMessage } =
+                            await import("../../chat/incognito/storage");
                           logger.info("[DEBUG] Saving incognito message", {
                             messageId: message.messageId,
                             contentPreview: eventData.content.substring(0, 50),
@@ -851,7 +838,6 @@ export function useAIStream(
                             upvotes: 0,
                             downvotes: 0,
                             sequenceId: message.sequenceId ?? null,
-                            sequenceIndex: message.sequenceIndex ?? 0,
                             createdAt: new Date(),
                             updatedAt: new Date(),
                             searchVector: null,
@@ -931,7 +917,6 @@ export function useAIStream(
                         upvotes: null,
                         downvotes: null,
                         sequenceId: null,
-                        sequenceIndex: 0,
                         createdAt: new Date(),
                         updatedAt: new Date(),
                       });

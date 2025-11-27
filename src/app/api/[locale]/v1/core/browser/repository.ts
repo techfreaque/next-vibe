@@ -16,7 +16,7 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { ParameterValue } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/execution/executor";
+import type { ParameterValue } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/executor";
 
 import type { BrowserRequestOutput, BrowserResponseOutput } from "./definition";
 import { BrowserToolStatus } from "./enum";

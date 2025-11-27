@@ -13,7 +13,7 @@ import {
   TimePeriod,
   TimePeriodOptions,
 } from "@/app/api/[locale]/v1/core/shared/stats-filtering";
-import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   objectField,
   requestDataField,

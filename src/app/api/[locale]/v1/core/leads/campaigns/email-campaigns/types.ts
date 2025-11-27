@@ -149,7 +149,3 @@ export interface EmailCampaignError {
   stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
   error: string;
 }
-
-const definitions = {};
-
-export default definitions;

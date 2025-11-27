@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createFormEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create-form";
+import { createFormEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create-form";
 import {
   field,
   objectField,

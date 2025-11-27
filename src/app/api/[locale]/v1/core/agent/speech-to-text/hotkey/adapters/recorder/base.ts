@@ -10,8 +10,8 @@ import "server-only";
 import type { Subprocess } from "bun";
 
 import type { Recorder } from "../../types";
-import type { RecorderBackendType } from "../../types";
 import { RecorderError } from "../../types";
+import type { RecorderBackendType } from "../../enum";
 
 /**
  * Abstract base recorder class
@@ -97,11 +97,7 @@ export abstract class BaseRecorder implements Recorder {
   async stop(): Promise<void> {
     if (!this._isRecording || !this._process) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Recorder state error
-      throw new RecorderError(
-        "No recording in progress",
-        "NO_RECORDING",
-        {},
-      );
+      throw new RecorderError("No recording in progress", "NO_RECORDING", {});
     }
 
     try {

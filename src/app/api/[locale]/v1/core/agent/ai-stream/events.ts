@@ -54,7 +54,6 @@ export interface MessageCreatedEventData {
   model?: ModelId;
   persona?: string;
   sequenceId?: string | null; // Links messages in the same AI response sequence
-  sequenceIndex?: number; // Order within sequence
   toolCalls?: ToolCall[]; // Tool calls for TOOL role messages
 }
 

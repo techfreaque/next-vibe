@@ -24,8 +24,7 @@ import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import { ChatInterface } from "../../chat/components/chat-interface";
+import { ChatInterface } from "@/app/api/[locale]/v1/core/agent/chat/_components/chat-interface";
 
 interface ThreadsPathPageProps {
   params: Promise<{
@@ -38,7 +37,7 @@ export default async function ThreadsPathPage({
   params,
 }: ThreadsPathPageProps): Promise<JSX.Element> {
   const { locale, path } = await params;
-  const logger = createEndpointLogger(true, Date.now(), locale);
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Get authenticated user
   const userResponse = await userRepository.getUserByAuth(

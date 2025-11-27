@@ -56,7 +56,6 @@ export interface ChatMessage {
   parentId: string | null;
   depth: number;
   sequenceId: string | null; // Links messages in the same AI response sequence
-  sequenceIndex: number; // Order within sequence
   authorId: string | null;
   authorName: string | null;
   isAI: boolean;
@@ -79,7 +78,7 @@ export interface ChatMessage {
  */
 export interface ChatFolder {
   id: string;
-  userId: string;
+  userId: string | null;
   rootFolderId: DefaultFolderId;
   name: string;
   icon: IconValue | null;

@@ -12,7 +12,7 @@ import { storage } from "next-vibe-ui/lib/storage";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import type { CreateApiEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import type { FieldUsage } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type {
   ExtractOutput,
@@ -65,8 +65,8 @@ export function useApiQueryForm<
   logger,
 }: {
   endpoint: TEndpoint;
-  urlPathParams: TEndpoint["TUrlVariablesOutput"];
-  formOptions?: ApiQueryFormOptions<TEndpoint["TRequestOutput"]> & {
+  urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+  formOptions?: ApiQueryFormOptions<TEndpoint["types"]["RequestOutput"]> & {
     /**
      * Whether to enable form persistence
      * @default true

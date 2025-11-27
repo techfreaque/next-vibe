@@ -9,11 +9,13 @@ import type { DbId } from "@/app/api/[locale]/v1/core/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 import type {
-  CsvImportConfig,
-  DomainImportRepository,
   ImportJobsListResponseType,
   LeadsImportResponseOutput,
 } from "../leads/import/definition";
+import type {
+  CsvImportConfig,
+  DomainImportRepository,
+} from "../leads/import/repository";
 
 /**
  * Domain-specific Record Interface
@@ -86,7 +88,3 @@ export interface ImportRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ processed: number; hasMore: boolean }>>;
 }
-
-const definitions = {};
-
-export default definitions;

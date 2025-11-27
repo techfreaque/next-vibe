@@ -198,7 +198,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
       // Get the authenticated user
       const verifiedUser = await authRepository.getAuthMinimalUser(
         roles,
-        { platform: Platform.WEB, locale },
+        { platform: Platform.NEXT_PAGE, locale },
         logger,
       );
 

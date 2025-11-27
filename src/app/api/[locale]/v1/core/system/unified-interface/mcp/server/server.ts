@@ -10,7 +10,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { MCP_CONFIG } from "../config";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { createMCPProtocolHandler } from "./protocol-handler";
 import { StdioTransport } from "./stdio-transport";
@@ -41,19 +40,12 @@ export class MCPServer {
     try {
       logger.info("[MCP Server] Starting...");
 
-      const capabilities = MCP_CONFIG.platformSpecific?.capabilities || {
-        tools: true,
-        prompts: false,
-        resources: false,
-      };
-
       logger.info("[MCP Server] Configuration", {
         // eslint-disable-next-line i18next/no-literal-string
         name: "Vibe MCP Server",
         version: "1.0.0",
         locale: locale,
         debug: logger.isDebugEnabled,
-        capabilities,
       });
 
       // Create protocol handler

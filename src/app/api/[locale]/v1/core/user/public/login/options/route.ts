@@ -1,6 +1,6 @@
 import "server-only";
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/v1/core/system/shared/enums";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 import { translateKey } from "@/i18n/core/translation-utils";

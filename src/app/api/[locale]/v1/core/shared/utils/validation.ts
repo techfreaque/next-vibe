@@ -1,4 +1,5 @@
-import type { z, ZodError, ZodIssue } from "zod";
+import type { ZodError, ZodIssue } from "zod";
+import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
@@ -18,6 +19,16 @@ export function validateData<TSchema extends z.ZodType>(
   schema: TSchema,
   logger: EndpointLogger,
 ): ResponseType<z.infer<TSchema>> {
+  if (isEmptyObjectSchema(schema)) {
+    return { success: true, data: {} as z.infer<TSchema> };
+  }
+  if (isEmptySchema(schema)) {
+    return { success: true, data: undefined as z.infer<TSchema> };
+  }
+  if (isNeverSchema(schema)) {
+    return { success: true, data: undefined as z.infer<TSchema> };
+  }
+
   try {
     const result = schema.safeParse(data);
 
@@ -66,7 +77,7 @@ export function validateData<TSchema extends z.ZodType>(
  * @param zodError - The ZodError object to format
  * @returns A formatted error string array
  */
-export function formatZodErrors(zodError: ZodError): string[] {
+function formatZodErrors(zodError: ZodError): string[] {
   if (
     !zodError?.issues ||
     !Array.isArray(zodError.issues) ||
@@ -77,4 +88,40 @@ export function formatZodErrors(zodError: ZodError): string[] {
   return zodError.issues.map(
     (err: ZodIssue) => `${err.path.join(".")}: ${err.message}`,
   );
+}
+
+/**
+ * Check if request schema is an empty object
+ */
+export function isEmptyObjectSchema(schema: z.ZodSchema): boolean {
+  return (
+    schema instanceof z.ZodObject && Object.keys(schema.shape).length === 0
+  );
+}
+
+/**
+ * Check if schema expects no input (undefined or never)
+ */
+export function isEmptySchema(schema: z.ZodSchema): boolean {
+  return (
+    schema instanceof z.ZodUndefined ||
+    schema instanceof z.ZodNever ||
+    schema instanceof z.ZodVoid
+  );
+}
+
+/**
+ * Check if schema expects never type specifically
+ */
+export function isNeverSchema(schema: z.ZodSchema): boolean {
+  try {
+    const testResult = schema.safeParse({});
+    return (
+      !testResult.success &&
+      testResult.error?.issues?.[0]?.code === "invalid_type" &&
+      testResult.error?.issues?.[0]?.expected === "never"
+    );
+  } catch {
+    return false;
+  }
 }

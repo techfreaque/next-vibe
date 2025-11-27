@@ -3,7 +3,7 @@
  * Next.js API route handlers for Chrome DevTools MCP tool execution
  */
 
-import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/handler/multi";
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 
 import browserEndpoints from "./definition";

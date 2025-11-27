@@ -66,7 +66,3 @@ export interface SendEmailRequestTypeOutput {
 export interface SendEmailResponseTypeOutput {
   result: SmtpSendResult;
 }
-
-const definitions = {};
-
-export default definitions;

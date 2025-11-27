@@ -17,10 +17,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import {
-  getCountryFromLocale,
-  getLanguageFromLocale,
-} from "@/i18n/core/language-utils";
+import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { smtpRepository } from "../../../emails/smtp-client/repository";
 import { leads } from "../../db";
@@ -82,9 +79,7 @@ export class CampaignStarterRepositoryImpl
         dryRun: config.dryRun,
       });
 
-      // Extract language code from locale (e.g., "en-GLOBAL" -> "en")
       const languageCode = getLanguageFromLocale(locale);
-      const country = getCountryFromLocale(locale);
 
       // Get current SMTP sending capacity to determine optimal queue size
       // Use system/public user context for cron job
@@ -93,7 +88,7 @@ export class CampaignStarterRepositoryImpl
       const capacityResult = await smtpRepository.getTotalSendingCapacity(
         {},
         { isPublic: true, leadId: SYSTEM_LEAD_ID },
-        country,
+        locale,
         logger,
       );
       const totalRemainingCapacity = capacityResult.success

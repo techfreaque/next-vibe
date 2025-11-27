@@ -57,9 +57,7 @@ export const translations = {
           sequenceId: {
             content: "Sequence ID",
           },
-          sequenceIndex: {
-            content: "Sequence Index",
-          },
+
           toolCalls: {
             content: "Tool Calls",
           },

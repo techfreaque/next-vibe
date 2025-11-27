@@ -43,20 +43,18 @@ import { ChatMessageRole } from "../../chat/enum";
 import { getModelById, type ModelId } from "../../chat/model-access/models";
 import { generateThreadTitle } from "../../chat/threads/repository";
 import {
-  fetchMessageHistory,
   createErrorMessage,
   createTextMessage,
   updateMessageContent,
   createToolMessage,
 } from "../../chat/threads/[threadId]/messages/repository";
-import { CONTINUE_CONVERSATION_PROMPT } from "../system-prompt";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
 } from "../definition";
 import { createStreamEvent, formatSSEEvent } from "../events";
 import { isUncensoredAIModel } from "../providers/uncensored-ai";
-import { handleUncensoredAI } from "../providers/uncensored-handler";
+import { handleUncensoredAIStream } from "../providers/uncensored-handler";
 
 /**
  * Maximum duration for streaming responses (in seconds)
@@ -73,7 +71,7 @@ export interface IAiStreamRepository {
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
-    request: NextRequest;
+    request: NextRequest | undefined;
   }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse>;
 }
 
@@ -113,43 +111,11 @@ function isValidToolResult(value: unknown): value is ToolCallResult {
 }
 
 /**
- * Convert ChatMessageRole enum to AI SDK compatible role
- * Filters out TOOL and ERROR roles (converts TOOL -> USER, ERROR -> ASSISTANT)
- */
-function toAiSdkMessage(message: { role: ChatMessageRole; content: string }): {
-  role: "user" | "assistant" | "system";
-  content: string;
-} | null {
-  switch (message.role) {
-    case ChatMessageRole.USER:
-      return { content: message.content, role: ChatMessageRole.USER };
-    case ChatMessageRole.ASSISTANT:
-      return { content: message.content, role: ChatMessageRole.ASSISTANT };
-    case ChatMessageRole.SYSTEM:
-      return { content: message.content, role: ChatMessageRole.SYSTEM };
-    case ChatMessageRole.TOOL:
-      return { content: message.content, role: ChatMessageRole.USER };
-    case ChatMessageRole.ERROR:
-      // Error messages become get removed
-      return null;
-  }
-}
-
-function toAiSdkMessages(
-  messages: Array<{ role: ChatMessageRole; content: string }>,
-): Array<{ role: "user" | "assistant" | "system"; content: string }> {
-  return messages.map((msg) => toAiSdkMessage(msg)).filter(Boolean) as Array<{
-    role: "user" | "assistant" | "system";
-    content: string;
-  }>;
-}
-
-/**
  * Extract user identifiers from request
  */
 function extractUserIdentifiers(
   user: JwtPayloadType,
-  request: NextRequest,
+  request: NextRequest | undefined,
   logger: EndpointLogger,
 ): {
   userId?: string;
@@ -167,10 +133,11 @@ function extractUserIdentifiers(
     "leadId" in user && typeof user.leadId === "string"
       ? user.leadId
       : undefined;
-  const ipAddress =
-    request.headers.get("x-forwarded-for") ||
-    request.headers.get("x-real-ip") ||
-    undefined;
+  const ipAddress = request
+    ? request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      undefined
+    : "cli";
 
   logger.debug("Extracted identifiers", { userId, leadId, ipAddress });
 
@@ -182,164 +149,9 @@ function extractUserIdentifiers(
  */
 class AiStreamRepository implements IAiStreamRepository {
   /**
-   * Handle send operation - normal message send
-   */
-  private handleSendOperation(data: AiStreamPostRequestOutput): {
-    threadId: string | null | undefined;
-    parentMessageId: string | null | undefined;
-    content: string;
-    role: ChatMessageRole;
-  } {
-    return {
-      threadId: data.threadId,
-      parentMessageId: data.parentMessageId,
-      content: data.content,
-      role: data.role,
-    };
-  }
-
-  /**
-   * Build message context for AI
-   */
-  private async buildMessageContext(params: {
-    operation: "send" | "retry" | "edit" | "answer-as-ai";
-    threadId: string | null | undefined;
-    parentMessageId: string | null | undefined;
-    content: string;
-    role: ChatMessageRole;
-    userId: string | undefined;
-    isIncognito: boolean;
-    messageHistory?: Array<{
-      role: ChatMessageRole;
-      content: string;
-    }> | null;
-    logger: EndpointLogger;
-  }): Promise<
-    Array<{ role: "user" | "assistant" | "system"; content: string }>
-  > {
-    // SECURITY: Reject messageHistory for non-incognito threads
-    // Non-incognito threads must fetch history from database to prevent manipulation
-    if (!params.isIncognito && params.messageHistory) {
-      params.logger.error(
-        "Security violation: messageHistory provided for non-incognito thread",
-        {
-          operation: params.operation,
-          threadId: params.threadId,
-          isIncognito: params.isIncognito,
-        },
-      );
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Security violation should throw immediately
-      throw new Error(
-        "messageHistory is only allowed for incognito mode. Server-side threads fetch history from database.",
-      );
-    }
-
-    if (params.operation === "answer-as-ai") {
-      // For incognito mode, use provided message history
-      if (params.isIncognito && params.messageHistory) {
-        const messages = toAiSdkMessages(params.messageHistory);
-        if (params.content.trim()) {
-          messages.push({ role: "user", content: params.content });
-        } else {
-          messages.push({
-            role: "user",
-            content: CONTINUE_CONVERSATION_PROMPT,
-          });
-        }
-        return messages;
-      }
-
-      // For non-incognito mode, fetch from database
-      if (
-        !params.isIncognito &&
-        params.userId &&
-        params.threadId &&
-        params.parentMessageId
-      ) {
-        const allMessages = await db
-          .select()
-          .from(chatMessages)
-          .where(eq(chatMessages.threadId, params.threadId))
-          .orderBy(chatMessages.createdAt);
-
-        const parentIndex = allMessages.findIndex(
-          (msg) => msg.id === params.parentMessageId,
-        );
-
-        if (parentIndex !== -1) {
-          const contextMessages = allMessages.slice(0, parentIndex + 1);
-          const messages = toAiSdkMessages(contextMessages);
-
-          if (params.content.trim()) {
-            messages.push({ role: "user", content: params.content });
-          } else {
-            messages.push({
-              role: "user",
-              content: CONTINUE_CONVERSATION_PROMPT,
-            });
-          }
-          return messages;
-        } else {
-          params.logger.error("Parent message not found in thread", {
-            parentMessageId: params.parentMessageId,
-            threadId: params.threadId,
-          });
-          return params.content.trim()
-            ? [{ role: "user", content: params.content }]
-            : [];
-        }
-      } else if (params.content.trim()) {
-        return [{ role: "user", content: params.content }];
-      } else {
-        return [];
-      }
-    } else if (!params.isIncognito && params.userId && params.threadId) {
-      // Non-incognito mode: fetch history from database
-      const history = await fetchMessageHistory(
-        params.threadId,
-        params.userId,
-        params.logger,
-      );
-      const currentMessage = toAiSdkMessage({
-        role: params.role,
-        content: params.content,
-      });
-      if (!currentMessage) {
-        return history;
-      }
-      return [...history, currentMessage];
-    } else if (params.isIncognito && params.messageHistory) {
-      // Incognito mode with message history: use provided history from client
-      params.logger.debug("Using provided message history for incognito mode", {
-        operation: params.operation,
-        historyLength: params.messageHistory.length,
-      });
-      const historyMessages = toAiSdkMessages(params.messageHistory);
-      const currentMessage = toAiSdkMessage({
-        role: params.role,
-        content: params.content,
-      });
-      if (!currentMessage) {
-        return historyMessages;
-      }
-      return [...historyMessages, currentMessage];
-    } else {
-      // Fallback: no thread or no history (new conversation)
-      const currentMessage = toAiSdkMessage({
-        role: params.role,
-        content: params.content,
-      });
-      if (!currentMessage) {
-        return [];
-      }
-      return [currentMessage];
-    }
-  }
-
-  /**
    * Deduct credits after successful AI response
    */
-  private async deductCreditsAfterCompletion(params: {
+  static async deductCreditsAfterCompletion(params: {
     modelCost: number;
     user: JwtPayloadType;
     model: ModelId;
@@ -394,7 +206,7 @@ class AiStreamRepository implements IAiStreamRepository {
   /**
    * Emit initial stream events (thread creation and user message)
    */
-  private emitInitialEvents(params: {
+  static emitInitialEvents(params: {
     isNewThread: boolean;
     threadId: string;
     rootFolderId: DefaultFolderId;
@@ -488,7 +300,7 @@ class AiStreamRepository implements IAiStreamRepository {
   /**
    * Emit content delta event for streaming
    */
-  private emitContentDelta(params: {
+  static emitContentDelta(params: {
     messageId: string;
     delta: string;
     controller: ReadableStreamDefaultController<Uint8Array>;
@@ -507,15 +319,14 @@ class AiStreamRepository implements IAiStreamRepository {
    * Create new ASSISTANT message in stream
    * Returns the new message ID and content
    */
-  private async createAssistantMessage(params: {
+  static async createAssistantMessage(params: {
     initialContent: string;
     threadId: string;
     parentId: string | null;
     depth: number;
     model: ModelId;
-    persona: string | undefined;
+    persona: string;
     sequenceId: string;
-    sequenceIndex: number;
     isIncognito: boolean;
     userId: string | undefined;
     controller: ReadableStreamDefaultController<Uint8Array>;
@@ -530,7 +341,6 @@ class AiStreamRepository implements IAiStreamRepository {
       model,
       persona,
       sequenceId,
-      sequenceIndex,
       isIncognito,
       userId,
       controller,
@@ -551,7 +361,6 @@ class AiStreamRepository implements IAiStreamRepository {
       model,
       persona,
       sequenceId,
-      sequenceIndex,
     });
     controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
 
@@ -568,14 +377,12 @@ class AiStreamRepository implements IAiStreamRepository {
         model,
         persona,
         sequenceId,
-        sequenceIndex,
         logger,
       });
     }
 
     logger.debug("ASSISTANT message created", {
       messageId,
-      sequenceIndex,
     });
 
     return { messageId, content: initialContent };
@@ -584,7 +391,7 @@ class AiStreamRepository implements IAiStreamRepository {
   /**
    * Finalize ASSISTANT message at stream end
    */
-  private async finalizeAssistantMessage(params: {
+  static async finalizeAssistantMessage(params: {
     currentAssistantMessageId: string;
     currentAssistantContent: string;
     isInReasoningBlock: boolean;
@@ -609,7 +416,7 @@ class AiStreamRepository implements IAiStreamRepository {
 
     let { currentAssistantContent } = params;
 
-    // CRITICAL FIX: If reasoning block is still open, close it at stream end
+    // If reasoning block is still open, close it at stream end
     if (isInReasoningBlock) {
       const thinkCloseTag = "</think>";
       currentAssistantContent += thinkCloseTag;
@@ -662,279 +469,6 @@ class AiStreamRepository implements IAiStreamRepository {
   }
 
   /**
-   * Handle Uncensored.ai model streaming
-   * Uncensored.ai doesn't support streaming, so we use direct API call
-   * and convert the response to SSE events
-   */
-  private async handleUncensoredAiStream(params: {
-    messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
-    temperature: number;
-    maxTokens: number;
-    locale: CountryLanguage;
-    logger: EndpointLogger;
-    // Context needed for SSE events
-    threadId: string;
-    isNewThread: boolean;
-    rootFolderId: DefaultFolderId;
-    subFolderId: string | null;
-    content: string;
-    operation: "send" | "retry" | "edit" | "answer-as-ai";
-    userMessageId: string;
-    effectiveRole: ChatMessageRole;
-    effectiveParentMessageId: string | null | undefined;
-    messageDepth: number;
-    effectiveContent: string;
-    model: ModelId;
-    persona: string | undefined;
-    isIncognito: boolean;
-    userId: string | undefined;
-    // Credit deduction
-    modelCost: number;
-    user: JwtPayloadType;
-  }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse> {
-    const {
-      messages,
-      temperature,
-      maxTokens,
-      locale,
-      logger,
-      threadId,
-      isNewThread,
-      rootFolderId,
-      subFolderId,
-      content,
-      operation,
-      userMessageId,
-      effectiveRole,
-      effectiveParentMessageId,
-      messageDepth,
-      effectiveContent,
-      model,
-      persona,
-      isIncognito,
-      userId,
-      modelCost,
-      user,
-    } = params;
-
-    if (!env.UNCENSORED_AI_API_KEY) {
-      logger.error("Uncensored.ai API key not configured");
-      return {
-        success: false,
-        message:
-          "app.api.v1.core.agent.chat.aiStream.route.errors.uncensoredApiKeyMissing",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      };
-    }
-
-    // Bind shared methods (same as OpenRouter implementation)
-    const encoder = new TextEncoder();
-    const emitInitialEvents = this.emitInitialEvents.bind(this);
-    const emitContentDelta = this.emitContentDelta.bind(this);
-    const finalizeAssistantMessage = this.finalizeAssistantMessage.bind(this);
-    const deductCredits = this.deductCreditsAfterCompletion.bind(this);
-
-    // Create SSE stream
-    const stream = new ReadableStream({
-      async start(controller): Promise<void> {
-        try {
-          // Emit initial events (thread creation and user message) - SHARED LOGIC
-          emitInitialEvents({
-            isNewThread,
-            threadId,
-            rootFolderId,
-            subFolderId,
-            content,
-            operation,
-            userMessageId,
-            effectiveRole,
-            effectiveParentMessageId,
-            messageDepth,
-            effectiveContent,
-            controller,
-            encoder,
-            logger,
-          });
-
-          // Calculate initial parent and depth for AI message - SAME AS OPENROUTER
-          const initialAiParentId =
-            operation === "answer-as-ai" || operation === "retry"
-              ? (effectiveParentMessageId ?? null)
-              : userMessageId;
-          const initialAiDepth =
-            operation === "answer-as-ai" || operation === "retry"
-              ? messageDepth
-              : messageDepth + 1;
-
-          // Track message sequencing - SAME AS OPENROUTER
-          const sequenceId = crypto.randomUUID();
-          let sequenceIndex = 0;
-
-          // Track current parent/depth - SAME AS OPENROUTER
-          const currentParentId = initialAiParentId;
-          const currentDepth = initialAiDepth;
-
-          // CRITICAL FIX: Create ASSISTANT message BEFORE API call to show loading state
-          // This ensures the UI displays a loading indicator while waiting for the API response
-          const aiMessageId = crypto.randomUUID();
-          let currentAssistantMessageId: string | null = aiMessageId;
-          let currentAssistantContent = "";
-
-          // Emit MESSAGE_CREATED event for ASSISTANT message immediately
-          // This shows loading state in UI while API call is in progress
-          const messageEvent = createStreamEvent.messageCreated({
-            messageId: aiMessageId,
-            threadId,
-            role: ChatMessageRole.ASSISTANT,
-            content: "", // Empty content initially
-            parentId: currentParentId,
-            depth: currentDepth,
-            model,
-            persona,
-            sequenceId,
-            sequenceIndex,
-          });
-          controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
-
-          logger.debug(
-            "[Uncensored AI] ASSISTANT message created (loading state)",
-            {
-              messageId: aiMessageId,
-            },
-          );
-
-          // Save initial ASSISTANT message to database if not incognito
-          // This ensures the message exists in DB while API call is in progress
-          if (!isIncognito) {
-            await createTextMessage({
-              messageId: aiMessageId,
-              threadId,
-              content: "", // Empty content initially
-              parentId: currentParentId,
-              depth: currentDepth,
-              userId,
-              model,
-              persona,
-              sequenceId,
-              sequenceIndex,
-              logger,
-            });
-          }
-
-          // Call Uncensored AI API
-          logger.info("[Uncensored AI] Calling API");
-          const response = await handleUncensoredAI(
-            env.UNCENSORED_AI_API_KEY,
-            messages,
-            temperature,
-            maxTokens,
-            locale,
-          );
-
-          // Read the complete response
-          const responseText = await response.text();
-          logger.info("[Uncensored AI] Received response", {
-            length: responseText.length,
-          });
-
-          // Parse the response - it's in Vercel AI SDK format: 0:"text"\n
-          let fullContent = "";
-          const lines = responseText.split("\n").filter((line) => line.trim());
-          for (const line of lines) {
-            // Parse format: 0:"text"
-            const match = line.match(/^0:"(.*)"/);
-            if (match) {
-              // Unescape the JSON string
-              const chunk = JSON.parse(`"${match[1]}"`);
-              fullContent += chunk;
-            }
-          }
-
-          logger.info("[Uncensored AI] Parsed content", {
-            length: fullContent.length,
-          });
-
-          // Stream content in chunks to simulate streaming
-          const chunkSize = 20;
-          for (let i = 0; i < fullContent.length; i += chunkSize) {
-            const chunk = fullContent.slice(i, i + chunkSize);
-
-            // Accumulate content and emit delta
-            currentAssistantContent += chunk;
-            emitContentDelta({
-              messageId: currentAssistantMessageId,
-              delta: chunk,
-              controller,
-              encoder,
-            });
-          }
-
-          // Finalize ASSISTANT message - SHARED LOGIC
-          if (currentAssistantMessageId) {
-            await finalizeAssistantMessage({
-              currentAssistantMessageId,
-              currentAssistantContent,
-              isInReasoningBlock: false,
-              streamResult: {
-                finishReason: "stop",
-                usage: {
-                  inputTokens: 0,
-                  outputTokens: 0,
-                  totalTokens: 0,
-                },
-              },
-              isIncognito,
-              controller,
-              encoder,
-              logger,
-            });
-          }
-
-          logger.info("[Uncensored AI] Stream completed", {
-            messageId: currentAssistantMessageId,
-            contentLength: fullContent.length,
-          });
-
-          // Deduct credits AFTER successful completion (not optimistically) - SAME AS OPENROUTER
-          await deductCredits({
-            modelCost,
-            user,
-            model,
-            logger,
-          });
-
-          controller.close();
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
-          logger.error("[Uncensored AI] Stream error", {
-            error: errorMessage,
-          });
-
-          // Emit error event
-          const errorEvent = createStreamEvent.error({
-            code: "UNCENSORED_AI_ERROR",
-            message: errorMessage,
-          });
-          controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
-          controller.close();
-        }
-      },
-    });
-
-    logger.info("[Uncensored AI] Returning streaming response");
-    return createStreamingResponse(
-      new Response(stream, {
-        headers: {
-          "Content-Type": "text/event-stream",
-          "Cache-Control": "no-cache",
-          Connection: "keep-alive",
-        },
-      }),
-    );
-  }
-
-  /**
    * Create AI streaming response with SSE events
    * Returns StreamingResponse for SSE stream or error ResponseType
    */
@@ -950,7 +484,7 @@ class AiStreamRepository implements IAiStreamRepository {
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
-    request: NextRequest;
+    request: NextRequest | undefined;
   }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse> {
     const { userId, leadId, ipAddress } = extractUserIdentifiers(
       user,
@@ -966,7 +500,6 @@ class AiStreamRepository implements IAiStreamRepository {
       userId,
       leadId,
       ipAddress,
-      buildMessageContext: this.buildMessageContext.bind(this),
     });
 
     if (!setupResult.success) {
@@ -991,14 +524,30 @@ class AiStreamRepository implements IAiStreamRepository {
 
     // Step 9: Start AI streaming (for all operations including answer-as-ai)
     try {
-      // Special handling for Uncensored.ai - doesn't support streaming
+      const modelConfig = getModelById(data.model);
+
+      const { tools, systemPrompt: updatedSystemPrompt } =
+        await this.setupStreamingTools({
+          model: data.model,
+          requestedTools: data.tools,
+          user,
+          locale,
+          logger,
+          systemPrompt,
+        });
+      systemPrompt = updatedSystemPrompt;
+
+      // Special handling for Uncensored.ai
       if (isUncensoredAIModel(data.model)) {
-        return await this.handleUncensoredAiStream({
+        return await handleUncensoredAIStream({
+          apiKey: env.UNCENSORED_AI_API_KEY,
           messages,
+          systemPrompt,
           temperature: data.temperature,
           maxTokens: data.maxTokens,
           locale,
           logger,
+          tools,
           threadId: threadResultThreadId,
           isNewThread,
           rootFolderId: data.rootFolderId,
@@ -1014,8 +563,14 @@ class AiStreamRepository implements IAiStreamRepository {
           persona: data.persona,
           isIncognito,
           userId,
-          modelCost,
-          user,
+          deductCredits: async () => {
+            await AiStreamRepository.deductCreditsAfterCompletion({
+              modelCost,
+              user,
+              model: data.model,
+              logger,
+            });
+          },
         });
       }
 
@@ -1219,23 +774,23 @@ class AiStreamRepository implements IAiStreamRepository {
                   textDelta !== null &&
                   textDelta !== ""
                 ) {
-                  // NEW ARCHITECTURE: Add text to current ASSISTANT message (or create if doesn't exist)
+                  // Add text to current ASSISTANT message (or create if doesn't exist)
                   if (!currentAssistantMessageId) {
-                    const result = await createAssistantMessage({
-                      initialContent: textDelta,
-                      threadId: threadResultThreadId,
-                      parentId: currentParentId,
-                      depth: currentDepth,
-                      model: data.model,
-                      persona: data.persona ?? undefined,
-                      sequenceId,
-                      sequenceIndex,
-                      isIncognito,
-                      userId,
-                      controller,
-                      encoder,
-                      logger,
-                    });
+                    const result =
+                      await AiStreamRepository.createAssistantMessage({
+                        initialContent: textDelta,
+                        threadId: threadResultThreadId,
+                        parentId: currentParentId,
+                        depth: currentDepth,
+                        model: data.model,
+                        persona: data.persona,
+                        sequenceId,
+                        isIncognito,
+                        userId,
+                        controller,
+                        encoder,
+                        logger,
+                      });
                     currentAssistantMessageId = result.messageId;
                     currentAssistantContent = result.content;
                   } else {
@@ -1244,7 +799,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   }
 
                   // Emit content-delta event
-                  emitContentDelta({
+                  AiStreamRepository.emitContentDelta({
                     messageId: currentAssistantMessageId,
                     delta: textDelta,
                     controller,
@@ -1252,27 +807,27 @@ class AiStreamRepository implements IAiStreamRepository {
                   });
                 }
               } else if (part.type === "reasoning-start") {
-                // NEW ARCHITECTURE: Add <think> tag inline to current ASSISTANT message
+                // Add <think> tag inline to current ASSISTANT message
                 isInReasoningBlock = true;
                 const thinkTag = "<think>";
 
                 // Create ASSISTANT message if it doesn't exist yet
                 if (!currentAssistantMessageId) {
-                  const result = await createAssistantMessage({
-                    initialContent: thinkTag,
-                    threadId: threadResultThreadId,
-                    parentId: currentParentId,
-                    depth: currentDepth,
-                    model: data.model,
-                    persona: data.persona ?? undefined,
-                    sequenceId,
-                    sequenceIndex,
-                    isIncognito,
-                    userId,
-                    controller,
-                    encoder,
-                    logger,
-                  });
+                  const result =
+                    await AiStreamRepository.createAssistantMessage({
+                      initialContent: thinkTag,
+                      threadId: threadResultThreadId,
+                      parentId: currentParentId,
+                      depth: currentDepth,
+                      model: data.model,
+                      persona: data.persona,
+                      sequenceId,
+                      isIncognito,
+                      userId,
+                      controller,
+                      encoder,
+                      logger,
+                    });
                   currentAssistantMessageId = result.messageId;
                   currentAssistantContent = result.content;
                 } else {
@@ -1280,7 +835,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   currentAssistantContent += thinkTag;
 
                   // Emit delta for <think> tag
-                  emitContentDelta({
+                  AiStreamRepository.emitContentDelta({
                     messageId: currentAssistantMessageId,
                     delta: thinkTag,
                     controller,
@@ -1290,7 +845,7 @@ class AiStreamRepository implements IAiStreamRepository {
 
                 logger.info("[AI Stream] ⏱️ Reasoning started → <think>");
               } else if (part.type === "reasoning-delta") {
-                // NEW ARCHITECTURE: Add reasoning text inline to current ASSISTANT message
+                // Add reasoning text inline to current ASSISTANT message
                 const reasoningText = "text" in part ? part.text : "";
 
                 if (
@@ -1303,7 +858,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   currentAssistantContent += reasoningText;
 
                   // Emit content delta
-                  emitContentDelta({
+                  AiStreamRepository.emitContentDelta({
                     messageId: currentAssistantMessageId,
                     delta: reasoningText,
                     controller,
@@ -1311,7 +866,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   });
                 }
               } else if (part.type === "reasoning-end") {
-                // NEW ARCHITECTURE: Add </think> tag inline to current ASSISTANT message
+                // Add </think> tag inline to current ASSISTANT message
                 if (currentAssistantMessageId && isInReasoningBlock) {
                   const thinkCloseTag = "</think>";
 
@@ -1319,7 +874,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   currentAssistantContent += thinkCloseTag;
 
                   // Emit closing tag delta
-                  emitContentDelta({
+                  AiStreamRepository.emitContentDelta({
                     messageId: currentAssistantMessageId,
                     delta: thinkCloseTag,
                     controller,
@@ -1375,9 +930,6 @@ class AiStreamRepository implements IAiStreamRepository {
                     contentLength: currentAssistantContent.length,
                   });
 
-                  // Increment sequence index for tool message
-                  sequenceIndex++;
-
                   // Update parent chain: tool message should be child of ASSISTANT message
                   currentParentId = currentAssistantMessageId;
                   currentDepth++;
@@ -1385,7 +937,6 @@ class AiStreamRepository implements IAiStreamRepository {
                   // Update last known values for error handling
                   lastParentId = currentParentId;
                   lastDepth = currentDepth;
-                  lastSequenceIndex = sequenceIndex;
 
                   // Clear current ASSISTANT message (tool call interrupts it)
                   currentAssistantMessageId = null;
@@ -1403,9 +954,8 @@ class AiStreamRepository implements IAiStreamRepository {
                 // Extract widget metadata from endpoint definition
                 if (endpoint) {
                   try {
-                    const { ResponseMetadataExtractor } = await import(
-                      "@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/response-metadata-extractor"
-                    );
+                    const { ResponseMetadataExtractor } =
+                      await import("@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/response-metadata-extractor");
                     const extractor = new ResponseMetadataExtractor();
 
                     // Debug: Log endpoint structure
@@ -1688,9 +1238,9 @@ class AiStreamRepository implements IAiStreamRepository {
             const usage = await streamResult.usage;
             const finishReason = await streamResult.finishReason;
 
-            // NEW ARCHITECTURE: Finalize current ASSISTANT message if exists
+            // Finalize current ASSISTANT message if exists
             if (currentAssistantMessageId && currentAssistantContent) {
-              await finalizeAssistantMessage({
+              await AiStreamRepository.finalizeAssistantMessage({
                 currentAssistantMessageId,
                 currentAssistantContent,
                 isInReasoningBlock,
@@ -1710,7 +1260,7 @@ class AiStreamRepository implements IAiStreamRepository {
             });
 
             // Deduct credits AFTER successful completion (not optimistically)
-            await deductCredits({
+            await AiStreamRepository.deductCreditsAfterCompletion({
               modelCost,
               user,
               model: data.model,
@@ -1723,7 +1273,7 @@ class AiStreamRepository implements IAiStreamRepository {
               error instanceof Error ? error.message : String(error);
             logger.error("Stream error", { error: errorMessage });
 
-            // NEW ARCHITECTURE: Create ERROR message in DB/localStorage
+            // Create ERROR message in DB/localStorage
             // Public users (userId undefined) are allowed - helper converts to null
             const errorMessageId = crypto.randomUUID();
             if (!isIncognito) {
@@ -1736,7 +1286,6 @@ class AiStreamRepository implements IAiStreamRepository {
                 depth: lastDepth,
                 userId,
                 sequenceId: lastSequenceId,
-                sequenceIndex: lastSequenceIndex,
                 logger,
               });
             }
@@ -1750,7 +1299,6 @@ class AiStreamRepository implements IAiStreamRepository {
               parentId: lastParentId,
               depth: lastDepth,
               sequenceId: lastSequenceId,
-              sequenceIndex: lastSequenceIndex,
             });
             controller.enqueue(
               encoder.encode(formatSSEEvent(errorMessageEvent)),
