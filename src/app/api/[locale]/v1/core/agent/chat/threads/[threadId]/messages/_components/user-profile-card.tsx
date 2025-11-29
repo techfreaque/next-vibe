@@ -14,7 +14,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 
 interface UserProfileCardProps {
   userId: string;
@@ -57,47 +57,47 @@ export function UserProfileCard({
           "animate-in fade-in-0 zoom-in-95 duration-150",
         )}
       >
-      {/* Header */}
-      <Div className="flex items-center gap-3 mb-3 pb-3 border-b border-border/50">
-        <Div className="flex-1">
-          <Div className="font-bold text-sm text-foreground">{userName}</Div>
-          <Div className="text-xs text-muted-foreground">
-            {t("app.chat.userProfile.postCount", { count: postCount })}
+        {/* Header */}
+        <Div className="flex items-center gap-3 mb-3 pb-3 border-b border-border/50">
+          <Div className="flex-1">
+            <Div className="font-bold text-sm text-foreground">{userName}</Div>
+            <Div className="text-xs text-muted-foreground">
+              {t("app.chat.userProfile.postCount", { count: postCount })}
+            </Div>
           </Div>
         </Div>
-      </Div>
 
-      {/* Recent Posts */}
-      {recentPosts.length > 0 && (
-        <Div className="flex flex-col gap-2">
-          <Div className="text-xs font-semibold text-muted-foreground mb-2">
-            {t("app.chat.userProfile.recentPosts")}
+        {/* Recent Posts */}
+        {recentPosts.length > 0 && (
+          <Div className="flex flex-col gap-2">
+            <Div className="text-xs font-semibold text-muted-foreground mb-2">
+              {t("app.chat.userProfile.recentPosts")}
+            </Div>
+            {recentPosts.map((post) => (
+              <Button
+                key={post.id}
+                variant="ghost"
+                size="unset"
+                onClick={() => onPostClick?.(post.id)}
+                className="w-full text-left p-2 rounded hover:bg-accent/50 transition-colors"
+              >
+                <Div className="text-xs text-muted-foreground mb-1">
+                  {formatRelativeTime(post.createdAt.getTime())}
+                </Div>
+                <Div className="text-sm text-foreground/90 line-clamp-2">
+                  {post.content.substring(0, 100)}
+                  {post.content.length > 100 && "..."}
+                </Div>
+              </Button>
+            ))}
           </Div>
-          {recentPosts.map((post) => (
-            <Button
-              key={post.id}
-              variant="ghost"
-              size="unset"
-              onClick={() => onPostClick?.(post.id)}
-              className="w-full text-left p-2 rounded hover:bg-accent/50 transition-colors"
-            >
-              <Div className="text-xs text-muted-foreground mb-1">
-                {formatRelativeTime(post.createdAt.getTime())}
-              </Div>
-              <Div className="text-sm text-foreground/90 line-clamp-2">
-                {post.content.substring(0, 100)}
-                {post.content.length > 100 && "..."}
-              </Div>
-            </Button>
-          ))}
-        </Div>
-      )}
+        )}
 
-      {postCount === 0 && (
-        <Div className="text-xs text-muted-foreground text-center py-4">
-          {t("app.chat.userProfile.noPostsYet")}
-        </Div>
-      )}
+        {postCount === 0 && (
+          <Div className="text-xs text-muted-foreground text-center py-4">
+            {t("app.chat.userProfile.noPostsYet")}
+          </Div>
+        )}
       </Div>
     </Div>
   );

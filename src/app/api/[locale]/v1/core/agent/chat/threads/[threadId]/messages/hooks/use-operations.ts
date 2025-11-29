@@ -16,16 +16,28 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { DefaultFolderId } from "../../../../config";
 import { ChatMessageRole, NEW_MESSAGE_ID } from "../../../../enum";
 import type { ModelId } from "../../../../model-access/models";
-import type { ChatMessage } from "../../../../hooks/store";
+import type { ChatMessage } from "../../../../db";
 import type { UseAIStreamReturn } from "../../../../../ai-stream/hooks/use-ai-stream";
 import { createCreditUpdateCallback } from "../../../../credit-updater";
+
+// TODO: Get from tool config
+const REQUIRE_TOOL_CONFIRMATION = false;
 
 /**
  * Message operations interface
  */
 export interface MessageOperations {
   sendMessage: (
-    content: string,
+    params: {
+      content: string;
+      threadId?: string;
+      parentId?: string;
+      toolConfirmation?: {
+        messageId: string;
+        confirmed: boolean;
+        updatedArgs?: Record<string, string | number | boolean | null>;
+      };
+    },
     onThreadCreated?: (
       threadId: string,
       rootFolderId: DefaultFolderId,
@@ -62,6 +74,7 @@ interface MessageOperationsDeps {
   streamStore: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     streamingMessages: Record<string, any>;
+    error: string | null;
     reset: () => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addMessage: (message: any) => void;
@@ -99,29 +112,47 @@ export function useMessageOperations(
 
   const sendMessage = useCallback(
     async (
-      content: string,
+      params: {
+        content: string;
+        threadId?: string;
+        parentId?: string;
+        toolConfirmation?: {
+          messageId: string;
+          confirmed: boolean;
+          updatedArgs?: Record<string, string | number | boolean | null>;
+        };
+      },
       onThreadCreated?: (
         threadId: string,
         rootFolderId: DefaultFolderId,
         subFolderId: string | null,
       ) => void,
     ): Promise<void> => {
+      const content = params.content;
       logger.debug("Message operations: Sending message", {
         content: content.substring(0, 50),
         activeThreadId,
         currentRootFolderId,
+        hasToolConfirmation: !!params.toolConfirmation,
       });
 
       chatStore.setLoading(true);
 
       try {
-        // CRITICAL FIX: Check if activeThreadId is actually a valid thread
-        // The URL parser can't distinguish between folder UUIDs and thread UUIDs
-        // If activeThreadId is set but doesn't exist in threads store, it's likely a folder ID
-        // In that case, treat it as null to create a new thread
-        // Also handle "new" from URL parser - convert to null for API
-        let threadIdToUse =
-          activeThreadId === NEW_MESSAGE_ID ? null : activeThreadId;
+        // If toolConfirmation is provided, use its threadId and parentId
+        // Otherwise use the normal flow with activeThreadId
+        let threadIdToUse: string | null;
+        if (params.toolConfirmation) {
+          threadIdToUse = params.threadId ?? null;
+        } else {
+          // Check if activeThreadId is actually a valid thread
+          // The URL parser can't distinguish between folder UUIDs and thread UUIDs
+          // If activeThreadId is set but doesn't exist in threads store, it's likely a folder ID
+          // In that case, treat it as null to create a new thread
+          // Also handle "new" from URL parser - convert to null for API
+          threadIdToUse =
+            activeThreadId === NEW_MESSAGE_ID ? null : activeThreadId;
+        }
 
         logger.debug("Message operations: Checking activeThreadId", {
           activeThreadId: threadIdToUse,
@@ -151,11 +182,9 @@ export function useMessageOperations(
         }
 
         let parentMessageId: string | null = null;
-        let messageHistory:
-          | Array<{ role: ChatMessageRole; content: string }>
-          | null
-          | undefined;
+        let messageHistory: ChatMessage[] | null | undefined;
 
+        // Load thread messages for incognito mode and for setting parentId
         if (threadIdToUse) {
           let threadMessages: ChatMessage[] = [];
           if (currentRootFolderId === "incognito") {
@@ -166,7 +195,10 @@ export function useMessageOperations(
             threadMessages = chatStore.getThreadMessages(threadIdToUse);
           }
 
-          if (threadMessages.length > 0) {
+          // If toolConfirmation is provided, use its parentId directly
+          if (params.toolConfirmation && params.parentId) {
+            parentMessageId = params.parentId;
+          } else if (threadMessages.length > 0) {
             const lastMessage = threadMessages[threadMessages.length - 1];
             parentMessageId = lastMessage.id;
             logger.debug("Message operations: Using last message as parent", {
@@ -174,17 +206,19 @@ export function useMessageOperations(
               lastMessageContent: lastMessage.content.substring(0, 50),
               isIncognito: currentRootFolderId === "incognito",
             });
+          }
 
-            if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-              messageHistory = threadMessages;
-              logger.debug(
-                "Message operations: Built message history for incognito mode",
-                {
-                  messageCount: messageHistory.length,
-                  threadId: threadIdToUse,
-                },
-              );
-            }
+          // ALWAYS build messageHistory for incognito mode (needed for tool confirmations)
+          if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
+            messageHistory = threadMessages;
+            logger.debug(
+              "Message operations: Built message history for incognito mode",
+              {
+                messageCount: messageHistory.length,
+                threadId: threadIdToUse,
+                hasToolConfirmation: !!params.toolConfirmation,
+              },
+            );
           }
         } else {
           logger.debug(
@@ -200,16 +234,21 @@ export function useMessageOperations(
           {
             operation: "send" as const,
             rootFolderId: currentRootFolderId,
-            subFolderId: currentSubFolderId,
-            threadId: threadIdToUse,
-            parentMessageId,
+            subFolderId: currentSubFolderId ?? null,
+            threadId: threadIdToUse ?? null,
+            parentMessageId: parentMessageId ?? null,
             content,
             role: ChatMessageRole.USER,
             model: settings.selectedModel,
-            persona: settings.selectedPersona,
+            persona: settings.selectedPersona ?? null,
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,
-            tools: settings.enabledToolIds,
+            tools:
+              settings.enabledToolIds?.map((toolId) => ({
+                toolId,
+                requiresConfirmation: REQUIRE_TOOL_CONFIRMATION,
+              })) ?? null,
+            toolConfirmation: params.toolConfirmation ?? null,
             messageHistory: messageHistory ?? null,
           },
           {
@@ -235,13 +274,35 @@ export function useMessageOperations(
           },
         );
 
-        setInput("");
+        // Only clear input if stream was successful (no error in stream store)
+        // If stream failed with SSE error during streaming, the error is set in stream store
+        // and we should NOT clear the input so user can try again
+        // IMPORTANT: Use getState() to get current value from Zustand store
+        const { useAIStreamStore } =
+          await import("../../../../../ai-stream/hooks/store");
+        const streamError = useAIStreamStore.getState().error;
+        if (!streamError) {
+          setInput("");
+          logger.debug(
+            "Message operations: Input cleared after successful stream",
+          );
+        } else {
+          logger.warn("Message operations: Stream failed, preserving input", {
+            error: streamError,
+          });
+        }
       } catch (error) {
         const errorMessage = parseError(error);
-        logger.error("Message operations: Failed to send message", {
-          error: errorMessage.message,
-          stack: errorMessage.stack,
-        });
+        logger.error(
+          "❌ CATCH BLOCK: Failed to send message - preserving input",
+          {
+            error: errorMessage.message,
+            stack: errorMessage.stack,
+            inputLength: content.length,
+          },
+        );
+        // DO NOT clear input on HTTP errors (403, 500, network errors, etc)
+        // User should be able to retry without re-typing their message
       } finally {
         chatStore.setLoading(false);
       }
@@ -272,10 +333,7 @@ export function useMessageOperations(
       chatStore.setLoading(true);
 
       try {
-        let messageHistory:
-          | Array<{ role: ChatMessageRole; content: string }>
-          | null
-          | undefined;
+        let messageHistory: ChatMessage[] | null | undefined;
 
         if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
           const threadMessages = Object.values(chatStore.messages)
@@ -302,16 +360,20 @@ export function useMessageOperations(
           {
             operation: "retry" as const,
             rootFolderId: currentRootFolderId,
-            subFolderId: currentSubFolderId,
-            threadId: message.threadId,
-            parentMessageId: messageId,
+            subFolderId: currentSubFolderId ?? null,
+            threadId: message.threadId ?? null,
+            parentMessageId: messageId ?? null,
             content: message.content,
             role: message.role,
             model: settings.selectedModel,
-            persona: settings.selectedPersona,
+            persona: settings.selectedPersona ?? null,
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,
-            tools: settings.enabledToolIds,
+            tools:
+              settings.enabledToolIds?.map((toolId) => ({
+                toolId,
+                requiresConfirmation: REQUIRE_TOOL_CONFIRMATION,
+              })) ?? null,
             messageHistory: messageHistory ?? null,
           },
           {
@@ -357,10 +419,7 @@ export function useMessageOperations(
       chatStore.setLoading(true);
 
       try {
-        let messageHistory:
-          | Array<{ role: ChatMessageRole; content: string }>
-          | null
-          | undefined;
+        let messageHistory: ChatMessage[] | null | undefined;
 
         const branchParentId = message.parentId;
 
@@ -384,16 +443,20 @@ export function useMessageOperations(
           {
             operation: "edit" as const,
             rootFolderId: currentRootFolderId,
-            subFolderId: currentSubFolderId,
-            threadId: message.threadId,
-            parentMessageId: branchParentId,
+            subFolderId: currentSubFolderId ?? null,
+            threadId: message.threadId ?? null,
+            parentMessageId: branchParentId ?? null,
             content: newContent,
             role: ChatMessageRole.USER,
             model: settings.selectedModel,
-            persona: settings.selectedPersona,
+            persona: settings.selectedPersona ?? null,
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,
-            tools: settings.enabledToolIds,
+            tools:
+              settings.enabledToolIds?.map((toolId) => ({
+                toolId,
+                requiresConfirmation: REQUIRE_TOOL_CONFIRMATION,
+              })) ?? null,
             messageHistory: messageHistory ?? null,
           },
           {
@@ -439,10 +502,7 @@ export function useMessageOperations(
       chatStore.setLoading(true);
 
       try {
-        let messageHistory:
-          | Array<{ role: ChatMessageRole; content: string }>
-          | null
-          | undefined;
+        let messageHistory: ChatMessage[] | null | undefined;
 
         if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
           const threadMessages = Object.values(chatStore.messages)
@@ -462,16 +522,20 @@ export function useMessageOperations(
           {
             operation: "answer-as-ai" as const,
             rootFolderId: currentRootFolderId,
-            subFolderId: currentSubFolderId,
-            threadId: message.threadId,
-            parentMessageId: messageId,
+            subFolderId: currentSubFolderId ?? null,
+            threadId: message.threadId ?? null,
+            parentMessageId: messageId ?? null,
             content,
             role: ChatMessageRole.ASSISTANT,
             model: settings.selectedModel,
-            persona: settings.selectedPersona,
+            persona: settings.selectedPersona ?? null,
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,
-            tools: settings.enabledToolIds,
+            tools:
+              settings.enabledToolIds?.map((toolId) => ({
+                toolId,
+                requiresConfirmation: REQUIRE_TOOL_CONFIRMATION,
+              })) ?? null,
             messageHistory: messageHistory ?? null,
           },
           {

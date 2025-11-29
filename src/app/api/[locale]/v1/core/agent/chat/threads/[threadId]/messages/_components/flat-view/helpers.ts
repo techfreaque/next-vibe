@@ -2,13 +2,16 @@
  * Helper functions for flat message view (4chan-style)
  */
 
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 
 /**
  * Count how many messages are direct replies to this message
  * Uses message structure (parentId) instead of parsing content
  */
-export function countReplies(messages: ChatMessage[], messageId: string): number {
+export function countReplies(
+  messages: ChatMessage[],
+  messageId: string,
+): number {
   return messages.filter((msg) => msg.parentId === messageId).length;
 }
 
@@ -25,7 +28,10 @@ export function getDirectReplies(
 /**
  * Count posts by a specific user ID
  */
-export function countPostsByUserId(messages: ChatMessage[], userId: string): number {
+export function countPostsByUserId(
+  messages: ChatMessage[],
+  userId: string,
+): number {
   return messages.filter((m) => m.authorId === userId).length;
 }
 

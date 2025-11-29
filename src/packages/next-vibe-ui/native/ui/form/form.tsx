@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Slot } from "@radix-ui/react-slot";
@@ -50,7 +49,9 @@ function Form<TRequest extends FieldValues>(
   if (props.form) {
     return (
       <FormProvider {...props.form}>
-        <StyledView className={cn(props.className)}>{props.children}</StyledView>
+        <StyledView className={cn(props.className)}>
+          {props.children}
+        </StyledView>
       </FormProvider>
     );
   }
@@ -152,7 +153,7 @@ function FormItem({
       <StyledView
         {...applyStyleType({
           nativeStyle,
-          className: cn("space-y-2", className),
+          className: cn("space-y-1", className),
         })}
       >
         {children}

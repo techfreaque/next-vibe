@@ -27,6 +27,7 @@ export enum StreamEventType {
   REASONING_DELTA = "reasoning-delta",
   REASONING_DONE = "reasoning-done",
   TOOL_CALL = "tool-call",
+  TOOL_WAITING = "tool-waiting",
   TOOL_RESULT = "tool-result",
   ERROR = "error",
 }
@@ -54,7 +55,7 @@ export interface MessageCreatedEventData {
   model?: ModelId;
   persona?: string;
   sequenceId?: string | null; // Links messages in the same AI response sequence
-  toolCalls?: ToolCall[]; // Tool calls for TOOL role messages
+  toolCall?: ToolCall; // Tool call for TOOL role messages (singular - each TOOL message has exactly one tool call)
 }
 
 /**
@@ -73,7 +74,6 @@ export interface ContentDoneEventData {
   content: string;
   totalTokens: number | null;
   finishReason: string | null;
-  toolCalls?: ToolCall[]; // Tool calls with results
 }
 
 /**
@@ -99,6 +99,15 @@ export interface ToolCallEventData {
   messageId: string;
   toolName: string;
   args: ToolCallResult;
+}
+
+/**
+ * Tool waiting event data
+ */
+export interface ToolWaitingEventData {
+  messageId: string;
+  toolName: string;
+  toolCallId: string;
 }
 
 /**
@@ -132,6 +141,7 @@ export interface StreamEventDataMap {
   [StreamEventType.REASONING_DELTA]: ReasoningDeltaEventData;
   [StreamEventType.REASONING_DONE]: ReasoningDoneEventData;
   [StreamEventType.TOOL_CALL]: ToolCallEventData;
+  [StreamEventType.TOOL_WAITING]: ToolWaitingEventData;
   [StreamEventType.TOOL_RESULT]: ToolResultEventData;
   [StreamEventType.ERROR]: ErrorEventData;
 }
@@ -194,6 +204,13 @@ export const createStreamEvent = {
     data: ToolCallEventData,
   ): StreamEvent<StreamEventType.TOOL_CALL> => ({
     type: StreamEventType.TOOL_CALL,
+    data,
+  }),
+
+  toolWaiting: (
+    data: ToolWaitingEventData,
+  ): StreamEvent<StreamEventType.TOOL_WAITING> => ({
+    type: StreamEventType.TOOL_WAITING,
     data,
   }),
 

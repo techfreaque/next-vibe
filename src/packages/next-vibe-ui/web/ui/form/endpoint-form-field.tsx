@@ -129,12 +129,12 @@ function getFieldStyleClassName(
   );
 
   const baseLabelClassName = cn(
-    "text-sm font-medium leading-none mb-2",
+    "text-sm font-medium leading-none",
     "peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
     "transition-colors duration-200",
   );
 
-  const baseContainerClassName = "flex flex-col gap-3";
+  const baseContainerClassName = "flex flex-col gap-2";
 
   // Error state - consistent red styling with better spacing and improved dark mode readability
   if (hasError) {
@@ -326,7 +326,7 @@ function renderFieldInput<
           value={String(field.value || "")}
           onChange={(e) => field.onChange(e.target.value)}
           onBlur={field.onBlur}
-          className={cn(inputClassName, "min-h-[80px] resize-none")}
+          className={cn(inputClassName, "min-h-20 resize-none")}
           placeholder={config.placeholder ? t(config.placeholder) : undefined}
           rows={config.rows || 3}
           maxLength={config.maxLength}
@@ -378,13 +378,11 @@ function renderFieldInput<
             htmlFor={field.name}
             className="text-sm font-normal cursor-pointer leading-relaxed"
           >
-            {config.checkboxLabelJsx
-              ? config.checkboxLabelJsx
-              : config.checkboxLabel
-                ? t(config.checkboxLabel)
-                : config.label
-                  ? t(config.label)
-                  : null}
+            {config.checkboxLabel
+              ? t(config.checkboxLabel)
+              : config.label
+                ? t(config.label)
+                : null}
           </Label>
         </div>
       );
@@ -600,9 +598,14 @@ export interface EndpointFormFieldProps<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
   TFields extends EndpointFieldStructure = EndpointFieldStructure,
-> extends Omit<EndpointFormFieldProps<TFieldValues, TName>, "requiredFields"> {
+> {
+  name: TName;
+  config?: FieldConfig; // Optional - auto-inferred from endpointFields if not provided
+  control: Control<TFieldValues>; // Properly typed form control from useEndpoint
   schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
   endpointFields?: TFields; // Endpoint fields for auto-inference (from definition.POST.fields) - now fully typed
+  theme?: RequiredFieldTheme;
+  className?: string;
 }
 
 /**

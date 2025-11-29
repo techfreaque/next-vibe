@@ -15,7 +15,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import {
   wrapSuccessResponse,
   wrapErrorResponse,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/next-api/next-endpoint-response";
+} from "@/app/api/[locale]/v1/core/system/unified-interface/next-api/response";
 import {
   parseRequestBody,
   parseSearchParams,

@@ -47,6 +47,28 @@ export const translations: typeof enTranslations = {
         content: {
           label: "Treść",
         },
+        metadata: {
+          toolCall: {
+            toolName: {
+              label: "Nazwa narzędzia",
+            },
+            args: {
+              label: "Argumenty narzędzia",
+            },
+            result: {
+              label: "Wynik narzędzia",
+            },
+            error: {
+              label: "Błąd narzędzia",
+            },
+            executionTime: {
+              label: "Czas wykonania (ms)",
+            },
+            creditsUsed: {
+              label: "Użyte kredyty",
+            },
+          },
+        },
       },
     },
     content: {
@@ -100,6 +122,16 @@ export const translations: typeof enTranslations = {
     enabledToolIds: {
       label: "ID włączonych narzędzi",
       description: "Lista ID narzędzi AI do włączenia dla tej konwersacji",
+    },
+    toolConfirmation: {
+      label: "Potwierdzenie narzędzia",
+      description: "Odpowiedź potwierdzająca narzędzie od użytkownika",
+      success: "Potwierdzenie narzędzia zostało pomyślnie przetworzone",
+      errors: {
+        messageNotFound: "Wiadomość narzędzia nie została znaleziona",
+        toolCallMissing: "Brak metadanych ToolCall",
+        toolNotFound: "Narzędzie nie znalezione",
+      },
     },
     response: {
       title: "Odpowiedź strumieniowa",
@@ -196,6 +228,12 @@ export const translations: typeof enTranslations = {
   },
   errorTypes: {
     streamError: "Błąd strumienia",
+  },
+  errorThread: {
+    title: "Błąd",
+  },
+  error: {
+    title: "Błąd strumienia",
   },
   providers: {
     uncensoredHandler: {

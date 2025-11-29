@@ -17,6 +17,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { ApiSection } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
+import { PATH_SEPARATOR } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/utils/path";
 import {
   extractPathKey,
   findFilesRecursively,
@@ -196,9 +197,9 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       // Get methods for this route from definition file
       const methods = await this.extractMethodsFromDefinition(routeFile);
 
-      // Add main path with method suffix for each method (e.g., "core/agent/ai-stream/POST")
+      // Add main path with method suffix for each method (e.g., "v1_core_agent_ai-stream_POST")
       for (const method of methods) {
-        const pathWithMethod = `${path}/${method}`;
+        const pathWithMethod = `${path}${PATH_SEPARATOR}${method}`;
         if (!pathMap[pathWithMethod]) {
           pathMap[pathWithMethod] = { importPath, method };
           allPaths.push(pathWithMethod);
@@ -224,10 +225,11 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
     const cases: string[] = [];
     for (const path of allPaths) {
       const { importPath } = pathMap[path];
-      // Return the whole module so executor can access definition and tools
+      // Return the handler - all handlers conform to GenericHandlerBase structurally
+      // The type assertion is safe because all handlers accept the same props shape
       // eslint-disable-next-line i18next/no-literal-string
       cases.push(`    case "${path}":
-      return await import("${importPath}");`);
+      return (await import("${importPath}")).tools.${pathMap[path].method} as GenericHandlerBase;`);
     }
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -241,6 +243,8 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
 
+import type { GenericHandlerBase } from "../unified-interface/shared/endpoints/route/handler";
+
 /* eslint-disable prettier/prettier */
 /* eslint-disable i18next/no-literal-string */
 
@@ -249,28 +253,14 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
  * @param path - The route path (e.g., "core/agent/chat/threads")
  * @returns The route module or null if not found
  */
-export async function getRouteHandler(path: string) {
+export async function getRouteHandler(
+  path: string,
+): Promise<GenericHandlerBase | null> {
   switch (path) {
 ${cases.join("\n")}
     default:
       return null;
   }
-}
-
-/**
- * Get all available route paths
- */
-export function getAllRoutePaths(): string[] {
-  return [
-${allPaths.map((p) => `    "${p}",`).join("\n")}
-  ];
-}
-
-/**
- * Check if a route path exists
- */
-export function hasRoute(path: string): boolean {
-  return getAllRoutePaths().includes(path);
 }
 `;
   }

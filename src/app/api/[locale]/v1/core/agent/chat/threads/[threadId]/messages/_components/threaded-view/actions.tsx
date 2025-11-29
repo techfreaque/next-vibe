@@ -21,7 +21,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import type { useMessageActions } from "../hooks/use-message-actions";
 
 interface ThreadedMessageActionsProps {

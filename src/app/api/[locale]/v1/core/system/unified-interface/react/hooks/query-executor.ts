@@ -66,15 +66,15 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
 }: {
   endpoint: TEndpoint;
   logger: EndpointLogger;
-  requestData: TEndpoint["TRequestOutput"];
-  pathParams: TEndpoint["TUrlVariablesOutput"];
+  requestData: TEndpoint["types"]["RequestOutput"];
+  pathParams: TEndpoint["types"]["UrlVariablesOutput"];
   locale: CountryLanguage;
   options?: QueryExecutorOptions<
-    TEndpoint["TRequestOutput"],
-    TEndpoint["TResponseOutput"],
-    TEndpoint["TUrlVariablesOutput"]
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"]
   >;
-}): Promise<ResponseType<TEndpoint["TResponseOutput"]>> {
+}): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
   let requestData = initialRequestData;
 
   // Check if the endpoint expects undefined for request data
@@ -95,12 +95,12 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
     typeof requestData === "object" &&
     requestData !== null
   ) {
-    requestData = undefined as TEndpoint["TRequestOutput"];
+    requestData = undefined as TEndpoint["types"]["RequestOutput"];
   }
 
   // If the schema expects an empty object but we received undefined, set requestData to empty object
   if (isEmptyObjectSchema && requestData === undefined) {
-    requestData = {} as TEndpoint["TRequestOutput"];
+    requestData = {} as TEndpoint["types"]["RequestOutput"];
   }
 
   // Validate request data using the endpoint's schema
@@ -296,7 +296,7 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
         urlPathParams: pathParams,
         responseData: (response.success
           ? response.data
-          : undefined) as TEndpoint["TResponseOutput"],
+          : undefined) as TEndpoint["types"]["ResponseOutput"],
       });
 
       // If onSuccess returns an error, treat it as an error
@@ -314,7 +314,7 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       }
     }
 
-    return response as ResponseType<TEndpoint["TResponseOutput"]>;
+    return response as ResponseType<TEndpoint["types"]["ResponseOutput"]>;
   } catch (err) {
     const parsedError = parseError(err);
 

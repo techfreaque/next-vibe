@@ -4,7 +4,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { enableDebugLogger } from "@/config/debug";
+import { enableDebugLogger, mcpSilentMode } from "@/config/debug";
 import type { TranslationKey } from "@/i18n/core/static-types";
 import type { ErrorResponseType } from "../../../../shared/types/response.schema";
 
@@ -81,7 +81,9 @@ export function createEndpointLogger(
 
   return {
     info(message: string, ...metadata: LoggerMetadata[]): void {
-      console.log(formatMessage("INFO", message), ...metadata);
+      if (!mcpSilentMode) {
+        console.log(formatMessage("INFO", message), ...metadata);
+      }
     },
 
     error(
@@ -89,22 +91,28 @@ export function createEndpointLogger(
       error?: LoggerMetadata,
       ...metadata: LoggerMetadata[]
     ): void {
-      const typedError = error ? parseError(error) : undefined;
-      console.error(formatMessage("ERROR", message), typedError, ...metadata);
+      if (!mcpSilentMode) {
+        const typedError = error ? parseError(error) : undefined;
+        console.error(formatMessage("ERROR", message), typedError, ...metadata);
+      }
     },
 
     vibe(message: string, ...metadata: LoggerMetadata[]): void {
-      // Special vibe formatting - messages are plain strings
-      console.log(`[${getElapsedTime()}] ${message}`, ...metadata);
+      if (!mcpSilentMode) {
+        // Special vibe formatting - messages are plain strings
+        console.log(`[${getElapsedTime()}] ${message}`, ...metadata);
+      }
     },
 
     debug(message: string, ...metadata: LoggerMetadata[]): void {
-      if (debugEnabled || enableDebugLogger) {
+      if (!mcpSilentMode && (debugEnabled || enableDebugLogger)) {
         console.log(formatMessage("DEBUG", message), ...metadata);
       }
     },
     warn(message: string, ...metadata: LoggerMetadata[]): void {
-      console.warn(formatMessage("WARN", message), ...metadata);
+      if (!mcpSilentMode) {
+        console.warn(formatMessage("WARN", message), ...metadata);
+      }
     },
     isDebugEnabled: debugEnabled || enableDebugLogger,
   };

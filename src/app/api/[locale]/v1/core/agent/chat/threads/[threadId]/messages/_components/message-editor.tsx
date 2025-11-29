@@ -19,7 +19,7 @@ import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/cont
 import { ModelSelector } from "@/app/api/[locale]/v1/core/agent/chat/threads/_components/chat-input/model-selector";
 import { SpeechInputButton } from "@/app/api/[locale]/v1/core/agent/chat/threads/_components/chat-input/speech-input-button";
 import { PersonaSelector } from "@/app/api/[locale]/v1/core/agent/chat/personas/_components/persona-selector";
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { useMessageEditor } from "./hooks/use-message-editor";
 

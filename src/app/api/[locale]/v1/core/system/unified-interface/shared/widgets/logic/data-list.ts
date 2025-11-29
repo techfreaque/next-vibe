@@ -42,14 +42,19 @@ export function extractDataListData(
       return null;
     }
 
-    const items = value.filter(isListItem);
+    const filteredItems: ListItem[] = [];
+    for (const item of value) {
+      if (isListItem(item)) {
+        filteredItems.push(item);
+      }
+    }
 
-    if (items.length === 0) {
+    if (filteredItems.length === 0) {
       return null;
     }
 
     return {
-      items,
+      items: filteredItems,
       showBullets: true,
     };
   }

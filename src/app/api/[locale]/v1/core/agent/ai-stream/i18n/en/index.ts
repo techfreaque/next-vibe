@@ -64,6 +64,28 @@ export const translations = {
         content: {
           label: "Content",
         },
+        metadata: {
+          toolCall: {
+            toolName: {
+              label: "Tool Name",
+            },
+            args: {
+              label: "Tool Arguments",
+            },
+            result: {
+              label: "Tool Result",
+            },
+            error: {
+              label: "Tool Error",
+            },
+            executionTime: {
+              label: "Execution Time (ms)",
+            },
+            creditsUsed: {
+              label: "Credits Used",
+            },
+          },
+        },
       },
     },
     content: {
@@ -112,6 +134,16 @@ export const translations = {
     enabledToolIds: {
       label: "Enabled Tool IDs",
       description: "List of AI tool IDs to enable for this conversation",
+    },
+    toolConfirmation: {
+      label: "Tool Confirmation",
+      description: "Tool confirmation response from user",
+      success: "Tool confirmation processed successfully",
+      errors: {
+        messageNotFound: "Tool message not found",
+        toolCallMissing: "ToolCall metadata missing",
+        toolNotFound: "Tool not found",
+      },
     },
     resumeToken: {
       label: "Resume Token",
@@ -189,6 +221,12 @@ export const translations = {
   },
   errorTypes: {
     streamError: "Stream Error",
+  },
+  errorThread: {
+    title: "Error",
+  },
+  error: {
+    title: "Stream Error",
   },
   providers: {
     uncensoredHandler: {

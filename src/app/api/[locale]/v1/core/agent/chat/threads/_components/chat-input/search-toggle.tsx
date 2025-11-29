@@ -11,9 +11,10 @@ import React from "react";
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { SEARCH_ALIAS } from "@/app/api/[locale]/v1/core/agent/brave-search/definition";
+import { aliasToPathMap } from "@/app/api/[locale]/v1/core/system/generated/endpoint";
 
-// Search tool ID from the unified-interface system
-const SEARCH_TOOL_ID = "get_v1_core_agent_brave-search";
+const SEARCH_TOOL_NAME = aliasToPathMap[SEARCH_ALIAS];
 
 interface SearchToggleProps {
   disabled?: boolean;
@@ -34,7 +35,7 @@ export function SearchToggle({
   const { t } = simpleT(locale);
 
   // Check if search tool is enabled
-  const enabled = enabledToolIds.includes(SEARCH_TOOL_ID);
+  const enabled = enabledToolIds.includes(SEARCH_TOOL_NAME);
 
   const titleText = enabled
     ? t("app.chat.searchToggle.enabledTitle")
@@ -48,12 +49,12 @@ export function SearchToggle({
     // Toggle search tool in the enabledToolIds array
     if (checked) {
       // Add search tool if not already present
-      if (!enabledToolIds.includes(SEARCH_TOOL_ID)) {
-        onToolsChange([...enabledToolIds, SEARCH_TOOL_ID]);
+      if (!enabledToolIds.includes(SEARCH_TOOL_NAME)) {
+        onToolsChange([...enabledToolIds, SEARCH_TOOL_NAME]);
       }
     } else {
       // Remove search tool
-      onToolsChange(enabledToolIds.filter((id) => id !== SEARCH_TOOL_ID));
+      onToolsChange(enabledToolIds.filter((id) => id !== SEARCH_TOOL_NAME));
     }
   };
 

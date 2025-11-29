@@ -61,9 +61,14 @@ export interface WidgetRenderContext {
   permissions: readonly UserRoleValue[];
   onNavigate?: (url: string) => void;
   onAction?: (action: WidgetAction) => void | Promise<void>;
-  platform?: typeof Platform.TRPC | typeof Platform.NEXT_PAGE | typeof Platform.NEXT_API | typeof Platform.CLI;
+  platform?:
+    | typeof Platform.TRPC
+    | typeof Platform.NEXT_PAGE
+    | typeof Platform.NEXT_API
+    | typeof Platform.CLI;
   theme?: "light" | "dark" | "system";
   endpointFields?: Record<string, unknown>; // Original endpoint fields for nested path lookup
+  disabled?: boolean; // Disable all form inputs
 }
 
 export interface WidgetComponentProps {
@@ -84,22 +89,13 @@ export interface WidgetRegistryEntry {
   type: WidgetType;
   component: React.ComponentType<WidgetComponentProps> | WidgetRenderer;
   platforms?: Array<
-    typeof Platform.TRPC | typeof Platform.NEXT_PAGE | typeof Platform.NEXT_API | typeof Platform.CLI
+    | typeof Platform.TRPC
+    | typeof Platform.NEXT_PAGE
+    | typeof Platform.NEXT_API
+    | typeof Platform.CLI
   >;
   supportsEditing?: boolean;
   supportsCRUD?: boolean;
-}
-
-export interface ToolResultWidgetConfig {
-  endpointId: string;
-  responseFields: UnifiedField[];
-  creditsUsed?: number;
-  executionTime?: number;
-  toolMetadata?: {
-    displayName: string;
-    icon?: string;
-    color?: string;
-  };
 }
 
 export interface WidgetErrorBoundaryProps {

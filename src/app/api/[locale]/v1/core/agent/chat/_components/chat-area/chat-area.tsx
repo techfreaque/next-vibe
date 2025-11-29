@@ -12,7 +12,10 @@ import { envClient } from "@/config/env-client";
 
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 import { useInputHeight } from "@/app/api/[locale]/v1/core/agent/chat/hooks/use-input-height";
-import { NEW_MESSAGE_ID } from "@/app/api/[locale]/v1/core/agent/chat/enum";
+import {
+  NEW_MESSAGE_ID,
+  ViewMode,
+} from "@/app/api/[locale]/v1/core/agent/chat/enum";
 import { AIToolsModal } from "@/app/api/[locale]/v1/core/agent/chat/threads/_components/chat-input/ai-tools-modal";
 import { ChatMessages } from "@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/messages/_components/messages";
 import { PublicFeed } from "@/app/api/[locale]/v1/core/agent/chat/threads/_components/public-feed/public-feed";
@@ -78,10 +81,9 @@ export function ChatArea({
           {/* Toolbar - View Mode Toggle & Screenshot Button */}
           {messages.length > 0 && <ChatToolbar locale={locale} />}
 
-          {/* Logo/Branding - Only show in linear view */}
-          {viewMode === "linear" && messages.length > 0 && (
-            <ChatBranding locale={locale} />
-          )}
+          {/* Logo/Branding - Only show in linear/debug view */}
+          {(viewMode === ViewMode.LINEAR || viewMode === ViewMode.DEBUG) &&
+            messages.length > 0 && <ChatBranding locale={locale} />}
 
           {/* Messages Area - Full height, scrollable inside */}
           <Div className="max-w-screen overflow-hidden h-screen h-max-screen">

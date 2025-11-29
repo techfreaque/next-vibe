@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   requestDataField,
@@ -122,6 +122,19 @@ const { POST } = createEndpoint({
             "app.api.v1.core.system.generators.generateAll.post.fields.skipTaskIndex.label",
           description:
             "app.api.v1.core.system.generators.generateAll.post.fields.skipTaskIndex.description",
+          columns: 4,
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      skipTrpc: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label:
+            "app.api.v1.core.system.generators.generateAll.post.fields.skipTrpc.label",
+          description:
+            "app.api.v1.core.system.generators.generateAll.post.fields.skipTrpc.description",
           columns: 4,
         },
         z.boolean().optional().default(false),
@@ -245,30 +258,35 @@ const { POST } = createEndpoint({
         verbose: false,
         skipEndpoints: false,
         skipSeeds: false,
+        skipTrpc: false,
       },
       success: {
         outputDir: "src/app/api/[locale]/v1/core/system/generated",
         verbose: false,
         skipEndpoints: false,
         skipSeeds: false,
+        skipTrpc: false,
       },
       verbose: {
         outputDir: "src/app/api/[locale]/v1/core/system/generated",
         verbose: true,
         skipEndpoints: false,
         skipSeeds: false,
+        skipTrpc: false,
       },
       skipSome: {
         outputDir: "src/app/api/[locale]/v1/core/system/generated",
         verbose: false,
         skipEndpoints: true,
         skipSeeds: false,
+        skipTrpc: false,
       },
       withSkips: {
         outputDir: "src/app/api/[locale]/v1/core/system/generated",
         verbose: true,
         skipEndpoints: true,
         skipSeeds: true,
+        skipTrpc: true,
       },
     },
     responses: {

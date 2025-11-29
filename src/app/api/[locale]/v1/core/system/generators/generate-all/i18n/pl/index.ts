@@ -33,6 +33,10 @@ export const translations: typeof enTranslations = {
         label: "Pomiń indeks zadań",
         description: "Pomiń generowanie indeksu zadań",
       },
+      skipTrpc: {
+        label: "Pomiń TRPC",
+        description: "Pomiń generowanie routera TRPC",
+      },
       success: {
         title: "Sukces",
       },

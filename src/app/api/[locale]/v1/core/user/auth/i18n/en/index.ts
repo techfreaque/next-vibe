@@ -76,6 +76,7 @@ export const translations = {
     user_not_authenticated: "User is not authenticated",
     publicUserNotAllowed: "Public user is not allowed for this endpoint",
     validation_failed: "Validation failed",
+    failed_to_create_lead: "Failed to create lead",
     native: {
       unsupported:
         "This authentication method is not supported on React Native",

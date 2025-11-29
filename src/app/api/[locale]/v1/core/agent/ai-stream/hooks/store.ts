@@ -6,7 +6,7 @@
 import { create } from "zustand";
 
 import type { DefaultFolderId } from "../../chat/config";
-import type { ToolCall, ToolCallResult } from "../../chat/db";
+import type { ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
 import type { ModelId } from "../../chat/model-access/models";
 
@@ -27,7 +27,7 @@ export interface StreamingMessage {
   finishReason?: string | null;
   isStreaming: boolean;
   error?: string;
-  toolCalls?: ToolCall[];
+  toolCall?: ToolCall;
   sequenceId?: string | null; // Links messages in the same AI response sequence
 }
 
@@ -65,12 +65,7 @@ interface AIStreamState {
   // Message actions
   addMessage: (message: StreamingMessage) => void;
   updateMessageContent: (messageId: string, content: string) => void;
-  addToolCall: (messageId: string, toolCall: ToolCall) => void;
-  updateToolCallResult: (
-    messageId: string,
-    toolCallIndex: number,
-    result: ToolCallResult,
-  ) => void;
+  setToolCall: (messageId: string, toolCall: ToolCall) => void;
   finalizeMessage: (
     messageId: string,
     content: string,
@@ -148,7 +143,7 @@ export const useAIStreamStore = create<AIStreamState>((set) => ({
       };
     }),
 
-  addToolCall: (messageId: string, toolCall: ToolCall): void =>
+  setToolCall: (messageId: string, toolCall: ToolCall): void =>
     set((state) => {
       const message = state.streamingMessages[messageId];
       if (!message) {
@@ -160,35 +155,7 @@ export const useAIStreamStore = create<AIStreamState>((set) => ({
           ...state.streamingMessages,
           [messageId]: {
             ...message,
-            toolCalls: [...(message.toolCalls || []), toolCall],
-          },
-        },
-      };
-    }),
-
-  updateToolCallResult: (
-    messageId: string,
-    toolCallIndex: number,
-    result: ToolCallResult,
-  ): void =>
-    set((state) => {
-      const message = state.streamingMessages[messageId];
-      if (!message?.toolCalls?.[toolCallIndex]) {
-        return state;
-      }
-
-      const updatedToolCalls = [...message.toolCalls];
-      updatedToolCalls[toolCallIndex] = {
-        ...updatedToolCalls[toolCallIndex],
-        result,
-      };
-
-      return {
-        streamingMessages: {
-          ...state.streamingMessages,
-          [messageId]: {
-            ...message,
-            toolCalls: updatedToolCalls,
+            toolCall,
           },
         },
       };

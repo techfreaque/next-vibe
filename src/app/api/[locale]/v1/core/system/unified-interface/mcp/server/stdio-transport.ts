@@ -17,6 +17,8 @@ export class StdioTransport implements IMCPTransport {
   private messageHandler?: (message: JsonRpcRequest) => Promise<void>;
   private readlineInterface?: readline.Interface;
   private running = false;
+  private initializationReceived = false;
+  private startupTimeout?: ReturnType<typeof setTimeout>;
 
   constructor(logger: EndpointLogger) {
     this.logger = logger;
@@ -34,9 +36,9 @@ export class StdioTransport implements IMCPTransport {
     this.logger.info("[MCP Transport] Starting STDIO transport...");
 
     // Create readline interface
+    // NOTE: Do NOT set output to process.stdout - it interferes with MCP protocol
     this.readlineInterface = readline.createInterface({
       input: process.stdin,
-      output: process.stdout,
       terminal: false,
     });
 
@@ -66,6 +68,18 @@ export class StdioTransport implements IMCPTransport {
 
     this.running = true;
     this.logger.info("[MCP Transport] STDIO transport started");
+
+    // Set up startup timeout - exit if no initialization within 5 seconds
+    // This prevents hanging when health checks don't send initialization
+    const timeoutMs = parseInt(process.env.MCP_STARTUP_TIMEOUT || "5000", 10);
+    this.startupTimeout = setTimeout(() => {
+      if (!this.initializationReceived) {
+        this.logger.warn(
+          "[MCP Transport] No initialization received within timeout, exiting",
+        );
+        process.exit(0);
+      }
+    }, timeoutMs);
   }
 
   /**
@@ -78,6 +92,11 @@ export class StdioTransport implements IMCPTransport {
     }
 
     this.logger.info("[MCP Transport] Stopping STDIO transport...");
+
+    if (this.startupTimeout) {
+      clearTimeout(this.startupTimeout);
+      this.startupTimeout = undefined;
+    }
 
     if (this.readlineInterface) {
       this.readlineInterface.close();
@@ -100,12 +119,8 @@ export class StdioTransport implements IMCPTransport {
 
     try {
       const json = JSON.stringify(message);
-      this.logger.debug("[MCP Transport] Sending message", {
-        id: message.id,
-        hasError: !!message.error,
-      });
 
-      // Write to stdout with newline
+      // Write to stdout with newline (MCP protocol)
       // eslint-disable-next-line i18next/no-literal-string
       process.stdout.write(`${json}\n`);
     } catch (error) {
@@ -133,11 +148,16 @@ export class StdioTransport implements IMCPTransport {
     }
 
     try {
-      this.logger.debug("[MCP Transport] Received message", {
-        length: line.length,
-      });
-
       const message = JSON.parse(line) as JsonRpcRequest;
+
+      // Mark initialization as received if this is an initialize method
+      if (message.method === "initialize") {
+        this.initializationReceived = true;
+        if (this.startupTimeout) {
+          clearTimeout(this.startupTimeout);
+          this.startupTimeout = undefined;
+        }
+      }
 
       if (!this.messageHandler) {
         this.logger.warn("[MCP Transport] No message handler registered");

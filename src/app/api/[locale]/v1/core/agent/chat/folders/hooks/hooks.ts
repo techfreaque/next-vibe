@@ -37,6 +37,7 @@ export function useFoldersList(
           folder: {
             rootFolderId: DefaultFolderId.PRIVATE,
             name: "",
+            icon: "folder",
           },
         },
       },

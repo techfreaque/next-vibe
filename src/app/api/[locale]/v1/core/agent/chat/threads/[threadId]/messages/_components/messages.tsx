@@ -23,7 +23,7 @@ import {
   LAYOUT,
   QUOTE_CHARACTER,
 } from "@/app/[locale]/chat/lib/config/constants";
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import {
   buildMessagePath,
   getDirectReplies,
@@ -34,6 +34,7 @@ import { LinearMessageView } from "./linear-view/view";
 import { LoadingIndicator } from "./loading-indicator";
 import { groupMessagesBySequence } from "./message-grouping";
 import { ThreadedMessage } from "./threaded-view/view";
+import { ViewMode } from "../../../../enum";
 
 interface ChatMessagesProps {
   inputHeight?: number;
@@ -105,7 +106,6 @@ export function ChatMessages({
         messageMap.set(streamMsg.messageId, {
           ...existingMsg,
           content: streamMsg.content,
-          toolCalls: streamMsg.toolCalls,
         });
       } else {
         // Add new streaming message with all required fields
@@ -120,18 +120,23 @@ export function ChatMessages({
           persona: streamMsg.persona ?? null,
           createdAt: new Date(),
           updatedAt: new Date(),
-          toolCalls: streamMsg.toolCalls,
           sequenceId: streamMsg.sequenceId ?? null,
           // Required fields with defaults
           authorId: null,
           authorName: null,
+          authorAvatar: null,
+          authorColor: null,
           isAI: streamMsg.role === "assistant",
           errorType: null,
           errorMessage: null,
+          errorCode: null,
           edited: false,
+          originalId: null,
           tokens: null,
-          upvotes: null,
-          downvotes: null,
+          metadata: {},
+          upvotes: 0,
+          downvotes: 0,
+          searchVector: null,
         });
       }
     }
@@ -357,7 +362,7 @@ export function ChatMessages({
                 {/* TODO add loading indicator */}
               </Div>
             </Div>
-          ) : viewMode === "flat" ? (
+          ) : viewMode === ViewMode.FLAT ? (
             // Flat view (4chan style) - ALL messages in chronological order
             ((): JSX.Element | null => {
               // Get ALL messages from thread, sorted by timestamp
@@ -388,7 +393,7 @@ export function ChatMessages({
                 />
               ) : null;
             })()
-          ) : viewMode === "threaded" ? (
+          ) : viewMode === ViewMode.THREADED ? (
             // Threaded view (Reddit style) - Show ALL messages, not just current path
             ((): JSX.Element[] => {
               // Group messages by sequence to filter out continuations

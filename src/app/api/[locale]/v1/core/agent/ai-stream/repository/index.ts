@@ -6,7 +6,7 @@
 import "server-only";
 
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { stepCountIs, streamText } from "ai";
+import { streamText, type JSONValue, stepCountIs } from "ai";
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import {
@@ -18,17 +18,14 @@ import {
 
 import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
-import { loadTools } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/loader";
-import type {
-  CoreTool,
-  DiscoveredEndpoint,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/ai/types";
+import { getFullPath } from "@/app/api/[locale]/v1/core/system/generated/endpoint";
+import { loadTools } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/tools-loader";
+import type { CoreTool } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import type { TFunction } from "@/i18n/core/static-types";
 
 import { setupAiStream } from "./stream-setup";
 
@@ -36,7 +33,6 @@ import {
   chatMessages,
   type ToolCall,
   type ToolCallResult,
-  type ToolCallWidgetMetadata,
 } from "../../chat/db";
 import type { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
@@ -53,8 +49,11 @@ import type {
   AiStreamPostResponseOutput,
 } from "../definition";
 import { createStreamEvent, formatSSEEvent } from "../events";
-import { isUncensoredAIModel } from "../providers/uncensored-ai";
-import { handleUncensoredAIStream } from "../providers/uncensored-handler";
+import {
+  isUncensoredAIModel,
+  createUncensoredAI,
+} from "../providers/uncensored-ai";
+import { parseError } from "../../../shared/utils";
 
 /**
  * Maximum duration for streaming responses (in seconds)
@@ -78,11 +77,11 @@ export interface IAiStreamRepository {
 /**
  * Type guard for tool result values
  * Validates that value is JSON-serializable and matches ToolCallResult type
+ * Accepts JSONValue from AI SDK which is the type used for tool inputs/outputs
  */
-// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Type guard requires unknown parameter
-function isValidToolResult(value: unknown): value is ToolCallResult {
+function isValidToolResult(value: JSONValue): value is ToolCallResult {
   if (value === null) {
-    return true;
+    return true; // null is a valid tool result
   }
   if (value === undefined) {
     return false; // ToolCallResult does not include undefined
@@ -116,18 +115,11 @@ function isValidToolResult(value: unknown): value is ToolCallResult {
 function extractUserIdentifiers(
   user: JwtPayloadType,
   request: NextRequest | undefined,
-  logger: EndpointLogger,
 ): {
   userId?: string;
   leadId?: string;
   ipAddress?: string;
 } {
-  logger.debug("Extracting user identifiers", {
-    isPublic: user.isPublic,
-    hasId: "id" in user,
-    hasLeadId: "leadId" in user,
-  });
-
   const userId = !user.isPublic && "id" in user ? user.id : undefined;
   const leadId =
     "leadId" in user && typeof user.leadId === "string"
@@ -139,8 +131,6 @@ function extractUserIdentifiers(
       undefined
     : "cli";
 
-  logger.debug("Extracted identifiers", { userId, leadId, ipAddress });
-
   return { userId, leadId, ipAddress };
 }
 
@@ -148,6 +138,563 @@ function extractUserIdentifiers(
  * AI Stream Repository Implementation
  */
 class AiStreamRepository implements IAiStreamRepository {
+  /**
+   * Create AI streaming response with SSE events
+   * Returns StreamingResponse for SSE stream or error ResponseType
+   */
+  async createAiStream({
+    data,
+    locale,
+    logger,
+    user,
+    request,
+  }: {
+    data: AiStreamPostRequestOutput;
+    t: TFunction;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+    user: JwtPayloadType;
+    request: NextRequest | undefined;
+  }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse> {
+    const { userId, leadId, ipAddress } = extractUserIdentifiers(user, request);
+
+    const setupResult = await setupAiStream({
+      data,
+      locale,
+      logger,
+      user,
+      userId,
+      leadId,
+      ipAddress,
+    });
+
+    if (!setupResult.success) {
+      return setupResult.error;
+    }
+
+    const {
+      isIncognito,
+      modelCost,
+      effectiveParentMessageId,
+      effectiveContent,
+      effectiveRole,
+      threadId: threadResultThreadId,
+      isNewThread,
+      messageDepth,
+      userMessageId,
+      messages,
+      systemPrompt: initialSystemPrompt,
+      toolConfirmationResult,
+    } = setupResult.data;
+
+    let systemPrompt = initialSystemPrompt;
+
+    // Step 9: Start AI streaming (for all operations including answer-as-ai)
+    try {
+      const modelConfig = getModelById(data.model);
+
+      const {
+        tools,
+        toolsConfig,
+        systemPrompt: updatedSystemPrompt,
+      } = await this.setupStreamingTools({
+        model: data.model,
+        requestedTools: data.tools,
+        user,
+        locale,
+        logger,
+        systemPrompt,
+      });
+      systemPrompt = updatedSystemPrompt;
+
+      // Configure provider based on model
+      // UncensoredAI uses custom provider with OpenAI-compatible API
+      // OpenRouter uses its own provider
+      const provider = isUncensoredAIModel(data.model)
+        ? createUncensoredAI({
+            apiKey: env.UNCENSORED_AI_API_KEY,
+          })
+        : createOpenRouter({
+            apiKey: env.OPENROUTER_API_KEY,
+          });
+
+      logger.info("[AI Stream] Starting OpenRouter stream", {
+        model: data.model,
+        hasTools: !!tools,
+        toolCount: tools ? Object.keys(tools).length : 0,
+        requestedTools: data.tools,
+        supportsTools: modelConfig?.supportsTools,
+      });
+
+      // Create SSE stream
+      const encoder = new TextEncoder();
+
+      // Track parent/depth/sequence for error handling (accessible in catch block)
+      let lastParentId: string | null = null;
+      let lastDepth = 0;
+      let lastSequenceId: string | null = null;
+
+      // Create abort controller for this stream - combines request signal with timeout
+      const streamAbortController = new AbortController();
+      const timeoutAbortController = AbortSignal.timeout(maxDuration * 1000);
+
+      // Abort our controller when timeout fires
+      const timeoutAbortHandler = (): void => {
+        streamAbortController.abort(new Error("Stream timeout"));
+      };
+      timeoutAbortController.addEventListener("abort", timeoutAbortHandler);
+
+      // Also abort if client disconnects (request signal)
+      if (request?.signal) {
+        const requestAbortHandler = (): void => {
+          streamAbortController.abort(new Error("Client disconnected"));
+        };
+        request.signal.addEventListener("abort", requestAbortHandler);
+      }
+
+      const stream = new ReadableStream({
+        async start(controller): Promise<void> {
+          try {
+            AiStreamRepository.emitInitialEvents({
+              isNewThread,
+              threadId: threadResultThreadId,
+              rootFolderId: data.rootFolderId,
+              subFolderId: data.subFolderId || null,
+              content: data.content,
+              operation: data.operation,
+              userMessageId,
+              effectiveRole,
+              effectiveParentMessageId,
+              messageDepth,
+              effectiveContent,
+              toolConfirmationResult,
+              controller,
+              encoder,
+              logger,
+            });
+
+            // Calculate initial parent and depth for AI message
+            // This will be updated if reasoning occurs
+            const initialAiParentId =
+              data.operation === "answer-as-ai" || data.operation === "retry"
+                ? (effectiveParentMessageId ?? null)
+                : userMessageId;
+            const initialAiDepth =
+              data.operation === "answer-as-ai" || data.operation === "retry"
+                ? messageDepth
+                : messageDepth + 1;
+
+            // Don't emit AI message-created event yet
+            // We'll emit it when we start getting content, so we can set the correct parent
+            // (if there's reasoning, the AI message should be a child of the reasoning message)
+
+            // Start streaming
+            // Single ASSISTANT message with inline <think> tags
+            // Only interrupted by tool calls
+            let currentAssistantMessageId: string | null = null; // Current ASSISTANT message being streamed
+            let currentAssistantContent = ""; // Accumulated content (reasoning + text with <think> tags inline)
+            // Track multiple TOOL messages (created on tool-call, stored on tool-result)
+            // Key: toolCallId from AI SDK, Value: { messageId, toolCallData }
+            const pendingToolMessages = new Map<
+              string,
+              {
+                messageId: string;
+                toolCallData: {
+                  toolCall: ToolCall;
+                  parentId: string | null;
+                  depth: number;
+                };
+              }
+            >();
+            let isInReasoningBlock = false; // Track if we're inside <think></think> tags
+
+            // Track message sequencing - all messages in this response share the same sequenceId
+            // CRITICAL: When continuing after tool confirmation, reuse the original sequenceId
+            // so all messages (tool + response) are grouped together in the UI
+            const sequenceId =
+              toolConfirmationResult?.sequenceId ?? crypto.randomUUID();
+            logger.info("[AI Stream] Sequence ID initialized", {
+              sequenceId,
+              isToolContinuation: !!toolConfirmationResult,
+              toolMessageId: toolConfirmationResult?.messageId,
+            });
+
+            // Track the current parent for chaining messages
+            // This gets updated as we create reasoning messages and tool calls
+            // IMPORTANT: For tool confirmation, the next ASSISTANT message should be child of the TOOL message
+            let currentParentId =
+              toolConfirmationResult?.messageId ?? initialAiParentId;
+            let currentDepth = toolConfirmationResult
+              ? messageDepth + 1
+              : initialAiDepth;
+
+            // Update last known values for error handling
+            lastSequenceId = sequenceId;
+            lastParentId = currentParentId;
+            lastDepth = currentDepth;
+
+            // Get the OpenRouter model ID (use openRouterModel if available, otherwise use model ID directly)
+            const openRouterModelId =
+              modelConfig?.openRouterModel || data.model;
+
+            const streamResult = streamText({
+              model: provider.chat(modelConfig.openRouterModel),
+              messages,
+              temperature: data.temperature,
+              abortSignal: streamAbortController.signal,
+              system: systemPrompt || undefined,
+              ...(tools
+                ? {
+                    tools,
+                    // Enable multi-step tool calling loop - AI can call tools up to 50 times
+                    stopWhen: stepCountIs(50),
+                    onStepFinish: (): void => {
+                      // Tool arguments are already sent via tool-call stream events
+                    },
+                  }
+                : {}),
+            });
+
+            for await (const part of streamResult.fullStream) {
+              if (part.type === "finish-step") {
+                // After a step finishes, update currentParentId/currentDepth to point to the last message
+                currentParentId = lastParentId;
+                currentDepth = lastDepth;
+
+                // Reset currentAssistantMessageId so the next step creates a new ASSISTANT message
+                currentAssistantMessageId = null;
+                currentAssistantContent = "";
+              } else if (part.type === "text-delta") {
+                const result = await AiStreamRepository.processTextDelta({
+                  textDelta: part.text,
+                  currentAssistantMessageId,
+                  currentAssistantContent,
+                  threadId: threadResultThreadId,
+                  currentParentId,
+                  currentDepth,
+                  model: data.model,
+                  persona: data.persona,
+                  sequenceId,
+                  isIncognito,
+                  userId,
+                  controller,
+                  encoder,
+                  logger,
+                });
+                currentAssistantMessageId = result.currentAssistantMessageId;
+                currentAssistantContent = result.currentAssistantContent;
+
+                // If a new ASSISTANT message was created, update currentParentId/currentDepth
+                if (result.wasCreated) {
+                  currentParentId = result.currentAssistantMessageId;
+                  currentDepth = result.newDepth;
+                  lastParentId = result.currentAssistantMessageId;
+                  lastDepth = result.newDepth;
+                }
+              } else if (part.type === "reasoning-start") {
+                isInReasoningBlock = true;
+                const result = await AiStreamRepository.processReasoningStart({
+                  currentAssistantMessageId,
+                  currentAssistantContent,
+                  threadId: threadResultThreadId,
+                  currentParentId,
+                  currentDepth,
+                  model: data.model,
+                  persona: data.persona,
+                  sequenceId,
+                  isIncognito,
+                  userId,
+                  controller,
+                  encoder,
+                  logger,
+                });
+                currentAssistantMessageId = result.currentAssistantMessageId;
+                currentAssistantContent = result.currentAssistantContent;
+
+                // If a new ASSISTANT message was created, update currentParentId/currentDepth
+                if (result.wasCreated) {
+                  currentParentId = result.currentAssistantMessageId;
+                  currentDepth = result.newDepth;
+                  lastParentId = result.currentAssistantMessageId;
+                  lastDepth = result.newDepth;
+                }
+              } else if (part.type === "reasoning-delta") {
+                const reasoningText = "text" in part ? part.text : "";
+                currentAssistantContent =
+                  AiStreamRepository.processReasoningDelta({
+                    reasoningText,
+                    currentAssistantMessageId,
+                    currentAssistantContent,
+                    controller,
+                    encoder,
+                    logger,
+                  });
+              } else if (part.type === "reasoning-end") {
+                if (isInReasoningBlock) {
+                  currentAssistantContent =
+                    AiStreamRepository.processReasoningEnd({
+                      currentAssistantMessageId,
+                      currentAssistantContent,
+                      controller,
+                      encoder,
+                      logger,
+                    });
+                  isInReasoningBlock = false;
+                }
+              } else if (part.type === "tool-call") {
+                if (
+                  "toolCallId" in part &&
+                  "toolName" in part &&
+                  typeof part.toolCallId === "string" &&
+                  typeof part.toolName === "string"
+                ) {
+                  const result = await AiStreamRepository.processToolCall({
+                    part: {
+                      type: "tool-call",
+                      toolCallId: part.toolCallId,
+                      toolName: part.toolName,
+                      input:
+                        "input" in part ? (part.input as JSONValue) : undefined,
+                    },
+                    currentAssistantMessageId,
+                    currentAssistantContent,
+                    isInReasoningBlock,
+                    threadId: threadResultThreadId,
+                    currentParentId,
+                    currentDepth,
+                    model: data.model,
+                    persona: data.persona,
+                    sequenceId,
+                    isIncognito,
+                    userId,
+                    toolsConfig,
+                    streamAbortController,
+                    controller,
+                    encoder,
+                    logger,
+                  });
+                  currentAssistantMessageId = result.currentAssistantMessageId;
+                  currentAssistantContent = result.currentAssistantContent;
+                  isInReasoningBlock = result.isInReasoningBlock;
+
+                  // Update currentParentId/currentDepth to chain each tool call to the previous message
+                  // This creates: USER → ASSISTANT → TOOL1 → TOOL2 → ASSISTANT (next step)
+                  // The next tool call should be a child of THIS tool message
+                  currentParentId = result.pendingToolMessage.messageId;
+                  currentDepth = result.pendingToolMessage.toolCallData.depth;
+
+                  // Track the last tool message for the next step
+                  lastParentId = result.pendingToolMessage.messageId;
+                  lastDepth = result.pendingToolMessage.toolCallData.depth;
+
+                  pendingToolMessages.set(
+                    part.toolCallId,
+                    result.pendingToolMessage,
+                  );
+                }
+              } else if (part.type === "tool-error") {
+                if (
+                  "toolCallId" in part &&
+                  "toolName" in part &&
+                  typeof part.toolCallId === "string" &&
+                  typeof part.toolName === "string"
+                ) {
+                  const pending = pendingToolMessages.get(part.toolCallId);
+                  const result = await AiStreamRepository.processToolError({
+                    part: {
+                      type: "tool-error",
+                      toolCallId: part.toolCallId,
+                      toolName: part.toolName,
+                      error:
+                        "error" in part ? (part.error as JSONValue) : undefined,
+                    },
+                    pendingToolMessage: pending,
+                    threadId: threadResultThreadId,
+                    model: data.model,
+                    persona: data.persona,
+                    sequenceId,
+                    isIncognito,
+                    userId,
+                    controller,
+                    encoder,
+                    logger,
+                  });
+                  if (result) {
+                    currentParentId = result.currentParentId;
+                    currentDepth = result.currentDepth;
+                    lastParentId = result.currentParentId;
+                    lastDepth = result.currentDepth;
+                    pendingToolMessages.delete(part.toolCallId);
+                  }
+                }
+              } else if (part.type === "tool-result") {
+                if (
+                  "toolCallId" in part &&
+                  "toolName" in part &&
+                  typeof part.toolCallId === "string" &&
+                  typeof part.toolName === "string"
+                ) {
+                  const pending = pendingToolMessages.get(part.toolCallId);
+                  const result = await AiStreamRepository.processToolResult({
+                    part: {
+                      type: "tool-result",
+                      toolCallId: part.toolCallId,
+                      toolName: part.toolName,
+                      output:
+                        "output" in part
+                          ? (part.output as JSONValue)
+                          : undefined,
+                      isError:
+                        "isError" in part ? Boolean(part.isError) : false,
+                    },
+                    pendingToolMessage: pending,
+                    threadId: threadResultThreadId,
+                    model: data.model,
+                    persona: data.persona,
+                    sequenceId,
+                    isIncognito,
+                    userId,
+                    controller,
+                    encoder,
+                    logger,
+                  });
+                  if (result) {
+                    currentParentId = result.currentParentId;
+                    currentDepth = result.currentDepth;
+                    lastParentId = result.currentParentId;
+                    lastDepth = result.currentDepth;
+                    pendingToolMessages.delete(part.toolCallId);
+                  }
+                }
+              }
+            }
+
+            // Wait for completion to get final usage stats
+            const usage = await streamResult.usage;
+            const finishReason = await streamResult.finishReason;
+
+            // Finalize current ASSISTANT message if exists
+            if (currentAssistantMessageId && currentAssistantContent) {
+              await AiStreamRepository.finalizeAssistantMessage({
+                currentAssistantMessageId,
+                currentAssistantContent,
+                isInReasoningBlock,
+                streamResult: {
+                  finishReason,
+                  usage,
+                },
+                isIncognito,
+                controller,
+                encoder,
+                logger,
+              });
+            }
+
+            logger.info("[AI Stream] Stream completed", {
+              totalTokens: usage.totalTokens,
+            });
+
+            // Deduct credits AFTER successful completion (not optimistically)
+            await AiStreamRepository.deductCreditsAfterCompletion({
+              modelCost,
+              user,
+              model: data.model,
+              logger,
+            });
+
+            controller.close();
+          } catch (error) {
+            // Check if this is an abort error (user stopped generation or tool confirmation required)
+            if (
+              error instanceof Error &&
+              (error.name === "AbortError" ||
+                error.name === "AI_NoOutputGeneratedError" ||
+                error.message === "Client disconnected" ||
+                error.message === "Tool requires user confirmation" ||
+                error.message.includes("No output generated"))
+            ) {
+              logger.info("[AI Stream] Stream aborted", {
+                message: error.message,
+                errorName: error.name,
+                reason:
+                  error.message === "Tool requires user confirmation" ||
+                  error.message.includes("No output generated")
+                    ? "waiting_for_tool_confirmation"
+                    : "client_disconnected",
+              });
+              // Controller is already closed in processToolCall for tool confirmation
+              // Only close if not already closed
+              if (
+                error.message !== "Tool requires user confirmation" &&
+                !error.message.includes("No output generated")
+              ) {
+                // Emit a stopped event to inform the frontend
+                const stoppedEvent = createStreamEvent.contentDone({
+                  messageId: lastSequenceId ?? "",
+                  content: "",
+                  totalTokens: null,
+                  finishReason: "stop",
+                });
+                controller.enqueue(
+                  encoder.encode(formatSSEEvent(stoppedEvent)),
+                );
+                controller.close();
+              }
+              return;
+            }
+
+            await AiStreamRepository.handleStreamError({
+              error: error instanceof Error ? error : (error as JSONValue),
+              threadId: threadResultThreadId,
+              isIncognito,
+              userId,
+              lastParentId,
+              lastDepth,
+              lastSequenceId,
+              controller,
+              encoder,
+              logger,
+            });
+          }
+        },
+
+        // Handle client disconnect - abort the stream
+        cancel(reason): void {
+          logger.info("[AI Stream] Stream cancelled by client", {
+            reason: String(reason),
+          });
+          streamAbortController.abort(new Error("Client disconnected"));
+        },
+      });
+
+      return createStreamingResponse(
+        new Response(stream, {
+          headers: {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
+          },
+        }),
+      );
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      logger.error("Failed to create AI stream", {
+        error: errorMessage,
+        model: data.model,
+      });
+
+      return {
+        success: false,
+        message:
+          "app.api.v1.core.agent.chat.aiStream.route.errors.streamCreationFailed",
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        messageParams: {
+          error: errorMessage,
+        },
+      };
+    }
+  }
   /**
    * Deduct credits after successful AI response
    */
@@ -171,13 +718,17 @@ class AiStreamRepository implements IAiStreamRepository {
    */
   private async setupStreamingTools(params: {
     model: ModelId;
-    requestedTools: string[] | null | undefined;
+    requestedTools:
+      | Array<{ toolId: string; requiresConfirmation: boolean }>
+      | null
+      | undefined;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
     systemPrompt: string;
   }): Promise<{
     tools: Record<string, CoreTool> | undefined;
+    toolsConfig: Map<string, { requiresConfirmation: boolean }>;
     systemPrompt: string;
   }> {
     const modelConfig = getModelById(params.model);
@@ -185,20 +736,47 @@ class AiStreamRepository implements IAiStreamRepository {
     if (!modelConfig?.supportsTools) {
       return {
         tools: undefined,
+        toolsConfig: new Map(),
         systemPrompt: params.systemPrompt,
       };
     }
 
+    // Extract tool IDs and build config map
+    const toolIds = params.requestedTools?.map((t) => t.toolId) ?? null;
+
     const toolsResult = await loadTools({
-      requestedTools: params.requestedTools,
+      requestedTools: toolIds,
       user: params.user,
       locale: params.locale,
       logger: params.logger,
       systemPrompt: params.systemPrompt,
     });
 
+    // Build toolsConfig map using AI SDK tool names (not aliases)
+    // The loadTools function returns tools with AI SDK names like 'v1_core_agent_brave-search_GET'
+    // We need to map tool aliases to their AI SDK names using getFullPath
+    const toolsConfig = new Map<string, { requiresConfirmation: boolean }>();
+    if (toolsResult.tools && params.requestedTools) {
+      for (const toolConfig of params.requestedTools) {
+        // Map tool alias/path to AI SDK tool name using getFullPath
+        const aiSdkToolName = getFullPath(toolConfig.toolId);
+        if (aiSdkToolName && toolsResult.tools[aiSdkToolName]) {
+          toolsConfig.set(aiSdkToolName, {
+            requiresConfirmation: toolConfig.requiresConfirmation,
+          });
+        }
+      }
+    }
+
+    params.logger.info("[AI Stream] Tools loaded", {
+      toolCount: toolsResult.tools ? Object.keys(toolsResult.tools).length : 0,
+      hasTools: !!toolsResult.tools,
+      requestedTools: toolIds,
+    });
+
     return {
       tools: toolsResult.tools,
+      toolsConfig,
       systemPrompt: toolsResult.systemPrompt,
     };
   }
@@ -221,6 +799,11 @@ class AiStreamRepository implements IAiStreamRepository {
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
     logger: EndpointLogger;
+    toolConfirmationResult?: {
+      messageId: string;
+      sequenceId: string;
+      toolCall: ToolCall; // Full ToolCall object with all required fields including args
+    };
   }): void {
     const {
       isNewThread,
@@ -237,6 +820,7 @@ class AiStreamRepository implements IAiStreamRepository {
       controller,
       encoder,
       logger,
+      toolConfirmationResult,
     } = params;
 
     // Emit thread-created event if new thread
@@ -262,9 +846,13 @@ class AiStreamRepository implements IAiStreamRepository {
       });
     }
 
-    // For answer-as-ai, skip user message event and only emit AI message
+    // For answer-as-ai, retry, or tool confirmation - skip user message event
     // For regular operations, emit both user and AI message events
-    if (operation !== "answer-as-ai" && operation !== "retry") {
+    if (
+      operation !== "answer-as-ai" &&
+      operation !== "retry" &&
+      !toolConfirmationResult
+    ) {
       // Emit user message-created event
       logger.debug("Emitting USER MESSAGE_CREATED event", {
         messageId: userMessageId,
@@ -287,13 +875,37 @@ class AiStreamRepository implements IAiStreamRepository {
       logger.debug("USER MESSAGE_CREATED event emitted", {
         messageId: userMessageId,
       });
-    } else {
-      logger.debug(
-        "Skipping USER MESSAGE_CREATED event for answer-as-ai operation",
+    } else if (toolConfirmationResult) {
+      logger.info(
+        "✅ Skipping USER MESSAGE_CREATED event for tool confirmation - emitting TOOL_RESULT instead",
         {
-          messageId: userMessageId,
+          toolMessageId: toolConfirmationResult.messageId,
+          toolName: toolConfirmationResult.toolCall.toolName,
         },
       );
+
+      // Emit TOOL_RESULT event to update frontend with executed tool result
+      const toolResultEvent = createStreamEvent.toolResult({
+        messageId: toolConfirmationResult.messageId,
+        toolName: toolConfirmationResult.toolCall.toolName,
+        result: toolConfirmationResult.toolCall.result,
+        error: toolConfirmationResult.toolCall.error,
+        toolCall: toolConfirmationResult.toolCall, // Include full tool call data for frontend rendering
+      });
+      controller.enqueue(encoder.encode(formatSSEEvent(toolResultEvent)));
+      logger.info("TOOL_RESULT event emitted for confirmed tool", {
+        messageId: toolConfirmationResult.messageId,
+        hasResult: !!toolConfirmationResult.toolCall.result,
+        hasError: !!toolConfirmationResult.toolCall.error,
+      });
+    } else {
+      logger.debug("Skipping USER MESSAGE_CREATED event", {
+        messageId: userMessageId,
+        reason:
+          operation === "answer-as-ai"
+            ? "answer-as-ai operation"
+            : "retry operation",
+      });
     }
   }
 
@@ -305,8 +917,15 @@ class AiStreamRepository implements IAiStreamRepository {
     delta: string;
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
+    logger: EndpointLogger;
   }): void {
-    const { messageId, delta, controller, encoder } = params;
+    const { messageId, delta, controller, encoder, logger } = params;
+
+    logger.debug("[AI Stream] Emitting CONTENT_DELTA", {
+      messageId,
+      deltaLength: delta.length,
+      delta: delta.substring(0, 50),
+    });
 
     const deltaEvent = createStreamEvent.contentDelta({
       messageId,
@@ -363,6 +982,12 @@ class AiStreamRepository implements IAiStreamRepository {
       sequenceId,
     });
     controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
+
+    logger.info("[AI Stream] MESSAGE_CREATED event sent for ASSISTANT", {
+      messageId,
+      isIncognito,
+      contentLength: initialContent.length,
+    });
 
     // Save ASSISTANT message to database if not incognito
     // Public users (userId undefined) are allowed - helper converts to null
@@ -427,10 +1052,6 @@ class AiStreamRepository implements IAiStreamRepository {
         delta: thinkCloseTag,
       });
       controller.enqueue(encoder.encode(formatSSEEvent(thinkCloseDelta)));
-
-      logger.info("[AI Stream] ⏱️ Reasoning closed at stream end → </think>", {
-        messageId: currentAssistantMessageId,
-      });
     }
 
     // Emit CONTENT_DONE event for ASSISTANT message
@@ -469,880 +1090,1085 @@ class AiStreamRepository implements IAiStreamRepository {
   }
 
   /**
-   * Create AI streaming response with SSE events
-   * Returns StreamingResponse for SSE stream or error ResponseType
+   * Process text-delta event from stream
    */
-  async createAiStream({
-    data,
-    locale,
-    logger,
-    user,
-    request,
-  }: {
-    data: AiStreamPostRequestOutput;
-    t: TFunction;
-    locale: CountryLanguage;
+  private static async processTextDelta(params: {
+    textDelta: string;
+    currentAssistantMessageId: string | null;
+    currentAssistantContent: string;
+    threadId: string;
+    currentParentId: string | null;
+    currentDepth: number;
+    model: ModelId;
+    persona: string;
+    sequenceId: string;
+    isIncognito: boolean;
+    userId: string | undefined;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
     logger: EndpointLogger;
-    user: JwtPayloadType;
-    request: NextRequest | undefined;
-  }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse> {
-    const { userId, leadId, ipAddress } = extractUserIdentifiers(
-      user,
-      request,
-      logger,
-    );
-
-    const setupResult = await setupAiStream({
-      data,
-      locale,
-      logger,
-      user,
-      userId,
-      leadId,
-      ipAddress,
-    });
-
-    if (!setupResult.success) {
-      return setupResult.error;
-    }
-
+  }): Promise<{
+    currentAssistantMessageId: string;
+    currentAssistantContent: string;
+    wasCreated: boolean;
+    newDepth: number;
+  }> {
     const {
+      textDelta,
+      currentAssistantContent,
+      threadId,
+      currentParentId,
+      currentDepth,
+      model,
+      persona,
+      sequenceId,
       isIncognito,
-      modelCost,
-      effectiveParentMessageId,
-      effectiveContent,
-      effectiveRole,
-      threadId: threadResultThreadId,
-      isNewThread,
-      messageDepth,
-      userMessageId,
-      messages,
-      systemPrompt: initialSystemPrompt,
-    } = setupResult.data;
+      userId,
+      controller,
+      encoder,
+      logger,
+    } = params;
 
-    let systemPrompt = initialSystemPrompt;
+    let { currentAssistantMessageId } = params;
 
-    // Step 9: Start AI streaming (for all operations including answer-as-ai)
-    try {
-      const modelConfig = getModelById(data.model);
-
-      const { tools, systemPrompt: updatedSystemPrompt } =
-        await this.setupStreamingTools({
-          model: data.model,
-          requestedTools: data.tools,
-          user,
-          locale,
-          logger,
-          systemPrompt,
-        });
-      systemPrompt = updatedSystemPrompt;
-
-      // Special handling for Uncensored.ai
-      if (isUncensoredAIModel(data.model)) {
-        return await handleUncensoredAIStream({
-          apiKey: env.UNCENSORED_AI_API_KEY,
-          messages,
-          systemPrompt,
-          temperature: data.temperature,
-          maxTokens: data.maxTokens,
-          locale,
-          logger,
-          tools,
-          threadId: threadResultThreadId,
-          isNewThread,
-          rootFolderId: data.rootFolderId,
-          subFolderId: data.subFolderId || null,
-          content: data.content,
-          operation: data.operation,
-          userMessageId,
-          effectiveRole,
-          effectiveParentMessageId,
-          messageDepth,
-          effectiveContent,
-          model: data.model,
-          persona: data.persona,
+    if (textDelta !== undefined && textDelta !== null && textDelta !== "") {
+      // Add text to current ASSISTANT message (or create if doesn't exist)
+      if (!currentAssistantMessageId) {
+        const result = await AiStreamRepository.createAssistantMessage({
+          initialContent: textDelta,
+          threadId,
+          parentId: currentParentId,
+          depth: currentDepth,
+          model,
+          persona,
+          sequenceId,
           isIncognito,
           userId,
-          deductCredits: async () => {
-            await AiStreamRepository.deductCreditsAfterCompletion({
-              modelCost,
-              user,
-              model: data.model,
-              logger,
-            });
-          },
-        });
-      }
-
-      const provider = createOpenRouter({
-        apiKey: env.OPENROUTER_API_KEY,
-      });
-
-      logger.debug("Starting OpenRouter stream", {
-        model: data.model,
-        tools: data.tools,
-      });
-
-      const modelConfig = getModelById(data.model);
-
-      const { tools, systemPrompt: updatedSystemPrompt } =
-        await this.setupStreamingTools({
-          model: data.model,
-          requestedTools: data.tools,
-          user,
-          locale,
+          controller,
+          encoder,
           logger,
-          systemPrompt,
         });
-      systemPrompt = updatedSystemPrompt;
-
-      // Create SSE stream
-      const encoder = new TextEncoder();
-      const deductCredits = this.deductCreditsAfterCompletion.bind(this);
-      const emitInitialEvents = this.emitInitialEvents.bind(this);
-      const emitContentDelta = this.emitContentDelta.bind(this);
-      const createAssistantMessage = this.createAssistantMessage.bind(this);
-      const finalizeAssistantMessage = this.finalizeAssistantMessage.bind(this);
-
-      // Track parent/depth/sequence for error handling (accessible in catch block)
-      let lastParentId: string | null = null;
-      let lastDepth = 0;
-      let lastSequenceId: string | null = null;
-      let lastSequenceIndex = 0;
-
-      const stream = new ReadableStream({
-        async start(controller): Promise<void> {
-          try {
-            logger.debug("Stream start() called");
-
-            emitInitialEvents({
-              isNewThread,
-              threadId: threadResultThreadId,
-              rootFolderId: data.rootFolderId,
-              subFolderId: data.subFolderId || null,
-              content: data.content,
-              operation: data.operation,
-              userMessageId,
-              effectiveRole,
-              effectiveParentMessageId,
-              messageDepth,
-              effectiveContent,
-              controller,
-              encoder,
-              logger,
-            });
-
-            // Calculate initial parent and depth for AI message
-            // This will be updated if reasoning occurs
-            const initialAiParentId =
-              data.operation === "answer-as-ai" || data.operation === "retry"
-                ? (effectiveParentMessageId ?? null)
-                : userMessageId;
-            const initialAiDepth =
-              data.operation === "answer-as-ai" || data.operation === "retry"
-                ? messageDepth
-                : messageDepth + 1;
-
-            // Don't emit AI message-created event yet
-            // We'll emit it when we start getting content, so we can set the correct parent
-            // (if there's reasoning, the AI message should be a child of the reasoning message)
-
-            // Start streaming
-            // NEW ARCHITECTURE: Single ASSISTANT message with inline <think> tags
-            // Only interrupted by tool calls
-            let currentAssistantMessageId: string | null = null; // Current ASSISTANT message being streamed
-            let currentAssistantContent = ""; // Accumulated content (reasoning + text with <think> tags inline)
-            let currentToolMessageId: string | null = null; // Current tool message being processed
-            let currentToolCallData: {
-              toolCall: ToolCall;
-              parentId: string | null;
-              depth: number;
-              sequenceIndex: number;
-            } | null = null; // Tool call data (stored until result arrives)
-            let isInReasoningBlock = false; // Track if we're inside <think></think> tags
-
-            // Track message sequencing - all messages in this response share the same sequenceId
-            const sequenceId = crypto.randomUUID(); // Generate independent sequence ID
-            let sequenceIndex = 0; // Current position in sequence
-
-            // Track the current parent for chaining messages
-            // This gets updated as we create reasoning messages and tool calls
-            let currentParentId = initialAiParentId;
-            let currentDepth = initialAiDepth;
-
-            // Update last known values for error handling
-            lastSequenceId = sequenceId;
-            lastParentId = currentParentId;
-            lastDepth = currentDepth;
-            lastSequenceIndex = sequenceIndex;
-
-            // Get the OpenRouter model ID (use openRouterModel if available, otherwise use model ID directly)
-            const openRouterModelId =
-              modelConfig?.openRouterModel || data.model;
-
-            // Use Vercel AI SDK's built-in multi-step tool calling
-            // maxSteps: allows up to 50 steps (tool call + text generation cycles)
-            // This allows for long-running tool sequences that could take minutes
-            logger.info("[AI Stream] ⏱️ Calling streamText");
-            const streamResult = streamText({
-              model: provider(openRouterModelId),
-              messages,
-              temperature: data.temperature,
-              abortSignal: AbortSignal.timeout(maxDuration * 1000),
-              system: systemPrompt || undefined,
-              ...(tools
-                ? {
-                    tools,
-                    // Enable multi-step tool calling loop - AI can call tools up to 50 times
-                    // stopWhen is required for the loop to continue after tool results
-                    stopWhen: stepCountIs(50),
-                    onStepFinish: ({
-                      text,
-                      toolCalls,
-                      toolResults,
-                      finishReason,
-                      usage,
-                    }): void => {
-                      logger.info("[AI Stream] Step finished", {
-                        hasText: !!text,
-                        textLength: text?.length || 0,
-                        toolCallsCount: toolCalls.length,
-                        toolResultsCount: toolResults.length,
-                        finishReason,
-                        totalTokens: usage.totalTokens,
-                        textPreview: text?.substring(0, 100),
-                      });
-                    },
-                  }
-                : {}),
-            });
-            logger.info(
-              "[AI Stream] ⏱️ streamText returned, starting iteration",
-            );
-
-            // Lazy load endpoint metadata only when tool calls are encountered
-            // This avoids loading all 143 endpoints when no tools are used
-            let endpointMap: Map<string, DiscoveredEndpoint> | null = null;
-            const getEndpointMap = async (): Promise<
-              Map<string, DiscoveredEndpoint>
-            > => {
-              if (!endpointMap) {
-                const { ToolRegistry } = await import(
-                  "@/app/api/[locale]/v1/core/system/unified-interface/ai/registry"
-                );
-                const allEndpoints = ToolRegistry.getEndpoints(user, Platform.AI);
-                endpointMap = new Map(
-                  allEndpoints.map((endpoint) => [endpoint.toolName, endpoint]),
-                );
-                logger.debug("Lazy loaded endpoint metadata for tool calls", {
-                  endpointCount: allEndpoints.length,
-                });
-              }
-              return endpointMap;
-            };
-
-            // Stream the response
-            logger.info("[AI Stream] ⏱️ Starting to process fullStream");
-
-            // NEW ARCHITECTURE: Don't create initial message
-            // Messages are created on-demand as content arrives (reasoning, text, tool calls)
-
-            logger.info("[AI Stream] ⏱️ Entering for-await loop");
-            for await (const part of streamResult.fullStream) {
-              if (part.type === "start-step") {
-                logger.info("[AI Stream] Step started", {
-                  stepNumber: ("stepNumber" in part
-                    ? String(part.stepNumber)
-                    : "unknown") as string,
-                });
-              } else if (part.type === "finish-step") {
-                const finishReason =
-                  "finishReason" in part
-                    ? String(part.finishReason)
-                    : "unknown";
-                const usage =
-                  "usage" in part && part.usage ? part.usage : undefined;
-                logger.info("[AI Stream] Step finished", {
-                  finishReason,
-                  usage: usage as Record<string, number> | undefined,
-                });
-              } else if (part.type === "text-delta") {
-                const textDelta = part.text;
-
-                if (
-                  textDelta !== undefined &&
-                  textDelta !== null &&
-                  textDelta !== ""
-                ) {
-                  // Add text to current ASSISTANT message (or create if doesn't exist)
-                  if (!currentAssistantMessageId) {
-                    const result =
-                      await AiStreamRepository.createAssistantMessage({
-                        initialContent: textDelta,
-                        threadId: threadResultThreadId,
-                        parentId: currentParentId,
-                        depth: currentDepth,
-                        model: data.model,
-                        persona: data.persona,
-                        sequenceId,
-                        isIncognito,
-                        userId,
-                        controller,
-                        encoder,
-                        logger,
-                      });
-                    currentAssistantMessageId = result.messageId;
-                    currentAssistantContent = result.content;
-                  } else {
-                    // Accumulate content
-                    currentAssistantContent += textDelta;
-                  }
-
-                  // Emit content-delta event
-                  AiStreamRepository.emitContentDelta({
-                    messageId: currentAssistantMessageId,
-                    delta: textDelta,
-                    controller,
-                    encoder,
-                  });
-                }
-              } else if (part.type === "reasoning-start") {
-                // Add <think> tag inline to current ASSISTANT message
-                isInReasoningBlock = true;
-                const thinkTag = "<think>";
-
-                // Create ASSISTANT message if it doesn't exist yet
-                if (!currentAssistantMessageId) {
-                  const result =
-                    await AiStreamRepository.createAssistantMessage({
-                      initialContent: thinkTag,
-                      threadId: threadResultThreadId,
-                      parentId: currentParentId,
-                      depth: currentDepth,
-                      model: data.model,
-                      persona: data.persona,
-                      sequenceId,
-                      isIncognito,
-                      userId,
-                      controller,
-                      encoder,
-                      logger,
-                    });
-                  currentAssistantMessageId = result.messageId;
-                  currentAssistantContent = result.content;
-                } else {
-                  // Add <think> tag to existing message
-                  currentAssistantContent += thinkTag;
-
-                  // Emit delta for <think> tag
-                  AiStreamRepository.emitContentDelta({
-                    messageId: currentAssistantMessageId,
-                    delta: thinkTag,
-                    controller,
-                    encoder,
-                  });
-                }
-
-                logger.info("[AI Stream] ⏱️ Reasoning started → <think>");
-              } else if (part.type === "reasoning-delta") {
-                // Add reasoning text inline to current ASSISTANT message
-                const reasoningText = "text" in part ? part.text : "";
-
-                if (
-                  reasoningText !== undefined &&
-                  reasoningText !== null &&
-                  reasoningText !== "" &&
-                  currentAssistantMessageId
-                ) {
-                  // Accumulate content
-                  currentAssistantContent += reasoningText;
-
-                  // Emit content delta
-                  AiStreamRepository.emitContentDelta({
-                    messageId: currentAssistantMessageId,
-                    delta: reasoningText,
-                    controller,
-                    encoder,
-                  });
-                }
-              } else if (part.type === "reasoning-end") {
-                // Add </think> tag inline to current ASSISTANT message
-                if (currentAssistantMessageId && isInReasoningBlock) {
-                  const thinkCloseTag = "</think>";
-
-                  // Add closing tag
-                  currentAssistantContent += thinkCloseTag;
-
-                  // Emit closing tag delta
-                  AiStreamRepository.emitContentDelta({
-                    messageId: currentAssistantMessageId,
-                    delta: thinkCloseTag,
-                    controller,
-                    encoder,
-                  });
-
-                  isInReasoningBlock = false;
-
-                  logger.info("[AI Stream] ⏱️ Reasoning ended → </think>", {
-                    messageId: currentAssistantMessageId,
-                    contentLength: currentAssistantContent.length,
-                  });
-                }
-              } else if (part.type === "tool-call") {
-                // NEW ARCHITECTURE: Finalize current ASSISTANT message before creating tool message
-                if (currentAssistantMessageId && currentAssistantContent) {
-                  // CRITICAL FIX: If reasoning block is still open, close it before tool call
-                  if (isInReasoningBlock) {
-                    const thinkCloseTag = "</think>";
-                    currentAssistantContent += thinkCloseTag;
-
-                    // Emit closing tag delta
-                    const thinkCloseDelta = createStreamEvent.contentDelta({
-                      messageId: currentAssistantMessageId,
-                      delta: thinkCloseTag,
-                    });
-                    controller.enqueue(
-                      encoder.encode(formatSSEEvent(thinkCloseDelta)),
-                    );
-
-                    isInReasoningBlock = false;
-
-                    logger.info(
-                      "[AI Stream] ⏱️ Reasoning interrupted by tool call → </think>",
-                      {
-                        messageId: currentAssistantMessageId,
-                      },
-                    );
-                  }
-
-                  // Update ASSISTANT message in database with accumulated content
-                  // Public users (userId undefined) are allowed - helper converts to null
-                  if (!isIncognito) {
-                    await updateMessageContent({
-                      messageId: currentAssistantMessageId,
-                      content: currentAssistantContent,
-                      logger,
-                    });
-                  }
-
-                  logger.debug("Finalized ASSISTANT message before tool call", {
-                    messageId: currentAssistantMessageId,
-                    contentLength: currentAssistantContent.length,
-                  });
-
-                  // Update parent chain: tool message should be child of ASSISTANT message
-                  currentParentId = currentAssistantMessageId;
-                  currentDepth++;
-
-                  // Update last known values for error handling
-                  lastParentId = currentParentId;
-                  lastDepth = currentDepth;
-
-                  // Clear current ASSISTANT message (tool call interrupts it)
-                  currentAssistantMessageId = null;
-                  currentAssistantContent = "";
-                  isInReasoningBlock = false;
-                }
-
-                // Lazy load endpoint metadata only when tool calls are encountered
-                const map = await getEndpointMap();
-                const endpoint = map.get(part.toolName);
-
-                // Try to get widget metadata from endpoint definition
-                let widgetMetadata: ToolCallWidgetMetadata | undefined;
-
-                // Extract widget metadata from endpoint definition
-                if (endpoint) {
-                  try {
-                    const { ResponseMetadataExtractor } =
-                      await import("@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/response-metadata-extractor");
-                    const extractor = new ResponseMetadataExtractor();
-
-                    // Debug: Log endpoint structure
-                    logger.info("[AI Stream] Endpoint structure", {
-                      toolName: part.toolName,
-                      hasDefinition: !!endpoint.definition,
-                      hasFields: !!endpoint.definition?.fields,
-                      fieldsType: typeof endpoint.definition?.fields,
-                      fieldsKeys:
-                        endpoint.definition?.fields &&
-                        typeof endpoint.definition.fields === "object"
-                          ? Object.keys(endpoint.definition.fields).slice(0, 5)
-                          : [],
-                    });
-
-                    const metadata = extractor.extractResponseMetadata(
-                      endpoint.definition,
-                    );
-
-                    logger.info("[AI Stream] Widget metadata extraction", {
-                      toolName: part.toolName,
-                      hasMetadata: !!metadata,
-                      hasFields: !!metadata?.fields,
-                      fieldsCount: metadata?.fields?.length || 0,
-                    });
-
-                    if (metadata?.fields && metadata.fields.length > 0) {
-                      widgetMetadata = {
-                        endpointId: endpoint.toolName,
-                        responseFields: metadata.fields.map((field) => ({
-                          // By architectural contract, field names/labels/descriptions from endpoint
-                          // definitions are translation keys
-                          name: field.name as TranslationKey,
-                          widgetType: field.widgetType,
-                          label: field.label as TranslationKey | undefined,
-                          description: field.description as
-                            | TranslationKey
-                            | undefined,
-                          layout: field.config as Record<
-                            string,
-                            string | number | boolean
-                          >,
-                        })),
-                      };
-                      logger.info("[AI Stream] Widget metadata created", {
-                        toolName: part.toolName,
-                        endpointId: widgetMetadata.endpointId,
-                        responseFieldsCount:
-                          widgetMetadata.responseFields.length,
-                      });
-                    } else {
-                      widgetMetadata = undefined;
-                      logger.warn(
-                        "[AI Stream] No widget metadata fields found",
-                        {
-                          toolName: part.toolName,
-                        },
-                      );
-                    }
-                  } catch (error) {
-                    logger.error("Failed to extract widget metadata", {
-                      error: String(error),
-                      toolName: part.toolName,
-                    });
-                    widgetMetadata = undefined;
-                  }
-                } else {
-                  logger.warn("[AI Stream] No endpoint found for tool", {
-                    toolName: part.toolName,
-                  });
-                  widgetMetadata = undefined;
-                }
-
-                // Validate and prepare tool call data
-                const rawArgs = "input" in part ? part.input : {};
-                const validatedArgs: ToolCallResult = isValidToolResult(rawArgs)
-                  ? rawArgs
-                  : {};
-
-                const toolCallData: ToolCall = {
-                  toolName: part.toolName,
-                  displayName: endpoint?.definition.title || part.toolName,
-                  icon: endpoint?.definition.aiTool?.icon,
-                  args: validatedArgs,
-                  creditsUsed: endpoint?.definition.credits ?? 0,
-                  widgetMetadata,
-                };
-
-                // NEW ARCHITECTURE: Emit MESSAGE_CREATED for UI, but DON'T store in DB yet
-                // DB storage happens only when tool-result arrives
-                currentToolMessageId = crypto.randomUUID();
-
-                // Store tool call data for later (when result arrives)
-                currentToolCallData = {
-                  toolCall: toolCallData,
-                  parentId: currentParentId,
-                  depth: currentDepth,
-                  sequenceIndex,
-                };
-
-                // Emit MESSAGE_CREATED event for UI (immediate feedback)
-                // Include toolCalls array so frontend can render tool display
-                const toolMessageEvent = createStreamEvent.messageCreated({
-                  messageId: currentToolMessageId,
-                  threadId: threadResultThreadId,
-                  role: ChatMessageRole.TOOL,
-                  content: "",
-                  parentId: currentParentId,
-                  depth: currentDepth,
-                  sequenceId,
-                  sequenceIndex,
-                  toolCalls: [toolCallData], // Include tool call data for frontend rendering
-                });
-                controller.enqueue(
-                  encoder.encode(formatSSEEvent(toolMessageEvent)),
-                );
-
-                // Emit TOOL_CALL event for real-time UX
-                const toolCallEvent = createStreamEvent.toolCall({
-                  messageId: currentToolMessageId,
-                  toolName: toolCallData.toolName,
-                  args: toolCallData.args,
-                });
-                controller.enqueue(
-                  encoder.encode(formatSSEEvent(toolCallEvent)),
-                );
-
-                logger.info(
-                  "[AI Stream] Tool call started (UI notified, DB storage pending)",
-                  {
-                    messageId: currentToolMessageId,
-                    toolName: part.toolName,
-                    sequenceIndex,
-                  },
-                );
-
-                // Increment sequence index for next message
-                sequenceIndex++;
-
-                // Update parent chain: next message should be child of this tool message
-                currentParentId = currentToolMessageId;
-                currentDepth++;
-              } else if (part.type === "tool-result") {
-                // NEW ARCHITECTURE: NOW store TOOL message in DB with result
-                if (currentToolMessageId && currentToolCallData) {
-                  // AI SDK returns 'output' as unknown type
-                  const output = "output" in part ? part.output : undefined;
-
-                  logger.info("[AI Stream] Tool result RAW output", {
-                    toolName: part.toolName,
-                    hasOutput: "output" in part,
-                    outputType: typeof output,
-                    outputStringified: JSON.stringify(output).substring(0, 500),
-                  });
-
-                  // Check if the output is an error result
-                  let toolError: string | undefined;
-                  if (
-                    output &&
-                    typeof output === "object" &&
-                    "success" in output &&
-                    "error" in output
-                  ) {
-                    if (output.success === false) {
-                      toolError =
-                        typeof output.error === "string"
-                          ? (output.error as string)
-                          : JSON.stringify(output.error);
-                    }
-                  }
-
-                  // Clean output by removing undefined values (they break validation)
-                  const cleanedOutput = output
-                    ? JSON.parse(JSON.stringify(output))
-                    : undefined;
-
-                  // Validate and type the output using type guard
-                  const validatedOutput: ToolCallResult | undefined =
-                    isValidToolResult(cleanedOutput)
-                      ? cleanedOutput
-                      : undefined;
-
-                  // If error, create ERROR message first (proper timestamp order)
-                  if (toolError && !isIncognito && userId) {
-                    const errorMessageId = crypto.randomUUID();
-                    await createErrorMessage({
-                      messageId: errorMessageId,
-                      threadId: threadResultThreadId,
-                      content: toolError,
-                      errorType: "TOOL_ERROR",
-                      parentId: currentToolCallData.parentId,
-                      depth: currentToolCallData.depth,
-                      userId,
-                      sequenceId,
-                      sequenceIndex: currentToolCallData.sequenceIndex - 0.5, // Insert before tool message
-                      logger,
-                    });
-
-                    logger.info(
-                      "[AI Stream] ERROR message created for tool error",
-                      {
-                        errorMessageId,
-                        toolError,
-                      },
-                    );
-                  }
-
-                  // Add result to tool call data (for both DB and UI)
-                  const toolCallWithResult: ToolCall = {
-                    ...currentToolCallData.toolCall,
-                    result: validatedOutput,
-                    error: toolError,
-                  };
-
-                  // NOW create TOOL message in DB with result/error
-                  // Public users (userId undefined) are allowed - helper converts to null
-                  if (!isIncognito) {
-                    await createToolMessage({
-                      messageId: currentToolMessageId,
-                      threadId: threadResultThreadId,
-                      toolCall: toolCallWithResult,
-                      parentId: currentToolCallData.parentId,
-                      depth: currentToolCallData.depth,
-                      userId,
-                      sequenceId,
-                      sequenceIndex: currentToolCallData.sequenceIndex,
-                      model: data.model,
-                      persona: data.persona,
-                      logger,
-                    });
-                  }
-
-                  logger.info(
-                    "[AI Stream] Tool result validated and saved to DB",
-                    {
-                      messageId: currentToolMessageId,
-                      toolName: part.toolName,
-                      hasResult: !!validatedOutput,
-                      hasError: !!toolError,
-                      resultType: typeof validatedOutput,
-                      isValid: isValidToolResult(cleanedOutput),
-                      wasCleaned: output !== cleanedOutput,
-                    },
-                  );
-
-                  // Emit TOOL_RESULT event for real-time UX with updated tool call data
-                  const toolResultEvent = createStreamEvent.toolResult({
-                    messageId: currentToolMessageId,
-                    toolName: part.toolName,
-                    result: validatedOutput,
-                    error: toolError,
-                    toolCall: toolCallWithResult, // Include full tool call data with result
-                  });
-                  controller.enqueue(
-                    encoder.encode(formatSSEEvent(toolResultEvent)),
-                  );
-
-                  // Clear current tool message tracking
-                  currentToolMessageId = null;
-                  currentToolCallData = null;
-
-                  logger.info("[AI Stream] Tool result streamed to UI", {
-                    toolName: part.toolName,
-                    hasResult: !!validatedOutput,
-                    hasError: !!toolError,
-                  });
-                }
-              } else {
-                // Log unhandled event types
-                logger.debug("[AI Stream] Unhandled event type", {
-                  type: part.type,
-                  partKeys: Object.keys(part),
-                });
-              }
-            }
-
-            logger.info("[AI Stream] Finished processing fullStream");
-
-            // Wait for completion to get final usage stats
-            const usage = await streamResult.usage;
-            const finishReason = await streamResult.finishReason;
-
-            // Finalize current ASSISTANT message if exists
-            if (currentAssistantMessageId && currentAssistantContent) {
-              await AiStreamRepository.finalizeAssistantMessage({
-                currentAssistantMessageId,
-                currentAssistantContent,
-                isInReasoningBlock,
-                streamResult: {
-                  finishReason,
-                  usage,
-                },
-                isIncognito,
-                controller,
-                encoder,
-                logger,
-              });
-            }
-
-            logger.info("[AI Stream] Stream completed", {
-              totalTokens: usage.totalTokens,
-            });
-
-            // Deduct credits AFTER successful completion (not optimistically)
-            await AiStreamRepository.deductCreditsAfterCompletion({
-              modelCost,
-              user,
-              model: data.model,
-              logger,
-            });
-
-            controller.close();
-          } catch (error) {
-            const errorMessage =
-              error instanceof Error ? error.message : String(error);
-            logger.error("Stream error", { error: errorMessage });
-
-            // Create ERROR message in DB/localStorage
-            // Public users (userId undefined) are allowed - helper converts to null
-            const errorMessageId = crypto.randomUUID();
-            if (!isIncognito) {
-              await createErrorMessage({
-                messageId: errorMessageId,
-                threadId: threadResultThreadId,
-                content: `Stream error: ${errorMessage}`,
-                errorType: "STREAM_ERROR",
-                parentId: lastParentId,
-                depth: lastDepth,
-                userId,
-                sequenceId: lastSequenceId,
-                logger,
-              });
-            }
-
-            // Emit ERROR message event for UI
-            const errorMessageEvent = createStreamEvent.messageCreated({
-              messageId: errorMessageId,
-              threadId: threadResultThreadId,
-              role: ChatMessageRole.ERROR,
-              content: `Stream error: ${errorMessage}`,
-              parentId: lastParentId,
-              depth: lastDepth,
-              sequenceId: lastSequenceId,
-            });
-            controller.enqueue(
-              encoder.encode(formatSSEEvent(errorMessageEvent)),
-            );
-
-            // Also emit legacy error event for compatibility
-            const errorEvent = createStreamEvent.error({
-              code: "STREAM_ERROR",
-              message: errorMessage,
-            });
-            controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
-            controller.close();
-          }
-        },
+        currentAssistantMessageId = result.messageId;
+        return {
+          currentAssistantMessageId,
+          currentAssistantContent: result.content,
+          wasCreated: true,
+          newDepth: currentDepth,
+        };
+      } else {
+        // Accumulate content
+        const newContent = currentAssistantContent + textDelta;
+
+        // Emit content-delta event
+        AiStreamRepository.emitContentDelta({
+          messageId: currentAssistantMessageId,
+          delta: textDelta,
+          controller,
+          encoder,
+          logger,
+        });
+
+        return {
+          currentAssistantMessageId,
+          currentAssistantContent: newContent,
+          wasCreated: false,
+          newDepth: currentDepth,
+        };
+      }
+    }
+
+    return {
+      currentAssistantMessageId: currentAssistantMessageId!,
+      currentAssistantContent,
+      wasCreated: false,
+      newDepth: currentDepth,
+    };
+  }
+
+  /**
+   * Process reasoning-start event from stream
+   */
+  private static async processReasoningStart(params: {
+    currentAssistantMessageId: string | null;
+    currentAssistantContent: string;
+    threadId: string;
+    currentParentId: string | null;
+    currentDepth: number;
+    model: ModelId;
+    persona: string;
+    sequenceId: string;
+    isIncognito: boolean;
+    userId: string | undefined;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
+    logger: EndpointLogger;
+  }): Promise<{
+    currentAssistantMessageId: string;
+    currentAssistantContent: string;
+    wasCreated: boolean;
+    newDepth: number;
+  }> {
+    const {
+      currentAssistantContent,
+      threadId,
+      currentParentId,
+      currentDepth,
+      model,
+      persona,
+      sequenceId,
+      isIncognito,
+      userId,
+      controller,
+      encoder,
+      logger,
+    } = params;
+
+    let { currentAssistantMessageId } = params;
+
+    const thinkTag = "<think>";
+
+    // Create ASSISTANT message if it doesn't exist yet
+    if (!currentAssistantMessageId) {
+      const result = await AiStreamRepository.createAssistantMessage({
+        initialContent: thinkTag,
+        threadId,
+        parentId: currentParentId,
+        depth: currentDepth,
+        model,
+        persona,
+        sequenceId,
+        isIncognito,
+        userId,
+        controller,
+        encoder,
+        logger,
       });
+      currentAssistantMessageId = result.messageId;
+      return {
+        currentAssistantMessageId,
+        currentAssistantContent: result.content,
+        wasCreated: true,
+        newDepth: currentDepth,
+      };
+    } else {
+      // Add <think> tag to existing message
+      const newContent = currentAssistantContent + thinkTag;
 
-      logger.info("[AI Stream] ⏱️ Returning streaming response to client");
-      return createStreamingResponse(
-        new Response(stream, {
-          headers: {
-            "Content-Type": "text/event-stream",
-            "Cache-Control": "no-cache",
-            Connection: "keep-alive",
-          },
-        }),
-      );
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      logger.error("Failed to create AI stream", {
-        error: errorMessage,
-        model: data.model,
+      // Emit delta for <think> tag
+      AiStreamRepository.emitContentDelta({
+        messageId: currentAssistantMessageId,
+        delta: thinkTag,
+        controller,
+        encoder,
+        logger,
       });
 
       return {
-        success: false,
-        message:
-          "app.api.v1.core.agent.chat.aiStream.route.errors.streamCreationFailed",
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: {
-          error: errorMessage,
+        currentAssistantMessageId,
+        currentAssistantContent: newContent,
+        wasCreated: false,
+        newDepth: currentDepth,
+      };
+    }
+  }
+
+  /**
+   * Process reasoning-delta event from stream
+   */
+  private static processReasoningDelta(params: {
+    reasoningText: string;
+    currentAssistantMessageId: string | null;
+    currentAssistantContent: string;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
+    logger: EndpointLogger;
+  }): string {
+    const {
+      reasoningText,
+      currentAssistantMessageId,
+      currentAssistantContent,
+      controller,
+      encoder,
+      logger,
+    } = params;
+
+    if (
+      reasoningText !== undefined &&
+      reasoningText !== null &&
+      reasoningText !== "" &&
+      currentAssistantMessageId
+    ) {
+      // Accumulate content
+      const newContent = currentAssistantContent + reasoningText;
+
+      // Emit content delta
+      AiStreamRepository.emitContentDelta({
+        messageId: currentAssistantMessageId,
+        delta: reasoningText,
+        controller,
+        encoder,
+        logger,
+      });
+
+      return newContent;
+    }
+
+    return currentAssistantContent;
+  }
+
+  /**
+   * Process reasoning-end event from stream
+   */
+  private static processReasoningEnd(params: {
+    currentAssistantMessageId: string | null;
+    currentAssistantContent: string;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
+    logger: EndpointLogger;
+  }): string {
+    const {
+      currentAssistantMessageId,
+      currentAssistantContent,
+      controller,
+      encoder,
+      logger,
+    } = params;
+
+    if (currentAssistantMessageId) {
+      const thinkCloseTag = "</think>";
+
+      // Add closing tag
+      const newContent = currentAssistantContent + thinkCloseTag;
+
+      // Emit closing tag delta
+      AiStreamRepository.emitContentDelta({
+        messageId: currentAssistantMessageId,
+        delta: thinkCloseTag,
+        controller,
+        encoder,
+        logger,
+      });
+
+      return newContent;
+    }
+
+    return currentAssistantContent;
+  }
+
+  /**
+   * Process tool-call event from stream
+   */
+  private static async processToolCall(params: {
+    part: {
+      type: "tool-call";
+      toolCallId: string;
+      toolName: string;
+      input?: JSONValue;
+    };
+    currentAssistantMessageId: string | null;
+    currentAssistantContent: string;
+    isInReasoningBlock: boolean;
+    threadId: string;
+    currentParentId: string | null;
+    currentDepth: number;
+    model: ModelId;
+    persona: string;
+    sequenceId: string;
+    isIncognito: boolean;
+    userId: string | undefined;
+    toolsConfig: Map<string, { requiresConfirmation: boolean }>;
+    streamAbortController: AbortController;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
+    logger: EndpointLogger;
+  }): Promise<{
+    currentAssistantMessageId: string | null;
+    currentAssistantContent: string;
+    isInReasoningBlock: boolean;
+    currentParentId: string | null;
+    currentDepth: number;
+    pendingToolMessage: {
+      messageId: string;
+      toolCallData: {
+        toolCall: ToolCall;
+        parentId: string | null;
+        depth: number;
+      };
+    };
+  }> {
+    const {
+      part,
+      currentAssistantContent,
+      isInReasoningBlock,
+      threadId,
+      currentParentId,
+      currentDepth,
+      model,
+      persona,
+      sequenceId,
+      isIncognito,
+      userId,
+      toolsConfig,
+      streamAbortController,
+      controller,
+      encoder,
+      logger,
+    } = params;
+
+    let { currentAssistantMessageId } = params;
+
+    // Tool call event - ASSISTANT message should already exist from tool-input-start
+    // But create it if it doesn't (safety fallback)
+    if (!currentAssistantMessageId) {
+      const result = await AiStreamRepository.createAssistantMessage({
+        initialContent: "",
+        threadId,
+        parentId: currentParentId,
+        depth: currentDepth,
+        model,
+        persona,
+        sequenceId,
+        isIncognito,
+        userId,
+        controller,
+        encoder,
+        logger,
+      });
+      currentAssistantMessageId = result.messageId;
+
+      logger.warn(
+        "[AI Stream] Created ASSISTANT message at tool-call (should have been created earlier)",
+        {
+          messageId: currentAssistantMessageId,
+        },
+      );
+    }
+
+    let newAssistantContent = currentAssistantContent;
+    let _newIsInReasoningBlock = isInReasoningBlock;
+
+    // Finalize current ASSISTANT message before creating tool message
+    if (currentAssistantMessageId) {
+      // If reasoning block is still open, close it before tool call
+      if (isInReasoningBlock) {
+        const thinkCloseTag = "</think>";
+        newAssistantContent += thinkCloseTag;
+
+        // Emit closing tag delta
+        const thinkCloseDelta = createStreamEvent.contentDelta({
+          messageId: currentAssistantMessageId,
+          delta: thinkCloseTag,
+        });
+        controller.enqueue(encoder.encode(formatSSEEvent(thinkCloseDelta)));
+
+        _newIsInReasoningBlock = false;
+
+        logger.info(
+          "[AI Stream] ⏱️ Reasoning interrupted by tool call → </think>",
+          {
+            messageId: currentAssistantMessageId,
+          },
+        );
+      }
+
+      // Update ASSISTANT message in database with accumulated content
+      // Public users (userId undefined) are allowed - helper converts to null
+      if (!isIncognito && newAssistantContent) {
+        await updateMessageContent({
+          messageId: currentAssistantMessageId,
+          content: newAssistantContent,
+          logger,
+        });
+      }
+
+      logger.debug("Finalized ASSISTANT message before tool call", {
+        messageId: currentAssistantMessageId,
+        contentLength: newAssistantContent.length,
+      });
+    }
+
+    // Get tool arguments from the AI SDK part.input
+    const toolCallArgs = (part.input as ToolCallResult) || {};
+
+    // Get tool config to determine if confirmation is required
+    const toolConfig = toolsConfig.get(part.toolName);
+    const requiresConfirmation = toolConfig?.requiresConfirmation ?? false;
+
+    // Update parent chain: TOOL message is always child of currentParentId
+    // currentParentId is updated after each message (ASSISTANT or TOOL) to point to that message
+    // This creates the chain: USER → ASSISTANT → TOOL1 → TOOL2 → ASSISTANT (next step)
+    const newCurrentParentId = currentParentId;
+    const newCurrentDepth = currentDepth + 1;
+
+    logger.info("[AI Stream] Tool confirmation check", {
+      toolName: part.toolName,
+      toolConfigFound: !!toolConfig,
+      requiresConfirmation,
+      toolsConfigSize: toolsConfig.size,
+    });
+
+    // Create tool call with args from AI SDK
+    const toolCallData: ToolCall = {
+      toolName: part.toolName,
+      args: toolCallArgs,
+      creditsUsed: 0,
+      requiresConfirmation,
+      isConfirmed: false,
+      waitingForConfirmation: requiresConfirmation, // Set to true if confirmation needed
+    };
+
+    // Emit MESSAGE_CREATED for UI, but DON'T store in DB yet
+    // DB storage happens only when tool-result arrives
+    const toolMessageId = crypto.randomUUID();
+    const toolCallId = part.toolCallId; // AI SDK provides unique ID for each tool call
+
+    // Emit MESSAGE_CREATED event for UI (immediate feedback)
+    // Include toolCall object so frontend can render tool display
+    const toolMessageEvent = createStreamEvent.messageCreated({
+      messageId: toolMessageId,
+      threadId,
+      role: ChatMessageRole.TOOL,
+      content: "",
+      parentId: newCurrentParentId,
+      depth: newCurrentDepth,
+      sequenceId,
+      toolCall: toolCallData, // Include tool call data for frontend rendering (singular - each TOOL message has exactly one tool call)
+    });
+    controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
+
+    // Emit TOOL_CALL event for real-time UX
+    const toolCallEvent = createStreamEvent.toolCall({
+      messageId: toolMessageId,
+      toolName: toolCallData.toolName,
+      args: toolCallData.args,
+    });
+    controller.enqueue(encoder.encode(formatSSEEvent(toolCallEvent)));
+
+    logger.info(
+      "[AI Stream] Tool call started (UI notified, DB storage pending)",
+      {
+        messageId: toolMessageId,
+        toolCallId,
+        toolName: part.toolName,
+        requiresConfirmation,
+      },
+    );
+
+    // If tool requires confirmation, store to DB (if not incognito) and send waiting event
+    if (requiresConfirmation) {
+      logger.info(
+        "[AI Stream] Tool requires confirmation - pausing stream for user confirmation",
+        {
+          messageId: toolMessageId,
+          toolName: part.toolName,
+          isIncognito,
+        },
+      );
+
+      // Store tool message to DB only if not incognito and has userId
+      if (!isIncognito && userId) {
+        await createToolMessage({
+          messageId: toolMessageId,
+          threadId,
+          toolCall: toolCallData,
+          parentId: newCurrentParentId,
+          depth: newCurrentDepth,
+          userId,
+          sequenceId,
+          model,
+          persona,
+          logger,
+        });
+        logger.info("[AI Stream] Tool call stored to DB", {
+          messageId: toolMessageId,
+        });
+      } else {
+        logger.info("[AI Stream] Incognito mode - skipping DB storage", {
+          messageId: toolMessageId,
+        });
+      }
+
+      // Emit TOOL_WAITING event to notify frontend that stream is paused
+      // This works for both logged-in and incognito modes
+      const waitingEvent = createStreamEvent.toolWaiting({
+        messageId: toolMessageId,
+        toolName: part.toolName,
+        toolCallId,
+      });
+      controller.enqueue(encoder.encode(formatSSEEvent(waitingEvent)));
+
+      logger.info(
+        "[AI Stream] Emitted TOOL_WAITING event - frontend should show confirmation UI",
+        {
+          messageId: toolMessageId,
+          isIncognito,
+        },
+      );
+
+      // Abort the AI SDK stream to prevent it from continuing
+      // The stream will be resumed when user confirms/rejects the tool
+      logger.info(
+        "[AI Stream] Aborting AI SDK stream - waiting for user confirmation",
+        {
+          messageId: toolMessageId,
+        },
+      );
+
+      // Abort the stream to stop the AI SDK from processing further
+      streamAbortController.abort(new Error("Tool requires user confirmation"));
+
+      // Close the controller to stop sending events to client
+      controller.close();
+
+      // Return early to prevent further processing
+      // IMPORTANT: Preserve currentAssistantMessageId so multiple tool calls in the same step
+      // all remain children of the same ASSISTANT message (not creating branches)
+      return {
+        currentAssistantMessageId,
+        currentAssistantContent: newAssistantContent,
+        isInReasoningBlock: _newIsInReasoningBlock,
+        currentParentId: newCurrentParentId,
+        currentDepth: newCurrentDepth,
+        pendingToolMessage: {
+          messageId: toolMessageId,
+          toolCallData: {
+            toolCall: toolCallData,
+            parentId: newCurrentParentId,
+            depth: newCurrentDepth,
+          },
         },
       };
     }
+
+    // Tool does NOT require confirmation - AI SDK will execute it automatically
+    // Store the tool message info so we can update it when tool-result arrives
+    logger.info(
+      "[AI Stream] Tool does NOT require confirmation - AI SDK will execute automatically",
+      {
+        messageId: toolMessageId,
+        toolName: part.toolName,
+        toolCallId,
+      },
+    );
+
+    // IMPORTANT: When requiresConfirmation is false, we still need to store the tool in pendingToolMessage
+    // so that when the tool-result event arrives, we can match it and save it to the database.
+    // The AI SDK will execute the tool automatically and send us the result via tool-result event.
+    // IMPORTANT: Preserve currentAssistantMessageId so multiple tool calls in the same step
+    // all remain children of the same ASSISTANT message (not creating branches)
+    return {
+      currentAssistantMessageId,
+      currentAssistantContent: newAssistantContent,
+      isInReasoningBlock: _newIsInReasoningBlock,
+      currentParentId: newCurrentParentId,
+      currentDepth: newCurrentDepth,
+      pendingToolMessage: {
+        messageId: toolMessageId,
+        toolCallData: {
+          toolCall: toolCallData,
+          parentId: newCurrentParentId,
+          depth: newCurrentDepth,
+        },
+      },
+    };
+  }
+
+  /**
+   * Process tool-error event from stream
+   */
+  private static async processToolError(params: {
+    part: {
+      type: "tool-error";
+      toolCallId: string;
+      toolName: string;
+      error?: JSONValue;
+    };
+    pendingToolMessage:
+      | {
+          messageId: string;
+          toolCallData: {
+            toolCall: ToolCall;
+            parentId: string | null;
+            depth: number;
+          };
+        }
+      | undefined;
+    threadId: string;
+    model: ModelId;
+    persona: string;
+    sequenceId: string;
+    isIncognito: boolean;
+    userId: string | undefined;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
+    logger: EndpointLogger;
+  }): Promise<{
+    currentParentId: string | null;
+    currentDepth: number;
+  } | null> {
+    const {
+      part,
+      pendingToolMessage,
+      threadId,
+      model,
+      persona,
+      sequenceId,
+      isIncognito,
+      userId,
+      controller,
+      encoder,
+      logger,
+    } = params;
+
+    if (!pendingToolMessage) {
+      return null;
+    }
+
+    const { messageId: toolMessageId, toolCallData } = pendingToolMessage;
+
+    // Extract error from the tool-error event
+    const error =
+      "error" in part && part.error
+        ? part.error instanceof Error
+          ? part.error.message
+          : String(part.error)
+        : "Tool execution failed";
+
+    logger.info("[AI Stream] Tool error event received", {
+      toolName: part.toolName,
+      error,
+      toolCallId: part.toolCallId,
+      messageId: toolMessageId,
+    });
+
+    // Add error to tool call data (for UI)
+    const toolCallWithError: ToolCall = {
+      ...toolCallData.toolCall,
+      error,
+    };
+
+    // Store TOOL message in DB (or emit for incognito)
+    // NO separate ERROR message - error is stored in TOOL message metadata
+    if (!isIncognito && userId) {
+      // DB mode: Store TOOL message with error in metadata
+      await createToolMessage({
+        messageId: toolMessageId,
+        threadId,
+        toolCall: toolCallWithError,
+        parentId: toolCallData.parentId,
+        depth: toolCallData.depth,
+        userId,
+        sequenceId,
+        model,
+        persona,
+        logger,
+      });
+
+      logger.info("[AI Stream] TOOL message stored in DB (error)", {
+        messageId: toolMessageId,
+        toolName: part.toolName,
+        error,
+      });
+    } else if (isIncognito) {
+      // Incognito mode: Emit MESSAGE_CREATED event for TOOL message
+      const toolMessageEvent = createStreamEvent.messageCreated({
+        messageId: toolMessageId,
+        threadId,
+        role: ChatMessageRole.TOOL,
+        content: "",
+        parentId: toolCallData.parentId,
+        depth: toolCallData.depth,
+        model,
+        persona,
+        sequenceId,
+        toolCall: toolCallWithError, // Include tool call data with error (singular - each TOOL message has exactly one tool call)
+      });
+      controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
+
+      logger.info("[AI Stream] TOOL MESSAGE_CREATED event sent (incognito)", {
+        messageId: toolMessageId,
+        toolName: part.toolName,
+      });
+    }
+
+    // Emit TOOL_RESULT event to frontend with error
+    const toolResultEvent = createStreamEvent.toolResult({
+      messageId: toolMessageId,
+      toolName: part.toolName,
+      result: undefined,
+      error,
+      toolCall: toolCallWithError,
+    });
+    controller.enqueue(encoder.encode(formatSSEEvent(toolResultEvent)));
+
+    logger.info("[AI Stream] TOOL_RESULT event sent (error)", {
+      messageId: toolMessageId,
+      toolName: part.toolName,
+    });
+
+    // After tool error, next message should be a child of the TOOL message
+    // NO separate ERROR message - error is displayed in the TOOL message UI
+    return {
+      currentParentId: toolMessageId, // Next message is child of TOOL
+      currentDepth: toolCallData.depth + 1, // One level deeper than TOOL
+    };
+  }
+
+  /**
+   * Process tool-result event from stream
+   */
+  private static async processToolResult(params: {
+    part: {
+      type: "tool-result";
+      toolCallId: string;
+      toolName: string;
+      output?: JSONValue;
+      isError?: boolean;
+    };
+    pendingToolMessage:
+      | {
+          messageId: string;
+          toolCallData: {
+            toolCall: ToolCall;
+            parentId: string | null;
+            depth: number;
+          };
+        }
+      | undefined;
+    threadId: string;
+    model: ModelId;
+    persona: string;
+    sequenceId: string;
+    isIncognito: boolean;
+    userId: string | undefined;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
+    logger: EndpointLogger;
+  }): Promise<{
+    currentParentId: string | null;
+    currentDepth: number;
+  } | null> {
+    const {
+      part,
+      pendingToolMessage,
+      threadId,
+      model,
+      persona,
+      sequenceId,
+      isIncognito,
+      userId,
+      controller,
+      encoder,
+      logger,
+    } = params;
+
+    if (!pendingToolMessage) {
+      return null;
+    }
+
+    // If controller is closed (waiting for confirmation), skip processing
+    // The tool result will be processed in the next stream after confirmation
+    try {
+      if (controller.desiredSize === null) {
+        logger.info(
+          "[AI Stream] Controller closed - skipping tool result processing",
+          {
+            toolCallId: part.toolCallId,
+            toolName: part.toolName,
+          },
+        );
+        return null;
+      }
+    } catch (e) {
+      logger.warn("[AI Stream] Error checking controller state", parseError(e));
+      return null;
+    }
+
+    const { messageId: toolMessageId, toolCallData } = pendingToolMessage;
+
+    // AI SDK returns 'output' as unknown type
+    const output = "output" in part ? part.output : undefined;
+    // AI SDK sets isError: true when tool throws an error
+    const isError = "isError" in part ? part.isError : false;
+
+    logger.info("[AI Stream] Tool result RAW output", {
+      toolName: part.toolName,
+      toolCallId: part.toolCallId,
+      messageId: toolMessageId,
+      hasOutput: "output" in part,
+      isError: Boolean(isError),
+      outputType: typeof output,
+      outputStringified: (JSON.stringify(output) || "undefined").substring(
+        0,
+        500,
+      ),
+    });
+
+    // Extract error message from AI SDK
+    let toolError: string | undefined;
+    if (isError) {
+      // When tool throws error, AI SDK puts error message in output
+      toolError =
+        typeof output === "string"
+          ? output
+          : output && typeof output === "object" && "message" in output
+            ? String(output.message)
+            : JSON.stringify(output);
+    }
+
+    // Clean output by removing undefined values (they break validation)
+    // Check for both undefined and null to avoid "Cannot convert null to object" error
+    const cleanedOutput =
+      output !== null && output !== undefined
+        ? JSON.parse(JSON.stringify(output))
+        : undefined;
+
+    // Validate and type the output using type guard
+    const validatedOutput: ToolCallResult | undefined = isValidToolResult(
+      cleanedOutput,
+    )
+      ? cleanedOutput
+      : undefined;
+
+    const toolCallWithResult: ToolCall = {
+      ...toolCallData.toolCall,
+      result: validatedOutput,
+      error: toolError,
+    };
+
+    // Store TOOL message in DB (or emit for incognito)
+    if (!isIncognito) {
+      // DB mode: Create ERROR message first if error (proper timestamp order)
+      if (toolError && userId) {
+        const errorMessageId = crypto.randomUUID();
+        await createErrorMessage({
+          messageId: errorMessageId,
+          threadId,
+          content: toolError,
+          errorType: "TOOL_ERROR",
+          parentId: toolMessageId, // Error is child of tool message
+          depth: toolCallData.depth + 1,
+          userId,
+          sequenceId,
+          logger,
+        });
+
+        logger.info("[AI Stream] ERROR message created for tool error", {
+          errorMessageId,
+          toolError,
+        });
+      }
+
+      // NOW create TOOL message in DB with result/error
+      await createToolMessage({
+        messageId: toolMessageId,
+        threadId,
+        toolCall: toolCallWithResult,
+        parentId: toolCallData.parentId,
+        depth: toolCallData.depth,
+        userId,
+        sequenceId,
+        model,
+        persona,
+        logger,
+      });
+    } else {
+      // Incognito mode: Emit MESSAGE_CREATED events so client can save to localStorage
+      // Emit TOOL message with toolCall object
+      const toolMessageEvent = createStreamEvent.messageCreated({
+        messageId: toolMessageId,
+        threadId,
+        role: ChatMessageRole.TOOL,
+        content: "",
+        parentId: toolCallData.parentId,
+        depth: toolCallData.depth,
+        model,
+        persona,
+        sequenceId,
+        toolCall: toolCallWithResult, // Include tool call data with result (singular - each TOOL message has exactly one tool call)
+      });
+
+      try {
+        controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
+      } catch (e) {
+        if (
+          e instanceof TypeError &&
+          e.message.includes("Controller is already closed")
+        ) {
+          logger.info(
+            "[AI Stream] Controller closed - skipping message event",
+            {
+              toolCallId: part.toolCallId,
+            },
+          );
+          return null;
+        }
+        logger.error(
+          "[AI Stream] Failed to enqueue tool message event",
+          parseError(e),
+        );
+        return null;
+      }
+
+      logger.info("[AI Stream] TOOL MESSAGE_CREATED event sent (incognito)", {
+        messageId: toolMessageId,
+        toolName: part.toolName,
+      });
+
+      // Emit ERROR message if error
+      if (toolError) {
+        const errorMessageId = crypto.randomUUID();
+        const errorMessageEvent = createStreamEvent.messageCreated({
+          messageId: errorMessageId,
+          threadId,
+          role: ChatMessageRole.ERROR,
+          content: toolError,
+          parentId: toolMessageId,
+          depth: toolCallData.depth + 1,
+          model,
+          persona,
+          sequenceId,
+        });
+        controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
+
+        logger.info(
+          "[AI Stream] ERROR MESSAGE_CREATED event sent (incognito)",
+          {
+            errorMessageId,
+            toolError,
+          },
+        );
+      }
+    }
+
+    logger.info("[AI Stream] Tool result validated and saved to DB", {
+      messageId: toolMessageId,
+      toolCallId: part.toolCallId,
+      toolName: part.toolName,
+      hasResult: !!validatedOutput,
+      hasError: !!toolError,
+      resultType: typeof validatedOutput,
+      isValid: isValidToolResult(cleanedOutput),
+      wasCleaned: output !== cleanedOutput,
+    });
+
+    // Emit TOOL_RESULT event for real-time UX with updated tool call data
+    const toolResultEvent = createStreamEvent.toolResult({
+      messageId: toolMessageId,
+      toolName: part.toolName,
+      result: validatedOutput,
+      error: toolError,
+      toolCall: toolCallWithResult, // Include full tool call data with result
+    });
+
+    try {
+      controller.enqueue(encoder.encode(formatSSEEvent(toolResultEvent)));
+    } catch (e) {
+      if (
+        e instanceof TypeError &&
+        e.message.includes("Controller is already closed")
+      ) {
+        logger.info(
+          "[AI Stream] Controller closed - skipping tool result event",
+          {
+            toolCallId: part.toolCallId,
+            toolName: part.toolName,
+          },
+        );
+        return null;
+      }
+      logger.error(
+        "[AI Stream] Failed to enqueue tool result event",
+        parseError(e),
+      );
+      return null;
+    }
+
+    logger.info("[AI Stream] Tool result streamed to UI", {
+      toolName: part.toolName,
+      hasResult: !!validatedOutput,
+      hasError: !!toolError,
+    });
+
+    // NOW update parent chain: tool message is in DB, next message can be its child
+    return {
+      currentParentId: toolMessageId,
+      currentDepth: toolCallData.depth + 1,
+    };
+  }
+
+  /**
+   * Handle stream error and emit error events
+   */
+  private static async handleStreamError(params: {
+    error: Error | JSONValue;
+    threadId: string;
+    isIncognito: boolean;
+    userId: string | undefined;
+    lastParentId: string | null;
+    lastDepth: number;
+    lastSequenceId: string | null;
+    controller: ReadableStreamDefaultController<Uint8Array>;
+    encoder: TextEncoder;
+    logger: EndpointLogger;
+  }): Promise<void> {
+    const {
+      error,
+      threadId,
+      isIncognito,
+      userId,
+      lastParentId,
+      lastDepth,
+      lastSequenceId,
+      controller,
+      encoder,
+      logger,
+    } = params;
+
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    logger.error("Stream error", {
+      error: errorMessage,
+      stack: errorStack,
+      errorType: error instanceof Error ? error.constructor.name : typeof error,
+    });
+
+    // Create ERROR message in DB/localStorage
+    // Public users (userId undefined) are allowed - helper converts to null
+    const errorMessageId = crypto.randomUUID();
+    if (!isIncognito) {
+      await createErrorMessage({
+        messageId: errorMessageId,
+        threadId,
+        content: `Stream error: ${errorMessage}`,
+        errorType: "STREAM_ERROR",
+        parentId: lastParentId,
+        depth: lastDepth,
+        userId,
+        sequenceId: lastSequenceId,
+        logger,
+      });
+    }
+
+    // Emit ERROR message event for UI
+    const errorMessageEvent = createStreamEvent.messageCreated({
+      messageId: errorMessageId,
+      threadId,
+      role: ChatMessageRole.ERROR,
+      content: `Stream error: ${errorMessage}`,
+      parentId: lastParentId,
+      depth: lastDepth,
+      sequenceId: lastSequenceId,
+    });
+    controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
+
+    // Also emit legacy error event for compatibility
+    const errorEvent = createStreamEvent.error({
+      code: "STREAM_ERROR",
+      message: errorMessage,
+    });
+    controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
+    controller.close();
   }
 }
 

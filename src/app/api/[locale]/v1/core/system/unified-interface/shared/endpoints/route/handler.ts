@@ -8,28 +8,23 @@ import "server-only";
 
 import type { NextRequest } from "next/server";
 import {
-  ErrorResponseTypes,
   isStreamingResponse,
   type ResponseType,
   type StreamingResponse,
+  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import { validateData } from "next-vibe/shared/utils";
 import type { z } from "zod";
 
 import { emailHandlingRepository } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/repository";
 import type { EmailHandleRequestOutput } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/types";
 import { handleSms } from "@/app/api/[locale]/v1/core/sms/handle-sms";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-import { authRepository } from "@/app/api/[locale]/v1/core/user/auth/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { Platform } from "../../types/platform";
 import type { EndpointLogger } from "../../logger/endpoint";
-import type { Methods } from "../../types/enums";
-import type { UnifiedField } from "../../types/endpoint";
-import { validateHandlerRequestData } from "./request-validator";
 import { permissionsRegistry } from "../permissions/registry";
-import type { CreateApiEndpoint } from "../definition/create";
+import type { CreateApiEndpointAny } from "../../types/endpoint";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -39,6 +34,11 @@ import type { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TFunction } from "@/i18n/core/static-types";
 import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/types";
 import type { SmsFunctionType } from "@/app/api/[locale]/v1/core/sms/utils";
+import { authRepository } from "@/app/api/[locale]/v1/core/user/auth/repository";
+import {
+  validateHandlerRequestData,
+  validateResponseData,
+} from "./request-validator";
 
 /**
  * Type helper to infer JWT payload type based on user roles
@@ -169,42 +169,15 @@ export interface MethodHandlerConfig<
   sms?: SMSHandler<TRequestOutput, TResponseOutput, TUrlVariablesOutput>[];
 }
 
-/**
- * API handler options - handlers receive OUTPUT types and return OUTPUT types
- *
- * Type parameters with inferred defaults:
- * - TRequestInput/Output: Inferred from endpoint.types.RequestInput/RequestOutput
- * - TResponseInput/Output: Inferred from endpoint.types.ResponseInput/ResponseOutput
- * - TUrlVariablesInput/Output: Inferred from endpoint.types.UrlVariablesInput/UrlVariablesOutput
- */
 export interface ApiHandlerOptions<
   TRequestOutput,
   TResponseOutput,
   TUrlVariablesOutput,
-  TExampleKey extends string,
-  TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
-  TRequestInput = TRequestOutput,
-  TResponseInput = TResponseOutput,
-  TUrlVariablesInput = TUrlVariablesOutput,
+  TEndpoint extends CreateApiEndpointAny,
   TPlatform extends Platform = Platform,
 > {
-  /** API endpoint definition */
-  endpoint: CreateApiEndpoint<
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TFields,
-    TRequestInput,
-    TRequestOutput,
-    TResponseInput,
-    TResponseOutput,
-    TUrlVariablesInput,
-    TUrlVariablesOutput
-  >;
-
-  /** Handler function - receives OUTPUT types, returns OUTPUT types */
+  endpoint: TEndpoint;
   handler: ApiHandlerFunction<
     TRequestOutput,
     TResponseOutput,
@@ -212,8 +185,6 @@ export interface ApiHandlerOptions<
     TUserRoleValue,
     TPlatform
   >;
-
-  /** Email handlers (optional) */
   email?:
     | {
         afterHandlerEmails?: EmailHandler<
@@ -223,7 +194,6 @@ export interface ApiHandlerOptions<
         >[];
       }
     | undefined;
-  /** SMS handlers (optional) */
   sms?: {
     afterHandlerSms?: SMSHandler<
       TRequestOutput,
@@ -267,34 +237,19 @@ export type GenericHandlerBase = GenericHandlerReturnType<
   readonly any[]
 >;
 
-/**
- * Create a generic handler for a specific method
- * This is the CORE handler that ALL platforms use
- * Handles: auth, permission checking, validation, business logic execution, email handling
- */
-export function createGenericHandler<
-  TRequestOutput,
-  TResponseOutput,
-  TUrlVariablesOutput,
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
->(
+export function createGenericHandler<T extends CreateApiEndpointAny>(
   options: ApiHandlerOptions<
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TFields
+    T["types"]["RequestOutput"],
+    T["types"]["ResponseOutput"],
+    T["types"]["UrlVariablesOutput"],
+    T["allowedRoles"],
+    T
   >,
 ): GenericHandlerReturnType<
-  TRequestOutput,
-  TResponseOutput,
-  TUrlVariablesOutput,
-  TUserRoleValue
+  T["types"]["RequestOutput"],
+  T["types"]["ResponseOutput"],
+  T["types"]["UrlVariablesOutput"],
+  T["allowedRoles"]
 > {
   const { endpoint, handler, email, sms } = options;
 
@@ -306,42 +261,51 @@ export function createGenericHandler<
     logger,
     platform,
     request,
-  }): Promise<ResponseType<TResponseOutput> | StreamingResponse> => {
+  }): Promise<
+    ResponseType<T["types"]["ResponseOutput"]> | StreamingResponse
+  > => {
     const { t } = simpleT(locale);
 
-    // 1. Authenticate user (if not already provided by platform)
-    let user = providedUser;
-    if (!user) {
-      user = await authRepository.getAuthMinimalUser(
+    // 1. Authenticate user - call authRepository directly if user not provided
+    let user: InferJwtPayloadTypeFromRoles<T["allowedRoles"]>;
+    if (providedUser) {
+      user = providedUser as InferJwtPayloadTypeFromRoles<T["allowedRoles"]>;
+    } else {
+      const authUser = await authRepository.getAuthMinimalUser(
         endpoint.allowedRoles,
         { platform, locale, request },
         logger,
       );
+
+      if (!authUser) {
+        return {
+          success: false,
+          message: ErrorResponseTypes.UNAUTHORIZED.errorKey,
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+          messageParams: { error: "User authentication failed" },
+        };
+      }
+
+      user = authUser as InferJwtPayloadTypeFromRoles<T["allowedRoles"]>;
     }
 
-    // 2. Check user permissions
-    const hasPermission = permissionsRegistry.hasEndpointPermission(
+    // 2. Validate endpoint access (platform + permissions)
+    const accessValidation = permissionsRegistry.validateEndpointAccess(
       endpoint,
       user,
       platform,
     );
 
-    if (!hasPermission) {
-      logger.warn(`[Generic Handler] User permission denied`, {
+    if (!accessValidation.success) {
+      logger.warn(`[Generic Handler] Endpoint access denied`, {
         routePath: `${endpoint.path.join("/")}/${endpoint.method}`,
         userId: user.isPublic ? "public" : user.id,
+        reason: accessValidation.message,
       });
-      return {
-        success: false,
-        message: ErrorResponseTypes.FORBIDDEN.errorKey,
-        errorType: ErrorResponseTypes.FORBIDDEN,
-        messageParams: {
-          error: "User does not have permission to access this endpoint",
-        },
-      };
+      return accessValidation;
     }
 
-    // 3. Validate request data
+    // 3. Validate request data using request validator
     const validationResult = validateHandlerRequestData(
       endpoint,
       {
@@ -359,15 +323,15 @@ export function createGenericHandler<
       return validationResult;
     }
 
-    // 4. Execute business logic handler
     const result = await handler({
-      data: validationResult.data.requestData as TRequestOutput,
-      urlPathParams: validationResult.data.urlPathParams as TUrlVariablesOutput,
+      data: validationResult.data.requestData as T["types"]["RequestOutput"],
+      urlPathParams: validationResult.data
+        .urlPathParams as T["types"]["UrlVariablesOutput"],
       user,
       t,
       locale: validationResult.data.locale,
       logger,
-      request, // Pass request (undefined for CLI/AI/MCP, NextRequest for Next.js)
+      request,
       platform,
     });
 
@@ -382,72 +346,64 @@ export function createGenericHandler<
       return result;
     }
 
-    // 7. Validate response data against schema
-    const responseValidation = validateData(
+    // 7. Validate response data using request validator
+    const responseValidation = validateResponseData<T["types"]["ResponseOutput"]>(
       result.data,
       endpoint.responseSchema,
       logger,
     );
 
     if (!responseValidation.success) {
-      logger.error("Response validation failed", {
-        error: responseValidation.message,
-        messageParams: responseValidation.messageParams,
-      });
-      return {
-        success: false,
-        message: "app.api.v1.core.shared.errorTypes.invalid_response_error",
-        errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
-        messageParams: {
-          error: responseValidation.message,
-        },
-      };
+      return responseValidation;
     }
 
-    // 8. Handle email sending if configured
     if (email?.afterHandlerEmails) {
       await emailHandlingRepository.handleEmails<
-        TRequestOutput,
-        TResponseOutput,
-        TUrlVariablesOutput
+        T["types"]["RequestOutput"],
+        T["types"]["ResponseOutput"],
+        T["types"]["UrlVariablesOutput"]
       >(
         {
           email,
-          responseData: responseValidation.data as TResponseOutput,
+          responseData: responseValidation.data as T["types"]["ResponseOutput"],
           urlPathParams: validationResult.data
-            .urlPathParams as TUrlVariablesOutput,
-          requestData: validationResult.data.requestData as TRequestOutput,
+            .urlPathParams as T["types"]["UrlVariablesOutput"],
+          requestData: validationResult.data
+            .requestData as T["types"]["RequestOutput"],
           t,
           locale: validationResult.data.locale,
           user,
         } satisfies EmailHandleRequestOutput<
-          TRequestOutput,
-          TResponseOutput,
-          TUrlVariablesOutput
+          T["types"]["RequestOutput"],
+          T["types"]["ResponseOutput"],
+          T["types"]["UrlVariablesOutput"]
         >,
         logger,
       );
     }
 
-    // 9. Handle SMS sending if configured
     if (sms?.afterHandlerSms) {
-      await handleSms<TRequestOutput, TResponseOutput, TUrlVariablesOutput>({
+      await handleSms<
+        T["types"]["RequestOutput"],
+        T["types"]["ResponseOutput"],
+        T["types"]["UrlVariablesOutput"]
+      >({
         sms,
         user,
-        responseData: responseValidation.data as TResponseOutput,
+        responseData: responseValidation.data as T["types"]["ResponseOutput"],
         urlPathParams: validationResult.data
-          .urlPathParams as TUrlVariablesOutput,
-        requestData: validationResult.data.requestData as TRequestOutput,
+          .urlPathParams as T["types"]["UrlVariablesOutput"],
+        requestData: validationResult.data
+          .requestData as T["types"]["RequestOutput"],
         t,
         locale: validationResult.data.locale,
         logger,
       });
     }
 
-    // 10. Return validated response
     return {
       success: true,
-      data: responseValidation.data as TResponseOutput,
+      data: responseValidation.data as T["types"]["ResponseOutput"],
     };
   };
 }

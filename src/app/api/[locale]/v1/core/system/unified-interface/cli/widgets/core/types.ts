@@ -8,28 +8,9 @@ import type {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
-import type {
-  RenderableValue as BaseRenderableValue,
-  ResponseFieldMetadata as BaseResponseFieldMetadata,
-} from "../../shared/ui/types";
-
-export type RenderableValue = BaseRenderableValue;
-export type ResponseFieldMetadata = BaseResponseFieldMetadata;
-
-/**
- * Response container metadata
- */
-export interface ResponseContainerMetadata {
-  type: WidgetType;
-  title?: TranslationKey;
-  description?: TranslationKey;
-  layout?: {
-    columns?: number;
-    spacing?: string;
-  };
-  fields: ResponseFieldMetadata[];
-}
+import type { TFunction } from "@/i18n/core/static-types";
+import type { UnifiedField } from "../../../shared/types/endpoint";
+import type { WidgetData, WidgetInput, WidgetRenderContext as SharedWidgetRenderContext } from "../../../shared/widgets/types";
 
 /**
  * CLI rendering options
@@ -42,32 +23,19 @@ export interface CLIRenderingOptions {
   locale: CountryLanguage;
 }
 
-/**
- * Widget renderer context
- */
-export interface WidgetRenderContext {
+export interface WidgetRenderContext extends SharedWidgetRenderContext {
   options: CLIRenderingOptions;
   depth: number;
   t: TFunction;
-  formatValue: (field: ResponseFieldMetadata, value: RenderableValue) => string;
+  formatValue: (field: UnifiedField, value: WidgetData) => string;
   getFieldIcon: (type: FieldDataType) => string;
   renderEmptyState: (message: string) => string;
   getRenderer: (widgetType: WidgetType) => WidgetRenderer;
 }
 
-/**
- * Base widget renderer interface
- */
 export interface WidgetRenderer {
-  /**
-   * Check if this renderer can handle the given widget type
-   */
   canRender(widgetType: WidgetType): boolean;
-
-  /**
-   * Render the widget with the given field metadata and context
-   */
-  render(field: ResponseFieldMetadata, context: WidgetRenderContext): string;
+  render(input: WidgetInput, context: WidgetRenderContext): string;
 }
 
 /**
@@ -83,11 +51,11 @@ export interface DataFormatter {
   formatBoolean(value: boolean): string;
   formatDate(value: Date | string, locale: CountryLanguage): string;
   formatArray(
-    value: RenderableValue[],
+    value: WidgetData[],
     options?: { separator?: string; maxItems?: number },
   ): string;
   formatObject(
-    value: { [key: string]: RenderableValue },
+    value: Record<string, WidgetData>,
     options?: { maxDepth?: number },
   ): string;
   formatDuration(milliseconds: number): string;
@@ -103,7 +71,7 @@ export interface TableRenderConfig {
     type: FieldDataType;
     width?: string;
     align?: "left" | "center" | "right";
-    formatter?: (value: RenderableValue) => string;
+    formatter?: (value: WidgetData) => string;
   }>;
   pagination?: {
     enabled: boolean;
@@ -144,17 +112,3 @@ export interface MetricConfig {
   };
   format?: "number" | "percentage" | "currency" | "bytes";
 }
-
-/**
- * Layout configuration
- */
-export interface LayoutConfig {
-  type: "vertical" | "horizontal" | "grid";
-  columns?: number;
-  spacing?: "compact" | "normal" | "loose";
-  alignment?: "left" | "center" | "right";
-}
-
-const definitions = {};
-
-export default definitions;

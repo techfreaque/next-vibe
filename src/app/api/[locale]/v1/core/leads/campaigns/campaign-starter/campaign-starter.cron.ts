@@ -14,6 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
@@ -35,6 +36,7 @@ const SYSTEM_LEAD_ID = "00000000-0000-0000-0000-000000000000";
 const SYSTEM_USER: JwtPayloadType = {
   isPublic: true,
   leadId: SYSTEM_LEAD_ID,
+  roles: [UserPermissionRole.PUBLIC],
 };
 
 // Define task execution types inline

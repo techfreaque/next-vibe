@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { H1, P } from "next-vibe-ui/ui/typography";
@@ -26,13 +25,12 @@ interface HelpListViewProps {
  */
 export function HelpListView({ locale }: HelpListViewProps): JSX.Element {
   const { t } = simpleT(locale);
+  const [responseData, setResponseData] =
+    useState<HelpListResponseOutput | null>(null);
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
-
-  const [responseData, setResponseData] =
-    useState<HelpListResponseOutput | null>(null);
 
   const { form, submitForm, isSubmitting, submitError } = useApiForm(
     helpListEndpoints.POST,
@@ -69,7 +67,7 @@ export function HelpListView({ locale }: HelpListViewProps): JSX.Element {
             <EndpointRenderer
               endpoint={helpListEndpoints.POST}
               form={form}
-              onSubmit={submitForm}
+              onSubmit={() => submitForm()}
               data={responseData ?? undefined}
               locale={locale}
               isSubmitting={isSubmitting}

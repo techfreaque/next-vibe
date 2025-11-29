@@ -7,21 +7,7 @@ import { useCallback, useEffect } from "react";
 import { useTheme } from "next-themes";
 
 import type { ModelId } from "../model-access/models";
-
-/**
- * Settings interface
- */
-export interface ChatSettings {
-  selectedPersona: string;
-  selectedModel: ModelId;
-  temperature: number;
-  maxTokens: number;
-  ttsAutoplay: boolean;
-  sidebarCollapsed: boolean;
-  theme: "light" | "dark";
-  viewMode: "linear" | "flat" | "threaded";
-  enabledToolIds: string[];
-}
+import type { ChatSettings } from "./store";
 
 /**
  * Settings operations interface
@@ -35,25 +21,20 @@ export interface SettingsOperations {
   setTTSAutoplay: (autoplay: boolean) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   setTheme: (theme: "light" | "dark") => void;
-  setViewMode: (mode: "linear" | "flat" | "threaded") => void;
+  setViewMode: (mode: ChatSettings["viewMode"]) => void;
   setEnabledToolIds: (toolIds: string[]) => void;
-}
-
-/**
- * Settings dependencies
- */
-interface SettingsDeps {
-  chatStore: {
-    settings: ChatSettings;
-    updateSettings: (updates: Partial<ChatSettings>) => void;
-    hydrateSettings: () => Promise<void>;
-  };
 }
 
 /**
  * Hook for managing chat settings
  */
-export function useSettings(deps: SettingsDeps): SettingsOperations {
+export function useSettings(deps: {
+  chatStore: {
+    settings: ChatSettings;
+    updateSettings: (updates: Partial<ChatSettings>) => void;
+    hydrateSettings: () => Promise<void>;
+  };
+}): SettingsOperations {
   const { chatStore } = deps;
   const { setTheme: setNextTheme } = useTheme();
 
@@ -114,7 +95,7 @@ export function useSettings(deps: SettingsDeps): SettingsOperations {
   );
 
   const setViewMode = useCallback(
-    (mode: "linear" | "flat" | "threaded") => {
+    (mode: ChatSettings["viewMode"]) => {
       chatStore.updateSettings({ viewMode: mode });
     },
     [chatStore],

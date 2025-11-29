@@ -1,60 +1,33 @@
 /**
- * Route Delegation Handler
- * Integrates with existing CLI handler system to execute routes
+ * CLI Route Executor
+ * Thin adapter that parses CLI input and delegates to central executor
+ * Handles CLI-specific concerns: argument parsing, interactive forms, output formatting
  */
 
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type z from "zod";
 
-import {
-  type UserRoleValue,
-  type UserPermissionRoleValue,
-} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
-import { userRolesRepository } from "@/app/api/[locale]/v1/core/user/user-roles/repository";
+import { type UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
-import type { CreateApiEndpoint } from "../shared/endpoint/create";
-import type { EndpointLogger } from "../shared/logger/endpoint";
-import { getCliUser } from "./auth/cli-user";
-import { Platform } from "../shared/types/platform";
-import { platformAccessChecker } from "../shared/server-only/permissions/platform-access";
-import { loadEndpointDefinition } from "../shared/registry/definition-loader";
-import type {
-  BaseExecutionContext,
-  BaseExecutionResult,
-  DiscoveredRoute as BaseDiscoveredRoute,
-} from "../shared/server-only/execution/executor";
-import { loadRouteHandler } from "../shared/server-only/execution/route-loader";
-import type { UnifiedField } from "../shared/types/endpoint";
-import type { Methods } from "../shared/types/enums";
-import type { InferJwtPayloadTypeFromRoles } from "../shared/types/handler";
-import { modularCLIResponseRenderer } from "./widgets/modular-response-renderer";
-import { responseMetadataExtractor } from "./widgets/response-metadata-extractor";
-import { schemaUIHandler } from "./widgets/schema-ui-handler";
-import type { RenderableValue, ResponseFieldMetadata } from "./widgets/types";
-
-// Re-export DiscoveredRoute for CLI consumers
-export type DiscoveredRoute = BaseDiscoveredRoute;
-
-// CLI handler function type - matches createCliHandler signature
-interface CliHandlerFunction<TUserRoleValue extends readonly UserRoleValue[]> {
-  (
-    data: CliRequestData,
-    urlPathParams: CliUrlParams,
-    user: InferJwtPayloadTypeFromRoles<TUserRoleValue>,
-    locale: CountryLanguage,
-    verbose?: boolean,
-  ): Promise<{
-    success: boolean;
-    data?: CliResponseData;
-    message?: string;
-  }>;
-}
-
-// Endpoint definition interface - removed as we now use CreateApiEndpoint
+import { isEmptySchema } from "../../../../shared/utils/validation";
+import type { CreateApiEndpoint } from "../../shared/endpoints/definition/create";
+import type { EndpointLogger } from "../../shared/logger/endpoint";
+import { getCliUser } from "../auth/cli-user";
+import { Platform } from "../../shared/types/platform";
+import { definitionLoader } from "../../shared/endpoints/definition/loader";
+import type { BaseExecutionContext } from "../../shared/endpoints/route/executor";
+import { routeExecutionExecutor } from "../../shared/endpoints/route/executor";
+import type { UnifiedField } from "../../shared/types/endpoint";
+import type { Methods } from "../../shared/types/enums";
+import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
+import { modularCLIResponseRenderer } from "../widgets/renderers/response-renderer";
+import { schemaUIHandler } from "../widgets/renderers/schema-handler";
+import type { WidgetData } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/widgets/types";
+import type { CliObject } from "./parsing";
 
 // Input data interfaces
 interface InputData {
@@ -74,16 +47,6 @@ interface CollectedInputData {
   urlPathParams?: InputData;
 }
 
-// Schema interface for validation
-interface SchemaValidator {
-  safeParse: (data: InputData) => {
-    success: boolean;
-    error?: {
-      issues: Array<{ code: string; received: string; path: string[] }>;
-    };
-  };
-}
-
 // CLI data types
 export interface CliRequestData {
   [key: string]:
@@ -100,9 +63,8 @@ interface CliUrlParams {
   [key: string]: string | number | boolean | null | undefined;
 }
 
-interface CliNamedArgs {
-  [key: string]: string | number | boolean | null | undefined;
-}
+// Use CliObject from parsing.ts for type-safe nested object support
+type CliNamedArgs = CliObject;
 
 interface CliResponseData {
   [key: string]:
@@ -119,8 +81,10 @@ interface CliResponseData {
  * Route execution context
  * Extends BaseExecutionContext with CLI-specific fields
  */
-export interface RouteExecutionContext
-  extends Omit<BaseExecutionContext, "user"> {
+export interface RouteExecutionContext extends Omit<
+  BaseExecutionContext,
+  "user"
+> {
   /** URL path parameters */
   urlPathParams?: CliUrlParams;
 
@@ -140,192 +104,95 @@ export interface RouteExecutionContext
     interactive?: boolean;
     output?: "json" | "table" | "pretty";
   };
+
+  /** Timestamp of execution */
+  timestamp: number;
 }
 
 /**
  * Route execution result
  * Extends BaseExecutionResult with CLI-specific fields
  */
-export interface RouteExecutionResult
-  extends Omit<BaseExecutionResult, "data" | "metadata"> {
+export interface RouteExecutionResult {
+  success: boolean;
   /** CLI response data */
   data?: CliResponseData;
+
+  /** Error message (translation key or plain text) */
+  error?: string;
+
+  /** Error parameters for translation */
+  errorParams?: Record<string, unknown>;
 
   /** CLI-specific metadata */
   metadata?: {
     executionTime: number;
     endpointPath: string;
-    method: string;
+    method?: string;
     route?: string;
+    resolvedCommand?: string;
   };
 
   /** Error cause chain for debugging - reuses ErrorResponseType */
   cause?: ErrorResponseType;
+
+  /** Formatted output string ready for display */
+  formattedOutput?: string;
 }
 
 /**
- * Route delegation handler class
+ * CLI Route Executor
+ * Thin adapter: parses CLI input → calls central executor → formats CLI output
  */
 export class RouteDelegationHandler {
   /**
-   * Execute a route using the existing CLI handler system
+   * Execute a route - delegates to central executor
    */
   async executeRoute(
-    route: DiscoveredRoute,
+    resolvedCommand: string,
     context: RouteExecutionContext,
     logger: EndpointLogger,
     locale: CountryLanguage,
-    t: TFunction,
   ): Promise<RouteExecutionResult> {
     const startTime = Date.now();
 
     try {
-      // Get the CLI handler from the route
-      let cliHandler = await this.getCliHandler(route, logger);
-
-      // Method is now explicit from route registration - no fallback needed
-
-      if (!cliHandler) {
-        return {
-          success: false,
-          error: t(
-            "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.routeNotFound",
-          ),
-        };
-      }
-
-      // Get endpoint definition for schema-driven UI
-      const endpoint = await this.getCreateApiEndpoint(route, logger);
-
-      // Collect input data using schema-driven UI if needed
-      const inputData = await this.collectInputData(endpoint, context, logger);
-
-      // Create CLI user context
+      // 1. Get CLI user (fallback to getCliUser if not provided)
+      // Note: Auth will be handled again by shared handler, this is just for endpoint loading
       let cliUser = context.user;
-
       if (!cliUser) {
         const cliUserResult = await getCliUser(logger, context.locale);
-
-        if (!cliUserResult.success) {
-          // Check if endpoint allows CLI_AUTH_BYPASS before failing
-          const { PlatformMarker } =
-            await import("@/app/api/[locale]/v1/core/user/user-roles/enum");
-          const allowsCliAuthBypass =
-            endpoint?.allowedRoles?.includes(PlatformMarker.CLI_AUTH_BYPASS) ??
-            false;
-
-          if (allowsCliAuthBypass) {
-            logger.warn(
-              "CLI user authentication failed, using public user due to CLI_AUTH_BYPASS",
-              {
-                message: cliUserResult.message,
-                errorType: cliUserResult.errorType,
-              },
-            );
-            // Endpoint allows bypass - use public user
-            const { createPublicCliUser } = await import("./auth/cli-user");
-            cliUser = createPublicCliUser();
-          } else {
-            // No bypass allowed - authentication is required
-            logger.error("Failed to get CLI user for authentication", {
-              message: cliUserResult.message,
-              errorType: cliUserResult.errorType,
-            });
-
-            return {
-              success: false,
-              error: cliUserResult.message,
-              errorParams: cliUserResult.messageParams,
-            };
-          }
-        } else {
+        if (cliUserResult.success) {
           cliUser = cliUserResult.data;
+        } else {
+          // If auth fails, still try to load endpoint - shared handler will re-auth properly
+          cliUser = {
+            isPublic: true,
+            leadId: "temp-for-loading",
+          } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
         }
       }
 
-      if (!cliUser) {
-        logger.error("Failed to get CLI user for authentication");
-        return {
-          success: false,
-          data: {
-            error: "CLI user authentication failed",
-            details: "Could not retrieve CLI user from database",
-          },
-        };
-      }
+      // 2. Get endpoint definition for CLI-specific features (interactive forms, arg parsing)
+      const endpointResult = await definitionLoader.load<
+        CreateApiEndpoint<
+          string,
+          Methods,
+          readonly UserRoleValue[],
+          UnifiedField<z.ZodTypeAny>
+        >
+      >({
+        identifier: resolvedCommand,
+        platform: Platform.CLI,
+        user: cliUser,
+        logger,
+      });
+      const endpoint = endpointResult.success ? endpointResult.data : null;
 
-      // Check platform access BEFORE executing handler
-      if (endpoint?.allowedRoles) {
-        // Fetch user roles from database for authenticated users
-        // User roles from database are ONLY permission roles (never platform markers)
-        let userRoles: (typeof UserPermissionRoleValue)[] = [];
+      // 3. CLI-specific: Collect input data (parse CLI args, interactive forms)
+      const inputData = await this.collectInputData(endpoint, context, logger);
 
-        if (!cliUser.isPublic && cliUser.id) {
-          const userRolesResult = await userRolesRepository.getUserRoles(
-            cliUser.id,
-            logger,
-          );
-
-          if (userRolesResult.success && userRolesResult.data) {
-            // Type flows naturally - no assertion needed
-            userRoles = userRolesResult.data;
-          } else {
-            logger.warn("Failed to fetch user roles, using empty roles", {
-              userId: cliUser.id,
-              error: userRolesResult.success
-                ? undefined
-                : userRolesResult.message,
-            });
-          }
-        }
-
-        // Check platform and role access
-        const accessResult = await platformAccessChecker.checkFullAccess(
-          endpoint.allowedRoles,
-          Platform.CLI,
-          cliUser,
-          userRoles,
-          logger,
-        );
-
-        if (!accessResult.success) {
-          logger.warn("Platform access denied for CLI route", {
-            route: route.path,
-            method: route.method,
-            userId: cliUser.isPublic ? "public" : cliUser.id,
-            message: accessResult.message,
-          });
-
-          return {
-            success: false,
-            error: accessResult.message,
-            errorParams: accessResult.messageParams,
-            metadata: {
-              executionTime: Date.now() - startTime,
-              endpointPath: route.path,
-              route: route.path,
-              method: route.method,
-            },
-          };
-        }
-      }
-
-      // Show execution info if verbose
-      if (context.options?.verbose) {
-        logger.info(`🎯 Executing route: ${route.path}`);
-        logger.info(`Method: ${route.method}`);
-        logger.info(`Data: ${JSON.stringify(inputData.data, null, 2)}`);
-        if (
-          inputData.urlPathParams &&
-          Object.keys(inputData.urlPathParams).length
-        ) {
-          logger.info(
-            `URL Params: ${JSON.stringify(inputData.urlPathParams, null, 2)}`,
-          );
-        }
-      }
-
-      // Execute dry run if requested
+      // 4. CLI-specific: Handle dry run
       if (context.options?.dryRun) {
         logger.info("🔍 Dry run - would execute with:");
         logger.info(
@@ -344,167 +211,99 @@ export class RouteDelegationHandler {
           } as CliResponseData,
           metadata: {
             executionTime: Date.now() - startTime,
-            endpointPath: route.path,
-            route: route.path,
-            method: route.method,
+            endpointPath: resolvedCommand,
+            resolvedCommand,
           },
         };
       }
 
-      // Execute the CLI handler
-      // Only pass URL parameters if they exist, otherwise pass undefined for never schemas
-      const urlPathParams = inputData.urlPathParams as CliUrlParams | undefined;
+      // 5. CLI-specific: Show execution info if verbose
+      if (context.options?.verbose) {
+        logger.info(`🎯 Executing route: ${resolvedCommand}`);
+        logger.info(`Data: ${JSON.stringify(inputData.data, null, 2)}`);
+        if (
+          inputData.urlPathParams &&
+          Object.keys(inputData.urlPathParams).length
+        ) {
+          logger.info(
+            `URL Params: ${JSON.stringify(inputData.urlPathParams, null, 2)}`,
+          );
+        }
+      }
 
-      // Debug locale before passing to CLI handler
-      logger.debug("CLI handler execution", {
-        locale: locale,
-        localeType: typeof locale,
-        cliUserId: cliUser.isPublic ? cliUser.leadId : cliUser.id,
-      });
-
-      logger.debug("About to call CLI handler", {
-        handlerType: typeof cliHandler,
-        dataKeys: Object.keys(inputData.data || {}),
-        urlPathParamsKeys: Object.keys(urlPathParams || {}),
-      });
-
-      const result = await cliHandler(
-        (inputData.data || {}) as CliRequestData,
-        (urlPathParams || {}) as CliUrlParams,
-        cliUser,
+      // 6. Delegate to shared generic handler executor
+      const result = await routeExecutionExecutor.executeGenericHandler({
+        toolName: resolvedCommand,
+        data: (inputData.data || {}) as Record<string, never>,
+        urlPathParams: (inputData.urlPathParams || {}) as Record<string, never>,
+        user: cliUser,
         locale,
-        context.options?.verbose || false,
-      );
-
-      logger.debug("CLI handler completed", {
-        success: result.success,
-        hasData: !!result.data,
+        logger,
+        platform: Platform.CLI,
       });
 
-      // Format result - pass through error response directly including cause chain
-      return {
+      // 7. Convert ResponseType to RouteExecutionResult
+      const routeResult: RouteExecutionResult = {
         success: result.success,
-        data: result.data,
+        data: result.success
+          ? (result.data as CliResponseData | undefined)
+          : undefined,
         error: result.success ? undefined : result.message,
-        errorParams: result.success
-          ? undefined
-          : (result as { messageParams?: Record<string, string | number> })
-              .messageParams,
-        cause: result.success
-          ? undefined
-          : (result as { cause?: ErrorResponseType }).cause,
+        errorParams: result.success ? undefined : result.messageParams,
         metadata: {
           executionTime: Date.now() - startTime,
-          endpointPath: route.path,
-          route: route.path,
-          method: route.method,
+          endpointPath: resolvedCommand,
+          method: "",
+          resolvedCommand,
         },
       };
-    } catch (error) {
+
+      // 8. Format result for CLI output
+      const formattedOutput = this.formatResult(
+        routeResult,
+        context.options?.output || "pretty",
+        endpoint, // Pass endpoint definition for widget-based formatting
+        locale,
+        context.options?.verbose || false,
+        logger,
+      );
+
+      // 9. Return result with formatted output
       return {
+        ...routeResult,
+        formattedOutput,
+      };
+    } catch (error) {
+      const errorResult = {
         success: false,
         error: parseError(error).message,
         metadata: {
           executionTime: Date.now() - startTime,
-          endpointPath: route.path,
-          route: route.path,
-          method: route.method,
+          endpointPath: resolvedCommand,
+          method: "",
         },
+      };
+
+      // Format error result
+      const formattedOutput = this.formatResult(
+        errorResult,
+        context.options?.output || "pretty",
+        null, // endpoint definition not needed for formatting
+        locale,
+        context.options?.verbose || false,
+        logger,
+      );
+
+      return {
+        ...errorResult,
+        formattedOutput,
       };
     }
   }
 
   /**
-   * Get CLI handler from new format route (0 type errors only)
-   */
-  private async getCliHandler(
-    route: DiscoveredRoute,
-    logger: EndpointLogger,
-  ): Promise<CliHandlerFunction<readonly UserRoleValue[]> | null> {
-    try {
-      const result = await loadRouteHandler<
-        CliHandlerFunction<readonly UserRoleValue[]>,
-        CreateApiEndpoint<
-          string,
-          Methods,
-          readonly UserRoleValue[],
-          UnifiedField<z.ZodTypeAny>
-        >
-      >(
-        {
-          routePath: route.routePath,
-          method: route.method,
-          alias: route.alias,
-        },
-        Platform.CLI,
-        logger,
-      );
-
-      if (result.error) {
-        logger.error(
-          `[Route Executor] Failed to load CLI handler for ${route.routePath}`,
-          {
-            error: result.error,
-            method: route.method,
-            alias: route.alias,
-          },
-        );
-        return null;
-      }
-
-      return result.handler;
-    } catch (error) {
-      logger.error(
-        `[Route Executor] Failed to load CLI handler for ${route.routePath}`,
-        {
-          error: parseError(error),
-          method: route.method,
-          alias: route.alias,
-        },
-      );
-      return null;
-    }
-  }
-
-  /**
-   * Get endpoint definition from route
-   */
-  private async getCreateApiEndpoint(
-    route: DiscoveredRoute,
-    logger: EndpointLogger,
-  ): Promise<CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    UnifiedField<z.ZodTypeAny>
-  > | null> {
-    const result = await loadEndpointDefinition<
-      CreateApiEndpoint<
-        string,
-        Methods,
-        readonly UserRoleValue[],
-        UnifiedField<z.ZodTypeAny>
-      >
-    >(
-      {
-        routePath: route.routePath,
-        method: route.method,
-      },
-      logger,
-    );
-
-    if (result.error) {
-      logger.warn(
-        `Failed to load endpoint definition for ${route.routePath}:`,
-        result.error,
-      );
-    }
-
-    return result.definition;
-  }
-
-  /**
    * Collect input data using schema-driven UI
+   * Now delegates validation to registry
    */
   private async collectInputData(
     endpoint: CreateApiEndpoint<
@@ -521,19 +320,18 @@ export class RouteDelegationHandler {
     // Always try to build data from CLI arguments first
     const cliData = this.buildDataFromCliArgs(endpoint, context);
 
-    // Merge CLI data with provided data (CLI args take precedence)
+    // Merge CLI data with provided data using registry
     const contextData = context.data as InputData | undefined;
     if (contextData || (cliData && Object.keys(cliData).length)) {
-      inputData.data = {
-        ...(contextData || {}),
-        ...(cliData || {}),
-      } as InputData;
+      inputData.data = routeExecutionExecutor.mergeData(
+        contextData || {},
+        cliData || {},
+      ) as InputData;
 
-      // Check if all required fields are satisfied with merged data
-      const mergedData = inputData.data;
-      const missingRequired = this.getMissingRequiredFields(
-        endpoint,
-        mergedData,
+      // Check if all required fields are satisfied using registry
+      const missingRequired = routeExecutionExecutor.getMissingRequiredFields(
+        inputData.data,
+        endpoint?.requestSchema,
         logger,
       );
 
@@ -567,32 +365,12 @@ export class RouteDelegationHandler {
 
     // Collect URL parameters if needed
     if (endpoint?.requestUrlPathParamsSchema && !context.urlPathParams) {
-      // Safely check if the schema is effectively empty (z.never() or
-      // empty object)
-      try {
-        const schema = endpoint.requestUrlPathParamsSchema as SchemaValidator;
-        const testResult = schema.safeParse({});
-        const isNeverSchema =
-          !testResult.success &&
-          testResult.error?.issues?.[0]?.code === "invalid_type";
-        const isEmptySchema =
-          testResult.success &&
-          Object.keys((testResult as { data?: CliUrlParams }).data || {})
-            .length === 0;
-
-        if (!isNeverSchema && !isEmptySchema) {
-          logger.info("🔗 URL Parameters:");
-          inputData.urlPathParams = await this.generateFormFromEndpoint(
-            endpoint,
-            "urlPathParams",
-          );
-        }
-        // For never schema, don't set urlPathParams at all
-      } catch (error) {
-        // If schema validation fails, skip URL parameters collection
-        logger.debug(
-          "Failed to validate URL parameters schema:",
-          parseError(error),
+      // Check if schema is empty
+      if (!isEmptySchema(endpoint.requestUrlPathParamsSchema)) {
+        logger.info("🔗 URL Parameters:");
+        inputData.urlPathParams = await this.generateFormFromEndpoint(
+          endpoint,
+          "urlPathParams",
         );
       }
     } else if (context.urlPathParams) {
@@ -658,7 +436,17 @@ export class RouteDelegationHandler {
       // Try to translate if it looks like a translation key (contains dots)
       if (errorMessage.includes(".")) {
         try {
-          errorMessage = t(errorMessage as TranslationKey, result.errorParams);
+          const translationParams = result.errorParams
+            ? Object.fromEntries(
+                Object.entries(result.errorParams).map(([key, value]) => [
+                  key,
+                  typeof value === "string" || typeof value === "number"
+                    ? value
+                    : String(value),
+                ]),
+              )
+            : undefined;
+          errorMessage = t(errorMessage as TranslationKey, translationParams);
         } catch {
           // If translation fails, use the key as-is
         }
@@ -807,7 +595,7 @@ export class RouteDelegationHandler {
    */
   private sanitizeDataForRenderer(
     data: CliResponseData,
-  ): Record<string, RenderableValue> {
+  ): Record<string, WidgetData> {
     if (typeof data !== "object" || data === null) {
       return { result: String(data) };
     }
@@ -821,35 +609,103 @@ export class RouteDelegationHandler {
         | boolean
         | null
         | undefined,
-    ): RenderableValue => {
-      if (value === undefined) {
-        return null;
-      } else if (
-        typeof value === "string" ||
-        typeof value === "number" ||
-        typeof value === "boolean" ||
-        value === null
-      ) {
+    ): WidgetData => {
+      if (value === undefined || value === null) {
+        return undefined;
+      }
+      if (typeof value === "string") {
         return value;
-      } else if (Array.isArray(value)) {
-        return value.map(sanitizeValue);
-      } else if (typeof value === "object") {
-        const sanitizedObj: { [key: string]: RenderableValue } = {};
+      }
+      if (typeof value === "number") {
+        return value;
+      }
+      if (typeof value === "boolean") {
+        return value;
+      }
+      if (Array.isArray(value)) {
+        return value.map(sanitizeValue) as WidgetData[];
+      }
+      if (typeof value === "object") {
+        const sanitizedObj: { [key: string]: WidgetData } = {};
         for (const [k, v] of Object.entries(value)) {
           sanitizedObj[k] = sanitizeValue(v);
         }
         return sanitizedObj;
-      } else {
-        return String(value);
       }
+      return String(value);
     };
 
-    const sanitized: Record<string, RenderableValue> = {};
+    const sanitized: Record<string, WidgetData> = {};
     for (const [key, value] of Object.entries(data)) {
       sanitized[key] = sanitizeValue(value);
     }
 
     return sanitized;
+  }
+
+  /**
+   * Extract response fields from endpoint definition
+   */
+  private extractResponseFields(
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response transformation requires 'unknown' for flexible response types
+    endpointDefinition: unknown,
+  ): Array<[string, UnifiedField]> {
+    // Type guard: check if it's a valid endpoint with fields
+    if (
+      !endpointDefinition ||
+      typeof endpointDefinition !== "object" ||
+      !("fields" in endpointDefinition)
+    ) {
+      return [];
+    }
+
+    const fields = endpointDefinition.fields;
+
+    // Check if fields is an ObjectField with children
+    if (
+      !fields ||
+      typeof fields !== "object" ||
+      !("children" in fields) ||
+      typeof fields.children !== "object" ||
+      fields.children === null
+    ) {
+      return [];
+    }
+
+    const children = fields.children as Record<string, UnifiedField>;
+    const responseFields: Array<[string, UnifiedField]> = [];
+
+    // Extract fields that have usage.response = true
+    for (const [fieldName, fieldDef] of Object.entries(children)) {
+      if (
+        "usage" in fieldDef &&
+        typeof fieldDef.usage === "object" &&
+        fieldDef.usage !== null
+      ) {
+        const usage = fieldDef.usage;
+        let hasResponse = false;
+
+        if ("response" in usage) {
+          hasResponse = usage.response === true;
+        } else {
+          // Check each method's usage for response field
+          const usageValues = Object.values(usage);
+          hasResponse = usageValues.some(
+            (methodUsage) =>
+              typeof methodUsage === "object" &&
+              methodUsage !== null &&
+              "response" in methodUsage &&
+              methodUsage.response === true,
+          );
+        }
+
+        if (hasResponse) {
+          responseFields.push([fieldName, fieldDef]);
+        }
+      }
+    }
+
+    return responseFields;
   }
 
   /**
@@ -863,29 +719,13 @@ export class RouteDelegationHandler {
     logger: EndpointLogger,
   ): string {
     try {
-      // Extract response metadata from endpoint definition
-      const metadata = responseMetadataExtractor.extractResponseMetadata(
-        endpointDefinition,
-        data as
-          | string
-          | number
-          | boolean
-          | null
-          | (
-              | string
-              | number
-              | boolean
-              | null
-              | (string | number | boolean | null)[]
-            )[]
-          | { [key: string]: string | number | boolean | null },
-      );
+      // Extract response fields from endpoint definition
+      const fields = this.extractResponseFields(endpointDefinition);
 
       // Use enhanced modular renderer with locale
-      const emptyMetadata: ResponseFieldMetadata[] = [];
       return modularCLIResponseRenderer.render(
         this.sanitizeDataForRenderer(data),
-        metadata !== null ? metadata : emptyMetadata,
+        fields,
         locale,
       );
     } catch (error) {
@@ -991,56 +831,6 @@ export class RouteDelegationHandler {
       data[camelCaseKey] = convertedValue;
     }
     return Object.keys(data).length ? data : null;
-  }
-
-  /**
-   * Check for missing required fields
-   */
-  private getMissingRequiredFields(
-    endpoint: CreateApiEndpoint<
-      string,
-      Methods,
-      readonly UserRoleValue[],
-      UnifiedField<z.ZodTypeAny>
-    > | null,
-    providedData: InputData,
-    logger: EndpointLogger,
-  ): string[] {
-    // Safely access requestSchema
-    const requestSchema =
-      endpoint && typeof endpoint === "object" && "requestSchema" in endpoint
-        ? endpoint.requestSchema
-        : null;
-
-    if (
-      !requestSchema ||
-      typeof requestSchema !== "object" ||
-      !("safeParse" in requestSchema)
-    ) {
-      return [];
-    }
-
-    const missing: string[] = [];
-
-    try {
-      // Try to parse the provided data with the schema
-      const validator = requestSchema as SchemaValidator;
-      const result = validator.safeParse(providedData);
-
-      if (!result.success && result.error) {
-        // Extract missing required fields from Zod errors
-        for (const issue of result.error.issues) {
-          if (issue.code === "invalid_type" && issue.received === "undefined") {
-            missing.push(issue.path.join("."));
-          }
-        }
-      }
-    } catch (error) {
-      // If schema parsing fails, assume no missing fields
-      logger.warn("Failed to validate schema:", parseError(error));
-    }
-
-    return missing;
   }
 }
 

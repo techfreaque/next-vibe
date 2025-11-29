@@ -128,12 +128,12 @@ function getFieldStyleClassName(
   );
 
   const baseLabelClassName = cn(
-    "text-sm font-medium leading-none mb-2",
+    "text-sm font-medium leading-none",
     "peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
     "transition-colors duration-200",
   );
 
-  const baseContainerClassName = "flex flex-col gap-3";
+  const baseContainerClassName = "flex flex-col gap-2";
 
   // Error state - consistent red styling with better spacing and improved dark mode readability
   if (hasError) {

@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   field,
   objectField,
@@ -28,6 +28,8 @@ import {
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { DefaultFolderId } from "../config";
+import type { IconKey } from "../model-access/icons";
+import { iconSchema } from "../../../shared/types/common.schema";
 
 /**
  * Get Folders List Endpoint (GET)
@@ -184,7 +186,8 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.folders.get.response.folders.folder.icon.content" as const,
               },
-              z.string().nullable(),
+              // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null
+              iconSchema.nullable(),
             ),
             color: responseField(
               {
@@ -541,7 +544,8 @@ const { POST } = createEndpoint({
                 "app.api.v1.core.agent.chat.folders.post.sections.folder.icon.description" as const,
               columns: 6,
             },
-            z.string().optional(),
+            // Runtime: accepts any string (emoji, IconKey), Type: IconKey | undefined
+            iconSchema.optional(),
           ),
           color: requestDataField(
             {
@@ -630,7 +634,8 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.post.response.folder.icon.content" as const,
                 },
-                z.string().nullable(),
+                // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null
+                z.string().nullable() as z.ZodType<IconKey | null>,
               ),
               color: responseField(
                 {

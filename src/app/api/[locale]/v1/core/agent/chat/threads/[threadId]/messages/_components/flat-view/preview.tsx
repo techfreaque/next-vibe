@@ -13,7 +13,7 @@ import { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { getIdColor } from "@/app/[locale]/chat/lib/utils/formatting";
 
 interface MessagePreviewProps {

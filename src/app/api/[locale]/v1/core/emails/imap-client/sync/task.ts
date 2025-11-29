@@ -31,6 +31,7 @@ import type {
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPrivatePayloadType } from "../../../user/auth/types";
+import { UserPermissionRole } from "../../../user/user-roles/enum";
 import { imapSyncTaskRepository } from "../sync-task/repository";
 
 /**
@@ -90,6 +91,7 @@ async function executeImapSync(
       id: "system",
       leadId: "system",
       isPublic: false,
+      roles: [UserPermissionRole.ADMIN],
     };
 
     // Use the repository to execute the IMAP sync task

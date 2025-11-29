@@ -1,6 +1,6 @@
 /**
  * AI Stream API Route
- * Handles streaming AI chat responses using OpenAI GPT-4o and Uncensored.ai
+ * Handles streaming AI chat responses with multi-step tool calling support
  */
 
 import "server-only";

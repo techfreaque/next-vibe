@@ -20,12 +20,14 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types"
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
+  type ChatMessage,
   chatFolders,
   chatMessages,
   chatThreads,
   type ToolCall,
 } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
+import type { ModelId } from "../../../model-access/models";
 import {
   canPostInThread,
   canViewThread,
@@ -78,7 +80,7 @@ export async function fetchMessageHistory(
   userId: string,
   logger: EndpointLogger,
   parentMessageId: string | null,
-): Promise<Array<{ role: ChatMessageRole; content: string }>> {
+): Promise<ChatMessage[]> {
   // If no parent message, this is a new root message - return empty history
   if (!parentMessageId) {
     logger.info("No parent message - returning empty history (new root)", {
@@ -212,7 +214,7 @@ export async function createAiMessagePlaceholder(params: {
   parentId: string | null;
   depth: number;
   userId: string | undefined;
-  model: string;
+  model: ModelId;
   persona: string | null | undefined;
   sequenceId: string | null;
   logger: EndpointLogger;
@@ -294,7 +296,7 @@ export async function createTextMessage(params: {
   parentId: string | null;
   depth: number;
   userId: string | undefined;
-  model: string;
+  model: ModelId;
   persona: string;
   sequenceId: string | null;
   logger: EndpointLogger;
@@ -355,7 +357,7 @@ export async function createToolMessage(params: {
   depth: number;
   userId: string | undefined;
   sequenceId: string | null;
-  model: string;
+  model: ModelId;
   persona: string;
   logger: EndpointLogger;
 }): Promise<void> {
@@ -607,57 +609,8 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
         count: messages.length,
       });
 
-      // Map messages to include toolCalls from metadata and sequencing fields
-      const mappedMessages = messages.map((msg) => {
-        // Only extract toolCalls for TOOL role messages
-        let toolCalls: ToolCall[] | undefined = undefined;
-
-        if (msg.role === "tool" && msg.metadata) {
-          // Check if metadata has toolCall object (new format)
-          if (
-            msg.metadata.toolCall &&
-            typeof msg.metadata.toolCall === "object"
-          ) {
-            toolCalls = [msg.metadata.toolCall];
-          }
-          // Fallback: check if metadata has individual tool call fields (old format)
-          else if (msg.metadata.toolName) {
-            toolCalls = [
-              {
-                toolName: msg.metadata.toolName,
-                displayName: msg.metadata.displayName || msg.metadata.toolName,
-                icon: msg.metadata.icon,
-                args: msg.metadata.args || {},
-                result: msg.metadata.result,
-                error: msg.metadata.error,
-                executionTime: msg.metadata.executionTime,
-                widgetMetadata: msg.metadata.widgetMetadata,
-                creditsUsed: msg.metadata.creditsUsed,
-              },
-            ];
-          }
-        }
-
-        return {
-          id: msg.id,
-          threadId: msg.threadId,
-          role: msg.role,
-          content: msg.content,
-          parentId: msg.parentId,
-          depth: msg.depth,
-          authorId: msg.authorId,
-          isAI: msg.isAI,
-          model: msg.model,
-          persona: msg.persona ?? null,
-          tokens: msg.tokens,
-          sequenceId: msg.sequenceId ?? null,
-          toolCalls: toolCalls ?? null,
-          createdAt: msg.createdAt.toISOString(),
-          updatedAt: msg.updatedAt.toISOString(),
-        };
-      });
-
-      return success({ messages: mappedMessages });
+      // Return messages directly - let type system handle transformations
+      return success({ messages });
     } catch (error) {
       logger.error("Error listing messages", parseError(error));
       return fail({

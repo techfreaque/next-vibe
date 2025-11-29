@@ -26,7 +26,7 @@ import React from "react";
 
 import {
   getIconComponent,
-  type IconValue,
+  type IconKey,
 } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type {
   PersonaCategory,
@@ -41,7 +41,7 @@ interface AddPersonaDialogProps {
   newPersona: {
     name: string;
     description: string;
-    icon: string;
+    icon: IconKey;
     systemPrompt: string;
     category: PersonaCategoryId;
     suggestedPrompts: string[];
@@ -50,7 +50,7 @@ interface AddPersonaDialogProps {
     React.SetStateAction<{
       name: string;
       description: string;
-      icon: string;
+      icon: IconKey;
       systemPrompt: string;
       category: PersonaCategoryId;
       suggestedPrompts: string[];
@@ -74,8 +74,8 @@ export function AddPersonaDialog({
 }: AddPersonaDialogProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  // Helper to render icon - handles IconValue (string or component)
-  const renderIcon = (icon: IconValue): React.ReactNode => {
+  // Helper to render icon - handles IconKey (string key from registry)
+  const renderIcon = (icon: IconKey): React.ReactNode => {
     const Icon = getIconComponent(icon);
     return React.createElement(Icon, { className: "text-base leading-none" });
   };
@@ -116,7 +116,7 @@ export function AddPersonaDialog({
                 )}
                 value={newPersona.icon}
                 onChange={(e) =>
-                  setNewPersona({ ...newPersona, icon: e.target.value })
+                  setNewPersona({ ...newPersona, icon: e.target.value as IconKey })
                 }
                 maxLength={2}
               />

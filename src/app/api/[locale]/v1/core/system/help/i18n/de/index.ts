@@ -12,6 +12,14 @@ export const translations = {
       },
       summary: "Interaktiven Modus starten",
     },
+    ui: {
+      title: "Interaktiver API-Explorer",
+      description: "Durchsuchen und ausführen alle",
+      availableEndpoints: "verfügbare Endpunkte",
+      endpointsLabel: "Endpunkte",
+      aliasesLabel: "Aliase:",
+      selectEndpoint: "Wählen Sie einen Endpunkt aus der Liste aus, um zu beginnen",
+    },
     response: {
       started: "Interaktiver Modus erfolgreich gestartet",
     },
@@ -156,6 +164,7 @@ export const translations = {
         server: {
           title: "Serverfehler",
           description: "Befehlsliste konnte nicht generiert werden",
+          errorLoading: "Fehler beim Laden der Befehle: {{error}}",
         },
         unknown: {
           title: "Unbekannter Fehler",

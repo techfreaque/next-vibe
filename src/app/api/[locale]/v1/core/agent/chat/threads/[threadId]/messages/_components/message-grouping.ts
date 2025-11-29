@@ -3,7 +3,10 @@
  * Groups messages that are part of the same AI response sequence
  */
 
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type {
+  ChatMessage,
+  ToolCall,
+} from "@/app/api/[locale]/v1/core/agent/chat/db";
 
 /**
  * Grouped message sequence
@@ -82,20 +85,18 @@ export function hasContentAfterToolCalls(group: MessageGroup): boolean {
  * Get all tool calls from a message group
  * Combines tool calls from primary and all continuations
  */
-export function getAllToolCallsFromGroup(
-  group: MessageGroup,
-): Array<NonNullable<ChatMessage["toolCalls"]>[number]> {
-  const allToolCalls: Array<NonNullable<ChatMessage["toolCalls"]>[number]> = [];
+export function getAllToolCallsFromGroup(group: MessageGroup): ToolCall[] {
+  const allToolCalls: ToolCall[] = [];
 
-  // Add tool calls from primary
-  if (group.primary.toolCalls) {
-    allToolCalls.push(...group.primary.toolCalls);
+  // Add tool call from primary (metadata.toolCall is singular)
+  if (group.primary.metadata?.toolCall) {
+    allToolCalls.push(group.primary.metadata.toolCall);
   }
 
   // Add tool calls from continuations
   for (const continuation of group.continuations) {
-    if (continuation.toolCalls) {
-      allToolCalls.push(...continuation.toolCalls);
+    if (continuation.metadata?.toolCall) {
+      allToolCalls.push(continuation.metadata.toolCall);
     }
   }
 

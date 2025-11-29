@@ -4,7 +4,7 @@
  */
 
 import { useCallback, useState } from "react";
-import type { ChatMessage } from "./store";
+import type { ChatMessage } from "../db";
 
 
 interface UseMessageActionsProps {

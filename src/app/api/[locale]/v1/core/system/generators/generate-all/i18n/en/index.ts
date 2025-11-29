@@ -31,6 +31,10 @@ export const translations = {
         label: "Skip Task Index",
         description: "Skip task index generation",
       },
+      skipTrpc: {
+        label: "Skip TRPC",
+        description: "Skip TRPC router generation",
+      },
       success: {
         title: "Success",
       },

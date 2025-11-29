@@ -10,6 +10,7 @@ import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-int
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import {
+  UserPermissionRole,
   UserRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -156,10 +157,12 @@ export function testEndpoint<
                   isPublic: false,
                   id: "test-user-id",
                   leadId: "test-lead-id",
+                  roles: [UserPermissionRole.ADMIN],
                 }
               : {
                   isPublic: true,
                   leadId: "test-lead-id",
+                  roles: [UserPermissionRole.PUBLIC],
                 };
 
             const response = await testRunner.executeWith({
@@ -204,6 +207,7 @@ export function testEndpoint<
             user: {
               isPublic: true,
               leadId: "test-lead-id",
+              roles: [UserPermissionRole.PUBLIC],
             },
           });
 
@@ -243,6 +247,7 @@ export function testEndpoint<
                   isPublic: false,
                   id: "authorized-test-user-id",
                   leadId: "test-lead-id",
+                  roles: [UserPermissionRole.ADMIN],
                 },
               });
 

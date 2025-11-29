@@ -9,38 +9,81 @@
  * All icon props (model, persona, folder) use the same IconValue type.
  */
 
-import {
+import * as Icons from "next-vibe-ui/ui/icons";
+/* eslint-disable @typescript-eslint/no-unused-vars -- exhaustive destructuring for type checking */
+const {
   Activity,
   AlertCircle,
+  AlertTriangle,
   Archive,
+  ArchiveRestore,
+  ArrowBigDown,
+  ArrowBigUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowLeftIcon,
   ArrowRight,
+  ArrowRightIcon,
+  ArrowUp,
   Atom,
   Award,
   Banknote,
+  BarChart3,
+  BarChart3Icon,
   Bell,
+  Bitcoin,
   Book,
-  Bookmark,
   BookOpen,
+  Bookmark,
   Bot,
+  Box,
   Brain,
   Briefcase,
+  Brush,
   Bug,
+  Building,
   Calendar,
   Camera,
+  Check,
   CheckCircle,
+  CheckCircle2,
+  CheckIcon,
+  ChevronDown,
+  ChevronDownIcon,
+  ChevronLeft,
+  ChevronLeftIcon,
+  ChevronRight,
+  ChevronRightIcon,
+  ChevronUp,
+  ChevronsLeft,
+  ChevronsRight,
+  Circle,
   Clock,
   Cloud,
   Code,
   Coffee,
+  Coins,
   Compass,
+  Copy,
+  CornerDownRight,
   Cpu,
+  CreditCard,
+  Cross2Icon,
   Crown,
+  DashIcon,
   Database,
   DollarSign,
+  DotFilledIcon,
+  DotsHorizontalIcon,
   Download,
+  DragHandleDots2Icon,
   Dumbbell,
   Edit,
+  Edit2,
+  ExternalLink,
+  Eye,
   EyeOff,
+  Facebook,
   FileText,
   Film,
   Filter,
@@ -50,12 +93,18 @@ import {
   FolderCode,
   FolderGit,
   FolderHeart,
+  FolderIcon,
+  FolderInput,
   FolderOpen,
+  FolderPlus,
   Gamepad,
   Gift,
   GitBranch,
   Globe,
   GraduationCap,
+  Grid3x3,
+  GripVertical,
+  Handshake,
   Hash,
   Heart,
   HelpCircle,
@@ -64,70 +113,115 @@ import {
   Image,
   Inbox,
   Info,
+  Instagram,
   Laptop,
   Layers,
+  Layout,
+  LayoutTemplate,
   Leaf,
   Library,
   Lightbulb,
+  LineChart,
+  LineChartIcon,
   Link,
+  Linkedin,
   List,
+  Loader2,
   Lock,
+  LogOut,
+  MagnifyingGlassIcon,
   Mail,
+  MailOpen,
   Map,
   Megaphone,
+  Menu,
   MessageCircle,
   MessageSquare,
+  MessageSquarePlus,
   Mic,
+  MicOff,
   Microscope,
+  Minus,
   Monitor,
+  Moon,
   MoonIcon,
+  MoreHorizontal,
+  MoreVertical,
   Mountain,
+  MousePointer,
+  MoveLeft,
   Music,
+  Navigation,
   Network,
   Newspaper,
   Package,
   Palette,
+  PanelLeft,
   Paperclip,
+  Pause,
   PenTool,
   Phone,
   PieChart,
   Pin,
+  PinOff,
   Plane,
   Play,
   Plus,
+  Printer,
   Radio,
+  RefreshCw,
   Rocket,
+  RotateCcw,
   Save,
   Scale,
   Search,
   Send,
+  Server,
   Settings,
   Share,
+  Share2,
   Shield,
+  ShieldOff,
   ShieldOffIcon,
   ShieldPlus,
   ShoppingBag,
   Sparkles,
+  Square,
   Star,
   Sun,
+  Table,
   Tag,
   Target,
   Terminal,
   TestTube,
+  ThumbsDown,
   ThumbsUp,
+  Trash2,
+  TrendingDown,
   TrendingUp,
+  TrendingUpIcon,
   Trophy,
   Tv,
+  Twitter,
   Upload,
   User,
+  UserCheck,
+  UserPlus,
   Users,
+  UserX,
   Utensils,
   Video,
   Volume2,
+  VolumeX,
   Wallet,
   Wand2,
   Wifi,
+  WifiOff,
   Wind,
+  Wrench,
+  X,
+  XCircle,
+  Youtube,
   Zap,
   SiAlibabadotcom,
   SiAndroid,
@@ -153,7 +247,11 @@ import {
   SiTypescript,
   SiX,
   SiZendesk,
-} from "next-vibe-ui/ui/icons";
+  ...exhaustiveCheck
+} = Icons;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _exhaustiveCheck: Record<string, never> = exhaustiveCheck;
+
 import { cn } from "next-vibe/shared/utils";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
@@ -164,11 +262,19 @@ import React from "react";
  */
 export type IconComponent =
   | React.FC<{ className?: string }>
-  | React.ComponentClass<{ className?: string }>
-  | React.ForwardRefExoticComponent<
-      React.PropsWithoutRef<{ className?: string }> &
-        React.RefAttributes<HTMLElement>
-    >;
+  | React.ComponentClass<{ className?: string }>;
+
+/**
+ * Helper to create emoji icon components
+ */
+/* eslint-disable i18next/no-literal-string -- Emoji icons are universal symbols */
+const createEmojiIcon = (emoji: string): IconComponent => {
+  const EmojiIcon: IconComponent = ({ className = "" }) => (
+    <Span className={cn("text-base leading-none", className)}>{emoji}</Span>
+  );
+  return EmojiIcon;
+};
+/* eslint-enable i18next/no-literal-string */
 
 /**
  * Special 1A icon component (defined outside registry due to JSX)
@@ -179,7 +285,7 @@ const OneAIcon: IconComponent = ({ className = "" }) => (
   <Span
     className={cn(
       "text-lg font-bold leading-none flex items-center justify-center",
-      "bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600",
+      "bg-linear-to-br from-amber-400 via-yellow-500 to-amber-600",
       "bg-clip-text text-transparent",
       className,
     )}
@@ -376,6 +482,35 @@ export const ICON_REGISTRY = {
 
   // Special: 1A icon (custom component)
   "1a": OneAIcon,
+
+  // Emoji Icons (AI Model Providers & Personas)
+  whale: createEmojiIcon("🐋"),
+  ocean: createEmojiIcon("🌊"),
+  "robot-face": createEmojiIcon("🤖"),
+  "speaking-head": createEmojiIcon("🗣️"),
+  "smiling-devil": createEmojiIcon("😈"),
+  gear: createEmojiIcon("⚙️"),
+  eagle: createEmojiIcon("🦅"),
+  scroll: createEmojiIcon("📜"),
+  "thinking-face": createEmojiIcon("🤔"),
+  "artist-palette": createEmojiIcon("🎨"),
+  "sleeping-face": createEmojiIcon("💤"),
+  salute: createEmojiIcon("o/"),
+  "smiling-face": createEmojiIcon("😊"),
+  "high-voltage": createEmojiIcon("⚡"),
+  books: createEmojiIcon("📚"),
+  fire: createEmojiIcon("🔥"),
+  "glowing-star": createEmojiIcon("🌟"),
+  "direct-hit": createEmojiIcon("🎯"),
+  technologist: createEmojiIcon("👨‍💻"),
+  locked: createEmojiIcon("🔒"),
+  "globe-emoji": createEmojiIcon("🌍"),
+  people: createEmojiIcon("👥"),
+  "rocket-emoji": createEmojiIcon("🚀"),
+  bulb: createEmojiIcon("💡"),
+  "star-emoji": createEmojiIcon("⭐"),
+  "mobile-phone": createEmojiIcon("📱"),
+  "game-controller": createEmojiIcon("🎮"),
 } as const;
 
 /**
@@ -384,13 +519,18 @@ export const ICON_REGISTRY = {
 export type IconKey = keyof typeof ICON_REGISTRY;
 
 /**
+ * DB enum array for Zod/Drizzle
+ */
+export const IconKeyDB = Object.keys(ICON_REGISTRY) as readonly IconKey[];
+
+/**
  * Union type for all possible icon values:
- * - string: Unicode/emoji (e.g., "🤖", "🎨") - includes IconKey strings
+ * - IconKey: String keys from ICON_REGISTRY
  * - IconComponent: React component with className prop
  *
- * Note: IconKey is a subset of string, so we don't need to include it separately
+ * Note: At runtime, we also accept emoji strings via Zod validation
  */
-export type IconValue = string | IconComponent;
+export type IconValue = IconKey | IconComponent;
 
 /**
  * Check if a value is an IconKey (exists in ICON_REGISTRY)

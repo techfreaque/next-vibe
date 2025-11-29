@@ -6,106 +6,178 @@
 import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { UserPermissionRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import type { RouteExecutionContext } from "../cli/route-executor";
-import { endpointToMetadata } from "../shared/conversion/endpoint-to-metadata";
-import type { ParameterValue } from "../shared/server-only/execution/executor";
-import { BaseRegistry } from "../shared/server-only/execution/registry";
-import { toolFilter } from "../shared/server-only/permissions/filter";
-/**
- * Singleton instance using shared factory
- */
-import { createKeyedSingletonGetter } from "../shared/utils/singleton";
-import { isMCPServerEnabled } from "./config";
-import { toolMetadataToMCPTool } from "./converter";
+import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
+import { Platform } from "../shared/types/platform";
+import { routeExecutionExecutor } from "../shared/endpoints/route/executor";
+import type { CreateApiEndpointAny } from "../shared/types/endpoint";
 import type {
-  IMCPRegistry,
   MCPExecutionContext,
   MCPToolCallResult,
   MCPToolMetadata,
 } from "./types";
 import { MCPErrorCode } from "./types";
+import type { TranslationKey } from "@/i18n/core/static-types";
+import type { Methods } from "../shared/types/enums";
+
+/**
+ * MCP Registry Interface
+ */
+export interface IMCPRegistry {
+  initialize(logger: EndpointLogger, locale: CountryLanguage): Promise<void>;
+  getTools(user: JwtPayloadType, logger: EndpointLogger): MCPToolMetadata[];
+  getToolByName(name: string, logger: EndpointLogger): MCPToolMetadata | null;
+  executeTool(
+    context: MCPExecutionContext,
+    logger: EndpointLogger,
+  ): Promise<MCPToolCallResult>;
+  isInitialized(): boolean;
+  refresh(logger: EndpointLogger, locale: CountryLanguage): Promise<void>;
+}
 
 /**
  * MCP Registry Implementation
- * Extends BaseRegistry to eliminate duplication
  */
-export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
-  private tools: MCPToolMetadata[] = [];
+export class MCPRegistry implements IMCPRegistry {
+  private initialized = false;
+  private lastRefresh = 0;
+  private locale: CountryLanguage = "en-GLOBAL" as CountryLanguage;
 
-  constructor(logger: EndpointLogger, locale: CountryLanguage) {
-    super(
-      {
-        // Platform name is an internal identifier for logging, not user-facing
-        // eslint-disable-next-line i18next/no-literal-string
-        platformName: "MCP Registry",
-        locale,
-        enabledCheck: isMCPServerEnabled,
-      },
-      logger,
-    );
+  /**
+   * Initialize the registry
+   */
+  async initialize(
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<void> {
+    if (this.initialized) {
+      return;
+    }
+
+    try {
+      logger.info("[MCP Registry] Starting initialization...");
+
+      this.locale = locale;
+      this.lastRefresh = Date.now();
+      this.initialized = true;
+
+      logger.info("[MCP Registry] Initialization complete");
+    } catch (error) {
+      logger.error("[MCP Registry] Initialization failed", {
+        error: parseError(error).message,
+      });
+      this.initialized = false;
+    }
   }
 
   /**
-   * Post-initialization hook - convert endpoints to MCP tools
-   * Async to match parent interface, even though no await is needed
+   * Ensure registry is initialized
    */
-  // eslint-disable-next-line @typescript-eslint/require-await
-  protected async onInitialized(): Promise<void> {
-    const endpoints = super.getEndpoints();
-    this.tools = endpoints.map((endpoint) => endpointToMetadata(endpoint));
-
-    this.logger.info("[MCP Registry] Tools registered", {
-      toolsCount: this.tools.length,
-    });
+  private ensureInitialized(logger: EndpointLogger): void {
+    if (!this.initialized) {
+      logger.warn(
+        "[MCP Registry] Registry not initialized, initializing now...",
+      );
+    }
   }
 
   /**
    * Get all tools for a specific user (filtered by permissions)
    */
-  getTools(user: JwtPayloadType): MCPToolMetadata[] {
-    this.ensureInitialized();
+  getTools(user: JwtPayloadType, logger: EndpointLogger): MCPToolMetadata[] {
+    this.ensureInitialized(logger);
 
-    // Use base class method for permission filtering
-    const filteredEndpoints = super.getEndpointsByPermissions(user);
-    const filteredEndpointIds = new Set(filteredEndpoints.map((e) => e.id));
+    // Get serialized tools from shared registry (already filtered by user)
+    const serialized = definitionsRegistry.getSerializedToolsForUser(
+      Platform.MCP,
+      user,
+      this.locale,
+      logger,
+    );
 
-    // Return only tools whose endpoints passed permission check
-    return this.tools.filter((tool) => filteredEndpointIds.has(tool.id));
+    // Convert to MCP tool metadata format
+    return serialized.map((tool) => ({
+      id: tool.name,
+      toolName: tool.name,
+      name: tool.name,
+      description: tool.description as TranslationKey,
+      category: tool.category as TranslationKey | undefined,
+      tags: tool.tags as readonly (TranslationKey | undefined)[],
+      path: tool.name,
+      routePath: tool.name,
+      definitionPath: tool.name,
+      method: tool.method as Methods,
+      allowedRoles: tool.allowedRoles,
+      requiresAuth: tool.allowedRoles.length > 0,
+      aliases: tool.aliases,
+    }));
+  }
+
+  /**
+   * Get full endpoints for a specific user (filtered by permissions)
+   * Returns endpoints with field information for schema generation
+   */
+  getEndpoints(
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): CreateApiEndpointAny[] {
+    this.ensureInitialized(logger);
+
+    // Get filtered endpoints from shared registry
+    return definitionsRegistry.getEndpointsForUser(Platform.MCP, user, logger);
   }
 
   /**
    * Get tool metadata by name
    */
-  getToolByName(name: string): MCPToolMetadata | null {
-    this.ensureInitialized();
+  getToolByName(name: string, logger: EndpointLogger): MCPToolMetadata | null {
+    this.ensureInitialized(logger);
+
+    // Get all tools (this will be filtered by user in getTools, but here we need unfiltered)
+    // For now, we'll use a public user to get all tools
+    const publicUser: JwtPayloadType = {
+      isPublic: true,
+      leadId: "mcp-registry-anonymous",
+      roles: [UserPermissionRole.PUBLIC],
+    };
+
+    const tools = this.getTools(publicUser, logger);
 
     // Try direct name match first
-    const tool = this.tools.find((t) => t.name === name);
+    const tool = tools.find((t) => t.name === name);
     if (tool) {
       return tool;
     }
 
-    // Try aliases (check definition files)
-    return this.findToolByAlias(name);
+    // Try aliases
+    return tools.find((t) => t.aliases?.includes(name)) || null;
   }
 
   /**
    * Execute a tool
    */
-  async executeTool(context: MCPExecutionContext): Promise<MCPToolCallResult> {
-    this.ensureInitialized();
+  async executeTool(
+    context: MCPExecutionContext,
+    logger: EndpointLogger,
+  ): Promise<MCPToolCallResult> {
+    this.ensureInitialized(logger);
 
     const { t } = simpleT(context.locale);
 
-    // Get tool metadata
-    const toolMeta = this.getToolByName(context.toolName);
+    // Get tool metadata (this checks if tool exists and user has permission)
+    const userTools = this.getTools(context.user, logger);
+    const toolMeta = userTools.find(
+      (t) =>
+        t.name === context.toolName || t.aliases?.includes(context.toolName),
+    );
+
     if (!toolMeta) {
       return this.fail({
         error: t(
@@ -116,75 +188,39 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
       });
     }
 
-    // Check permissions (toolMeta IS the endpoint now)
-    const endpoint = super.getEndpoints().find((e) => e.id === toolMeta.id);
-    if (!endpoint) {
-      return this.fail({
-        error: t(
-          "app.api.v1.core.system.unifiedInterface.mcp.registry.endpointNotFound",
-        ),
-        code: MCPErrorCode.TOOL_NOT_FOUND,
-        details: { toolName: context.toolName },
-      });
-    }
-
-    if (!toolFilter.hasEndpointPermission(endpoint, context.user)) {
-      return this.fail({
-        error: t(
-          "app.api.v1.core.system.unifiedInterface.mcp.registry.permissionDenied",
-        ),
-        code: MCPErrorCode.PERMISSION_DENIED,
-        details: {
-          toolName: context.toolName,
-          requiredRoles: toolMeta.allowedRoles,
-        },
-      });
-    }
-
-    // Execute tool using shared base executor
+    // Execute tool using shared generic handler
     try {
-      const { RouteDelegationHandler } =
-        await import("../../unified-interface/cli/route-executor");
+      logger.debug("[MCP Registry] Executing tool", {
+        toolName: context.toolName,
+        user: context.user.isPublic
+          ? { isPublic: true, leadId: context.user.leadId }
+          : { isPublic: false, id: context.user.id },
+        dataKeys: Object.keys(context.data),
+      });
 
-      const { t } = simpleT(context.locale);
-
-      const discoveredRoute = {
-        alias: toolMeta.name,
-        path: toolMeta.path,
-        method: toolMeta.method,
-        routePath: toolMeta.routePath,
-        description: toolMeta.description,
-      };
-
-      const executionContext: RouteExecutionContext = {
-        toolName: toolMeta.name,
+      const result = await routeExecutionExecutor.executeGenericHandler({
+        toolName: context.toolName,
         data: context.data,
-        urlPathParams: {},
         user: context.user,
         locale: context.locale,
-        logger: this.logger,
-        platform: context.platform,
-        options: {
-          dryRun: false,
-          interactive: false,
-          output: "json" as const,
-        },
-      };
+        logger,
+        platform: Platform.MCP,
+      });
 
-      const routeExecutor = new RouteDelegationHandler();
-      const result = await routeExecutor.executeRoute(
-        discoveredRoute,
-        executionContext,
-        this.logger,
-        context.locale,
-        t,
-      );
+      logger.debug("[MCP Registry] Tool execution complete", {
+        toolName: context.toolName,
+        success: result.success,
+        hasData: !!(result.success && result.data),
+        errorMessage: result.success ? undefined : result.message,
+      });
 
       return this.convertToMCPResult(result, context.toolName, context.locale);
     } catch (error) {
-      this.logger.error("[MCP Registry] Tool execution failed", {
+      const parsedError = parseError(error);
+      logger.error("[MCP Registry] Tool execution failed with exception", {
         toolName: context.toolName,
-        error: parseError(error).message,
+        error: parsedError.message,
+        stack: parsedError.stack,
       });
 
       return this.fail({
@@ -192,7 +228,11 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
           "app.api.v1.core.system.unifiedInterface.mcp.registry.toolExecutionFailed",
         ),
         code: MCPErrorCode.TOOL_EXECUTION_FAILED,
-        details: { toolName: context.toolName },
+        details: {
+          toolName: context.toolName,
+          exceptionMessage: parsedError.message,
+          stack: parsedError.stack?.split("\n").slice(0, 3).join("\n"),
+        },
       });
     }
   }
@@ -230,7 +270,7 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
    * Convert route execution result to MCP format
    */
   private convertToMCPResult(
-    result: { success: boolean; data?: ParameterValue; error?: string },
+    result: ResponseType<unknown>,
     toolName: string,
     locale: CountryLanguage,
   ): MCPToolCallResult {
@@ -247,14 +287,41 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
     }
 
     const { t } = simpleT(locale);
-    return this.fail({
-      error:
-        result.error ||
-        t(
+
+    // Extract error message from ResponseType
+    const errorMessage = result.message
+      ? t(result.message, result.messageParams)
+      : t(
           "app.api.v1.core.system.unifiedInterface.mcp.registry.toolExecutionFailed",
-        ),
+        );
+
+    // Build detailed error information for debugging
+    const errorDetails: {
+      toolName: string;
+      errorType?: string;
+      message?: string;
+      messageParams?: unknown;
+      cause?: string;
+      causeType?: string;
+      causeParams?: unknown;
+    } = {
+      toolName,
+      errorType: result.errorType?.errorKey,
+      message: result.message,
+      messageParams: result.messageParams,
+    };
+
+    // Include full cause chain for better debugging
+    if (result.cause) {
+      errorDetails.cause = result.cause.message;
+      errorDetails.causeType = result.cause.errorType?.errorKey;
+      errorDetails.causeParams = result.cause.messageParams;
+    }
+
+    return this.fail({
+      error: errorMessage,
       code: MCPErrorCode.TOOL_EXECUTION_FAILED,
-      details: { toolName },
+      details: errorDetails,
     });
   }
 
@@ -268,42 +335,14 @@ export class MCPRegistry extends BaseRegistry implements IMCPRegistry {
   /**
    * Refresh the registry
    */
-  async refresh(): Promise<void> {
-    this.logger.info("[MCP Registry] Refreshing...");
-    this.tools = [];
-    await super.refresh();
-  }
-
-  /**
-   * Find tool by checking definition files for custom aliases
-   */
-  private findToolByAlias(alias: string): MCPToolMetadata | null {
-    // Search through all tools for matching aliases
-    for (const tool of this.tools) {
-      const endpoint = super.getEndpoints().find((e) => e.id === tool.id);
-      if (!endpoint) {
-        continue;
-      }
-
-      // Check if alias matches any of the endpoint's aliases
-      const aliases = endpoint.definition.aliases;
-      if (aliases?.includes(alias)) {
-        return tool;
-      }
-    }
-
-    return null;
+  async refresh(
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<void> {
+    logger.info("[MCP Registry] Refreshing...");
+    this.initialized = false;
+    await this.initialize(logger, locale);
   }
 }
 
-export const getMCPRegistry = createKeyedSingletonGetter(
-  (key: string, locale: CountryLanguage) => {
-    const logger = createEndpointLogger(false, Date.now(), locale);
-    return new MCPRegistry(logger, locale);
-  },
-);
-
-/**
- * Export converter utilities for direct use
- */
-export { toolMetadataToMCPTool };
+export const mcpRegistry = new MCPRegistry();

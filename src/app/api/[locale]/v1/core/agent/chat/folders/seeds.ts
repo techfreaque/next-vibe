@@ -15,6 +15,7 @@ import {
 
 import { DefaultFolderId } from "../config";
 import { chatFolders } from "../db";
+import type { IconKey } from "../model-access/icons";
 
 /**
  * Forum category configurations
@@ -23,7 +24,7 @@ import { chatFolders } from "../db";
 interface CategoryConfig {
   id: string; // Fixed UUID for stable identification
   name: string;
-  icon: string;
+  icon: IconKey;
   color: string;
   sortOrder: number;
   description?: string;

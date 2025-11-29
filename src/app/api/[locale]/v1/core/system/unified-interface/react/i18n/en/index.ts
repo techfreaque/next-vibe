@@ -44,6 +44,7 @@ export const translations = {
         error: "Error",
         executing: "Executing...",
         complete: "Complete",
+        waitingForConfirmation: "Waiting for confirmation",
       },
       sections: {
         request: "Request",
@@ -56,6 +57,11 @@ export const translations = {
         noResult: "No result",
         metadataNotAvailable:
           "Widget metadata not available. Showing raw result.",
+        confirmationRequired: "Review and edit parameters, then confirm to execute.",
+      },
+      actions: {
+        confirm: "Confirm",
+        cancel: "Cancel",
       },
     },
     codeQualityList: {

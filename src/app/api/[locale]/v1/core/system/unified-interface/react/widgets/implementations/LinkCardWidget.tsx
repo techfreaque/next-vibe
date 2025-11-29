@@ -57,48 +57,10 @@ export function LinkCardWidget({
   // Always use external links for openInNewTab to avoid eslint errors
   const shouldUseExternalLink = isExternal || openInNewTab;
 
-  const linkContent = (
-    <>
-      <CardHeader className="pb-3">
-        <Div className="flex items-start justify-between gap-2">
-          <Div className="min-w-0 flex-1">
-            <CardTitle className="group flex items-center gap-2 text-base font-semibold">
-              <Span className="truncate transition-colors group-hover:text-primary">
-                {title}
-              </Span>
-              <ExternalLink className="h-4 w-4 shrink-0 opacity-50 transition-opacity group-hover:opacity-100" />
-            </CardTitle>
-            <Div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-              {source && <Span className="font-medium">{source}</Span>}
-              {age && source && <Span>•</Span>}
-              {age && <Span>{age}</Span>}
-            </Div>
-          </Div>
-          {thumbnail && (
-            <Image
-              src={thumbnail}
-              alt={title}
-              width={64}
-              height={64}
-              className="w-16 h-16 object-cover rounded shrink-0"
-            />
-          )}
-        </Div>
-      </CardHeader>
-      {displayDescription && (
-        <CardContent className="pt-0">
-          <CardDescription className="line-clamp-3 text-sm">
-            {displayDescription}
-          </CardDescription>
-        </CardContent>
-      )}
-    </>
-  );
-
   return (
     <Card
       className={cn(
-        "transition-all hover:shadow-md",
+        "group/card transition-all hover:shadow-md",
         !context.isInteractive && "opacity-75",
         className,
       )}
@@ -115,7 +77,39 @@ export function LinkCardWidget({
             !context.isInteractive && "pointer-events-none",
           )}
         >
-          {linkContent}
+          <CardHeader className="pb-3">
+            <Div className="flex items-start justify-between gap-2">
+              <Div className="min-w-0 flex-1">
+                <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                  <Span className="truncate transition-colors group-hover/card:text-primary">
+                    {title}
+                  </Span>
+                  <ExternalLink className="h-4 w-4 shrink-0 opacity-50 transition-opacity group-hover/card:opacity-100" />
+                </CardTitle>
+                <Div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                  {source && <Span className="font-medium">{source}</Span>}
+                  {age && source && <Span>•</Span>}
+                  {age && <Span>{age}</Span>}
+                </Div>
+              </Div>
+              {thumbnail && (
+                <Image
+                  src={thumbnail}
+                  alt={title}
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 object-cover rounded shrink-0"
+                />
+              )}
+            </Div>
+          </CardHeader>
+          {displayDescription && (
+            <CardContent className="pt-0">
+              <CardDescription className="line-clamp-3 text-sm">
+                {displayDescription}
+              </CardDescription>
+            </CardContent>
+          )}
         </a>
       ) : (
         <Link
@@ -125,7 +119,39 @@ export function LinkCardWidget({
             !context.isInteractive && "pointer-events-none",
           )}
         >
-          {linkContent}
+          <CardHeader className="pb-3">
+            <Div className="flex items-start justify-between gap-2">
+              <Div className="min-w-0 flex-1">
+                <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                  <Span className="truncate transition-colors group-hover/card:text-primary">
+                    {title}
+                  </Span>
+                  <ExternalLink className="h-4 w-4 shrink-0 opacity-50 transition-opacity group-hover/card:opacity-100" />
+                </CardTitle>
+                <Div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                  {source && <Span className="font-medium">{source}</Span>}
+                  {age && source && <Span>•</Span>}
+                  {age && <Span>{age}</Span>}
+                </Div>
+              </Div>
+              {thumbnail && (
+                <Image
+                  src={thumbnail}
+                  alt={title}
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 object-cover rounded shrink-0"
+                />
+              )}
+            </Div>
+          </CardHeader>
+          {displayDescription && (
+            <CardContent className="pt-0">
+              <CardDescription className="line-clamp-3 text-sm">
+                {displayDescription}
+              </CardDescription>
+            </CardContent>
+          )}
         </Link>
       )}
     </Card>

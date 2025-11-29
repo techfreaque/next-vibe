@@ -6,6 +6,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import { getModelById, type ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { getPersonaById } from "@/app/api/[locale]/v1/core/agent/chat/personas/config";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -86,10 +87,8 @@ export function MessageAuthorInfo({
             model &&
             ((): JSX.Element | null => {
               const modelData = getModelById(model);
-              const ModelIcon = modelData.icon;
-              return typeof ModelIcon === "string" ? (
-                <Span className="text-base leading-none">{ModelIcon}</Span>
-              ) : (
+              const ModelIcon = getIconComponent(modelData.icon);
+              return (
                 <ModelIcon
                   className={cn(compact ? "h-3 w-3" : "h-3.5 w-3.5")}
                 />

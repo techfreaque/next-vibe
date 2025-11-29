@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   requestDataField,
@@ -23,6 +23,7 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { ModelId, ModelIdOptions } from "../model-access/models";
 import { CategoryOptions } from "./config";
+import { iconSchema } from "../../../shared/types/common.schema";
 
 /**
  * Get Personas List Endpoint (GET)
@@ -58,7 +59,8 @@ const { GET } = createEndpoint({
             type: WidgetType.CONTAINER,
             title:
               "app.api.v1.core.agent.chat.personas.get.response.personas.persona.title" as const,
-            layoutType: LayoutType.GRID, columns: 2,
+            layoutType: LayoutType.GRID,
+            columns: 2,
           },
           { response: true },
           {
@@ -92,7 +94,8 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.v1.core.agent.chat.personas.get.response.personas.persona.icon.content" as const,
               },
-              z.string(),
+              // Runtime: accepts any string (emoji, IconKey), Type: IconKey
+              iconSchema,
             ),
             systemPrompt: responseField(
               {
@@ -219,7 +222,7 @@ const { GET } = createEndpoint({
             id: "default",
             name: "Default",
             description: "The models unmodified behavior",
-            icon: "🤖",
+            icon: "robot-face",
             systemPrompt: "",
             category: "general",
             source: "built-in",
@@ -232,7 +235,7 @@ const { GET } = createEndpoint({
             id: "550e8400-e29b-41d4-a716-446655440000",
             name: "My Custom Persona",
             description: "A custom persona I created",
-            icon: "🎯",
+            icon: "direct-hit",
             systemPrompt: "You are a helpful assistant specialized in...",
             category: "technical",
             source: "my",
@@ -304,7 +307,8 @@ const { POST } = createEndpoint({
             "app.api.v1.core.agent.chat.personas.post.icon.description" as const,
           columns: 6,
         },
-        z.string().min(1).max(10),
+        // Runtime: accepts any string (emoji, IconKey), Type: IconKey
+        iconSchema,
       ),
       systemPrompt: requestDataField(
         {
@@ -444,7 +448,7 @@ const { POST } = createEndpoint({
       create: {
         name: "Code Reviewer",
         description: "Expert at reviewing code and suggesting improvements",
-        icon: "👨‍💻",
+        icon: "technologist",
         systemPrompt:
           "You are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
         category: "technical",

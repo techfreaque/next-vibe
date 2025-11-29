@@ -9,7 +9,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import type { CreateApiEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { Methods as MethodsEnum } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -69,15 +69,15 @@ export async function executeMutation<
 }: {
   endpoint: TEndpoint;
   logger: EndpointLogger;
-  requestData: TEndpoint["TRequestOutput"];
-  pathParams: TEndpoint["TUrlVariablesOutput"];
+  requestData: TEndpoint["types"]["RequestOutput"];
+  pathParams: TEndpoint["types"]["UrlVariablesOutput"];
   locale: CountryLanguage;
   options?: MutationExecutorOptions<
-    TEndpoint["TRequestOutput"],
-    TEndpoint["TResponseOutput"],
-    TEndpoint["TUrlVariablesOutput"]
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"]
   >;
-}): Promise<ResponseType<TEndpoint["TResponseOutput"]>> {
+}): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
   let requestData = initialRequestData;
 
   // Validate request data against schema
@@ -101,7 +101,7 @@ export async function executeMutation<
       "Converting object to undefined for endpoint with undefinedSchema",
       endpoint.path.join("/"),
     );
-    requestData = undefined as TEndpoint["TRequestOutput"];
+    requestData = undefined as TEndpoint["types"]["RequestOutput"];
   }
 
   if (isEmptyObjectSchema && requestData === undefined) {
@@ -109,7 +109,7 @@ export async function executeMutation<
       "Converting undefined to empty object for endpoint with empty object schema",
       endpoint.path.join("/"),
     );
-    requestData = {} as TEndpoint["TRequestOutput"];
+    requestData = {} as TEndpoint["types"]["RequestOutput"];
   }
 
   // Build the endpoint URL with locale and replace URL path parameters
@@ -172,7 +172,7 @@ export async function executeMutation<
 
   try {
     // Make API call
-    const response = await callApi<TEndpoint["TResponseOutput"]>(
+    const response = await callApi<TEndpoint["types"]["ResponseOutput"]>(
       endpoint,
       endpointUrl,
       body,
@@ -189,7 +189,7 @@ export async function executeMutation<
 
       // If callback returns an error, return it
       if (callbackResult) {
-        return callbackResult as ResponseType<TEndpoint["TResponseOutput"]>;
+        return callbackResult as ResponseType<TEndpoint["types"]["ResponseOutput"]>;
       }
     }
 

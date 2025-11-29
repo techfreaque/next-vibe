@@ -13,7 +13,7 @@ interface ChatBrandingProps {
 
 /**
  * Logo/branding display for the chat interface.
- * Only shown in linear view when there are messages.
+ * Only shown in linear and debug views when there are messages.
  * Uses zero-height container to overlay the logo without affecting layout.
  */
 export function ChatBranding({ locale }: ChatBrandingProps): JSX.Element {

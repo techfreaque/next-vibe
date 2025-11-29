@@ -5,20 +5,17 @@
 
 import chalk from "chalk";
 
-import { getBaseFormatter } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/formatting/data";
+import { getBaseFormatter } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/widgets/utils/formatting";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { WidgetData, WidgetInput } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/widgets/types";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 
 import type {
   DataFormatter,
-  RenderableValue,
-  ResponseFieldMetadata,
   WidgetRenderContext,
   WidgetRenderer,
 } from "./types";
 
-/**
- * Abstract base widget renderer with common utilities
- */
 export abstract class BaseWidgetRenderer implements WidgetRenderer {
   protected formatter: DataFormatter;
 
@@ -27,10 +24,7 @@ export abstract class BaseWidgetRenderer implements WidgetRenderer {
   }
 
   abstract canRender(widgetType: string): boolean;
-  abstract render(
-    field: ResponseFieldMetadata,
-    context: WidgetRenderContext,
-  ): string;
+  abstract render(input: WidgetInput, context: WidgetRenderContext): string;
 
   /**
    * Create indentation for the given depth
@@ -85,23 +79,15 @@ export abstract class BaseWidgetRenderer implements WidgetRenderer {
     return `${icon} ${text}`;
   }
 
-  /**
-   * Format field label with translation
-   */
   protected formatLabel(
-    field: ResponseFieldMetadata,
+    field: UnifiedField,
     context: WidgetRenderContext,
   ): string {
-    // If we have a translation key, use it
-    if (field.label) {
-      return this.styleText(context.t(field.label), "bold", context);
+    // Check if ui config has a label property
+    if ("label" in field.ui && field.ui.label) {
+      return this.styleText(context.t(field.ui.label), "bold", context);
     }
-    // Otherwise format the field name directly (non-i18n)
-    const formatted = field.name
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (str) => str.toUpperCase())
-      .trim();
-    return this.styleText(formatted, "bold", context);
+    return "";
   }
 
   /**
@@ -211,7 +197,7 @@ class DefaultDataFormatter implements DataFormatter {
   }
 
   formatArray(
-    value: RenderableValue[],
+    value: WidgetData[],
     options?: { separator?: string; maxItems?: number },
   ): string {
     const separator = options?.separator ?? ", ";
@@ -248,7 +234,7 @@ class DefaultDataFormatter implements DataFormatter {
     return formatted;
   }
 
-  formatObject(value: Record<string, RenderableValue>): string {
+  formatObject(value: Record<string, WidgetData>): string {
     try {
       return JSON.stringify(value, null, 2);
     } catch {

@@ -22,6 +22,7 @@ import React, { useMemo, useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
+import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -82,12 +83,12 @@ export function RedditStyleView({
       const modelNames = [
         ...new Set(
           messages
-            .filter((msg) => msg.model)
+            .filter((msg): msg is typeof msg & { model: ModelId } => msg.model !== null)
             .map((msg) => {
               try {
-                return getModelById(msg.model!).name;
+                return getModelById(msg.model).name;
               } catch {
-                return msg.model as string;
+                return msg.model;
               }
             }),
         ),

@@ -77,6 +77,7 @@ export const translations = {
       linearView: "Linear view (ChatGPT style)",
       threadedView: "Threaded view (Reddit/Discord style)",
       flatView: "Flat view (4chan style)",
+      debugView: "Debug view (with system prompts)",
     },
 
     // Search Modal
@@ -690,6 +691,25 @@ export const translations = {
     },
   },
   linearMessageView: {
+    retryModal: {
+      title: "Retry with Different Settings",
+      description: "Choose a model and persona to regenerate the response",
+      confirmLabel: "Retry",
+    },
+    answerModal: {
+      title: "Answer as AI Model",
+      description: "Choose a model and persona to generate an AI response",
+      confirmLabel: "Generate",
+      inputPlaceholder:
+        "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
+    },
+  },
+  debugView: {
+    systemPrompt: "System Prompt",
+    systemPromptHint:
+      "This is the system prompt for the entire conversation thread",
+    systemMessage: "System Message",
+    systemMessageHint: "This is a system message injected into the conversation",
     retryModal: {
       title: "Retry with Different Settings",
       description: "Choose a model and persona to regenerate the response",

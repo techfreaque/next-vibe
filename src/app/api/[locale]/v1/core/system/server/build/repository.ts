@@ -110,9 +110,8 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               skipEndpoints: data.skipEndpoints,
               skipSeeds: data.skipSeeds,
               skipTaskIndex: false,
+              skipTrpc: false,
             },
-            user,
-            locale,
             logger,
           );
 

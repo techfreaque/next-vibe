@@ -20,7 +20,6 @@ interface UserMenuProps {
 export function UserMenu({ user, locale, logger }: UserMenuProps): JSX.Element {
   const { t } = simpleT(locale);
   const logout = useLogout(logger);
-
   return !user || user.isPublic ? (
     <Link href={`/${locale}/user/login`}>
       <Button

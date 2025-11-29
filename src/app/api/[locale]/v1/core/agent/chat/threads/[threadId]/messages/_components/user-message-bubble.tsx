@@ -13,7 +13,7 @@ import {
   chatShadows,
   chatTransitions,
 } from "@/app/[locale]/chat/lib/design-tokens";
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { MessageAuthorInfo } from "./message-author";
 import { UserMessageActions } from "./user-message-actions";
 

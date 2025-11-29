@@ -13,14 +13,16 @@ import type { CountryLanguage } from "@/i18n/core/config";
  * Tool Display Props
  */
 interface ToolDisplayProps {
-  /** Array of tool calls to display */
-  toolCalls: ToolCall[];
+  /** Single tool call to display (each TOOL message has exactly one tool call) */
+  toolCall: ToolCall;
   /** Current locale for translations */
   locale: CountryLanguage;
+  /** Thread ID */
+  threadId: string;
   /** Whether the message has content after tool calls (affects default open state) */
-  hasContent?: boolean;
+  hasContent: boolean;
   /** Message ID for collapse state tracking */
-  messageId?: string;
+  messageId: string;
   /** Collapse state management callbacks */
   collapseState?: {
     isCollapsed: (
@@ -45,13 +47,13 @@ interface ToolDisplayProps {
 /**
  * Tool Display Component
  *
- * Renders tool calls using the unified-interface widget system via ToolCallRenderer.
+ * Renders a single tool call using the unified-interface widget system via ToolCallRenderer.
  * This component is a thin wrapper that creates the widget render context and
  * delegates all rendering logic to ToolCallRenderer.
  *
  * **Architecture**:
  * - Uses definition-driven UI from unified-interface system
- * - Each tool call is rendered by ToolCallRenderer
+ * - Each TOOL message has exactly one tool call (singular, not array)
  * - Request fields (args) and response fields (result) are rendered using WidgetRenderer
  * - All widget types (LINK_LIST, DATA_TABLE, etc.) are supported
  *
@@ -61,25 +63,27 @@ interface ToolDisplayProps {
  * - Once toggled, state is preserved in collapseState
  *
  * @param props - Component props
- * @returns Rendered tool calls or null if no tool calls
+ * @returns Rendered tool call or null if no tool call
  */
 export function ToolDisplay({
-  toolCalls,
+  toolCall,
   locale,
+  threadId,
   hasContent: _hasContent = false,
   messageId,
   collapseState,
 }: ToolDisplayProps): JSX.Element | null {
-  if (!toolCalls || toolCalls.length === 0) {
+  if (!toolCall) {
     return null;
   }
 
   // Create widget render context
+  // Use NEXT_PAGE as the default for web UI components
   const context: WidgetRenderContext = {
     locale,
     isInteractive: true,
     permissions: [],
-    platform: Platform.WEB,
+    platform: Platform.NEXT_PAGE,
   };
 
   // Tool calls should always start collapsed
@@ -87,18 +91,16 @@ export function ToolDisplay({
 
   return (
     <Div className="flex flex-col gap-3 mb-3">
-      {toolCalls.map((toolCall, index) => (
-        <ToolCallRenderer
-          key={index}
-          toolCall={toolCall}
-          locale={locale}
-          context={context}
-          defaultOpen={defaultOpen}
-          messageId={messageId}
-          toolIndex={index}
-          collapseState={collapseState}
-        />
-      ))}
+      <ToolCallRenderer
+        toolCall={toolCall}
+        locale={locale}
+        context={context}
+        defaultOpen={defaultOpen}
+        threadId={threadId}
+        messageId={messageId}
+        toolIndex={0}
+        collapseState={collapseState}
+      />
     </Div>
   );
 }

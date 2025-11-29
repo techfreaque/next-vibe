@@ -14,7 +14,7 @@ import { generateAllRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: generateAllEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) =>
-      generateAllRepository.generateAll(data, user, locale, logger),
+    handler: ({ data, logger }) =>
+      generateAllRepository.generateAll(data, logger),
   },
 });

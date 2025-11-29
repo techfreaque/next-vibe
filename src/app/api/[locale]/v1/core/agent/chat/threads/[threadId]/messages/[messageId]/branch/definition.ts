@@ -22,6 +22,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../../../../enum";
+import { ModelId } from "../../../../../model-access/models";
 
 /**
  * Create Branch Endpoint (POST)
@@ -161,7 +162,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.role.description" as const,
           options: ChatMessageRoleOptions},
-        z.enum(ChatMessageRole),
+        z.nativeEnum(ChatMessageRole),
       ),
       model: requestDataField(
         {
@@ -172,7 +173,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.v1.core.agent.chat.threads.threadId.messages.messageId.branch.post.model.description" as const,
         },
-        z.string().optional(),
+        z.nativeEnum(ModelId).optional(),
       ),
 
       // === RESPONSE ===

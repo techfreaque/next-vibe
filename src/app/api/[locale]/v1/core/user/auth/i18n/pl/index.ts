@@ -32,6 +32,7 @@ export const translations: typeof enTranslations = {
     publicUserNotAllowed:
       "Użytkownik publiczny nie jest dozwolony dla tego endpointu",
     validation_failed: "Walidacja nie powiodła się",
+    failed_to_create_lead: "Nie udało się utworzyć leada",
     native: {
       unsupported:
         "Ta metoda uwierzytelniania nie jest obsługiwana w React Native",

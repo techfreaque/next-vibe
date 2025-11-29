@@ -79,6 +79,7 @@ export const translations: typeof enTranslations = {
       linearView: "Widok liniowy (styl ChatGPT)",
       threadedView: "Widok wątkowy (styl Reddit/Discord)",
       flatView: "Widok płaski (styl 4chan)",
+      debugView: "Widok debugowania (z promptami systemowymi)",
     },
 
     // Search Modal
@@ -667,6 +668,25 @@ export const translations: typeof enTranslations = {
     },
   },
   linearMessageView: {
+    retryModal: {
+      title: "Ponów z innymi ustawieniami",
+      description:
+        "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
+      confirmLabel: "Ponów",
+    },
+    answerModal: {
+      title: "Odpowiedz jako model AI",
+      description: "Wybierz model i personę, aby wygenerować odpowiedź AI",
+      confirmLabel: "Generuj",
+      inputPlaceholder:
+        "Wprowadź monit dla AI (opcjonalnie - pozostaw puste, aby AI wygenerowało własną odpowiedź)",
+    },
+  },
+  debugView: {
+    systemPrompt: "Prompt systemowy",
+    systemPromptHint: "To jest prompt systemowy dla całego wątku rozmowy",
+    systemMessage: "Wiadomość systemowa",
+    systemMessageHint: "To jest wiadomość systemowa wstrzyknięta do rozmowy",
     retryModal: {
       title: "Ponów z innymi ustawieniami",
       description:

@@ -29,6 +29,13 @@
       "when": 1764025920626,
       "tag": "20251124231200_aspiring_golden_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1764340536474,
+      "tag": "20251128143536_broad_meteorite",
+      "breakpoints": true
     }
   ]
 }

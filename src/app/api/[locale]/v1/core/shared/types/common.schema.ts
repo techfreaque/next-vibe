@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import type { IconKey } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
+
 // Common reusable schemas
 
 export const dateSchema = z
@@ -12,6 +14,9 @@ export const dateSchema = z
   });
 
 export type DateInputType = z.input<typeof dateRangeSchema>;
+
+// Runtime: accepts any string (emoji, IconKey), Type: IconKey
+export const iconSchema = z.string() as z.ZodType<IconKey>;
 
 export const idSchema = z.object({
   id: z.uuid(),

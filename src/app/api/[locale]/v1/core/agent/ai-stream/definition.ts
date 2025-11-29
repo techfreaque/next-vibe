@@ -5,10 +5,9 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataArrayOptionalField,
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
@@ -28,6 +27,8 @@ import {
   ChatMessageRole,
   NEW_MESSAGE_ID,
 } from "../chat/enum";
+import { selectChatMessageSchema } from "../chat/db";
+import { dateSchema } from "../../shared/types/common.schema";
 
 /**
  * AI Stream Endpoint (POST)
@@ -259,51 +260,54 @@ const { POST } = createEndpoint({
           columns: 12,
         },
         z
-          .array(z.string())
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
           .nullable()
-          .optional()
-          .describe(
-            "Array of endpoint IDs to enable. null = no tools, undefined/[] = all available tools for user (filtered by permissions), ['get_v1_core_agent_chat_folders', 'post_v1_core_user_create'] = specific endpoints",
-          ),
+          .optional(),
+      ),
+      toolConfirmation: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.v1.core.agent.chat.aiStream.post.toolConfirmation.label",
+          description:
+            "app.api.v1.core.agent.chat.aiStream.post.toolConfirmation.description",
+          columns: 12,
+        },
+        z
+          .object({
+            messageId: z.string().uuid(),
+            confirmed: z.boolean(),
+            updatedArgs: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
+          })
+          .nullable()
+          .optional(),
       ),
 
       // === MESSAGE HISTORY (for incognito mode) ===
-      messageHistory: requestDataArrayOptionalField(
+      messageHistory: requestDataField(
         {
           type: WidgetType.DATA_LIST,
-          title:
-            "app.api.v1.core.agent.chat.aiStream.post.messageHistory.label",
+          fieldType: FieldDataType.JSON,
+          label:
+            "app.api.v1.core.agent.chat.aiStream.post.messageHistory.label" as const,
           description:
-            "app.api.v1.core.agent.chat.aiStream.post.messageHistory.description",
+            "app.api.v1.core.agent.chat.aiStream.post.messageHistory.description" as const,
           optional: true,
-        } as const,
-        objectField(
-          {
-            type: WidgetType.DATA_CARD,
-          },
-          { request: "data" },
-          {
-            role: requestDataField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.SELECT,
-                label:
-                  "app.api.v1.core.agent.chat.aiStream.post.messageHistory.item.role.label",
-                options: ChatMessageRoleOptions,
-              },
-              z.enum(ChatMessageRole),
-            ),
-            content: requestDataField(
-              {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXTAREA,
-                label:
-                  "app.api.v1.core.agent.chat.aiStream.post.messageHistory.item.content.label",
-              },
-              z.string().min(1).max(10000),
-            ),
-          },
-        ),
+        },
+        z
+          .array(
+            selectChatMessageSchema.extend({
+              createdAt: dateSchema,
+              updatedAt: dateSchema,
+            }),
+          )
+          .optional()
+          .nullable(),
       ),
 
       // === RESUMABLE STREAM SUPPORT ===

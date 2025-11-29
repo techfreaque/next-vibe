@@ -5,20 +5,24 @@
  * Command line interface that can execute any route.ts from generated index files
  */
 
-import * as fs from "node:fs";
-import * as path from "node:path";
-
 import { Command } from "commander";
-import { config } from "dotenv";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "../shared/logger/endpoint";
 import { createEndpointLogger } from "../shared/logger/endpoint";
-import { ErrorHandler, setupGlobalErrorHandlers } from "./execution-errors";
-import { enableDebug } from "@/config/debug";
+import {
+  ErrorHandler,
+  setupGlobalErrorHandlers,
+} from "./runtime/execution-errors";
+import { enableDebug, enableMcpSilentMode } from "@/config/debug";
+import { loadEnvironment } from "./runtime/environment";
+import {
+  parseCliArguments,
+  parseCliArgumentsSimple,
+  type ParsedCliData,
+} from "./runtime/parsing";
 
 export const binaryStartTime = Date.now();
 
@@ -42,12 +46,6 @@ interface CliOptions {
 const CLI_CONSTANTS = {
   CLI_NAME: "vibe" as const,
   CLI_VERSION: "2.0.0" as const,
-  DOUBLE_HYPHEN: "--" as const,
-  SINGLE_HYPHEN: "-" as const,
-  EQUALS: "=" as const,
-  TRUE_VALUE: "true" as const,
-  FALSE_VALUE: "false" as const,
-  ENV_FILE: ".env" as const,
   ADMIN_USER_TYPE: "ADMIN" as const,
   DEFAULT_OUTPUT: "pretty" as const,
   JSON_OUTPUT: "json" as const,
@@ -55,274 +53,11 @@ const CLI_CONSTANTS = {
   QUOTED_COLON_PATTERN: '"":' as const,
 } as const;
 
-/**
- * Type for parsed CLI data
- */
-type ParsedCliData = Record<string, string | number | boolean | null>;
-
-// Load environment variables from the correct location
-function loadEnvironment(): void {
-  // Find the project root by looking for package.json
-  let currentDir = process.cwd();
-  let envPath: string | null = null;
-  const envFileName = CLI_CONSTANTS.ENV_FILE;
-
-  // Look for .env file starting from current directory and going up
-  while (currentDir !== path.dirname(currentDir)) {
-    const potentialEnvPath = path.join(currentDir, envFileName);
-    if (fs.existsSync(potentialEnvPath)) {
-      envPath = potentialEnvPath;
-      break;
-    }
-    currentDir = path.dirname(currentDir);
-  }
-
-  // Load the .env file if found
-  if (envPath) {
-    config({ path: envPath, quiet: true });
-    // Environment loaded from specific path
-  } else {
-    // Fallback to default dotenv behavior
-    config({ quiet: true });
-    // Using default environment loading
-  }
-}
-
 // Load environment first
 loadEnvironment();
 
 import { env } from "@/config/env";
-import { cliEntryPoint } from "./entry-point";
-
-/**
- * Try to parse a string as a number if it looks like one
- */
-function tryParseNumber(value: string): string | number {
-  // Don't try to parse empty strings or strings with only whitespace
-  if (!value?.trim()) {
-    return value;
-  }
-
-  // Don't try to parse if it contains non-numeric characters (except for decimal point and minus sign)
-  if (!/^-?\d*\.?\d*$/.test(value)) {
-    return value;
-  }
-
-  // Try to parse as integer first
-  if (/^-?\d+$/.test(value)) {
-    const intValue = parseInt(value, 10);
-    // Make sure the parsed value equals the original string to avoid precision issues
-    if (String(intValue) === value) {
-      return intValue;
-    }
-  }
-
-  // Try to parse as float
-  if (/^-?\d*\.\d+$/.test(value)) {
-    const floatValue = parseFloat(value);
-    // Make sure the parsed value equals the original string to avoid precision issues
-    if (String(floatValue) === value) {
-      return floatValue;
-    }
-  }
-
-  return value;
-}
-
-/**
- * Convert CLI argument value to appropriate type
- */
-function convertCliValue(value: string): string | number | boolean {
-  // Handle boolean values first
-  if (value === CLI_CONSTANTS.TRUE_VALUE) {
-    return true;
-  }
-  if (value === CLI_CONSTANTS.FALSE_VALUE) {
-    return false;
-  }
-
-  // Try to parse as number
-  const numberValue = tryParseNumber(value);
-  if (typeof numberValue === "number") {
-    return numberValue;
-  }
-
-  // Return as string if not a number
-  return value;
-}
-
-/**
- * Simple CLI argument parser for when rawArgs is not available
- */
-function parseCliArgumentsSimple(args: string[]): {
-  positionalArgs: string[];
-  namedArgs: Record<string, string | number | boolean>;
-} {
-  const positionalArgs: string[] = [];
-  const namedArgs: Record<string, string | number | boolean> = {};
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-
-    // Skip undefined, null, or empty arguments
-    if (!arg || typeof arg !== "string") {
-      continue;
-    }
-
-    if (arg.startsWith(CLI_CONSTANTS.DOUBLE_HYPHEN)) {
-      // Handle --key=value or --key value
-      const sliced = arg.slice(2);
-      const [key, ...valueParts] = sliced.split(CLI_CONSTANTS.EQUALS);
-      let value: string | number | boolean;
-
-      if (valueParts.length) {
-        // --key=value format
-        value = valueParts.join(CLI_CONSTANTS.EQUALS);
-      } else if (
-        i + 1 < args.length &&
-        !args[i + 1].startsWith(CLI_CONSTANTS.SINGLE_HYPHEN)
-      ) {
-        // --key value format
-        value = args[i + 1];
-        i++; // Skip the next argument as it's the value
-      } else {
-        // Boolean flag
-        value = true;
-      }
-
-      // Try to parse simple boolean values
-      if (typeof value === "string") {
-        value = convertCliValue(value);
-      }
-
-      namedArgs[key] = value;
-    } else if (arg.startsWith(CLI_CONSTANTS.SINGLE_HYPHEN)) {
-      // Handle -k value (single dash)
-      const key = arg.slice(1);
-      if (
-        i + 1 < args.length &&
-        args[i + 1] &&
-        !args[i + 1].startsWith(CLI_CONSTANTS.SINGLE_HYPHEN)
-      ) {
-        namedArgs[key] = convertCliValue(args[i + 1]);
-        i++;
-      } else {
-        namedArgs[key] = true;
-      }
-    } else {
-      // Positional argument
-      positionalArgs.push(arg);
-    }
-  }
-
-  return { positionalArgs, namedArgs };
-}
-
-/**
- * Parse CLI arguments into structured data
- */
-function parseCliArguments(
-  args: string[],
-  rawArgs: string[],
-  logger: EndpointLogger,
-): {
-  positionalArgs: string[];
-  namedArgs: Record<string, string | number | boolean>;
-} {
-  const positionalArgs: string[] = [];
-  const namedArgs: Record<string, string | number | boolean> = {};
-
-  // Safety checks for input parameters
-  if (!Array.isArray(args)) {
-    logger.error("parseCliArguments: args is not an array", undefined, {
-      argsType: typeof args,
-    });
-    return { positionalArgs, namedArgs };
-  }
-  if (!Array.isArray(rawArgs)) {
-    logger.error("parseCliArguments: rawArgs is not an array", undefined, {
-      rawArgsType: typeof rawArgs,
-    });
-    return { positionalArgs, namedArgs };
-  }
-
-  // Find the command position in rawArgs to extract everything after it
-  const commandIndex = rawArgs.findIndex((arg) => arg && args.includes(arg));
-  const relevantArgs = commandIndex >= 0 ? rawArgs.slice(commandIndex + 1) : [];
-
-  const doubleHyphenPrefix = CLI_CONSTANTS.DOUBLE_HYPHEN;
-  const singleHyphenPrefix = CLI_CONSTANTS.SINGLE_HYPHEN;
-  const equalsSeparator = CLI_CONSTANTS.EQUALS;
-
-  for (let i = 0; i < relevantArgs.length; i++) {
-    const arg = relevantArgs[i];
-
-    // Skip undefined, null, or empty arguments
-    if (!arg || typeof arg !== "string") {
-      continue;
-    }
-
-    if (arg.startsWith(doubleHyphenPrefix)) {
-      // Handle --key=value or --key value
-      try {
-        const sliced = arg.slice(2);
-        if (typeof sliced !== "string") {
-          logger.error("parseCliArguments: sliced is not a string");
-          continue;
-        }
-        const [key, ...valueParts] = sliced.split(equalsSeparator);
-        let value: string | number | boolean;
-
-        if (valueParts.length) {
-          // --key=value format
-          value = valueParts.join(equalsSeparator);
-        } else if (
-          i + 1 < relevantArgs.length &&
-          !relevantArgs[i + 1].startsWith(singleHyphenPrefix)
-        ) {
-          // --key value format
-          value = relevantArgs[i + 1];
-          i++; // Skip the next argument as it's the value
-        } else {
-          // Boolean flag
-          value = true;
-        }
-
-        // Try to parse simple boolean values only
-        if (typeof value === "string") {
-          value = convertCliValue(value);
-          // Don't parse JSON here - let the main handler do it
-        }
-
-        namedArgs[key] = value;
-      } catch (parseError) {
-        logger.error(
-          "parseCliArguments: Error parsing double hyphen arg",
-          parseError as Error,
-        );
-        continue;
-      }
-    } else if (arg.startsWith(singleHyphenPrefix)) {
-      // Handle -k value (single dash)
-      const key = arg.slice(1);
-      if (
-        i + 1 < relevantArgs.length &&
-        relevantArgs[i + 1] &&
-        !relevantArgs[i + 1].startsWith(singleHyphenPrefix)
-      ) {
-        namedArgs[key] = convertCliValue(relevantArgs[i + 1]);
-        i++;
-      } else {
-        namedArgs[key] = true;
-      }
-    } else {
-      // Positional argument
-      positionalArgs.push(arg);
-    }
-  }
-
-  return { positionalArgs, namedArgs };
-}
+import { cliEntryPoint } from "./runtime/entry-point";
 
 const program = new Command();
 
@@ -399,6 +134,11 @@ program
       options: CliOptions,
       cmd: Record<string, string | number | boolean>,
     ) => {
+      // Enable MCP silent mode FIRST if this is an MCP command
+      if (command === "mcp") {
+        enableMcpSilentMode();
+      }
+
       const debug = options.debug || options.verbose;
       const logger = createEndpointLogger(
         debug ?? false,
@@ -421,8 +161,7 @@ program
       }
 
       // Initialize CLI resource manager and performance monitoring
-      const { cliResourceManager } =
-        await import("../shared/server-only/utils/debug");
+      const { cliResourceManager } = await import("./runtime/debug");
       await cliResourceManager.initialize(logger, options.locale);
       const performanceMonitor = cliResourceManager.getPerformanceMonitor();
 
@@ -512,7 +251,9 @@ program
         performanceMonitor.mark("routeEnd");
 
         performanceMonitor.mark("renderStart");
-        // Rendering happens in the executeCommand above
+        if (result.formattedOutput && command !== "mcp") {
+          process.stdout.write(`${result.formattedOutput}\n`);
+        }
         performanceMonitor.mark("renderEnd");
 
         // Use the new resource manager for cleanup and exit

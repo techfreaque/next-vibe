@@ -310,6 +310,11 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
       .returning();
 
     logger.debug("Created new anonymous lead", { leadId: newLead.id });
+
+    // Create credit wallet for new lead (triggers via getLeadBalance)
+    const { creditRepository } = await import("../../credits/repository");
+    await creditRepository.getLeadBalance(newLead.id, logger);
+
     return newLead.id;
   }
 
@@ -357,6 +362,10 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         leadId: fallbackLead.id,
         linkReason: "fallback_creation",
       });
+
+      // Create credit wallet for fallback lead
+      const { creditRepository } = await import("../../credits/repository");
+      await creditRepository.getLeadBalance(fallbackLead.id, logger);
 
       return fallbackLead.id;
     }
@@ -412,6 +421,11 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
       .onConflictDoNothing();
 
     logger.debug("Created lead for user", { userId, leadId: newLead.id });
+
+    // Create credit wallet for new lead
+    const { creditRepository } = await import("../../credits/repository");
+    await creditRepository.getLeadBalance(newLead.id, logger);
+
     return newLead.id;
   }
 

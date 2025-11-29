@@ -16,6 +16,7 @@ import { userRepository } from "../repository";
 import type { CompleteUserType } from "../types";
 import { UserRole } from "../user-roles/enum";
 import { authRepository } from "./repository";
+import type { JwtPrivatePayloadType } from "./types";
 
 /**
  * Require an authenticated admin user
@@ -24,7 +25,7 @@ import { authRepository } from "./repository";
 export async function requireAdminUser(
   locale: CountryLanguage,
   redirectPath?: string,
-): Promise<CompleteUserType> {
+): Promise<JwtPrivatePayloadType> {
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   try {
@@ -40,21 +41,7 @@ export async function requireAdminUser(
       );
     }
 
-    // Fetch complete user details
-    const userResult = await userRepository.getUserById(
-      minimalUser.id,
-      UserDetailLevel.COMPLETE,
-      locale,
-      logger,
-    );
-
-    if (!userResult.success) {
-      redirect(
-        `/${locale}/user/login?callbackUrl=${encodeURIComponent(redirectPath || `/${locale}/admin`)}`,
-      );
-    }
-
-    return userResult.data;
+    return minimalUser;
   } catch (error) {
     logger.error("Error in requireAdminUser", parseError(error));
     redirect(

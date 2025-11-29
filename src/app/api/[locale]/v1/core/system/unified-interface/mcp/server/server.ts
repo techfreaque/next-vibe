@@ -57,7 +57,12 @@ export class MCPServer {
       // Connect transport to protocol handler
       this.transport.onMessage(async (request) => {
         const response = await protocolHandler.handleRequest(request);
-        await this.transport!.send(response);
+
+        // Only send response if request had an ID (not a notification)
+        // JSON-RPC 2.0: notifications (id: null) must not receive responses
+        if (request.id !== null && request.id !== undefined) {
+          await this.transport!.send(response);
+        }
       });
 
       // Start transport

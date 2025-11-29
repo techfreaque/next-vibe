@@ -17,6 +17,7 @@ import type { z } from "zod";
 
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 
+import type { IconKey } from "../model-access/icons";
 import type { ModelId } from "../model-access/models";
 import type { PersonaCategoryId } from "./config";
 
@@ -44,7 +45,7 @@ export const customPersonas = pgTable("custom_personas", {
   // Persona details
   name: text("name").notNull(),
   description: text("description").notNull(),
-  icon: text("icon").notNull(), // emoji or icon identifier
+  icon: text("icon").$type<IconKey>().notNull(), // emoji or icon identifier
   systemPrompt: text("system_prompt").notNull(),
 
   // Categorization

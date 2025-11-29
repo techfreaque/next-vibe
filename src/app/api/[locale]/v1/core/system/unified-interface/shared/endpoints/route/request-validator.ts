@@ -165,3 +165,35 @@ export function validateHandlerRequestData<
     };
   }
 }
+
+/**
+ * Validate response data against endpoint schema
+ * Returns validated data or error
+ */
+export function validateResponseData<TResponseOutput>(
+  data: unknown,
+  schema: z.ZodTypeAny,
+  logger: EndpointLogger,
+): ResponseType<TResponseOutput> {
+  const validation = validateData(data, schema, logger);
+
+  if (!validation.success) {
+    logger.error("[Request Validator] Response validation failed", {
+      error: validation.message,
+      messageParams: validation.messageParams,
+    });
+    return {
+      success: false,
+      message: "app.api.v1.core.shared.errorTypes.invalid_response_error",
+      errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
+      messageParams: {
+        error: validation.message,
+      },
+    };
+  }
+
+  return {
+    success: true,
+    data: validation.data as TResponseOutput,
+  };
+}

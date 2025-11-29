@@ -9,6 +9,8 @@ import { existsSync, mkdirSync, readdirSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 
+import { PATH_SEPARATOR } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/utils/path";
+
 /**
  * Default directories to exclude from scanning
  */
@@ -83,7 +85,7 @@ export function getRelativeImportPath(
 /**
  * Extract nested path segments from a file path
  * Example: src/app/api/[locale]/v1/core/agent/chat/personas/definition.ts
- * Returns: ["core", "agent", "chat", "personas"]
+ * Returns: ["v1", "core", "agent", "chat", "personas"]
  */
 export function extractNestedPath(
   filePath: string,
@@ -119,7 +121,8 @@ export function extractNestedPath(
     throw new Error(`Could not find ${actualEndMarker} in path: ${filePath}`);
   }
 
-  return pathParts.slice(startIndex + 1, endIndex);
+  // Include v1 in the path - don't skip it
+  return pathParts.slice(startIndex, endIndex);
 }
 
 /**
@@ -191,18 +194,20 @@ export function generateFileHeader(
  * Extract path from definition file for flat structure
  * Returns path only - no duplicate parameter format aliases
  * Real aliases come from definition files, not parameter format variations
+ * Uses PATH_SEPARATOR constant for consistency
  */
 export function extractPathKey(
   filePath: string,
   startMarker = "v1",
 ): { path: string } {
   const nestedPath = extractNestedPath(filePath, startMarker);
-  const path = nestedPath.join("/");
+  const path = nestedPath.join(PATH_SEPARATOR);
   return { path };
 }
 
 /**
  * Generate absolute import path for definition or route file
+ * nestedPath now includes v1, so we don't add it again
  */
 export function generateAbsoluteImportPath(
   filePath: string,
@@ -210,5 +215,5 @@ export function generateAbsoluteImportPath(
 ): string {
   const nestedPath = extractNestedPath(filePath);
   const pathStr = nestedPath.join("/");
-  return `@/app/api/[locale]/v1/${pathStr}/${fileType}`;
+  return `@/app/api/[locale]/${pathStr}/${fileType}`;
 }

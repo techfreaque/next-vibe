@@ -13,7 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { Platform } from "../../shared/types/platform";
-import { toolMetadataToMCPTool } from "../converter";
+import { endpointToMCPTool } from "../converter";
 import { mcpRegistry } from "../registry";
 import type {
   IMCPProtocolHandler,
@@ -66,7 +66,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       // Validate JSON-RPC version
       if (request.jsonrpc !== "2.0") {
         return this.fail(
-          request.id || null,
+          request.id ?? null,
           MCPErrorCode.INVALID_REQUEST,
           "Invalid JSON-RPC version",
         );
@@ -92,7 +92,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
         case MCPMethod.TOOLS_LIST:
           if (!this.initialized) {
             return this.fail(
-              request.id || null,
+              request.id ?? null,
               MCPErrorCode.INVALID_REQUEST,
               // eslint-disable-next-line i18next/no-literal-string
               "Server not initialized. Call initialize first.",
@@ -106,7 +106,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
         case MCPMethod.TOOLS_CALL:
           if (!this.initialized) {
             return this.fail(
-              request.id || null,
+              request.id ?? null,
               MCPErrorCode.INVALID_REQUEST,
               // eslint-disable-next-line i18next/no-literal-string
               "Server not initialized. Call initialize first.",
@@ -119,14 +119,14 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
 
         default:
           return this.fail(
-            request.id || null,
+            request.id ?? null,
             MCPErrorCode.METHOD_NOT_FOUND,
             // eslint-disable-next-line i18next/no-literal-string
             `Method not found: ${request.method}`,
           );
       }
 
-      return this.success(request.id || null, result);
+      return this.success(request.id ?? null, result);
     } catch (error) {
       const parsedError = parseError(error);
       this.logger.error("[MCP Protocol] Request handling failed", {
@@ -135,7 +135,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       });
 
       return this.fail(
-        request.id || null,
+        request.id ?? null,
         MCPErrorCode.INTERNAL_ERROR,
         parsedError.message,
       );
@@ -187,12 +187,11 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   ): Promise<MCPToolsListResult> {
     this.logger.info("[MCP Protocol] Listing tools");
 
-    const toolMetadata = mcpRegistry.getTools(this.user, this.logger);
+    // Get full endpoints with field information for proper schema generation
+    const endpoints = mcpRegistry.getEndpoints(this.user, this.logger);
 
-    // Convert to MCP tool format
-    const tools = toolMetadata.map((meta) =>
-      toolMetadataToMCPTool(meta, this.locale),
-    );
+    // Convert to MCP tool format with proper JSON Schema
+    const tools = endpoints.map((endpoint) => endpointToMCPTool(endpoint));
 
     this.logger.info("[MCP Protocol] Tools listed", {
       count: tools.length,
@@ -305,17 +304,5 @@ export async function createMCPProtocolHandler(
     throw new Error("CLI user ID is required");
   }
 
-  // Convert to JwtPayloadType for MCP
-  const user: JwtPayloadType = cliUser.isPublic
-    ? {
-        isPublic: true,
-        leadId: cliUser.leadId,
-      }
-    : {
-        isPublic: false,
-        id: cliUser.id,
-        leadId: cliUser.id, // Use same ID for leadId in CLI context
-      };
-
-  return new MCPProtocolHandler(logger, locale, user);
+  return new MCPProtocolHandler(logger, locale, cliUser);
 }

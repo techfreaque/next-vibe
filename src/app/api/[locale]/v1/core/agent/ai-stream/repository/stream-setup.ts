@@ -5,6 +5,9 @@
 
 import "server-only";
 
+import type { CoreMessage } from "ai";
+import type { z } from "zod";
+
 import {
   ErrorResponseTypes,
   fail,
@@ -31,9 +34,17 @@ import {
 import type { AiStreamPostRequestOutput } from "../definition";
 import { buildSystemPrompt } from "../system-prompt-builder";
 import { CONTINUE_CONVERSATION_PROMPT } from "../system-prompt";
-import { chatMessages } from "../../chat/db";
+import {
+  chatMessages,
+  type ChatMessage,
+  type ToolCall,
+  type ToolCallResult,
+} from "../../chat/db";
+import { selectChatMessageSchema } from "../../chat/db";
 import { eq } from "drizzle-orm";
 import { db } from "../../../system/db";
+import { dateSchema } from "@/app/api/[locale]/v1/core/shared/types/common.schema";
+import { loadTools } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/tools-loader";
 
 export interface StreamSetupResult {
   userId: string | undefined;
@@ -50,21 +61,13 @@ export interface StreamSetupResult {
   messageDepth: number;
   userMessageId: string;
   aiMessageId: string;
-  messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
+  messages: CoreMessage[];
   systemPrompt: string;
-}
-
-function toChatMessageRole(
-  role: string,
-): ChatMessageRole.USER | ChatMessageRole.ASSISTANT | ChatMessageRole.SYSTEM {
-  const roleLower = role.toLowerCase();
-  if (roleLower === "assistant") {
-    return ChatMessageRole.ASSISTANT;
-  }
-  if (roleLower === "system") {
-    return ChatMessageRole.SYSTEM;
-  }
-  return ChatMessageRole.USER;
+  toolConfirmationResult?: {
+    messageId: string;
+    sequenceId: string;
+    toolCall: ToolCall; // Full ToolCall object with all fields including args
+  };
 }
 
 export async function setupAiStream(params: {
@@ -82,14 +85,44 @@ export async function setupAiStream(params: {
   const { data, locale, logger, user, userId, leadId, ipAddress } = params;
   const isIncognito = data.rootFolderId === "incognito";
 
-  logger.debug("Setting up AI stream", {
+  logger.info("[Setup] RECOMPILED - Setting up AI stream", {
     operation: data.operation,
     model: data.model,
     rootFolderId: data.rootFolderId,
     isIncognito,
     userId,
     leadId,
+    hasToolConfirmation: !!data.toolConfirmation,
   });
+
+  // Handle tool confirmation if present - execute tool and update message
+  if (data.toolConfirmation) {
+    logger.info("[Setup] Processing tool confirmation", {
+      messageId: data.toolConfirmation.messageId,
+      confirmed: data.toolConfirmation.confirmed,
+    });
+
+    const confirmResult = await handleToolConfirmationInSetup({
+      toolConfirmation: data.toolConfirmation,
+      messageHistory: data.messageHistory,
+      isIncognito,
+      userId,
+      locale,
+      logger,
+      user,
+    });
+
+    if (!confirmResult.success) {
+      return { success: false, error: confirmResult };
+    }
+
+    logger.info(
+      "[Setup] Tool executed - continuing with AI stream to process result",
+    );
+    // Tool has been executed and message updated with result
+    // Continue with the normal flow to start AI stream
+    // The tool result is now in the message history and AI will process it
+  }
 
   if (!userId && !leadId && !isIncognito) {
     logger.error("User has neither userId nor leadId", {
@@ -333,7 +366,30 @@ export async function setupAiStream(params: {
   );
 
   const userMessageId = crypto.randomUUID();
-  if (data.operation !== "answer-as-ai" && data.operation !== "retry") {
+
+  // Log the decision-making process for user message creation
+  logger.info("[Setup] User message creation decision", {
+    operation: data.operation,
+    hasToolConfirmation: !!data.toolConfirmation,
+    content: data.content,
+    contentLength: data.content?.length,
+    willCreateMessage:
+      data.operation !== "answer-as-ai" &&
+      data.operation !== "retry" &&
+      !data.toolConfirmation,
+  });
+
+  // Skip creating user message if this is a tool confirmation (content is empty)
+  if (
+    data.operation !== "answer-as-ai" &&
+    data.operation !== "retry" &&
+    !data.toolConfirmation
+  ) {
+    logger.info("[Setup] Creating user message", {
+      messageId: userMessageId,
+      threadId: threadResult.threadId,
+    });
+
     if (!isIncognito) {
       const authorName = await getUserPublicName(userId, logger);
 
@@ -354,6 +410,22 @@ export async function setupAiStream(params: {
         operation: data.operation,
       });
     }
+  } else if (data.toolConfirmation) {
+    logger.info(
+      "[Setup] ✅ SKIPPING user message creation for tool confirmation",
+      {
+        messageId: data.toolConfirmation.messageId,
+        operation: data.operation,
+      },
+    );
+  } else {
+    logger.info("[Setup] ✅ SKIPPING user message creation", {
+      operation: data.operation,
+      reason:
+        data.operation === "answer-as-ai"
+          ? "answer-as-ai operation"
+          : "retry operation",
+    });
   }
 
   // Build complete system prompt from persona and formatting instructions
@@ -376,12 +448,7 @@ export async function setupAiStream(params: {
     role: effectiveRole,
     userId,
     isIncognito,
-    messageHistory: data.messageHistory
-      ? data.messageHistory.map((msg) => ({
-          role: toChatMessageRole(msg.role),
-          content: msg.content,
-        }))
-      : null,
+    messageHistory: data.messageHistory ?? null,
     logger,
   });
 
@@ -400,6 +467,83 @@ export async function setupAiStream(params: {
     operation: data.operation,
     isIncognito,
   });
+
+  // Include tool confirmation result if present (both confirmed and cancelled)
+  let toolConfirmationResult:
+    | {
+        messageId: string;
+        sequenceId: string;
+        toolCall: ToolCall; // Full ToolCall object with all fields including args
+      }
+    | undefined;
+  if (data.toolConfirmation) {
+    // Get the updated tool message to include in result
+    let updatedToolMessage: ChatMessage | undefined;
+    if (isIncognito && data.messageHistory) {
+      updatedToolMessage = data.messageHistory.find(
+        (msg) => msg.id === data.toolConfirmation!.messageId,
+      ) as ChatMessage | undefined;
+    } else if (userId) {
+      const [dbMessage] = await db
+        .select()
+        .from(chatMessages)
+        .where(eq(chatMessages.id, data.toolConfirmation.messageId))
+        .limit(1);
+      updatedToolMessage = dbMessage as ChatMessage | undefined;
+    }
+
+    if (updatedToolMessage?.metadata?.toolCall) {
+      // Extract toolCall from metadata
+      // The metadata.toolCall field is typed as ToolCall in MessageMetadata interface
+      // but comes from JSONB column, so we validate it has required fields
+      const toolCall = updatedToolMessage.metadata.toolCall;
+
+      // Runtime validation: ensure toolCall has the required 'args' field
+      // This is necessary because JSONB data might not match the TypeScript type
+      if (!toolCall.toolName || !toolCall.args) {
+        logger.error("[Setup] Tool call missing required fields", {
+          messageId: data.toolConfirmation.messageId,
+          hasToolName: !!toolCall.toolName,
+          hasArgs: !!toolCall.args,
+        });
+        return {
+          success: false,
+          error: fail({
+            message:
+              "app.api.v1.core.agent.chat.aiStream.route.errors.invalidRequestData",
+            errorType: ErrorResponseTypes.INVALID_DATA_ERROR,
+          }),
+        };
+      }
+
+      const validatedToolCall: ToolCall = {
+        toolName: toolCall.toolName,
+        args: toolCall.args,
+        result: toolCall.result,
+        error: toolCall.error,
+        executionTime: toolCall.executionTime,
+        creditsUsed: toolCall.creditsUsed,
+        requiresConfirmation: toolCall.requiresConfirmation,
+        isConfirmed: toolCall.isConfirmed,
+        waitingForConfirmation: toolCall.waitingForConfirmation,
+      };
+
+      toolConfirmationResult = {
+        messageId: data.toolConfirmation.messageId,
+        toolCall: validatedToolCall,
+        // CRITICAL: Reuse the sequenceId from the tool message so new assistant messages
+        // after tool execution are grouped with the tool message in the UI
+        sequenceId: updatedToolMessage.sequenceId ?? crypto.randomUUID(),
+      };
+      logger.info("[Setup] Including tool confirmation result in setup data", {
+        messageId: toolConfirmationResult.messageId,
+        confirmed: data.toolConfirmation.confirmed,
+        hasResult: !!toolConfirmationResult.toolCall.result,
+        hasError: !!toolConfirmationResult.toolCall.error,
+        sequenceId: toolConfirmationResult.sequenceId,
+      });
+    }
+  }
 
   return {
     success: true,
@@ -420,6 +564,7 @@ export async function setupAiStream(params: {
       aiMessageId,
       messages,
       systemPrompt,
+      toolConfirmationResult,
     },
   };
 }
@@ -427,6 +572,12 @@ export async function setupAiStream(params: {
 /**
  * Build message context for AI
  */
+// Define the message history schema with proper date transformations
+const messageHistorySchema = selectChatMessageSchema.extend({
+  createdAt: dateSchema,
+  updatedAt: dateSchema,
+});
+
 async function buildMessageContext(params: {
   operation: "send" | "retry" | "edit" | "answer-as-ai";
   threadId: string | null | undefined;
@@ -435,12 +586,9 @@ async function buildMessageContext(params: {
   role: ChatMessageRole;
   userId: string | undefined;
   isIncognito: boolean;
-  messageHistory?: Array<{
-    role: ChatMessageRole;
-    content: string;
-  }> | null;
+  messageHistory?: Array<z.infer<typeof messageHistorySchema>> | null;
   logger: EndpointLogger;
-}): Promise<Array<{ role: "user" | "assistant" | "system"; content: string }>> {
+}): Promise<CoreMessage[]> {
   // SECURITY: Reject messageHistory for non-incognito threads
   // Non-incognito threads must fetch history from database to prevent manipulation
   if (!params.isIncognito && params.messageHistory) {
@@ -541,6 +689,10 @@ async function buildMessageContext(params: {
       historyLength: params.messageHistory.length,
     });
     const historyMessages = toAiSdkMessages(params.messageHistory);
+    // Don't add empty content as a message (happens with tool confirmations)
+    if (!params.content.trim()) {
+      return historyMessages;
+    }
     const currentMessage = toAiSdkMessage({
       role: params.role,
       content: params.content,
@@ -564,13 +716,12 @@ async function buildMessageContext(params: {
 
 /**
  * Convert ChatMessageRole enum to AI SDK compatible role
- * Skips TOOL messages (they have empty content and are not needed in AI context)
+ * Converts TOOL messages to proper AI SDK tool result format
  * Converts ERROR -> ASSISTANT (so errors stay in chain)
  */
-function toAiSdkMessage(message: { role: ChatMessageRole; content: string }): {
-  role: "user" | "assistant" | "system";
-  content: string;
-} | null {
+function toAiSdkMessage(
+  message: ChatMessage | { role: ChatMessageRole; content: string },
+): CoreMessage | null {
   switch (message.role) {
     case ChatMessageRole.USER:
       return { content: message.content, role: "user" };
@@ -579,8 +730,30 @@ function toAiSdkMessage(message: { role: ChatMessageRole; content: string }): {
     case ChatMessageRole.SYSTEM:
       return { content: message.content, role: "system" };
     case ChatMessageRole.TOOL:
-      // Skip TOOL messages - they have empty content and are not needed in AI context
-      // The AI already knows about tool calls from the previous ASSISTANT message
+      // Convert TOOL messages to proper AI SDK tool result format
+      // The AI SDK expects tool results in assistant messages for proper multi-turn tool calling
+      if ("metadata" in message && message.metadata?.toolCall) {
+        const toolCall = message.metadata.toolCall;
+
+        // Return tool result in AI SDK format
+        // This allows the AI to properly understand the tool execution and continue with more tool calls
+        const output: ToolCallResult = toolCall.error
+          ? { error: toolCall.error }
+          : (toolCall.result ?? null);
+
+        return {
+          role: "assistant",
+          content: [
+            {
+              type: "tool-result",
+              toolCallId: message.id, // Use message ID as tool call ID
+              toolName: toolCall.toolName,
+              output,
+            },
+          ],
+        };
+      }
+      // Skip TOOL messages without toolCall metadata
       return null;
     case ChatMessageRole.ERROR:
       // Error messages become ASSISTANT messages so they stay in the chain
@@ -588,15 +761,214 @@ function toAiSdkMessage(message: { role: ChatMessageRole; content: string }): {
   }
 }
 
+/**
+ * Handle tool confirmation - execute tool and update message in DB/messageHistory
+ */
+async function handleToolConfirmationInSetup(params: {
+  toolConfirmation: {
+    messageId: string;
+    confirmed: boolean;
+    updatedArgs?: Record<string, string | number | boolean | null>;
+  };
+  messageHistory?: Array<z.infer<typeof messageHistorySchema>> | null;
+  isIncognito: boolean;
+  userId: string | undefined;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+  user: JwtPayloadType;
+}): Promise<ResponseType<{ threadId: string; toolMessageId: string }>> {
+  const {
+    toolConfirmation,
+    messageHistory,
+    isIncognito,
+    userId,
+    locale,
+    logger,
+    user,
+  } = params;
+
+  // Find tool message in messageHistory (incognito) or DB
+  let toolMessage: ChatMessage | undefined;
+
+  if (isIncognito && messageHistory) {
+    toolMessage = messageHistory.find(
+      (msg) => msg.id === toolConfirmation.messageId,
+    ) as ChatMessage | undefined;
+  } else if (userId) {
+    const [dbMessage] = await db
+      .select()
+      .from(chatMessages)
+      .where(eq(chatMessages.id, toolConfirmation.messageId))
+      .limit(1);
+    toolMessage = dbMessage as ChatMessage | undefined;
+  }
+
+  if (!toolMessage) {
+    logger.error("[Tool Confirmation] Message not found", {
+      messageId: toolConfirmation.messageId,
+      isIncognito,
+    });
+    return fail({
+      message:
+        "app.api.v1.core.agent.chat.aiStream.post.toolConfirmation.errors.messageNotFound",
+      errorType: ErrorResponseTypes.NOT_FOUND,
+    });
+  }
+
+  const toolCall = toolMessage.metadata?.toolCall as ToolCall | undefined;
+  if (!toolCall) {
+    logger.error("[Tool Confirmation] ToolCall metadata missing");
+    return fail({
+      message:
+        "app.api.v1.core.agent.chat.aiStream.post.toolConfirmation.errors.toolCallMissing",
+      errorType: ErrorResponseTypes.BAD_REQUEST,
+    });
+  }
+
+  if (toolConfirmation.confirmed) {
+    // Execute tool with updated args
+    const finalArgs = toolConfirmation.updatedArgs
+      ? {
+          ...(toolCall.args as Record<
+            string,
+            string | number | boolean | null
+          >),
+          ...toolConfirmation.updatedArgs,
+        }
+      : toolCall.args;
+
+    // Load and execute tool
+    const toolsResult = await loadTools({
+      requestedTools: [toolCall.toolName],
+      user,
+      locale,
+      logger,
+      systemPrompt: "",
+    });
+
+    const toolEntry = Object.entries(toolsResult.tools ?? {}).find(
+      ([name]) =>
+        name === toolCall.toolName || name.endsWith(`/${toolCall.toolName}`),
+    );
+
+    if (!toolEntry) {
+      logger.error("[Tool Confirmation] Tool not found", {
+        toolName: toolCall.toolName,
+      });
+      return fail({
+        message:
+          "app.api.v1.core.agent.chat.aiStream.post.toolConfirmation.errors.toolNotFound",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    interface ToolExecuteOptions {
+      toolCallId: string;
+      messages: Array<{ role: ChatMessageRole; content: string }>;
+      abortSignal: AbortSignal;
+    }
+    const [, tool] = toolEntry as [
+      string,
+      {
+        execute?: (
+          args: ToolCallResult,
+          options: ToolExecuteOptions,
+        ) => Promise<ToolCallResult>;
+      },
+    ];
+    let toolResult: ToolCallResult | undefined;
+    let toolError: string | undefined;
+
+    try {
+      if (tool?.execute) {
+        toolResult = await tool.execute(finalArgs, {
+          toolCallId: toolConfirmation.messageId,
+          messages: [],
+          abortSignal: AbortSignal.timeout(60000),
+        });
+      } else {
+        toolError = "Tool does not have execute method";
+      }
+    } catch (error) {
+      toolError = error instanceof Error ? error.message : String(error);
+    }
+
+    // Update tool message with result
+    const updatedToolCall: ToolCall = {
+      ...toolCall,
+      args: finalArgs as ToolCallResult,
+      result: toolResult,
+      error: toolError,
+      isConfirmed: true,
+      waitingForConfirmation: false,
+    };
+
+    // Update in DB (non-incognito) or messageHistory (incognito - handled by client)
+    if (!isIncognito && userId) {
+      await db
+        .update(chatMessages)
+        .set({
+          metadata: { toolCall: updatedToolCall },
+          updatedAt: new Date(),
+        })
+        .where(eq(chatMessages.id, toolConfirmation.messageId));
+    } else if (isIncognito && messageHistory) {
+      // Update in messageHistory array for incognito mode
+      const msgIndex = messageHistory.findIndex(
+        (msg) => msg.id === toolConfirmation.messageId,
+      );
+      if (msgIndex >= 0) {
+        messageHistory[msgIndex].metadata = { toolCall: updatedToolCall };
+      }
+    }
+
+    logger.info("[Tool Confirmation] Tool executed", {
+      hasResult: !!toolResult,
+      hasError: !!toolError,
+    });
+  } else {
+    // User rejected - update with structured error that includes the input args
+    const rejectedToolCall: ToolCall = {
+      ...toolCall,
+      args: toolCall.args, // Keep original args for display
+      isConfirmed: false,
+      waitingForConfirmation: false,
+      error: "User declined tool execution",
+    };
+
+    if (!isIncognito && userId) {
+      await db
+        .update(chatMessages)
+        .set({
+          metadata: { toolCall: rejectedToolCall },
+          updatedAt: new Date(),
+        })
+        .where(eq(chatMessages.id, toolConfirmation.messageId));
+    } else if (isIncognito && messageHistory) {
+      const msgIndex = messageHistory.findIndex(
+        (msg) => msg.id === toolConfirmation.messageId,
+      );
+      if (msgIndex >= 0) {
+        messageHistory[msgIndex].metadata = { toolCall: rejectedToolCall };
+      }
+    }
+
+    logger.info("[Tool Confirmation] Tool rejected by user");
+  }
+
+  return {
+    success: true,
+    data: {
+      threadId: toolMessage.threadId,
+      toolMessageId: toolConfirmation.messageId,
+    },
+  };
+}
+
 function toAiSdkMessages(
-  messages: Array<{ role: ChatMessageRole; content: string }>,
-): Array<{ role: "user" | "assistant" | "system"; content: string }> {
+  messages: Array<ChatMessage | { role: ChatMessageRole; content: string }>,
+): CoreMessage[] {
   return messages
     .map((msg) => toAiSdkMessage(msg))
-    .filter(
-      (
-        msg,
-      ): msg is { role: "user" | "assistant" | "system"; content: string } =>
-        msg !== null,
-    );
+    .filter((msg): msg is CoreMessage => msg !== null);
 }

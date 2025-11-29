@@ -121,7 +121,7 @@ export const branchRepository = {
           depth: sourceMessage.depth, // Same depth as source
           authorId: userId,
           isAI: false,
-          model: data.model || null,
+          model: data.model ?? null,
         })
         .returning();
 

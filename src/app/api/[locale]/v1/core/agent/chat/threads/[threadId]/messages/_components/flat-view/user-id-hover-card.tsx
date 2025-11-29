@@ -13,8 +13,12 @@ import type { JSX } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
-import { format4chanTimestamp, getIdColor, getShortId } from "@/app/[locale]/chat/lib/utils/formatting";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
+import {
+  format4chanTimestamp,
+  getIdColor,
+  getShortId,
+} from "@/app/[locale]/chat/lib/utils/formatting";
 import { getPostsByUserId } from "./helpers";
 
 interface UserIdHoverCardProps {

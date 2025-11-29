@@ -12,23 +12,23 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { EndpointLogger } from "../shared/logger/endpoint";
-import type { ParameterValue } from "../shared/endpoints/route/executor";
-import type { InferJwtPayloadTypeFromRoles } from "../shared/types/handler";
-import { Platform } from "../shared/types/platform";
+import type { EndpointLogger } from "../../shared/logger/endpoint";
+import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
+import { Platform } from "../../shared/types/platform";
 import type {
   CliRequestData,
   RouteExecutionContext,
   RouteExecutionResult,
 } from "./route-executor";
 import { routeDelegationHandler } from "./route-executor";
+import type { CliObject } from "./parsing";
 
 interface CliExecutionOptions {
   data?: CliRequestData;
   urlPathParams?: Record<string, string | number | boolean | null | undefined>;
   cliArgs?: {
     positionalArgs: string[];
-    namedArgs: Record<string, string | number | boolean>;
+    namedArgs: CliObject;
   };
   user?: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
   locale: CountryLanguage;
@@ -65,7 +65,7 @@ class CliEntryPoint {
     let cliUser = options.user;
 
     if (!cliUser) {
-      const { getCliUser } = await import("./auth/cli-user");
+      const { getCliUser } = await import("../auth/cli-user");
       const cliUserResult = await getCliUser(logger, options.locale);
 
       if (cliUserResult.success) {
@@ -75,13 +75,14 @@ class CliEntryPoint {
 
     const context: RouteExecutionContext = {
       toolName: resolvedCommand,
-      data: (options.data || {}) as { [key: string]: ParameterValue },
+      data: (options.data || {}) as Record<string, unknown>,
       urlPathParams: options.urlPathParams,
       cliArgs: options.cliArgs,
       user: cliUser,
       locale: options.locale,
       logger: logger,
       platform: Platform.CLI,
+      timestamp: Date.now(),
       options: {
         dryRun: options.dryRun,
         interactive: options.interactive,
@@ -96,7 +97,6 @@ class CliEntryPoint {
         context,
         logger,
         locale,
-        t,
       );
 
       return result;

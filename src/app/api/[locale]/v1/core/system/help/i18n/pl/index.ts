@@ -12,6 +12,14 @@ export const translations = {
       },
       summary: "Uruchom tryb interaktywny",
     },
+    ui: {
+      title: "Interaktywny Eksplorator API",
+      description: "Przeglądaj i wykonuj wszystkie",
+      availableEndpoints: "dostępne punkty końcowe",
+      endpointsLabel: "Punkty końcowe",
+      aliasesLabel: "Aliasy:",
+      selectEndpoint: "Wybierz punkt końcowy z listy, aby rozpocząć",
+    },
     response: {
       started: "Tryb interaktywny uruchomiony pomyślnie",
     },
@@ -155,6 +163,7 @@ export const translations = {
         server: {
           title: "Błąd serwera",
           description: "Nie udało się wygenerować listy poleceń",
+          errorLoading: "Błąd podczas ładowania poleceń: {{error}}",
         },
         unknown: {
           title: "Nieznany błąd",

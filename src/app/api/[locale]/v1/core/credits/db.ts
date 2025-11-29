@@ -8,7 +8,7 @@
  * - credit_transactions: Immutable audit log
  */
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
@@ -142,6 +142,9 @@ export const creditWallets = pgTable(
       .notNull()
       .default(20),
     freePeriodStart: timestamp("free_period_start").defaultNow().notNull(),
+    freePeriodId: text("free_period_id")
+      .notNull()
+      .default(sql`to_char(NOW(), 'YYYY-MM')`),
 
     // Metadata
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -228,6 +231,9 @@ export const creditTransactions = pgTable(
     packId: uuid("pack_id").references(() => creditPacks.id, {
       onDelete: "set null",
     }),
+
+    // Period tracking for free credit transactions
+    freePeriodId: text("free_period_id"),
 
     // Rich metadata (typed per transaction type)
     metadata: jsonb("metadata")

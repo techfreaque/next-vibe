@@ -7,8 +7,8 @@ import { useEffect } from "react";
 
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { ChatMessageRole } from "../enum";
-import type { ChatMessage, ChatThread } from "./store";
+import { ChatMessageRole, ThreadStatus } from "../enum";
+import type { ChatMessage, ChatThread } from "../db";
 import type {
   StreamingMessage,
   StreamingThread,
@@ -57,6 +57,8 @@ export function useStreamSync(deps: StreamSyncDeps): void {
           depth: streamMsg.depth,
           authorId: null,
           authorName: null,
+          authorAvatar: null,
+          authorColor: null,
           isAI: streamMsg.role === ChatMessageRole.ASSISTANT,
           model: streamMsg.model || null,
           persona: null,
@@ -64,28 +66,31 @@ export function useStreamSync(deps: StreamSyncDeps): void {
             ? t("app.api.v1.core.agent.chat.aiStream.errorTypes.streamError")
             : null,
           errorMessage: streamMsg.error || null,
+          errorCode: null,
           edited: false,
+          originalId: null,
           tokens: streamMsg.totalTokens || null,
-          toolCalls: streamMsg.toolCalls || null,
-          upvotes: null,
-          downvotes: null,
+          metadata: streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {},
+          upvotes: 0,
+          downvotes: 0,
           sequenceId: streamMsg.sequenceId ?? null,
           createdAt: new Date(),
           updatedAt: new Date(),
+          searchVector: null,
         });
       } else {
         // Check if we need to update the message
         const needsUpdate =
           existingMsg.content !== streamMsg.content ||
           existingMsg.tokens !== (streamMsg.totalTokens || null) ||
-          JSON.stringify(existingMsg.toolCalls) !==
-            JSON.stringify(streamMsg.toolCalls || null);
+          JSON.stringify(existingMsg.metadata?.toolCall) !==
+            JSON.stringify(streamMsg.toolCall);
 
         if (needsUpdate) {
           updateMessage(streamMsg.messageId, {
             content: streamMsg.content,
             tokens: streamMsg.totalTokens || null,
-            toolCalls: streamMsg.toolCalls || null,
+            metadata: streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {},
             errorType: streamMsg.error
               ? t("app.api.v1.core.agent.chat.aiStream.errorTypes.streamError")
               : null,
@@ -105,10 +110,11 @@ export function useStreamSync(deps: StreamSyncDeps): void {
         addThread({
           id: streamThread.threadId,
           userId: "",
+          leadId: null,
           title: streamThread.title,
           rootFolderId: streamThread.rootFolderId,
           folderId: streamThread.subFolderId,
-          status: "active",
+          status: ThreadStatus.ACTIVE,
           defaultModel: null,
           defaultPersona: null,
           systemPrompt: null,
@@ -116,8 +122,16 @@ export function useStreamSync(deps: StreamSyncDeps): void {
           archived: false,
           tags: [],
           preview: null,
+          metadata: {},
+          rolesView: null,
+          rolesEdit: null,
+          rolesPost: null,
+          rolesModerate: null,
+          rolesAdmin: null,
+          published: false,
           createdAt: streamThread.createdAt,
           updatedAt: streamThread.createdAt,
+          searchVector: null,
         });
       }
     });

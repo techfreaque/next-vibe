@@ -13,12 +13,22 @@ import React, { useCallback } from "react";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
+import {
+  ChatMessageRole,
+  ViewMode,
+} from "@/app/api/[locale]/v1/core/agent/chat/enum";
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
-import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
+import {
+  chatAnimations,
+  chatProse,
+} from "@/app/[locale]/chat/lib/design-tokens";
+import { simpleT } from "@/i18n/core/shared";
+import { Markdown } from "next-vibe-ui/ui/markdown";
 import { BranchNavigator } from "../branch-navigator";
 import { ErrorMessageBubble } from "../error-message-bubble";
 import { GroupedAssistantMessage } from "../grouped-assistant-message";
+import { MessageAuthorInfo } from "../message-author";
 import { MessageEditor } from "../message-editor";
 import { groupMessagesBySequence } from "../message-grouping";
 import { ModelPersonaSelectorModal } from "../model-persona-selector-modal";
@@ -39,6 +49,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   logger,
   currentUserId,
 }: LinearMessageViewProps): JSX.Element {
+  const { t } = simpleT(locale);
+
   // Get callbacks and editor actions from context
   const {
     currentRootFolderId: rootFolderId,
@@ -62,6 +74,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     setAnswerContent: onSetAnswerContent,
     // Collapse state
     collapseState,
+    // View mode to check if we should show system messages
+    viewMode,
   } = useChatContext();
 
   // Wrap handleBranchEdit to pass branchMessage as the third parameter
@@ -209,6 +223,43 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   {message.role === "error" && (
                     <ErrorMessageBubble message={message} />
                   )}
+                  {/* Debug mode: Show system messages inline */}
+                  {viewMode === ViewMode.DEBUG &&
+                    message.role === ChatMessageRole.SYSTEM && (
+                      <Div className="flex items-start gap-3">
+                        <Div className="flex-1 max-w-full">
+                          <Div className="mb-2">
+                            <MessageAuthorInfo
+                              authorName={t("app.chat.debugView.systemMessage")}
+                              authorId={null}
+                              currentUserId={undefined}
+                              isAI={true}
+                              model={message.model}
+                              timestamp={message.createdAt}
+                              edited={message.edited}
+                              persona={null}
+                              locale={locale}
+                              rootFolderId={rootFolderId}
+                              compact
+                            />
+                          </Div>
+
+                          <Div
+                            className={cn(
+                              chatProse.all,
+                              "pl-2 py-2.5 sm:py-3",
+                              "border border-blue-500/30 bg-blue-500/5 rounded-md",
+                            )}
+                          >
+                            <Markdown content={message.content} />
+                          </Div>
+
+                          <Div className="mt-1 text-xs text-muted-foreground pl-2">
+                            {t("app.chat.debugView.systemMessageHint")}
+                          </Div>
+                        </Div>
+                      </Div>
+                    )}
                 </>
               )}
             </Div>

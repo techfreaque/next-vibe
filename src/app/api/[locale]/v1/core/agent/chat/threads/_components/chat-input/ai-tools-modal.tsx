@@ -28,7 +28,7 @@ import React, { useMemo, useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 import { useAIToolsList } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/tools/hooks";
-import type { AIToolMetadataSerialized } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/types";
+import type { AIToolMetadataSerialized } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/tools/definition";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -139,26 +139,26 @@ export function AIToolsModal({
   }, [filteredTools]);
 
   // Toggle a single tool
-  const handleToggleTool = (endpointId: string): void => {
-    const isEnabled = enabledToolIds.includes(endpointId);
+  const handleToggleTool = (toolName: string): void => {
+    const isEnabled = enabledToolIds.includes(toolName);
 
     if (isEnabled) {
       // Remove from enabled list
-      onToolsChange(enabledToolIds.filter((id) => id !== endpointId));
+      onToolsChange(enabledToolIds.filter((id) => id !== toolName));
     } else {
       // Add to enabled list
-      onToolsChange([...enabledToolIds, endpointId]);
+      onToolsChange([...enabledToolIds, toolName]);
     }
 
     logger.debug("AIToolsModal", "Tool toggled", {
-      endpointId,
+      toolName,
       enabled: !isEnabled,
     });
   };
 
   // Toggle all tools in current view
   const handleToggleAll = (): void => {
-    const allEndpointIds = filteredTools.map((tool) => tool.endpointId);
+    const allEndpointIds = filteredTools.map((tool) => tool.toolName);
     const allEnabled = allEndpointIds.every((id) =>
       enabledToolIds.includes(id),
     );
@@ -186,7 +186,7 @@ export function AIToolsModal({
       return false;
     }
     return filteredTools.every((tool) =>
-      enabledToolIds.includes(tool.endpointId),
+      enabledToolIds.includes(tool.toolName),
     );
   }, [filteredTools, enabledToolIds]);
 
@@ -205,7 +205,7 @@ export function AIToolsModal({
   const toggleCategoryTools = (
     categoryTools: AIToolMetadataSerialized[],
   ): void => {
-    const categoryEndpointIds = categoryTools.map((t) => t.endpointId);
+    const categoryEndpointIds = categoryTools.map((t) => t.toolName);
     const allEnabled = categoryEndpointIds.every((id) =>
       enabledToolIds.includes(id),
     );
@@ -242,7 +242,7 @@ export function AIToolsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <Div className="flex flex-col gap-4 flex-1 flex flex-col">
+        <Div className="flex gap-4 flex-1 flex-col">
           {/* Search and Controls */}
           <Div className="flex flex-col gap-2 shrink-0">
             {/* Search Input */}
@@ -317,7 +317,7 @@ export function AIToolsModal({
               <Div className="flex flex-col gap-4">
                 {Object.entries(toolsByCategory).map(([category, tools]) => {
                   const isExpanded = expandedCategories.has(category);
-                  const categoryEndpointIds = tools.map((t) => t.endpointId);
+                  const categoryEndpointIds = tools.map((t) => t.toolName);
                   const allCategoryEnabled = categoryEndpointIds.every((id) =>
                     enabledToolIds.includes(id),
                   );
@@ -358,14 +358,14 @@ export function AIToolsModal({
                         <Div className="px-4 pb-3 flex flex-col gap-2 border-t">
                           {tools.map((tool) => {
                             const isEnabled = enabledToolIds.includes(
-                              tool.endpointId,
+                              tool.toolName,
                             );
 
                             return (
                               <Div
-                                key={tool.endpointId}
+                                key={tool.toolName}
                                 onClick={() =>
-                                  handleToggleTool(tool.endpointId)
+                                  handleToggleTool(tool.toolName)
                                 }
                                 className={cn(
                                   "w-full text-left px-3 py-2 rounded-md border transition-all cursor-pointer",
@@ -377,7 +377,7 @@ export function AIToolsModal({
                                 <Checkbox
                                   checked={isEnabled}
                                   onCheckedChange={() =>
-                                    handleToggleTool(tool.endpointId)
+                                    handleToggleTool(tool.toolName)
                                   }
                                   className="mt-0.5 shrink-0"
                                   onClick={(e) => e.stopPropagation()}

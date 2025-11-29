@@ -3,9 +3,9 @@
  */
 
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../shared/types/node.d.ts" />
+/// <reference path="../../shared/types/node.d.ts" />
 
-import type { EndpointLogger } from "../shared/logger/endpoint";
+import type { EndpointLogger } from "../../shared/logger/endpoint";
 
 /**
  * Error context type

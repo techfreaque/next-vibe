@@ -8,8 +8,8 @@ import { success } from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
 import { create } from "zustand";
 
-import { generateStorageKey } from "@/app/api/[locale]/v1/core/system/unified-interface/react/storage-storage-client";
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import { generateStorageKey } from "@/app/api/[locale]/v1/core/system/unified-interface/react/utils/storage-storage-client";
+import type { CreateApiEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -22,7 +22,7 @@ import { buildQueryKey } from "./query-key-builder";
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 
 // Create a single QueryClient instance
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60_000,
@@ -169,17 +169,17 @@ export interface ApiStore {
       oldData:
         | {
             success: boolean;
-            data: TEndpoint["TResponseOutput"];
+            data: TEndpoint["types"]["ResponseOutput"];
           }
         | undefined,
     ) =>
       | {
           success: boolean;
-          data: TEndpoint["TResponseOutput"];
+          data: TEndpoint["types"]["ResponseOutput"];
         }
       | undefined,
-    requestData?: TEndpoint["TRequestOutput"],
-    urlPathParams?: TEndpoint["TUrlVariablesOutput"],
+    requestData?: TEndpoint["types"]["RequestOutput"],
+    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"],
   ) => void;
 }
 
@@ -316,17 +316,17 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       oldData:
         | {
             success: boolean;
-            data: TEndpoint["TResponseOutput"];
+            data: TEndpoint["types"]["ResponseOutput"];
           }
         | undefined,
     ) =>
       | {
           success: boolean;
-          data: TEndpoint["TResponseOutput"];
+          data: TEndpoint["types"]["ResponseOutput"];
         }
       | undefined,
-    requestData?: TEndpoint["TRequestOutput"],
-    urlPathParams?: TEndpoint["TUrlVariablesOutput"],
+    requestData?: TEndpoint["types"]["RequestOutput"],
+    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"],
   ): void => {
     // Generate the query key using shared utility (same format as useApiQuery)
     const queryKey = buildQueryKey(
@@ -342,7 +342,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       const typedOldData = oldData as
         | {
             success: boolean;
-            data: TEndpoint["TResponseOutput"];
+            data: TEndpoint["types"]["ResponseOutput"];
           }
         | undefined;
 
@@ -350,9 +350,6 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     });
   },
 }));
-
-// Export QueryClient for potential direct usage
-export { queryClient };
 
 /**
  * Non-hook version for fetching data outside of React components
@@ -408,7 +405,7 @@ export const apiClient = {
         "Converting object to undefined for endpoint with undefinedSchema",
         endpoint.path.join("/"),
       );
-      requestData = undefined as TEndpoint["TRequestOutput"];
+      requestData = undefined as TEndpoint["types"]["RequestOutput"];
     }
 
     // If the schema expects an empty object but we received undefined, set requestData to empty object
@@ -417,7 +414,7 @@ export const apiClient = {
         "Converting undefined to empty object for endpoint with empty object schema",
         endpoint.path.join("/"),
       );
-      requestData = {} as TEndpoint["TRequestOutput"];
+      requestData = {} as TEndpoint["types"]["RequestOutput"];
     }
 
     // Use the query executor directly
@@ -446,15 +443,15 @@ export const apiClient = {
   >(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    requestData: TEndpoint["TRequestOutput"],
-    pathParams: TEndpoint["TUrlVariablesOutput"],
+    requestData: TEndpoint["types"]["RequestOutput"],
+    pathParams: TEndpoint["types"]["UrlVariablesOutput"],
     locale: CountryLanguage,
     options: ApiMutationOptions<
-      TEndpoint["TRequestOutput"],
-      TEndpoint["TResponseOutput"],
-      TEndpoint["TUrlVariablesOutput"]
+      TEndpoint["types"]["RequestOutput"],
+      TEndpoint["types"]["ResponseOutput"],
+      TEndpoint["types"]["UrlVariablesOutput"]
     > = {},
-  ): Promise<ResponseType<TEndpoint["TResponseOutput"]>> => {
+  ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> => {
     const { executeMutation } = await import("./mutation-executor");
 
     return executeMutation({
@@ -530,7 +527,7 @@ export const apiClient = {
     TEndpoint extends CreateApiEndpoint<string, Methods, TUserRoleValue, any>,
   >(
     _endpoint: TEndpoint,
-  ): MutationStoreType<TEndpoint["TResponseOutput"]> | undefined => {
+  ): MutationStoreType<TEndpoint["types"]["ResponseOutput"]> | undefined => {
     // Mutations are no longer stored in Zustand
     // This function is kept for backward compatibility but returns undefined
     return undefined;
@@ -568,17 +565,17 @@ export const apiClient = {
       oldData:
         | {
             success: boolean;
-            data: TEndpoint["TResponseOutput"];
+            data: TEndpoint["types"]["ResponseOutput"];
           }
         | undefined,
     ) =>
       | {
           success: boolean;
-          data: TEndpoint["TResponseOutput"];
+          data: TEndpoint["types"]["ResponseOutput"];
         }
       | undefined,
-    requestData?: TEndpoint["TRequestOutput"],
-    urlPathParams?: TEndpoint["TUrlVariablesOutput"],
+    requestData?: TEndpoint["types"]["RequestOutput"],
+    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"],
   ): void => {
     useApiStore
       .getState()

@@ -8,9 +8,12 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 
-import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/handler";
+import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import {
+  UserPermissionRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -59,12 +62,14 @@ export function createPublicCliUser(): InferJwtPayloadTypeFromRoles<
  */
 function createCliUserFromDb(
   userId: string,
-  leadId?: string | null,
+  leadId: string,
+  roles: UserRoleValue[],
 ): InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> {
   return {
     isPublic: false,
     id: userId,
-    leadId: leadId || userId,
+    leadId,
+    roles,
   } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
 }
 
@@ -76,11 +81,13 @@ export function createMockUser(): {
   id: string;
   leadId: string;
   isPublic: false;
+  roles: (typeof UserPermissionRole.ADMIN)[];
 } {
   return {
     id: DEFAULT_CLI_USER_ID,
     leadId: DEFAULT_CLI_USER_ID,
     isPublic: false,
+    roles: [UserPermissionRole.ADMIN],
   };
 }
 
@@ -113,17 +120,27 @@ export async function getCliUser(
       });
 
       // Verify the token is still valid
-      const { authRepository } = await import("@/app/api/[locale]/v1/core/user/auth/repository");
-      const verifyResult = await authRepository.verifyJwt(sessionResult.data.token, logger);
+      const { authRepository } =
+        await import("@/app/api/[locale]/v1/core/user/auth/repository");
+      const verifyResult = await authRepository.verifyJwt(
+        sessionResult.data.token,
+        logger,
+      );
 
       if (verifyResult.success && verifyResult.data) {
         logger.debug("Session token is valid, using session user");
         return {
           success: true,
-          data: createCliUserFromDb(verifyResult.data.id, verifyResult.data.leadId),
+          data: createCliUserFromDb(
+            verifyResult.data.id,
+            verifyResult.data.leadId,
+            verifyResult.data.roles,
+          ),
         };
       } else {
-        logger.debug("Session token is invalid or expired, falling back to email auth");
+        logger.debug(
+          "Session token is invalid or expired, falling back to email auth",
+        );
       }
     }
   } catch (error) {
@@ -144,11 +161,13 @@ export async function getCliUser(
     // Create a public user with a new lead directly from database
     // We can't use getLeadIdFromDb() here because it tries to access cookies
     try {
-      const { getLanguageAndCountryFromLocale } = await import("@/i18n/core/language-utils");
+      const { getLanguageAndCountryFromLocale } =
+        await import("@/i18n/core/language-utils");
       const { language, country } = getLanguageAndCountryFromLocale(locale);
       const { db } = await import("@/app/api/[locale]/v1/core/system/db");
       const { leads } = await import("@/app/api/[locale]/v1/core/leads/db");
-      const { LeadStatus, LeadSource } = await import("@/app/api/[locale]/v1/core/leads/enum");
+      const { LeadStatus, LeadSource } =
+        await import("@/app/api/[locale]/v1/core/leads/enum");
 
       const [newLead] = await db
         .insert(leads)
@@ -206,11 +225,12 @@ export async function getCliUser(
       logger.debug("CLI user found in database", {
         id: user.id,
         leadId: user.leadId,
+        roles: user.roles,
       });
 
       return {
         success: true,
-        data: createCliUserFromDb(user.id, user.leadId),
+        data: createCliUserFromDb(user.id, user.leadId, user.roles),
       };
     }
 

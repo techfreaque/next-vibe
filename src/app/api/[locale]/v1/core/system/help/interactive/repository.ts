@@ -16,21 +16,24 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/handler";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/handler";
+import {
+  UserPermissionRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { endpoints } from "../../generated/endpoints";
-import type { ApiSection } from "../../unified-interface/shared/types/endpoint";
-import type {
-  DiscoveredRoute,
-  RouteExecutionContext,
-} from "../../unified-interface/cli/route-executor";
-import { routeDelegationHandler } from "../../unified-interface/cli/route-executor";
+import { definitionsRegistry } from "../../unified-interface/shared/endpoints/definitions/registry";
+import type { RouteExecutionContext } from "../../unified-interface/cli/runtime/route-executor";
+import { routeDelegationHandler } from "../../unified-interface/cli/runtime/route-executor";
 import { Platform } from "../../unified-interface/shared/types/platform";
-import { splitPath } from "../../unified-interface/shared/utils/path";
-import { schemaUIHandler } from "../../unified-interface/cli/widgets/schema-ui-handler";
+import {
+  splitPath,
+  endpointToToolName,
+} from "../../unified-interface/shared/utils/path";
+import { schemaUIHandler } from "../../unified-interface/cli/widgets/renderers/schema-handler";
+import type { CreateApiEndpointAny } from "../../unified-interface/shared/types/endpoint";
 
 /**
  * Interactive session state
@@ -52,7 +55,7 @@ interface DirectoryNode {
   path: string;
   type: "directory" | "route";
   children?: DirectoryNode[];
-  route?: DiscoveredRoute;
+  route?: CreateApiEndpointAny;
   parent?: DirectoryNode;
 }
 
@@ -70,6 +73,7 @@ export interface InteractiveRepository {
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> | undefined,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<{ started: boolean }>>;
 }
 
@@ -92,10 +96,12 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> | undefined,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    platform: Platform,
   ): Promise<ResponseType<{ started: boolean }>> {
     if (!user) {
       return fail({
-        message: "app.api.v1.core.system.help.interactive.errors.unauthorized.title",
+        message:
+          "app.api.v1.core.system.help.interactive.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -109,7 +115,9 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
 
       // Show welcome message
       this.logger.info(
-        t("app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.welcome"),
+        t(
+          "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.welcome",
+        ),
       );
       this.logger.info(
         t("app.api.v1.core.system.unifiedInterface.cli.vibe.help.description"),
@@ -117,54 +125,15 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       this.logger.info("");
 
       // Build route tree for file explorer navigation
-      // Convert nested endpoints object to array of DiscoveredRoute
-      const routesArray: DiscoveredRoute[] = [];
+      // Use centralized endpoint adapter to get all platform-accessible endpoints
+      // (filtered by user permissions from JWT)
+      const discoveredEndpoints = definitionsRegistry.getEndpointsForUser(
+        platform,
+        user,
+        logger,
+      );
 
-      // Helper function to recursively extract routes from nested structure
-      const extractRoutes = (obj: ApiSection, pathParts: string[] = []): void => {
-        for (const [key, value] of Object.entries(obj)) {
-          if (!value || typeof value !== "object") {
-            continue;
-          }
-
-          // Check if this is an endpoint (has 'path' property) or a section (nested structure)
-          // If it has HTTP method keys AND those methods have 'path', it's an endpoint section
-          const hasMethod = "GET" in value || "POST" in value || "PUT" in value || "PATCH" in value || "DELETE" in value;
-
-          if (hasMethod) {
-            // This is an endpoint section - extract route info from each method
-            const fullPath = [...pathParts, key].join("/");
-            const httpMethods = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const;
-
-            for (const method of httpMethods) {
-              if (method in value) {
-                const endpoint = value[method];
-                // Check if this is actually an endpoint by checking for 'path' property
-                if (endpoint && typeof endpoint === "object" && "path" in endpoint) {
-                  const pathValue = endpoint.path;
-                  const pathArray = Array.isArray(pathValue) ? pathValue : [pathValue];
-                  const routePath = pathArray.join("/");
-
-                  routesArray.push({
-                    alias: ("aliases" in endpoint && Array.isArray(endpoint.aliases) ? endpoint.aliases[0] : undefined) || fullPath,
-                    path: `/api/[locale]/${routePath}`,
-                    method: method,
-                    routePath: fullPath,
-                    description: "description" in endpoint && typeof endpoint.description === "string" ? endpoint.description : undefined,
-                  });
-                }
-              }
-            }
-          } else if (!("path" in value)) {
-            // No HTTP methods and no 'path' property - must be nested ApiSection structure
-            extractRoutes(value, [...pathParts, key]);
-          }
-        }
-      };
-
-      extractRoutes(endpoints);
-
-      this.buildRouteTree(routesArray);
+      this.buildRouteTree(discoveredEndpoints);
 
       // Start at root
       this.currentNode = this.routeTree;
@@ -193,7 +162,12 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
           output: "pretty",
         },
         locale: "en-GLOBAL",
-        user: { id: "system", leadId: "system", isPublic: false },
+        user: {
+          id: "system",
+          leadId: "system",
+          isPublic: false,
+          roles: [UserPermissionRole.ADMIN],
+        },
       };
     }
     return this.session;
@@ -228,7 +202,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     };
   }
 
-  private buildRouteTree(routes: DiscoveredRoute[]): void {
+  private buildRouteTree(routes: CreateApiEndpointAny[]): void {
     const { t } = simpleT(this.getSession().locale);
 
     this.routeTree = {
@@ -247,16 +221,13 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     this.sortTree(this.routeTree);
   }
 
-  private addRouteToTree(route: DiscoveredRoute): void {
+  private addRouteToTree(route: CreateApiEndpointAny): void {
     if (!this.routeTree) {
       return;
     }
 
-    if (!route.path || typeof route.path !== "string") {
-      return;
-    }
-
-    const pathParts = splitPath(route.path).slice(4);
+    const routePath = route.path.join("/");
+    const pathParts = splitPath(`/api/[locale]/v1/${routePath}`).slice(4);
 
     let currentNode = this.routeTree;
 
@@ -479,9 +450,15 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
   private findRouteByPath(
     node: DirectoryNode,
     path: string,
-  ): DiscoveredRoute | null {
-    if (node.route && node.route.path === path) {
-      return node.route;
+  ): CreateApiEndpointAny | null {
+    if (node.route) {
+      const pathArray = node.route.path;
+      const routePath = Array.isArray(pathArray)
+        ? pathArray.join("/")
+        : pathArray;
+      if (routePath === path) {
+        return node.route;
+      }
     }
     if (node.children) {
       for (const child of node.children) {
@@ -495,7 +472,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
   }
 
   private async executeRouteWithDataDrivenUI(
-    route: DiscoveredRoute,
+    route: CreateApiEndpointAny,
   ): Promise<void> {
     const { t } = simpleT(this.getSession().locale);
 
@@ -512,8 +489,14 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.description",
     );
 
-    this.logger.info(`${executingText}: ${route.alias || route.path}`);
-    this.logger.info(`${routeText}: ${route.path}`);
+    const pathArray = route.path;
+    const routePath = Array.isArray(pathArray)
+      ? pathArray.join("/")
+      : pathArray;
+    const alias =
+      route.aliases && route.aliases.length > 0 ? route.aliases[0] : undefined;
+    this.logger.info(`${executingText}: ${alias || routePath}`);
+    this.logger.info(`${routeText}: ${routePath}`);
     this.logger.info(`${methodText}: ${route.method}`);
     if (route.description) {
       this.logger.info(`${descriptionText}: ${route.description}`);
@@ -579,7 +562,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
   }
 
   private async generateDataDrivenForm(
-    route: DiscoveredRoute,
+    route: CreateApiEndpointAny,
     endpoint: {
       title?: string;
       description?: string;
@@ -587,7 +570,10 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       requestUrlPathParamsSchema?: z.ZodTypeAny;
     },
   ): Promise<void> {
-    const title = endpoint.title || route.alias || route.path;
+    const routePath = route.path.join("/");
+    const alias =
+      route.aliases && route.aliases.length > 0 ? route.aliases[0] : undefined;
+    const title = endpoint.title || alias || routePath;
 
     this.logger.info(title);
     if (endpoint.description) {
@@ -626,10 +612,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       );
     }
 
-    if (
-      Object.keys(requestData).length ||
-      Object.keys(urlPathParams).length
-    ) {
+    if (Object.keys(requestData).length || Object.keys(urlPathParams).length) {
       const previewText = tSelected(
         "app.api.v1.core.system.unifiedInterface.cli.vibe.interactive.navigation.preview",
       );
@@ -710,35 +693,34 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     return false;
   }
 
-  private async getCreateApiEndpoint(route: DiscoveredRoute): Promise<{
+  private async getCreateApiEndpoint(route: CreateApiEndpointAny): Promise<{
     title?: string;
     description?: string;
     requestSchema?: z.ZodTypeAny;
     requestUrlPathParamsSchema?: z.ZodTypeAny;
   } | null> {
-    const { loadEndpointDefinition } = await import(
-      "../../unified-interface/shared/registry/definition-loader"
-    );
+    const { definitionLoader } =
+      await import("../../unified-interface/shared/endpoints/definition/loader");
 
-    const result = await loadEndpointDefinition(
-      {
-        routePath: route.routePath,
-        method: route.method,
-      },
-      this.logger,
-    );
+    const routePath = route.path.join("/");
+    const alias =
+      route.aliases && route.aliases.length > 0 ? route.aliases[0] : undefined;
+    const resolvedCommand = alias || routePath;
+    const result = await definitionLoader.load({
+      identifier: resolvedCommand,
+      platform: Platform.CLI,
+      user: this.session.user,
+      logger: this.logger,
+    });
 
-    if (result.error) {
-      this.logger.warn(
-        `Failed to load endpoint definition for ${route.routePath}`,
-        {
-          error: result.error,
-        },
-      );
+    if (!result.success) {
+      this.logger.warn(`Failed to load endpoint definition for ${routePath}`, {
+        error: result.message,
+      });
       return null;
     }
 
-    const definition = result.definition;
+    const definition = result.data;
     if (!definition || typeof definition !== "object") {
       return null;
     }
@@ -767,30 +749,32 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
   }
 
   private async executeRouteWithData(
-    route: DiscoveredRoute,
+    route: CreateApiEndpointAny,
     requestData: Record<string, string | number | boolean>,
     urlPathParams: Record<string, string | number | boolean>,
   ): Promise<void> {
     const session = this.getSession();
+    // resolvedCommand can be either the alias or the full toolName
+    const toolName = endpointToToolName(route);
+    const resolvedCommand = (route.aliases && route.aliases[0]) || toolName;
     const context: RouteExecutionContext = {
-      toolName: route.alias,
+      toolName: resolvedCommand,
       data: requestData,
       urlPathParams: urlPathParams,
       user: session.user,
       locale: session.locale,
+      timestamp: Date.now(),
       options: session.options,
       logger: this.logger,
       platform: Platform.CLI,
     };
 
     try {
-      const { t } = simpleT(session.locale);
       const result = await routeDelegationHandler.executeRoute(
-        route,
+        resolvedCommand,
         context,
         this.logger,
         session.locale,
-        t,
       );
 
       const endpointDefinition = await this.getCreateApiEndpoint(route);
@@ -814,26 +798,28 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     }
   }
 
-  private async executeRouteBasic(route: DiscoveredRoute): Promise<void> {
+  private async executeRouteBasic(route: CreateApiEndpointAny): Promise<void> {
     const session = this.getSession();
+    // resolvedCommand can be either the alias or the full toolName
+    const toolName = endpointToToolName(route);
+    const resolvedCommand = (route.aliases && route.aliases[0]) || toolName;
     const context: RouteExecutionContext = {
-      toolName: route.alias,
+      toolName: resolvedCommand,
       data: {},
       user: session.user,
       locale: session.locale,
+      timestamp: Date.now(),
       options: session.options,
       logger: this.logger,
       platform: Platform.CLI,
     };
 
     try {
-      const { t } = simpleT(session.locale);
       const result = await routeDelegationHandler.executeRoute(
-        route,
+        resolvedCommand,
         context,
         this.logger,
         session.locale,
-        t,
       );
 
       const endpointDefinition = await this.getCreateApiEndpoint(route);

@@ -24,11 +24,6 @@ import purchaseDefinitions, {
   type CreditsPurchasePostResponseOutput,
 } from "./purchase/definition";
 
-interface EndpointData {
-  success: boolean;
-  data: CreditsGetResponseOutput;
-}
-
 export interface UseCreditsReturn extends EndpointReturn<typeof definitions> {
   /**
    * Optimistically deduct credits from the balance
@@ -86,62 +81,58 @@ export function useCredits(
         return;
       }
 
-      apiClient.updateEndpointData(
-        definitions.GET,
-        logger,
-        (oldData: EndpointData | undefined) => {
-          if (!oldData?.success || !oldData.data) {
-            return oldData;
-          }
+      apiClient.updateEndpointData(definitions.GET, logger, (oldData) => {
+        if (!oldData?.success) {
+          return oldData;
+        }
 
-          const data = oldData.data;
+        const data = oldData.data;
 
-          // Ensure we don't go negative
-          if (data.total < creditCost) {
-            return oldData;
-          }
+        // Ensure we don't go negative
+        if (data.total < creditCost) {
+          return oldData;
+        }
 
-          // Deduct credits in the correct order: free → expiring → permanent
-          let remaining = creditCost;
-          let newFree = data.free;
-          let newExpiring = data.expiring;
-          let newPermanent = data.permanent;
+        // Deduct credits in the correct order: free → expiring → permanent
+        let remaining = creditCost;
+        let newFree = data.free;
+        let newExpiring = data.expiring;
+        let newPermanent = data.permanent;
 
-          // Step 1: Deduct from free credits first (includes lead credits)
-          if (remaining > 0 && newFree > 0) {
-            const deduction = Math.min(newFree, remaining);
-            newFree -= deduction;
-            remaining -= deduction;
-          }
+        // Step 1: Deduct from free credits first (includes lead credits)
+        if (remaining > 0 && newFree > 0) {
+          const deduction = Math.min(newFree, remaining);
+          newFree -= deduction;
+          remaining -= deduction;
+        }
 
-          // Step 2: Deduct from expiring credits (subscription)
-          if (remaining > 0 && newExpiring > 0) {
-            const deduction = Math.min(newExpiring, remaining);
-            newExpiring -= deduction;
-            remaining -= deduction;
-          }
+        // Step 2: Deduct from expiring credits (subscription)
+        if (remaining > 0 && newExpiring > 0) {
+          const deduction = Math.min(newExpiring, remaining);
+          newExpiring -= deduction;
+          remaining -= deduction;
+        }
 
-          // Step 3: Deduct from permanent credits
-          if (remaining > 0 && newPermanent > 0) {
-            const deduction = Math.min(newPermanent, remaining);
-            newPermanent -= deduction;
-            remaining -= deduction;
-          }
+        // Step 3: Deduct from permanent credits
+        if (remaining > 0 && newPermanent > 0) {
+          const deduction = Math.min(newPermanent, remaining);
+          newPermanent -= deduction;
+          remaining -= deduction;
+        }
 
-          const newTotal = newFree + newExpiring + newPermanent;
+        const newTotal = newFree + newExpiring + newPermanent;
 
-          return {
-            success: true,
-            data: {
-              total: newTotal,
-              expiring: newExpiring,
-              permanent: newPermanent,
-              free: newFree,
-              expiresAt: data.expiresAt,
-            },
-          };
-        },
-      );
+        return {
+          success: true,
+          data: {
+            total: newTotal,
+            expiring: newExpiring,
+            permanent: newPermanent,
+            free: newFree,
+            expiresAt: data.expiresAt,
+          },
+        };
+      });
     },
     // oxlint-disable-next-line exhaustive-deps
     [], // apiClient and definitions.GET are stable references

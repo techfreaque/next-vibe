@@ -21,8 +21,11 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { dateSchema } from "@/app/api/[locale]/v1/core/shared/types/common.schema";
 
+import { selectChatMessageSchema } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
+import { ModelId } from "../../../model-access/models";
 
 /**
  * Get Messages List Endpoint (GET)
@@ -129,137 +132,17 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.DATA_CARDS,
         },
-        objectField(
+        responseField(
           {
-            type: WidgetType.CONTAINER,
+            type: WidgetType.DATA_CARD,
             title:
               "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.title" as const,
-            layoutType: LayoutType.GRID,
-            columns: 2,
           },
-          { response: true },
-          {
-            id: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.id.content" as const,
-              },
-              z.uuid(),
-            ),
-            threadId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.threadId.content" as const,
-              },
-              z.uuid(),
-            ),
-            role: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.role.content" as const,
-              },
-              z.enum(ChatMessageRole),
-            ),
-            content: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.content.content" as const,
-              },
-              z.string(),
-            ),
-            parentId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.parentId.content" as const,
-              },
-              z.uuid().nullable(),
-            ),
-            depth: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.depth.content" as const,
-              },
-              z.number(),
-            ),
-            authorId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.authorId.content" as const,
-              },
-              z.string().nullable(),
-            ),
-            isAI: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.isAI.content" as const,
-              },
-              z.boolean(),
-            ),
-            model: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.model.content" as const,
-              },
-              z.string().nullable(),
-            ),
-            persona: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.persona.content" as const,
-              },
-              z.string().nullable(),
-            ),
-            tokens: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.tokens.content" as const,
-              },
-              z.number().nullable(),
-            ),
-            sequenceId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.sequenceId.content" as const,
-              },
-              z.uuid().nullable(),
-            ),
-            toolCalls: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.toolCalls.content" as const,
-              },
-              z.array(z.any()).nullable(),
-            ),
-            createdAt: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.createdAt.content" as const,
-              },
-              z.string().datetime(),
-            ),
-            updatedAt: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.v1.core.agent.chat.threads.threadId.messages.get.response.messages.message.updatedAt.content" as const,
-              },
-              z.string().datetime(),
-            ),
-          },
+          // Use selectChatMessageSchema directly with date transformations
+          selectChatMessageSchema.extend({
+            createdAt: dateSchema,
+            updatedAt: dateSchema,
+          }),
         ),
       ),
     },
@@ -288,12 +171,23 @@ const { GET } = createEndpoint({
             parentId: null,
             depth: 0,
             authorId: "770e8400-e29b-41d4-a716-446655440000",
+            authorName: "User",
+            authorAvatar: null,
+            authorColor: null,
             isAI: false,
             model: null,
             persona: null,
             tokens: null,
             sequenceId: null,
-            toolCalls: null,
+            metadata: null,
+            upvotes: 0,
+            downvotes: 0,
+            edited: false,
+            errorType: null,
+            errorMessage: null,
+            errorCode: null,
+            originalId: null,
+            searchVector: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },
@@ -305,12 +199,23 @@ const { GET } = createEndpoint({
             parentId: "660e8400-e29b-41d4-a716-446655440000",
             depth: 1,
             authorId: "770e8400-e29b-41d4-a716-446655440000",
+            authorName: "Assistant",
+            authorAvatar: null,
+            authorColor: null,
             isAI: true,
             model: "gpt-4o",
             persona: null,
             tokens: 150,
             sequenceId: null,
-            toolCalls: null,
+            metadata: null,
+            upvotes: 0,
+            downvotes: 0,
+            edited: false,
+            errorType: null,
+            errorMessage: null,
+            errorCode: null,
+            originalId: null,
+            searchVector: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },
@@ -478,7 +383,7 @@ const { POST } = createEndpoint({
               description:
                 "app.api.v1.core.agent.chat.threads.threadId.messages.post.model.description" as const,
             },
-            z.string().optional(),
+            z.nativeEnum(ModelId).optional(),
           ),
         },
       ),

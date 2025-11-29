@@ -4,21 +4,34 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import type { WidgetInput } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/widgets/types";
 
-import { CodeOutputWidgetRenderer } from "./code-output-widget-renderer";
-import { CodeQualityListWidgetRenderer } from "./code-quality-list-widget-renderer";
-import { ContainerWidgetRenderer } from "./container-widget-renderer";
-import { DataCardsWidgetRenderer } from "./data-cards-widget-renderer";
-import { DataListWidgetRenderer } from "./data-list-widget-renderer";
-import { DataTableWidgetRenderer } from "./data-table-widget-renderer";
-import { GroupedListWidgetRenderer } from "./grouped-list-widget-renderer";
-import { MetricWidgetRenderer } from "./metric-widget-renderer";
-import { SectionWidgetRenderer } from "./section-widget-renderer";
-import { StatsGridWidgetRenderer } from "./stats-grid-widget-renderer";
-import { TextWidgetRenderer } from "./text-widget-renderer";
-import { TitleWidgetRenderer } from "./title-widget-renderer";
+import { AccordionWidgetRenderer } from "../implementations/accordion";
+import { AvatarWidgetRenderer } from "../implementations/avatar";
+import { BadgeWidgetRenderer } from "../implementations/badge";
+import { CodeOutputWidgetRenderer } from "../implementations/code-output";
+import { CodeQualityListWidgetRenderer } from "../implementations/code-quality-list";
+import { ContainerWidgetRenderer } from "../implementations/container";
+import { DataCardWidgetRenderer } from "../implementations/data-card";
+import { DataCardsWidgetRenderer } from "../implementations/data-cards";
+import { DataListWidgetRenderer } from "../implementations/data-list";
+import { DataTableWidgetRenderer } from "../implementations/data-table";
+import { EditableTextWidgetRenderer } from "../implementations/editable-text";
+import { EmptyStateWidgetRenderer } from "../implementations/empty-state";
+import { ErrorWidgetRenderer } from "../implementations/errors";
+import { GroupedListWidgetRenderer } from "../implementations/grouped-list";
+import { LinkWidgetRenderer } from "../implementations/link";
+import { LinkCardWidgetRenderer } from "../implementations/link-card";
+import { LinkListWidgetRenderer } from "../implementations/link-list";
+import { LoadingWidgetRenderer } from "../implementations/loading";
+import { MarkdownWidgetRenderer } from "../implementations/markdown";
+import { MetricWidgetRenderer } from "../implementations/metric";
+import { SectionWidgetRenderer } from "../implementations/section";
+import { StatsGridWidgetRenderer } from "../implementations/stats-grid";
+import { TabsWidgetRenderer } from "../implementations/tabs";
+import { TextWidgetRenderer } from "../implementations/text";
+import { TitleWidgetRenderer } from "../implementations/title";
 import type {
-  ResponseFieldMetadata,
   WidgetRenderContext,
   WidgetRenderer,
 } from "./types";
@@ -43,6 +56,7 @@ export class WidgetRegistry {
     this.register(new TextWidgetRenderer());
     this.register(new SectionWidgetRenderer());
     this.register(new DataTableWidgetRenderer());
+    this.register(new DataCardWidgetRenderer());
     this.register(new DataCardsWidgetRenderer());
     this.register(new DataListWidgetRenderer());
     this.register(new GroupedListWidgetRenderer());
@@ -51,6 +65,18 @@ export class WidgetRegistry {
     this.register(new MetricWidgetRenderer());
     this.register(new StatsGridWidgetRenderer());
     this.register(new ContainerWidgetRenderer());
+    this.register(new LinkWidgetRenderer());
+    this.register(new LinkCardWidgetRenderer());
+    this.register(new LinkListWidgetRenderer());
+    this.register(new MarkdownWidgetRenderer());
+    this.register(new EditableTextWidgetRenderer());
+    this.register(new BadgeWidgetRenderer());
+    this.register(new AvatarWidgetRenderer());
+    this.register(new EmptyStateWidgetRenderer());
+    this.register(new ErrorWidgetRenderer());
+    this.register(new LoadingWidgetRenderer());
+    this.register(new TabsWidgetRenderer());
+    this.register(new AccordionWidgetRenderer());
   }
 
   /**
@@ -71,9 +97,9 @@ export class WidgetRegistry {
   /**
    * Render a field using the appropriate widget renderer
    */
-  render(field: ResponseFieldMetadata, context: WidgetRenderContext): string {
-    const renderer = this.getRenderer(field.widgetType);
-    return renderer.render(field, context);
+  render(input: WidgetInput, context: WidgetRenderContext): string {
+    const renderer = this.getRenderer(input.field.ui.type);
+    return renderer.render(input, context);
   }
 
   /**
@@ -84,11 +110,30 @@ export class WidgetRegistry {
     // For now, return the known types
     return [
       WidgetType.TEXT,
+      WidgetType.TITLE,
+      WidgetType.SECTION,
       WidgetType.DATA_TABLE,
+      WidgetType.DATA_CARD,
       WidgetType.DATA_CARDS,
+      WidgetType.DATA_LIST,
       WidgetType.GROUPED_LIST,
+      WidgetType.CODE_QUALITY_LIST,
+      WidgetType.CODE_OUTPUT,
       WidgetType.METRIC_CARD,
       WidgetType.STATS_GRID,
+      WidgetType.CONTAINER,
+      WidgetType.LINK,
+      WidgetType.LINK_CARD,
+      WidgetType.LINK_LIST,
+      WidgetType.MARKDOWN,
+      WidgetType.MARKDOWN_EDITOR,
+      WidgetType.BADGE,
+      WidgetType.AVATAR,
+      WidgetType.EMPTY_STATE,
+      WidgetType.ERROR,
+      WidgetType.LOADING,
+      WidgetType.TABS,
+      WidgetType.ACCORDION,
     ];
   }
 }

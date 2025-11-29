@@ -174,7 +174,7 @@ export function FormItem({
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div className={cn("space-y-2", className)} {...props} />
+      <div className={cn("space-y-1", className)} {...props} />
     </FormItemContext.Provider>
   );
 }
@@ -187,13 +187,11 @@ export function FormLabel({
   const { error, formItemId } = useFormField();
 
   return (
-    <div>
-      <Label
-        className={cn(error && "text-red-600 dark:text-red-400", className)}
-        htmlFor={formItemId}
-        {...props}
-      />
-    </div>
+    <Label
+      className={cn(error && "text-red-600 dark:text-red-400", className)}
+      htmlFor={formItemId}
+      {...props}
+    />
   );
 }
 FormLabel.displayName = "FormLabel";

@@ -45,6 +45,7 @@ export const translations: typeof enTranslations = {
         error: "Błąd",
         executing: "Wykonywanie...",
         complete: "Zakończono",
+        waitingForConfirmation: "Oczekiwanie na potwierdzenie",
       },
       sections: {
         request: "Żądanie",
@@ -57,6 +58,11 @@ export const translations: typeof enTranslations = {
         noResult: "Brak wyniku",
         metadataNotAvailable:
           "Metadane widgetu niedostępne. Pokazywanie surowych danych.",
+        confirmationRequired: "Sprawdź i edytuj parametry, następnie potwierdź.",
+      },
+      actions: {
+        confirm: "Potwierdź",
+        cancel: "Anuluj",
       },
     },
     codeQualityList: {

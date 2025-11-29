@@ -42,7 +42,6 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import type { ToolResultWidgetConfig } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/widgets/types";
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
@@ -50,6 +49,7 @@ import type { DefaultFolderId } from "./config";
 import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
 
 import type { ModelId } from "./model-access/models";
+import type { IconKey } from "./model-access/icons";
 
 import { leads } from "@/app/api/[locale]/v1/core/leads/db";
 
@@ -79,19 +79,16 @@ export type ToolCallResult =
   | { [key: string]: ToolCallResult }
   | ToolCallResult[];
 
-/**
- * Tool call information
- */
 export interface ToolCall {
   toolName: string;
-  displayName: string;
-  icon?: string;
-  args: ToolCallResult; // Allow any JSON-serializable value
+  args: ToolCallResult;
   result?: ToolCallResult;
   error?: string;
   executionTime?: number;
-  widgetMetadata?: ToolResultWidgetConfig;
   creditsUsed?: number;
+  requiresConfirmation?: boolean;
+  isConfirmed?: boolean;
+  waitingForConfirmation?: boolean; // True when stream is paused waiting for user confirmation
 }
 
 /**
@@ -110,20 +107,15 @@ export interface ReasoningMetadata {
   isStreaming?: boolean;
 }
 
-/**
- * Tool call metadata for TOOL role messages
- * Contains the tool call information directly in metadata
- */
 export interface ToolCallMetadata {
   toolName: string;
-  displayName: string;
-  icon?: string;
   args: ToolCallResult;
   result?: ToolCallResult;
   error?: string;
   executionTime?: number;
-  widgetMetadata?: ToolResultWidgetConfig;
   creditsUsed?: number;
+  requiresConfirmation?: boolean;
+  isConfirmed?: boolean;
 }
 
 /**
@@ -144,18 +136,7 @@ export interface MessageMetadata {
   isStreaming?: boolean;
 
   // Tool call metadata (for TOOL messages)
-  // New format: toolCall object contains all tool call data
   toolCall?: ToolCall;
-  // Old format: individual fields (kept for backwards compatibility)
-  toolName?: string;
-  displayName?: string;
-  icon?: string;
-  args?: ToolCallResult;
-  result?: ToolCallResult;
-  error?: string;
-  executionTime?: number;
-  widgetMetadata?: ToolResultWidgetConfig;
-  creditsUsed?: number;
 
   // Attachments
   attachments?: {
@@ -191,7 +172,7 @@ export const chatFolders = pgTable(
 
     // Folder details
     name: text("name").notNull(),
-    icon: text("icon"), // lucide icon name or si icon name
+    icon: text("icon").$type<IconKey | null>(),
     color: text("color"), // hex color for visual distinction
 
     // Hierarchy - self-reference requires AnyPgColumn to break circular inference
@@ -427,8 +408,8 @@ export const chatMessages = pgTable(
     isAI: boolean("is_ai").default(false).notNull(),
 
     // AI-specific fields
-    model: text("model"), // ModelId if AI message
-    persona: text("tone"), // Persona used (DB column is "tone" for backwards compatibility)
+    model: text("model").$type<ModelId | null>(), // ModelId if AI message
+    persona: text("tone"),
 
     // Error information (for error messages)
     errorType: text("error_type"),
@@ -439,7 +420,6 @@ export const chatMessages = pgTable(
     edited: boolean("edited").default(false).notNull(),
     originalId: uuid("original_id"), // If this is an edit
     tokens: integer("tokens"),
-    collapsed: boolean("collapsed").default(false).notNull(),
     metadata: jsonb("metadata").$type<MessageMetadata>().default({}),
 
     // Voting
@@ -531,11 +511,26 @@ export const insertChatMessageSchema = createInsertSchema(chatMessages);
 /**
  * Types
  */
-export type ChatFolder = z.infer<typeof selectChatFolderSchema>;
+export type ChatFolder = z.infer<typeof selectChatFolderSchema> & {
+  rootFolderId: DefaultFolderId;
+  icon: IconKey | null;
+  canManage?: boolean;
+  canCreateThread?: boolean;
+  canModerate?: boolean;
+  canDelete?: boolean;
+  canManagePermissions?: boolean;
+};
 export type NewChatFolder = z.infer<typeof insertChatFolderSchema>;
 
-export type ChatThread = z.infer<typeof selectChatThreadSchema>;
+export type ChatThread = z.infer<typeof selectChatThreadSchema> & {
+  rootFolderId: DefaultFolderId;
+  canEdit?: boolean;
+  canPost?: boolean;
+  canModerate?: boolean;
+  canDelete?: boolean;
+  canManagePermissions?: boolean;
+};
 export type NewChatThread = z.infer<typeof insertChatThreadSchema>;
 
-export type ChatMessage = z.infer<typeof selectChatMessageSchema>;
+export type ChatMessage = typeof chatMessages.$inferSelect;
 export type NewChatMessage = z.infer<typeof insertChatMessageSchema>;

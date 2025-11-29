@@ -9,12 +9,13 @@ import type { JSX } from "react";
 import React from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
+import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { getPersonaName } from "@/app/api/[locale]/v1/core/agent/chat/personas/config";
 import { ToolDisplay } from "../tool-display";
 import { ErrorMessageBubble } from "../error-message-bubble";
@@ -104,12 +105,8 @@ export function ThreadedMessageContent({
                 message.model &&
                 ((): JSX.Element | null => {
                   const modelData = getModelById(message.model);
-                  const ModelIcon = modelData.icon;
-                  return typeof ModelIcon === "string" ? (
-                    <Span className="text-base leading-none">{ModelIcon}</Span>
-                  ) : (
-                    <ModelIcon className="h-3 w-3" />
-                  );
+                  const ModelIcon = getIconComponent(modelData.icon);
+                  return <ModelIcon className="h-3 w-3" />;
                 })()}
               {message.role === "user"
                 ? currentUserId && message.authorId === currentUserId
@@ -146,12 +143,13 @@ export function ThreadedMessageContent({
               .some((m) => m.content.trim().length > 0);
 
             // TOOL message
-            if (msg.role === "tool" && msg.toolCalls) {
+            if (msg.role === "tool" && msg.metadata?.toolCall) {
               return (
                 <ToolDisplay
                   key={msg.id}
-                  toolCalls={msg.toolCalls}
+                  toolCall={msg.metadata.toolCall}
                   locale={locale}
+                  threadId={msg.threadId}
                   hasContent={hasContentAfter}
                   messageId={msg.id}
                   collapseState={collapseState}

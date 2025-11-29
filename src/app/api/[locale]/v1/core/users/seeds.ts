@@ -12,9 +12,10 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import { UserDetailLevel } from "../user/enum";
 import { userRepository } from "../user/repository";
-import { UserRole } from "../user/user-roles/enum";
+import { UserPermissionRole, UserRole } from "../user/user-roles/enum";
 import type { UserCreateRequestOutput } from "./create/definition";
 import { userCreateRepository } from "./create/repository";
+import type { JwtPrivatePayloadType } from "../user/auth/types";
 
 /**
  * Dummy translation function for seeds
@@ -64,11 +65,12 @@ export async function dev(
       return;
     }
 
-    const adminJwtPayload = {
+    const adminJwtPayload: JwtPrivatePayloadType = {
       id: adminUser.id,
       leadId: adminUser.leadId,
-      isPublic: false,
-    } as const;
+      isPublic: false as const,
+      roles: [UserPermissionRole.ADMIN],
+    };
 
     // Create sample users for testing user management functionality
     const sampleUsers = [
@@ -208,11 +210,12 @@ export async function test(
       return;
     }
 
-    const adminJwtPayload = {
+    const adminJwtPayload: JwtPrivatePayloadType = {
       id: adminUser.id,
       leadId: adminUser.leadId,
-      isPublic: false,
-    } as const;
+      isPublic: false as const,
+      roles: [UserPermissionRole.ADMIN],
+    };
 
     // Create minimal test user for user management testing
     const testUserData = createUserManagementSeed({

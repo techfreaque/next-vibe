@@ -4,7 +4,11 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-import { ChevronDown, ChevronRight, CornerDownRight } from "next-vibe-ui/ui/icons";
+import {
+  ChevronDown,
+  ChevronRight,
+  CornerDownRight,
+} from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -15,7 +19,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import { LAYOUT } from "@/app/[locale]/chat/lib/config/constants";

@@ -46,6 +46,28 @@ export const translations: typeof enTranslations = {
         content: {
           label: "Inhalt",
         },
+        metadata: {
+          toolCall: {
+            toolName: {
+              label: "Werkzeugname",
+            },
+            args: {
+              label: "Werkzeugargumente",
+            },
+            result: {
+              label: "Werkzeugergebnis",
+            },
+            error: {
+              label: "Werkzeugfehler",
+            },
+            executionTime: {
+              label: "Ausführungszeit (ms)",
+            },
+            creditsUsed: {
+              label: "Verwendete Credits",
+            },
+          },
+        },
       },
     },
     content: {
@@ -101,6 +123,16 @@ export const translations: typeof enTranslations = {
       label: "Aktivierte Tool-IDs",
       description:
         "Liste der KI-Tool-IDs, die für diese Konversation aktiviert werden sollen",
+    },
+    toolConfirmation: {
+      label: "Tool-Bestätigung",
+      description: "Tool-Bestätigungsantwort vom Benutzer",
+      success: "Tool-Bestätigung erfolgreich verarbeitet",
+      errors: {
+        messageNotFound: "Tool-Nachricht nicht gefunden",
+        toolCallMissing: "ToolCall-Metadaten fehlen",
+        toolNotFound: "Tool nicht gefunden",
+      },
     },
     response: {
       title: "Stream-Antwort",
@@ -195,6 +227,12 @@ export const translations: typeof enTranslations = {
   },
   errorTypes: {
     streamError: "Stream-Fehler",
+  },
+  errorThread: {
+    title: "Fehler",
+  },
+  error: {
+    title: "Stream-Fehler",
   },
   providers: {
     uncensoredHandler: {

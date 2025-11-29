@@ -194,7 +194,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                   outputDir: "src/app/api/[locale]/v1/core/system/generated",
                   includeTestData: true,
                   includeProdData: true,
-                  verbose: false,
                   dryRun: false,
                 },
                 logger,
@@ -266,8 +265,51 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorsSkipped++;
       }
 
-      // 4. tRPC Router Generator - Now handled by functional generators above
-      // No separate tRPC generation needed
+      // 4. tRPC Router Generator
+      if (!data.skipTrpc) {
+        generatorPromises.push(
+          (async (): Promise<string | null> => {
+            try {
+              outputLines.push("🔌 Generating tRPC router...");
+              const { generateTrpcRouterRepository } =
+                await import("../generate-trpc-router/repository");
+
+              const result =
+                await generateTrpcRouterRepository.generateTrpcRouter(
+                  {
+                    apiDir: "src/app/api",
+                    outputFile:
+                      "src/app/api/[locale]/v1/core/system/unified-interface/trpc/[...trpc]/router.ts",
+                    includeWarnings: false,
+                    excludePatterns: [],
+                  },
+                  logger,
+                );
+
+              if (result.success && result.data) {
+                outputLines.push(
+                  `✅ tRPC router generated successfully: ${result.data.output}`,
+                );
+                generatorsRun++;
+                return "trpc-router";
+              } else {
+                outputLines.push(
+                  `❌ tRPC router generation failed: ${result.errorType?.errorKey || "Unknown error"}`,
+                );
+                return null;
+              }
+            } catch (error) {
+              outputLines.push(
+                `❌ tRPC router generator failed: ${parseError(error).message}`,
+              );
+              return null;
+            }
+          })(),
+        );
+      } else {
+        outputLines.push("⏭️  tRPC router generation skipped");
+        generatorsSkipped++;
+      }
 
       // Wait for all generators to complete
       const results = await Promise.allSettled(generatorPromises);
@@ -321,13 +363,16 @@ if (import.meta.main && Bun.main === import.meta.path) {
         skipEndpoints: false,
         skipSeeds: false,
         skipTaskIndex: false,
-        skipTrpcRouter: false,
+        skipTrpc: false,
+        verbose: false,
         outputDir: "src/app/api/[locale]/v1/core/system/generated",
       },
       logger,
     )
     .then((result) => {
-      logger.info(result.data.output);
+      if (result.success && result.data) {
+        logger.info(result.data.output);
+      }
       return;
     })
     .catch((error) => {

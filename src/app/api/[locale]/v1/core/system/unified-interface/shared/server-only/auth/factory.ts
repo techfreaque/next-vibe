@@ -32,26 +32,3 @@ export function getPlatformAuthHandler(platform: Platform): BaseAuthHandler {
     }
   }
 }
-
-/**
- * Check if platform uses session file storage
- */
-export function usesSessionFile(platform: Platform): boolean {
-  return (
-    platform === Platform.CLI ||
-    platform === Platform.AI ||
-    platform === Platform.MCP
-  );
-}
-
-/**
- * Check if platform uses cookie storage
- */
-export function usesCookies(platform: Platform): boolean {
-  return (
-    platform === Platform.TRPC ||
-    platform === Platform.NEXT_PAGE ||
-    platform === Platform.NEXT_API ||
-    platform === Platform.AI
-  );
-}

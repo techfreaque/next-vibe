@@ -46,6 +46,7 @@ export const translations: typeof enTranslations = {
       linear: "Linear",
       threaded: "Threaded",
       flat: "Flach",
+      debug: "Debug",
     },
   },
   common: {
@@ -98,6 +99,7 @@ export const translations: typeof enTranslations = {
     linearView: "Lineare Ansicht (ChatGPT-Stil)",
     threadedView: "Thread-Ansicht (Reddit/Discord-Stil)",
     flatView: "Flache Ansicht (4chan-Stil)",
+    debugView: "Debug-Ansicht (mit Systemprompts)",
   },
   screenshot: {
     capturing: "Erfassen...",

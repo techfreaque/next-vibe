@@ -18,6 +18,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 import { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import { useCredits } from "@/app/api/[locale]/v1/core/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
@@ -159,7 +160,7 @@ export function ChatSidebar({
   }, []);
 
   const handleCreateFolder = React.useCallback(
-    (name: string, icon: string): void => {
+    (name: string, icon: IconValue): void => {
       // If in a subfolder, create under that subfolder
       // If in root folder (no activeFolderId), create at root level
       const parentId: string | null = activeFolderId;

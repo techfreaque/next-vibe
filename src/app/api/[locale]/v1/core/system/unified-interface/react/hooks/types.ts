@@ -9,7 +9,7 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -148,11 +148,14 @@ export interface ApiQueryReturn<TResponse> {
 /**
  * Type for the API query options
  */
-export interface ApiQueryOptions<TRequest, TResponse, TUrlVariables>
-  extends Omit<
-    UseQueryOptions<TResponse, DefaultError, TResponse, QueryKey>,
-    "queryFn" | "initialData" | "queryKey"
-  > {
+export interface ApiQueryOptions<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+> extends Omit<
+  UseQueryOptions<TResponse, DefaultError, TResponse, QueryKey>,
+  "queryFn" | "initialData" | "queryKey"
+> {
   queryKey?: QueryKey;
   enabled?: boolean;
   staleTime?: number;
@@ -202,16 +205,17 @@ export type ApiInferMutationOptions<
     any
   >,
 > = ApiMutationOptions<
-  TEndpoint["TRequestOutput"],
-  TEndpoint["TResponseOutput"],
-  TEndpoint["TUrlVariablesOutput"]
+  TEndpoint["types"]["RequestOutput"],
+  TEndpoint["types"]["ResponseOutput"],
+  TEndpoint["types"]["UrlVariablesOutput"]
 >;
 
 /**
  * Type for the API query form options
  */
-export interface ApiQueryFormOptions<TRequest extends FieldValues>
-  extends ApiFormOptions<TRequest> {
+export interface ApiQueryFormOptions<
+  TRequest extends FieldValues,
+> extends ApiFormOptions<TRequest> {
   autoSubmit?: boolean; // Whether to automatically submit the form when values change
   debounceMs?: number; // Debounce time in ms for auto-submission
 }
@@ -312,7 +316,3 @@ export interface SubmitFormFunctionOptions<TRequest, TResponse, TUrlVariables> {
     pathParams: TUrlVariables;
   }) => void;
 }
-
-const definitions = {};
-
-export default definitions;

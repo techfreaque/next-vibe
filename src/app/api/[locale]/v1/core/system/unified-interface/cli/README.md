@@ -148,14 +148,20 @@ vibe create-user --email=john@example.com --output=json
 
 ## Authentication
 
-CLI uses a system user by default:
+CLI authentication flow:
+
+1. Check `.vibe.session` file (from login/signup)
+2. If no session, check `VIBE_CLI_USER_EMAIL` env var and authenticate from DB
+3. If `VIBE_CLI_USER_EMAIL` is empty, create public user with new lead
+4. If email is set but user not found in DB, return error
 
 ```bash
-# Default: cli@system.local
+# Use authenticated user from DB
+export VIBE_CLI_USER_EMAIL=admin@example.com
 vibe create-user --email=john@example.com
 
-# Custom user via environment variable
-export VIBE_CLI_USER_EMAIL=admin@example.com
+# Use public user (no env var set)
+unset VIBE_CLI_USER_EMAIL
 vibe create-user --email=john@example.com
 ```
 

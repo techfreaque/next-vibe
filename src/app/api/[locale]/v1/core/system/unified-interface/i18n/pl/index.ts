@@ -24,6 +24,21 @@ export const translations: typeof enTranslations = {
           "Odmowa dostępu dla platformy {{platform}}: {{reason}}",
         insufficientRoles:
           "Niewystarczające role. Użytkownik ma: {{userRoles}}. Wymagane: {{requiredRoles}}",
+        definitionError: "Błąd definicji punktu końcowego: {{error}}",
+      },
+    },
+    endpoints: {
+      definition: {
+        loader: {
+          errors: {
+            endpointNotFound:
+              "Punkt końcowy '{{identifier}}' nie został znaleziony",
+            loadFailed:
+              "Nie udało się załadować punktu końcowego '{{identifier}}': {{error}}",
+            batchLoadFailed:
+              "Ładowanie wsadowe nie powiodło się: {{failedCount}} z {{totalCount}} punktów końcowych nie powiodło się",
+          },
+        },
       },
     },
   },

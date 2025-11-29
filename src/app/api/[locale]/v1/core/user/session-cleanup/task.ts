@@ -26,6 +26,7 @@ import type { Task } from "@/app/api/[locale]/v1/core/system/unified-interface/t
 import { defaultLocale } from "@/i18n/core/config";
 
 import type { JWTPublicPayloadType } from "../auth/types";
+import { UserPermissionRole } from "../user-roles/enum";
 import { sessionCleanupRepository } from "./repository";
 import type { SessionCleanupResponseOutput } from "./types";
 
@@ -60,6 +61,7 @@ export async function executeTask(
   const systemUser: JWTPublicPayloadType = {
     isPublic: true,
     leadId: "00000000-0000-0000-0000-000000000000", // System task lead ID
+    roles: [UserPermissionRole.PUBLIC],
   };
 
   return await sessionCleanupRepository.executeSessionCleanup(

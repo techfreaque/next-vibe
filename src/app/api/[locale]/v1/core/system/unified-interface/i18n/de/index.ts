@@ -24,6 +24,20 @@ export const translations: typeof enTranslations = {
           "Zugriff verweigert für {{platform}} Plattform: {{reason}}",
         insufficientRoles:
           "Unzureichende Rollen. Benutzer hat: {{userRoles}}. Erforderlich: {{requiredRoles}}",
+        definitionError: "Endpunkt-Definitionsfehler: {{error}}",
+      },
+    },
+    endpoints: {
+      definition: {
+        loader: {
+          errors: {
+            endpointNotFound: "Endpunkt '{{identifier}}' nicht gefunden",
+            loadFailed:
+              "Fehler beim Laden des Endpunkts '{{identifier}}': {{error}}",
+            batchLoadFailed:
+              "Batch-Laden fehlgeschlagen: {{failedCount}} von {{totalCount}} Endpunkten fehlgeschlagen",
+          },
+        },
       },
     },
   },

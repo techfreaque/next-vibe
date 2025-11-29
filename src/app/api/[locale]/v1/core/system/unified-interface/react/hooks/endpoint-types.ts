@@ -9,7 +9,7 @@ import type { UseFormReturn } from "react-hook-form";
 import type { ZodType } from "zod";
 import type { ZodTypeDef } from "zod/v3";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import type { CreateApiEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import type {
   ExtractOutput,
   InferSchemaFromField,
@@ -21,8 +21,6 @@ import type {
   ApiMutationOptions,
   ApiQueryFormOptions,
   ApiQueryOptions,
-  InferApiFormReturn,
-  InferApiQueryReturn,
   SubmitFormFunction,
 } from "./types";
 
@@ -604,16 +602,6 @@ export interface UseEndpointDeleteOptions<T> {
     : DeleteEndpointTypes<T>["urlPathParams"];
 }
 
-// Re-export the Infer types and hooks for easier access
-export type { InferApiFormReturn, InferApiQueryReturn, SubmitFormFunction };
-
-// Re-export InferEnhancedMutationResult from main types
-export type { InferEnhancedMutationResult } from "./types";
-
-// Re-export hooks from their respective modules
-export { useApiForm } from "./use-api-mutation-form";
-export { useApiQuery } from "./use-api-query";
-export { useTranslation } from "@/i18n/core/client";
 /**
  * Form auto-prefill types and configurations
  */

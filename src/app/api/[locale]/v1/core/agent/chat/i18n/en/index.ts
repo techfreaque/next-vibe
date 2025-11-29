@@ -45,6 +45,7 @@ export const translations = {
       linear: "Linear",
       threaded: "Threaded",
       flat: "Flat",
+      debug: "Debug",
     },
   },
   common: {
@@ -97,6 +98,7 @@ export const translations = {
     linearView: "Linear view (ChatGPT style)",
     threadedView: "Threaded view (Reddit/Discord style)",
     flatView: "Flat view (4chan style)",
+    debugView: "Debug view (with system prompts)",
   },
   screenshot: {
     capturing: "Capturing...",

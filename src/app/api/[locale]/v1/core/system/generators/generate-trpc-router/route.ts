@@ -14,8 +14,8 @@ import { generateTrpcRouterRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: generateTrpcRouterEndpoints,
   [Methods.POST]: {
-    handler: ({ data, locale }) => {
-      return generateTrpcRouterRepository.generateTrpcRouter(data, locale);
+    handler: ({ data, logger }) => {
+      return generateTrpcRouterRepository.generateTrpcRouter(data, logger);
     },
   },
 });

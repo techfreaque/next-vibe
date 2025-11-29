@@ -23,11 +23,16 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { authRepository } from "../../auth/repository";
-import type { JWTPublicPayloadType } from "../../auth/types";
+import type {
+  JWTPublicPayloadType,
+  JwtPrivatePayloadType,
+} from "../../auth/types";
+import { UserPermissionRole } from "../../user-roles/enum";
 import { users } from "../../db";
 import { UserDetailLevel } from "../../enum";
 import { sessionRepository } from "../../private/session/repository";
 import { userRepository } from "../../repository";
+import { userRolesRepository } from "../../user-roles/repository";
 import type {
   LoginPostRequestOutput,
   LoginPostResponseOutput,
@@ -396,17 +401,11 @@ export class LoginRepositoryImpl implements LoginRepository {
 
       // Link the leadId to the user
       // This ensures the userLeads table has the relationship for credit lookups
-      await leadAuthRepository.linkLeadToUser(
-        leadId,
-        userId,
-        locale,
-        logger,
-      );
+      await leadAuthRepository.linkLeadToUser(leadId, userId, locale, logger);
 
       // Merge lead wallet into user wallet immediately
       // This ensures user gets their pre-login credits
-      const { creditRepository } =
-        await import("../../../credits/repository");
+      const { creditRepository } = await import("../../../credits/repository");
       const mergeResult = await creditRepository.mergePendingLeadWallets(
         userId,
         [leadId],
@@ -425,11 +424,28 @@ export class LoginRepositoryImpl implements LoginRepository {
       const sessionDurationDays = rememberMe ? 30 : 7;
       const sessionDurationSeconds = sessionDurationDays * 24 * 60 * 60;
 
-      // Create JWT payload with proper structure including leadId
-      const tokenPayload = {
+      // Fetch user roles from DB to include in JWT
+      const rolesResult = await userRolesRepository.getUserRoles(
+        userResponse.data.id,
+        logger,
+      );
+      // Default to CUSTOMER role if roles fetch fails
+      const roles = rolesResult.success
+        ? rolesResult.data
+        : [UserPermissionRole.CUSTOMER];
+
+      if (!rolesResult.success) {
+        logger.warn("Failed to fetch user roles for JWT, using default CUSTOMER role", {
+          userId: userResponse.data.id,
+        });
+      }
+
+      // Create JWT payload with proper structure including leadId and roles
+      const tokenPayload: JwtPrivatePayloadType = {
         id: userResponse.data.id,
         leadId: leadId,
         isPublic: false as const,
+        roles,
       };
 
       // Sign JWT token

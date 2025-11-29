@@ -12,7 +12,7 @@ import React, { useState } from "react";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { ChatMessage, ChatThread } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage, ChatThread } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import { groupMessagesBySequence } from "../message-grouping";

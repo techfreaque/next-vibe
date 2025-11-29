@@ -13,6 +13,7 @@ import { Label } from "next-vibe-ui/ui/label";
 import type { JSX } from "react";
 import React from "react";
 
+import type { IconKey } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -21,12 +22,12 @@ interface AddCategoryDialogProps {
   onOpenChange: (open: boolean) => void;
   newCategory: {
     name: string;
-    icon: string;
+    icon: IconKey;
   };
   setNewCategory: React.Dispatch<
     React.SetStateAction<{
       name: string;
-      icon: string;
+      icon: IconKey;
     }>
   >;
   onAddCategory: () => void;
@@ -83,7 +84,7 @@ export function AddCategoryDialog({
               )}
               value={newCategory.icon}
               onChange={(e) =>
-                setNewCategory({ ...newCategory, icon: e.target.value })
+                setNewCategory({ ...newCategory, icon: e.target.value as IconKey })
               }
               maxLength={2}
             />

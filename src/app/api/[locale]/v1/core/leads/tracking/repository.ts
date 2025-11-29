@@ -344,14 +344,18 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       }
 
       // Transition lead status based on engagement type
-      const actionMap: Record<
-        EngagementType,
-        "website_visit" | "email_open" | "email_click" | "form_submit"
+      // Note: Not all engagement types trigger status transitions (e.g., LEAD_ATTRIBUTION)
+      const actionMap: Partial<
+        Record<
+          EngagementType,
+          "website_visit" | "email_open" | "email_click" | "form_submit"
+        >
       > = {
         [EngagementTypes.WEBSITE_VISIT]: "website_visit",
         [EngagementTypes.EMAIL_OPEN]: "email_open",
         [EngagementTypes.EMAIL_CLICK]: "email_click",
         [EngagementTypes.FORM_SUBMIT]: "form_submit",
+        // LEAD_ATTRIBUTION intentionally omitted - no status transition needed
       };
 
       const action = actionMap[data.engagementType];
@@ -1198,39 +1202,49 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
               currentLeadId,
             });
 
-            // Merge tracking lead wallet into user wallet immediately
-            // This ensures user gets credits from tracking lead
+            // Redistribute free credits across user pool
             const { creditRepository } =
               await import("../../credits/repository");
-            const mergeResult = await creditRepository.mergePendingLeadWallets(
-              user.id,
-              [trackingLeadId],
-              logger,
-            );
-            if (!mergeResult.success) {
-              logger.error(
-                "Failed to merge tracking lead wallet",
-                parseError(mergeResult).message,
-                {
-                  userId: user.id,
-                  trackingLeadId,
-                },
-              );
+            const poolResult = await creditRepository.getUserPool(user.id, logger);
+            if (poolResult.success) {
+              await creditRepository.redistributeFreeCredits(poolResult.data, logger);
             }
           } else {
-            // For anonymous users, log the lead-to-lead relationship in engagement metadata
-            // (Lead-to-lead linking table removed in wallet-based system)
+            // For anonymous users, create LEAD_ATTRIBUTION to link leads
+            await this.recordEngagement(
+              {
+                leadId: currentLeadId,
+                engagementType: EngagementTypes.LEAD_ATTRIBUTION,
+                metadata: {
+                  sourceLeadId: trackingLeadId,
+                  attributionType: "tracking_link",
+                  timestamp: new Date().toISOString(),
+                  url,
+                  campaignId: campaignId || "",
+                },
+              },
+              clientInfo,
+              logger,
+            );
+
+            // Redistribute free credits across lead pool
+            const { creditRepository } =
+              await import("../../credits/repository");
+            const poolResult = await creditRepository.getLeadPool(currentLeadId, logger);
+            if (poolResult.success) {
+              await creditRepository.redistributeFreeCredits(poolResult.data, logger);
+            }
+
+            leadsLinked = true;
             logger.debug(
-              "app.api.v1.core.leads.tracking.click.leadRelationship",
+              "app.api.v1.core.leads.tracking.click.leadAttribution",
               {
                 currentLeadId,
                 trackingLeadId,
                 campaignId: campaignId || "",
                 url,
-                timestamp: new Date().toISOString(),
               },
             );
-            leadsLinked = false; // No actual linking in wallet-based system
           }
         } catch (error) {
           logger.error(

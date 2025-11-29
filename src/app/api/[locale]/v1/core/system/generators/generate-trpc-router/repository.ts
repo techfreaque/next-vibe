@@ -10,10 +10,9 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 // Import types from the endpoint definition
 import type generateTrpcRouterEndpoints from "./definition";
+import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 
 type GenerateTrpcRouterRequestType =
   typeof generateTrpcRouterEndpoints.POST.types.RequestOutput;
@@ -26,24 +25,21 @@ type GenerateTrpcRouterResponseType =
 export interface GenerateTrpcRouterRepository {
   generateTrpcRouter(
     data: GenerateTrpcRouterRequestType,
-    locale: CountryLanguage,
+    logger: EndpointLogger,
   ): Promise<ResponseType<GenerateTrpcRouterResponseType>>;
 }
 
 /**
  * Generate tRPC Router Repository Implementation
  */
-export class GenerateTrpcRouterRepositoryImpl
-  implements GenerateTrpcRouterRepository
-{
+export class GenerateTrpcRouterRepositoryImpl implements GenerateTrpcRouterRepository {
   async generateTrpcRouter(
     data: GenerateTrpcRouterRequestType,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _locale: CountryLanguage,
+    logger: EndpointLogger,
   ): Promise<ResponseType<GenerateTrpcRouterResponseType>> {
     try {
       // Execute tRPC router generation based on the original logic
-      const result = await this.executeTrpcRouterGeneration(data);
+      const result = await this.executeTrpcRouterGeneration(data, logger);
 
       const response: GenerateTrpcRouterResponseType = {
         success: result.success,
@@ -67,6 +63,7 @@ export class GenerateTrpcRouterRepositoryImpl
    */
   private async executeTrpcRouterGeneration(
     data: GenerateTrpcRouterRequestType,
+    logger: EndpointLogger,
   ): Promise<{
     success: boolean;
     generationCompleted: boolean;
@@ -98,9 +95,8 @@ export class GenerateTrpcRouterRepositoryImpl
       outputLines.push(SCANNING_ROUTES);
 
       // Import the tRPC router generator
-      const { generateTRPCRouter } = await import(
-        "./trpc-trpc-router-generator"
-      );
+      const { generateTRPCRouter } =
+        await import("./trpc-trpc-router-generator");
 
       // Prepare options for the generator
       const generatorOptions = {
@@ -108,11 +104,13 @@ export class GenerateTrpcRouterRepositoryImpl
         outputFile: data.outputFile,
         includeWarnings: data.includeWarnings,
         excludePatterns: data.excludePatterns,
-        verbose: data.verbose,
       };
 
       // Execute the tRPC router generation
-      const generationResult = await generateTRPCRouter(generatorOptions);
+      const generationResult = await generateTRPCRouter(
+        generatorOptions,
+        logger,
+      );
 
       // Extract statistics from the generation result
       totalRoutes = generationResult.routeFiles?.length || 0;

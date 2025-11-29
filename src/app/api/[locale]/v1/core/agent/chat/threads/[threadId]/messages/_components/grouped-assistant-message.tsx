@@ -82,8 +82,14 @@ export function GroupedAssistantMessage({
   // Check if there's any content
   const hasContent = allMessages.some((msg) => msg.content.trim().length > 0);
 
-  // Show streaming placeholder when no content yet
-  const isStreaming = !hasContent;
+  // Check if any tool calls are waiting for confirmation
+  const hasToolWaitingForConfirmation = allMessages.some(
+    (msg) =>
+      msg.role === "tool" && msg.metadata?.toolCall?.waitingForConfirmation,
+  );
+
+  // Show streaming placeholder when no content yet AND no tools waiting for confirmation
+  const isStreaming = !hasContent && !hasToolWaitingForConfirmation;
 
   // Get all content for actions (ASSISTANT messages only, strip <think> tags)
   const allContent = allMessages
@@ -122,12 +128,13 @@ export function GroupedAssistantMessage({
               .some((m) => m.content.trim().length > 0);
 
             // TOOL message
-            if (message.role === "tool" && message.toolCalls) {
+            if (message.role === "tool" && message.metadata?.toolCall) {
               return (
                 <ToolDisplay
                   key={message.id}
-                  toolCalls={message.toolCalls}
+                  toolCall={message.metadata.toolCall}
                   locale={locale}
+                  threadId={message.threadId}
                   hasContent={hasContentAfter}
                   messageId={message.id}
                   collapseState={collapseState}

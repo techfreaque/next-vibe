@@ -6,8 +6,8 @@ import { useState } from "react";
 import {
   type WidgetActionType,
   type WidgetAction,
-} from "../../shared/ui/types";
-import { ensureError } from "../../shared/utils/error-utils";
+} from "../../../shared/widgets/types";
+import { ensureError } from "../../../shared/utils/error-utils";
 /**
  * Tool Action Handler Props
  */
@@ -75,16 +75,14 @@ ToolActionHandler.displayName = "ToolActionHandler";
 /**
  * Hook for handling widget actions
  */
-export function useWidgetActions<
-  TPayload = Record<string, string | number | boolean>,
->(
+export function useWidgetActions(
   onAction?: (action: WidgetAction) => void | Promise<void>,
 ): {
   isProcessing: boolean;
   error: string | null;
   handleAction: (
     type: WidgetActionType,
-    payload: TPayload,
+    payload: WidgetAction["payload"],
     metadata?: WidgetAction["metadata"],
   ) => Promise<void>;
   clearError: () => void;
@@ -94,7 +92,7 @@ export function useWidgetActions<
 
   const handleAction = async (
     type: WidgetActionType,
-    payload: TPayload,
+    payload: WidgetAction["payload"],
     metadata?: WidgetAction["metadata"],
   ): Promise<void> => {
     setIsProcessing(true);

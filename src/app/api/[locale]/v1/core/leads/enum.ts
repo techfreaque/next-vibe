@@ -17,6 +17,8 @@ export const {
     "app.api.v1.core.leads.enums.engagementTypes.websiteVisit" as const,
   FORM_SUBMIT:
     "app.api.v1.core.leads.enums.engagementTypes.formSubmit" as const,
+  LEAD_ATTRIBUTION:
+    "app.api.v1.core.leads.enums.engagementTypes.leadAttribution" as const,
 });
 
 /**
@@ -590,6 +592,7 @@ export const EngagementTypesDB = [
   EngagementTypes.EMAIL_CLICK,
   EngagementTypes.WEBSITE_VISIT,
   EngagementTypes.FORM_SUBMIT,
+  EngagementTypes.LEAD_ATTRIBUTION,
 ] as const;
 
 export const LeadStatusDB = [

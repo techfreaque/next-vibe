@@ -23,12 +23,13 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { authRepository } from "../../auth/repository";
-import type { JwtPayloadType } from "../../auth/types";
+import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
 import { UserDetailLevel } from "../../enum";
 import { sessionRepository } from "../../private/session/repository";
 import { userRepository } from "../../repository";
 import type { StandardUserType } from "../../types";
 import {
+  UserPermissionRole,
   UserRole,
   type UserRoleValue,
   isUserPermissionRole,
@@ -228,11 +229,28 @@ export class SignupRepositoryImpl implements SignupRepository {
         logger,
       );
 
-      // Create JWT payload
-      const tokenPayload = {
+      // Fetch user roles from DB to include in JWT
+      const rolesResult = await userRolesRepository.getUserRoles(
+        userData.id,
+        logger,
+      );
+      // Default to CUSTOMER role if roles fetch fails
+      const roles = rolesResult.success
+        ? rolesResult.data
+        : [UserPermissionRole.CUSTOMER];
+
+      if (!rolesResult.success) {
+        logger.warn("Failed to fetch user roles for JWT after signup, using default CUSTOMER role", {
+          userId: userData.id,
+        });
+      }
+
+      // Create JWT payload with roles
+      const tokenPayload: JwtPrivatePayloadType = {
         id: userData.id,
         leadId: leadIdResult.leadId,
         isPublic: false as const,
+        roles,
       };
 
       // Sign JWT token
@@ -474,12 +492,21 @@ export class SignupRepositoryImpl implements SignupRepository {
         leadId,
       });
 
+      // Fetch user roles for lead conversion tracking
+      const userRolesResult = await userRolesRepository.getUserRoles(
+        userResponse.data.id,
+        logger,
+      );
+      const userRoles = userRolesResult.success
+        ? userRolesResult.data
+        : [UserPermissionRole.CUSTOMER];
+
       // Link leadId to user (always happens during signup)
       await this.handleLeadConversion(
         email,
         leadId,
         userResponse.data.id,
-        { id: userResponse.data.id, isPublic: false, leadId },
+        { id: userResponse.data.id, isPublic: false, leadId, roles: userRoles },
         locale,
         logger,
       );

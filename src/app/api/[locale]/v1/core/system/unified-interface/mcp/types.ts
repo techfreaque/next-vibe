@@ -11,10 +11,10 @@ import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/e
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type {
-  BaseExecutionContext,
-  ParameterValue,
-} from "../shared/server-only/execution/executor";
+import type { BaseExecutionContext } from "../shared/endpoints/route/executor";
+import type { JsonValue } from "../shared/utils/error-types";
+
+export type ParameterValue = JsonValue;
 
 /**
  * JSON-RPC 2.0 Base Types
@@ -191,8 +191,9 @@ export interface MCPServerConfig {
  * MCP Execution Context
  * Extends BaseExecutionContext with MCP-specific fields
  */
-export interface MCPExecutionContext<TData = { [key: string]: ParameterValue }>
-  extends Omit<BaseExecutionContext<TData>, "user" | "requestId"> {
+export interface MCPExecutionContext<
+  TData = { [key: string]: ParameterValue },
+> extends Omit<BaseExecutionContext<TData>, "user" | "requestId"> {
   /** More specific user type for MCP */
   user: JwtPayloadType;
 
@@ -201,16 +202,17 @@ export interface MCPExecutionContext<TData = { [key: string]: ParameterValue }>
 }
 
 /**
- * MCP Tool Metadata extends shared DiscoveredEndpointMetadata
+ * MCP Tool Metadata extends shared SerializableToolMetadata
  * Uses same field names for consistency
  */
 export interface MCPToolMetadata {
-  id: string; // Unique identifier (same as DiscoveredEndpointMetadata.id)
+  id: string; // Unique identifier
+  toolName: string; // Tool name for serialization
   name: string;
-  description: TranslationKey | undefined;
+  description: TranslationKey;
   category?: TranslationKey;
   tags: readonly (TranslationKey | undefined)[];
-  path: string; // API path (same as DiscoveredEndpointMetadata.path)
+  path: string; // API path
   routePath: string;
   definitionPath: string;
   method: Methods;
@@ -219,18 +221,6 @@ export interface MCPToolMetadata {
   requestSchema?: z.ZodTypeAny;
   responseSchema?: z.ZodTypeAny;
   aliases?: readonly string[];
-}
-
-/**
- * MCP Registry Interface
- */
-export interface IMCPRegistry {
-  initialize(): Promise<void>;
-  getTools(user: JwtPayloadType): MCPToolMetadata[];
-  getToolByName(name: string): MCPToolMetadata | null;
-  executeTool(context: MCPExecutionContext): Promise<MCPToolCallResult>;
-  isInitialized(): boolean;
-  refresh(): Promise<void>;
 }
 
 /**
@@ -255,7 +245,3 @@ export interface IMCPProtocolHandler {
   handleToolCall(params: MCPToolCallParams): Promise<MCPToolCallResult>;
   handlePing(): Promise<Record<string, never>>;
 }
-
-const definitions = {};
-
-export default definitions;

@@ -13,9 +13,12 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-import { endpointListingService } from "../../unified-interface/shared/server-only/endpoint-listing/service";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
+import { definitionsRegistry } from "../../unified-interface/shared/endpoints/definitions/registry";
+import { Platform } from "../../unified-interface/shared/types/platform";
 import type {
   HelpListRequestOutput,
   HelpListResponseOutput,
@@ -30,39 +33,55 @@ class HelpListRepository {
    */
   execute(
     data: HelpListRequestOutput,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<HelpListResponseOutput> {
     logger.info("Discovering available commands");
 
     try {
-      // Use unified endpoint listing service
-      const endpoints = endpointListingService.discoverEndpoints(logger, {
-        locale,
-        category: data.category,
-      });
+      // Use unified endpoint listing service (filtered by user permissions from JWT)
+      const endpoints = definitionsRegistry.getEndpointsForUser(
+        Platform.CLI,
+        user,
+        logger,
+      );
 
-      // Sort endpoints by category and name
+      // Sort endpoints by category and toolName
       const sortedEndpoints = endpoints.toSorted((a, b) => {
-        const catCompare = a.category.localeCompare(b.category);
+        const catA = a.category || "";
+        const catB = b.category || "";
+        const catCompare = catA.localeCompare(catB);
         if (catCompare !== 0) {
           return catCompare;
         }
-        return a.name.localeCompare(b.name);
+        const toolNameA = a.path.join("_");
+        const toolNameB = b.path.join("_");
+        return toolNameA.localeCompare(toolNameB);
       });
 
       // Format commands for API response
-      const formattedCommands = sortedEndpoints.map((ep) => ({
-        alias: ep.name,
-        message: data.showDescriptions && ep.description ? ep.description : ep.name,
-        description:
-          data.showDescriptions && ep.description ? ep.description : undefined,
-        category: ep.category,
-        aliases:
-          data.showAliases && ep.aliases ? ep.aliases.join(", ") : undefined,
-        // Add display name for GROUPED_LIST
-        rule: ep.name,
-      }));
+      const { t } = simpleT(locale);
+      const formattedCommands = sortedEndpoints.map((ep) => {
+        const toolName = ep.path.join("_");
+        const translatedDescription =
+          data.showDescriptions && ep.description
+            ? t(ep.description)
+            : toolName;
+        return {
+          alias: toolName,
+          message: translatedDescription,
+          description:
+            data.showDescriptions && ep.description
+              ? translatedDescription
+              : undefined,
+          category: ep.category ? t(ep.category) : "",
+          aliases:
+            data.showAliases && ep.aliases ? ep.aliases.join(", ") : undefined,
+          // Add display name for GROUPED_LIST
+          rule: toolName,
+        };
+      });
 
       logger.info("Command discovery completed", {
         totalCommands: formattedCommands.length,

@@ -4,7 +4,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ChatMessage } from "./store";
+import type { ChatMessage } from "../db";
 
 interface UseBranchManagementProps {
   activeThreadMessages: ChatMessage[];

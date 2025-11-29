@@ -7,15 +7,13 @@ import { success } from "next-vibe/shared/types/response.schema";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { useMemo } from "react";
 
-import type { CreateApiEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
-import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import { useTranslation } from "@/i18n/core/client";
 
 import { executeQuery } from "./query-executor";
 import { buildQueryKey } from "./query-key-builder";
 import type { ApiQueryReturn } from "./types";
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 
 /**
  * React Query hook for API queries with type-safe responses
@@ -34,15 +32,7 @@ import type { ApiQueryReturn } from "./types";
  * @param logger - Logger instance
  * @returns Enhanced query result with loading states and data
  */
-export function useApiQuery<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
->({
+export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
   requestData,
   urlPathParams,
@@ -51,15 +41,15 @@ export function useApiQuery<
 }: {
   endpoint: TEndpoint;
   logger: EndpointLogger;
-} & (TEndpoint["TRequestOutput"] extends never
+} & (TEndpoint["types"]["RequestOutput"] extends never
   ? { requestData?: never }
   : {
-      requestData: TEndpoint["TRequestOutput"];
+      requestData: TEndpoint["types"]["RequestOutput"];
     }) &
-  (TEndpoint["TUrlVariablesOutput"] extends never
+  (TEndpoint["types"]["UrlVariablesOutput"] extends never
     ? { urlPathParams?: never }
     : {
-        urlPathParams: TEndpoint["TUrlVariablesOutput"];
+        urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
       }) & {
     options: {
       queryKey?: QueryKey;
@@ -67,9 +57,9 @@ export function useApiQuery<
       staleTime?: number;
       gcTime?: number;
       onSuccess?: (data: {
-        responseData: TEndpoint["TResponseOutput"];
-        requestData: TEndpoint["TRequestOutput"];
-        urlPathParams: TEndpoint["TUrlVariablesOutput"];
+        responseData: TEndpoint["types"]["ResponseOutput"];
+        requestData: TEndpoint["types"]["RequestOutput"];
+        urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
       }) => void | ErrorResponseType | Promise<void | ErrorResponseType>;
       onError?: ({
         error,
@@ -77,15 +67,15 @@ export function useApiQuery<
         urlPathParams,
       }: {
         error: ErrorResponseType;
-        requestData: TEndpoint["TRequestOutput"];
-        urlPathParams: TEndpoint["TUrlVariablesOutput"];
+        requestData: TEndpoint["types"]["RequestOutput"];
+        urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
       }) => void | Promise<void>;
       refetchOnWindowFocus?: boolean;
       retry?: number;
-      initialData?: TEndpoint["TResponseOutput"];
+      initialData?: TEndpoint["types"]["ResponseOutput"];
       persistToStorage?: boolean;
     };
-  }): ApiQueryReturn<TEndpoint["TResponseOutput"]> {
+  }): ApiQueryReturn<TEndpoint["types"]["ResponseOutput"]> {
   const { locale } = useTranslation();
 
   const {
@@ -162,7 +152,7 @@ export function useApiQuery<
     // initialData populates the cache and respects staleTime
     // This allows optimistic updates to work because data is in the cache
     initialData: initialData
-      ? (): ResponseType<TEndpoint["TResponseOutput"]> => success(initialData)
+      ? (): ResponseType<TEndpoint["types"]["ResponseOutput"]> => success(initialData)
       : undefined,
   });
 
@@ -206,9 +196,9 @@ export function useApiQuery<
               : isError
                 ? "app.api.v1.core.system.unifiedInterface.react.hooks.store.errors.request_failed"
                 : undefined
-    ) as ApiQueryReturn<TEndpoint["TResponseOutput"]>["statusMessage"];
+    ) as ApiQueryReturn<TEndpoint["types"]["ResponseOutput"]>["statusMessage"];
 
-    const result: ApiQueryReturn<TEndpoint["TResponseOutput"]> = {
+    const result: ApiQueryReturn<TEndpoint["types"]["ResponseOutput"]> = {
       response: responseData,
 
       // Backward compatibility properties

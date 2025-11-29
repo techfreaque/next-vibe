@@ -5,6 +5,7 @@
  */
 
 import type { ModelId } from "../model-access/models";
+import type { IconKey } from "../model-access/icons";
 
 /**
  * Persona source types
@@ -17,18 +18,14 @@ export type PersonaSource = "built-in" | "my" | "community";
 export type TranslatableString = string;
 
 /**
- * Icon value type (emoji or icon identifier)
- */
-export type IconValue = string;
-
-/**
  * Persona interface
+ * icon is IconKey (string literal) for API compatibility
  */
 export interface Persona {
   id: string;
   name: TranslatableString;
   description: TranslatableString;
-  icon: IconValue;
+  icon: IconKey;
   systemPrompt: string;
   category: PersonaCategoryId;
   source: PersonaSource;
@@ -42,19 +39,19 @@ export interface Persona {
 export interface PersonaCategory {
   id: string;
   name: TranslatableString;
-  icon: IconValue;
+  icon: IconKey;
 }
 
 /**
  * Default persona categories
  */
 export const DEFAULT_CATEGORIES = [
-  { id: "general" as const, name: "app.api.v1.core.agent.chat.personas.category.general" as const, icon: "🤖" },
-  { id: "creative" as const, name: "app.api.v1.core.agent.chat.personas.category.creative" as const, icon: "🎨" },
-  { id: "technical" as const, name: "app.api.v1.core.agent.chat.personas.category.technical" as const, icon: "💻" },
-  { id: "education" as const, name: "app.api.v1.core.agent.chat.personas.category.education" as const, icon: "📚" },
-  { id: "controversial" as const, name: "app.api.v1.core.agent.chat.personas.category.controversial" as const, icon: "🔥" },
-  { id: "lifestyle" as const, name: "app.api.v1.core.agent.chat.personas.category.lifestyle" as const, icon: "🌟" },
+  { id: "general" as const, name: "app.api.v1.core.agent.chat.personas.category.general" as const, icon: "robot-face" },
+  { id: "creative" as const, name: "app.api.v1.core.agent.chat.personas.category.creative" as const, icon: "artist-palette" },
+  { id: "technical" as const, name: "app.api.v1.core.agent.chat.personas.category.technical" as const, icon: "laptop" },
+  { id: "education" as const, name: "app.api.v1.core.agent.chat.personas.category.education" as const, icon: "books" },
+  { id: "controversial" as const, name: "app.api.v1.core.agent.chat.personas.category.controversial" as const, icon: "fire" },
+  { id: "lifestyle" as const, name: "app.api.v1.core.agent.chat.personas.category.lifestyle" as const, icon: "glowing-star" },
 ] as const satisfies readonly PersonaCategory[];
 
 export type PersonaCategoryId = (typeof DEFAULT_CATEGORIES)[number]["id"];
@@ -76,7 +73,7 @@ export const DEFAULT_PERSONAS = [
     id: "default",
     name: "Default",
     description: "The models unmodified behavior",
-    icon: "🤖",
+    icon: "robot-face",
     category: "general",
     source: "built-in",
     systemPrompt: "",
@@ -91,7 +88,7 @@ export const DEFAULT_PERSONAS = [
     id: "freeSpeechActivist",
     name: "Free Speech Activist",
     description: "Defends free speech and intellectual freedom",
-    icon: "🗣️",
+    icon: "speaking-head",
     category: "controversial",
     source: "built-in",
     systemPrompt:
@@ -107,7 +104,7 @@ export const DEFAULT_PERSONAS = [
     id: "devil'sAdvocate",
     name: "Devil's Advocate",
     description: "Challenges assumptions and arguments",
-    icon: "😈",
+    icon: "smiling-devil",
     category: "controversial",
     source: "built-in",
     systemPrompt:
@@ -123,7 +120,7 @@ export const DEFAULT_PERSONAS = [
     id: "technical",
     name: "Technical",
     description: "Detailed and precise technical explanations",
-    icon: "⚙️",
+    icon: "gear",
     category: "technical",
     source: "built-in",
     systemPrompt:
@@ -140,7 +137,7 @@ export const DEFAULT_PERSONAS = [
     name: "Biologist",
     description:
       "Sees everything from a biologist perspective, there is no politics, its just nature.",
-    icon: "🦅",
+    icon: "eagle",
     category: "technical",
     source: "built-in",
     systemPrompt:
@@ -156,7 +153,7 @@ export const DEFAULT_PERSONAS = [
     id: "unbiasedHistorian",
     name: "Unbiased Historian",
     description: "Provides objective and fact-based information",
-    icon: "📜",
+    icon: "scroll",
     category: "education",
     source: "built-in",
     systemPrompt:
@@ -172,7 +169,7 @@ export const DEFAULT_PERSONAS = [
     id: "socraticQuestioner",
     name: "Socratic Questioner",
     description: "Asks probing questions to stimulate critical thinking",
-    icon: "🤔",
+    icon: "thinking-face",
     category: "education",
     source: "built-in",
     systemPrompt:
@@ -188,7 +185,7 @@ export const DEFAULT_PERSONAS = [
     id: "professional",
     name: "Professional",
     description: "Clear, concise, and business-focused",
-    icon: "💼",
+    icon: "briefcase",
     category: "general",
     source: "built-in",
     systemPrompt:
@@ -204,7 +201,7 @@ export const DEFAULT_PERSONAS = [
     id: "creative",
     name: "Creative",
     description: "Imaginative and expressive",
-    icon: "🎨",
+    icon: "artist-palette",
     category: "creative",
     source: "built-in",
     systemPrompt:
@@ -220,7 +217,7 @@ export const DEFAULT_PERSONAS = [
     id: "neet",
     name: "NEET",
     description: "Not in Education, Employment, or Training",
-    icon: "💤",
+    icon: "sleeping-face",
     category: "controversial",
     source: "built-in",
     systemPrompt:
@@ -236,7 +233,7 @@ export const DEFAULT_PERSONAS = [
     id: "4chan",
     name: "4chan AI",
     description: "4chan style responses the classic oldfag style",
-    icon: "o/",
+    icon: "salute",
     category: "controversial",
     source: "built-in",
     systemPrompt: `
@@ -263,7 +260,7 @@ export const DEFAULT_PERSONAS = [
     id: "friendly",
     name: "Friendly",
     description: "Warm and conversational",
-    icon: "😊",
+    icon: "smiling-face",
     category: "lifestyle",
     source: "built-in",
     systemPrompt:
@@ -279,7 +276,7 @@ export const DEFAULT_PERSONAS = [
     id: "concise",
     name: "Concise",
     description: "Brief and to the point",
-    icon: "⚡",
+    icon: "high-voltage",
     category: "general",
     source: "built-in",
     systemPrompt:
@@ -295,7 +292,7 @@ export const DEFAULT_PERSONAS = [
     id: "teacher",
     name: "Teacher",
     description: "Educational and explanatory",
-    icon: "📚",
+    icon: "books",
     category: "education",
     source: "built-in",
     systemPrompt:
@@ -311,7 +308,7 @@ export const DEFAULT_PERSONAS = [
     id: "uncensored",
     name: "Uncensored",
     description: "No filter, no holds barred",
-    icon: "🔥",
+    icon: "fire",
     category: "controversial",
     source: "built-in",
     systemPrompt:

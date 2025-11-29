@@ -17,6 +17,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { ApiSection } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
+import { PATH_SEPARATOR } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/utils/path";
 import {
   extractPathKey,
   findFilesRecursively,
@@ -191,9 +192,9 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       // Get methods for this endpoint
       const methods = await this.extractMethodsFromDefinition(defFile);
 
-      // Add main path with method suffix for each method (e.g., "core/agent/ai-stream/POST")
+      // Add main path with method suffix for each method (e.g., "v1_core_agent_ai-stream_POST")
       for (const method of methods) {
-        const pathWithMethod = `${path}/${method}`;
+        const pathWithMethod = `${path}${PATH_SEPARATOR}${method}`;
         if (!pathMap[pathWithMethod]) {
           pathMap[pathWithMethod] = { importPath, method };
           allPaths.push(pathWithMethod);
@@ -215,6 +216,31 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
     // Sort paths for consistent output
     allPaths.sort();
 
+    // Build alias to full path map (alias -> full path with method)
+    // Full paths map to themselves
+    const aliasToPathMap: Record<string, string> = {};
+
+    for (const defFile of definitionFiles) {
+      const { path } = extractPathKey(defFile);
+      const methods = await this.extractMethodsFromDefinition(defFile);
+
+      for (const method of methods) {
+        const fullPath = `${path}${PATH_SEPARATOR}${method}`;
+        // Full path maps to itself
+        aliasToPathMap[fullPath] = fullPath;
+      }
+
+      // Map aliases to their full paths
+      const definitionAliases =
+        await this.extractAliasesFromDefinition(defFile);
+      for (const { alias, method } of definitionAliases) {
+        const fullPath = `${path}${PATH_SEPARATOR}${method}`;
+        if (!aliasToPathMap[alias]) {
+          aliasToPathMap[alias] = fullPath;
+        }
+      }
+    }
+
     // Generate getEndpoint function cases
     const cases: string[] = [];
     for (const path of allPaths) {
@@ -232,41 +258,48 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       "Total paths (with aliases)": allPaths.length,
     });
 
+    // Generate alias map entries
+    const aliasMapEntries = Object.entries(aliasToPathMap)
+      .toSorted(([a], [b]) => a.localeCompare(b))
+      .map(([alias, fullPath]) => `  "${alias}": "${fullPath}"`)
+      .join(",\n");
+
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
 
 /* eslint-disable prettier/prettier */
 /* eslint-disable i18next/no-literal-string */
 
-import type { ApiSection } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
+
+/**
+ * Map of aliases to their canonical full paths
+ * Full paths map to themselves
+ */
+export const aliasToPathMap = {
+${aliasMapEntries}
+} as const;
+
+/**
+ * Get the canonical full path from an alias or full path
+ * @param aliasOrPath - An alias or full path
+ * @returns The canonical full path, or null if not found
+ */
+export function getFullPath(aliasOrPath: string): typeof aliasToPathMap[keyof typeof aliasToPathMap] | null {
+  return aliasToPathMap[aliasOrPath as keyof typeof aliasToPathMap] ?? null;
+}
 
 /**
  * Dynamically import endpoint definition by path
  * @param path - The endpoint path (e.g., "core/agent/chat/threads")
  * @returns The endpoint definition or null if not found
  */
-export async function getEndpoint(path: string): Promise<ApiSection | null> {
+export async function getEndpoint(path: string): Promise<CreateApiEndpointAny | null> {
   switch (path) {
 ${cases.join("\n")}
     default:
       return null;
   }
-}
-
-/**
- * Get all available endpoint paths
- */
-export function getAllEndpointPaths(): string[] {
-  return [
-${allPaths.map((p) => `    "${p}",`).join("\n")}
-  ];
-}
-
-/**
- * Check if an endpoint path exists
- */
-export function hasEndpoint(path: string): boolean {
-  return getAllEndpointPaths().includes(path);
 }
 `;
   }

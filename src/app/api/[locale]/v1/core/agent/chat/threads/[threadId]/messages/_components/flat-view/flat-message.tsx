@@ -7,12 +7,13 @@ import type { JSX } from "react";
 import React from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
+import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import type { ModelId } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 import {
@@ -168,12 +169,8 @@ export function FlatMessage({
           {!isUser &&
             modelData &&
             ((): JSX.Element | null => {
-              const ModelIcon = modelData.icon;
-              return typeof ModelIcon === "string" ? (
-                <Span className="text-base leading-none">{ModelIcon}</Span>
-              ) : (
-                <ModelIcon className="h-3.5 w-3.5" />
-              );
+              const ModelIcon = getIconComponent(modelData.icon);
+              return <ModelIcon className="h-3.5 w-3.5" />;
             })()}
           {displayName}
         </Span>
@@ -373,11 +370,12 @@ export function FlatMessage({
               : "border-border/30 hover:border-border/50",
           )}
         >
-          {/* NEW ARCHITECTURE: TOOL messages have toolCalls in metadata */}
-          {message.toolCalls && message.toolCalls.length > 0 && (
+          {/* TOOL messages have toolCall in metadata (singular) */}
+          {message.metadata?.toolCall && (
             <ToolDisplay
-              toolCalls={message.toolCalls}
+              toolCall={message.metadata.toolCall}
               locale={locale}
+              threadId={message.threadId}
               hasContent={false}
               messageId={message.id}
               collapseState={collapseState}
@@ -403,12 +401,13 @@ export function FlatMessage({
               .some((m) => m.content.trim().length > 0);
 
             // TOOL message
-            if (msg.role === "tool" && msg.toolCalls) {
+            if (msg.role === "tool" && msg.metadata?.toolCall) {
               return (
                 <ToolDisplay
                   key={msg.id}
-                  toolCalls={msg.toolCalls}
+                  toolCall={msg.metadata.toolCall}
                   locale={locale}
+                  threadId={msg.threadId}
                   hasContent={hasContentAfter}
                   messageId={msg.id}
                   collapseState={collapseState}

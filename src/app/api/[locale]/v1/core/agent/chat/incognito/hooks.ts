@@ -13,9 +13,9 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { DefaultFolderId } from "../config";
 import { CHAT_CONSTANTS } from "../config";
-import { ChatMessageRole } from "../enum";
+import { ChatMessageRole, ThreadStatus } from "../enum";
 import type { ModelId } from "../model-access/models";
-import type { ChatFolder, ChatMessage, ChatThread } from "../hooks/store";
+import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import {
   createIncognitoMessage,
   createIncognitoThread,
@@ -145,10 +145,11 @@ export function useIncognitoChat(
       return {
         id: placeholderId,
         userId: "incognito",
+        leadId: null,
         title: title || t(CHAT_CONSTANTS.DEFAULT_THREAD_TITLE),
         rootFolderId: currentRootFolderId,
         folderId: currentSubFolderId,
-        status: "active",
+        status: ThreadStatus.ACTIVE,
         defaultModel: null,
         defaultPersona: null,
         systemPrompt: null,
@@ -156,6 +157,13 @@ export function useIncognitoChat(
         archived: false,
         tags: [],
         preview: null,
+        metadata: {},
+        rolesView: null,
+        rolesEdit: null,
+        rolesPost: null,
+        rolesModerate: null,
+        rolesAdmin: null,
+        published: false,
         canPost: true,
         canEdit: true,
         canModerate: true,
@@ -163,6 +171,7 @@ export function useIncognitoChat(
         canManagePermissions: false,
         createdAt: new Date(),
         updatedAt: new Date(),
+        searchVector: null,
       };
     },
     [logger, t, currentRootFolderId, currentSubFolderId],
@@ -247,20 +256,26 @@ export function useIncognitoChat(
         content,
         parentId,
         depth: 0,
+        sequenceId: null,
         authorId: "incognito",
         authorName: null,
+        authorAvatar: null,
+        authorColor: null,
         isAI: role === "assistant",
         model,
         persona,
         errorType: null,
         errorMessage: null,
+        errorCode: null,
         edited: false,
+        originalId: null,
         tokens: null,
-        upvotes: null,
-        downvotes: null,
-        sequenceId: null,
+        metadata: {},
+        upvotes: 0,
+        downvotes: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
+        searchVector: null,
       };
 
       void (async (): Promise<void> => {

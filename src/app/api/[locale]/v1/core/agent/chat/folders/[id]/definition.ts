@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   field,
   objectField,
@@ -21,6 +21,7 @@ import {
   UserRoleDB,
   UserRole,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { iconSchema } from "../../../../shared/types/common.schema";
 
 /**
  * Get Single Folder Endpoint (GET)
@@ -76,7 +77,8 @@ const { GET } = createEndpoint({
               type: WidgetType.CONTAINER,
               title:
                 "app.api.v1.core.agent.chat.folders.id.get.response.folder.title" as const,
-              layoutType: LayoutType.GRID, columns: 2,
+              layoutType: LayoutType.GRID,
+              columns: 2,
             },
             { response: true },
             {
@@ -110,7 +112,8 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.get.response.folder.icon.content" as const,
                 },
-                z.string().nullable(),
+                // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null
+                iconSchema.nullable(),
               ),
               color: responseField(
                 {
@@ -381,7 +384,8 @@ const { PATCH } = createEndpoint({
             "app.api.v1.core.agent.chat.folders.id.patch.sections.updates.title" as const,
           description:
             "app.api.v1.core.agent.chat.folders.id.patch.sections.updates.description" as const,
-          layoutType: LayoutType.GRID, columns: 2,
+          layoutType: LayoutType.GRID,
+          columns: 2,
         },
         { request: "data" },
         {
@@ -407,7 +411,8 @@ const { PATCH } = createEndpoint({
                 "app.api.v1.core.agent.chat.folders.id.patch.icon.description" as const,
               columns: 6,
             },
-            z.string().optional(),
+            // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null | undefined
+            iconSchema.nullish(),
           ),
           color: requestDataField(
             {
@@ -555,7 +560,8 @@ const { PATCH } = createEndpoint({
               type: WidgetType.CONTAINER,
               title:
                 "app.api.v1.core.agent.chat.folders.id.patch.response.folder.title" as const,
-              layoutType: LayoutType.GRID, columns: 2,
+              layoutType: LayoutType.GRID,
+              columns: 2,
             },
             { response: true },
             {
@@ -589,7 +595,8 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.v1.core.agent.chat.folders.id.patch.response.folder.icon.content" as const,
                 },
-                z.string().nullable(),
+                // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null
+                iconSchema.nullable(),
               ),
               color: responseField(
                 {
@@ -793,6 +800,7 @@ const { PATCH } = createEndpoint({
         updates: {
           name: "Personal",
           color: "#10b981",
+          icon: "folder-heart",
         },
       },
     },

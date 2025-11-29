@@ -33,6 +33,10 @@ export const translations: typeof enTranslations = {
         label: "Task-Index überspringen",
         description: "Task-Index-Generierung überspringen",
       },
+      skipTrpc: {
+        label: "TRPC überspringen",
+        description: "TRPC-Router-Generierung überspringen",
+      },
       success: {
         title: "Erfolg",
       },

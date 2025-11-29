@@ -12,10 +12,10 @@
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { binaryStartTime } from "../../../cli/vibe-runtime";
-import type { RouteExecutionResult } from "../../../cli/route-executor";
-import type { EndpointLogger } from "../../logger/endpoint";
-import { createEndpointLogger } from "../../logger/endpoint";
+import { binaryStartTime } from "../vibe-runtime";
+import type { RouteExecutionResult } from "./route-executor";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 
 /**
  * Safe handle types that should not be forcefully closed
@@ -376,20 +376,11 @@ export class CliResourceManager {
   initialize(logger: EndpointLogger, locale: CountryLanguage): void {
     this.performanceMonitor.initialize();
 
-    // Register performance monitor cleanup
-    this.cleanupRegistry.register(async () => {
-      try {
-        const { performanceMonitor } = await import("./performance");
-        performanceMonitor.setEnabled(false);
-      } catch {
-        // Performance monitor might not be available
-      }
-    });
-
     // Register database cleanup - this is critical for preventing hanging
     this.cleanupRegistry.register(async () => {
       try {
-        const { closeDatabase } = await import("../../../../db");
+        const { closeDatabase } =
+          await import("@/app/api/[locale]/v1/core/system/db");
         await closeDatabase(logger);
       } catch {
         // Database might not be imported yet
@@ -405,20 +396,6 @@ export class CliResourceManager {
    */
   getPerformanceMonitor(): CliPerformanceMonitor {
     return this.performanceMonitor;
-  }
-
-  /**
-   * Get cleanup registry
-   */
-  getCleanupRegistry(): ResourceCleanupRegistry {
-    return this.cleanupRegistry;
-  }
-
-  /**
-   * Get resource monitor
-   */
-  getResourceMonitor(): ResourceMonitor {
-    return this.resourceMonitor;
   }
 
   /**

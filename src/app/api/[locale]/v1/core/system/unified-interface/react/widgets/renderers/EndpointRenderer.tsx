@@ -11,11 +11,15 @@
 
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
+import { X } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
-import type { FieldValues, UseFormReturn } from "react-hook-form";
+import type { DefaultValues, FieldValues, UseFormReturn } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -43,8 +47,10 @@ export interface EndpointRendererProps<
   locale: CountryLanguage;
   /** React Hook Form instance */
   form?: UseFormReturn<TFieldValues>;
-  /** Form submit handler */
-  onSubmit?: () => void | Promise<void>;
+  /** Form submit handler - receives form data */
+  onSubmit?: (data: TFieldValues) => void | Promise<void>;
+  /** Cancel handler - when provided, shows Cancel button alongside Submit */
+  onCancel?: () => void;
   /** Data to populate fields with */
   data?: Record<string, WidgetData>;
   /** Whether the form is submitting */
@@ -57,6 +63,8 @@ export interface EndpointRendererProps<
   children?: React.ReactNode;
   /** Custom className for the container */
   className?: string;
+  /** Disable all form inputs */
+  disabled?: boolean;
 }
 
 /**
@@ -137,14 +145,16 @@ export function EndpointRenderer<
 >({
   endpoint,
   locale,
-  form,
+  form: externalForm,
   onSubmit,
+  onCancel,
   data,
   isSubmitting = false,
   submitButtonText,
   submitButtonLoadingText,
   children,
   className,
+  disabled = false,
 }: EndpointRendererProps<TEndpoint, TFieldValues>): JSX.Element {
   const { t } = simpleT(locale);
   // Extract ALL fields
@@ -153,69 +163,146 @@ export function EndpointRenderer<
   // Check if there are any request fields
   const hasRequest = hasRequestFields(fields);
 
+  // Create internal form if none provided (for display-only mode like tool calls)
+  const internalForm = useForm<TFieldValues>({
+    resolver: zodResolver(endpoint.requestSchema),
+    defaultValues: (data ?? {}) as DefaultValues<TFieldValues>,
+  });
+
+  // Reset form when data changes
+  useEffect(() => {
+    if (!externalForm && data) {
+      internalForm.reset(data as TFieldValues);
+    }
+  }, [data, externalForm, internalForm]);
+
+  // Use external form if provided, otherwise use internal form
+  const form = externalForm ?? internalForm;
+
   // Create render context
   const context: WidgetRenderContext = {
     locale,
     isInteractive: true,
     permissions: [],
     endpointFields: endpoint.fields, // Pass original fields for nested path lookup
+    disabled, // Pass disabled state to widgets
   };
 
-  // Render all widgets - they decide what to show based on data
-  // Skip response-only fields that have no data
-  const widgetElements = fields
-    .filter(([fieldName, field]) => {
-      // Always show request fields (form inputs)
-      if (!isResponseField(field)) {
-        return true;
-      }
-      // For response-only fields, only show if we have data
-      const fieldData = data?.[fieldName];
-      return fieldData !== null && fieldData !== undefined;
-    })
-    .map(([fieldName, field]) => (
-      <WidgetRenderer
-        key={fieldName}
-        widgetType={field.ui.type}
-        fieldName={fieldName}
-        data={data?.[fieldName] ?? null}
-        field={field}
-        context={context}
-        form={form}
-      />
-    ));
+  // Separate fields into request and response for better UX
+  const requestFields = fields.filter(([_, field]) => !isResponseField(field));
+  const responseFields = fields.filter(([fieldName, field]) => {
+    if (!isResponseField(field)) {
+      return false;
+    }
+    // Only show response fields with data
+    const fieldData = data?.[fieldName];
+    return fieldData !== null && fieldData !== undefined;
+  });
 
-  // If we have form, onSubmit, AND request fields, wrap in form with submit button
-  if (form && onSubmit && hasRequest) {
-    const submitText = submitButtonText
-      ? t(submitButtonText)
-      : t(
-          "app.api.v1.core.system.unifiedInterface.react.widgets.endpointRenderer.submit",
-        );
-    const loadingText = submitButtonLoadingText
-      ? t(submitButtonLoadingText)
-      : t(
-          "app.api.v1.core.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
-        );
+  // Render request widgets
+  const requestWidgets = requestFields.map(([fieldName, field]) => (
+    <WidgetRenderer
+      key={fieldName}
+      widgetType={field.ui.type}
+      fieldName={fieldName}
+      data={data?.[fieldName] ?? null}
+      field={field}
+      context={context}
+      form={form}
+    />
+  ));
 
+  // Render response widgets
+  const responseWidgets = responseFields.map(([fieldName, field]) => (
+    <WidgetRenderer
+      key={fieldName}
+      widgetType={field.ui.type}
+      fieldName={fieldName}
+      data={data?.[fieldName] ?? null}
+      field={field}
+      context={context}
+      form={form}
+    />
+  ));
+
+  // Show visual separator only when we have both request and response data
+  const showSeparator = requestFields.length > 0 && responseFields.length > 0;
+
+  // Always wrap in Form if we have form fields (request fields)
+  if (hasRequest) {
+    // If we have onSubmit, show submit button
+    if (onSubmit) {
+      const submitText = submitButtonText
+        ? t(submitButtonText)
+        : t(
+            "app.api.v1.core.system.unifiedInterface.react.widgets.endpointRenderer.submit",
+          );
+      const loadingText = submitButtonLoadingText
+        ? t(submitButtonLoadingText)
+        : t(
+            "app.api.v1.core.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
+          );
+
+      // Wrap onSubmit with handleSubmit to pass validated form data
+      const handleFormSubmit = (): void => {
+        void form.handleSubmit(onSubmit)();
+      };
+
+      return (
+        <Form form={form} onSubmit={handleFormSubmit} className={className}>
+          <Div className="flex flex-col gap-6">
+            {requestWidgets}
+            {showSeparator && (
+              <Div className="border-t border-border/50 my-2" />
+            )}
+            {responseWidgets}
+            {children}
+            {onCancel ? (
+              <Div className="flex gap-2">
+                <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                  {isSubmitting ? loadingText : submitText}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={onCancel}
+                  disabled={isSubmitting}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  {t("app.api.v1.core.system.unifiedInterface.react.widgets.toolCall.actions.cancel")}
+                </Button>
+              </Div>
+            ) : (
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? loadingText : submitText}
+              </Button>
+            )}
+          </Div>
+        </Form>
+      );
+    }
+
+    // No onSubmit - display only mode (like tool calls), but still wrap in Form for context
     return (
-      <Form form={form} onSubmit={onSubmit} className={className}>
-        <Div className="flex flex-col gap-6">
-          {widgetElements}
+      <Form form={form} className={className}>
+        <Div className="flex flex-col gap-4">
+          {requestWidgets}
+          {showSeparator && (
+            <Div className="border-t border-border/50 my-2" />
+          )}
+          {responseWidgets}
           {children}
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? loadingText : submitText}
-          </Button>
         </Div>
       </Form>
     );
   }
 
-  // Otherwise just show the fields
+  // No request fields - just response display, no form needed
   return (
     <Div className={className}>
       <Div className="flex flex-col gap-4">
-        {widgetElements}
+        {responseWidgets}
         {children}
       </Div>
     </Div>

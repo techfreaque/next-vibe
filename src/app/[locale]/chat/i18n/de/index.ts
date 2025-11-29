@@ -79,6 +79,7 @@ export const translations: typeof enTranslations = {
       linearView: "Lineare Ansicht (ChatGPT-Stil)",
       threadedView: "Thread-Ansicht (Reddit/Discord-Stil)",
       flatView: "Flache Ansicht (4chan-Stil)",
+      debugView: "Debug-Ansicht (mit System-Prompts)",
     },
 
     // Search Modal
@@ -685,6 +686,28 @@ export const translations: typeof enTranslations = {
     },
   },
   linearMessageView: {
+    retryModal: {
+      title: "Mit anderen Einstellungen wiederholen",
+      description:
+        "Wählen Sie ein Modell und eine Persona, um die Antwort neu zu generieren",
+      confirmLabel: "Wiederholen",
+    },
+    answerModal: {
+      title: "Als KI-Modell antworten",
+      description:
+        "Wählen Sie ein Modell und eine Persona, um eine KI-Antwort zu generieren",
+      confirmLabel: "Generieren",
+      inputPlaceholder:
+        "Geben Sie eine Eingabeaufforderung für die KI ein (optional - leer lassen, damit die KI ihre eigene Antwort generiert)",
+    },
+  },
+  debugView: {
+    systemPrompt: "System-Prompt",
+    systemPromptHint:
+      "Dies ist der System-Prompt für den gesamten Konversationsthread",
+    systemMessage: "Systemnachricht",
+    systemMessageHint:
+      "Dies ist eine in die Konversation eingefügte Systemnachricht",
     retryModal: {
       title: "Mit anderen Einstellungen wiederholen",
       description:

@@ -1,137 +1,84 @@
-/**
- * MCP Converter
- * Converts endpoint definitions to MCP tool format
- * Uses shared base converter to eliminate duplication
- */
-
 import "server-only";
 
-import type { CountryLanguage } from "@/i18n/core/config";
+import { z } from "zod";
 
-import {
-  safeTranslate,
-  zodSchemaToJsonSchema,
-} from "../shared/conversion/endpoint-to-metadata";
-import type { DiscoveredEndpointMetadata } from "../shared/server-only/types/registry";
-import type { MCPTool, MCPToolMetadata } from "./types";
+import { generateSchemaForUsage } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
+import { FieldUsage } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import { zodSchemaToJsonSchema } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/endpoint-to-metadata";
+
+import type { MCPTool } from "./types";
+
+function toolNameToApiPath(toolName: string): string {
+  const parts = toolName.split("_");
+  const method = parts[parts.length - 1];
+  const pathParts = parts.slice(0, -1);
+  const apiPath = pathParts.join("/");
+  return `api/[locale]/${apiPath} (${method})`;
+}
 
 /**
- * Convert MCP tool metadata to MCP tool (wire format)
+ * Generate input schema from endpoint fields
+ * Combines RequestData and RequestUrlParams for MCP tools
  */
-export function toolMetadataToMCPTool(
-  metadata: MCPToolMetadata,
-  locale: CountryLanguage,
-): MCPTool {
-  // Convert Zod schema to JSON Schema
-  const baseSchema = metadata.requestSchema
-    ? zodSchemaToJsonSchema(metadata.requestSchema)
-    : { type: "object", properties: {}, required: [] };
+function generateInputSchema(
+  endpoint: CreateApiEndpointAny,
+): z.ZodObject<Record<string, z.ZodTypeAny>> {
+  if (!endpoint.fields) {
+    return z.object({});
+  }
 
-  // Build MCP input schema from JSON schema
-  const inputSchema = buildMCPInputSchema(baseSchema);
+  try {
+    // Combine request data and URL params
+    const requestDataSchema = generateSchemaForUsage(
+      endpoint.fields,
+      FieldUsage.RequestData,
+    ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+
+    const urlPathParamsSchema = generateSchemaForUsage(
+      endpoint.fields,
+      FieldUsage.RequestUrlParams,
+    ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+
+    const combinedShape: { [key: string]: z.ZodTypeAny } = {};
+
+    if (requestDataSchema instanceof z.ZodObject) {
+      Object.assign(combinedShape, requestDataSchema.shape);
+    }
+
+    if (urlPathParamsSchema instanceof z.ZodObject) {
+      Object.assign(combinedShape, urlPathParamsSchema.shape);
+    }
+
+    if (Object.keys(combinedShape).length === 0) {
+      return z.object({});
+    }
+
+    return z.object(combinedShape);
+  } catch {
+    return z.object({});
+  }
+}
+
+/**
+ * Convert endpoint to MCP tool format
+ * Uses shared zodSchemaToJsonSchema for consistent schema conversion
+ */
+export function endpointToMCPTool(endpoint: CreateApiEndpointAny): MCPTool {
+  const toolName = `${endpoint.path.join("_")}_${endpoint.method.toUpperCase()}`;
+  const apiPath = toolNameToApiPath(toolName);
+  const description = `${String(endpoint.description || endpoint.title)}\n📁 ${apiPath}`;
+
+  // Generate Zod schema from endpoint fields
+  const zodSchema = generateInputSchema(endpoint);
+
+  // Convert to JSON Schema using shared utility
+  // zodToJsonSchema automatically handles transforms
+  const jsonSchema = zodSchemaToJsonSchema(zodSchema);
 
   return {
-    name: metadata.name,
-    description: safeTranslate(metadata.description, locale, metadata.name),
-    inputSchema,
+    name: toolName,
+    description,
+    inputSchema: jsonSchema as MCPTool["inputSchema"],
   };
-}
-
-/**
- * MCP property value type
- */
-interface MCPPropertyValue {
-  [key: string]: string | number | boolean | null | MCPPropertyValue;
-}
-
-/**
- * Type guard for MCP property
- */
-function isMCPProperty(
-  // eslint-disable-next-line no-restricted-syntax -- Infrastructure: MCP tool conversion requires 'unknown' for flexible tool schemas
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: MCP tool conversion requires 'unknown' for flexible tool schemas
-  value: unknown,
-): value is Record<
-  string,
-  string | number | boolean | null | MCPPropertyValue
-> {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return false;
-  }
-
-  // Check all values are valid primitive types or objects
-  for (const v of Object.values(value)) {
-    const type = typeof v;
-    if (
-      type !== "string" &&
-      type !== "number" &&
-      type !== "boolean" &&
-      type !== "object" &&
-      v !== null
-    ) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-/**
- * Build MCP input schema from JSON schema
- * Safely extracts and types properties for MCP format
- */
-function buildMCPInputSchema(
-  schema: ReturnType<typeof zodSchemaToJsonSchema>,
-): MCPTool["inputSchema"] {
-  const defaultSchema: MCPTool["inputSchema"] = {
-    type: "object",
-    properties: undefined,
-    required: undefined,
-    additionalProperties: undefined,
-  };
-
-  if (!schema || typeof schema !== "object") {
-    return defaultSchema;
-  }
-
-  // Extract properties
-  const properties = "properties" in schema ? schema.properties : undefined;
-  const required = "required" in schema ? schema.required : undefined;
-  const additionalProperties =
-    "additionalProperties" in schema ? schema.additionalProperties : undefined;
-
-  // Validate and build properties
-  let typedProperties: MCPTool["inputSchema"]["properties"];
-  if (
-    properties &&
-    typeof properties === "object" &&
-    !Array.isArray(properties)
-  ) {
-    typedProperties = {};
-    for (const [key, value] of Object.entries(properties)) {
-      if (isMCPProperty(value)) {
-        typedProperties[key] = value;
-      }
-    }
-  }
-
-  return {
-    type: "object",
-    properties: typedProperties,
-    required: Array.isArray(required) ? required : undefined,
-    additionalProperties:
-      typeof additionalProperties === "boolean"
-        ? additionalProperties
-        : undefined,
-  };
-}
-
-/**
- * Convert endpoint directly to MCP tool (convenience function)
- */
-export function endpointToMCPTool(
-  endpoint: DiscoveredEndpointMetadata,
-  locale: CountryLanguage,
-): MCPTool {
-  return toolMetadataToMCPTool(endpoint, locale);
 }

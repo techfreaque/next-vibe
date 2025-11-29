@@ -25,16 +25,12 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { ToolCallResult } from "@/app/api/[locale]/v1/core/agent/chat/db";
-import type { ToolCallWidgetMetadata } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/types";
 import type {
-  RenderableValue,
-  ResponseFieldMetadata,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/cli/widgets/types";
-import type { WidgetRenderContext } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/ui/types";
-import {
-  FieldDataType,
-  WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+  WidgetRenderContext,
+  WidgetData,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/widgets/types";
+import type { UnifiedField, CreateApiEndpointAny } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
+import { WidgetType } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -42,7 +38,7 @@ import { WidgetRenderer } from "./WidgetRenderer";
 
 interface ResponseFieldsRendererProps {
   result: ToolCallResult | undefined;
-  widgetMetadata: ToolCallWidgetMetadata | undefined;
+  definition: CreateApiEndpointAny | null;
   locale: CountryLanguage;
   context: WidgetRenderContext;
 }
@@ -94,20 +90,19 @@ function transformDataForWidget(
  * Render a single response field using WidgetRenderer
  */
 function renderResponseField(
-  field: ToolCallWidgetMetadata["responseFields"][number],
+  fieldKey: string,
+  field: UnifiedField,
   result: ToolCallResult | null,
   context: WidgetRenderContext,
-  locale: CountryLanguage,
+  _locale: CountryLanguage,
 ): JSX.Element | null {
-  const { t } = simpleT(locale);
-
   // Handle null result
   if (!result) {
     return null;
   }
 
-  // Get field value from result
-  const fieldValue = result[field.name as keyof typeof result];
+  // Get field value from result using the passed fieldKey
+  const fieldValue = result[fieldKey as keyof typeof result];
 
   // Skip if no value
   if (fieldValue === undefined || fieldValue === null) {
@@ -115,35 +110,26 @@ function renderResponseField(
   }
 
   // Transform data for widget type
-  const transformedData = transformDataForWidget(field.widgetType, fieldValue);
-
-  // Create proper metadata structure
-  const metadata: ResponseFieldMetadata = {
-    name: field.name,
-    type: FieldDataType.TEXT, // Default type, will be inferred from value
-    widgetType: field.widgetType,
-    value: transformedData as RenderableValue,
-    label: field.label,
-    description: field.description,
-    config: field.layout as ResponseFieldMetadata["config"],
-  };
+  const transformedData = transformDataForWidget(field.ui.type, fieldValue);
 
   // Use WidgetRenderer to render the field
   return (
-    <Div key={field.name} className="flex flex-col gap-1">
+    <Div key={fieldKey} className="flex flex-col gap-1">
       {/* Field Label (if provided) */}
-      {field.label && (
-        <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
-          {t(field.label)}
-        </Span>
-      )}
+      {"label" in field.ui &&
+        field.ui.label &&
+        typeof field.ui.label === "string" && (
+          <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
+            {field.ui.label}
+          </Span>
+        )}
 
       {/* Widget Renderer */}
       <Div className="pl-0">
         <WidgetRenderer
-          widgetType={field.widgetType}
-          data={transformedData as RenderableValue}
-          metadata={metadata}
+          widgetType={field.ui.type}
+          data={transformedData as WidgetData}
+          field={field}
           context={context}
         />
       </Div>
@@ -185,13 +171,12 @@ function renderFallback(
  */
 export function ResponseFieldsRenderer({
   result,
-  widgetMetadata,
+  definition,
   locale,
   context,
 }: ResponseFieldsRendererProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  // Handle no result
   if (!result) {
     return (
       <Div className="text-sm text-muted-foreground italic py-2">
@@ -202,20 +187,41 @@ export function ResponseFieldsRenderer({
     );
   }
 
-  // Handle no widget metadata - fallback to JSON dump
-  if (
-    !widgetMetadata ||
-    !widgetMetadata.responseFields ||
-    widgetMetadata.responseFields.length === 0
-  ) {
+  const responseFields: Array<{ key: string; field: UnifiedField }> = [];
+  if (definition?.fields && typeof definition.fields === "object" && "children" in definition.fields) {
+    const children = definition.fields.children as Record<string, UnifiedField>;
+
+    for (const [fieldKey, fieldDef] of Object.entries(children)) {
+      if ("usage" in fieldDef && typeof fieldDef.usage === "object" && fieldDef.usage !== null) {
+        const usage = fieldDef.usage;
+        let hasResponse = false;
+        if ("response" in usage) {
+          hasResponse = usage.response === true;
+        } else {
+          const usageValues = Object.values(usage);
+          hasResponse = usageValues.some(
+            (methodUsage) =>
+              typeof methodUsage === "object" &&
+              methodUsage !== null &&
+              "response" in methodUsage &&
+              methodUsage.response === true,
+          );
+        }
+        if (hasResponse) {
+          responseFields.push({ key: fieldKey, field: fieldDef });
+        }
+      }
+    }
+  }
+
+  if (responseFields.length === 0) {
     return renderFallback(result, locale);
   }
 
-  // Render all response fields using WidgetRenderer
   return (
     <Div className="flex flex-col gap-3">
-      {widgetMetadata.responseFields.map((field) =>
-        renderResponseField(field, result, context, locale),
+      {responseFields.map(({ key, field }) =>
+        renderResponseField(key, field, result, context, locale),
       )}
     </Div>
   );

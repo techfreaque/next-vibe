@@ -89,14 +89,16 @@ import {
 import type { ComponentType, JSX } from "react";
 import React from "react";
 
+import type { IconKey } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
+
 interface FolderIconSelectorProps {
-  value: string;
-  onChange: (icon: string) => void;
+  value: IconKey;
+  onChange: (icon: IconKey) => void;
 }
 export type FolderIcons = (typeof ICON_OPTIONS)[number]["id"];
 
 const ICON_OPTIONS: {
-  id: string;
+  id: IconKey;
   label: string;
   Icon: ComponentType<{ className?: string }>;
 }[] = [

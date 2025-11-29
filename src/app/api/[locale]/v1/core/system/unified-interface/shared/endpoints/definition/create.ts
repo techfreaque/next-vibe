@@ -18,6 +18,7 @@ import {
   UserRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { generateSchemaForUsage as generateSchemaFromUtils } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
@@ -99,7 +100,7 @@ export interface ApiEndpoint<
     /** Display name for the tool */
     displayName: string;
     /** Icon identifier */
-    icon: string;
+    icon: IconValue;
     /** Color for UI display */
     color: string;
     /** Priority for tool selection (higher = more important) */

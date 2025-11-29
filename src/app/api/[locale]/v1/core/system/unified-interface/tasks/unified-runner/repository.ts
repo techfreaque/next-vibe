@@ -22,6 +22,7 @@ import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "@/app/api/[locale]/v1/core/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CronTaskStatus } from "../enum";
@@ -43,6 +44,7 @@ const CRON_SYSTEM_USER: JwtPrivatePayloadType = {
   id: "system-cron",
   leadId: "system-cron-lead",
   isPublic: false,
+  roles: [UserPermissionRole.ADMIN],
 };
 
 /**

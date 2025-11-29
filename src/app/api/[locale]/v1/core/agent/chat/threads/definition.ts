@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   requestDataField,
@@ -25,7 +25,7 @@ import {
 } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 import { DefaultFolderId } from "../config";
-import { ThreadStatus, ThreadStatusOptions } from "../enum";
+import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
 import { ModelId } from "../model-access/models";
 
 /**
@@ -65,7 +65,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.get.page.description" as const,
           columns: 6,
         },
-        z.number().min(1).optional().default(1),
+        z.coerce.number().min(1).optional().default(1),
       ),
       limit: requestDataField(
         {
@@ -76,7 +76,7 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.threads.get.limit.description" as const,
           columns: 6,
         },
-        z.number().min(1).max(100).optional().default(20),
+        z.coerce.number().min(1).max(100).optional().default(20),
       ),
 
       // === FILTERS ===
@@ -136,7 +136,7 @@ const { GET } = createEndpoint({
           columns: 6,
           options: ThreadStatusOptions,
         },
-        z.enum(ThreadStatus).optional(),
+        z.enum(ThreadStatusDB).optional(),
       ),
       search: requestDataField(
         {
@@ -248,7 +248,7 @@ const { GET } = createEndpoint({
                     type: WidgetType.BADGE,
                     text: "app.api.v1.core.agent.chat.threads.get.response.threads.thread.status.content" as const,
                   },
-                  z.enum(ThreadStatus),
+                  z.enum(ThreadStatusDB),
                 ),
                 preview: responseField(
                   {
@@ -713,7 +713,7 @@ const { POST } = createEndpoint({
                   type: WidgetType.BADGE,
                   text: "app.api.v1.core.agent.chat.threads.post.response.thread.status.content" as const,
                 },
-                z.enum(ThreadStatus),
+                z.enum(ThreadStatusDB),
               ),
               createdAt: responseField(
                 {

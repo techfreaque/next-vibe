@@ -4,7 +4,10 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import { useTranslation } from "@/i18n/core/client";
+
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 interface ErrorMessageBubbleProps {
   message: ChatMessage;
@@ -13,6 +16,11 @@ interface ErrorMessageBubbleProps {
 export function ErrorMessageBubble({
   message,
 }: ErrorMessageBubbleProps): JSX.Element {
+  const { t } = useTranslation();
+
+  // Translate error message if it's a translation key
+  const displayContent = t(message.content as TranslationKey);
+
   return (
     <Div className="flex items-start gap-3">
       <Div className="max-w-full">
@@ -23,7 +31,7 @@ export function ErrorMessageBubble({
           )}
         >
           <Div className="text-sm text-red-900 dark:text-red-100">
-            {message.content}
+            {displayContent}
           </Div>
         </Div>
 

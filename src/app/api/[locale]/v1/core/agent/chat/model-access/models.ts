@@ -1,18 +1,6 @@
-import {
-  MoonIcon,
-  ShieldOffIcon,
-  SiAlibabadotcom,
-  SiAnthropic,
-  SiGooglegemini,
-  SiMistralai,
-  SiOpenai,
-  SiX,
-  SiZendesk,
-} from "next-vibe-ui/ui/icons";
-
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { IconValue } from "./icons";
+import type { IconKey } from "./icons";
 import { ModelUtility } from "./model-utilities";
 
 /**
@@ -81,8 +69,8 @@ export interface ModelOption {
   parameterCount: number | undefined;
   /** Maximum context window size in tokens */
   contextWindow: number;
-  /** Icon for UI display (emoji, icon key, or React component) */
-  icon: IconValue;
+  /** Icon key from ICON_REGISTRY for UI display */
+  icon: IconKey;
   /** OpenRouter API model identifier */
   openRouterModel: string;
   /** Credit cost per message (0 = free) */
@@ -95,65 +83,63 @@ export interface ModelOption {
 
 export interface ModelProvider {
   name: string;
-  icon: IconValue;
+  icon: IconKey;
 }
 
 export type ModelProviderId = keyof typeof modelProviders;
 
-export const modelProviders = {
+export const modelProviders: Record<string, ModelProvider> = {
   openAI: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "OpenAI",
-    icon: SiOpenai,
+    icon: "si-openai",
   },
   google: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Google",
-    icon: SiGooglegemini,
+    icon: "si-googlegemini",
   },
   mistralAI: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Mistral AI",
-    icon: SiMistralai,
+    icon: "si-mistralai",
   },
   moonshotAI: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Moonshot AI",
-    icon: MoonIcon,
+    icon: "moon",
   },
   deepSeek: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "DeepSeek",
-    // eslint-disable-next-line i18next/no-literal-string -- Emoji icon
-    icon: "🐋",
+    icon: "whale",
   },
   alibaba: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Alibaba",
-    icon: SiAlibabadotcom,
+    icon: "si-alibabadotcom",
   },
   xAI: {
     name: "X-AI",
-    icon: SiX,
+    icon: "si-x",
   },
   uncensoredAI: {
     name: "Uncensored.ai",
-    icon: ShieldOffIcon,
+    icon: "shield-off",
   },
   anthropic: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Anthropic",
-    icon: SiAnthropic,
+    icon: "si-anthropic",
   },
   zAi: {
     name: "Z.AI",
-    icon: SiZendesk,
+    icon: "si-zendesk",
   },
   cognitiveComputations: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Cognitive Computations",
-    // eslint-disable-next-line i18next/no-literal-string
-    icon: "🌊",
+    icon: "ocean",
   },
 };
 
@@ -167,7 +153,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.uncensoredLmV11",
     parameterCount: undefined,
     contextWindow: 32768,
-    icon: ShieldOffIcon,
+    icon: "shield-off",
     openRouterModel: "uncensored-lm",
     creditCost: 5,
     utilities: [
@@ -184,7 +170,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.uncensoredLmV11",
     parameterCount: 24,
     contextWindow: 32768,
-    icon: "🌊",
+    icon: "ocean",
     openRouterModel:
       "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
     creditCost: 0,
@@ -198,7 +184,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.mistralNemo",
     parameterCount: 24,
     contextWindow: 32768,
-    icon: "🌊",
+    icon: "ocean",
     openRouterModel: "cognitivecomputations/dolphin3.0-mistral-24b:free",
     creditCost: 0,
     utilities: [ModelUtility.FAST],
@@ -211,7 +197,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.glm45Air",
     parameterCount: undefined,
     contextWindow: 203000,
-    icon: SiZendesk,
+    icon: "si-zendesk",
     openRouterModel: "z-ai/glm-4.5-air",
     creditCost: 1,
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
@@ -224,7 +210,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.glm46",
     parameterCount: undefined,
     contextWindow: 203000,
-    icon: SiZendesk,
+    icon: "si-zendesk",
     openRouterModel: "z-ai/glm-4.6",
     creditCost: 5,
     utilities: [ModelUtility.SMART],
@@ -237,7 +223,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.glm45v",
     parameterCount: 106,
     contextWindow: 203000,
-    icon: SiZendesk,
+    icon: "si-zendesk",
     openRouterModel: "z-ai/glm-4.5v",
     creditCost: 1,
     utilities: [ModelUtility.VISION],
@@ -250,7 +236,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.claudeHaiku45",
     parameterCount: undefined,
     contextWindow: 200000,
-    icon: SiAnthropic,
+    icon: "si-anthropic",
     openRouterModel: "anthropic/claude-haiku-4.5",
     creditCost: 3,
     utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.CODING],
@@ -263,7 +249,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.claudeSonnet45",
     parameterCount: undefined,
     contextWindow: 1000000,
-    icon: SiAnthropic,
+    icon: "si-anthropic",
     openRouterModel: "anthropic/claude-sonnet-4.5",
     creditCost: 10,
     utilities: [
@@ -281,7 +267,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.gpt5Pro",
     parameterCount: undefined,
     contextWindow: 400000,
-    icon: SiOpenai,
+    icon: "si-openai",
     openRouterModel: "openai/gpt-5-pro",
     creditCost: 20, // Premium model
     utilities: [
@@ -299,7 +285,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.gpt5Codex",
     parameterCount: undefined,
     contextWindow: 400000,
-    icon: SiOpenai,
+    icon: "si-openai",
     openRouterModel: "openai/gpt-5-codex",
     creditCost: 10, // Premium model
     utilities: [ModelUtility.LEGACY],
@@ -312,7 +298,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.gpt51Codex",
     parameterCount: undefined,
     contextWindow: 400000,
-    icon: SiOpenai,
+    icon: "si-openai",
     openRouterModel: "openai/gpt-5.1-codex",
     creditCost: 10, // Premium model
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
@@ -325,7 +311,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.gpt51",
     parameterCount: undefined,
     contextWindow: 400000,
-    icon: SiOpenai,
+    icon: "si-openai",
     openRouterModel: "openai/gpt-5.1",
     creditCost: 10, // Premium model
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
@@ -338,7 +324,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.gpt5",
     parameterCount: undefined,
     contextWindow: 400000,
-    icon: SiOpenai,
+    icon: "si-openai",
     openRouterModel: "openai/gpt-5",
     creditCost: 10, // Premium model
     utilities: [ModelUtility.LEGACY],
@@ -351,7 +337,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.gpt5Mini",
     parameterCount: undefined,
     contextWindow: 400000,
-    icon: SiOpenai,
+    icon: "si-openai",
     openRouterModel: "openai/gpt-5-mini",
     creditCost: 3,
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
@@ -364,7 +350,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.gpt5Nano",
     parameterCount: undefined,
     contextWindow: 400000,
-    icon: SiOpenai,
+    icon: "si-openai",
     openRouterModel: "openai/gpt-5-nano",
     creditCost: 2, // Basic model
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
@@ -377,7 +363,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.gptOss120b",
     parameterCount: 117,
     contextWindow: 33000,
-    icon: SiOpenai,
+    icon: "si-openai",
     openRouterModel: "openai/gpt-oss-120b",
     creditCost: 1,
     utilities: [ModelUtility.CHAT, ModelUtility.CODING],
@@ -398,7 +384,7 @@ export const modelOptions: ModelOption[] = [
       ModelUtility.ANALYSIS,
       ModelUtility.CREATIVE,
     ],
-    icon: MoonIcon,
+    icon: "moon",
     openRouterModel: "moonshotai/kimi-k2-0905",
     supportsTools: true, // OpenRouter reports: "No endpoints found that support tool use"
   },
@@ -416,7 +402,7 @@ export const modelOptions: ModelOption[] = [
       ModelUtility.ANALYSIS,
       ModelUtility.CREATIVE,
     ],
-    icon: MoonIcon,
+    icon: "moon",
     openRouterModel: "moonshotai/kimi-k2-thinking",
     supportsTools: true, // OpenRouter reports: "No endpoints found that support tool use"
   },
@@ -427,7 +413,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.geminiFlash25Lite",
     parameterCount: undefined,
     contextWindow: 1050000,
-    icon: SiGooglegemini,
+    icon: "si-googlegemini",
     openRouterModel: "google/gemini-2.5-flash-lite",
     creditCost: 1,
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
@@ -440,7 +426,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.geminiFlash25Flash",
     parameterCount: undefined,
     contextWindow: 1050000,
-    icon: SiGooglegemini,
+    icon: "si-googlegemini",
     openRouterModel: "google/gemini-2.5-flash",
     creditCost: 2,
     utilities: [ModelUtility.CHAT],
@@ -453,7 +439,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.geminiFlash25Pro",
     parameterCount: undefined,
     contextWindow: 1050000,
-    icon: SiGooglegemini,
+    icon: "si-googlegemini",
     openRouterModel: "google/gemini-2.5-flash-pro",
     creditCost: 10,
     utilities: [ModelUtility.LEGACY],
@@ -466,7 +452,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.geminiFlash25Pro",
     parameterCount: undefined,
     contextWindow: 1048576,
-    icon: SiGooglegemini,
+    icon: "si-googlegemini",
     openRouterModel: "google/gemini-3-pro-preview",
     creditCost: 15,
     utilities: [ModelUtility.SMART, ModelUtility.CODING],
@@ -479,7 +465,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.mistralNemo",
     parameterCount: 12,
     contextWindow: 131072,
-    icon: SiMistralai,
+    icon: "si-mistralai",
     openRouterModel: "mistralai/mistral-nemo:free",
     creditCost: 0, // Free model
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
@@ -492,7 +478,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.deepseekV31",
     parameterCount: 671,
     contextWindow: 164000,
-    icon: "🐋",
+    icon: "whale",
     openRouterModel: "deepseek/deepseek-chat-v3.1",
     creditCost: 5,
     utilities: [ModelUtility.SMART, ModelUtility.CODING],
@@ -505,7 +491,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.deepseekR1",
     parameterCount: 671,
     contextWindow: 164000,
-    icon: "🐋",
+    icon: "whale",
     openRouterModel: "deepseek/deepseek-r1-0528",
     creditCost: 6,
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS],
@@ -519,7 +505,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.qwen3235bFree",
     parameterCount: 235,
     contextWindow: 131000,
-    icon: SiAlibabadotcom,
+    icon: "si-alibabadotcom",
     openRouterModel: "qwen/qwen3-235b-a22b:free",
     creditCost: 0, // Free model
     utilities: [ModelUtility.SMART, ModelUtility.CODING],
@@ -532,7 +518,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.deepseekR1Distill",
     parameterCount: 70,
     contextWindow: 64000,
-    icon: "🐋",
+    icon: "whale",
     openRouterModel: "deepseek/deepseek-r1-distill-qwen-32b",
     creditCost: 2, // Pro model
     utilities: [ModelUtility.CODING, ModelUtility.ANALYSIS],
@@ -545,7 +531,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.qwen257b",
     parameterCount: 7,
     contextWindow: 32768,
-    icon: SiAlibabadotcom,
+    icon: "si-alibabadotcom",
     openRouterModel: "qwen/qwen-2.5-7b-instruct",
     creditCost: 2, // Pro model
     utilities: [ModelUtility.CHAT],
@@ -558,7 +544,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.grok4",
     parameterCount: undefined,
     contextWindow: 256000,
-    icon: SiX,
+    icon: "si-x",
     openRouterModel: "x-ai/grok-4",
     creditCost: 10,
     utilities: [ModelUtility.SMART, ModelUtility.CODING],
@@ -571,7 +557,7 @@ export const modelOptions: ModelOption[] = [
     description: "app.chat.models.descriptions.grok4Fast",
     parameterCount: undefined,
     contextWindow: 2000000,
-    icon: SiX,
+    icon: "si-x",
     openRouterModel: "x-ai/grok-4-fast",
     creditCost: 2,
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],

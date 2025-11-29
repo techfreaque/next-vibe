@@ -12,9 +12,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../../config";
-import type { IconValue } from "../../model-access/icons";
+import { isIconKey, type IconKey, type IconValue } from "../../model-access/icons";
 import type { ChatFolder } from "../../hooks/store";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { type UserPermissionRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
  * Folder update type
@@ -26,12 +26,12 @@ export interface FolderUpdate {
   parentId?: string | null;
   expanded?: boolean;
   sortOrder?: number;
-  rolesView?: UserRoleValue[] | null;
-  rolesManage?: UserRoleValue[] | null;
-  rolesCreateThread?: UserRoleValue[] | null;
-  rolesPost?: UserRoleValue[] | null;
-  rolesModerate?: UserRoleValue[] | null;
-  rolesAdmin?: UserRoleValue[] | null;
+  rolesView?: (typeof UserPermissionRoleValue)[] | null;
+  rolesManage?: (typeof UserPermissionRoleValue)[] | null;
+  rolesCreateThread?: (typeof UserPermissionRoleValue)[] | null;
+  rolesPost?: (typeof UserPermissionRoleValue)[] | null;
+  rolesModerate?: (typeof UserPermissionRoleValue)[] | null;
+  rolesAdmin?: (typeof UserPermissionRoleValue)[] | null;
 }
 
 /**
@@ -42,7 +42,7 @@ export interface FolderOperations {
     name: string,
     rootFolderId: DefaultFolderId,
     parentId: string | null,
-    icon?: string,
+    icon?: IconValue,
   ) => Promise<string>;
   updateFolder: (folderId: string, updates: FolderUpdate) => Promise<void>;
   deleteFolder: (folderId: string) => Promise<void>;
@@ -75,13 +75,16 @@ export function useFolderOperations(
       name: string,
       rootFolderId: DefaultFolderId,
       parentId: string | null,
-      icon?: string,
+      icon?: IconValue,
     ): Promise<string> => {
+      // Convert IconValue to IconKey for API (only IconKey strings allowed)
+      const iconKey: IconKey | undefined = icon && isIconKey(icon) ? icon : undefined;
+
       logger.debug("Folder operations: Creating folder", {
         name,
         rootFolderId,
         parentId,
-        icon,
+        icon: iconKey,
       });
 
       // Handle incognito folder creation
@@ -97,9 +100,10 @@ export function useFolderOperations(
         const folder: ChatFolder = {
           id: generateIncognitoId("folder"),
           userId: "incognito",
+          leadId: null,
           rootFolderId,
           name,
-          icon: (icon as IconValue) || null,
+          icon: iconKey ?? null,
           color: null,
           parentId,
           expanded: true,
@@ -110,15 +114,13 @@ export function useFolderOperations(
           rolesPost: [],
           rolesModerate: [],
           rolesAdmin: [],
-          // Incognito folders: everyone has full permissions locally
-          // BUT canManagePermissions is false because permissions don't apply to local-only content
+          createdAt: new Date(),
+          updatedAt: new Date(),
           canManage: true,
           canCreateThread: true,
           canModerate: true,
           canDelete: true,
           canManagePermissions: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
         };
 
         saveFolder(folder);
@@ -141,7 +143,7 @@ export function useFolderOperations(
                 name,
                 rootFolderId,
                 ...(parentId && { parentId }),
-                ...(icon && { icon }),
+                ...(iconKey && { icon: iconKey }),
               },
             }),
           },
@@ -150,7 +152,6 @@ export function useFolderOperations(
         if (!response.ok) {
           const errorData = (await response
             .json()
-            // eslint-disable-next-line no-restricted-syntax
             .catch(() => ({}))) as Record<
             string,
             string | number | boolean | null
@@ -189,6 +190,30 @@ export function useFolderOperations(
         updatedFields: Object.keys(updates).join(", "),
       });
 
+      // Convert IconValue to IconKey for storage/API
+      const storeUpdates: Partial<ChatFolder> = {};
+
+      // Handle icon separately (IconValue -> IconKey conversion)
+      if ("icon" in updates) {
+        const iconValue = updates.icon;
+        if (iconValue === null) {
+          storeUpdates.icon = null;
+        } else if (iconValue !== undefined && isIconKey(iconValue)) {
+          storeUpdates.icon = iconValue;
+        }
+      }
+
+      // Handle other fields that don't need conversion
+      if (updates.name !== undefined) {
+        storeUpdates.name = updates.name;
+      }
+      if (updates.color !== undefined) {
+        storeUpdates.color = updates.color;
+      }
+      if (updates.parentId !== undefined) {
+        storeUpdates.parentId = updates.parentId;
+      }
+
       const folder = chatStore.folders[folderId];
       if (folder && folder.rootFolderId === "incognito") {
         logger.debug(
@@ -200,11 +225,11 @@ export function useFolderOperations(
 
         const updatedFolder = {
           ...folder,
-          ...updates,
+          ...storeUpdates,
           updatedAt: new Date(),
         };
         saveFolder(updatedFolder);
-        chatStore.updateFolder(folderId, updates);
+        chatStore.updateFolder(folderId, storeUpdates);
 
         return;
       }
@@ -218,7 +243,7 @@ export function useFolderOperations(
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ updates }),
+            body: JSON.stringify({ updates: storeUpdates }),
           },
         );
 
@@ -229,7 +254,7 @@ export function useFolderOperations(
           return;
         }
 
-        chatStore.updateFolder(folderId, updates);
+        chatStore.updateFolder(folderId, storeUpdates);
       } catch (error) {
         logger.error(
           "Folder operations: Failed to update folder",

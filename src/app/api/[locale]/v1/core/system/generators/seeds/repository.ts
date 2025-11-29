@@ -30,7 +30,6 @@ interface SeedsRequestType {
   outputDir: string;
   includeTestData: boolean;
   includeProdData: boolean;
-  verbose: boolean;
   dryRun: boolean;
 }
 

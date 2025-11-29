@@ -199,14 +199,19 @@ export function extractDataCardsData(
       return null;
     }
 
-    const cards = value.filter(isCardItem);
+    const filteredCards: CardItem[] = [];
+    for (const item of value) {
+      if (isCardItem(item)) {
+        filteredCards.push(item);
+      }
+    }
 
-    if (cards.length === 0) {
+    if (filteredCards.length === 0) {
       return null;
     }
 
     return {
-      cards,
+      cards: filteredCards,
       columns: 3,
     };
   }

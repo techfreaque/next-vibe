@@ -9,7 +9,8 @@
 import { storage } from "next-vibe-ui/lib/storage";
 
 import type { DefaultFolderId } from "../config";
-import type { ChatFolder, ChatMessage, ChatThread } from "../hooks/store";
+import type { ChatFolder, ChatMessage, ChatThread } from "../db";
+import { ThreadStatus } from "../enum";
 
 /**
  * Storage keys
@@ -97,15 +98,28 @@ export async function saveThread(thread: ChatThread): Promise<void> {
 }
 
 /**
+ * Message save queue to prevent race conditions
+ */
+let messageSaveQueue: Promise<void> = Promise.resolve();
+
+/**
  * Save message to storage
+ * Uses a queue to prevent concurrent writes from causing race conditions
  */
 export async function saveMessage(message: ChatMessage): Promise<void> {
-  const messages = await getItem<Record<string, ChatMessage>>(
-    STORAGE_KEYS.MESSAGES,
-    {},
-  );
-  messages[message.id] = message;
-  await setItem(STORAGE_KEYS.MESSAGES, messages);
+  // Chain this save operation after the previous one completes
+  messageSaveQueue = messageSaveQueue.then(async () => {
+    const messages = await getItem<Record<string, ChatMessage>>(
+      STORAGE_KEYS.MESSAGES,
+      {},
+    );
+    messages[message.id] = message;
+    await setItem(STORAGE_KEYS.MESSAGES, messages);
+    return;
+  });
+
+  // Wait for this operation to complete
+  await messageSaveQueue;
 }
 
 /**
@@ -218,6 +232,23 @@ export async function getThreadsForFolder(
 }
 
 /**
+ * Parse message from storage - convert string dates to Date objects
+ */
+function parseMessage(message: ChatMessage): ChatMessage {
+  return {
+    ...message,
+    createdAt:
+      typeof message.createdAt === "string"
+        ? new Date(message.createdAt)
+        : message.createdAt,
+    updatedAt:
+      typeof message.updatedAt === "string"
+        ? new Date(message.updatedAt)
+        : message.updatedAt,
+  };
+}
+
+/**
  * Get messages for a specific thread
  */
 export async function getMessagesForThread(
@@ -230,14 +261,8 @@ export async function getMessagesForThread(
 
   return Object.values(messages)
     .filter((msg) => msg.threadId === threadId)
-    .toSorted((a, b) => {
-      // Convert string dates to Date objects if needed
-      const aDate =
-        typeof a.createdAt === "string" ? new Date(a.createdAt) : a.createdAt;
-      const bDate =
-        typeof b.createdAt === "string" ? new Date(b.createdAt) : b.createdAt;
-      return aDate.getTime() - bDate.getTime();
-    });
+    .map(parseMessage) // Parse dates
+    .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
 /**
@@ -268,11 +293,12 @@ export async function createIncognitoThread(
 ): Promise<ChatThread> {
   const thread: ChatThread = {
     id: generateIncognitoId("thread"),
-    userId: "incognito", // Special user ID for incognito mode
+    userId: "incognito",
+    leadId: null,
     title,
     rootFolderId: rootFolderId,
     folderId: subFolderId,
-    status: "active",
+    status: ThreadStatus.ACTIVE,
     defaultModel: null,
     defaultPersona: null,
     systemPrompt: null,
@@ -280,8 +306,13 @@ export async function createIncognitoThread(
     archived: false,
     tags: [],
     preview: null,
-    // Incognito threads: everyone has full permissions locally
-    // BUT canManagePermissions is false because permissions don't apply to local-only content
+    metadata: {},
+    rolesView: null,
+    rolesEdit: null,
+    rolesPost: null,
+    rolesModerate: null,
+    rolesAdmin: null,
+    published: false,
     canPost: true,
     canEdit: true,
     canModerate: true,
@@ -289,6 +320,7 @@ export async function createIncognitoThread(
     canManagePermissions: false,
     createdAt: new Date(),
     updatedAt: new Date(),
+    searchVector: null,
   };
 
   await saveThread(thread);
@@ -312,21 +344,27 @@ export async function createIncognitoMessage(
     role,
     content,
     parentId,
-    depth: 0, // Will be calculated based on parent
+    depth: 0,
+    sequenceId: null,
     authorId: "incognito",
     authorName: null,
+    authorAvatar: null,
+    authorColor: null,
     isAI: role === "assistant",
     model,
     persona,
     errorType: null,
     errorMessage: null,
+    errorCode: null,
     edited: false,
+    originalId: null,
     tokens: null,
-    upvotes: null,
-    downvotes: null,
-    sequenceId: null,
+    metadata: {},
+    upvotes: 0,
+    downvotes: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
+    searchVector: null,
   };
 
   await saveMessage(message);

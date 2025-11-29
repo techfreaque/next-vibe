@@ -1,7 +1,7 @@
 import { Environment } from "next-vibe/shared/utils";
 import { useMemo } from "react";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoint/create";
+import type { CreateApiEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
 import {
   Methods,
   ALL_METHODS,

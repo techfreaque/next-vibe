@@ -3,6 +3,7 @@ export let debugCli = false;
 export let debugCron = false;
 export let debugMiddleware = false;
 export let debugApp = enableDebugLogger;
+export let mcpSilentMode = false;
 export const translationsKeyMode = false as boolean;
 
 // Form clearing behavior in development
@@ -18,4 +19,12 @@ export function enableDebug(): void {
   debugCron = true;
   debugMiddleware = true;
   debugApp = true;
+}
+
+/**
+ * Used to enable MCP silent mode at runtime
+ * Disables ALL console output for MCP protocol compatibility
+ */
+export function enableMcpSilentMode(): void {
+  mcpSilentMode = true;
 }

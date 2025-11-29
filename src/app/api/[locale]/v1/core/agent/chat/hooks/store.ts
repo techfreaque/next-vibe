@@ -6,101 +6,15 @@
 import { create } from "zustand";
 import { storage } from "next-vibe-ui/lib/storage";
 
-import type { DefaultFolderId } from "../config";
-import type { MessageMetadata, ToolCall } from "../db";
-import type { IconValue } from "../model-access/icons";
+import type { ChatMessage, ChatThread, ChatFolder } from "../db";
 import { ModelId, type ModelId as ModelIdType } from "../model-access/models";
-import { type ChatMessageRole } from "../enum";
-import { type UserRoleValue } from "../../../user/user-roles/enum";
+import {
+  saveMessage as saveIncognitoMessage,
+  saveThread as saveIncognitoThread,
+} from "../incognito/storage";
+import { ViewMode, type ViewModeValue } from "../enum";
 
-/**
- * Chat thread type
- */
-export interface ChatThread {
-  id: string;
-  userId: string;
-  title: string;
-  rootFolderId: DefaultFolderId;
-  folderId: string | null;
-  status: "active" | "archived" | "deleted";
-  defaultModel: ModelId | null;
-  defaultPersona: string | null;
-  systemPrompt: string | null;
-  pinned: boolean;
-  archived: boolean;
-  tags: string[];
-  preview: string | null;
-  rolesView?: UserRoleValue[] | null; // Roles that can view/read this thread
-  rolesEdit?: UserRoleValue[] | null; // Roles that can edit thread properties
-  rolesPost?: UserRoleValue[] | null; // Roles that can post messages in this thread
-  rolesModerate?: UserRoleValue[] | null; // Roles that can moderate/hide messages
-  rolesAdmin?: UserRoleValue[] | null; // Roles that can delete this thread
-  // Permission flags - computed server-side based on user's actual permissions
-  canEdit?: boolean; // Whether current user can edit thread title/settings
-  canPost?: boolean; // Whether current user can post messages
-  canModerate?: boolean; // Whether current user can moderate/hide messages
-  canDelete?: boolean; // Whether current user can delete thread
-  canManagePermissions?: boolean; // Whether current user can manage permissions
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-/**
- * Chat message type
- */
-export interface ChatMessage {
-  id: string;
-  threadId: string;
-  role: ChatMessageRole;
-  content: string;
-  parentId: string | null;
-  depth: number;
-  sequenceId: string | null; // Links messages in the same AI response sequence
-  authorId: string | null;
-  authorName: string | null;
-  isAI: boolean;
-  model: ModelId | null;
-  persona: string | null;
-  errorType: string | null;
-  errorMessage: string | null;
-  edited: boolean;
-  tokens: number | null;
-  toolCalls?: ToolCall[] | null;
-  upvotes: number | null;
-  downvotes: number | null;
-  metadata?: MessageMetadata; // Message metadata (reasoning, tool calls, etc.)
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-/**
- * Chat folder type
- */
-export interface ChatFolder {
-  id: string;
-  userId: string | null;
-  rootFolderId: DefaultFolderId;
-  name: string;
-  icon: IconValue | null;
-  color: string | null;
-  parentId: string | null;
-  expanded: boolean;
-  sortOrder: number;
-  rolesView?: UserRoleValue[] | null; // Roles that can view/read this folder
-  rolesManage?: UserRoleValue[] | null; // Roles that can edit folder and create subfolders
-  rolesCreateThread?: UserRoleValue[] | null; // Roles that can create threads in this folder
-  rolesPost?: UserRoleValue[] | null; // Roles that can post messages in threads
-  rolesModerate?: UserRoleValue[] | null; // Roles that can hide/moderate this folder
-  rolesAdmin?: UserRoleValue[] | null; // Roles that can delete this folder
-  // Permission flags - computed server-side based on user's actual permissions
-  canManage?: boolean; // Whether current user can edit folder/create subfolders
-  canCreateThread?: boolean; // Whether current user can create threads
-  canModerate?: boolean; // Whether current user can moderate content
-  canDelete?: boolean; // Whether current user can delete folder
-  canManagePermissions?: boolean; // Whether current user can manage permissions
-  createdAt: Date;
-  updatedAt: Date;
-}
+export type { ChatMessage, ChatThread, ChatFolder };
 
 /**
  * Chat settings type
@@ -113,7 +27,7 @@ export interface ChatSettings {
   ttsAutoplay: boolean;
   sidebarCollapsed: boolean;
   theme: "light" | "dark";
-  viewMode: "linear" | "flat" | "threaded";
+  viewMode: typeof ViewModeValue;
   enabledToolIds: string[];
 }
 
@@ -173,30 +87,9 @@ const getDefaultSettings = (): ChatSettings => ({
   ttsAutoplay: false,
   sidebarCollapsed: false,
   theme: "dark",
-  viewMode: "linear",
+  viewMode: ViewMode.LINEAR,
   enabledToolIds: [],
 });
-
-/**
- * Migrate old tool ID format to new format
- * Old format: "core_credits", "core_agent_chat_personas"
- * New format: "get_v1_core_credits", "get_v1_core_agent_chat_personas"
- */
-const migrateToolIds = (toolIds: string[]): string[] => {
-  return toolIds
-    .map((id) => {
-      // If ID already has method prefix (contains _v1_), it's already in new format
-      if (id.includes("_v1_")) {
-        return id;
-      }
-
-      // Old format detected - migrate to new format
-      // Default to GET method for most tools
-      // Special cases can be added here if needed
-      return `get_v1_${id}`;
-    })
-    .filter((id, index, self) => self.indexOf(id) === index); // Remove duplicates
-};
 
 // Helper to load settings from localStorage (client-only, called after mount)
 const loadSettings = async (): Promise<ChatSettings> => {
@@ -210,25 +103,6 @@ const loadSettings = async (): Promise<ChatSettings> => {
     const stored = await storage.getItem("chat-settings");
     if (stored) {
       const parsed = JSON.parse(stored) as Partial<ChatSettings>;
-
-      // Migrate old tool IDs to new format
-      if (parsed.enabledToolIds && Array.isArray(parsed.enabledToolIds)) {
-        const migratedToolIds = migrateToolIds(parsed.enabledToolIds);
-
-        // If migration happened, save the migrated version back to storage
-        if (
-          JSON.stringify(migratedToolIds) !==
-          JSON.stringify(parsed.enabledToolIds)
-        ) {
-          const migratedSettings = {
-            ...defaults,
-            ...parsed,
-            enabledToolIds: migratedToolIds,
-          };
-          await saveSettings(migratedSettings);
-          return migratedSettings;
-        }
-      }
 
       // Return merged settings
       return {
@@ -278,6 +152,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
         [thread.id]: thread,
       },
     }));
+
+    void saveIncognitoThread(thread);
   },
 
   updateThread: (threadId: string, updates: Partial<ChatThread>): void =>
@@ -287,14 +163,18 @@ export const useChatStore = create<ChatState>((set, get) => ({
         return state;
       }
 
+      const updatedThread = {
+        ...thread,
+        ...updates,
+        updatedAt: new Date(),
+      };
+
+      void saveIncognitoThread(updatedThread);
+
       return {
         threads: {
           ...state.threads,
-          [threadId]: {
-            ...thread,
-            ...updates,
-            updatedAt: new Date(),
-          },
+          [threadId]: updatedThread,
         },
       };
     }),
@@ -309,13 +189,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }),
 
   // Message actions
-  addMessage: (message: ChatMessage): void =>
+  addMessage: (message: ChatMessage): void => {
     set((state) => ({
       messages: {
         ...state.messages,
         [message.id]: message,
       },
-    })),
+    }));
+
+    void saveIncognitoMessage(message);
+  },
 
   updateMessage: (messageId: string, updates: Partial<ChatMessage>): void =>
     set((state) => {
@@ -324,14 +207,18 @@ export const useChatStore = create<ChatState>((set, get) => ({
         return state;
       }
 
+      const updatedMessage = {
+        ...message,
+        ...updates,
+        updatedAt: new Date(),
+      };
+
+      void saveIncognitoMessage(updatedMessage);
+
       return {
         messages: {
           ...state.messages,
-          [messageId]: {
-            ...message,
-            ...updates,
-            updatedAt: new Date(),
-          },
+          [messageId]: updatedMessage,
         },
       };
     }),

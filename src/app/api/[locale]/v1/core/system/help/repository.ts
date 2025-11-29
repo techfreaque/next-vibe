@@ -16,51 +16,49 @@ import { parseError } from "next-vibe/shared/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../system/unified-interface/shared/logger/endpoint";
-import { endpointListingService } from "../../system/unified-interface/shared/server-only/endpoint-listing/service";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
+import { definitionsRegistry } from "../../system/unified-interface/shared/endpoints/definitions/registry";
+import type { Platform } from "../../system/unified-interface/shared/types/platform";
+import { endpointToToolName } from "../../system/unified-interface/shared/utils/path";
+
 import type { HelpRequestOutput, HelpResponseOutput } from "./definition";
+import type { CreateApiEndpointAny } from "../unified-interface/shared/types/endpoint";
 
 /**
  * Help Repository
  */
 class HelpRepository {
   /**
-   * Discover all available commands using unified service
-   */
-  discoverCommands(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-    category?: string,
-  ): ReturnType<typeof endpointListingService.discoverEndpoints> {
-    // Use unified endpoint listing service
-    return endpointListingService.discoverEndpoints(logger, {
-      locale,
-      category,
-    });
-  }
-
-  /**
    * Execute the help command
    */
   execute(
     data: HelpRequestOutput,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    platform: Platform,
   ): ResponseType<HelpResponseOutput> {
     logger.info("Generating help information", {
       command: data.command || "all",
     });
 
     try {
-      // Discover commands
-      const commands = this.discoverCommands(logger, locale);
+      // Discover commands (filtered by user permissions from JWT)
+      const commands = definitionsRegistry.getEndpointsForUser(
+        platform,
+        user,
+        logger,
+      );
 
       if (data.command) {
         // Show help for specific command
-        const command = commands.find(
-          (cmd) =>
-            cmd.name === data.command ||
-            cmd.aliases?.includes(data.command || ""),
-        );
+        const command = commands.find((cmd) => {
+          const toolName = endpointToToolName(cmd);
+          return (
+            toolName === data.command ||
+            cmd.aliases?.includes(data.command || "")
+          );
+        });
 
         if (!command) {
           return fail({
@@ -93,28 +91,22 @@ class HelpRepository {
   /**
    * Format help for a specific command
    */
-  private formatCommandHelp(command: {
-    name: string;
-    path: string;
-    method: string;
-    category: string;
-    description: string;
-    aliases?: string[];
-  }): HelpResponseOutput {
+  private formatCommandHelp(command: CreateApiEndpointAny): HelpResponseOutput {
+    const toolName = endpointToToolName(command);
     return {
       header: {
-        title: `${command.name} - ${command.description || "No description available"}`,
+        title: `${toolName} - ${command.description || "No description available"}`,
         description: command.description,
       },
       usage: {
-        patterns: [`vibe ${command.name} [options]`],
+        patterns: [`vibe ${toolName} [options]`],
       },
       commonCommands: {
         items: [], // Empty for specific command help
       },
       details: {
         category: command.category,
-        path: command.path,
+        path: command.path.join("/"),
         method: command.method,
         aliases:
           command.aliases && command.aliases.length > 0
@@ -144,11 +136,11 @@ class HelpRepository {
       examples: {
         items: [
           {
-            command: `vibe ${command.name}`,
+            command: `vibe ${toolName}`,
             description: "Run command with default options",
           },
           {
-            command: `vibe ${command.name} --help`,
+            command: `vibe ${toolName} --help`,
             description: "Show command help",
           },
         ],

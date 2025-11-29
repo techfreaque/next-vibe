@@ -13,7 +13,7 @@ import type {
 import type { DivRefObject } from "@/packages/next-vibe-ui/web/ui/div";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { TIMING } from "@/app/[locale]/chat/lib/config/constants";
 
 export type EditorActionType = "branch" | null;

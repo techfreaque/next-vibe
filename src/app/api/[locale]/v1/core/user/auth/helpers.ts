@@ -5,6 +5,8 @@
  */
 
 import type { JwtPayloadType, JwtPrivatePayloadType } from "./types";
+import { UserPermissionRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { UserPermissionRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
 /**
  * Create public user payload
@@ -21,6 +23,7 @@ export function createPublicUser(leadId: string): JwtPayloadType {
   return {
     leadId,
     isPublic: true,
+    roles: [UserPermissionRole.PUBLIC],
   };
 }
 
@@ -35,6 +38,7 @@ export function createPublicUser(leadId: string): JwtPayloadType {
 export function createPrivateUser(
   userId: string,
   leadId: string,
+  roles: (typeof UserPermissionRoleValue)[],
 ): JwtPrivatePayloadType {
   if (!leadId) {
     // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
@@ -48,5 +52,6 @@ export function createPrivateUser(
     id: userId,
     leadId,
     isPublic: false,
+    roles,
   };
 }

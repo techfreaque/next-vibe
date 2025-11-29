@@ -6,7 +6,14 @@
 
 "use client";
 
-import { type RefObject, useCallback, useMemo, useRef, useState } from "react";
+import {
+  type RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -17,10 +24,11 @@ import { useAIStreamStore } from "../../ai-stream/hooks/store";
 import type { DefaultFolderId } from "../config";
 import { NEW_MESSAGE_ID } from "../enum";
 import type { ModelId } from "../model-access/models";
+import type { IconValue } from "../model-access/icons";
 import type { PersonaListResponseOutput } from "../personas/definition";
 import { usePersonasList } from "../personas/hooks";
-import type { ChatFolder, ChatMessage, ChatThread } from "./store";
-import { useChatStore } from "./store";
+import type { ChatFolder, ChatMessage, ChatThread } from "../db";
+import { useChatStore, type ChatSettings } from "./store";
 
 import { useDataLoader } from "./use-data-loader";
 import { useMessageLoader } from "./use-message-loader";
@@ -45,7 +53,11 @@ import { useInputHandlers } from "./use-input-handlers";
 import type { TextareaKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/textarea";
 import { useUIState } from "./use-ui-state";
 import { useFolderHandlers } from "./use-folder-handlers";
-
+import {
+  getDraftKey,
+  loadDraft,
+  saveDraft as saveDraftToStorage,
+} from "./use-input-autosave";
 /**
  * Return type for useChat hook
  */
@@ -78,7 +90,7 @@ export interface UseChatReturn {
   maxTokens: number;
   ttsAutoplay: boolean;
   sidebarCollapsed: boolean;
-  viewMode: "linear" | "flat" | "threaded";
+  viewMode: ChatSettings["viewMode"];
   enabledToolIds: string[];
   setSelectedPersona: (persona: string) => void;
   setSelectedModel: (model: ModelId) => void;
@@ -86,7 +98,7 @@ export interface UseChatReturn {
   setMaxTokens: (tokens: number) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
-  setViewMode: (mode: "linear" | "flat" | "threaded") => void;
+  setViewMode: (mode: ChatSettings["viewMode"]) => void;
   setEnabledToolIds: (toolIds: string[]) => void;
 
   // Credits
@@ -96,7 +108,16 @@ export interface UseChatReturn {
 
   // Message operations
   sendMessage: (
-    content: string,
+    params: {
+      content: string;
+      threadId?: string;
+      parentId?: string;
+      toolConfirmation?: {
+        messageId: string;
+        confirmed: boolean;
+        updatedArgs?: Record<string, string | number | boolean | null>;
+      };
+    },
     onThreadCreated?: (
       threadId: string,
       rootFolderId: DefaultFolderId,
@@ -119,7 +140,7 @@ export interface UseChatReturn {
     name: string,
     rootFolderId: DefaultFolderId,
     parentId: string | null,
-    icon?: string,
+    icon?: IconValue,
   ) => Promise<string>;
   updateFolder: (folderId: string, updates: FolderUpdate) => Promise<void>;
   deleteFolder: (folderId: string) => Promise<void>;
@@ -263,6 +284,31 @@ export function useChat(
   const [input, setInput] = useState("");
   const inputRef = useRef<TextareaRefObject>(null);
 
+  // Generate draft key for current context
+  const draftKey = getDraftKey(
+    activeThreadId,
+    currentRootFolderId,
+    currentSubFolderId,
+  );
+
+  // Load draft when navigation context changes
+  useEffect(() => {
+    const loadDraftForContext = async (): Promise<void> => {
+      const draft = await loadDraft(draftKey, logger);
+      setInput(draft);
+    };
+    void loadDraftForContext();
+  }, [draftKey, logger]);
+
+  // Wrapper function to save input and draft together
+  const setInputAndSaveDraft = useCallback(
+    (newInput: string) => {
+      setInput(newInput);
+      void saveDraftToStorage(draftKey, newInput, logger);
+    },
+    [draftKey, logger],
+  );
+
   // Use modular hooks
   useDataLoader(
     locale,
@@ -281,7 +327,13 @@ export function useChat(
     chatStore.addMessage,
   );
 
-  const settingsOps = useSettings({ chatStore });
+  const settingsOps = useSettings({
+    chatStore: {
+      settings: chatStore.settings,
+      updateSettings: chatStore.updateSettings,
+      hydrateSettings: chatStore.hydrateSettings,
+    },
+  });
 
   useStreamSync({
     streamingMessages: streamStore.streamingMessages,
@@ -317,7 +369,7 @@ export function useChat(
     chatStore,
     streamStore,
     settings: settingsOps.settings,
-    setInput,
+    setInput: setInputAndSaveDraft,
     deductCredits: creditsHook.deductCredits,
   });
 
@@ -387,12 +439,13 @@ export function useChat(
     isLoading,
     enabledToolIds: settingsOps.settings.enabledToolIds,
     sendMessage: messageOps.sendMessage,
-    setInput,
+    setInput: setInputAndSaveDraft,
     setSelectedModel: settingsOps.setSelectedModel,
     setEnabledToolIds: settingsOps.setEnabledToolIds,
     inputRef,
     locale,
     logger,
+    draftKey,
   });
 
   // UI State
@@ -479,7 +532,7 @@ export function useChat(
 
     // Input
     input,
-    setInput,
+    setInput: setInputAndSaveDraft,
 
     // Settings
     selectedPersona: settingsOps.settings.selectedPersona,

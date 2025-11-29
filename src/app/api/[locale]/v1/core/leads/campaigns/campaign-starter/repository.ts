@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { UserPermissionRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
@@ -87,7 +88,7 @@ export class CampaignStarterRepositoryImpl
       const SYSTEM_LEAD_ID = "00000000-0000-0000-0000-000000000000";
       const capacityResult = await smtpRepository.getTotalSendingCapacity(
         {},
-        { isPublic: true, leadId: SYSTEM_LEAD_ID },
+        { isPublic: true, leadId: SYSTEM_LEAD_ID, roles: [UserPermissionRole.PUBLIC] },
         locale,
         logger,
       );

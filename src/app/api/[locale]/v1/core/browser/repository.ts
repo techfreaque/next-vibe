@@ -16,7 +16,6 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { ParameterValue } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/executor";
 
 import type { BrowserRequestOutput, BrowserResponseOutput } from "./definition";
 import { BrowserToolStatus } from "./enum";
@@ -45,21 +44,29 @@ export interface BrowserRepository {
 /**
  * MCP JSON-RPC message types
  */
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
 interface MCPRequest {
   jsonrpc: "2.0";
   id: number;
   method: string;
-  params?: Record<string, ParameterValue>;
+  params?: Record<string, JsonValue>;
 }
 
 interface MCPResponse {
   jsonrpc: "2.0";
   id: number;
-  result?: ParameterValue;
+  result?: JsonValue;
   error?: {
     code: number;
     message: string;
-    data?: ParameterValue;
+    data?: JsonValue;
   };
 }
 
@@ -101,13 +108,10 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       }
 
       // Parse arguments
-      let parsedArgs: Record<string, ParameterValue> = {};
+      let parsedArgs: Record<string, JsonValue> = {};
       if (data.arguments) {
         try {
-          parsedArgs = JSON.parse(data.arguments) as Record<
-            string,
-            ParameterValue
-          >;
+          parsedArgs = JSON.parse(data.arguments) as Record<string, JsonValue>;
         } catch (parseError) {
           logger.warn("[Browser Repository] Failed to parse arguments", {
             arguments: data.arguments,
@@ -265,9 +269,9 @@ export class BrowserRepositoryImpl implements BrowserRepository {
    */
   private async callTool(
     toolName: string,
-    args: Record<string, ParameterValue>,
+    args: Record<string, JsonValue>,
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; result?: ParameterValue; error?: string }> {
+  ): Promise<{ success: boolean; result?: JsonValue; error?: string }> {
     const toolRequest: MCPRequest = {
       jsonrpc: "2.0",
       id: this.nextRequestId++,

@@ -35,24 +35,24 @@ interface IconSelectorProps {
   locale: CountryLanguage;
 }
 
-// Common emoji suggestions (visual UI elements, not translatable text)
-const COMMON_EMOJIS = [
-  "🤖",
-  "🎨",
-  "💼",
-  "🔒",
-  "🌍",
-  "👥",
-  "⚡",
-  "🚀",
-  "💡",
-  "📚",
-  "🎯",
-  "🔥",
-  "⭐",
-  "💻",
-  "📱",
-  "🎮",
+// Common icon keys (visual UI elements, not translatable text)
+const COMMON_ICONS = [
+  "robot-face",
+  "artist-palette",
+  "briefcase",
+  "locked",
+  "globe-emoji",
+  "people",
+  "high-voltage",
+  "rocket-emoji",
+  "bulb",
+  "books",
+  "direct-hit",
+  "fire",
+  "star-emoji",
+  "laptop",
+  "mobile-phone",
+  "game-controller",
 ] as const;
 
 /**
@@ -75,7 +75,7 @@ export function IconSelector({
   locale,
 }: IconSelectorProps): JSX.Element {
   const [open, setOpen] = useState(false);
-  const [emojiInput, setEmojiInput] = useState("");
+  const [emojiInput, setEmojiInput] = useState<IconKey>("" as IconKey);
   const [activeTab, setActiveTab] = useState<"library" | "emoji">("library");
 
   // Translation function
@@ -91,14 +91,14 @@ export function IconSelector({
 
   // Handle emoji input change
   const handleEmojiChange = (e: InputChangeEvent): void => {
-    setEmojiInput(e.target.value);
+    setEmojiInput(e.target.value as IconKey);
   };
 
   // Handle emoji submit
   const handleEmojiSubmit = (): void => {
     if (emojiInput.trim()) {
-      onChange(emojiInput.trim());
-      setEmojiInput("");
+      onChange(emojiInput.trim() as IconKey);
+      setEmojiInput("" as IconKey);
       setOpen(false);
     }
   };
@@ -262,24 +262,27 @@ export function IconSelector({
                   {t("app.chat.iconSelector.emojiTab.commonEmojis")}
                 </Div>
                 <Div className="grid grid-cols-8 gap-1">
-                  {COMMON_EMOJIS.map((emoji) => (
-                    <Button
-                      key={emoji}
-                      variant="ghost"
-                      size="unset"
-                      onClick={() => {
-                        onChange(emoji);
-                        setOpen(false);
-                      }}
-                      className={cn(
-                        "flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent transition-colors text-xl",
-                        currentValueString === emoji &&
-                          "bg-accent border-2 border-primary",
-                      )}
-                    >
-                      {emoji}
-                    </Button>
-                  ))}
+                  {COMMON_ICONS.map((iconKey) => {
+                    const Icon = getIconComponent(iconKey);
+                    return (
+                      <Button
+                        key={iconKey}
+                        variant="ghost"
+                        size="unset"
+                        onClick={() => {
+                          onChange(iconKey);
+                          setOpen(false);
+                        }}
+                        className={cn(
+                          "flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent transition-colors text-xl",
+                          currentValueString === iconKey &&
+                            "bg-accent border-2 border-primary",
+                        )}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </Button>
+                    );
+                  })}
                 </Div>
               </Div>
             </Div>

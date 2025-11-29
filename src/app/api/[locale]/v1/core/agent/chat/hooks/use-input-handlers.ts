@@ -16,6 +16,7 @@ import {
 } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { clearDraft } from "./use-input-autosave";
 
 // Utility functions
 const isValidInput = (input: string): boolean => input.trim().length > 0;
@@ -27,7 +28,16 @@ interface UseInputHandlersProps {
   isLoading: boolean;
   enabledToolIds: string[];
   sendMessage: (
-    input: string,
+    params: {
+      content: string;
+      threadId?: string;
+      parentId?: string;
+      toolConfirmation?: {
+        messageId: string;
+        confirmed: boolean;
+        updatedArgs?: Record<string, string | number | boolean | null>;
+      };
+    },
     onNewThread?: (
       threadId: string,
       rootFolderId: string,
@@ -40,6 +50,7 @@ interface UseInputHandlersProps {
   inputRef: React.RefObject<TextareaRefObject | null>;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  draftKey: string;
 }
 
 interface UseInputHandlersReturn {
@@ -66,6 +77,7 @@ export function useInputHandlers({
   inputRef,
   locale,
   logger,
+  draftKey,
 }: UseInputHandlersProps): UseInputHandlersReturn {
   const router = useRouter();
 
@@ -78,7 +90,7 @@ export function useInputHandlers({
 
     if (isValidInput(input) && !isLoading) {
       logger.debug("Chat", "submitMessage calling sendMessage");
-      await sendMessage(input, (threadId, rootFolderId, subFolderId) => {
+      await sendMessage({ content: input }, (threadId, rootFolderId, subFolderId) => {
         // Navigate to the newly created thread
         logger.debug("Chat", "Navigating to newly created thread", {
           threadId,
@@ -91,11 +103,14 @@ export function useInputHandlers({
           : `/${locale}/threads/${rootFolderId}/${threadId}`;
         router.push(url);
       });
-      logger.debug("Chat", "submitMessage completed");
+      // Clear the draft after successful send
+      logger.debug("Chat", "submitMessage completed, clearing draft");
+      await clearDraft(draftKey, logger);
+      logger.debug("Chat", "Draft cleared");
     } else {
       logger.debug("Chat", "submitMessage blocked");
     }
-  }, [input, isLoading, sendMessage, logger, locale, router]);
+  }, [input, isLoading, sendMessage, logger, locale, router, draftKey]);
 
   const handleKeyDown = useCallback(
     (e: TextareaKeyboardEvent) => {

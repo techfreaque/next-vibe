@@ -11,8 +11,7 @@ export const translations: typeof enTranslations = {
         "Authentifizierungsstatus konnte nicht überprüft werden",
       token_save_failed:
         "Authentifizierungstoken konnte nicht gespeichert werden",
-      token_get_failed:
-        "Authentifizierungstoken konnte nicht abgerufen werden",
+      token_get_failed: "Authentifizierungstoken konnte nicht abgerufen werden",
       token_remove_failed:
         "Authentifizierungstoken konnte nicht entfernt werden",
     },
@@ -39,6 +38,7 @@ export const translations: typeof enTranslations = {
     publicUserNotAllowed:
       "Öffentlicher Benutzer ist für diesen Endpunkt nicht erlaubt",
     validation_failed: "Validierung fehlgeschlagen",
+    failed_to_create_lead: "Lead konnte nicht erstellt werden",
     native: {
       unsupported:
         "Diese Authentifizierungsmethode wird in React Native nicht unterstützt",

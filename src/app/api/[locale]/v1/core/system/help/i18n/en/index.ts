@@ -12,6 +12,14 @@ export const translations = {
       },
       summary: "Start interactive mode",
     },
+    ui: {
+      title: "Interactive API Explorer",
+      description: "Browse and execute all",
+      availableEndpoints: "available endpoints",
+      endpointsLabel: "Endpoints",
+      aliasesLabel: "Aliases:",
+      selectEndpoint: "Select an endpoint from the list to get started",
+    },
     response: {
       started: "Interactive mode started successfully",
     },
@@ -166,6 +174,7 @@ export const translations = {
         server: {
           title: "Server Error",
           description: "Failed to generate command list",
+          errorLoading: "Error loading commands: {{error}}",
         },
         unknown: {
           title: "Unknown Error",

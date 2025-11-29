@@ -35,31 +35,36 @@ export interface ProcessedLinkList {
 export function extractLinkListData(
   value: WidgetData,
 ): ProcessedLinkList | null {
-  // Narrow to object type first
-  const isObject =
-    typeof value === "object" && value !== null && !Array.isArray(value);
+  let items: unknown[] = [];
+  let title = "";
+  let description = "";
+  let layout = "list";
+  let columns = 1;
 
-  if (!isObject) {
+  // Handle raw array format (from responseArrayField)
+  if (Array.isArray(value)) {
+    items = value;
+  }
+  // Handle object format with items property
+  else if (typeof value === "object" && value !== null) {
+    items = "items" in value && Array.isArray(value.items) ? value.items : [];
+    title =
+      "title" in value && typeof value.title === "string" ? value.title : "";
+    description =
+      "description" in value && typeof value.description === "string"
+        ? value.description
+        : "";
+    layout =
+      "layout" in value && typeof value.layout === "string"
+        ? value.layout
+        : "list";
+    columns =
+      "columns" in value && typeof value.columns === "number"
+        ? value.columns
+        : 1;
+  } else {
     return null;
   }
-
-  // Extract properties with explicit checks
-  const items =
-    "items" in value && Array.isArray(value.items) ? value.items : [];
-  const title =
-    "title" in value && typeof value.title === "string" ? value.title : "";
-  const description =
-    "description" in value && typeof value.description === "string"
-      ? value.description
-      : "";
-  const layout =
-    "layout" in value && typeof value.layout === "string"
-      ? value.layout
-      : "list";
-  const columns =
-    "columns" in value && typeof value.columns === "number"
-      ? value.columns
-      : 1;
 
   if (!items || !Array.isArray(items) || items.length === 0) {
     return null;

@@ -10,7 +10,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { ChatMessage, ChatThread } from "./store";
+import type { ChatMessage, ChatThread } from "../db";
 
 /**
  * Hook for loading messages when activeThreadId changes
@@ -69,28 +69,10 @@ export function useMessageLoader(
           });
 
           if (data.success && data.data?.messages) {
-            // Add messages to store
+            // Add messages to store (messages from API already have all required DB fields)
             data.data.messages.forEach((message) => {
               addMessage({
-                id: message.id,
-                threadId: message.threadId,
-                role: message.role,
-                content: message.content,
-                model: message.model,
-                persona: message.persona ?? null,
-                parentId: message.parentId,
-                depth: message.depth,
-                authorId: message.authorId,
-                authorName: null,
-                isAI: message.isAI,
-                errorType: null,
-                errorMessage: null,
-                edited: false,
-                tokens: message.tokens,
-                toolCalls: message.toolCalls,
-                upvotes: null,
-                downvotes: null,
-                sequenceId: message.sequenceId ?? null,
+                ...message,
                 createdAt: new Date(message.createdAt),
                 updatedAt: new Date(message.updatedAt),
               });

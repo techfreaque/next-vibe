@@ -11,14 +11,15 @@ import { getCookie } from "next-vibe-ui/lib/cookies";
 
 import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { DefaultFolderId } from "../config";
 import type { FolderListResponseOutput } from "../folders/definition";
 import { GET as foldersGetEndpoint } from "../folders/definition";
-import type { ChatFolder, ChatMessage, ChatThread } from "./store";
-import { GET as threadsGetEndpoint } from "../threads/definition";
+import type { ChatFolder, ChatMessage, ChatThread } from "../db";
+import {
+  GET as threadsGetEndpoint,
+  type ThreadListResponseOutput,
+} from "../threads/definition";
 
 /**
  * Check if user is authenticated
@@ -65,6 +66,14 @@ async function loadIncognitoData(
 
     // Load messages
     Object.values(incognitoState.messages).forEach((message) => {
+      logger.debug("Chat: Loading incognito message", {
+        messageId: message.id,
+        threadId: message.threadId,
+        role: message.role,
+        contentLength: message.content?.length || 0,
+        hasToolCall: !!message.metadata?.toolCall,
+      });
+
       addMessage({
         ...message,
         createdAt: new Date(message.createdAt),
@@ -130,42 +139,14 @@ async function loadThreadsFromServer(
       hasData: threadsResponse.success && !!threadsResponse.data,
     });
 
-    if (threadsResponse.success) {
-      const responseData = threadsResponse.data as {
-        response: {
-          threads: Array<{
-            id: string;
-            title: string;
-            rootFolderId: DefaultFolderId;
-            folderId: string | null;
-            status: "active" | "archived" | "deleted";
-            pinned: boolean;
-            preview: string | null;
-            rolesView?: UserRoleValue[] | null;
-            rolesEdit?: UserRoleValue[] | null;
-            rolesPost?: UserRoleValue[] | null;
-            rolesModerate?: UserRoleValue[] | null;
-            rolesAdmin?: UserRoleValue[] | null;
-            canEdit?: boolean;
-            canPost?: boolean;
-            canModerate?: boolean;
-            canDelete?: boolean;
-            canManagePermissions?: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-          }>;
-          totalCount: number;
-          pageCount: number;
-          page: number;
-          limit: number;
-        };
-      };
-
-      if (responseData.response?.threads) {
-        responseData.response.threads.forEach((thread) => {
+    if (threadsResponse.success && threadsResponse.data) {
+      const data = threadsResponse.data as ThreadListResponseOutput;
+      if (data.response?.threads) {
+        data.response.threads.forEach((thread) => {
           addThread({
             id: thread.id,
             userId: "",
+            leadId: null,
             title: thread.title,
             rootFolderId: thread.rootFolderId,
             folderId: thread.folderId,
@@ -177,22 +158,25 @@ async function loadThreadsFromServer(
             archived: false,
             tags: [],
             preview: thread.preview,
+            metadata: {},
             rolesView: thread.rolesView,
             rolesEdit: thread.rolesEdit,
             rolesPost: thread.rolesPost,
             rolesModerate: thread.rolesModerate,
             rolesAdmin: thread.rolesAdmin,
+            published: false,
+            createdAt: new Date(thread.createdAt),
+            updatedAt: new Date(thread.updatedAt),
+            searchVector: null,
             canEdit: thread.canEdit,
             canPost: thread.canPost,
             canModerate: thread.canModerate,
             canDelete: thread.canDelete,
             canManagePermissions: thread.canManagePermissions,
-            createdAt: new Date(thread.createdAt),
-            updatedAt: new Date(thread.updatedAt),
           });
         });
         logger.debug("Chat: Threads loaded successfully", {
-          count: responseData.response.threads.length,
+          count: data.response.threads.length,
         });
       }
     }
@@ -234,6 +218,7 @@ async function loadFoldersFromServer(
           addFolder({
             id: folder.id,
             userId: folder.userId,
+            leadId: null,
             rootFolderId: folder.rootFolderId,
             name: folder.name,
             icon: folder.icon,
@@ -247,13 +232,13 @@ async function loadFoldersFromServer(
             rolesPost: folder.rolesPost,
             rolesModerate: folder.rolesModerate,
             rolesAdmin: folder.rolesAdmin,
+            createdAt: new Date(folder.createdAt),
+            updatedAt: new Date(folder.updatedAt),
             canManage: folder.canManage,
             canCreateThread: folder.canCreateThread,
             canModerate: folder.canModerate,
             canDelete: folder.canDelete,
             canManagePermissions: folder.canManagePermissions,
-            createdAt: new Date(folder.createdAt),
-            updatedAt: new Date(folder.updatedAt),
           });
         });
         logger.debug("Chat: Folders loaded successfully", {

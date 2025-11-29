@@ -33,7 +33,7 @@ import { LeadSource, LeadStatus } from "../../leads/enum";
 import { db } from "../../system/db";
 import { type AuthContext } from "../../system/unified-interface/shared/server-only/auth/base-auth-handler";
 import { getPlatformAuthHandler } from "../../system/unified-interface/shared/server-only/auth/factory";
-import type { Platform } from "../../system/unified-interface/shared/types/platform";
+import { Platform } from "../../system/unified-interface/shared/types/platform";
 import { users } from "../db";
 import { UserDetailLevel } from "../enum";
 import { sessionRepository } from "../private/session/repository";
@@ -65,17 +65,28 @@ export type InferUserType<TRoles extends readonly UserRoleValue[]> =
 function createPublicUser<TRoles extends readonly UserRoleValue[]>(
   leadId: string,
 ): InferUserType<TRoles> {
-  return { isPublic: true, leadId } as InferUserType<TRoles>;
+  return {
+    isPublic: true,
+    leadId,
+    roles: [UserPermissionRole.PUBLIC],
+  } as InferUserType<TRoles>;
 }
 
 /**
  * Helper to create private user payload
+ * Note: This is a helper for creating payload structure - roles should be fetched from DB
  */
 function createPrivateUser<TRoles extends readonly UserRoleValue[]>(
   userId: string,
   leadId: string,
+  roles: (typeof UserPermissionRole)[keyof typeof UserPermissionRole][],
 ): InferUserType<TRoles> {
-  return { isPublic: false, id: userId, leadId } as InferUserType<TRoles>;
+  return {
+    isPublic: false,
+    id: userId,
+    leadId,
+    roles,
+  } as InferUserType<TRoles>;
 }
 
 /**
@@ -93,17 +104,8 @@ export interface AuthRepository {
 
   /**
    * Verify a JWT token
-   * Implements BaseAuthHandler.verifyToken
    */
   verifyJwt(
-    token: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<JwtPrivatePayloadType>>;
-
-  /**
-   * Alias for verifyJwt to match BaseAuthHandler interface
-   */
-  verifyToken(
     token: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPrivatePayloadType>>;
@@ -256,7 +258,6 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   async getPrimaryLeadId(userId: string): Promise<string | null> {
-    // With wallet-based system, no isPrimary concept - just get first linked lead
     const [userLeadLink] = await db
       .select()
       .from(userLeadLinks)
@@ -321,7 +322,17 @@ class AuthRepositoryImpl implements AuthRepository {
         logger.error("Failed to get or create lead for user", { userId });
         return null;
       }
-      return { isPublic: false, id: userId, leadId };
+
+      // Fetch user roles
+      const userRolesResponse = await userRolesRepository.findByUserId(
+        userId,
+        logger,
+      );
+      const roles = userRolesResponse.success
+        ? userRolesResponse.data.map((r) => r.role)
+        : [];
+
+      return { isPublic: false, id: userId, leadId, roles };
     } catch (error) {
       logger.error(
         "app.api.v1.core.user.auth.debug.errorValidatingUserSession",
@@ -497,7 +508,7 @@ class AuthRepositoryImpl implements AuthRepository {
   private async getLeadIdForPublicUser(
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<string | null> {
+  ): Promise<string> {
     try {
       // Always create a new lead for public users
       // Platform handlers are responsible for checking/storing lead IDs
@@ -521,7 +532,10 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorGettingPublicLeadId",
         parseError(error),
       );
-      return null;
+      throwErrorResponse(
+        "app.api.v1.core.user.auth.errors.failed_to_create_lead",
+        ErrorResponseTypes.INTERNAL_ERROR,
+      );
     }
   }
 
@@ -554,7 +568,16 @@ class AuthRepositoryImpl implements AuthRepository {
           originalRoles: [...requiredRoles] as string[],
         },
       );
-      return createPrivateUser<TRoles>(userId, leadId);
+      const userRoles = await this.getUserRolesInternal(
+        userId,
+        requiredRoles,
+        logger,
+      );
+      return createPrivateUser(
+        userId,
+        leadId,
+        filterUserPermissionRoles(userRoles),
+      ) as InferUserType<TRoles>;
     }
 
     // Check if endpoint only allows PUBLIC role (no authenticated users allowed)
@@ -575,9 +598,20 @@ class AuthRepositoryImpl implements AuthRepository {
       return createPublicUser<TRoles>(leadId);
     }
 
+    // Get user roles from database
+    const userRoles = await this.getUserRolesInternal(
+      userId,
+      requiredRoles,
+      logger,
+    );
+
     // Customer role is allowed for any authenticated user
     if (permissionRoles.includes(UserPermissionRole.CUSTOMER)) {
-      return createPrivateUser<TRoles>(userId, leadId);
+      return createPrivateUser(
+        userId,
+        leadId,
+        filterUserPermissionRoles(userRoles),
+      ) as InferUserType<TRoles>;
     }
 
     // For other roles (ADMIN, etc.), check the user's roles
@@ -595,12 +629,20 @@ class AuthRepositoryImpl implements AuthRepository {
         });
         // If CUSTOMER role is in permission roles, return authenticated user
         if (permissionRoles.includes(UserPermissionRole.CUSTOMER)) {
-          return createPrivateUser<TRoles>(userId, leadId);
+          return createPrivateUser(
+            userId,
+            leadId,
+            filterUserPermissionRoles(userRoles),
+          ) as InferUserType<TRoles>;
         }
         // If PUBLIC role is in permission roles (mixed with other roles), return authenticated user
         // (authenticated users can access PUBLIC endpoints when mixed with other roles)
         if (permissionRoles.includes(UserPermissionRole.PUBLIC)) {
-          return createPrivateUser<TRoles>(userId, leadId);
+          return createPrivateUser(
+            userId,
+            leadId,
+            filterUserPermissionRoles(userRoles),
+          ) as InferUserType<TRoles>;
         }
         // Otherwise, user doesn't have required roles
         logger.warn("User does not have required permission roles", {
@@ -619,7 +661,11 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
       if (hasRequiredRole) {
-        return createPrivateUser<TRoles>(userId, leadId);
+        return createPrivateUser(
+          userId,
+          leadId,
+          filterUserPermissionRoles(userRoles),
+        ) as InferUserType<TRoles>;
       }
 
       // User doesn't have required roles
@@ -630,7 +676,11 @@ class AuthRepositoryImpl implements AuthRepository {
         // User is authenticated but doesn't have the specific role
         // However, since PUBLIC is allowed (mixed with other roles), we can return the authenticated user
         // as they have at least CUSTOMER role (all authenticated users have CUSTOMER)
-        return createPrivateUser<TRoles>(userId, leadId);
+        return createPrivateUser(
+          userId,
+          leadId,
+          filterUserPermissionRoles(userRoles),
+        ) as InferUserType<TRoles>;
       }
 
       // User doesn't have required roles and PUBLIC is not allowed
@@ -652,7 +702,17 @@ class AuthRepositoryImpl implements AuthRepository {
       });
       // If there's an error but PUBLIC is allowed (mixed with other roles), return authenticated user
       if (permissionRoles.includes(UserPermissionRole.PUBLIC)) {
-        return createPrivateUser<TRoles>(userId, leadId);
+        // Fetch roles for error case
+        const errorUserRoles = await this.getUserRolesInternal(
+          userId,
+          requiredRoles,
+          logger,
+        );
+        return createPrivateUser(
+          userId,
+          leadId,
+          filterUserPermissionRoles(errorUserRoles),
+        ) as InferUserType<TRoles>;
       }
       // Otherwise, return public user (will be rejected by endpoint handler)
       return createPublicUser<TRoles>(leadId);
@@ -809,12 +869,22 @@ class AuthRepositoryImpl implements AuthRepository {
         });
       }
 
+      // Validate roles are present
+      if (!payload.roles || !Array.isArray(payload.roles)) {
+        logger.debug("app.api.v1.core.user.auth.debug.invalidTokenPayload");
+        return fail({
+          message: "app.api.v1.core.user.auth.errors.invalid_token_signature",
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
+      }
+
       logger.debug("app.api.v1.core.user.auth.debug.jwtVerifiedSuccessfully");
 
       return success({
         isPublic: false,
         id: payload.id,
         leadId: payload.leadId,
+        roles: payload.roles,
       });
     } catch (error) {
       logger.debug("app.api.v1.core.user.auth.debug.errorVerifyingJwt", {
@@ -829,80 +899,176 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   /**
-   * Alias for verifyJwt to match BaseAuthHandler interface
-   */
-  async verifyToken(
-    token: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<JwtPrivatePayloadType>> {
-    return await this.verifyJwt(token, logger);
-  }
-
-  /**
-   * Authenticate user based on context
-   * Implements BaseAuthHandler.authenticate
+   * Authenticate user from context
+   * Contains all authentication business logic
+   * Platform handlers only provide storage access
    */
   async authenticate(
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPayloadType>> {
-    return await this.getCurrentUser(context, logger);
+    try {
+      // Get platform-specific storage handler
+      const authHandler = getPlatformAuthHandler(context.platform);
+
+      // If JWT payload provided directly (e.g., from CLI), use it
+      if (context.jwtPayload) {
+        logger.debug("Using provided JWT payload");
+        return success(context.jwtPayload);
+      }
+
+      // Get token from platform-specific storage
+      const token = await authHandler.getStoredAuthToken(context, logger);
+
+      if (!token) {
+        logger.debug("No auth token found");
+        if (context.platform === Platform.CLI) {
+          // Try CLI email auth if no token
+          const cliEmail = env.VIBE_CLI_USER_EMAIL;
+          if (cliEmail) {
+            logger.debug("Attempting CLI email authentication");
+            return await this.authenticateUserByEmail(
+              cliEmail,
+              context.locale,
+              logger,
+            );
+          }
+        }
+
+        // Fall back to public user
+        const leadId = await this.getLeadIdFromDb(
+          undefined,
+          context.locale,
+          logger,
+        );
+        return success(createPublicUser(leadId || ""));
+      }
+
+      // Verify token
+      const verifyResult = await this.verifyJwt(token, logger);
+      if (!verifyResult.success) {
+        logger.debug("Token verification failed");
+        await authHandler.clearAuthToken(logger);
+        const leadId = await this.getLeadIdFromDb(
+          undefined,
+          context.locale,
+          logger,
+        );
+        return success(createPublicUser(leadId || ""));
+      }
+
+      // For Next.js platforms (both page and API), validate session against database
+      if (
+        context.platform === Platform.NEXT_PAGE ||
+        context.platform === Platform.NEXT_API
+      ) {
+        const sessionValid = await this.validateWebSession(
+          token,
+          verifyResult.data.id,
+          context.locale,
+          logger,
+        );
+        if (!sessionValid) {
+          logger.debug("Session validation failed");
+          await authHandler.clearAuthToken(logger);
+          const leadId = await this.getLeadIdFromDb(
+            undefined,
+            context.locale,
+            logger,
+          );
+          return success(createPublicUser(leadId || ""));
+        }
+      }
+
+      // For public users, return directly (no roles to fetch)
+      if (verifyResult.data.isPublic) {
+        return success(verifyResult.data);
+      }
+
+      // For authenticated users, always refetch roles from database
+      // Never trust roles from JWT/cookies - they may be stale
+      const userRolesResponse = await userRolesRepository.findByUserId(
+        verifyResult.data.id,
+        logger,
+      );
+      const roles = userRolesResponse.success
+        ? userRolesResponse.data.map((r) => r.role)
+        : [UserPermissionRole.CUSTOMER];
+
+      // Construct JWT payload with fresh roles from database
+      const payload: JwtPrivatePayloadType = {
+        isPublic: false,
+        id: verifyResult.data.id,
+        leadId: verifyResult.data.leadId,
+        roles,
+      };
+
+      return success(payload);
+    } catch (error) {
+      logger.error("Authentication failed", parseError(error));
+      const leadId = await this.getLeadIdFromDb(
+        undefined,
+        context.locale,
+        logger,
+      );
+      return success(createPublicUser(leadId || ""));
+    }
+  }
+
+  /**
+   * Validate web session against database
+   */
+  private async validateWebSession(
+    token: string,
+    userId: string,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<boolean> {
+    try {
+      const sessionResult = await sessionRepository.findByToken(token);
+      if (!sessionResult.success) {
+        return false;
+      }
+
+      const session = sessionResult.data;
+      if (session.userId !== userId) {
+        logger.error("Session user ID mismatch", {
+          sessionUserId: session.userId,
+          expectedUserId: userId,
+        });
+        return false;
+      }
+
+      // Check if session is expired
+      if (session.expiresAt < new Date()) {
+        logger.debug("Session expired", { expiresAt: session.expiresAt });
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      logger.error("Session validation failed", parseError(error));
+      return false;
+    }
   }
 
   /**
    * Get current user with platform-aware handling
-   * Delegates to platform handlers for authentication
    */
   async getCurrentUser(
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
-    try {
-      // Locale is required
-      if (!context.locale) {
-        return fail({
-          message: "app.api.v1.core.user.auth.errors.missing_locale",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
+    const authResult = await this.authenticate(context, logger);
 
-      // Get platform-specific auth handler
-      const authHandler = getPlatformAuthHandler(context.platform);
-
-      // Authenticate using platform handler
-      const authResult = await authHandler.authenticate(context, logger);
-
-      if (!authResult.success) {
-        return fail({
-          message: "app.api.v1.core.user.auth.errors.authentication_failed",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-          messageParams: { error: authResult.message },
-          cause: authResult,
-        });
-      }
-
-      const jwtPayload = authResult.data;
-
-      // Ensure we have a private user (not public)
-      if (jwtPayload.isPublic) {
-        return fail({
-          message: "app.api.v1.core.user.auth.errors.user_not_authenticated",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-        });
-      }
-
-      return success(jwtPayload);
-    } catch (error) {
-      logger.error(
-        "app.api.v1.core.user.auth.debug.errorInUnifiedGetCurrentUser",
-        parseError(error),
-      );
+    if (!authResult.success || authResult.data.isPublic) {
       return fail({
-        message: "app.api.v1.core.user.auth.errors.session_retrieval_failed",
+        message: "app.api.v1.core.user.auth.errors.user_not_authenticated",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
-        messageParams: { error: parseError(error).message },
       });
     }
+
+    return success(authResult.data);
   }
 
   /**
@@ -914,11 +1080,7 @@ class AuthRepositoryImpl implements AuthRepository {
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     try {
-      // Get platform-specific auth handler
-      const authHandler = getPlatformAuthHandler(context.platform);
-
-      // Authenticate using platform handler
-      const authResult = await authHandler.authenticate(context, logger);
+      const authResult = await this.authenticate(context, logger);
 
       if (!authResult.success) {
         logger.error("Platform authentication failed", {
@@ -968,7 +1130,7 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.v1.core.user.auth.debug.errorInUnifiedGetAuthMinimalUser",
         parseError(error),
       );
-      const leadId = await authRepository.getLeadIdFromDb(
+      const leadId = await this.getLeadIdFromDb(
         undefined,
         context.locale,
         logger,
@@ -1194,10 +1356,29 @@ class AuthRepositoryImpl implements AuthRepository {
         logger,
       );
 
+      // Fetch user roles from DB to include in JWT
+      const rolesResult = await userRolesRepository.getUserRoles(
+        userId,
+        logger,
+      );
+
+      // Default to CUSTOMER role if roles fetch fails
+      const roles = rolesResult.success
+        ? rolesResult.data
+        : [UserPermissionRole.CUSTOMER];
+
+      if (!rolesResult.success) {
+        logger.warn(
+          "Failed to fetch user roles for CLI token, using default CUSTOMER role",
+          { userId },
+        );
+      }
+
       const payload: JwtPrivatePayloadType = {
         isPublic: false,
         id: userId,
         leadId: leadIdResult.leadId,
+        roles,
       };
 
       return await this.signJwt(payload, logger);
@@ -1362,10 +1543,20 @@ class AuthRepositoryImpl implements AuthRepository {
         });
       }
 
+      // Fetch user roles
+      const userRolesResponse = await userRolesRepository.findByUserId(
+        user.id,
+        logger,
+      );
+      const roles = userRolesResponse.success
+        ? userRolesResponse.data.map((r) => r.role)
+        : [UserPermissionRole.CUSTOMER];
+
       return success({
         isPublic: false,
         id: user.id,
         leadId,
+        roles,
       });
     } catch (error) {
       const parsedError = parseError(error);

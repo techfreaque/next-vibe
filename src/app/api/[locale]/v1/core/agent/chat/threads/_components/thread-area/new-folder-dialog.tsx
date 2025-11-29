@@ -16,13 +16,14 @@ import React, { useEffect, useState } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
+import type { IconKey, IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 
 import { FolderIconSelector } from "./folder-icon-selector";
 
 interface NewFolderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (name: string, icon: string) => void;
+  onSave: (name: string, icon: IconValue) => void;
   locale: CountryLanguage;
   /** Optional custom title translation key. If not provided, uses default "app.chat.newFolder.title" */
   titleKey?: TranslationKey;
@@ -37,7 +38,7 @@ export function NewFolderDialog({
 }: NewFolderDialogProps): JSX.Element {
   const { t } = simpleT(locale);
   const [name, setName] = useState("");
-  const [icon, setIcon] = useState("folder");
+  const [icon, setIcon] = useState<IconKey>("folder");
 
   // Reset state when dialog opens
   useEffect(() => {

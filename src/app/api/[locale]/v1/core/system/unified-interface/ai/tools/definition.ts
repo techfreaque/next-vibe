@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   responseField,
@@ -26,8 +26,8 @@ const aiToolMetadataSchema = z.object({
   description: z.string(),
   category: z.string().optional(),
   tags: z.array(z.string()),
-  endpointId: z.string(),
-  allowedRoles: z.array(z.string()),
+  toolName: z.string(),
+  allowedRoles: z.array(z.string()).readonly(),
   aliases: z.array(z.string()).optional(),
 });
 
@@ -57,7 +57,8 @@ const { GET } = createEndpoint({
         "app.api.v1.core.system.unifiedInterface.ai.tools.get.response.title" as const,
       description:
         "app.api.v1.core.system.unifiedInterface.ai.tools.get.response.description" as const,
-      layoutType: LayoutType.GRID, columns: 12,
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { response: true },
     {
@@ -158,3 +159,6 @@ export type AIToolsListRequestInput = typeof GET.types.RequestInput;
 export type AIToolsListRequestOutput = typeof GET.types.RequestOutput;
 export type AIToolsListResponseInput = typeof GET.types.ResponseInput;
 export type AIToolsListResponseOutput = typeof GET.types.ResponseOutput;
+
+// Inferred types for component use
+export type AIToolMetadataSerialized = AIToolsListResponseOutput["tools"][0];

@@ -93,6 +93,7 @@ export const translations = {
       emailClick: "Email Clicked",
       websiteVisit: "Website Visit",
       formSubmit: "Form Submission",
+      leadAttribution: "Lead Attribution",
     },
     leadStatus: {
       new: "New",

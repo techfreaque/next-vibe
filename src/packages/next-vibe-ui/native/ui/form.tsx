@@ -103,9 +103,9 @@ const useFormField = (): UseFormFieldReturn => {
   };
 };
 
-const FormItemContext = React.createContext<
-  FormItemContextValue | undefined
->(undefined);
+const FormItemContext = React.createContext<FormItemContextValue | undefined>(
+  undefined,
+);
 
 function FormItem({
   className,
@@ -113,7 +113,7 @@ function FormItem({
   children,
 }: FormItemProps): JSX.Element {
   const id = React.useId();
-  const viewClassName = cn("space-y-2", className);
+  const viewClassName = cn("space-y-1", className);
 
   return (
     <FormItemContext.Provider value={{ id }}>
@@ -129,11 +129,7 @@ function FormLabel({
   htmlFor: _htmlFor,
 }: LabelRootProps): JSX.Element {
   const { error, formItemId } = useFormField();
-  const labelClassName = cn(
-    "pb-1 pb-2 px-px",
-    error && "text-destructive",
-    className,
-  );
+  const labelClassName = cn("px-px", error && "text-destructive", className);
 
   return (
     <Label htmlFor={formItemId} className={labelClassName}>

@@ -38,18 +38,11 @@ export default async function ImapMessageDetailPage({
     `/${locale}/admin/emails/imap/messages/${id}`,
   );
 
-  // Extract JWT payload for repository call
-  const jwtUser = {
-    id: user.id,
-    leadId: user.leadId ?? user.id,
-    isPublic: false as const,
-  };
-
   // Fetch message data
   const logger = createEndpointLogger(false, Date.now(), locale);
   const messageResponse = await imapMessagesRepository.getMessageById(
     { id },
-    jwtUser,
+    user,
     locale,
     logger,
   );

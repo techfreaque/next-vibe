@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   requestDataField,
@@ -25,6 +25,7 @@ import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
  * Freshness options for search results
  */
 const FRESHNESS_OPTIONS = ["pd", "pw", "pm", "py"] as const;
+export const SEARCH_ALIAS = "search" as const;
 
 /**
  * GET /brave-search - Search the web
@@ -64,7 +65,7 @@ const { GET } = createEndpoint({
 
   fields: objectField(
     {
-      type: WidgetType.DATA_CARD,
+      type: WidgetType.CONTAINER,
       linkable: true,
       title:
         "app.api.v1.core.agent.chat.tools.braveSearch.get.form.title" as const,
@@ -86,7 +87,8 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.query.description" as const,
           placeholder:
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.query.placeholder" as const,
-          columns: 12},
+          columns: 12,
+        },
         z.string().min(1).max(400),
       ),
 
@@ -98,7 +100,8 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.maxResults.title" as const,
           description:
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.maxResults.description" as const,
-          columns: 6},
+          columns: 4,
+        },
         z.number().min(1).max(10).optional().default(5),
       ),
 
@@ -110,7 +113,8 @@ const { GET } = createEndpoint({
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.includeNews.title" as const,
           description:
             "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.includeNews.description" as const,
-          columns: 6},
+          columns: 4,
+        },
         z.boolean().optional().default(false),
       ),
 
@@ -144,25 +148,18 @@ const { GET } = createEndpoint({
                 "app.api.v1.core.agent.chat.tools.braveSearch.get.fields.freshness.options.year" as const,
             },
           ],
-          columns: 6},
+          columns: 4,
+        },
         z.enum(FRESHNESS_OPTIONS).optional(),
       ),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.agent.chat.tools.braveSearch.get.response.success.title" as const,
-        },
-        z.boolean(),
-      ),
-
       message: responseField(
         {
           type: WidgetType.TEXT,
           content:
             "app.api.v1.core.agent.chat.tools.braveSearch.get.response.message.title" as const,
+          columns: 12,
         },
         z.string(),
       ),
@@ -171,7 +168,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.LINK_LIST,
           layoutType: LayoutType.GRID,
-          columns: 1,
+          columns: 12,
         },
         objectField(
           {
@@ -225,24 +222,6 @@ const { GET } = createEndpoint({
             ),
           },
         ),
-      ),
-
-      cached: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.agent.chat.tools.braveSearch.get.response.cached.title" as const,
-        },
-        z.boolean().optional(),
-      ),
-
-      timestamp: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.v1.core.agent.chat.tools.braveSearch.get.response.timestamp.title" as const,
-        },
-        z.string().optional(),
       ),
     },
   ),
@@ -333,7 +312,6 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
-        success: true,
         message: "Found 5 results for: latest AI news",
         results: [
           {
@@ -345,11 +323,8 @@ const { GET } = createEndpoint({
             source: "TechNews",
           },
         ],
-        cached: false,
-        timestamp: "2024-01-15T10:30:00Z",
       },
       withNews: {
-        success: true,
         message: "Found 10 results for: breaking news today",
         results: [
           {
@@ -360,11 +335,8 @@ const { GET } = createEndpoint({
             source: "NewsSource",
           },
         ],
-        cached: false,
-        timestamp: "2024-01-15T10:30:00Z",
       },
       recent: {
-        success: true,
         message: "Found 5 results for: tech updates",
         results: [
           {
@@ -375,8 +347,6 @@ const { GET } = createEndpoint({
             source: "TechDaily",
           },
         ],
-        cached: false,
-        timestamp: "2024-01-15T10:30:00Z",
       },
     },
   },

@@ -178,7 +178,7 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
       totalCount: number;
     }>
   > {
-    logger?.error("getTransactions not implemented on native");
+    logger.error("getTransactions not implemented on native");
     void userId;
     void limit;
     void offset;

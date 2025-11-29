@@ -3,11 +3,7 @@ import "server-only";
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
-import type {
-  JwtPayloadType,
-  JwtPrivatePayloadType,
-} from "@/app/api/[locale]/v1/core/user/auth/types";
-import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../logger/endpoint";
@@ -61,64 +57,34 @@ export interface SessionData {
 
 /**
  * Base Authentication Handler
- * All platform-specific auth handlers must extend this class
+ * Platform-specific storage handlers ONLY
+ *
+ * ARCHITECTURE:
+ * - Platform handlers: ONLY handle storage (cookies, session files, AsyncStorage)
+ * - authRepository: Contains ALL authentication business logic
  *
  * Platform implementations:
  * - Web: Uses Next.js cookies for session storage
  * - CLI/MCP: Uses .vibe.session file for JWT storage
  * - Native: Uses AsyncStorage for session storage
  *
- * ARCHITECTURE NOTE:
- * This class should ONLY contain platform-specific infrastructure methods.
- * All business logic (user/lead management) has been moved to domain repositories:
- * - @/app/api/[locale]/v1/core/user/auth/helpers.ts
- * - @/app/api/[locale]/v1/core/user/auth/lead-manager.ts
- * - @/app/api/[locale]/v1/core/user/auth/validators.ts
- * - @/app/api/[locale]/v1/core/leads/auth/helpers.ts
+ * All business logic (user/lead management, token verification, authentication flows)
+ * is in @/app/api/[locale]/v1/core/user/auth/repository.ts
  */
 export abstract class BaseAuthHandler {
   /**
-   * Authenticate user based on context
-   * Each platform implements its own authentication logic
+   * Get authentication token from platform-specific storage
+   * Web: Reads from cookies and Authorization header
+   * CLI/MCP: Reads from .vibe.session file and Authorization header
+   * Native: Reads from AsyncStorage
    */
-  abstract authenticate(
+  abstract getStoredAuthToken(
     context: AuthContext,
     logger: EndpointLogger,
-  ): Promise<ResponseType<JwtPayloadType>>;
+  ): Promise<string | undefined>;
 
   /**
-   * Verify JWT token
-   * Platform-specific implementation (same JWT library, different storage)
-   */
-  abstract verifyToken(
-    token: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<JwtPrivatePayloadType>>;
-
-  /**
-   * Sign JWT token
-   * Platform-specific implementation (same JWT library, different storage)
-   */
-  abstract signToken(
-    payload: JwtPrivatePayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<string>>;
-
-  /**
-   * Validate session (platform-specific)
-   * Web: Validates against database sessions
-   * CLI/MCP: Validates JWT and checks .vibe.session file
-   * Native: Validates JWT and checks AsyncStorage
-   */
-  abstract validateSession(
-    token: string,
-    userId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<JwtPrivatePayloadType | null>;
-
-  /**
-   * Store authentication token (platform-specific)
+   * Store authentication token in platform-specific storage
    * Web: Sets HTTP-only cookies
    * CLI/MCP: Writes to .vibe.session file
    * Native: Writes to AsyncStorage
@@ -131,31 +97,10 @@ export abstract class BaseAuthHandler {
   ): Promise<ResponseType<void>>;
 
   /**
-   * Clear authentication token (platform-specific)
+   * Clear authentication token from platform-specific storage
    * Web: Clears cookies
    * CLI/MCP: Deletes .vibe.session file
    * Native: Clears AsyncStorage
    */
   abstract clearAuthToken(logger: EndpointLogger): Promise<ResponseType<void>>;
-
-  /**
-   * Get stored authentication token (platform-specific)
-   * Web: Reads from cookies
-   * CLI/MCP: Reads from .vibe.session file
-   * Native: Reads from AsyncStorage
-   */
-  abstract getStoredAuthToken(
-    logger: EndpointLogger,
-  ): Promise<string | undefined>;
-
-  /**
-   * Helper: Check if user has required roles
-   * Pure utility function for role checking
-   */
-  protected hasRequiredRoles(
-    userRoles: UserRoleValue[],
-    requiredRoles: readonly UserRoleValue[],
-  ): boolean {
-    return requiredRoles.some((role) => userRoles.includes(role));
-  }
 }

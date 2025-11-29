@@ -23,6 +23,19 @@ export const translations = {
           "Access denied for {{platform}} platform: {{reason}}",
         insufficientRoles:
           "Insufficient roles. User has: {{userRoles}}. Required: {{requiredRoles}}",
+        definitionError: "Endpoint definition error: {{error}}",
+      },
+    },
+    endpoints: {
+      definition: {
+        loader: {
+          errors: {
+            endpointNotFound: "Endpoint '{{identifier}}' not found",
+            loadFailed: "Failed to load endpoint '{{identifier}}': {{error}}",
+            batchLoadFailed:
+              "Batch load failed: {{failedCount}} of {{totalCount}} endpoints failed",
+          },
+        },
       },
     },
   },

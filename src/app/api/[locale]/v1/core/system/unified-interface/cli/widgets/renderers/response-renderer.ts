@@ -5,7 +5,7 @@
 
 import chalk from "chalk";
 
-import { getBaseFormatter } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/formatting/data";
+import { getBaseFormatter } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/widgets/utils/formatting";
 import {
   FieldDataType,
   WidgetType,
@@ -14,22 +14,21 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
+import type { UnifiedField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 
 import type {
   CLIRenderingOptions,
   DataFormatter,
-  RenderableValue,
-  ResponseContainerMetadata,
-  ResponseFieldMetadata,
   WidgetRenderContext,
-} from "./types";
-import type { WidgetRegistry } from "./widget-registry";
-import { defaultWidgetRegistry } from "./widget-registry";
+} from "../core/types";
+import type { WidgetRegistry } from "../core/registry";
+import { defaultWidgetRegistry } from "../core/registry";
+import type { WidgetData } from "../../../shared/widgets/types";
 
 /**
  * Data record type for response rendering
  */
-type DataRecord = Record<string, RenderableValue>;
+type DataRecord = Record<string, WidgetData>;
 
 /**
  * Modular CLI response renderer using widget system
@@ -60,7 +59,7 @@ export class ModularCLIResponseRenderer {
    */
   render(
     data: DataRecord,
-    metadata: ResponseContainerMetadata | ResponseFieldMetadata[],
+    fields: Array<[string, UnifiedField]>,
     locale: CountryLanguage,
   ): string {
     this.options.locale = locale;
@@ -74,70 +73,36 @@ export class ModularCLIResponseRenderer {
       getFieldIcon: (type) => this.getFieldIcon(type),
       renderEmptyState: (message) => this.renderEmptyState(message),
       getRenderer: (widgetType) => this.widgetRegistry.getRenderer(widgetType),
+      locale,
+      isInteractive: false,
+      permissions: [],
     };
 
-    if (Array.isArray(metadata)) {
-      return this.renderFields(data, metadata, context);
-    } else {
-      return this.renderContainer(data, metadata, context);
-    }
+    return this.renderFields(data, fields, context);
   }
 
-  /**
-   * Render a container with multiple fields
-   */
-  private renderContainer(
-    data: DataRecord,
-    container: ResponseContainerMetadata,
-    context: WidgetRenderContext,
-  ): string {
-    const result: string[] = [];
-
-    if (container.title) {
-      const title = context.t(container.title);
-      // eslint-disable-next-line i18next/no-literal-string
-      const titleIcon = "📋 ";
-      const titleWithIcon = titleIcon + title;
-      const styledTitle = this.styleText(titleWithIcon, "bold", context);
-      result.push(styledTitle);
-      result.push("");
-    }
-
-    if (container.description) {
-      const description = context.t(container.description);
-      result.push(`   ${description}`);
-      result.push("");
-    }
-
-    const fieldsOutput = this.renderFields(data, container.fields, context);
-    result.push(fieldsOutput);
-
-    return result.join("\n");
-  }
 
   /**
    * Render multiple fields
    */
   private renderFields(
     data: DataRecord,
-    fields: ResponseFieldMetadata[],
+    fields: Array<[string, UnifiedField]>,
     context: WidgetRenderContext,
   ): string {
     const result: string[] = [];
 
-    // If no metadata provided, auto-detect fields from data
+    // If no fields provided, auto-detect fields from data
     if (fields.length === 0 && data && typeof data === "object") {
       return this.renderAutoDetectedFields(data, context);
     }
 
-    for (const field of fields) {
-      const fieldValue = data[field.name];
-      const fieldWithValue: ResponseFieldMetadata = {
-        ...field,
-        value: fieldValue,
-      };
+    for (const [fieldName, field] of fields) {
+      const fieldValue = data[fieldName];
 
-      const renderedField = this.widgetRegistry.render(fieldWithValue, context);
+      // Create WidgetInput for the widget renderer
+      const widgetInput = { field, value: fieldValue, context };
+      const renderedField = this.widgetRegistry.render(widgetInput, context);
       result.push(renderedField);
     }
 
@@ -149,7 +114,7 @@ export class ModularCLIResponseRenderer {
    */
   private renderAutoDetectedFields(
     data: DataRecord,
-    context: WidgetRenderContext,
+    _context: WidgetRenderContext,
   ): string {
     const result: string[] = [];
 
@@ -165,31 +130,16 @@ export class ModularCLIResponseRenderer {
           continue; // Skip empty arrays
         }
 
-        // Check if this looks like a list of issues/errors
-        if (this.looksLikeIssuesList(value)) {
-          const field: ResponseFieldMetadata = {
-            name: key,
-            type: FieldDataType.ARRAY,
-            widgetType: WidgetType.GROUPED_LIST,
-            value: value as RenderableValue,
-            groupBy: "file",
-            sortBy: "severity",
-            showGroupSummary: true,
-          };
-          const rendered = this.widgetRegistry.render(field, context);
-          result.push(rendered);
-        } else {
-          // Generic array rendering - use formatted field name directly
-          const label = this.formatLabel(key);
-          const formattedArray = this.formatter.formatArray(value);
-          result.push(`${label}: ${formattedArray}`);
-        }
+        // Generic array rendering - use formatted field name directly
+        const label = this.formatLabel(key);
+        const formattedArray = this.formatter.formatArray(value);
+        result.push(`${label}: ${formattedArray}`);
       }
       // Handle objects
       else if (typeof value === "object") {
         const label = this.formatLabel(key);
         const formattedObject = this.formatter.formatObject(
-          value as Record<string, RenderableValue>,
+          value as Record<string, WidgetData>,
         );
         // eslint-disable-next-line i18next/no-literal-string
         result.push(`${label}:\n${formattedObject}`);
@@ -208,7 +158,7 @@ export class ModularCLIResponseRenderer {
   /**
    * Check if an array looks like a list of issues/errors
    */
-  private looksLikeIssuesList(arr: RenderableValue[]): boolean {
+  private looksLikeIssuesList(arr: WidgetData[]): boolean {
     if (arr.length === 0) {
       return false;
     }
@@ -248,7 +198,7 @@ export class ModularCLIResponseRenderer {
   /**
    * Format primitive values
    */
-  private formatPrimitiveValue(value: RenderableValue): string {
+  private formatPrimitiveValue(value: WidgetData): string {
     if (typeof value === "boolean") {
       return this.formatter.formatBoolean(value);
     }
@@ -262,9 +212,7 @@ export class ModularCLIResponseRenderer {
       return this.formatter.formatArray(value);
     }
     if (typeof value === "object" && value !== null) {
-      return this.formatter.formatObject(
-        value as Record<string, RenderableValue>,
-      );
+      return this.formatter.formatObject(value as Record<string, WidgetData>);
     }
     return "";
   }
@@ -273,8 +221,8 @@ export class ModularCLIResponseRenderer {
    * Format field value based on type and configuration
    */
   private formatFieldValue(
-    field: ResponseFieldMetadata,
-    value: RenderableValue,
+    field: UnifiedField,
+    value: WidgetData,
   ): string {
     if (value === null || value === undefined) {
       // eslint-disable-next-line i18next/no-literal-string
@@ -283,8 +231,10 @@ export class ModularCLIResponseRenderer {
       } as WidgetRenderContext);
     }
 
+    const fieldName = "name" in field ? field.name : undefined;
+
     // Special handling for duration fields
-    if (field.name === "duration" && typeof value === "number") {
+    if (fieldName === "duration" && typeof value === "number") {
       return this.formatter.formatDuration(value);
     }
 
@@ -293,37 +243,34 @@ export class ModularCLIResponseRenderer {
       return this.formatter.formatBoolean(value);
     }
 
-    switch (field.type) {
-      case FieldDataType.TEXT:
-        return this.formatter.formatText(String(value), {
-          maxLength:
-            typeof field.config?.maxLength === "number"
-              ? field.config.maxLength
-              : undefined,
-        });
-      case FieldDataType.NUMBER:
-        return this.formatter.formatNumber(Number(value), this.options.locale, {
-          precision: field.precision,
-          unit: field.unit,
-        });
-      case FieldDataType.BOOLEAN:
-        return this.formatter.formatBoolean(Boolean(value));
-      case FieldDataType.DATE:
-        return this.formatter.formatDate(String(value), this.options.locale);
-      case FieldDataType.ARRAY:
-        return this.formatter.formatArray(
-          Array.isArray(value) ? value : [value],
-          { maxItems: 5 },
-        );
-      case FieldDataType.OBJECT:
-        return this.formatter.formatObject(
-          typeof value === "object" && value !== null && !Array.isArray(value)
-            ? value
-            : {},
-        );
-      default:
-        return String(value);
+    // Handle based on actual value type since we don't have FieldDataType in UnifiedField
+    if (typeof value === "string") {
+      return this.formatter.formatText(value, {
+        maxLength:
+          field.ui.type === WidgetType.TEXT &&
+          typeof field.ui.maxLength === "number"
+            ? field.ui.maxLength
+            : undefined,
+      });
     }
+
+    if (typeof value === "number") {
+      return this.formatter.formatNumber(value, this.options.locale);
+    }
+
+    if (typeof value === "boolean") {
+      return this.formatter.formatBoolean(value);
+    }
+
+    if (Array.isArray(value)) {
+      return this.formatter.formatArray(value, { maxItems: 5 });
+    }
+
+    if (typeof value === "object" && value !== null) {
+      return this.formatter.formatObject(value as Record<string, WidgetData>);
+    }
+
+    return String(value);
   }
 
   /**
@@ -439,9 +386,9 @@ class DefaultDataFormatter implements DataFormatter {
   }
 
   /**
-   * Safely convert RenderableValue to string
+   * Safely convert WidgetData to string
    */
-  private safeItemToString(item: RenderableValue): string {
+  private safeItemToString(item: WidgetData): string {
     if (typeof item === "string") {
       return item;
     }
@@ -461,7 +408,7 @@ class DefaultDataFormatter implements DataFormatter {
   }
 
   formatArray(
-    value: RenderableValue[],
+    value: WidgetData[],
     options?: { separator?: string; maxItems?: number },
   ): string {
     const separator = options?.separator ?? ", ";
@@ -480,7 +427,7 @@ class DefaultDataFormatter implements DataFormatter {
     return formatted;
   }
 
-  formatObject(value: Record<string, RenderableValue>): string {
+  formatObject(value: Record<string, WidgetData>): string {
     try {
       return JSON.stringify(value, null, 2);
     } catch {

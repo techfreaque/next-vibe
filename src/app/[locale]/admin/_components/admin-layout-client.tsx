@@ -28,7 +28,7 @@ import { useState } from "react";
 
 import CountrySelector from "@/app/[locale]/_components/country-selector";
 import { ThemeToggle } from "@/app/[locale]/_components/theme-toggle";
-import type { CompleteUserType } from "@/app/api/[locale]/v1/core/user/types";
+import type { UserGetResponseOutput } from "@/app/api/[locale]/v1/core/users/user/[id]/definition";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -42,7 +42,7 @@ interface NavigationItem {
 interface AdminLayoutClientProps {
   children: ReactNode;
   locale: CountryLanguage;
-  user: CompleteUserType;
+  user: UserGetResponseOutput;
 }
 
 export function AdminLayoutClient({

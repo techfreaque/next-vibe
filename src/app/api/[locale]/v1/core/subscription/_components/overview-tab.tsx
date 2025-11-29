@@ -17,6 +17,7 @@ import {
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
+import { getIconComponent } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatPrice } from "./types";
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/v1/core/products/repository-client";
@@ -154,11 +155,10 @@ export function OverviewTab({
                     return (
                       <Div key={providerId}>
                         <H4 className="font-semibold mb-2 flex items-center gap-2">
-                          {typeof provider.icon === "string" ? (
-                            <Span>{provider.icon}</Span>
-                          ) : (
-                            <provider.icon className="h-5 w-5" />
-                          )}
+                          {((): JSX.Element => {
+                            const ProviderIcon = getIconComponent(provider.icon);
+                            return <ProviderIcon className="h-5 w-5" />;
+                          })()}
                           {provider.name}
                         </H4>
                         <Div className="grid grid-cols-2 gap-2 text-sm">

@@ -94,6 +94,7 @@ export const translations: typeof enTranslations = {
       emailClick: "E-Mail geklickt",
       websiteVisit: "Website-Besuch",
       formSubmit: "Formular abgeschickt",
+      leadAttribution: "Lead-Zuordnung",
     },
     leadStatus: {
       new: "Neu",

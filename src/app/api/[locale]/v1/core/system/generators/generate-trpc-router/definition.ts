@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   requestDataField,
@@ -77,21 +77,12 @@ const { POST } = createEndpoint({
         z
           .string()
           .optional()
-          .default("src/app/api/[locale]/trpc/[...trpc]/router.ts"),
+          .default(
+            "src/app/api/[locale]/v1/core/system/unified-interface/trpc/[...trpc]/router.ts",
+          ),
       ),
 
       includeWarnings: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.v1.core.system.dev.typecheck.title",
-          description: "app.api.v1.core.system.dev.typecheck.description",
-          columns: 4,
-        },
-        z.boolean().optional().default(false),
-      ),
-
-      verbose: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
@@ -228,32 +219,22 @@ const { POST } = createEndpoint({
         apiDir: "src/app/api",
         outputFile: "src/app/api/[locale]/trpc/[...trpc]/router.ts",
         includeWarnings: false,
-        verbose: false,
       },
       success: {
         apiDir: "src/app/api",
         outputFile: "src/app/api/[locale]/trpc/[...trpc]/router.ts",
         includeWarnings: false,
-        verbose: false,
-      },
-      verbose: {
-        apiDir: "src/app/api",
-        outputFile: "src/app/api/[locale]/trpc/[...trpc]/router.ts",
-        includeWarnings: true,
-        verbose: true,
       },
       custom: {
         apiDir: "custom/api",
         outputFile: "custom/trpc/router.ts",
         includeWarnings: false,
-        verbose: false,
         excludePatterns: ["test", "temp"],
       },
       withWarnings: {
         apiDir: "src/app/api",
         outputFile: "src/app/api/[locale]/trpc/[...trpc]/router.ts",
         includeWarnings: true,
-        verbose: false,
       },
     },
     responses: {
@@ -272,20 +253,6 @@ const { POST } = createEndpoint({
         },
       },
       success: {
-        success: true,
-        generationCompleted: true,
-        output:
-          "🔍 Scanning API routes for tRPC generation...\n📝 Generating tRPC router...\n✅ tRPC router generated successfully!",
-        generationStats: {
-          totalRoutes: 30,
-          validRoutes: 28,
-          invalidRoutes: 2,
-          routesWithWarnings: 1,
-          routerGenerated: true,
-          executionTimeMs: 2100,
-        },
-      },
-      verbose: {
         success: true,
         generationCompleted: true,
         output:

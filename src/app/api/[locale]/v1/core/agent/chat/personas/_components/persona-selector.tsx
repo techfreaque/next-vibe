@@ -6,7 +6,7 @@ import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
-import { type IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
+import { type IconKey, type IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
 import {
   DEFAULT_CATEGORIES,
   DEFAULT_PERSONAS,
@@ -52,7 +52,7 @@ export function PersonaSelector({
 }: PersonaSelectorProps): JSX.Element {
   const { handleModelChange: onModelChange } = useChatContext();
   const { t } = simpleT(locale);
-  const defaultIcon = t("app.chat.personaSelector.defaultIcon");
+  const defaultIcon: IconKey = "robot-face";
   const [personas, setPersonas] = useState<Persona[]>([...DEFAULT_PERSONAS]);
   const [categories, setCategories] = useState<PersonaCategory[]>([
     ...DEFAULT_CATEGORIES,
@@ -67,7 +67,7 @@ export function PersonaSelector({
   const [newPersona, setNewPersona] = useState<{
     name: string;
     description: string;
-    icon: string;
+    icon: IconKey;
     systemPrompt: string;
     category: PersonaCategoryId;
     suggestedPrompts: string[];
@@ -79,7 +79,10 @@ export function PersonaSelector({
     category: "general",
     suggestedPrompts: ["", "", "", ""],
   });
-  const [newCategory, setNewCategory] = useState({
+  const [newCategory, setNewCategory] = useState<{
+    name: string;
+    icon: IconKey;
+  }>({
     name: "",
     icon: defaultIcon,
   });
@@ -164,7 +167,7 @@ export function PersonaSelector({
     saveCustomCategories([...categories, category]);
     setNewCategory({
       name: "",
-      icon: t("app.chat.personaSelector.defaultIcon"),
+      icon: defaultIcon,
     });
     setAddCategoryOpen(false);
   };
@@ -226,19 +229,21 @@ export function PersonaSelector({
     };
     return {
       group: sourceLabels[persona.source],
-      groupIcon: sourceIcons[persona.source],
+      groupIcon: sourceIcons[persona.source] as IconValue,
     };
   };
-
-  // Build utility icons map for category grouping (for "utility" mode in SelectorBase)
-  const categoryUtilityIcons: Record<string, IconValue> = {};
-  categories.forEach((cat) => {
-    categoryUtilityIcons[cat.id] = cat.icon;
-  });
 
   // Convert personas to selector options
   const options: SelectorOption<string>[] = personas.map((persona) => {
     const sourceInfo = getSourceGroupInfo(persona);
+
+    // Build utility icons map for this persona's category
+    const category = categories.find((cat) => cat.id === persona.category);
+    const utilityIcons: Record<string, IconValue> = {};
+    if (category) {
+      utilityIcons[persona.category] = category.icon;
+    }
+
     return {
       id: persona.id,
       name: persona.name,
@@ -247,7 +252,7 @@ export function PersonaSelector({
       group: sourceInfo.group,
       groupIcon: sourceInfo.groupIcon,
       utilities: [persona.category], // Category as utility for "utility" mode
-      utilityIcons: categoryUtilityIcons,
+      utilityIcons,
     };
   });
 

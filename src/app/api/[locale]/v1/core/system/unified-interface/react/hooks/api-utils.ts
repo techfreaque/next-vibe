@@ -89,7 +89,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   endpointUrl: string,
   postBody: string | FormData | undefined,
   logger: EndpointLogger,
-): Promise<ResponseType<TEndpoint["TResponseOutput"]>> {
+): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
   try {
     // Prepare headers - don't set Content-Type for FormData (browser will set it with boundary)
     const headers: HeadersInit =
@@ -117,7 +117,9 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
       const storedToken = await authClientRepository.getAuthToken(logger);
       if (storedToken.success && storedToken.data) {
         headers.Authorization = `Bearer ${storedToken.data}`;
-        logger.debug("Added Authorization header for React Native authentication");
+        logger.debug(
+          "Added Authorization header for React Native authentication",
+        );
       }
     }
 
@@ -136,7 +138,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     // Make the API call
     const response = await fetch(endpointUrl, options);
     const json = (await response.json()) as ResponseType<
-      TEndpoint["TResponseOutput"]
+      TEndpoint["types"]["ResponseOutput"]
     >;
 
     // Handle API response

@@ -82,10 +82,12 @@ export const {
   LINEAR: "app.api.v1.core.agent.chat.enums.viewMode.linear",
   THREADED: "app.api.v1.core.agent.chat.enums.viewMode.threaded",
   FLAT: "app.api.v1.core.agent.chat.enums.viewMode.flat",
+  DEBUG: "app.api.v1.core.agent.chat.enums.viewMode.debug",
 });
 
 export const ViewModeDB = [
   ViewMode.LINEAR,
   ViewMode.THREADED,
   ViewMode.FLAT,
+  ViewMode.DEBUG,
 ] as const;
