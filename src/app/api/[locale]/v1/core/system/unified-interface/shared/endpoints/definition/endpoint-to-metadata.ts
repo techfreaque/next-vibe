@@ -5,29 +5,20 @@
  * Pure logic - no server dependencies
  */
 
-import { zodToJsonSchema } from "zod-to-json-schema";
-import type { z } from "zod";
-
-/**
- * JSON Schema type from zod-to-json-schema
- */
-type JsonSchema = ReturnType<typeof zodToJsonSchema>;
+import { z } from "zod";
 
 /**
  * Convert Zod schema to JSON Schema
- * zodToJsonSchema automatically handles transforms and refinements
+ * z.toJSONSchema automatically handles transforms and refinements
  */
-export function zodSchemaToJsonSchema(schema: z.ZodTypeAny): JsonSchema {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function zodSchemaToJsonSchema(schema: z.ZodTypeAny): any {
   try {
-    // zodToJsonSchema automatically strips transforms and refinements
+    // z.toJSONSchema automatically strips transforms and refinements
     // No manual stripping needed
-    return zodToJsonSchema(
-      schema as unknown as Parameters<typeof zodToJsonSchema>[0],
-      {
-        target: "jsonSchema7",
-        $refStrategy: "none",
-      },
-    );
+    return z.toJSONSchema(schema, {
+      target: "draft-7",
+    });
   } catch {
     return {
       type: "object",

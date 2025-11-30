@@ -73,7 +73,7 @@ export function endpointToMCPTool(endpoint: CreateApiEndpointAny): MCPTool {
   const zodSchema = generateInputSchema(endpoint);
 
   // Convert to JSON Schema using shared utility
-  // zodToJsonSchema automatically handles transforms
+  // z.toJSONSchema automatically handles transforms
   const jsonSchema = zodSchemaToJsonSchema(zodSchema);
 
   return {
