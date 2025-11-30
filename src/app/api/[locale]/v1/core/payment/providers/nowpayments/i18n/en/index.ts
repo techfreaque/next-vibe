@@ -1,6 +1,10 @@
+import { translations as cliTranslations } from "../../cli/i18n/en";
+
 export const translations = {
   name: "NOWPayments",
   description: "Cryptocurrency payment provider with subscription support",
+
+  cli: cliTranslations,
 
   errors: {
     userNotFound: {
@@ -26,6 +30,11 @@ export const translations = {
     invoiceCreationFailed: {
       title: "Invoice Creation Failed",
       description: "Failed to create NOWPayments invoice: {error}",
+    },
+    invalidApiKey: {
+      title: "Invalid API Key",
+      description:
+        "Invalid NOWPayments API key. Please check your configuration and ensure you have a valid API key from https://nowpayments.io/app/dashboard",
     },
     planCreationFailed: {
       title: "Plan Creation Failed",

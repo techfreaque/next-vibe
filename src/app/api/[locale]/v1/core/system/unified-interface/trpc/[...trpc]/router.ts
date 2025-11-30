@@ -94,28 +94,29 @@ import { tools as route81Tools } from '../../../../subscription/route';
 import { tools as route82Tools } from '../../../../payment/portal/route';
 import { tools as route83Tools } from '../../../../payment/invoice/route';
 import { tools as route84Tools } from '../../../../payment/providers/stripe/cli/route';
-import { tools as route85Tools } from '../../../../payment/checkout/route';
-import { tools as route86Tools } from '../../../../payment/refund/route';
-import { tools as route87Tools } from '../../../../credits/history/route';
-import { tools as route88Tools } from '../../../../credits/purchase/route';
-import { tools as route89Tools } from '../../../../contact/route';
-import { tools as route90Tools } from '../../../../emails/smtp-client/list/route';
-import { tools as route91Tools } from '../../../../emails/smtp-client/edit/[id]/route';
-import { tools as route92Tools } from '../../../../emails/smtp-client/create/route';
-import { tools as route93Tools } from '../../../../emails/send/route';
-import { tools as route94Tools } from '../../../../emails/messages/[id]/route';
-import { tools as route95Tools } from '../../../../emails/imap-client/messages/[id]/route';
-import { tools as route96Tools } from '../../../../emails/imap-client/folders/list/route';
-import { tools as route97Tools } from '../../../../emails/imap-client/folders/sync/route';
-import { tools as route98Tools } from '../../../../emails/imap-client/config/route';
-import { tools as route99Tools } from '../../../../emails/imap-client/health/route';
-import { tools as route100Tools } from '../../../../emails/imap-client/sync/route';
-import { tools as route101Tools } from '../../../../emails/imap-client/accounts/[id]/route';
-import { tools as route102Tools } from '../../../../import/route';
-import { tools as route103Tools } from '../../../../newsletter/unsubscribe/route';
-import { tools as route104Tools } from '../../../../newsletter/subscribe/route';
-import { tools as route105Tools } from '../../../../newsletter/status/route';
-import { tools as route106Tools } from '../../../../browser/route';
+import { tools as route85Tools } from '../../../../payment/providers/nowpayments/cli/route';
+import { tools as route86Tools } from '../../../../payment/checkout/route';
+import { tools as route87Tools } from '../../../../payment/refund/route';
+import { tools as route88Tools } from '../../../../credits/history/route';
+import { tools as route89Tools } from '../../../../credits/purchase/route';
+import { tools as route90Tools } from '../../../../contact/route';
+import { tools as route91Tools } from '../../../../emails/smtp-client/list/route';
+import { tools as route92Tools } from '../../../../emails/smtp-client/edit/[id]/route';
+import { tools as route93Tools } from '../../../../emails/smtp-client/create/route';
+import { tools as route94Tools } from '../../../../emails/send/route';
+import { tools as route95Tools } from '../../../../emails/messages/[id]/route';
+import { tools as route96Tools } from '../../../../emails/imap-client/messages/[id]/route';
+import { tools as route97Tools } from '../../../../emails/imap-client/folders/list/route';
+import { tools as route98Tools } from '../../../../emails/imap-client/folders/sync/route';
+import { tools as route99Tools } from '../../../../emails/imap-client/config/route';
+import { tools as route100Tools } from '../../../../emails/imap-client/health/route';
+import { tools as route101Tools } from '../../../../emails/imap-client/sync/route';
+import { tools as route102Tools } from '../../../../emails/imap-client/accounts/[id]/route';
+import { tools as route103Tools } from '../../../../import/route';
+import { tools as route104Tools } from '../../../../newsletter/unsubscribe/route';
+import { tools as route105Tools } from '../../../../newsletter/subscribe/route';
+import { tools as route106Tools } from '../../../../newsletter/status/route';
+import { tools as route107Tools } from '../../../../browser/route';
 
 const route0 = wrapToolsForTRPC(route0Tools);
 const route1 = wrapToolsForTRPC(route1Tools);
@@ -224,6 +225,7 @@ const route103 = wrapToolsForTRPC(route103Tools);
 const route104 = wrapToolsForTRPC(route104Tools);
 const route105 = wrapToolsForTRPC(route105Tools);
 const route106 = wrapToolsForTRPC(route106Tools);
+const route107 = wrapToolsForTRPC(route107Tools);
 
 export const appRouter = router({
   v1: router({
@@ -380,42 +382,45 @@ export const appRouter = router({
           stripe: router({
             cli: router({ ...route84 }),
           }),
+          nowpayments: router({
+            cli: router({ ...route85 }),
+          }),
         }),
-        checkout: router({ ...route85 }),
-        refund: router({ ...route86 }),
+        checkout: router({ ...route86 }),
+        refund: router({ ...route87 }),
       }),
       credits: router({
-        history: router({ ...route87 }),
-        purchase: router({ ...route88 }),
+        history: router({ ...route88 }),
+        purchase: router({ ...route89 }),
       }),
-      contact: router({ ...route89 }),
+      contact: router({ ...route90 }),
       emails: router({
         "smtp-client": router({
-          list: router({ ...route90 }),
-          edit: router({ ...route91 }),
-          create: router({ ...route92 }),
+          list: router({ ...route91 }),
+          edit: router({ ...route92 }),
+          create: router({ ...route93 }),
         }),
-        send: router({ ...route93 }),
-        messages: router({ ...route94 }),
+        send: router({ ...route94 }),
+        messages: router({ ...route95 }),
         "imap-client": router({
-          messages: router({ ...route95 }),
+          messages: router({ ...route96 }),
           folders: router({
-            list: router({ ...route96 }),
-            sync: router({ ...route97 }),
+            list: router({ ...route97 }),
+            sync: router({ ...route98 }),
           }),
-          config: router({ ...route98 }),
-          health: router({ ...route99 }),
-          sync: router({ ...route100 }),
-          accounts: router({ ...route101 }),
+          config: router({ ...route99 }),
+          health: router({ ...route100 }),
+          sync: router({ ...route101 }),
+          accounts: router({ ...route102 }),
         }),
       }),
-      import: router({ ...route102 }),
+      import: router({ ...route103 }),
       newsletter: router({
-        unsubscribe: router({ ...route103 }),
-        subscribe: router({ ...route104 }),
-        status: router({ ...route105 }),
+        unsubscribe: router({ ...route104 }),
+        subscribe: router({ ...route105 }),
+        status: router({ ...route106 }),
       }),
-      browser: router({ ...route106 }),
+      browser: router({ ...route107 }),
     }),
   }),
 });

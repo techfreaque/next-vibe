@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
       freeReset: "Kostenlose Zurücksetzung",
       refund: "Rückerstattung",
       transfer: "Übertragung",
+      otherDevices: "Verbrauch von anderen Geräten",
     },
   },
   expire: {
@@ -51,8 +52,7 @@ export const translations: typeof enTranslations = {
     mergeFailed: "Fehler beim Zusammenführen der Lead-Credits",
     mergeLeadWalletsFailed:
       "Fehler beim Zusammenführen der Lead-Wallets mit dem Benutzerkonto",
-    cleanupOrphanedFailed:
-      "Fehler beim Bereinigen verwaister Lead-Wallets",
+    cleanupOrphanedFailed: "Fehler beim Bereinigen verwaister Lead-Wallets",
     monthlyResetFailed: "Fehler beim monatlichen Zurücksetzen der Credits",
     noLeadsToMerge: "Keine Leads zum Zusammenführen vorhanden",
     oldestLeadNotFound: "Ältester Lead im Cluster nicht gefunden",

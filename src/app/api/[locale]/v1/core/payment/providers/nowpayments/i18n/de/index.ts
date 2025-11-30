@@ -1,6 +1,11 @@
-export const translations = {
+import { translations as cliTranslations } from "../../cli/i18n/de";
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   name: "NOWPayments",
   description: "Kryptowährungs-Zahlungsanbieter mit Abo-Unterstützung",
+
+  cli: cliTranslations,
 
   errors: {
     userNotFound: {
@@ -28,6 +33,11 @@ export const translations = {
     invoiceCreationFailed: {
       title: "Rechnungserstellung fehlgeschlagen",
       description: "NOWPayments-Rechnung konnte nicht erstellt werden: {error}",
+    },
+    invalidApiKey: {
+      title: "Ungültiger API-Schlüssel",
+      description:
+        "Ungültiger NOWPayments API-Schlüssel. Bitte überprüfen Sie Ihre Konfiguration und stellen Sie sicher, dass Sie einen gültigen API-Schlüssel von https://nowpayments.io/app/dashboard haben",
     },
     planCreationFailed: {
       title: "Plan-Erstellung fehlgeschlagen",

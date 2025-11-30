@@ -19,6 +19,7 @@ export const translations = {
       freeReset: "Free Reset",
       refund: "Refund",
       transfer: "Transfer",
+      otherDevices: "Spending from other devices",
     },
   },
   expire: {

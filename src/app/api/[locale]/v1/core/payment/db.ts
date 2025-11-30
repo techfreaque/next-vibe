@@ -154,6 +154,7 @@ export const paymentInvoices = pgTable("payment_invoices", {
   invoicePdf: text("invoice_pdf"),
   dueDate: timestamp("due_date"),
   paidAt: timestamp("paid_at"),
+  callbackToken: text("callback_token").unique(),
   metadata: jsonb("metadata"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

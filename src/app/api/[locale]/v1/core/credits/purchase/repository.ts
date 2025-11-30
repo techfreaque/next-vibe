@@ -3,6 +3,10 @@
  * Handles payment provider checkout session creation for credit packs
  */
 
+import "server-only";
+
+import { randomBytes } from "node:crypto";
+
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
@@ -41,6 +45,14 @@ export interface CreditPurchaseRepository {
  * Credit Purchase Repository Implementation
  */
 export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
+  /**
+   * Generate a secure callback token for payment redirects
+   */
+  private generateCallbackToken(): string {
+    // Generate a secure random token (32 bytes = 64 hex characters)
+    return randomBytes(32).toString("hex");
+  }
+
   /**
    * Create a payment provider checkout session for credit pack purchase
    */
@@ -163,6 +175,9 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
       const totalAmount = product.price * data.quantity;
       const totalCredits = product.credits * data.quantity;
 
+      // Generate secure callback token for redirect verification
+      const callbackToken = this.generateCallbackToken();
+
       // Create checkout session using provider abstraction
       // Note: We calculate total on our side and send as single line item to Stripe
       logger.debug("About to create checkout session", {
@@ -183,8 +198,8 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
           interval: "one_time",
           country,
           locale,
-          successUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?payment=success&type=credits&session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?payment=canceled&type=credits`,
+          successUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?payment=success&type=credits&token=${callbackToken}`,
+          cancelUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?payment=canceled&type=credits&token=${callbackToken}`,
           metadata: {
             userId,
             type: "credit_pack",
@@ -196,6 +211,7 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
         },
         customer.customerId,
         logger,
+        callbackToken,
       );
 
       logger.debug("Checkout session result", {

@@ -99,6 +99,7 @@ export interface PaymentProvider {
     params: CheckoutSessionParams,
     customerId: string,
     logger: EndpointLogger,
+    callbackToken: string,
   ): Promise<ResponseType<CheckoutSessionResult>>;
 
   verifyWebhook(

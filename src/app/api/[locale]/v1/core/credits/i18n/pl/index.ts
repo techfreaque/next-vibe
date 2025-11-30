@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
       freeReset: "Darmowe odnowienie",
       refund: "Zwrot",
       transfer: "Transfer",
+      otherDevices: "Wydatki z innych urządzeń",
     },
   },
   expire: {

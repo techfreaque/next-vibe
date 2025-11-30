@@ -22,6 +22,8 @@ import { env } from "@/config/env";
 import { productsRepository } from "@/app/api/[locale]/v1/core/products/repository-client";
 
 import { users } from "../../../user/db";
+import { paymentInvoices } from "../../db";
+import { InvoiceStatus } from "../../enum";
 import type {
   CheckoutSessionParams,
   CheckoutSessionResult,
@@ -152,11 +154,11 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
   /**
    * Get authentication headers for NOWPayments API
-   * Uses Authorization: Bearer header for authentication
+   * Uses x-api-key header for authentication
    */
   private getAuthHeaders(): Record<string, string> {
     return {
-      Authorization: `Bearer ${this.apiKey}`,
+      "x-api-key": this.apiKey,
     };
   }
 
@@ -216,6 +218,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
     params: CheckoutSessionParams,
     customerId: string,
     logger: EndpointLogger,
+    callbackToken: string,
   ): Promise<ResponseType<CheckoutSessionResult>> {
     try {
       logger.debug("Creating NOWPayments checkout session", {
@@ -268,7 +271,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       }
 
       // Handle one-time payments
-      return this.createOneTimeCheckout(params, product, logger);
+      return this.createOneTimeCheckout(params, product, logger, callbackToken);
     } catch (error) {
       logger.error("Failed to create NOWPayments checkout session", {
         error: parseError(error),
@@ -290,17 +293,28 @@ export class NOWPaymentsProvider implements PaymentProvider {
     params: CheckoutSessionParams,
     product: { price: number; currency: string; credits: number },
     logger: EndpointLogger,
+    callbackToken: string,
   ): Promise<ResponseType<CheckoutSessionResult>> {
+    // Get quantity from metadata (defaults to 1 if not provided)
+    const quantity = parseInt(params.metadata.quantity || "1", 10);
+    const totalAmount = product.price * quantity;
+    const totalCredits = product.credits * quantity;
+
     const invoiceData = {
-      price_amount: product.price,
+      price_amount: totalAmount,
       price_currency: product.currency,
       order_id: `${params.userId}_${Date.now()}`,
-      order_description: `${params.productId} - ${product.credits} credits`,
+      order_description: `${params.productId} - ${totalCredits} credits`,
       ipn_callback_url: `${env.NEXT_PUBLIC_APP_URL}/api/${params.locale}/v1/core/payment/providers/nowpayments/webhook`,
       success_url: params.successUrl,
       cancel_url: params.cancelUrl,
       is_fee_paid_by_user: true,
     };
+
+    logger.info("Creating NOWPayments invoice with data", {
+      invoiceData,
+      apiUrl: this.apiUrl,
+    });
 
     const response = await fetch(`${this.apiUrl}/invoice`, {
       method: "POST",
@@ -313,11 +327,36 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
     if (!response.ok) {
       const errorText = await response.text();
+
+      // Parse error response
+      let errorDetails: { code?: string; message?: string } = {};
+      try {
+        errorDetails = JSON.parse(errorText);
+      } catch {
+        // If parsing fails, use raw error text
+        errorDetails = { message: errorText };
+      }
+
       logger.error("NOWPayments API error", {
         status: response.status,
         statusText: response.statusText,
         error: errorText,
+        errorCode: errorDetails.code,
+        errorMessage: errorDetails.message,
       });
+
+      // Provide specific error messages for common issues
+      if (errorDetails.code === "INVALID_API_KEY" || response.status === 403) {
+        return fail({
+          message:
+            "app.api.v1.core.payment.providers.nowpayments.errors.invalidApiKey.title",
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          messageParams: {
+            error:
+              "Invalid NOWPayments API key. Please check your NOWPAYMENTS_API_KEY environment variable and ensure it's valid. Visit https://nowpayments.io/app/dashboard to get your API key.",
+          },
+        });
+      }
       return fail({
         message:
           "app.api.v1.core.payment.providers.nowpayments.errors.invoiceCreationFailed.title",
@@ -328,13 +367,35 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
     const invoice: NOWPaymentsInvoiceResponse = await response.json();
 
-    logger.debug("Created NOWPayments invoice", {
-      invoiceId: invoice.id,
-      orderId: invoice.order_id,
-      userId: params.userId,
-      amount: invoice.price_amount,
-      currency: invoice.price_currency,
-    });
+    logger.debug("Created NOWPayments invoice - FULL RESPONSE");
+
+    // Store invoice in database with callback token
+    if (callbackToken) {
+      try {
+        await db.insert(paymentInvoices).values({
+          userId: params.userId,
+          providerInvoiceId: invoice.id,
+          amount: totalAmount.toString(),
+          currency: product.currency,
+          status: InvoiceStatus.DRAFT,
+          invoiceUrl: invoice.invoice_url,
+          callbackToken,
+          metadata: params.metadata,
+        });
+
+        logger.debug("Stored invoice in database", {
+          invoiceId: invoice.id,
+          userId: params.userId,
+          callbackToken: callbackToken.substring(0, 8),
+        });
+      } catch (dbError) {
+        logger.error("Failed to store invoice in database", {
+          error: parseError(dbError),
+          invoiceId: invoice.id,
+        });
+        // Continue anyway - webhook can still process the payment
+      }
+    }
 
     return success<CheckoutSessionResult>({
       sessionId: invoice.id,
@@ -526,20 +587,52 @@ export class NOWPaymentsProvider implements PaymentProvider {
         ? "subscription"
         : "credit_pack";
 
+      // Retrieve stored invoice metadata from database
+      let storedMetadata: Record<string, string> = {};
+      if (payload.invoice_id) {
+        try {
+          const [invoice] = await db
+            .select()
+            .from(paymentInvoices)
+            .where(eq(paymentInvoices.providerInvoiceId, payload.invoice_id))
+            .limit(1);
+
+          if (invoice?.metadata && typeof invoice.metadata === "object") {
+            storedMetadata = Object.fromEntries(
+              Object.entries(invoice.metadata).map(([k, v]) => [k, String(v)]),
+            );
+            logger.debug("Retrieved stored invoice metadata", {
+              invoiceId: payload.invoice_id,
+              metadata: storedMetadata,
+            });
+          }
+        } catch (dbError) {
+          logger.error("Failed to retrieve invoice metadata", {
+            error: parseError(dbError),
+            invoiceId: payload.invoice_id,
+          });
+          // Continue without stored metadata
+        }
+      }
+
+      // Merge webhook payload metadata with stored metadata
+      const mergedMetadata = {
+        ...storedMetadata, // Stored metadata (includes quantity, totalCredits, etc.)
+        userId: payload.order_id.split("_")[0], // Extract userId from order_id
+        orderId: payload.order_id,
+        paymentId: payload.payment_id,
+        subscriptionId: payload.subscription_id?.toString(),
+        subscriptionPlanId: payload.subscription_plan_id?.toString(),
+        type: paymentType,
+      };
+
       // Return standardized webhook event
       return success<WebhookEvent>({
         id: payload.payment_id,
         type: eventType,
         data: {
           id: payload.invoice_id || payload.payment_id,
-          metadata: {
-            userId: payload.order_id.split("_")[0], // Extract userId from order_id
-            orderId: payload.order_id,
-            paymentId: payload.payment_id,
-            subscriptionId: payload.subscription_id?.toString(),
-            subscriptionPlanId: payload.subscription_plan_id?.toString(),
-            type: paymentType,
-          },
+          metadata: mergedMetadata,
           customer: payload.order_id.split("_")[0],
           amount_total: Math.round(payload.price_amount * 100), // Convert to cents
         },

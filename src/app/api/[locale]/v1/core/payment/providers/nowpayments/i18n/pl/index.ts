@@ -1,6 +1,11 @@
-export const translations = {
+import { translations as cliTranslations } from "../../cli/i18n/pl";
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   name: "NOWPayments",
   description: "Dostawca płatności kryptowalutowych z obsługą subskrypcji",
+
+  cli: cliTranslations,
 
   errors: {
     userNotFound: {
@@ -26,6 +31,11 @@ export const translations = {
     invoiceCreationFailed: {
       title: "Tworzenie faktury nie powiodło się",
       description: "Nie udało się utworzyć faktury NOWPayments: {error}",
+    },
+    invalidApiKey: {
+      title: "Nieprawidłowy klucz API",
+      description:
+        "Nieprawidłowy klucz API NOWPayments. Sprawdź swoją konfigurację i upewnij się, że masz prawidłowy klucz API z https://nowpayments.io/app/dashboard",
     },
     planCreationFailed: {
       title: "Tworzenie planu nie powiodło się",

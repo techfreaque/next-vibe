@@ -1,0 +1,2 @@
+ALTER TABLE "payment_invoices" ADD COLUMN "callback_token" text;--> statement-breakpoint
+ALTER TABLE "payment_invoices" ADD CONSTRAINT "payment_invoices_callback_token_unique" UNIQUE("callback_token");

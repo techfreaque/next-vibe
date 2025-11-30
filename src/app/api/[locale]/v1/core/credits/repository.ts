@@ -535,17 +535,14 @@ class CreditRepository implements CreditRepositoryInterface {
             })
             .where(eq(creditWallets.id, wallet.id));
 
-          // Update FREE_GRANT/FREE_RESET transaction timestamps to oldest period
+          // Update FREE_GRANT transaction timestamps to oldest period
           await tx
             .update(creditTransactions)
             .set({ createdAt: oldestPeriodStart })
             .where(
               and(
                 eq(creditTransactions.walletId, wallet.id),
-                or(
-                  eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
-                  eq(creditTransactions.type, CreditTransactionType.FREE_RESET),
-                ),
+                eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
                 eq(creditTransactions.freePeriodId, periodId),
               ),
             );
@@ -574,7 +571,7 @@ class CreditRepository implements CreditRepositoryInterface {
             .set({ freeCreditsRemaining: targetCredits, updatedAt: new Date() })
             .where(eq(creditWallets.id, targetWallet.id));
 
-          // Zero out other wallets and record deduction
+          // Zero out other wallets (no transaction needed)
           for (const wallet of allWallets.filter(
             (w) => w.id !== targetWallet.id,
           )) {
@@ -583,20 +580,6 @@ class CreditRepository implements CreditRepositoryInterface {
                 .update(creditWallets)
                 .set({ freeCreditsRemaining: 0, updatedAt: new Date() })
                 .where(eq(creditWallets.id, wallet.id));
-
-              // Record deduction transaction
-              await tx.insert(creditTransactions).values({
-                walletId: wallet.id,
-                amount: -wallet.freeCreditsRemaining,
-                balanceAfter: wallet.balance,
-                type: CreditTransactionType.FREE_RESET,
-                freePeriodId: periodId,
-                metadata: {
-                  previousFreeCredits: wallet.freeCreditsRemaining,
-                  newFreeCredits: 0,
-                  daysSinceLastReset: 0,
-                },
-              });
             }
           }
         }
@@ -642,7 +625,7 @@ class CreditRepository implements CreditRepositoryInterface {
     const now = new Date();
 
     for (const wallet of allWallets) {
-      // Sum free credits
+      // Sum free credits directly from wallet
       totalFree += wallet.freeCreditsRemaining;
 
       // Sum pack credits
@@ -901,6 +884,9 @@ class CreditRepository implements CreditRepositoryInterface {
   /**
    * Check and reset monthly free credits for entire pool (pool-aware)
    * Per spec: "When any wallet in pool hits new month: Reset entire pool to 20 total free credits"
+   *
+   * CRITICAL: Only reset when moving to a NEW period (future month), not when syncing old periods
+   * This prevents resetting credits that were already spent in the current period
    */
   private async ensureMonthlyFreeCreditsForPool(
     pool: CreditPool,
@@ -917,18 +903,63 @@ class CreditRepository implements CreditRepositoryInterface {
       return;
     }
 
-    // Check if ANY wallet in pool needs reset (different period)
-    const needsReset = allWallets.some(
-      (w) => w.freePeriodId !== currentPeriodId,
+    // Find the wallet with the most recent reset (newest freePeriodStart)
+    const mostRecentlyResetWallet = allWallets.reduce((newest, current) =>
+      current.freePeriodStart > newest.freePeriodStart ? current : newest,
     );
 
-    if (!needsReset) {
-      return; // All wallets are current
+    // Check if the most recent reset was in a PREVIOUS calendar month
+    const lastResetDate = new Date(mostRecentlyResetWallet.freePeriodStart);
+    const lastResetMonth = lastResetDate.getMonth();
+    const lastResetYear = lastResetDate.getFullYear();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Only reset if we're in a different calendar month than the last reset
+    const isNewMonth =
+      currentYear > lastResetYear ||
+      (currentYear === lastResetYear && currentMonth > lastResetMonth);
+
+    if (!isNewMonth) {
+      // We're still in the same calendar month as the last reset - no reset needed
+      // Just sync old wallets to current period without changing credits
+      const walletsToSync = allWallets.filter(
+        (w) => w.freePeriodId !== currentPeriodId,
+      );
+
+      if (walletsToSync.length > 0) {
+        logger.debug("Syncing old wallet periods without resetting credits", {
+          poolId: pool.poolId,
+          currentPeriodId,
+          lastResetDate: lastResetDate.toISOString(),
+          walletsToSync: walletsToSync.length,
+        });
+
+        await withTransaction(logger, async (tx) => {
+          for (const wallet of walletsToSync) {
+            // Just update period ID, don't touch freeCreditsRemaining
+            await tx
+              .update(creditWallets)
+              .set({
+                freePeriodStart: mostRecentlyResetWallet.freePeriodStart,
+                freePeriodId: currentPeriodId,
+                updatedAt: now,
+              })
+              .where(eq(creditWallets.id, wallet.id));
+          }
+        });
+      }
+      return;
     }
 
-    logger.info("Pool needs monthly free credits reset", {
+    // We're in a NEW month - perform full reset
+    logger.info("Pool needs monthly free credits reset (new month detected)", {
       poolId: pool.poolId,
       currentPeriodId,
+      lastResetDate: lastResetDate.toISOString(),
+      daysSinceLastReset: Math.floor(
+        (now.getTime() - lastResetDate.getTime()) / (1000 * 60 * 60 * 24),
+      ),
       walletCount: allWallets.length,
     });
 
@@ -952,7 +983,6 @@ class CreditRepository implements CreditRepositoryInterface {
       // Reset all wallets in pool
       for (const wallet of allWallets) {
         const isTarget = wallet.id === targetWallet.id;
-        const previousFree = wallet.freeCreditsRemaining;
         const newFree = isTarget ? freeCredits : 0;
 
         // Update wallet
@@ -966,22 +996,20 @@ class CreditRepository implements CreditRepositoryInterface {
           })
           .where(eq(creditWallets.id, wallet.id));
 
-        // Create FREE_RESET transaction
-        await tx.insert(creditTransactions).values({
-          walletId: wallet.id,
-          amount: newFree - previousFree,
-          balanceAfter: wallet.balance,
-          type: CreditTransactionType.FREE_RESET,
-          freePeriodId: currentPeriodId,
-          metadata: {
-            previousFreeCredits: previousFree,
-            newFreeCredits: newFree,
-            daysSinceLastReset: Math.floor(
-              (now.getTime() - new Date(wallet.freePeriodStart).getTime()) /
-                (1000 * 60 * 60 * 24),
-            ),
-          },
-        });
+        // Create FREE_GRANT transaction only for target wallet
+        if (isTarget && newFree > 0) {
+          await tx.insert(creditTransactions).values({
+            walletId: wallet.id,
+            amount: newFree,
+            balanceAfter: wallet.balance,
+            type: CreditTransactionType.FREE_GRANT,
+            freePeriodId: currentPeriodId,
+            metadata: {
+              reason: "initial_grant",
+              freeCreditsRemaining: newFree,
+            },
+          });
+        }
       }
 
       logger.info("Pool monthly free credits reset complete", {
@@ -1805,8 +1833,7 @@ class CreditRepository implements CreditRepositoryInterface {
 
   /**
    * Get transactions by lead ID
-   * Pool-based: Fetches from ONLY lead wallets (no user wallet)
-   * This ensures public/logged-out users only see lead transactions
+   * Shows only current lead wallet's transactions + summary of other devices' spending
    */
   async getTransactionsByLeadId(
     leadId: string,
@@ -1821,7 +1848,6 @@ class CreditRepository implements CreditRepositoryInterface {
   > {
     try {
       // Get lead pool (lead wallets only, no user wallet)
-      // This ensures logged-out users don't see authenticated user's transactions
       const poolResult = await this.getLeadPoolOnly(leadId, logger);
       if (!poolResult.success) {
         return poolResult;
@@ -1831,21 +1857,25 @@ class CreditRepository implements CreditRepositoryInterface {
       const allWallets = [pool.userWallet, ...pool.leadWallets].filter(
         (w): w is CreditWallet => w !== null,
       );
-      const walletIds = allWallets.map((w) => w.id);
 
-      // Handle edge case: no wallets in pool (shouldn't happen but safeguard)
-      if (walletIds.length === 0) {
+      // Find current lead's wallet
+      const currentWallet = allWallets.find((w) => w.leadId === leadId);
+      if (!currentWallet) {
         return success({
           transactions: [],
           totalCount: 0,
         });
       }
 
-      // Fetch transactions from ALL wallets in pool
+      // Get current period
+      const now = new Date();
+      const currentPeriodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+      // Fetch transactions from ONLY current wallet
       const transactions = await db
         .select()
         .from(creditTransactions)
-        .where(inArray(creditTransactions.walletId, walletIds))
+        .where(eq(creditTransactions.walletId, currentWallet.id))
         .orderBy(desc(creditTransactions.createdAt))
         .limit(limit)
         .offset(offset);
@@ -1853,19 +1883,57 @@ class CreditRepository implements CreditRepositoryInterface {
       const [{ count }] = await db
         .select({ count: sql<number>`count(*)` })
         .from(creditTransactions)
-        .where(inArray(creditTransactions.walletId, walletIds));
+        .where(eq(creditTransactions.walletId, currentWallet.id));
+
+      // Calculate total spending from other linked lead wallets in current period
+      const otherWallets = allWallets.filter((w) => w.id !== currentWallet.id);
+      let otherDevicesSpending = 0;
+
+      if (otherWallets.length > 0) {
+        const otherWalletIds = otherWallets.map((w) => w.id);
+        const otherTransactions = await db
+          .select()
+          .from(creditTransactions)
+          .where(
+            and(
+              inArray(creditTransactions.walletId, otherWalletIds),
+              eq(creditTransactions.freePeriodId, currentPeriodId),
+              eq(creditTransactions.type, CreditTransactionType.USAGE),
+            ),
+          );
+
+        otherDevicesSpending = otherTransactions.reduce(
+          (sum, t) => sum + Math.abs(t.amount),
+          0,
+        );
+      }
+
+      const result: CreditTransactionOutput[] = transactions.map((t) => ({
+        id: t.id,
+        amount: t.amount,
+        balanceAfter: t.balanceAfter,
+        type: t.type,
+        modelId: t.modelId,
+        messageId: t.messageId,
+        createdAt: t.createdAt.toISOString(),
+      }));
+
+      // Add summary entry for other devices' spending if > 0
+      if (otherDevicesSpending > 0 && offset === 0) {
+        result.unshift({
+          id: "other-devices-summary",
+          amount: -otherDevicesSpending,
+          balanceAfter: currentWallet.balance,
+          type: "app.api.v1.core.credits.enums.transactionType.otherDevices",
+          modelId: null,
+          messageId: null,
+          createdAt: new Date().toISOString(),
+        });
+      }
 
       return success({
-        transactions: transactions.map((t) => ({
-          id: t.id,
-          amount: t.amount,
-          balanceAfter: t.balanceAfter,
-          type: t.type,
-          modelId: t.modelId,
-          messageId: t.messageId,
-          createdAt: t.createdAt.toISOString(),
-        })),
-        totalCount: count,
+        transactions: result,
+        totalCount: count + (otherDevicesSpending > 0 ? 1 : 0),
       });
     } catch (error) {
       logger.error("Failed to get transactions", parseError(error), { leadId });

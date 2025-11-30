@@ -16,8 +16,11 @@ import Stripe from "stripe";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
+import { productsRepository } from "@/app/api/[locale]/v1/core/products/repository-client";
 
 import { users } from "../../../user/db";
+import { paymentInvoices } from "../../db";
+import { InvoiceStatus } from "../../enum";
 import type {
   CheckoutSessionParams,
   CheckoutSessionResult,
@@ -107,6 +110,7 @@ export class StripeProvider implements PaymentProvider {
     params: CheckoutSessionParams,
     customerId: string,
     logger: EndpointLogger,
+    callbackToken: string,
   ) {
     try {
       logger.debug("Creating checkout session", {
@@ -165,6 +169,40 @@ export class StripeProvider implements PaymentProvider {
         mode,
         interval: params.interval,
       });
+
+      // Store invoice in database with callback token for one-time payments
+      if (mode === "payment") {
+        try {
+          const product = productsRepository.getProduct(
+            params.productId,
+            params.locale,
+            params.interval,
+          );
+
+          await db.insert(paymentInvoices).values({
+            userId: params.userId,
+            providerInvoiceId: session.id,
+            amount: product.price.toString(),
+            currency: product.currency,
+            status: InvoiceStatus.DRAFT,
+            invoiceUrl: session.url || undefined,
+            callbackToken,
+            metadata: params.metadata,
+          });
+
+          logger.debug("Stored invoice in database", {
+            sessionId: session.id,
+            userId: params.userId,
+            callbackToken: callbackToken.substring(0, 8),
+          });
+        } catch (dbError) {
+          logger.error("Failed to store invoice in database", {
+            error: parseError(dbError),
+            sessionId: session.id,
+          });
+          // Continue anyway - webhook can still process the payment
+        }
+      }
 
       return success<CheckoutSessionResult>({
         sessionId: session.id,
