@@ -86,6 +86,14 @@ export class TranslationReorganizeRepositoryImpl {
     }> = [];
 
     try {
+      // Validate: removeUnused requires regenerateStructure
+      if (request.removeUnused && !request.regenerateStructure) {
+        return error({
+          error: "validation_error",
+          message: "removeUnused requires regenerateStructure to be enabled",
+        });
+      }
+
       output.push(
         t(
           "app.api.v1.core.system.translations.reorganize.post.messages.starting",
@@ -230,6 +238,10 @@ export class TranslationReorganizeRepositoryImpl {
 
         // Group translations by usage location
         logger.debug("Grouping translations by usage location");
+        logger.info(
+          `filteredTranslations keys: ${Object.keys(filteredTranslations).slice(0, 10).join(", ")}`,
+        );
+        logger.info(`keyUsageMap size: ${keyUsageMap.size}`);
         const { groups, keyMappings } = this.groupTranslationsByUsage(
           filteredTranslations,
           keyUsageMap,
@@ -237,9 +249,16 @@ export class TranslationReorganizeRepositoryImpl {
           logger,
         );
 
-        logger.debug(
-          `Created ${groups.size} location-based translation groups`,
+        logger.info(`Created ${groups.size} location-based translation groups`);
+        logger.info(
+          `Key mappings: ${keyMappings.size} keys need to be updated`,
         );
+        if (keyMappings.size > 0) {
+          const firstFive = Array.from(keyMappings.entries()).slice(0, 5);
+          logger.info(
+            `First 5 key mappings: ${firstFive.map(([old, newKey]) => `${old} -> ${newKey}`).join(", ")}`,
+          );
+        }
 
         // Update code files with new keys
         if (keyMappings.size > 0) {
@@ -369,7 +388,11 @@ export class TranslationReorganizeRepositoryImpl {
         );
 
         logger.debug("Calling groupTranslationsByUsage");
-        const { groups } = this.groupTranslationsByUsage(
+        logger.info(
+          `filteredTranslations keys: ${Object.keys(filteredTranslations).slice(0, 10).join(", ")}`,
+        );
+        logger.info(`keyUsageMap size: ${keyUsageMap.size}`);
+        const { groups, keyMappings } = this.groupTranslationsByUsage(
           filteredTranslations, // Use filtered translations (with unused keys removed if requested)
           keyUsageMap,
           keyUsageFrequency,
@@ -378,10 +401,35 @@ export class TranslationReorganizeRepositoryImpl {
 
         logger.debug("groupTranslationsByUsage completed");
 
-        logger.debug(`Created ${groups.size} translation groups`);
+        logger.info(`Created ${groups.size} translation groups`);
+        logger.info(
+          `Key mappings: ${keyMappings.size} keys need to be updated`,
+        );
+        if (keyMappings.size > 0) {
+          const firstFive = [...keyMappings.entries()].slice(0, 5);
+          logger.info(
+            `First 5 key mappings: ${firstFive.map(([old, newKey]) => `${old} -> ${newKey}`).join(", ")}`,
+          );
+        }
+
         for (const [location, translations] of groups) {
-          logger.debug(
+          logger.info(
             `Group: ${location} - ${Object.keys(translations).length} keys`,
+          );
+        }
+
+        // Update code files with new keys
+        if (keyMappings.size > 0) {
+          logger.info(
+            `Updating code files with ${keyMappings.size} key mappings`,
+          );
+          const codeFilesUpdated = this.updateCodeFilesWithNewKeys(
+            keyMappings,
+            logger,
+          );
+          logger.info(`Updated ${codeFilesUpdated} code files`);
+          output.push(
+            `Updated ${codeFilesUpdated} code files with new translation keys`,
           );
         }
 
@@ -1105,6 +1153,9 @@ export class TranslationReorganizeRepositoryImpl {
 
     try {
       // Process each translation key and co-locate at ALL usage locations
+      logger.info(
+        `Starting processTranslationKeysForCoLocation with ${Object.keys(translations).length} top-level keys`,
+      );
       this.processTranslationKeysForCoLocation(
         translations,
         "",
@@ -1114,6 +1165,9 @@ export class TranslationReorganizeRepositoryImpl {
         originalKeys,
         keyMappings,
         logger,
+      );
+      logger.info(
+        `Finished processTranslationKeysForCoLocation, groups size: ${groups.size}`,
       );
 
       logger.debug(`Created ${groups.size} location-based translation groups`);
@@ -1127,9 +1181,13 @@ export class TranslationReorganizeRepositoryImpl {
 
       return { groups, originalKeys, keyMappings };
     } catch (error) {
+      console.error("RAW ERROR:", error);
+      console.error("ERROR TYPE:", typeof error);
+      console.error("ERROR CONSTRUCTOR:", error?.constructor?.name);
       logger.error("Error in groupTranslationsByUsage", {
         error: parseError(error).message,
         stack: error instanceof Error ? error.stack : undefined,
+        rawError: String(error),
       });
       return {
         groups: new Map(),
@@ -1276,6 +1334,7 @@ export class TranslationReorganizeRepositoryImpl {
         !Array.isArray(value)
       ) {
         // Recursively process nested objects
+        logger.debug(`Recursing into nested object: ${fullPath}`);
         this.processTranslationKeysForCoLocation(
           value,
           fullPath,
@@ -1297,7 +1356,7 @@ export class TranslationReorganizeRepositoryImpl {
         // Only process keys that are actually used in the codebase
         if (usageFiles.length === 0) {
           logger.debug(`Skipping unused translation key: ${fullPath}`);
-          return;
+          continue;
         }
 
         // Place translation at the FOLDER where the key is used
@@ -1319,70 +1378,101 @@ export class TranslationReorganizeRepositoryImpl {
           location = location.slice(projectRoot.length + 1); // +1 for the slash
         }
 
-        // Calculate the location prefix - this is what the key SHOULD start with
-        let locationPrefix =
+        // Strip src/ prefix since we only work inside src folder
+        if (location.startsWith("src/")) {
+          location = location.slice(4); // Remove "src/"
+        } else if (location === "src") {
+          location = ""; // Root level
+        }
+
+        // Calculate what the key SHOULD be based on the actual location
+        const actualLocationPrefix =
           this.fileGenerator.locationToFlatKeyPublic(location);
 
-        // If the key doesn't match the location prefix, move UP the directory tree
-        // until we find a location where the key DOES match
-        while (
-          location !== "src" &&
-          locationPrefix &&
-          !fullPath.startsWith(`${locationPrefix}.`)
-        ) {
-          const parentLocation = path.dirname(location);
-          if (parentLocation === location) {
-            break; // Can't go higher
-          }
-          location = parentLocation;
-          locationPrefix = this.fileGenerator.locationToFlatKeyPublic(location);
-        }
-
         logger.debug(
-          `Co-locating key: ${fullPath} at location: ${location} (location prefix: ${locationPrefix}, isShared: ${isShared})`,
+          `Co-locating key: ${fullPath} at location: ${location} (actual location prefix: ${actualLocationPrefix}, isShared: ${isShared})`,
         );
 
-        // Determine the correct key structure
+        // Determine the correct key structure based on actual location
+        // The key should match the folder structure where it's used
         let correctKey: string;
-        let strippedKey: string;
 
-        if (locationPrefix && fullPath.startsWith(`${locationPrefix}.`)) {
-          // Key matches location - strip the prefix
+        // Extract the suffix after the location prefix
+        let keySuffix: string;
+
+        // Try to find where the key diverges from the actual location
+        if (
+          actualLocationPrefix &&
+          fullPath.startsWith(`${actualLocationPrefix}.`)
+        ) {
+          // Key already matches the location - it's correct!
+          keySuffix = fullPath.slice(actualLocationPrefix.length + 1);
           correctKey = fullPath;
-          strippedKey = fullPath.slice(locationPrefix.length + 1);
-        } else if (!locationPrefix || locationPrefix === "") {
-          // At src/ level - keep full key, no prefix to strip
-          // For shared keys, add common prefix
-          if (isShared) {
-            strippedKey = `common.${fullPath}`;
-            correctKey = `common.${fullPath}`;
-          } else {
-            strippedKey = fullPath;
-            correctKey = fullPath;
-          }
+          logger.info(`Key ${fullPath} already matches location ${location}`);
         } else {
-          // Key doesn't match location prefix
-          // For shared keys, add common prefix
-          if (isShared) {
-            strippedKey = `common.${fullPath}`;
-            correctKey = locationPrefix
-              ? `${locationPrefix}.common.${fullPath}`
-              : `common.${fullPath}`;
-          } else {
-            strippedKey = fullPath;
-            correctKey = fullPath;
+          // Key doesn't match the actual location
+          // We need to reconstruct the correct key
+          logger.info(
+            `Key ${fullPath} does NOT match location ${location} (prefix: ${actualLocationPrefix})`,
+          );
+
+          // Find the common prefix between the key and the location
+          // Then keep everything after the common prefix as the suffix
+          // For example:
+          // - Key: app.admin.cron.taskDetails.editDescription
+          // - Location: app/[locale]/admin/cron/task/[id]/edit → prefix: app.admin.cron.task.[id].edit
+          // - Common prefix: app.admin.cron (3 parts)
+          // - Key suffix after common: taskDetails.editDescription
+          // - Correct key: app.admin.cron.task.[id].edit.taskDetails.editDescription
+
+          const keyParts = fullPath.split(".");
+          const locationParts = actualLocationPrefix
+            ? actualLocationPrefix.split(".")
+            : [];
+
+          // Find where they diverge
+          let commonLength = 0;
+          for (
+            let i = 0;
+            i < Math.min(keyParts.length, locationParts.length);
+            i++
+          ) {
+            if (keyParts[i] === locationParts[i]) {
+              commonLength++;
+            } else {
+              break;
+            }
           }
+
+          // The suffix is everything after the common prefix in the key
+          keySuffix = keyParts.slice(commonLength).join(".");
+
+          // The correct key should be: actualLocationPrefix + keySuffix
+          if (actualLocationPrefix && keySuffix) {
+            correctKey = `${actualLocationPrefix}.${keySuffix}`;
+          } else if (actualLocationPrefix) {
+            // No suffix - this means the key is shorter than the location
+            // Use a default suffix like "page" or "title"
+            correctKey = `${actualLocationPrefix}.page`;
+            keySuffix = "page";
+          } else {
+            correctKey = keySuffix;
+          }
+
+          logger.info(
+            `Reconstructed correct key: ${correctKey} (suffix: ${keySuffix}, common prefix length: ${commonLength})`,
+          );
         }
 
         logger.debug(
-          `Key structure: original="${fullPath}", correct="${correctKey}", stripped="${strippedKey}"`,
+          `Key structure: original="${fullPath}", correct="${correctKey}", suffix="${keySuffix}"`,
         );
 
-        // Add the key to this location group with the STRIPPED key (for translation files)
+        // Add the key to this location group with the CORRECT FULL key
         if (!groups.has(location)) {
           groups.set(location, {});
         }
-        groups.get(location)![strippedKey] = value;
+        groups.get(location)![correctKey] = value;
 
         // Track key mapping for updating source files
         if (fullPath !== correctKey) {
@@ -1394,7 +1484,7 @@ export class TranslationReorganizeRepositoryImpl {
           originalKeys.set(location, []);
         }
         originalKeys.get(location)!.push({
-          key: strippedKey,
+          key: keySuffix,
           value: value,
         });
       }
@@ -1506,7 +1596,7 @@ export class TranslationReorganizeRepositoryImpl {
     keyUsageMap: Map<string, string[]>,
     logger: EndpointLogger,
   ): Map<string, TranslationObject> {
-    logger.debug("Regrouping translations for language", {
+    logger.info("Regrouping translations for language", {
       groupCount: groups.size,
       languageKeysCount: Object.keys(languageTranslations).length,
     });
@@ -1516,6 +1606,10 @@ export class TranslationReorganizeRepositoryImpl {
     // For each location group, extract the corresponding translation values
     for (const [location, englishTranslations] of groups) {
       const locationTranslations: TranslationObject = {};
+
+      logger.info(
+        `Processing location: ${location} with ${Object.keys(englishTranslations).length} keys`,
+      );
 
       // Extract translation values for each key in this location
       this.extractTranslationValuesForLocation(
@@ -1529,9 +1623,11 @@ export class TranslationReorganizeRepositoryImpl {
 
       if (Object.keys(locationTranslations).length > 0) {
         regroupedTranslations.set(location, locationTranslations);
-        logger.debug(
+        logger.info(
           `Regrouped ${Object.keys(locationTranslations).length} translations for location: ${location}`,
         );
+      } else {
+        logger.info(`No translations found for location: ${location}`);
       }
     }
 

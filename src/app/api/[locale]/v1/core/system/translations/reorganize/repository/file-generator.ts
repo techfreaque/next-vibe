@@ -23,12 +23,12 @@ export class FileGenerator {
     logger: EndpointLogger,
   ): boolean {
     try {
-      logger.debug(
+      logger.info(
         `Generating translation files for language: ${language}, groups: ${groups.size}`,
       );
 
       if (groups.size === 0) {
-        logger.debug(`No groups to process for language: ${language}`);
+        logger.info(`No groups to process for language: ${language}`);
         return false;
       }
 
@@ -467,8 +467,10 @@ export class FileGenerator {
   ): void {
     try {
       // Generate co-located file path (next to the code, not in src/i18n)
+      // Location is relative to src/, so prepend "src"
       const filePath = path.join(
         process.cwd(),
+        "src",
         location,
         I18N_PATH,
         language,
@@ -529,7 +531,7 @@ export class FileGenerator {
   private generateLeafFileContent(
     translations: TranslationObject,
     language: string,
-    _location: string,
+    location: string,
   ): string {
     const isMainLanguage = language === "en";
     let imports = "";
@@ -540,9 +542,23 @@ export class FileGenerator {
       imports = `import type { translations as enTranslations } from "../en/index";\n\n`;
     }
 
-    // Keys are already stripped by the reorganize logic
-    // Just convert to nested structure
-    const nestedTranslations = this.unflattenTranslationObject(translations);
+    // Strip the location prefix from keys for the leaf file
+    // E.g., location="app/[locale]/admin", key="app.admin.nav.dashboard" -> "nav.dashboard"
+    const locationPrefix = this.locationToFlatKey(location);
+    const strippedTranslations: TranslationObject = {};
+
+    for (const [key, value] of Object.entries(translations)) {
+      // Remove location prefix from key
+      let strippedKey = key;
+      if (locationPrefix && key.startsWith(`${locationPrefix}.`)) {
+        strippedKey = key.slice(locationPrefix.length + 1);
+      }
+      strippedTranslations[strippedKey] = value;
+    }
+
+    // Convert to nested structure
+    const nestedTranslations =
+      this.unflattenTranslationObject(strippedTranslations);
     const translationsObject = this.objectToString(nestedTranslations, 0);
     // eslint-disable-next-line i18next/no-literal-string
     const typeAnnotation = isMainLanguage ? "" : ": typeof enTranslations";
@@ -763,7 +779,7 @@ export class FileGenerator {
       INDEX_FILE,
     );
 
-    // Generate imports only for direct children
+    // Generate imports only for direct children that actually have translation files
     const imports: string[] = [];
     const exports: string[] = [];
 
@@ -771,9 +787,26 @@ export class FileGenerator {
       const childName = childPath.split("/").pop() || "unknown";
       const sanitizedName = this.sanitizeIdentifier(childName);
 
+      // Check if the child directory has an i18n folder
+      const childI18nPath = path.join(
+        process.cwd(),
+        "src",
+        childPath,
+        I18N_PATH,
+        language,
+        INDEX_FILE,
+      );
+
+      if (!fs.existsSync(childI18nPath)) {
+        logger.debug(
+          `Skipping import for ${childPath} - no translation file exists`,
+        );
+        continue;
+      }
+
       imports.push(
         // eslint-disable-next-line i18next/no-literal-string
-        `import { translations as ${sanitizedName}Translations } from "./${childPath}";`,
+        `import { translations as ${sanitizedName}Translations } from "../../${childPath}/${I18N_PATH}/${language}";`,
       );
       // eslint-disable-next-line i18next/no-literal-string
       exports.push(`  "${childName}": ${sanitizedName}Translations`);
@@ -1134,8 +1167,8 @@ export class FileGenerator {
   ): void {
     const indexPath = path.join(
       process.cwd(),
+      "src",
       sourcePath,
-
       I18N_PATH,
       language,
       INDEX_FILE,
@@ -1213,9 +1246,24 @@ export class FileGenerator {
 
     if (ownTranslations && Object.keys(ownTranslations).length > 0) {
       // This location has its own translations - include them
-      // Keys are already stripped by the reorganize logic
+      // Strip the location prefix from keys first
+      const locationPrefix = this.locationToFlatKey(sourcePath);
+      const strippedTranslations: TranslationObject = {};
+
+      logger.info(
+        `Source path: ${sourcePath}, location prefix: ${locationPrefix}, own translations keys: ${Object.keys(ownTranslations).slice(0, 5).join(", ")}`,
+      );
+
+      for (const [key, value] of Object.entries(ownTranslations)) {
+        let strippedKey = key;
+        if (locationPrefix && key.startsWith(`${locationPrefix}.`)) {
+          strippedKey = key.slice(locationPrefix.length + 1);
+        }
+        strippedTranslations[strippedKey] = value;
+      }
+
       const nestedTranslations =
-        this.unflattenTranslationObject(ownTranslations);
+        this.unflattenTranslationObject(strippedTranslations);
 
       // Add own translations as spread entries in the exports
       // BUT exclude translations that belong to child directories
@@ -1267,19 +1315,29 @@ export class FileGenerator {
       INDEX_FILE,
     );
 
-    // Find top-level sections (src/app, src/api, src/packages)
+    // Find top-level sections (app, packages, app-native, etc.)
+    // Locations are now relative to src/ (e.g., "app/[locale]/admin", "packages/...")
     const topLevelSections = new Set<string>();
 
+    logger.info(`Generating clean main index for ${language}`);
+
     for (const [location] of groups) {
+      if (!location) {
+        continue;
+      } // Skip empty location (root level)
       const parts = location.split("/").filter((p) => p.length > 0);
-      if (parts.length > 1 && parts[0] === "src") {
-        topLevelSections.add(parts[1]); // app, api, packages
+      if (parts.length > 0) {
+        topLevelSections.add(parts[0]); // app, packages, app-native, etc.
       }
     }
 
+    logger.info(
+      `Found ${topLevelSections.size} top-level sections: ${[...topLevelSections].join(", ")}`,
+    );
+
     // Skip if no top-level sections found
     if (topLevelSections.size === 0) {
-      logger.debug(
+      logger.info(
         "No top-level sections found, skipping main index generation",
       );
       return;
@@ -1305,11 +1363,20 @@ export class FileGenerator {
         INDEX_FILE,
       );
 
+      // Check if the section index file actually exists
+      if (!fs.existsSync(sectionIndexPath)) {
+        logger.debug(
+          `Skipping import for ${section} - no translation file exists at ${sectionIndexPath}`,
+        );
+        continue;
+      }
+
       // Check if the section index file exists or will be created
       const relativePath = path
         .relative(path.dirname(mainIndexPath), sectionIndexPath)
         .replaceAll(/\\/g, "/")
-        .replace(/\.ts$/, "");
+        .replace(/\.ts$/, "")
+        .replace(/\/index$/, ""); // Remove /index from the end
 
       imports.push(
         // eslint-disable-next-line i18next/no-literal-string
@@ -1329,8 +1396,9 @@ export class FileGenerator {
     }
 
     fs.writeFileSync(mainIndexPath, content, "utf8");
-    logger.debug(
+    logger.info(
       `Generated clean main index with ${topLevelSections.size} top-level sections: ${mainIndexPath}`,
     );
+    logger.info(`Main index content preview: ${content.slice(0, 200)}...`);
   }
 }
