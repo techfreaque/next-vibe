@@ -155,6 +155,7 @@ export const translations = {
         free_reset: "Free Reset",
         refund: "Refund",
         transfer: "Transfer",
+        other_devices: "Spending from other devices",
       },
     },
     tabs: {

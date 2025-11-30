@@ -10,7 +10,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   requestDataField,
@@ -24,6 +24,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import { UserRole } from "../../../user/user-roles/enum";
 
 /**
  * Translation Reorganization POST Endpoint
@@ -34,7 +35,7 @@ const { POST } = createEndpoint({
   path: ["v1", "core", "system", "translations", "reorganize"],
   allowedRoles: [
     // still a bit buggy - disabled to prevent AI from calling it
-    // UserRole.ADMIN,
+    UserRole.ADMIN,
   ],
 
   title: "app.api.v1.core.system.translations.reorganize.post.title",
@@ -48,7 +49,7 @@ const { POST } = createEndpoint({
   ],
 
   // CLI configuration
-  aliases: ["translations:reorganize", "tr"],
+  aliases: ["translations:reorganize"],
   cli: {
     firstCliArgKey: "removeUnused",
   },

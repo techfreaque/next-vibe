@@ -19,7 +19,10 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/v1/core/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
-import { productsRepository } from "@/app/api/[locale]/v1/core/products/repository-client";
+import {
+  productsRepository,
+  type Product,
+} from "@/app/api/[locale]/v1/core/products/repository-client";
 
 import { users } from "../../../user/db";
 import { paymentInvoices } from "../../db";
@@ -291,7 +294,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
    */
   private async createOneTimeCheckout(
     params: CheckoutSessionParams,
-    product: { price: number; currency: string; credits: number },
+    product: Product,
     logger: EndpointLogger,
     callbackToken: string,
   ): Promise<ResponseType<CheckoutSessionResult>> {
@@ -375,7 +378,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         await db.insert(paymentInvoices).values({
           userId: params.userId,
           providerInvoiceId: invoice.id,
-          amount: totalAmount.toString(),
+          amount: totalAmount.toFixed(2),
           currency: product.currency,
           status: InvoiceStatus.DRAFT,
           invoiceUrl: invoice.invoice_url,
@@ -410,7 +413,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
    */
   private async createSubscriptionCheckout(
     params: CheckoutSessionParams,
-    product: { price: number; currency: string; credits: number },
+    product: Product,
     email: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<CheckoutSessionResult>> {

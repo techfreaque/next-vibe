@@ -203,17 +203,13 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     const definition = productDefinitions[productId];
 
     // Get price and currency based on interval and country
-    let priceData: { price: number; currency: Currencies };
-    if (interval === "year" && "yearlyPriceByCountry" in definition) {
-      priceData = definition.yearlyPriceByCountry[country];
-    } else if (
-      interval === "one_time" &&
-      "oneTimePriceByCountry" in definition
-    ) {
-      priceData = definition.oneTimePriceByCountry[country];
-    } else {
-      priceData = definition.priceByCountry[country];
-    }
+    // Let TypeScript infer the literal type from the data
+    const priceData =
+      interval === "year" && "yearlyPriceByCountry" in definition
+        ? definition.yearlyPriceByCountry[country]
+        : interval === "one_time" && "oneTimePriceByCountry" in definition
+          ? definition.oneTimePriceByCountry[country]
+          : definition.priceByCountry[country];
 
     return {
       id: productId,

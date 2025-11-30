@@ -158,6 +158,7 @@ export const translations: typeof enTranslations = {
         free_reset: "Kostenlose Zurücksetzung",
         refund: "Rückerstattung",
         transfer: "Übertragung",
+        other_devices: "Verbrauch von anderen Geräten",
       },
     },
     tabs: {

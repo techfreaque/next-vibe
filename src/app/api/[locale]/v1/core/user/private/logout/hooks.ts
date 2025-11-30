@@ -84,7 +84,7 @@ export function useLogout(logger: EndpointLogger): () => void {
       await apiClient.refetchEndpoint(definitions.GET, logger);
 
       router.push(`/${locale}/user/login`);
-      await refetch();
+      void refetch();
     },
   });
 

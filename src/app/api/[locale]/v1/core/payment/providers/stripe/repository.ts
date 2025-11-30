@@ -182,7 +182,7 @@ export class StripeProvider implements PaymentProvider {
           await db.insert(paymentInvoices).values({
             userId: params.userId,
             providerInvoiceId: session.id,
-            amount: product.price.toString(),
+            amount: product.price.toFixed(2),
             currency: product.currency,
             status: InvoiceStatus.DRAFT,
             invoiceUrl: session.url || undefined,

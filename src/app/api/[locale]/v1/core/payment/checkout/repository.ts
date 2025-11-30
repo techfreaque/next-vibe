@@ -43,9 +43,7 @@ export interface SubscriptionCheckoutRepository {
 /**
  * Subscription Checkout Repository Implementation
  */
-export class SubscriptionCheckoutRepositoryImpl
-  implements SubscriptionCheckoutRepository
-{
+export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutRepository {
   /**
    * Create a subscription checkout session
    */
@@ -151,6 +149,9 @@ export class SubscriptionCheckoutRepositoryImpl
       const interval =
         data.billingInterval === BillingInterval.MONTHLY ? "month" : "year";
 
+      // Generate callback token for webhook verification
+      const callbackToken = crypto.randomUUID();
+
       // Create checkout session using provider abstraction
       const session = await provider.createCheckoutSession(
         {
@@ -173,6 +174,7 @@ export class SubscriptionCheckoutRepositoryImpl
         },
         customerResult.data.customerId,
         logger,
+        callbackToken,
       );
 
       if (!session.success) {
