@@ -23,6 +23,7 @@ import {
   COLON_SPACE,
   COMMA_NEWLINE,
   DOT_SLASH,
+  FILE_EXTENSIONS,
   FILE_PROTOCOL,
   I18N_PATH,
   IMPORT_CLOSE,
@@ -36,6 +37,8 @@ import {
   OBJECT_OPEN,
   QUOTE,
   SPACE_SPACE,
+  SRC_DIR,
+  TEST_FILE_PATTERN,
   TMP_EXTENSION,
   TRANSLATIONS_DIR,
   TRANSLATIONS_OBJECT_PLACEHOLDER,
@@ -227,7 +230,7 @@ export class TranslationReorganizeRepositoryImpl {
 
         // Group translations by usage location
         logger.debug("Grouping translations by usage location");
-        const { groups } = this.groupTranslationsByUsage(
+        const { groups, originalKeys } = this.groupTranslationsByUsage(
           filteredTranslations,
           keyUsageMap,
           keyUsageFrequency,
@@ -237,6 +240,47 @@ export class TranslationReorganizeRepositoryImpl {
         logger.debug(
           `Created ${groups.size} location-based translation groups`,
         );
+
+        // Build key mapping (old key -> new key) for code updates
+        const keyMappings = new Map<string, string>();
+        for (const [location, translations] of groups) {
+          const locationPrefix =
+            this.fileGenerator.locationToFlatKeyPublic(location);
+          const origKeys = originalKeys.get(location) || [];
+
+          for (const { key: oldKey } of origKeys) {
+            // Find the new key in the translations
+            for (const newKey of Object.keys(translations)) {
+              if (newKey.startsWith(`${locationPrefix}.`)) {
+                // Check if this new key corresponds to the old key
+                const oldKeyLeaf = oldKey.split(".").slice(-2).join(".");
+                const newKeyLeaf = newKey.split(".").slice(-2).join(".");
+                if (oldKeyLeaf === newKeyLeaf) {
+                  keyMappings.set(oldKey, newKey);
+                  break;
+                }
+              }
+            }
+          }
+        }
+
+        // Update code files with new keys
+        if (keyMappings.size > 0) {
+          logger.debug(
+            `Updating code files with ${keyMappings.size} key mappings`,
+          );
+          const filesUpdated = this.updateCodeFilesWithNewKeys(
+            keyMappings,
+            logger,
+          );
+          logger.debug(`Updated ${filesUpdated} code files`);
+          output.push(
+            t(
+              "app.api.v1.core.system.translations.reorganize.post.messages.updatedCodeFiles",
+              { count: filesUpdated },
+            ),
+          );
+        }
 
         // Process each language
         const languages = this.getAvailableLanguages();
@@ -1112,6 +1156,109 @@ export class TranslationReorganizeRepositoryImpl {
   }
 
   /**
+   * Get the common ancestor location for multiple usage files
+   * @param usageFiles - Array of file paths where the key is used
+   * @returns The common ancestor directory path
+   */
+  private getCommonAncestorLocation(usageFiles: string[]): string {
+    if (usageFiles.length === 0) {
+      return SRC_DIR;
+    }
+
+    if (usageFiles.length === 1) {
+      // Single usage - use the directory containing the file
+      return path.dirname(usageFiles[0]);
+    }
+
+    // Find common ancestor
+    const dirs = usageFiles.map((f) => path.dirname(f));
+    let commonPath = dirs[0];
+
+    for (const dir of dirs.slice(1)) {
+      // Find common prefix
+      const parts1 = commonPath.split(path.sep);
+      const parts2 = dir.split(path.sep);
+      const common: string[] = [];
+
+      for (let i = 0; i < Math.min(parts1.length, parts2.length); i++) {
+        if (parts1[i] === parts2[i]) {
+          common.push(parts1[i]);
+        } else {
+          break;
+        }
+      }
+
+      commonPath = common.join(path.sep);
+    }
+
+    return commonPath || SRC_DIR;
+  }
+
+  /**
+   * Update code files to use new translation keys
+   * @param keyMappings - Map of old keys to new keys
+   * @param logger - Logger instance for debugging
+   * @returns Number of files updated
+   */
+  private updateCodeFilesWithNewKeys(
+    keyMappings: Map<string, string>,
+    logger: EndpointLogger,
+  ): number {
+    let filesUpdated = 0;
+
+    // Get all source files
+    const sourceFiles = this.keyUsageAnalyzer.findFiles(
+      SRC_DIR,
+      FILE_EXTENSIONS,
+    );
+
+    for (const filePath of sourceFiles) {
+      // Skip translation files, test files, and backup files
+      if (
+        filePath.includes("/i18n/") ||
+        filePath.includes("/__tests__/") ||
+        filePath.includes(TEST_FILE_PATTERN) ||
+        filePath.includes("/.tmp/")
+      ) {
+        continue;
+      }
+
+      try {
+        let content = fs.readFileSync(filePath, "utf8");
+        let modified = false;
+
+        // Replace each old key with the new key
+        for (const [oldKey, newKey] of keyMappings) {
+          // Match t("oldKey") or t('oldKey')
+          const patterns = [
+            new RegExp(`t\\("${oldKey.replace(/\./g, "\\.")}"\\)`, "g"),
+            new RegExp(`t\\('${oldKey.replace(/\./g, "\\.")}'\\)`, "g"),
+          ];
+
+          for (const pattern of patterns) {
+            if (pattern.test(content)) {
+              content = content.replace(pattern, `t("${newKey}")`);
+              modified = true;
+              logger.debug(`Updated ${oldKey} -> ${newKey} in ${filePath}`);
+            }
+          }
+        }
+
+        if (modified) {
+          fs.writeFileSync(filePath, content, "utf8");
+          filesUpdated++;
+        }
+      } catch (error) {
+        logger.error(`Failed to update file ${filePath}`, {
+          error: parseError(error).message,
+        });
+      }
+    }
+
+    return filesUpdated;
+  }
+
+  /**
    * Process translation keys for location-based co-location
    * Co-locates each translation at ALL of its specific usage locations
    * @param obj - The translation object to process
@@ -1166,32 +1313,40 @@ export class TranslationReorganizeRepositoryImpl {
           return;
         }
 
-        // Co-locate at EACH specific usage location (not common ancestor)
-        const specificLocations = this.getSpecificUsageLocations(
-          usageFiles,
-          logger,
+        // Find the common ancestor location for all usage files
+        const commonLocation = this.getCommonAncestorLocation(usageFiles);
+
+        // Calculate what the new key should be based on the location
+        const locationPrefix =
+          this.fileGenerator.locationToFlatKeyPublic(commonLocation);
+
+        // Extract the leaf parts of the key (last 1-2 segments)
+        const keyParts = fullPath.split(".");
+        const leafParts = keyParts.slice(-2); // Take last 2 parts as leaf
+
+        // Build the new key: locationPrefix + leaf parts
+        const newKey = `${locationPrefix}.${leafParts.join(".")}`;
+
+        logger.debug(
+          `Co-locating key: ${fullPath} -> ${newKey} at location: ${commonLocation}`,
         );
 
-        for (const location of specificLocations) {
-          // Transform the key based on the specific location
-          const transformedKey = this.locationAnalyzer.transformKeyForLocation(
-            fullPath,
-            location,
-            keyUsageFrequency,
-          );
-
-          logger.debug(
-            `Co-locating key: ${fullPath} -> ${transformedKey} at location: ${location}`,
-          );
-
-          // Add the key to this specific location group
-          if (!groups.has(location)) {
-            groups.set(location, {});
-          }
-
-          // Store the translation directly - we'll build nested structure in file generation
-          groups.get(location)![fullPath] = value;
+        // Add the key to this location group
+        if (!groups.has(commonLocation)) {
+          groups.set(commonLocation, {});
         }
+
+        // Store the translation with the NEW key
+        groups.get(commonLocation)![newKey] = value;
+
+        // Track the original key for this location
+        if (!originalKeys.has(commonLocation)) {
+          originalKeys.set(commonLocation, []);
+        }
+        originalKeys.get(commonLocation)!.push({
+          key: fullPath,
+          value: value,
+        });
       }
     }
   }

@@ -123,7 +123,7 @@ export class KeyUsageAnalyzer {
    * @param extensions - Array of file extensions to include (e.g., ['.ts', '.tsx'])
    * @returns Array of file paths matching the extensions
    */
-  private findFiles(dir: string, extensions: string[]): string[] {
+  findFiles(dir: string, extensions: string[]): string[] {
     // Use consolidated directory scanner
     const results = scanDirectory(dir, {
       extensions,

@@ -529,7 +529,7 @@ export class FileGenerator {
   private generateLeafFileContent(
     translations: TranslationObject,
     language: string,
-    _location: string,
+    location: string,
   ): string {
     const isMainLanguage = language === "en";
     let imports = "";
@@ -540,9 +540,24 @@ export class FileGenerator {
       imports = `import type { translations as enTranslations } from "../en/index";\n\n`;
     }
 
-    // Keep the full path in the keys - don't strip anything
-    // The translation system expects keys to match the full path from src/
-    const nestedTranslations = this.unflattenTranslationObject(translations);
+    // Convert location to the expected key prefix
+    // e.g., "src/app/[locale]/admin/cron/stats" -> "app.admin.cron.stats"
+    const locationPrefix = this.locationToFlatKey(location);
+
+    // Strip the location prefix from all keys
+    const strippedTranslations: TranslationObject = {};
+    for (const [key, value] of Object.entries(translations)) {
+      if (key.startsWith(`${locationPrefix}.`)) {
+        const leafKey = key.slice(locationPrefix.length + 1);
+        strippedTranslations[leafKey] = value;
+      } else {
+        // Keep keys that don't match the prefix (shouldn't happen in leaf files)
+        strippedTranslations[key] = value;
+      }
+    }
+
+    const nestedTranslations =
+      this.unflattenTranslationObject(strippedTranslations);
     const translationsObject = this.objectToString(nestedTranslations, 0);
     // eslint-disable-next-line i18next/no-literal-string
     const typeAnnotation = isMainLanguage ? "" : ": typeof enTranslations";
@@ -614,22 +629,36 @@ export class FileGenerator {
   /**
    * Convert location path to flat key for main index
    * src/app/[locale]/admin/cron -> app.admin.cron
-   * src/app/api/[locale]/v1/core/contact -> app.api.v1.core.contact
+   * src/app/api/[locale]/v1/core/contact/_components -> app.api.v1.core.contact._components
+   * Note: _components is kept in the key path as per i18n spec
    */
   private locationToFlatKey(location: string): string {
+    // Normalize to relative path from project root
+    const projectRoot = process.cwd();
+    let normalizedLocation = location;
+
+    // If it's an absolute path, make it relative to project root
+    if (location.startsWith(projectRoot)) {
+      normalizedLocation = location.slice(projectRoot.length + 1); // +1 for the slash
+    }
+
     // Remove src/ prefix
-    let key = location.replace(/^src\//, "");
+    let key = normalizedLocation.replace(/^src\//, "");
 
     // Remove [locale] segments
     key = key.replace(/\/\[locale\]/g, "");
-
-    // Remove _components suffix
-    key = key.replace(/\/_components$/, "");
 
     // Convert to dot notation
     key = key.replaceAll(/\//g, ".");
 
     return key;
+  }
+
+  /**
+   * Public wrapper for locationToFlatKey
+   */
+  locationToFlatKeyPublic(location: string): string {
+    return this.locationToFlatKey(location);
   }
 
   /**
