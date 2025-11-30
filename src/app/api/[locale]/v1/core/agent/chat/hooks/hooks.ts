@@ -441,6 +441,7 @@ export function useChat(
     sendMessage: messageOps.sendMessage,
     setInput: setInputAndSaveDraft,
     setSelectedModel: settingsOps.setSelectedModel,
+    setSelectedPersona: settingsOps.setSelectedPersona,
     setEnabledToolIds: settingsOps.setEnabledToolIds,
     inputRef,
     locale,

@@ -74,10 +74,11 @@ export function ChatMessages({
   );
   const lastThreadIdRef = useRef<string | null>(null);
 
-  // Get streaming messages from AI stream store
+  // Get streaming messages and streaming state from AI stream store
   const streamingMessages = useAIStreamStore(
     (state) => state.streamingMessages,
   );
+  const isStreamingActive = useAIStreamStore((state) => state.isStreaming);
 
   // Merge streaming messages with persisted messages for instant UI updates
   const mergedMessages = useMemo(() => {
@@ -452,8 +453,8 @@ export function ChatMessages({
             })()
           )}
 
-          {/* Only show loading indicator if no messages exist yet */}
-          {isLoading && mergedMessages.length === 0 && <LoadingIndicator />}
+          {/* Show loading indicator while streaming */}
+          {isStreamingActive && <LoadingIndicator />}
 
           <Div ref={messagesEndRef} />
         </Div>

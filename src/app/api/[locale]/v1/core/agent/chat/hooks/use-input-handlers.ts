@@ -46,6 +46,7 @@ interface UseInputHandlersProps {
   ) => Promise<void>;
   setInput: (input: string) => void;
   setSelectedModel: (modelId: ModelId) => void;
+  setSelectedPersona: (personaId: string) => void;
   setEnabledToolIds: (toolIds: string[]) => void;
   inputRef: React.RefObject<TextareaRefObject | null>;
   locale: CountryLanguage;
@@ -73,6 +74,7 @@ export function useInputHandlers({
   sendMessage,
   setInput,
   setSelectedModel,
+  setSelectedPersona,
   setEnabledToolIds,
   inputRef,
   locale,
@@ -90,19 +92,22 @@ export function useInputHandlers({
 
     if (isValidInput(input) && !isLoading) {
       logger.debug("Chat", "submitMessage calling sendMessage");
-      await sendMessage({ content: input }, (threadId, rootFolderId, subFolderId) => {
-        // Navigate to the newly created thread
-        logger.debug("Chat", "Navigating to newly created thread", {
-          threadId,
-          rootFolderId,
-          subFolderId,
-        });
-        // Build URL with proper subfolder path if present
-        const url = subFolderId
-          ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
-          : `/${locale}/threads/${rootFolderId}/${threadId}`;
-        router.push(url);
-      });
+      await sendMessage(
+        { content: input },
+        (threadId, rootFolderId, subFolderId) => {
+          // Navigate to the newly created thread
+          logger.debug("Chat", "Navigating to newly created thread", {
+            threadId,
+            rootFolderId,
+            subFolderId,
+          });
+          // Build URL with proper subfolder path if present
+          const url = subFolderId
+            ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
+            : `/${locale}/threads/${rootFolderId}/${threadId}`;
+          router.push(url);
+        },
+      );
       // Clear the draft after successful send
       logger.debug("Chat", "submitMessage completed, clearing draft");
       await clearDraft(draftKey, logger);
@@ -143,7 +148,10 @@ export function useInputHandlers({
   );
 
   const handleFillInputWithPrompt = useCallback(
-    (prompt: string, _personaId: string, modelId?: ModelId) => {
+    (prompt: string, personaId: string, modelId?: ModelId) => {
+      // Switch to the selected persona
+      setSelectedPersona(personaId);
+
       // Switch to the persona's preferred model if provided
       if (modelId) {
         handleModelChange(modelId);
@@ -153,7 +161,7 @@ export function useInputHandlers({
       setInput(prompt);
       inputRef.current?.focus();
     },
-    [setInput, inputRef, handleModelChange],
+    [setInput, inputRef, handleModelChange, setSelectedPersona],
   );
 
   const handleScreenshot = useCallback(() => {
