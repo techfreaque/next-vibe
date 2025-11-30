@@ -13,10 +13,10 @@ import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { translations } from "@/config/i18n/en";
 
 import { SubscriptionClientContent } from "@/app/api/[locale]/v1/core/subscription/_components/subscription-client-content";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
+import { envClient } from "@/config/env-client";
 
 interface SubscriptionPageProps {
   params: Promise<{ locale: CountryLanguage }>;
@@ -34,7 +34,7 @@ export async function generateMetadata({
     title: "app.subscription.meta.subscription.title",
     description: "app.subscription.meta.subscription.description",
     category: "app.subscription.meta.subscription.category",
-    image: `${translations.websiteUrl}/images/subscription-plans.jpg`,
+    image: `${envClient.NEXT_PUBLIC_APP_URL}/images/subscription-plans.jpg`,
     imageAlt: "app.subscription.meta.subscription.imageAlt",
     keywords: [
       "app.subscription.meta.subscription.keywords.subscription",

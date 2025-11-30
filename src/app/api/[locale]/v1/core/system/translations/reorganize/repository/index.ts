@@ -293,6 +293,7 @@ export class TranslationReorganizeRepositoryImpl {
             groups,
             keyUsageMap,
             logger,
+            undefined, // No key mappings in removeUnused mode
           );
 
           logger.debug(
@@ -461,6 +462,7 @@ export class TranslationReorganizeRepositoryImpl {
               groups,
               keyUsageMap,
               logger,
+              keyMappings,
             );
 
             logger.debug(
@@ -1171,9 +1173,11 @@ export class TranslationReorganizeRepositoryImpl {
       );
 
       logger.debug(`Created ${groups.size} location-based translation groups`);
-      for (const [location, translations] of groups) {
-        logger.debug(
-          `Location: ${location} - ${Object.keys(translations).length} keys`,
+      const groupsArray = Array.from(groups.entries());
+      logger.info(`First 10 groups:`);
+      for (const [location, translations] of groupsArray.slice(0, 10)) {
+        logger.info(
+          `  Location: "${location}" - ${Object.keys(translations).length} keys - First key: ${Object.keys(translations)[0]}`,
         );
       }
 
@@ -1595,6 +1599,7 @@ export class TranslationReorganizeRepositoryImpl {
     groups: Map<string, TranslationObject>,
     keyUsageMap: Map<string, string[]>,
     logger: EndpointLogger,
+    keyMappings?: Map<string, string>,
   ): Map<string, TranslationObject> {
     logger.info("Regrouping translations for language", {
       groupCount: groups.size,
@@ -1602,6 +1607,14 @@ export class TranslationReorganizeRepositoryImpl {
     });
 
     const regroupedTranslations = new Map<string, TranslationObject>();
+
+    // Create reverse mapping: NEW key → OLD key
+    const reverseKeyMappings = new Map<string, string>();
+    if (keyMappings) {
+      for (const [oldKey, newKey] of keyMappings) {
+        reverseKeyMappings.set(newKey, oldKey);
+      }
+    }
 
     // For each location group, extract the corresponding translation values
     for (const [location, englishTranslations] of groups) {
@@ -1619,15 +1632,18 @@ export class TranslationReorganizeRepositoryImpl {
         "",
         keyUsageMap,
         logger,
+        reverseKeyMappings,
       );
 
       if (Object.keys(locationTranslations).length > 0) {
         regroupedTranslations.set(location, locationTranslations);
-        logger.info(
+        logger.debug(
           `Regrouped ${Object.keys(locationTranslations).length} translations for location: ${location}`,
         );
       } else {
-        logger.info(`No translations found for location: ${location}`);
+        logger.warn(
+          `No translations found for location: ${location} - Expected keys: ${Object.keys(englishTranslations).slice(0, 3).join(", ")}`,
+        );
       }
     }
 
@@ -1647,6 +1663,7 @@ export class TranslationReorganizeRepositoryImpl {
     currentPath: string,
     keyUsageMap: Map<string, string[]>,
     logger: EndpointLogger,
+    keyMappings?: Map<string, string>,
   ): void {
     for (const [key, englishValue] of Object.entries(englishTranslations)) {
       const fullKey = currentPath ? `${currentPath}.${key}` : key;
@@ -1664,17 +1681,29 @@ export class TranslationReorganizeRepositoryImpl {
           fullKey,
           keyUsageMap,
           logger,
+          keyMappings,
         );
       } else {
         // This is a leaf translation value - find the corresponding value in source language
+        // If the key was remapped, use the original key to look up the translation
+        const lookupKey = keyMappings?.has(fullKey)
+          ? keyMappings.get(fullKey)!
+          : fullKey;
+
         const sourceValue = this.findTranslationValue(
-          fullKey,
+          lookupKey,
           sourceLanguageTranslations,
         );
 
         if (sourceValue !== undefined) {
           targetLocationTranslations[key] = sourceValue;
-          logger.debug(`Extracted translation: ${fullKey} = ${sourceValue}`);
+          logger.debug(
+            `Extracted translation: ${fullKey} (lookup: ${lookupKey}) = ${sourceValue}`,
+          );
+        } else {
+          logger.warn(
+            `Could not find translation for key: ${fullKey} (lookup: ${lookupKey})`,
+          );
         }
       }
     }

@@ -12,10 +12,10 @@ import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repo
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
-import { translations } from "@/config/i18n/en";
 
 import { PrivacyPolicyClientInteraction } from "./_components/privacy-policy-client-content";
 import { SupportButton } from "./_components/support-button";
+import { envClient } from "@/config/env-client";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -32,7 +32,7 @@ export async function generateMetadata(
     path: "privacy-policy",
     title: "app.meta.privacyPolicy.title",
     description: "app.meta.privacyPolicy.description",
-    image: `${translations.websiteUrl}/images/privacy-hero.jpg`,
+    image: `${envClient.NEXT_PUBLIC_APP_URL}/images/privacy-hero.jpg`,
     category: "app.meta.privacyPolicy.category",
     imageAlt: "app.meta.privacyPolicy.imageAlt",
     keywords: ["app.meta.privacyPolicy.keywords"],
@@ -40,7 +40,7 @@ export async function generateMetadata(
       openGraph: {
         title: "app.meta.privacyPolicy.ogTitle",
         description: "app.meta.privacyPolicy.ogDescription",
-        url: `${translations.websiteUrl}/${locale}/privacy-policy`,
+        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/privacy-policy`,
         type: "website",
         images: [...previousImages],
       },

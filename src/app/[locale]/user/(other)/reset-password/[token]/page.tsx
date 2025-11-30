@@ -13,9 +13,9 @@ import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
-import { translations } from "@/config/i18n/en";
 
 import ResetPasswordConfirmForm from "@/app/api/[locale]/v1/core/user/public/reset-password/confirm/_components/reset-password-confirm-form";
+import { envClient } from "@/config/env-client";
 
 /**
  * Generate metadata for the Reset Password Confirm page with translations
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: "app.user.other.resetPassword.meta.passwordReset.title",
         description:
           "app.user.other.resetPassword.meta.passwordReset.description",
-        url: `${translations.websiteUrl}/${locale}/reset-password`,
+        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/reset-password`,
         type: "website",
         images: [
           {

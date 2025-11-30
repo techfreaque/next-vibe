@@ -10,12 +10,12 @@ import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { translations } from "@/config/i18n/en";
 
 import CallToAction from "./_components/call-to-action";
 import Features from "./_components/features";
 import Hero from "./_components/hero";
 import { StoryPricingSection } from "./_components/story-pricing-section";
+import { envClient } from "@/config/env-client";
 
 interface HomePageProps {
   params: Promise<{ locale: CountryLanguage }>;
@@ -33,18 +33,18 @@ export async function generateMetadata({
     title: "app.meta.home.title",
     category: "app.meta.home.category",
     description: "app.meta.home.description",
-    image: `${translations.websiteUrl}/images/home-hero.jpg`,
+    image: `${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`,
     imageAlt: "app.meta.home.imageAlt",
     keywords: ["app.meta.home.keywords"],
     additionalMetadata: {
       openGraph: {
         title: "app.meta.home.ogTitle",
         description: "app.meta.home.ogDescription",
-        url: `${translations.websiteUrl}/${locale}`,
+        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}`,
         type: "website",
         images: [
           {
-            url: `${translations.websiteUrl}/images/home-hero.jpg`,
+            url: `${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`,
             width: 1200,
             height: 630,
             alt: "app.meta.home.imageAlt",
@@ -55,7 +55,7 @@ export async function generateMetadata({
         card: "summary_large_image",
         title: "app.meta.home.twitterTitle",
         description: "app.meta.home.twitterDescription",
-        images: [`${translations.websiteUrl}/images/home-hero.jpg`],
+        images: [`${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`],
       },
     },
   });

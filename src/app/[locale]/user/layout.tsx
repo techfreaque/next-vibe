@@ -5,7 +5,7 @@ import type { JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { translations } from "@/config/i18n/en";
+import { envClient } from "@/config/env-client";
 
 /**
  * Generate metadata for the user pages with translations
@@ -21,14 +21,14 @@ export async function generateMetadata({
     title: "app.user.meta.profile.title",
     description: "app.user.meta.profile.description",
     category: "app.user.meta.profile.category",
-    image: `${translations.websiteUrl}/images/user-hero.jpg`,
+    image: `${envClient.NEXT_PUBLIC_APP_URL}/images/user-hero.jpg`,
     imageAlt: "app.user.meta.profile.imageAlt",
     keywords: ["app.user.meta.profile.keywords"],
     additionalMetadata: {
       openGraph: {
         title: "app.user.meta.profile.ogTitle",
         description: "app.user.meta.profile.ogDescription",
-        url: `${translations.websiteUrl}/${locale}/user`,
+        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/user`,
         type: "website",
       },
       twitter: {

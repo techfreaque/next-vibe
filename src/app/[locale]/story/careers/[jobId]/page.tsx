@@ -16,7 +16,7 @@ import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repo
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
-import { translations } from "@/config/i18n/en";
+import { envClient } from "@/config/env-client";
 
 interface JobType {
   title: string;
@@ -70,14 +70,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: "app.meta.careers.title",
     description: "app.meta.careers.description",
     category: "app.meta.careers.category",
-    image: `${translations.websiteUrl}/images/careers-hero.jpg`,
+    image: `${envClient.NEXT_PUBLIC_APP_URL}/images/careers-hero.jpg`,
     imageAlt: "app.meta.careers.imageAlt",
     keywords: ["app.meta.careers.keywords"],
     additionalMetadata: {
       openGraph: {
         title: "app.meta.careers.ogTitle",
         description: "app.meta.careers.ogDescription",
-        url: `${translations.websiteUrl}/${locale}/careers/${jobId}`,
+        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/careers/${jobId}`,
         type: "website",
       },
       twitter: {

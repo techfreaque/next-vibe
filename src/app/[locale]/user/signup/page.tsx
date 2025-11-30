@@ -9,11 +9,11 @@ import type { JSX } from "react";
 import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { translations } from "@/config/i18n/en";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
 import SignUpForm from "@/app/api/[locale]/v1/core/user/public/signup/_components/sign-up-form";
+import { envClient } from "@/config/env-client";
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
 }
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: "app.user.signup.meta.ogTitle",
         description: "app.user.signup.meta.ogDescription",
-        url: `${translations.websiteUrl}/${locale}/user/signup`,
+        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/user/signup`,
         type: "website",
         images: [
           {

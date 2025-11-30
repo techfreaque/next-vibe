@@ -12,10 +12,10 @@ import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repo
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
-import { translations } from "@/config/i18n/en";
 
 import { TermsClientInteraction } from "./_components/terms-client-content";
 import { TermsContactButton } from "./_components/terms-contact-button";
+import { envClient } from "@/config/env-client";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -32,7 +32,7 @@ export async function generateMetadata(
     path: "terms-of-service",
     title: "app.meta.termsOfService.title",
     description: "app.meta.termsOfService.description",
-    image: `${translations.websiteUrl}/images/terms-hero.jpg`,
+    image: `${envClient.NEXT_PUBLIC_APP_URL}/images/terms-hero.jpg`,
     imageAlt: "app.meta.termsOfService.imageAlt",
     keywords: ["app.meta.termsOfService.keywords"],
     category: "app.meta.termsOfService.category",
@@ -40,7 +40,7 @@ export async function generateMetadata(
       openGraph: {
         title: "app.meta.termsOfService.ogTitle",
         description: "app.meta.termsOfService.ogDescription",
-        url: `${translations.websiteUrl}/${locale}/terms-of-service`,
+        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/terms-of-service`,
         type: "website",
         images: [...previousImages],
       },

@@ -10,7 +10,7 @@ import type { JSX } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { Button } from "next-vibe-ui/ui/button";
-import { translations } from "@/config/i18n/en/index";
+import { envClient } from "@/config/env-client";
 
 interface ContactInfoProps {
   locale: CountryLanguage;
@@ -58,7 +58,7 @@ export default function ContactInfo({
               </H3>
             </Div>
             <Link
-              href={translations.websiteUrl}
+              href={envClient.NEXT_PUBLIC_APP_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 dark:text-blue-400 hover:underline ml-8"

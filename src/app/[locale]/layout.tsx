@@ -11,10 +11,10 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
-import { translations } from "@/config/i18n/en/index";
 
 import { RootProviders } from "./layout-shared";
 import { Body } from "@/packages/next-vibe-ui/web/ui/body";
+import { envClient } from "@/config/env-client";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -44,7 +44,7 @@ export async function generateMetadata({
     title: "app.layout.metadata.defaultTitle",
     category: "app.layout.metadata.category",
     description: "app.layout.metadata.description",
-    image: `${translations.websiteUrl}/og-image.jpg`,
+    image: `${envClient.NEXT_PUBLIC_APP_URL}/og-image.jpg`,
     imageAlt: "app.layout.openGraph.imageAlt",
     keywords: ["app.meta.home.keywords"],
   });
@@ -66,8 +66,8 @@ export default async function RootLayoutServer({
     "@context": "https://schema.org",
     "@type": t("app.layout.structuredData.organization.types.organization"),
     name: t("config.group.name"),
-    url: translations.websiteUrl,
-    logo: `${translations.websiteUrl}/logo.png`,
+    url: envClient.NEXT_PUBLIC_APP_URL,
+    logo: `${envClient.NEXT_PUBLIC_APP_URL}/logo.png`,
     sameAs: [
       t("config.social.facebookUrl"),
       t("config.social.twitterUrl"),

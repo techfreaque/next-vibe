@@ -12,9 +12,9 @@ import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repo
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
-import { translations } from "@/config/i18n/en";
 
 import { ImprintClientInteraction } from "./_components/imprint-client-content";
+import { envClient } from "@/config/env-client";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -31,7 +31,7 @@ export async function generateMetadata(
     path: "imprint",
     title: "app.meta.imprint.title",
     description: "app.meta.imprint.description",
-    image: `${translations.websiteUrl}/images/imprint-hero.jpg`,
+    image: `${envClient.NEXT_PUBLIC_APP_URL}/images/imprint-hero.jpg`,
     category: "app.meta.imprint.category",
     imageAlt: "app.meta.imprint.imageAlt",
     keywords: ["app.meta.imprint.keywords"],
@@ -39,7 +39,7 @@ export async function generateMetadata(
       openGraph: {
         title: "app.meta.imprint.ogTitle",
         description: "app.meta.imprint.ogDescription",
-        url: `${translations.websiteUrl}/${locale}/imprint`,
+        url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/imprint`,
         type: "website",
         images: [...previousImages],
       },
