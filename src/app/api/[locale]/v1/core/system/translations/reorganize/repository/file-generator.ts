@@ -529,7 +529,7 @@ export class FileGenerator {
   private generateLeafFileContent(
     translations: TranslationObject,
     language: string,
-    location: string,
+    _location: string,
   ): string {
     const isMainLanguage = language === "en";
     let imports = "";
@@ -540,24 +540,9 @@ export class FileGenerator {
       imports = `import type { translations as enTranslations } from "../en/index";\n\n`;
     }
 
-    // Convert location to the expected key prefix
-    // e.g., "src/app/[locale]/admin/cron/stats" -> "app.admin.cron.stats"
-    const locationPrefix = this.locationToFlatKey(location);
-
-    // Strip the location prefix from all keys
-    const strippedTranslations: TranslationObject = {};
-    for (const [key, value] of Object.entries(translations)) {
-      if (key.startsWith(`${locationPrefix}.`)) {
-        const leafKey = key.slice(locationPrefix.length + 1);
-        strippedTranslations[leafKey] = value;
-      } else {
-        // Keep keys that don't match the prefix (shouldn't happen in leaf files)
-        strippedTranslations[key] = value;
-      }
-    }
-
-    const nestedTranslations =
-      this.unflattenTranslationObject(strippedTranslations);
+    // Keys are already stripped by the reorganize logic
+    // Just convert to nested structure
+    const nestedTranslations = this.unflattenTranslationObject(translations);
     const translationsObject = this.objectToString(nestedTranslations, 0);
     // eslint-disable-next-line i18next/no-literal-string
     const typeAnnotation = isMainLanguage ? "" : ": typeof enTranslations";
@@ -642,8 +627,8 @@ export class FileGenerator {
       normalizedLocation = location.slice(projectRoot.length + 1); // +1 for the slash
     }
 
-    // Remove src/ prefix
-    let key = normalizedLocation.replace(/^src\//, "");
+    // Remove src/ prefix or src itself
+    let key = normalizedLocation.replace(/^src(\/|$)/, "");
 
     // Remove [locale] segments
     key = key.replace(/\/\[locale\]/g, "");
@@ -1220,6 +1205,35 @@ export class FileGenerator {
           : // eslint-disable-next-line i18next/no-literal-string
             `"${child}"`;
         exports.push(`  ${exportKey}: ${importName}`);
+      }
+    }
+
+    // Check if this location has its own translations
+    const ownTranslations = groups.get(sourcePath);
+
+    if (ownTranslations && Object.keys(ownTranslations).length > 0) {
+      // This location has its own translations - include them
+      // Keys are already stripped by the reorganize logic
+      const nestedTranslations =
+        this.unflattenTranslationObject(ownTranslations);
+
+      // Add own translations as spread entries in the exports
+      // BUT exclude translations that belong to child directories
+      for (const [key, value] of Object.entries(nestedTranslations)) {
+        // Check if this key matches a child directory name
+        if (directChildren.has(key)) {
+          // This is a child directory import, skip it (will be imported separately)
+          continue;
+        }
+
+        const valueStr =
+          typeof value === "string"
+            ? JSON.stringify(value)
+            : this.objectToString(value as TranslationObject, 1);
+        const exportKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
+          ? key
+          : `"${key}"`;
+        exports.push(`  ${exportKey}: ${valueStr}`);
       }
     }
 

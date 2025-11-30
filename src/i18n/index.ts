@@ -1,7 +1,7 @@
 import type { LanguageConfig, LanguageDefaults } from "./core/config";
-import deTranslations from "./de";
-import enTranslations from "./en";
-import plTranslations from "./pl";
+import { translations as deTranslations } from "./de";
+import { translations as enTranslations } from "./en";
+import { translations as plTranslations } from "./pl";
 
 // ----------------
 // CONFIGURATION

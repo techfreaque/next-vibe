@@ -230,7 +230,7 @@ export class TranslationReorganizeRepositoryImpl {
 
         // Group translations by usage location
         logger.debug("Grouping translations by usage location");
-        const { groups, originalKeys } = this.groupTranslationsByUsage(
+        const { groups, keyMappings } = this.groupTranslationsByUsage(
           filteredTranslations,
           keyUsageMap,
           keyUsageFrequency,
@@ -240,29 +240,6 @@ export class TranslationReorganizeRepositoryImpl {
         logger.debug(
           `Created ${groups.size} location-based translation groups`,
         );
-
-        // Build key mapping (old key -> new key) for code updates
-        const keyMappings = new Map<string, string>();
-        for (const [location, translations] of groups) {
-          const locationPrefix =
-            this.fileGenerator.locationToFlatKeyPublic(location);
-          const origKeys = originalKeys.get(location) || [];
-
-          for (const { key: oldKey } of origKeys) {
-            // Find the new key in the translations
-            for (const newKey of Object.keys(translations)) {
-              if (newKey.startsWith(`${locationPrefix}.`)) {
-                // Check if this new key corresponds to the old key
-                const oldKeyLeaf = oldKey.split(".").slice(-2).join(".");
-                const newKeyLeaf = newKey.split(".").slice(-2).join(".");
-                if (oldKeyLeaf === newKeyLeaf) {
-                  keyMappings.set(oldKey, newKey);
-                  break;
-                }
-              }
-            }
-          }
-        }
 
         // Update code files with new keys
         if (keyMappings.size > 0) {
@@ -275,10 +252,7 @@ export class TranslationReorganizeRepositoryImpl {
           );
           logger.debug(`Updated ${filesUpdated} code files`);
           output.push(
-            t(
-              "app.api.v1.core.system.translations.reorganize.post.messages.updatedCodeFiles",
-              { count: filesUpdated },
-            ),
+            `Updated ${filesUpdated} code files with new translation keys`,
           );
         }
 
@@ -1114,12 +1088,14 @@ export class TranslationReorganizeRepositoryImpl {
       string,
       Array<{ key: string; value: string | number | boolean }>
     >;
+    keyMappings: Map<string, string>;
   } {
     const groups = new Map<string, TranslationObject>();
     const originalKeys = new Map<
       string,
       Array<{ key: string; value: string | number | boolean }>
     >();
+    const keyMappings = new Map<string, string>();
 
     logger.debug("Grouping translations by location-based co-location");
     logger.debug(
@@ -1136,6 +1112,7 @@ export class TranslationReorganizeRepositoryImpl {
         keyUsageFrequency,
         groups,
         originalKeys,
+        keyMappings,
         logger,
       );
 
@@ -1145,13 +1122,20 @@ export class TranslationReorganizeRepositoryImpl {
           `Location: ${location} - ${Object.keys(translations).length} keys`,
         );
       }
-      return { groups, originalKeys };
+
+      logger.debug(`Key mappings: ${keyMappings.size} keys will be updated`);
+
+      return { groups, originalKeys, keyMappings };
     } catch (error) {
       logger.error("Error in groupTranslationsByUsage", {
         error: parseError(error).message,
         stack: error instanceof Error ? error.stack : undefined,
       });
-      return { groups: new Map(), originalKeys: new Map() };
+      return {
+        groups: new Map(),
+        originalKeys: new Map(),
+        keyMappings: new Map(),
+      };
     }
   }
 
@@ -1267,6 +1251,7 @@ export class TranslationReorganizeRepositoryImpl {
    * @param keyUsageFrequency - Map of key usage frequency for smart flattening
    * @param groups - Map to store the co-located translations
    * @param originalKeys - Map to store original key mappings for each location
+   * @param keyMappings - Map to store old key to new key mappings
    * @param logger - Logger instance for debugging
    */
   private processTranslationKeysForCoLocation(
@@ -1279,6 +1264,7 @@ export class TranslationReorganizeRepositoryImpl {
       string,
       Array<{ key: string; value: string | number | boolean }>
     >,
+    keyMappings: Map<string, string>,
     logger: EndpointLogger,
   ): void {
     for (const [key, value] of Object.entries(obj)) {
@@ -1297,6 +1283,7 @@ export class TranslationReorganizeRepositoryImpl {
           keyUsageFrequency,
           groups,
           originalKeys,
+          keyMappings,
           logger,
         );
       } else if (
@@ -1313,38 +1300,101 @@ export class TranslationReorganizeRepositoryImpl {
           return;
         }
 
-        // Find the common ancestor location for all usage files
-        const commonLocation = this.getCommonAncestorLocation(usageFiles);
+        // Place translation at the FOLDER where the key is used
+        let location: string;
+        let isShared = false;
 
-        // Calculate what the new key should be based on the location
-        const locationPrefix =
-          this.fileGenerator.locationToFlatKeyPublic(commonLocation);
+        if (usageFiles.length === 1) {
+          // Single usage - place at the directory of that file
+          location = path.dirname(usageFiles[0]);
+        } else {
+          // Multiple usages - find common ancestor
+          location = this.getCommonAncestorLocation(usageFiles);
+          isShared = true;
+        }
 
-        // Extract the leaf parts of the key (last 1-2 segments)
-        const keyParts = fullPath.split(".");
-        const leafParts = keyParts.slice(-2); // Take last 2 parts as leaf
+        // Convert absolute path to relative path from project root
+        const projectRoot = process.cwd();
+        if (location.startsWith(projectRoot)) {
+          location = location.slice(projectRoot.length + 1); // +1 for the slash
+        }
 
-        // Build the new key: locationPrefix + leaf parts
-        const newKey = `${locationPrefix}.${leafParts.join(".")}`;
+        // Calculate the location prefix - this is what the key SHOULD start with
+        let locationPrefix =
+          this.fileGenerator.locationToFlatKeyPublic(location);
+
+        // If the key doesn't match the location prefix, move UP the directory tree
+        // until we find a location where the key DOES match
+        while (
+          location !== "src" &&
+          locationPrefix &&
+          !fullPath.startsWith(`${locationPrefix}.`)
+        ) {
+          const parentLocation = path.dirname(location);
+          if (parentLocation === location) {
+            break; // Can't go higher
+          }
+          location = parentLocation;
+          locationPrefix = this.fileGenerator.locationToFlatKeyPublic(location);
+        }
 
         logger.debug(
-          `Co-locating key: ${fullPath} -> ${newKey} at location: ${commonLocation}`,
+          `Co-locating key: ${fullPath} at location: ${location} (location prefix: ${locationPrefix}, isShared: ${isShared})`,
         );
 
-        // Add the key to this location group
-        if (!groups.has(commonLocation)) {
-          groups.set(commonLocation, {});
+        // Determine the correct key structure
+        let correctKey: string;
+        let strippedKey: string;
+
+        if (locationPrefix && fullPath.startsWith(`${locationPrefix}.`)) {
+          // Key matches location - strip the prefix
+          correctKey = fullPath;
+          strippedKey = fullPath.slice(locationPrefix.length + 1);
+        } else if (!locationPrefix || locationPrefix === "") {
+          // At src/ level - keep full key, no prefix to strip
+          // For shared keys, add common prefix
+          if (isShared) {
+            strippedKey = `common.${fullPath}`;
+            correctKey = `common.${fullPath}`;
+          } else {
+            strippedKey = fullPath;
+            correctKey = fullPath;
+          }
+        } else {
+          // Key doesn't match location prefix
+          // For shared keys, add common prefix
+          if (isShared) {
+            strippedKey = `common.${fullPath}`;
+            correctKey = locationPrefix
+              ? `${locationPrefix}.common.${fullPath}`
+              : `common.${fullPath}`;
+          } else {
+            strippedKey = fullPath;
+            correctKey = fullPath;
+          }
         }
 
-        // Store the translation with the NEW key
-        groups.get(commonLocation)![newKey] = value;
+        logger.debug(
+          `Key structure: original="${fullPath}", correct="${correctKey}", stripped="${strippedKey}"`,
+        );
+
+        // Add the key to this location group with the STRIPPED key (for translation files)
+        if (!groups.has(location)) {
+          groups.set(location, {});
+        }
+        groups.get(location)![strippedKey] = value;
+
+        // Track key mapping for updating source files
+        if (fullPath !== correctKey) {
+          keyMappings.set(fullPath, correctKey);
+        }
 
         // Track the original key for this location
-        if (!originalKeys.has(commonLocation)) {
-          originalKeys.set(commonLocation, []);
+        if (!originalKeys.has(location)) {
+          originalKeys.set(location, []);
         }
-        originalKeys.get(commonLocation)!.push({
-          key: fullPath,
+        originalKeys.get(location)!.push({
+          key: strippedKey,
           value: value,
         });
       }
