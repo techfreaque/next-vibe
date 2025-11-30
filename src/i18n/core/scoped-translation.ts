@@ -3,17 +3,22 @@
  * Creates module-specific translation functions that work only within a defined scope
  */
 
-import type { CountryLanguage, Languages } from "./config";
+import { type CountryLanguage, type Languages, defaultLocale } from "./config";
 import {
   navigateTranslationObject,
   processTranslationValue,
 } from "./shared-translation-utils";
 import type { TParams } from "./static-types";
+import { getLanguageFromLocale } from "./language-utils";
+import type { DotNotation } from "./static-types";
 
 /**
  * Generic translation parameter type for scoped translations
  */
 export type ScopedTParams = Record<string, string | number | boolean>;
+
+// this value should never be used at runtime
+export type TranslatedKeyType = "createScopedTranslation-key";
 
 /**
  * Translation schema type for scoped modules
@@ -24,35 +29,6 @@ type NestedTranslation =
   | { [key: string]: string | { [key: string]: string } };
 
 export type ScopedTranslationSchema = Record<string, NestedTranslation>;
-
-/**
- * Extract translation keys from the EN schema for type safety
- * Recursively extracts all nested keys as dot-notation strings
- */
-type ExtractKeys<T, Prefix extends string = ""> = T extends string
-  ? Prefix
-  : T extends Record<string, string>
-    ? {
-        [K in keyof T]: ExtractKeys<
-          T[K],
-          Prefix extends "" ? `${K & string}` : `${Prefix}.${K & string}`
-        >;
-      }[keyof T]
-    : T extends Record<string, Record<string, string>>
-      ? {
-          [K in keyof T]: ExtractKeys<
-            T[K],
-            Prefix extends "" ? `${K & string}` : `${Prefix}.${K & string}`
-          >;
-        }[keyof T]
-      : T extends Record<string, NestedTranslation>
-        ? {
-            [K in keyof T]: ExtractKeys<
-              T[K],
-              Prefix extends "" ? `${K & string}` : `${Prefix}.${K & string}`
-            >;
-          }[keyof T]
-        : never;
 
 /**
  * Creates a scoped translation system for a specific module
@@ -79,40 +55,65 @@ type ExtractKeys<T, Prefix extends string = ""> = T extends string
  * t("sms.error.invalid_phone_format"); // Type-safe based on EN schema
  */
 export function createScopedTranslation<
-  TEnTranslations extends ScopedTranslationSchema,
-  TTranslations extends Record<Languages, TEnTranslations>,
->(translationsByLanguage: TTranslations) {
-  type TranslationKey = ExtractKeys<TEnTranslations>;
+  const TTranslations extends Record<Languages, ScopedTranslationSchema>,
+>(
+  translationsByLanguage: TTranslations,
+): {
+  ScopedTranslationKey: DotNotation<TTranslations["en"]>;
+  scopedT: (locale: CountryLanguage) => {
+    t: <K extends DotNotation<TTranslations["en"]>>(
+      key: K,
+      params?: ScopedTParams,
+    ) => TranslatedKeyType;
+  };
+} {
+  return {
+    ScopedTranslationKey: undefined as DotNotation<TTranslations["en"]>,
 
-  return function simpleT(locale: CountryLanguage): {
-    t: (key: TranslationKey, params?: ScopedTParams) => string;
-  } {
-    return {
-      t: (key: TranslationKey, params?: ScopedTParams): string => {
-        // Extract language from locale with safety check
-        if (!locale || typeof locale !== "string") {
-          return key; // Return the key as fallback
-        }
+    scopedT: function simpleT(locale: CountryLanguage): {
+      t: <K extends DotNotation<TTranslations["en"]>>(
+        key: K,
+        params?: ScopedTParams,
+      ) => TranslatedKeyType;
+    } {
+      return {
+        t: <K extends DotNotation<TTranslations["en"]>>(
+          key: K,
+          params?: ScopedTParams,
+        ): TranslatedKeyType => {
+          // Extract language from locale with safety check
+          if (!locale || typeof locale !== "string") {
+            return key as TranslatedKeyType; // Return the key as fallback
+          }
+          if (!key || typeof key !== "string") {
+            return key as TranslatedKeyType; // Return the key as fallback
+          }
 
-        const language = locale.split("-")[0] as Languages;
-        const fallbackLanguage: Languages = "en";
+          const language = locale.split("-")[0] as Languages;
+          const defaultLanguage = getLanguageFromLocale(defaultLocale);
 
-        // Get translations for the requested language
-        const languageTranslations = translationsByLanguage[language];
-        const fallbackTranslations = translationsByLanguage[fallbackLanguage];
+          // Get translations for the requested language
+          const languageTranslations = translationsByLanguage[language];
+          const fallbackTranslations = translationsByLanguage[defaultLanguage];
 
-        // Navigate through the translation object using shared logic
-        const keys = key.split(".");
-        let value = navigateTranslationObject(languageTranslations, keys);
+          // Navigate through the translation object using shared logic
+          const keys = (key as string).split(".");
+          let value = navigateTranslationObject(languageTranslations, keys);
 
-        // Try fallback language if value not found
-        if (value === undefined && language !== fallbackLanguage) {
-          value = navigateTranslationObject(fallbackTranslations, keys);
-        }
+          // Try fallback language if value not found
+          if (value === undefined && language !== defaultLanguage) {
+            value = navigateTranslationObject(fallbackTranslations, keys);
+          }
 
-        // Process the translation value using shared logic (handles parameter replacement)
-        return processTranslationValue(value, key, params as TParams, "scoped");
-      },
-    };
+          // Process the translation value using shared logic (handles parameter replacement)
+          return processTranslationValue(
+            value,
+            key,
+            params as TParams,
+            "scoped",
+          ) as TranslatedKeyType;
+        },
+      };
+    },
   };
 }

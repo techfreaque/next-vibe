@@ -21,8 +21,9 @@ import { translations as plTranslations } from "./pl";
 
 // Create an isolated translation function that ONLY uses SMS module translations
 // EN translations are used as the source of truth for type safety
-export const simpleT = createScopedTranslation({
-  en: enTranslations,
-  de: deTranslations,
-  pl: plTranslations,
-});
+export const { scopedT: smsScopedT, ScopedTranslationKey: SmsTranslationKey } =
+  createScopedTranslation({
+    en: enTranslations,
+    de: deTranslations,
+    pl: plTranslations,
+  });

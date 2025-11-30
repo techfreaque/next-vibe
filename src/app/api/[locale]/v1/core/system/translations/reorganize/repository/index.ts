@@ -203,6 +203,122 @@ export class TranslationReorganizeRepositoryImpl {
         });
       }
 
+      // If removeUnused is enabled but regenerateStructure is not, we need to regenerate files based on usage
+      if (
+        request.removeUnused &&
+        !request.regenerateStructure &&
+        keysRemoved > 0
+      ) {
+        logger.debug(
+          "Regenerating translation files based on usage locations (removeUnused without regenerateStructure)",
+        );
+
+        output.push(
+          t(
+            "app.api.v1.core.system.translations.reorganize.post.messages.writingFilteredTranslations",
+          ),
+        );
+
+        // Calculate key usage frequency for smart flattening
+        const keyUsageFrequency = new Map<string, number>();
+        for (const [key, files] of keyUsageMap) {
+          keyUsageFrequency.set(key, files.length);
+        }
+
+        // Group translations by usage location
+        logger.debug("Grouping translations by usage location");
+        const { groups } = this.groupTranslationsByUsage(
+          filteredTranslations,
+          keyUsageMap,
+          keyUsageFrequency,
+          logger,
+        );
+
+        logger.debug(
+          `Created ${groups.size} location-based translation groups`,
+        );
+
+        // Process each language
+        const languages = this.getAvailableLanguages();
+        let filesCreated = 0;
+
+        for (const language of languages) {
+          logger.debug(`Processing language: ${language}`);
+
+          const languageTranslations = await this.loadLanguageTranslations(
+            language,
+            logger,
+          );
+
+          // Apply the new grouping to this language's translations
+          const regroupedTranslations = this.regroupTranslationsForLanguage(
+            languageTranslations,
+            groups,
+            keyUsageMap,
+            logger,
+          );
+
+          logger.debug(
+            `Regrouped translations for ${language}: ${regroupedTranslations.size} groups`,
+          );
+
+          // Generate files
+          try {
+            const generated = this.fileGenerator.generateTranslationFiles(
+              regroupedTranslations,
+              language,
+              logger,
+            );
+
+            if (generated) {
+              filesCreated++;
+              changes.push({
+                type: "updated",
+                path: `i18n/${language}/**/*.ts`,
+                description:
+                  "app.api.v1.core.system.translations.reorganize.post.messages.removedUnusedKeys",
+                descriptionParams: {
+                  language,
+                  count: keysRemoved,
+                },
+              });
+              logger.debug(`Successfully generated files for ${language}`);
+            } else {
+              logger.debug(`File generation returned false for ${language}`);
+            }
+          } catch (fileGenError) {
+            logger.error(`File generation failed for ${language}`, {
+              error: parseError(fileGenError).message,
+            });
+          }
+        }
+
+        output.push(
+          t(
+            "app.api.v1.core.system.translations.reorganize.post.messages.completed",
+          ),
+        );
+
+        return success({
+          response: {
+            success: true,
+            summary: {
+              totalKeys: allKeys.size,
+              usedKeys,
+              unusedKeys: 0,
+              keysRemoved,
+              filesUpdated: 0,
+              filesCreated,
+              backupCreated: !!backupPath,
+            },
+            output: output.join("\n"),
+            duration: Date.now() - startTime,
+            backupPath: backupPath || undefined,
+            changes: changes || [],
+          },
+        });
+      }
+
       // Generate new structure if requested
       if (request.regenerateStructure) {
         logger.debug("Starting regenerateStructure block");
@@ -739,15 +855,14 @@ export class TranslationReorganizeRepositoryImpl {
    * @returns ISO date string
    */
   private extractBackupDate(backupPath: string): string {
-    // Extract timestamp from backup path like "translations-2025-07-28T09-30-44-053Z"
+    // Extract timestamp from backup path like "translations-2025-11-30T12-45-17-439Z"
     const match = backupPath.match(
-      /translations-(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z)/,
+      /translations-(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})-(\d{3})Z/,
     );
     if (match) {
-      // Convert back to ISO format
-      return match[1]
-        .replace(/-/g, ":")
-        .replace(/T(\d{2}):(\d{2}):(\d{2}):(\d{3})Z/, "T$1:$2:$3.$4Z");
+      // Convert back to ISO format: YYYY-MM-DDTHH:MM:SS.mmmZ
+      const [, year, month, day, hour, minute, second, millisecond] = match;
+      return `${year}-${month}-${day}T${hour}:${minute}:${second}.${millisecond}Z`;
     }
     return new Date().toISOString();
   }

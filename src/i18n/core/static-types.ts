@@ -1,6 +1,7 @@
 import type { ExplicitObjectType } from "next-vibe/shared/types/utils";
 
 import type { TranslationSchema } from "./config";
+import type { TranslatedKeyType } from "./scoped-translation";
 
 export interface TranslationElement {
   [key: string]: string | number | string[] | TranslationElement;
@@ -20,7 +21,7 @@ export type DotNotation<T> = (
   : never;
 
 // Type for all possible translation keys
-export type TranslationKey = DotNotation<TranslationSchema>;
+export type TranslationKey = DotNotation<TranslationSchema> | TranslatedKeyType;
 
 // Utility type to get the type of a value at a specific path
 type PathValue<T, P extends string> = P extends `${infer K}.${infer Rest}`

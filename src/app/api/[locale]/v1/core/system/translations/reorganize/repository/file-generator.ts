@@ -204,7 +204,7 @@ export class FileGenerator {
     const typeAnnotation = isMainLanguage ? "" : ": typeof enTranslations";
 
     // eslint-disable-next-line i18next/no-literal-string
-    exports = `export const translations${typeAnnotation} = ${translationsObject} as const;\n\nexport default translations;\n`;
+    exports = `export const translations${typeAnnotation} = ${translationsObject};\n`;
 
     return imports + exports;
   }
@@ -452,7 +452,7 @@ export class FileGenerator {
     const exportsSection = exports.length > 0 ? exports.join(",\n") : "";
 
     // eslint-disable-next-line i18next/no-literal-string
-    return `${importsSection}export const translations = {\n${exportsSection}\n} as const;\n\nexport default translations;\n`;
+    return `${importsSection}export const translations = {\n${exportsSection}\n};\n`;
   }
 
   /**
@@ -483,7 +483,11 @@ export class FileGenerator {
       }
 
       // Generate content with nested objects (not flat keys)
-      const content = this.generateLeafFileContent(translations, language);
+      const content = this.generateLeafFileContent(
+        translations,
+        language,
+        location,
+      );
 
       // Write file
       fs.writeFileSync(filePath, content, "utf8");
@@ -520,62 +524,12 @@ export class FileGenerator {
   }
 
   /**
-   * Strip the path prefix from translation keys to get only the leaf keys
-   * For example: "app.api.v1.core.system.check.typecheck.title" -> "title"
-   */
-  private stripPathPrefixFromKeys(
-    translations: TranslationObject,
-  ): TranslationObject {
-    const stripped: TranslationObject = {};
-
-    for (const [key, value] of Object.entries(translations)) {
-      // Find the last meaningful part after the path
-      const parts = key.split(".");
-
-      // For keys like "app.api.v1.core.system.check.typecheck.title"
-      // We want to keep everything after the location path
-      // The location path typically ends with the directory name
-
-      // Find where the actual translation keys start (after the path structure)
-      let startIndex = 0;
-      const COMMON_PATH_PARTS = [
-        "api",
-        "v1",
-        "core",
-        "system",
-        "app",
-        "locale",
-      ] as const;
-      for (let i = 0; i < parts.length; i++) {
-        // Skip common path parts
-        if (
-          COMMON_PATH_PARTS.includes(
-            parts[i] as (typeof COMMON_PATH_PARTS)[number],
-          )
-        ) {
-          startIndex = i + 1;
-        } else {
-          // Once we hit a non-path part, we've found the start of actual keys
-          break;
-        }
-      }
-
-      // Take everything from the last path segment onwards
-      const leafKey = parts.slice(startIndex).join(".");
-      if (leafKey) {
-        stripped[leafKey] = value;
-      }
-    }
-
-    return stripped;
-  }
-
-  /**
    * Generate content for leaf translation file
    */
   private generateLeafFileContent(
     translations: TranslationObject,
     language: string,
+    _location: string,
   ): string {
     const isMainLanguage = language === "en";
     let imports = "";
@@ -586,16 +540,15 @@ export class FileGenerator {
       imports = `import type { translations as enTranslations } from "../en/index";\n\n`;
     }
 
-    // For leaf files, strip the path prefix and only keep the leaf keys
-    const leafTranslations = this.stripPathPrefixFromKeys(translations);
-    const nestedTranslations =
-      this.unflattenTranslationObject(leafTranslations);
+    // Keep the full path in the keys - don't strip anything
+    // The translation system expects keys to match the full path from src/
+    const nestedTranslations = this.unflattenTranslationObject(translations);
     const translationsObject = this.objectToString(nestedTranslations, 0);
     // eslint-disable-next-line i18next/no-literal-string
     const typeAnnotation = isMainLanguage ? "" : ": typeof enTranslations";
 
     // eslint-disable-next-line i18next/no-literal-string
-    return `${imports}export const translations${typeAnnotation} = ${translationsObject} as const;\n\nexport default translations;\n`;
+    return `${imports}export const translations${typeAnnotation} = ${translationsObject};\n`;
   }
 
   /**
@@ -645,7 +598,7 @@ export class FileGenerator {
     }
 
     // eslint-disable-next-line i18next/no-literal-string
-    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")}\n} as const;\n\nexport default translations;\n`;
+    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")}\n};\n`;
 
     // Create directory if it doesn't exist
     const dir = path.dirname(filePath);
@@ -813,7 +766,7 @@ export class FileGenerator {
     }
 
     // eslint-disable-next-line i18next/no-literal-string
-    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")}\n} as const;\n\nexport default translations;\n`;
+    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")}\n};\n`;
 
     fs.writeFileSync(filePath, content, "utf8");
     logger.debug(
@@ -869,7 +822,7 @@ export class FileGenerator {
     }
 
     // eslint-disable-next-line i18next/no-literal-string
-    return `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")}\n} as const;\n\nexport default translations;\n`;
+    return `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")}\n};\n`;
   }
 
   /**
@@ -1124,7 +1077,7 @@ export class FileGenerator {
     }
 
     // eslint-disable-next-line i18next/no-literal-string
-    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")}\n} as const;\n\nexport default translations;\n`;
+    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")}\n};\n`;
     return content;
   }
 
@@ -1242,7 +1195,7 @@ export class FileGenerator {
     }
 
     // eslint-disable-next-line i18next/no-literal-string
-    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")},\n} as const;\n\nexport default translations;\n`;
+    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")},\n};\n`;
 
     // Create directory
     const dir = path.dirname(indexPath);
@@ -1324,7 +1277,7 @@ export class FileGenerator {
     }
 
     // eslint-disable-next-line i18next/no-literal-string
-    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")},\n} as const;\n\nexport default translations;\n`;
+    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")},\n};\n\nexport default translations;\n`;
 
     // Create directory
     const dir = path.dirname(mainIndexPath);
