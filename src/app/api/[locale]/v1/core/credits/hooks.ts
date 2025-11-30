@@ -141,17 +141,13 @@ export function useCredits(
   /**
    * Refetch credits from server
    */
-  const refetchCredits = useCallback(() => {
-    if (!definitions.GET) {
+  const refetchCredits = useCallback(async () => {
+    if (!endpoint.read?.refetch) {
+      logger.warn("Credits refetch not available");
       return;
     }
-    // Trigger a refetch by invalidating the query
-    // Use the endpoint path as the query key
-    const queryKey = ["credits"];
-    apiClient.invalidateQueries(queryKey).catch((error) => {
-      logger.error("Failed to refetch credits", { error });
-    });
-  }, [logger]);
+    await endpoint.read.refetch();
+  }, [endpoint.read, logger]);
 
   return useMemo(
     () => ({

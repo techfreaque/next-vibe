@@ -14,8 +14,8 @@ import {
 } from "next-vibe-ui/ui/dropdown-menu";
 import { Span } from "next-vibe-ui/ui/span";
 import {
-  Menu,
   MessageSquarePlus,
+  PanelLeft,
   Settings,
   Volume2,
   VolumeX,
@@ -36,10 +36,7 @@ interface TopBarProps {
   locale: CountryLanguage;
 }
 
-export function TopBar({
-  currentCountry,
-  locale,
-}: TopBarProps): JSX.Element {
+export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
   const {
     messages,
     ttsAutoplay,
@@ -67,7 +64,7 @@ export function TopBar({
         className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
         title={t("app.chat.common.toggleSidebar")}
       >
-        <Menu className="h-5 w-5" />
+        <PanelLeft className="h-5 w-5" />
       </Button>
 
       {/* Settings Dropdown */}

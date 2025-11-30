@@ -29,6 +29,8 @@ import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 import { authClientRepository } from "../../auth/repository-client";
 import { useUser } from "../../private/me/hooks";
 import loginEndpoints from "./definition";
+import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
+import definitions from "@/app/api/[locale]/v1/core/credits/definition";
 
 import { useLoginOptions } from "./options/hooks";
 import type { LoginOptions } from "./repository";
@@ -197,6 +199,9 @@ export function useLogin(
             errorCode: authStatusResult.errorType.errorCode,
           });
         }
+
+        // Invalidate credits queries to trigger refetch with new auth state
+        await apiClient.refetchEndpoint(definitions.GET, logger);
 
         // Navigate immediately - the new page will handle user data fetching
         logger.debug("app.api.v1.core.user.public.login.redirect", {

@@ -6,9 +6,8 @@
 
 import "server-only";
 
-import { jsonSchema, tool } from "ai";
+import { jsonSchema, tool, type JSONSchema7 } from "ai";
 import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -52,19 +51,14 @@ function createToolFromEndpoint(
   // Generate Zod schema from fields (with transforms)
   const zodSchemaWithTransforms = generateInputSchema(endpoint);
 
-  // Convert Zod schema to JSON Schema for AI SDK
-  // zodToJsonSchema automatically handles transforms by stripping them
-  const jsonSchemaObject = zodToJsonSchema(
-    zodSchemaWithTransforms as unknown as Parameters<typeof zodToJsonSchema>[0],
-    {
-      target: "openApi3",
-      $refStrategy: "none",
-    },
-  );
+  // Target draft-7 to ensure compatibility with AI SDK's JSONSchema7 type
+  const jsonSchemaObject = z.toJSONSchema(zodSchemaWithTransforms, {
+    target: "draft-7",
+  });
 
   // Wrap JSON Schema in AI SDK's jsonSchema() function
   // This creates a FlexibleSchema that the AI SDK can use
-  const inputSchema = jsonSchema(jsonSchemaObject, {
+  const inputSchema = jsonSchema(jsonSchemaObject as JSONSchema7, {
     validate: (value) => {
       // Use the original Zod schema (with transforms) for validation
       const result = zodSchemaWithTransforms.safeParse(value);

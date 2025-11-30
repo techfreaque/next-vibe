@@ -414,6 +414,13 @@ export async function handleEditOperation<
   content: string;
   role: ChatMessageRole;
 } | null> {
+  logger.info("handleEditOperation called", {
+    hasParentMessageId: !!data.parentMessageId,
+    parentMessageId: data.parentMessageId,
+    threadId: data.threadId,
+    contentPreview: data.content.substring(0, 50),
+  });
+
   // If no parentMessageId, this is branching from the first message (creating a second root message)
   // In this case, we need threadId to be provided
   if (!data.parentMessageId) {
@@ -448,9 +455,15 @@ export async function handleEditOperation<
     return null;
   }
 
+  logger.info("handleEditOperation returning", {
+    threadId: parentMessage.threadId,
+    parentMessageId: parentMessageId,
+    contentPreview: data.content.substring(0, 50),
+  });
+
   return {
     threadId: parentMessage.threadId,
-    parentMessageId: parentMessage.parentId,
+    parentMessageId: parentMessageId, // Use the passed parentMessageId, not parentMessage.parentId
     content: data.content,
     role: data.role,
   };

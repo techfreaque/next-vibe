@@ -114,7 +114,14 @@ export function FolderItem({
   const threadsInFolder = useMemo(() => {
     return Object.values(threads)
       .filter((t) => t.folderId === folder.id)
-      .toSorted((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+      .toSorted((a, b) => {
+        // Pinned threads come first
+        if (a.pinned !== b.pinned) {
+          return a.pinned ? -1 : 1;
+        }
+        // Then sort by updatedAt (newest first)
+        return b.updatedAt.getTime() - a.updatedAt.getTime();
+      });
   }, [threads, folder.id]);
 
   const groupedThreads = useMemo(() => {

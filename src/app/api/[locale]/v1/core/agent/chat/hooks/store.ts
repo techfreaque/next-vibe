@@ -153,7 +153,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
       },
     }));
 
-    void saveIncognitoThread(thread);
+    // Only save to localStorage for incognito threads
+    if (thread.rootFolderId === "incognito") {
+      void saveIncognitoThread(thread);
+    }
   },
 
   updateThread: (threadId: string, updates: Partial<ChatThread>): void =>
@@ -169,7 +172,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
         updatedAt: new Date(),
       };
 
-      void saveIncognitoThread(updatedThread);
+      // Only save to localStorage for incognito threads
+      if (updatedThread.rootFolderId === "incognito") {
+        void saveIncognitoThread(updatedThread);
+      }
 
       return {
         threads: {
@@ -181,6 +187,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   deleteThread: (threadId: string): void =>
     set((state) => {
+      const thread = state.threads[threadId];
+
+      // If incognito thread, also delete from localStorage
+      if (thread?.rootFolderId === "incognito") {
+        void import("../incognito/storage")
+          .then(({ deleteThread }) => {
+            return deleteThread(threadId);
+          })
+          .catch(() => {
+            // Silently fail - localStorage cleanup is not critical
+          });
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [threadId]: _deleted, ...remainingThreads } = state.threads;
       return {
@@ -190,14 +209,23 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   // Message actions
   addMessage: (message: ChatMessage): void => {
-    set((state) => ({
-      messages: {
-        ...state.messages,
-        [message.id]: message,
-      },
-    }));
+    set((state) => {
+      // Check if this message belongs to an incognito thread
+      const thread = state.threads[message.threadId];
+      const isIncognito = thread?.rootFolderId === "incognito";
 
-    void saveIncognitoMessage(message);
+      // Only save to localStorage for incognito messages
+      if (isIncognito) {
+        void saveIncognitoMessage(message);
+      }
+
+      return {
+        messages: {
+          ...state.messages,
+          [message.id]: message,
+        },
+      };
+    });
   },
 
   updateMessage: (messageId: string, updates: Partial<ChatMessage>): void =>
@@ -213,7 +241,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
         updatedAt: new Date(),
       };
 
-      void saveIncognitoMessage(updatedMessage);
+      // Check if this message belongs to an incognito thread
+      const thread = state.threads[message.threadId];
+      const isIncognito = thread?.rootFolderId === "incognito";
+
+      // Only save to localStorage for incognito messages
+      if (isIncognito) {
+        void saveIncognitoMessage(updatedMessage);
+      }
 
       return {
         messages: {
@@ -225,6 +260,22 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   deleteMessage: (messageId: string): void =>
     set((state) => {
+      const message = state.messages[messageId];
+
+      // If incognito message, also delete from localStorage
+      if (message) {
+        const thread = state.threads[message.threadId];
+        if (thread?.rootFolderId === "incognito") {
+          void import("../incognito/storage")
+            .then(({ deleteMessage }) => {
+              return deleteMessage(messageId);
+            })
+            .catch(() => {
+              // Silently fail - localStorage cleanup is not critical
+            });
+        }
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [messageId]: _deleted, ...remainingMessages } = state.messages;
       return {

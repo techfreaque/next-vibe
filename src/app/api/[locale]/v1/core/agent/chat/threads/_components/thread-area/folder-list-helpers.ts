@@ -112,6 +112,20 @@ export function getFolderColorClasses(color: string | null): {
   }
 }
 
+/**
+ * Sort threads by pinned status (pinned first) and then by updatedAt (newest first)
+ */
+function sortThreads(threads: ChatThread[]): ChatThread[] {
+  return threads.toSorted((a, b) => {
+    // Pinned threads come first
+    if (a.pinned !== b.pinned) {
+      return a.pinned ? -1 : 1;
+    }
+    // Then sort by updatedAt (newest first)
+    return b.updatedAt.getTime() - a.updatedAt.getTime();
+  });
+}
+
 export function groupThreadsByTime(threads: ChatThread[]): {
   today: ChatThread[];
   lastWeek: ChatThread[];
@@ -133,5 +147,10 @@ export function groupThreadsByTime(threads: ChatThread[]): {
     }
   });
 
-  return { today, lastWeek, lastMonth };
+  // Sort each group by pinned status and updatedAt
+  return {
+    today: sortThreads(today),
+    lastWeek: sortThreads(lastWeek),
+    lastMonth: sortThreads(lastMonth),
+  };
 }

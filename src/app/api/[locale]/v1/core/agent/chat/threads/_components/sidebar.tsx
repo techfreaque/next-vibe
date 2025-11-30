@@ -176,8 +176,20 @@ export function ChatSidebar({
   );
 
   // Memoize filtered threads for search results to avoid recomputation
+  // Sort by pinned status (pinned first) and then by updatedAt (newest first)
   const filteredSearchThreads = useMemo(
-    () => searchResults.map((result) => threads[result.id]).filter(Boolean),
+    () =>
+      searchResults
+        .map((result) => threads[result.id])
+        .filter(Boolean)
+        .toSorted((a, b) => {
+          // Pinned threads come first
+          if (a.pinned !== b.pinned) {
+            return a.pinned ? -1 : 1;
+          }
+          // Then sort by updatedAt (newest first)
+          return b.updatedAt.getTime() - a.updatedAt.getTime();
+        }),
     [searchResults, threads],
   );
 

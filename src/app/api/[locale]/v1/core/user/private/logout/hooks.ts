@@ -16,6 +16,8 @@ import { authClientRepository } from "../../auth/repository-client";
 import { useUser } from "../me/hooks";
 import logoutEndpoints from "./definition";
 import { useApiMutation } from "../../../system/unified-interface/react/hooks/use-api-mutation";
+import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
+import definitions from "@/app/api/[locale]/v1/core/credits/definition";
 
 /****************************
  * MUTATION HOOKS
@@ -54,6 +56,10 @@ export function useLogout(logger: EndpointLogger): () => void {
       if (!removeResponse.success) {
         // Note: Error already logged by repository
       }
+
+      // Invalidate credits queries to trigger refetch with new auth state
+      await apiClient.refetchEndpoint(definitions.GET, logger);
+
       router.push(`/${locale}/user/login`);
       await refetch();
     },
@@ -73,6 +79,10 @@ export function useLogout(logger: EndpointLogger): () => void {
       if (!removeResponse.success) {
         // Note: Error already logged by repository
       }
+
+      // Invalidate credits queries to trigger refetch with new auth state
+      await apiClient.refetchEndpoint(definitions.GET, logger);
+
       router.push(`/${locale}/user/login`);
       await refetch();
     },

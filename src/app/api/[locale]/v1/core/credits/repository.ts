@@ -9,7 +9,18 @@
  * - All transactions are immutable audit logs
  */
 
-import { and, desc, eq, gte, inArray, isNull, lt, not, or, sql } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  gte,
+  inArray,
+  isNull,
+  lt,
+  not,
+  or,
+  sql,
+} from "drizzle-orm";
 import {
   success,
   ErrorResponseTypes,
@@ -257,7 +268,10 @@ class CreditRepository implements CreditRepositoryInterface {
         for (const leadId of linkedLeadIds) {
           const hasWallet = leadWallets.some((w) => w.leadId === leadId);
           if (!hasWallet) {
-            const walletResult = await this.getOrCreateLeadWallet(leadId, logger);
+            const walletResult = await this.getOrCreateLeadWallet(
+              leadId,
+              logger,
+            );
             if (walletResult.success) {
               leadWallets.push(walletResult.data);
             }
@@ -281,7 +295,68 @@ class CreditRepository implements CreditRepositoryInterface {
   }
 
   /**
+   * Get pool for a lead - ONLY lead wallets (no user wallet)
+   * Used when accessing as a public/logged-out user
+   * Even if lead is linked to a user, only returns lead wallets
+   */
+  async getLeadPoolOnly(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditPool>> {
+    try {
+      // Find all connected leads (lead-to-lead connections only)
+      const connectedLeadIds = await this.findConnectedLeads(leadId, logger);
+
+      // Get wallets for all connected leads
+      let leadWallets = await db
+        .select()
+        .from(creditWallets)
+        .where(inArray(creditWallets.leadId, connectedLeadIds));
+
+      // If no wallets exist, create wallet for the primary lead
+      if (leadWallets.length === 0) {
+        const walletResult = await this.getOrCreateLeadWallet(leadId, logger);
+        if (!walletResult.success) {
+          return walletResult;
+        }
+        leadWallets = [walletResult.data];
+      } else {
+        // Ensure all connected leads have wallets
+        for (const connectedLeadId of connectedLeadIds) {
+          const hasWallet = leadWallets.some(
+            (w) => w.leadId === connectedLeadId,
+          );
+          if (!hasWallet) {
+            const walletResult = await this.getOrCreateLeadWallet(
+              connectedLeadId,
+              logger,
+            );
+            if (walletResult.success) {
+              leadWallets.push(walletResult.data);
+            }
+          }
+        }
+      }
+
+      return success({
+        userWallet: null, // Never include user wallet for lead-only pool
+        leadWallets,
+        poolId: leadId,
+        poolType: "LEAD_POOL",
+      });
+    } catch (error) {
+      logger.error("Failed to get lead pool", parseError(error));
+      return fail({
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.v1.core.credits.errors.getBalanceFailed",
+      });
+    }
+  }
+
+  /**
    * Get pool for a lead - uses graph traversal to find all connected leads
+   * If lead is linked to a user, returns the full user pool (user wallet + lead wallets)
+   * This is used for internal operations where we want full pool behavior
    */
   async getLeadPool(
     leadId: string,
@@ -319,9 +394,14 @@ class CreditRepository implements CreditRepositoryInterface {
       } else {
         // Ensure all connected leads have wallets
         for (const connectedLeadId of connectedLeadIds) {
-          const hasWallet = leadWallets.some((w) => w.leadId === connectedLeadId);
+          const hasWallet = leadWallets.some(
+            (w) => w.leadId === connectedLeadId,
+          );
           if (!hasWallet) {
-            const walletResult = await this.getOrCreateLeadWallet(connectedLeadId, logger);
+            const walletResult = await this.getOrCreateLeadWallet(
+              connectedLeadId,
+              logger,
+            );
             if (walletResult.success) {
               leadWallets.push(walletResult.data);
             }
@@ -375,14 +455,16 @@ class CreditRepository implements CreditRepositoryInterface {
         .where(
           and(
             eq(leadEngagements.leadId, currentLeadId),
-            eq(leadEngagements.engagementType, EngagementTypes.LEAD_ATTRIBUTION),
+            eq(
+              leadEngagements.engagementType,
+              EngagementTypes.LEAD_ATTRIBUTION,
+            ),
           ),
         );
 
       for (const engagement of outbound) {
-        const targetLeadId = (
-          engagement.metadata as { sourceLeadId?: string }
-        )?.sourceLeadId;
+        const targetLeadId = (engagement.metadata as { sourceLeadId?: string })
+          ?.sourceLeadId;
         if (targetLeadId && !visited.has(targetLeadId)) {
           queue.push(targetLeadId);
         }
@@ -392,7 +474,9 @@ class CreditRepository implements CreditRepositoryInterface {
       const inbound = await db
         .select()
         .from(leadEngagements)
-        .where(eq(leadEngagements.engagementType, EngagementTypes.LEAD_ATTRIBUTION));
+        .where(
+          eq(leadEngagements.engagementType, EngagementTypes.LEAD_ATTRIBUTION),
+        );
 
       for (const engagement of inbound) {
         const metadata = engagement.metadata as { sourceLeadId?: string };
@@ -571,10 +655,7 @@ class CreditRepository implements CreditRepositoryInterface {
         .where(
           and(
             eq(creditPacks.walletId, wallet.id),
-            or(
-              isNull(creditPacks.expiresAt),
-              gte(creditPacks.expiresAt, now),
-            ),
+            or(isNull(creditPacks.expiresAt), gte(creditPacks.expiresAt, now)),
           ),
         );
 
@@ -828,17 +909,18 @@ class CreditRepository implements CreditRepositoryInterface {
     const now = new Date();
     const currentPeriodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-    const allWallets = [
-      pool.userWallet,
-      ...pool.leadWallets,
-    ].filter((w): w is CreditWallet => w !== null);
+    const allWallets = [pool.userWallet, ...pool.leadWallets].filter(
+      (w): w is CreditWallet => w !== null,
+    );
 
     if (allWallets.length === 0) {
       return;
     }
 
     // Check if ANY wallet in pool needs reset (different period)
-    const needsReset = allWallets.some((w) => w.freePeriodId !== currentPeriodId);
+    const needsReset = allWallets.some(
+      (w) => w.freePeriodId !== currentPeriodId,
+    );
 
     if (!needsReset) {
       return; // All wallets are current
@@ -854,7 +936,7 @@ class CreditRepository implements CreditRepositoryInterface {
     // USER_POOL: user wallet gets all credits
     // LEAD_POOL: oldest wallet gets credits
     const oldestWallet = allWallets.reduce((oldest, current) =>
-      current.freePeriodStart < oldest.freePeriodStart ? current : oldest
+      current.freePeriodStart < oldest.freePeriodStart ? current : oldest,
     );
     const targetWallet =
       pool.poolType === "USER_POOL" && pool.userWallet
@@ -982,7 +1064,9 @@ class CreditRepository implements CreditRepositoryInterface {
 
   /**
    * Get credit balance for user
-   * Pool-based: Sum all wallets in the pool (user wallet + all linked lead wallets)
+   * Pool-based: Sum all wallets in the pool
+   * - Public users: Only lead wallets (no user wallet)
+   * - Authenticated users: User wallet + all linked lead wallets
    */
   async getCreditBalanceForUser(
     user: JwtPayloadType,
@@ -992,10 +1076,11 @@ class CreditRepository implements CreditRepositoryInterface {
       // Get the pool for this user
       let poolResult: ResponseType<CreditPool>;
       if (user.isPublic) {
-        // Public user - get lead pool
-        poolResult = await this.getLeadPool(user.leadId, logger);
+        // Public user - get ONLY lead wallets (no user wallet)
+        // This ensures logged-out users don't see the authenticated user's credits
+        poolResult = await this.getLeadPoolOnly(user.leadId, logger);
       } else {
-        // Authenticated user - get user pool
+        // Authenticated user - get full user pool (user wallet + lead wallets)
         poolResult = await this.getUserPool(user.id, logger);
       }
 
@@ -1022,7 +1107,6 @@ class CreditRepository implements CreditRepositoryInterface {
       });
     }
   }
-
 
   /**
    * Get or create lead by IP address
@@ -1052,7 +1136,10 @@ class CreditRepository implements CreditRepositoryInterface {
         await this.ensureMonthlyFreeCreditsForPool(poolResult.data, logger);
 
         // Calculate total credits across pool
-        const balance = await this.calculatePoolBalance(poolResult.data, logger);
+        const balance = await this.calculatePoolBalance(
+          poolResult.data,
+          logger,
+        );
 
         return success({
           leadId: existingLead.id,
@@ -1412,11 +1499,15 @@ class CreditRepository implements CreditRepositoryInterface {
             continue;
           }
 
-          const deduction = Math.min(lockedWallet.freeCreditsRemaining, remaining);
+          const deduction = Math.min(
+            lockedWallet.freeCreditsRemaining,
+            remaining,
+          );
           await tx
             .update(creditWallets)
             .set({
-              freeCreditsRemaining: lockedWallet.freeCreditsRemaining - deduction,
+              freeCreditsRemaining:
+                lockedWallet.freeCreditsRemaining - deduction,
               updatedAt: new Date(),
             })
             .where(eq(creditWallets.id, lockedWallet.id));
@@ -1603,7 +1694,8 @@ class CreditRepository implements CreditRepositoryInterface {
         if (remaining > 0) {
           return {
             success: false as const,
-            error: "app.api.v1.core.credits.errors.insufficientCredits" as const,
+            error:
+              "app.api.v1.core.credits.errors.insufficientCredits" as const,
           };
         }
 
@@ -1713,7 +1805,8 @@ class CreditRepository implements CreditRepositoryInterface {
 
   /**
    * Get transactions by lead ID
-   * Pool-based: Fetches from ALL wallets in lead's pool
+   * Pool-based: Fetches from ONLY lead wallets (no user wallet)
+   * This ensures public/logged-out users only see lead transactions
    */
   async getTransactionsByLeadId(
     leadId: string,
@@ -1727,8 +1820,9 @@ class CreditRepository implements CreditRepositoryInterface {
     }>
   > {
     try {
-      // Get lead pool to fetch from all wallets
-      const poolResult = await this.getLeadPool(leadId, logger);
+      // Get lead pool (lead wallets only, no user wallet)
+      // This ensures logged-out users don't see authenticated user's transactions
+      const poolResult = await this.getLeadPoolOnly(leadId, logger);
       if (!poolResult.success) {
         return poolResult;
       }
@@ -2102,10 +2196,14 @@ class CreditRepository implements CreditRepositoryInterface {
 
       return success(undefined);
     } catch (error) {
-      logger.error("Failed to redistribute credits during signup", parseError(error), {
-        userId,
-        leadIds,
-      });
+      logger.error(
+        "Failed to redistribute credits during signup",
+        parseError(error),
+        {
+          userId,
+          leadIds,
+        },
+      );
       return fail({
         message: "app.api.v1.core.credits.errors.mergeLeadWalletsFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

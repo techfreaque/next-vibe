@@ -817,7 +817,7 @@ export class RouteDelegationHandler {
       );
 
       // Convert string boolean values to actual booleans if not already parsed
-      let convertedValue: string | number | boolean | null | undefined = value;
+      let convertedValue: string | number | boolean | null | undefined | InputData | InputData[] = value;
       if (typeof value === "string") {
         const lowerValue = value.toLowerCase();
         if (lowerValue === "true") {
@@ -828,7 +828,7 @@ export class RouteDelegationHandler {
         // Note: Numbers should already be parsed by the CLI argument parser
       }
 
-      data[camelCaseKey] = convertedValue;
+      data[camelCaseKey] = convertedValue as string | number | boolean | null | undefined | InputData | InputData[] | Array<string | number | boolean | null | undefined>;
     }
     return Object.keys(data).length ? data : null;
   }

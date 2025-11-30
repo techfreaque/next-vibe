@@ -4,7 +4,7 @@
  *
  * Routes found: 156
  * Total paths (with aliases): 313
- * Generated at: 2025-11-29T20:14:13.991Z
+ * Generated at: 2025-11-29T22:37:45.563Z
  */
 
 import type { GenericHandlerBase } from "../unified-interface/shared/endpoints/route/handler";

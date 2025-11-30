@@ -9,7 +9,7 @@ import { z } from "zod";
 import { create } from "zustand";
 
 import { generateStorageKey } from "@/app/api/[locale]/v1/core/system/unified-interface/react/utils/storage-storage-client";
-import type { CreateApiEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import type { CreateApiEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import type { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
@@ -31,7 +31,6 @@ export const queryClient = new QueryClient({
   },
 });
 
-// Type alias for any data that can be stored
 export type AnyData =
   | Record<string, never>
   | Record<string, string | number | boolean | null | undefined>
@@ -41,13 +40,8 @@ export type AnyData =
   | null
   | undefined;
 
-// Generic type for custom state values - must be compatible with AnyData
 type CustomStateValue = string | number | boolean | null | undefined;
 
-// Note: In-flight request tracking, throttling, and deduplication
-// are now handled by React Query, so these utilities have been removed
-
-// Type definitions for better type safety
 interface FormStoreItem {
   formError: ErrorResponseType | null;
   isSubmitting: boolean;
@@ -80,7 +74,6 @@ export type TypedCustomStateSetter<T extends CustomStateValue> = (
   value: T,
 ) => void;
 
-// Helper function to create a typed custom state key
 export function createCustomStateKey<T extends CustomStateValue>(
   key: string,
 ): TypedCustomStateKey<T> {
@@ -157,6 +150,15 @@ export interface ApiStore {
   refetchQuery: <TResponse>(
     queryKey: QueryKey,
   ) => Promise<ResponseType<TResponse | undefined>>;
+
+  /**
+   * Refetch endpoint queries by invalidating all queries for this endpoint
+   * This will cause all matching queries to refetch with their stored parameters
+   */
+  refetchEndpoint: <TEndpoint extends CreateApiEndpointAny>(
+    endpoint: TEndpoint,
+    logger: EndpointLogger,
+  ) => Promise<void>;
 
   /**
    * Update endpoint data in React Query cache (for optimistic updates)
@@ -260,8 +262,31 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     return data ?? success(undefined);
   },
 
-  // OLD executeQuery IMPLEMENTATION REMOVED - lines 321-1029
-  // Now using query-executor.ts with React Query
+  refetchEndpoint: async <TEndpoint extends CreateApiEndpointAny>(
+    endpoint: TEndpoint,
+    logger: EndpointLogger,
+  ): Promise<void> => {
+    // Build the endpoint key prefix
+    const endpointKeyPrefix = `query-${endpoint.path.join("-")}-${endpoint.method}`;
+
+    logger.debug("Invalidating endpoint queries", { endpointKeyPrefix });
+
+    // Get all queries from cache that match this endpoint
+    const matchingQueries = queryClient.getQueryCache().findAll({
+      predicate: (query) => query.queryKey[0] === endpointKeyPrefix,
+    });
+
+    logger.debug("Found queries to invalidate", {
+      count: matchingQueries.length,
+    });
+
+    // Invalidate each query using its exact stored queryKey
+    // The queryKey contains [endpointKey, requestDataKey, urlPathParamsKey]
+    // where requestDataKey and urlPathParamsKey are JSON stringified
+    for (const query of matchingQueries) {
+      await queryClient.invalidateQueries({ queryKey: query.queryKey });
+    }
+  },
 
   // Form-related methods
   setFormError: (formId: string, error: ErrorResponseType | null): void => {
@@ -486,6 +511,19 @@ export const apiClient = {
    */
   invalidateQueries: async (queryKey: QueryKey): Promise<void> => {
     await useApiStore.getState().invalidateQueries(queryKey);
+  },
+
+  /**
+   * Refetch endpoint queries by invalidating all queries for this endpoint
+   *
+   * @example
+   * await apiClient.refetchEndpoint(creditsDefinition.GET, logger);
+   */
+  refetchEndpoint: async <TEndpoint extends CreateApiEndpointAny>(
+    endpoint: TEndpoint,
+    logger: EndpointLogger,
+  ): Promise<void> => {
+    return useApiStore.getState().refetchEndpoint(endpoint, logger);
   },
 
   /**

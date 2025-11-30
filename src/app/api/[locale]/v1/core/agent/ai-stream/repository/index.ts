@@ -333,10 +333,6 @@ class AiStreamRepository implements IAiStreamRepository {
             lastParentId = currentParentId;
             lastDepth = currentDepth;
 
-            // Get the OpenRouter model ID (use openRouterModel if available, otherwise use model ID directly)
-            const openRouterModelId =
-              modelConfig?.openRouterModel || data.model;
-
             const streamResult = streamText({
               model: provider.chat(modelConfig.openRouterModel),
               messages,
@@ -357,6 +353,26 @@ class AiStreamRepository implements IAiStreamRepository {
 
             for await (const part of streamResult.fullStream) {
               if (part.type === "finish-step") {
+                // Finalize current ASSISTANT message before resetting for next step
+                if (currentAssistantMessageId && currentAssistantContent) {
+                  const usage = await streamResult.usage;
+                  const finishReason = await streamResult.finishReason;
+
+                  await AiStreamRepository.finalizeAssistantMessage({
+                    currentAssistantMessageId,
+                    currentAssistantContent,
+                    isInReasoningBlock,
+                    streamResult: {
+                      finishReason,
+                      usage,
+                    },
+                    isIncognito,
+                    controller,
+                    encoder,
+                    logger,
+                  });
+                }
+
                 // After a step finishes, update currentParentId/currentDepth to point to the last message
                 currentParentId = lastParentId;
                 currentDepth = lastDepth;
@@ -573,8 +589,23 @@ class AiStreamRepository implements IAiStreamRepository {
             const usage = await streamResult.usage;
             const finishReason = await streamResult.finishReason;
 
+            logger.info("[AI Stream] Before finalization check", {
+              hasCurrentAssistantMessageId: !!currentAssistantMessageId,
+              currentAssistantMessageId,
+              hasCurrentAssistantContent: !!currentAssistantContent,
+              currentAssistantContentLength: currentAssistantContent.length,
+              currentAssistantContentPreview: currentAssistantContent.substring(
+                0,
+                100,
+              ),
+            });
+
             // Finalize current ASSISTANT message if exists
             if (currentAssistantMessageId && currentAssistantContent) {
+              logger.info("[AI Stream] Calling finalizeAssistantMessage", {
+                messageId: currentAssistantMessageId,
+                contentLength: currentAssistantContent.length,
+              });
               await AiStreamRepository.finalizeAssistantMessage({
                 currentAssistantMessageId,
                 currentAssistantContent,
@@ -587,6 +618,11 @@ class AiStreamRepository implements IAiStreamRepository {
                 controller,
                 encoder,
                 logger,
+              });
+            } else {
+              logger.warn("[AI Stream] Skipping finalization", {
+                hasCurrentAssistantMessageId: !!currentAssistantMessageId,
+                hasCurrentAssistantContent: !!currentAssistantContent,
               });
             }
 

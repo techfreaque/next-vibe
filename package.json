@@ -226,7 +226,6 @@
     "vite": "7.2.2",
     "webpack": "5.103.0",
     "zod": "4.1.12",
-    "zod-to-json-schema": "^3.25.0",
     "zustand": "5.0.8"
   },
   "devDependencies": {

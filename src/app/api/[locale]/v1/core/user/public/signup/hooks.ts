@@ -17,6 +17,8 @@ import { authClientRepository } from "../../auth/repository-client";
 import { useUser } from "../../private/me/hooks";
 import signupEndpoints from "./definition";
 import { type ApiInferMutationOptions } from "../../../system/unified-interface/react/hooks/types";
+import { apiClient } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/store";
+import definitions from "@/app/api/[locale]/v1/core/credits/definition";
 
 type SignupFormReturn = EndpointReturn<typeof signupEndpoints> & {
   logger: ReturnType<typeof createEndpointLogger>;
@@ -79,6 +81,9 @@ export function useRegister(): SignupFormReturn & {
         });
         return setTokenResponse;
       }
+
+      // Invalidate credits queries to trigger refetch with new auth state
+      await apiClient.refetchEndpoint(definitions.GET, logger);
 
       // Show success message (alert is handled by useEndpoint)
       toast({

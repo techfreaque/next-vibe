@@ -68,12 +68,13 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
   }
 
   async doGenerate(): Promise<never> {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     throw new Error("doGenerate not implemented - use doStream instead");
   }
 
   async doStream(options: LanguageModelV2CallOptions): Promise<{
     stream: ReadableStream<LanguageModelV2StreamPart>;
-    request?: { body?: unknown };
+    request?: { body?: string };
     response?: { headers?: Record<string, string> };
   }> {
     const { prompt, tools, ...settings } = options;
@@ -98,33 +99,35 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
           .join("\n");
         return { role: "assistant" as const, content: textContent };
       }
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
       throw new Error(`Unsupported message role: ${msg.role}`);
     });
 
     // Convert AI SDK tools to OpenAI format
     // AI SDK passes tools as an array of LanguageModelV2FunctionTool
-    // Each tool has: { type: 'function', name: string, description?: string, inputSchema: JSONSchema7 }
-    console.log("[UncensoredAI] Tools debug", {
-      toolsArray: tools,
-      firstTool: tools?.[0],
-      firstToolKeys: tools?.[0] ? Object.keys(tools[0]) : null,
-      inputSchema: tools?.[0]?.inputSchema,
-      inputSchemaType: typeof tools?.[0]?.inputSchema,
-      inputSchemaKeys:
-        tools?.[0]?.inputSchema && typeof tools[0].inputSchema === "object"
-          ? Object.keys(tools[0].inputSchema)
-          : null,
-    });
-
+    // Each tool has: { type: 'function', name: string, description?: string, parameters: JSONSchema7 }
     const openAITools = tools
-      ? tools.map((tool) => ({
-          type: "function" as const,
-          function: {
-            name: tool.name,
-            description: tool.description || "",
-            parameters: tool.inputSchema, // AI SDK uses inputSchema, OpenAI uses parameters
-          },
-        }))
+      ? tools.map((tool) => {
+          if (tool.type === "function") {
+            return {
+              type: "function" as const,
+              function: {
+                name: tool.name,
+                description: tool.description || "",
+                parameters: tool.inputSchema, // AI SDK v2 uses inputSchema
+              },
+            };
+          }
+          // Provider-defined tools
+          return {
+            type: "function" as const,
+            function: {
+              name: tool.name,
+              description: "",
+              parameters: {},
+            },
+          };
+        })
       : undefined;
 
     const requestBody = {
@@ -136,14 +139,7 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
       ...(openAITools && openAITools.length > 0 ? { tools: openAITools } : {}),
     };
 
-    console.log("[UncensoredAI] Sending request to API", {
-      model: this.modelId,
-      messageCount: messages.length,
-      hasTools: !!openAITools && openAITools.length > 0,
-      toolCount: openAITools?.length ?? 0,
-      tools: openAITools,
-      fullRequestBody: JSON.stringify(requestBody, null, 2),
-    });
+    // Debug logging disabled in production
 
     const response = await fetch(this.baseURL, {
       method: "POST",
@@ -158,6 +154,7 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
 
     if (!response.ok) {
       const errorText = await response.text();
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
       throw new Error(
         `UncensoredAI API error: ${response.status} ${response.statusText} - ${errorText}`,
       );
@@ -168,7 +165,7 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
     return {
       stream,
       request: {
-        body: requestBody,
+        body: JSON.stringify(requestBody),
       },
       response: {
         headers: Object.fromEntries(response.headers.entries()),

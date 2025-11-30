@@ -6,9 +6,7 @@
 
 import { useCallback } from "react";
 
-import { AUTH_STATUS_COOKIE_PREFIX } from "@/config/constants";
 import { parseError } from "next-vibe/shared/utils";
-import { getCookie } from "next-vibe-ui/lib/cookies";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -421,13 +419,24 @@ export function useMessageOperations(
       try {
         let messageHistory: ChatMessage[] | null | undefined;
 
+        // Branch should be a sibling to the source message
+        // So the parent is the source message's parent (the AI response before it)
         const branchParentId = message.parentId;
+
+        logger.info("Branch operation details", {
+          sourceMessageId: messageId,
+          sourceMessageContent: message.content.substring(0, 50),
+          sourceMessageParentId: message.parentId,
+          sourceMessageDepth: message.depth,
+          branchParentId,
+        });
 
         if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
           const threadMessages = Object.values(chatStore.messages)
             .filter((msg) => msg.threadId === message.threadId)
             .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
+          // For incognito, we need to include up to the parent message in history
           if (branchParentId) {
             const parentIndex = threadMessages.findIndex(
               (msg) => msg.id === branchParentId,
@@ -584,17 +593,27 @@ export function useMessageOperations(
         return;
       }
 
-      const authStatusCookie = await getCookie(AUTH_STATUS_COOKIE_PREFIX);
-      const isAuthenticated = authStatusCookie !== null;
+      // Determine if this is an incognito thread or streaming message
+      // Both are handled client-side only
+      const isIncognitoThread = thread.rootFolderId === DefaultFolderId.INCOGNITO;
+      const isStreamingMessage = streamStore.streamingMessages[messageId] !== undefined;
 
-      // Handle incognito message deletion
-      if (!isAuthenticated || thread.rootFolderId === "incognito") {
+      logger.debug("Message operations: Delete message thread type check", {
+        messageId,
+        threadRootFolderId: thread.rootFolderId,
+        isIncognitoThread,
+        isStreamingMessage,
+        willUseServerAPI: !isIncognitoThread && !isStreamingMessage,
+      });
+
+      // Handle incognito or streaming message deletion (client-side only)
+      if (isIncognitoThread || isStreamingMessage) {
         logger.debug(
-          "Message operations: Deleting incognito message (client-side only)",
+          "Message operations: Deleting message (client-side only)",
           {
             messageId,
-            isAuthenticated,
             rootFolderId: thread.rootFolderId,
+            reason: isIncognitoThread ? "incognito thread" : "streaming message",
           },
         );
 
@@ -629,6 +648,12 @@ export function useMessageOperations(
 
       // Handle server-side message deletion
       try {
+        logger.debug("Message operations: Making DELETE request to server", {
+          url: `/api/${locale}/v1/core/agent/chat/threads/${message.threadId}/messages/${messageId}`,
+          threadId: message.threadId,
+          messageId,
+        });
+
         const response = await fetch(
           `/api/${locale}/v1/core/agent/chat/threads/${message.threadId}/messages/${messageId}`,
           {
@@ -637,11 +662,38 @@ export function useMessageOperations(
         );
 
         if (!response.ok) {
-          logger.error("Message operations: Failed to delete message", {
+          const errorText = await response.text();
+
+          // If message not found (404), it might already be deleted
+          // In this case, remove it from local store anyway
+          if (response.status === 404) {
+            logger.warn(
+              "Message operations: Message not found on server (already deleted?), removing from local store",
+              {
+                messageId,
+                threadId: message.threadId,
+                errorBody: errorText,
+              },
+            );
+            chatStore.deleteMessage(messageId);
+            return;
+          }
+
+          // For other errors, log and don't delete from store
+          logger.error("Message operations: Server failed to delete message", {
             status: response.status,
+            statusText: response.statusText,
+            errorBody: errorText,
+            messageId,
+            threadId: message.threadId,
           });
           return;
         }
+
+        logger.debug("Message operations: Server deletion successful", {
+          messageId,
+          threadId: message.threadId,
+        });
 
         chatStore.deleteMessage(messageId);
 
@@ -655,7 +707,7 @@ export function useMessageOperations(
         }
       } catch (error) {
         logger.error(
-          "Message operations: Failed to delete message",
+          "Message operations: Exception during message deletion",
           parseError(error),
         );
       }
@@ -685,15 +737,14 @@ export function useMessageOperations(
         return;
       }
 
-      const authStatusCookie = await getCookie(AUTH_STATUS_COOKIE_PREFIX);
-      const isAuthenticated = authStatusCookie !== null;
+      // Voting is only supported for server threads (not incognito)
+      const isIncognitoThread = thread.rootFolderId === DefaultFolderId.INCOGNITO;
 
-      if (!isAuthenticated || thread.rootFolderId === "incognito") {
+      if (isIncognitoThread) {
         logger.debug(
           "Message operations: Voting not supported in incognito mode",
           {
             messageId,
-            isAuthenticated,
             rootFolderId: thread.rootFolderId,
           },
         );

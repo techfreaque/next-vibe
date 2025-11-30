@@ -737,9 +737,9 @@ function toAiSdkMessage(
 
         // Return tool result in AI SDK format
         // This allows the AI to properly understand the tool execution and continue with more tool calls
-        const output: ToolCallResult = toolCall.error
-          ? { error: toolCall.error }
-          : (toolCall.result ?? null);
+        const output = toolCall.error
+          ? { type: "error-text" as const, value: toolCall.error }
+          : { type: "json" as const, value: toolCall.result ?? null };
 
         return {
           role: "assistant",
