@@ -16,10 +16,6 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type {
-  ApiSection,
-  CreateApiEndpointAny,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
 import { endpointToToolName } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/utils/path";
 import {
   findFilesRecursively,
@@ -27,18 +23,6 @@ import {
   generateFileHeader,
   writeGeneratedFile,
 } from "../shared/utils";
-
-// HTTP method keys for explicit property access
-type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
-const HTTP_METHODS: readonly HttpMethod[] = [
-  "GET",
-  "POST",
-  "PUT",
-  "PATCH",
-  "DELETE",
-  "HEAD",
-  "OPTIONS",
-] as const;
 
 // Type definitions
 interface EndpointRequestType {
@@ -126,7 +110,6 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
     }
   }
 
-
   /**
    * Generate endpoint content with dynamic imports and real aliases from definitions
    * Main paths include method suffix (e.g., "core/agent/ai-stream/POST")
@@ -211,7 +194,7 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
         { method: "OPTIONS" as const, endpoint: defaultExport.OPTIONS },
       ];
 
-      for (const { method, endpoint } of methodEntries) {
+      for (const { endpoint } of methodEntries) {
         if (!endpoint) {
           continue;
         }

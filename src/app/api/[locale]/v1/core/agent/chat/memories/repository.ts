@@ -205,20 +205,6 @@ export async function generateMemorySummary(params: {
   // Update access metadata
   await updateMemoryAccess({ userId, logger });
 
-  // Helper to get relative time
-  const getRelativeTime = (date: Date): string => {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 1) return "now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return `${diffDays}d ago`;
-  };
-
   // Format as numbered list with IDs, priority, and recency
   const summary = memoriesList
     .map((memory, index) => {
@@ -257,6 +243,26 @@ ${summary}
 - When consolidating: UPDATE most recent/highest priority, DELETE duplicates
 - Check priority (P:) and age before deciding which to keep`;
 }
+
+// Helper to get relative time
+const getRelativeTime = (date: Date): string => {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) {
+    return "now";
+  }
+  if (diffMins < 60) {
+    return `${diffMins}m ago`;
+  }
+  if (diffHours < 24) {
+    return `${diffHours}h ago`;
+  }
+  return `${diffDays}d ago`;
+};
 
 /**
  * Get next sequence number for a user
