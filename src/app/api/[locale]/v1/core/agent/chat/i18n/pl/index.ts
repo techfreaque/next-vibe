@@ -158,4 +158,14 @@ export const translations: typeof enTranslations = {
   tools: {
     braveSearch: braveSearchTranslations,
   },
+  models: {
+    descriptions: {
+      uncensoredLmV11:
+        "Niecenzurowany model AI dla kreatywnych i nieograniczonych rozmów",
+      freedomgptLiberty:
+        "FreedomGPT Liberty - Niecenzurowany model AI skoncentrowany na wolności wypowiedzi i treściach kreatywnych",
+      gabAiArya:
+        "Gab AI Arya - Niecenzurowany model konwersacyjny AI z wolnością wypowiedzi i kreatywnymi możliwościami",
+    },
+  },
 };

@@ -97,6 +97,8 @@ const {
   FolderInput,
   FolderOpen,
   FolderPlus,
+  FreedomGptLogo,
+  GabAILogo,
   Gamepad,
   Gift,
   GitBranch,
@@ -473,6 +475,8 @@ export const ICON_REGISTRY = {
   "si-x": SiX,
   "si-zendesk": SiZendesk,
   "si-alibabadotcom": SiAlibabadotcom,
+  "freedom-gpt-logo": FreedomGptLogo,
+  "gab-ai-logo": GabAILogo,
   moon: MoonIcon,
 
   // News & Media

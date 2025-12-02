@@ -388,17 +388,37 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
           ? new Date(subscriptionResult.data.currentPeriodEnd)
           : null;
 
+        // IDEMPOTENCY CHECK: Verify credits haven't been added for this checkout session already
+        const { creditPacks } = await import("../credits/db");
+        const { sql } = await import("drizzle-orm");
+        const [existingPack] = await db
+          .select()
+          .from(creditPacks)
+          .where(sql`${creditPacks.metadata}->>'sessionId' = ${session.id}`)
+          .limit(1);
+
+        if (existingPack) {
+          logger.info("Subscription credits already processed for session", {
+            sessionId: session.id,
+            packId: existingPack.id,
+            userId,
+          });
+          return; // Idempotent - already processed
+        }
+
         await creditRepository.addUserCredits(
           userId as string,
           product.credits,
           "subscription",
           logger,
           expiresAt ?? undefined,
+          session.id, // Pass sessionId for idempotency tracking
         );
         logger.debug("Added subscription credits", {
           userId,
           credits: product.credits,
           expiresAt: expiresAt?.toISOString(),
+          sessionId: session.id,
         });
       }
 
@@ -493,18 +513,42 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
             ? new Date(subscriptionResult.data.currentPeriodEnd)
             : null;
 
+          // IDEMPOTENCY CHECK: Verify credits haven't been added for this invoice already
+          // Use invoice ID as sessionId for idempotency tracking
+          const invoiceId = (invoice as { id?: string }).id;
+          if (invoiceId) {
+            const { creditPacks } = await import("../credits/db");
+            const { sql } = await import("drizzle-orm");
+            const [existingPack] = await db
+              .select()
+              .from(creditPacks)
+              .where(sql`${creditPacks.metadata}->>'sessionId' = ${invoiceId}`)
+              .limit(1);
+
+            if (existingPack) {
+              logger.info("Renewal credits already processed for invoice", {
+                invoiceId,
+                packId: existingPack.id,
+                userId: subscription.userId,
+              });
+              return; // Idempotent - already processed
+            }
+          }
+
           await creditRepository.addUserCredits(
             subscription.userId,
             product.credits,
             "subscription",
             logger,
             expiresAt ?? undefined,
+            invoiceId, // Pass invoiceId as sessionId for idempotency tracking
           );
           logger.debug("Added renewal credits", {
             userId: subscription.userId,
             credits: product.credits,
             expiresAt: expiresAt?.toISOString(),
             billingReason,
+            invoiceId,
           });
         }
       }

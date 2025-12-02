@@ -61,6 +61,7 @@ export const translations = {
     assistantMessageActions: {
       stopAudio: "Stop audio playback",
       playAudio: "Play audio",
+      cancelLoading: "Cancel loading",
       answerAsAI: "Answer as AI model",
       deleteMessage: "Delete message",
     },
@@ -627,6 +628,10 @@ export const translations = {
         "GLM 4.5v - vision-capable multimodal model with large context window",
       uncensoredLmV11:
         "Uncensored language model without content filtering - premium model",
+      freedomgptLiberty:
+        "FreedomGPT Liberty - Uncensored AI model focused on free expression and creative content",
+      gabAiArya:
+        "Gab AI Arya - Uncensored conversational AI model with free expression and creative capabilities",
     },
   },
   tones: {
@@ -706,10 +711,13 @@ export const translations = {
   },
   debugView: {
     systemPrompt: "System Prompt",
+    systemPromptTitle: "System Prompt (Generated)",
     systemPromptHint:
       "This is the system prompt for the entire conversation thread",
     systemMessage: "System Message",
-    systemMessageHint: "This is a system message injected into the conversation",
+    systemMessageHint:
+      "This is a system message injected into the conversation",
+    copied: "Copied!",
     retryModal: {
       title: "Retry with Different Settings",
       description: "Choose a model and persona to regenerate the response",
@@ -895,8 +903,10 @@ export const translations = {
       loadingAudio: "Loading audio...",
       stopAudio: "Stop audio",
       playAudio: "Play audio",
+      cancelLoading: "Cancel loading",
       stop: "Stop",
       play: "Play",
+      cancel: "Cancel",
       reply: "Reply",
       replyToMessage: "Reply to this message (creates a branch)",
       edit: "Edit",

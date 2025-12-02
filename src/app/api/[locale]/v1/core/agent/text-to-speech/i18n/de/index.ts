@@ -5,10 +5,10 @@
 export const translations = {
   post: {
     title: "Text zu Sprache",
-    description: "Konvertieren Sie Text in natürlich klingende Sprache mit KI",
+    description: "Konvertieren Sie Text in natürlich klingende Sprache mit KI (pro Zeichen berechnet)",
     form: {
       title: "Text-zu-Sprache-Konvertierung",
-      description: "Geben Sie Text ein, um ihn in Sprache umzuwandeln",
+      description: "Geben Sie Text ein, um ihn in Sprache umzuwandeln (Kosten basieren auf Zeichenanzahl)",
     },
     text: {
       label: "Text",

@@ -6,44 +6,64 @@
 import "server-only";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { TFunction } from "@/i18n/core/static-types";
+import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getPersonaById } from "@/app/api/[locale]/v1/core/agent/chat/personas/repository";
 import { formattingInstructions } from "./system-prompt";
+import {
+  generateSystemPrompt,
+  getCurrentDateString,
+  getModelCount,
+} from "./system-prompt-generator";
 
 /**
  * Build complete system prompt from persona ID
  *
  * Priority order:
- * 1. Persona systemPrompt (if persona ID provided)
- * 2. Empty string (default behavior - formatting instructions only)
- *
- * Formatting instructions are ALWAYS appended to the final system prompt
+ * 1. Platform introduction (unbottled.ai, model count, freedom of speech)
+ * 2. User locale and language requirements
+ * 3. Persona systemPrompt (if persona ID provided)
+ * 4. Formatting instructions
  *
  * @param personaId - Optional persona ID (can be default persona ID or custom persona UUID)
  * @param userId - Optional user ID (required for custom personas)
  * @param logger - Logger instance
+ * @param t - Translation function for appName
+ * @param locale - User's locale (language-country)
+ * @param rootFolderId - Current root folder context
+ * @param subFolderId - Current sub folder context
  * @returns Complete system prompt with formatting instructions
  */
 export async function buildSystemPrompt(params: {
   personaId: string | null | undefined;
   userId: string | undefined;
   logger: EndpointLogger;
+  t: TFunction;
+  locale: CountryLanguage;
+  rootFolderId?: DefaultFolderId;
+  subFolderId?: string | null;
 }): Promise<string> {
-  const { personaId, userId, logger } = params;
+  const { personaId, userId, logger, t, locale, rootFolderId, subFolderId } =
+    params;
 
   logger.debug("Building system prompt", {
     hasPersonaId: !!personaId,
     hasUserId: !!userId,
+    rootFolderId,
+    subFolderId,
   });
 
-  // Priority 1: Persona system prompt
+  let personaPrompt = "";
+
+  // Get persona system prompt if provided
   if (personaId) {
     try {
       const persona = await getPersonaById(personaId, userId);
 
       if (!persona) {
         logger.warn("Persona not found, using default", { personaId });
-        // Fall through to default (empty string)
       } else {
         logger.debug("Using persona system prompt", {
           personaId: persona.id,
@@ -52,24 +72,35 @@ export async function buildSystemPrompt(params: {
         });
 
         if (persona.systemPrompt && persona.systemPrompt.trim()) {
-          return buildFinalSystemPrompt(persona.systemPrompt, logger);
+          personaPrompt = persona.systemPrompt.trim();
+        } else {
+          logger.debug(
+            "Persona has empty system prompt, using default behavior",
+          );
         }
-
-        // Persona exists but has empty system prompt (e.g., "default" persona)
-        logger.debug("Persona has empty system prompt, using default behavior");
       }
     } catch (error) {
       logger.error("Failed to load persona, using default", {
         personaId,
         error: error instanceof Error ? error.message : String(error),
       });
-      // Fall through to default (empty string)
     }
   }
 
-  // Priority 2: Default (empty string with only formatting instructions)
-  logger.debug("Using default system prompt (formatting instructions only)");
-  return buildFinalSystemPrompt("", logger);
+  // Generate platform introduction with context
+  const appName = t("config.appName");
+  const platformPrompt = generateSystemPrompt({
+    appName,
+    date: getCurrentDateString(),
+    modelCount: getModelCount(),
+    locale,
+    rootFolderId,
+    subFolderId,
+    personaPrompt,
+  });
+
+  // Build final prompt with formatting instructions
+  return buildFinalSystemPrompt(platformPrompt, logger);
 }
 
 /**

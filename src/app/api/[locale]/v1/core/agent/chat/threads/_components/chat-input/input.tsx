@@ -67,7 +67,7 @@ export function ChatInput({
     <Form
       onSubmit={onSubmit}
       className={cn(
-        "p-2 sm:p-3 md:p-4 bg-background/20 backdrop-blur",
+        "p-2 sm:p-3 md:p-4 bg-blue-200/70 dark:bg-blue-950/70 backdrop-blur",
         "border border-border rounded-t-lg",
         className,
       )}

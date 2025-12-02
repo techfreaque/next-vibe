@@ -5,10 +5,10 @@
 export const translations = {
   post: {
     title: "Text to Speech",
-    description: "Convert text to natural-sounding speech using AI",
+    description: "Convert text to natural-sounding speech using AI (charged per character)",
     form: {
       title: "Text to Speech Conversion",
-      description: "Enter text to convert to speech",
+      description: "Enter text to convert to speech (cost calculated based on character count)",
     },
     text: {
       label: "Text",

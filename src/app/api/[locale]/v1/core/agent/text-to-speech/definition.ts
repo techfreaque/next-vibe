@@ -20,11 +20,7 @@ import {
 } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
 
-import {
-  TtsLanguageOptions,
-  TtsProviderOptions,
-  TtsVoiceOptions,
-} from "./enum";
+import { TtsVoiceOptions } from "./enum";
 
 /**
  * Text-to-Speech Endpoint (POST)
@@ -39,7 +35,7 @@ const { POST } = createEndpoint({
     UserRole.PUBLIC,
     UserRole.AI_TOOL_OFF,
   ],
-  credits: 2, // Cost 2 credits per TTS conversion
+  credits: 0, // Cost is calculated based on character count (not fixed)
 
   title: "app.api.v1.core.agent.textToSpeech.post.title",
   description: "app.api.v1.core.agent.textToSpeech.post.description",
@@ -73,18 +69,6 @@ const { POST } = createEndpoint({
         },
         z.string().min(1).max(5000),
       ),
-      provider: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.v1.core.agent.textToSpeech.post.provider.label",
-          description:
-            "app.api.v1.core.agent.textToSpeech.post.provider.description",
-          columns: 4,
-          options: TtsProviderOptions,
-        },
-        z.string().default("openai"),
-      ),
       voice: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -92,22 +76,10 @@ const { POST } = createEndpoint({
           label: "app.api.v1.core.agent.textToSpeech.post.voice.label",
           description:
             "app.api.v1.core.agent.textToSpeech.post.voice.description",
-          columns: 4,
+          columns: 12,
           options: TtsVoiceOptions,
         },
         z.string().default("MALE"),
-      ),
-      language: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.v1.core.agent.textToSpeech.post.language.label",
-          description:
-            "app.api.v1.core.agent.textToSpeech.post.language.description",
-          columns: 4,
-          options: TtsLanguageOptions,
-        },
-        z.string().default("en"),
       ),
 
       // === RESPONSE FIELDS ===
@@ -213,9 +185,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         text: "Hello, this is a test of the text to speech system.",
-        provider: "openai",
         voice: "MALE",
-        language: "en",
       },
     },
     responses: {
@@ -223,7 +193,7 @@ const { POST } = createEndpoint({
         response: {
           success: true,
           audioUrl: "https://example.com/audio.mp3",
-          provider: "openai",
+          provider: "amazon",
         },
       },
     },

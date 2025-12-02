@@ -96,16 +96,18 @@ export function MessageEditor({
           )}
         </Div>
 
-        {/* Controls */}
-        <Div className="flex flex-col gap-2">
-          {/* Model and Tone Selectors */}
-          <Div className="flex items-center gap-2 flex-wrap">
+        {/* Controls - ALL IN ONE LINE */}
+        <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 flex-nowrap">
+          {/* Left side: Model & Persona Selectors */}
+          <Div className="flex flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 flex-1 min-w-0">
             {onModelChange && (
               <ModelSelector
                 value={selectedModel}
                 onChange={onModelChange}
                 locale={locale}
                 logger={logger}
+                buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
+                showTextAt="sm"
               />
             )}
             {onPersonaChange && (
@@ -114,12 +116,14 @@ export function MessageEditor({
                 onChange={onPersonaChange}
                 locale={locale}
                 logger={logger}
+                buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
+                showTextAt="md"
               />
             )}
           </Div>
 
-          {/* Action Buttons */}
-          <Div className="flex items-center gap-2 flex-wrap">
+          {/* Right side: Speech Input & Branch/Cancel Buttons */}
+          <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 shrink-0">
             {/* Speech Input Button */}
             <SpeechInputButton
               onTranscript={(text): void => {
@@ -139,15 +143,12 @@ export function MessageEditor({
             <Button
               type="submit"
               disabled={!editor.content.trim() || editor.isLoading}
-              size="sm"
+              size="icon"
               variant="default"
-              className="flex-1 sm:flex-none h-9"
+              className="h-8 w-8 sm:h-9 sm:w-9 shrink-0"
               title={t("app.chat.messageEditor.titles.branch")}
             >
-              <GitBranch className="h-3.5 w-3.5 mr-2" />
-              {editor.isLoading && editor.actionType === "branch"
-                ? t("app.chat.messageEditor.buttons.branching")
-                : t("app.chat.messageEditor.buttons.branch")}
+              <GitBranch className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
 
             {/* Cancel Button */}
@@ -155,13 +156,12 @@ export function MessageEditor({
               type="button"
               onClick={editor.handleCancel}
               disabled={editor.isLoading}
-              size="sm"
-              variant="ghost"
-              className="shrink-0 h-9"
+              size="icon"
+              variant="destructive"
+              className="h-8 w-8 sm:h-9 sm:w-9 shrink-0"
               title={t("app.chat.messageEditor.titles.cancel")}
             >
-              <X className="h-3.5 w-3.5 mr-2" />
-              {t("app.chat.messageEditor.buttons.cancel")}
+              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
           </Div>
         </Div>

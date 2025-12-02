@@ -1,5 +1,5 @@
 import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { Calendar, Coins, Info, Sparkles, Zap } from "next-vibe-ui/ui/icons";
+import { ArrowRight, Calendar, Coins, Info, Sparkles, Zap } from "next-vibe-ui/ui/icons";
 import {
   Card,
   CardContent,
@@ -10,6 +10,7 @@ import {
 import { Div } from "next-vibe-ui/ui/div";
 import { H4, P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
+import { Button } from "next-vibe-ui/ui/button";
 import type { JSX } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
@@ -29,6 +30,7 @@ interface OverviewTabProps {
   packPrice: number;
   packCredits: number;
   freeCredits: number;
+  onSwitchTab: () => void;
 }
 
 export function OverviewTab({
@@ -38,6 +40,7 @@ export function OverviewTab({
   packPrice,
   packCredits,
   freeCredits,
+  onSwitchTab,
 }: OverviewTabProps): JSX.Element {
   const { t } = useTranslation();
 
@@ -126,6 +129,32 @@ export function OverviewTab({
         </CardContent>
       </Card>
 
+      {/* CTA Section */}
+      <Card className="mt-6 overflow-hidden border-0 bg-gradient-to-br from-primary/10 via-primary/5 to-background">
+        <CardContent className="p-8">
+          <Div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <Div className="flex-1 text-center md:text-left">
+              <H4 className="text-2xl font-bold mb-2">
+                {t("app.subscription.subscription.overview.cta.title")}
+              </H4>
+              <P className="text-muted-foreground">
+                {t("app.subscription.subscription.overview.cta.description", {
+                  modelCount: TOTAL_MODEL_COUNT,
+                })}
+              </P>
+            </Div>
+            <Button
+              size="lg"
+              onClick={onSwitchTab}
+              className="group flex items-center gap-2 shadow-lg hover:shadow-xl transition-all"
+            >
+              {t("app.subscription.subscription.overview.cta.button")}
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </Div>
+        </CardContent>
+      </Card>
+
       {/* Cost Reference */}
       <Card className="mt-6" id="model-costs">
         <CardHeader>
@@ -146,7 +175,7 @@ export function OverviewTab({
               <Div className="flex flex-col gap-4">
                 {Object.entries(modelProviders).map(
                   ([providerId, provider]) => {
-                    const providerModels = modelOptions.filter(
+                    const providerModels = Object.values(modelOptions).filter(
                       (model) => model.provider === providerId,
                     );
                     if (providerModels.length === 0) {

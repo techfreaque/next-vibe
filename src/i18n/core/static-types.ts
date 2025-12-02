@@ -20,8 +20,15 @@ export type DotNotation<T> = (
   ? Extract<D, string>
   : never;
 
+const translationsKeyTypesafety = false;
+
 // Type for all possible translation keys
-export type TranslationKey = DotNotation<TranslationSchema> | TranslatedKeyType;
+export type TranslationKey = typeof translationsKeyTypesafety extends true
+  ? _TranslationKey
+  : string;
+export type _TranslationKey =
+  | DotNotation<TranslationSchema>
+  | TranslatedKeyType;
 
 // Utility type to get the type of a value at a specific path
 type PathValue<T, P extends string> = P extends `${infer K}.${infer Rest}`

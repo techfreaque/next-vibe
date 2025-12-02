@@ -70,6 +70,8 @@ export const translations: typeof enTranslations = {
       generatingFiles: "Generowanie plików",
       completed: "Zakończono",
       noKeysInUse: "Brak kluczy w użyciu",
+      writingFilteredTranslations: "Zapisywanie przefiltrowanych tłumaczeń",
+      removeUnusedRequiresRegenerate: "removeUnused wymaga włączenia regenerateStructure",
     },
     response: {
       title: "Wynik reorganizacji",

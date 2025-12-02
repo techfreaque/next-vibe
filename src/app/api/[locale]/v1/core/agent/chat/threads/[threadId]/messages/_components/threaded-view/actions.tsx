@@ -8,11 +8,11 @@ import {
   ArrowBigDown,
   ArrowBigUp,
   CornerDownRight,
-  Loader2,
   MessageSquare,
   Share2,
   Square,
   Volume2,
+  X,
 } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React from "react";
@@ -36,6 +36,9 @@ interface ThreadedMessageActionsProps {
   isPlaying: boolean;
   playAudio: () => void;
   stopAudio: () => void;
+  cancelLoading: () => void;
+  currentChunk: number;
+  totalChunks: number;
   // Vote props
   userVote: "up" | "down" | null;
   voteScore: number;
@@ -62,6 +65,9 @@ export function ThreadedMessageActions({
   isPlaying,
   playAudio,
   stopAudio,
+  cancelLoading,
+  currentChunk,
+  totalChunks,
   userVote,
   voteScore,
   onVoteMessage,
@@ -146,31 +152,46 @@ export function ThreadedMessageActions({
         <Button
           variant="ghost"
           size="unset"
-          onClick={isPlaying ? stopAudio : (): void => void playAudio()}
-          disabled={isTTSLoading}
+          onClick={
+            isTTSLoading
+              ? cancelLoading
+              : isPlaying
+                ? stopAudio
+                : (): void => void playAudio()
+          }
           className={cn(
-            "flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all",
-            isTTSLoading && "opacity-50 cursor-not-allowed",
+            "flex items-center gap-1 px-2 py-1 rounded transition-all",
+            isTTSLoading
+              ? "bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 hover:text-orange-300"
+              : isPlaying
+                ? "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300"
+                : "text-muted-foreground hover:bg-blue-500/10 hover:text-blue-400",
           )}
           title={
             isTTSLoading
-              ? t("app.chat.threadedView.actions.loadingAudio")
+              ? t("app.chat.threadedView.actions.cancelLoading")
               : isPlaying
                 ? t("app.chat.threadedView.actions.stopAudio")
                 : t("app.chat.threadedView.actions.playAudio")
           }
         >
           {isTTSLoading ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <X className="h-3.5 w-3.5" />
           ) : isPlaying ? (
             <Square className="h-3.5 w-3.5" />
           ) : (
             <Volume2 className="h-3.5 w-3.5" />
           )}
           <Span>
-            {isPlaying
-              ? t("app.chat.threadedView.actions.stop")
-              : t("app.chat.threadedView.actions.play")}
+            {isTTSLoading
+              ? totalChunks > 1
+                ? `${t("app.chat.threadedView.actions.cancel")} (${currentChunk}/${totalChunks})`
+                : t("app.chat.threadedView.actions.cancel")
+              : isPlaying
+                ? totalChunks > 1
+                  ? `${t("app.chat.threadedView.actions.stop")} (${currentChunk}/${totalChunks})`
+                  : t("app.chat.threadedView.actions.stop")
+                : t("app.chat.threadedView.actions.play")}
           </Span>
         </Button>
       )}

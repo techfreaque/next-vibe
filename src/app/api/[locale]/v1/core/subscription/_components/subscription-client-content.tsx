@@ -158,6 +158,7 @@ export function SubscriptionClientContent({
             packPrice={PACK_PRICE}
             packCredits={PACK_CREDITS}
             freeCredits={FREE_CREDITS}
+            onSwitchTab={() => setActiveTab("buy")}
           />
         </TabsContent>
 

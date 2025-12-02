@@ -3,10 +3,11 @@
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
-import type { JSX } from "react";
+import React, { type JSX } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
+import { processMessageGroupForTTS } from "@/app/api/[locale]/v1/core/agent/text-to-speech/content-processing";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -77,7 +78,10 @@ export function GroupedAssistantMessage({
     : t("app.chat.messages.assistant");
 
   // Each message is already a separate entity (reasoning, text, tool, error)
-  const allMessages = [primary, ...continuations];
+  const allMessages = React.useMemo(
+    () => [primary, ...continuations],
+    [primary, continuations],
+  );
 
   // Check if there's any content
   const hasContent = allMessages.some((msg) => msg.content.trim().length > 0);
@@ -91,12 +95,13 @@ export function GroupedAssistantMessage({
   // Show streaming placeholder when no content yet AND no tools waiting for confirmation
   const isStreaming = !hasContent && !hasToolWaitingForConfirmation;
 
-  // Get all content for actions (ASSISTANT messages only, strip <think> tags)
-  const allContent = allMessages
-    .filter((msg) => msg.role === "assistant")
-    .map((m) => m.content.replace(/<think>[\s\S]*?<\/think>/g, "").trim())
-    .filter((content) => content.length > 0)
-    .join("\n\n");
+  // Get all content for actions - process entire message group for TTS
+  // This includes tool calls (as titles) and strips <think> tags
+  const [allContent, setAllContent] = React.useState<string>("");
+
+  React.useEffect(() => {
+    void processMessageGroupForTTS(allMessages, locale).then(setAllContent);
+  }, [allMessages, locale]);
 
   return (
     <Div className="flex items-start gap-3">

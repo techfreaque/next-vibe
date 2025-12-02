@@ -1,8 +1,10 @@
+import type { translations as enTranslations } from "../en";
+
 /**
  * Browser API translations (German)
  */
 
-export const translations = {
+export const translations: typeof enTranslations = {
   title: "Chrome DevTools MCP Tools",
   description:
     "Chrome DevTools MCP Tools für Browser-Automatisierung und Debugging ausführen",
@@ -76,7 +78,6 @@ export const translations = {
   },
 
   status: {
-    statusItem: "Status item",
     pending: "Ausstehend",
     running: "Läuft",
     completed: "Abgeschlossen",
@@ -217,12 +218,15 @@ export const translations = {
         start: "Verbindung zum Chrome DevTools MCP Server herstellen",
         success: "Erfolgreich mit MCP Server verbunden",
         error: "Fehler beim Verbinden mit MCP Server",
+        failedToInitialize: "Fehler beim Initialisieren des Chrome DevTools MCP Servers",
       },
       tool: {
         call: {
           start: "MCP Tool aufrufen",
           success: "MCP Tool erfolgreich aufgerufen",
           error: "Fehler beim Aufrufen des MCP Tools",
+          invalidJsonArguments: "Ungültige JSON-Argumente",
+          executionFailed: "Tool-Ausführung fehlgeschlagen: {{error}}",
         },
       },
     },

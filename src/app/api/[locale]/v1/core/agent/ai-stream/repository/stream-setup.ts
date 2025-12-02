@@ -20,6 +20,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
 import { getUserPublicName } from "@/app/api/[locale]/v1/core/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
 
 import { ChatMessageRole } from "../../chat/enum";
 import { getModelCost } from "../../chat/model-access/costs";
@@ -45,6 +46,8 @@ import { eq } from "drizzle-orm";
 import { db } from "../../../system/db";
 import { dateSchema } from "@/app/api/[locale]/v1/core/shared/types/common.schema";
 import { loadTools } from "@/app/api/[locale]/v1/core/system/unified-interface/ai/tools-loader";
+import type { DefaultFolderId } from "../../chat/config";
+import { createMetadataSystemMessage } from "../message-metadata-generator";
 
 export interface StreamSetupResult {
   userId: string | undefined;
@@ -78,11 +81,12 @@ export async function setupAiStream(params: {
   userId: string | undefined;
   leadId: string | undefined;
   ipAddress: string | undefined;
+  t: TFunction;
 }): Promise<
   | { success: false; error: ResponseType<never> }
   | { success: true; data: StreamSetupResult }
 > {
-  const { data, locale, logger, user, userId, leadId, ipAddress } = params;
+  const { data, locale, logger, user, userId, leadId, ipAddress, t } = params;
   const isIncognito = data.rootFolderId === "incognito";
 
   logger.info("[Setup] RECOMPILED - Setting up AI stream", {
@@ -433,6 +437,10 @@ export async function setupAiStream(params: {
     personaId: data.persona,
     userId,
     logger,
+    t,
+    locale,
+    rootFolderId: data.rootFolderId,
+    subFolderId: data.subFolderId,
   });
 
   logger.debug("System prompt built", {
@@ -448,6 +456,7 @@ export async function setupAiStream(params: {
     role: effectiveRole,
     userId,
     isIncognito,
+    rootFolderId: data.rootFolderId,
     messageHistory: data.messageHistory ?? null,
     logger,
   });
@@ -586,6 +595,7 @@ async function buildMessageContext(params: {
   role: ChatMessageRole;
   userId: string | undefined;
   isIncognito: boolean;
+  rootFolderId?: DefaultFolderId;
   messageHistory?: Array<z.infer<typeof messageHistorySchema>> | null;
   logger: EndpointLogger;
 }): Promise<CoreMessage[]> {
@@ -609,7 +619,7 @@ async function buildMessageContext(params: {
   if (params.operation === "answer-as-ai") {
     // For incognito mode, use provided message history
     if (params.isIncognito && params.messageHistory) {
-      const messages = toAiSdkMessages(params.messageHistory);
+      const messages = toAiSdkMessages(params.messageHistory, params.rootFolderId);
       if (params.content.trim()) {
         messages.push({ role: "user", content: params.content });
       } else {
@@ -640,7 +650,7 @@ async function buildMessageContext(params: {
 
       if (parentIndex !== -1) {
         const contextMessages = allMessages.slice(0, parentIndex + 1);
-        const messages = toAiSdkMessages(contextMessages);
+        const messages = toAiSdkMessages(contextMessages, params.rootFolderId);
 
         if (params.content.trim()) {
           messages.push({ role: "user", content: params.content });
@@ -673,7 +683,7 @@ async function buildMessageContext(params: {
       params.logger,
       params.parentMessageId ?? null, // Pass parent message ID for branch filtering, convert undefined to null
     );
-    const historyMessages = toAiSdkMessages(history);
+    const historyMessages = toAiSdkMessages(history, params.rootFolderId);
     const currentMessage = toAiSdkMessage({
       role: params.role,
       content: params.content,
@@ -688,7 +698,7 @@ async function buildMessageContext(params: {
       operation: params.operation,
       historyLength: params.messageHistory.length,
     });
-    const historyMessages = toAiSdkMessages(params.messageHistory);
+    const historyMessages = toAiSdkMessages(params.messageHistory, params.rootFolderId);
     // Don't add empty content as a message (happens with tool confirmations)
     if (!params.content.trim()) {
       return historyMessages;
@@ -712,6 +722,15 @@ async function buildMessageContext(params: {
     }
     return [currentMessage];
   }
+}
+
+/**
+ * Type guard to check if a message is a full ChatMessage (not a simple role/content object)
+ */
+function isChatMessage(
+  message: ChatMessage | { role: ChatMessageRole; content: string },
+): message is ChatMessage {
+  return "id" in message && "createdAt" in message;
 }
 
 /**
@@ -967,8 +986,30 @@ async function handleToolConfirmationInSetup(params: {
 
 function toAiSdkMessages(
   messages: Array<ChatMessage | { role: ChatMessageRole; content: string }>,
+  rootFolderId?: DefaultFolderId,
 ): CoreMessage[] {
-  return messages
-    .map((msg) => toAiSdkMessage(msg))
-    .filter((msg): msg is CoreMessage => msg !== null);
+  const result: CoreMessage[] = [];
+
+  for (const msg of messages) {
+    // Inject metadata system message before user/assistant messages
+    // Only for full ChatMessage objects (not simple { role, content } objects)
+    if (
+      isChatMessage(msg) &&
+      (msg.role === ChatMessageRole.USER || msg.role === ChatMessageRole.ASSISTANT)
+    ) {
+      const metadataContent = createMetadataSystemMessage(msg, rootFolderId);
+      result.push({
+        role: "system",
+        content: metadataContent,
+      });
+    }
+
+    // Convert and add the actual message
+    const converted = toAiSdkMessage(msg);
+    if (converted !== null) {
+      result.push(converted);
+    }
+  }
+
+  return result;
 }

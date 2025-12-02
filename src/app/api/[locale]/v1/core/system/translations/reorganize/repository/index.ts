@@ -88,9 +88,9 @@ export class TranslationReorganizeRepositoryImpl {
     try {
       // Validate: removeUnused requires regenerateStructure
       if (request.removeUnused && !request.regenerateStructure) {
-        return error({
-          error: "validation_error",
-          message: "removeUnused requires regenerateStructure to be enabled",
+        return fail({
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          message: "app.api.v1.core.system.translations.reorganize.post.messages.removeUnusedRequiresRegenerate",
         });
       }
 
@@ -148,9 +148,6 @@ export class TranslationReorganizeRepositoryImpl {
           },
         ),
       );
-      logger.debug(
-        `Key scanning completed. usedKeys: ${usedKeys}, unusedKeys: ${unusedKeys}`,
-      );
 
       // Handle unused key removal if requested
       let keysRemoved = 0;
@@ -169,10 +166,7 @@ export class TranslationReorganizeRepositoryImpl {
           logger,
         );
         keysRemoved = unusedKeys;
-        logger.debug(`Removed ${keysRemoved} unused keys`);
       }
-
-      logger.debug(`About to check dryRun: ${request.dryRun}`);
 
       if (request.dryRun) {
         output.push(
@@ -220,10 +214,6 @@ export class TranslationReorganizeRepositoryImpl {
         !request.regenerateStructure &&
         keysRemoved > 0
       ) {
-        logger.debug(
-          "Regenerating translation files based on usage locations (removeUnused without regenerateStructure)",
-        );
-
         output.push(
           t(
             "app.api.v1.core.system.translations.reorganize.post.messages.writingFilteredTranslations",
@@ -237,11 +227,6 @@ export class TranslationReorganizeRepositoryImpl {
         }
 
         // Group translations by usage location
-        logger.debug("Grouping translations by usage location");
-        logger.info(
-          `filteredTranslations keys: ${Object.keys(filteredTranslations).slice(0, 10).join(", ")}`,
-        );
-        logger.info(`keyUsageMap size: ${keyUsageMap.size}`);
         const { groups, keyMappings } = this.groupTranslationsByUsage(
           filteredTranslations,
           keyUsageMap,
@@ -253,23 +238,13 @@ export class TranslationReorganizeRepositoryImpl {
         logger.info(
           `Key mappings: ${keyMappings.size} keys need to be updated`,
         );
-        if (keyMappings.size > 0) {
-          const firstFive = Array.from(keyMappings.entries()).slice(0, 5);
-          logger.info(
-            `First 5 key mappings: ${firstFive.map(([old, newKey]) => `${old} -> ${newKey}`).join(", ")}`,
-          );
-        }
 
         // Update code files with new keys
         if (keyMappings.size > 0) {
-          logger.debug(
-            `Updating code files with ${keyMappings.size} key mappings`,
-          );
           const filesUpdated = this.updateCodeFilesWithNewKeys(
             keyMappings,
             logger,
           );
-          logger.debug(`Updated ${filesUpdated} code files`);
           output.push(
             `Updated ${filesUpdated} code files with new translation keys`,
           );
@@ -279,9 +254,14 @@ export class TranslationReorganizeRepositoryImpl {
         const languages = this.getAvailableLanguages();
         let filesCreated = 0;
 
-        for (const language of languages) {
-          logger.debug(`Processing language: ${language}`);
+        // First pass: Collect all regrouped translations for all languages
+        const allRegroupedTranslations: Map<string, TranslationObject>[] = [];
+        const languageTranslationsMap = new Map<
+          string,
+          Map<string, TranslationObject>
+        >();
 
+        for (const language of languages) {
           const languageTranslations = await this.loadLanguageTranslations(
             language,
             logger,
@@ -296,9 +276,16 @@ export class TranslationReorganizeRepositoryImpl {
             undefined, // No key mappings in removeUnused mode
           );
 
-          logger.debug(
-            `Regrouped translations for ${language}: ${regroupedTranslations.size} groups`,
-          );
+          allRegroupedTranslations.push(regroupedTranslations);
+          languageTranslationsMap.set(language, regroupedTranslations);
+        }
+
+        // Register all locations from all languages so parent aggregators are created correctly
+        this.fileGenerator.registerAllLocations(allRegroupedTranslations);
+
+        // Second pass: Generate files for each language
+        for (const language of languages) {
+          const regroupedTranslations = languageTranslationsMap.get(language)!;
 
           // Generate files
           try {
@@ -314,15 +301,12 @@ export class TranslationReorganizeRepositoryImpl {
                 type: "updated",
                 path: `i18n/${language}/**/*.ts`,
                 description:
-                  "app.api.v1.core.system.translations.reorganize.post.messages.removedUnusedKeys",
+                  "app.api.v1.core.system.translations.reorganize.post.messages.removingKeys",
                 descriptionParams: {
                   language,
                   count: keysRemoved,
                 },
               });
-              logger.debug(`Successfully generated files for ${language}`);
-            } else {
-              logger.debug(`File generation returned false for ${language}`);
             }
           } catch (fileGenError) {
             logger.error(`File generation failed for ${language}`, {
@@ -359,8 +343,6 @@ export class TranslationReorganizeRepositoryImpl {
 
       // Generate new structure if requested
       if (request.regenerateStructure) {
-        logger.debug("Starting regenerateStructure block");
-
         output.push(
           t(
             "app.api.v1.core.system.translations.reorganize.post.messages.regeneratingStructure",
@@ -376,23 +358,13 @@ export class TranslationReorganizeRepositoryImpl {
         );
         const keyUsageFrequency =
           this.locationAnalyzer.analyzeKeyUsageFrequency(currentTranslations);
-        logger.debug(
-          `Analyzed ${keyUsageFrequency.size} key paths for frequency`,
-        );
 
-        logger.debug("About to group translations by usage location");
         // Group translations by usage location
         output.push(
           t(
             "app.api.v1.core.system.translations.reorganize.post.messages.groupingByLocation",
           ),
         );
-
-        logger.debug("Calling groupTranslationsByUsage");
-        logger.info(
-          `filteredTranslations keys: ${Object.keys(filteredTranslations).slice(0, 10).join(", ")}`,
-        );
-        logger.info(`keyUsageMap size: ${keyUsageMap.size}`);
         const { groups, keyMappings } = this.groupTranslationsByUsage(
           filteredTranslations, // Use filtered translations (with unused keys removed if requested)
           keyUsageMap,
@@ -400,35 +372,17 @@ export class TranslationReorganizeRepositoryImpl {
           logger,
         );
 
-        logger.debug("groupTranslationsByUsage completed");
-
         logger.info(`Created ${groups.size} translation groups`);
         logger.info(
           `Key mappings: ${keyMappings.size} keys need to be updated`,
         );
-        if (keyMappings.size > 0) {
-          const firstFive = [...keyMappings.entries()].slice(0, 5);
-          logger.info(
-            `First 5 key mappings: ${firstFive.map(([old, newKey]) => `${old} -> ${newKey}`).join(", ")}`,
-          );
-        }
-
-        for (const [location, translations] of groups) {
-          logger.info(
-            `Group: ${location} - ${Object.keys(translations).length} keys`,
-          );
-        }
 
         // Update code files with new keys
         if (keyMappings.size > 0) {
-          logger.info(
-            `Updating code files with ${keyMappings.size} key mappings`,
-          );
           const codeFilesUpdated = this.updateCodeFilesWithNewKeys(
             keyMappings,
             logger,
           );
-          logger.info(`Updated ${codeFilesUpdated} code files`);
           output.push(
             `Updated ${codeFilesUpdated} code files with new translation keys`,
           );
@@ -444,13 +398,17 @@ export class TranslationReorganizeRepositoryImpl {
         // Only generate files if there are actually used keys
         if (usedKeys > 0) {
           const languages = this.getAvailableLanguages();
-          logger.debug(`Available languages: ${languages.join(", ")}`);
           let filesUpdated = 0;
           let filesCreated = 0;
 
-          for (const language of languages) {
-            logger.debug(`Processing language: ${language}`);
+          // First pass: Collect all regrouped translations for all languages
+          const allRegroupedTranslations: Map<string, TranslationObject>[] = [];
+          const languageTranslationsMap = new Map<
+            string,
+            Map<string, TranslationObject>
+          >();
 
+          for (const language of languages) {
             const languageTranslations = await this.loadLanguageTranslations(
               language,
               logger,
@@ -465,9 +423,17 @@ export class TranslationReorganizeRepositoryImpl {
               keyMappings,
             );
 
-            logger.debug(
-              `Regrouped translations for ${language}: ${regroupedTranslations.size} groups`,
-            );
+            allRegroupedTranslations.push(regroupedTranslations);
+            languageTranslationsMap.set(language, regroupedTranslations);
+          }
+
+          // Register all locations from all languages so parent aggregators are created correctly
+          this.fileGenerator.registerAllLocations(allRegroupedTranslations);
+
+          // Second pass: Generate files for each language
+          for (const language of languages) {
+            const regroupedTranslations =
+              languageTranslationsMap.get(language)!;
 
             // Generate files
             try {
@@ -486,9 +452,6 @@ export class TranslationReorganizeRepositoryImpl {
                     "app.api.v1.core.system.translations.reorganize.post.messages.regeneratedStructure",
                   descriptionParams: { language },
                 });
-                logger.debug(`Successfully generated files for ${language}`);
-              } else {
-                logger.debug(`File generation returned false for ${language}`);
               }
             } catch (fileGenError) {
               logger.error(`File generation failed for ${language}`, {
@@ -499,10 +462,6 @@ export class TranslationReorganizeRepositoryImpl {
 
           // Main index structure is now handled by the hierarchical file generation
           // The new system generates proper hierarchical imports instead of flat location-based imports
-          logger.debug(
-            "Main index structure handled by hierarchical file generation",
-          );
-
           output.push(
             t(
               "app.api.v1.core.system.translations.reorganize.post.messages.completed",
@@ -586,8 +545,6 @@ export class TranslationReorganizeRepositoryImpl {
     keyUsageMap: Map<string, string[]>,
     logger: EndpointLogger,
   ): TranslationObject {
-    logger.debug("Removing unused translation keys");
-
     const filteredTranslations: TranslationObject = {};
     this.filterUsedKeys(
       translations,
@@ -597,9 +554,6 @@ export class TranslationReorganizeRepositoryImpl {
       logger,
     );
 
-    logger.debug(
-      `Filtered translations: ${Object.keys(filteredTranslations).length} top-level keys remaining`,
-    );
     return filteredTranslations;
   }
 
@@ -633,17 +587,12 @@ export class TranslationReorganizeRepositoryImpl {
         // Only include the nested object if it has used children
         if (Object.keys(nestedTarget).length > 0) {
           target[key] = nestedTarget;
-        } else {
-          logger.debug(`Removing unused nested object: ${fullPath}`);
         }
       } else {
         // For leaf values, check if the key is used
         const usageFiles = keyUsageMap.get(fullPath) || [];
         if (usageFiles.length > 0) {
           target[key] = value;
-          logger.debug(`Keeping used key: ${fullPath}`);
-        } else {
-          logger.debug(`Removing unused key: ${fullPath}`);
         }
       }
     }
@@ -666,8 +615,6 @@ export class TranslationReorganizeRepositoryImpl {
     // Create backup structure
     const srcDir = path.resolve(process.cwd(), "src");
     this.backupI18nFiles(srcDir, backupPath, logger);
-
-    logger.debug("Created comprehensive backup", { path: backupPath });
 
     return backupPath;
   }
@@ -701,11 +648,6 @@ export class TranslationReorganizeRepositoryImpl {
           );
           const backupPath = path.join(backupRoot, relativePath);
 
-          logger.debug("Backing up i18n directory", {
-            source: sourcePath,
-            backup: backupPath,
-          });
-
           // Ensure backup directory exists
           fs.mkdirSync(path.dirname(backupPath), { recursive: true });
 
@@ -730,15 +672,11 @@ export class TranslationReorganizeRepositoryImpl {
       return;
     }
 
-    logger.debug(`Starting restore from backup: ${backupPath}`);
-
     // First, remove all existing i18n directories
     this.removeAllI18nDirectories(logger);
 
     // Then restore from backup
-    this.restoreI18nFiles(backupPath, logger);
-
-    logger.debug("Restore completed successfully");
+    this.restoreI18nFiles(backupPath);
   }
 
   /**
@@ -806,7 +744,6 @@ export class TranslationReorganizeRepositoryImpl {
       let newBackupPath: string | undefined;
       if (request.createBackupBeforeRestore) {
         newBackupPath = this.createBackup(logger);
-        logger.debug(`Created backup before restore: ${newBackupPath}`);
       }
 
       // Perform the restore
@@ -870,7 +807,6 @@ export class TranslationReorganizeRepositoryImpl {
       if (entry.isDirectory()) {
         if (entry.name === "i18n") {
           // Found an i18n directory, remove it
-          logger.debug(`Removing i18n directory: ${sourcePath}`);
           fs.rmSync(sourcePath, { recursive: true, force: true });
         } else {
           // Recursively search subdirectories
@@ -885,7 +821,7 @@ export class TranslationReorganizeRepositoryImpl {
    * @param backupRoot - The backup root directory
    * @param logger - Logger instance for debugging
    */
-  private restoreI18nFiles(backupRoot: string, logger: EndpointLogger): void {
+  private restoreI18nFiles(backupRoot: string): void {
     if (!fs.existsSync(backupRoot)) {
       return;
     }
@@ -902,11 +838,6 @@ export class TranslationReorganizeRepositoryImpl {
           path.resolve(process.cwd(), "src"),
           relativePath,
         );
-
-        logger.debug("Restoring i18n directory", {
-          backup: backupPath,
-          target: targetPath,
-        });
 
         // Ensure target directory parent exists
         fs.mkdirSync(path.dirname(targetPath), { recursive: true });
@@ -979,11 +910,8 @@ export class TranslationReorganizeRepositoryImpl {
       );
 
       if (!fs.existsSync(mainLanguagePath)) {
-        logger.debug(`Main language file not found: ${mainLanguagePath}`);
         return {};
       }
-
-      logger.debug(`Loading translations from: ${mainLanguagePath}`);
 
       // Use dynamic import for proper ES module support
       let translationModule: TranslationModule;
@@ -1009,11 +937,6 @@ export class TranslationReorganizeRepositoryImpl {
         });
         return {};
       }
-
-      logger.debug("Successfully loaded translations", {
-        keyCount: Object.keys(translations).length,
-        topLevelKeys: Object.keys(translations).slice(0, 10),
-      });
 
       return translations;
     } catch (error) {
@@ -1147,17 +1070,8 @@ export class TranslationReorganizeRepositoryImpl {
     >();
     const keyMappings = new Map<string, string>();
 
-    logger.debug("Grouping translations by location-based co-location");
-    logger.debug(
-      `Input translations keys: ${Object.keys(translations).join(", ")}`,
-    );
-    logger.debug(`Key usage map size: ${keyUsageMap.size}`);
-
     try {
       // Process each translation key and co-locate at ALL usage locations
-      logger.info(
-        `Starting processTranslationKeysForCoLocation with ${Object.keys(translations).length} top-level keys`,
-      );
       this.processTranslationKeysForCoLocation(
         translations,
         "",
@@ -1168,30 +1082,12 @@ export class TranslationReorganizeRepositoryImpl {
         keyMappings,
         logger,
       );
-      logger.info(
-        `Finished processTranslationKeysForCoLocation, groups size: ${groups.size}`,
-      );
-
-      logger.debug(`Created ${groups.size} location-based translation groups`);
-      const groupsArray = Array.from(groups.entries());
-      logger.info(`First 10 groups:`);
-      for (const [location, translations] of groupsArray.slice(0, 10)) {
-        logger.info(
-          `  Location: "${location}" - ${Object.keys(translations).length} keys - First key: ${Object.keys(translations)[0]}`,
-        );
-      }
-
-      logger.debug(`Key mappings: ${keyMappings.size} keys will be updated`);
 
       return { groups, originalKeys, keyMappings };
     } catch (error) {
-      console.error("RAW ERROR:", error);
-      console.error("ERROR TYPE:", typeof error);
-      console.error("ERROR CONSTRUCTOR:", error?.constructor?.name);
       logger.error("Error in groupTranslationsByUsage", {
         error: parseError(error).message,
         stack: error instanceof Error ? error.stack : undefined,
-        rawError: String(error),
       });
       return {
         groups: new Map(),
@@ -1285,7 +1181,6 @@ export class TranslationReorganizeRepositoryImpl {
             if (pattern.test(content)) {
               content = content.replace(pattern, `t("${newKey}")`);
               modified = true;
-              logger.debug(`Updated ${oldKey} -> ${newKey} in ${filePath}`);
             }
           }
         }
@@ -1389,6 +1284,19 @@ export class TranslationReorganizeRepositoryImpl {
           location = ""; // Root level
         }
 
+        // Special handling for root-level keys that should be mapped to specific folders
+        // If location is empty (root level) and key starts with a known prefix, map it to that folder
+        if (location === "") {
+          const keyPrefix = fullPath.split(".")[0];
+          // Map keys like config.* to config folder, app-native.* to app-native folder, etc.
+          if (keyPrefix && keyPrefix !== "app" && keyPrefix !== "packages") {
+            location = keyPrefix;
+            logger.debug(
+              `Mapped root-level key ${fullPath} to folder: ${location}`,
+            );
+          }
+        }
+
         // Calculate what the key SHOULD be based on the actual location
         const actualLocationPrefix =
           this.fileGenerator.locationToFlatKeyPublic(location);
@@ -1412,65 +1320,40 @@ export class TranslationReorganizeRepositoryImpl {
           // Key already matches the location - it's correct!
           keySuffix = fullPath.slice(actualLocationPrefix.length + 1);
           correctKey = fullPath;
-          logger.info(`Key ${fullPath} already matches location ${location}`);
         } else {
           // Key doesn't match the actual location
           // We need to reconstruct the correct key
-          logger.info(
-            `Key ${fullPath} does NOT match location ${location} (prefix: ${actualLocationPrefix})`,
-          );
-
-          // Find the common prefix between the key and the location
-          // Then keep everything after the common prefix as the suffix
+          // Strategy: Replace the location-related parts of the key with the actual location prefix
+          // Then keep the rest as the suffix
           // For example:
-          // - Key: app.admin.cron.taskDetails.editDescription
-          // - Location: app/[locale]/admin/cron/task/[id]/edit → prefix: app.admin.cron.task.[id].edit
-          // - Common prefix: app.admin.cron (3 parts)
-          // - Key suffix after common: taskDetails.editDescription
-          // - Correct key: app.admin.cron.task.[id].edit.taskDetails.editDescription
+          // - Key: app.admin.components.navigation.dashboard
+          // - Location: app/[locale]/admin/_components → prefix: app.admin._components
+          // - We replace "app.admin.components" with "app.admin._components"
+          // - Suffix: navigation.dashboard
+          // - Correct key: app.admin._components.navigation.dashboard
 
           const keyParts = fullPath.split(".");
           const locationParts = actualLocationPrefix
             ? actualLocationPrefix.split(".")
             : [];
 
-          // Find where they diverge
-          let commonLength = 0;
-          for (
-            let i = 0;
-            i < Math.min(keyParts.length, locationParts.length);
-            i++
-          ) {
-            if (keyParts[i] === locationParts[i]) {
-              commonLength++;
-            } else {
-              break;
-            }
-          }
-
-          // The suffix is everything after the common prefix in the key
-          keySuffix = keyParts.slice(commonLength).join(".");
+          // The suffix starts after the location depth
+          // If location has 3 parts (app.admin._components), the suffix is everything after part 3
+          const suffixStartIndex = locationParts.length;
+          keySuffix = keyParts.slice(suffixStartIndex).join(".");
 
           // The correct key should be: actualLocationPrefix + keySuffix
           if (actualLocationPrefix && keySuffix) {
             correctKey = `${actualLocationPrefix}.${keySuffix}`;
-          } else if (actualLocationPrefix) {
-            // No suffix - this means the key is shorter than the location
+          } else if (actualLocationPrefix && !keySuffix) {
+            // No suffix - this means the key is shorter than or equal to the location
             // Use a default suffix like "page" or "title"
             correctKey = `${actualLocationPrefix}.page`;
             keySuffix = "page";
           } else {
-            correctKey = keySuffix;
+            correctKey = keySuffix || actualLocationPrefix || fullPath;
           }
-
-          logger.info(
-            `Reconstructed correct key: ${correctKey} (suffix: ${keySuffix}, common prefix length: ${commonLength})`,
-          );
         }
-
-        logger.debug(
-          `Key structure: original="${fullPath}", correct="${correctKey}", suffix="${keySuffix}"`,
-        );
 
         // Add the key to this location group with the CORRECT FULL key
         if (!groups.has(location)) {
@@ -1620,10 +1503,6 @@ export class TranslationReorganizeRepositoryImpl {
     for (const [location, englishTranslations] of groups) {
       const locationTranslations: TranslationObject = {};
 
-      logger.info(
-        `Processing location: ${location} with ${Object.keys(englishTranslations).length} keys`,
-      );
-
       // Extract translation values for each key in this location
       this.extractTranslationValuesForLocation(
         englishTranslations,
@@ -1641,7 +1520,8 @@ export class TranslationReorganizeRepositoryImpl {
           `Regrouped ${Object.keys(locationTranslations).length} translations for location: ${location}`,
         );
       } else {
-        logger.warn(
+        // Only log at debug level - these are expected when location has no translations yet
+        logger.debug(
           `No translations found for location: ${location} - Expected keys: ${Object.keys(englishTranslations).slice(0, 3).join(", ")}`,
         );
       }
@@ -1701,7 +1581,8 @@ export class TranslationReorganizeRepositoryImpl {
             `Extracted translation: ${fullKey} (lookup: ${lookupKey}) = ${sourceValue}`,
           );
         } else {
-          logger.warn(
+          // Only log at debug level - these are expected when keys are defined but not yet translated
+          logger.debug(
             `Could not find translation for key: ${fullKey} (lookup: ${lookupKey})`,
           );
         }

@@ -8,7 +8,7 @@
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -22,6 +22,8 @@ import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/cont
 import {
   chatAnimations,
   chatProse,
+  chatShadows,
+  chatTransitions,
 } from "@/app/[locale]/chat/lib/design-tokens";
 import { simpleT } from "@/i18n/core/shared";
 import { Markdown } from "next-vibe-ui/ui/markdown";
@@ -33,6 +35,12 @@ import { MessageEditor } from "../message-editor";
 import { groupMessagesBySequence } from "../message-grouping";
 import { ModelPersonaSelectorModal } from "../model-persona-selector-modal";
 import { UserMessageBubble } from "../user-message-bubble";
+import { useSystemPrompt } from "@/app/api/[locale]/v1/core/agent/chat/hooks/use-system-prompt";
+import { Button } from "next-vibe-ui/ui/button";
+import { Copy, FileText, Code } from "next-vibe-ui/ui/icons";
+import { useState } from "react";
+import { Logo } from "@/app/[locale]/_components/logo";
+import { createMetadataSystemMessage } from "@/app/api/[locale]/v1/core/agent/ai-stream/message-metadata-generator";
 
 interface LinearMessageViewProps {
   messages: ChatMessage[];
@@ -50,10 +58,13 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   currentUserId,
 }: LinearMessageViewProps): JSX.Element {
   const { t } = simpleT(locale);
+  const [copiedSystemPrompt, setCopiedSystemPrompt] = useState(false);
+  const [showMarkdown, setShowMarkdown] = useState(true);
 
   // Get callbacks and editor actions from context
   const {
     currentRootFolderId: rootFolderId,
+    currentSubFolderId: subFolderId,
     handleDeleteMessage: onDeleteMessage,
     retryMessage: onRetryMessage,
     answerAsAI: onAnswerAsModel,
@@ -76,7 +87,51 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     collapseState,
     // View mode to check if we should show system messages
     viewMode,
+    // Personas and selected persona
+    personas,
+    selectedPersona,
   } = useChatContext();
+
+  // Get the current persona's system prompt (memoized to ensure stable reference)
+  const personaPrompt = useMemo(() => {
+    const prompt = selectedPersona
+      ? personas[selectedPersona]?.systemPrompt || ""
+      : "";
+
+    return prompt;
+  }, [selectedPersona, personas]);
+
+  // Generate system prompt on client side (same as server)
+  const systemPrompt = useSystemPrompt({
+    locale,
+    rootFolderId,
+    subFolderId,
+    personaPrompt,
+  });
+
+  // Debug: Log final system prompt
+  if (typeof window !== "undefined" && viewMode === ViewMode.DEBUG) {
+    logger.debug("Generated system prompt", {
+      systemPromptLength: systemPrompt.length,
+      systemPromptPreview: systemPrompt.substring(0, 500),
+      includesYourRole: systemPrompt.includes("## Your Role"),
+      includesFormattingInstructions: systemPrompt.includes(
+        "# Formatting Instructions",
+      ),
+    });
+  }
+
+  const handleCopySystemPrompt = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(systemPrompt);
+      setCopiedSystemPrompt(true);
+      setTimeout(() => setCopiedSystemPrompt(false), 2000);
+    } catch (error) {
+      logger.error("Failed to copy system prompt", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }, [systemPrompt, logger]);
 
   // Wrap handleBranchEdit to pass branchMessage as the third parameter
   const handleBranch = useCallback(
@@ -127,6 +182,75 @@ export const LinearMessageView = React.memo(function LinearMessageView({
         </Div>
       )}
 
+      {/* Show System Prompt in Debug Mode */}
+      {viewMode === ViewMode.DEBUG && (
+        <Div className={cn(chatAnimations.slideIn, "mb-4")}>
+          <Div
+            className={cn(
+              "rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3",
+              "bg-purple-500/10 border border-purple-500/20",
+              chatShadows.sm,
+              chatTransitions.default,
+            )}
+          >
+            {/* Card Header with Logo */}
+            <Div className="flex items-center justify-between mb-3 pb-2 border-b border-purple-500/20">
+              <Div className="flex items-center gap-2">
+                <Div className="text-sm font-semibold text-purple-400">
+                  {t("app.chat.debugView.systemPromptTitle")}
+                </Div>
+                <Button
+                  onClick={handleCopySystemPrompt}
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 hover:bg-purple-500/20"
+                >
+                  <Copy className="h-4 w-4" />
+                  {copiedSystemPrompt && (
+                    <span className="ml-1 text-xs text-purple-400">
+                      {t("app.chat.debugView.copied")}
+                    </span>
+                  )}
+                </Button>
+                <Button
+                  onClick={() => setShowMarkdown(!showMarkdown)}
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 hover:bg-purple-500/20"
+                  title={
+                    showMarkdown
+                      ? "Show as plain text"
+                      : "Show as markdown"
+                  }
+                >
+                  {showMarkdown ? (
+                    <FileText className="h-4 w-4" />
+                  ) : (
+                    <Code className="h-4 w-4" />
+                  )}
+                </Button>
+              </Div>
+
+              {/* Logo on the right */}
+              <Div className="flex items-center">
+                <Logo locale={locale} disabled size="h-8" />
+              </Div>
+            </Div>
+
+            {/* System Prompt Content */}
+            {showMarkdown ? (
+              <Div className={cn(chatProse.all, "text-sm")}>
+                <Markdown content={systemPrompt} />
+              </Div>
+            ) : (
+              <Div className="text-sm leading-relaxed whitespace-pre-wrap wrap-break-word text-foreground/80 font-mono">
+                {systemPrompt}
+              </Div>
+            )}
+          </Div>
+        </Div>
+      )}
+
       {messages.map((message, index) => {
         const isEditing = editingMessageId === message.id;
         const isRetrying = retryingMessageId === message.id;
@@ -151,6 +275,24 @@ export const LinearMessageView = React.memo(function LinearMessageView({
 
         return (
           <React.Fragment key={message.id}>
+            {/* Show Message Metadata in Debug Mode */}
+            {viewMode === ViewMode.DEBUG &&
+              (message.role === ChatMessageRole.USER ||
+                message.role === ChatMessageRole.ASSISTANT) && (
+                <Div className={cn(chatAnimations.slideIn, "mb-2")}>
+                  <Div
+                    className={cn(
+                      "rounded-lg px-3 py-2 text-xs font-mono",
+                      "bg-blue-500/10 border border-blue-500/20",
+                      "text-blue-300",
+                      chatShadows.sm,
+                    )}
+                  >
+                    {createMetadataSystemMessage(message, rootFolderId)}
+                  </Div>
+                </Div>
+              )}
+
             <Div className={cn(chatAnimations.slideIn, "group")}>
               {isEditing ? (
                 <Div className="flex justify-end">

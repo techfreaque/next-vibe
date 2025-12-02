@@ -81,9 +81,10 @@ export function ChatArea({
           {/* Toolbar - View Mode Toggle & Screenshot Button */}
           {messages.length > 0 && <ChatToolbar locale={locale} />}
 
-          {/* Logo/Branding - Only show in linear/debug view */}
-          {(viewMode === ViewMode.LINEAR || viewMode === ViewMode.DEBUG) &&
-            messages.length > 0 && <ChatBranding locale={locale} />}
+          {/* Logo/Branding - Only show in linear view (not debug - logo is in card header) */}
+          {viewMode === ViewMode.LINEAR && messages.length > 0 && (
+            <ChatBranding locale={locale} />
+          )}
 
           {/* Messages Area - Full height, scrollable inside */}
           <Div className="max-w-screen overflow-hidden h-screen h-max-screen">

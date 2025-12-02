@@ -32,6 +32,17 @@ import {
 } from "@/app/api/[locale]/v1/core/products/repository-client";
 import { type CreditsGetResponseOutput } from "@/app/api/[locale]/v1/core/credits/definition";
 
+/**
+ * Format credit amount for display
+ * Shows decimals only when needed
+ */
+function formatCredits(amount: number): string {
+  if (amount === Math.floor(amount)) {
+    return amount.toString();
+  }
+  return amount.toFixed(2);
+}
+
 interface CreditBalanceCardProps {
   locale: CountryLanguage;
   initialCredits: CreditsGetResponseOutput | null;
@@ -94,10 +105,10 @@ export function CreditBalanceCard({
             <Badge className="text-lg font-bold px-4 py-2">
               {(credits?.total ?? 0) === 1
                 ? t("app.subscription.subscription.balance.credit", {
-                    count: credits?.total ?? 0,
+                    count: formatCredits(credits?.total ?? 0),
                   })
                 : t("app.subscription.subscription.balance.credits", {
-                    count: credits?.total ?? 0,
+                    count: formatCredits(credits?.total ?? 0),
                   })}
             </Badge>
           </Div>
@@ -111,7 +122,7 @@ export function CreditBalanceCard({
                 {t("app.subscription.subscription.balance.expiring.title")}
               </Div>
               <Div className="text-2xl font-bold text-amber-900 dark:text-amber-100">
-                {credits?.expiring ?? 0}
+                {formatCredits(credits?.expiring ?? 0)}
               </Div>
               <Div className="text-xs text-amber-600 dark:text-amber-400 mt-1">
                 {t(
@@ -130,7 +141,7 @@ export function CreditBalanceCard({
                 {t("app.subscription.subscription.balance.permanent.title")}
               </Div>
               <Div className="text-2xl font-bold text-green-900 dark:text-green-100">
-                {credits?.permanent ?? 0}
+                {formatCredits(credits?.permanent ?? 0)}
               </Div>
               <Div className="text-xs text-green-600 dark:text-green-400 mt-1">
                 {t(
@@ -146,7 +157,7 @@ export function CreditBalanceCard({
                 {t("app.subscription.subscription.balance.free.title")}
               </Div>
               <Div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                {credits?.free ?? 0}
+                {formatCredits(credits?.free ?? 0)}
               </Div>
               <Div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                 {t("app.subscription.subscription.balance.free.description", {
@@ -168,10 +179,10 @@ export function CreditBalanceCard({
                 <Div className="text-xs text-muted-foreground mt-1">
                   {credits.expiring === 1
                     ? t("app.subscription.subscription.balance.credit", {
-                        count: credits.expiring,
+                        count: formatCredits(credits.expiring),
                       })
                     : t("app.subscription.subscription.balance.credits", {
-                        count: credits.expiring,
+                        count: formatCredits(credits.expiring),
                       })}
                 </Div>
               </Div>

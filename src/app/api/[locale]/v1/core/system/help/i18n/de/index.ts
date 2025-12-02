@@ -1,10 +1,13 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   category: "Hilfe & Dokumentation",
   tag: "Hilfe",
   interactive: {
     post: {
       title: "Interaktiver Modus",
-      description: "Interaktiven Datei-Explorer-Modus zum Navigieren und Ausführen von Routen starten",
+      description:
+        "Interaktiven Datei-Explorer-Modus zum Navigieren und Ausführen von Routen starten",
       category: "System-Hilfe",
       tags: {
         system: "System",
@@ -18,7 +21,8 @@ export const translations = {
       availableEndpoints: "verfügbare Endpunkte",
       endpointsLabel: "Endpunkte",
       aliasesLabel: "Aliase:",
-      selectEndpoint: "Wählen Sie einen Endpunkt aus der Liste aus, um zu beginnen",
+      selectEndpoint:
+        "Wählen Sie einen Endpunkt aus der Liste aus, um zu beginnen",
     },
     response: {
       started: "Interaktiver Modus erfolgreich gestartet",
@@ -94,6 +98,7 @@ export const translations = {
     },
     header: {
       title: "Kopfzeile",
+      description: "Kopfzeilenbeschreibung",
     },
     title: {
       label: "Titel",
@@ -103,7 +108,9 @@ export const translations = {
     },
     usage: {
       title: "Verwendung",
-      patterns: "Verwendungsmuster",
+      patterns: {
+        item: "Muster",
+      },
     },
     commonCommands: {
       title: "Häufige Befehle",
@@ -125,10 +132,18 @@ export const translations = {
     },
     details: {
       title: "Details",
-      category: "Kategorie",
-      path: "Pfad",
-      method: "Methode",
-      aliases: "Aliase",
+      category: {
+        content: "Kategorie",
+      },
+      path: {
+        content: "Pfad",
+      },
+      method: {
+        content: "Methode",
+      },
+      aliases: {
+        content: "Aliase",
+      },
     },
   },
   list: {
@@ -215,6 +230,14 @@ export const translations = {
       commandsText: {
         label: "Verfügbare Befehle",
         description: "Formatierte Liste aller verfügbaren Befehle",
+      },
+      commands: {
+        alias: "Befehlsalias",
+        message: "Befehlsnachricht",
+        description: "Befehlsbeschreibung",
+        category: "Befehlskategorie",
+        aliases: "Befehlsaliase",
+        rule: "Befehlsregel",
       },
     },
     response: {

@@ -151,6 +151,8 @@ export const envSchema = envClientSchema.extend({
 
   OPENROUTER_API_KEY: z.string().min(1),
   UNCENSORED_AI_API_KEY: z.string(),
+  FREEDOMGPT_API_KEY: z.string(),
+  GAB_AI_API_KEY: z.string(),
   EDEN_AI_API_KEY: z.string().min(1),
   BRAVE_SEARCH_API_KEY: z.string(),
   STRIPE_WEBHOOK_SECRET: z.string().min(1),

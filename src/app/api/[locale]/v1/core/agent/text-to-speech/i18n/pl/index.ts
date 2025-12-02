@@ -5,10 +5,10 @@
 export const translations = {
   post: {
     title: "Tekst na mowę",
-    description: "Konwertuj tekst na naturalnie brzmiącą mowę za pomocą AI",
+    description: "Konwertuj tekst na naturalnie brzmiącą mowę za pomocą AI (opłata za znak)",
     form: {
       title: "Konwersja tekstu na mowę",
-      description: "Wprowadź tekst do przekształcenia na mowę",
+      description: "Wprowadź tekst do przekształcenia na mowę (koszt obliczany na podstawie liczby znaków)",
     },
     text: {
       label: "Tekst",

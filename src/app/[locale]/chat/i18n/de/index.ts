@@ -63,6 +63,7 @@ export const translations: typeof enTranslations = {
     assistantMessageActions: {
       stopAudio: "Audio-Wiedergabe stoppen",
       playAudio: "Audio abspielen",
+      cancelLoading: "Laden abbrechen",
       answerAsAI: "Als KI-Modell antworten",
       deleteMessage: "Nachricht löschen",
     },
@@ -616,6 +617,10 @@ export const translations: typeof enTranslations = {
         "GLM 4.5v - visionsfähiges multimodales Modell mit großem Kontextfenster",
       uncensoredLmV11:
         "Unzensiertes Sprachmodell ohne Inhaltsfilterung - Premium-Modell",
+      freedomgptLiberty:
+        "FreedomGPT Liberty - Unzensiertes KI-Modell mit Fokus auf freie Meinungsäußerung und kreative Inhalte",
+      gabAiArya:
+        "Gab AI Arya - Unzensiertes Konversations-KI-Modell mit freier Meinungsäußerung und kreativen Fähigkeiten",
     },
   },
   tones: {
@@ -703,11 +708,13 @@ export const translations: typeof enTranslations = {
   },
   debugView: {
     systemPrompt: "System-Prompt",
+    systemPromptTitle: "System-Prompt (Generiert)",
     systemPromptHint:
       "Dies ist der System-Prompt für den gesamten Konversationsthread",
     systemMessage: "Systemnachricht",
     systemMessageHint:
       "Dies ist eine in die Konversation eingefügte Systemnachricht",
+    copied: "Kopiert!",
     retryModal: {
       title: "Mit anderen Einstellungen wiederholen",
       description:
@@ -892,8 +899,10 @@ export const translations: typeof enTranslations = {
       loadingAudio: "Audio wird geladen...",
       stopAudio: "Audio stoppen",
       playAudio: "Audio abspielen",
+      cancelLoading: "Laden abbrechen",
       stop: "Stoppen",
       play: "Abspielen",
+      cancel: "Abbrechen",
       reply: "Antworten",
       replyToMessage: "Auf diese Nachricht antworten (erstellt einen Branch)",
       edit: "Bearbeiten",

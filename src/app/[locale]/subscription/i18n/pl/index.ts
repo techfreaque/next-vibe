@@ -85,6 +85,12 @@ export const translations: typeof enTranslations = {
           audioCost: "+2 kredyty",
         },
       },
+      cta: {
+        title: "Gotowy, aby zacząć?",
+        description:
+          "Subskrybuj dla miesięcznych kredytów i rozmawiaj ze wszystkimi {{modelCount}} modelami AI. Subskrybenci mogą kupować dodatkowe pakiety kredytów!",
+        button: "Subskrybuj teraz",
+      },
     },
     buy: {
       signInRequired: {

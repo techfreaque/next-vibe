@@ -38,6 +38,8 @@ export enum ModelId {
   GLM_4_5V = "glm-4.5v",
   VENICE_UNCENSORED = "venice-uncensored-free",
   DOLPHIN_3_0_MISTRAL_24B = "dolphin-3.0-mistral-24b",
+  FREEDOMGPT_LIBERTY = "freedomgpt-liberty",
+  GAB_AI_ARYA = "gab-ai-arya",
 }
 
 export const DEFAULT_MODEL = ModelId.GPT_5_NANO;
@@ -53,6 +55,16 @@ export const DEFAULT_FAVORITES: ModelId[] = [
 ];
 
 /**
+ * API Provider enum - determines which API to use for the model
+ */
+export enum ApiProvider {
+  OPENROUTER = "openrouter",
+  GAB_AI = "gab-ai",
+  FREEDOMGPT = "freedomgpt",
+  UNCENSORED_AI = "uncensored-ai",
+}
+
+/**
  * Configuration interface for AI model options.
  * Contains all necessary information for model selection and API integration.
  */
@@ -63,6 +75,8 @@ export interface ModelOption {
   name: string;
   /** AI provider company name */
   provider: ModelProviderId;
+  /** API provider to use for requests */
+  apiProvider: ApiProvider;
   /** Brief description of model capabilities */
   description: TranslationKey;
   /** Number of parameters in billions */
@@ -141,16 +155,27 @@ export const modelProviders: Record<string, ModelProvider> = {
     name: "Cognitive Computations",
     icon: "ocean",
   },
+  freedomGPT: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "FreedomGPT",
+    icon: "freedom-gpt-logo",
+  },
+  gabAI: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Gab AI",
+    icon: "gab-ai-logo",
+  },
 };
 
 // Model names and icons are technical identifiers that should not be translated
 /* eslint-disable i18next/no-literal-string */
-export const modelOptions: ModelOption[] = [
-  {
+export const modelOptions: Record<ModelId, ModelOption> = {
+  [ModelId.UNCENSORED_LM_V1_1]: {
     id: ModelId.UNCENSORED_LM_V1_1,
     name: "UncensoredLM v1.1",
     provider: "uncensoredAI",
-    description: "app.chat.models.descriptions.uncensoredLmV11",
+    apiProvider: ApiProvider.UNCENSORED_AI,
+    description: "app.api.v1.core.agent.chat.models.descriptions.uncensoredLmV11",
     parameterCount: undefined,
     contextWindow: 32768,
     icon: "shield-off",
@@ -163,10 +188,47 @@ export const modelOptions: ModelOption[] = [
     ],
     supportsTools: false,
   },
-  {
+  [ModelId.FREEDOMGPT_LIBERTY]: {
+    id: ModelId.FREEDOMGPT_LIBERTY,
+    name: "FreedomGPT Liberty",
+    provider: "freedomGPT",
+    apiProvider: ApiProvider.FREEDOMGPT,
+    description: "app.chat.models.descriptions.freedomgptLiberty",
+    parameterCount: undefined,
+    contextWindow: 32768,
+    icon: "freedom-gpt-logo",
+    openRouterModel: "freedomgpt-liberty",
+    creditCost: 3,
+    utilities: [
+      ModelUtility.UNCENSORED,
+      ModelUtility.CREATIVE,
+      ModelUtility.CHAT,
+    ],
+    supportsTools: false,
+  },
+  [ModelId.GAB_AI_ARYA]: {
+    id: ModelId.GAB_AI_ARYA,
+    name: "Gab AI Arya",
+    provider: "gabAI",
+    apiProvider: ApiProvider.GAB_AI,
+    description: "app.chat.models.descriptions.gabAiArya",
+    parameterCount: undefined,
+    contextWindow: 8192,
+    icon: "gab-ai-logo",
+    openRouterModel: "gab-ai-arya",
+    creditCost: 2,
+    utilities: [
+      ModelUtility.UNCENSORED,
+      ModelUtility.CREATIVE,
+      ModelUtility.CHAT,
+    ],
+    supportsTools: true,
+  },
+  [ModelId.VENICE_UNCENSORED]: {
     id: ModelId.VENICE_UNCENSORED,
     name: "Venice Uncensored",
     provider: "cognitiveComputations",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.uncensoredLmV11",
     parameterCount: 24,
     contextWindow: 32768,
@@ -177,10 +239,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.UNCENSORED, ModelUtility.CREATIVE],
     supportsTools: false, // OpenRouter reports: "No endpoints found that support tool use"
   },
-  {
+  [ModelId.DOLPHIN_3_0_MISTRAL_24B]: {
     id: ModelId.DOLPHIN_3_0_MISTRAL_24B,
     name: "Dolphin 3.0 Mistral 24B",
     provider: "cognitiveComputations",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.mistralNemo",
     parameterCount: 24,
     contextWindow: 32768,
@@ -190,10 +253,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.FAST],
     supportsTools: false, // OpenRouter reports: "No endpoints found that support tool use"
   },
-  {
+  [ModelId.GLM_4_5_AIR]: {
     id: ModelId.GLM_4_5_AIR,
     name: "GLM 4.5 AIR",
     provider: "zAi",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.glm45Air",
     parameterCount: undefined,
     contextWindow: 203000,
@@ -203,10 +267,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
   },
-  {
+  [ModelId.GLM_4_6]: {
     id: ModelId.GLM_4_6,
     name: "GLM 4.6",
     provider: "zAi",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.glm46",
     parameterCount: undefined,
     contextWindow: 203000,
@@ -216,10 +281,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.SMART],
     supportsTools: true,
   },
-  {
+  [ModelId.GLM_4_5V]: {
     id: ModelId.GLM_4_5V,
     name: "GLM 4.5v",
     provider: "zAi",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.glm45v",
     parameterCount: 106,
     contextWindow: 203000,
@@ -229,10 +295,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.VISION],
     supportsTools: true,
   },
-  {
+  [ModelId.CLAUDE_HAIKU_4_5]: {
     id: ModelId.CLAUDE_HAIKU_4_5,
     name: "Claude Haiku 4.5",
     provider: "anthropic",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.claudeHaiku45",
     parameterCount: undefined,
     contextWindow: 200000,
@@ -242,10 +309,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.CODING],
     supportsTools: true,
   },
-  {
+  [ModelId.CLAUDE_SONNET_4_5]: {
     id: ModelId.CLAUDE_SONNET_4_5,
     name: "Claude Sonnet 4.5",
     provider: "anthropic",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.claudeSonnet45",
     parameterCount: undefined,
     contextWindow: 1000000,
@@ -260,10 +328,11 @@ export const modelOptions: ModelOption[] = [
     ],
     supportsTools: true,
   },
-  {
+  [ModelId.GTP_5_PRO]: {
     id: ModelId.GTP_5_PRO,
     name: "GPT-5 Pro",
     provider: "openAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.gpt5Pro",
     parameterCount: undefined,
     contextWindow: 400000,
@@ -278,10 +347,11 @@ export const modelOptions: ModelOption[] = [
     ],
     supportsTools: true,
   },
-  {
+  [ModelId.GPT_5_CODEX]: {
     id: ModelId.GPT_5_CODEX,
     name: "GPT-5 Codex",
     provider: "openAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.gpt5Codex",
     parameterCount: undefined,
     contextWindow: 400000,
@@ -291,10 +361,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.LEGACY],
     supportsTools: true,
   },
-  {
+  [ModelId.GPT_5_1_CODEX]: {
     id: ModelId.GPT_5_1_CODEX,
     name: "GPT-5.1 Codex",
     provider: "openAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.gpt51Codex",
     parameterCount: undefined,
     contextWindow: 400000,
@@ -304,10 +375,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
     supportsTools: true,
   },
-  {
+  [ModelId.GPT_5_1]: {
     id: ModelId.GPT_5_1,
     name: "GPT-5.1",
     provider: "openAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.gpt51",
     parameterCount: undefined,
     contextWindow: 400000,
@@ -317,10 +389,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
     supportsTools: true,
   },
-  {
+  [ModelId.GPT_5]: {
     id: ModelId.GPT_5,
     name: "GPT-5",
     provider: "openAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.gpt5",
     parameterCount: undefined,
     contextWindow: 400000,
@@ -330,10 +403,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.LEGACY],
     supportsTools: true,
   },
-  {
+  [ModelId.GPT_5_MINI]: {
     id: ModelId.GPT_5_MINI,
     name: "GPT-5 Mini",
     provider: "openAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.gpt5Mini",
     parameterCount: undefined,
     contextWindow: 400000,
@@ -343,10 +417,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
   },
-  {
+  [ModelId.GPT_5_NANO]: {
     id: ModelId.GPT_5_NANO,
     name: "GPT-5 Nano",
     provider: "openAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.gpt5Nano",
     parameterCount: undefined,
     contextWindow: 400000,
@@ -356,10 +431,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
   },
-  {
+  [ModelId.GPT_OSS_120B]: {
     id: ModelId.GPT_OSS_120B,
     name: "GPT-OSS 120B",
     provider: "openAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.gptOss120b",
     parameterCount: 117,
     contextWindow: 33000,
@@ -369,10 +445,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.CHAT, ModelUtility.CODING],
     supportsTools: true,
   },
-  {
+  [ModelId.KIMI_K2]: {
     id: ModelId.KIMI_K2,
     name: "Kimi K2",
     provider: "moonshotAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.kimiK2",
     parameterCount: 1000,
     contextWindow: 256000,
@@ -388,10 +465,11 @@ export const modelOptions: ModelOption[] = [
     openRouterModel: "moonshotai/kimi-k2-0905",
     supportsTools: true, // OpenRouter reports: "No endpoints found that support tool use"
   },
-  {
+  [ModelId.KIMI_K2_THINKING]: {
     id: ModelId.KIMI_K2_THINKING,
     name: "Kimi K2 Thinking",
     provider: "moonshotAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.kimiK2Thinking",
     parameterCount: 1000,
     contextWindow: 256000,
@@ -406,10 +484,11 @@ export const modelOptions: ModelOption[] = [
     openRouterModel: "moonshotai/kimi-k2-thinking",
     supportsTools: true, // OpenRouter reports: "No endpoints found that support tool use"
   },
-  {
+  [ModelId.GEMINI_2_5_FLASH_LITE]: {
     id: ModelId.GEMINI_2_5_FLASH_LITE,
     name: "Gemini 2.5 Flash Lite",
     provider: "google",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.geminiFlash25Lite",
     parameterCount: undefined,
     contextWindow: 1050000,
@@ -419,10 +498,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
   },
-  {
+  [ModelId.GEMINI_2_5_FLASH]: {
     id: ModelId.GEMINI_2_5_FLASH,
     name: "Gemini 2.5 Flash",
     provider: "google",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.geminiFlash25Flash",
     parameterCount: undefined,
     contextWindow: 1050000,
@@ -432,10 +512,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.CHAT],
     supportsTools: true,
   },
-  {
+  [ModelId.GEMINI_2_5_PRO]: {
     id: ModelId.GEMINI_2_5_PRO,
     name: "Gemini 2.5 Flash Pro",
     provider: "google",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.geminiFlash25Pro",
     parameterCount: undefined,
     contextWindow: 1050000,
@@ -445,10 +526,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.LEGACY],
     supportsTools: true,
   },
-  {
+  [ModelId.GEMINI_3_PRO]: {
     id: ModelId.GEMINI_3_PRO,
     name: "Gemini 2.5 Flash Pro",
     provider: "google",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.geminiFlash25Pro",
     parameterCount: undefined,
     contextWindow: 1048576,
@@ -458,10 +540,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
   },
-  {
+  [ModelId.MISTRAL_NEMO]: {
     id: ModelId.MISTRAL_NEMO,
     name: "Mistral Nemo",
     provider: "mistralAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.mistralNemo",
     parameterCount: 12,
     contextWindow: 131072,
@@ -471,10 +554,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
   },
-  {
+  [ModelId.DEEPSEEK_V31]: {
     id: ModelId.DEEPSEEK_V31,
     name: "DeepSeek V3.1",
     provider: "deepSeek",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.deepseekV31",
     parameterCount: 671,
     contextWindow: 164000,
@@ -484,10 +568,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
   },
-  {
+  [ModelId.DEEPSEEK_R1]: {
     id: ModelId.DEEPSEEK_R1,
     name: "DeepSeek R1",
     provider: "deepSeek",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.deepseekR1",
     parameterCount: 671,
     contextWindow: 164000,
@@ -498,10 +583,11 @@ export const modelOptions: ModelOption[] = [
     supportsTools: true,
   },
 
-  {
+  [ModelId.QWEN3_235B_FREE]: {
     id: ModelId.QWEN3_235B_FREE,
     name: "Qwen3 235B ",
     provider: "alibaba",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.qwen3235bFree",
     parameterCount: 235,
     contextWindow: 131000,
@@ -511,10 +597,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
   },
-  {
+  [ModelId.DEEPSEEK_R1_DISTILL]: {
     id: ModelId.DEEPSEEK_R1_DISTILL,
     name: "DeepSeek R1 Distill",
     provider: "deepSeek",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.deepseekR1Distill",
     parameterCount: 70,
     contextWindow: 64000,
@@ -524,10 +611,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.CODING, ModelUtility.ANALYSIS],
     supportsTools: true,
   },
-  {
+  [ModelId.QWEN_2_5_7B]: {
     id: ModelId.QWEN_2_5_7B,
     name: "Qwen 2.5 7B",
     provider: "alibaba",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.qwen257b",
     parameterCount: 7,
     contextWindow: 32768,
@@ -537,10 +625,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.CHAT],
     supportsTools: true,
   },
-  {
+  [ModelId.GROK_4]: {
     id: ModelId.GROK_4,
     name: "Grok 4",
     provider: "xAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.grok4",
     parameterCount: undefined,
     contextWindow: 256000,
@@ -550,10 +639,11 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
   },
-  {
+  [ModelId.GROK_4_FAST]: {
     id: ModelId.GROK_4_FAST,
     name: "Grok 4 Fast",
     provider: "xAI",
+    apiProvider: ApiProvider.OPENROUTER,
     description: "app.chat.models.descriptions.grok4Fast",
     parameterCount: undefined,
     contextWindow: 2000000,
@@ -563,7 +653,7 @@ export const modelOptions: ModelOption[] = [
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
   },
-];
+};
 /* eslint-enable i18next/no-literal-string */
 
 /** Default model used when no specific model is selected */
@@ -577,19 +667,14 @@ export const defaultModel = ModelId.GPT_5_NANO;
  * @returns The model configuration object
  */
 export function getModelById(modelId: ModelId): ModelOption {
-  const foundModel = modelOptions.find((model) => model.id === modelId);
+  const foundModel = modelOptions[modelId];
 
   if (foundModel) {
     return foundModel;
   }
 
-  // Fallback to default model - this should never fail as default model is in the array
-  const defaultModelOption = modelOptions.find(
-    (model) => model.id === defaultModel,
-  );
-
-  // This should never happen in a properly configured system, but we handle it gracefully
-  return defaultModelOption ?? modelOptions[0];
+  // Fallback to default model - this should never fail as default model is in the object
+  return modelOptions[defaultModel];
 }
 
 /**
@@ -599,13 +684,13 @@ export function getModelById(modelId: ModelId): ModelOption {
  * @returns Array of all available model IDs
  */
 export function getAllModelIds(): ModelId[] {
-  return modelOptions.map((model) => model.id);
+  return Object.keys(modelOptions) as ModelId[];
 }
 
 /**
  * Model ID options for SELECT fields
  */
-export const ModelIdOptions = modelOptions.map((model) => ({
+export const ModelIdOptions = Object.values(modelOptions).map((model) => ({
   value: model.id,
   label: model.name as TranslationKey,
 }));

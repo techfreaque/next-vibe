@@ -21,6 +21,7 @@ import {
   or,
   sql,
 } from "drizzle-orm";
+
 import {
   success,
   ErrorResponseTypes,
@@ -1534,8 +1535,7 @@ class CreditRepository implements CreditRepositoryInterface {
           await tx
             .update(creditWallets)
             .set({
-              freeCreditsRemaining:
-                lockedWallet.freeCreditsRemaining - deduction,
+              freeCreditsRemaining: lockedWallet.freeCreditsRemaining - deduction,
               updatedAt: new Date(),
             })
             .where(eq(creditWallets.id, lockedWallet.id));

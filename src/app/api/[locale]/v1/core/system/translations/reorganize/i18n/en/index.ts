@@ -70,6 +70,8 @@ export const translations = {
       generatingFiles: "Generating files",
       completed: "Completed",
       noKeysInUse: "No keys in use",
+      writingFilteredTranslations: "Writing filtered translations",
+      removeUnusedRequiresRegenerate: "removeUnused requires regenerateStructure to be enabled",
     },
     response: {
       title: "Reorganization Result",

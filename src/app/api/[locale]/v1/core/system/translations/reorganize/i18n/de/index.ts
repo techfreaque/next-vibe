@@ -74,6 +74,8 @@ export const translations: typeof enTranslations = {
       generatingFiles: "Dateien generieren",
       completed: "Abgeschlossen",
       noKeysInUse: "Keine Schlüssel in Verwendung",
+      writingFilteredTranslations: "Gefilterte Übersetzungen schreiben",
+      removeUnusedRequiresRegenerate: "removeUnused erfordert, dass regenerateStructure aktiviert ist",
     },
     response: {
       title: "Reorganisationsergebnis",

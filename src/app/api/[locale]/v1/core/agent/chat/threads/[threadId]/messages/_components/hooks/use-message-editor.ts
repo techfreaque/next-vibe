@@ -1,6 +1,7 @@
 /**
  * Custom hook for message editor logic
  * Handles content state, loading state, and action handlers
+ * Includes autosave functionality to persist drafts across page refreshes
  */
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -15,6 +16,11 @@ import type { DivRefObject } from "@/packages/next-vibe-ui/web/ui/div";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { TIMING } from "@/app/[locale]/chat/lib/config/constants";
+import {
+  loadDraft,
+  saveDraft,
+  clearDraft,
+} from "@/app/api/[locale]/v1/core/agent/chat/hooks/use-input-autosave";
 
 export type EditorActionType = "branch" | null;
 
@@ -57,10 +63,33 @@ export function useMessageEditor({
   const editorRef = useRef<DivRefObject>(null);
   const textareaRef = useRef<TextareaRefObject>(null);
 
-  // Initialize content when message changes
+  // Generate unique draft key for this message editor
+  const draftKey = `message-editor-draft:${message.id}`;
+
+  // Load draft on mount or when message ID changes
+  // Don't re-run when message.content changes to avoid overriding user input
   useEffect(() => {
-    setContent(message.content);
-  }, [message.id, message.content]);
+    const loadDraftForMessage = async (): Promise<void> => {
+      const draft = await loadDraft(draftKey, logger);
+      // Prioritize draft over original content - if user typed something, keep it
+      if (draft) {
+        setContent(draft);
+      } else {
+        setContent(message.content);
+      }
+    };
+    void loadDraftForMessage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftKey, message.id, logger]);
+
+  // Wrapper function to save content and draft together
+  const setContentAndSaveDraft = useCallback(
+    (newContent: string) => {
+      setContent(newContent);
+      void saveDraft(draftKey, newContent, logger);
+    },
+    [draftKey, logger],
+  );
 
   // Scroll into view and focus when editor mounts
   useEffect(() => {
@@ -93,6 +122,8 @@ export function useMessageEditor({
     setIsLoading(true);
     try {
       await onBranch(message.id, trimmedContent);
+      // Clear draft after successful branch
+      await clearDraft(draftKey, logger);
     } catch (error) {
       logger.error("Failed to branch message", parseError(error));
       // Error is logged, no need to throw
@@ -100,7 +131,7 @@ export function useMessageEditor({
       setIsLoading(false);
       setActionType(null);
     }
-  }, [content, isLoading, message.id, onBranch, logger]);
+  }, [content, isLoading, message.id, onBranch, logger, draftKey]);
 
   const handleKeyDown = useCallback(
     (e: TextareaKeyboardEvent): void => {
@@ -119,6 +150,7 @@ export function useMessageEditor({
 
   const handleCancel = useCallback(() => {
     if (!isLoading) {
+      // Don't clear draft - keep it for next time editor opens
       onCancel();
     }
   }, [isLoading, onCancel]);
@@ -129,7 +161,7 @@ export function useMessageEditor({
     actionType,
     editorRef,
     textareaRef,
-    setContent,
+    setContent: setContentAndSaveDraft,
     handleBranch,
     handleKeyDown,
     handleCancel,

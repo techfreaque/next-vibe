@@ -106,46 +106,51 @@ export function ModelPersonaSelectorModal({
           </Div>
         )}
 
-        {/* Selectors */}
-        <Div className="flex flex-col gap-3 mb-4">
-          <Div className="flex items-center gap-2 flex-wrap">
+        {/* Selectors & Actions - ALL IN ONE LINE */}
+        <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 flex-nowrap">
+          {/* Left side: Model & Persona Selectors */}
+          <Div className="flex flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 flex-1 min-w-0">
             <ModelSelector
               value={selectedModel}
               onChange={onModelChange}
               locale={locale}
               logger={logger}
+              buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
+              showTextAt="sm"
             />
             <PersonaSelector
               value={selectedPersona}
               onChange={onPersonaChange}
               locale={locale}
               logger={logger}
+              buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
+              showTextAt="md"
             />
           </Div>
-        </Div>
 
-        {/* Actions */}
-        <Div className="flex items-center gap-2 justify-end">
-          <Button
-            onClick={onCancel}
-            disabled={isDisabled}
-            size="sm"
-            variant="ghost"
-            className="h-10 min-h-[44px]"
-          >
-            <X className="h-4 w-4 mr-2" />
-            {t("app.chat.common.cancel")}
-          </Button>
-          <Button
-            onClick={handleConfirm}
-            disabled={isDisabled}
-            size="sm"
-            variant="default"
-            className="h-10 min-h-[44px]"
-          >
-            <Send className="h-4 w-4 mr-2" />
-            {isDisabled ? t("app.chat.common.sending") : finalConfirmLabel}
-          </Button>
+          {/* Right side: Cancel & Confirm Buttons */}
+          <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 shrink-0">
+            <Button
+              onClick={onCancel}
+              disabled={isDisabled}
+              size="icon"
+              variant="destructive"
+              className="h-8 w-8 sm:h-9 sm:w-9 shrink-0"
+              title={t("app.chat.common.cancel")}
+            >
+              <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </Button>
+            <Button
+              onClick={handleConfirm}
+              disabled={isDisabled}
+              size="icon"
+              variant="default"
+              className="h-8 w-8 sm:h-9 sm:w-9 shrink-0"
+              title={isDisabled ? t("app.chat.common.sending") : finalConfirmLabel}
+            >
+              <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </Button>
+          </Div>
         </Div>
       </Div>
     </Div>

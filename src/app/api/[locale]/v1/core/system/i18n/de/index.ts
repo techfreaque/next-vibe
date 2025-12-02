@@ -9,8 +9,9 @@ import { translations as releaseToolTranslations } from "../../release-tool/i18n
 import { translations as serverTranslations } from "../../server/i18n/de";
 import { translations as translationsTranslations } from "../../translations/i18n/de";
 import { translations as unifiedInterfaceTranslations } from "../../unified-interface/i18n/de";
+import type { translations as enTranslations } from "../en";
 
-export const translations = {
+export const translations: typeof enTranslations = {
   builder: builderTranslations,
   check: checkTranslations,
   db: dbTranslations,

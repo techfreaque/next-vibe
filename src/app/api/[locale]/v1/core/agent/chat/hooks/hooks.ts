@@ -67,7 +67,10 @@ export interface UseChatReturn {
   messages: Record<string, ChatMessage>;
   folders: Record<string, ChatFolder>;
   rootFolderPermissions: RootFolderPermissions; // Server-computed permissions for current root folder
-  personas: Record<string, { id: string; name: string; icon: string }>;
+  personas: Record<
+    string,
+    { id: string; name: string; icon: string; systemPrompt: string }
+  >;
   activeThread: ChatThread | null;
   activeThreadMessages: ChatMessage[];
   isLoading: boolean;
@@ -406,6 +409,8 @@ export function useChat(
   // Branch management
   const branchManagement = useBranchManagement({
     activeThreadMessages,
+    threadId: activeThreadId || "", // Pass thread ID for persistence
+    logger,
   });
 
   // Message actions (delete)
@@ -470,7 +475,7 @@ export function useChat(
     const personasList = response?.personas;
     const personasMap: Record<
       string,
-      { id: string; name: string; icon: string }
+      { id: string; name: string; icon: string; systemPrompt: string }
     > = {};
 
     if (personasList && Array.isArray(personasList)) {
@@ -479,6 +484,7 @@ export function useChat(
           id: p.id,
           name: p.name,
           icon: p.icon,
+          systemPrompt: p.systemPrompt,
         };
       });
     }

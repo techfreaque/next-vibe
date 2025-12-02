@@ -7,10 +7,10 @@ import { getModelById, type ModelId, modelOptions } from "./models";
 
 /**
  * Feature costs (non-model)
+ * Note: TTS pricing is now in products/repository-client.ts (single source of truth)
  */
 export const FEATURE_COSTS = {
   BRAVE_SEARCH: 1, // 1 credit per search
-  TTS: 2, // 2 credits per TTS operation
   STT: 2, // 2 credits per STT operation
 } as const;
 
@@ -44,7 +44,7 @@ export function isModelFree(modelId: ModelId): boolean {
  * @returns Array of free model IDs
  */
 export function getFreeModels(): ModelId[] {
-  return modelOptions
+  return Object.values(modelOptions)
     .filter((model) => model.creditCost === 0)
     .map((model) => model.id);
 }
@@ -55,7 +55,7 @@ export function getFreeModels(): ModelId[] {
  * @returns Array of model IDs with that cost
  */
 export function getModelsByCost(cost: number): ModelId[] {
-  return modelOptions
+  return Object.values(modelOptions)
     .filter((model) => model.creditCost === cost)
     .map((model) => model.id);
 }
@@ -66,7 +66,7 @@ export function getModelsByCost(cost: number): ModelId[] {
  */
 export function getAllModelCosts(): Record<string, number> {
   const costs: Record<string, number> = {};
-  for (const model of modelOptions) {
+  for (const model of Object.values(modelOptions)) {
     costs[model.id] = model.creditCost;
   }
   return costs;

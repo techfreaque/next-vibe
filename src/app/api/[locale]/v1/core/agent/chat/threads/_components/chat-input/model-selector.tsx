@@ -11,6 +11,7 @@ import {
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
+import type { ModelUtility } from "@/app/api/[locale]/v1/core/agent/chat/model-access/model-utilities";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -50,7 +51,7 @@ export function ModelSelector({
 
   // Convert models to selector options with cost information
   const options: SelectorOption<ModelId>[] = useMemo(() => {
-    return modelOptions.map((model) => {
+    return Object.values(modelOptions).map((model) => {
       const provider = modelProviders[model.provider];
       const costText =
         model.creditCost === 0
@@ -69,7 +70,7 @@ export function ModelSelector({
       const utilityTitleKeys: string[] = [];
 
       if (model.utilities) {
-        model.utilities.forEach((utilityId) => {
+        model.utilities.forEach((utilityId: ModelUtility) => {
           const utility = MODEL_UTILITIES[utilityId];
           if (utility) {
             // Use titleKey for grouping (will be translated by t() in UI)

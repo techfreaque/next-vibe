@@ -36,7 +36,11 @@ import {
 } from "../../chat/db";
 import type { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
-import { getModelById, type ModelId } from "../../chat/model-access/models";
+import {
+  getModelById,
+  type ModelId,
+  ApiProvider,
+} from "../../chat/model-access/models";
 import { generateThreadTitle } from "../../chat/threads/repository";
 import {
   createErrorMessage,
@@ -49,10 +53,9 @@ import type {
   AiStreamPostResponseOutput,
 } from "../definition";
 import { createStreamEvent, formatSSEEvent } from "../events";
-import {
-  isUncensoredAIModel,
-  createUncensoredAI,
-} from "../providers/uncensored-ai";
+import { createUncensoredAI } from "../providers/uncensored-ai";
+import { createFreedomGPT } from "../providers/freedomgpt";
+import { createGabAI } from "../providers/gab-ai";
 import { parseError } from "../../../shared/utils";
 
 /**
@@ -144,6 +147,7 @@ class AiStreamRepository implements IAiStreamRepository {
    */
   async createAiStream({
     data,
+    t,
     locale,
     logger,
     user,
@@ -166,6 +170,7 @@ class AiStreamRepository implements IAiStreamRepository {
       userId,
       leadId,
       ipAddress,
+      t,
     });
 
     if (!setupResult.success) {
@@ -208,15 +213,7 @@ class AiStreamRepository implements IAiStreamRepository {
       systemPrompt = updatedSystemPrompt;
 
       // Configure provider based on model
-      // UncensoredAI uses custom provider with OpenAI-compatible API
-      // OpenRouter uses its own provider
-      const provider = isUncensoredAIModel(data.model)
-        ? createUncensoredAI({
-            apiKey: env.UNCENSORED_AI_API_KEY,
-          })
-        : createOpenRouter({
-            apiKey: env.OPENROUTER_API_KEY,
-          });
+      const provider = this.getProviderForModel(data.model);
 
       logger.info("[AI Stream] Starting OpenRouter stream", {
         model: data.model,
@@ -746,6 +743,39 @@ class AiStreamRepository implements IAiStreamRepository {
       params.model,
       params.logger,
     );
+  }
+
+  /**
+   * Get the appropriate provider for a given model
+   */
+  private getProviderForModel(
+    model: ModelId,
+  ): ReturnType<
+    | typeof createOpenRouter
+    | typeof createUncensoredAI
+    | typeof createFreedomGPT
+    | typeof createGabAI
+  > {
+    const modelOption = getModelById(model);
+
+    switch (modelOption.apiProvider) {
+      case ApiProvider.UNCENSORED_AI:
+        return createUncensoredAI({
+          apiKey: env.UNCENSORED_AI_API_KEY,
+        });
+
+      case ApiProvider.FREEDOMGPT:
+        return createFreedomGPT();
+
+      case ApiProvider.GAB_AI:
+        return createGabAI();
+
+      case ApiProvider.OPENROUTER:
+      default:
+        return createOpenRouter({
+          apiKey: env.OPENROUTER_API_KEY,
+        });
+    }
   }
 
   /**
@@ -1437,8 +1467,6 @@ class AiStreamRepository implements IAiStreamRepository {
       currentAssistantContent,
       isInReasoningBlock,
       threadId,
-      currentParentId,
-      currentDepth,
       model,
       persona,
       sequenceId,
@@ -1451,7 +1479,7 @@ class AiStreamRepository implements IAiStreamRepository {
       logger,
     } = params;
 
-    let { currentAssistantMessageId } = params;
+    let { currentAssistantMessageId, currentParentId, currentDepth } = params;
 
     // Tool call event - ASSISTANT message should already exist from tool-input-start
     // But create it if it doesn't (safety fallback)
@@ -1472,10 +1500,16 @@ class AiStreamRepository implements IAiStreamRepository {
       });
       currentAssistantMessageId = result.messageId;
 
+      // Update parent chain to point to the newly created ASSISTANT message
+      // This ensures the TOOL message becomes a child of the ASSISTANT message
+      currentParentId = currentAssistantMessageId;
+      // currentDepth stays the same - ASSISTANT message is at the same depth
+
       logger.warn(
         "[AI Stream] Created ASSISTANT message at tool-call (should have been created earlier)",
         {
           messageId: currentAssistantMessageId,
+          updatedParentId: currentParentId,
         },
       );
     }
@@ -1530,8 +1564,8 @@ class AiStreamRepository implements IAiStreamRepository {
     const toolConfig = toolsConfig.get(part.toolName);
     const requiresConfirmation = toolConfig?.requiresConfirmation ?? false;
 
-    // Update parent chain: TOOL message is always child of currentParentId
-    // currentParentId is updated after each message (ASSISTANT or TOOL) to point to that message
+    // Update parent chain: TOOL message is always child of the ASSISTANT message
+    // currentParentId now points to the ASSISTANT message (either existing or just created)
     // This creates the chain: USER → ASSISTANT → TOOL1 → TOOL2 → ASSISTANT (next step)
     const newCurrentParentId = currentParentId;
     const newCurrentDepth = currentDepth + 1;

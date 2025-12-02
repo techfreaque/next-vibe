@@ -16,10 +16,11 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import type { JwtPayloadType } from "../../user/auth/types";
 import { creditRepository } from "../../credits/repository";
-import { FEATURE_COSTS } from "../chat/model-access/costs";
+import { TTS_COST_PER_CHARACTER } from "../../products/repository-client";
 import type { TextToSpeechPostRequestOutput } from "./definition";
 
 /**
@@ -35,6 +36,14 @@ interface EdenAITTSResponse {
     };
     status?: string;
   };
+}
+
+/**
+ * Map locale to language code for TTS
+ * Uses getLanguageFromLocale to extract language
+ */
+function mapLocaleToLanguage(locale: CountryLanguage): string {
+  return getLanguageFromLocale(locale);
 }
 
 /**
@@ -78,10 +87,14 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
       response: { success: boolean; audioUrl: string; provider: string };
     }>
   > {
+    // Server-side configuration
+    const provider = "amazon";
+    const language = mapLocaleToLanguage(locale);
+
     logger.info("Starting text-to-speech conversion", {
-      provider: data.provider,
+      provider,
       voice: data.voice,
-      language: data.language,
+      language,
       textLength: data.text.length,
     });
 
@@ -94,11 +107,47 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
       });
     }
 
+    // Calculate credits based on character count
+    // Amazon TTS: $4 per 1M chars + 30% markup = $5.20 per 1M chars
+    const characterCount = data.text.length;
+    const creditsNeeded = characterCount * TTS_COST_PER_CHARACTER;
+
+    logger.info("Calculating TTS credits", {
+      characterCount,
+      creditsNeeded,
+      costPerCharacter: TTS_COST_PER_CHARACTER,
+    });
+
+    // Deduct credits BEFORE making the API call
+    // This ensures credits are deducted even if the request is interrupted
+    try {
+      await creditRepository.deductCreditsForFeature(
+        user,
+        creditsNeeded,
+        "tts",
+        logger,
+      );
+    } catch (error) {
+      const errorMessage = parseError(error).message;
+      logger.error("Failed to deduct credits", {
+        error: errorMessage,
+        creditsNeeded,
+        characterCount,
+      });
+      return fail({
+        message: "app.api.v1.core.agent.textToSpeech.post.errors.creditsFailed",
+        errorType: ErrorResponseTypes.PAYMENT_ERROR,
+        messageParams: {
+          error: errorMessage,
+        },
+      });
+    }
+
     try {
       logger.debug("Sending request to Eden AI", {
-        provider: data.provider,
+        provider,
         voice: data.voice,
-        language: data.language,
+        language,
       });
 
       // Call Eden AI TTS API
@@ -112,9 +161,9 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            providers: data.provider,
+            providers: provider,
             text: data.text,
-            language: data.language.toLowerCase(),
+            language: language.toLowerCase(),
             option: data.voice,
           }),
         },
@@ -138,18 +187,18 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
 
       const responseData = (await response.json()) as EdenAITTSResponse;
       logger.debug("Received response from Eden AI", {
-        hasProviderResult: !!responseData[data.provider],
+        hasProviderResult: !!responseData[provider],
       });
 
       // Extract audio URL from response
-      const providerResult = responseData[data.provider];
+      const providerResult = responseData[provider];
 
       // Check for provider-level errors
       if (providerResult?.error || providerResult?.status === "fail") {
         const errorMessage =
           providerResult.error?.message || "Unknown provider error";
         logger.error("Provider returned error", {
-          provider: data.provider,
+          provider,
           error: errorMessage,
           errorType: providerResult.error?.type,
         });
@@ -167,7 +216,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
 
       if (!audioResourceUrl) {
         logger.error("No audio URL in response", {
-          provider: data.provider,
+          provider,
           responseKeys: Object.keys(responseData),
         });
         return fail({
@@ -213,29 +262,21 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
       logger.info("Text-to-speech conversion successful", {
         audioSize: audioBuffer.byteLength,
         contentType,
-        provider: data.provider,
+        provider,
       });
-
-      // Deduct credits AFTER successful completion
-      await creditRepository.deductCreditsForFeature(
-        user,
-        FEATURE_COSTS.TTS,
-        "tts",
-        logger,
-      );
 
       return success({
         response: {
           success: true,
           audioUrl,
-          provider: data.provider,
+          provider,
         },
       });
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Failed to convert text to speech", {
         error: errorMessage,
-        provider: data.provider,
+        provider,
       });
 
       return fail({

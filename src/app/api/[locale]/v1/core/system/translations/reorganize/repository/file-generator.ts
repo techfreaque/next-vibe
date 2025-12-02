@@ -10,6 +10,25 @@ import type { TranslationObject } from "./key-usage-analyzer";
 
 export class FileGenerator {
   /**
+   * Set of all locations across all languages
+   * Used to ensure parent aggregators are generated even when a location has no translations in a specific language
+   */
+  private allLocations: Set<string> = new Set();
+
+  /**
+   * Register all locations from all languages before generating files
+   * This ensures parent aggregators are created even when a location has no translations in a specific language
+   */
+  registerAllLocations(allGroups: Map<string, TranslationObject>[]): void {
+    this.allLocations.clear();
+    for (const groups of allGroups) {
+      for (const location of groups.keys()) {
+        this.allLocations.add(location);
+      }
+    }
+  }
+
+  /**
    * Generate translation files with proper location-based co-location
    * Creates files at target locations matching usage patterns
    * @param groups - Map of location paths to translation objects
@@ -23,26 +42,16 @@ export class FileGenerator {
     logger: EndpointLogger,
   ): boolean {
     try {
-      logger.info(
-        `Generating translation files for language: ${language}, groups: ${groups.size}`,
-      );
-
       if (groups.size === 0) {
-        logger.info(`No groups to process for language: ${language}`);
         return false;
       }
 
       // Clean up old generated files before creating new ones
-      logger.debug(
-        `Cleaning up old generated i18n files for language: ${language}`,
-      );
+
       this.cleanupOldGeneratedFiles(language, logger);
 
       // Generate files directly at target locations (location-based co-location)
-      logger.debug(`Starting location-based file generation`);
       this.generateLocationBasedFiles(groups, language, logger);
-
-      logger.debug(`File generation completed for language: ${language}`);
       return true;
     } catch (error) {
       logger.error(`Failed to generate translation files for ${language}`, {
@@ -106,16 +115,12 @@ export class FileGenerator {
           if (absoluteI18nPath !== rootSrcI18nDir) {
             const languageDir = path.join(fullPath, language);
             if (fs.existsSync(languageDir)) {
-              logger.debug("Removing old generated i18n directory", {
-                path: languageDir,
-              });
               fs.rmSync(languageDir, { recursive: true, force: true });
             }
 
             // If the i18n directory is now empty, remove it entirely
             const remainingEntries = fs.readdirSync(fullPath);
             if (remainingEntries.length === 0) {
-              logger.debug("Removing empty i18n directory", { path: fullPath });
               fs.rmSync(fullPath, { recursive: true, force: true });
             }
           }
@@ -139,14 +144,8 @@ export class FileGenerator {
     language: string,
     logger: EndpointLogger,
   ): void {
-    logger.debug(
-      `Generating ${groups.size} location-based files for ${language}`,
-    );
-
     // Step 1: Generate leaf files (actual translation files)
-    logger.debug(`Generating ${groups.size} leaf translation files`);
     for (const [location, translations] of groups) {
-      logger.debug(`Generating leaf file for location: ${location}`);
       this.generateLeafTranslationFile(
         location,
         translations,
@@ -160,70 +159,6 @@ export class FileGenerator {
   }
 
   /**
-   * Resolve target path from location string
-   * Converts relative paths to absolute paths from project root
-   * @param targetLocation - The target location string to resolve
-   * @returns The absolute path for the target location
-   */
-  private resolveTargetPath(targetLocation: string): string {
-    // If already absolute, use as-is
-    if (path.isAbsolute(targetLocation)) {
-      return targetLocation;
-    }
-
-    // Convert relative path to absolute from project root
-    return path.resolve(process.cwd(), targetLocation);
-  }
-
-  /**
-   * Generate file content for location-based files
-   * Creates nested object structure (not flat keys)
-   * @param translations - The translation object to generate content for
-   * @param language - The language code for the file
-   * @returns The generated file content as a string
-   */
-  private generateLocationBasedFileContent(
-    translations: TranslationObject,
-    language: string,
-  ): string {
-    const isMainLanguage = language === "en";
-    let imports = "";
-    let exports = "";
-
-    // Add type import for non-English languages
-    if (!isMainLanguage) {
-      const englishImportPath = "../en/index";
-      // eslint-disable-next-line i18next/no-literal-string
-      imports = `import type { translations as enTranslations } from "${englishImportPath}";\n\n`;
-    }
-
-    // Generate nested translations object (not flat)
-    const translationsObject =
-      this.generateNestedTranslationsObject(translations);
-    // eslint-disable-next-line i18next/no-literal-string
-    const typeAnnotation = isMainLanguage ? "" : ": typeof enTranslations";
-
-    // eslint-disable-next-line i18next/no-literal-string
-    exports = `export const translations${typeAnnotation} = ${translationsObject};\n`;
-
-    return imports + exports;
-  }
-
-  /**
-   * Generate nested translations object (not flat keys)
-   * Creates proper nested object structure like the contact API example
-   * @param translations - The translation object to process
-   * @returns The nested translations object as a string
-   */
-  private generateNestedTranslationsObject(
-    translations: TranslationObject,
-  ): string {
-    // Convert flat keys back to nested structure
-    const nestedTranslations = this.unflattenTranslationObject(translations);
-    return this.objectToString(nestedTranslations, 0);
-  }
-
-  /**
    * Convert flat dot-notation keys back to nested object structure
    * @param translations - The translation object with flat keys
    * @returns The nested translation object
@@ -233,21 +168,44 @@ export class FileGenerator {
   ): TranslationObject {
     const nested: TranslationObject = {};
 
-    for (const [key, value] of Object.entries(translations)) {
+    keyLoop: for (const [key, value] of Object.entries(translations)) {
       const parts = key.split(".");
       let current = nested;
 
       // Navigate/create the nested structure
       for (let i = 0; i < parts.length - 1; i++) {
         const part = parts[i];
-        if (!(part in current)) {
+
+        // Check if the property exists and is not an object
+        if (part in current) {
+          const existing = current[part];
+          // If it's a primitive value (string/number/boolean), we have a key conflict
+          // Skip this entire key to avoid errors
+          if (typeof existing !== "object" || existing === null) {
+            // Key conflict detected - this is expected when a parent key exists as both
+            // a primitive value and an object path (e.g., "health" string vs "health.get.title")
+            // The child directory import will override the primitive value, so we skip it here
+            // Only log at debug level to reduce noise
+            // Skip this entire key
+            continue keyLoop;
+          }
+        } else {
           current[part] = {};
         }
+
         current = current[part] as TranslationObject;
       }
 
       // Set the final value
       const lastPart = parts[parts.length - 1];
+
+      // Check if we're trying to overwrite an object with a primitive
+      if (lastPart in current && typeof current[lastPart] === "object") {
+        // Key conflict detected - trying to set a primitive value where an object already exists
+        // This is expected and handled correctly - skip this key
+        continue;
+      }
+
       current[lastPart] = value;
     }
 
@@ -302,160 +260,6 @@ export class FileGenerator {
   }
 
   /**
-   * Build hierarchical structure from flat location groups
-   * Creates a tree structure where each node knows its children
-   * Maps src/app/[locale]/... to app/... hierarchy
-   */
-  private buildHierarchicalStructure(
-    groups: Map<string, TranslationObject>,
-    logger: EndpointLogger,
-  ): Map<string, { translations: TranslationObject; children: Set<string> }> {
-    const hierarchy = new Map<
-      string,
-      { translations: TranslationObject; children: Set<string> }
-    >();
-
-    // Initialize all nodes
-    for (const [location, translations] of groups) {
-      // Convert location to hierarchy path
-      const hierarchyPath = this.locationToHierarchyPath(location);
-      const pathParts = hierarchyPath
-        .split("/")
-        .filter((part) => part.length > 0);
-
-      // Create all parent paths
-      for (let i = 0; i <= pathParts.length; i++) {
-        const currentPath = pathParts.slice(0, i).join("/");
-        if (!hierarchy.has(currentPath)) {
-          hierarchy.set(currentPath, { translations: {}, children: new Set() });
-        }
-      }
-
-      // Set translations for the leaf node
-      const leafPath = pathParts.join("/");
-      const leafNode = hierarchy.get(leafPath);
-      if (leafNode) {
-        leafNode.translations = translations;
-      }
-    }
-
-    // Build parent-child relationships
-    for (const [path] of hierarchy) {
-      if (path === "") {
-        continue;
-      } // Skip root
-
-      const pathParts = path.split("/");
-      const parentPath = pathParts.slice(0, -1).join("/");
-
-      const parentNode = hierarchy.get(parentPath);
-      if (parentNode) {
-        parentNode.children.add(path);
-      }
-    }
-
-    logger.debug(`Built hierarchical structure with ${hierarchy.size} nodes`);
-    return hierarchy;
-  }
-
-  /**
-   * Generate files for hierarchical structure
-   * Each level imports only its direct children
-   */
-  private generateHierarchicalFiles(
-    hierarchy: Map<
-      string,
-      { translations: TranslationObject; children: Set<string> }
-    >,
-    language: string,
-    logger: EndpointLogger,
-  ): void {
-    for (const [path, node] of hierarchy) {
-      if (
-        Object.keys(node.translations).length === 0 &&
-        node.children.size === 0
-      ) {
-        continue; // Skip empty nodes
-      }
-
-      const filePath = this.getHierarchicalFilePath(path, language);
-      const fileContent = this.generateHierarchicalFileContent(path, node);
-
-      // Ensure directory exists
-      const dir = filePath.slice(0, filePath.lastIndexOf("/"));
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-
-      // Write file
-      fs.writeFileSync(filePath, fileContent, "utf8");
-      logger.debug(`Generated hierarchical file: ${filePath}`);
-    }
-  }
-
-  /**
-   * Get file path for hierarchical structure
-   */
-  private getHierarchicalFilePath(
-    hierarchyPath: string,
-    language: string,
-  ): string {
-    if (hierarchyPath === "") {
-      // Root level - main index
-      return path.join(process.cwd(), "src", I18N_PATH, language, INDEX_FILE);
-    }
-
-    // Child level - create index in the path
-    return path.join(
-      process.cwd(),
-      "src",
-      I18N_PATH,
-      language,
-      hierarchyPath,
-      INDEX_FILE,
-    );
-  }
-
-  /**
-   * Generate content for hierarchical file
-   */
-  private generateHierarchicalFileContent(
-    _currentPath: string,
-    node: { translations: TranslationObject; children: Set<string> },
-  ): string {
-    const imports: string[] = [];
-    const exports: string[] = [];
-
-    // Import children
-    for (const childPath of node.children) {
-      const childName = childPath.split("/").pop() || "unknown";
-      // eslint-disable-next-line i18next/no-literal-string
-      const importName = `${childName}Translations`;
-      const relativePath = `./${childName}`;
-
-      imports.push(
-        // eslint-disable-next-line i18next/no-literal-string
-        `import { translations as ${importName} } from "${relativePath}";`,
-      );
-      exports.push(`  ${childName}: ${importName}`);
-    }
-
-    // Add own translations if any
-    if (Object.keys(node.translations).length > 0) {
-      const ownTranslations = this.objectToString(node.translations, 1);
-      exports.push(`  ...${ownTranslations}`);
-    }
-
-    const importsSection =
-      // eslint-disable-next-line i18next/no-literal-string
-      imports.length > 0 ? `${imports.join("\n")}\n\n` : "";
-    const exportsSection = exports.length > 0 ? exports.join(",\n") : "";
-
-    // eslint-disable-next-line i18next/no-literal-string
-    return `${importsSection}export const translations = {\n${exportsSection}\n};\n`;
-  }
-
-  /**
    * Generate a leaf translation file for a specific location
    * Co-locates translations with the code (e.g., src/app/[locale]/admin/i18n/en/index.ts)
    */
@@ -481,7 +285,6 @@ export class FileGenerator {
       const dir = filePath.slice(0, filePath.lastIndexOf("/"));
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
-        logger.debug(`Created directory: ${dir}`);
       }
 
       // Generate content with nested objects (not flat keys)
@@ -493,7 +296,6 @@ export class FileGenerator {
 
       // Write file
       fs.writeFileSync(filePath, content, "utf8");
-      logger.debug(`Generated co-located file: ${filePath}`);
     } catch (error) {
       const errorDetails = parseError(error);
       logger.error(`Failed to generate leaf translation file for ${location}`, {
@@ -516,13 +318,13 @@ export class FileGenerator {
     logger: EndpointLogger,
   ): void {
     // Clean up existing language directory first
-    this.cleanupLanguageDirectory(language, logger);
+    this.cleanupLanguageDirectory(language);
 
     // Generate hierarchical index files in source folders
     this.generateSourceHierarchy(groups, language, logger);
 
     // Generate clean main index that imports only top-level sections
-    this.generateCleanMainIndex(groups, language, logger);
+    this.generateCleanMainIndex(groups, language);
   }
 
   /**
@@ -568,66 +370,6 @@ export class FileGenerator {
   }
 
   /**
-   * Generate main index file that imports from co-located translation files
-   * Creates src/i18n/{language}/index.ts with imports from actual code locations
-   */
-  private generateMainIndexFile(
-    groups: Map<string, TranslationObject>,
-    language: string,
-    logger: EndpointLogger,
-  ): void {
-    const filePath = path.join(
-      process.cwd(),
-      "src",
-      I18N_PATH,
-      language,
-      INDEX_FILE,
-    );
-
-    // Generate imports from co-located files
-    const imports: string[] = [];
-    const exports: string[] = [];
-    let importIndex = 0;
-
-    for (const [location] of groups) {
-      // Create import from co-located file
-      const relativePath = path
-        .relative(
-          path.dirname(filePath),
-          path.join(process.cwd(), location, I18N_PATH, language, INDEX_FILE),
-        )
-        .replaceAll(/\\/g, "/")
-        .replace(/\.ts$/, "");
-
-      const importName = `locationTranslations${importIndex}`;
-      imports.push(
-        // eslint-disable-next-line i18next/no-literal-string
-        `import { translations as ${importName} } from "${relativePath}";`,
-      );
-
-      // Create flat key from location path
-      const flatKey = this.locationToFlatKey(location);
-      // eslint-disable-next-line i18next/no-literal-string
-      exports.push(`  "${flatKey}": ${importName}`);
-
-      importIndex++;
-    }
-
-    // eslint-disable-next-line i18next/no-literal-string
-    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")}\n};\n`;
-
-    // Create directory if it doesn't exist
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
-    // Write file
-    fs.writeFileSync(filePath, content, "utf8");
-    logger.debug(`Generated main index file: ${filePath}`);
-  }
-
-  /**
    * Convert location path to flat key for main index
    * src/app/[locale]/admin/cron -> app.admin.cron
    * src/app/api/[locale]/v1/core/contact/_components -> app.api.v1.core.contact._components
@@ -649,6 +391,17 @@ export class FileGenerator {
     // Remove [locale] segments
     key = key.replace(/\/\[locale\]/g, "");
 
+    // Convert kebab-case folder names to camelCase
+    // e.g., unified-interface -> unifiedInterface, react-native -> reactNative
+    key = key.replace(/\/([a-z0-9-]+)/g, (match, segment) => {
+      // Convert kebab-case to camelCase
+      const camelCased = segment.replace(
+        /-([a-z0-9])/g,
+        (_: string, letter: string) => letter.toUpperCase(),
+      );
+      return `/${camelCased}`;
+    });
+
     // Convert to dot notation
     key = key.replaceAll(/\//g, ".");
 
@@ -660,216 +413,6 @@ export class FileGenerator {
    */
   locationToFlatKeyPublic(location: string): string {
     return this.locationToFlatKey(location);
-  }
-
-  /**
-   * Build hierarchical structure from co-located file locations
-   * Maps locations to their hierarchical paths for index generation
-   */
-  private buildHierarchyFromLocations(
-    groups: Map<string, TranslationObject>,
-    logger: EndpointLogger,
-  ): Map<string, { children: Set<string>; locations: string[] }> {
-    const hierarchy = new Map<
-      string,
-      { children: Set<string>; locations: string[] }
-    >();
-
-    // Process each location to build hierarchy
-    for (const [location] of groups) {
-      const hierarchyPath = this.locationToHierarchyPath(location);
-      const parts = hierarchyPath.split("/").filter((p) => p.length > 0);
-
-      // Create all parent paths
-      for (let i = 0; i <= parts.length; i++) {
-        const currentPath = parts.slice(0, i).join("/");
-        if (!hierarchy.has(currentPath)) {
-          hierarchy.set(currentPath, { children: new Set(), locations: [] });
-        }
-
-        // Add location to leaf node
-        if (i === parts.length) {
-          const currentNode = hierarchy.get(currentPath);
-          if (currentNode) {
-            currentNode.locations.push(location);
-          }
-        }
-      }
-    }
-
-    // Build parent-child relationships
-    for (const [path] of hierarchy) {
-      if (path === "") {
-        continue;
-      } // Skip root
-
-      const parts = path.split("/");
-      const parentPath = parts.slice(0, -1).join("/");
-
-      const parentNode = hierarchy.get(parentPath);
-      if (parentNode) {
-        parentNode.children.add(path);
-      }
-    }
-
-    logger.debug(`Built hierarchy with ${hierarchy.size} nodes`);
-    return hierarchy;
-  }
-
-  /**
-   * Generate hierarchical index files for intermediate levels
-   */
-  private generateHierarchicalIndexFiles(
-    hierarchy: Map<string, { children: Set<string>; locations: string[] }>,
-    language: string,
-    logger: EndpointLogger,
-  ): void {
-    for (const [hierarchyPath, node] of hierarchy) {
-      if (hierarchyPath === "") {
-        continue;
-      } // Skip root - handled by main index
-      if (node.children.size === 0) {
-        continue;
-      } // Skip leaf nodes - they're co-located files
-
-      // Generate intermediate index file
-      const filePath = path.join(
-        process.cwd(),
-        "src",
-        I18N_PATH,
-        language,
-        hierarchyPath,
-        INDEX_FILE,
-      );
-      const content = this.generateIntermediateIndexContent(
-        hierarchyPath,
-        node,
-        language,
-      );
-
-      // Create directory
-      const dir = filePath.slice(0, filePath.lastIndexOf("/"));
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-
-      fs.writeFileSync(filePath, content, "utf8");
-      logger.debug(`Generated intermediate index: ${filePath}`);
-    }
-  }
-
-  /**
-   * Generate main index file that imports only direct children
-   */
-  private generateMainIndexFromHierarchy(
-    hierarchy: Map<string, { children: Set<string>; locations: string[] }>,
-    language: string,
-    logger: EndpointLogger,
-  ): void {
-    const rootNode = hierarchy.get("");
-    if (!rootNode) {
-      return;
-    }
-
-    const filePath = path.join(
-      process.cwd(),
-      "src",
-      I18N_PATH,
-      language,
-      INDEX_FILE,
-    );
-
-    // Generate imports only for direct children that actually have translation files
-    const imports: string[] = [];
-    const exports: string[] = [];
-
-    for (const childPath of rootNode.children) {
-      const childName = childPath.split("/").pop() || "unknown";
-      const sanitizedName = this.sanitizeIdentifier(childName);
-
-      // Check if the child directory has an i18n folder
-      const childI18nPath = path.join(
-        process.cwd(),
-        "src",
-        childPath,
-        I18N_PATH,
-        language,
-        INDEX_FILE,
-      );
-
-      if (!fs.existsSync(childI18nPath)) {
-        logger.debug(
-          `Skipping import for ${childPath} - no translation file exists`,
-        );
-        continue;
-      }
-
-      imports.push(
-        // eslint-disable-next-line i18next/no-literal-string
-        `import { translations as ${sanitizedName}Translations } from "../../${childPath}/${I18N_PATH}/${language}";`,
-      );
-      // eslint-disable-next-line i18next/no-literal-string
-      exports.push(`  "${childName}": ${sanitizedName}Translations`);
-    }
-
-    // eslint-disable-next-line i18next/no-literal-string
-    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")}\n};\n`;
-
-    fs.writeFileSync(filePath, content, "utf8");
-    logger.debug(
-      `Generated main index with ${rootNode.children.size} direct children: ${filePath}`,
-    );
-  }
-
-  /**
-   * Generate content for intermediate index files
-   */
-  private generateIntermediateIndexContent(
-    currentPath: string,
-    node: { children: Set<string>; locations: string[] },
-    language: string,
-  ): string {
-    const imports: string[] = [];
-    const exports: string[] = [];
-
-    // Import from children
-    for (const childPath of node.children) {
-      const childName = childPath.split("/").pop() || "unknown";
-      const sanitizedName = this.sanitizeIdentifier(childName);
-      const relativePath =
-        path.relative(currentPath, childPath) || `./${childName}`;
-
-      imports.push(
-        // eslint-disable-next-line i18next/no-literal-string
-        `import { translations as ${sanitizedName}Translations } from "${relativePath}";`,
-      );
-      // eslint-disable-next-line i18next/no-literal-string
-      exports.push(`  "${childName}": ${sanitizedName}Translations`);
-    }
-
-    // Import from co-located files if any
-    for (const location of node.locations) {
-      const relativePath = path
-        .relative(
-          path.join("src", I18N_PATH, language, currentPath),
-          path.join(location, I18N_PATH, language, INDEX_FILE),
-        )
-        .replaceAll(/\\/g, "/")
-        .replace(/\.ts$/, "");
-
-      const locationKey = this.locationToFlatKey(location);
-      const sanitizedName = `location${Math.random().toString(36).substr(2, 9)}`;
-
-      imports.push(
-        // eslint-disable-next-line i18next/no-literal-string
-        `import { translations as ${sanitizedName} } from "${relativePath}";`,
-      );
-      // eslint-disable-next-line i18next/no-literal-string
-      exports.push(`  "${locationKey}": ${sanitizedName}`);
-    }
-
-    // eslint-disable-next-line i18next/no-literal-string
-    return `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")}\n};\n`;
   }
 
   /**
@@ -902,31 +445,9 @@ export class FileGenerator {
   }
 
   /**
-   * Convert location path to hierarchy path for index structure
-   */
-  private locationToHierarchyPath(location: string): string {
-    // Remove src/ prefix
-    let path = location.replace(/^src\//, "");
-
-    // Handle app routes: app/[locale]/... -> app/...
-    path = path.replace(/^app\/\[locale\]\//, "app/");
-
-    // Handle API routes: app/api/[locale]/... -> api/...
-    path = path.replace(/^app\/api\/\[locale\]\//, "api/");
-
-    // Remove _components suffix for cleaner hierarchy
-    path = path.replace(/\/_components$/, "");
-
-    return path;
-  }
-
-  /**
    * Clean up existing language directory except core utilities
    */
-  private cleanupLanguageDirectory(
-    language: string,
-    logger: EndpointLogger,
-  ): void {
+  private cleanupLanguageDirectory(language: string): void {
     const languageDir = path.join(process.cwd(), "src", I18N_PATH, language);
 
     if (!fs.existsSync(languageDir)) {
@@ -944,203 +465,42 @@ export class FileGenerator {
       if (item !== "core" && item !== INDEX_FILE) {
         if (stat.isDirectory()) {
           fs.rmSync(itemPath, { recursive: true, force: true });
-          logger.debug(`Removed directory: ${itemPath}`);
         } else {
           fs.unlinkSync(itemPath);
-          logger.debug(`Removed file: ${itemPath}`);
         }
       }
     }
-  }
-
-  /**
-   * Build complete hierarchical structure from co-located files
-   * Creates a tree where each node knows its children and co-located files
-   */
-  private buildCompleteHierarchy(
-    groups: Map<string, TranslationObject>,
-    logger: EndpointLogger,
-  ): Map<string, { children: Set<string>; colocatedFiles: string[] }> {
-    const hierarchy = new Map<
-      string,
-      { children: Set<string>; colocatedFiles: string[] }
-    >();
-
-    // Initialize root
-    hierarchy.set("", { children: new Set(), colocatedFiles: [] });
-
-    // Process each co-located file location
-    for (const [location] of groups) {
-      const hierarchyPath = this.locationToHierarchyPath(location);
-      const parts = hierarchyPath.split("/").filter((p) => p.length > 0);
-
-      // Create all parent paths in hierarchy
-      for (let i = 0; i <= parts.length; i++) {
-        const currentPath = parts.slice(0, i).join("/");
-
-        if (!hierarchy.has(currentPath)) {
-          hierarchy.set(currentPath, {
-            children: new Set(),
-            colocatedFiles: [],
-          });
-        }
-
-        // Add co-located file to leaf node
-        if (i === parts.length) {
-          const currentNode = hierarchy.get(currentPath);
-          if (currentNode) {
-            currentNode.colocatedFiles.push(location);
-          }
-        }
-      }
-    }
-
-    // Build parent-child relationships
-    for (const [currentPath] of hierarchy) {
-      if (currentPath === "") {
-        continue;
-      } // Skip root
-
-      const parts = currentPath.split("/");
-      const parentPath = parts.slice(0, -1).join("/");
-
-      const parentNode = hierarchy.get(parentPath);
-      if (parentNode) {
-        parentNode.children.add(currentPath);
-      }
-    }
-
-    logger.debug(`Built complete hierarchy with ${hierarchy.size} nodes`);
-    return hierarchy;
-  }
-
-  /**
-   * Generate complete hierarchical structure with proper parent-child imports
-   */
-  private generateHierarchicalStructure(
-    hierarchy: Map<string, { children: Set<string>; colocatedFiles: string[] }>,
-    language: string,
-    logger: EndpointLogger,
-  ): void {
-    // Generate index file for each node in the hierarchy
-    for (const [currentPath, node] of hierarchy) {
-      // Skip nodes that have no children and no co-located files
-      if (node.children.size === 0 && node.colocatedFiles.length === 0) {
-        continue;
-      }
-
-      const filePath = this.getHierarchyFilePath(currentPath, language);
-      const content = this.generateHierarchyIndexContent(
-        currentPath,
-        node,
-        language,
-      );
-
-      // Create directory
-      const dir = path.dirname(filePath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-
-      fs.writeFileSync(filePath, content, "utf8");
-      logger.debug(`Generated hierarchy index: ${filePath}`);
-    }
-  }
-
-  /**
-   * Get file path for hierarchy node
-   */
-  private getHierarchyFilePath(
-    hierarchyPath: string,
-    language: string,
-  ): string {
-    if (hierarchyPath === "") {
-      // Root - main index
-      return path.join(process.cwd(), "src", I18N_PATH, language, INDEX_FILE);
-    }
-
-    // Intermediate or leaf - create index in the hierarchy path
-    return path.join(
-      process.cwd(),
-      "src",
-
-      I18N_PATH,
-      language,
-      hierarchyPath,
-      INDEX_FILE,
-    );
-  }
-
-  /**
-   * Generate content for hierarchy index file
-   */
-  private generateHierarchyIndexContent(
-    currentPath: string,
-    node: { children: Set<string>; colocatedFiles: string[] },
-    language: string,
-  ): string {
-    const imports: string[] = [];
-    const exports: string[] = [];
-
-    // Import from direct children (other hierarchy nodes)
-    for (const childPath of node.children) {
-      const childName = childPath.split("/").pop() || "unknown";
-      const sanitizedName = this.sanitizeIdentifier(childName);
-      // eslint-disable-next-line i18next/no-literal-string
-      const importName = `${sanitizedName}Translations`;
-
-      imports.push(
-        // eslint-disable-next-line i18next/no-literal-string
-        `import { translations as ${importName} } from "./${childName}";`,
-      );
-      // eslint-disable-next-line i18next/no-literal-string
-      exports.push(`  "${childName}": ${importName}`);
-    }
-
-    // Import from co-located files
-    for (const colocatedFile of node.colocatedFiles) {
-      const relativePath = path
-        .relative(
-          path.join("src", I18N_PATH, language, currentPath),
-          path.join(colocatedFile, I18N_PATH, language, INDEX_FILE),
-        )
-        .replaceAll(/\\/g, "/")
-        .replace(/\.ts$/, "");
-
-      // Create a unique import name for co-located file
-      const locationKey = this.locationToFlatKey(colocatedFile);
-      const parts = locationKey.split(".");
-      const lastPart = parts[parts.length - 1] || "translations";
-      const sanitizedName = this.sanitizeIdentifier(lastPart);
-      // eslint-disable-next-line i18next/no-literal-string
-      const importName = `colocated${sanitizedName}Translations`;
-
-      imports.push(
-        // eslint-disable-next-line i18next/no-literal-string
-        `import { translations as ${importName} } from "${relativePath}";`,
-      );
-      // eslint-disable-next-line i18next/no-literal-string
-      exports.push(`  "${locationKey}": ${importName}`);
-    }
-
-    // eslint-disable-next-line i18next/no-literal-string
-    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")}\n};\n`;
-    return content;
   }
 
   /**
    * Generate hierarchical index files in source folders (next to the code)
    * Creates parent index files that import their direct children
+   * Uses two-pass approach:
+   * 1. First pass: Generate all leaf files and track which were created
+   * 2. Second pass: Generate parent aggregators that only import existing children
    */
   private generateSourceHierarchy(
     groups: Map<string, TranslationObject>,
     language: string,
     logger: EndpointLogger,
   ): void {
+    // Track which files were actually generated
+    // Pre-populate with all leaf locations (these were generated by generateLeafTranslationFile)
+    const generatedFiles = new Set<string>(groups.keys());
+
     // Build hierarchy of all source paths
+    // Use allLocations (from all languages) instead of just current language's groups
+    // This ensures parent aggregators are created even when a location has no translations in this language
     const sourcePaths = new Set<string>();
 
-    for (const [location] of groups) {
+    // Use allLocations if available, otherwise fall back to current groups
+    const locationsToProcess =
+      this.allLocations.size > 0 ? this.allLocations : new Set(groups.keys());
+
+    for (const location of locationsToProcess) {
+      // Add the location itself (leaf node)
+      sourcePaths.add(location);
+
       // Get all parent paths for this location
       const parts = location.split("/").filter((p) => p.length > 0);
 
@@ -1150,9 +510,23 @@ export class FileGenerator {
       }
     }
 
-    // Generate index file for each parent path
-    for (const sourcePath of sourcePaths) {
-      this.generateSourceIndexFile(sourcePath, groups, language, logger);
+    // PASS 2: Generate index files for parent paths, bottom-up (deepest first)
+    // Sort by depth (deepest first) so children are generated before parents
+    const sortedPaths = [...sourcePaths].toSorted((a, b) => {
+      const depthA = a.split("/").length;
+      const depthB = b.split("/").length;
+      return depthB - depthA; // Descending order (deepest first)
+    });
+
+    // Pass generatedFiles so we only import from children that exist
+    for (const sourcePath of sortedPaths) {
+      this.generateSourceIndexFile(
+        sourcePath,
+        groups,
+        language,
+        logger,
+        generatedFiles,
+      );
     }
   }
 
@@ -1164,6 +538,7 @@ export class FileGenerator {
     groups: Map<string, TranslationObject>,
     language: string,
     logger: EndpointLogger,
+    generatedFiles: Set<string>,
   ): void {
     const indexPath = path.join(
       process.cwd(),
@@ -1175,9 +550,14 @@ export class FileGenerator {
     );
 
     // Find ALL direct children (both with translations and intermediate directories)
+    // Use allLocations (from all languages) to ensure we find children even if current language has no translations
     const directChildren = new Set<string>();
 
-    for (const [location] of groups) {
+    // Use allLocations if available, otherwise fall back to current groups
+    const locationsToCheck =
+      this.allLocations.size > 0 ? this.allLocations : new Set(groups.keys());
+
+    for (const location of locationsToCheck) {
       if (location.startsWith(`${sourcePath}/`)) {
         const relativePath = location.slice(sourcePath.length + 1);
 
@@ -1193,18 +573,25 @@ export class FileGenerator {
       }
     }
 
-    // Skip if no children
-    if (directChildren.size === 0) {
-      return;
-    }
-
     // Generate imports and exports with correct logic
     const imports: string[] = [];
     const exports: string[] = [];
     const usedImportNames = new Set<string>();
 
-    // Import from direct children
+    // Import from direct children - but only if they have generated files
     for (const child of directChildren) {
+      const childLocation = `${sourcePath}/${child}`;
+
+      // Check if this child has a generated file OR will generate one (has children with files)
+      const hasGeneratedFile = generatedFiles.has(childLocation);
+      const hasChildrenWithFiles = [...generatedFiles].some((loc) =>
+        loc.startsWith(`${childLocation}/`),
+      );
+
+      if (!hasGeneratedFile && !hasChildrenWithFiles) {
+        continue;
+      }
+
       const sanitizedName = this.sanitizeIdentifier(child);
       // eslint-disable-next-line i18next/no-literal-string
       let importName = `${sanitizedName}Translations`;
@@ -1222,10 +609,6 @@ export class FileGenerator {
       imports.push(
         // eslint-disable-next-line i18next/no-literal-string
         `import { translations as ${importName} } from "${importPath}";`,
-      );
-
-      logger.debug(
-        `Adding import for child: ${child} from ${importPath} in ${sourcePath}`,
       );
 
       // Only spread [locale] folders, use keyed exports for everything else
@@ -1250,10 +633,6 @@ export class FileGenerator {
       const locationPrefix = this.locationToFlatKey(sourcePath);
       const strippedTranslations: TranslationObject = {};
 
-      logger.info(
-        `Source path: ${sourcePath}, location prefix: ${locationPrefix}, own translations keys: ${Object.keys(ownTranslations).slice(0, 5).join(", ")}`,
-      );
-
       for (const [key, value] of Object.entries(ownTranslations)) {
         let strippedKey = key;
         if (locationPrefix && key.startsWith(`${locationPrefix}.`)) {
@@ -1262,40 +641,70 @@ export class FileGenerator {
         strippedTranslations[strippedKey] = value;
       }
 
-      const nestedTranslations =
-        this.unflattenTranslationObject(strippedTranslations);
+      try {
+        const nestedTranslations =
+          this.unflattenTranslationObject(strippedTranslations);
 
-      // Add own translations as spread entries in the exports
-      // BUT exclude translations that belong to child directories
-      for (const [key, value] of Object.entries(nestedTranslations)) {
-        // Check if this key matches a child directory name
-        if (directChildren.has(key)) {
-          // This is a child directory import, skip it (will be imported separately)
-          continue;
+        // Add own translations as spread entries in the exports
+        // BUT exclude translations that belong to child directories
+        for (const [key, value] of Object.entries(nestedTranslations)) {
+          // Check if this key matches a child directory name
+          if (directChildren.has(key)) {
+            // This is a child directory import, skip it (will be imported separately)
+            continue;
+          }
+
+          const valueStr =
+            typeof value === "string"
+              ? JSON.stringify(value)
+              : this.objectToString(value as TranslationObject, 1);
+          const exportKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
+            ? key
+            : `"${key}"`;
+          exports.push(`  ${exportKey}: ${valueStr}`);
         }
-
-        const valueStr =
-          typeof value === "string"
-            ? JSON.stringify(value)
-            : this.objectToString(value as TranslationObject, 1);
-        const exportKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
-          ? key
-          : `"${key}"`;
-        exports.push(`  ${exportKey}: ${valueStr}`);
+      } catch (error) {
+        logger.error(
+          `Failed to unflatten translations for ${sourcePath} (${language})`,
+          {
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+            keys: Object.keys(strippedTranslations).slice(0, 10).join(", "),
+          },
+        );
+        // Continue without own translations - at least generate the imports
       }
     }
 
-    // eslint-disable-next-line i18next/no-literal-string
-    const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")},\n};\n`;
-
-    // Create directory
-    const dir = path.dirname(indexPath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    // Skip generating file if there are no exports AND no imports
+    // (Parent aggregators with only imports are still needed to re-export children)
+    if (exports.length === 0 && imports.length === 0) {
+      return;
     }
 
-    fs.writeFileSync(indexPath, content, "utf8");
-    logger.debug(`Generated source hierarchy index: ${indexPath}`);
+    try {
+      // eslint-disable-next-line i18next/no-literal-string
+      const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")},\n};\n`;
+
+      // Create directory
+      const dir = path.dirname(indexPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
+      fs.writeFileSync(indexPath, content, "utf8");
+
+      // Mark this file as generated
+      generatedFiles.add(sourcePath);
+    } catch (error) {
+      logger.error(
+        `Failed to generate source hierarchy index for ${sourcePath} (${language})`,
+        {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        },
+      );
+    }
   }
 
   /**
@@ -1304,7 +713,6 @@ export class FileGenerator {
   private generateCleanMainIndex(
     groups: Map<string, TranslationObject>,
     language: string,
-    logger: EndpointLogger,
   ): void {
     const mainIndexPath = path.join(
       process.cwd(),
@@ -1319,8 +727,6 @@ export class FileGenerator {
     // Locations are now relative to src/ (e.g., "app/[locale]/admin", "packages/...")
     const topLevelSections = new Set<string>();
 
-    logger.info(`Generating clean main index for ${language}`);
-
     for (const [location] of groups) {
       if (!location) {
         continue;
@@ -1331,15 +737,8 @@ export class FileGenerator {
       }
     }
 
-    logger.info(
-      `Found ${topLevelSections.size} top-level sections: ${[...topLevelSections].join(", ")}`,
-    );
-
     // Skip if no top-level sections found
     if (topLevelSections.size === 0) {
-      logger.info(
-        "No top-level sections found, skipping main index generation",
-      );
       return;
     }
 
@@ -1365,9 +764,6 @@ export class FileGenerator {
 
       // Check if the section index file actually exists
       if (!fs.existsSync(sectionIndexPath)) {
-        logger.debug(
-          `Skipping import for ${section} - no translation file exists at ${sectionIndexPath}`,
-        );
         continue;
       }
 
@@ -1386,6 +782,11 @@ export class FileGenerator {
       exports.push(`  "${section}": ${importName}`);
     }
 
+    // Skip if no exports
+    if (exports.length === 0) {
+      return;
+    }
+
     // eslint-disable-next-line i18next/no-literal-string
     const content = `${imports.join("\n")}\n\nexport const translations = {\n${exports.join(",\n")},\n};\n\nexport default translations;\n`;
 
@@ -1396,9 +797,5 @@ export class FileGenerator {
     }
 
     fs.writeFileSync(mainIndexPath, content, "utf8");
-    logger.info(
-      `Generated clean main index with ${topLevelSections.size} top-level sections: ${mainIndexPath}`,
-    );
-    logger.info(`Main index content preview: ${content.slice(0, 200)}...`);
   }
 }

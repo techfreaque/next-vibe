@@ -85,6 +85,12 @@ export const translations: typeof enTranslations = {
           audioCost: "+2 Credits",
         },
       },
+      cta: {
+        title: "Bereit, loszulegen?",
+        description:
+          "Abonnieren Sie für monatliche Credits und chatten Sie mit allen {{modelCount}} KI-Modellen. Abonnenten können zusätzliche Credit-Pakete kaufen!",
+        button: "Jetzt abonnieren",
+      },
     },
     buy: {
       signInRequired: {

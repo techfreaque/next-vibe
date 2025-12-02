@@ -57,6 +57,9 @@ export function StoryPricingSection({
           packPrice={PACK_PRICE}
           packCredits={PACK_CREDITS}
           freeCredits={FREE_CREDITS}
+          onSwitchTab={(): void => {
+            /* no-op */
+          }}
         />
       </Div>
 

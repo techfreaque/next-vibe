@@ -155,4 +155,14 @@ export const translations = {
   tools: {
     braveSearch: braveSearchTranslations,
   },
+  models: {
+    descriptions: {
+      uncensoredLmV11:
+        "Uncensored AI model for creative and unrestricted conversations",
+      freedomgptLiberty:
+        "FreedomGPT Liberty - Uncensored AI model focused on free expression and creative content",
+      gabAiArya:
+        "Gab AI Arya - Uncensored conversational AI model with free expression and creative capabilities",
+    },
+  },
 };

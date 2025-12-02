@@ -13,6 +13,7 @@ import type { JSX } from "react";
 import React, { useState } from "react";
 
 import { useAIStreamStore } from "@/app/api/[locale]/v1/core/agent/ai-stream/hooks/store";
+import { processMessageGroupForTTS } from "@/app/api/[locale]/v1/core/agent/text-to-speech/content-processing";
 import { useTTSAudio } from "@/app/api/[locale]/v1/core/agent/text-to-speech/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -98,13 +99,32 @@ export function ThreadedMessage({
   const isMessageStreaming = streamingMessage?.isStreaming ?? false;
 
   // TTS support for assistant messages
+  // Process entire message group (primary + continuations) for sequential playback
+  const allMessagesInGroup = React.useMemo(
+    () =>
+      messageGroup
+        ? [messageGroup.primary, ...messageGroup.continuations]
+        : [message],
+    [messageGroup, message],
+  );
+
+  // Process messages for TTS (async operation)
+  const [ttsText, setTtsText] = React.useState<string>("");
+
+  React.useEffect(() => {
+    void processMessageGroupForTTS(allMessagesInGroup, locale).then(setTtsText);
+  }, [allMessagesInGroup, locale]);
+
   const {
     isLoading: isTTSLoading,
     isPlaying,
     playAudio,
     stopAudio,
+    cancelLoading,
+    currentChunk,
+    totalChunks,
   } = useTTSAudio({
-    text: message.content,
+    text: ttsText,
     enabled: message.role === "assistant" && ttsAutoplay,
     isStreaming: isMessageStreaming,
     locale,
@@ -283,6 +303,9 @@ export function ThreadedMessage({
               isPlaying={isPlaying}
               playAudio={playAudio}
               stopAudio={stopAudio}
+              cancelLoading={cancelLoading}
+              currentChunk={currentChunk}
+              totalChunks={totalChunks}
               userVote={userVote}
               voteScore={voteScore}
               onVoteMessage={onVoteMessage}

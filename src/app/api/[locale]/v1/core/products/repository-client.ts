@@ -17,9 +17,27 @@ import { modelOptions } from "@/app/api/[locale]/v1/core/agent/chat/model-access
 
 /**
  * Total number of AI models available
- * Dynamically calculated from modelOptions array
+ * Dynamically calculated from modelOptions object
  */
-export const TOTAL_MODEL_COUNT = modelOptions.length;
+export const TOTAL_MODEL_COUNT = Object.keys(modelOptions).length;
+
+/**
+ * Credit Value Definition
+ * 1 credit = €0.01 = $0.01 = 0.24 PLN
+ */
+const CREDIT_VALUE_USD = 0.01;
+
+/**
+ * TTS Pricing (Amazon Polly)
+ * Base: $4/1M chars + 30% markup = $5.20/1M chars
+ * Credits: $5.20 / $0.01 per credit = 520 credits per 1M chars
+ */
+const AMAZON_TTS_BASE_COST_PER_MILLION_USD = 4;
+const TTS_MARKUP_PERCENTAGE = 0.3;
+const TTS_COST_PER_MILLION_USD =
+  AMAZON_TTS_BASE_COST_PER_MILLION_USD * (1 + TTS_MARKUP_PERCENTAGE);
+const TTS_CREDITS_PER_MILLION = TTS_COST_PER_MILLION_USD / CREDIT_VALUE_USD;
+export const TTS_COST_PER_CHARACTER = TTS_CREDITS_PER_MILLION / 1_000_000;
 
 export type PaymentInterval = "month" | "year" | "one_time";
 

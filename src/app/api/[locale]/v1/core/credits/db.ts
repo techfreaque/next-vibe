@@ -10,8 +10,8 @@
 
 import { relations, sql } from "drizzle-orm";
 import {
+  customType,
   index,
-  integer,
   jsonb,
   pgTable,
   text,
@@ -25,6 +25,26 @@ import type { z } from "zod";
 import { leads } from "../leads/db";
 import { users } from "../user/db";
 import { CreditTransactionTypeDB } from "./enum";
+
+/**
+ * Custom numeric type that returns numbers instead of strings
+ * Database: numeric(10, 6) - proper PostgreSQL numeric type
+ * TypeScript: number - for calculations and type safety
+ */
+const numericNumber = customType<{
+  data: number;
+  driverData: string;
+}>({
+  dataType() {
+    return "numeric(10, 6)";
+  },
+  toDriver(value: number): string {
+    return value.toString();
+  },
+  fromDriver(value: string): number {
+    return Number(value);
+  },
+});
 
 /**
  * Typed Metadata for Credit Transactions
@@ -135,10 +155,12 @@ export const creditWallets = pgTable(
     leadId: uuid("lead_id").references(() => leads.id, { onDelete: "cascade" }),
 
     // Total balance from credit packs (subscription + permanent + bonus)
-    balance: integer("balance").notNull().default(0),
+    balance: numericNumber("balance")
+      .notNull()
+      .default(0),
 
     // Free tier tracking (20 credits per month)
-    freeCreditsRemaining: integer("free_credits_remaining")
+    freeCreditsRemaining: numericNumber("free_credits_remaining")
       .notNull()
       .default(20),
     freePeriodStart: timestamp("free_period_start").defaultNow().notNull(),
@@ -175,8 +197,10 @@ export const creditPacks = pgTable(
       .references(() => creditWallets.id, { onDelete: "cascade" }),
 
     // Pack details
-    originalAmount: integer("original_amount").notNull(), // Initial amount purchased
-    remaining: integer("remaining").notNull(), // Current remaining credits
+    originalAmount: numericNumber("original_amount")
+      .notNull(), // Initial amount purchased
+    remaining: numericNumber("remaining")
+      .notNull(), // Current remaining credits
     type: text("type", {
       enum: ["subscription", "permanent", "bonus"],
     }).notNull(),
@@ -217,8 +241,8 @@ export const creditTransactions = pgTable(
       .references(() => creditWallets.id, { onDelete: "cascade" }),
 
     // Transaction details
-    amount: integer("amount").notNull(), // Positive for additions, negative for usage
-    balanceAfter: integer("balance_after").notNull(), // Total balance after transaction
+    amount: numericNumber("amount").notNull(), // Positive for additions, negative for usage
+    balanceAfter: numericNumber("balance_after").notNull(), // Total balance after transaction
     type: text("type", {
       enum: CreditTransactionTypeDB,
     }).notNull(),

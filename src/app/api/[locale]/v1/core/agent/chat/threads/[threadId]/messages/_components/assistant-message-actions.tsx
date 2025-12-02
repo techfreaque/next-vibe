@@ -2,10 +2,14 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import { Bot, Loader2, Square, Trash2, Volume2 } from "next-vibe-ui/ui/icons";
+import { Bot, Square, Trash2, Volume2, X } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
 import { useAIStreamStore } from "@/app/api/[locale]/v1/core/agent/ai-stream/hooks/store";
+import {
+  prepareTextForTTS,
+  stripThinkTags,
+} from "@/app/api/[locale]/v1/core/agent/text-to-speech/content-processing";
 import textToSpeechDefinition from "@/app/api/[locale]/v1/core/agent/text-to-speech/definition";
 import { useTTSAudio } from "@/app/api/[locale]/v1/core/agent/text-to-speech/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
@@ -48,8 +52,19 @@ export function AssistantMessageActions({
   );
   const isMessageStreaming = streamingMessage?.isStreaming ?? false;
 
-  const { isLoading, isPlaying, playAudio, stopAudio } = useTTSAudio({
-    text: content,
+  // Prepare content for TTS (strip think tags, markdown, convert line breaks)
+  const ttsText = prepareTextForTTS(stripThinkTags(content));
+
+  const {
+    isLoading,
+    isPlaying,
+    playAudio,
+    stopAudio,
+    cancelLoading,
+    currentChunk,
+    totalChunks,
+  } = useTTSAudio({
+    text: ttsText,
     enabled: ttsAutoplay,
     isStreaming: isMessageStreaming,
     locale,
@@ -75,22 +90,33 @@ export function AssistantMessageActions({
     >
       <CopyButton content={content} locale={locale} logger={logger} />
 
-      {/* TTS Play/Stop Button */}
+      {/* TTS Play/Stop/Cancel Button */}
       <MessageActionButton
-        icon={isLoading ? Loader2 : isPlaying ? Square : Volume2}
+        icon={isLoading ? X : isPlaying ? Square : Volume2}
         onClick={
-          isPlaying
-            ? stopAudio
-            : (): void => {
-                void playAudio();
-              }
+          isLoading
+            ? cancelLoading
+            : isPlaying
+              ? stopAudio
+              : (): void => {
+                  void playAudio();
+                }
         }
         title={
-          isPlaying
-            ? t("app.chat.common.assistantMessageActions.stopAudio")
-            : `${t("app.chat.common.assistantMessageActions.playAudio")} (+${ttsCreditCost})`
+          isLoading
+            ? totalChunks > 1
+              ? `${t("app.chat.common.assistantMessageActions.cancelLoading")} (${currentChunk}/${totalChunks})`
+              : t("app.chat.common.assistantMessageActions.cancelLoading")
+            : isPlaying
+              ? totalChunks > 1
+                ? `${t("app.chat.common.assistantMessageActions.stopAudio")} (${currentChunk}/${totalChunks})`
+                : t("app.chat.common.assistantMessageActions.stopAudio")
+              : `${t("app.chat.common.assistantMessageActions.playAudio")} (+${ttsCreditCost})`
         }
-        className={cn(isLoading && "animate-spin")}
+        className={cn(
+          isLoading && "text-orange-400 hover:text-orange-300",
+          isPlaying && "text-blue-400 hover:text-blue-300",
+        )}
       />
 
       {onAnswerAsModel && (

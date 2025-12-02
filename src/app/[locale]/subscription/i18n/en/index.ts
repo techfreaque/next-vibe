@@ -82,6 +82,12 @@ export const translations = {
           audioCost: "+2 credits",
         },
       },
+      cta: {
+        title: "Ready to get started?",
+        description:
+          "Subscribe for monthly credits and chat with all {{modelCount}} AI models. Subscribers can buy extra credit packs when needed!",
+        button: "Subscribe Now",
+      },
     },
     buy: {
       signInRequired: {

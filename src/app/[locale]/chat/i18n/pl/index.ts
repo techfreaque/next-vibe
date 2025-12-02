@@ -63,6 +63,7 @@ export const translations: typeof enTranslations = {
     assistantMessageActions: {
       stopAudio: "Zatrzymaj odtwarzanie audio",
       playAudio: "Odtwórz audio",
+      cancelLoading: "Anuluj ładowanie",
       answerAsAI: "Odpowiedz jako model AI",
       deleteMessage: "Usuń wiadomość",
     },
@@ -569,7 +570,8 @@ export const translations: typeof enTranslations = {
       gpt5Pro:
         "Najnowszy model GPT z doskonałą wydajnością do zadań programistycznych",
       gpt5Codex: "Najnowszy model GPT z doskonałą wydajnością",
-      gpt51Codex: "Najnowszy model GPT 5.1 Codex zoptymalizowany do programowania",
+      gpt51Codex:
+        "Najnowszy model GPT 5.1 Codex zoptymalizowany do programowania",
       gpt5Mini:
         "Najnowszy model mini z doskonałym stosunkiem wydajności do kosztów",
       gpt5Nano:
@@ -604,6 +606,10 @@ export const translations: typeof enTranslations = {
         "GLM 4.5v - multimodalny model z obsługą wizji i dużym oknem kontekstu",
       uncensoredLmV11:
         "Niecenzurowany model językowy bez filtrowania treści - model premium",
+      freedomgptLiberty:
+        "FreedomGPT Liberty - Niecenzurowany model AI skoncentrowany na wolności wypowiedzi i treściach kreatywnych",
+      gabAiArya:
+        "Gab AI Arya - Niecenzurowany model konwersacyjny AI z wolnością wypowiedzi i kreatywnymi możliwościami",
     },
   },
   tones: {
@@ -684,9 +690,11 @@ export const translations: typeof enTranslations = {
   },
   debugView: {
     systemPrompt: "Prompt systemowy",
+    systemPromptTitle: "Prompt systemowy (Wygenerowany)",
     systemPromptHint: "To jest prompt systemowy dla całego wątku rozmowy",
     systemMessage: "Wiadomość systemowa",
     systemMessageHint: "To jest wiadomość systemowa wstrzyknięta do rozmowy",
+    copied: "Skopiowano!",
     retryModal: {
       title: "Ponów z innymi ustawieniami",
       description:
@@ -868,8 +876,10 @@ export const translations: typeof enTranslations = {
       loadingAudio: "Ładowanie audio...",
       stopAudio: "Zatrzymaj audio",
       playAudio: "Odtwórz audio",
+      cancelLoading: "Anuluj ładowanie",
       stop: "Zatrzymaj",
       play: "Odtwórz",
+      cancel: "Anuluj",
       reply: "Odpowiedz",
       replyToMessage: "Odpowiedz na tę wiadomość (tworzy gałąź)",
       edit: "Edytuj",
