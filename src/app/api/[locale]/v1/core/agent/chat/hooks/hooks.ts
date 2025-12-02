@@ -295,13 +295,26 @@ export function useChat(
   );
 
   // Load draft when navigation context changes
+  // Only reload when draftKey changes (navigation), not when logger changes
   useEffect(() => {
     const loadDraftForContext = async (): Promise<void> => {
       const draft = await loadDraft(draftKey, logger);
-      setInput(draft);
+      // Only update if draft is different from current input to prevent loops
+      setInput((currentInput) => {
+        if (currentInput !== draft) {
+          logger.debug("Chat: Loading draft", {
+            draftKey,
+            draftLength: draft.length,
+            currentInputLength: currentInput.length,
+          });
+          return draft;
+        }
+        return currentInput;
+      });
     };
     void loadDraftForContext();
-  }, [draftKey, logger]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftKey]);
 
   // Wrapper function to save input and draft together
   const setInputAndSaveDraft = useCallback(

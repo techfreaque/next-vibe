@@ -7,7 +7,7 @@
  */
 
 import type { JSX, ReactNode } from "react";
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useMemo } from "react";
 
 import {
   useChat,
@@ -67,8 +67,12 @@ export function ChatProvider({
   initialCredits,
   rootFolderPermissions,
 }: ChatProviderProps): JSX.Element {
-  // Create logger
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  // Create logger once - memoize to prevent infinite re-renders
+  // The timestamp is only used for logging context, not for identity
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
 
   // Get chat hook with URL-derived navigation state
   const chat = useChat(
