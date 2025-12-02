@@ -21,6 +21,7 @@ import { useMessageActions } from "../hooks/use-message-actions";
 import { MessagePreview } from "./preview";
 import { UserIdHoverCard } from "./user-id-hover-card";
 import { FlatMessage } from "./flat-message";
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 
 interface FlatMessageViewProps {
   thread: ChatThread;
@@ -120,30 +121,31 @@ export const FlatMessageView = React.memo(function FlatMessageView({
         }
 
         return (
-          <FlatMessage
-            key={message.id}
-            message={message}
-            index={index}
-            postNum={message.id.split("-")[0]}
-            messages={messages}
-            messageGroup={group}
-            locale={locale}
-            logger={logger}
-            messageActions={messageActions}
-            isTouch={isTouch}
-            hoveredRef={hoveredRef}
-            onSetHoveredRef={(ref, pos) => {
-              setHoveredRef(ref);
-              setPreviewPosition(pos);
-            }}
-            onSetHoveredUserId={(userId, pos) => {
-              setHoveredUserId(userId);
-              setUserIdPosition(pos);
-            }}
-            onInsertQuote={_onInsertQuote}
-            collapseState={collapseState}
-            currentUserId={currentUserId}
-          />
+          <ErrorBoundary key={message.id} locale={locale}>
+            <FlatMessage
+              message={message}
+              index={index}
+              postNum={message.id.split("-")[0]}
+              messages={messages}
+              messageGroup={group}
+              locale={locale}
+              logger={logger}
+              messageActions={messageActions}
+              isTouch={isTouch}
+              hoveredRef={hoveredRef}
+              onSetHoveredRef={(ref, pos) => {
+                setHoveredRef(ref);
+                setPreviewPosition(pos);
+              }}
+              onSetHoveredUserId={(userId, pos) => {
+                setHoveredUserId(userId);
+                setUserIdPosition(pos);
+              }}
+              onInsertQuote={_onInsertQuote}
+              collapseState={collapseState}
+              currentUserId={currentUserId}
+            />
+          </ErrorBoundary>
         );
       })}
     </Div>

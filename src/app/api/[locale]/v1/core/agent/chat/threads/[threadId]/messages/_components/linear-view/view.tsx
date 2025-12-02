@@ -41,6 +41,7 @@ import { Copy, FileText, Code } from "next-vibe-ui/ui/icons";
 import { useState } from "react";
 import { Logo } from "@/app/[locale]/_components/logo";
 import { createMetadataSystemMessage } from "@/app/api/[locale]/v1/core/agent/ai-stream/message-metadata-generator";
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 
 interface LinearMessageViewProps {
   messages: ChatMessage[];
@@ -293,118 +294,120 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                 </Div>
               )}
 
-            <Div className={cn(chatAnimations.slideIn, "group")}>
-              {isEditing ? (
-                <Div className="flex justify-end">
-                  <MessageEditor
-                    message={message}
-                    onBranch={handleBranch}
-                    onCancel={onCancelAction}
-                    onModelChange={onModelChange}
-                    onPersonaChange={onPersonaChange}
-                    locale={locale}
-                    logger={logger}
-                  />
-                </Div>
-              ) : isRetrying ? (
-                <Div className="flex justify-end">
-                  <ModelPersonaSelectorModal
-                    titleKey="app.chat.linearMessageView.retryModal.title"
-                    descriptionKey="app.chat.linearMessageView.retryModal.description"
-                    onModelChange={
-                      onModelChange ||
-                      ((): void => {
-                        /* no-op */
-                      })
-                    }
-                    onPersonaChange={
-                      onPersonaChange ||
-                      ((): void => {
-                        /* no-op */
-                      })
-                    }
-                    onConfirm={(): void => {
-                      if (onRetryMessage) {
-                        void onRetryMessage(message.id);
-                      }
-                      onCancelAction();
-                    }}
-                    onCancel={onCancelAction}
-                    confirmLabelKey="app.chat.linearMessageView.retryModal.confirmLabel"
-                    locale={locale}
-                    logger={logger}
-                  />
-                </Div>
-              ) : (
-                <>
-                  {message.role === "user" && (
-                    <UserMessageBubble
+            <ErrorBoundary locale={locale}>
+              <Div className={cn(chatAnimations.slideIn, "group")}>
+                {isEditing ? (
+                  <Div className="flex justify-end">
+                    <MessageEditor
                       message={message}
+                      onBranch={handleBranch}
+                      onCancel={onCancelAction}
+                      onModelChange={onModelChange}
+                      onPersonaChange={onPersonaChange}
                       locale={locale}
                       logger={logger}
-                      onBranch={onStartEdit}
-                      onRetry={onStartRetry}
-                      onDelete={onDeleteMessage}
-                      showAuthor={rootFolderId === "public"}
-                      rootFolderId={rootFolderId}
-                      currentUserId={currentUserId}
                     />
-                  )}
-                  {(message.role === "assistant" || message.role === "tool") &&
-                    group && (
-                      <GroupedAssistantMessage
-                        group={group}
+                  </Div>
+                ) : isRetrying ? (
+                  <Div className="flex justify-end">
+                    <ModelPersonaSelectorModal
+                      titleKey="app.chat.linearMessageView.retryModal.title"
+                      descriptionKey="app.chat.linearMessageView.retryModal.description"
+                      onModelChange={
+                        onModelChange ||
+                        ((): void => {
+                          /* no-op */
+                        })
+                      }
+                      onPersonaChange={
+                        onPersonaChange ||
+                        ((): void => {
+                          /* no-op */
+                        })
+                      }
+                      onConfirm={(): void => {
+                        if (onRetryMessage) {
+                          void onRetryMessage(message.id);
+                        }
+                        onCancelAction();
+                      }}
+                      onCancel={onCancelAction}
+                      confirmLabelKey="app.chat.linearMessageView.retryModal.confirmLabel"
+                      locale={locale}
+                      logger={logger}
+                    />
+                  </Div>
+                ) : (
+                  <>
+                    {message.role === "user" && (
+                      <UserMessageBubble
+                        message={message}
                         locale={locale}
-                        onAnswerAsModel={onStartAnswer}
-                        onDelete={onDeleteMessage}
-                        showAuthor={true}
                         logger={logger}
-                        collapseState={collapseState}
+                        onBranch={onStartEdit}
+                        onRetry={onStartRetry}
+                        onDelete={onDeleteMessage}
+                        showAuthor={rootFolderId === "public"}
+                        rootFolderId={rootFolderId}
+                        currentUserId={currentUserId}
                       />
                     )}
-                  {message.role === "error" && (
-                    <ErrorMessageBubble message={message} />
-                  )}
-                  {/* Debug mode: Show system messages inline */}
-                  {viewMode === ViewMode.DEBUG &&
-                    message.role === ChatMessageRole.SYSTEM && (
-                      <Div className="flex items-start gap-3">
-                        <Div className="flex-1 max-w-full">
-                          <Div className="mb-2">
-                            <MessageAuthorInfo
-                              authorName={t("app.chat.debugView.systemMessage")}
-                              authorId={null}
-                              currentUserId={undefined}
-                              isAI={true}
-                              model={message.model}
-                              timestamp={message.createdAt}
-                              edited={message.edited}
-                              persona={null}
-                              locale={locale}
-                              rootFolderId={rootFolderId}
-                              compact
-                            />
-                          </Div>
+                    {(message.role === "assistant" || message.role === "tool") &&
+                      group && (
+                        <GroupedAssistantMessage
+                          group={group}
+                          locale={locale}
+                          onAnswerAsModel={onStartAnswer}
+                          onDelete={onDeleteMessage}
+                          showAuthor={true}
+                          logger={logger}
+                          collapseState={collapseState}
+                        />
+                      )}
+                    {message.role === "error" && (
+                      <ErrorMessageBubble message={message} />
+                    )}
+                    {/* Debug mode: Show system messages inline */}
+                    {viewMode === ViewMode.DEBUG &&
+                      message.role === ChatMessageRole.SYSTEM && (
+                        <Div className="flex items-start gap-3">
+                          <Div className="flex-1 max-w-full">
+                            <Div className="mb-2">
+                              <MessageAuthorInfo
+                                authorName={t("app.chat.debugView.systemMessage")}
+                                authorId={null}
+                                currentUserId={undefined}
+                                isAI={true}
+                                model={message.model}
+                                timestamp={message.createdAt}
+                                edited={message.edited}
+                                persona={null}
+                                locale={locale}
+                                rootFolderId={rootFolderId}
+                                compact
+                              />
+                            </Div>
 
-                          <Div
-                            className={cn(
-                              chatProse.all,
-                              "pl-2 py-2.5 sm:py-3",
-                              "border border-blue-500/30 bg-blue-500/5 rounded-md",
-                            )}
-                          >
-                            <Markdown content={message.content} />
-                          </Div>
+                            <Div
+                              className={cn(
+                                chatProse.all,
+                                "pl-2 py-2.5 sm:py-3",
+                                "border border-blue-500/30 bg-blue-500/5 rounded-md",
+                              )}
+                            >
+                              <Markdown content={message.content} />
+                            </Div>
 
-                          <Div className="mt-1 text-xs text-muted-foreground pl-2">
-                            {t("app.chat.debugView.systemMessageHint")}
+                            <Div className="mt-1 text-xs text-muted-foreground pl-2">
+                              {t("app.chat.debugView.systemMessageHint")}
+                            </Div>
                           </Div>
                         </Div>
-                      </Div>
-                    )}
-                </>
-              )}
-            </Div>
+                      )}
+                  </>
+                )}
+              </Div>
+            </ErrorBoundary>
 
             {/* Show Answer-as-AI dialog below the message */}
             {isAnswering && (
