@@ -23,6 +23,7 @@ import { ChatArea } from "./chat-area/chat-area";
 import { SidebarWrapper } from "./sidebar/sidebar-wrapper";
 import { TopBar } from "./sidebar/top-area/top-bar";
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 
 interface ChatInterfaceProps {
   /** URL path segments from /threads/[...path] route (for logging/debugging only) */
@@ -85,39 +86,47 @@ export function ChatInterface({
         }
       >
         {/* Top Bar - Menu, Search, Settings */}
-        <TopBar currentCountry={currentCountry} locale={locale} />
+        <ErrorBoundary locale={locale}>
+          <TopBar currentCountry={currentCountry} locale={locale} />
+        </ErrorBoundary>
 
         {/* Sidebar and Main Chat Area */}
-        <SidebarWrapper user={user} locale={locale} logger={logger}>
-          {/* Main Chat Area */}
-          <ChatArea locale={locale} logger={logger} currentUserId={user?.id} />
-        </SidebarWrapper>
+        <ErrorBoundary locale={locale}>
+          <SidebarWrapper user={user} locale={locale} logger={logger}>
+            {/* Main Chat Area */}
+            <ErrorBoundary locale={locale}>
+              <ChatArea locale={locale} logger={logger} currentUserId={user?.id} />
+            </ErrorBoundary>
+          </SidebarWrapper>
+        </ErrorBoundary>
       </Div>
 
       {/* Delete Message Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("app.admin.common.actions.delete")}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("app.chat.confirmations.deleteMessage")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancelDelete}>
-              {t("app.admin.common.actions.cancel")}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {t("app.admin.common.actions.delete")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ErrorBoundary locale={locale}>
+        <AlertDialog open={deleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {t("app.admin.common.actions.delete")}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {t("app.chat.confirmations.deleteMessage")}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={handleCancelDelete}>
+                {t("app.admin.common.actions.cancel")}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirmDelete}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {t("app.admin.common.actions.delete")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </ErrorBoundary>
     </>
   );
 }

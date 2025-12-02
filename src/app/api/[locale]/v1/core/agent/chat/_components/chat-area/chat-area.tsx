@@ -23,6 +23,7 @@ import { ChatBranding } from "@/app/api/[locale]/v1/core/agent/chat/threads/[thr
 import { ChatEmptyState } from "@/app/api/[locale]/v1/core/agent/chat/threads/_components/new-thread/empty-state";
 import { ChatInputContainer } from "@/app/api/[locale]/v1/core/agent/chat/threads/_components/chat-input/input-container";
 import { ChatToolbar } from "@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/_components/toolbar";
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 
 interface ChatAreaProps {
   locale: CountryLanguage;
@@ -79,45 +80,57 @@ export function ChatArea({
           }
         >
           {/* Toolbar - View Mode Toggle & Screenshot Button */}
-          {messages.length > 0 && <ChatToolbar locale={locale} />}
+          {messages.length > 0 && (
+            <ErrorBoundary locale={locale}>
+              <ChatToolbar locale={locale} />
+            </ErrorBoundary>
+          )}
 
           {/* Logo/Branding - Only show in linear view (not debug - logo is in card header) */}
           {viewMode === ViewMode.LINEAR && messages.length > 0 && (
-            <ChatBranding locale={locale} />
+            <ErrorBoundary locale={locale}>
+              <ChatBranding locale={locale} />
+            </ErrorBoundary>
           )}
 
           {/* Messages Area - Full height, scrollable inside */}
-          <Div className="max-w-screen overflow-hidden h-screen h-max-screen">
-            {thread ? (
-              <ChatMessages
-                inputHeight={inputHeight}
-                locale={locale}
-                logger={logger}
-                currentUserId={currentUserId}
-              />
-            ) : rootFolderId === "public" && !chat.currentSubFolderId ? (
-              // Public folder root (no subfolder) - show feed view
-              <PublicFeed locale={locale} />
-            ) : isLoadingThread ? (
-              <Div className="flex-1 flex flex-col gap-5">
-                <Div className="h-10" />
-              </Div>
-            ) : (
-              <ChatEmptyState locale={locale} inputHeight={inputHeight} />
-            )}
-          </Div>
+          <ErrorBoundary locale={locale}>
+            <Div className="max-w-screen overflow-hidden h-screen h-max-screen">
+              {thread ? (
+                <ChatMessages
+                  inputHeight={inputHeight}
+                  locale={locale}
+                  logger={logger}
+                  currentUserId={currentUserId}
+                />
+              ) : rootFolderId === "public" && !chat.currentSubFolderId ? (
+                // Public folder root (no subfolder) - show feed view
+                <PublicFeed locale={locale} />
+              ) : isLoadingThread ? (
+                <Div className="flex-1 flex flex-col gap-5">
+                  <Div className="h-10" />
+                </Div>
+              ) : (
+                <ChatEmptyState locale={locale} inputHeight={inputHeight} />
+              )}
+            </Div>
+          </ErrorBoundary>
 
           {/* Input Container */}
           {shouldShowInput && (
-            <ChatInputContainer
-              locale={locale}
-              logger={logger}
-              inputContainerRef={inputContainerRef}
-            />
+            <ErrorBoundary locale={locale}>
+              <ChatInputContainer
+                locale={locale}
+                logger={logger}
+                inputContainerRef={inputContainerRef}
+              />
+            </ErrorBoundary>
           )}
 
           {/* AI Tools Modal */}
-          <AIToolsModal locale={locale} logger={logger} />
+          <ErrorBoundary locale={locale}>
+            <AIToolsModal locale={locale} logger={logger} />
+          </ErrorBoundary>
         </Div>
       </Div>
     </KeyboardAvoidingView>
