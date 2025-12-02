@@ -3,7 +3,7 @@ import * as React from "react";
 import { Text as RNText } from "react-native";
 import { styled } from "nativewind";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { convertCSSToTextStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
 

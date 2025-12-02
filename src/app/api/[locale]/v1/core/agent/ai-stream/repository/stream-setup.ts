@@ -12,6 +12,7 @@ import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
+  type MessageResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -757,7 +758,14 @@ function toAiSdkMessage(
         // Return tool result in AI SDK format
         // This allows the AI to properly understand the tool execution and continue with more tool calls
         const output = toolCall.error
-          ? { type: "error-text" as const, value: toolCall.error }
+          ? {
+              type: "error-text" as const,
+              // Serialize structured error for AI consumption
+              value: JSON.stringify({
+                message: toolCall.error.message,
+                params: toolCall.error.messageParams,
+              }),
+            }
           : { type: "json" as const, value: toolCall.result ?? null };
 
         return {
@@ -896,7 +904,7 @@ async function handleToolConfirmationInSetup(params: {
       },
     ];
     let toolResult: ToolCallResult | undefined;
-    let toolError: string | undefined;
+    let toolError: MessageResponseType | undefined;
 
     try {
       if (tool?.execute) {
@@ -906,10 +914,19 @@ async function handleToolConfirmationInSetup(params: {
           abortSignal: AbortSignal.timeout(60000),
         });
       } else {
-        toolError = "Tool does not have execute method";
+        toolError = {
+          message:
+            "app.api.v1.core.agent.aiStream.errors.toolExecutionError",
+          messageParams: { error: "Tool does not have execute method" },
+        };
       }
     } catch (error) {
-      toolError = error instanceof Error ? error.message : String(error);
+      toolError = {
+        message: "app.api.v1.core.agent.aiStream.errors.toolExecutionError",
+        messageParams: {
+          error: error instanceof Error ? error.message : String(error),
+        },
+      };
     }
 
     // Update tool message with result
@@ -952,7 +969,9 @@ async function handleToolConfirmationInSetup(params: {
       args: toolCall.args, // Keep original args for display
       isConfirmed: false,
       waitingForConfirmation: false,
-      error: "User declined tool execution",
+      error: {
+        message: "app.api.v1.core.agent.aiStream.errors.userDeclinedTool",
+      },
     };
 
     if (!isIncognito && userId) {

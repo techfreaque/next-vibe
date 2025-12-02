@@ -132,11 +132,12 @@ const startSmartFileWatcher = async (
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let changeCount = 0;
 
-  const runGenerators = async (): Promise<void> => {
+  const runGenerators = async (skipSeeds = true): Promise<void> => {
     try {
       changeCount++;
+      const action = skipSeeds ? "File changes detected" : "Initial startup";
       logger.debug(
-        `📁 File changes detected - Running generators (change #${changeCount})...`,
+        `📁 ${action} - Running generators (change #${changeCount})...`,
       );
 
       await generateAllRepository.generateAll(
@@ -144,7 +145,7 @@ const startSmartFileWatcher = async (
           outputDir: "src/app/api/[locale]/v1/core/system/generated",
           verbose: false,
           skipEndpoints: false,
-          skipSeeds: true, // Seeds don't need frequent regeneration
+          skipSeeds, // Generate seeds on startup, skip on file changes
           skipTaskIndex: false, // Keep task index updated
           skipTrpc: false,
         },
@@ -195,9 +196,9 @@ const startSmartFileWatcher = async (
     }
   }
 
-  // Run generators once on startup
+  // Run generators once on startup with full generation including seeds
   logger.debug("🚀 Running initial generator scan...");
-  await runGenerators();
+  await runGenerators(false);
 
   // Wait for abort signal
   return await new Promise<void>((resolve) => {
@@ -252,21 +253,22 @@ const startPollingWatcher = async (
       const { generateAllRepository } =
         await import("@/app/api/[locale]/v1/core/system/generators/generate-all/repository");
 
-      logger.info(`⏰ Polling cycle #${watchCount} - Running generators...`);
+      const action = watchCount === 1 ? "Initial startup" : "Polling cycle";
+      logger.info(`⏰ ${action} #${watchCount} - Running generators...`);
 
       await generateAllRepository.generateAll(
         {
           outputDir: "src/app/api/[locale]/v1/core/system/generated",
           verbose: false,
           skipEndpoints: false,
-          skipSeeds: true,
+          skipSeeds: watchCount !== 1, // Generate seeds on first run only
           skipTaskIndex: false,
           skipTrpc: false,
         },
         logger,
       );
 
-      logger.info(`✅ Polling cycle #${watchCount} completed`);
+      logger.info(`✅ ${action} #${watchCount} completed`);
     } catch (error) {
       const errorMsg = parseError(error).message;
       logger.error("Polling watcher error", new Error(errorMsg));

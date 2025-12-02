@@ -341,6 +341,7 @@ export function useChat(
     activeThreadId,
     threads,
     chatStore.addMessage,
+    isDataLoaded,
   );
 
   const settingsOps = useSettings({

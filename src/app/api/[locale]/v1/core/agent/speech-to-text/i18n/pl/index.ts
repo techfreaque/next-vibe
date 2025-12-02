@@ -135,10 +135,10 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Mowa na tekst",
-    description: "Konwertuj audio na tekst za pomocą transkrypcji AI",
+    description: "Konwertuj audio na tekst za pomocą transkrypcji AI (~0,011 kredytów na sekundę)",
     form: {
       title: "Transkrypcja audio",
-      description: "Prześlij plik audio do transkrypcji",
+      description: "Prześlij plik audio do transkrypcji (Deepgram: ~0,011 kredytów na sekundę)",
     },
     fileUpload: {
       title: "Przesyłanie pliku audio",
@@ -182,13 +182,15 @@ export const translations: typeof enTranslations = {
         description: "Nie udało się przetworzyć transkrypcji",
       },
       apiKeyMissing: "Klucz API Eden AI nie jest skonfigurowany",
-      transcriptionFailed: "Transkrypcja nie powiodła się: {error}",
+      transcriptionFailed: "Transkrypcja nie powiodła się: {{error}}",
       noAudioFile: "Nie podano pliku audio",
       internalError: "Wewnętrzny błąd serwera",
       noPublicId: "Nie otrzymano publicznego ID",
       pollFailed: "Nie udało się pobrać wyników transkrypcji",
       failed: "Transkrypcja nie powiodła się",
       timeout: "Przekroczono limit czasu transkrypcji",
+      creditsFailed: "Nie udało się potrącić kredytów: {{error}}",
+      providerError: "Błąd usługi transkrypcji. Spróbuj ponownie lub skontaktuj się z pomocą techniczną, jeśli problem będzie się powtarzał.",
     },
     success: {
       title: "Sukces",

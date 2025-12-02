@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   requestDataField,
@@ -37,6 +37,7 @@ const { POST } = createEndpoint({
     UserRole.ADMIN,
     UserRole.WEB_OFF,
     UserRole.CLI_AUTH_BYPASS,
+    UserRole.AI_TOOL_OFF,
     UserRole.PRODUCTION_OFF,
   ],
 
@@ -45,7 +46,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.system.server.dev.post.form.title",
       description: "app.api.v1.core.system.server.dev.post.form.description",
-      layoutType: LayoutType.GRID, columns: 12,
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {

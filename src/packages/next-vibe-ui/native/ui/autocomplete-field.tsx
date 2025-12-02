@@ -7,7 +7,7 @@ import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 import { Check, ChevronDown, Search, X } from "./icons";
 
 import { useTranslation } from "@/i18n/core/client";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
 import { Badge } from "./badge";

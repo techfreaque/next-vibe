@@ -355,18 +355,14 @@ class AuthRepositoryImpl implements AuthRepository {
     logger: EndpointLogger,
   ): Promise<UserRoleValue[]> {
     try {
-      // Public role is always allowed
-      if (requiredRoles.includes(UserRole.PUBLIC)) {
-        return [UserRole.PUBLIC];
-      }
+      const roles: UserRoleValue[] = [];
 
       // Customer role is allowed for any authenticated user
-      const roles: UserRoleValue[] = [];
       if (requiredRoles.includes(UserRole.CUSTOMER)) {
         roles.push(UserRole.CUSTOMER);
       }
 
-      // Check for other roles in database
+      // Check for other roles in database (e.g., ADMIN, MODERATOR)
       const userRolesResponse = await userRolesRepository.findByUserId(
         userId,
         logger,
@@ -376,8 +372,35 @@ class AuthRepositoryImpl implements AuthRepository {
           .map((r) => r.role)
           .filter((role) => requiredRoles.includes(role)) as UserRoleValue[];
         for (const role of dbRoles) {
-          roles.push(role);
+          // Avoid duplicates
+          if (!roles.includes(role)) {
+            roles.push(role);
+          }
         }
+      }
+
+      // If user has actual roles, return them (even if PUBLIC is in requiredRoles)
+      // This ensures admin users get their ADMIN role, not PUBLIC
+      if (roles.length > 0) {
+        logger.debug("Returning user's actual roles", {
+          userId,
+          roles: roles as string[],
+          requiredRoles: [...requiredRoles] as string[],
+        });
+        return roles;
+      }
+
+      // Only return PUBLIC role if user has no other roles
+      // (This shouldn't happen for authenticated users, but handle gracefully)
+      if (requiredRoles.includes(UserRole.PUBLIC)) {
+        logger.debug(
+          "User has no roles in database, returning PUBLIC as fallback",
+          {
+            userId,
+            requiredRoles: [...requiredRoles] as string[],
+          },
+        );
+        return [UserRole.PUBLIC];
       }
 
       return roles;

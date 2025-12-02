@@ -235,6 +235,13 @@ export const translations: typeof enTranslations = {
   error: {
     title: "Błąd strumienia",
   },
+  errors: {
+    toolExecutionError: "Błąd wykonania narzędzia: {{error}}",
+    toolExecutionFailed: "Wykonanie narzędzia nie powiodło się",
+    userDeclinedTool: "Użytkownik odrzucił wykonanie narzędzia",
+    streamError: "Błąd strumienia: {{error}}",
+    streamProcessingError: "Błąd przetwarzania strumienia",
+  },
   providers: {
     uncensoredHandler: {
       errors: {

@@ -99,9 +99,19 @@ You are an AI assistant on ${appName}, a platform dedicated to freedom of speech
   // Section 4: User Locale and Language
   sections.push(`## User Language and Location
 
-**CRITICAL: Respond in ${localeInfo.languageName} (${localeInfo.language})** unless explicitly asked otherwise.
+**User's default language:** ${localeInfo.languageName} (${localeInfo.language})
+**User location:** ${localeInfo.countryName} ${localeInfo.flag}
 
-User location: ${localeInfo.countryName} ${localeInfo.flag}`);
+**Language Rules:**
+- Start conversation in ${localeInfo.languageName}
+- **Auto-detect:** If user writes in a different language, switch to that language
+- **Persist:** Continue in the switched language until user switches again
+- Multi-language support: Respond in whatever language the user's most recent message uses
+
+**Examples:**
+- User writes in English → Respond in English
+- Next message in Deutsch → Switch to Deutsch
+- Next message in English → Switch back to English`);
 
   // Section 5: Context Information
   if (rootFolderId || subFolderId) {
@@ -126,34 +136,29 @@ You are currently operating in the following context:`);
     sections.push(`## Your Role\n\n${personaPrompt.trim()}`);
   }
 
-  // Section 7: Message Metadata Format
-  sections.push(`## Message Context Information
+  // Section 7: Message Metadata Format (compact)
+  sections.push(`## Message Context (Compact Format)
 
-Before each user and assistant message, you will receive a system message with metadata in this format:
+Before each message, you receive metadata. Only non-empty fields included:
 
-**For Assistant Messages:**
-\`[Message Context: Message ID: <8-char-id> | Model: <model-name> | Persona: <persona-name> | Author: <name> | 👍 X | 👎 Y | Posted: <relative-time> | Status: <edited/branched>]\`
+**Examples:**
+\`[Context: ID:0b501ca0 | Posted:2h ago]\`
+\`[Context: ID:4f00edb6 | Model:claude-haiku-4.5 | Persona:default | Posted:2h ago]\`
+\`[Context: ID:abc12345 | Author:John(def67890) | 👍5 👎1 | Posted:1d ago | edited]\`
 
-**For User Messages:**
-\`[Message Context: Message ID: <8-char-id> | Author: <name> (<user-id-fragment>) | 👍 X | 👎 Y | Posted: <relative-time> | Status: <edited/branched>]\`
+**Fields:**
+- **ID** - 8-char message reference
+- **Model** - AI model used (assistant messages only)
+- **Persona** - Persona/role (assistant messages only)
+- **Author** - Name(id) in public/shared threads only
+- **Votes** - 👍/👎 counts (community rating)
+- **Posted** - Xh/m/d ago (now = <1min)
+- **Status** - edited, branched (only if applicable)
 
-**What each field means:**
-- **Message ID**: A short identifier for referencing specific messages in your responses
-- **Model**: (Assistant only) The AI model that generated the response (e.g., "claude-sonnet-4.5", "gpt-5")
-- **Persona**: (Assistant only) The persona/role used for that response (e.g., "creative", "technical")
-- **Author**: Who wrote the message - only shown in public/shared threads for privacy
-- **Votes**: Community rating (👍 upvotes, 👎 downvotes) - vote counts help you identify valuable contributions and community consensus
-- **Posted**: When the message was created (relative time)
-- **Status**:
-  - \`edited\` - message was modified after posting
-  - \`branched\` - message is part of an alternative conversation path
-
-**Important notes:**
-- **Multiple models/personas in one chat**: Different messages may be from different AI models with different personas - always check the metadata
-- In private/incognito threads, author information is omitted for privacy
-- These metadata messages are never stored in the database
-- You can reference message IDs when discussing specific parts of the conversation
-- Vote counts (upvotes and downvotes) help you identify particularly helpful or controversial messages`);
+**Key points:**
+- Multiple models/personas may be in one chat - check metadata
+- Empty fields omitted for brevity
+- Vote counts indicate valuable/controversial messages`);
 
   return sections.join("\n\n");
 }

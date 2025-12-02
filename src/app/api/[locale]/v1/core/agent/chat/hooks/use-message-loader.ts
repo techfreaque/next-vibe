@@ -21,6 +21,7 @@ export function useMessageLoader(
   activeThreadId: string | null,
   threads: Record<string, ChatThread>,
   addMessage: (message: ChatMessage) => void,
+  isDataLoaded: boolean,
 ): void {
   const loadedThreadsRef = useRef<Set<string>>(new Set());
 
@@ -31,6 +32,13 @@ export function useMessageLoader(
 
     // Skip if messages already loaded for this thread
     if (loadedThreadsRef.current.has(activeThreadId)) {
+      return;
+    }
+
+    // Wait for initial data load to complete before checking thread existence
+    // This prevents race condition on page refresh where activeThreadId is set
+    // but threads haven't been loaded from server yet
+    if (!isDataLoaded) {
       return;
     }
 
@@ -98,5 +106,5 @@ export function useMessageLoader(
 
     void loadMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeThreadId, locale, logger]);
+  }, [activeThreadId, locale, logger, isDataLoaded]);
 }

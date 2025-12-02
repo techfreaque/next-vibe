@@ -16,7 +16,7 @@ import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
 
 import { useTranslation } from "../../../../i18n/core/client";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { Badge } from "./badge";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";

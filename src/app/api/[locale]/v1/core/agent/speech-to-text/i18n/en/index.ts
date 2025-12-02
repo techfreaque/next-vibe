@@ -133,10 +133,10 @@ export const translations = {
   },
   post: {
     title: "Speech to Text",
-    description: "Convert audio to text using AI transcription",
+    description: "Convert audio to text using AI transcription (~0.011 credits per second)",
     form: {
       title: "Audio Transcription",
-      description: "Upload an audio file to transcribe",
+      description: "Upload an audio file to transcribe (Deepgram: ~0.011 credits per second)",
     },
     fileUpload: {
       title: "Audio File Upload",
@@ -180,13 +180,15 @@ export const translations = {
         description: "Failed to process the transcription",
       },
       apiKeyMissing: "Eden AI API key is not configured",
-      transcriptionFailed: "Transcription failed: {error}",
+      transcriptionFailed: "Transcription failed: {{error}}",
       noAudioFile: "No audio file provided",
       internalError: "Internal server error",
       noPublicId: "No public ID received",
       pollFailed: "Failed to poll transcription results",
       failed: "Transcription failed",
       timeout: "Transcription timeout",
+      creditsFailed: "Failed to deduct credits: {{error}}",
+      providerError: "Transcription service error. Please try again or contact support if the issue persists.",
     },
     success: {
       title: "Success",

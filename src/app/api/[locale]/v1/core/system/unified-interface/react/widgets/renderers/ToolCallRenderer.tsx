@@ -353,7 +353,14 @@ export function ToolCallRenderer({
                         )}
                       </Span>
                       <Span className="text-destructive text-sm">
-                        {toolCall.error}
+                        {toolCall.error
+                          ? t(
+                              toolCall.error.message,
+                              toolCall.error.messageParams as
+                                | Record<string, string | number>
+                                | undefined,
+                            )
+                          : ""}
                       </Span>
                     </Div>
                   </Div>
@@ -455,7 +462,14 @@ export function ToolCallRenderer({
                     {isDeclined && (
                       <Div className="rounded-md bg-destructive/10 border border-destructive/20 p-3">
                         <Span className="text-destructive text-sm font-medium">
-                          {toolCall.error}
+                          {toolCall.error
+                            ? t(
+                                toolCall.error.message,
+                                toolCall.error.messageParams as
+                                  | Record<string, string | number>
+                                  | undefined,
+                              )
+                            : ""}
                         </Span>
                       </Div>
                     )}

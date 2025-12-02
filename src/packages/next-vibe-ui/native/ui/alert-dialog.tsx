@@ -4,7 +4,7 @@ import type { ViewStyle } from "react-native";
 import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
 import { buttonTextVariants, buttonVariants } from "./button";
@@ -170,7 +170,10 @@ function AlertDialogTitle({
     <AlertDialogPrimitive.Title
       {...applyStyleType({
         nativeStyle,
-        className: cn("text-lg text-xl text-foreground font-semibold", className),
+        className: cn(
+          "text-lg text-xl text-foreground font-semibold",
+          className,
+        ),
       })}
     >
       {children}

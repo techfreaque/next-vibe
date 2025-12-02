@@ -20,7 +20,7 @@ import type {
   AccordionProps,
   AccordionTriggerProps,
 } from "@/packages/next-vibe-ui/web/ui/accordion";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
 import { ChevronDown } from "./icons/ChevronDown";

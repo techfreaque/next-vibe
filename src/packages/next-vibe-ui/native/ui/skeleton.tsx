@@ -8,7 +8,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import type { SkeletonProps } from "@/packages/next-vibe-ui/web/ui/skeleton";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const duration = 1000;

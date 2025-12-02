@@ -5,10 +5,10 @@
 export const translations = {
   post: {
     title: "Text to Speech",
-    description: "Convert text to natural-sounding speech using AI (charged per character)",
+    description: "Convert text to natural-sounding speech using AI (~0.00052 credits per character)",
     form: {
       title: "Text to Speech Conversion",
-      description: "Enter text to convert to speech (cost calculated based on character count)",
+      description: "Enter text to convert to speech (Amazon Polly: ~0.00052 credits per character)",
     },
     text: {
       label: "Text",
@@ -72,12 +72,13 @@ export const translations = {
         description: "A conflict occurred",
       },
       apiKeyMissing: "Eden AI API key is not configured",
-      conversionFailed: "Speech synthesis failed: {error}",
+      conversionFailed: "Speech synthesis failed: {{error}}",
       noText: "No text provided",
       noAudioUrl: "No audio URL received from provider",
       audioFetchFailed: "Failed to fetch audio file",
-      providerError: "Provider error: {error}",
+      providerError: "Provider error: {{error}}",
       internalError: "Internal server error",
+      creditsFailed: "Failed to deduct credits: {{error}}",
     },
     success: {
       title: "Success",

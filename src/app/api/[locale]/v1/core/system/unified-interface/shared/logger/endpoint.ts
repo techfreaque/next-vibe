@@ -24,6 +24,23 @@ export type LoggerMetadata =
   | LoggerMetadata[];
 
 /**
+ * Dynamically import and use file logging
+ * Only imports when actually needed (in MCP mode)
+ */
+async function writeToFile(
+  message: string,
+  data?: Record<string, unknown>,
+): Promise<void> {
+  try {
+    const { fileLog } = await import("./file-logger");
+    fileLog(message, data);
+  } catch {
+    // Ignore errors - logging is best effort
+    // Can't log the error because we're in silent mode
+  }
+}
+
+/**
  * Logger interface for endpoint handlers
  * Provides structured logging with timing information
  */
@@ -81,7 +98,14 @@ export function createEndpointLogger(
 
   return {
     info(message: string, ...metadata: LoggerMetadata[]): void {
-      if (!mcpSilentMode) {
+      if (mcpSilentMode) {
+        // In MCP mode, dynamically import and log to file instead of console
+        const metadataObj = metadata.length > 0 ? { metadata } : undefined;
+        void writeToFile(
+          `[INFO] ${formatMessage("INFO", message)}`,
+          metadataObj,
+        );
+      } else {
         console.log(formatMessage("INFO", message), ...metadata);
       }
     },
@@ -91,26 +115,60 @@ export function createEndpointLogger(
       error?: LoggerMetadata,
       ...metadata: LoggerMetadata[]
     ): void {
-      if (!mcpSilentMode) {
+      if (mcpSilentMode) {
+        // In MCP mode, dynamically import and log to file instead of console
+        const typedError = error ? parseError(error) : undefined;
+        const metadataObj = {
+          error: typedError,
+          ...(metadata.length > 0 && { metadata }),
+        };
+        void writeToFile(
+          `[ERROR] ${formatMessage("ERROR", message)}`,
+          metadataObj,
+        );
+      } else {
         const typedError = error ? parseError(error) : undefined;
         console.error(formatMessage("ERROR", message), typedError, ...metadata);
       }
     },
 
     vibe(message: string, ...metadata: LoggerMetadata[]): void {
-      if (!mcpSilentMode) {
+      if (mcpSilentMode) {
+        // In MCP mode, dynamically import and log to file instead of console
+        const metadataObj = metadata.length > 0 ? { metadata } : undefined;
+        void writeToFile(
+          `[VIBE] [${getElapsedTime()}] ${message}`,
+          metadataObj,
+        );
+      } else {
         // Special vibe formatting - messages are plain strings
         console.log(`[${getElapsedTime()}] ${message}`, ...metadata);
       }
     },
 
     debug(message: string, ...metadata: LoggerMetadata[]): void {
-      if (!mcpSilentMode && (debugEnabled || enableDebugLogger)) {
-        console.log(formatMessage("DEBUG", message), ...metadata);
+      if (debugEnabled || enableDebugLogger) {
+        if (mcpSilentMode) {
+          // In MCP mode, dynamically import and log to file instead of console
+          const metadataObj = metadata.length > 0 ? { metadata } : undefined;
+          void writeToFile(
+            `[DEBUG] ${formatMessage("DEBUG", message)}`,
+            metadataObj,
+          );
+        } else {
+          console.log(formatMessage("DEBUG", message), ...metadata);
+        }
       }
     },
     warn(message: string, ...metadata: LoggerMetadata[]): void {
-      if (!mcpSilentMode) {
+      if (mcpSilentMode) {
+        // In MCP mode, dynamically import and log to file instead of console
+        const metadataObj = metadata.length > 0 ? { metadata } : undefined;
+        void writeToFile(
+          `[WARN] ${formatMessage("WARN", message)}`,
+          metadataObj,
+        );
+      } else {
         console.warn(formatMessage("WARN", message), ...metadata);
       }
     },

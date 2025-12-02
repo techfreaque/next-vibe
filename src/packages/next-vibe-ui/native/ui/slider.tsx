@@ -11,7 +11,7 @@ import type {
   SliderThumbProps,
   SliderTrackProps,
 } from "@/packages/next-vibe-ui/web/ui/slider";
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
 

@@ -11,6 +11,7 @@ import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/conf
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getPersonaById } from "@/app/api/[locale]/v1/core/agent/chat/personas/repository";
+import { generateMemorySummary } from "@/app/api/[locale]/v1/core/agent/chat/memories/repository";
 import { formattingInstructions } from "./system-prompt";
 import {
   generateSystemPrompt,
@@ -24,11 +25,12 @@ import {
  * Priority order:
  * 1. Platform introduction (unbottled.ai, model count, freedom of speech)
  * 2. User locale and language requirements
- * 3. Persona systemPrompt (if persona ID provided)
- * 4. Formatting instructions
+ * 3. User memories (persistent facts about the user)
+ * 4. Persona systemPrompt (if persona ID provided)
+ * 5. Formatting instructions
  *
  * @param personaId - Optional persona ID (can be default persona ID or custom persona UUID)
- * @param userId - Optional user ID (required for custom personas)
+ * @param userId - Optional user ID (required for custom personas and memories)
  * @param logger - Logger instance
  * @param t - Translation function for appName
  * @param locale - User's locale (language-country)
@@ -45,8 +47,15 @@ export async function buildSystemPrompt(params: {
   rootFolderId?: DefaultFolderId;
   subFolderId?: string | null;
 }): Promise<string> {
-  const { personaId, userId, logger, t, locale, rootFolderId, subFolderId } =
-    params;
+  const {
+    personaId,
+    userId,
+    logger,
+    t,
+    locale,
+    rootFolderId,
+    subFolderId,
+  } = params;
 
   logger.debug("Building system prompt", {
     hasPersonaId: !!personaId,
@@ -56,6 +65,30 @@ export async function buildSystemPrompt(params: {
   });
 
   let personaPrompt = "";
+  let memorySummary = "";
+
+  // Load user memories for persistent context (only for authenticated users)
+  if (userId) {
+    try {
+      memorySummary = await generateMemorySummary({
+        userId,
+        logger,
+      });
+
+      if (memorySummary) {
+        logger.info("Loaded user memories into system prompt", {
+          userId,
+          memorySummaryLength: memorySummary.length,
+        });
+      }
+    } catch (error) {
+      logger.error("Failed to load memories", {
+        userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      // Continue without memories on error
+    }
+  }
 
   // Get persona system prompt if provided
   if (personaId) {
@@ -99,38 +132,57 @@ export async function buildSystemPrompt(params: {
     personaPrompt,
   });
 
-  // Build final prompt with formatting instructions
-  return buildFinalSystemPrompt(platformPrompt, logger);
+  // Build final prompt with memories and formatting instructions
+  return buildFinalSystemPrompt(platformPrompt, memorySummary, logger);
 }
 
 /**
- * Build final system prompt by combining base prompt with formatting instructions
+ * Build final system prompt by combining base prompt, memories, and formatting instructions
  *
  * @param basePrompt - Base system prompt (from persona or custom)
+ * @param memorySummary - User/lead memories summary
  * @param logger - Logger instance
- * @returns Complete system prompt with formatting instructions appended
+ * @returns Complete system prompt with memories and formatting instructions appended
  */
 function buildFinalSystemPrompt(
   basePrompt: string,
+  memorySummary: string,
   logger: EndpointLogger,
 ): string {
   const trimmedBase = basePrompt.trim();
+  const trimmedMemories = memorySummary.trim();
   const formattingSection = buildFormattingSection();
 
-  // If base prompt is empty, return only formatting instructions
-  if (!trimmedBase) {
+  // Build sections
+  const sections: string[] = [];
+
+  // Add base prompt
+  if (trimmedBase) {
+    sections.push(trimmedBase);
+  }
+
+  // Add memory summary if available
+  if (trimmedMemories) {
+    sections.push(trimmedMemories);
+  }
+
+  // Add formatting instructions
+  sections.push(formattingSection);
+
+  // If no base prompt and no memories, return only formatting instructions
+  if (sections.length === 1) {
     logger.debug("Building system prompt with formatting instructions only");
     return formattingSection;
   }
 
-  // Combine base prompt with formatting instructions
-  const finalPrompt = `${trimmedBase}
-
-${formattingSection}`;
+  // Combine all sections
+  const finalPrompt = sections.join("\n\n");
 
   logger.debug("Built complete system prompt", {
     basePromptLength: trimmedBase.length,
+    memorySummaryLength: trimmedMemories.length,
     finalPromptLength: finalPrompt.length,
+    hasMemories: !!trimmedMemories,
     hasFormattingInstructions: true,
   });
 

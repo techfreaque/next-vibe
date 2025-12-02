@@ -98,7 +98,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.v1.core.browser.response.result",
         },
-        z.any().optional(),
+        z.unknown().optional(),
       ),
       status: responseArrayOptionalField(
         {

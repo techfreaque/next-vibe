@@ -5,10 +5,10 @@
 export const translations = {
   post: {
     title: "Tekst na mowę",
-    description: "Konwertuj tekst na naturalnie brzmiącą mowę za pomocą AI (opłata za znak)",
+    description: "Konwertuj tekst na naturalnie brzmiącą mowę za pomocą AI (~0,00052 kredytów na znak)",
     form: {
       title: "Konwersja tekstu na mowę",
-      description: "Wprowadź tekst do przekształcenia na mowę (koszt obliczany na podstawie liczby znaków)",
+      description: "Wprowadź tekst do przekształcenia na mowę (Amazon Polly: ~0,00052 kredytów na znak)",
     },
     text: {
       label: "Tekst",

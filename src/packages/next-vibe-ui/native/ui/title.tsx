@@ -5,7 +5,7 @@
 import { Text as RNText } from "react-native";
 import type { TextStyle } from "react-native";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import type { TitleProps } from "../../web/ui/title";
 import { convertCSSToTextStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";

@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://socialmediaservice.center/sitemap.xml
+Sitemap: https://unbottled.ai/sitemap.xml

@@ -13,6 +13,13 @@ import {
   saveThread as saveIncognitoThread,
 } from "../incognito/storage";
 import { ViewMode, type ViewModeValue } from "../enum";
+import { SEARCH_ALIAS } from "../../brave-search/definition";
+import { MEMORY_ADD_ALIAS, MEMORY_LIST_ALIAS } from "../memories/definition";
+import {
+  MEMORY_DELETE_ALIAS,
+  MEMORY_UPDATE_ALIAS,
+} from "../memories/[id]/definition";
+import { aliasToPathMap } from "../../../system/generated/endpoint";
 
 export type { ChatMessage, ChatThread, ChatFolder };
 
@@ -88,7 +95,13 @@ const getDefaultSettings = (): ChatSettings => ({
   sidebarCollapsed: false,
   theme: "dark",
   viewMode: ViewMode.LINEAR,
-  enabledToolIds: [],
+  enabledToolIds: [
+    aliasToPathMap[SEARCH_ALIAS],
+    aliasToPathMap[MEMORY_LIST_ALIAS],
+    aliasToPathMap[MEMORY_ADD_ALIAS],
+    aliasToPathMap[MEMORY_UPDATE_ALIAS],
+    aliasToPathMap[MEMORY_DELETE_ALIAS],
+  ],
 });
 
 // Helper to load settings from localStorage (client-only, called after mount)
@@ -104,12 +117,14 @@ const loadSettings = async (): Promise<ChatSettings> => {
     if (stored) {
       const parsed = JSON.parse(stored) as Partial<ChatSettings>;
 
-      // Return merged settings
+      // User has stored settings - return them as-is without merging defaults
+      // This preserves the user's explicit tool choices
       return {
         ...defaults,
         ...parsed,
       };
     }
+    // No stored settings - return defaults (new user gets default tools)
   } catch {
     // Silently fail and return defaults
   }

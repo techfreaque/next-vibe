@@ -57,6 +57,8 @@ export const translations: typeof enTranslations = {
     copyButton: {
       copyToClipboard: "Kopiuj do schowka",
       copied: "Skopiowano!",
+      copyAsMarkdown: "Skopiuj jako Markdown",
+      copyAsText: "Skopiuj jako tekst",
     },
 
     // Assistant Message Actions

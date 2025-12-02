@@ -66,7 +66,7 @@ export function ToastViewport({
       {...applyStyleType({
         nativeStyle,
         className: cn(
-          "absolute top-0 left-0 right-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 pointer-events-none",
+          "absolute top-0 right-0 z-[100] flex max-h-screen flex-col-reverse p-4 pointer-events-none md:max-w-[420px]",
           className,
         ),
       })}

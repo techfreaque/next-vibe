@@ -24,6 +24,8 @@ import { MessageActionButton } from "./message-action-button";
 interface AssistantMessageActionsProps {
   messageId: string;
   content: string;
+  contentMarkdown?: string;
+  contentText?: string;
   locale: CountryLanguage;
   onAnswerAsModel?: (messageId: string) => void;
   onDelete?: (messageId: string) => void;
@@ -34,6 +36,8 @@ interface AssistantMessageActionsProps {
 export function AssistantMessageActions({
   messageId,
   content,
+  contentMarkdown,
+  contentText,
   locale,
   onAnswerAsModel,
   onDelete,
@@ -88,7 +92,13 @@ export function AssistantMessageActions({
         className,
       )}
     >
-      <CopyButton content={content} locale={locale} logger={logger} />
+      <CopyButton
+        content={content}
+        contentMarkdown={contentMarkdown}
+        contentText={contentText}
+        locale={locale}
+        logger={logger}
+      />
 
       {/* TTS Play/Stop/Cancel Button */}
       <MessageActionButton

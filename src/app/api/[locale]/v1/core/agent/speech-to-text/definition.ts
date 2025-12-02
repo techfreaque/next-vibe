@@ -35,8 +35,6 @@ const { POST } = createEndpoint({
     UserRole.PUBLIC,
     UserRole.AI_TOOL_OFF,
   ],
-  credits: 2, // Cost 2 credits per STT conversion
-
   title: "app.api.v1.core.agent.speechToText.post.title",
   description: "app.api.v1.core.agent.speechToText.post.description",
   category: "app.api.v1.core.agent.category",

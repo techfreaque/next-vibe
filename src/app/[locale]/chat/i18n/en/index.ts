@@ -55,6 +55,8 @@ export const translations = {
     copyButton: {
       copyToClipboard: "Copy to clipboard",
       copied: "Copied!",
+      copyAsMarkdown: "Copy as Markdown",
+      copyAsText: "Copy as Text",
     },
 
     // Assistant Message Actions

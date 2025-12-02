@@ -3,19 +3,22 @@
  * Utilities for preparing message content for text-to-speech
  */
 
-import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
+import type {
+  ChatMessage,
+  ToolCallResult,
+} from "@/app/api/[locale]/v1/core/agent/chat/db";
 import { definitionLoader } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/loader";
 import { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { parseError } from "../../shared/utils";
 
 /**
  * Strip <think> tags from content
  * Handles both closed tags <think>...</think> and unclosed tags <think>...
  */
 export function stripThinkTags(content: string): string {
-  const originalLength = content.length;
-
   // Remove closed think tags: <think>...</think>
   let processed = content.replace(/<think>[\s\S]*?<\/think>/gi, "");
 
@@ -24,16 +27,6 @@ export function stripThinkTags(content: string): string {
 
   // Trim whitespace
   const result = processed.trim();
-
-  // Log if we stripped anything
-  if (result.length !== originalLength) {
-    // eslint-disable-next-line no-console
-    console.log("[TTS Content] Stripped think tags", {
-      originalLength,
-      processedLength: result.length,
-      removed: originalLength - result.length,
-    });
-  }
 
   return result;
 }
@@ -105,12 +98,6 @@ function convertLineBreaksToPauses(text: string): string {
  * Prepare text for TTS by stripping markdown and converting line breaks to pauses
  */
 export function prepareTextForTTS(content: string): string {
-  // eslint-disable-next-line no-console
-  console.log("[TTS Content] Preparing text for TTS", {
-    originalLength: content.length,
-    preview: content.substring(0, 100),
-  });
-
   // 1. Strip markdown formatting
   let text = stripMarkdown(content);
 
@@ -119,13 +106,6 @@ export function prepareTextForTTS(content: string): string {
 
   // 3. Clean up extra whitespace
   text = text.replace(/\s+/g, " ").trim();
-
-  // eslint-disable-next-line no-console
-  console.log("[TTS Content] Text prepared for TTS", {
-    originalLength: content.length,
-    processedLength: text.length,
-    preview: text.substring(0, 100),
-  });
 
   return text;
 }
@@ -137,6 +117,7 @@ export function prepareTextForTTS(content: string): string {
 export async function extractToolCallText(
   toolName: string,
   locale: CountryLanguage,
+  logger: EndpointLogger,
 ): Promise<string> {
   const { t } = simpleT(locale);
 
@@ -161,19 +142,18 @@ export async function extractToolCallText(
     if (result.success && result.data?.title) {
       // Use the same translation logic as ToolCallRenderer
       const title = t(result.data.title);
-      // eslint-disable-next-line no-console
-      console.log("[TTS Content] Loaded tool title from definition", {
-        toolName,
-        title,
-      });
+
       return title;
     }
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.warn("[TTS Content] Failed to load tool definition", {
-      toolName,
-      error,
-    });
+    logger.warn(
+      "[TTS Content] Failed to load tool definition",
+      parseError(error),
+      {
+        toolName,
+      },
+    );
   }
 
   // Fallback: use the tool name (last part after the last dot)
@@ -187,12 +167,6 @@ export async function extractToolCallText(
     .replace(/^./, (str) => str.toUpperCase())
     .trim();
 
-  // eslint-disable-next-line no-console
-  console.log("[TTS Content] Using fallback tool title", {
-    toolName,
-    fallbackTitle,
-  });
-
   return fallbackTitle;
 }
 
@@ -203,11 +177,12 @@ export async function extractToolCallText(
 export async function processMessageForTTS(
   message: ChatMessage,
   locale: CountryLanguage,
+  logger: EndpointLogger,
 ): Promise<string> {
   // TOOL message - extract tool title
   if (message.role === "tool" && message.metadata?.toolCall) {
     const toolName = message.metadata.toolCall.toolName;
-    return await extractToolCallText(toolName, locale);
+    return await extractToolCallText(toolName, locale, logger);
   }
 
   // Regular message - strip think tags, then prepare for TTS
@@ -226,16 +201,11 @@ export async function processMessageForTTS(
 export async function processMessageGroupForTTS(
   messages: ChatMessage[],
   locale: CountryLanguage,
+  logger: EndpointLogger,
 ): Promise<string> {
-  // eslint-disable-next-line no-console
-  console.log("[TTS Content] Processing message group", {
-    messageCount: messages.length,
-    roles: messages.map((m) => m.role),
-  });
-
   // Process all messages in parallel
   const processedMessages = await Promise.all(
-    messages.map((msg) => processMessageForTTS(msg, locale)),
+    messages.map((msg) => processMessageForTTS(msg, locale, logger)),
   );
 
   // Filter out empty messages
@@ -243,13 +213,106 @@ export async function processMessageGroupForTTS(
     (text) => text.trim().length > 0,
   );
 
-  // eslint-disable-next-line no-console
-  console.log("[TTS Content] Processed message group", {
-    originalCount: messages.length,
-    processedCount: nonEmptyMessages.length,
-    totalLength: nonEmptyMessages.join("\n\n").length,
-  });
-
   // Join with double newline for clear separation
   return nonEmptyMessages.join("\n\n");
+}
+
+/**
+ * Format tool call for copying
+ * Returns a formatted string representation of a tool call
+ */
+async function formatToolCallForCopy(
+  toolName: string,
+  args: ToolCallResult,
+  result: ToolCallResult | undefined,
+  locale: CountryLanguage,
+  asMarkdown: boolean,
+  logger: EndpointLogger,
+): Promise<string> {
+  const toolTitle = await extractToolCallText(toolName, locale, logger);
+  const parts: string[] = [];
+
+  if (asMarkdown) {
+    // Markdown format with code blocks
+    parts.push(`## ${toolTitle}`);
+    parts.push("");
+
+    if (args && typeof args === "object" && Object.keys(args).length > 0) {
+      parts.push("**Arguments:**");
+      parts.push("```json");
+      parts.push(JSON.stringify(args, null, 2));
+      parts.push("```");
+      parts.push("");
+    }
+
+    if (result) {
+      parts.push("**Result:**");
+      parts.push("```json");
+      parts.push(JSON.stringify(result, null, 2));
+      parts.push("```");
+    }
+  } else {
+    // Plain text format
+    parts.push(`${toolTitle}`);
+
+    if (args && typeof args === "object" && Object.keys(args).length > 0) {
+      parts.push("");
+      parts.push("Arguments:");
+      parts.push(JSON.stringify(args, null, 2));
+    }
+
+    if (result) {
+      parts.push("");
+      parts.push("Result:");
+      parts.push(JSON.stringify(result, null, 2));
+    }
+  }
+
+  return parts.join("\n");
+}
+
+/**
+ * Process a message group for copying
+ * Extracts content including tool calls with both markdown and plain text options
+ * ALWAYS strips think tags (both closed and unclosed) for both formats
+ */
+export async function processMessageGroupForCopy(
+  messages: ChatMessage[],
+  locale: CountryLanguage,
+  asMarkdown: boolean,
+  logger: EndpointLogger,
+): Promise<string> {
+  const parts: string[] = [];
+
+  for (const message of messages) {
+    if (message.role === "tool" && message.metadata?.toolCall) {
+      // Format tool call with args and results
+      const toolCall = message.metadata.toolCall;
+      const formatted = await formatToolCallForCopy(
+        toolCall.toolName,
+        toolCall.args,
+        toolCall.result,
+        locale,
+        asMarkdown,
+        logger,
+      );
+      parts.push(formatted);
+    } else if (message.content) {
+      // ALWAYS strip think tags first (both closed <think>...</think> and unclosed <think>...)
+      const withoutThinkTags = stripThinkTags(message.content);
+
+      if (asMarkdown) {
+        // Keep markdown formatting, but think tags are already stripped
+        parts.push(withoutThinkTags);
+      } else {
+        // Plain text: also strip markdown
+        const plainText = stripMarkdown(withoutThinkTags);
+        parts.push(plainText);
+      }
+    }
+  }
+
+  // Join with appropriate separators
+  const separator = asMarkdown ? "\n\n---\n\n" : "\n\n";
+  return parts.join(separator);
 }

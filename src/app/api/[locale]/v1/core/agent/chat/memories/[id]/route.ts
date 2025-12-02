@@ -1,0 +1,37 @@
+/**
+ * Single Memory API Route Handler
+ * Thin handlers that delegate to repository
+ */
+
+import { endpointsHandler } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/multi";
+import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+
+import definitions from "./definition";
+import * as repository from "../repository";
+
+export const { PATCH, DELETE, tools } = endpointsHandler({
+  endpoint: definitions,
+  [Methods.PATCH]: {
+    email: undefined,
+    handler: async ({ user, data, urlPathParams, logger }) => {
+      return repository.updateMemory({
+        userId: user.id,
+        memoryId: urlPathParams.id,
+        content: data.content,
+        tags: data.tags,
+        priority: data.priority,
+        logger,
+      });
+    },
+  },
+  [Methods.DELETE]: {
+    email: undefined,
+    handler: async ({ user, urlPathParams, logger }) => {
+      return repository.deleteMemory({
+        userId: user.id,
+        memoryId: urlPathParams.id,
+        logger,
+      });
+    },
+  },
+});

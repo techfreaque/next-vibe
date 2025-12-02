@@ -22,22 +22,86 @@ import { modelOptions } from "@/app/api/[locale]/v1/core/agent/chat/model-access
 export const TOTAL_MODEL_COUNT = Object.keys(modelOptions).length;
 
 /**
+ * ============================================================================
+ * PRICING CONFIGURATION
+ * Single source of truth for all feature pricing
+ * ============================================================================
+ */
+
+/**
  * Credit Value Definition
  * 1 credit = €0.01 = $0.01 = 0.24 PLN
  */
 const CREDIT_VALUE_USD = 0.01;
 
 /**
- * TTS Pricing (Amazon Polly)
- * Base: $4/1M chars + 30% markup = $5.20/1M chars
- * Credits: $5.20 / $0.01 per credit = 520 credits per 1M chars
+ * Standard markup percentage applied to all external API costs
  */
-const AMAZON_TTS_BASE_COST_PER_MILLION_USD = 4;
-const TTS_MARKUP_PERCENTAGE = 0.3;
-const TTS_COST_PER_MILLION_USD =
-  AMAZON_TTS_BASE_COST_PER_MILLION_USD * (1 + TTS_MARKUP_PERCENTAGE);
-const TTS_CREDITS_PER_MILLION = TTS_COST_PER_MILLION_USD / CREDIT_VALUE_USD;
-export const TTS_COST_PER_CHARACTER = TTS_CREDITS_PER_MILLION / 1_000_000;
+const STANDARD_MARKUP_PERCENTAGE = 0.3; // 30% markup
+
+/**
+ * TTS Pricing (Amazon Polly)
+ * Base: $4.00/1M characters
+ * With 30% markup: $5.20/1M characters
+ * Per character: $0.0000052 = 0.00052 credits
+ */
+const TTS_BASE_COST_PER_MILLION_USD = 4.0;
+const TTS_COST_WITH_MARKUP_USD =
+  TTS_BASE_COST_PER_MILLION_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
+export const TTS_COST_PER_CHARACTER =
+  TTS_COST_WITH_MARKUP_USD / 1_000_000 / CREDIT_VALUE_USD;
+
+/**
+ * STT Pricing (OpenAI Whisper)
+ * Base: $0.006/60 seconds (per minute)
+ * With 30% markup: $0.0078/60 seconds
+ * Per second: $0.00013 = 0.013 credits
+ */
+const STT_BASE_COST_PER_MINUTE_USD = 0.006;
+const STT_COST_WITH_MARKUP_USD =
+  STT_BASE_COST_PER_MINUTE_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
+const STT_COST_PER_SECOND_USD = STT_COST_WITH_MARKUP_USD / 60;
+export const STT_COST_PER_SECOND = STT_COST_PER_SECOND_USD / CREDIT_VALUE_USD;
+
+/**
+ * Brave Search Pricing
+ * Base: $5.00/1,000 requests
+ * With 30% markup: $6.50/1,000 requests
+ * Per request: $0.0065 = 0.65 credits
+ */
+const BRAVE_SEARCH_BASE_COST_PER_1000_USD = 5.0;
+const BRAVE_SEARCH_COST_WITH_MARKUP_USD =
+  BRAVE_SEARCH_BASE_COST_PER_1000_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
+const BRAVE_SEARCH_COST_PER_REQUEST_USD =
+  BRAVE_SEARCH_COST_WITH_MARKUP_USD / 1000;
+export const BRAVE_SEARCH_COST_PER_REQUEST =
+  BRAVE_SEARCH_COST_PER_REQUEST_USD / CREDIT_VALUE_USD;
+
+/**
+ * Feature Costs Object
+ * Consolidated pricing for all non-model features
+ */
+export const FEATURE_COSTS = {
+  /**
+   * Brave Search: 0.65 credits per search
+   * Based on $5/1000 requests + 30% markup
+   */
+  BRAVE_SEARCH: BRAVE_SEARCH_COST_PER_REQUEST,
+
+  /**
+   * STT: 0.013 credits per second
+   * Based on OpenAI Whisper $0.006/minute + 30% markup
+   * NOTE: Multiply by recording duration in seconds
+   */
+  STT: STT_COST_PER_SECOND,
+
+  /**
+   * TTS: 0.00052 credits per character
+   * Based on Amazon Polly $4/1M chars + 30% markup
+   * NOTE: Multiply by text length in characters
+   */
+  TTS: TTS_COST_PER_CHARACTER,
+} as const;
 
 export type PaymentInterval = "month" | "year" | "one_time";
 

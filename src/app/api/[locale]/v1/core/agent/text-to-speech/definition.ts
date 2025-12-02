@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   requestDataField,
@@ -35,7 +35,6 @@ const { POST } = createEndpoint({
     UserRole.PUBLIC,
     UserRole.AI_TOOL_OFF,
   ],
-  credits: 0, // Cost is calculated based on character count (not fixed)
 
   title: "app.api.v1.core.agent.textToSpeech.post.title",
   description: "app.api.v1.core.agent.textToSpeech.post.description",
@@ -51,7 +50,8 @@ const { POST } = createEndpoint({
       type: WidgetType.CONTAINER,
       title: "app.api.v1.core.agent.textToSpeech.post.form.title",
       description: "app.api.v1.core.agent.textToSpeech.post.form.description",
-      layoutType: LayoutType.GRID, columns: 12,
+      layoutType: LayoutType.GRID,
+      columns: 12,
     },
     { request: "data", response: true },
     {
@@ -89,7 +89,8 @@ const { POST } = createEndpoint({
           title: "app.api.v1.core.agent.textToSpeech.post.response.title",
           description:
             "app.api.v1.core.agent.textToSpeech.post.response.description",
-          layoutType: LayoutType.GRID, columns: 12,
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
         { response: true },
         {

@@ -73,6 +73,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
         Object.values(Methods).includes(key as Methods),
       );
 
+      // Process methods if they exist
       if (methods.length) {
         for (const method of methods) {
           const methodKey = method as Methods;
@@ -95,17 +96,19 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
 
           discovered.push(definition);
         }
-      } else {
-        for (const [key, value] of Object.entries(obj)) {
-          if (
-            key.startsWith("_") ||
-            typeof value !== "object" ||
-            value === null
-          ) {
-            continue;
-          }
-          traverse(value as EndpointNode, [...pathSegments, key]);
+      }
+
+      // Always traverse child nodes (nodes can have both methods and children)
+      for (const [key, value] of Object.entries(obj)) {
+        if (
+          key.startsWith("_") ||
+          Object.values(Methods).includes(key as Methods) ||
+          typeof value !== "object" ||
+          value === null
+        ) {
+          continue;
         }
+        traverse(value as EndpointNode, [...pathSegments, key]);
       }
     };
 

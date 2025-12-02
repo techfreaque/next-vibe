@@ -4,7 +4,7 @@ import * as React from "react";
 import { View } from "react-native";
 import { styled } from "nativewind";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";
@@ -75,7 +75,9 @@ export function ToggleGroup({
   return (
     <ToggleGroupContext.Provider value={{ variant, size }}>
       {toggleType === "single" ? (
-        <StyledView {...applyStyleType({ nativeStyle, className: mergedClassName })}>
+        <StyledView
+          {...applyStyleType({ nativeStyle, className: mergedClassName })}
+        >
           <StyledToggleGroupRoot
             {...({
               type: "single",
@@ -94,13 +96,19 @@ export function ToggleGroup({
           </StyledToggleGroupRoot>
         </StyledView>
       ) : (
-        <StyledView {...applyStyleType({ nativeStyle, className: mergedClassName })}>
+        <StyledView
+          {...applyStyleType({ nativeStyle, className: mergedClassName })}
+        >
           <StyledToggleGroupRoot
             {...({
               type: "multiple",
-              value: (Array.isArray(toggleValue) ? toggleValue : []) as string[],
+              value: (Array.isArray(toggleValue)
+                ? toggleValue
+                : []) as string[],
               onValueChange: multipleHandler,
-              defaultValue: (Array.isArray(defaultValue) ? defaultValue : []) as string[],
+              defaultValue: (Array.isArray(defaultValue)
+                ? defaultValue
+                : []) as string[],
               disabled,
               rovingFocus,
               loop,

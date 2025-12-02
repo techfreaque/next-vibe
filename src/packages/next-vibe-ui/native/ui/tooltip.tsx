@@ -3,7 +3,7 @@ import * as React from "react";
 import { StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
 import { TextClassContext } from "./text";

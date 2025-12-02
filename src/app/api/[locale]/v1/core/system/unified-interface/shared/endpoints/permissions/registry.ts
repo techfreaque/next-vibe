@@ -413,6 +413,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
     // Check if user has any of the required roles
     // User roles come from JWT payload which was populated from DB during login/signup
     const userRoles = user.roles || [];
+
     const hasRequiredRole = effectiveAllowedRoles.some((requiredRole) =>
       userRoles.includes(requiredRole),
     );

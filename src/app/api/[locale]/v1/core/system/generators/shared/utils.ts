@@ -184,10 +184,20 @@ export function generateFileHeader(
     }
   }
 
-  lines.push(` * Generated at: ${new Date().toISOString()}`);
   lines.push(" */");
 
   return lines.join("\n");
+}
+
+/**
+ * Sanitize a path segment to remove invalid characters for tool names
+ * Removes square brackets from dynamic routes like [id]
+ * This must match the sanitization in endpointToToolName to ensure consistency
+ */
+function sanitizePathSegment(segment: string): string {
+  // Remove square brackets to handle dynamic routes like [id]
+  // Example: "[id]" becomes "id", "[threadId]" becomes "threadId"
+  return segment.replace(/\[|\]/g, "");
 }
 
 /**
@@ -195,13 +205,16 @@ export function generateFileHeader(
  * Returns path only - no duplicate parameter format aliases
  * Real aliases come from definition files, not parameter format variations
  * Uses PATH_SEPARATOR constant for consistency
+ * Sanitizes path segments to match endpointToToolName behavior
  */
 export function extractPathKey(
   filePath: string,
   startMarker = "v1",
 ): { path: string } {
   const nestedPath = extractNestedPath(filePath, startMarker);
-  const path = nestedPath.join(PATH_SEPARATOR);
+  // Sanitize each segment to remove brackets from dynamic routes
+  const sanitizedPath = nestedPath.map(sanitizePathSegment);
+  const path = sanitizedPath.join(PATH_SEPARATOR);
   return { path };
 }
 

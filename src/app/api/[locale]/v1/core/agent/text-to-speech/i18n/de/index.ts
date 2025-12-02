@@ -5,10 +5,10 @@
 export const translations = {
   post: {
     title: "Text zu Sprache",
-    description: "Konvertieren Sie Text in natürlich klingende Sprache mit KI (pro Zeichen berechnet)",
+    description: "Konvertieren Sie Text in natürlich klingende Sprache mit KI (~0,00052 Credits pro Zeichen)",
     form: {
       title: "Text-zu-Sprache-Konvertierung",
-      description: "Geben Sie Text ein, um ihn in Sprache umzuwandeln (Kosten basieren auf Zeichenanzahl)",
+      description: "Geben Sie Text ein, um ihn in Sprache umzuwandeln (Amazon Polly: ~0,00052 Credits pro Zeichen)",
     },
     text: {
       label: "Text",
@@ -76,12 +76,13 @@ export const translations = {
         description: "Ein Konflikt ist aufgetreten",
       },
       apiKeyMissing: "Eden AI API-Schlüssel ist nicht konfiguriert",
-      conversionFailed: "Sprachsynthese fehlgeschlagen: {error}",
+      conversionFailed: "Sprachsynthese fehlgeschlagen: {{error}}",
       noText: "Kein Text angegeben",
       noAudioUrl: "Keine Audio-URL vom Anbieter erhalten",
       audioFetchFailed: "Fehler beim Abrufen der Audiodatei",
-      providerError: "Anbieterfehler: {error}",
+      providerError: "Anbieterfehler: {{error}}",
       internalError: "Interner Serverfehler",
+      creditsFailed: "Fehler beim Abziehen der Credits: {{error}}",
     },
     success: {
       title: "Erfolg",

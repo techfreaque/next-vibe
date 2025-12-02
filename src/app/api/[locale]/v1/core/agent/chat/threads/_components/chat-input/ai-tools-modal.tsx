@@ -384,9 +384,10 @@ export function AIToolsModal({
                                 />
 
                                 <Div className="flex-1 min-w-0">
+                                  {/* Title from definition */}
                                   <Div className="flex items-center gap-2">
-                                    <P className="text-sm font-medium truncate">
-                                      {tool.name}
+                                    <P className="text-sm font-medium line-clamp-2">
+                                      {tool.description}
                                     </P>
                                     <Badge
                                       variant="outline"
@@ -395,8 +396,10 @@ export function AIToolsModal({
                                       {tool.method}
                                     </Badge>
                                   </Div>
-                                  <P className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                                    {tool.description}
+
+                                  {/* Technical name (toolName) */}
+                                  <P className="text-[11px] text-muted-foreground/80 mt-1 font-mono">
+                                    {tool.toolName}
                                   </P>
 
                                   {/* Aliases */}

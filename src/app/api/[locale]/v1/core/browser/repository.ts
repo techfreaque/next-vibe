@@ -18,8 +18,40 @@ import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types"
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { BrowserRequestOutput, BrowserResponseOutput } from "./definition";
-import { BrowserToolStatus } from "./enum";
+import { BrowserTool, BrowserToolStatus } from "./enum";
 import { getChromeMCPConfig } from "./config";
+
+/**
+ * Map translation keys to MCP tool names
+ */
+const TOOL_NAME_MAP: Record<string, string> = {
+  [BrowserTool.CLICK]: "click",
+  [BrowserTool.DRAG]: "drag",
+  [BrowserTool.FILL]: "fill",
+  [BrowserTool.FILL_FORM]: "fill-form",
+  [BrowserTool.HANDLE_DIALOG]: "handle-dialog",
+  [BrowserTool.HOVER]: "hover",
+  [BrowserTool.PRESS_KEY]: "press-key",
+  [BrowserTool.UPLOAD_FILE]: "upload-file",
+  [BrowserTool.CLOSE_PAGE]: "close-page",
+  [BrowserTool.LIST_PAGES]: "list-pages",
+  [BrowserTool.NAVIGATE_PAGE]: "navigate-page",
+  [BrowserTool.NEW_PAGE]: "new-page",
+  [BrowserTool.SELECT_PAGE]: "select-page",
+  [BrowserTool.WAIT_FOR]: "wait-for",
+  [BrowserTool.EMULATE]: "emulate",
+  [BrowserTool.RESIZE_PAGE]: "resize-page",
+  [BrowserTool.PERFORMANCE_ANALYZE_INSIGHT]: "performance-analyze-insight",
+  [BrowserTool.PERFORMANCE_START_TRACE]: "performance-start-trace",
+  [BrowserTool.PERFORMANCE_STOP_TRACE]: "performance-stop-trace",
+  [BrowserTool.GET_NETWORK_REQUEST]: "get-network-request",
+  [BrowserTool.LIST_NETWORK_REQUESTS]: "list-network-requests",
+  [BrowserTool.EVALUATE_SCRIPT]: "evaluate-script",
+  [BrowserTool.GET_CONSOLE_MESSAGE]: "get-console-message",
+  [BrowserTool.LIST_CONSOLE_MESSAGES]: "list-console-messages",
+  [BrowserTool.TAKE_SCREENSHOT]: "take-screenshot",
+  [BrowserTool.TAKE_SNAPSHOT]: "take-snapshot",
+};
 
 /**
  * Browser repository interface
@@ -28,14 +60,14 @@ export interface BrowserRepository {
   /**
    * Execute a Chrome DevTools MCP tool
    * @param data - Request data (tool and arguments)
-   * @param user - User from authentication
+   * @param user - User from authentication (may be null for public endpoints)
    * @param logger - Logger instance for debugging and monitoring
    * @param locale - Locale for error messages
    * @returns Tool execution result
    */
   executeTool(
     data: BrowserRequestOutput,
-    user: JwtPayloadType,
+    user: JwtPayloadType | null,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<BrowserResponseOutput>>;
@@ -87,7 +119,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
    */
   async executeTool(
     data: BrowserRequestOutput,
-    _user: JwtPayloadType,
+    _user: JwtPayloadType | null,
     logger: EndpointLogger,
     _locale: CountryLanguage,
   ): Promise<ResponseType<BrowserResponseOutput>> {
@@ -106,6 +138,14 @@ export class BrowserRepositoryImpl implements BrowserRepository {
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
+
+      // Map translation key to MCP tool name
+      const mcpToolName = TOOL_NAME_MAP[data.tool] || data.tool;
+
+      logger.debug("[Browser Repository] Tool name mapping", {
+        translationKey: data.tool,
+        mcpToolName,
+      });
 
       // Parse arguments
       let parsedArgs: Record<string, JsonValue> = {};
@@ -128,8 +168,8 @@ export class BrowserRepositoryImpl implements BrowserRepository {
         }
       }
 
-      // Execute the tool
-      const result = await this.callTool(data.tool, parsedArgs, logger);
+      // Execute the tool with mapped name
+      const result = await this.callTool(mcpToolName, parsedArgs, logger);
 
       const executionId = `exec_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 

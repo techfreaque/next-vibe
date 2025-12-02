@@ -25,7 +25,7 @@ import {
   TooltipTrigger,
 } from "./tooltip";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
 
@@ -887,10 +887,7 @@ const SidebarMenuSkeleton = React.forwardRef<
       ref={ref}
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "rounded-md h-8 flex gap-2 px-2 items-center",
-          className,
-        ),
+        className: cn("rounded-md h-8 flex gap-2 px-2 items-center", className),
       })}
       {...props}
     >

@@ -16,15 +16,29 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { ApiSection } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
-import { PATH_SEPARATOR } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/utils/path";
+import type {
+  ApiSection,
+  CreateApiEndpointAny,
+} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/endpoint";
+import { endpointToToolName } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/utils/path";
 import {
-  extractPathKey,
   findFilesRecursively,
   generateAbsoluteImportPath,
   generateFileHeader,
   writeGeneratedFile,
 } from "../shared/utils";
+
+// HTTP method keys for explicit property access
+type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
+const HTTP_METHODS: readonly HttpMethod[] = [
+  "GET",
+  "POST",
+  "PUT",
+  "PATCH",
+  "DELETE",
+  "HEAD",
+  "OPTIONS",
+] as const;
 
 // Type definitions
 interface EndpointRequestType {
@@ -112,68 +126,6 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
     }
   }
 
-  /**
-   * Extract aliases from definition file (async)
-   */
-  private async extractAliasesFromDefinition(
-    defFile: string,
-  ): Promise<Array<{ alias: string; method: string }>> {
-    try {
-      const definition = (await import(defFile)) as {
-        default?: Record<string, { aliases?: string[] }>;
-      };
-      const defaultExport = definition.default;
-
-      if (!defaultExport) {
-        return [];
-      }
-
-      const aliasesWithMethods: Array<{ alias: string; method: string }> = [];
-
-      // Get aliases from each method
-      for (const method of Object.keys(defaultExport)) {
-        const methodDef = defaultExport[method];
-        if (methodDef?.aliases && Array.isArray(methodDef.aliases)) {
-          for (const alias of methodDef.aliases) {
-            aliasesWithMethods.push({ alias, method });
-          }
-        }
-      }
-
-      return aliasesWithMethods;
-    } catch {
-      // Definition file doesn't exist or can't be loaded
-    }
-    return [];
-  }
-
-  /**
-   * Extract methods from definition file (async)
-   */
-  private async extractMethodsFromDefinition(
-    defFile: string,
-  ): Promise<string[]> {
-    try {
-      const definition = (await import(defFile)) as {
-        default?: ApiSection;
-      };
-      const defaultExport = definition.default;
-
-      if (!defaultExport) {
-        return [];
-      }
-
-      // Get all HTTP methods from the definition
-      const methods = Object.keys(defaultExport).filter((key) =>
-        ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(
-          key,
-        ),
-      );
-      return methods;
-    } catch {
-      return [];
-    }
-  }
 
   /**
    * Generate endpoint content with dynamic imports and real aliases from definitions
@@ -186,29 +138,48 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
 
     // Build path map with real aliases (deduplicate)
     for (const defFile of definitionFiles) {
-      const { path } = extractPathKey(defFile);
       const importPath = generateAbsoluteImportPath(defFile, "definition");
 
-      // Get methods for this endpoint
-      const methods = await this.extractMethodsFromDefinition(defFile);
+      // Load the actual definition - let TypeScript infer the concrete type
+      const definition = await import(defFile);
+      const defaultExport = definition.default;
 
-      // Add main path with method suffix for each method (e.g., "v1_core_agent_ai-stream_POST")
-      for (const method of methods) {
-        const pathWithMethod = `${path}${PATH_SEPARATOR}${method}`;
-        if (!pathMap[pathWithMethod]) {
-          pathMap[pathWithMethod] = { importPath, method };
-          allPaths.push(pathWithMethod);
-        }
+      if (!defaultExport) {
+        continue;
       }
 
-      // Extract and add real aliases from definition file (with their method)
-      const definitionAliases =
-        await this.extractAliasesFromDefinition(defFile);
-      for (const { alias, method } of definitionAliases) {
-        // Only add if not already present (first wins)
-        if (!pathMap[alias]) {
-          pathMap[alias] = { importPath, method };
-          allPaths.push(alias);
+      // Explicitly access each HTTP method property
+      const methodEntries = [
+        { method: "GET" as const, endpoint: defaultExport.GET },
+        { method: "POST" as const, endpoint: defaultExport.POST },
+        { method: "PUT" as const, endpoint: defaultExport.PUT },
+        { method: "PATCH" as const, endpoint: defaultExport.PATCH },
+        { method: "DELETE" as const, endpoint: defaultExport.DELETE },
+        { method: "HEAD" as const, endpoint: defaultExport.HEAD },
+        { method: "OPTIONS" as const, endpoint: defaultExport.OPTIONS },
+      ];
+
+      for (const { method, endpoint } of methodEntries) {
+        if (!endpoint) {
+          continue;
+        }
+
+        // Use endpointToToolName to get properly sanitized tool name
+        const toolName = endpointToToolName(endpoint);
+
+        if (!pathMap[toolName]) {
+          pathMap[toolName] = { importPath, method };
+          allPaths.push(toolName);
+        }
+
+        // Add aliases if they exist
+        if (endpoint.aliases && Array.isArray(endpoint.aliases)) {
+          for (const alias of endpoint.aliases) {
+            if (!pathMap[alias]) {
+              pathMap[alias] = { importPath, method };
+              allPaths.push(alias);
+            }
+          }
         }
       }
     }
@@ -221,22 +192,43 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
     const aliasToPathMap: Record<string, string> = {};
 
     for (const defFile of definitionFiles) {
-      const { path } = extractPathKey(defFile);
-      const methods = await this.extractMethodsFromDefinition(defFile);
+      // Load the actual definition - let TypeScript infer the concrete type
+      const definition = await import(defFile);
+      const defaultExport = definition.default;
 
-      for (const method of methods) {
-        const fullPath = `${path}${PATH_SEPARATOR}${method}`;
-        // Full path maps to itself
-        aliasToPathMap[fullPath] = fullPath;
+      if (!defaultExport) {
+        continue;
       }
 
-      // Map aliases to their full paths
-      const definitionAliases =
-        await this.extractAliasesFromDefinition(defFile);
-      for (const { alias, method } of definitionAliases) {
-        const fullPath = `${path}${PATH_SEPARATOR}${method}`;
-        if (!aliasToPathMap[alias]) {
-          aliasToPathMap[alias] = fullPath;
+      // Explicitly access each HTTP method property
+      const methodEntries = [
+        { method: "GET" as const, endpoint: defaultExport.GET },
+        { method: "POST" as const, endpoint: defaultExport.POST },
+        { method: "PUT" as const, endpoint: defaultExport.PUT },
+        { method: "PATCH" as const, endpoint: defaultExport.PATCH },
+        { method: "DELETE" as const, endpoint: defaultExport.DELETE },
+        { method: "HEAD" as const, endpoint: defaultExport.HEAD },
+        { method: "OPTIONS" as const, endpoint: defaultExport.OPTIONS },
+      ];
+
+      for (const { method, endpoint } of methodEntries) {
+        if (!endpoint) {
+          continue;
+        }
+
+        // Use endpointToToolName to get properly sanitized canonical tool name
+        const canonicalName = endpointToToolName(endpoint);
+
+        // Canonical name maps to itself
+        aliasToPathMap[canonicalName] = canonicalName;
+
+        // Map aliases to their canonical names
+        if (endpoint.aliases && Array.isArray(endpoint.aliases)) {
+          for (const alias of endpoint.aliases) {
+            if (!aliasToPathMap[alias]) {
+              aliasToPathMap[alias] = canonicalName;
+            }
+          }
         }
       }
     }

@@ -7,7 +7,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { join } from "node:path";
-
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { SessionData } from "../../shared/server-only/auth/base-auth-handler";
 
@@ -16,6 +15,20 @@ import type { SessionData } from "../../shared/server-only/auth/base-auth-handle
  * Stored in project root directory
  */
 const SESSION_FILE_NAME = ".vibe.session";
+
+/**
+ * Get project root directory
+ * This is more reliable than process.cwd() which depends on where the process was started
+ */
+function getProjectRoot(): string {
+  // Try environment variable first (can be set by CLI or MCP config)
+  if (process.env.VIBE_PROJECT_ROOT) {
+    return process.env.VIBE_PROJECT_ROOT;
+  }
+
+  // Fall back to process.cwd() - this will work when MCP server runs from project root
+  return process.cwd();
+}
 
 /**
  * Error message patterns for file not found errors
@@ -27,10 +40,13 @@ const FILE_NOT_FOUND_ERROR_PATTERNS = {
 
 /**
  * Get session file path
- * Always uses project root (current working directory)
+ * Uses project root from environment variable or falls back to cwd
  */
 function getSessionFilePath(): string {
-  return join(process.cwd(), SESSION_FILE_NAME);
+  const projectRoot = getProjectRoot();
+  const sessionPath = join(projectRoot, SESSION_FILE_NAME);
+
+  return sessionPath;
 }
 
 /**
@@ -41,7 +57,29 @@ export async function readSessionFile(
 ): Promise<ResponseType<SessionData>> {
   try {
     const sessionPath = getSessionFilePath();
-    logger.debug("Reading session file", { path: sessionPath });
+    const projectRoot = getProjectRoot();
+    const cwd = process.cwd();
+
+    // Enhanced debugging: Log current working directory and full path
+    logger.debug("Reading session file", {
+      path: sessionPath,
+      projectRoot,
+      cwd,
+      sessionFileName: SESSION_FILE_NAME,
+      vibeProjectRoot: process.env.VIBE_PROJECT_ROOT,
+    });
+
+    // Check if file exists before attempting to read
+    try {
+      await fs.access(sessionPath);
+      logger.debug("Session file exists at path", { path: sessionPath });
+    } catch (accessError) {
+      const errorMsg = parseError(accessError).message;
+      logger.debug("Session file does not exist at path", {
+        path: sessionPath,
+        accessError: errorMsg,
+      });
+    }
 
     const fileContent = await fs.readFile(sessionPath, "utf-8");
     const sessionData = JSON.parse(fileContent) as SessionData;
@@ -87,7 +125,18 @@ export async function readSessionFile(
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.ENOENT) ||
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.NO_SUCH_FILE);
     if (isFileNotFoundError) {
-      logger.debug("Session file not found - user not authenticated");
+      // Enhanced debugging: Log path details when file not found
+      const debugData = {
+        searchedPath: getSessionFilePath(),
+        projectRoot: getProjectRoot(),
+        cwd: process.cwd(),
+        vibeProjectRoot: process.env.VIBE_PROJECT_ROOT,
+        errorMessage: parsedError.message,
+      };
+      logger.debug(
+        "Session file not found - user not authenticated",
+        debugData,
+      );
       return fail({
         message:
           "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.notFound",
@@ -95,7 +144,13 @@ export async function readSessionFile(
       });
     }
 
-    logger.error("Error reading session file", parsedError);
+    logger.error("Error reading session file", {
+      ...parsedError,
+      path: getSessionFilePath(),
+      projectRoot: getProjectRoot(),
+      cwd: process.cwd(),
+      vibeProjectRoot: process.env.VIBE_PROJECT_ROOT,
+    });
     return fail({
       message:
         "app.api.v1.core.system.unifiedInterface.cli.vibe.errors.readFailed",

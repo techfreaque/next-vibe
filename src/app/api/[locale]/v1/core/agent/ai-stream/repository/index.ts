@@ -14,6 +14,7 @@ import {
   ErrorResponseTypes,
   type ResponseType,
   type StreamingResponse,
+  type MessageResponseType,
 } from "next-vibe/shared/types/response.schema";
 
 import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
@@ -371,8 +372,18 @@ class AiStreamRepository implements IAiStreamRepository {
                 }
 
                 // After a step finishes, update currentParentId/currentDepth to point to the last message
+                // The next ASSISTANT message should be a CHILD of the last tool message, so increment depth
+                logger.info(
+                  "[AI Stream] Step finished - updating parent chain",
+                  {
+                    oldParentId: currentParentId,
+                    newParentId: lastParentId,
+                    oldDepth: currentDepth,
+                    newDepth: lastDepth + 1,
+                  },
+                );
                 currentParentId = lastParentId;
-                currentDepth = lastDepth;
+                currentDepth = lastDepth + 1;
 
                 // Reset currentAssistantMessageId so the next step creates a new ASSISTANT message
                 currentAssistantMessageId = null;
@@ -572,10 +583,12 @@ class AiStreamRepository implements IAiStreamRepository {
                     logger,
                   });
                   if (result) {
+                    // Update currentParentId/currentDepth for the next tool call
+                    // But DON'T update lastParentId/lastDepth here because tool results
+                    // can arrive in any order (async). lastParentId/lastDepth should only
+                    // be updated when tool CALLS arrive (which is the correct order).
                     currentParentId = result.currentParentId;
                     currentDepth = result.currentDepth;
-                    lastParentId = result.currentParentId;
-                    lastDepth = result.currentDepth;
                     pendingToolMessages.delete(part.toolCallId);
                   }
                 }
@@ -637,30 +650,25 @@ class AiStreamRepository implements IAiStreamRepository {
 
             controller.close();
           } catch (error) {
-            // Check if this is an abort error (user stopped generation or tool confirmation required)
+            // Check if this is a graceful abort (user stopped generation or tool confirmation required)
+            // DO NOT catch AI_NoOutputGeneratedError here - it could be a provider validation error
             if (
               error instanceof Error &&
               (error.name === "AbortError" ||
-                error.name === "AI_NoOutputGeneratedError" ||
                 error.message === "Client disconnected" ||
-                error.message === "Tool requires user confirmation" ||
-                error.message.includes("No output generated"))
+                error.message === "Tool requires user confirmation")
             ) {
               logger.info("[AI Stream] Stream aborted", {
                 message: error.message,
                 errorName: error.name,
                 reason:
-                  error.message === "Tool requires user confirmation" ||
-                  error.message.includes("No output generated")
+                  error.message === "Tool requires user confirmation"
                     ? "waiting_for_tool_confirmation"
                     : "client_disconnected",
               });
               // Controller is already closed in processToolCall for tool confirmation
               // Only close if not already closed
-              if (
-                error.message !== "Tool requires user confirmation" &&
-                !error.message.includes("No output generated")
-              ) {
+              if (error.message !== "Tool requires user confirmation") {
                 // Emit a stopped event to inform the frontend
                 const stoppedEvent = createStreamEvent.contentDone({
                   messageId: lastSequenceId ?? "",
@@ -676,6 +684,8 @@ class AiStreamRepository implements IAiStreamRepository {
               return;
             }
 
+            // All other errors (including AI_NoOutputGeneratedError from provider validation)
+            // should be sent to the frontend as error messages
             await AiStreamRepository.handleStreamError({
               error: error instanceof Error ? error : (error as JSONValue),
               threadId: threadResultThreadId,
@@ -1035,12 +1045,21 @@ class AiStreamRepository implements IAiStreamRepository {
 
     const messageId = crypto.randomUUID();
 
-    // Emit MESSAGE_CREATED event
+    logger.info("[AI Stream] Creating ASSISTANT message", {
+      messageId,
+      parentId,
+      depth,
+      sequenceId,
+      threadId,
+    });
+
+    // Emit MESSAGE_CREATED event with empty content
+    // Content will be streamed via CONTENT_DELTA events
     const messageEvent = createStreamEvent.messageCreated({
       messageId,
       threadId,
       role: ChatMessageRole.ASSISTANT,
-      content: initialContent,
+      content: "",
       parentId,
       depth,
       model,
@@ -1054,6 +1073,17 @@ class AiStreamRepository implements IAiStreamRepository {
       isIncognito,
       contentLength: initialContent.length,
     });
+
+    // Emit CONTENT_DELTA event for initial content to enable streaming
+    if (initialContent) {
+      AiStreamRepository.emitContentDelta({
+        messageId,
+        delta: initialContent,
+        controller,
+        encoder,
+        logger,
+      });
+    }
 
     // Save ASSISTANT message to database if not incognito
     // Public users (userId undefined) are allowed - helper converts to null
@@ -1587,8 +1617,7 @@ class AiStreamRepository implements IAiStreamRepository {
       waitingForConfirmation: requiresConfirmation, // Set to true if confirmation needed
     };
 
-    // Emit MESSAGE_CREATED for UI, but DON'T store in DB yet
-    // DB storage happens only when tool-result arrives
+    // Create tool message ID and emit to UI immediately
     const toolMessageId = crypto.randomUUID();
     const toolCallId = part.toolCallId; // AI SDK provides unique ID for each tool call
 
@@ -1614,17 +1643,50 @@ class AiStreamRepository implements IAiStreamRepository {
     });
     controller.enqueue(encoder.encode(formatSSEEvent(toolCallEvent)));
 
-    logger.info(
-      "[AI Stream] Tool call started (UI notified, DB storage pending)",
-      {
+    logger.info("[AI Stream] Tool call started (UI notified)", {
+      messageId: toolMessageId,
+      toolCallId,
+      toolName: part.toolName,
+      requiresConfirmation,
+    });
+
+    // CRITICAL: Store tool message to DB immediately (if not incognito)
+    // This is required so subsequent tool calls can use this message as parent
+    // Without this, parallel tool calls will fail with foreign key constraint errors
+    if (!isIncognito && userId) {
+      logger.info("[AI Stream] Creating tool message in DB", {
         messageId: toolMessageId,
         toolCallId,
         toolName: part.toolName,
-        requiresConfirmation,
-      },
-    );
+        parentId: newCurrentParentId,
+        depth: newCurrentDepth,
+        threadId,
+        sequenceId,
+      });
 
-    // If tool requires confirmation, store to DB (if not incognito) and send waiting event
+      await createToolMessage({
+        messageId: toolMessageId,
+        threadId,
+        toolCall: toolCallData,
+        parentId: newCurrentParentId,
+        depth: newCurrentDepth,
+        userId,
+        sequenceId,
+        model,
+        persona,
+        logger,
+      });
+
+      logger.info("[AI Stream] Tool message saved to DB immediately", {
+        messageId: toolMessageId,
+        toolCallId,
+        toolName: part.toolName,
+        parentId: newCurrentParentId,
+        depth: newCurrentDepth,
+      });
+    }
+
+    // If tool requires confirmation, send waiting event and abort stream
     if (requiresConfirmation) {
       logger.info(
         "[AI Stream] Tool requires confirmation - pausing stream for user confirmation",
@@ -1635,28 +1697,8 @@ class AiStreamRepository implements IAiStreamRepository {
         },
       );
 
-      // Store tool message to DB only if not incognito and has userId
-      if (!isIncognito && userId) {
-        await createToolMessage({
-          messageId: toolMessageId,
-          threadId,
-          toolCall: toolCallData,
-          parentId: newCurrentParentId,
-          depth: newCurrentDepth,
-          userId,
-          sequenceId,
-          model,
-          persona,
-          logger,
-        });
-        logger.info("[AI Stream] Tool call stored to DB", {
-          messageId: toolMessageId,
-        });
-      } else {
-        logger.info("[AI Stream] Incognito mode - skipping DB storage", {
-          messageId: toolMessageId,
-        });
-      }
+      // Tool message already saved to DB above (for both confirmation and non-confirmation tools)
+      // No need to save again here
 
       // Emit TOOL_WAITING event to notify frontend that stream is paused
       // This works for both logged-in and incognito modes
@@ -1726,6 +1768,8 @@ class AiStreamRepository implements IAiStreamRepository {
     // The AI SDK will execute the tool automatically and send us the result via tool-result event.
     // IMPORTANT: Preserve currentAssistantMessageId so multiple tool calls in the same step
     // all remain children of the same ASSISTANT message (not creating branches)
+    // IMPORTANT: Return the tool message ID so the caller can update the parent chain
+    // This creates: USER → ASSISTANT → TOOL1 → TOOL2 → TOOL3 (chained)
     return {
       currentAssistantMessageId,
       currentAssistantContent: newAssistantContent,
@@ -1796,13 +1840,29 @@ class AiStreamRepository implements IAiStreamRepository {
 
     const { messageId: toolMessageId, toolCallData } = pendingToolMessage;
 
-    // Extract error from the tool-error event
-    const error =
+    // Extract error from the tool-error event and structure it for translation
+    const error: MessageResponseType =
       "error" in part && part.error
         ? part.error instanceof Error
-          ? part.error.message
-          : String(part.error)
-        : "Tool execution failed";
+          ? {
+              message:
+                "app.api.v1.core.agent.aiStream.errors.toolExecutionError",
+              messageParams: { error: part.error.message },
+            }
+          : typeof part.error === "object" &&
+              part.error !== null &&
+              "message" in part.error &&
+              typeof part.error.message === "string"
+            ? (part.error as MessageResponseType)
+            : {
+                message:
+                  "app.api.v1.core.agent.aiStream.errors.toolExecutionError",
+                messageParams: { error: String(part.error) },
+              }
+        : {
+            message:
+              "app.api.v1.core.agent.aiStream.errors.toolExecutionFailed",
+          };
 
     logger.info("[AI Stream] Tool error event received", {
       toolName: part.toolName,
@@ -1820,19 +1880,50 @@ class AiStreamRepository implements IAiStreamRepository {
     // Store TOOL message in DB (or emit for incognito)
     // NO separate ERROR message - error is stored in TOOL message metadata
     if (!isIncognito && userId) {
-      // DB mode: Store TOOL message with error in metadata
-      await createToolMessage({
-        messageId: toolMessageId,
-        threadId,
-        toolCall: toolCallWithError,
-        parentId: toolCallData.parentId,
-        depth: toolCallData.depth,
-        userId,
-        sequenceId,
-        model,
-        persona,
-        logger,
-      });
+      // DB mode: UPDATE existing TOOL message with error in metadata
+      // The tool message was already created when tool-call event arrived
+      const updateResult = await db
+        .update(chatMessages)
+        .set({
+          metadata: { toolCall: toolCallWithError },
+          updatedAt: new Date(),
+        })
+        .where(eq(chatMessages.id, toolMessageId))
+        .returning({ id: chatMessages.id });
+
+      if (updateResult.length === 0) {
+        logger.error(
+          "[AI Stream] CRITICAL: Tool message update failed - message not found in DB",
+          {
+            messageId: toolMessageId,
+            toolCallId: part.toolCallId,
+            toolName: part.toolName,
+            threadId,
+          },
+        );
+        // Fallback: create message if update failed
+        await createToolMessage({
+          messageId: toolMessageId,
+          threadId,
+          toolCall: toolCallWithError,
+          parentId: toolCallData.parentId,
+          depth: toolCallData.depth,
+          userId,
+          sequenceId,
+          model,
+          persona,
+          logger,
+        });
+        logger.warn("[AI Stream] Created missing tool message as fallback", {
+          messageId: toolMessageId,
+        });
+      } else {
+        logger.info("[AI Stream] Tool message updated with error", {
+          messageId: toolMessageId,
+          toolName: part.toolName,
+          error,
+        });
+      }
 
       logger.info("[AI Stream] TOOL message stored in DB (error)", {
         messageId: toolMessageId,
@@ -1933,8 +2024,25 @@ class AiStreamRepository implements IAiStreamRepository {
     } = params;
 
     if (!pendingToolMessage) {
+      logger.error(
+        "[AI Stream] Tool result received but no pending message found",
+        {
+          toolCallId: part.toolCallId,
+          toolName: part.toolName,
+        },
+      );
       return null;
     }
+
+    const { messageId: toolMessageId, toolCallData } = pendingToolMessage;
+
+    logger.info("[AI Stream] Processing tool result", {
+      toolCallId: part.toolCallId,
+      toolName: part.toolName,
+      messageId: toolMessageId,
+      hasOutput: "output" in part,
+      isError: part.isError,
+    });
 
     // If controller is closed (waiting for confirmation), skip processing
     // The tool result will be processed in the next stream after confirmation
@@ -1954,8 +2062,6 @@ class AiStreamRepository implements IAiStreamRepository {
       return null;
     }
 
-    const { messageId: toolMessageId, toolCallData } = pendingToolMessage;
-
     // AI SDK returns 'output' as unknown type
     const output = "output" in part ? part.output : undefined;
     // AI SDK sets isError: true when tool throws an error
@@ -1974,16 +2080,21 @@ class AiStreamRepository implements IAiStreamRepository {
       ),
     });
 
-    // Extract error message from AI SDK
-    let toolError: string | undefined;
+    // Extract error message from AI SDK and structure it for translation
+    let toolError: MessageResponseType | undefined;
     if (isError) {
       // When tool throws error, AI SDK puts error message in output
-      toolError =
+      const errorMessage =
         typeof output === "string"
           ? output
           : output && typeof output === "object" && "message" in output
             ? String(output.message)
             : JSON.stringify(output);
+
+      toolError = {
+        message: "app.api.v1.core.agent.aiStream.errors.toolExecutionError",
+        messageParams: { error: errorMessage },
+      };
     }
 
     // Clean output by removing undefined values (they break validation)
@@ -2006,15 +2117,16 @@ class AiStreamRepository implements IAiStreamRepository {
       error: toolError,
     };
 
-    // Store TOOL message in DB (or emit for incognito)
+    // Update TOOL message in DB with result (or emit for incognito)
     if (!isIncognito) {
       // DB mode: Create ERROR message first if error (proper timestamp order)
       if (toolError && userId) {
         const errorMessageId = crypto.randomUUID();
+        const { serializeError } = await import("../error-utils");
         await createErrorMessage({
           messageId: errorMessageId,
           threadId,
-          content: toolError,
+          content: serializeError(toolError), // Serialize structured error for storage
           errorType: "TOOL_ERROR",
           parentId: toolMessageId, // Error is child of tool message
           depth: toolCallData.depth + 1,
@@ -2029,19 +2141,51 @@ class AiStreamRepository implements IAiStreamRepository {
         });
       }
 
-      // NOW create TOOL message in DB with result/error
-      await createToolMessage({
-        messageId: toolMessageId,
-        threadId,
-        toolCall: toolCallWithResult,
-        parentId: toolCallData.parentId,
-        depth: toolCallData.depth,
-        userId,
-        sequenceId,
-        model,
-        persona,
-        logger,
-      });
+      // UPDATE existing TOOL message in DB with result/error
+      // Message was already created in processToolCall, now we just update it with the result
+      const updateResult = await db
+        .update(chatMessages)
+        .set({
+          metadata: { toolCall: toolCallWithResult },
+          updatedAt: new Date(),
+        })
+        .where(eq(chatMessages.id, toolMessageId))
+        .returning({ id: chatMessages.id });
+
+      if (updateResult.length === 0) {
+        logger.error(
+          "[AI Stream] CRITICAL: Tool message update failed - message not found in DB",
+          {
+            messageId: toolMessageId,
+            toolCallId: part.toolCallId,
+            toolName: part.toolName,
+            threadId,
+          },
+        );
+        // Message doesn't exist - this shouldn't happen since we created it in processToolCall
+        // But if it does, we need to create it now
+        await createToolMessage({
+          messageId: toolMessageId,
+          threadId,
+          toolCall: toolCallWithResult,
+          parentId: toolCallData.parentId,
+          depth: toolCallData.depth,
+          userId,
+          sequenceId,
+          model,
+          persona,
+          logger,
+        });
+        logger.warn("[AI Stream] Created missing tool message as fallback", {
+          messageId: toolMessageId,
+        });
+      } else {
+        logger.info("[AI Stream] Tool message updated with result", {
+          messageId: toolMessageId,
+          hasResult: !!validatedOutput,
+          hasError: !!toolError,
+        });
+      }
     } else {
       // Incognito mode: Emit MESSAGE_CREATED events so client can save to localStorage
       // Emit TOOL message with toolCall object
@@ -2088,11 +2232,12 @@ class AiStreamRepository implements IAiStreamRepository {
       // Emit ERROR message if error
       if (toolError) {
         const errorMessageId = crypto.randomUUID();
+        const { serializeError } = await import("../error-utils");
         const errorMessageEvent = createStreamEvent.messageCreated({
           messageId: errorMessageId,
           threadId,
           role: ChatMessageRole.ERROR,
-          content: toolError,
+          content: serializeError(toolError), // Serialize structured error for transmission
           parentId: toolMessageId,
           depth: toolCallData.depth + 1,
           model,
@@ -2161,9 +2306,10 @@ class AiStreamRepository implements IAiStreamRepository {
     });
 
     // NOW update parent chain: tool message is in DB, next message can be its child
+    // Return the tool message's depth (not +1) because processToolCall will increment it
     return {
       currentParentId: toolMessageId,
-      currentDepth: toolCallData.depth + 1,
+      currentDepth: toolCallData.depth,
     };
   }
 
@@ -2203,14 +2349,21 @@ class AiStreamRepository implements IAiStreamRepository {
       errorType: error instanceof Error ? error.constructor.name : typeof error,
     });
 
+    // Create structured error with translation key
+    const structuredError: MessageResponseType = {
+      message: "app.api.v1.core.agent.aiStream.errors.streamError",
+      messageParams: { error: errorMessage },
+    };
+
     // Create ERROR message in DB/localStorage
     // Public users (userId undefined) are allowed - helper converts to null
     const errorMessageId = crypto.randomUUID();
     if (!isIncognito) {
+      const { serializeError } = await import("../error-utils");
       await createErrorMessage({
         messageId: errorMessageId,
         threadId,
-        content: `Stream error: ${errorMessage}`,
+        content: serializeError(structuredError),
         errorType: "STREAM_ERROR",
         parentId: lastParentId,
         depth: lastDepth,
@@ -2221,11 +2374,12 @@ class AiStreamRepository implements IAiStreamRepository {
     }
 
     // Emit ERROR message event for UI
+    const { serializeError } = await import("../error-utils");
     const errorMessageEvent = createStreamEvent.messageCreated({
       messageId: errorMessageId,
       threadId,
       role: ChatMessageRole.ERROR,
-      content: `Stream error: ${errorMessage}`,
+      content: serializeError(structuredError),
       parentId: lastParentId,
       depth: lastDepth,
       sequenceId: lastSequenceId,

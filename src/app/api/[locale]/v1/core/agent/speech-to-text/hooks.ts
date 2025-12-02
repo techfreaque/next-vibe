@@ -33,6 +33,8 @@ interface UseEdenAISpeechReturn {
   toggleRecording: () => Promise<void>;
   error: string | null;
   transcript: string | null;
+  stream: MediaStream | null;
+  clearError: () => void;
 }
 
 export function useEdenAISpeech({
@@ -163,11 +165,14 @@ export function useEdenAISpeech({
           }
         },
         onError: ({ error }) => {
-          const errorMessage =
-            error.message ?? t("app.chat.hooks.stt.transcription-failed");
+          // Translate the error message if it's a translation key
+          const errorMessage = error.message
+            ? t(error.message, error.messageParams)
+            : t("app.chat.hooks.stt.transcription-failed");
           logger.error("STT: API returned error", {
             errorType: error.errorType,
             errorMessage: error.message,
+            translatedMessage: errorMessage,
           });
           setError(errorMessage);
           onError?.(errorMessage);
@@ -199,6 +204,9 @@ export function useEdenAISpeech({
 
   const startRecording = useCallback(async (): Promise<void> => {
     try {
+      // Clear any previous errors when starting a new recording
+      setError(null);
+
       logger.debug("STT: Requesting microphone access");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -224,7 +232,6 @@ export function useEdenAISpeech({
 
       mediaRecorder.start();
       setIsRecording(true);
-      setError(null);
       logger.debug("STT: Recording started");
     } catch (err) {
       const errorMsg =
@@ -254,6 +261,10 @@ export function useEdenAISpeech({
     }
   }, [isRecording, startRecording, stopRecording]);
 
+  const clearError = useCallback((): void => {
+    setError(null);
+  }, []);
+
   return {
     isRecording,
     isProcessing,
@@ -262,5 +273,7 @@ export function useEdenAISpeech({
     toggleRecording,
     error,
     transcript,
+    stream: streamRef.current,
+    clearError,
   };
 }

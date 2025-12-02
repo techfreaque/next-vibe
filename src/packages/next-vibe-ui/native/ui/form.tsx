@@ -22,7 +22,7 @@ import { Pressable, View } from "react-native";
 import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 import { styled } from "nativewind";
 
-import { cn } from "../lib/utils";
+import { cn } from "next-vibe/shared/utils/utils";
 import {
   BottomSheet,
   BottomSheetContent,

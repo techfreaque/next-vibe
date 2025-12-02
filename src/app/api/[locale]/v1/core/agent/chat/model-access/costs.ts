@@ -6,15 +6,6 @@
 import { getModelById, type ModelId, modelOptions } from "./models";
 
 /**
- * Feature costs (non-model)
- * Note: TTS pricing is now in products/repository-client.ts (single source of truth)
- */
-export const FEATURE_COSTS = {
-  BRAVE_SEARCH: 1, // 1 credit per search
-  STT: 2, // 2 credits per STT operation
-} as const;
-
-/**
  * Get credit cost for a specific model
  * Reads from model configuration
  * @param modelId - The model identifier

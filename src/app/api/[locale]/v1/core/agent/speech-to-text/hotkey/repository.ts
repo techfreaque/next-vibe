@@ -19,8 +19,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-i
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
-import { FEATURE_COSTS } from "@/app/api/[locale]/v1/core/agent/chat/model-access/costs";
 import { speechToTextRepository } from "@/app/api/[locale]/v1/core/agent/speech-to-text/repository";
+import { STT_COST_PER_SECOND } from "@/app/api/[locale]/v1/core/products/repository-client";
 
 import { createAdapters } from "./adapters/factory";
 import type {
@@ -278,15 +278,21 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
     const text = await session.stopAndInsert();
     const duration = Date.now() - startTime;
 
+    // Calculate cost based on duration (STT is charged per second)
+    const durationInSeconds = Math.ceil(duration / 1000); // Round up to nearest second
+    const cost = durationInSeconds * STT_COST_PER_SECOND;
+
     logger.info("Recording stopped and text inserted", {
       textLength: text.length,
       duration,
+      durationInSeconds,
+      cost,
     });
 
-    // Deduct credits AFTER successful completion
+    // Deduct credits AFTER successful completion based on recording duration
     await creditRepository.deductCreditsForFeature(
       user,
-      FEATURE_COSTS.STT,
+      cost,
       "stt-hotkey",
       logger,
     );

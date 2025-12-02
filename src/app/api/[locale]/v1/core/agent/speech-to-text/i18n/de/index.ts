@@ -135,10 +135,10 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Sprache zu Text",
-    description: "Konvertieren Sie Audio in Text mit KI-Transkription",
+    description: "Konvertieren Sie Audio in Text mit KI-Transkription (~0,011 Credits pro Sekunde)",
     form: {
       title: "Audio-Transkription",
-      description: "Laden Sie eine Audiodatei zum Transkribieren hoch",
+      description: "Laden Sie eine Audiodatei zum Transkribieren hoch (Deepgram: ~0,011 Credits pro Sekunde)",
     },
     fileUpload: {
       title: "Audiodatei-Upload",
@@ -182,13 +182,15 @@ export const translations: typeof enTranslations = {
         description: "Fehler beim Verarbeiten der Transkription",
       },
       apiKeyMissing: "Eden AI API-Schlüssel ist nicht konfiguriert",
-      transcriptionFailed: "Transkription fehlgeschlagen: {error}",
+      transcriptionFailed: "Transkription fehlgeschlagen: {{error}}",
       noAudioFile: "Keine Audiodatei bereitgestellt",
       internalError: "Interner Serverfehler",
       noPublicId: "Keine öffentliche ID erhalten",
       pollFailed: "Fehler beim Abrufen der Transkriptionsergebnisse",
       failed: "Transkription fehlgeschlagen",
       timeout: "Transkriptions-Zeitüberschreitung",
+      creditsFailed: "Fehler beim Abziehen der Credits: {{error}}",
+      providerError: "Fehler beim Transkriptionsdienst. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support, wenn das Problem weiterhin besteht.",
     },
     success: {
       title: "Erfolg",

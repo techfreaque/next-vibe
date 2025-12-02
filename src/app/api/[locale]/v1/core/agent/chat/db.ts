@@ -44,6 +44,7 @@ import type { z } from "zod";
 
 import { users } from "@/app/api/[locale]/v1/core/user/db";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import type { MessageResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
 
 import type { DefaultFolderId } from "./config";
 import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
@@ -83,7 +84,7 @@ export interface ToolCall {
   toolName: string;
   args: ToolCallResult;
   result?: ToolCallResult;
-  error?: string;
+  error?: MessageResponseType; // Structured error with translation key and params
   executionTime?: number;
   creditsUsed?: number;
   requiresConfirmation?: boolean;
@@ -111,7 +112,7 @@ export interface ToolCallMetadata {
   toolName: string;
   args: ToolCallResult;
   result?: ToolCallResult;
-  error?: string;
+  error?: MessageResponseType; // Structured error with translation key and params
   executionTime?: number;
   creditsUsed?: number;
   requiresConfirmation?: boolean;

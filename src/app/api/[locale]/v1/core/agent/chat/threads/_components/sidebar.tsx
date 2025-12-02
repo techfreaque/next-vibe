@@ -252,7 +252,7 @@ export function ChatSidebar({
             placeholder={t("app.chat.common.searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="pl-8 h-10 sm:h-8 text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-500"
+            className="pl-8 h-10 sm:h-8 text-sm border-none bg-blue-200 dark:bg-blue-950 focus-visible:ring-blue-500"
           />
         </Div>
       </Div>

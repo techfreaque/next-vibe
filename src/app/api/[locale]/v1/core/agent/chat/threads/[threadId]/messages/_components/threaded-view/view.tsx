@@ -112,7 +112,10 @@ export function ThreadedMessage({
   const [ttsText, setTtsText] = React.useState<string>("");
 
   React.useEffect(() => {
-    void processMessageGroupForTTS(allMessagesInGroup, locale).then(setTtsText);
+    void processMessageGroupForTTS(allMessagesInGroup, locale, logger).then(
+      setTtsText,
+    );
+    // oxlint-disable-next-line exhaustive-deps
   }, [allMessagesInGroup, locale]);
 
   const {

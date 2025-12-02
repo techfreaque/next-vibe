@@ -3,6 +3,8 @@
  * 100% typesafe event definitions shared between server and client
  */
 
+import type { MessageResponseType } from "@/app/api/[locale]/v1/core/shared/types/response.schema";
+
 import type { DefaultFolderId } from "../chat/config";
 import type { ToolCall, ToolCallResult } from "../chat/db";
 import type { ChatMessageRole } from "../chat/enum";
@@ -117,7 +119,7 @@ export interface ToolResultEventData {
   messageId: string;
   toolName: string;
   result: ToolCallResult | undefined;
-  error?: string; // Tool execution error message
+  error?: MessageResponseType; // Tool execution error message
   toolCall?: ToolCall; // Full tool call data with result for frontend rendering
 }
 
@@ -230,17 +232,49 @@ export const createStreamEvent = {
 /**
  * Format SSE event for transmission
  * Uses SSE protocol constants for consistency
+ * Handles error serialization for events with error fields
  */
 export function formatSSEEvent<T extends StreamEventType>(
   event: StreamEvent<T>,
 ): string {
+  let dataToSerialize = event.data;
+
+  // Handle TOOL_RESULT events with error field - serialize all errors
+  if (event.type === StreamEventType.TOOL_RESULT) {
+    const toolResultData = event.data as ToolResultEventData;
+    const updates: Partial<ToolResultEventData> = {};
+
+    // Serialize top-level error field
+    if (toolResultData.error) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+      updates.error = JSON.stringify(toolResultData.error) as any;
+    }
+
+    // Serialize error inside toolCall object
+    if (toolResultData.toolCall?.error) {
+      updates.toolCall = {
+        ...toolResultData.toolCall,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+        error: JSON.stringify(toolResultData.toolCall.error) as any,
+      };
+    }
+
+    if (Object.keys(updates).length > 0) {
+      dataToSerialize = {
+        ...toolResultData,
+        ...updates,
+      } as StreamEventDataMap[T];
+    }
+  }
+
   // eslint-disable-next-line i18next/no-literal-string
-  return `${SSE_EVENT_PREFIX}${event.type}\n${SSE_DATA_PREFIX}${JSON.stringify(event.data)}${SSE_EVENT_SEPARATOR}`;
+  return `${SSE_EVENT_PREFIX}${event.type}\n${SSE_DATA_PREFIX}${JSON.stringify(dataToSerialize)}${SSE_EVENT_SEPARATOR}`;
 }
 
 /**
  * Parse SSE event from string
  * Uses SSE protocol constants for consistency
+ * Handles error deserialization for events with error fields
  * Returns null if parsing fails
  */
 export function parseSSEEvent(eventString: string): StreamEvent | null {
@@ -268,7 +302,48 @@ export function parseSSEEvent(eventString: string): StreamEvent | null {
       return null;
     }
 
-    const data = JSON.parse(eventData) as StreamEventDataMap[StreamEventType];
+    let data = JSON.parse(eventData) as StreamEventDataMap[StreamEventType];
+
+    // Handle TOOL_RESULT events with error field - deserialize all errors
+    if (eventType === StreamEventType.TOOL_RESULT) {
+      const toolResultData = data as ToolResultEventData;
+      const updates: Partial<ToolResultEventData> = {};
+
+      // Deserialize top-level error field
+      if (
+        toolResultData.error &&
+        typeof toolResultData.error === "string"
+      ) {
+        try {
+          updates.error = JSON.parse(toolResultData.error) as MessageResponseType;
+        } catch {
+          // If error parsing fails, keep the original string
+        }
+      }
+
+      // Deserialize error inside toolCall object
+      if (
+        toolResultData.toolCall?.error &&
+        typeof toolResultData.toolCall.error === "string"
+      ) {
+        try {
+          const parsedError = JSON.parse(toolResultData.toolCall.error) as MessageResponseType;
+          updates.toolCall = {
+            ...toolResultData.toolCall,
+            error: parsedError,
+          };
+        } catch {
+          // If error parsing fails, keep the original
+        }
+      }
+
+      if (Object.keys(updates).length > 0) {
+        data = {
+          ...toolResultData,
+          ...updates,
+        } as StreamEventDataMap[StreamEventType];
+      }
+    }
 
     return {
       type: eventType as StreamEventType,

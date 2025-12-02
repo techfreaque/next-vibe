@@ -234,6 +234,13 @@ export const translations: typeof enTranslations = {
   error: {
     title: "Stream-Fehler",
   },
+  errors: {
+    toolExecutionError: "Werkzeug-Ausführungsfehler: {{error}}",
+    toolExecutionFailed: "Werkzeug-Ausführung fehlgeschlagen",
+    userDeclinedTool: "Benutzer hat die Werkzeug-Ausführung abgelehnt",
+    streamError: "Stream-Fehler: {{error}}",
+    streamProcessingError: "Fehler beim Verarbeiten des Streams",
+  },
   providers: {
     uncensoredHandler: {
       errors: {

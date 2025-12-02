@@ -10,7 +10,7 @@ import type { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/conf
 import type { ChatMessage } from "@/app/api/[locale]/v1/core/agent/chat/db";
 
 /**
- * Get relative time string from date
+ * Get relative time string from date (compact format)
  */
 export function getRelativeTime(date: Date): string {
   const now = new Date();
@@ -20,29 +20,20 @@ export function getRelativeTime(date: Date): string {
   const diffDays = Math.floor(diffHours / 24);
 
   if (diffMins < 1) {
-    return "just now";
-  }
-  if (diffMins === 1) {
-    return "1 minute ago";
+    return "now";
   }
   if (diffMins < 60) {
-    return `${diffMins} minutes ago`;
-  }
-  if (diffHours === 1) {
-    return "1 hour ago";
+    return `${diffMins}m ago`;
   }
   if (diffHours < 24) {
-    return `${diffHours} hours ago`;
+    return `${diffHours}h ago`;
   }
-  if (diffDays === 1) {
-    return "1 day ago";
-  }
-  return `${diffDays} days ago`;
+  return `${diffDays}d ago`;
 }
 
 /**
- * Create metadata string for a chat message
- * Injects structured context for AI models
+ * Create metadata string for a chat message (compact format)
+ * Only includes non-empty fields
  * Context-aware: includes author info for public/shared threads
  */
 export function createMessageMetadata(
@@ -53,13 +44,13 @@ export function createMessageMetadata(
 
   // Message ID (short fragment for AI reference)
   const shortId = message.id.slice(-8);
-  parts.push(`Message ID: ${shortId}`);
+  parts.push(`ID:${shortId}`);
 
   // Model and Persona (for assistant messages)
   if (message.role === "assistant" && message.model) {
-    parts.push(`Model: ${message.model}`);
+    parts.push(`Model:${message.model}`);
     if (message.persona) {
-      parts.push(`Persona: ${message.persona}`);
+      parts.push(`Persona:${message.persona}`);
     }
   }
 
@@ -69,28 +60,28 @@ export function createMessageMetadata(
     message.authorName
   ) {
     const authorInfo = message.authorId
-      ? `${message.authorName} (${message.authorId.slice(-8)})`
+      ? `${message.authorName}(${message.authorId.slice(-8)})`
       : message.authorName;
-    parts.push(`Author: ${authorInfo}`);
+    parts.push(`Author:${authorInfo}`);
   }
 
   // Votes (show if either upvotes or downvotes > 0)
   if (message.upvotes > 0 || message.downvotes > 0) {
     const voteParts: string[] = [];
     if (message.upvotes > 0) {
-      voteParts.push(`👍 ${message.upvotes}`);
+      voteParts.push(`👍${message.upvotes}`);
     }
     if (message.downvotes > 0) {
-      voteParts.push(`👎 ${message.downvotes}`);
+      voteParts.push(`👎${message.downvotes}`);
     }
-    parts.push(voteParts.join(" | "));
+    parts.push(voteParts.join(" "));
   }
 
   // Timestamp (relative time)
   const timeAgo = getRelativeTime(message.createdAt);
-  parts.push(`Posted: ${timeAgo}`);
+  parts.push(`Posted:${timeAgo}`);
 
-  // Status indicators
+  // Status indicators (only if present)
   const statusParts: string[] = [];
   if (message.edited) {
     statusParts.push("edited");
@@ -99,20 +90,25 @@ export function createMessageMetadata(
     statusParts.push("branched");
   }
   if (statusParts.length > 0) {
-    parts.push(`Status: ${statusParts.join(", ")}`);
+    parts.push(statusParts.join(","));
   }
 
   return parts.join(" | ");
 }
 
 /**
- * Create metadata system message content
+ * Create metadata system message content (compact format)
  * Wraps metadata in standard format
+ * Returns empty string if no metadata available
  */
 export function createMetadataSystemMessage(
   message: ChatMessage,
   rootFolderId: DefaultFolderId | undefined,
 ): string {
   const metadata = createMessageMetadata(message, rootFolderId);
-  return `[Message Context: ${metadata}]`;
+  // Don't send empty context if no metadata
+  if (!metadata || metadata.trim().length === 0) {
+    return "";
+  }
+  return `[Context: ${metadata}]`;
 }

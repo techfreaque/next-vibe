@@ -25,8 +25,7 @@ import type {
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
 
-import { cn } from "../lib/utils";
-
+import { cn } from "next-vibe/shared/utils/utils";
 const noop = (): void => {
   return undefined;
 };

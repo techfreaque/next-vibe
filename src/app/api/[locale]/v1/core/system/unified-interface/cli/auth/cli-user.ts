@@ -108,13 +108,23 @@ export async function getCliUser(
 ): Promise<
   ResponseType<InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>>
 > {
+  // Enhanced debugging: Log authentication flow entry point
+  const authFlowData = {
+    locale,
+    cwd: process.cwd(),
+    nodeEnv: process.env.NODE_ENV,
+    vibeProjectRoot: process.env.VIBE_PROJECT_ROOT,
+  };
+  logger.debug("[CLI AUTH] Starting CLI user authentication flow", authFlowData);
+
   // Step 1: Check for existing session from .vibe.session file
   try {
+    logger.debug("[CLI AUTH] Step 1: Checking for .vibe.session file");
     const { readSessionFile } = await import("./session-file");
     const sessionResult = await readSessionFile(logger);
 
     if (sessionResult.success && sessionResult.data) {
-      logger.debug("Found existing CLI session", {
+      logger.debug("[CLI AUTH] Found existing CLI session", {
         userId: sessionResult.data.userId,
         leadId: sessionResult.data.leadId,
       });
@@ -128,7 +138,10 @@ export async function getCliUser(
       );
 
       if (verifyResult.success && verifyResult.data) {
-        logger.debug("Session token is valid, using session user");
+        logger.debug("[CLI AUTH] Session token is valid, using session user", {
+          userId: verifyResult.data.id,
+          roles: verifyResult.data.roles,
+        });
         return {
           success: true,
           data: createCliUserFromDb(
@@ -139,22 +152,35 @@ export async function getCliUser(
         };
       } else {
         logger.debug(
-          "Session token is invalid or expired, falling back to email auth",
+          "[CLI AUTH] Session token is invalid or expired, falling back to email auth",
+          {
+            verifySuccess: verifyResult.success,
+            verifyMessage: verifyResult.message,
+          },
         );
       }
+    } else {
+      logger.debug("[CLI AUTH] No session data found in session file");
     }
   } catch (error) {
-    logger.debug("No valid session found, falling back to email auth", {
+    logger.debug("[CLI AUTH] No valid session found, falling back to email auth", {
       error: parseError(error).message,
     });
   }
 
   // Step 2: Check VIBE_CLI_USER_EMAIL environment variable
+  logger.debug("[CLI AUTH] Step 2: Checking VIBE_CLI_USER_EMAIL environment variable");
   const cliUserEmail = getCliUserEmail();
+
+  logger.debug("[CLI AUTH] VIBE_CLI_USER_EMAIL result", {
+    hasEmail: !!cliUserEmail,
+    email: cliUserEmail ? `${cliUserEmail.substring(0, 3)}***` : null,
+    envVarExists: "VIBE_CLI_USER_EMAIL" in process.env,
+  });
 
   // Step 3: If VIBE_CLI_USER_EMAIL is not set, return public user
   if (!cliUserEmail) {
-    logger.debug("CLI user email not configured, using public user", {
+    logger.debug("[CLI AUTH] Step 3: CLI user email not configured, creating public user", {
       envVar: "VIBE_CLI_USER_EMAIL",
     });
 
@@ -207,7 +233,10 @@ export async function getCliUser(
   }
 
   // Step 4: Email is set, authenticate from database
-  logger.debug("Getting CLI user from database", { email: cliUserEmail });
+  logger.debug("[CLI AUTH] Step 4: Authenticating user from database", {
+    email: cliUserEmail,
+    locale,
+  });
 
   try {
     const { authRepository } =
@@ -222,10 +251,11 @@ export async function getCliUser(
     if (authResult.success && authResult.data) {
       const user = authResult.data;
 
-      logger.debug("CLI user found in database", {
+      logger.debug("[CLI AUTH] CLI user found in database - authentication successful", {
         id: user.id,
         leadId: user.leadId,
         roles: user.roles,
+        email: cliUserEmail,
       });
 
       return {
@@ -235,8 +265,10 @@ export async function getCliUser(
     }
 
     // User not found in database - this is an ERROR
-    logger.error("CLI user not found in database", {
+    logger.error("[CLI AUTH] CLI user not found in database", {
       email: cliUserEmail,
+      authSuccess: authResult.success,
+      authMessage: authResult.message,
     });
 
     return {
@@ -250,9 +282,11 @@ export async function getCliUser(
     };
   } catch (error) {
     // Database error
-    logger.error("Error getting CLI user from database", {
+    logger.error("[CLI AUTH] Error getting CLI user from database", {
       error: parseError(error).message,
+      errorStack: error instanceof Error ? error.stack : undefined,
       email: cliUserEmail,
+      locale,
     });
 
     return {

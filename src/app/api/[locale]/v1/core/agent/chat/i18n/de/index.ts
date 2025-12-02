@@ -72,6 +72,19 @@ export const translations: typeof enTranslations = {
       country: "Land",
       language: "Sprache",
     },
+    copyButton: {
+      copied: "Kopiert!",
+      copyToClipboard: "In Zwischenablage kopieren",
+      copyAsMarkdown: "Als Markdown kopieren",
+      copyAsText: "Als Text kopieren",
+    },
+    assistantMessageActions: {
+      cancelLoading: "Laden abbrechen",
+      stopAudio: "Audio stoppen",
+      playAudio: "Audio abspielen",
+      answerAsAI: "Als KI-Modell antworten",
+      deleteMessage: "Nachricht löschen",
+    },
   },
   actions: {
     newChatInFolder: "Neuer Chat im Ordner",

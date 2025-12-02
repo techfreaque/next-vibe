@@ -46,6 +46,7 @@ export const DEFAULT_MODEL = ModelId.GPT_5_NANO;
 
 export const DEFAULT_FAVORITES: ModelId[] = [
   ModelId.UNCENSORED_LM_V1_1,
+  ModelId.GAB_AI_ARYA,
   ModelId.GPT_5_NANO,
   ModelId.GPT_5,
   ModelId.CLAUDE_HAIKU_4_5,
@@ -175,7 +176,8 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     name: "UncensoredLM v1.1",
     provider: "uncensoredAI",
     apiProvider: ApiProvider.UNCENSORED_AI,
-    description: "app.api.v1.core.agent.chat.models.descriptions.uncensoredLmV11",
+    description:
+      "app.api.v1.core.agent.chat.models.descriptions.uncensoredLmV11",
     parameterCount: undefined,
     contextWindow: 32768,
     icon: "shield-off",
@@ -216,13 +218,15 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 8192,
     icon: "gab-ai-logo",
     openRouterModel: "gab-ai-arya",
-    creditCost: 2,
+    creditCost: 5,
     utilities: [
       ModelUtility.UNCENSORED,
       ModelUtility.CREATIVE,
       ModelUtility.CHAT,
+      ModelUtility.ANALYSIS,
+      ModelUtility.SMART,
     ],
-    supportsTools: true,
+    supportsTools: false,
   },
   [ModelId.VENICE_UNCENSORED]: {
     id: ModelId.VENICE_UNCENSORED,
@@ -235,7 +239,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "ocean",
     openRouterModel:
       "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-    creditCost: 0,
+    creditCost: 1,
     utilities: [ModelUtility.UNCENSORED, ModelUtility.CREATIVE],
     supportsTools: false, // OpenRouter reports: "No endpoints found that support tool use"
   },
@@ -249,7 +253,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 32768,
     icon: "ocean",
     openRouterModel: "cognitivecomputations/dolphin3.0-mistral-24b:free",
-    creditCost: 0,
+    creditCost: 1,
     utilities: [ModelUtility.FAST],
     supportsTools: false, // OpenRouter reports: "No endpoints found that support tool use"
   },

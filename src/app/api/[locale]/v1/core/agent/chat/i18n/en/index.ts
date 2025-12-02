@@ -71,6 +71,19 @@ export const translations = {
       country: "Country",
       language: "Language",
     },
+    copyButton: {
+      copied: "Copied!",
+      copyToClipboard: "Copy to clipboard",
+      copyAsMarkdown: "Copy as Markdown",
+      copyAsText: "Copy as Text",
+    },
+    assistantMessageActions: {
+      cancelLoading: "Cancel loading",
+      stopAudio: "Stop audio",
+      playAudio: "Play audio",
+      answerAsAI: "Answer as AI model",
+      deleteMessage: "Delete message",
+    },
   },
   actions: {
     newChatInFolder: "New chat in folder",

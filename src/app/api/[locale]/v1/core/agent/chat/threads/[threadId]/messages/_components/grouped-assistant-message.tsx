@@ -7,7 +7,10 @@ import React, { type JSX } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
 import { getModelById } from "@/app/api/[locale]/v1/core/agent/chat/model-access/models";
-import { processMessageGroupForTTS } from "@/app/api/[locale]/v1/core/agent/text-to-speech/content-processing";
+import {
+  processMessageGroupForCopy,
+  processMessageGroupForTTS,
+} from "@/app/api/[locale]/v1/core/agent/text-to-speech/content-processing";
 import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -95,12 +98,28 @@ export function GroupedAssistantMessage({
   // Show streaming placeholder when no content yet AND no tools waiting for confirmation
   const isStreaming = !hasContent && !hasToolWaitingForConfirmation;
 
-  // Get all content for actions - process entire message group for TTS
-  // This includes tool calls (as titles) and strips <think> tags
+  // Get all content for actions - process entire message group for both TTS and copying
+  // This includes tool calls and strips <think> tags (both closed and unclosed)
   const [allContent, setAllContent] = React.useState<string>("");
+  const [contentMarkdown, setContentMarkdown] = React.useState<string>("");
+  const [contentText, setContentText] = React.useState<string>("");
 
   React.useEffect(() => {
-    void processMessageGroupForTTS(allMessages, locale).then(setAllContent);
+    // Process for TTS (used by speech)
+    void processMessageGroupForTTS(allMessages, locale, logger).then(
+      setAllContent,
+    );
+
+    // Process for copying - markdown format (includes tool calls with formatting)
+    void processMessageGroupForCopy(allMessages, locale, true, logger).then(
+      setContentMarkdown,
+    );
+
+    // Process for copying - plain text format (includes tool calls, strips markdown)
+    void processMessageGroupForCopy(allMessages, locale, false, logger).then(
+      setContentText,
+    );
+    // oxlint-disable-next-line exhaustive-deps
   }, [allMessages, locale]);
 
   return (
@@ -197,6 +216,8 @@ export function GroupedAssistantMessage({
           <AssistantMessageActions
             messageId={primary.id}
             content={allContent}
+            contentMarkdown={contentMarkdown}
+            contentText={contentText}
             locale={locale}
             onAnswerAsModel={onAnswerAsModel}
             onDelete={onDelete}
