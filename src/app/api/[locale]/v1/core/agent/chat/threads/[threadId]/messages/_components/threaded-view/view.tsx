@@ -35,6 +35,7 @@ import type { useCollapseState } from "../hooks/use-collapse-state";
 import type { groupMessagesBySequence } from "../message-grouping";
 import { ThreadedMessageActions } from "./actions";
 import { ThreadedMessageContent } from "./content";
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 
 interface ThreadedMessageProps {
   message: ChatMessage;
@@ -371,20 +372,21 @@ export function ThreadedMessage({
             (depth < maxDepth || showDeepReplies) && (
               <Div className="mt-2 flex flex-col gap-2">
                 {replies.map((reply) => (
-                  <ThreadedMessage
-                    key={reply.id}
-                    message={reply}
-                    messageGroup={messageToGroupMap.get(reply.id)}
-                    replies={getDirectReplies(allMessages, reply.id)}
-                    allMessages={allMessages}
-                    messageToGroupMap={messageToGroupMap}
-                    depth={depth + 1}
-                    locale={locale}
-                    logger={logger}
-                    collapseState={collapseState}
-                    maxDepth={maxDepth}
-                    currentUserId={currentUserId}
-                  />
+                  <ErrorBoundary key={reply.id} locale={locale}>
+                    <ThreadedMessage
+                      message={reply}
+                      messageGroup={messageToGroupMap.get(reply.id)}
+                      replies={getDirectReplies(allMessages, reply.id)}
+                      allMessages={allMessages}
+                      messageToGroupMap={messageToGroupMap}
+                      depth={depth + 1}
+                      locale={locale}
+                      logger={logger}
+                      collapseState={collapseState}
+                      maxDepth={maxDepth}
+                      currentUserId={currentUserId}
+                    />
+                  </ErrorBoundary>
                 ))}
               </Div>
             )}

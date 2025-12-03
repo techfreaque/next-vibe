@@ -35,6 +35,7 @@ import { LoadingIndicator } from "./loading-indicator";
 import { groupMessagesBySequence } from "./message-grouping";
 import { ThreadedMessage } from "./threaded-view/view";
 import { ViewMode } from "../../../../enum";
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 
 interface ChatMessagesProps {
   inputHeight?: number;
@@ -418,19 +419,20 @@ export function ChatMessages({
 
               const rootMessages = getRootMessages(primaryMessages, null);
               return rootMessages.map((rootMessage) => (
-                <ThreadedMessage
-                  key={rootMessage.id}
-                  message={rootMessage}
-                  messageGroup={messageToGroupMap.get(rootMessage.id)}
-                  replies={getDirectReplies(primaryMessages, rootMessage.id)}
-                  allMessages={primaryMessages}
-                  messageToGroupMap={messageToGroupMap}
-                  depth={0}
-                  locale={locale}
-                  logger={logger}
-                  collapseState={collapseState}
-                  currentUserId={currentUserId}
-                />
+                <ErrorBoundary key={rootMessage.id} locale={locale}>
+                  <ThreadedMessage
+                    message={rootMessage}
+                    messageGroup={messageToGroupMap.get(rootMessage.id)}
+                    replies={getDirectReplies(primaryMessages, rootMessage.id)}
+                    allMessages={primaryMessages}
+                    messageToGroupMap={messageToGroupMap}
+                    depth={0}
+                    locale={locale}
+                    logger={logger}
+                    collapseState={collapseState}
+                    currentUserId={currentUserId}
+                  />
+                </ErrorBoundary>
               ));
             })()
           ) : (
