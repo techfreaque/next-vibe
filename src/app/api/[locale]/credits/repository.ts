@@ -1,0 +1,2370 @@
+/**
+ * Credit Repository
+ * Simplified wallet-based credit system
+ *
+ * Architecture:
+ * - Single wallet per user OR lead (not both)
+ * - Credit packs (subscription/permanent/bonus) with expiration
+ * - Free tier credits tracked per wallet
+ * - All transactions are immutable audit logs
+ */
+
+import {
+  and,
+  desc,
+  eq,
+  gte,
+  inArray,
+  isNull,
+  lt,
+  not,
+  or,
+  sql,
+} from "drizzle-orm";
+
+import {
+  success,
+  ErrorResponseTypes,
+  fail,
+  type ResponseType,
+} from "next-vibe/shared/types/response.schema";
+
+import {
+  leads,
+  leadEngagements,
+  userLeadLinks,
+} from "@/app/api/[locale]/leads/db";
+import {
+  EngagementTypes,
+  LeadSource,
+  LeadStatus,
+} from "@/app/api/[locale]/leads/enum";
+import type { CreditPackCheckoutSession } from "@/app/api/[locale]/payment/providers/types";
+import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
+import { subscriptions } from "@/app/api/[locale]/subscription/db";
+import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
+import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
+
+import { productsRepository, ProductIds } from "../products/repository-client";
+import { withTransaction } from "../system/db/utils/repository-helpers";
+import {
+  creditPacks,
+  creditTransactions,
+  creditWallets,
+  type CreditWallet,
+} from "./db";
+import {
+  CreditTransactionType,
+  type CreditTransactionTypeValue,
+  CreditTypeIdentifier,
+  type CreditTypeIdentifierValue,
+} from "./enum";
+
+/**
+ * Credit Balance - summary of user/lead credit state
+ */
+export interface CreditBalance {
+  total: number;
+  expiring: number;
+  permanent: number;
+  free: number;
+  expiresAt: string | null;
+}
+
+/**
+ * Pool of wallets that share free credits
+ */
+export interface CreditPool {
+  userWallet: CreditWallet | null;
+  leadWallets: CreditWallet[];
+  poolId: string;
+  poolType: "USER_POOL" | "LEAD_POOL";
+}
+
+/**
+ * Credit Identifier - identifies who owns credits
+ */
+export interface CreditIdentifier {
+  leadId?: string;
+  userId?: string;
+}
+
+/**
+ * Credit Transaction Interface
+ */
+export interface CreditTransactionOutput {
+  id: string;
+  amount: number;
+  balanceAfter: number;
+  type: CreditTransactionTypeValue;
+  modelId: string | null;
+  messageId: string | null;
+  createdAt: string;
+}
+
+/**
+ * Credit Repository Interface
+ */
+export interface CreditRepositoryInterface {
+  getBalance(
+    identifier: CreditIdentifier,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditBalance>>;
+
+  deductCredits(
+    identifier: CreditIdentifier,
+    amount: number,
+    modelId: string,
+    messageId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>>;
+
+  addCredits(
+    identifier: CreditIdentifier,
+    amount: number,
+    type: "subscription" | "permanent" | "bonus",
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>>;
+
+  getLeadBalance(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<number>>;
+
+  getCreditBalanceForUser(
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditBalance>>;
+
+  getOrCreateLeadByIp(
+    ipAddress: string,
+    locale: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ leadId: string; credits: number }>>;
+
+  addUserCredits(
+    userId: string,
+    amount: number,
+    type: "subscription" | "permanent" | "free",
+    logger: EndpointLogger,
+    expiresAt?: Date,
+    sessionId?: string,
+  ): Promise<ResponseType<void>>;
+
+  getTransactions(
+    userId: string,
+    limit: number,
+    offset: number,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      transactions: CreditTransactionOutput[];
+      totalCount: number;
+    }>
+  >;
+
+  expireCredits(logger: EndpointLogger): Promise<ResponseType<number>>;
+
+  handleCreditPackPurchase(
+    session: CreditPackCheckoutSession,
+    logger: EndpointLogger,
+  ): Promise<void>;
+
+  getCreditIdentifierBySubscription(
+    userId: string,
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      userId?: string;
+      leadId?: string;
+      creditType: CreditTypeIdentifierValue;
+    }>
+  >;
+
+  deductCreditsForFeature(
+    user: { id?: string; leadId?: string; isPublic: boolean },
+    cost: number,
+    feature: string,
+    logger: EndpointLogger,
+  ): Promise<{ success: boolean; messageId?: string }>;
+
+  mergePendingLeadWallets(
+    userId: string,
+    leadIds: string[],
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>>;
+
+  cleanupOrphanedLeadWallets(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<number>>;
+
+  hasSufficientCredits(
+    identifier: CreditIdentifier,
+    required: number,
+    logger: EndpointLogger,
+  ): Promise<boolean>;
+
+  deductCreditsWithValidation(
+    identifier: CreditIdentifier,
+    amount: number,
+    modelId: string,
+    logger: EndpointLogger,
+  ): Promise<{ success: boolean; messageId?: string; error?: string }>;
+
+  generateMessageId(): string;
+}
+
+/**
+ * Credit Repository Implementation
+ * Uses simplified wallet-based architecture
+ */
+class CreditRepository implements CreditRepositoryInterface {
+  /**
+   * Initial free credits for new wallets
+   * Uses the FREE_TIER product definition as single source of truth
+   */
+  private getInitialFreeCredits(): number {
+    return productsRepository.getProduct(ProductIds.FREE_TIER, "en-GLOBAL")
+      .credits;
+  }
+
+  /**
+   * Get pool for a user - includes user wallet + all linked lead wallets
+   */
+  async getUserPool(
+    userId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditPool>> {
+    try {
+      // Get user wallet
+      const userWalletResult = await this.getOrCreateUserWallet(userId, logger);
+      if (!userWalletResult.success) {
+        return userWalletResult;
+      }
+
+      // Get all linked leads
+      const linkedLeads = await db
+        .select({ leadId: userLeadLinks.leadId })
+        .from(userLeadLinks)
+        .where(eq(userLeadLinks.userId, userId));
+
+      const linkedLeadIds = linkedLeads.map((l) => l.leadId);
+
+      // Get wallets for linked leads
+      let leadWallets =
+        linkedLeadIds.length > 0
+          ? await db
+              .select()
+              .from(creditWallets)
+              .where(inArray(creditWallets.leadId, linkedLeadIds))
+          : [];
+
+      // Ensure all linked leads have wallets
+      if (linkedLeadIds.length > 0) {
+        for (const leadId of linkedLeadIds) {
+          const hasWallet = leadWallets.some((w) => w.leadId === leadId);
+          if (!hasWallet) {
+            const walletResult = await this.getOrCreateLeadWallet(
+              leadId,
+              logger,
+            );
+            if (walletResult.success) {
+              leadWallets.push(walletResult.data);
+            }
+          }
+        }
+      }
+
+      return success({
+        userWallet: userWalletResult.data,
+        leadWallets,
+        poolId: userId,
+        poolType: "USER_POOL",
+      });
+    } catch (error) {
+      logger.error("Failed to get user pool", parseError(error));
+      return fail({
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.credits.errors.getBalanceFailed",
+      });
+    }
+  }
+
+  /**
+   * Get pool for a lead - ONLY lead wallets (no user wallet)
+   * Used when accessing as a public/logged-out user
+   * Even if lead is linked to a user, only returns lead wallets
+   */
+  async getLeadPoolOnly(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditPool>> {
+    try {
+      // Find all connected leads (lead-to-lead connections only)
+      const connectedLeadIds = await this.findConnectedLeads(leadId, logger);
+
+      // Get wallets for all connected leads
+      let leadWallets = await db
+        .select()
+        .from(creditWallets)
+        .where(inArray(creditWallets.leadId, connectedLeadIds));
+
+      // If no wallets exist, create wallet for the primary lead
+      if (leadWallets.length === 0) {
+        const walletResult = await this.getOrCreateLeadWallet(leadId, logger);
+        if (!walletResult.success) {
+          return walletResult;
+        }
+        leadWallets = [walletResult.data];
+      } else {
+        // Ensure all connected leads have wallets
+        for (const connectedLeadId of connectedLeadIds) {
+          const hasWallet = leadWallets.some(
+            (w) => w.leadId === connectedLeadId,
+          );
+          if (!hasWallet) {
+            const walletResult = await this.getOrCreateLeadWallet(
+              connectedLeadId,
+              logger,
+            );
+            if (walletResult.success) {
+              leadWallets.push(walletResult.data);
+            }
+          }
+        }
+      }
+
+      return success({
+        userWallet: null, // Never include user wallet for lead-only pool
+        leadWallets,
+        poolId: leadId,
+        poolType: "LEAD_POOL",
+      });
+    } catch (error) {
+      logger.error("Failed to get lead pool", parseError(error));
+      return fail({
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.credits.errors.getBalanceFailed",
+      });
+    }
+  }
+
+  /**
+   * Get pool for a lead - uses graph traversal to find all connected leads
+   * If lead is linked to a user, returns the full user pool (user wallet + lead wallets)
+   * This is used for internal operations where we want full pool behavior
+   */
+  async getLeadPool(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditPool>> {
+    try {
+      // Check if lead is linked to a user
+      const [userLink] = await db
+        .select()
+        .from(userLeadLinks)
+        .where(eq(userLeadLinks.leadId, leadId))
+        .limit(1);
+
+      if (userLink) {
+        // Lead is linked to user -> return user's pool
+        return this.getUserPool(userLink.userId, logger);
+      }
+
+      // Lead is not linked to user -> find lead-to-lead pool
+      const connectedLeadIds = await this.findConnectedLeads(leadId, logger);
+
+      // Get wallets for all connected leads
+      let leadWallets = await db
+        .select()
+        .from(creditWallets)
+        .where(inArray(creditWallets.leadId, connectedLeadIds));
+
+      // If no wallets exist, create wallet for the primary lead
+      if (leadWallets.length === 0) {
+        const walletResult = await this.getOrCreateLeadWallet(leadId, logger);
+        if (!walletResult.success) {
+          return walletResult;
+        }
+        leadWallets = [walletResult.data];
+      } else {
+        // Ensure all connected leads have wallets
+        for (const connectedLeadId of connectedLeadIds) {
+          const hasWallet = leadWallets.some(
+            (w) => w.leadId === connectedLeadId,
+          );
+          if (!hasWallet) {
+            const walletResult = await this.getOrCreateLeadWallet(
+              connectedLeadId,
+              logger,
+            );
+            if (walletResult.success) {
+              leadWallets.push(walletResult.data);
+            }
+          }
+        }
+      }
+
+      // Primary lead is the oldest
+      const sortedWallets = leadWallets.toSorted(
+        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+      );
+      const primaryLead = sortedWallets[0];
+
+      return success({
+        userWallet: null,
+        leadWallets,
+        poolId: primaryLead?.leadId || leadId,
+        poolType: "LEAD_POOL",
+      });
+    } catch (error) {
+      logger.error("Failed to get lead pool", parseError(error));
+      return fail({
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.credits.errors.getBalanceFailed",
+      });
+    }
+  }
+
+  /**
+   * Find all leads connected via LEAD_ATTRIBUTION using graph traversal
+   */
+  private async findConnectedLeads(
+    startLeadId: string,
+    _logger: EndpointLogger,
+  ): Promise<string[]> {
+    const visited = new Set<string>();
+    const queue = [startLeadId];
+
+    while (queue.length > 0) {
+      const currentLeadId = queue.shift()!;
+
+      if (visited.has(currentLeadId)) {
+        continue;
+      }
+      visited.add(currentLeadId);
+
+      // Find outbound attributions (FROM this lead)
+      const outbound = await db
+        .select()
+        .from(leadEngagements)
+        .where(
+          and(
+            eq(leadEngagements.leadId, currentLeadId),
+            eq(
+              leadEngagements.engagementType,
+              EngagementTypes.LEAD_ATTRIBUTION,
+            ),
+          ),
+        );
+
+      for (const engagement of outbound) {
+        const targetLeadId = (engagement.metadata as { sourceLeadId?: string })
+          ?.sourceLeadId;
+        if (targetLeadId && !visited.has(targetLeadId)) {
+          queue.push(targetLeadId);
+        }
+      }
+
+      // Find inbound attributions (TO this lead)
+      const inbound = await db
+        .select()
+        .from(leadEngagements)
+        .where(
+          eq(leadEngagements.engagementType, EngagementTypes.LEAD_ATTRIBUTION),
+        );
+
+      for (const engagement of inbound) {
+        const metadata = engagement.metadata as { sourceLeadId?: string };
+        if (metadata.sourceLeadId === currentLeadId) {
+          const sourceLeadId = engagement.leadId;
+          if (!visited.has(sourceLeadId)) {
+            queue.push(sourceLeadId);
+          }
+        }
+      }
+    }
+
+    return [...visited];
+  }
+
+  /**
+   * Redistribute free credits across pool and align to oldest period
+   * Ensures max 20 credits per pool and all wallets share same period
+   */
+  async redistributeFreeCredits(
+    pool: CreditPool,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    try {
+      const allWallets = [pool.userWallet, ...pool.leadWallets].filter(
+        (w): w is CreditWallet => w !== null,
+      );
+
+      if (allWallets.length === 0) {
+        return success(undefined);
+      }
+
+      // Find oldest period in pool
+      const oldestWallet = allWallets.reduce((oldest, current) =>
+        current.freePeriodStart < oldest.freePeriodStart ? current : oldest,
+      );
+
+      const oldestPeriodStart = oldestWallet.freePeriodStart;
+      const periodId = `${oldestPeriodStart.getFullYear()}-${String(oldestPeriodStart.getMonth() + 1).padStart(2, "0")}`;
+
+      // Calculate total free credits in pool
+      const totalFree = allWallets.reduce(
+        (sum, w) => sum + w.freeCreditsRemaining,
+        0,
+      );
+
+      await withTransaction(logger, async (tx) => {
+        // Align all wallets to oldest period
+        for (const wallet of allWallets) {
+          await tx
+            .update(creditWallets)
+            .set({
+              freePeriodStart: oldestPeriodStart,
+              freePeriodId: periodId,
+              updatedAt: new Date(),
+            })
+            .where(eq(creditWallets.id, wallet.id));
+
+          // Update FREE_GRANT transaction timestamps to oldest period
+          await tx
+            .update(creditTransactions)
+            .set({ createdAt: oldestPeriodStart })
+            .where(
+              and(
+                eq(creditTransactions.walletId, wallet.id),
+                eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
+                eq(creditTransactions.freePeriodId, periodId),
+              ),
+            );
+        }
+
+        // Redistribute credits based on pool type
+        // USER_POOL: ALWAYS consolidate all free credits to user wallet, lead wallets get 0
+        // LEAD_POOL: Only redistribute if total > 20 (otherwise keep as is)
+        const shouldRedistribute =
+          pool.poolType === "USER_POOL" || totalFree > 20;
+
+        if (shouldRedistribute) {
+          // Determine which wallet gets the credits
+          // USER_POOL: user wallet gets ALL free credits (up to max 20)
+          // LEAD_POOL: oldest wallet gets credits
+          const targetWallet =
+            pool.poolType === "USER_POOL" && pool.userWallet
+              ? pool.userWallet
+              : oldestWallet;
+
+          const targetCredits = Math.min(totalFree, 20);
+
+          // Put credits in target wallet
+          await tx
+            .update(creditWallets)
+            .set({ freeCreditsRemaining: targetCredits, updatedAt: new Date() })
+            .where(eq(creditWallets.id, targetWallet.id));
+
+          // Zero out other wallets (no transaction needed)
+          for (const wallet of allWallets.filter(
+            (w) => w.id !== targetWallet.id,
+          )) {
+            if (wallet.freeCreditsRemaining > 0) {
+              await tx
+                .update(creditWallets)
+                .set({ freeCreditsRemaining: 0, updatedAt: new Date() })
+                .where(eq(creditWallets.id, wallet.id));
+            }
+          }
+        }
+
+        logger.info("Redistributed free credits across pool", {
+          poolId: pool.poolId,
+          poolType: pool.poolType,
+          walletCount: allWallets.length,
+          totalFreeBefore: totalFree,
+          totalFreeAfter: Math.min(totalFree, 20),
+          oldestPeriodStart: oldestPeriodStart.toISOString(),
+          periodId,
+        });
+      });
+
+      return success(undefined);
+    } catch (error) {
+      logger.error("Failed to redistribute free credits", parseError(error));
+      return fail({
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: "app.api.credits.errors.transactionFailed",
+      });
+    }
+  }
+
+  /**
+   * Calculate balance across all wallets in pool
+   */
+  private async calculatePoolBalance(
+    pool: CreditPool,
+    _logger: EndpointLogger,
+  ): Promise<CreditBalance> {
+    const allWallets = [pool.userWallet, ...pool.leadWallets].filter(
+      (w): w is CreditWallet => w !== null,
+    );
+
+    let totalFree = 0;
+    let totalPaid = 0;
+    let totalExpiring = 0;
+    let totalPermanent = 0;
+    let earliestExpiry: Date | null = null;
+
+    const now = new Date();
+
+    for (const wallet of allWallets) {
+      // Sum free credits directly from wallet
+      totalFree += wallet.freeCreditsRemaining;
+
+      // Sum pack credits
+      totalPaid += wallet.balance;
+
+      // Get ACTIVE packs for this wallet (not expired)
+      const packs = await db
+        .select()
+        .from(creditPacks)
+        .where(
+          and(
+            eq(creditPacks.walletId, wallet.id),
+            or(isNull(creditPacks.expiresAt), gte(creditPacks.expiresAt, now)),
+          ),
+        );
+
+      for (const pack of packs) {
+        if (pack.type === "subscription" && pack.expiresAt) {
+          totalExpiring += pack.remaining;
+          if (!earliestExpiry || pack.expiresAt < earliestExpiry) {
+            earliestExpiry = pack.expiresAt;
+          }
+        } else {
+          totalPermanent += pack.remaining;
+        }
+      }
+    }
+
+    return {
+      total: totalFree + totalPaid,
+      free: totalFree,
+      expiring: totalExpiring,
+      permanent: totalPermanent,
+      expiresAt: earliestExpiry?.toISOString() || null,
+    };
+  }
+
+  /**
+   * Get or create wallet for a user
+   * Per spec: User wallet gets created with 0 free credits (not 20)
+   * Free credits come from lead wallets during redistribution
+   * ATOMIC: Wallet creation wrapped in database transaction
+   */
+  private async getOrCreateUserWallet(
+    userId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditWallet>> {
+    const [existingWallet] = await db
+      .select()
+      .from(creditWallets)
+      .where(eq(creditWallets.userId, userId))
+      .limit(1);
+
+    if (existingWallet) {
+      // Backfill freePeriodId if it's null (for existing wallets)
+      if (!existingWallet.freePeriodId && existingWallet.freePeriodStart) {
+        const periodId = `${existingWallet.freePeriodStart.getFullYear()}-${String(existingWallet.freePeriodStart.getMonth() + 1).padStart(2, "0")}`;
+        const [updated] = await db
+          .update(creditWallets)
+          .set({ freePeriodId: periodId })
+          .where(eq(creditWallets.id, existingWallet.id))
+          .returning();
+
+        if (updated) {
+          logger.debug("Backfilled freePeriodId for user wallet", {
+            walletId: existingWallet.id,
+            periodId,
+          });
+          return success(updated);
+        }
+      }
+      return success(existingWallet);
+    }
+
+    // Create new wallet for user with 0 free credits (per spec)
+    // No FREE_GRANT transaction - user gets 0 initial free credits
+    const initialCredits = 0;
+    const now = new Date();
+    const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    try {
+      const newWallet = await withTransaction(logger, async (tx) => {
+        const [wallet] = await tx
+          .insert(creditWallets)
+          .values({
+            userId,
+            balance: 0,
+            freeCreditsRemaining: initialCredits,
+            freePeriodStart: now,
+            freePeriodId: periodId,
+          })
+          .onConflictDoNothing() // Handle race condition
+          .returning();
+
+        if (wallet) {
+          // NOTE: No FREE_GRANT transaction for user wallets
+          // User wallets start with 0 free credits
+          // Free credits come from linked lead wallets during redistribution
+
+          logger.info("Created new user wallet", {
+            userId,
+            walletId: wallet.id,
+            initialCredits: 0,
+            periodId,
+          });
+        }
+
+        return wallet;
+      });
+
+      if (newWallet) {
+        return success(newWallet);
+      }
+    } catch (error) {
+      logger.warn(
+        "Wallet creation transaction failed, checking for race condition",
+        {
+          userId,
+          error: parseError(error),
+        },
+      );
+    }
+
+    // Race condition: another process created it, fetch it
+    const [wallet] = await db
+      .select()
+      .from(creditWallets)
+      .where(eq(creditWallets.userId, userId))
+      .limit(1);
+
+    if (!wallet) {
+      logger.error("Failed to retrieve user wallet after creation attempt", {
+        userId,
+      });
+      return fail({
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        message: "app.api.credits.errors.walletCreationFailed",
+      });
+    }
+
+    return success(wallet);
+  }
+
+  /**
+   * Get or create wallet for a lead
+   * ATOMIC: Wallet creation and FREE_GRANT transaction are wrapped in database transaction
+   */
+  private async getOrCreateLeadWallet(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditWallet>> {
+    const [existingWallet] = await db
+      .select()
+      .from(creditWallets)
+      .where(eq(creditWallets.leadId, leadId))
+      .limit(1);
+
+    if (existingWallet) {
+      // Backfill freePeriodId if it's null (for existing wallets)
+      if (!existingWallet.freePeriodId && existingWallet.freePeriodStart) {
+        const periodId = `${existingWallet.freePeriodStart.getFullYear()}-${String(existingWallet.freePeriodStart.getMonth() + 1).padStart(2, "0")}`;
+        const [updated] = await db
+          .update(creditWallets)
+          .set({ freePeriodId: periodId })
+          .where(eq(creditWallets.id, existingWallet.id))
+          .returning();
+
+        if (updated) {
+          logger.debug("Backfilled freePeriodId for lead wallet", {
+            walletId: existingWallet.id,
+            periodId,
+          });
+          return success(updated);
+        }
+      }
+      return success(existingWallet);
+    }
+
+    // Create new wallet for lead - ATOMIC operation
+    const initialCredits = this.getInitialFreeCredits();
+    const now = new Date();
+    const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    try {
+      const newWallet = await withTransaction(logger, async (tx) => {
+        const [wallet] = await tx
+          .insert(creditWallets)
+          .values({
+            leadId,
+            balance: 0,
+            freeCreditsRemaining: initialCredits,
+            freePeriodStart: now,
+            freePeriodId: periodId,
+          })
+          .onConflictDoNothing() // Handle race condition with UNIQUE constraint
+          .returning();
+
+        if (wallet) {
+          // Create FREE_GRANT transaction atomically with wallet
+          await tx.insert(creditTransactions).values({
+            walletId: wallet.id,
+            amount: initialCredits,
+            balanceAfter: 0, // Pack balance is 0, free credits are separate
+            type: CreditTransactionType.FREE_GRANT,
+            freePeriodId: periodId,
+            metadata: {
+              reason: "initial_grant",
+              freeCreditsRemaining: initialCredits,
+            },
+          });
+
+          logger.info("Created new lead wallet", {
+            leadId,
+            walletId: wallet.id,
+            initialCredits,
+            periodId,
+          });
+        }
+
+        return wallet;
+      });
+
+      if (newWallet) {
+        return success(newWallet);
+      }
+    } catch (error) {
+      logger.warn(
+        "Wallet creation transaction failed, checking for race condition",
+        {
+          leadId,
+          error: parseError(error),
+        },
+      );
+    }
+
+    // Race condition: another process created it, fetch it
+    const [wallet] = await db
+      .select()
+      .from(creditWallets)
+      .where(eq(creditWallets.leadId, leadId))
+      .limit(1);
+
+    if (!wallet) {
+      logger.error("Failed to retrieve lead wallet after creation attempt", {
+        leadId,
+      });
+      return fail({
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        message: "app.api.credits.errors.walletCreationFailed",
+      });
+    }
+
+    return success(wallet);
+  }
+
+  /**
+   * Check and reset monthly free credits for entire pool (pool-aware)
+   * Per spec: "When any wallet in pool hits new month: Reset entire pool to 20 total free credits"
+   *
+   * CRITICAL: Only reset when moving to a NEW period (future month), not when syncing old periods
+   * This prevents resetting credits that were already spent in the current period
+   */
+  private async ensureMonthlyFreeCreditsForPool(
+    pool: CreditPool,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const now = new Date();
+    const currentPeriodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+    const allWallets = [pool.userWallet, ...pool.leadWallets].filter(
+      (w): w is CreditWallet => w !== null,
+    );
+
+    if (allWallets.length === 0) {
+      return;
+    }
+
+    // Find the wallet with the most recent reset (newest freePeriodStart)
+    const mostRecentlyResetWallet = allWallets.reduce((newest, current) =>
+      current.freePeriodStart > newest.freePeriodStart ? current : newest,
+    );
+
+    // Check if the most recent reset was in a PREVIOUS calendar month
+    const lastResetDate = new Date(mostRecentlyResetWallet.freePeriodStart);
+    const lastResetMonth = lastResetDate.getMonth();
+    const lastResetYear = lastResetDate.getFullYear();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Only reset if we're in a different calendar month than the last reset
+    const isNewMonth =
+      currentYear > lastResetYear ||
+      (currentYear === lastResetYear && currentMonth > lastResetMonth);
+
+    if (!isNewMonth) {
+      // We're still in the same calendar month as the last reset - no reset needed
+      // Just sync old wallets to current period without changing credits
+      const walletsToSync = allWallets.filter(
+        (w) => w.freePeriodId !== currentPeriodId,
+      );
+
+      if (walletsToSync.length > 0) {
+        logger.debug("Syncing old wallet periods without resetting credits", {
+          poolId: pool.poolId,
+          currentPeriodId,
+          lastResetDate: lastResetDate.toISOString(),
+          walletsToSync: walletsToSync.length,
+        });
+
+        await withTransaction(logger, async (tx) => {
+          for (const wallet of walletsToSync) {
+            // Just update period ID, don't touch freeCreditsRemaining
+            await tx
+              .update(creditWallets)
+              .set({
+                freePeriodStart: mostRecentlyResetWallet.freePeriodStart,
+                freePeriodId: currentPeriodId,
+                updatedAt: now,
+              })
+              .where(eq(creditWallets.id, wallet.id));
+          }
+        });
+      }
+      return;
+    }
+
+    // We're in a NEW month - perform full reset
+    logger.info("Pool needs monthly free credits reset (new month detected)", {
+      poolId: pool.poolId,
+      currentPeriodId,
+      lastResetDate: lastResetDate.toISOString(),
+      daysSinceLastReset: Math.floor(
+        (now.getTime() - lastResetDate.getTime()) / (1000 * 60 * 60 * 24),
+      ),
+      walletCount: allWallets.length,
+    });
+
+    // Determine which wallet gets the 20 credits
+    // USER_POOL: user wallet gets all credits
+    // LEAD_POOL: oldest wallet gets credits
+    const oldestWallet = allWallets.reduce((oldest, current) =>
+      current.freePeriodStart < oldest.freePeriodStart ? current : oldest,
+    );
+    const targetWallet =
+      pool.poolType === "USER_POOL" && pool.userWallet
+        ? pool.userWallet
+        : oldestWallet;
+
+    const freeCredits = productsRepository.getProduct(
+      ProductIds.FREE_TIER,
+      "en-GLOBAL",
+    ).credits;
+
+    await withTransaction(logger, async (tx) => {
+      // Reset all wallets in pool
+      for (const wallet of allWallets) {
+        const isTarget = wallet.id === targetWallet.id;
+        const newFree = isTarget ? freeCredits : 0;
+
+        // Update wallet
+        await tx
+          .update(creditWallets)
+          .set({
+            freeCreditsRemaining: newFree,
+            freePeriodStart: now,
+            freePeriodId: currentPeriodId,
+            updatedAt: now,
+          })
+          .where(eq(creditWallets.id, wallet.id));
+
+        // Create FREE_GRANT transaction only for target wallet
+        if (isTarget && newFree > 0) {
+          await tx.insert(creditTransactions).values({
+            walletId: wallet.id,
+            amount: newFree,
+            balanceAfter: wallet.balance,
+            type: CreditTransactionType.FREE_GRANT,
+            freePeriodId: currentPeriodId,
+            metadata: {
+              reason: "initial_grant",
+              freeCreditsRemaining: newFree,
+            },
+          });
+        }
+      }
+
+      logger.info("Pool monthly free credits reset complete", {
+        poolId: pool.poolId,
+        oldestWalletId: oldestWallet.id,
+        totalWallets: allWallets.length,
+      });
+    });
+  }
+
+  /**
+   * Get balance for identifier
+   */
+  async getBalance(
+    identifier: CreditIdentifier,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditBalance>> {
+    try {
+      let poolResult: ResponseType<CreditPool>;
+
+      if (identifier.userId) {
+        poolResult = await this.getUserPool(identifier.userId, logger);
+      } else if (identifier.leadId) {
+        poolResult = await this.getLeadPool(identifier.leadId, logger);
+      } else {
+        return fail({
+          message: "app.api.credits.errors.invalidIdentifier",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      if (!poolResult.success) {
+        return poolResult;
+      }
+
+      const balance = await this.calculatePoolBalance(poolResult.data, logger);
+      return success(balance);
+    } catch (error) {
+      logger.error("Failed to get balance", parseError(error), {
+        ...identifier,
+      });
+      return fail({
+        message: "app.api.credits.errors.getBalanceFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Get lead's credit balance (pool-based)
+   * Sums all wallets in the lead's pool
+   */
+  async getLeadBalance(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<number>> {
+    try {
+      // Get pool for this lead
+      const poolResult = await this.getLeadPool(leadId, logger);
+      if (!poolResult.success) {
+        return poolResult;
+      }
+
+      const pool = poolResult.data;
+
+      // Check and reset monthly free credits for entire pool if needed
+      await this.ensureMonthlyFreeCreditsForPool(pool, logger);
+
+      // Calculate balance across all wallets in pool
+      const balance = await this.calculatePoolBalance(pool, logger);
+      return success(balance.total);
+    } catch (error) {
+      logger.error("Failed to get lead balance", parseError(error), { leadId });
+      return fail({
+        message: "app.api.credits.errors.getLeadBalanceFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Get credit balance for user
+   * Pool-based: Sum all wallets in the pool
+   * - Public users: Only lead wallets (no user wallet)
+   * - Authenticated users: User wallet + all linked lead wallets
+   */
+  async getCreditBalanceForUser(
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CreditBalance>> {
+    try {
+      // Get the pool for this user
+      let poolResult: ResponseType<CreditPool>;
+      if (user.isPublic) {
+        // Public user - get ONLY lead wallets (no user wallet)
+        // This ensures logged-out users don't see the authenticated user's credits
+        poolResult = await this.getLeadPoolOnly(user.leadId, logger);
+      } else {
+        // Authenticated user - get full user pool (user wallet + lead wallets)
+        poolResult = await this.getUserPool(user.id, logger);
+      }
+
+      if (!poolResult.success) {
+        return poolResult;
+      }
+
+      const pool = poolResult.data;
+
+      // Check and reset monthly free credits for entire pool if needed
+      await this.ensureMonthlyFreeCreditsForPool(pool, logger);
+
+      // Calculate balance across all wallets in pool
+      const balance = await this.calculatePoolBalance(pool, logger);
+      return success(balance);
+    } catch (error) {
+      logger.error("Failed to get user balance", parseError(error), {
+        userId: user.isPublic ? undefined : user.id,
+        leadId: user.leadId,
+      });
+      return fail({
+        message: "app.api.credits.errors.getBalanceFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Get or create lead by IP address
+   * Pool-based: Returns total credits across lead's pool
+   */
+  async getOrCreateLeadByIp(
+    ipAddress: string,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ leadId: string; credits: number }>> {
+    try {
+      // Check if lead exists for this IP
+      const [existingLead] = await db
+        .select()
+        .from(leads)
+        .where(eq(leads.ipAddress, ipAddress))
+        .limit(1);
+
+      if (existingLead) {
+        // Get pool for this lead
+        const poolResult = await this.getLeadPool(existingLead.id, logger);
+        if (!poolResult.success) {
+          return poolResult;
+        }
+
+        // Ensure monthly credits are current for pool
+        await this.ensureMonthlyFreeCreditsForPool(poolResult.data, logger);
+
+        // Calculate total credits across pool
+        const balance = await this.calculatePoolBalance(
+          poolResult.data,
+          logger,
+        );
+
+        return success({
+          leadId: existingLead.id,
+          credits: balance.total,
+        });
+      }
+
+      // Create new lead with IP
+      const { language, country } = getLanguageAndCountryFromLocale(locale);
+
+      const [newLead] = await db
+        .insert(leads)
+        .values({
+          ipAddress,
+          businessName: "",
+          country,
+          language,
+          status: LeadStatus.WEBSITE_USER,
+          source: LeadSource.WEBSITE,
+        })
+        .returning();
+
+      // Create wallet for new lead
+      const walletResult = await this.getOrCreateLeadWallet(newLead.id, logger);
+      if (!walletResult.success) {
+        return walletResult;
+      }
+
+      // New lead has just one wallet, so credits = wallet balance
+      const credits =
+        walletResult.data.freeCreditsRemaining + walletResult.data.balance;
+
+      logger.debug("Created new lead with wallet", {
+        leadId: newLead.id,
+        ipAddress,
+        credits,
+      });
+
+      return success({
+        leadId: newLead.id,
+        credits,
+      });
+    } catch (error) {
+      logger.error("Failed to get or create lead by IP", parseError(error), {
+        ipAddress,
+      });
+      return fail({
+        message: "app.api.credits.errors.getOrCreateLeadFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Add credits to identifier
+   * Validates input and creates typed transaction metadata
+   */
+  async addCredits(
+    identifier: CreditIdentifier,
+    amount: number,
+    type: "subscription" | "permanent" | "bonus",
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    // Input validation
+    if (amount <= 0) {
+      return fail({
+        message: "app.api.credits.errors.invalidAmount",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    if (!identifier.userId && !identifier.leadId) {
+      return fail({
+        message: "app.api.credits.errors.invalidIdentifier",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    try {
+      let walletResult: ResponseType<CreditWallet>;
+
+      if (identifier.userId) {
+        // Add to user wallet (credits are pooled across user + linked leads)
+        walletResult = await this.getOrCreateUserWallet(
+          identifier.userId,
+          logger,
+        );
+      } else {
+        // Check if this lead is linked to a user
+        const [leadLink] = await db
+          .select()
+          .from(userLeadLinks)
+          .where(eq(userLeadLinks.leadId, identifier.leadId!))
+          .limit(1);
+
+        if (leadLink) {
+          // Lead is linked to a user - add to user wallet
+          logger.debug("Lead is linked to user, adding to user wallet", {
+            leadId: identifier.leadId,
+            userId: leadLink.userId,
+          });
+          walletResult = await this.getOrCreateUserWallet(
+            leadLink.userId,
+            logger,
+          );
+        } else {
+          // Lead is not linked - use lead wallet
+          walletResult = await this.getOrCreateLeadWallet(
+            identifier.leadId!,
+            logger,
+          );
+        }
+      }
+
+      if (!walletResult.success) {
+        return walletResult;
+      }
+
+      const wallet = walletResult.data;
+
+      // Determine pack type and expiration
+      let packType: "subscription" | "permanent" | "bonus";
+      let expiresAt: Date | null = null;
+
+      if (type === "subscription") {
+        packType = "subscription";
+        // Subscription credits expire in 30 days
+        expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 30);
+      } else if (type === "permanent") {
+        packType = "permanent";
+      } else {
+        packType = "bonus";
+      }
+
+      // Create credit pack
+      const [newPack] = await db
+        .insert(creditPacks)
+        .values({
+          walletId: wallet.id,
+          originalAmount: amount,
+          remaining: amount,
+          type: packType,
+          expiresAt,
+          source: type,
+          metadata: {},
+        })
+        .returning();
+
+      // Update wallet balance
+      const newBalance = wallet.balance + amount;
+      await db
+        .update(creditWallets)
+        .set({ balance: newBalance, updatedAt: new Date() })
+        .where(eq(creditWallets.id, wallet.id));
+
+      // Create transaction with typed metadata
+      const transactionMetadata =
+        packType === "subscription"
+          ? {
+              subscriptionId: `system_add_${Date.now()}`,
+              periodStart: new Date().toISOString(),
+              periodEnd: expiresAt?.toISOString(),
+            }
+          : { packQuantity: 1 };
+
+      await db.insert(creditTransactions).values({
+        walletId: wallet.id,
+        amount,
+        balanceAfter: newBalance,
+        type:
+          packType === "subscription"
+            ? CreditTransactionType.SUBSCRIPTION
+            : CreditTransactionType.PURCHASE,
+        packId: newPack.id,
+        freePeriodId: wallet.freePeriodId,
+        metadata: transactionMetadata,
+      });
+
+      logger.info("Credits added", {
+        walletId: wallet.id,
+        amount,
+        packType,
+        expiresAt,
+      });
+
+      return success(undefined);
+    } catch (error) {
+      logger.error("Failed to add credits", parseError(error), {
+        ...identifier,
+        amount,
+        type,
+      });
+      return fail({
+        message: "app.api.credits.errors.addCreditsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Add credits to user account (specific method)
+   * Optional sessionId for idempotency checking
+   */
+  async addUserCredits(
+    userId: string,
+    amount: number,
+    type: "subscription" | "permanent" | "free",
+    logger: EndpointLogger,
+    expiresAt?: Date,
+    sessionId?: string,
+  ): Promise<ResponseType<void>> {
+    try {
+      // Add to user wallet (credits are pooled across user + linked leads)
+      const walletResult = await this.getOrCreateUserWallet(userId, logger);
+      if (!walletResult.success) {
+        return walletResult;
+      }
+
+      const wallet = walletResult.data;
+
+      let packType: "subscription" | "permanent" | "bonus";
+      let finalExpiresAt: Date | null = null;
+
+      if (type === "subscription") {
+        packType = "subscription";
+        finalExpiresAt =
+          expiresAt ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      } else if (type === "permanent") {
+        packType = "permanent";
+      } else {
+        packType = "bonus";
+      }
+
+      // Create credit pack with optional session tracking for idempotency
+      const [newPack] = await db
+        .insert(creditPacks)
+        .values({
+          walletId: wallet.id,
+          originalAmount: amount,
+          remaining: amount,
+          type: packType,
+          expiresAt: finalExpiresAt,
+          source: `${type}_purchase`,
+          metadata: sessionId ? { sessionId } : {},
+        })
+        .returning();
+
+      // Update wallet balance
+      const newBalance = wallet.balance + amount;
+      await db
+        .update(creditWallets)
+        .set({ balance: newBalance, updatedAt: new Date() })
+        .where(eq(creditWallets.id, wallet.id));
+
+      // Create transaction with typed metadata
+      const purchaseMetadata = sessionId
+        ? { sessionId, packQuantity: 1, totalPaid: 0, currency: "USD" }
+        : { packQuantity: 1 };
+
+      await db.insert(creditTransactions).values({
+        walletId: wallet.id,
+        amount,
+        balanceAfter: newBalance,
+        type:
+          type === "subscription"
+            ? CreditTransactionType.SUBSCRIPTION
+            : type === "free"
+              ? CreditTransactionType.FREE_GRANT
+              : CreditTransactionType.PURCHASE,
+        packId: newPack.id,
+        freePeriodId: wallet.freePeriodId,
+        metadata: purchaseMetadata,
+      });
+
+      return success(undefined);
+    } catch (error) {
+      logger.error("Failed to add user credits", parseError(error), {
+        userId,
+        amount,
+        type,
+      });
+      return fail({
+        message: "app.api.credits.errors.addCreditsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Deduct credits from identifier
+   * Priority: free credits → expiring soonest packs → permanent packs
+   *
+   * CRITICAL: Uses database transaction with row locking to prevent race conditions
+   */
+  async deductCredits(
+    identifier: CreditIdentifier,
+    amount: number,
+    modelId: string,
+    messageId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    // Input validation
+    if (amount <= 0) {
+      return fail({
+        message: "app.api.credits.errors.invalidAmount",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    if (!identifier.userId && !identifier.leadId) {
+      return fail({
+        message: "app.api.credits.errors.invalidIdentifier",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    try {
+      // Get pool for this identifier
+      let poolResult: ResponseType<CreditPool>;
+      if (identifier.userId) {
+        poolResult = await this.getUserPool(identifier.userId, logger);
+      } else {
+        poolResult = await this.getLeadPool(identifier.leadId!, logger);
+      }
+
+      if (!poolResult.success) {
+        return poolResult;
+      }
+
+      const pool = poolResult.data;
+
+      // Ensure monthly credits are current for ENTIRE pool (pool-aware reset)
+      await this.ensureMonthlyFreeCreditsForPool(pool, logger);
+
+      const allWallets = [pool.userWallet, ...pool.leadWallets].filter(
+        (w): w is CreditWallet => w !== null,
+      );
+
+      // Execute deduction within a transaction for atomicity
+      const result = await withTransaction(logger, async (tx) => {
+        let remaining = amount;
+
+        // Step 1: Deduct from free credits (any wallet with free credits)
+        for (const wallet of allWallets) {
+          if (remaining <= 0) {
+            break;
+          }
+
+          const [lockedWallet] = await tx
+            .select()
+            .from(creditWallets)
+            .where(eq(creditWallets.id, wallet.id))
+            .for("update");
+
+          if (!lockedWallet || lockedWallet.freeCreditsRemaining <= 0) {
+            continue;
+          }
+
+          const deduction = Math.min(
+            lockedWallet.freeCreditsRemaining,
+            remaining,
+          );
+          await tx
+            .update(creditWallets)
+            .set({
+              freeCreditsRemaining:
+                lockedWallet.freeCreditsRemaining - deduction,
+              updatedAt: new Date(),
+            })
+            .where(eq(creditWallets.id, lockedWallet.id));
+
+          // Record transaction
+          await tx.insert(creditTransactions).values({
+            walletId: lockedWallet.id,
+            amount: -deduction,
+            balanceAfter: lockedWallet.balance,
+            type: CreditTransactionType.USAGE,
+            modelId,
+            messageId,
+            freePeriodId: lockedWallet.freePeriodId,
+            metadata: {
+              feature: "credit_usage",
+              cost: amount,
+              modelId,
+              messageId,
+              freeCreditsUsed: deduction,
+              packCreditsUsed: 0,
+            },
+          });
+
+          remaining -= deduction;
+        }
+
+        // Step 2: Deduct from expiring packs (soonest expiry first, across all wallets)
+        if (remaining > 0) {
+          const walletIds = allWallets.map((w) => w.id);
+          const expiringPacks = await tx
+            .select()
+            .from(creditPacks)
+            .where(
+              and(
+                inArray(creditPacks.walletId, walletIds),
+                not(isNull(creditPacks.expiresAt)),
+                gte(creditPacks.expiresAt, new Date()),
+              ),
+            )
+            .orderBy(sql`${creditPacks.expiresAt} ASC`);
+
+          for (const pack of expiringPacks) {
+            if (remaining <= 0) {
+              break;
+            }
+
+            const deduction = Math.min(pack.remaining, remaining);
+
+            if (deduction === pack.remaining) {
+              await tx.delete(creditPacks).where(eq(creditPacks.id, pack.id));
+            } else {
+              await tx
+                .update(creditPacks)
+                .set({
+                  remaining: pack.remaining - deduction,
+                  updatedAt: new Date(),
+                })
+                .where(eq(creditPacks.id, pack.id));
+            }
+
+            // Update wallet balance
+            await tx
+              .update(creditWallets)
+              .set({
+                balance: sql`${creditWallets.balance} - ${deduction}`,
+                updatedAt: new Date(),
+              })
+              .where(eq(creditWallets.id, pack.walletId));
+
+            // Get updated balance for transaction record
+            const [updatedWallet] = await tx
+              .select({ balance: creditWallets.balance })
+              .from(creditWallets)
+              .where(eq(creditWallets.id, pack.walletId));
+
+            // Get wallet's freePeriodId for transaction
+            const [walletInfo] = await tx
+              .select({ freePeriodId: creditWallets.freePeriodId })
+              .from(creditWallets)
+              .where(eq(creditWallets.id, pack.walletId));
+
+            // Record transaction
+            await tx.insert(creditTransactions).values({
+              walletId: pack.walletId,
+              amount: -deduction,
+              balanceAfter: updatedWallet?.balance || 0,
+              type: CreditTransactionType.USAGE,
+              modelId,
+              messageId,
+              packId: pack.id,
+              freePeriodId: walletInfo?.freePeriodId || null,
+              metadata: {
+                feature: "credit_usage",
+                cost: amount,
+                modelId,
+                messageId,
+                freeCreditsUsed: 0,
+                packCreditsUsed: deduction,
+              },
+            });
+
+            remaining -= deduction;
+          }
+        }
+
+        // Step 3: Deduct from permanent packs (across all wallets)
+        if (remaining > 0) {
+          const walletIds = allWallets.map((w) => w.id);
+          const permanentPacks = await tx
+            .select()
+            .from(creditPacks)
+            .where(
+              and(
+                inArray(creditPacks.walletId, walletIds),
+                isNull(creditPacks.expiresAt),
+              ),
+            )
+            .orderBy(desc(creditPacks.createdAt));
+
+          for (const pack of permanentPacks) {
+            if (remaining <= 0) {
+              break;
+            }
+
+            const deduction = Math.min(pack.remaining, remaining);
+
+            if (deduction === pack.remaining) {
+              await tx.delete(creditPacks).where(eq(creditPacks.id, pack.id));
+            } else {
+              await tx
+                .update(creditPacks)
+                .set({
+                  remaining: pack.remaining - deduction,
+                  updatedAt: new Date(),
+                })
+                .where(eq(creditPacks.id, pack.id));
+            }
+
+            // Update wallet balance
+            await tx
+              .update(creditWallets)
+              .set({
+                balance: sql`${creditWallets.balance} - ${deduction}`,
+                updatedAt: new Date(),
+              })
+              .where(eq(creditWallets.id, pack.walletId));
+
+            // Get updated balance for transaction record
+            const [updatedWallet] = await tx
+              .select({ balance: creditWallets.balance })
+              .from(creditWallets)
+              .where(eq(creditWallets.id, pack.walletId));
+
+            // Get wallet's freePeriodId for transaction
+            const [walletInfo] = await tx
+              .select({ freePeriodId: creditWallets.freePeriodId })
+              .from(creditWallets)
+              .where(eq(creditWallets.id, pack.walletId));
+
+            // Record transaction
+            await tx.insert(creditTransactions).values({
+              walletId: pack.walletId,
+              amount: -deduction,
+              balanceAfter: updatedWallet?.balance || 0,
+              type: CreditTransactionType.USAGE,
+              modelId,
+              messageId,
+              packId: pack.id,
+              freePeriodId: walletInfo?.freePeriodId || null,
+              metadata: {
+                feature: "credit_usage",
+                cost: amount,
+                modelId,
+                messageId,
+                freeCreditsUsed: 0,
+                packCreditsUsed: deduction,
+              },
+            });
+
+            remaining -= deduction;
+          }
+        }
+
+        if (remaining > 0) {
+          return {
+            success: false as const,
+            error: "app.api.credits.errors.insufficientCredits" as const,
+          };
+        }
+
+        return { success: true as const };
+      });
+
+      if (!result.success) {
+        return fail({
+          message: result.error,
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      logger.debug("Credits deducted from pool", {
+        poolId: pool.poolId,
+        poolType: pool.poolType,
+        amount,
+        walletCount: allWallets.length,
+      });
+
+      return success(undefined);
+    } catch (error) {
+      logger.error("Failed to deduct credits", parseError(error), {
+        ...identifier,
+        amount,
+      });
+      return fail({
+        message: "app.api.credits.errors.deductCreditsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Get transaction history
+   */
+  /**
+   * Get transactions for user
+   * Pool-based: Fetches from ALL wallets in user's pool
+   */
+  async getTransactions(
+    userId: string,
+    limit: number,
+    offset: number,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      transactions: CreditTransactionOutput[];
+      totalCount: number;
+    }>
+  > {
+    try {
+      // Get user pool to fetch from all wallets
+      const poolResult = await this.getUserPool(userId, logger);
+      if (!poolResult.success) {
+        return poolResult;
+      }
+
+      const pool = poolResult.data;
+      const allWallets = [pool.userWallet, ...pool.leadWallets].filter(
+        (w): w is CreditWallet => w !== null,
+      );
+      const walletIds = allWallets.map((w) => w.id);
+
+      // Handle edge case: no wallets in pool (shouldn't happen but safeguard)
+      if (walletIds.length === 0) {
+        return success({
+          transactions: [],
+          totalCount: 0,
+        });
+      }
+
+      // Fetch transactions from ALL wallets in pool
+      const transactions = await db
+        .select()
+        .from(creditTransactions)
+        .where(inArray(creditTransactions.walletId, walletIds))
+        .orderBy(desc(creditTransactions.createdAt))
+        .limit(limit)
+        .offset(offset);
+
+      const [{ count }] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(creditTransactions)
+        .where(inArray(creditTransactions.walletId, walletIds));
+
+      return success({
+        transactions: transactions.map((t) => ({
+          id: t.id,
+          amount: t.amount,
+          balanceAfter: t.balanceAfter,
+          type: t.type,
+          modelId: t.modelId,
+          messageId: t.messageId,
+          createdAt: t.createdAt.toISOString(),
+        })),
+        totalCount: count,
+      });
+    } catch (error) {
+      logger.error("Failed to get transactions", parseError(error), { userId });
+      return fail({
+        message: "app.api.credits.errors.getTransactionsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Get transactions by lead ID
+   * Shows only current lead wallet's transactions + summary of other devices' spending
+   */
+  async getTransactionsByLeadId(
+    leadId: string,
+    limit: number,
+    offset: number,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      transactions: CreditTransactionOutput[];
+      totalCount: number;
+    }>
+  > {
+    try {
+      // Get lead pool (lead wallets only, no user wallet)
+      const poolResult = await this.getLeadPoolOnly(leadId, logger);
+      if (!poolResult.success) {
+        return poolResult;
+      }
+
+      const pool = poolResult.data;
+      const allWallets = [pool.userWallet, ...pool.leadWallets].filter(
+        (w): w is CreditWallet => w !== null,
+      );
+
+      // Find current lead's wallet
+      const currentWallet = allWallets.find((w) => w.leadId === leadId);
+      if (!currentWallet) {
+        return success({
+          transactions: [],
+          totalCount: 0,
+        });
+      }
+
+      // Get current period
+      const now = new Date();
+      const currentPeriodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+      // Fetch transactions from ONLY current wallet
+      const transactions = await db
+        .select()
+        .from(creditTransactions)
+        .where(eq(creditTransactions.walletId, currentWallet.id))
+        .orderBy(desc(creditTransactions.createdAt))
+        .limit(limit)
+        .offset(offset);
+
+      const [{ count }] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(creditTransactions)
+        .where(eq(creditTransactions.walletId, currentWallet.id));
+
+      // Calculate total spending from other linked lead wallets in current period
+      const otherWallets = allWallets.filter((w) => w.id !== currentWallet.id);
+      let otherDevicesSpending = 0;
+
+      if (otherWallets.length > 0) {
+        const otherWalletIds = otherWallets.map((w) => w.id);
+        const otherTransactions = await db
+          .select()
+          .from(creditTransactions)
+          .where(
+            and(
+              inArray(creditTransactions.walletId, otherWalletIds),
+              eq(creditTransactions.freePeriodId, currentPeriodId),
+              eq(creditTransactions.type, CreditTransactionType.USAGE),
+            ),
+          );
+
+        otherDevicesSpending = otherTransactions.reduce(
+          (sum, t) => sum + Math.abs(t.amount),
+          0,
+        );
+      }
+
+      const result: CreditTransactionOutput[] = transactions.map((t) => ({
+        id: t.id,
+        amount: t.amount,
+        balanceAfter: t.balanceAfter,
+        type: t.type,
+        modelId: t.modelId,
+        messageId: t.messageId,
+        createdAt: t.createdAt.toISOString(),
+      }));
+
+      // Add summary entry for other devices' spending if > 0
+      if (otherDevicesSpending > 0 && offset === 0) {
+        result.unshift({
+          id: "other-devices-summary",
+          amount: -otherDevicesSpending,
+          balanceAfter: currentWallet.balance,
+          type: "app.api.credits.enums.transactionType.otherDevices",
+          modelId: null,
+          messageId: null,
+          createdAt: new Date().toISOString(),
+        });
+      }
+
+      return success({
+        transactions: result,
+        totalCount: count + (otherDevicesSpending > 0 ? 1 : 0),
+      });
+    } catch (error) {
+      logger.error("Failed to get transactions", parseError(error), { leadId });
+      return fail({
+        message: "app.api.credits.errors.getTransactionsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Expire old subscription credits (cron job)
+   * Creates EXPIRY transaction before deleting packs
+   * Each pack expiration is wrapped in a transaction for atomicity
+   */
+  async expireCredits(logger: EndpointLogger): Promise<ResponseType<number>> {
+    try {
+      const expiredPacks = await db
+        .select()
+        .from(creditPacks)
+        .where(
+          and(
+            eq(creditPacks.type, "subscription"),
+            lt(creditPacks.expiresAt, new Date()),
+          ),
+        );
+
+      let expiredCount = 0;
+
+      for (const pack of expiredPacks) {
+        try {
+          // Wrap each pack expiration in a transaction for atomicity
+          await withTransaction(logger, async (tx) => {
+            if (pack.remaining > 0) {
+              // Get wallet to update balance (with row lock to prevent concurrent modifications)
+              const [wallet] = await tx
+                .select()
+                .from(creditWallets)
+                .where(eq(creditWallets.id, pack.walletId))
+                .for("update")
+                .limit(1);
+
+              if (wallet) {
+                const newBalance = wallet.balance - pack.remaining;
+
+                // Update wallet balance
+                await tx
+                  .update(creditWallets)
+                  .set({
+                    balance: Math.max(0, newBalance),
+                    updatedAt: new Date(),
+                  })
+                  .where(eq(creditWallets.id, wallet.id));
+
+                // Create EXPIRY transaction (preserves history)
+                await tx.insert(creditTransactions).values({
+                  walletId: wallet.id,
+                  amount: -pack.remaining,
+                  balanceAfter: Math.max(0, newBalance),
+                  type: CreditTransactionType.EXPIRY,
+                  packId: pack.id,
+                  freePeriodId: wallet.freePeriodId,
+                  metadata: {
+                    expiredPackId: pack.id,
+                    expiredAmount: pack.remaining,
+                    originalAmount: pack.originalAmount,
+                    expiredAt: pack.expiresAt?.toISOString() ?? null,
+                  },
+                });
+              }
+            }
+
+            // Delete the expired pack
+            await tx.delete(creditPacks).where(eq(creditPacks.id, pack.id));
+          });
+
+          expiredCount++;
+        } catch (packError) {
+          // Log individual pack failure but continue with other packs
+          logger.error(
+            "Failed to expire individual pack",
+            parseError(packError),
+            {
+              packId: pack.id,
+              walletId: pack.walletId,
+            },
+          );
+        }
+      }
+
+      logger.info("Expired credits cleanup completed", { expiredCount });
+      return success(expiredCount);
+    } catch (error) {
+      logger.error("Failed to expire credits", parseError(error));
+      return fail({
+        message: "app.api.credits.errors.expireCreditsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Get credit identifier based on subscription status
+   */
+  async getCreditIdentifierBySubscription(
+    userId: string,
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      userId?: string;
+      leadId?: string;
+      creditType: CreditTypeIdentifierValue;
+    }>
+  > {
+    try {
+      // Check if user has an active subscription
+      const [subscription] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.userId, userId))
+        .limit(1);
+
+      const hasActiveSubscription =
+        subscription && subscription.status === SubscriptionStatus.ACTIVE;
+
+      if (hasActiveSubscription) {
+        logger.debug("Using user credits (subscription)", {
+          userId,
+          subscriptionId: subscription.id,
+        });
+        return success({
+          userId,
+          creditType: CreditTypeIdentifier.USER_SUBSCRIPTION,
+        });
+      }
+
+      // No subscription: use user wallet (which has free credits)
+      logger.debug("Using user credits (no subscription)", { userId });
+      return success({
+        userId,
+        creditType: CreditTypeIdentifier.LEAD_FREE,
+      });
+    } catch (error) {
+      logger.error("Failed to get credit identifier", parseError(error), {
+        userId,
+        leadId,
+      });
+      return fail({
+        message: "app.api.credits.errors.getCreditIdentifierFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Deduct credits for a feature (high-level wrapper)
+   */
+  async deductCreditsForFeature(
+    user: JwtPayloadType,
+    cost: number,
+    feature: string,
+    logger: EndpointLogger,
+  ): Promise<{ success: boolean; messageId?: string }> {
+    if (cost <= 0) {
+      logger.debug("Skipping credit deduction - zero or negative cost", {
+        feature,
+        cost,
+      });
+      return { success: true };
+    }
+
+    try {
+      const creditMessageId = crypto.randomUUID();
+      let identifier: CreditIdentifier;
+
+      if (user.isPublic && user.leadId) {
+        identifier = { leadId: user.leadId };
+      } else if (user.id) {
+        identifier = { userId: user.id };
+      } else if (user.leadId) {
+        identifier = { leadId: user.leadId };
+      } else {
+        logger.error("No identifier for credit deduction", { feature, cost });
+        return { success: false };
+      }
+
+      const result = await this.deductCredits(
+        identifier,
+        cost,
+        feature,
+        creditMessageId,
+        logger,
+      );
+
+      if (!result.success) {
+        logger.error(`Failed to deduct credits for ${feature}`, {
+          ...identifier,
+          cost,
+        });
+        return { success: false };
+      }
+
+      logger.info(`Credits deducted for ${feature}`, {
+        ...identifier,
+        cost,
+        messageId: creditMessageId,
+      });
+
+      return { success: true, messageId: creditMessageId };
+    } catch (error) {
+      logger.error(`Error deducting credits for ${feature}`, {
+        error: error instanceof Error ? error.message : String(error),
+        cost,
+      });
+      return { success: false };
+    }
+  }
+
+  /**
+   * Handle credit pack purchase from webhook
+   * CRITICAL: Includes idempotency check to prevent duplicate credit additions
+   */
+  async handleCreditPackPurchase(
+    session: CreditPackCheckoutSession,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const userId = session.metadata?.userId;
+      const totalCredits = parseInt(session.metadata?.totalCredits || "0", 10);
+
+      if (!userId || !totalCredits) {
+        logger.error("Invalid credit pack metadata", {
+          sessionId: session.id,
+          metadata: session.metadata,
+        });
+        return;
+      }
+
+      // IDEMPOTENCY CHECK: Verify this session hasn't been processed already
+      const [existingPack] = await db
+        .select()
+        .from(creditPacks)
+        .where(sql`${creditPacks.metadata}->>'sessionId' = ${session.id}`)
+        .limit(1);
+
+      if (existingPack) {
+        logger.info("Credit pack already processed for session", {
+          sessionId: session.id,
+          packId: existingPack.id,
+          userId,
+        });
+        return; // Idempotent - already processed
+      }
+
+      const result = await this.addUserCredits(
+        userId,
+        totalCredits,
+        "permanent",
+        logger,
+        undefined, // no expiration for permanent packs
+        session.id, // sessionId for idempotency tracking
+      );
+
+      if (!result.success) {
+        logger.error("Failed to add credits after purchase", {
+          sessionId: session.id,
+          userId,
+          totalCredits,
+        });
+      } else {
+        logger.info("Credits added after purchase", {
+          sessionId: session.id,
+          userId,
+          totalCredits,
+        });
+      }
+    } catch (error) {
+      logger.error("Failed to handle credit pack purchase", {
+        error: parseError(error),
+        sessionId: session.id,
+      });
+    }
+  }
+
+  /**
+   * Redistribute free credits across user pool during signup/login
+   * Pool-based approach: Wallets stay separate, credits redistributed across pool
+   */
+  async mergePendingLeadWallets(
+    userId: string,
+    leadIds: string[],
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    try {
+      logger.debug("Redistributing credits for user pool during signup", {
+        userId,
+        leadIds,
+      });
+
+      // Get user pool (this will create user wallet if it doesn't exist)
+      const poolResult = await this.getUserPool(userId, logger);
+      if (!poolResult.success) {
+        logger.error("Failed to get user pool during signup", {
+          userId,
+          error: poolResult.message,
+        });
+        return poolResult;
+      }
+
+      // Redistribute free credits across the pool (max 20 total)
+      const redistributeResult = await this.redistributeFreeCredits(
+        poolResult.data,
+        logger,
+      );
+      if (!redistributeResult.success) {
+        logger.error("Failed to redistribute free credits during signup", {
+          userId,
+          error: redistributeResult.message,
+        });
+        return redistributeResult;
+      }
+
+      logger.info("Free credits redistributed for user pool", {
+        userId,
+        poolLeadCount: poolResult.data.leadWallets.length,
+      });
+
+      return success(undefined);
+    } catch (error) {
+      logger.error(
+        "Failed to redistribute credits during signup",
+        parseError(error),
+        {
+          userId,
+          leadIds,
+        },
+      );
+      return fail({
+        message: "app.api.credits.errors.mergeLeadWalletsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Pool-based architecture: No orphaned wallets exist
+   * All wallets remain active in their pools
+   * Credits are automatically redistributed during signup/login
+   */
+  async cleanupOrphanedLeadWallets(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<number>> {
+    logger.info("Pool-based credits: No orphaned wallets to clean up");
+    return success(0);
+  }
+
+  /**
+   * Check if identifier has sufficient credits (repository-level business logic)
+   * Moved from BaseCreditHandler to enforce repository-first architecture
+   */
+  async hasSufficientCredits(
+    identifier: CreditIdentifier,
+    required: number,
+    logger: EndpointLogger,
+  ): Promise<boolean> {
+    if (!identifier.leadId && !identifier.userId) {
+      logger.error("Credit check requires leadId or userId");
+      return false;
+    }
+    const balanceResult = await this.getBalance(identifier, logger);
+    if (!balanceResult.success) {
+      return false;
+    }
+    return balanceResult.data.total >= required;
+  }
+
+  /**
+   * Deduct credits with validation (repository-level business logic)
+   * Moved from BaseCreditHandler to enforce repository-first architecture
+   */
+  async deductCreditsWithValidation(
+    identifier: CreditIdentifier,
+    amount: number,
+    modelId: string,
+    logger: EndpointLogger,
+  ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    if (!identifier.leadId && !identifier.userId) {
+      logger.error("Credit deduction requires leadId or userId");
+      return {
+        success: false,
+        error: "app.api.credits.errors.missingIdentifier",
+      };
+    }
+
+    const hasSufficient = await this.hasSufficientCredits(
+      identifier,
+      amount,
+      logger,
+    );
+    if (!hasSufficient) {
+      return {
+        success: false,
+        error: "app.api.credits.errors.insufficientCredits",
+      };
+    }
+
+    const messageId = this.generateMessageId();
+    const result = await this.deductCredits(
+      identifier,
+      amount,
+      modelId,
+      messageId,
+      logger,
+    );
+    if (!result.success) {
+      return {
+        success: false,
+        error: "app.api.credits.errors.deductionFailed",
+      };
+    }
+    return { success: true, messageId };
+  }
+
+  /**
+   * Generate unique message ID for credit transactions
+   * Moved from BaseCreditHandler to enforce repository-first architecture
+   */
+  generateMessageId(): string {
+    return `msg_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+  }
+}
+
+export const creditRepository = new CreditRepository();

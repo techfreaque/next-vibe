@@ -10,7 +10,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { CronHistoryClient } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/history/_components/cron-history-client";
+import { CronHistoryClient } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/_components/cron-history-client";
 
 interface CronHistoryPageProps {
   params: Promise<{

@@ -10,7 +10,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { UsersListClient } from "@/app/api/[locale]/v1/core/users/list/_components/users-list-client";
+import { UsersListClient } from "@/app/api/[locale]/users/list/_components/users-list-client";
 
 export default async function UsersListPage({
   params,

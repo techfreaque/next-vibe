@@ -40,13 +40,13 @@
         "./src/*"
       ],
       "next-vibe/*": [
-        "./src/app/api/[locale]/v1/core/*"
+        "./src/app/api/[locale]/*"
       ],
       "next-vibe-ui/*": [
         "./src/packages/next-vibe-ui/web/*"
       ],
       "server-only": [
-        "./src/app/api/[locale]/v1/core/system/unified-interface/shared/server-only/server-only.ts"
+        "./src/app/api/[locale]/system/unified-interface/shared/server-only/server-only.ts"
       ]
     }
   },
@@ -65,7 +65,6 @@
     ".next",
     "to_migrate/**/*.ts",
     "to_migrate/**/*.tsx",
-    
   ],
   "extends": "expo/tsconfig.base"
 }

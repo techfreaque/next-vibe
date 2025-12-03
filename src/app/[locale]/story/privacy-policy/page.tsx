@@ -8,7 +8,7 @@ import { Li } from "next-vibe-ui/ui/li";
 import { Ul } from "next-vibe-ui/ui/ul";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 
-import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
+import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";

@@ -8,13 +8,13 @@ import { notFound } from "next-vibe-ui/lib/not-found";
 import { H1 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { imapMessagesRepository } from "@/app/api/[locale]/v1/core/emails/imap-client/messages/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
+import { imapMessagesRepository } from "@/app/api/[locale]/emails/imap-client/messages/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { ImapMessageDetail } from "@/app/api/[locale]/v1/core/emails/imap-client/_components/imap-message-detail";
+import { ImapMessageDetail } from "@/app/api/[locale]/emails/imap-client/_components/imap-message-detail";
 
 interface ImapMessageDetailPageProps {
   params: Promise<{

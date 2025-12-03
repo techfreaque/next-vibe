@@ -7,7 +7,7 @@ import type { JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { ImapAdminLayoutClient } from "@/app/api/[locale]/v1/core/emails/imap-client/_components/imap-admin-layout-client";
+import { ImapAdminLayoutClient } from "@/app/api/[locale]/emails/imap-client/_components/imap-admin-layout-client";
 
 interface ImapAdminLayoutProps {
   children: ReactNode;

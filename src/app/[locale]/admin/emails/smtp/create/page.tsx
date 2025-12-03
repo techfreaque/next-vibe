@@ -10,7 +10,7 @@ import type { JSX } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { CreateSmtpAccountForm } from "@/app/api/[locale]/v1/core/emails/smtp-client/create/_components/create-smtp-account-form";
+import { CreateSmtpAccountForm } from "@/app/api/[locale]/emails/smtp-client/create/_components/create-smtp-account-form";
 
 export default async function CreateSmtpAccountPage({
   params,

@@ -4,11 +4,11 @@ import type { JSX, ReactNode } from "react";
 
 import Footer from "@/app/[locale]/story/_components/footer";
 import { Navbar } from "@/app/[locale]/story/_components/nav/navbar";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { SubscriptionStatus } from "@/app/api/[locale]/v1/core/subscription/enum";
-import { subscriptionRepository } from "@/app/api/[locale]/v1/core/subscription/repository";
-import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
-import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
+import { subscriptionRepository } from "@/app/api/[locale]/subscription/repository";
+import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { userRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { navItems } from "../story/_components/nav/nav-constants";

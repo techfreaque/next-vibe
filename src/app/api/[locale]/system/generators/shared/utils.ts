@@ -1,0 +1,233 @@
+/**
+ * Shared Generator Utilities
+ * Simple utilities for all generators
+ */
+
+import "server-only";
+
+import { existsSync, mkdirSync, readdirSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
+import { dirname, join, relative } from "node:path";
+
+import { PATH_SEPARATOR } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+
+/**
+ * Default directories to exclude from scanning
+ */
+export const DEFAULT_EXCLUDE_DIRS = [
+  "node_modules",
+  ".git",
+  ".next",
+  "dist",
+  ".dist",
+  "generated",
+];
+
+/**
+ * Recursively find files with specific filename in a directory
+ */
+export function findFilesRecursively(
+  dir: string,
+  targetFilename: string,
+  excludeDirs: string[] = DEFAULT_EXCLUDE_DIRS,
+): string[] {
+  const results: string[] = [];
+
+  if (!existsSync(dir)) {
+    return results;
+  }
+
+  const entries = readdirSync(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = join(dir, entry.name);
+
+    // Skip excluded directories
+    if (entry.isDirectory() && excludeDirs.includes(entry.name)) {
+      continue;
+    }
+
+    if (entry.isDirectory()) {
+      // Recursively search subdirectories
+      results.push(
+        ...findFilesRecursively(fullPath, targetFilename, excludeDirs),
+      );
+    } else if (entry.isFile() && entry.name === targetFilename) {
+      // Found a matching file
+      results.push(fullPath);
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Get relative import path from source file to output file
+ */
+export function getRelativeImportPath(
+  sourceFile: string,
+  outputFile: string,
+): string {
+  const outputDir = dirname(outputFile);
+  let relativePath = relative(outputDir, sourceFile);
+
+  // Remove .ts extension and normalize path separators
+  relativePath = relativePath.replace(/\.ts$/, "").replace(/\\/g, "/");
+
+  // Ensure it starts with ./ or ../
+  if (!relativePath.startsWith(".")) {
+    relativePath = `./${relativePath}`;
+  }
+
+  return relativePath;
+}
+
+/**
+ * Extract nested path segments from a file path
+ * Example: src/app/api/[locale]/agent/chat/personas/definition.ts
+ * Returns: ["agent", "chat", "personas"]
+ */
+export function extractNestedPath(
+  filePath: string,
+  startMarker = "[locale]",
+  endMarker?: string,
+): string[] {
+  const pathParts = filePath.split("/");
+
+  const startIndex = pathParts.findIndex((p) => p === startMarker);
+  if (startIndex === -1) {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
+    throw new Error(`Could not find ${startMarker} in path: ${filePath}`);
+  }
+
+  // If no end marker provided, auto-detect definition.ts or route.ts
+  let actualEndMarker = endMarker;
+  if (!actualEndMarker) {
+    if (pathParts.includes("definition.ts")) {
+      actualEndMarker = "definition.ts";
+    } else if (pathParts.includes("route.ts")) {
+      actualEndMarker = "route.ts";
+    } else {
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
+      throw new Error(
+        `Could not auto-detect end marker (definition.ts or route.ts) in path: ${filePath}`,
+      );
+    }
+  }
+
+  const endIndex = pathParts.findIndex((p) => p === actualEndMarker);
+  if (endIndex === -1) {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
+    throw new Error(`Could not find ${actualEndMarker} in path: ${filePath}`);
+  }
+
+  // Extract path segments between locale and the target file
+  // Skip the [locale] marker itself, start from the next segment
+  return pathParts.slice(startIndex + 1, endIndex);
+}
+
+/**
+ * Extract module name from file path
+ * Example: .../core/leads/seeds.ts -> "leads"
+ * Example: .../core/emails/smtp-client/seeds.ts -> "smtp-client"
+ */
+export function extractModuleName(
+  filePath: string,
+  coreMarker = "core",
+): string {
+  const pathParts = filePath.split("/");
+  const coreIndex = pathParts.findIndex((p) => p === coreMarker);
+
+  if (coreIndex === -1 || coreIndex >= pathParts.length - 1) {
+    return pathParts[pathParts.length - 2] || "unknown";
+  }
+
+  const moduleParts = pathParts.slice(coreIndex + 1, pathParts.length - 1);
+  return moduleParts[moduleParts.length - 1] || moduleParts.join("-");
+}
+
+/**
+ * Write generated content to file
+ */
+export async function writeGeneratedFile(
+  filePath: string,
+  content: string,
+  dryRun = false,
+): Promise<void> {
+  if (dryRun) {
+    return;
+  }
+
+  const outputDir = dirname(filePath);
+  if (!existsSync(outputDir)) {
+    mkdirSync(outputDir, { recursive: true });
+  }
+
+  await writeFile(filePath, content, "utf8");
+}
+
+/**
+ * Generate standard file header
+ */
+export function generateFileHeader(
+  title: string,
+  generatedBy: string,
+  additionalInfo?: Record<string, string | number>,
+): string {
+  const lines = ["/**"];
+  lines.push(` * ${title}`);
+  lines.push(` * Generated by ${generatedBy}`);
+
+  if (additionalInfo) {
+    lines.push(" *");
+    for (const [key, value] of Object.entries(additionalInfo)) {
+      lines.push(` * ${key}: ${value}`);
+    }
+  }
+
+  lines.push(" */");
+
+  return lines.join("\n");
+}
+
+/**
+ * Sanitize a path segment to remove invalid characters for tool names
+ * Removes square brackets from dynamic routes like [id]
+ * This must match the sanitization in endpointToToolName to ensure consistency
+ */
+function sanitizePathSegment(segment: string): string {
+  // Remove square brackets to handle dynamic routes like [id]
+  // Example: "[id]" becomes "id", "[threadId]" becomes "threadId"
+  return segment.replace(/\[|\]/g, "");
+}
+
+/**
+ * Extract path from definition file for flat structure
+ * Returns path only - no duplicate parameter format aliases
+ * Real aliases come from definition files, not parameter format variations
+ * Uses PATH_SEPARATOR constant for consistency
+ * Sanitizes path segments to match endpointToToolName behavior
+ */
+export function extractPathKey(
+  filePath: string,
+  startMarker = "[locale]",
+): { path: string } {
+  const nestedPath = extractNestedPath(filePath, startMarker);
+  // Sanitize each segment to remove brackets from dynamic routes
+  const sanitizedPath = nestedPath.map(sanitizePathSegment);
+  const path = sanitizedPath.join(PATH_SEPARATOR);
+  return { path };
+}
+
+/**
+ * Generate absolute import path for definition or route file
+ * nestedPath extracts segments after [locale], which we then append to the base path
+ */
+export function generateAbsoluteImportPath(
+  filePath: string,
+  fileType: "definition" | "route",
+): string {
+  const nestedPath = extractNestedPath(filePath);
+  const pathStr = nestedPath.join("/");
+  return `@/app/api/[locale]/${pathStr}/${fileType}`;
+}

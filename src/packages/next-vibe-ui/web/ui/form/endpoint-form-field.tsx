@@ -58,9 +58,9 @@ import type {
   FieldStyleClassName,
   FieldValidationState,
   RequiredFieldTheme,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field-config/field-config-types";
-import { getFieldConfig } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field-config/infer-field-config";
-import type { EndpointFieldStructure } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field-config/endpoint-field-types";
+} from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
+import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
+import type { EndpointFieldStructure } from "@/app/api/[locale]/system/unified-interface/shared/field-config/endpoint-field-types";
 import {
   FormControl,
   FormField,

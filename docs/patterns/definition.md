@@ -36,8 +36,8 @@ response: responseField({...}, z.object({ field: z.string() }))
 response: objectField(
   {
     type: WidgetType.CONTAINER,
-    title: "app.api.v1.core.domain.subdomain.get.response.title",
-    description: "app.api.v1.core.domain.subdomain.get.response.description",
+    title: "app.api.domain.subdomain.get.response.title",
+    description: "app.api.domain.subdomain.get.response.description",
     layoutType: LayoutType.GRID,
     columns: 12
   },
@@ -77,7 +77,7 @@ preferredModel: requestDataField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
-    label: "app.api.v1.core.agent.chat.personas.post.preferredModel.label",
+    label: "app.api.agent.chat.personas.post.preferredModel.label",
     options: ModelIdOptions,
     columns: 6,
   },
@@ -92,7 +92,7 @@ preferredModel: requestDataField(
 securityInfo: objectOptionalField(
   {
     type: WidgetType.CONTAINER,
-    title: "app.api.v1.core.user.public.resetPassword.request.response.securityInfo.title",
+    title: "app.api.user.public.resetPassword.request.response.securityInfo.title",
     layoutType: LayoutType.GRID,
     columns: 12,
   },
@@ -130,7 +130,7 @@ tags: requestDataArrayOptionalField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
-    label: "app.api.v1.core.tags.label",
+    label: "app.api.tags.label",
     columns: 12,
   },
   z.string()
@@ -139,16 +139,16 @@ tags: requestDataArrayOptionalField(
 
 ### Specialized Field Functions
 
-For common field types, use specialized field functions from `@/app/api/[locale]/v1/core/system/unified-interface/shared/field/specialized`:
+For common field types, use specialized field functions from `@/app/api/[locale]/system/unified-interface/shared/field/specialized`:
 
 ```typescript
-import { currencyField, languageField, countryField, timezoneField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/specialized";
+import { currencyField, languageField, countryField, timezoneField } from "@/app/api/[locale]/system/unified-interface/shared/field/specialized";
 
 // Currency selection
 currency: currencyField(
-  "app.api.v1.core.domain.fields.currency.label",
-  "app.api.v1.core.domain.fields.currency.description",
-  "app.api.v1.core.domain.fields.currency.placeholder",
+  "app.api.domain.fields.currency.label",
+  "app.api.domain.fields.currency.description",
+  "app.api.domain.fields.currency.placeholder",
   true, // required
   false // multiple selection
 )
@@ -387,8 +387,8 @@ requestDataField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
-    label: "app.api.v1.core.agent.chat.personas.post.name.label",
-    description: "app.api.v1.core.agent.chat.personas.post.name.description",
+    label: "app.api.agent.chat.personas.post.name.label",
+    description: "app.api.agent.chat.personas.post.name.description",
     columns: 6,  // Grid width (1-12)
   },
   z.string().min(1).max(100)  // Validation in Zod schema
@@ -399,8 +399,8 @@ requestDataField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXTAREA,
-    label: "app.api.v1.core.agent.chat.personas.post.systemPrompt.label",
-    description: "app.api.v1.core.agent.chat.personas.post.systemPrompt.description",
+    label: "app.api.agent.chat.personas.post.systemPrompt.label",
+    description: "app.api.agent.chat.personas.post.systemPrompt.description",
     columns: 12,  // Full width
   },
   z.string().min(1).max(5000)
@@ -411,8 +411,8 @@ requestDataField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
-    label: "app.api.v1.core.agent.chat.personas.post.category.label",
-    description: "app.api.v1.core.agent.chat.personas.post.category.description",
+    label: "app.api.agent.chat.personas.post.category.label",
+    description: "app.api.agent.chat.personas.post.category.description",
     options: CategoryOptions,  // From enum or config
     columns: 6,
   },
@@ -440,7 +440,7 @@ Response fields display data (not for user input):
 responseField(
   {
     type: WidgetType.TEXT,
-    content: "app.api.v1.core.agent.chat.personas.get.response.personas.persona.name.content",
+    content: "app.api.agent.chat.personas.get.response.personas.persona.name.content",
   },
   z.string()
 )
@@ -453,7 +453,7 @@ responseArrayField(
   objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.v1.core.agent.chat.personas.get.response.personas.persona.title",
+      title: "app.api.agent.chat.personas.get.response.personas.persona.title",
       layoutType: LayoutType.GRID,
       columns: 2,
     },
@@ -551,8 +551,8 @@ Group related fields for better UX:
 contactInfo: objectField(
   {
     type: WidgetType.SECTION,
-    title: "app.api.v1.core.user.create.post.sections.contact.title",
-    description: "app.api.v1.core.user.create.post.sections.contact.description",
+    title: "app.api.user.create.post.sections.contact.title",
+    description: "app.api.user.create.post.sections.contact.description",
     layoutType: LayoutType.GRID_2_COLUMNS
   },
   { request: "data" },
@@ -566,8 +566,8 @@ contactInfo: objectField(
 addressInfo: objectField(
   {
     type: WidgetType.SECTION,
-    title: "app.api.v1.core.user.create.post.sections.address.title",
-    description: "app.api.v1.core.user.create.post.sections.address.description",
+    title: "app.api.user.create.post.sections.address.title",
+    description: "app.api.user.create.post.sections.address.description",
     layoutType: LayoutType.STACKED
   },
   { request: "data" },
@@ -664,41 +664,41 @@ app.api.v1.{domain}.{subdomain}.{action}.{field}.{property}
 {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.TEXT,
-  label: "app.api.v1.core.agent.chat.personas.post.name.label",
-  description: "app.api.v1.core.agent.chat.personas.post.name.description",
+  label: "app.api.agent.chat.personas.post.name.label",
+  description: "app.api.agent.chat.personas.post.name.description",
   columns: 6
 }
 
 // TEXT (response) - Uses content
 {
   type: WidgetType.TEXT,
-  content: "app.api.v1.core.agent.chat.personas.get.response.personas.persona.name.content"
+  content: "app.api.agent.chat.personas.get.response.personas.persona.name.content"
 }
 
 // CONTAINER - Uses title, description
 {
   type: WidgetType.CONTAINER,
-  title: "app.api.v1.core.agent.chat.personas.get.container.title",
-  description: "app.api.v1.core.agent.chat.personas.get.container.description",
+  title: "app.api.agent.chat.personas.get.container.title",
+  description: "app.api.agent.chat.personas.get.container.description",
   layoutType: LayoutType.STACKED
 }
 
 // Endpoint metadata - Uses title, description, category, tags
 {
-  title: "app.api.v1.core.agent.chat.personas.get.title",
-  description: "app.api.v1.core.agent.chat.personas.get.description",
-  category: "app.api.v1.core.agent.chat.category",
-  tags: ["app.api.v1.core.agent.chat.tags.personas"]
+  title: "app.api.agent.chat.personas.get.title",
+  description: "app.api.agent.chat.personas.get.description",
+  category: "app.api.agent.chat.category",
+  tags: ["app.api.agent.chat.tags.personas"]
 }
 ```
 
 ### Dynamic Routes
 
 ```typescript
-// Path: src/app/api/[locale]/v1/core/agent/chat/personas/[id]/definition.ts
-// Pattern: app.api.v1.core.agent.chat.personas.id.{method}.{field}
-title: "app.api.v1.core.agent.chat.personas.id.get.title";
-description: "app.api.v1.core.agent.chat.personas.id.get.description";
+// Path: src/app/api/[locale]/agent/chat/personas/[id]/definition.ts
+// Pattern: app.api.agent.chat.personas.id.{method}.{field}
+title: "app.api.agent.chat.personas.id.get.title";
+description: "app.api.agent.chat.personas.id.get.description";
 ```
 
 ### Enum Translation Keys
@@ -706,8 +706,8 @@ description: "app.api.v1.core.agent.chat.personas.id.get.description";
 ```typescript
 export const { enum: LeadStatus, options: LeadStatusOptions } =
   createEnumOptions({
-    NEW: "app.api.v1.core.leads.enums.leadStatus.new",
-    PENDING: "app.api.v1.core.leads.enums.leadStatus.pending",
+    NEW: "app.api.leads.enums.leadStatus.new",
+    PENDING: "app.api.leads.enums.leadStatus.pending",
   });
 ```
 
@@ -716,21 +716,21 @@ export const { enum: LeadStatus, options: LeadStatusOptions } =
 ```typescript
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from '@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create';
 import {
   objectField,
   requestDataField,
   requestResponseField,
   responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 // Local imports
 import { MyEnum, MyEnumOptions } from "./enum";
@@ -742,7 +742,7 @@ import { MyType } from "../types";
 1. Use `@/` for absolute imports from project root
 2. Import enums from `/enum` not `/definition` (avoid circular deps)
 3. Use relative paths for same-domain imports
-4. Import `UserRole` from `@/app/api/[locale]/v1/core/user/user-roles/enum`
+4. Import `UserRole` from `@/app/api/[locale]/user/user-roles/enum`
 
 ## Enum Integration
 
@@ -750,16 +750,16 @@ import { MyType } from "../types";
 
 ```typescript
 // File: enum.ts
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
 export const {
   enum: LeadStatus,
   options: LeadStatusOptions,
   Value: LeadStatusValues,
 } = createEnumOptions({
-  NEW: "app.api.v1.core.leads.enums.leadStatus.new",
-  PENDING: "app.api.v1.core.leads.enums.leadStatus.pending",
-  ACTIVE: "app.api.v1.core.leads.enums.leadStatus.active",
+  NEW: "app.api.leads.enums.leadStatus.new",
+  PENDING: "app.api.leads.enums.leadStatus.pending",
+  ACTIVE: "app.api.leads.enums.leadStatus.active",
 });
 
 // Database enum for Drizzle
@@ -780,7 +780,7 @@ status: requestResponseField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
-    label: "app.api.v1.core.leads.create.post.status.label",
+    label: "app.api.leads.create.post.status.label",
     options: LeadStatusOptions,
     columns: 6,
   },
@@ -791,7 +791,7 @@ status: requestResponseField(
 status: responseField(
   {
     type: WidgetType.BADGE,
-    text: "app.api.v1.core.leads.get.response.status.text",
+    text: "app.api.leads.get.response.status.text",
   },
   z.enum(LeadStatus),
 );
@@ -843,8 +843,8 @@ return success({
 ```typescript
 errorTypes: {
   [EndpointErrorTypes.UNAUTHORIZED]: {
-    title: "app.api.v1.core.domain.subdomain.action.errors.unauthorized.title",
-    description: "app.api.v1.core.domain.subdomain.action.errors.unauthorized.description"
+    title: "app.api.domain.subdomain.action.errors.unauthorized.title",
+    description: "app.api.domain.subdomain.action.errors.unauthorized.description"
   },
   [EndpointErrorTypes.VALIDATION_FAILED]: {...},
   [EndpointErrorTypes.FORBIDDEN]: {...},
@@ -920,8 +920,8 @@ verbose: requestDataField({...}, z.boolean().default(false))
 
 **Clean definition files with no errors:**
 
-- `src/app/api/[locale]/v1/core/agent/chat/personas/definition.ts` - GET and POST endpoints with forms, arrays, optional fields
-- `src/app/api/[locale]/v1/core/agent/brave-search/definition.ts` - POST endpoint with search functionality
+- `src/app/api/[locale]/agent/chat/personas/definition.ts` - GET and POST endpoints with forms, arrays, optional fields
+- `src/app/api/[locale]/agent/brave-search/definition.ts` - POST endpoint with search functionality
 
 ---
 

@@ -7,7 +7,7 @@
 import type { NextRequest, NextResponse } from "next/server";
 
 // we have to use relative paths as vercel cant resolve import aliases from here
-import { middleware } from "./app/api/[locale]/v1/core/system/middleware";
+import { middleware } from "./app/api/[locale]/system/middleware";
 import type { languageDefaults } from "./i18n";
 import type { Countries, CountryLanguage, Languages } from "./i18n/core/config";
 

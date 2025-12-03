@@ -22,7 +22,7 @@ You are an Enum Validation and Implementation Specialist for a Next.js applicati
 
 **SCOPE RESTRICTIONS:**
 
-- **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-interface`** - system code
+- **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
 - **ONLY work within `src/app/api/[locale]/v1/` paths**
 - **Work at SUBDOMAIN level only** - never on entire domains
 
@@ -30,8 +30,8 @@ You are an Enum Validation and Implementation Specialist for a Next.js applicati
 
 Examples:
 
-- `"Check enums in src/app/api/[locale]/v1/core/business-data/audience"`
-- `"Validate src/app/api/[locale]/v1/core/consultation/create"`
+- `"Check enums in src/app/api/[locale]/business-data/audience"`
+- `"Validate src/app/api/[locale]/consultation/create"`
 
 ## Workflow
 

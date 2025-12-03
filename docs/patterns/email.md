@@ -62,7 +62,7 @@ subdomain/
 ### EmailFunctionType Signature
 
 ```typescript
-import type { EmailFunctionType } from "@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/types";
+import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 
 export const renderCompanyMail: EmailFunctionType<
   RequestType,
@@ -73,7 +73,7 @@ export const renderCompanyMail: EmailFunctionType<
   return success({
     toEmail: "recipient@example.com",
     toName: "Recipient Name",
-    subject: t("app.api.v1.core.module.email.subject"),
+    subject: t("app.api.module.email.subject"),
     replyToEmail: requestData.email,
     replyToName: requestData.name,
     jsx: <YourEmailComponent />,
@@ -112,7 +112,7 @@ return success({
 
 ```typescript
 return fail({
-  message: "app.api.v1.core.module.error.email_send_failed",
+  message: "app.api.module.error.email_send_failed",
   errorType: ErrorResponseTypes.INTERNAL_ERROR,
 });
 ```
@@ -127,7 +127,7 @@ return fail({
 import {
   createTrackingContext,
   EmailTemplate,
-} from "@/app/api/[locale]/v1/core/emails/smtp-client/components";
+} from "@/app/api/[locale]/emails/smtp-client/components";
 
 function YourEmailContent({
   requestData,
@@ -149,8 +149,8 @@ function YourEmailContent({
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("app.api.v1.core.module.email.title")}
-      previewText={t("app.api.v1.core.module.email.preview")}
+      title={t("app.api.module.email.title")}
+      previewText={t("app.api.module.email.preview")}
       tracking={tracking}
     >
       <Span>Your content here</Span>
@@ -172,7 +172,7 @@ import {
 
 <Section style={{ backgroundColor: "#f9fafb", padding: "16px" }}>
   <Span style={{ fontSize: "16px", color: "#374151" }}>
-    {t("app.api.v1.core.module.email.content")}
+    {t("app.api.module.email.content")}
   </Span>
 
   <Button
@@ -183,7 +183,7 @@ import {
       padding: "10px 20px",
     }}
   >
-    {t("app.api.v1.core.module.email.button")}
+    {t("app.api.module.email.button")}
   </Button>
 </Section>
 ```
@@ -218,8 +218,8 @@ const styles = {
 ### Standard Pattern
 
 ```typescript
-import { endpointsHandler } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/multi';
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from '@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi';
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
 import { renderCompanyMail, renderPartnerMail } from "./email";
@@ -283,12 +283,12 @@ All email text must use translation keys following the path-to-key formula:
 
 ```typescript
 // Email subjects
-t("app.api.v1.core.module.email.subject", { name: "John" });
+t("app.api.module.email.subject", { name: "John" });
 
 // Email content
-t("app.api.v1.core.module.email.greeting");
-t("app.api.v1.core.module.email.content");
-t("app.api.v1.core.module.email.button");
+t("app.api.module.email.greeting");
+t("app.api.module.email.content");
+t("app.api.module.email.button");
 
 // Common translations
 t("config.appName");
@@ -324,7 +324,7 @@ export const renderEmail: EmailFunctionType<...> = ({ ... }) => {
     });
   } catch {
     return fail({
-      message: "app.api.v1.core.module.error.email_failed",
+      message: "app.api.module.error.email_failed",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -359,7 +359,7 @@ function ContactDetailsSection({
   return (
     <Section style={{ backgroundColor: "#f9fafb", padding: "16px" }}>
       <Span style={{ fontWeight: "700" }}>
-        {t("app.api.v1.core.contact.email.name")}:
+        {t("app.api.contact.email.name")}:
       </Span>
       <Span>{data.name}</Span>
     </Section>
@@ -373,7 +373,7 @@ function ContactDetailsSection({
 {requestData.company && (
   <Span>
     <Span style={{ fontWeight: "700" }}>
-      {t("app.api.v1.core.contact.email.company")}:
+      {t("app.api.contact.email.company")}:
     </Span>{" "}
     {requestData.company}
   </Span>
@@ -412,7 +412,7 @@ vibe core:leads:campaigns:emails:test-mail \
 Use the test-mail endpoint for previewing:
 
 ```typescript
-POST /api/v1/core/leads/campaigns/emails/test-mail
+POST /api/leads/campaigns/emails/test-mail
 {
   "emailId": "campaign-email-id",
   "testEmail": "test@example.com",
@@ -443,14 +443,14 @@ export const renderConfirmationMail: EmailFunctionType<
     return success({
       toEmail: requestData.email,
       toName: requestData.name,
-      subject: t("app.api.v1.core.contact.email.partner.subject"),
+      subject: t("app.api.contact.email.partner.subject"),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
       replyToName: t("config.appName"),
       jsx: ContactEmailContent({ requestData, t, locale, userId: user?.id }),
     });
   } catch {
     return fail({
-      message: "app.api.v1.core.contact.error.email_failed",
+      message: "app.api.contact.error.email_failed",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -473,7 +473,7 @@ export const renderAdminNotificationMail: EmailFunctionType<
     return success({
       toEmail: contactClientRepository.getSupportEmail(locale),
       toName: t("config.appName"),
-      subject: t("app.api.v1.core.leads.create.email.admin.newLead.subject"),
+      subject: t("app.api.leads.create.email.admin.newLead.subject"),
       replyToEmail: responseData.lead.summary.email,
       jsx: AdminNotificationEmailContent({
         lead: responseData.lead,
@@ -483,7 +483,7 @@ export const renderAdminNotificationMail: EmailFunctionType<
     });
   } catch {
     return fail({
-      message: "app.api.v1.core.leads.create.email.error.general",
+      message: "app.api.leads.create.email.error.general",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -509,7 +509,7 @@ export const renderWelcomeMail: EmailFunctionType<
 
   if (!userResponse.success) {
     return fail({
-      message: "app.api.v1.core.user.errors.not_found",
+      message: "app.api.user.errors.not_found",
       errorType: ErrorResponseTypes.NOT_FOUND,
       cause: userResponse,
     });
@@ -518,7 +518,7 @@ export const renderWelcomeMail: EmailFunctionType<
   return success({
     toEmail: userResponse.data.email,
     toName: userResponse.data.privateName,
-    subject: t("app.api.v1.core.user.public.signup.email.subject"),
+    subject: t("app.api.user.public.signup.email.subject"),
     jsx: WelcomeEmailContent({ user: userResponse.data, t, locale }),
   });
 };
@@ -530,12 +530,12 @@ export const renderWelcomeMail: EmailFunctionType<
 
 ### Import Paths
 
-| Component                  | Import Path                                                          |
-| -------------------------- | -------------------------------------------------------------------- |
-| **EmailFunctionType**      | `@/app/api/[locale]/v1/core/emails/smtp-client/email-handling/types` |
-| **EmailTemplate**          | `@/app/api/[locale]/v1/core/emails/smtp-client/components`           |
-| **React Email Components** | `@react-email/components`                                            |
-| **Response Utils**         | `next-vibe/shared/types/response.schema`                             |
+| Component                  | Import Path                                                  |
+| -------------------------- | ------------------------------------------------------------ |
+| **EmailFunctionType**      | `@/app/api/[locale]/emails/smtp-client/email-handling/types` |
+| **EmailTemplate**          | `@/app/api/[locale]/emails/smtp-client/components`           |
+| **React Email Components** | `@react-email/components`                                    |
+| **Response Utils**         | `next-vibe/shared/types/response.schema`                     |
 
 ### Email Config
 

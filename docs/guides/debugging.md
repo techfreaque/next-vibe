@@ -35,7 +35,7 @@ const name = user.publicName; // ✅ Check actual schema in db.ts
 
 // "Type 'X' is not assignable to type 'Y'"
 const role = "ADMIN"; // ❌ Error
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 const role = UserRole.ADMIN; // ✅ Use proper enum
 
 // "Possibly undefined"
@@ -53,11 +53,11 @@ if (response.success) {
 
 **Debug Steps:**
 
-1. Find i18n file location: `src/app/api/[locale]/v1/core/user/public/login/i18n/en/index.ts`
+1. Find i18n file location: `src/app/api/[locale]/user/public/login/i18n/en/index.ts`
 2. Build correct key from path:
-   - Path: `app/api/[locale]/v1/core/user/public/login`
-   - Remove `[locale]`: `app/api/v1/core/user/public/login`
-   - Replace `/` with `.`: `app.api.v1.core.user.public.login.title`
+   - Path: `app/api/[locale]/user/public/login`
+   - Remove `[locale]`: `app/api/user/public/login`
+   - Replace `/` with `.`: `app.api.user.public.login.title`
 3. Verify key exists in all language files
 4. Run `vibe check` - error disappears if fixed
 
@@ -79,9 +79,9 @@ vibe user:create --name="Test" --verbose          # Detailed errors
 
 **"Endpoint not found" (404)**
 
-1. Check folder structure: `/api/en-GLOBAL/v1/core/user/create` → `src/app/api/[locale]/v1/core/user/create/route.ts`
+1. Check folder structure: `/api/en-GLOBAL/user/create` → `src/app/api/[locale]/user/create/route.ts`
 2. Verify exports: `export const { POST } = endpointsHandler({ ... });`
-3. Check path array: `path: ["v1", "core", "user", "create"]` matches folders
+3. Check path array: `path: ["user", "create"]` matches folders
 
 **"Validation failed" (Zod errors)**
 
@@ -129,7 +129,7 @@ logger.debug("Query result", { found: !!result });
 **Server-Side:**
 
 ```typescript
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 async function processData(data, user, locale, logger: EndpointLogger) {
   logger.info("Processing started", { userId: user.id });

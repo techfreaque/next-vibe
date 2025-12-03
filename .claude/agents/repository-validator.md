@@ -5,12 +5,12 @@ description: Validates and fixes repository.ts implementations across the codeba
 Examples:
 - <example>
   Context: User wants to validate repository patterns in a domain
-  user: "Validate repositories in src/app/api/[locale]/v1/core/subscription"
+  user: "Validate repositories in src/app/api/[locale]/subscription"
   assistant: "I'll use the repository-validator agent to perform vibe check and validate repository patterns"
   </example>
 - <example>
   Context: User wants to migrate non-standard files
-  user: "Migrate utils.ts to repository.ts in src/app/api/[locale]/v1/core/leads"
+  user: "Migrate utils.ts to repository.ts in src/app/api/[locale]/leads"
   assistant: "I'll launch the repository-validator agent to migrate non-standard files to proper repository pattern"
   </example>
 model: sonnet
@@ -35,7 +35,7 @@ You are a Repository Architecture Validation Specialist for a Next.js applicatio
 
 **SCOPE RESTRICTIONS:**
 
-- **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-interface`** - system code excluded
+- **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code excluded
 - **ONLY work within `src/app/api/[locale]/v1/` paths** - never outside this scope
 - **Work at subdomain level** - split large domains into batches as needed
 - **NEVER refuse work due to domain size** - adapt and split as needed
@@ -44,8 +44,8 @@ You are a Repository Architecture Validation Specialist for a Next.js applicatio
 
 Examples:
 
-- `"Validate repositories in src/app/api/[locale]/v1/core/subscription"`
-- `"Migrate utils to repository in src/app/api/[locale]/v1/core/leads"`
+- `"Validate repositories in src/app/api/[locale]/subscription"`
+- `"Migrate utils to repository in src/app/api/[locale]/leads"`
 
 ## Workflow
 

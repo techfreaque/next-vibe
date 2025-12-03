@@ -13,18 +13,18 @@
 
 import type { JSX } from "react";
 
-import { ChatProvider } from "@/app/api/[locale]/v1/core/agent/chat/hooks/context";
+import { ChatProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
-import { getFolder } from "@/app/api/[locale]/v1/core/agent/chat/folders/[id]/repository";
-import { rootFolderPermissionsRepository } from "@/app/api/[locale]/v1/core/agent/chat/folders/root-permissions/repository";
-import { threadByIdRepository } from "@/app/api/[locale]/v1/core/agent/chat/threads/[threadId]/repository";
-import { creditRepository } from "@/app/api/[locale]/v1/core/credits/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
-import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { getFolder } from "@/app/api/[locale]/agent/chat/folders/[id]/repository";
+import { rootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/root-permissions/repository";
+import { threadByIdRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/repository";
+import { creditRepository } from "@/app/api/[locale]/credits/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { ChatInterface } from "@/app/api/[locale]/v1/core/agent/chat/_components/chat-interface";
+import { ChatInterface } from "@/app/api/[locale]/agent/chat/_components/chat-interface";
 
 interface ThreadsPathPageProps {
   params: Promise<{

@@ -1,0 +1,54 @@
+/**
+ * Password reset request API route
+ *
+ * This file defines the Next.js API route handler for requesting a password reset.
+ * It connects the API endpoint definition with its implementation and email template.
+ */
+
+import { success } from "next-vibe/shared/types/response.schema";
+
+// Logger is available via handler parameters
+import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
+import resetPasswordRequestEndpoint from "./definition";
+import { renderResetPasswordMail } from "./email";
+
+export const { POST, tools } = endpointsHandler({
+  endpoint: resetPasswordRequestEndpoint,
+  [Methods.POST]: {
+    email: [
+      {
+        render: renderResetPasswordMail,
+        // Ignore email errors to avoid revealing if an email exists
+        ignoreErrors: true,
+      },
+    ],
+    handler: ({ data, logger }) => {
+      logger.debug("Password reset request received", {
+        email: data.emailInput.email,
+      });
+      // We handle token creation in the email template
+      return success({
+        response: {
+          success: true,
+          message:
+            "app.api.user.public.resetPassword.request.response.success.message",
+          deliveryInfo: {
+            emailSent: true,
+            estimatedDelivery:
+              "app.api.user.public.resetPassword.request.response.deliveryInfo.estimatedTime",
+            expiresAt:
+              "app.api.user.public.resetPassword.request.response.deliveryInfo.expiresAt",
+            checkSpamFolder: true,
+          },
+          nextSteps: [
+            "app.api.user.public.resetPassword.request.response.nextSteps.checkEmail",
+            "app.api.user.public.resetPassword.request.response.nextSteps.clickLink",
+            "app.api.user.public.resetPassword.request.response.nextSteps.createPassword",
+          ],
+        },
+      });
+    },
+  },
+});

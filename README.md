@@ -89,7 +89,7 @@ That's it! NextVibe automatically:
 Your folder structure **IS** your API. No routing configuration needed.
 
 ```
-src/app/api/[locale]/v1/core/user/
+src/app/api/[locale]/user/
 ├── public/
 │   ├── login/
 │   │   ├── definition.ts    → API contract
@@ -110,7 +110,7 @@ src/app/api/[locale]/v1/core/user/
 
 **Result:**
 
-- 🌐 Next.js API: `POST /api/en-GLOBAL/v1/core/user/public/login`
+- 🌐 Next.js API: `POST /api/en-GLOBAL/user/public/login`
 - 🔌 tRPC: `trpc.user.public.login.mutate()`
 - 💻 CLI: `vibe user:public:login --email=test@example.com`
 - ⚛️ React Hook: `useLogin()`
@@ -123,21 +123,21 @@ Write your endpoint once, get everything:
 
 ```typescript
 // definition.ts - The single source of truth
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from '@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create';
 import {
   Methods,
   WidgetType,
   FieldDataType,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   objectField,
   requestDataField,
   responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 
 const { POST } = createEndpoint({
   method: Methods.POST,
-  path: ["v1", "core", "user", "public", "login"],
+  path: ["user", "public", "login"],
   fields: objectField({
     /* ... */
   }),
@@ -158,7 +158,7 @@ const { POST } = createEndpoint({
 
 ```typescript
 // Auto-detected from folder path
-t("app.api.v1.core.user.public.login.title"); // ✅ Valid
+t("app.api.user.public.login.title"); // ✅ Valid
 t("app.invalid.key"); // ❌ TypeScript error
 
 // Works in:
@@ -338,8 +338,8 @@ export const creditExpirationTask: Task = {
 ```typescript
 // page.tsx - Works on Web AND Native
 import { Button } from "next-vibe-ui/web/ui/button";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { useLogin } from "@/app/api/[locale]/v1/core/user/public/login/hooks";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useLogin } from "@/app/api/[locale]/user/public/login/hooks";
 import { useTranslation } from "@/i18n/core/client";
 
 export default function LoginPage() {
@@ -452,8 +452,8 @@ Comprehensive documentation in `./docs/`:
 src/
 ├── app/
 │   ├── [locale]/                   # Next.js pages (Web)
-│   ├── api/[locale]/v1/core/       # API endpoints (recursive structure)
-│   └── api/[locale]/v1/core/system # Core Framework and CLI tools
+│   ├── api/[locale]/       # API endpoints (recursive structure)
+│   └── api/[locale]/system # Core Framework and CLI tools
 ├── packages/
 │   ├── next-vibe/                  # Deprecated: Core framework utilities
 │   ├── next-vibe-ui/
@@ -472,8 +472,8 @@ src/
 ### 1. Create Folder Structure
 
 ```bash
-mkdir -p src/app/api/[locale]/v1/core/products/create
-cd src/app/api/[locale]/v1/core/products/create
+mkdir -p src/app/api/[locale]/products/create
+cd src/app/api/[locale]/products/create
 ```
 
 ### 2. Define the API Contract
@@ -481,25 +481,25 @@ cd src/app/api/[locale]/v1/core/products/create
 ```typescript
 // definition.ts
 import { z } from "zod";
-import { createEndpoint } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from '@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create';
 import {
   Methods,
   WidgetType,
   FieldDataType,
   LayoutType,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   objectField,
   requestDataField,
   responseField,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/utils";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 const { POST } = createEndpoint({
   method: Methods.POST,
-  path: ["v1", "core", "products", "create"],
-  title: "app.api.v1.core.products.create.title",
-  description: "app.api.v1.core.products.create.description",
+  path: ["products", "create"],
+  title: "app.api.products.create.title",
+  description: "app.api.products.create.description",
   allowedRoles: [UserRole.ADMIN],
 
   fields: objectField(
@@ -510,7 +510,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.v1.core.products.create.fields.name.label",
+          label: "app.api.products.create.fields.name.label",
         },
         z.string().min(1).max(100),
       ),
@@ -518,7 +518,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.v1.core.products.create.fields.price.label",
+          label: "app.api.products.create.fields.price.label",
         },
         z.number().positive(),
       ),
@@ -536,8 +536,8 @@ export default { POST };
 // repository.ts
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import type { JWTPayloadType } from "@/app/api/[locale]/v1/core/user/auth/types";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JWTPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 export class ProductRepository {
@@ -569,8 +569,8 @@ export const productRepository = new ProductRepository();
 
 ```typescript
 // route.ts
-import { Methods } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { endpointsHandler } from '@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/route/multi';
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { endpointsHandler } from '@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi';
 import definitions from "./definition";
 import { productRepository } from "./repository";
 
@@ -588,9 +588,9 @@ export const { POST, tools } = endpointsHandler({
 **React Component:**
 
 ```typescript
-import { useApiForm } from "@/app/api/[locale]/v1/core/system/unified-interface/react/hooks/use-api-mutation-form";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import definitions from "@/app/api/[locale]/v1/core/products/create/definition";
+import { useApiForm } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation-form";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import definitions from "@/app/api/[locale]/products/create/definition";
 import { useTranslation } from "@/i18n/core/client";
 
 function CreateProduct() {
@@ -738,7 +738,7 @@ console.log(user.invalid); // ❌ Property doesn't exist
 
 ```typescript
 // Translation keys are validated at compile time
-t("app.api.v1.core.user.public.login.title"); // ✅ Valid key
+t("app.api.user.public.login.title"); // ✅ Valid key
 t("app.some.invalid.key"); // ❌ Type error
 
 // Works in components, APIs, CLI, everywhere
@@ -762,8 +762,8 @@ i18n/
 Translation keys **automatically match your folder structure**:
 
 ```
-File: src/app/api/[locale]/v1/core/user/public/login/i18n/en/index.ts
-Key:  app.api.v1.core.user.public.login.{yourKey}
+File: src/app/api/[locale]/user/public/login/i18n/en/index.ts
+Key:  app.api.user.public.login.{yourKey}
 ```
 
 **The path IS the namespace. No configuration needed.**
@@ -777,24 +777,24 @@ import { useTranslation } from "@/i18n/core/client";
 function LoginForm() {
   const { t } = useTranslation();
 
-  return <h1>{t("app.api.v1.core.user.public.login.title")}</h1>;
+  return <h1>{t("app.api.user.public.login.title")}</h1>;
 }
 
 // In API responses
 return fail({
-  message: "app.api.v1.core.user.errors.invalid_credentials",
+  message: "app.api.user.errors.invalid_credentials",
   errorType: ErrorResponseTypes.UNAUTHORIZED,
 });
 
 // In CLI output
-logger.info("app.api.v1.core.user.public.login.success");
+logger.info("app.api.user.public.login.success");
 ```
 
 **ESLint enforces translation usage:**
 
 ```typescript
 <h1>Login</h1>  // ❌ ESLint error: Use translation key
-<h1>{t("app.api.v1.core.user.public.login.title")}</h1>  // ✅ Valid
+<h1>{t("app.api.user.public.login.title")}</h1>  // ✅ Valid
 ```
 
 ---
@@ -896,15 +896,15 @@ user-management/
 Fork the repo and explore existing endpoints:
 
 ```bash
-src/app/api/[locale]/v1/core/user/public/login/
+src/app/api/[locale]/user/public/login/
 ```
 
 ### 2. **Copy-Paste-Modify**
 
 ```bash
 # Copy existing endpoint
-cp -r src/app/api/[locale]/v1/core/user/public/login \
-      src/app/api/[locale]/v1/core/user/public/signin
+cp -r src/app/api/[locale]/user/public/login \
+      src/app/api/[locale]/user/public/signin
 
 # Modify definition.ts, repository.ts, route.ts
 # That's it!
@@ -1079,7 +1079,7 @@ NextVibe uses a dual licensing model to balance open-source contribution with fl
 
 **Only these directories** are licensed under **GPL-3.0-only**:
 
-- `src/app/api/[locale]/v1/core/` - Framework core system
+- `src/app/api/[locale]/` - Framework core system
 - `src/packages/` - Framework packages
 
 **This means:**

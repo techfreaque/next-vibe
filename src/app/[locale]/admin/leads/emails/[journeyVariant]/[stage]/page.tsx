@@ -12,17 +12,17 @@ import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
 import type React from "react";
 
-import { EmailPreviewClient } from "@/app/api/[locale]/v1/core/leads/campaigns/emails/_components/email-preview-client";
-import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
-import { emailService } from "@/app/api/[locale]/v1/core/leads/campaigns/emails";
+import { EmailPreviewClient } from "@/app/api/[locale]/leads/campaigns/emails/_components/email-preview-client";
+import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
 import type {
   EmailCampaignStageValues,
   EmailJourneyVariantValues,
-} from "@/app/api/[locale]/v1/core/leads/enum";
+} from "@/app/api/[locale]/leads/enum";
 import {
   EmailCampaignStage,
   EmailJourneyVariant,
-} from "@/app/api/[locale]/v1/core/leads/enum";
+} from "@/app/api/[locale]/leads/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

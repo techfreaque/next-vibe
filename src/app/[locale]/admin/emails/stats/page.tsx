@@ -12,7 +12,7 @@ import type React from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { EmailsStatsClient } from "@/app/api/[locale]/v1/core/emails/messages/stats/_components/emails-stats-client";
+import { EmailsStatsClient } from "@/app/api/[locale]/emails/messages/stats/_components/emails-stats-client";
 
 interface EmailsStatsPageProps {
   params: Promise<{

@@ -8,7 +8,7 @@ import { Input } from "next-vibe-ui/ui/input";
 import { Check, Send, X } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 
-import { useNewsletterManager } from "@/app/api/[locale]/v1/core/newsletter/hooks";
+import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

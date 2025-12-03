@@ -95,7 +95,7 @@ export default async function RootLayoutServer({
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/images/apple-icon.png" />
-        <link rel="manifest" href={`/api/${locale}/v1/core/manifest`} />
+        <link rel="manifest" href={`/api/${locale}/manifest`} />
       </head>
       <Body className={inter.className}>
         <RootProviders locale={locale}>{children}</RootProviders>

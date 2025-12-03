@@ -22,7 +22,7 @@ You are a Database Architecture Validation Specialist for a Next.js application 
 
 **SCOPE RESTRICTIONS:**
 
-- **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-interface`** - system code
+- **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
 - **ONLY work within `src/app/api/[locale]/v1/` paths**
 - **Work at SUBDOMAIN level only** - never on entire domains
 
@@ -30,8 +30,8 @@ You are a Database Architecture Validation Specialist for a Next.js application 
 
 Examples:
 
-- `"Validate database patterns in src/app/api/[locale]/v1/core/user/auth"`
-- `"Check src/app/api/[locale]/v1/core/consultation/admin"`
+- `"Validate database patterns in src/app/api/[locale]/user/auth"`
+- `"Check src/app/api/[locale]/consultation/admin"`
 
 ## Workflow
 

@@ -5,17 +5,17 @@ import {
   type CreditBalance,
   type CreditTransactionOutput,
   creditRepository,
-} from "@/app/api/[locale]/v1/core/credits/repository";
-import { subscriptionRepository } from "@/app/api/[locale]/v1/core/subscription/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
-import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+} from "@/app/api/[locale]/credits/repository";
+import { subscriptionRepository } from "@/app/api/[locale]/subscription/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 
-import { SubscriptionClientContent } from "@/app/api/[locale]/v1/core/subscription/_components/subscription-client-content";
-import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
+import { SubscriptionClientContent } from "@/app/api/[locale]/subscription/_components/subscription-client-content";
+import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { envClient } from "@/config/env-client";
 
 interface SubscriptionPageProps {

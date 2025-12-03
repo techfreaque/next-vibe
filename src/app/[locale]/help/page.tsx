@@ -5,21 +5,21 @@ import { ChevronLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
-import { contactClientRepository } from "@/app/api/[locale]/v1/core/contact/repository-client";
+import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import {
   ProductIds,
   productsRepository,
   TOTAL_MODEL_COUNT,
-} from "@/app/api/[locale]/v1/core/products/repository-client";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
-import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
+} from "@/app/api/[locale]/products/repository-client";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { userRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
-import ContactForm from "@/app/api/[locale]/v1/core/contact/_components/contact-form";
-import ContactInfo from "@/app/api/[locale]/v1/core/contact/_components/contact-info";
+import ContactForm from "@/app/api/[locale]/contact/_components/contact-form";
+import ContactInfo from "@/app/api/[locale]/contact/_components/contact-info";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;

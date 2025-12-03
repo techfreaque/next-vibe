@@ -4,7 +4,7 @@ import type { ExplicitAnyType } from "next-vibe/shared/types/utils";
 import { Environment, validateEnv } from "next-vibe/shared/utils/env-util";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 const isServer = typeof window === "undefined";
 const isReactNative = false;

@@ -5,7 +5,7 @@ description: Use this agent to migrate business logic from non-standard files to
 Examples:
 - <example>
   Context: User wants to migrate services files to repository pattern
-  user: "Migrate services in src/app/api/[locale]/v1/core/agent"
+  user: "Migrate services in src/app/api/[locale]/agent"
   assistant: "I'll use the non-standard-file-migrator agent to perform vibe check and convert all services files to repository.ts pattern"
   <commentary>
   The agent will run vibe check first, then systematically migrate all non-standard files to repository pattern
@@ -54,9 +54,9 @@ Act as related agents when issues found: definition-file-validator, enum-validat
 
 Examples:
 
-- `"Migrate services in src/app/api/[locale]/v1/core/agent/create"`
-- `"Clean up src/app/api/[locale]/v1/core/system/db/migrate"`
-- `"Migrate services in src/app/api/[locale]/v1/core/user/auth"`
+- `"Migrate services in src/app/api/[locale]/agent/create"`
+- `"Clean up src/app/api/[locale]/system/db/migrate"`
+- `"Migrate services in src/app/api/[locale]/user/auth"`
 
 The agent works at SUBDOMAIN level only - never on entire domains.
 

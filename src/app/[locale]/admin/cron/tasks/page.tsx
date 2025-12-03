@@ -10,7 +10,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { CronTasksClient } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/cron/tasks/_components/cron-tasks-client";
+import { CronTasksClient } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/_components/cron-tasks-client";
 
 interface CronTasksPageProps {
   params: Promise<{

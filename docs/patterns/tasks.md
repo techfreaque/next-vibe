@@ -84,12 +84,12 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/constants";
-import type { Task } from "@/app/api/[locale]/v1/core/system/unified-interface/tasks/types/repository";
+} from "@/app/api/[locale]/system/unified-interface/tasks/constants";
+import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/types/repository";
 
 import { taskRepository } from "./repository";
 import type { TaskResponseOutput } from "./types";
@@ -125,7 +125,7 @@ export const taskConfig = {
 const myTask: Task = {
   type: "cron",
   name: "domain-subdomain-task",
-  description: "app.api.v1.core.domain.subdomain.task.description",
+  description: "app.api.domain.subdomain.task.description",
   schedule: CRON_SCHEDULES.DAILY_6AM,
   category: TaskCategory.MAINTENANCE,
   enabled: true,
@@ -163,7 +163,7 @@ export default tasks;
 // ✅ CORRECT - Side task pattern
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import { sideTaskRepository } from "./repository";
@@ -206,7 +206,7 @@ Follow [Repository Patterns](repository.md) with task-specific considerations:
 // ✅ CORRECT - Task repository pattern
 import "server-only";
 
-import type { EndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
@@ -254,7 +254,7 @@ export class TaskRepositoryImpl implements TaskRepository {
     } catch (error) {
       logger.error("Task execution failed", error);
       return fail({
-        message: "app.api.v1.core.tasks.execution.errors.failed",
+        message: "app.api.tasks.execution.errors.failed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -343,10 +343,10 @@ export const sideTaskConfig = {
 
 ```typescript
 // ❌ WRONG - Incorrect path pattern (missing path segments)
-"app.api.v1.core.consultation.admin.new.errors.email_send_failed.title";
+"app.api.consultation.admin.new.errors.email_send_failed.title";
 
 // ✅ CORRECT - Proper path pattern matching file structure
-"app.api.v1.core.consultation.admin.consultation.new.post.errors.email_send_failed.title";
+"app.api.consultation.admin.consultation.new.post.errors.email_send_failed.title";
 ```
 
 **Path Structure Mapping Rules** (from [i18n Patterns](i18n.md)):

@@ -15,7 +15,7 @@ import type {
   OxlintConfig,
   OxlintPrettierEslintConfig,
   PrettierConfig,
-} from "./src/app/api/[locale]/v1/core/system/check/oxlint/types";
+} from "./src/app/api/[locale]/system/check/oxlint/types";
 
 // Get project root directory (process is available at runtime via Node.js)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,10 +76,10 @@ export const oxlintConfig: OxlintConfig = {
   ],
 
   jsPlugins: [
-    `${projectRoot}/src/app/api/[locale]/v1/core/system/check/oxlint/plugins/restricted-syntax/src/index.ts`,
+    `${projectRoot}/src/app/api/[locale]/system/check/oxlint/plugins/restricted-syntax/src/index.ts`,
     ...(enableI18n
       ? [
-          `${projectRoot}/src/app/api/[locale]/v1/core/system/check/oxlint/plugins/i18n/src/index.ts`,
+          `${projectRoot}/src/app/api/[locale]/system/check/oxlint/plugins/i18n/src/index.ts`,
         ]
       : []),
   ],

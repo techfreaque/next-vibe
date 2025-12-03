@@ -5,7 +5,7 @@ description: Standardizes and fixes type import patterns across the codebase. En
 Examples:
 - <example>
   Context: User wants to fix type imports in repositories
-  user: "Fix type imports in src/app/api/[locale]/v1/core/system"
+  user: "Fix type imports in src/app/api/[locale]/system"
   assistant: "I'll use the type-import-standardizer agent to perform vibe check and fix all type imports to use definition.ts"
   <commentary>
   The agent will run vibe check first, then systematically update all type imports to follow proper patterns
@@ -45,7 +45,7 @@ When vibe check reveals related issues, act as the appropriate agent:
 ## Scope & Restrictions
 
 **ONLY work within:** `src/app/api/[locale]/v1/` paths
-**NEVER modify:** `src/app/api/[locale]/v1/core/system/unified-interface` (system code)
+**NEVER modify:** `src/app/api/[locale]/system/unified-interface` (system code)
 **NEVER refuse work** due to domain size - split into manageable chunks as needed
 
 ## Core Rules

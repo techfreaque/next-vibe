@@ -45,7 +45,7 @@ contact/
 └── i18n/              # Translations
 ```
 
-**Real Example:** `src/app/api/[locale]/v1/core/contact/`
+**Real Example:** `src/app/api/[locale]/contact/`
 
 ### Pattern 2: Hierarchical Structure
 
@@ -74,7 +74,7 @@ leads/
             └── ...
 ```
 
-**Real Example:** `src/app/api/[locale]/v1/core/leads/`
+**Real Example:** `src/app/api/[locale]/leads/`
 
 ### Pattern 3: Nested Schemas
 
@@ -104,7 +104,7 @@ chat/
             └── ...
 ```
 
-**Real Example:** `src/app/api/[locale]/v1/core/agent/chat/`
+**Real Example:** `src/app/api/[locale]/agent/chat/`
 
 **Decision Guide:**
 
@@ -301,7 +301,7 @@ metadata: jsonb("metadata").$type<ThreadMetadata>().default({});
 
 ```typescript
 // enum.ts
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
 /**
  * Lead Status Enum
@@ -312,12 +312,12 @@ export const {
   options: LeadStatusOptions,
   Value: LeadStatusValue,
 } = createEnumOptions({
-  NEW: "app.api.v1.core.leads.enums.leadStatus.new",
-  PENDING: "app.api.v1.core.leads.enums.leadStatus.pending",
-  CAMPAIGN_RUNNING: "app.api.v1.core.leads.enums.leadStatus.campaignRunning",
-  SIGNED_UP: "app.api.v1.core.leads.enums.leadStatus.signedUp",
-  BOUNCED: "app.api.v1.core.leads.enums.leadStatus.bounced",
-  INVALID: "app.api.v1.core.leads.enums.leadStatus.invalid",
+  NEW: "app.api.leads.enums.leadStatus.new",
+  PENDING: "app.api.leads.enums.leadStatus.pending",
+  CAMPAIGN_RUNNING: "app.api.leads.enums.leadStatus.campaignRunning",
+  SIGNED_UP: "app.api.leads.enums.leadStatus.signedUp",
+  BOUNCED: "app.api.leads.enums.leadStatus.bounced",
+  INVALID: "app.api.leads.enums.leadStatus.invalid",
 });
 
 /**
@@ -350,7 +350,7 @@ export const leads = pgTable("leads", {
 
 **Why text() instead of pgEnum()?**
 
-PostgreSQL enum labels have a 63-byte limit. Our translation keys like `app.api.v1.core.leads.enums.leadStatus.campaignRunning` exceed this limit. Using `text()` with `{ enum: EnumDB }` provides the same type safety through Drizzle's validation while avoiding the database limitation.
+PostgreSQL enum labels have a 63-byte limit. Our translation keys like `app.api.leads.enums.leadStatus.campaignRunning` exceed this limit. Using `text()` with `{ enum: EnumDB }` provides the same type safety through Drizzle's validation while avoiding the database limitation.
 
 ---
 
@@ -429,7 +429,7 @@ Use `db.select().from()` - **NOT** `db.query`:
 
 ```typescript
 // repository.ts
-import { db } from "@/app/api/[locale]/v1/core/system/db";
+import { db } from "@/app/api/[locale]/system/db";
 import { leads } from "./db";
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 
@@ -459,7 +459,7 @@ const results = await query;
 ### Insert Operations
 
 ```typescript
-import { db } from "@/app/api/[locale]/v1/core/system/db";
+import { db } from "@/app/api/[locale]/system/db";
 import { leads } from "./db";
 
 // Single insert
@@ -529,7 +529,7 @@ CREATE TABLE IF NOT EXISTS "leads" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "email" text UNIQUE,
   "business_name" text NOT NULL,
-  "status" text NOT NULL DEFAULT 'app.api.v1.core.leads.enums.leadStatus.new',
+  "status" text NOT NULL DEFAULT 'app.api.leads.enums.leadStatus.new',
   "created_at" timestamp DEFAULT now() NOT NULL,
   "updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -628,8 +628,8 @@ export const leads = pgTable("leads", {...});
 ```typescript
 // ❌ WRONG - Exceeds PostgreSQL 63-byte limit
 export const statusEnum = pgEnum("status", [
-  "app.api.v1.core.leads.enums.status.new",
-  "app.api.v1.core.leads.enums.status.pending",
+  "app.api.leads.enums.status.new",
+  "app.api.leads.enums.status.pending",
 ]);
 
 // ✅ CORRECT - Use text() with enum constraint

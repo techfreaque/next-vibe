@@ -1,10 +1,10 @@
 import { redirect } from "next-vibe-ui/lib/redirect";
 
-import { DefaultFolderId } from "@/app/api/[locale]/v1/core/agent/chat/config";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { UserDetailLevel } from "@/app/api/[locale]/v1/core/user/enum";
-import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ChatPageProps {

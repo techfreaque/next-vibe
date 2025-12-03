@@ -13,7 +13,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { H2, H3, H4, P } from "next-vibe-ui/ui/typography";
 import { Progress } from "next-vibe-ui/ui/progress";
 
-import { getABTestSummary } from "@/app/api/[locale]/v1/core/leads/campaigns/emails/services/ab-testing";
+import { getABTestSummary } from "@/app/api/[locale]/leads/campaigns/emails/services/ab-testing";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

@@ -1,0 +1,289 @@
+/// <reference types="node" />
+/* eslint-disable no-restricted-syntax */
+import { execSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  fail,
+  success,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
+
+import { parseError } from "next-vibe/shared/utils/parse-error";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
+import type { PackageJson } from "../types/index.js";
+import { runSnykMonitor, runSnykTest } from "./snyk.js";
+
+/**
+ * Type guard to validate if parsed JSON matches PackageJson structure
+ */
+// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Script execution requires 'unknown' for flexible command output
+function isPackageJson(value: unknown): value is PackageJson {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Process result handling requires 'unknown' for flexible exit data
+  const obj = value as Record<string, unknown>;
+  return typeof obj.name === "string" && typeof obj.version === "string";
+}
+
+/**
+ * Type guard to check if error has stdout property
+ */
+// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Script arguments require 'unknown' for flexible parameter passing
+function hasStdout(error: unknown): error is { stdout: string | Buffer } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "stdout" in error &&
+    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Environment variables require 'unknown' for flexible env config
+    (typeof (error as { stdout: unknown }).stdout === "string" ||
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Process options require 'unknown' for flexible spawn configuration
+      Buffer.isBuffer((error as { stdout: unknown }).stdout))
+  );
+}
+
+/**
+ * Runs tests for the given package path.
+ */
+export function runTests(
+  packagePath: string,
+  logger: EndpointLogger,
+): ResponseType<void> {
+  const pkgPath = `${packagePath}/package.json`;
+  if (!existsSync(pkgPath)) {
+    logger.info(`No package.json found in ${packagePath}, skipping tests.`);
+    return success(undefined);
+  }
+
+  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Output parsing requires 'unknown' for flexible data formats
+  const parsedJson: unknown = JSON.parse(readFileSync(pkgPath, "utf8"));
+  if (!isPackageJson(parsedJson)) {
+    logger.error(`Invalid package.json format in ${packagePath}`);
+    return fail({
+      message: "app.api.system.releaseTool.scripts.invalidPackageJson",
+      errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+      messageParams: { path: packagePath },
+    });
+  }
+
+  if (!parsedJson.scripts?.["test"]) {
+    logger.info(
+      `No test script found in package.json at ${pkgPath}, skipping tests.`,
+    );
+    return success(undefined);
+  }
+
+  try {
+    // eslint-disable-next-line i18next/no-literal-string
+    execSync(`yarn test`, { stdio: "inherit", cwd: packagePath });
+    return success(undefined);
+  } catch (error) {
+    logger.error(`Tests failed in ${packagePath}`, parseError(error));
+    return fail({
+      message: "app.api.system.releaseTool.scripts.testsFailed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { path: packagePath, error: String(error) },
+    });
+  }
+}
+
+export const lint = (
+  cwd: string,
+  logger: EndpointLogger,
+): ResponseType<void> => {
+  let lintOutput = "";
+  try {
+    // Use the local eslint binary directly from node_modules
+    // eslint-disable-next-line i18next/no-literal-string
+    const eslintPath = join(cwd, "node_modules", ".bin", "eslint");
+
+    // Check if eslint exists and use it directly
+    if (existsSync(eslintPath)) {
+      lintOutput = execSync(`${eslintPath} --fix`, {
+        encoding: "utf8",
+
+        env: { ...process.env, FORCE_COLOR: "1" },
+        cwd: cwd,
+      });
+    } else {
+      // Fall back to yarn lint if eslint binary not found
+      // eslint-disable-next-line i18next/no-literal-string
+      lintOutput = execSync(`yarn lint`, {
+        encoding: "utf8",
+
+        env: { ...process.env, FORCE_COLOR: "1" },
+        cwd: cwd,
+      });
+    }
+    return success(undefined);
+  } catch (error) {
+    if (hasStdout(error)) {
+      lintOutput = error.stdout.toString();
+    } else if (error instanceof Error) {
+      lintOutput = error.message;
+    } else {
+      // eslint-disable-next-line i18next/no-literal-string
+      lintOutput = "Unknown linting error.";
+    }
+    logger.error(`\n${lintOutput}`);
+    logger.error(`Linting errors detected in ${cwd}. Aborting release.`);
+    // If there is any lint output (e.g. warnings), print it at the bottom
+    if (lintOutput.trim().length > 0) {
+      logger.info(`\n${lintOutput}`);
+    }
+    return fail({
+      message: "app.api.system.releaseTool.scripts.lintFailed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { path: cwd, output: lintOutput },
+    });
+  }
+};
+
+export const typecheck = (
+  cwd: string,
+  logger: EndpointLogger,
+): ResponseType<void> => {
+  // Check if tsconfig.json exists in the package directory
+
+  const tsconfigPath = join(cwd, "tsconfig.json");
+  if (!existsSync(tsconfigPath)) {
+    logger.info(`No tsconfig.json found in ${cwd}, skipping typecheck.`);
+    return success(undefined);
+  }
+
+  try {
+    // Try to use local TypeScript binary first
+    // eslint-disable-next-line i18next/no-literal-string
+    const tscPath = join(cwd, "node_modules", ".bin", "tsc");
+
+    if (existsSync(tscPath)) {
+      // Use local tsc binary with --noEmit flag for type checking only
+
+      execSync(`${tscPath} --noEmit`, {
+        stdio: "inherit",
+        cwd,
+
+        env: { ...process.env, FORCE_COLOR: "1" },
+      });
+    } else {
+      // Fall back to yarn/npm script if available
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Command result requires 'unknown' for flexible command output
+      const parsedJson: unknown = JSON.parse(
+        readFileSync(join(cwd, "package.json"), "utf8"),
+      );
+      if (!isPackageJson(parsedJson)) {
+        logger.error(`Invalid package.json format in ${cwd}`);
+        return fail({
+          message: "app.api.system.releaseTool.scripts.invalidPackageJson",
+          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+          messageParams: { path: cwd },
+        });
+      }
+
+      if (parsedJson.scripts?.["typecheck"]) {
+        // eslint-disable-next-line i18next/no-literal-string
+        execSync(`yarn typecheck`, { stdio: "inherit", cwd });
+      } else {
+        // Try global tsc as last resort
+        // eslint-disable-next-line i18next/no-literal-string
+        execSync(`tsc --noEmit`, {
+          stdio: "inherit",
+          cwd,
+
+          env: { ...process.env, FORCE_COLOR: "1" },
+        });
+      }
+    }
+    logger.info(`TypeScript type checking passed for ${cwd}`);
+    return success(undefined);
+  } catch (error) {
+    logger.error(
+      `TypeScript type checking failed in ${cwd}. Aborting release.`,
+      parseError(error),
+    );
+    return fail({
+      message: "app.api.system.releaseTool.scripts.typecheckFailed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { path: cwd, error: String(error) },
+    });
+  }
+};
+
+export const build = (
+  cwd: string,
+  logger: EndpointLogger,
+): ResponseType<void> => {
+  try {
+    // eslint-disable-next-line i18next/no-literal-string
+    execSync(`yarn build`, { stdio: "inherit", cwd });
+    return success(undefined);
+  } catch (error) {
+    logger.error(`Build failed in ${cwd}`, parseError(error));
+    return fail({
+      message: "app.api.system.releaseTool.scripts.buildFailed",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { path: cwd, error: String(error) },
+    });
+  }
+};
+
+/**
+ * Runs Snyk vulnerability test for a package (local mode)
+ */
+export function snykTest(
+  cwd: string,
+  logger: EndpointLogger,
+): ResponseType<void> {
+  const packageJsonResponse = getPackageJson(cwd, logger);
+  if (!packageJsonResponse.success) {
+    return packageJsonResponse;
+  }
+  return runSnykTest(cwd, packageJsonResponse.data.name, logger);
+}
+
+/**
+ * Runs Snyk monitor to upload to dashboard (CI mode)
+ */
+export function snykMonitor(
+  cwd: string,
+  logger: EndpointLogger,
+): ResponseType<void> {
+  const packageJsonResponse = getPackageJson(cwd, logger);
+  if (!packageJsonResponse.success) {
+    return packageJsonResponse;
+  }
+  return runSnykMonitor(cwd, packageJsonResponse.data.name, logger);
+}
+
+/**
+ * Gets package.json from a directory
+ */
+function getPackageJson(
+  cwd: string,
+  logger: EndpointLogger,
+): ResponseType<PackageJson> {
+  const pkgPath = join(cwd, "package.json");
+  if (!existsSync(pkgPath)) {
+    logger.error(`No package.json found in ${cwd}`);
+    return fail({
+      message: "app.api.system.releaseTool.scripts.packageJsonNotFound",
+      errorType: ErrorResponseTypes.NOT_FOUND,
+      messageParams: { path: cwd },
+    });
+  }
+  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Script validation requires 'unknown' for runtime checking
+  const parsedJson: unknown = JSON.parse(readFileSync(pkgPath, "utf8"));
+  if (!isPackageJson(parsedJson)) {
+    logger.error(`Invalid package.json format in ${cwd}`);
+    return fail({
+      message: "app.api.system.releaseTool.scripts.invalidPackageJson",
+      errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+      messageParams: { path: cwd },
+    });
+  }
+  return success(parsedJson);
+}

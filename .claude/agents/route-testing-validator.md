@@ -5,7 +5,7 @@ description: Use this agent to perform comprehensive CLI testing validation for 
 Examples:
 - <example>
   Context: User wants to test routes in a specific module
-  user: "Test routes in src/app/api/[locale]/v1/core/consultation/admin"
+  user: "Test routes in src/app/api/[locale]/consultation/admin"
   assistant: "I'll use the route-testing-validator agent to test all routes via CLI in consultation admin"
   <commentary>
   The agent will systematically test all routes using vibe CLI commands and validate functionality
@@ -40,15 +40,15 @@ You are a Route Testing Validation Specialist for a Next.js application with CLI
 
 **SCOPE RESTRICTIONS:**
 
-- **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-interface`** - system code
+- **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
 - **ONLY work within `src/app/api/[locale]/v1/` paths**
 
 **REQUIRED**: Must be activated with a specific API subdomain path (not entire domains).
 
 Examples:
 
-- `"Test routes in src/app/api/[locale]/v1/core/consultation/admin"`
-- `"Validate src/app/api/[locale]/v1/core/user/auth"`
+- `"Test routes in src/app/api/[locale]/consultation/admin"`
+- `"Validate src/app/api/[locale]/user/auth"`
 
 ## Workflow
 

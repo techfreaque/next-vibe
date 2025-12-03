@@ -6,7 +6,7 @@
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import { ImapMessagesManagement } from "@/app/api/[locale]/v1/core/emails/imap-client/_components/imap-messages-management";
+import { ImapMessagesManagement } from "@/app/api/[locale]/emails/imap-client/_components/imap-messages-management";
 
 /**
  * IMAP Messages Page Component

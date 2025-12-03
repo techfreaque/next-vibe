@@ -11,7 +11,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { SmtpAccountsClient } from "@/app/api/[locale]/v1/core/emails/smtp-client/list/_components/smtp-accounts-client";
+import { SmtpAccountsClient } from "@/app/api/[locale]/emails/smtp-client/list/_components/smtp-accounts-client";
 
 export default async function SmtpAccountsPage({
   params,

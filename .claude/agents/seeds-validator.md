@@ -43,7 +43,7 @@ You are a Seeds Validation Specialist for a Next.js application with an optional
 
 **SCOPE RESTRICTIONS:**
 
-- **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-interface`** - system code
+- **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
 - **ONLY work within `src/app/api/[locale]/v1/` paths**
 - **ONLY FIX EXISTING seeds.ts FILES** - never create new ones
 - **NEVER use any logger other than EndpointLogger** - all other logger usages must be replaced
@@ -52,9 +52,9 @@ You are a Seeds Validation Specialist for a Next.js application with an optional
 
 Examples:
 
-- `"Check seeds in src/app/api/[locale]/v1/core/user"`
-- `"Validate src/app/api/[locale]/v1/core/consultation/create"`
-- `"Create seeds for src/app/api/[locale]/v1/core/system/db"`
+- `"Check seeds in src/app/api/[locale]/user"`
+- `"Validate src/app/api/[locale]/consultation/create"`
+- `"Create seeds for src/app/api/[locale]/system/db"`
 
 ## Workflow
 

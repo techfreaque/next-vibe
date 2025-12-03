@@ -25,7 +25,7 @@
 
 ### createEnumOptions
 
-**Import:** `@/app/api/[locale]/v1/core/system/unified-interface/shared/field/enum`
+**Import:** `@/app/api/[locale]/system/unified-interface/shared/field/enum`
 
 **Returns:**
 
@@ -54,7 +54,7 @@
 
 ```typescript
 // enum.ts
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
 /**
  * Consultation Status Enum
@@ -65,10 +65,10 @@ export const {
   options: ConsultationStatusOptions,
   Value: ConsultationStatusValue,
 } = createEnumOptions({
-  PENDING: "app.api.v1.core.consultation.enums.consultationStatus.pending",
-  SCHEDULED: "app.api.v1.core.consultation.enums.consultationStatus.scheduled",
-  COMPLETED: "app.api.v1.core.consultation.enums.consultationStatus.completed",
-  CANCELLED: "app.api.v1.core.consultation.enums.consultationStatus.cancelled",
+  PENDING: "app.api.consultation.enums.consultationStatus.pending",
+  SCHEDULED: "app.api.consultation.enums.consultationStatus.scheduled",
+  COMPLETED: "app.api.consultation.enums.consultationStatus.completed",
+  CANCELLED: "app.api.consultation.enums.consultationStatus.cancelled",
 });
 
 /**
@@ -130,9 +130,9 @@ app.api.v1.{domain}.{subdomain}.enums.{enumName}.{value}
 **Examples:**
 
 ```typescript
-"app.api.v1.core.consultation.enums.consultationStatus.pending";
-"app.api.v1.core.leads.enums.leadStatus.new";
-"app.api.v1.core.user.enums.userRole.admin";
+"app.api.consultation.enums.consultationStatus.pending";
+"app.api.leads.enums.leadStatus.new";
+"app.api.user.enums.userRole.admin";
 ```
 
 ### Creating Translations
@@ -207,8 +207,8 @@ consultation/
 import {
   WidgetType,
   FieldDataType,
-} from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/enums";
-import { requestResponseField } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field";
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { requestResponseField } from "@/app/api/[locale]/system/unified-interface/shared/field";
 import { z } from "zod";
 import { ConsultationStatus, ConsultationStatusOptions } from "./enum";
 
@@ -244,7 +244,7 @@ export const examples = {
 ### In repository.ts
 
 ```typescript
-import { db } from "@/app/api/[locale]/v1/core/system/db";
+import { db } from "@/app/api/[locale]/system/db";
 import { eq } from "drizzle-orm";
 import { consultations } from "./db";
 import { ConsultationStatus, ConsultationStatusValue } from "./enum";
@@ -367,7 +367,7 @@ export type NewConsultation = z.infer<typeof insertConsultationSchema>;
 
 **Why text() instead of pgEnum()?**
 
-PostgreSQL enum labels have a 63-byte limit. Translation keys like `app.api.v1.core.consultation.enums.consultationStatus.pending` exceed this. Using `text()` with `{ enum: EnumDB }` provides the same type safety while avoiding the database limitation.
+PostgreSQL enum labels have a 63-byte limit. Translation keys like `app.api.consultation.enums.consultationStatus.pending` exceed this. Using `text()` with `{ enum: EnumDB }` provides the same type safety while avoiding the database limitation.
 
 ### Anti-Pattern: pgEnum
 
@@ -504,7 +504,7 @@ export const translations: typeof enTranslations = {
 
 ```typescript
 // enum.ts
-import { createEnumOptions } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/field/enum";
+import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
 export const {
   enum: Theme,
@@ -580,8 +580,8 @@ export const {
   options: UserRoleOptions,
   Value: UserRoleValue,
 } = createEnumOptions({
-  ADMIN: "app.api.v1.core.user.enums.userRole.admin",
-  USER: "app.api.v1.core.user.enums.userRole.user",
+  ADMIN: "app.api.user.enums.userRole.admin",
+  USER: "app.api.user.enums.userRole.user",
 });
 
 export const UserRoleDB = [UserRole.ADMIN, UserRole.USER] as const;
@@ -681,11 +681,11 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 **NEVER** apply validation to:
 
-- `src/app/api/[locale]/v1/core/system/unified-interface` - System code
+- `src/app/api/[locale]/system/unified-interface` - System code
 
 **ONLY** work within:
 
-- `src/app/api/[locale]/v1/core/*` (excluding unified-interface)
+- `src/app/api/[locale]/*` (excluding unified-interface)
 - Work at SUBDOMAIN level only - never entire domains
 
 ### Common Errors & Fixes

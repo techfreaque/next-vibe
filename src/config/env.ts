@@ -4,8 +4,8 @@ import { stringToIntSchema } from "next-vibe/shared/types/common.schema";
 import { validateEnv } from "next-vibe/shared/utils/env-util";
 import { z } from "zod";
 
-import { AwsSnsAwsRegions } from "@/app/api/[locale]/v1/core/sms/providers/aws-sns-enum";
-import { SmsProviders } from "@/app/api/[locale]/v1/core/sms/utils-enum";
+import { AwsSnsAwsRegions } from "@/app/api/[locale]/sms/providers/aws-sns-enum";
+import { SmsProviders } from "@/app/api/[locale]/sms/utils-enum";
 import { envClientSchema, envValidationLogger } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";

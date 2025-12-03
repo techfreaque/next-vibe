@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type React from "react";
 
-import { emailService } from "@/app/api/[locale]/v1/core/leads/campaigns/emails";
+import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

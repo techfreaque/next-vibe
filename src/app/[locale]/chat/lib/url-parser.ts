@@ -6,8 +6,8 @@
 import {
   DefaultFolderId,
   isDefaultFolderId,
-} from "@/app/api/[locale]/v1/core/agent/chat/config";
-import { NEW_MESSAGE_ID } from "@/app/api/[locale]/v1/core/agent/chat/enum";
+} from "@/app/api/[locale]/agent/chat/config";
+import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 
 /**
  * Parsed URL result

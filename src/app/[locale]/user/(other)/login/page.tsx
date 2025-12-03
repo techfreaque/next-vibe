@@ -6,15 +6,15 @@ import { Link } from "next-vibe-ui/ui/link";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { loginRepository } from "@/app/api/[locale]/v1/core/user/public/login/repository";
-import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
-import { UserRole } from "@/app/api/[locale]/v1/core/user/user-roles/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { loginRepository } from "@/app/api/[locale]/user/public/login/repository";
+import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
-import { LoginForm } from "@/app/api/[locale]/v1/core/user/public/login/_components/login-form";
+import { LoginForm } from "@/app/api/[locale]/user/public/login/_components/login-form";
 import { envClient } from "@/config/env-client";
 
 interface Props {

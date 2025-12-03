@@ -38,7 +38,7 @@ export type ScopedTranslationSchema = Record<string, NestedTranslation>;
  * @returns A simpleT function that works only with the provided translations
  *
  * @example
- * // In src/app/api/[locale]/v1/core/sms/i18n/index.ts
+ * // In src/app/api/[locale]/sms/i18n/index.ts
  * import { createScopedTranslation } from "@/i18n/core/scoped-translation";
  * import { translations as enTranslations } from "./en";
  * import { translations as deTranslations } from "./de";

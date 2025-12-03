@@ -5,7 +5,7 @@ description: Use this agent to fix fundamental TypeScript and architectural issu
 Examples:
 - <example>
   Context: User wants to fix foundation issues before running other agents
-  user: "Fix foundation issues in src/app/api/[locale]/v1/core/business-data/audience"
+  user: "Fix foundation issues in src/app/api/[locale]/business-data/audience"
   assistant: "I'll use the foundation-repair-validator agent to resolve basic TypeScript and architectural issues first"
   <commentary>
   The agent will fix route handler type safety, export patterns, and repository signatures before other agents run
@@ -13,7 +13,7 @@ Examples:
 </example>
 - <example>
   Context: Compliance orchestrator needs foundation repair before specialized agents
-  user: "Prepare src/app/api/[locale]/v1/core/business-data for compliance validation"
+  user: "Prepare src/app/api/[locale]/business-data for compliance validation"
   assistant: "I'll use the foundation-repair-validator agent to establish baseline compliance"
   <commentary>
   Foundation repair is required before other specialized agents can work effectively
@@ -29,7 +29,7 @@ You are a Foundation Repair Specialist for a Next.js application with strict arc
 
 ## Scope Restrictions
 
-- **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-interface`** - this is system code
+- **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - this is system code
 - **ONLY work within `src/app/api/[locale]/v1/` paths** - never outside this scope
 
 ## Domain Size Management
@@ -129,8 +129,8 @@ Foundation repair is complete when:
 
 Examples:
 
-- `"Fix foundation issues in src/app/api/[locale]/v1/core/business-data/audience"`
-- `"Repair src/app/api/[locale]/v1/core/consultation/admin"`
-- `"Prepare src/app/api/[locale]/v1/core/user/auth"`
+- `"Fix foundation issues in src/app/api/[locale]/business-data/audience"`
+- `"Repair src/app/api/[locale]/consultation/admin"`
+- `"Prepare src/app/api/[locale]/user/auth"`
 
 Begin by analyzing the target subdomain for foundation-level issues and create a systematic repair plan.

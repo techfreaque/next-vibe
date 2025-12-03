@@ -11,8 +11,8 @@ import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import { useEffect, useMemo } from "react";
 
-import { generateEngagementTrackingApiUrl } from "@/app/api/[locale]/v1/core/leads/tracking/utils";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { generateEngagementTrackingApiUrl } from "@/app/api/[locale]/leads/tracking/utils";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

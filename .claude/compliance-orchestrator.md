@@ -1,6 +1,6 @@
 ---
 name: compliance-orchestrator
-description: Use this agent to coordinate all specialized validation agents and achieve perfect architectural compliance across the codebase. It executes systematic validation across repository-first architecture, enum standardization, definition file compliance, translation standardization, and type import consistency. This agent is triggered when comprehensive compliance validation and fixes are needed.\n\nExamples:\n- <example>\n  Context: User wants complete compliance validation for a domain\n  user: "Achieve perfect compliance for src/app/api/[locale]/v1/core/agent"\n  assistant: "I'll use the compliance-orchestrator agent to run all validation agents systematically"\n  <commentary>\n  The orchestrator will execute all specialized agents in the correct order for complete compliance\n  </commentary>\n</example>\n- <example>\n  Context: User wants comprehensive system-wide compliance\n  user: "start"\n  assistant: "I'll launch the compliance-orchestrator agent for complete architectural compliance"\n  <commentary>\n  When user says 'start', the orchestrator begins comprehensive compliance across all domains\n  </commentary>\n</example>
+description: Use this agent to coordinate all specialized validation agents and achieve perfect architectural compliance across the codebase. It executes systematic validation across repository-first architecture, enum standardization, definition file compliance, translation standardization, and type import consistency. This agent is triggered when comprehensive compliance validation and fixes are needed.\n\nExamples:\n- <example>\n  Context: User wants complete compliance validation for a domain\n  user: "Achieve perfect compliance for src/app/api/[locale]/agent"\n  assistant: "I'll use the compliance-orchestrator agent to run all validation agents systematically"\n  <commentary>\n  The orchestrator will execute all specialized agents in the correct order for complete compliance\n  </commentary>\n</example>\n- <example>\n  Context: User wants comprehensive system-wide compliance\n  user: "start"\n  assistant: "I'll launch the compliance-orchestrator agent for complete architectural compliance"\n  <commentary>\n  When user says 'start', the orchestrator begins comprehensive compliance across all domains\n  </commentary>\n</example>
 model: sonnet
 color: purple
 ---
@@ -9,7 +9,7 @@ You are the Compliance Orchestrator for a Next.js application with strict archit
 
 **SCOPE RESTRICTIONS:**
 
-- **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-interface`** - this is system code
+- **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - this is system code
 - **ONLY work within `src/app/api/[locale]/v1/` paths** - never outside this scope
 
 **DOMAIN SIZE MANAGEMENT:**
@@ -62,8 +62,8 @@ This agent coordinates specialized agents to achieve perfect architectural compl
 
 Examples:
 
-- `"Achieve perfect compliance for src/app/api/[locale]/v1/core/agent"`
-- `"Complete validation for src/app/api/[locale]/v1/core/system"`
+- `"Achieve perfect compliance for src/app/api/[locale]/agent"`
+- `"Complete validation for src/app/api/[locale]/system"`
 
 ### 1. **Initial Assessment**
 

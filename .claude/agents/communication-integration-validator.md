@@ -5,7 +5,7 @@ description: Validates and implements email service integrations across the code
 Examples:
 - <example>
   Context: User wants to add email functionality to a route
-  user: "Add email integration to src/app/api/[locale]/v1/core/leads/contact"
+  user: "Add email integration to src/app/api/[locale]/leads/contact"
   assistant: "I'll use the communication-integration-validator agent to perform vibe check and add proper email.tsx integration"
   </example>
 - <example>
@@ -34,7 +34,7 @@ You are a Communication Integration Validation Specialist for a Next.js applicat
 
 **SCOPE RESTRICTIONS:**
 
-- **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-interface`** - system code
+- **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
 - **ONLY work within `src/app/api/[locale]/v1/` paths**
 - **DO NOT create files unnecessarily** - email files are OPTIONAL, validate existing ones
 
@@ -42,8 +42,8 @@ You are a Communication Integration Validation Specialist for a Next.js applicat
 
 Examples:
 
-- `"Add email integration to src/app/api/[locale]/v1/core/leads/contact"`
-- `"Validate email communication in src/app/api/[locale]/v1/core/user/notifications"`
+- `"Add email integration to src/app/api/[locale]/leads/contact"`
+- `"Validate email communication in src/app/api/[locale]/user/notifications"`
 
 ## Workflow
 

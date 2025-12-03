@@ -138,7 +138,7 @@ vibe dev
 
    ```typescript
    // ✅ GOOD
-   t("app.api.v1.core.user.login.title")
+   t("app.api.user.login.title")
 
    // ❌ BAD
    <h1>Login</h1>  // No hardcoded strings
@@ -293,7 +293,7 @@ Users requested ability to export their profile data
 
 ## Changes
 
-- Added `/api/[locale]/v1/core/user/private/export` endpoint
+- Added `/api/[locale]/user/private/export` endpoint
 - Added export format options (JSON, CSV)
 - Added tests for export functionality
 - Added translations (en, de, pl)
@@ -431,7 +431,7 @@ Report issues to: max@a42.ch
 ## 📄 License
 
 By contributing, you agree that your contributions will be licensed under:
-- **GPL-3.0** for framework core (`src/app/api/[locale]/v1/core/` and `src/packages/`)
+- **GPL-3.0** for framework core (`src/app/api/[locale]/` and `src/packages/`)
 - **MIT** for everything else
 
 See [LICENSE](LICENSE) and [src/packages/LICENSE](src/packages/LICENSE) for details.

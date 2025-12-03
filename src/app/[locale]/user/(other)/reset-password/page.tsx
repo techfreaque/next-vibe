@@ -4,13 +4,13 @@ import { redirect } from "next-vibe-ui/lib/redirect";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { userRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
-import ResetPasswordForm from "@/app/api/[locale]/v1/core/user/public/reset-password/request/_components/reset-password-form";
+import ResetPasswordForm from "@/app/api/[locale]/user/public/reset-password/request/_components/reset-password-form";
 import { envClient } from "@/config/env-client";
 
 interface Props {

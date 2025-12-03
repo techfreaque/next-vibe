@@ -6,12 +6,12 @@
 import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type { JSX } from "react";
 
-import { HelpInteractiveView } from "@/app/api/[locale]/v1/core/system/help/interactive/_components/help-interactive-view";
+import { HelpInteractiveView } from "@/app/api/[locale]/system/help/interactive/_components/help-interactive-view";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { definitionsRegistry } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/endpoints/definitions/registry";
-import { Platform } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/types/platform";
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
+import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 
 interface HelpInteractivePageProps {
   params: Promise<{ locale: CountryLanguage }>;

@@ -7,11 +7,11 @@ import {
   DEFAULT_FOLDER_CONFIGS,
   DefaultFolderId,
   isDefaultFolderId,
-} from "@/app/api/[locale]/v1/core/agent/chat/config";
-import type { IconValue } from "@/app/api/[locale]/v1/core/agent/chat/model-access/icons";
+} from "@/app/api/[locale]/agent/chat/config";
+import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { ChatFolder } from "@/app/api/[locale]/v1/core/agent/chat/hooks/store";
+import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
 
 /**
  * Check if a folder ID is a default/root folder

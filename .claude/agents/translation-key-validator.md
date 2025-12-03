@@ -44,8 +44,8 @@ You are a Translation Validation and Remediation Specialist for a Next.js applic
 
 Examples:
 
-- `"Check translations in src/app/api/[locale]/v1/core/user/auth"`
-- `"Validate src/app/api/[locale]/v1/core/consultation/create"`
+- `"Check translations in src/app/api/[locale]/user/auth"`
+- `"Validate src/app/api/[locale]/consultation/create"`
 
 ## Workflow
 
@@ -95,7 +95,7 @@ subdomain/
 **Extract missing keys from errors:**
 
 ```
-Error: "app.api.v1.core.consultation.admin.new.errors.email_send_failed.title"
+Error: "app.api.consultation.admin.new.errors.email_send_failed.title"
        is not assignable to parameter of type 'TranslationKey'
 ```
 

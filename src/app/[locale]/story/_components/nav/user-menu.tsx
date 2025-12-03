@@ -17,9 +17,9 @@ import { P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { useLogout } from "@/app/api/[locale]/v1/core/user/private/logout/hooks";
-import type { StandardUserType } from "@/app/api/[locale]/v1/core/user/types";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useLogout } from "@/app/api/[locale]/user/private/logout/hooks";
+import type { StandardUserType } from "@/app/api/[locale]/user/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

@@ -9,12 +9,12 @@ import {
 } from "next-vibe-ui/utils/browser";
 import { useEffect, useMemo, useRef } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 
-import { EngagementTypes } from "../../api/[locale]/v1/core/leads/enum";
-import type { LeadEngagementResponseOutput } from "../../api/[locale]/v1/core/leads/tracking/engagement/definition";
+import { EngagementTypes } from "../../api/[locale]/leads/enum";
+import type { LeadEngagementResponseOutput } from "../../api/[locale]/leads/tracking/engagement/definition";
 
 const TRACKING_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 let lastTrackedTime = 0;
@@ -62,7 +62,7 @@ export function LeadTrackingProvider(): null {
         // Call the engagement endpoint to record website visit
         // Server will handle leadid creation/validation via JWT payload
         const baseUrl = envClient.NEXT_PUBLIC_APP_URL;
-        const apiUrl = `${baseUrl}/api/${locale}/v1/core/leads/tracking/engagement`;
+        const apiUrl = `${baseUrl}/api/${locale}/leads/tracking/engagement`;
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {

@@ -5,12 +5,12 @@ description: Validates and fixes definition.ts files for data-driven interface g
 Examples:
 - <example>
   Context: User needs definition.ts validation for multi-interface generation
-  user: "Fix src/app/api/[locale]/v1/core/user/auth"
+  user: "Fix src/app/api/[locale]/user/auth"
   assistant: "I'll use the definition-file-validator agent to ensure proper definition patterns and UI/UX optimization across all interfaces"
   </example>
 - <example>
   Context: User wants to validate multiple definition files
-  user: "Validate src/app/api/[locale]/v1/core/consultation"
+  user: "Validate src/app/api/[locale]/consultation"
   assistant: "I'll use the definition-file-validator agent to check all definition files in the consultation domain"
   </example>
 - <example>
@@ -46,7 +46,7 @@ You are an expert validator for data-driven interface definition files. Your rol
 
 **SCOPE RESTRICTIONS:**
 
-- **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-interface`** - system code
+- **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
 - **ONLY work within `src/app/api/[locale]/v1/` paths**
 - **FOCUS ON BOTH:** Technical correctness AND user experience optimization
 
@@ -54,10 +54,10 @@ You are an expert validator for data-driven interface definition files. Your rol
 
 Examples:
 
-- `"Fix src/app/api/[locale]/v1/core/user/auth"` (folder)
-- `"Fix src/app/api/[locale]/v1/core/consultation"` (domain)
-- `"Validate src/app/api/[locale]/v1/core/user/auth/definition.ts"` (file)
-- `"Optimize UI for src/app/api/[locale]/v1/core/business-data/profile"` (UX focus)
+- `"Fix src/app/api/[locale]/user/auth"` (folder)
+- `"Fix src/app/api/[locale]/consultation"` (domain)
+- `"Validate src/app/api/[locale]/user/auth/definition.ts"` (file)
+- `"Optimize UI for src/app/api/[locale]/business-data/profile"` (UX focus)
 
 ## Workflow
 

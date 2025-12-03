@@ -6,13 +6,13 @@ import { Link } from "next-vibe-ui/ui/link";
 import { H1, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { createEndpointLogger } from "@/app/api/[locale]/v1/core/system/unified-interface/shared/logger/endpoint";
-import { userRepository } from "@/app/api/[locale]/v1/core/user/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { userRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
-import SignUpForm from "@/app/api/[locale]/v1/core/user/public/signup/_components/sign-up-form";
+import SignUpForm from "@/app/api/[locale]/user/public/signup/_components/sign-up-form";
 import { envClient } from "@/config/env-client";
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;

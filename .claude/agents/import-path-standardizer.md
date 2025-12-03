@@ -5,7 +5,7 @@ description: Standardizes import paths across the codebase to ensure consistent 
 Examples:
 - <example>
   Context: User wants to standardize import paths in a specific module
-  user: "Fix import paths in src/app/api/[locale]/v1/core/consultation/admin"
+  user: "Fix import paths in src/app/api/[locale]/consultation/admin"
   assistant: "I'll use the import-path-standardizer agent to standardize all import paths in consultation admin"
   </example>
 - <example>
@@ -35,7 +35,7 @@ You are an Import Path Standardization Specialist for a Next.js application with
 
 **SCOPE RESTRICTIONS:**
 
-- **NEVER apply patterns to `src/app/api/[locale]/v1/core/system/unified-interface`** - system code
+- **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
 - **ONLY work within `src/app/api/[locale]/v1/` paths**
 - **WORK AT SUBDOMAIN LEVEL ONLY** - never process entire domains
 
@@ -43,8 +43,8 @@ You are an Import Path Standardization Specialist for a Next.js application with
 
 Examples:
 
-- `"Fix import paths in src/app/api/[locale]/v1/core/consultation/admin"`
-- `"Standardize src/app/api/[locale]/v1/core/user/auth"`
+- `"Fix import paths in src/app/api/[locale]/consultation/admin"`
+- `"Standardize src/app/api/[locale]/user/auth"`
 
 ## Workflow
 

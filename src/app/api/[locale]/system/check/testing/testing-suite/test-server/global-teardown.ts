@@ -1,0 +1,25 @@
+/**
+ * Global teardown for all tests
+ * This runs once after all tests complete
+ */
+
+import { parseError } from "next-vibe/shared/utils";
+
+import { closeDatabase } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
+import { stopServer } from "./test-server";
+
+export default async function teardown(logger: EndpointLogger): Promise<void> {
+  try {
+    logger.debug("Global teardown starting...");
+    await closeDatabase(logger);
+    await stopServer(logger);
+    logger.debug("Test server stopped successfully");
+  } catch (error) {
+    logger.error("Error during test teardown:", parseError(error));
+    // Attempt to force disconnect even if there's an error
+    await closeDatabase(logger).catch(void logger.error);
+    process.exit(1);
+  }
+}

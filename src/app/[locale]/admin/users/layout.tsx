@@ -6,10 +6,10 @@
 import type React from "react";
 import type { ReactNode } from "react";
 
-import { requireAdminUser } from "@/app/api/[locale]/v1/core/user/auth/utils";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { AdminUsersLayoutClient } from "@/app/api/[locale]/v1/core/users/_components/admin-users-layout-client";
+import { AdminUsersLayoutClient } from "@/app/api/[locale]/users/_components/admin-users-layout-client";
 
 interface AdminUsersLayoutProps {
   children: ReactNode;

@@ -4,7 +4,7 @@ import type { JSX } from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { NewsletterPage } from "@/app/api/[locale]/v1/core/newsletter/subscribe/_components/newsletter-page";
+import { NewsletterPage } from "@/app/api/[locale]/newsletter/subscribe/_components/newsletter-page";
 
 interface PageProps {
   params: Promise<{

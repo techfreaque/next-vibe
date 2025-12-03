@@ -8,12 +8,12 @@ import type { JSX } from "react";
 import {
   ProductIds,
   productsRepository,
-} from "@/app/api/[locale]/v1/core/products/repository-client";
+} from "@/app/api/[locale]/products/repository-client";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { BuyCreditsTab } from "@/app/api/[locale]/v1/core/subscription/_components/buy-credits-tab";
-import { OverviewTab } from "@/app/api/[locale]/v1/core/subscription/_components/overview-tab";
-import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/v1/core/subscription/definition";
+import { BuyCreditsTab } from "@/app/api/[locale]/subscription/_components/buy-credits-tab";
+import { OverviewTab } from "@/app/api/[locale]/subscription/_components/overview-tab";
+import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 
 interface StoryPricingSectionProps {
   locale: CountryLanguage;
