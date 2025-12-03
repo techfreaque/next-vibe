@@ -119,7 +119,6 @@ RUN bun install --frozen-lockfile
 
 # Build using vibe CLI
 RUN bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build
-RUN bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts migrate
 
 ENV NODE_ENV=production
 
