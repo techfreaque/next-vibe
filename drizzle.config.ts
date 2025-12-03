@@ -30,9 +30,8 @@ export default {
 
   migrations: {
     prefix: "timestamp",
-
     table: "__drizzle_migrations__",
-    schema: "drizzle",
+    schema: "public",
   },
 
   breakpoints: true,
