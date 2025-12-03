@@ -64,6 +64,13 @@
       "when": 1764770720090,
       "tag": "20251203140520_third_ares",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1764791540000,
+      "tag": "20251203193220_update_jsonb_roles",
+      "breakpoints": true
     }
   ]
 }
