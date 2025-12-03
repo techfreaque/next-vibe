@@ -82,7 +82,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.system.server.dev.post.fields.skipDbReset.description",
         },
-        z.boolean().default(false),
+        z.boolean().default(true),
       ),
 
       fastDbReset: requestDataField(
