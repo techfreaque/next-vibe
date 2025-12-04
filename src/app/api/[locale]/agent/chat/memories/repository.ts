@@ -149,7 +149,7 @@ export async function updateMemory(params: {
 
   if (!updated) {
     return fail({
-      message: "app.api.agent.chat.memories.patch.errors.notFound.title",
+      message: "app.api.agent.chat.memories.id.patch.errors.notFound.title",
       errorType: ErrorResponseTypes.NOT_FOUND,
     });
   }
@@ -175,7 +175,7 @@ export async function deleteMemory(params: {
 
   if (result.length === 0) {
     return fail({
-      message: "app.api.agent.chat.memories.delete.errors.notFound.title",
+      message: "app.api.agent.chat.memories.id.delete.errors.notFound.title",
       errorType: ErrorResponseTypes.NOT_FOUND,
     });
   }

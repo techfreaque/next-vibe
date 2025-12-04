@@ -3,6 +3,9 @@ import { translations as searchTranslations } from "../../search/i18n/en";
 
 export const translations = {
   ...searchTranslations,
+  errors: {
+    count_failed: "Failed to get conversation count: {{error}}",
+  },
   get: {
     title: "List Chat Threads",
     description:

@@ -156,7 +156,7 @@ export function SuggestedPrompts({
             </DialogHeader>
             <ScrollArea className="h-[70vh] pr-4">
               <Div className="flex flex-col gap-4">
-                {DEFAULT_PERSONAS.map((persona) => {
+                {DEFAULT_PERSONAS.map((persona: Persona) => {
                   const isExpanded = expandedPersonaId === persona.id;
                   const categoryConfig = DEFAULT_CATEGORIES.find(
                     (cat) => cat.id === persona.category,

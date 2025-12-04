@@ -90,7 +90,8 @@ export async function executeMCPTool<T>(
       error: error instanceof Error ? error.message : String(error),
     });
     return fail({
-      message: `Failed to execute ${params.toolName}`,
+      message: "app.api.browser.repository.mcp.tool.call.toolExecutionFailed",
+      messageParams: { toolName: params.toolName },
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     }) as ResponseType<T>;
   }

@@ -4,6 +4,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   ...searchTranslations,
+  errors: {
+    count_failed: "Fehler beim Abrufen der Konversationsanzahl: {{error}}",
+  },
   get: {
     title: "Chat-Threads auflisten",
     description:

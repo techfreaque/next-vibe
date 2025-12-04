@@ -4,22 +4,18 @@ export const translations = {
   nav: navTranslations,
   home: {
     hero: {
-      badge: "🔥 AI Chat + Community Forum",
-      title: "Chat with AI, Connect with Community",
+      title: "Uncensored AI Chat Without Limits",
       subtitle:
-        "Experience uncensored AI conversations with {{modelCount}}+ models. Join forum discussions. All in one platform.",
-      description:
-        "Private AI chats, collaborative spaces, and public forum threads. Choose your privacy level: Private (encrypted), Incognito (local-only), Shared (collaborative), or Public (community forum).",
-      cta: "Start Chatting Free",
-      learnMore: "Learn More",
-      secondaryCta: "Browse Forum",
-      userAvatarAlt: "User avatar",
-      satisfiedClients: "Join 10,000+ satisfied users",
-      imageAlt: "{{appName}} Chat + Forum Interface",
+        "Access {{modelCount}} AI models. Private chats or public discussions. Your data, your rules.",
+      cta: "Start Free",
+      secondaryCta: "Explore Community",
       stats: {
-        users: "10,000+ Users",
-        models: "{{modelCount}}+ AI Models",
-        messages: "1M+ Messages",
+        users: "10K+",
+        usersLabel: "Active Users",
+        models: "{{modelCount}}",
+        modelsLabel: "AI Models",
+        messages: "1M+",
+        messagesLabel: "Conversations",
       },
       imageOverlay: {
         title: "Real-time AI + Community",
@@ -59,7 +55,7 @@ export const translations = {
       contentCreation: {
         title: "Private Folders - Your Personal AI",
         description:
-          "Encrypted, server-stored chats. Access GPT-4, Claude, Gemini, and {{modelCount}}+ models. Your private conversations, synced across devices.",
+          "Encrypted, server-stored chats. Access GPT-4, Claude, Gemini, and {{modelCount}} models. Your private conversations, synced across devices.",
       },
       strategyDevelopment: {
         title: "Incognito Folders - Local Only",
@@ -77,7 +73,7 @@ export const translations = {
           "Join the community! Create public threads, participate in discussions, upvote content, and connect with other AI enthusiasts.",
       },
       growth: {
-        title: "{{modelCount}}+ Uncensored AI Models",
+        title: "{{modelCount}} Uncensored AI Models",
         description:
           "GPT-4, Claude, Gemini, Llama, Mistral, and more. No filters, no restrictions. Switch models mid-conversation.",
       },
@@ -120,7 +116,7 @@ export const translations = {
     cta: {
       title: "Ready to Join the AI + Community Platform?",
       subtitle:
-        "Chat privately with {{modelCount}}+ AI models. Join public forum discussions. Choose your privacy level. Start free today.",
+        "Chat privately with {{modelCount}} AI models. Join public forum discussions. Choose your privacy level. Start free today.",
       signUp: "Sign Up Free",
       viewPlans: "View Pricing Plans",
     },
@@ -141,7 +137,7 @@ export const translations = {
         credits: "{{credits}} free credits (one-time)",
         features: {
           credits: "{{credits}} credits to start",
-          models: "Access to all {{modelCount}}+ AI models",
+          models: "Access to all {{modelCount}} AI models",
           folders: "All folder types (private, incognito, shared, public)",
           personas: "Use community personas",
           support: "Community support",
@@ -155,7 +151,7 @@ export const translations = {
         credits: "{{credits}} credits/month",
         features: {
           unlimited: "Unlimited AI conversations",
-          models: "All {{modelCount}}+ AI models",
+          models: "All {{modelCount}} AI models",
           folders: "All folder types",
           personas: "Create unlimited personas",
           priority: "Priority support",
@@ -172,7 +168,7 @@ export const translations = {
         features: {
           payAsYouGo: "Pay only for what you use",
           neverExpires: "Credits never expire",
-          models: "All {{modelCount}}+ AI models",
+          models: "All {{modelCount}} AI models",
           folders: "All folder types",
           buyMore: "Buy more anytime",
         },
@@ -190,7 +186,7 @@ export const translations = {
       badge: "Free Trial",
       title: "Try All AI Models Free",
       description:
-        "Start with {{freeCredits}} free credits. Test all {{modelCount}}+ AI models before upgrading.",
+        "Start with {{freeCredits}} free credits. Test all {{modelCount}} AI models before upgrading.",
       card: {
         title: "Free Access",
         subtitle: "Everything you need to get started",
@@ -202,7 +198,7 @@ export const translations = {
       },
       benefits: {
         professionalSetup: "No credit card required",
-        brandConsistency: "Access to all {{modelCount}}+ models",
+        brandConsistency: "Access to all {{modelCount}} models",
         optimizedProfiles: "{{freeCredits}} free credits to start",
         strategicPlanning: "Upgrade anytime",
       },
@@ -219,7 +215,7 @@ export const translations = {
         strategyDevelopment: {
           title: "1. Sign Up Free",
           description:
-            "Create your account in seconds. No credit card required. Start with {{freeCredits}} free credits per month across all {{modelCount}}+ AI models.",
+            "Create your account in seconds. No credit card required. Start with {{freeCredits}} free credits per month across all {{modelCount}} AI models.",
           tags: {
             audienceAnalysis: "Quick Setup",
             competitorResearch: "No Credit Card",
@@ -248,7 +244,7 @@ export const translations = {
           description:
             "Have private AI conversations, collaborate with friends, or join public forum discussions. Use custom personas and switch AI models mid-chat.",
           tags: {
-            optimalTiming: "{{modelCount}}+ AI Models",
+            optimalTiming: "{{modelCount}} AI Models",
             communityBuilding: "Community Forum",
           },
         },
@@ -268,7 +264,7 @@ export const translations = {
         title: "About {{appName}}",
         subtitle: "AI Chat + Community Forum. Your Privacy. Your Choice.",
         description:
-          "We're building a platform that combines private AI conversations with community forum discussions. Choose your privacy level, chat with {{modelCount}}+ AI models, and connect with our community.",
+          "We're building a platform that combines private AI conversations with community forum discussions. Choose your privacy level, chat with {{modelCount}} AI models, and connect with our community.",
       },
       mission: {
         title: "Our Mission",
@@ -278,7 +274,7 @@ export const translations = {
       story: {
         title: "Our Story",
         description:
-          "{{appName}} was created to solve two problems: censored AI platforms and fragmented chat experiences. We built a single platform where you can have private AI chats, collaborate with teams, and participate in public forum discussions. Today, thousands of users enjoy complete privacy control while accessing {{modelCount}}+ uncensored AI models.",
+          "{{appName}} was created to solve two problems: censored AI platforms and fragmented chat experiences. We built a single platform where you can have private AI chats, collaborate with teams, and participate in public forum discussions. Today, thousands of users enjoy complete privacy control while accessing {{modelCount}} uncensored AI models.",
       },
       values: {
         excellence: {
@@ -854,7 +850,7 @@ export const translations = {
   footer: {
     tagline: "Chat with AI, Connect with Community",
     privacyTagline:
-      "Privacy-first AI chat with {{modelCount}}+ uncensored models",
+      "Privacy-first AI chat with {{modelCount}} uncensored models",
     platform: {
       title: "Platform",
       features: "Features",

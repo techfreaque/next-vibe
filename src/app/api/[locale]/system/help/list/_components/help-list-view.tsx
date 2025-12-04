@@ -51,10 +51,10 @@ export function HelpListView({ locale }: HelpListViewProps): JSX.Element {
   );
 
   return (
-    <Div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-950 dark:to-gray-900 py-16 px-4">
+    <Div className="min-h-screen bg-linear-to-b from-blue-50 to-white dark:from-gray-950 dark:to-gray-900 py-16 px-4">
       <Div className="container max-w-6xl mx-auto">
         <Div className="text-center mb-12">
-          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600">
             {t("app.api.system.help.list.post.title")}
           </H1>
           <P className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">

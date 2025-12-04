@@ -75,11 +75,11 @@ export const translations = {
         },
         features: {
           title: "Features",
-          search: "Brave Search",
-          tts: "Text-to-Speech",
-          stt: "Speech-to-Text",
-          searchCost: "+1 credit",
-          audioCost: "+2 credits",
+          searchLabel: "Brave Search",
+          ttsLabel: "Text-to-Speech (per 1000 chars)",
+          sttLabel: "Speech-to-Text (per minute)",
+          costFormat: "{{value}} {{unit}}",
+          creditsUnit: "credits",
         },
       },
       cta: {
@@ -201,6 +201,21 @@ export const translations = {
         plans: "AI chat plans",
         pricing: "uncensored AI pricing",
       },
+    },
+    overview: {
+      title: "Subscription Overview - Unbottled AI",
+      description:
+        "View your credit balance, subscription status, and learn how credits work. Chat with {{modelCount}}+ uncensored AI models.",
+    },
+    buyCredits: {
+      title: "Buy Credits - Unbottled AI",
+      description:
+        "Subscribe for {{subCredits}} monthly credits or buy extra credit packs. Access {{modelCount}}+ uncensored AI models.",
+    },
+    history: {
+      title: "Transaction History - Unbottled AI",
+      description:
+        "View your credit transaction history, purchases, and usage. Manage your AI chat credits.",
     },
   },
   payment: {

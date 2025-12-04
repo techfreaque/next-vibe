@@ -834,10 +834,10 @@ export interface StatusIndicatorWidgetConfig extends BaseWidgetConfig {
 // CUSTOM WIDGETS
 // ============================================================================
 
-export interface CustomWidgetConfig extends BaseWidgetConfig {
+export interface CustomWidgetConfig<TProps extends Record<string, string | number | boolean | null | undefined> = Record<string, never>> extends BaseWidgetConfig {
   type: WidgetType.CUSTOM;
   componentId: string;
-  props?: Record<string, unknown>;
+  props?: TProps;
 }
 
 // ============================================================================

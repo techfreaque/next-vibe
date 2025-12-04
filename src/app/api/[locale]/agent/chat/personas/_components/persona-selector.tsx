@@ -19,6 +19,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/personas/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslationKey } from "@/i18n/core/static-types";
 import { simpleT } from "@/i18n/core/shared";
 
 import {
@@ -164,9 +165,10 @@ export function PersonaSelector({
       return;
     }
 
+    // User-provided category name treated as TranslationKey for API compatibility
     const category: PersonaCategory = {
       id: `custom-${Date.now()}`,
-      name: newCategory.name,
+      name: newCategory.name as TranslationKey,
       icon: newCategory.icon,
     };
 
@@ -183,15 +185,18 @@ export function PersonaSelector({
       return;
     }
 
+    // User-provided persona data treated as TranslationKey for API compatibility
     const persona: Persona = {
       id: `custom-${Date.now()}`,
-      name: newPersona.name,
-      description: newPersona.description,
+      name: newPersona.name as TranslationKey,
+      description: newPersona.description as TranslationKey,
       icon: newPersona.icon,
       systemPrompt: newPersona.systemPrompt,
       category: newPersona.category,
       source: "my",
-      suggestedPrompts: newPersona.suggestedPrompts.filter((p) => p.trim()),
+      suggestedPrompts: newPersona.suggestedPrompts.filter((p) =>
+        p.trim(),
+      ) as TranslationKey[],
     };
 
     savePersonas([...personas, persona]);

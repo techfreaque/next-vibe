@@ -276,4 +276,24 @@ export const translations = {
       other: "Other",
     },
   },
+
+  // Page metadata
+  meta: {
+    subscription: {
+      title: "Subscription",
+      description: "Manage your subscription and billing",
+    },
+    buyCredits: {
+      title: "Buy Credits",
+      description: "Purchase additional credits for your account",
+    },
+    history: {
+      title: "Billing History",
+      description: "View your billing and transaction history",
+    },
+    overview: {
+      title: "Subscription Overview",
+      description: "View your subscription status and details",
+    },
+  },
 };

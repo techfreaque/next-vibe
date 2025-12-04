@@ -278,7 +278,7 @@ export default async function JobPostingPage({
   }
 
   return (
-    <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
+    <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
       <Div className="container max-w-6xl mx-auto py-8 px-4">
         <Div className="mb-8">
           <Button
@@ -297,7 +297,7 @@ export default async function JobPostingPage({
         </Div>
 
         <Div className="max-w-5xl mx-auto">
-          <H1 className="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+          <H1 className="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600">
             {job.title}
           </H1>
           <P className="text-xl text-gray-700 dark:text-gray-300 mb-8">

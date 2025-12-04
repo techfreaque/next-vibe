@@ -453,7 +453,7 @@ if (typeof process !== "undefined") {
 
   process.on("SIGINT", () => {
     browserRepository.cleanup();
-    process.exit();
+    // Don't call process.exit() - let other handlers (like dev server) manage exit
   });
 
   process.on("SIGTERM", () => {

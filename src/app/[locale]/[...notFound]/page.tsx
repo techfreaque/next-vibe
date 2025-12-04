@@ -52,7 +52,7 @@ export default async function NotFound({
   const { locale } = await params;
   const { t } = simpleT(locale);
   return (
-    <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900 flex flex-col items-center justify-center px-4 py-12">
+    <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900 flex flex-col items-center justify-center px-4 py-12">
       <Div className="w-full max-w-3xl">
         <Card className="border-none shadow-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
           <CardContent className="p-0 overflow-hidden">

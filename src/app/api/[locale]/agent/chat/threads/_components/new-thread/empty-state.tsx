@@ -68,16 +68,48 @@ export function ChatEmptyState({
   const folderConfig = getDefaultFolderConfig(rootFolderId);
   const color = folderConfig?.color || "blue";
 
-  // Map color names to RGB values for inline styles
-  const colorMap: Record<string, { r: number; g: number; b: number }> = {
-    sky: { r: 14, g: 165, b: 233 }, // sky-500
-    purple: { r: 168, g: 85, b: 247 }, // purple-500
-    teal: { r: 20, g: 184, b: 166 }, // teal-500
-    amber: { r: 245, g: 158, b: 11 }, // amber-500
-    blue: { r: 59, g: 130, b: 246 }, // blue-500
-  };
+  // Map color names to Tailwind classes
+  const getColorClasses = (
+    variant: "bg" | "border" | "text" | "hover-bg",
+  ): string => {
+    const colorMap: Record<
+      string,
+      Record<"bg" | "border" | "text" | "hover-bg", string>
+    > = {
+      sky: {
+        bg: "bg-sky-500/20",
+        border: "border-sky-500/50",
+        text: "text-sky-500",
+        "hover-bg": "hover:bg-sky-500/10",
+      },
+      purple: {
+        bg: "bg-purple-500/20",
+        border: "border-purple-500/50",
+        text: "text-purple-500",
+        "hover-bg": "hover:bg-purple-500/10",
+      },
+      teal: {
+        bg: "bg-teal-500/20",
+        border: "border-teal-500/50",
+        text: "text-teal-500",
+        "hover-bg": "hover:bg-teal-500/10",
+      },
+      amber: {
+        bg: "bg-amber-500/20",
+        border: "border-amber-500/50",
+        text: "text-amber-500",
+        "hover-bg": "hover:bg-amber-500/10",
+      },
+      blue: {
+        bg: "bg-blue-500/20",
+        border: "border-blue-500/50",
+        text: "text-blue-500",
+        "hover-bg": "hover:bg-blue-500/10",
+      },
+    };
 
-  const rgb = colorMap[color] || colorMap.blue;
+    return colorMap[color]?.[variant] || colorMap.blue[variant];
+  };
 
   // Get personas to display in tabs - always include selected persona
   const getDisplayedPersonas = (): Persona[] => {
@@ -179,38 +211,12 @@ export function ChatEmptyState({
               }
         }
       >
-        <Div
-          style={{
-            maxWidth: "48rem",
-            marginLeft: "auto",
-            marginRight: "auto",
-            paddingLeft: "0.75rem",
-            paddingRight: "0.75rem",
-            paddingTop: "5rem",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
+        <Div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pt-20 flex flex-col items-center">
           {/* Folder icon */}
           <Div
-            style={{
-              width: "5rem",
-              height: "5rem",
-              borderRadius: "9999px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: "1.5rem",
-              backgroundColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`,
-            }}
+            className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 ${getColorClasses("bg").replace("/20", "/10")}`}
           >
-            <Div
-              style={{
-                fontSize: "2.25rem",
-                color: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
-              }}
-            >
+            <Div className={`text-4xl ${getColorClasses("text")}`}>
               {React.createElement(
                 getIconComponent(folderConfig?.icon || "message-circle"),
               )}
@@ -218,66 +224,29 @@ export function ChatEmptyState({
           </Div>
 
           {/* Title and description */}
-          <H1
-            style={{
-              fontSize: "1.875rem",
-              fontWeight: "bold",
-              marginBottom: "0.5rem",
-              textAlign: "center",
-            }}
-          >
-            {getTitle()}
-          </H1>
-          <P
-            style={{
-              color: "var(--muted-foreground)",
-              textAlign: "center",
-              marginBottom: "2rem",
-            }}
-          >
+          <H1 className="text-3xl font-bold mb-2 text-center">{getTitle()}</H1>
+          <P className="text-muted-foreground text-center mb-8">
             {getDescription()}
           </P>
 
           {/* Horizontal persona selector */}
-          <Div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "0.5rem",
-              justifyContent: "center",
-              marginBottom: "1.5rem",
-              width: "100%",
-            }}
-          >
+          <Div className="flex flex-wrap gap-2 justify-center mb-6 w-full">
             {getDisplayedPersonas().map((persona) => (
               <Button
                 key={persona.id}
                 onClick={(): void => handlePersonaClick(persona)}
                 variant="ghost"
                 size="sm"
-                style={
+                className={`flex gap-2 border ${
                   selectedPersona.id === persona.id
-                    ? {
-                        display: "flex",
-                        gap: "0.5rem",
-                        backgroundColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`,
-                        borderColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`,
-                        borderWidth: "1px",
-                        borderStyle: "solid",
-                      }
-                    : {
-                        display: "flex",
-                        gap: "0.5rem",
-                        borderColor: "transparent",
-                        borderWidth: "1px",
-                        borderStyle: "solid",
-                      }
-                }
+                    ? `${getColorClasses("bg")} ${getColorClasses("border")}`
+                    : "border-transparent"
+                }`}
               >
-                <Div style={{ fontSize: "1rem" }}>
+                <Div className="text-base">
                   {React.createElement(getIconComponent(persona.icon))}
                 </Div>
-                <span style={{ fontSize: "0.875rem" }}>{t(persona.name)}</span>
+                <span className="text-sm">{t(persona.name)}</span>
               </Button>
             ))}
 
@@ -287,36 +256,22 @@ export function ChatEmptyState({
                 <Button
                   variant="ghost"
                   size="sm"
-                  style={{
-                    display: "flex",
-                    gap: "0.5rem",
-                    borderColor: "transparent",
-                    borderWidth: "1px",
-                    borderStyle: "solid",
-                  }}
+                  className="flex gap-2 border border-transparent"
                 >
-                  <Div style={{ height: "1rem", width: "1rem" }}>
-                    <MoreHorizontal />
-                  </Div>
-                  <span style={{ fontSize: "0.875rem" }}>
+                  <MoreHorizontal className="h-4 w-4" />
+                  <span className="text-sm">
                     {t("app.chat.suggestedPrompts.more")}
                   </span>
                 </Button>
               </DialogTrigger>
-              <DialogContent style={{ maxWidth: "48rem", maxHeight: "85vh" }}>
+              <DialogContent className="max-w-3xl max-h-[85vh]">
                 <DialogHeader>
                   <DialogTitle>
                     {t("app.chat.suggestedPrompts.selectPersona")}
                   </DialogTitle>
                 </DialogHeader>
-                <ScrollArea style={{ height: "70vh", paddingRight: "1rem" }}>
-                  <Div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "1rem",
-                    }}
-                  >
+                <ScrollArea className="h-[70vh] pr-4">
+                  <Div className="flex flex-col gap-4">
                     {DEFAULT_PERSONAS.map((persona: Persona) => {
                       const isExpanded = expandedPersonaId === persona.id;
                       const categoryConfig = DEFAULT_CATEGORIES.find(
@@ -329,93 +284,37 @@ export function ChatEmptyState({
                       return (
                         <Div
                           key={persona.id}
-                          style={
+                          className={`rounded-lg border transition-all ${
                             selectedPersona.id === persona.id
-                              ? {
-                                  borderRadius: "0.5rem",
-                                  border: "1px solid",
-                                  transition: "all 0.2s",
-                                  borderColor: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
-                                  backgroundColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.05)`,
-                                }
-                              : {
-                                  borderRadius: "0.5rem",
-                                  border: "1px solid var(--border)",
-                                  transition: "all 0.2s",
-                                }
-                          }
+                              ? `${getColorClasses("border").replace("/50", "")} ${getColorClasses("bg").replace("/20", "/5")}`
+                              : ""
+                          }`}
                         >
                           {/* Header - clickable to select persona */}
                           <Button
                             onClick={(): void => handlePersonaSelect(persona)}
                             variant="ghost"
                             size="unset"
-                            style={{
-                              width: "100%",
-                              textAlign: "left",
-                              padding: "1rem",
-                              borderRadius: "0.5rem",
-                            }}
+                            className="w-full text-left p-4 rounded-lg"
                           >
-                            <Div
-                              style={{
-                                display: "flex",
-                                alignItems: "flex-start",
-                                gap: "1rem",
-                                width: "100%",
-                              }}
-                            >
-                              <Div
-                                style={{
-                                  fontSize: "1.875rem",
-                                  flexShrink: 0,
-                                }}
-                              >
+                            <Div className="flex items-start gap-4 w-full">
+                              <Div className="text-3xl shrink-0">
                                 {React.createElement(
                                   getIconComponent(persona.icon),
                                 )}
                               </Div>
-                              <Div style={{ flex: 1, minWidth: 0 }}>
-                                <H3
-                                  style={{
-                                    fontSize: "1.125rem",
-                                    fontWeight: 600,
-                                    marginBottom: "0.25rem",
-                                  }}
-                                >
+                              <Div className="flex-1 min-w-0">
+                                <H3 className="text-lg font-semibold mb-1">
                                   {t(persona.name)}
                                 </H3>
-                                <P
-                                  style={{
-                                    fontSize: "0.875rem",
-                                    color: "var(--muted-foreground)",
-                                  }}
-                                >
+                                <P className="text-sm text-muted-foreground">
                                   {t(persona.description)}
                                 </P>
                                 {/* Category and Model badges */}
-                                <Div
-                                  style={{
-                                    display: "flex",
-                                    flexWrap: "wrap",
-                                    gap: "0.5rem",
-                                    marginTop: "0.5rem",
-                                  }}
-                                >
+                                <Div className="flex flex-wrap gap-2 mt-2">
                                   {categoryConfig && (
-                                    <Div
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "0.375rem",
-                                        padding: "0.25rem 0.5rem",
-                                        borderRadius: "0.375rem",
-                                        backgroundColor: "var(--muted)",
-                                        opacity: 0.5,
-                                        fontSize: "0.75rem",
-                                      }}
-                                    >
-                                      <Div style={{ fontSize: "0.875rem" }}>
+                                    <Div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50 text-xs">
+                                      <Div className="text-sm">
                                         {React.createElement(
                                           getIconComponent(categoryConfig.icon),
                                         )}
@@ -424,19 +323,8 @@ export function ChatEmptyState({
                                     </Div>
                                   )}
                                   {modelConfig && (
-                                    <Div
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "0.375rem",
-                                        padding: "0.25rem 0.5rem",
-                                        borderRadius: "0.375rem",
-                                        backgroundColor: "var(--muted)",
-                                        opacity: 0.5,
-                                        fontSize: "0.75rem",
-                                      }}
-                                    >
-                                      <Div style={{ fontSize: "0.875rem" }}>
+                                    <Div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50 text-xs">
+                                      <Div className="text-sm">
                                         {React.createElement(
                                           getIconComponent(modelConfig.icon),
                                         )}
@@ -450,39 +338,19 @@ export function ChatEmptyState({
                           </Button>
 
                           {/* Toggle button for more details */}
-                          <Div
-                            style={{
-                              paddingLeft: "1rem",
-                              paddingRight: "1rem",
-                              paddingBottom: "0.5rem",
-                            }}
-                          >
+                          <Div className="px-4 pb-2">
                             <Button
                               onClick={(): void => toggleExpanded(persona.id)}
                               variant="ghost"
                               size="sm"
-                              style={{
-                                width: "100%",
-                                justifyContent: "flex-start",
-                                fontSize: "0.75rem",
-                                gap: "0.5rem",
-                                height: "2rem",
-                              }}
+                              className="w-full justify-start text-xs gap-2 h-8"
                             >
-                              <Div
-                                style={{
-                                  height: "0.875rem",
-                                  width: "0.875rem",
-                                  flexShrink: 0,
-                                }}
-                              >
+                              <Div className="h-3.5 w-3.5 shrink-0">
                                 {React.createElement(
                                   isExpanded ? ChevronUp : ChevronDown,
                                 )}
                               </Div>
-                              <Span
-                                style={{ color: "var(--muted-foreground)" }}
-                              >
+                              <Span className="text-muted-foreground">
                                 {isExpanded
                                   ? t("app.chat.suggestedPrompts.hideDetails")
                                   : t("app.chat.suggestedPrompts.showDetails")}
@@ -492,51 +360,17 @@ export function ChatEmptyState({
 
                           {/* Expanded details */}
                           {isExpanded && (
-                            <Div
-                              style={{
-                                paddingLeft: "1rem",
-                                paddingRight: "1rem",
-                                paddingBottom: "1rem",
-                                paddingTop: "0.5rem",
-                                borderTop: "1px solid var(--border)",
-                              }}
-                            >
-                              <Div
-                                style={{
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  gap: "1rem",
-                                }}
-                              >
+                            <Div className="px-4 pb-4 pt-2 border-t border-border">
+                              <Div className="flex flex-col gap-4">
                                 {/* System Prompt with Markdown */}
                                 {persona.systemPrompt && (
-                                  <Div
-                                    style={{
-                                      display: "flex",
-                                      flexDirection: "column",
-                                      gap: "0.5rem",
-                                    }}
-                                  >
-                                    <Span
-                                      style={{
-                                        fontSize: "0.875rem",
-                                        fontWeight: 600,
-                                      }}
-                                    >
+                                  <Div className="flex flex-col gap-2">
+                                    <Span className="text-sm font-semibold">
                                       {t(
                                         "app.chat.suggestedPrompts.systemPromptLabel",
                                       )}
                                     </Span>
-                                    <Div
-                                      style={{
-                                        maxWidth: "none",
-                                        backgroundColor: "var(--muted)",
-                                        opacity: 0.3,
-                                        padding: "0.75rem",
-                                        borderRadius: "0.375rem",
-                                        border: "1px solid var(--border)",
-                                      }}
-                                    >
+                                    <Div className="prose prose-sm dark:prose-invert max-w-none bg-muted/30 p-3 rounded-md border border-border">
                                       <Markdown
                                         content={persona.systemPrompt}
                                       />
@@ -547,30 +381,13 @@ export function ChatEmptyState({
                                 {/* Suggested Prompts - Same style as outside modal */}
                                 {persona.suggestedPrompts &&
                                   persona.suggestedPrompts.length > 0 && (
-                                    <Div
-                                      style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        gap: "0.5rem",
-                                      }}
-                                    >
-                                      <Span
-                                        style={{
-                                          fontSize: "0.875rem",
-                                          fontWeight: 600,
-                                        }}
-                                      >
+                                    <Div className="flex flex-col gap-2">
+                                      <Span className="text-sm font-semibold">
                                         {t(
                                           "app.chat.suggestedPrompts.suggestedPromptsLabel",
                                         )}
                                       </Span>
-                                      <Div
-                                        style={{
-                                          display: "flex",
-                                          flexDirection: "column",
-                                          gap: "0.5rem",
-                                        }}
-                                      >
+                                      <Div className="flex flex-col gap-2">
                                         {persona.suggestedPrompts.map(
                                           (promptKey, idx) => (
                                             <Button
@@ -584,16 +401,7 @@ export function ChatEmptyState({
                                               }}
                                               variant="ghost"
                                               size="unset"
-                                              style={{
-                                                width: "100%",
-                                                textAlign: "left",
-                                                padding: "0.75rem",
-                                                borderRadius: "0.5rem",
-                                                transition: "all 0.2s",
-                                                border:
-                                                  "1px solid var(--border)",
-                                                fontSize: "0.875rem",
-                                              }}
+                                              className="w-full text-left p-3 rounded-lg hover:bg-accent transition-all border border-border text-sm"
                                             >
                                               {t(promptKey)}
                                             </Button>
@@ -615,14 +423,7 @@ export function ChatEmptyState({
           </Div>
 
           {/* Selected persona prompts */}
-          <Div
-            style={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.5rem",
-            }}
-          >
+          <Div className="w-full space-y-2">
             {(selectedPersona.suggestedPrompts || [])
               .slice(0, 4)
               .map((promptKey, idx) => (
@@ -631,16 +432,9 @@ export function ChatEmptyState({
                   onClick={(): void => handlePromptClick(promptKey)}
                   variant="ghost"
                   size="unset"
-                  style={{
-                    width: "100%",
-                    padding: "1rem",
-                    borderColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`,
-                    borderWidth: "1px",
-                    borderStyle: "solid",
-                  }}
-                  className="hover:opacity-80 transition-opacity"
+                  className={`w-full p-4 border ${getColorClasses("border").replace("/50", "/20")} ${getColorClasses("hover-bg")}`}
                 >
-                  <span style={{ fontSize: "0.875rem" }}>{t(promptKey)}</span>
+                  <span className="text-sm">{t(promptKey)}</span>
                 </Button>
               ))}
           </Div>

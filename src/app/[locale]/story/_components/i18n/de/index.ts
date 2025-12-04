@@ -5,22 +5,18 @@ export const translations: typeof enTranslations = {
   nav: navTranslations,
   home: {
     hero: {
-      badge: "🔥 KI-Chat + Community-Forum",
-      title: "Chatten Sie mit KI, Verbinden Sie sich mit der Community",
+      title: "Unzensierter KI-Chat ohne Limits",
       subtitle:
-        "Erleben Sie unzensierte KI-Gespräche mit über {{modelCount}} Modellen. Nehmen Sie an Forum-Diskussionen teil. Alles auf einer Plattform.",
-      description:
-        "Private KI-Chats, kollaborative Räume und öffentliche Forum-Threads. Wählen Sie Ihr Privatsphäre-Level: Privat (verschlüsselt), Inkognito (nur lokal), Geteilt (kollaborativ) oder Öffentlich (Community-Forum).",
-      cta: "Kostenlos chatten",
-      learnMore: "Mehr erfahren",
-      secondaryCta: "Forum durchsuchen",
-      userAvatarAlt: "Benutzer-Avatar",
-      satisfiedClients: "Schließen Sie sich 10.000+ zufriedenen Nutzern an",
-      imageAlt: "{{appName}} Chat-Oberfläche",
+        "Zugriff auf {{modelCount}} KI-Modelle. Private Chats oder öffentliche Diskussionen. Ihre Daten, Ihre Regeln.",
+      cta: "Kostenlos starten",
+      secondaryCta: "Community entdecken",
       stats: {
-        users: "10.000+ Nutzer",
-        models: "40+ KI-Modelle",
-        messages: "1M+ Nachrichten",
+        users: "10K+",
+        usersLabel: "Aktive Nutzer",
+        models: "{{modelCount}}",
+        modelsLabel: "KI-Modelle",
+        messages: "1M+",
+        messagesLabel: "Konversationen",
       },
       imageOverlay: {
         title: "Echtzeit-KI-Gespräche",
@@ -60,7 +56,7 @@ export const translations: typeof enTranslations = {
       contentCreation: {
         title: "Private Ordner - Ihre persönliche KI",
         description:
-          "Verschlüsselt, server-gespeicherte Chats. Zugriff auf GPT-4, Claude, Gemini und {{modelCount}}+ Modelle. Ihre privaten Gespräche, synchronisiert über Geräte.",
+          "Verschlüsselt, server-gespeicherte Chats. Zugriff auf GPT-4, Claude, Gemini und {{modelCount}} Modelle. Ihre privaten Gespräche, synchronisiert über Geräte.",
       },
       strategyDevelopment: {
         title: "Inkognito-Ordner - Nur lokal",
@@ -121,7 +117,7 @@ export const translations: typeof enTranslations = {
     cta: {
       title: "Bereit, der KI + Community-Plattform beizutreten?",
       subtitle:
-        "Chatten Sie privat mit {{modelCount}}+ KI-Modellen. Nehmen Sie an öffentlichen Forum-Diskussionen teil. Wählen Sie Ihr Privatsphäre-Level. Starten Sie heute kostenlos.",
+        "Chatten Sie privat mit {{modelCount}} KI-Modellen. Nehmen Sie an öffentlichen Forum-Diskussionen teil. Wählen Sie Ihr Privatsphäre-Level. Starten Sie heute kostenlos.",
       signUp: "Kostenlos anmelden",
       viewPlans: "Preispläne ansehen",
     },
@@ -142,7 +138,7 @@ export const translations: typeof enTranslations = {
         credits: "{{credits}} kostenlose Credits (einmalig)",
         features: {
           credits: "{{credits}} Credits zum Start",
-          models: "Zugriff auf alle {{modelCount}}+ KI-Modelle",
+          models: "Zugriff auf alle {{modelCount}} KI-Modelle",
           folders: "Alle Ordnertypen (privat, inkognito, geteilt, öffentlich)",
           personas: "Community-Personas verwenden",
           support: "Community-Support",
@@ -156,7 +152,7 @@ export const translations: typeof enTranslations = {
         credits: "{{credits}} Credits/Monat",
         features: {
           unlimited: "Unbegrenzte KI-Gespräche",
-          models: "Alle {{modelCount}}+ KI-Modelle",
+          models: "Alle {{modelCount}} KI-Modelle",
           folders: "Alle Ordnertypen",
           personas: "Unbegrenzte Personas erstellen",
           priority: "Prioritäts-Support",
@@ -173,7 +169,7 @@ export const translations: typeof enTranslations = {
         features: {
           payAsYouGo: "Bezahlen Sie nur für das, was Sie nutzen",
           neverExpires: "Credits laufen nie ab",
-          models: "Alle {{modelCount}}+ KI-Modelle",
+          models: "Alle {{modelCount}} KI-Modelle",
           folders: "Alle Ordnertypen",
           buyMore: "Jederzeit mehr kaufen",
         },
@@ -191,7 +187,7 @@ export const translations: typeof enTranslations = {
       badge: "Kostenlose Testversion",
       title: "Testen Sie alle KI-Modelle kostenlos",
       description:
-        "Starten Sie mit {{freeCredits}} kostenlosen Credits. Testen Sie alle {{modelCount}}+ KI-Modelle vor dem Upgrade.",
+        "Starten Sie mit {{freeCredits}} kostenlosen Credits. Testen Sie alle {{modelCount}} KI-Modelle vor dem Upgrade.",
       card: {
         title: "Kostenloser Zugang",
         subtitle: "Alles, was Sie für den Einstieg benötigen",
@@ -203,7 +199,7 @@ export const translations: typeof enTranslations = {
       },
       benefits: {
         professionalSetup: "Keine Kreditkarte erforderlich",
-        brandConsistency: "Zugriff auf alle {{modelCount}}+ Modelle",
+        brandConsistency: "Zugriff auf alle {{modelCount}} Modelle",
         optimizedProfiles: "{{freeCredits}} kostenlose Credits zum Starten",
         strategicPlanning: "Jederzeit upgraden",
       },
@@ -219,7 +215,7 @@ export const translations: typeof enTranslations = {
         strategyDevelopment: {
           title: "Kostenlos anmelden",
           description:
-            "Erstellen Sie Ihr Konto in Sekunden. Keine Kreditkarte erforderlich. Starten Sie mit {{freeCredits}} kostenlosen Credits pro Monat über alle {{modelCount}}+ KI-Modelle.",
+            "Erstellen Sie Ihr Konto in Sekunden. Keine Kreditkarte erforderlich. Starten Sie mit {{freeCredits}} kostenlosen Credits pro Monat über alle {{modelCount}} KI-Modelle.",
           tags: {
             audienceAnalysis: "Schnelle Einrichtung",
             competitorResearch: "Keine Kreditkarte",
@@ -235,7 +231,7 @@ export const translations: typeof enTranslations = {
           description:
             "Wählen Sie aus über {{modelCount}} unzensierten KI-Modellen einschließlich GPT-4, Claude, Gemini und mehr.",
           tags: {
-            brandAlignedContent: "{{modelCount}}+ Modelle",
+            brandAlignedContent: "{{modelCount}} Modelle",
             engagingVisuals: "Keine Zensur",
           },
           insights: {
@@ -864,7 +860,7 @@ export const translations: typeof enTranslations = {
   footer: {
     tagline: "Chatten Sie mit KI, Verbinden Sie sich mit der Community",
     privacyTagline:
-      "Datenschutzorientierter KI-Chat mit {{modelCount}}+ unzensierten Modellen",
+      "Datenschutzorientierter KI-Chat mit {{modelCount}} unzensierten Modellen",
     platform: {
       title: "Plattform",
       features: "Funktionen",

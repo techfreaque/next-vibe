@@ -5,22 +5,18 @@ export const translations: typeof enTranslations = {
   nav: navTranslations,
   home: {
     hero: {
-      badge: "🔥 Czat AI + Forum społeczności",
-      title: "Czatuj z AI, Łącz się ze społecznością",
+      title: "Niecenzurowany czat AI bez limitów",
       subtitle:
-        "Doświadcz niecenzurowanych rozmów z AI z ponad {{modelCount}} modelami. Dołącz do dyskusji na forum. Wszystko na jednej platformie.",
-      description:
-        "Prywatne czaty AI, przestrzenie współpracy i publiczne wątki forum. Wybierz poziom prywatności: Prywatny (zaszyfrowany), Incognito (tylko lokalnie), Współdzielony (współpraca) lub Publiczny (forum społeczności).",
-      cta: "Zacznij czatować za darmo",
-      learnMore: "Dowiedz się więcej",
-      secondaryCta: "Przeglądaj forum",
-      userAvatarAlt: "Awatar użytkownika",
-      satisfiedClients: "Dołącz do 10 000+ zadowolonych użytkowników",
-      imageAlt: "Interfejs czatu {{appName}}",
+        "Dostęp do {{modelCount}} modeli AI. Prywatne czaty lub publiczne dyskusje. Twoje dane, Twoje zasady.",
+      cta: "Rozpocznij za darmo",
+      secondaryCta: "Odkryj społeczność",
       stats: {
-        users: "10 000+ użytkowników",
-        models: "40+ modeli AI",
-        messages: "1M+ wiadomości",
+        users: "10K+",
+        usersLabel: "Aktywni użytkownicy",
+        models: "{{modelCount}}",
+        modelsLabel: "Modele AI",
+        messages: "1M+",
+        messagesLabel: "Konwersacje",
       },
       imageOverlay: {
         title: "Rozmowy z AI w czasie rzeczywistym",
@@ -60,7 +56,7 @@ export const translations: typeof enTranslations = {
       contentCreation: {
         title: "Foldery prywatne - Twoja osobista AI",
         description:
-          "Zaszyfrowane, zapisane na serwerze czaty. Dostęp do GPT-4, Claude, Gemini i {{modelCount}}+ modeli. Twoje prywatne rozmowy, zsynchronizowane na urządzeniach.",
+          "Zaszyfrowane, zapisane na serwerze czaty. Dostęp do GPT-4, Claude, Gemini i {{modelCount}} modeli. Twoje prywatne rozmowy, zsynchronizowane na urządzeniach.",
       },
       strategyDevelopment: {
         title: "Foldery incognito - Tylko lokalnie",
@@ -121,7 +117,7 @@ export const translations: typeof enTranslations = {
     cta: {
       title: "Gotowy dołączyć do platformy AI + społeczności?",
       subtitle:
-        "Czatuj prywatnie z {{modelCount}}+ modelami AI. Dołącz do publicznych dyskusji na forum. Wybierz poziom prywatności. Zacznij za darmo już dziś.",
+        "Czatuj prywatnie z {{modelCount}} modelami AI. Dołącz do publicznych dyskusji na forum. Wybierz poziom prywatności. Zacznij za darmo już dziś.",
       signUp: "Zarejestruj się za darmo",
       viewPlans: "Zobacz plany cenowe",
     },
@@ -143,7 +139,7 @@ export const translations: typeof enTranslations = {
         credits: "{{credits}} darmowe kredyty (jednorazowo)",
         features: {
           credits: "{{credits}} kredytów na start",
-          models: "Dostęp do wszystkich {{modelCount}}+ modeli AI",
+          models: "Dostęp do wszystkich {{modelCount}} modeli AI",
           folders:
             "Wszystkie typy folderów (prywatne, incognito, współdzielone, publiczne)",
           personas: "Korzystanie z person społeczności",
@@ -158,7 +154,7 @@ export const translations: typeof enTranslations = {
         credits: "{{credits}} kredytów/miesiąc",
         features: {
           unlimited: "Nielimitowane rozmowy z AI",
-          models: "Wszystkie {{modelCount}}+ modele AI",
+          models: "Wszystkie {{modelCount}} modele AI",
           folders: "Wszystkie typy folderów",
           personas: "Twórz nielimitowane persony",
           priority: "Wsparcie priorytetowe",
@@ -175,7 +171,7 @@ export const translations: typeof enTranslations = {
         features: {
           payAsYouGo: "Płać tylko za to, czego używasz",
           neverExpires: "Kredyty nigdy nie wygasają",
-          models: "Wszystkie {{modelCount}}+ modele AI",
+          models: "Wszystkie {{modelCount}} modele AI",
           folders: "Wszystkie typy folderów",
           buyMore: "Kup więcej w dowolnym momencie",
         },
@@ -193,7 +189,7 @@ export const translations: typeof enTranslations = {
       badge: "Darmowa wersja próbna",
       title: "Wypróbuj wszystkie modele AI za darmo",
       description:
-        "Zacznij z {{freeCredits}} darmowymi kredytami. Przetestuj wszystkie {{modelCount}}+ modeli AI przed aktualizacją.",
+        "Zacznij z {{freeCredits}} darmowymi kredytami. Przetestuj wszystkie {{modelCount}} modeli AI przed aktualizacją.",
       card: {
         title: "Darmowy dostęp",
         subtitle: "Wszystko, czego potrzebujesz, aby zacząć",
@@ -205,7 +201,7 @@ export const translations: typeof enTranslations = {
       },
       benefits: {
         professionalSetup: "Nie wymagana karta kredytowa",
-        brandConsistency: "Dostęp do wszystkich {{modelCount}}+ modeli",
+        brandConsistency: "Dostęp do wszystkich {{modelCount}} modeli",
         optimizedProfiles: "{{freeCredits}} darmowych kredytów na start",
         strategicPlanning: "Uaktualnij w dowolnym momencie",
       },
@@ -223,7 +219,7 @@ export const translations: typeof enTranslations = {
         strategyDevelopment: {
           title: "Zarejestruj się za darmo",
           description:
-            "Utwórz swoje konto w kilka sekund. Nie wymagana karta kredytowa. Zacznij z {{freeCredits}} darmowymi kredytami miesięcznie dla wszystkich {{modelCount}}+ modeli AI.",
+            "Utwórz swoje konto w kilka sekund. Nie wymagana karta kredytowa. Zacznij z {{freeCredits}} darmowymi kredytami miesięcznie dla wszystkich {{modelCount}} modeli AI.",
           tags: {
             audienceAnalysis: "Szybka konfiguracja",
             competitorResearch: "Bez karty kredytowej",
@@ -239,7 +235,7 @@ export const translations: typeof enTranslations = {
           description:
             "Wybierz spośród ponad {{modelCount}} niecenzurowanych modeli AI, w tym GPT-4, Claude, Gemini i więcej.",
           tags: {
-            brandAlignedContent: "{{modelCount}}+ modeli",
+            brandAlignedContent: "{{modelCount}} modeli",
             engagingVisuals: "Bez cenzury",
           },
           insights: {
@@ -861,7 +857,7 @@ export const translations: typeof enTranslations = {
   footer: {
     tagline: "Rozmawiaj z AI, łącz się ze społecznością",
     privacyTagline:
-      "Czat AI zorientowany na prywatność z {{modelCount}}+ niecenzurowanymi modelami",
+      "Czat AI zorientowany na prywatność z {{modelCount}} niecenzurowanymi modelami",
     platform: {
       title: "Platforma",
       features: "Funkcje",

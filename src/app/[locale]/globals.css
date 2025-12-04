@@ -94,19 +94,19 @@
 
   /* Fallback for gradient text when bg-clip-text fails */
   @supports not (-webkit-background-clip: text) {
-    .bg-gradient-to-r.from-cyan-500.to-blue-600.text-transparent.bg-clip-text {
+    .bg-linear-to-br.from-cyan-500.to-blue-600.text-transparent.bg-clip-text {
       color: #2563eb !important;
       background: none !important;
       -webkit-text-fill-color: unset !important;
     }
 
-    .bg-gradient-to-r.from-red-600.to-orange-600.text-transparent.bg-clip-text {
+    .bg-linear-to-br.from-red-600.to-orange-600.text-transparent.bg-clip-text {
       color: #dc2626 !important;
       background: none !important;
       -webkit-text-fill-color: unset !important;
     }
 
-    .bg-gradient-to-r.from-blue-600.to-cyan-600.text-transparent.bg-clip-text {
+    .bg-linear-to-br.from-blue-600.to-cyan-600.text-transparent.bg-clip-text {
       color: #2563eb !important;
       background: none !important;
       -webkit-text-fill-color: unset !important;
@@ -115,21 +115,21 @@
 
   /* Additional fallback for when gradients don't render at all on Apple devices */
   @media screen and (-webkit-min-device-pixel-ratio: 0) {
-    .bg-gradient-to-r.from-cyan-500.to-blue-600.text-transparent.bg-clip-text {
+    .bg-linear-to-br.from-cyan-500.to-blue-600.text-transparent.bg-clip-text {
       background: linear-gradient(to right, #06b6d4, #2563eb) !important;
       -webkit-background-clip: text !important;
       background-clip: text !important;
       -webkit-text-fill-color: transparent !important;
     }
 
-    .bg-gradient-to-r.from-red-600.to-orange-600.text-transparent.bg-clip-text {
+    .bg-linear-to-br.from-red-600.to-orange-600.text-transparent.bg-clip-text {
       background: linear-gradient(to right, #dc2626, #ea580c) !important;
       -webkit-background-clip: text !important;
       background-clip: text !important;
       -webkit-text-fill-color: transparent !important;
     }
 
-    .bg-gradient-to-r.from-blue-600.to-cyan-600.text-transparent.bg-clip-text {
+    .bg-linear-to-br.from-blue-600.to-cyan-600.text-transparent.bg-clip-text {
       background: linear-gradient(to right, #2563eb, #0891b2) !important;
       -webkit-background-clip: text !important;
       background-clip: text !important;
@@ -137,12 +137,12 @@
     }
 
     /* Stronger fallback for button gradients on Apple devices */
-    .bg-gradient-to-r.from-cyan-500.to-blue-600:not(.text-transparent) {
+    .bg-linear-to-br.from-cyan-500.to-blue-600:not(.text-transparent) {
       background: #2563eb !important;
       background-image: linear-gradient(to right, #06b6d4, #2563eb) !important;
     }
 
-    .bg-gradient-to-r.from-cyan-500.to-blue-600:not(.text-transparent):hover {
+    .bg-linear-to-br.from-cyan-500.to-blue-600:not(.text-transparent):hover {
       background: #1d4ed8 !important;
       background-image: linear-gradient(to right, #0891b2, #1d4ed8) !important;
     }
@@ -150,12 +150,12 @@
 
   /* Emergency fallback for invisible buttons on Apple devices */
   @supports not (background: linear-gradient(to right, #06b6d4, #2563eb)) {
-    .bg-gradient-to-r.from-cyan-500.to-blue-600:not(.text-transparent) {
+    .bg-linear-to-br.from-cyan-500.to-blue-600:not(.text-transparent) {
       background-color: #2563eb !important;
       background-image: none !important;
     }
 
-    .bg-gradient-to-r.from-cyan-500.to-blue-600:not(.text-transparent):hover {
+    .bg-linear-to-br.from-cyan-500.to-blue-600:not(.text-transparent):hover {
       background-color: #1d4ed8 !important;
       background-image: none !important;
     }

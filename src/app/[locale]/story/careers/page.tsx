@@ -109,10 +109,10 @@ export default async function CareersPage({
   ];
 
   return (
-    <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
+    <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
       <Div className="container max-w-6xl mx-auto py-8 px-4">
         <Div className="max-w-4xl mx-auto">
-          <H1 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+          <H1 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600">
             {t("app.story._components.home.careers.title")}
           </H1>
 
@@ -124,8 +124,8 @@ export default async function CareersPage({
 
           {/* Hero Section with Image */}
           <Div className="relative h-[300px] rounded-xl overflow-hidden shadow-xl mb-12">
-            <Div className="absolute inset-0 bg-blue-600/20 bg-gradient-to-r from-blue-600/20 to-cyan-500/20 z-10" />
-            <Div className="absolute inset-0 bg-black/60 bg-gradient-to-t from-black/60 to-transparent z-10" />
+            <Div className="absolute inset-0 bg-blue-600/20 bg-linear-to-br from-blue-600/20 to-cyan-500/20 z-10" />
+            <Div className="absolute inset-0 bg-black/60 bg-linear-to-t from-black/60 to-transparent z-10" />
             <Div className="absolute bottom-0 left-0 p-8 z-20 text-white">
               <H2 className="text-3xl font-bold mb-2">
                 {t("app.story._components.home.careers.joinTeam")}
@@ -269,7 +269,7 @@ export default async function CareersPage({
                       </Span>
                     </Div>
                   </Div>
-                  <Div className="flex flex flex-row gap-3">
+                  <Div className="flex flex-row gap-3">
                     <Button className="flex-1" asChild>
                       <Link href={`/${locale}/story/careers/${position.id}`}>
                         {t(
@@ -290,7 +290,7 @@ export default async function CareersPage({
             </Div>
           </Div>
 
-          <Div className="text-center bg-blue-50 bg-gradient-to-r from-blue-50 to-cyan-50 dark:bg-gray-800 dark:from-gray-800 dark:to-gray-700 p-8 rounded-xl">
+          <Div className="text-center bg-blue-50 bg-linear-to-br from-blue-50 to-cyan-50 dark:bg-gray-800 dark:from-gray-800 dark:to-gray-700 p-8 rounded-xl">
             <H2 className="text-2xl font-semibold mb-4">
               {t("app.story._components.home.careers.readyToJoin")}
             </H2>

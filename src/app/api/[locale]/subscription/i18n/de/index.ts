@@ -281,4 +281,24 @@ export const translations: typeof enTranslations = {
       other: "Andere",
     },
   },
+
+  // Page metadata
+  meta: {
+    subscription: {
+      title: "Abonnement",
+      description: "Verwalten Sie Ihr Abonnement und Ihre Abrechnung",
+    },
+    buyCredits: {
+      title: "Credits kaufen",
+      description: "Zusätzliche Credits für Ihr Konto erwerben",
+    },
+    history: {
+      title: "Abrechnungshistorie",
+      description: "Ihre Abrechnungs- und Transaktionshistorie anzeigen",
+    },
+    overview: {
+      title: "Abonnementübersicht",
+      description: "Ihren Abonnementstatus und Details anzeigen",
+    },
+  },
 };

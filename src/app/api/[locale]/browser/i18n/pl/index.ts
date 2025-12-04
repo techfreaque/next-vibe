@@ -284,6 +284,7 @@ export const translations: typeof enTranslations = {
           error: "Błąd podczas wywoływania narzędzia MCP",
           invalidJsonArguments: "Nieprawidłowe argumenty JSON",
           executionFailed: "Wykonanie narzędzia nie powiodło się: {{error}}",
+          toolExecutionFailed: "Nie udało się wykonać {{toolName}}",
         },
       },
     },

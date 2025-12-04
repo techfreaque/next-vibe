@@ -28,7 +28,10 @@ import {
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatPrice } from "./types";
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
+import {
+  TOTAL_MODEL_COUNT,
+  FEATURE_COSTS,
+} from "@/app/api/[locale]/products/repository-client";
 
 interface OverviewTabProps {
   locale: CountryLanguage;
@@ -137,7 +140,7 @@ export function OverviewTab({
       </Card>
 
       {/* CTA Section */}
-      <Card className="mt-6 overflow-hidden border-0 bg-gradient-to-br from-primary/10 via-primary/5 to-background">
+      <Card className="mt-6 overflow-hidden border-0 bg-linear-to-br from-primary/10 via-primary/5 to-background">
         <CardContent className="p-8">
           <Div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <Div className="flex-1 text-center md:text-left">
@@ -233,36 +236,54 @@ export function OverviewTab({
                 <Div className="flex justify-between p-2 rounded bg-accent">
                   <Span>
                     {t(
-                      "app.subscription.subscription.overview.costs.features.search",
+                      "app.subscription.subscription.overview.costs.features.searchLabel",
                     )}
                   </Span>
                   <Span className="font-mono">
                     {t(
-                      "app.subscription.subscription.overview.costs.features.searchCost",
+                      "app.subscription.subscription.overview.costs.features.costFormat",
+                      {
+                        value: FEATURE_COSTS.BRAVE_SEARCH.toFixed(2),
+                        unit: t(
+                          "app.subscription.subscription.overview.costs.features.creditsUnit",
+                        ),
+                      },
                     )}
                   </Span>
                 </Div>
                 <Div className="flex justify-between p-2 rounded bg-accent">
                   <Span>
                     {t(
-                      "app.subscription.subscription.overview.costs.features.tts",
+                      "app.subscription.subscription.overview.costs.features.ttsLabel",
                     )}
                   </Span>
                   <Span className="font-mono">
                     {t(
-                      "app.subscription.subscription.overview.costs.features.audioCost",
+                      "app.subscription.subscription.overview.costs.features.costFormat",
+                      {
+                        value: (FEATURE_COSTS.TTS * 1000).toFixed(2),
+                        unit: t(
+                          "app.subscription.subscription.overview.costs.features.creditsUnit",
+                        ),
+                      },
                     )}
                   </Span>
                 </Div>
                 <Div className="flex justify-between p-2 rounded bg-accent">
                   <Span>
                     {t(
-                      "app.subscription.subscription.overview.costs.features.stt",
+                      "app.subscription.subscription.overview.costs.features.sttLabel",
                     )}
                   </Span>
                   <Span className="font-mono">
                     {t(
-                      "app.subscription.subscription.overview.costs.features.audioCost",
+                      "app.subscription.subscription.overview.costs.features.costFormat",
+                      {
+                        value: (FEATURE_COSTS.STT * 60).toFixed(2),
+                        unit: t(
+                          "app.subscription.subscription.overview.costs.features.creditsUnit",
+                        ),
+                      },
                     )}
                   </Span>
                 </Div>

@@ -23,7 +23,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../user/user-roles/enum";
-import { dateSchema } from "../shared/types/common.schema";
 
 /**
  * POST endpoint for creating a referral code
@@ -73,26 +72,6 @@ export const { POST } = createEndpoint({
         },
         z.string().optional(),
       ),
-      maxUses: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.referral.form.fields.maxUses.label",
-          description: "app.api.referral.form.fields.maxUses.description",
-          placeholder: "app.api.referral.form.fields.maxUses.placeholder",
-        },
-        z.number().positive().optional(),
-      ),
-      expiresAt: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.DATETIME,
-          label: "app.api.referral.form.fields.expiresAt.label",
-          description: "app.api.referral.form.fields.expiresAt.description",
-          placeholder: "app.api.referral.form.fields.expiresAt.placeholder",
-        },
-        dateSchema.optional(),
-      ),
 
       // Response fields
       id: responseField(
@@ -115,13 +94,6 @@ export const { POST } = createEndpoint({
           content: "app.api.contact.response.success",
         },
         z.string().nullable(),
-      ),
-      responseMaxUses: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.contact.response.success",
-        },
-        z.number().nullable(),
       ),
       ownerUserId: responseField(
         {
@@ -210,7 +182,6 @@ export const { POST } = createEndpoint({
       default: {
         code: "FRIEND2024",
         label: "Friend Referral",
-        maxUses: 100,
       },
       unlimited: {
         code: "UNLIMITED",
@@ -221,7 +192,6 @@ export const { POST } = createEndpoint({
         id: "123e4567-e89b-12d3-a456-426614174000",
         responseCode: "FRIEND2024",
         responseLabel: "Friend Referral",
-        responseMaxUses: 100,
         ownerUserId: "123e4567-e89b-12d3-a456-426614174001",
         currentUses: 0,
         isActive: true,
@@ -232,7 +202,6 @@ export const { POST } = createEndpoint({
         id: "123e4567-e89b-12d3-a456-426614174002",
         responseCode: "UNLIMITED",
         responseLabel: null,
-        responseMaxUses: null,
         ownerUserId: "123e4567-e89b-12d3-a456-426614174001",
         currentUses: 0,
         isActive: true,

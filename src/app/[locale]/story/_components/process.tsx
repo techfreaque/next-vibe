@@ -89,7 +89,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
   return (
     <section
       id="process"
-      className="w-full py-24 bg-white bg-gradient-to-b from-white to-gray-50 dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900"
+      className="w-full py-24 bg-white bg-linear-to-b from-white to-gray-50 dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900"
       ref={ref}
     >
       <Div className="container px-4 md:px-6">
@@ -106,7 +106,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
           </MotionDiv>
 
           <MotionDiv
-            className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600"
+            className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600"
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -136,12 +136,12 @@ const Process: FC<ProcessProps> = ({ locale }) => {
             >
               {/* Connecting line */}
               {index < steps.length - 1 && (
-                <Div className="absolute left-[39px] top-[160px] bottom-[-160px] w-0.5 bg-blue-500 bg-gradient-to-b from-blue-500 to-transparent md:hidden" />
+                <Div className="absolute left-[39px] top-40 -bottom-40 w-0.5 bg-blue-500 bg-linear-to-b from-blue-500 to-transparent md:hidden" />
               )}
 
               <Div className="md:w-1/2 relative">
                 <Div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl border border-gray-200 dark:border-gray-700 relative z-10">
-                  <Div className="absolute -left-5 -top-5 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full w-16 h-16 flex items-center justify-center text-xl font-bold">
+                  <Div className="absolute -left-5 -top-5 bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 text-white rounded-full w-16 h-16 flex items-center justify-center text-xl font-bold">
                     {step.number}
                   </Div>
 
@@ -225,7 +225,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
                     height={400}
                     className="object-cover w-full h-full"
                   />
-                  <Div className="absolute inset-0 bg-black/40 bg-gradient-to-tr from-black/40 via-black/10 to-transparent" />
+                  <Div className="absolute inset-0 bg-black/40 bg-linear-to-tr from-black/40 via-black/10 to-transparent" />
 
                   {index === 0 && (
                     <Div className="absolute bottom-4 left-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-lg p-3 shadow-lg max-w-[200px]">
@@ -288,7 +288,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
             </P>
             <Link
               href={`/${locale}/#pricing`}
-              className="inline-flex items-center justify-center rounded-md bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all"
+              className="inline-flex items-center justify-center rounded-md bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all"
             >
               {t("app.story._components.home.process.getStarted")}
             </Link>

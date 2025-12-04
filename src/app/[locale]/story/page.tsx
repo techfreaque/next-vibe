@@ -10,6 +10,7 @@ import { userRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
+import { threadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
 
 import CallToAction from "./_components/call-to-action";
 import Features from "./_components/features";
@@ -105,10 +106,21 @@ export default async function HomePage({
       : null;
   }
 
+  // Fetch stats for hero section (cached for 24h)
+  const activeUserCountResponse = await userRepository.getActiveUserCount(logger);
+  const totalConversationsResponse = await threadsRepository.getTotalConversationsCount(logger);
+
+  const activeUserCount = activeUserCountResponse.success ? activeUserCountResponse.data : 0;
+  const totalConversations = totalConversationsResponse.success ? totalConversationsResponse.data : 0;
+
   return (
     <Div role="main" className="flex min-h-screen flex-col w-full">
       {/* Hero Section */}
-      <Hero locale={locale} />
+      <Hero
+        locale={locale}
+        activeUserCount={activeUserCount}
+        totalConversations={totalConversations}
+      />
 
       {/* Features Section */}
       <Features locale={locale} />

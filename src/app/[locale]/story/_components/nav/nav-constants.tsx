@@ -12,6 +12,9 @@ export type NavPaths =
   | ""
   | "/story#features"
   | "/subscription"
+  | "/subscription/overview"
+  | "/subscription/buy-credits"
+  | "/subscription/history"
   | "/story"
   | "/story/about-us"
   | "/story/careers"
@@ -65,7 +68,7 @@ export const navItems: NavItemType[] = [
   {
     icon: <Tag className="h-4 w-4" />,
     title: "app.story._components.nav.pricing",
-    href: "/subscription",
+    href: "/subscription/buy-credits",
   },
   {
     title: "app.story._components.nav.company",

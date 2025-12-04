@@ -88,7 +88,7 @@ export default async function SignUpPage({
 
         <Div className="order-1 xl:order-2 text-center xl:text-left">
           <Div className="mb-8">
-            <H1 className="text-3xl xl:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+            <H1 className="text-3xl xl:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600">
               {t("app.user.signup.auth.signup.title", {
                 appName: t("config.appName"),
               })}

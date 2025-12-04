@@ -69,6 +69,7 @@ export const translations: typeof enTranslations = {
     password_hashing_failed: "Passwort-Hashing fehlgeschlagen",
     not_implemented_on_native:
       "Diese Funktion ist in React Native nicht implementiert",
+    count_failed: "Fehler beim Abrufen der Benutzeranzahl: {{error}}",
   },
   notifications: {
     profileUpdated: {

@@ -55,28 +55,6 @@ export function ReferralCodeForm({
         />
       </Div>
 
-      <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <EndpointFormField
-          name="maxUses"
-          control={form.control}
-          endpointFields={referralDefinitions.POST.fields}
-          theme={{
-            style: "none",
-            showAllRequired: false,
-          }}
-        />
-
-        <EndpointFormField
-          name="expiresAt"
-          control={form.control}
-          endpointFields={referralDefinitions.POST.fields}
-          theme={{
-            style: "none",
-            showAllRequired: false,
-          }}
-        />
-      </Div>
-
       <Div className="flex justify-end">
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting

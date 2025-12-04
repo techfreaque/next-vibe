@@ -39,6 +39,12 @@ import { UserRole, type UserRoleValue } from "./user-roles/enum";
 import { userRolesRepository } from "./user-roles/repository";
 
 /**
+ * 24h cache for active user count
+ */
+let activeUserCountCache: { count: number; timestamp: number } | null = null;
+const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+/**
  * User Repository Interface
  * User-related functionality
  */
@@ -164,6 +170,12 @@ export interface UserRepository {
       };
     }>
   >;
+
+  /**
+   * Get total count of active users (cached for 24h)
+   * "Active" is defined as users who have isActive=true
+   */
+  getActiveUserCount(logger: EndpointLogger): Promise<ResponseType<number>>;
 }
 
 /**
@@ -815,6 +827,54 @@ export class BaseUserRepositoryImpl implements UserRepository {
         totalResults: total,
       },
     });
+  }
+
+  /**
+   * Get total count of active users with 24h caching
+   */
+  async getActiveUserCount(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<number>> {
+    try {
+      const now = Date.now();
+
+      // Check if cache exists and is still valid (within 24h)
+      if (
+        activeUserCountCache &&
+        now - activeUserCountCache.timestamp < CACHE_DURATION_MS
+      ) {
+        logger.debug("Returning cached active user count", {
+          count: activeUserCountCache.count,
+          age: `${Math.floor((now - activeUserCountCache.timestamp) / 1000 / 60 / 60)}h`,
+        });
+        return success(activeUserCountCache.count);
+      }
+
+      // Cache is invalid or doesn't exist - query database
+      logger.debug("Fetching fresh active user count from database");
+
+      const [{ total }] = await db
+        .select({ total: count() })
+        .from(users)
+        .where(eq(users.isActive, true));
+
+      // Update cache
+      activeUserCountCache = {
+        count: total,
+        timestamp: now,
+      };
+
+      logger.debug("Active user count fetched and cached", { count: total });
+
+      return success(total);
+    } catch (error) {
+      logger.error("Error getting active user count", parseError(error));
+      return fail({
+        message: "app.api.user.errors.count_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
+    }
   }
 }
 

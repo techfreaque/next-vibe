@@ -277,4 +277,24 @@ export const translations: typeof enTranslations = {
       other: "Inne",
     },
   },
+
+  // Page metadata
+  meta: {
+    subscription: {
+      title: "Subskrypcja",
+      description: "Zarządzaj swoją subskrypcją i rozliczeniami",
+    },
+    buyCredits: {
+      title: "Kup kredyty",
+      description: "Kup dodatkowe kredyty na swoje konto",
+    },
+    history: {
+      title: "Historia rozliczeń",
+      description: "Zobacz historię rozliczeń i transakcji",
+    },
+    overview: {
+      title: "Przegląd subskrypcji",
+      description: "Zobacz status i szczegóły swojej subskrypcji",
+    },
+  },
 };

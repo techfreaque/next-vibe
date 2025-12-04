@@ -93,10 +93,7 @@ export function ReferralCodesList({
                 <P className="text-muted-foreground">
                   {t("app.user.referral.myCodes.uses")}
                 </P>
-                <P className="font-semibold">
-                  {code.currentUses}
-                  {code.maxUses && ` / ${code.maxUses}`}
-                </P>
+                <P className="font-semibold">{code.currentUses}</P>
               </Div>
               <Div>
                 <P className="text-muted-foreground">

@@ -119,7 +119,7 @@ export default async function AboutUsPage({
   ];
 
   return (
-    <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
+    <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
       {/* Hero Section */}
       <Div className="relative bg-blue-600 dark:bg-blue-900 text-white">
         <Div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070')] bg-cover bg-center" />
@@ -172,7 +172,7 @@ export default async function AboutUsPage({
           <Div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             <Card className="h-full transition-all hover:shadow-lg border-l-4 border-l-blue-500">
               <CardHeader>
-                <Div className="w-14 h-14 rounded-full bg-blue-150 bg-gradient-to-br from-blue-100 to-blue-200 dark:bg-blue-850 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center mb-4">
+                <Div className="w-14 h-14 rounded-full bg-blue-150 bg-linear-to-br from-blue-100 to-blue-200 dark:bg-blue-850 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center mb-4">
                   <Lightbulb className="h-7 w-7 text-blue-600 dark:text-blue-400" />
                 </Div>
                 <CardTitle className="text-xl">
@@ -193,7 +193,7 @@ export default async function AboutUsPage({
 
             <Card className="h-full transition-all hover:shadow-lg border-l-4 border-l-green-500">
               <CardHeader>
-                <Div className="w-14 h-14 rounded-full bg-green-150 bg-gradient-to-br from-green-100 to-green-200 dark:bg-green-850 dark:from-green-900 dark:to-green-800 flex items-center justify-center mb-4">
+                <Div className="w-14 h-14 rounded-full bg-green-150 bg-linear-to-br from-green-100 to-green-200 dark:bg-green-850 dark:from-green-900 dark:to-green-800 flex items-center justify-center mb-4">
                   <Globe className="h-7 w-7 text-green-600 dark:text-green-400" />
                 </Div>
                 <CardTitle className="text-xl">
@@ -213,7 +213,7 @@ export default async function AboutUsPage({
 
             <Card className="h-full transition-all hover:shadow-lg border-l-4 border-l-purple-500 md:col-span-2 lg:col-span-1">
               <CardHeader>
-                <Div className="w-14 h-14 rounded-full bg-purple-150 bg-gradient-to-br from-purple-100 to-purple-200 dark:bg-purple-850 dark:from-purple-900 dark:to-purple-800 flex items-center justify-center mb-4">
+                <Div className="w-14 h-14 rounded-full bg-purple-150 bg-linear-to-br from-purple-100 to-purple-200 dark:bg-purple-850 dark:from-purple-900 dark:to-purple-800 flex items-center justify-center mb-4">
                   <Handshake className="h-7 w-7 text-purple-600 dark:text-purple-400" />
                 </Div>
                 <CardTitle className="text-xl">
@@ -240,7 +240,7 @@ export default async function AboutUsPage({
               fill
               className="object-cover"
             />
-            <Div className="absolute inset-0 bg-black/60 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+            <Div className="absolute inset-0 bg-black/60 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
             <Div className="absolute bottom-8 left-8 right-8 text-white">
               <H3 className="text-2xl font-bold mb-2">{t("config.appName")}</H3>
               <P className="text-lg opacity-90">

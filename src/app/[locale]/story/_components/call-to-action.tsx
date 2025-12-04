@@ -35,8 +35,8 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
         transition={{ duration: 0.5 }}
       >
         {/* Background with overlay */}
-        <Div className="absolute inset-0 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600" />
-        <Div className="absolute inset-0 bg-blue-500/20 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 mix-blend-overlay opacity-50" />
+        <Div className="absolute inset-0 bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600" />
+        <Div className="absolute inset-0 bg-blue-500/20 bg-linear-to-br from-blue-500/20 to-cyan-500/20 mix-blend-overlay opacity-50" />
 
         {/* Content */}
         <Div className="relative p-8 md:p-16 text-white text-center">
@@ -67,7 +67,7 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
                 className="bg-transparent border-white text-white hover:bg-white/10"
                 asChild
               >
-                <Link href={`/${locale}/subscription`}>
+                <Link href={`/${locale}/subscription/buy-credits`}>
                   {t("app.story._components.home.cta.viewPlans")}
                 </Link>
               </Button>

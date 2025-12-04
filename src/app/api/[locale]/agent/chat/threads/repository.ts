@@ -315,6 +315,12 @@ export async function ensureThread({
 }
 
 /**
+ * 24h cache for total conversations count
+ */
+let totalConversationsCountCache: { count: number; timestamp: number } | null = null;
+const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+/**
  * Threads Repository Interface
  */
 export interface ThreadsRepositoryInterface {
@@ -331,6 +337,11 @@ export interface ThreadsRepositoryInterface {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadCreateResponseOutput>>;
+
+  /**
+   * Get total count of conversations/threads (cached for 24h)
+   */
+  getTotalConversationsCount(logger: EndpointLogger): Promise<ResponseType<number>>;
 }
 
 /**
@@ -784,6 +795,48 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       return fail({
         message: "app.api.agent.chat.threads.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
+    }
+  }
+
+  /**
+   * Get total count of conversations/threads with 24h caching
+   */
+  async getTotalConversationsCount(logger: EndpointLogger): Promise<ResponseType<number>> {
+    try {
+      const now = Date.now();
+
+      // Check if cache exists and is still valid (within 24h)
+      if (totalConversationsCountCache && (now - totalConversationsCountCache.timestamp) < CACHE_DURATION_MS) {
+        logger.debug("Returning cached total conversations count", {
+          count: totalConversationsCountCache.count,
+          age: `${Math.floor((now - totalConversationsCountCache.timestamp) / 1000 / 60 / 60)}h`
+        });
+        return success(totalConversationsCountCache.count);
+      }
+
+      // Cache is invalid or doesn't exist - query database
+      logger.debug("Fetching fresh total conversations count from database");
+
+      const [{ total }] = await db
+        .select({ total: count() })
+        .from(chatThreads);
+
+      // Update cache
+      totalConversationsCountCache = {
+        count: total,
+        timestamp: now,
+      };
+
+      logger.debug("Total conversations count fetched and cached", { count: total });
+
+      return success(total);
+    } catch (error) {
+      logger.error("Error getting total conversations count", parseError(error));
+      return fail({
+        message: "app.api.agent.chat.threads.errors.count_failed",
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parseError(error).message },
       });
     }

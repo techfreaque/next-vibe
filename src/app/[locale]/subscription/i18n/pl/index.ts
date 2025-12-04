@@ -78,11 +78,11 @@ export const translations: typeof enTranslations = {
         },
         features: {
           title: "Funkcje",
-          search: "Wyszukiwanie Brave",
-          tts: "Tekst na mowę",
-          stt: "Mowa na tekst",
-          searchCost: "+1 kredyt",
-          audioCost: "+2 kredyty",
+          searchLabel: "Wyszukiwanie Brave",
+          ttsLabel: "Tekst na mowę (na 1000 znaków)",
+          sttLabel: "Mowa na tekst (na minutę)",
+          costFormat: "{{value}} {{unit}}",
+          creditsUnit: "kredytów",
         },
       },
       cta: {
@@ -204,6 +204,21 @@ export const translations: typeof enTranslations = {
         plans: "plany",
         pricing: "cennik",
       },
+    },
+    overview: {
+      title: "Przegląd subskrypcji - Unbottled AI",
+      description:
+        "Zobacz swój stan kredytów, status subskrypcji i dowiedz się, jak działają kredyty. Czatuj z {{modelCount}}+ niecenzurowanymi modelami AI.",
+    },
+    buyCredits: {
+      title: "Kup kredyty - Unbottled AI",
+      description:
+        "Subskrybuj za {{subCredits}} miesięcznych kredytów lub kup dodatkowe pakiety kredytów. Dostęp do {{modelCount}}+ niecenzurowanych modeli AI.",
+    },
+    history: {
+      title: "Historia transakcji - Unbottled AI",
+      description:
+        "Zobacz historię transakcji kredytowych, zakupy i użycie. Zarządzaj swoimi kredytami czatu AI.",
     },
   },
   payment: {

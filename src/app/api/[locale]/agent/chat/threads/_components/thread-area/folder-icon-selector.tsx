@@ -116,7 +116,7 @@ const ICON_OPTIONS: {
     Icon: ({ className = "" }) => (
       <Span
         className={cn(
-          "flex items-center justify-center leading-none bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600 bg-clip-text text-transparent hover:from-amber-500 hover:via-yellow-300 hover:to-amber-500 transition-all duration-300 font-bold text-center animate-gold-sheen bg-[length:150%_100%]",
+          "flex items-center justify-center leading-none bg-linear-to-br from-amber-600 via-yellow-400 to-amber-600 bg-clip-text text-transparent hover:from-amber-500 hover:via-yellow-300 hover:to-amber-500 transition-all duration-300 font-bold text-center animate-gold-sheen bg-size-[150%_100%]",
           className,
         )}
       >

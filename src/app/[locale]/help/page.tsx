@@ -90,7 +90,7 @@ export default async function ContactPage({
   return (
     <Div
       role="main"
-      className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900"
+      className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900"
     >
       <Div className="container max-w-6xl mx-auto py-8 px-4">
         <Link
@@ -102,7 +102,7 @@ export default async function ContactPage({
         </Link>
 
         <Div className="text-center mb-12">
-          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600 text-center">
+          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600 text-center">
             {t("app.help.pages.help.title")}
           </H1>
           <P className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto text-center">

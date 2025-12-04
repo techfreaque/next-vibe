@@ -96,11 +96,11 @@ export function NewsletterPage({
   ];
 
   return (
-    <Div className="min-h-screen bg-blue-50 bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <Div className="min-h-screen bg-blue-50 bg-linear-to-br from-blue-50 via-white to-cyan-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Hero Section */}
       <Div className="relative py-20 px-4 md:px-6">
         <Div className="container mx-auto max-w-4xl text-center">
-          <H1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+          <H1 className="text-4xl md:text-6xl font-bold mb-6 bg-linear-to-br from-blue-600 to-cyan-600 bg-clip-text text-transparent">
             {prefilledEmail !== undefined && prefilledEmail.length > 0
               ? t("app.story.newsletter.page.emailProvided.title")
               : t("app.story.newsletter.page.title")}
@@ -153,7 +153,7 @@ export function NewsletterPage({
                       ? showConfirmUnsubscribe
                         ? "bg-red-600 hover:bg-red-700"
                         : "border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-                      : "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+                      : "bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
                   }`}
                   variant={
                     isSubscribed && !showConfirmUnsubscribe
@@ -250,7 +250,7 @@ export function NewsletterPage({
                   key={`benefit_${index}_${benefit.title}`}
                   className="text-center p-6 rounded-xl bg-gray-50 dark:bg-gray-700 hover:shadow-lg transition-shadow"
                 >
-                  <Div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full mb-4">
+                  <Div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 rounded-full mb-4">
                     <IconComponent className="h-8 w-8 text-white" />
                   </Div>
                   <H3 className="text-xl font-semibold mb-3">
@@ -279,7 +279,7 @@ export function NewsletterPage({
       </Div>
 
       {/* Final CTA Section */}
-      <Div className="py-20 px-4 md:px-6 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600">
+      <Div className="py-20 px-4 md:px-6 bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600">
         <Div className="container mx-auto max-w-4xl text-center text-white">
           <H2 className="text-3xl md:text-4xl font-bold mb-4">
             {t("app.story.newsletter.page.cta.title")}

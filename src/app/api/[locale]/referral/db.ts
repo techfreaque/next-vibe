@@ -30,9 +30,7 @@ export const referralCodes = pgTable("referral_codes", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   label: text("label"),
-  maxUses: integer("max_uses"),
   currentUses: integer("current_uses").notNull().default(0),
-  expiresAt: timestamp("expires_at"),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

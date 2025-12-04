@@ -70,6 +70,14 @@
       "version": "7",
       "when": 1764791540000,
       "tag": "20251203193220_update_jsonb_roles",
+      "breakpoints": true,
+      "prevSnapshot": "20251203140520"
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1764868154953,
+      "tag": "20251204170914_sharp_zuras",
       "breakpoints": true
     }
   ]

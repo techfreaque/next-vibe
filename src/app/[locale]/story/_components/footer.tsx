@@ -18,6 +18,7 @@ import type React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
 
 import { Logo } from "../../_components/logo";
 
@@ -40,10 +41,14 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
           <Div className="lg:col-span-1 flex flex-col gap-4">
             <Logo locale={locale} pathName="/story" />
             <P className="text-sm text-gray-600 dark:text-gray-400 max-w-xs">
-              {t("app.story._components.footer.tagline")}
+              {t("app.story._components.footer.tagline", {
+                modelCount: TOTAL_MODEL_COUNT,
+              })}
             </P>
             <P className="text-sm text-gray-600 dark:text-gray-400 max-w-xs">
-              {t("app.story._components.footer.privacyTagline")}
+              {t("app.story._components.footer.privacyTagline", {
+                modelCount: TOTAL_MODEL_COUNT,
+              })}
             </P>
           </Div>
 
@@ -67,7 +72,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
               </Div>
               <Div role="listitem">
                 <Link
-                  href={`/${locale}/subscription`}
+                  href={`/${locale}/subscription/buy-credits`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <Tag className="h-4 w-4" />

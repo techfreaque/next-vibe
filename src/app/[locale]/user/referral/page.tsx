@@ -7,6 +7,8 @@ import type { Metadata } from "next";
 import { Div } from "next-vibe-ui/ui/div";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { H1, H2, P } from "next-vibe-ui/ui/typography";
+import { Link } from "next-vibe-ui/ui/link";
+import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
 import { requireUser } from "@/app/api/[locale]/user/auth/utils";
@@ -50,6 +52,17 @@ export default async function ReferralPage({
       <Div className="absolute inset-0 bg-linear-to-b from-blue-500/5 to-background -z-10" />
 
       <Div className="container px-4 md:px-6 py-16 md:py-24 lg:py-32">
+        {/* Back to Chat Button */}
+        <Div className="flex justify-between items-center mb-6 gap-4">
+          <Link
+            href={`/${locale}`}
+            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t("app.subscription.subscription.backToChat")}
+          </Link>
+        </Div>
+
         {/* Hero */}
         <Div className="flex flex-col gap-6 mb-20 md:mb-28">
           <P className="inline-flex w-fit items-center rounded-full border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/30 px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400">

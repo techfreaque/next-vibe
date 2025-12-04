@@ -38,7 +38,7 @@ export function SubscriptionHeader({
           </Button>
           <Button
             asChild
-            className="bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+            className="bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
           >
             <Link href={`/${locale}/user/signup`}>
               {t("app.story._components.nav.user.signup")}

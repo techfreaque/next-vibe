@@ -62,14 +62,14 @@ export default async function TermsOfServicePage({
   const supportEmail = contactClientRepository.getSupportEmail(locale);
 
   return (
-    <Div className="min-h-screen bg-blue-50 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
+    <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
       <Div className="container max-w-4xl mx-auto py-16 px-4">
         {/* Header with icon */}
         <Div className="mb-12 text-center">
           <Div className="inline-flex items-center justify-center p-2 bg-blue-100 dark:bg-blue-900 rounded-full mb-4">
             <Scale className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </Div>
-          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
+          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600">
             {t("app.story._components.home.termsOfService.title")}
           </H1>
           <P className="text-lg text-gray-600 dark:text-gray-400">

@@ -150,8 +150,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
           code: data.code,
           ownerUserId: userId,
           label: data.label ?? null,
-          maxUses: data.maxUses ?? null,
-          expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
           isActive: true,
           currentUses: 0,
         })
@@ -165,7 +163,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
         id: newCode.id,
         responseCode: newCode.code,
         responseLabel: newCode.label,
-        responseMaxUses: newCode.maxUses,
         ownerUserId: newCode.ownerUserId,
         currentUses: newCode.currentUses,
         isActive: newCode.isActive,
@@ -206,9 +203,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
           code: code.code,
           label: code.label,
           currentUses: code.currentUses,
-          maxUses: code.maxUses,
           isActive: code.isActive,
-          expiresAt: code.expiresAt?.toISOString() ?? null,
           createdAt: code.createdAt.toISOString(),
           totalSignups: 0,
           totalRevenueCents: 0,
@@ -253,25 +248,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
 
       // Check if code is active
       if (!referralCode.isActive) {
-        return fail({
-          message: "app.api.referral.errors.validation.title",
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-        });
-      }
-
-      // Check if code is expired
-      if (referralCode.expiresAt && referralCode.expiresAt < new Date()) {
-        return fail({
-          message: "app.api.referral.errors.validation.title",
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-        });
-      }
-
-      // Check if code has reached max uses
-      if (
-        referralCode.maxUses &&
-        referralCode.currentUses >= referralCode.maxUses
-      ) {
         return fail({
           message: "app.api.referral.errors.validation.title",
           errorType: ErrorResponseTypes.BAD_REQUEST,

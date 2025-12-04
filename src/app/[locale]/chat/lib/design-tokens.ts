@@ -10,21 +10,21 @@ export const chatColors = {
   primary: {
     from: "from-blue-500",
     to: "to-blue-600",
-    gradient: "bg-gradient-to-br from-blue-500 to-blue-600",
+    gradient: "bg-linear-to-br from-blue-500 to-blue-600",
   },
 
   // Secondary blue gradients (lighter)
   secondary: {
     from: "from-blue-400",
     to: "to-indigo-500",
-    gradient: "bg-gradient-to-br from-blue-400 to-indigo-500",
+    gradient: "bg-linear-to-br from-blue-400 to-indigo-500",
   },
 
   // Accent blue gradients (for highlights)
   accent: {
     from: "from-blue-50",
     to: "to-indigo-50",
-    gradient: "bg-gradient-to-br from-blue-50 to-indigo-50",
+    gradient: "bg-linear-to-br from-blue-50 to-indigo-50",
     dark: "dark:from-blue-950/30 dark:to-indigo-950/30",
   },
 

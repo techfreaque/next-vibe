@@ -78,11 +78,11 @@ export const translations: typeof enTranslations = {
         },
         features: {
           title: "Funktionen",
-          search: "Brave-Suche",
-          tts: "Text-zu-Sprache",
-          stt: "Sprache-zu-Text",
-          searchCost: "+1 Credit",
-          audioCost: "+2 Credits",
+          searchLabel: "Brave-Suche",
+          ttsLabel: "Text-zu-Sprache (pro 1000 Zeichen)",
+          sttLabel: "Sprache-zu-Text (pro Minute)",
+          costFormat: "{{value}} {{unit}}",
+          creditsUnit: "Credits",
         },
       },
       cta: {
@@ -203,6 +203,21 @@ export const translations: typeof enTranslations = {
         plans: "Pläne",
         pricing: "Preise",
       },
+    },
+    overview: {
+      title: "Abonnement-Übersicht - Unbottled AI",
+      description:
+        "Sehen Sie Ihren Credit-Kontostand, Abonnementstatus und erfahren Sie, wie Credits funktionieren. Chatten Sie mit {{modelCount}}+ zensurierten KI-Modellen.",
+    },
+    buyCredits: {
+      title: "Credits kaufen - Unbottled AI",
+      description:
+        "Abonnieren Sie für {{subCredits}} monatliche Credits oder kaufen Sie zusätzliche Credit-Pakete. Zugriff auf {{modelCount}}+ zensurierte KI-Modelle.",
+    },
+    history: {
+      title: "Transaktionsverlauf - Unbottled AI",
+      description:
+        "Sehen Sie Ihren Credit-Transaktionsverlauf, Käufe und Nutzung. Verwalten Sie Ihre KI-Chat-Credits.",
     },
   },
   payment: {

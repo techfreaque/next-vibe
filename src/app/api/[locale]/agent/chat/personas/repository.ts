@@ -6,6 +6,7 @@
 import { and, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { DEFAULT_PERSONAS, type Persona } from "./config";
 import {
@@ -25,16 +26,17 @@ export async function getAllPersonas(userId: string): Promise<Persona[]> {
     .where(eq(customPersonas.userId, userId));
 
   // Convert custom personas to Persona format
+  // Custom personas use regular strings (user-provided) treated as TranslationKey for API compatibility
   const customPersonasFormatted: Persona[] = customPersonasList.map((cp) => ({
     id: cp.id,
-    name: cp.name,
-    description: cp.description,
+    name: cp.name as TranslationKey,
+    description: cp.description as TranslationKey,
     icon: cp.icon,
     systemPrompt: cp.systemPrompt,
     category: cp.category,
     source: "my" as const,
     preferredModel: cp.preferredModel ?? undefined,
-    suggestedPrompts: cp.suggestedPrompts ?? [],
+    suggestedPrompts: (cp.suggestedPrompts ?? []) as TranslationKey[],
   }));
 
   // Merge default personas with custom personas
@@ -72,16 +74,17 @@ export async function getPersonaById(
   }
 
   // Convert to Persona format
+  // Custom personas use regular strings (user-provided) treated as TranslationKey for API compatibility
   return {
     id: customPersona.id,
-    name: customPersona.name,
-    description: customPersona.description,
+    name: customPersona.name as TranslationKey,
+    description: customPersona.description as TranslationKey,
     icon: customPersona.icon,
     systemPrompt: customPersona.systemPrompt,
     category: customPersona.category,
     source: "my" as const,
     preferredModel: customPersona.preferredModel ?? undefined,
-    suggestedPrompts: customPersona.suggestedPrompts ?? [],
+    suggestedPrompts: (customPersona.suggestedPrompts ?? []) as TranslationKey[],
   };
 }
 
@@ -164,15 +167,16 @@ export async function getCustomPersonas(userId: string): Promise<Persona[]> {
     .from(customPersonas)
     .where(eq(customPersonas.userId, userId));
 
+  // Custom personas use regular strings (user-provided) treated as TranslationKey for API compatibility
   return customPersonasList.map((cp) => ({
     id: cp.id,
-    name: cp.name,
-    description: cp.description,
+    name: cp.name as TranslationKey,
+    description: cp.description as TranslationKey,
     icon: cp.icon,
     systemPrompt: cp.systemPrompt,
     category: cp.category,
     source: "my" as const,
     preferredModel: cp.preferredModel ?? undefined,
-    suggestedPrompts: cp.suggestedPrompts ?? [],
+    suggestedPrompts: (cp.suggestedPrompts ?? []) as TranslationKey[],
   }));
 }

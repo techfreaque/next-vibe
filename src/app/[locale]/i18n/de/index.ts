@@ -131,6 +131,14 @@ export const translations: typeof enTranslations = {
       description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
       tryAgain: "Erneut versuchen",
       sending_sms: "SMS konnte nicht gesendet werden",
+      boundary: {
+        stackTrace: "Stack-Trace",
+        componentStack: "Komponenten-Stack",
+        errorDetails: "Fehlerdetails",
+        name: "Name:",
+        errorMessage: "Nachricht:",
+        cause: "Ursache:",
+      },
     },
     errors: {
       unknown: "Ein unbekannter Fehler ist aufgetreten",

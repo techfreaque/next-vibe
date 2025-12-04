@@ -69,9 +69,7 @@ export function SearchToggle({
       title={titleText}
     >
       <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-      <Span className="hidden min-[680px]:inline text-xs">
-        {t("app.chat.searchToggle.search")}
-      </Span>
+      <Span className="sr-only">{t("app.chat.searchToggle.search")}</Span>
       <Switch
         checked={enabled}
         onCheckedChange={handleChange}

@@ -21,7 +21,7 @@ export function AuthButtons({ locale }: AuthButtonsProps): JSX.Element {
         </Link>
       </Button>
       <Button
-        className="hidden md:flex bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+        className="hidden md:flex bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
         asChild
       >
         <Link href={`/${locale}/user/signup`}>
@@ -39,7 +39,7 @@ export function MobileAuthButtons({ locale }: AuthButtonsProps): JSX.Element {
     <Button
       asChild
       size="sm"
-      className="text-white px-2 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+      className="text-white px-2 bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
     >
       <Link href={`/${locale}/user/signup`}>
         {t("app.story._components.nav.user.signup")}

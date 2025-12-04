@@ -245,7 +245,7 @@ export function BuyCreditsTab({
                 </Button>
                 <Button
                   asChild
-                  className="flex-1 bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+                  className="flex-1 bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
                   size="lg"
                 >
                   <Link href={`/${locale}/user/signup`}>
