@@ -187,6 +187,7 @@ const {
   ShieldOffIcon,
   ShieldPlus,
   ShoppingBag,
+  ShoppingCart,
   Sparkles,
   Square,
   Star,
@@ -389,6 +390,7 @@ export const ICON_REGISTRY = {
   banknote: Banknote,
   wallet: Wallet,
   "shopping-bag": ShoppingBag,
+  "shopping-cart": ShoppingCart,
   "pie-chart": PieChart,
   gift: Gift,
 

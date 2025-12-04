@@ -260,12 +260,12 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
         (key) => key !== "updatedAt",
       );
 
-      // Return the correct response structure
+      // Return the correct response structure with flattened user fields
       return success({
         response: {
           success: true,
           message: "app.api.user.private.me.update.success.message",
-          user: updatedUserResponse.data,
+          ...updatedUserResponse.data,
           changesSummary: {
             totalChanges: changedFields.length,
             changedFields: changedFields,

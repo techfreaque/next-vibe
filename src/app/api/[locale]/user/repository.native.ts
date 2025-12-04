@@ -109,14 +109,14 @@ class UserRepositoryNativeImpl implements UserRepository {
       locale,
     );
 
-    // The response from /me endpoint has shape: { user: CompleteUserType }
+    // The response from /me endpoint returns flat user data (CompleteUserType)
     // Since native always calls GET /me which returns CompleteUserType,
     // and CompleteUserType satisfies all UserType<T> variants (it's the most complete),
     // we can safely return it for any UserType<T> generic parameter.
     if (response.success) {
       return {
         success: true,
-        data: response.data.user as UserType<T>,
+        data: response.data as UserType<T>,
         message: response.message,
       };
     }
@@ -276,6 +276,17 @@ class UserRepositoryNativeImpl implements UserRepository {
           totalResults: number;
         };
       }>("searchUsersWithPagination"),
+    );
+  }
+
+  async getActiveUserCount(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<number>> {
+    logger.error(
+      "getActiveUserCount not implemented on native - not used in page.tsx",
+    );
+    return await Promise.resolve(
+      this.createNotImplementedError<number>("getActiveUserCount"),
     );
   }
 }

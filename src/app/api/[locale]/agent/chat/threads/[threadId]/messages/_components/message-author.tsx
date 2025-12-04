@@ -72,7 +72,7 @@ export function MessageAuthorInfo({
   }
 
   // Get persona name if persona is provided
-  const personaName = persona ? getPersonaById(persona)?.name : null;
+  const personaName = persona ? t(getPersonaById(persona)?.name) : null;
 
   return (
     <Div className={cn("flex items-center gap-2", className)}>
@@ -108,12 +108,12 @@ export function MessageAuthorInfo({
           </Span>
         )}
 
-        <Span className="text-xs text-muted-foreground flex-shrink-0">
+        <Span className="text-xs text-muted-foreground shrink-0">
           {formatRelativeTime(timestamp.getTime())}
         </Span>
 
         {edited && (
-          <Span className="text-xs text-muted-foreground italic flex-shrink-0">
+          <Span className="text-xs text-muted-foreground italic shrink-0">
             {/* eslint-disable-next-line i18next/no-literal-string -- Formatting characters */}
             {`(${t("app.chat.messages.edited")})`}
           </Span>
