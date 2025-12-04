@@ -649,9 +649,8 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       "optional" in typedField.ui &&
       typedField.ui.optional
     ) {
-      return objectSchema
-        .nullable()
-        .optional() as unknown as InferSchemaFromField<F, Usage>;
+      const optionalSchema = objectSchema.nullable().optional();
+      return optionalSchema as unknown as InferSchemaFromField<F, Usage>;
     }
 
     return objectSchema as InferSchemaFromField<F, Usage>;
@@ -685,9 +684,8 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         "optional" in typedField.ui &&
         typedField.ui.optional
       ) {
-        return arraySchema
-          .nullable()
-          .optional() as unknown as InferSchemaFromField<F, Usage>;
+        const optionalArraySchema = arraySchema.nullable().optional();
+        return optionalArraySchema as unknown as InferSchemaFromField<F, Usage>;
       }
 
       return arraySchema as InferSchemaFromField<F, Usage>;
@@ -716,9 +714,9 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       }
 
       // For array-optional, always apply nullable and optional
-      const arraySchema = z.array(childSchema).nullable().optional();
+      const arrayOptionalSchema = z.array(childSchema).nullable().optional();
 
-      return arraySchema as unknown as InferSchemaFromField<F, Usage>;
+      return arrayOptionalSchema as unknown as InferSchemaFromField<F, Usage>;
     }
     return z.never() as InferSchemaFromField<F, Usage>;
   }

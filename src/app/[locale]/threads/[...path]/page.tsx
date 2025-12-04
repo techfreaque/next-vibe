@@ -140,6 +140,7 @@ export default async function ThreadsPathPage({
 
   return (
     <ChatProvider
+      user={user}
       locale={locale}
       activeThreadId={initialThreadId}
       currentRootFolderId={initialRootFolderId}

@@ -155,9 +155,9 @@ export function useEndpoint<
   // 1. Both types are extracted from the same generic T
   // 2. UseEndpointOptions<T> ensures options match the endpoint types at compile time
   // 3. Runtime behavior is correct as types are structurally compatible
-  type CreateOptions = typeof options.create extends object
-    ? typeof options.create
-    : Record<string, never>;
+  type CreateOptions = typeof options.create extends undefined
+    ? Record<string, never>
+    : typeof options.create;
 
   const createOperation = primaryEndpoint
     ? useEndpointCreate<PrimaryEndpoint>(

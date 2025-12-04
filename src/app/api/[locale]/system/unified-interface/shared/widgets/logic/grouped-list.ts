@@ -249,7 +249,7 @@ export function extractGroupedListData(
 
   // Process and validate groups
   const processedGroups = groups
-    .map((group: unknown) => {
+    .map((group: WidgetData) => {
       if (typeof group !== "object" || group === null) {
         return null;
       }

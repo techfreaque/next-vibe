@@ -16,6 +16,7 @@ import {
 } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -252,6 +253,7 @@ export interface RootFolderPermissions {
  * @param rootFolderPermissions - Root folder permissions computed server-side
  */
 export function useChat(
+  user: JwtPayloadType | undefined,
   locale: CountryLanguage,
   logger: EndpointLogger,
   activeThreadId: string | null,
@@ -327,6 +329,7 @@ export function useChat(
 
   // Use modular hooks
   useDataLoader(
+    user,
     locale,
     logger,
     chatStore.addThread,

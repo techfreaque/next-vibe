@@ -52,8 +52,8 @@ interface ResponseFieldsRendererProps {
  */
 function transformDataForWidget(
   widgetType: WidgetType,
-  value: unknown,
-): unknown {
+  value: ToolCallResult,
+): ToolCallResult {
   // LINK_LIST expects { items: [...] } format
   if (widgetType === WidgetType.LINK_LIST && Array.isArray(value)) {
     return {

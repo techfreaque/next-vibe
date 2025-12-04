@@ -21,6 +21,36 @@ import { callApi, containsFile, objectToFormData } from "./api-utils";
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 
 /**
+ * JSON-serializable value type for request/response data
+ */
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
+interface JsonObject {
+  [key: string]: JsonValue;
+}
+
+/**
+ * Type guard to check if a value is a JsonObject
+ */
+function isJsonObject(value: JsonValue): value is JsonObject {
+  return (
+    value !== null &&
+    value !== undefined &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    !(value instanceof File) &&
+    !(value instanceof Blob)
+  );
+}
+
+/**
  * Options for query execution
  */
 export interface QueryExecutorOptions<TRequest, TResponse, TUrlVariables> {
@@ -83,11 +113,10 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
     !endpoint.requestSchema.safeParse({}).success;
 
   // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
-  const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
+  const requestSchema = endpoint.requestSchema as z.ZodTypeAny;
   const isEmptyObjectSchema =
     requestSchema instanceof z.ZodObject &&
-    Object.keys((requestSchema as z.ZodObject<z.ZodRawShape>).shape || {})
-      .length === 0;
+    Object.keys(requestSchema.shape || {}).length === 0;
 
   // If the schema expects undefined but we received an object, set requestData to undefined
   if (
@@ -205,10 +234,7 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
         const searchParams = new URLSearchParams();
 
         // Helper function to flatten nested objects into dot notation
-        function flattenObject(
-          obj: Record<string, unknown>,
-          prefix = "",
-        ): void {
+        function flattenObject(obj: JsonObject, prefix = ""): void {
           for (const [key, value] of Object.entries(obj)) {
             const fullKey = prefix ? `${prefix}.${key}` : key;
 
@@ -221,21 +247,16 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
                 searchParams.append(`${fullKey}._placeholder`, "");
               } else {
                 value.forEach((item, index) => {
-                  if (typeof item === "object" && item !== null) {
-                    flattenObject(
-                      item as Record<string, unknown>,
-                      `${fullKey}[${index}]`,
-                    );
+                  if (isJsonObject(item)) {
+                    flattenObject(item, `${fullKey}[${index}]`);
                   } else {
                     searchParams.append(`${fullKey}[${index}]`, String(item));
                   }
                 });
               }
-            } else if (typeof value === "object") {
+            } else if (isJsonObject(value)) {
               // Handle nested objects
-              const objEntries = Object.entries(
-                value as Record<string, unknown>,
-              );
+              const objEntries = Object.entries(value);
               const hasNonNullValues = objEntries.some(
                 ([, v]) => v !== undefined && v !== null,
               );
@@ -245,7 +266,7 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
                 searchParams.append(`${fullKey}._placeholder`, "");
               } else {
                 // Recursively flatten non-empty object
-                flattenObject(value as Record<string, unknown>, fullKey);
+                flattenObject(value, fullKey);
               }
             } else {
               // Handle primitives
@@ -254,7 +275,9 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
           }
         }
 
-        flattenObject(requestData as Record<string, unknown>);
+        if (isJsonObject(requestData)) {
+          flattenObject(requestData);
+        }
 
         const queryString = searchParams.toString();
         if (queryString) {
@@ -266,8 +289,9 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       // Check if requestData contains File objects - if so, use FormData
       if (containsFile(requestData)) {
         // Convert to FormData
-        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: FormData conversion requires 'unknown' for flexible data structure support
-        postBody = objectToFormData(requestData as Record<string, unknown>);
+        if (isJsonObject(requestData)) {
+          postBody = objectToFormData(requestData);
+        }
       } else {
         // Use JSON
         postBody = JSON.stringify(requestData);

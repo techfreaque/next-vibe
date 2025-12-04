@@ -11,7 +11,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { TranslationProvider } from "@/i18n/core/client";
 
 import { ErrorBoundary } from "./_components/error-boundary";
-import ErrorFallback from "./_components/error-fallback";
 import { LeadTrackingProvider } from "./_components/lead-tracking-provider";
 import { QueryProvider } from "next-vibe/system/unified-interface/react/hooks/query-provider";
 /**
@@ -30,7 +29,7 @@ export function RootProviders({
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <TranslationProvider currentLocale={locale}>
           <LeadTrackingProvider />
-          <ErrorBoundary fallback={<ErrorFallback />} locale={locale}>
+          <ErrorBoundary locale={locale}>
             {children}
           </ErrorBoundary>
           <Toaster />

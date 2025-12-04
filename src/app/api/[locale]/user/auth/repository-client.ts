@@ -14,7 +14,6 @@
  * All methods return ResponseType<T> for consistent error handling
  */
 
-import { AUTH_STATUS_COOKIE_NAME } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
@@ -23,7 +22,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { getCookie, deleteCookie, setCookie } from "next-vibe-ui/lib/cookies";
 import { storage } from "next-vibe-ui/lib/storage";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { envClient } from "@/config/env-client";
@@ -36,27 +34,6 @@ const AUTH_TOKEN_STORAGE_KEY = "auth_token";
  * Provides all client-side authentication-related functionality in a single interface
  */
 export interface AuthClientRepository {
-  /**
-   * Sets the authentication status flag (indicates httpOnly cookie is present)
-   * @param logger - Optional logger for debugging
-   * @returns Promise<ResponseType> indicating success or failure
-   */
-  setAuthStatus(logger: EndpointLogger): Promise<ResponseType<void>>;
-
-  /**
-   * Removes the authentication status flag
-   * @param logger - Optional logger for debugging
-   * @returns Promise<ResponseType> indicating success or failure
-   */
-  removeAuthStatus(logger: EndpointLogger): Promise<ResponseType<void>>;
-
-  /**
-   * Checks if the user has authentication status (indicates httpOnly cookie might be present)
-   * @param logger - Optional logger for debugging
-   * @returns Promise<ResponseType> with boolean indicating authentication status
-   */
-  hasAuthStatus(logger: EndpointLogger): Promise<ResponseType<boolean>>;
-
   /**
    * Stores the JWT token using platform-agnostic storage (next-vibe-ui)
    * For web, uses localStorage
@@ -95,102 +72,6 @@ export interface AuthClientRepository {
  * Auth Client Repository Implementation
  */
 export class AuthClientRepositoryImpl implements AuthClientRepository {
-  /**
-   * Sets the authentication status flag to indicate httpOnly cookie is present
-   * @param logger - Optional logger for debugging
-   * @returns Promise<ResponseType> indicating success or failure
-   */
-  async setAuthStatus(logger: EndpointLogger): Promise<ResponseType<void>> {
-    try {
-      if (envClient.platform.isServer) {
-        logger.error("setAuthStatus cannot be called on the server");
-        return fail({
-          message: "app.api.user.auth.authClient.errors.status_save_failed",
-          errorType: ErrorResponseTypes.AUTH_ERROR,
-        });
-      }
-
-      logger.debug("Setting auth status storage", {
-        key: AUTH_STATUS_COOKIE_NAME,
-        isServer: envClient.platform.isServer,
-        hasDocument: typeof document !== "undefined",
-      });
-      await setCookie(AUTH_STATUS_COOKIE_NAME, "1");
-
-      return success(undefined);
-    } catch (error) {
-      logger.error("Error setting auth status", parseError(error));
-      return fail({
-        message: "app.api.user.auth.authClient.errors.status_save_failed",
-        errorType: ErrorResponseTypes.AUTH_ERROR,
-        messageParams: { error: String(error) },
-      });
-    }
-  }
-
-  /**
-   * Removes the authentication status flag
-   * @param logger - Optional logger for debugging
-   * @returns Promise<ResponseType> indicating success or failure
-   */
-  async removeAuthStatus(logger: EndpointLogger): Promise<ResponseType<void>> {
-    try {
-      if (envClient.platform.isServer) {
-        logger.error("removeAuthStatus cannot be called on the server");
-        return fail({
-          message: "app.api.user.auth.authClient.errors.status_remove_failed",
-          errorType: ErrorResponseTypes.AUTH_ERROR,
-        });
-      }
-      await deleteCookie(AUTH_STATUS_COOKIE_NAME);
-
-      return success(undefined);
-    } catch (error) {
-      logger.error("Error removing auth status", parseError(error));
-      return fail({
-        message: "app.api.user.auth.authClient.errors.status_remove_failed",
-        errorType: ErrorResponseTypes.AUTH_ERROR,
-        messageParams: { error: String(error) },
-      });
-    }
-  }
-
-  /**
-   * Checks if the user has authentication status flag set
-   * This indicates that an httpOnly cookie might be present and we should attempt authenticated calls
-   * @param logger - Optional logger for debugging
-   * @returns Promise<ResponseType> with boolean indicating authentication status
-   */
-  async hasAuthStatus(logger: EndpointLogger): Promise<ResponseType<boolean>> {
-    try {
-      if (envClient.platform.isServer) {
-        logger.error("hasAuthStatus cannot be called on the server");
-        return fail({
-          message: "app.api.user.auth.authClient.errors.status_check_failed",
-          errorType: ErrorResponseTypes.AUTH_ERROR,
-        });
-      }
-
-      const status = await getCookie(AUTH_STATUS_COOKIE_NAME);
-      const hasStatus = status !== null && status !== undefined;
-
-      logger.debug("Checking auth status storage", {
-        key: AUTH_STATUS_COOKIE_NAME,
-        value: status,
-        hasStatus,
-      });
-
-      return success(hasStatus);
-    } catch (error) {
-      logger.error("Error in hasAuthStatus", parseError(error));
-      return fail({
-        message: "app.api.user.auth.authClient.errors.status_check_failed",
-        errorType: ErrorResponseTypes.AUTH_ERROR,
-        messageParams: { error: String(error) },
-      });
-    }
-  }
-
   /**
    * Stores the JWT token using platform-agnostic storage
    * For web, uses localStorage (tokens can also be in httpOnly cookies)

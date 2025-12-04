@@ -76,7 +76,7 @@ export function ContainerWidget({
       )}
       <CardContent>
         <Div className={cn(layoutClass)}>
-          {children.map((child: unknown, index: number) => {
+          {children.map((child: WidgetData, index: number) => {
             // Type narrow each child
             if (typeof child !== "object" || child === null) {
               return null;

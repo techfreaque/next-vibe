@@ -12,10 +12,41 @@ import { authClientRepository } from "@/app/api/[locale]/user/auth/repository-cl
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 
 /**
+ * JSON-serializable value type for request/response data
+ */
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | File
+  | Blob
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
+interface JsonObject {
+  [key: string]: JsonValue;
+}
+
+/**
+ * Type guard to check if a value is a JsonObject
+ */
+function isJsonObject(value: JsonValue): value is JsonObject {
+  return (
+    value !== null &&
+    value !== undefined &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    !(value instanceof File) &&
+    !(value instanceof Blob)
+  );
+}
+
+/**
  * Check if an object contains File instances (recursively)
  */
-// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: API response handling requires 'unknown' for flexible response types
-export function containsFile(obj: unknown): boolean {
+export function containsFile(obj: JsonValue): boolean {
   if (obj instanceof File) {
     return true;
   }
@@ -35,8 +66,7 @@ export function containsFile(obj: unknown): boolean {
  * Convert an object to FormData (recursively handles nested objects and arrays)
  */
 export function objectToFormData(
-  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Error extraction requires 'unknown' to handle any error type
-  obj: Record<string, unknown>,
+  obj: JsonObject,
   formData: FormData = new FormData(),
   parentKey = "",
 ): FormData {
@@ -52,26 +82,16 @@ export function objectToFormData(
         const arrayKey = `${formKey}[${index}]`;
         if (item instanceof File || item instanceof Blob) {
           formData.append(arrayKey, item);
-        } else if (item && typeof item === "object") {
-          objectToFormData(
-            // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Data transformation requires 'unknown' for flexible input types
-            item as Record<string, unknown>,
-            formData,
-            arrayKey,
-          );
+        } else if (isJsonObject(item)) {
+          objectToFormData(item, formData, arrayKey);
         } else if (item !== null && item !== undefined) {
           // Primitives: string, number, boolean
           formData.append(arrayKey, String(item));
         }
       });
-    } else if (value && typeof value === "object") {
+    } else if (isJsonObject(value)) {
       // Handle nested objects
-      objectToFormData(
-        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Type guard requires 'unknown' for runtime type checking
-        value as Record<string, unknown>,
-        formData,
-        formKey,
-      );
+      objectToFormData(value, formData, formKey);
     } else if (value !== null && value !== undefined) {
       // Handle primitives: string, number, boolean
       formData.append(formKey, String(value));
@@ -99,21 +119,10 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
             "Content-Type": "application/json",
           };
 
-    // Check authentication status if required
+    // For React Native and mobile platforms, check for stored token and add Authorization header
+    // This allows React Native apps to authenticate using Bearer tokens stored in AsyncStorage
+    // Web apps will continue to use httpOnly cookies automatically sent with credentials: "include"
     if (endpoint.requiresAuthentication()) {
-      const tokenResponse = await authClientRepository.hasAuthStatus(logger);
-      if (!tokenResponse.success || !tokenResponse.data) {
-        // Return error - server should provide proper translation key
-        return fail({
-          message:
-            "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.auth_required",
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
-        });
-      }
-
-      // For React Native and mobile platforms, check for stored token and add Authorization header
-      // This allows React Native apps to authenticate using Bearer tokens stored in AsyncStorage
-      // Web apps will continue to use httpOnly cookies automatically sent with credentials: "include"
       const storedToken = await authClientRepository.getAuthToken(logger);
       if (storedToken.success && storedToken.data) {
         headers.Authorization = `Bearer ${storedToken.data}`;

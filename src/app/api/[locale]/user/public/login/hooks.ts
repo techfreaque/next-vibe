@@ -26,7 +26,6 @@ import { useApiForm } from "@/app/api/[locale]/system/unified-interface/react/ho
 import { useTranslation } from "@/i18n/core/client";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
-import { authClientRepository } from "../../auth/repository-client";
 import { useUser } from "../../private/me/hooks";
 import loginEndpoints from "./definition";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
@@ -158,21 +157,7 @@ export function useLogin(
       try {
         logger.debug("app.api.user.public.login.onSuccess.start");
 
-        // Set the auth status to indicate successful login
-        // No need to clear first since the server has already set the httpOnly cookie
-        const tokenResult = await authClientRepository.setAuthStatus(logger);
-        if (!tokenResult.success) {
-          logger.error("app.api.user.public.login.token.save.failed");
-          toast({
-            title: t("app.api.user.public.login.errors.title"),
-            description: t(
-              "app.api.user.public.login.errors.token_save_failed",
-            ),
-            variant: "destructive",
-          });
-          return tokenResult;
-        }
-        logger.debug("app.api.user.public.login.token.save.success");
+        // Server has already set httpOnly cookie - no client-side auth status needed
 
         // Show success message (alert is handled by useEndpoint)
         toast({
@@ -187,16 +172,6 @@ export function useLogin(
         );
         const redirectTo: Route = (redirectParam ||
           `/${locale}/`) satisfies Route;
-
-        // Set auth status to enable user query on the next page
-        const authStatusResult =
-          await authClientRepository.setAuthStatus(logger);
-        if (!authStatusResult.success) {
-          logger.error("user.auth.status.set.failed", {
-            message: authStatusResult.message,
-            errorCode: authStatusResult.errorType.errorCode,
-          });
-        }
 
         // Invalidate credits queries to trigger refetch with new auth state
         await apiClient.refetchEndpoint(definitions.GET, logger);

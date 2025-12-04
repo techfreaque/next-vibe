@@ -35,7 +35,7 @@ export interface ProcessedLinkList {
 export function extractLinkListData(
   value: WidgetData,
 ): ProcessedLinkList | null {
-  let items: unknown[] = [];
+  let items: WidgetData[] = [];
   let title = "";
   let description = "";
   let layout = "list";
@@ -72,7 +72,7 @@ export function extractLinkListData(
 
   // Validate and process items
   const validItems = items
-    .map((item: unknown) => {
+    .map((item: WidgetData) => {
       if (typeof item !== "object" || item === null || Array.isArray(item)) {
         return null;
       }

@@ -43,8 +43,8 @@ interface InputData {
 }
 
 interface CollectedInputData {
-  data?: InputData;
-  urlPathParams?: InputData;
+  data?: Partial<InputData>;
+  urlPathParams?: Partial<InputData>;
 }
 
 // CLI data types
@@ -82,7 +82,7 @@ interface CliResponseData {
  * Extends BaseExecutionContext with CLI-specific fields
  */
 export interface RouteExecutionContext extends Omit<
-  BaseExecutionContext,
+  BaseExecutionContext<InputData>,
   "user"
 > {
   /** URL path parameters */
@@ -122,7 +122,7 @@ export interface RouteExecutionResult {
   error?: string;
 
   /** Error parameters for translation */
-  errorParams?: Record<string, unknown>;
+  errorParams?: Record<string, string | number | boolean | null | undefined>;
 
   /** CLI-specific metadata */
   metadata?: {
@@ -321,12 +321,14 @@ export class RouteDelegationHandler {
     const cliData = this.buildDataFromCliArgs(endpoint, context);
 
     // Merge CLI data with provided data using registry
-    const contextData = context.data as InputData | undefined;
+    const contextData = context.data;
     if (contextData || (cliData && Object.keys(cliData).length)) {
-      inputData.data = routeExecutionExecutor.mergeData(
+      const mergedData = routeExecutionExecutor.mergeData(
         contextData || {},
         cliData || {},
-      ) as InputData;
+      );
+      // mergedData is Partial<InputData>, which is compatible with InputData for our purposes
+      inputData.data = mergedData;
 
       // Check if all required fields are satisfied using registry
       const missingRequired = routeExecutionExecutor.getMissingRequiredFields(

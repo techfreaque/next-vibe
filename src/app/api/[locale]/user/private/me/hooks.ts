@@ -9,14 +9,12 @@ import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
 import { useEffect } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 
-import { authClientRepository } from "../../auth/repository-client";
 import meEndpoints, {
   type MeDeleteRequestOutput,
   type MeDeleteResponseOutput,
@@ -87,56 +85,22 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
     endpoint: meEndpoints.GET,
     logger,
     options: {
-      enabled: queryEnabled, // Enable based on auth status
-      onError: async ({ error }) => {
-        logger.error("Failed to fetch user data", error);
-        await authClientRepository.removeAuthStatus(logger);
-      },
-      onSuccess: async () => {
-        const authStatusResult =
-          await authClientRepository.setAuthStatus(logger);
-        if (!authStatusResult.success) {
-          logger.error("user.auth.status.set.failed", {
-            message: authStatusResult.message,
-            errorCode: authStatusResult.errorType.errorCode,
-          });
-        }
-      },
+      enabled: queryEnabled, // Enable immediately - server handles auth
     },
   });
 
   // Transform user data to match AuthUser interface with proper typing
   const authUser = userResponse;
 
-  // Check authentication status only once on mount
+  // Enable query immediately - server will return 401 if not authenticated
   useEffect(() => {
-    if (authChecked) {
-      return;
+    if (!authChecked) {
+      logger.debug("Enabling /me query - server will handle auth");
+      setQueryEnabled(true);
+      setAuthChecked(true);
     }
-
-    const checkInitialAuthState = async (): Promise<void> => {
-      try {
-        // Check if we have client-side auth status
-        const authResponse = await authClientRepository.hasAuthStatus(logger);
-
-        if (authResponse.success && authResponse.data) {
-          logger.debug("Client-side auth status found, enabling query");
-          setQueryEnabled(true);
-        } else {
-          logger.debug("No client-side auth status, disabling query");
-          setQueryEnabled(false);
-        }
-
-        setAuthChecked(true);
-      } catch (error) {
-        logger.error("user.auth.initial.check.failed", parseError(error));
-        setAuthChecked(true);
-      }
-    };
-
-    void checkInitialAuthState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authChecked, setQueryEnabled, setAuthChecked]); // Removed logger from deps to prevent re-runs
+  }, [authChecked]);
 
   return {
     user: authUser,

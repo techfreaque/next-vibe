@@ -101,7 +101,7 @@ export function DefaultErrorFallback({
               <div>
                 <span className="font-semibold">Message:</span> {error.message}
               </div>
-              {error.cause && (
+              {error.cause !== undefined && (
                 <div>
                   <span className="font-semibold">Cause:</span>{" "}
                   {String(error.cause)}

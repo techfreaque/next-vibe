@@ -37,7 +37,7 @@ interface RequestFieldsRendererProps {
 /**
  * Format a value for display
  */
-function formatValue(value: unknown): string {
+function formatValue(value: ToolCallResult): string {
   if (value === null) {
     return "null";
   }
@@ -65,7 +65,7 @@ function formatValue(value: unknown): string {
 /**
  * Get icon for value type
  */
-function getTypeIcon(value: unknown): string {
+function getTypeIcon(value: ToolCallResult): string {
   if (value === null || value === undefined) {
     return "∅";
   }
@@ -90,7 +90,7 @@ function getTypeIcon(value: unknown): string {
 /**
  * Get color class for value type
  */
-function getTypeColor(value: unknown): string {
+function getTypeColor(value: ToolCallResult): string {
   if (value === null || value === undefined) {
     return "text-muted-foreground/50";
   }
@@ -115,7 +115,7 @@ function getTypeColor(value: unknown): string {
 /**
  * Render a single field
  */
-function renderField(key: string, value: unknown, depth = 0): JSX.Element {
+function renderField(key: string, value: ToolCallResult, depth = 0): JSX.Element {
   const isComplex = typeof value === "object" && value !== null;
   const indent = depth * 16; // 16px per level
 
@@ -150,9 +150,8 @@ function renderField(key: string, value: unknown, depth = 0): JSX.Element {
                   renderField(`[${index}]`, item, depth + 1),
                 )
               : // Render object fields
-                Object.entries(value as Record<string, unknown>).map(
-                  ([nestedKey, nestedValue]) =>
-                    renderField(nestedKey, nestedValue, depth + 1),
+                Object.entries(value).map(([nestedKey, nestedValue]) =>
+                  renderField(nestedKey, nestedValue, depth + 1),
                 )}
           </Div>
         )}

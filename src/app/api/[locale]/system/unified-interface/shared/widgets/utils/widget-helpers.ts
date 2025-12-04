@@ -222,7 +222,7 @@ export interface ColumnConfig {
   align: "left" | "center" | "right";
   sortable: boolean;
   width?: string | number;
-  format?: (value: unknown) => unknown;
+  format?: (value: WidgetData) => WidgetData;
 }
 
 export function extractColumnConfig(
@@ -245,7 +245,7 @@ export function extractColumnConfig(
   }
 
   const rawColumn = value.columns.find(
-    (c: unknown) =>
+    (c: WidgetData) =>
       typeof c === "object" && c !== null && "key" in c && c.key === columnKey,
   );
 
@@ -271,7 +271,7 @@ export function extractColumnConfig(
 
   const format =
     "format" in rawColumn && typeof rawColumn.format === "function"
-      ? (rawColumn.format as (value: unknown) => unknown)
+      ? (rawColumn.format as (value: WidgetData) => WidgetData)
       : undefined;
 
   return {
@@ -286,7 +286,7 @@ export function extractColumnConfig(
  * Sort table rows by column
  * Used by: DataTableWidget
  */
-export function sortTableRows<T extends Record<string, unknown>>(
+export function sortTableRows<T extends Record<string, WidgetData>>(
   rows: T[],
   sortBy: string | null,
   sortOrder: "asc" | "desc",
@@ -376,7 +376,7 @@ export function isTextareaField(field: {
  * Used by: TextWidget
  */
 export function getFieldPlaceholder(field: {
-  ui: { placeholder?: unknown };
+  ui: { placeholder?: string };
 }): string | undefined {
   return "placeholder" in field.ui && typeof field.ui.placeholder === "string"
     ? field.ui.placeholder
@@ -387,7 +387,7 @@ export function getFieldPlaceholder(field: {
  * Extract field name from field structure
  * Used by: TextWidget
  */
-export function getFieldName(field: { name?: unknown }): string {
+export function getFieldName(field: { name?: string }): string {
   if ("name" in field && typeof field.name === "string") {
     return field.name;
   }

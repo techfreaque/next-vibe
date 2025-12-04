@@ -41,7 +41,7 @@ export function extractCodeQualityListData(
     }
 
     const items = value
-      .map((item: unknown) => validateCodeQualityItem(item))
+      .map((item: WidgetData) => validateCodeQualityItem(item))
       .filter((item): item is CodeQualityItem => item !== null);
 
     if (items.length === 0) {
@@ -68,7 +68,7 @@ export function extractCodeQualityListData(
         : true;
 
     const validItems = items
-      .map((item: unknown) => validateCodeQualityItem(item))
+      .map((item: WidgetData) => validateCodeQualityItem(item))
       .filter((item): item is CodeQualityItem => item !== null);
 
     if (validItems.length === 0) {
@@ -91,7 +91,7 @@ export function extractCodeQualityListData(
 /**
  * Validate a single code quality item
  */
-function validateCodeQualityItem(item: unknown): CodeQualityItem | null {
+function validateCodeQualityItem(item: WidgetData): CodeQualityItem | null {
   if (typeof item !== "object" || item === null || Array.isArray(item)) {
     return null;
   }

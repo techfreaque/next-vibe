@@ -13,7 +13,6 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 
-import { authClientRepository } from "../../auth/repository-client";
 import { useUser } from "../../private/me/hooks";
 import signupEndpoints from "./definition";
 import { type ApiInferMutationOptions } from "../../../system/unified-interface/react/hooks/types";
@@ -70,15 +69,7 @@ export function useRegister(): SignupFormReturn & {
       // Clear referral code from localStorage after successful signup
       localStorage.removeItem("referralCode");
 
-      const setTokenResponse = await authClientRepository.setAuthStatus(logger);
-      if (!setTokenResponse.success) {
-        toast({
-          title: t("app.api.user.public.signup.errors.title"),
-          description: t("app.api.user.public.login.errors.token_save_failed"),
-          variant: "destructive",
-        });
-        return setTokenResponse;
-      }
+      // Server has already set httpOnly cookie - no client-side auth status needed
 
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);

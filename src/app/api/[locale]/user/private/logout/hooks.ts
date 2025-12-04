@@ -12,12 +12,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 
-import { authClientRepository } from "../../auth/repository-client";
 import { useUser } from "../me/hooks";
 import logoutEndpoints from "./definition";
 import { useApiMutation } from "../../../system/unified-interface/react/hooks/use-api-mutation";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import definitions from "@/app/api/[locale]/credits/definition";
+import { authClientRepository } from "../../auth/repository-client";
 
 /****************************
  * MUTATION HOOKS
@@ -48,13 +48,8 @@ export function useLogout(logger: EndpointLogger): () => void {
         variant: "default",
       });
 
-      // Remove token AFTER successful API call
-      const removeResponse =
-        await authClientRepository.removeAuthStatus(logger);
-      if (!removeResponse.success) {
-        // Note: Error already logged by repository
-      }
-
+      // remove react native token - web token is already cleared by server
+      await authClientRepository.removeAuthToken(logger);
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);
 
@@ -68,13 +63,8 @@ export function useLogout(logger: EndpointLogger): () => void {
         description: t("app.api.user.private.logout.success.description"),
         variant: "default",
       });
-
-      // Remove token AFTER API call completes (even with error)
-      const removeResponse =
-        await authClientRepository.removeAuthStatus(logger);
-      if (!removeResponse.success) {
-        // Note: Error already logged by repository
-      }
+      // remove react native token - web token is already cleared by server
+      await authClientRepository.removeAuthToken(logger);
 
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);

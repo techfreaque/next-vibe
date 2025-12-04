@@ -28,7 +28,7 @@ import { getErrorMessage } from "../../utils/error-utils";
 /**
  * Base execution context
  */
-export interface BaseExecutionContext<TData = { [key: string]: unknown }> {
+export interface BaseExecutionContext<TData> {
   toolName: string;
   data: TData;
   user: JwtPayloadType;
@@ -58,20 +58,20 @@ export interface IRouteExecutionExecutor {
    * Standard handler signature: { data, urlPathParams, user, locale, logger, platform }
    * Handles: permission checking, route loading, handler execution
    */
-  executeGenericHandler(params: {
+  executeGenericHandler<TData, TUrlPathParams, TResult>(params: {
     toolName: string;
-    data: { [key: string]: unknown };
-    urlPathParams?: { [key: string]: unknown };
+    data: TData;
+    urlPathParams?: TUrlPathParams;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
     platform: typeof Platform.CLI | typeof Platform.AI | typeof Platform.MCP;
-  }): Promise<ResponseType<unknown>>;
+  }): Promise<ResponseType<TResult>>;
 
   /**
    * CLI-specific: Get missing required fields from schema (for interactive forms)
    */
-  getMissingRequiredFields<TData = { [key: string]: unknown }>(
+  getMissingRequiredFields<TData>(
     data: TData,
     schema: z.ZodTypeAny | null | undefined,
     logger: EndpointLogger,
@@ -80,9 +80,9 @@ export interface IRouteExecutionExecutor {
   /**
    * Merge data from multiple sources (for arg parsing)
    */
-  mergeData<TData = { [key: string]: unknown }>(
+  mergeData<TData extends Record<string, any>>(
     ...sources: Array<TData | null | undefined>
-  ): TData;
+  ): Partial<TData>;
 }
 
 export class RouteExecutionExecutor implements IRouteExecutionExecutor {
@@ -90,7 +90,7 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
    * Get missing required fields from schema
    * Platform-agnostic field validation
    */
-  getMissingRequiredFields<TData = { [key: string]: unknown }>(
+  getMissingRequiredFields<TData>(
     data: TData,
     schema: z.ZodTypeAny | null | undefined,
     logger: EndpointLogger,
@@ -108,7 +108,8 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
           .filter(
             (issue) =>
               issue.code === "invalid_type" &&
-              (issue as { received?: string }).received === "undefined",
+              "received" in issue &&
+              issue.received === "undefined",
           )
           .map((issue) => [...issue.path].join("."));
       }
@@ -129,15 +130,15 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
    * Merge data from multiple sources
    * Platform-agnostic data merging (CLI args, provided data, defaults, etc.)
    */
-  mergeData<TData = { [key: string]: unknown }>(
+  mergeData<TData extends Record<string, any>>(
     ...sources: Array<TData | null | undefined>
-  ): TData {
-    return sources.reduce<TData>((acc, source) => {
+  ): Partial<TData> {
+    return sources.reduce<Partial<TData>>((acc, source) => {
       if (source && typeof source === "object") {
-        return { ...acc, ...source } as TData;
+        return { ...acc, ...source };
       }
       return acc;
-    }, {} as TData);
+    }, {});
   }
 
   /**
@@ -146,15 +147,15 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
    *
    * Standard handler signature: { data, urlPathParams, user, locale, logger, platform }
    */
-  async executeGenericHandler(params: {
+  async executeGenericHandler<TData, TUrlPathParams, TResult>(params: {
     toolName: string;
-    data: { [key: string]: unknown };
-    urlPathParams?: { [key: string]: unknown };
+    data: TData;
+    urlPathParams?: TUrlPathParams;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
     platform: typeof Platform.CLI | typeof Platform.AI | typeof Platform.MCP;
-  }): Promise<ResponseType<unknown>> {
+  }): Promise<ResponseType<TResult>> {
     try {
       const handlerResult = await getRouteHandler(params.toolName);
 
@@ -169,7 +170,7 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
       // Execute handler
       const result = await handlerResult({
         data: params.data,
-        urlPathParams: params.urlPathParams || {},
+        urlPathParams: params.urlPathParams ?? {},
         user: params.user,
         locale: params.locale,
         logger: params.logger,
@@ -187,17 +188,17 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
 
       if (result.success) {
         return success(result.data);
-      } else {
-        // Return the original error from the handler
-        return result;
       }
+
+      // Return the original error from the handler
+      return result;
     } catch (error) {
       params.logger.error(
         "[Route Execution Executor] Handler execution failed",
         parseError(error),
         {
           toolName: params.toolName,
-          error: getErrorMessage(error as Error),
+          error: getErrorMessage(error instanceof Error ? error : new Error(String(error))),
         },
       );
       return fail({

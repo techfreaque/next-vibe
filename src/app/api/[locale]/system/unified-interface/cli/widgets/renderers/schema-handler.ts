@@ -15,6 +15,15 @@ interface ZodShape {
 }
 
 /**
+ * Zod check constraint
+ */
+interface ZodCheck {
+  kind: string;
+  value?: number;
+  message?: string;
+}
+
+/**
  * Zod with internal _def property
  */
 interface ZodInternal {
@@ -22,6 +31,7 @@ interface ZodInternal {
     innerType?: z.ZodTypeAny;
     defaultValue?: () => FormFieldValue;
     description?: string;
+    checks?: ZodCheck[];
   };
 }
 
@@ -155,14 +165,12 @@ export class SchemaUIHandler {
       let numberSchema = z.coerce.number();
       // Copy constraints from original schema if possible
       if (hasZodDef(currentSchema)) {
-        const checks = (currentSchema._def as { checks?: unknown[] }).checks;
+        const checks = (currentSchema._def as ZodInternal["_def"]).checks;
         if (Array.isArray(checks)) {
           for (const check of checks) {
             if (check && typeof check === "object" && "kind" in check) {
-              const checkKind = (check as { kind: string; value?: number })
-                .kind;
-              const checkValue = (check as { kind: string; value?: number })
-                .value;
+              const checkKind = check.kind;
+              const checkValue = check.value;
               if (checkKind === "min" && typeof checkValue === "number") {
                 numberSchema = numberSchema.min(checkValue);
               } else if (

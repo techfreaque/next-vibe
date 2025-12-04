@@ -261,7 +261,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
                   generate: true,
                   redo: false,
                   schema: "public",
-                  dryRun: data.dryRun,
+                  dryRun: false,
                 },
                 user,
                 locale,

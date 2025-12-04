@@ -12,11 +12,6 @@ import definitions from "./definition";
 import { aiStreamRepository } from "./repository";
 
 /**
- * Allow streaming responses up to 30 seconds
- */
-export const maxDuration = 30;
-
-/**
  * POST handler for AI streaming
  */
 export const { POST, tools } = endpointsHandler({

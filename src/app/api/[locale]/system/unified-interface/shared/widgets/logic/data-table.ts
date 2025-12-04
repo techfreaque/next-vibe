@@ -104,7 +104,7 @@ export function extractDataTableData(
 
     // Validate columns
     const validColumns = columns
-      .map((col: unknown) => {
+      .map((col: WidgetData) => {
         if (typeof col !== "object" || col === null || Array.isArray(col)) {
           return null;
         }

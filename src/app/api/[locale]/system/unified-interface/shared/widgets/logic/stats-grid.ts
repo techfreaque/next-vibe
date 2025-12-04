@@ -51,7 +51,7 @@ export function extractStatsGridData(
 
   // Process each stat using metric card extractor
   const processedStats = stats
-    .map((stat: unknown) => extractMetricCardData(stat as WidgetData))
+    .map((stat: WidgetData) => extractMetricCardData(stat))
     .filter((stat): stat is ProcessedMetricCard => stat !== null);
 
   if (processedStats.length === 0) {

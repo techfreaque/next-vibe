@@ -95,7 +95,7 @@ export default async function ResetPasswordConfirmPage({
 
   return (
     <ErrorBoundary
-      fallback={
+      fallback={() => (
         <Alert variant="destructive" className="mb-8">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>{t("app.user.common.error.title")}</AlertTitle>
@@ -105,7 +105,7 @@ export default async function ResetPasswordConfirmPage({
             )}
           </AlertDescription>
         </Alert>
-      }
+      )}
       locale={locale}
     >
       <Suspense fallback={<Div>{t("app.user.common.loading")}</Div>}>

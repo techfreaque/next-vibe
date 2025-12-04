@@ -15,6 +15,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/hooks/hooks";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { DefaultFolderId } from "../config";
 
@@ -39,6 +40,8 @@ export interface RootFolderPermissions {
  * All navigation state comes from URL props (not from store)
  */
 interface ChatProviderProps {
+  /** JWT payload from server (undefined for unauthenticated/public users) */
+  user: JwtPayloadType | undefined;
   locale: CountryLanguage;
   children: ReactNode;
   /** Active thread ID from URL (null if none) */
@@ -59,6 +62,7 @@ interface ChatProviderProps {
  * URL is the single source of truth - no hydration mismatch
  */
 export function ChatProvider({
+  user,
   locale,
   children,
   activeThreadId,
@@ -76,6 +80,7 @@ export function ChatProvider({
 
   // Get chat hook with URL-derived navigation state
   const chat = useChat(
+    user,
     locale,
     logger,
     activeThreadId,

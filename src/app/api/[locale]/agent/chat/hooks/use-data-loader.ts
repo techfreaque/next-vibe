@@ -5,12 +5,11 @@
 
 import { useEffect, useRef } from "react";
 
-import { AUTH_STATUS_COOKIE_PREFIX } from "@/config/constants";
 import { parseError } from "next-vibe/shared/utils";
-import { getCookie } from "next-vibe-ui/lib/cookies";
 
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { FolderListResponseOutput } from "../folders/definition";
@@ -20,14 +19,6 @@ import {
   GET as threadsGetEndpoint,
   type ThreadListResponseOutput,
 } from "../threads/definition";
-
-/**
- * Check if user is authenticated
- */
-async function isUserAuthenticated(): Promise<boolean> {
-  const authStatusCookie = await getCookie(AUTH_STATUS_COOKIE_PREFIX);
-  return authStatusCookie !== null;
-}
 
 /**
  * Load incognito data from localStorage
@@ -256,6 +247,7 @@ async function loadFoldersFromServer(
  * NOTE: Root folder permissions are now computed server-side and passed as props
  */
 export function useDataLoader(
+  user: JwtPayloadType | undefined,
   locale: CountryLanguage,
   logger: EndpointLogger,
   addThread: (thread: ChatThread) => void,
@@ -273,10 +265,12 @@ export function useDataLoader(
     dataLoadedRef.current = true;
 
     const loadData = async (): Promise<void> => {
-      const isAuthenticated = await isUserAuthenticated();
+      // Determine if user is authenticated from passed user prop
+      const isAuthenticated = user !== undefined && !user.isPublic;
 
       logger.debug("Chat: Checking authentication before loading data", {
         isAuthenticated,
+        isPublic: user?.isPublic ?? true,
       });
 
       // ALWAYS load incognito data from localStorage
@@ -299,5 +293,5 @@ export function useDataLoader(
 
     void loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locale]);
+  }, [locale, user]);
 }

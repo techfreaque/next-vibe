@@ -363,15 +363,15 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     );
 
     // Update React Query cache (single source of truth)
-    queryClient.setQueryData(queryKey, (oldData: unknown) => {
-      const typedOldData = oldData as
-        | {
-            success: boolean;
-            data: TEndpoint["types"]["ResponseOutput"];
-          }
-        | undefined;
+    type CachedData =
+      | {
+          success: boolean;
+          data: TEndpoint["types"]["ResponseOutput"];
+        }
+      | undefined;
 
-      return updater(typedOldData);
+    queryClient.setQueryData(queryKey, (oldData: CachedData) => {
+      return updater(oldData);
     });
   },
 }));

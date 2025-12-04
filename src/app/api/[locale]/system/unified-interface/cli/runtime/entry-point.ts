@@ -23,6 +23,9 @@ import type {
 import { routeDelegationHandler } from "./route-executor";
 import type { CliObject } from "./parsing";
 
+// Import InputData type from route-executor
+type InputData = CliRequestData;
+
 interface CliExecutionOptions {
   data?: CliRequestData;
   urlPathParams?: Record<string, string | number | boolean | null | undefined>;
@@ -73,9 +76,11 @@ class CliEntryPoint {
       }
     }
 
+    const dataForContext: InputData = options.data || {};
+
     const context: RouteExecutionContext = {
       toolName: resolvedCommand,
-      data: (options.data || {}) as Record<string, unknown>,
+      data: dataForContext,
       urlPathParams: options.urlPathParams,
       cliArgs: options.cliArgs,
       user: cliUser,

@@ -24,7 +24,7 @@ import type {
   MCPToolMetadata,
 } from "./types";
 import { MCPErrorCode } from "./types";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslationKey, TParams } from "@/i18n/core/static-types";
 import type { Methods } from "../shared/types/enums";
 
 /**
@@ -267,8 +267,8 @@ export class MCPRegistry implements IMCPRegistry {
   /**
    * Convert route execution result to MCP format
    */
-  private convertToMCPResult(
-    result: ResponseType<unknown>,
+  private convertToMCPResult<TData>(
+    result: ResponseType<TData>,
     toolName: string,
     locale: CountryLanguage,
   ): MCPToolCallResult {
@@ -296,10 +296,10 @@ export class MCPRegistry implements IMCPRegistry {
       toolName: string;
       errorType?: string;
       message?: string;
-      messageParams?: unknown;
+      messageParams?: TParams;
       cause?: string;
       causeType?: string;
-      causeParams?: unknown;
+      causeParams?: TParams;
     } = {
       toolName,
       errorType: result.errorType?.errorKey,

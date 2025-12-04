@@ -75,8 +75,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
   ) => {
     // Extract Next.js-specific data
     const { locale, ...resolvedParams } = await params;
-    const urlPathParams =
-      resolvedParams as unknown as T["types"]["UrlVariablesOutput"];
+    const urlPathParams = resolvedParams as T["types"]["UrlVariablesOutput"];
     const logger = createEndpointLogger(false, Date.now(), locale);
 
     try {
