@@ -19,11 +19,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useUser } from "@/app/api/[locale]/user/private/me/hooks";
 
 import statusEndpoints from "./status/definition";
 import subscribeEndpoints from "./subscribe/definition";
 import unsubscribeEndpoints from "./unsubscribe/definition";
+import type { MeGetResponseOutput } from "../user/private/me/definition";
 
 /****************************
  * TYPED STATE KEYS
@@ -147,15 +147,14 @@ interface NewsletterManagerResult {
  * Hook for comprehensive newsletter management with manual email input support
  * Supports both logged-in users (auto-fill email) and non-logged-in users (manual input)
  */
-export function useNewsletterManager(): NewsletterManagerResult {
+export function useNewsletterManager(
+  user: MeGetResponseOutput | undefined,
+): NewsletterManagerResult {
   const { locale } = useTranslation();
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
-
-  // Fetch current user data to get email
-  const { user, isLoggedIn } = useUser(logger);
 
   // Use typed custom state for newsletter-related state
   const [manualEmail, setManualEmail] = useCustomState(manualEmailKey, "");
@@ -165,10 +164,7 @@ export function useNewsletterManager(): NewsletterManagerResult {
   );
 
   // Use user email if logged in, otherwise use manual input
-  const email: string =
-    isLoggedIn && user && "email" in user && typeof user.email === "string"
-      ? user.email
-      : manualEmail;
+  const email: string = user ? user.email : manualEmail;
 
   // Improved email validation
   const isValidEmail = useCallback((emailToValidate: string): boolean => {
@@ -185,11 +181,12 @@ export function useNewsletterManager(): NewsletterManagerResult {
   // Handle email change - only allow changes when not logged in
   const handleEmailChange = useCallback(
     (e: InputChangeEvent<"email">): void => {
-      if (!isLoggedIn) {
+      if (!user) {
         setManualEmail(e.target.value);
       }
     },
-    [isLoggedIn, setManualEmail],
+    // oxlint-disable-next-line exhaustive-deps
+    [user],
   );
 
   // Check if any operation is in progress
@@ -347,7 +344,7 @@ export function useNewsletterManager(): NewsletterManagerResult {
 
   const setEmail = useCallback(
     (newEmail: string): void => {
-      if (!isLoggedIn) {
+      if (!user) {
         setManualEmail(newEmail);
         setShowConfirmUnsubscribe(false);
 
@@ -367,18 +364,18 @@ export function useNewsletterManager(): NewsletterManagerResult {
       }
     },
     [
-      isLoggedIn,
       subscriptionEndpoint.create,
       unsubscribeEndpoint.create,
       setManualEmail,
       setShowConfirmUnsubscribe,
+      user,
     ],
   );
 
   return {
     email: email || "",
     setEmail,
-    isLoggedIn,
+    isLoggedIn: !!user,
     isSubscribed: effectiveIsSubscribed,
     isSubmitting: subscriptionEndpoint.create?.isSubmitting ?? false,
     isUnsubscribing: unsubscribeEndpoint.create?.isSubmitting ?? false,

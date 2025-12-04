@@ -6,12 +6,12 @@
 /**
  * Primitive JSON values
  */
-export type JsonPrimitive = string | number | boolean | null;
+type JsonPrimitive = string | number | boolean | null;
 
 /**
  * JSON-compatible object (record with JSON values)
  */
-export interface JsonObject {
+interface JsonObject {
   [key: string]: JsonValue;
 }
 
@@ -19,21 +19,9 @@ export interface JsonObject {
  * JSON-compatible array
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface JsonArray extends Array<JsonValue> {}
+interface JsonArray extends Array<JsonValue> {}
 
 /**
  * Any valid JSON value
  */
 export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
-
-/**
- * Error details type
- */
-export type ErrorDetails = Record<string, JsonPrimitive>;
-
-/**
- * Logger interface for error handling
- */
-export interface ErrorLogger {
-  error: (message: string, context?: ErrorDetails) => void;
-}

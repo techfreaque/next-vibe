@@ -35,9 +35,10 @@ export interface SelectorOption<T = string> {
   icon: IconValue;
   group?: string;
   groupIcon?: IconValue;
-  utilities?: string[]; // Utility names (translated keys)
-  utilityIcons?: Record<string, IconValue>; // Map of utility name to icon
-  utilityOrders?: Record<string, number>; // Map of utility name to order
+  utilities?: string[]; // Utility keys
+  utilityIcons?: Record<string, IconValue>; // Map of utility key to icon
+  utilityLabels?: Record<string, string>; // Map of utility key to translated label
+  utilityOrders?: Record<string, number>; // Map of utility key to order
 }
 
 type GroupMode = "provider" | "utility";
@@ -169,15 +170,23 @@ export function SelectorBase<T extends string = string>({
       return sortedGroups;
     } else {
       // Group by utility - convert utility keys to translated names
-      // Get utility icons from the first option's utilityIcons map
+      // Get utility icons and labels from options
       const utilityIconsMap: Record<string, IconValue> = {};
+      const utilityLabelsMap: Record<string, string> = {};
 
-      // Collect utility icons from the first option that has them
+      // Collect utility icons and labels from options
       for (const option of optionsToGroup) {
         if (option.utilityIcons) {
           Object.entries(option.utilityIcons).forEach(([key, icon]) => {
             if (!utilityIconsMap[key]) {
               utilityIconsMap[key] = icon;
+            }
+          });
+        }
+        if (option.utilityLabels) {
+          Object.entries(option.utilityLabels).forEach(([key, label]) => {
+            if (!utilityLabelsMap[key]) {
+              utilityLabelsMap[key] = label;
             }
           });
         }
@@ -188,24 +197,27 @@ export function SelectorBase<T extends string = string>({
 
       optionsToGroup.forEach((option) => {
         if (option.utilities && option.utilities.length > 0) {
-          option.utilities.forEach((utilityName) => {
-            if (!grouped[utilityName]) {
-              grouped[utilityName] = {
+          option.utilities.forEach((utilityKey) => {
+            // Use the translated label as the group key, fallback to the raw key
+            const groupKey = utilityLabelsMap[utilityKey] || utilityKey;
+
+            if (!grouped[groupKey]) {
+              grouped[groupKey] = {
                 options: [],
-                icon: utilityIconsMap[utilityName],
+                icon: utilityIconsMap[utilityKey],
               };
               // Store the order for this utility from utilityOrders map
               if (
                 option.utilityOrders &&
-                option.utilityOrders[utilityName] !== undefined
+                option.utilityOrders[utilityKey] !== undefined
               ) {
                 utilityOrderMap.set(
-                  utilityName,
-                  option.utilityOrders[utilityName],
+                  groupKey,
+                  option.utilityOrders[utilityKey],
                 );
               }
             }
-            grouped[utilityName].options.push(option);
+            grouped[groupKey].options.push(option);
           });
         } else {
           // Options without utilities go to "Others"
@@ -277,27 +289,27 @@ export function SelectorBase<T extends string = string>({
         >
           {selectedOption ? (
             <>
-              <Span className="flex items-center justify-center w-4 h-4 flex-shrink-0">
+              <Span className="flex items-center justify-center w-4 h-4 shrink-0">
                 {renderIcon(selectedOption.icon)}
               </Span>
               {/* Text visibility based on showTextAt prop */}
               {showTextAt === "always" && (
-                <Span className="max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left break-words line-clamp-2">
+                <Span className="max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left wrap-break-word line-clamp-2">
                   {selectedOption.name}
                 </Span>
               )}
               {showTextAt === "sm" && (
-                <Span className="hidden min-[480px]:inline max-w-[100px] min-[480px]:max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left break-words line-clamp-2">
+                <Span className="hidden min-[480px]:inline max-w-[100px] min-[480px]:max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left wrap-break-word line-clamp-2">
                   {selectedOption.name}
                 </Span>
               )}
               {showTextAt === "md" && (
-                <Span className="hidden min-[580px]:inline max-w-[100px] min-[580px]:max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left break-words line-clamp-2">
+                <Span className="hidden min-[580px]:inline max-w-[100px] min-[580px]:max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left wrap-break-word line-clamp-2">
                   {selectedOption.name}
                 </Span>
               )}
               {showTextAt === "lg" && (
-                <Span className="hidden min-[680px]:inline max-w-[100px] min-[680px]:max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left break-words line-clamp-2">
+                <Span className="hidden min-[680px]:inline max-w-[100px] min-[680px]:max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left wrap-break-word line-clamp-2">
                   {selectedOption.name}
                 </Span>
               )}
@@ -305,15 +317,15 @@ export function SelectorBase<T extends string = string>({
           ) : (
             <Span className="text-muted-foreground">{placeholder}</Span>
           )}
-          <ChevronDown className="h-4 w-4 opacity-50 flex-shrink-0" />
+          <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
         className={cn(
           "p-0",
           showAll
-            ? "w-[100vw] sm:w-[90vw] max-w-[700px]"
-            : "w-[100vw] sm:w-[400px] max-w-[450px]",
+            ? "w-screen sm:w-[90vw] max-w-[700px]"
+            : "w-screen sm:w-[400px] max-w-[450px]",
           className,
         )}
         align="start"
@@ -322,7 +334,7 @@ export function SelectorBase<T extends string = string>({
         <Div className="flex flex-col max-h-[75dvh] sm:max-h-[600px]">
           {/* Search Bar - Only show when in showAll mode */}
           {showAll && (
-            <Div className="p-2.5 sm:p-3 border-b flex-shrink-0">
+            <Div className="p-2.5 sm:p-3 border-b shrink-0">
               <Div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                 <Input
@@ -340,7 +352,7 @@ export function SelectorBase<T extends string = string>({
 
           {/* Group Mode & Sort Controls - Only visible when showAll */}
           {showAll && (
-            <Div className="px-2.5 sm:px-3 py-2 border-b flex-shrink-0 flex gap-2 items-center">
+            <Div className="px-2.5 sm:px-3 py-2 border-b shrink-0 flex gap-2 items-center">
               {/* Group Mode Toggle */}
               <Div className="flex gap-1 bg-muted rounded-md p-0.5">
                 <Button
@@ -456,9 +468,7 @@ export function SelectorBase<T extends string = string>({
                           {renderIcon(groupData.icon, ICON_SIZE_SMALL)}
                         </Span>
                       )}
-                      {groupMode === "utility"
-                        ? t(group as Parameters<typeof t>[0])
-                        : group}
+                      {group}
                     </Div>
                     <Div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
                       {groupData.options.map((option) => (
@@ -485,7 +495,7 @@ export function SelectorBase<T extends string = string>({
           )}
 
           {/* Footer - Show All / Favorites Toggle + Add New */}
-          <Div className="border-t p-2 flex gap-2 flex-shrink-0">
+          <Div className="border-t p-2 flex gap-2 shrink-0">
             <Button
               type="button"
               variant="ghost"

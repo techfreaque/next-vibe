@@ -18,6 +18,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -80,6 +81,7 @@ export function ChatSidebar({
     folders,
     currentSubFolderId: activeFolderId,
     currentRootFolderId: activeRootFolderId,
+    activeThreadId,
     rootFolderPermissions,
     handleCreateThread,
     createFolder,
@@ -216,6 +218,9 @@ export function ChatSidebar({
             return null;
           }
 
+          // Check if we're on the new thread page
+          const isOnNewThreadPage = activeThreadId === NEW_MESSAGE_ID;
+
           return (
             <TooltipProvider delayDuration={300}>
               <Tooltip>
@@ -223,6 +228,7 @@ export function ChatSidebar({
                   <Div className="w-full">
                     <Button
                       onClick={() => handleCreateThread(activeRootFolderId)}
+                      disabled={isOnNewThreadPage}
                       className={`w-full h-10 sm:h-9 ${getButtonColorClasses(rootFolderColor)}`}
                     >
                       <MessageSquarePlus className="h-4 w-4 mr-2" />

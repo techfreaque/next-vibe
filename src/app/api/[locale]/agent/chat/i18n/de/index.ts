@@ -2,6 +2,7 @@ import { translations as creditsTranslations } from "../../../../credits/i18n/de
 import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/de";
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/de";
 import { translations as foldersTranslations } from "../../folders/i18n/de";
+import { translations as memoriesTranslations } from "../../memories/i18n/de";
 import { translations as personasTranslations } from "../../personas/i18n/de";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/de";
 import { translations as threadsTranslations } from "../../threads/i18n/de";
@@ -14,6 +15,7 @@ export const translations: typeof enTranslations = {
     folders: "Ordner",
     messages: "Nachrichten",
     personas: "Personas",
+    memories: "Erinnerungen",
     credits: "Credits",
     balance: "Guthaben",
     permissions: "Berechtigungen",
@@ -84,6 +86,71 @@ export const translations: typeof enTranslations = {
       playAudio: "Audio abspielen",
       answerAsAI: "Als KI-Modell antworten",
       deleteMessage: "Nachricht löschen",
+    },
+    personaSelector: {
+      placeholder: "Persona auswählen",
+      addNewLabel: "Benutzerdefinierte Persona erstellen",
+      grouping: {
+        bySource: "Nach Quelle",
+        byCategory: "Nach Kategorie",
+        sourceLabels: {
+          builtIn: "Integriert",
+          my: "Meine Personas",
+          community: "Community",
+        },
+        sourceIcons: {
+          builtIn: "sparkles",
+          my: "user",
+          community: "people",
+        },
+      },
+      addDialog: {
+        title: "Benutzerdefinierte Persona erstellen",
+        fields: {
+          name: {
+            label: "Name",
+            placeholder: "Persona-Name eingeben",
+          },
+          icon: {
+            label: "Symbol (Emoji)",
+            placeholder: "😊",
+          },
+          description: {
+            label: "Beschreibung",
+            placeholder: "Kurze Beschreibung der Persona",
+          },
+          systemPrompt: {
+            label: "System-Prompt",
+            placeholder: "Definieren Sie, wie sich die Persona verhält...",
+          },
+          category: {
+            label: "Kategorie",
+          },
+          suggestedPrompts: {
+            label: "Vorgeschlagene Prompts (optional)",
+            description: "Fügen Sie bis zu 4 Beispiel-Prompts hinzu, um Benutzern den Einstieg zu erleichtern",
+            placeholder: "Beispiel-Prompt {{number}}",
+          },
+        },
+        createCategory: "Kategorie erstellen",
+        cancel: "Abbrechen",
+        create: "Persona erstellen",
+      },
+      addCategoryDialog: {
+        title: "Kategorie erstellen",
+        fields: {
+          name: {
+            label: "Kategoriename",
+            placeholder: "Kategorienamen eingeben",
+          },
+          icon: {
+            label: "Symbol (Emoji)",
+            placeholder: "📁",
+          },
+        },
+        cancel: "Abbrechen",
+        create: "Kategorie erstellen",
+      },
     },
   },
   actions: {
@@ -163,6 +230,7 @@ export const translations: typeof enTranslations = {
   aiStream: aiStreamTranslations,
   credits: creditsTranslations,
   folders: foldersTranslations,
+  memories: memoriesTranslations,
   personas: personasTranslations,
   threads: {
     ...threadsTranslations,

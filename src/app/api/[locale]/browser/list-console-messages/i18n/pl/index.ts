@@ -1,0 +1,75 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  title: "Lista wiadomości konsoli",
+  description: "Lista wszystkich wiadomości konsoli dla aktualnie wybranej strony od ostatniej nawigacji",
+  form: {
+    label: "Lista wiadomości konsoli",
+    description: "Pobierz wszystkie wiadomości konsoli ze strony przeglądarki",
+    fields: {
+      includePreservedMessages: {
+        label: "Uwzględnij zachowane wiadomości",
+        description: "Ustaw na true, aby zwrócić zachowane wiadomości z ostatnich 3 nawigacji",
+        placeholder: "false",
+      },
+      pageIdx: {
+        label: "Indeks strony",
+        description: "Numer strony do zwrócenia (0-based, pomiń dla pierwszej strony)",
+        placeholder: "Wprowadź indeks strony",
+      },
+      pageSize: {
+        label: "Rozmiar strony",
+        description: "Maksymalna liczba wiadomości do zwrócenia (pomiń, aby zwrócić wszystkie wiadomości)",
+        placeholder: "Wprowadź rozmiar strony",
+      },
+      types: {
+        label: "Typy wiadomości",
+        description: "Filtruj wiadomości, aby zwracać tylko wiadomości określonych typów (pomiń dla wszystkich)",
+        placeholder: "Wybierz typy wiadomości",
+        options: {
+          log: "Log",
+          debug: "Debug",
+          info: "Info",
+          error: "Błąd",
+          warn: "Ostrzeżenie",
+          dir: "Dir",
+          dirxml: "Dirxml",
+          table: "Tabela",
+          trace: "Trace",
+          clear: "Wyczyść",
+          startGroup: "Rozpocznij grupę",
+          startGroupCollapsed: "Rozpocznij grupę zwinięte",
+          endGroup: "Zakończ grupę",
+          assert: "Assert",
+          profile: "Profil",
+          profileEnd: "Koniec profilu",
+          count: "Licznik",
+          timeEnd: "Koniec czasu",
+          verbose: "Szczegółowe",
+          issue: "Problem",
+        },
+      },
+    },
+  },
+  response: {
+    success: "Wiadomości konsoli pobrane pomyślnie",
+    result: "Wynik listy wiadomości konsoli",
+    error: "Komunikat błędu",
+    executionId: "ID wykonania do śledzenia",
+  },
+  errors: {
+    validation: { title: "Błąd walidacji", description: "Sprawdź wprowadzone dane i spróbuj ponownie" },
+    network: { title: "Błąd sieci", description: "Wystąpił błąd sieci podczas listowania wiadomości konsoli" },
+    unauthorized: { title: "Nieautoryzowany", description: "Nie masz uprawnień do listowania wiadomości konsoli" },
+    forbidden: { title: "Zabronione", description: "Listowanie wiadomości konsoli jest zabronione" },
+    notFound: { title: "Nie znaleziono", description: "Żądany zasób nie został znaleziony" },
+    serverError: { title: "Błąd serwera", description: "Wystąpił wewnętrzny błąd serwera podczas listowania wiadomości konsoli" },
+    unknown: { title: "Nieznany błąd", description: "Wystąpił nieznany błąd podczas listowania wiadomości konsoli" },
+    unsavedChanges: { title: "Niezapisane zmiany", description: "Masz niezapisane zmiany, które mogą zostać utracone" },
+    conflict: { title: "Konflikt", description: "Wystąpił konflikt podczas listowania wiadomości konsoli" },
+  },
+  success: {
+    title: "Wiadomości konsoli pobrane pomyślnie",
+    description: "Wiadomości konsoli zostały pomyślnie pobrane",
+  },
+};

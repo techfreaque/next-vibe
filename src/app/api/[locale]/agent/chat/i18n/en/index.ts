@@ -2,6 +2,7 @@ import { translations as creditsTranslations } from "../../../../credits/i18n/en
 import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/en";
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/en";
 import { translations as foldersTranslations } from "../../folders/i18n/en";
+import { translations as memoriesTranslations } from "../../memories/i18n/en";
 import { translations as personasTranslations } from "../../personas/i18n/en";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/en";
 import { translations as threadsTranslations } from "../../threads/i18n/en";
@@ -13,6 +14,7 @@ export const translations = {
     folders: "Folders",
     messages: "Messages",
     personas: "Personas",
+    memories: "Memories",
     credits: "Credits",
     balance: "Balance",
     permissions: "Permissions",
@@ -83,6 +85,71 @@ export const translations = {
       playAudio: "Play audio",
       answerAsAI: "Answer as AI model",
       deleteMessage: "Delete message",
+    },
+    personaSelector: {
+      placeholder: "Select persona",
+      addNewLabel: "Create custom persona",
+      grouping: {
+        bySource: "By Source",
+        byCategory: "By Category",
+        sourceLabels: {
+          builtIn: "Built-in",
+          my: "My Personas",
+          community: "Community",
+        },
+        sourceIcons: {
+          builtIn: "sparkles",
+          my: "user",
+          community: "people",
+        },
+      },
+      addDialog: {
+        title: "Create Custom Persona",
+        fields: {
+          name: {
+            label: "Name",
+            placeholder: "Enter persona name",
+          },
+          icon: {
+            label: "Icon (emoji)",
+            placeholder: "😊",
+          },
+          description: {
+            label: "Description",
+            placeholder: "Brief description of the persona",
+          },
+          systemPrompt: {
+            label: "System Prompt",
+            placeholder: "Define how the persona behaves...",
+          },
+          category: {
+            label: "Category",
+          },
+          suggestedPrompts: {
+            label: "Suggested Prompts (optional)",
+            description: "Add up to 4 example prompts to help users get started",
+            placeholder: "Example prompt {{number}}",
+          },
+        },
+        createCategory: "Create Category",
+        cancel: "Cancel",
+        create: "Create Persona",
+      },
+      addCategoryDialog: {
+        title: "Create Category",
+        fields: {
+          name: {
+            label: "Category Name",
+            placeholder: "Enter category name",
+          },
+          icon: {
+            label: "Icon (emoji)",
+            placeholder: "📁",
+          },
+        },
+        cancel: "Cancel",
+        create: "Create Category",
+      },
     },
   },
   actions: {
@@ -160,6 +227,7 @@ export const translations = {
   aiStream: aiStreamTranslations,
   credits: creditsTranslations,
   folders: foldersTranslations,
+  memories: memoriesTranslations,
   personas: personasTranslations,
   threads: {
     ...threadsTranslations,

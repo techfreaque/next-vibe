@@ -1,3 +1,5 @@
+"use client";
+
 import type { JSX } from "react";
 import * as React from "react";
 import { Text as RNText, Pressable } from "react-native";
@@ -114,14 +116,10 @@ export const Span = React.forwardRef<SpanRefObject, Omit<SpanProps, "ref">>(
   ): JSX.Element => {
     const textRef = React.useRef<RNText>(null);
 
-    React.useImperativeHandle(
-      ref,
-      (): SpanRefObject | null => {
-        const node = textRef.current;
-        return createSpanRefObject(node);
-      },
-      [],
-    );
+    React.useImperativeHandle(ref, (): SpanRefObject | null => {
+      const node = textRef.current;
+      return createSpanRefObject(node);
+    }, []);
 
     const handlePress = React.useCallback((): void => {
       if (onClick) {

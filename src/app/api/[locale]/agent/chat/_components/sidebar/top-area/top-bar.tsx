@@ -28,6 +28,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { LocaleSelectorContent } from "./locale-selector-content";
 import { ThemeToggleDropdown } from "@/app/[locale]/_components/theme-toggle";
 
@@ -39,6 +40,7 @@ interface TopBarProps {
 export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
   const {
     messages,
+    activeThreadId,
     ttsAutoplay,
     setTTSAutoplay,
     sidebarCollapsed,
@@ -116,7 +118,7 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {mounted && sidebarCollapsed && (
+      {mounted && sidebarCollapsed && activeThreadId !== NEW_MESSAGE_ID && (
         <>
           {/* New Chat Button */}
           <Button

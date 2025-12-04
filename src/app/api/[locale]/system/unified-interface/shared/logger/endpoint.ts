@@ -29,7 +29,7 @@ export type LoggerMetadata =
  */
 async function writeToFile(
   message: string,
-  data?: Record<string, unknown>,
+  data?: Record<string, LoggerMetadata>,
 ): Promise<void> {
   try {
     const { fileLog } = await import("./file-logger");

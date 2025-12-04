@@ -9,7 +9,6 @@
 import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
-import { ensureError } from "../../shared/utils/error-utils";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -263,12 +262,11 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
       this.markTaskAsCompleted(taskName);
       return success(undefined);
     } catch (error) {
-      const errorMsg = parseError(error).message;
-      this.markTaskAsFailed(taskName, errorMsg);
+      const errorObj = parseError(error);
+      this.markTaskAsFailed(taskName, errorObj.message);
       if (task.onError) {
-        const errorInstance = ensureError(error, errorMsg);
         await task.onError({
-          error: errorInstance,
+          error: errorObj,
           logger: this.logger,
           locale: this.locale,
           cronUser: this.cronUser,
@@ -278,7 +276,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
         message:
           "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: errorMsg, taskName },
+        messageParams: { error: errorObj.message, taskName },
       });
     }
   }
@@ -411,16 +409,13 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
           this.logger.debug(`Side task completed: ${task.name}`);
           this.markTaskAsCompleted(task.name);
         } catch (error) {
-          const errorMsg = parseError(error).message;
-          this.logger.error(`Side task failed: ${task.name}`, {
-            error: errorMsg,
-          });
-          this.markTaskAsFailed(task.name, errorMsg);
+          const errorObj = parseError(error);
+          this.logger.error(`Side task failed: ${task.name}`, errorObj);
+          this.markTaskAsFailed(task.name, errorObj.message);
 
           if (task.onError) {
-            const errorInstance = ensureError(error, errorMsg);
             await task.onError({
-              error: errorInstance,
+              error: errorObj,
               logger: this.logger,
               locale: this.locale,
               cronUser: this.cronUser,

@@ -12,6 +12,7 @@
  */
 
 import type { JSX } from "react";
+import { redirect } from "next/navigation";
 
 import { ChatProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
@@ -25,6 +26,8 @@ import { userRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { ChatInterface } from "@/app/api/[locale]/agent/chat/_components/chat-interface";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 
 interface ThreadsPathPageProps {
   params: Promise<{
@@ -135,6 +138,20 @@ export default async function ThreadsPathPage({
       );
     if (permissionsResult.success) {
       rootFolderPermissions = permissionsResult.data;
+    }
+  }
+
+  // Handle redirects based on root folder type
+  // For private/shared/incognito: redirect from root to /new
+  // For public: redirect from /new to root
+  if (
+    initialRootFolderId === DefaultFolderId.PRIVATE ||
+    initialRootFolderId === DefaultFolderId.SHARED ||
+    initialRootFolderId === DefaultFolderId.INCOGNITO
+  ) {
+    // Redirect to /new if no thread ID and no subfolder
+    if (!initialThreadId && !initialSubFolderId) {
+      redirect(`/${locale}/threads/${initialRootFolderId}/${NEW_MESSAGE_ID}`);
     }
   }
 

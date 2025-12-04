@@ -52,13 +52,14 @@ const shouldTriggerGeneration = (filename: string): boolean => {
   return hasRelevantExtension;
 };
 
+export const DEV_WATCHER_TASK_NAME = "dev-file-watcher";
 /**
  * Development File Watcher Task Runner
  * Only runs in development mode
  */
 const devWatcherTaskRunner: TaskRunner = {
   type: "task-runner",
-  name: "dev-file-watcher",
+  name: DEV_WATCHER_TASK_NAME,
   description: "app.api.system.unifiedInterface.tasks.devWatcher.description",
   category: TaskCategory.DEVELOPMENT,
   enabled: env.NODE_ENV === Environment.DEVELOPMENT,

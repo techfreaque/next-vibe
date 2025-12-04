@@ -13,15 +13,20 @@ import React, { useEffect, useRef } from "react";
 import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type {
+  MeGetResponseOutput,
+} from "../../../user/private/me/definition";
 
 interface UnsubscribePageProps {
   locale: CountryLanguage;
   prefilledEmail: string | undefined;
+  user: MeGetResponseOutput | undefined;
 }
 
 export function UnsubscribePage({
   locale,
   prefilledEmail,
+  user,
 }: UnsubscribePageProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -36,7 +41,7 @@ export function UnsubscribePage({
     unsubscribe,
     handleEmailChange,
     // isSubmitting and isSubscribed are not used in unsubscribe page
-  } = useNewsletterManager();
+  } = useNewsletterManager(user);
 
   // Track if we've already set the prefilled email to prevent infinite loops
   const hasSetPrefilledEmail = useRef(false);

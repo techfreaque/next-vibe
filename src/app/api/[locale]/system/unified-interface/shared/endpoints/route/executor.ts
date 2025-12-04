@@ -23,7 +23,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Platform } from "../../types/platform";
-import { getErrorMessage } from "../../utils/error-utils";
 
 /**
  * Base execution context
@@ -80,7 +79,8 @@ export interface IRouteExecutionExecutor {
   /**
    * Merge data from multiple sources (for arg parsing)
    */
-  mergeData<TData extends Record<string, any>>(
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Data merging: Input data from CLI arguments, environment vars, etc. can have any object structure, so unknown is correct for the generic merge utility.
+  mergeData<TData extends Record<string, unknown>>(
     ...sources: Array<TData | null | undefined>
   ): Partial<TData>;
 }
@@ -130,7 +130,8 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
    * Merge data from multiple sources
    * Platform-agnostic data merging (CLI args, provided data, defaults, etc.)
    */
-  mergeData<TData extends Record<string, any>>(
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Data merging: Input data from CLI arguments, environment vars, etc. can have any object structure, so unknown is correct for the generic merge utility.
+  mergeData<TData extends Record<string, unknown>>(
     ...sources: Array<TData | null | undefined>
   ): Partial<TData> {
     return sources.reduce<Partial<TData>>((acc, source) => {
@@ -193,12 +194,13 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
       // Return the original error from the handler
       return result;
     } catch (error) {
+      const parsedError = parseError(error);
       params.logger.error(
         "[Route Execution Executor] Handler execution failed",
-        parseError(error),
+        parsedError,
         {
           toolName: params.toolName,
-          error: getErrorMessage(error instanceof Error ? error : new Error(String(error))),
+          error: parsedError.message,
         },
       );
       return fail({

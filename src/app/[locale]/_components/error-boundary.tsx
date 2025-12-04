@@ -10,10 +10,16 @@ import { Component } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { envClient } from "@/config/env-client";
+import { Environment } from "@/app/api/[locale]/shared/utils";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
-  fallback?: (error: Error, errorInfo: ErrorInfo | null, reset: () => void) => ReactNode;
+  fallback?: (
+    error: Error,
+    errorInfo: ErrorInfo | null,
+    reset: () => void,
+  ) => ReactNode;
   locale: CountryLanguage;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
@@ -44,7 +50,8 @@ export function DefaultErrorFallback({
 
   // Get full stack trace if available
   const stackTrace = error.stack || "No stack trace available";
-  const componentStack = errorInfo?.componentStack || "No component stack available";
+  const componentStack =
+    errorInfo?.componentStack || "No component stack available";
 
   return (
     <Card className="border-destructive max-w-4xl mx-auto my-4">
@@ -74,7 +81,7 @@ export function DefaultErrorFallback({
         <div className="space-y-4 text-left">
           <details className="group">
             <summary className="cursor-pointer font-semibold text-sm hover:text-primary transition-colors select-none">
-              📋 Stack Trace
+              {t("app.common.error.boundary.stackTrace")}
             </summary>
             <pre className="mt-2 p-4 bg-muted rounded-md text-xs overflow-auto max-h-64 border border-border">
               {stackTrace}
@@ -83,7 +90,7 @@ export function DefaultErrorFallback({
 
           <details className="group">
             <summary className="cursor-pointer font-semibold text-sm hover:text-primary transition-colors select-none">
-              🔍 Component Stack
+              {t("app.common.error.boundary.componentStack")}
             </summary>
             <pre className="mt-2 p-4 bg-muted rounded-md text-xs overflow-auto max-h-64 border border-border">
               {componentStack}
@@ -92,18 +99,26 @@ export function DefaultErrorFallback({
 
           <details className="group">
             <summary className="cursor-pointer font-semibold text-sm hover:text-primary transition-colors select-none">
-              ℹ️ Error Details
+              {t("app.common.error.boundary.errorDetails")}
             </summary>
             <div className="mt-2 p-4 bg-muted rounded-md text-xs space-y-2 border border-border">
               <div>
-                <span className="font-semibold">Name:</span> {error.name}
+                <span className="font-semibold">
+                  {t("app.common.error.boundary.name")}
+                </span>{" "}
+                {error.name}
               </div>
               <div>
-                <span className="font-semibold">Message:</span> {error.message}
+                <span className="font-semibold">
+                  {t("app.common.error.boundary.errorMessage")}
+                </span>{" "}
+                {error.message}
               </div>
               {error.cause !== undefined && (
                 <div>
-                  <span className="font-semibold">Cause:</span>{" "}
+                  <span className="font-semibold">
+                    {t("app.common.error.boundary.cause")}
+                  </span>{" "}
                   {String(error.cause)}
                 </div>
               )}
@@ -155,6 +170,10 @@ export class ErrorBoundary extends Component<
     // Call optional error callback
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
+    }
+    if (envClient.NODE_ENV !== Environment.PRODUCTION) {
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax
+      throw error;
     }
   }
 

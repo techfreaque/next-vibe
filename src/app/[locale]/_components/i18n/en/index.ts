@@ -30,6 +30,14 @@ export const translations = {
       description: "An error occurred. Please try again.",
       tryAgain: "Try Again",
       sending_sms: "Failed to send SMS",
+      boundary: {
+        stackTrace: "📋 Stack Trace",
+        componentStack: "🔍 Component Stack",
+        errorDetails: "ℹ️ Error Details",
+        name: "Name:",
+        errorMessage: "Message:",
+        cause: "Cause:",
+      },
     },
     errors: {
       unknown: "An unknown error occurred",

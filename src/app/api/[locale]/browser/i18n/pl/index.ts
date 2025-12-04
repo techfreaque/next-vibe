@@ -2,7 +2,61 @@
  * Browser API translations (Polish)
  */
 
-export const translations = {
+import type { translations as enTranslations } from "../en";
+import { translations as clickTranslations } from "../../click/i18n/pl";
+import { translations as closePageTranslations } from "../../close-page/i18n/pl";
+import { translations as dragTranslations } from "../../drag/i18n/pl";
+import { translations as fillTranslations } from "../../fill/i18n/pl";
+import { translations as fillFormTranslations } from "../../fill-form/i18n/pl";
+import { translations as handleDialogTranslations } from "../../handle-dialog/i18n/pl";
+import { translations as hoverTranslations } from "../../hover/i18n/pl";
+import { translations as pressKeyTranslations } from "../../press-key/i18n/pl";
+import { translations as uploadFileTranslations } from "../../upload-file/i18n/pl";
+import { translations as listPagesTranslations } from "../../list-pages/i18n/pl";
+import { translations as navigatePageTranslations } from "../../navigate-page/i18n/pl";
+import { translations as newPageTranslations } from "../../new-page/i18n/pl";
+import { translations as selectPageTranslations } from "../../select-page/i18n/pl";
+import { translations as emulateTranslations } from "../../emulate/i18n/pl";
+import { translations as resizePageTranslations } from "../../resize-page/i18n/pl";
+import { translations as evaluateScriptTranslations } from "../../evaluate-script/i18n/pl";
+import { translations as getConsoleMessageTranslations } from "../../get-console-message/i18n/pl";
+import { translations as listConsoleMessagesTranslations } from "../../list-console-messages/i18n/pl";
+import { translations as getNetworkRequestTranslations } from "../../get-network-request/i18n/pl";
+import { translations as listNetworkRequestsTranslations } from "../../list-network-requests/i18n/pl";
+import { translations as performanceAnalyzeInsightTranslations } from "../../performance-analyze-insight/i18n/pl";
+import { translations as performanceStartTraceTranslations } from "../../performance-start-trace/i18n/pl";
+import { translations as performanceStopTraceTranslations } from "../../performance-stop-trace/i18n/pl";
+import { translations as takeScreenshotTranslations } from "../../take-screenshot/i18n/pl";
+import { translations as takeSnapshotTranslations } from "../../take-snapshot/i18n/pl";
+import { translations as waitForTranslations } from "../../wait-for/i18n/pl";
+
+export const translations: typeof enTranslations = {
+  click: clickTranslations,
+  "close-page": closePageTranslations,
+  drag: dragTranslations,
+  fill: fillTranslations,
+  "fill-form": fillFormTranslations,
+  "handle-dialog": handleDialogTranslations,
+  hover: hoverTranslations,
+  "press-key": pressKeyTranslations,
+  "upload-file": uploadFileTranslations,
+  "list-pages": listPagesTranslations,
+  "navigate-page": navigatePageTranslations,
+  "new-page": newPageTranslations,
+  "select-page": selectPageTranslations,
+  emulate: emulateTranslations,
+  "resize-page": resizePageTranslations,
+  "evaluate-script": evaluateScriptTranslations,
+  "get-console-message": getConsoleMessageTranslations,
+  "list-console-messages": listConsoleMessagesTranslations,
+  "get-network-request": getNetworkRequestTranslations,
+  "list-network-requests": listNetworkRequestsTranslations,
+  "performance-analyze-insight": performanceAnalyzeInsightTranslations,
+  "performance-start-trace": performanceStartTraceTranslations,
+  "performance-stop-trace": performanceStopTraceTranslations,
+  "take-screenshot": takeScreenshotTranslations,
+  "take-snapshot": takeSnapshotTranslations,
+  "wait-for": waitForTranslations,
   title: "Chrome DevTools MCP Tools",
   description:
     "Wykonaj narzędzia Chrome DevTools MCP dla automatyzacji przeglądarki i debugowania",
@@ -15,6 +69,16 @@ export const translations = {
     mcpTools: "Narzędzia MCP",
     webDebugging: "Debugowanie webowe",
     performanceAnalysis: "Analiza wydajności",
+    inputAutomation: "Automatyzacja wprowadzania",
+    captureAutomation: "Automatyzacja przechwytywania",
+    debugging: "Debugowanie",
+    dialogAutomation: "Automatyzacja dialogów",
+    navigationAutomation: "Automatyzacja nawigacji",
+    networkAnalysis: "Analiza sieci",
+    performanceAutomation: "Automatyzacja wydajności",
+    scriptExecution: "Wykonywanie skryptów",
+    viewportAutomation: "Automatyzacja widoku",
+    waitAutomation: "Automatyzacja oczekiwania",
   },
 
   form: {
@@ -76,7 +140,6 @@ export const translations = {
   },
 
   status: {
-    statusItem: "Status item",
     pending: "Oczekujący",
     running: "Uruchomiony",
     completed: "Ukończony",
@@ -212,12 +275,15 @@ export const translations = {
         start: "Łączenie z serwerem Chrome DevTools MCP",
         success: "Pomyślnie połączono z serwerem MCP",
         error: "Błąd podczas łączenia z serwerem MCP",
+        failedToInitialize: "Nie udało się zainicjować serwera Chrome DevTools MCP",
       },
       tool: {
         call: {
           start: "Wywołuję narzędzie MCP",
           success: "Narzędzie MCP wywołane pomyślnie",
           error: "Błąd podczas wywoływania narzędzia MCP",
+          invalidJsonArguments: "Nieprawidłowe argumenty JSON",
+          executionFailed: "Wykonanie narzędzia nie powiodło się: {{error}}",
         },
       },
     },

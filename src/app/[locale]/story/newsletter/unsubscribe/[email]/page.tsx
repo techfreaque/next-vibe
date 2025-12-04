@@ -6,6 +6,11 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { UnsubscribePage } from "@/app/api/[locale]/newsletter/unsubscribe/_components/unsubscribe-page";
+import { userProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { authRepository } from "@/app/api/[locale]/user/auth/repository";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 interface PageProps {
   params: Promise<{
@@ -61,6 +66,19 @@ export default async function NewsletterUnsubscribeWithEmail({
 }: PageProps): Promise<JSX.Element> {
   const { locale, email } = await params;
 
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const authUser = await authRepository.getAuthMinimalUser(
+    [UserRole.PUBLIC, UserRole.CUSTOMER],
+    { platform: Platform.NEXT_PAGE, locale },
+    logger,
+  );
+
+  const userResponse = authUser
+    ? await userProfileRepository.getProfile(authUser, locale, logger)
+    : undefined;
+
+  const user = userResponse?.success ? userResponse.data : undefined;
+
   // Decode the email parameter
   const decodedEmail = decodeURIComponent(email);
 
@@ -69,5 +87,11 @@ export default async function NewsletterUnsubscribeWithEmail({
     notFound();
   }
 
-  return <UnsubscribePage locale={locale} prefilledEmail={decodedEmail} />;
+  return (
+    <UnsubscribePage
+      locale={locale}
+      prefilledEmail={decodedEmail}
+      user={user}
+    />
+  );
 }

@@ -20,6 +20,7 @@ export interface EndpointFormFieldProps<
   requiredFields?: string[]; // List of required field names
   theme?: RequiredFieldTheme;
   className?: string;
+  // TODO infer types and properly constrain
   endpointFields?: unknown; // Endpoint fields structure for auto-inference
   schema?: unknown; // Zod schema for validation
 }

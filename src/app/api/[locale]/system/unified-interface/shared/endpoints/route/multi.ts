@@ -98,11 +98,11 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
   const { endpoint: definitions, ...methodConfigs } = config;
 
   // Build the result object dynamically
-  // We use a Record type here because we're building the object dynamically
-  // The return type EndpointsHandlerReturn<T> ensures type safety at the API boundary
-  const result: Record<string, unknown> = {
+  // The return type verifies correctness - this allows flexible construction
+  const result: Partial<EndpointsHandlerReturn<T>> & {
+    tools: Partial<ToolsObject<T>>;
+  } = {
     tools: {},
-    definitions,
   };
 
   // Process GET method
@@ -121,8 +121,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           : undefined,
       });
       result[Methods.GET] = handler[Methods.GET];
-      (result.tools as Record<string, unknown>)[Methods.GET] =
-        handler.tools[Methods.GET];
+      result.tools[Methods.GET] = handler.tools[Methods.GET];
     }
   }
 
@@ -142,8 +141,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           : undefined,
       });
       result[Methods.POST] = handler[Methods.POST];
-      (result.tools as Record<string, unknown>)[Methods.POST] =
-        handler.tools[Methods.POST];
+      result.tools[Methods.POST] = handler.tools[Methods.POST];
     }
   }
 
@@ -163,8 +161,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           : undefined,
       });
       result[Methods.PUT] = handler[Methods.PUT];
-      (result.tools as Record<string, unknown>)[Methods.PUT] =
-        handler.tools[Methods.PUT];
+      result.tools[Methods.PUT] = handler.tools[Methods.PUT];
     }
   }
 
@@ -184,8 +181,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           : undefined,
       });
       result[Methods.PATCH] = handler[Methods.PATCH];
-      (result.tools as Record<string, unknown>)[Methods.PATCH] =
-        handler.tools[Methods.PATCH];
+      result.tools[Methods.PATCH] = handler.tools[Methods.PATCH];
     }
   }
 
@@ -205,8 +201,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
           : undefined,
       });
       result[Methods.DELETE] = handler[Methods.DELETE];
-      (result.tools as Record<string, unknown>)[Methods.DELETE] =
-        handler.tools[Methods.DELETE];
+      result.tools[Methods.DELETE] = handler.tools[Methods.DELETE];
     }
   }
 

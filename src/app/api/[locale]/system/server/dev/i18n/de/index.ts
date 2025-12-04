@@ -29,18 +29,7 @@ export const translations: typeof enTranslations = {
         title: "DB-Reset überspringen",
         description: "Datenbank-Reset-Operation überspringen",
       },
-      fastDbReset: {
-        title: "Schneller DB-Reset",
-        description: "Schnelle Datenbank-Reset-Methode verwenden",
-      },
-      skipHardReset: {
-        title: "Hard-Reset überspringen",
-        description: "Harten Datenbank-Reset überspringen",
-      },
-      force: {
-        title: "Erzwingen",
-        description: "Operation auch bei Fehlern erzwingen",
-      },
+
       port: {
         title: "Port",
         description: "Portnummer für den Entwicklungsserver",

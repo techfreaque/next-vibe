@@ -2,6 +2,7 @@ import { translations as creditsTranslations } from "../../../../credits/i18n/pl
 import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/pl";
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/pl";
 import { translations as foldersTranslations } from "../../folders/i18n/pl";
+import { translations as memoriesTranslations } from "../../memories/i18n/pl";
 import { translations as personasTranslations } from "../../personas/i18n/pl";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/pl";
 import { translations as threadsTranslations } from "../../threads/i18n/pl";
@@ -14,6 +15,7 @@ export const translations: typeof enTranslations = {
     folders: "Foldery",
     messages: "Wiadomości",
     personas: "Persony",
+    memories: "Wspomnienia",
     credits: "Kredyty",
     balance: "Saldo",
     permissions: "Uprawnienia",
@@ -84,6 +86,71 @@ export const translations: typeof enTranslations = {
       playAudio: "Odtwórz audio",
       answerAsAI: "Odpowiedz jako model AI",
       deleteMessage: "Usuń wiadomość",
+    },
+    personaSelector: {
+      placeholder: "Wybierz personę",
+      addNewLabel: "Utwórz własną personę",
+      grouping: {
+        bySource: "Według źródła",
+        byCategory: "Według kategorii",
+        sourceLabels: {
+          builtIn: "Wbudowane",
+          my: "Moje persony",
+          community: "Społeczność",
+        },
+        sourceIcons: {
+          builtIn: "sparkles",
+          my: "user",
+          community: "people",
+        },
+      },
+      addDialog: {
+        title: "Utwórz własną personę",
+        fields: {
+          name: {
+            label: "Nazwa",
+            placeholder: "Wprowadź nazwę persony",
+          },
+          icon: {
+            label: "Ikona (emoji)",
+            placeholder: "😊",
+          },
+          description: {
+            label: "Opis",
+            placeholder: "Krótki opis persony",
+          },
+          systemPrompt: {
+            label: "Prompt systemowy",
+            placeholder: "Zdefiniuj, jak zachowuje się persona...",
+          },
+          category: {
+            label: "Kategoria",
+          },
+          suggestedPrompts: {
+            label: "Sugerowane prompty (opcjonalne)",
+            description: "Dodaj do 4 przykładowych promptów, aby pomóc użytkownikom rozpocząć",
+            placeholder: "Przykładowy prompt {{number}}",
+          },
+        },
+        createCategory: "Utwórz kategorię",
+        cancel: "Anuluj",
+        create: "Utwórz personę",
+      },
+      addCategoryDialog: {
+        title: "Utwórz kategorię",
+        fields: {
+          name: {
+            label: "Nazwa kategorii",
+            placeholder: "Wprowadź nazwę kategorii",
+          },
+          icon: {
+            label: "Ikona (emoji)",
+            placeholder: "📁",
+          },
+        },
+        cancel: "Anuluj",
+        create: "Utwórz kategorię",
+      },
     },
   },
   actions: {
@@ -163,6 +230,7 @@ export const translations: typeof enTranslations = {
   aiStream: aiStreamTranslations,
   credits: creditsTranslations,
   folders: foldersTranslations,
+  memories: memoriesTranslations,
   personas: personasTranslations,
   threads: {
     ...threadsTranslations,

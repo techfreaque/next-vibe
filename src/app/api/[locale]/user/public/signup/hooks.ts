@@ -4,16 +4,11 @@ import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useCallback, useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type {
-  UseEndpointMutationOptions,
-  UseEndpointOptions,
-  EndpointReturn,
-} from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { envClient } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 
-import { useUser } from "../../private/me/hooks";
 import signupEndpoints from "./definition";
 import { type ApiInferMutationOptions } from "../../../system/unified-interface/react/hooks/types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
@@ -34,13 +29,6 @@ export function useRegister(): SignupFormReturn & {
   const { toast } = useToast();
   const router = useRouter();
   const { t, locale } = useTranslation();
-  const { refetch } = useUser(
-    createEndpointLogger(
-      (envClient.NODE_ENV as string) === "development",
-      Date.now(),
-      locale,
-    ),
-  );
 
   // Initialize logger for client-side operations
   const logger = createEndpointLogger(
@@ -83,11 +71,10 @@ export function useRegister(): SignupFormReturn & {
 
       // Redirect
       router.push(`/${locale}/subscription`);
-      // Force a refresh to update the UI with the new auth state
-      refetch();
+
       router.refresh();
     },
-    [logger, toast, t, router, locale, refetch],
+    [logger, toast, t, router, locale],
   );
 
   // Error callback for signup

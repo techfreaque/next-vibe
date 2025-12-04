@@ -38,19 +38,3 @@ export function deserializeError(
     return null;
   }
 }
-
-/**
- * Check if a value is a valid MessageResponseType
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function isMessageResponseType(
-  value: any,
-): value is MessageResponseType {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "message" in value &&
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    typeof value.message === "string"
-  );
-}

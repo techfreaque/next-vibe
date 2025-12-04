@@ -32,6 +32,7 @@ import { WidgetRenderer } from "../renderers/WidgetRenderer";
 /**
  * Type guard to check if an object is a UnifiedField
  */
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard: Must accept unknown to narrow any value to UnifiedField. This is the standard TypeScript pattern for type guards.
 function isUnifiedField(obj: unknown): obj is UnifiedField {
   return (
     typeof obj === "object" &&

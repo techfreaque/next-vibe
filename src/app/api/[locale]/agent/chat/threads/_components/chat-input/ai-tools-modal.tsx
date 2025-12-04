@@ -32,6 +32,7 @@ import type { AIToolMetadataSerialized } from "@/app/api/[locale]/system/unified
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { DEFAULT_TOOL_IDS } from "@/app/api/[locale]/agent/chat/config";
 
 interface AIToolsModalProps {
   locale: CountryLanguage;
@@ -232,6 +233,14 @@ export function AIToolsModal({
     setExpandedCategories(new Set());
   };
 
+  // Reset to default tools
+  const handleResetToDefault = (): void => {
+    onToolsChange([...DEFAULT_TOOL_IDS]);
+    logger.debug("AIToolsModal", "Reset to default tools", {
+      defaultToolIds: DEFAULT_TOOL_IDS,
+    });
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px] max-h-[90dvh] flex flex-col overflow-x-hidden overflow-y-auto">
@@ -267,11 +276,13 @@ export function AIToolsModal({
                   }
                   variant="outline"
                   size="sm"
-                  className="flex-1"
+                  className="flex-1 min-w-0"
                 >
-                  {expandedCategories.size === 0
-                    ? t("app.chat.aiTools.modal.expandAll")
-                    : t("app.chat.aiTools.modal.collapseAll")}
+                  <Span className="truncate">
+                    {expandedCategories.size === 0
+                      ? t("app.chat.aiTools.modal.expandAll")
+                      : t("app.chat.aiTools.modal.collapseAll")}
+                  </Span>
                 </Button>
 
                 {/* Select/Deselect All */}
@@ -279,19 +290,35 @@ export function AIToolsModal({
                   onClick={handleToggleAll}
                   variant="outline"
                   size="sm"
-                  className="flex-1"
+                  className="flex-1 min-w-0"
                 >
                   {allVisibleToolsEnabled ? (
                     <>
-                      <X className="h-4 w-4 mr-2" />
-                      {t("app.chat.aiTools.modal.deselectAll")}
+                      <X className="h-4 w-4 mr-1 shrink-0" />
+                      <Span className="truncate">
+                        {t("app.chat.aiTools.modal.deselectAll")}
+                      </Span>
                     </>
                   ) : (
                     <>
-                      <Check className="h-4 w-4 mr-2" />
-                      {t("app.chat.aiTools.modal.selectAll")}
+                      <Check className="h-4 w-4 mr-1 shrink-0" />
+                      <Span className="truncate">
+                        {t("app.chat.aiTools.modal.selectAll")}
+                      </Span>
                     </>
                   )}
+                </Button>
+
+                {/* Reset to Default */}
+                <Button
+                  onClick={handleResetToDefault}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 min-w-0"
+                >
+                  <Span className="truncate">
+                    {t("app.chat.aiTools.modal.resetToDefault")}
+                  </Span>
                 </Button>
               </Div>
             )}

@@ -1,4 +1,5 @@
 import type React from "react";
+import type { UseFormReturn, FieldValues } from "react-hook-form";
 
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
@@ -67,27 +68,27 @@ export interface WidgetRenderContext {
     | typeof Platform.NEXT_API
     | typeof Platform.CLI;
   theme?: "light" | "dark" | "system";
-  endpointFields?: Record<string, unknown>; // Original endpoint fields for nested path lookup
+  endpointFields?: Record<string, WidgetData>; // Original endpoint fields for nested path lookup
   disabled?: boolean; // Disable all form inputs
 }
 
-export interface WidgetComponentProps {
+export interface WidgetComponentProps<TFieldValues extends FieldValues = FieldValues> {
   field: UnifiedField;
   fieldName?: string; // Field name for form fields (e.g., "email", "password")
   value: WidgetData;
   context: WidgetRenderContext;
   onAction?: (action: WidgetAction) => void | Promise<void>;
   className?: string;
-  form?: unknown;
+  form?: UseFormReturn<TFieldValues>;
 }
 
-export type WidgetRenderer = (
-  props: WidgetComponentProps,
+export type WidgetRenderer<TFieldValues extends FieldValues = FieldValues> = (
+  props: WidgetComponentProps<TFieldValues>,
 ) => React.ReactElement | string | null;
 
-export interface WidgetRegistryEntry {
+export interface WidgetRegistryEntry<TFieldValues extends FieldValues = FieldValues> {
   type: WidgetType;
-  component: React.ComponentType<WidgetComponentProps> | WidgetRenderer;
+  component: React.ComponentType<WidgetComponentProps<TFieldValues>> | WidgetRenderer<TFieldValues>;
   platforms?: Array<
     | typeof Platform.TRPC
     | typeof Platform.NEXT_PAGE

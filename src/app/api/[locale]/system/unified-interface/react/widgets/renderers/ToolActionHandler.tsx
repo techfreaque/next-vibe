@@ -7,7 +7,7 @@ import {
   type WidgetActionType,
   type WidgetAction,
 } from "../../../shared/widgets/types";
-import { ensureError } from "../../../shared/utils/error-utils";
+import { parseError } from "@/app/api/[locale]/shared/utils";
 /**
  * Tool Action Handler Props
  */
@@ -56,11 +56,11 @@ export function ToolActionHandler({
       }
     } catch (err) {
       // eslint-disable-next-line i18next/no-literal-string
-      const errorMessage = err instanceof Error ? err.message : "Unknown error";
-      setError(errorMessage);
+      const error = parseError(err);
+      setError(error.message);
 
       if (onError) {
-        onError(ensureError(err, errorMessage), action);
+        onError(error, action);
       }
     } finally {
       setIsProcessing(false);

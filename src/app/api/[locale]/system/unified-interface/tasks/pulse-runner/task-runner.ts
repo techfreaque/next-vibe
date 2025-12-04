@@ -44,7 +44,7 @@ const pulseTaskRunner: TaskRunner = {
     while (!signal.aborted) {
       try {
         pulseCount++;
-        logger.info(`Pulse #${pulseCount} - Triggering task execution...`);
+        logger.debug(`Pulse #${pulseCount} - Triggering task execution...`);
 
         // Import pulse repository dynamically to avoid circular dependencies
         const { pulseHealthRepository } = await import("../pulse/repository");
@@ -57,12 +57,9 @@ const pulseTaskRunner: TaskRunner = {
 
         if (pulseResult.success) {
           const summary = pulseResult.data.summary;
-          logger.info(`Pulse #${pulseCount} completed`, {
-            tasksExecuted: summary.tasksExecuted.length,
-            tasksSucceeded: summary.tasksSucceeded.length,
-            tasksFailed: summary.tasksFailed.length,
-            executionTime: `${summary.totalExecutionTimeMs}ms`,
-          });
+          logger.info(
+            `Pulse #${pulseCount} completed with ${summary.tasksSucceeded.length} successes and ${summary.tasksFailed.length} failures in ${summary.totalExecutionTimeMs}ms`,
+          );
         } else {
           logger.error(
             `Pulse #${pulseCount} failed`,

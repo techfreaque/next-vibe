@@ -29,18 +29,7 @@ export const translations: typeof enTranslations = {
         title: "Pomiń reset bazy",
         description: "Pomiń operację resetu bazy danych",
       },
-      fastDbReset: {
-        title: "Szybki reset bazy",
-        description: "Użyj szybkiej metody resetu bazy danych",
-      },
-      skipHardReset: {
-        title: "Pomiń twardy reset",
-        description: "Pomiń twardy reset bazy danych",
-      },
-      force: {
-        title: "Wymuś",
-        description: "Wymuś operację nawet przy błędach",
-      },
+
       port: {
         title: "Port",
         description: "Numer portu dla serwera deweloperskiego",

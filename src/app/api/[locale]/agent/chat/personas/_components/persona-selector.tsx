@@ -243,22 +243,25 @@ export function PersonaSelector({
   const options: SelectorOption<string>[] = personas.map((persona) => {
     const sourceInfo = getSourceGroupInfo(persona);
 
-    // Build utility icons map for this persona's category
+    // Build utility icons map and utility labels for this persona's category
     const category = categories.find((cat) => cat.id === persona.category);
     const utilityIcons: Record<string, IconValue> = {};
+    const utilityLabels: Record<string, string> = {};
     if (category) {
       utilityIcons[persona.category] = category.icon;
+      utilityLabels[persona.category] = t(category.name);
     }
 
     return {
       id: persona.id,
-      name: persona.name,
-      description: persona.description,
+      name: t(persona.name),
+      description: t(persona.description),
       icon: persona.icon,
       group: sourceInfo.group,
       groupIcon: sourceInfo.groupIcon,
       utilities: [persona.category], // Category as utility for "utility" mode
       utilityIcons,
+      utilityLabels,
     };
   });
 

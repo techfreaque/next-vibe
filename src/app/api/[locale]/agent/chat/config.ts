@@ -10,6 +10,13 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { IconValue } from "./model-access/icons";
+import { aliasToPathMap } from "../../system/generated/endpoint";
+import { SEARCH_ALIAS } from "../brave-search/definition";
+import { MEMORY_ADD_ALIAS, MEMORY_LIST_ALIAS } from "./memories/definition";
+import {
+  MEMORY_DELETE_ALIAS,
+  MEMORY_UPDATE_ALIAS,
+} from "./memories/[id]/definition";
 
 /**
  * Default folder IDs
@@ -181,3 +188,15 @@ export const CHAT_CONSTANTS = {
   /** Maximum depth for message threading/branching */
   MAX_MESSAGE_DEPTH: 10,
 } as const;
+
+/**
+ * Default AI tools enabled for new chats
+ * These tools are enabled by default when creating a new chat or resetting tools
+ */
+export const DEFAULT_TOOL_IDS = [
+  aliasToPathMap[SEARCH_ALIAS],
+  aliasToPathMap[MEMORY_LIST_ALIAS],
+  aliasToPathMap[MEMORY_ADD_ALIAS],
+  aliasToPathMap[MEMORY_UPDATE_ALIAS],
+  aliasToPathMap[MEMORY_DELETE_ALIAS],
+] as const;

@@ -50,7 +50,7 @@ export function createEnumOptions<
     enum: enumObj,
     options: optionsArray,
     // intentianally unsafe cast to get a enum value type
-    // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Type placeholder for enum value extraction requires 'unknown' cast for type system compatibility
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Type placeholder for enum value extraction requires 'unknown' cast for type system compatibility. This is a compile-time only type, never used at runtime.
     Value: undefined as unknown as T[keyof T],
   };
 }

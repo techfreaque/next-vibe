@@ -60,10 +60,26 @@ const { POST } = createEndpoint({
             "app.api.browser.navigate-page.form.fields.type.placeholder",
           columns: 6,
           options: [
-            { label: "URL", value: "url" },
-            { label: "Back", value: "back" },
-            { label: "Forward", value: "forward" },
-            { label: "Reload", value: "reload" },
+            {
+              label:
+                "app.api.browser.navigate-page.form.fields.type.options.url" as const,
+              value: "url",
+            },
+            {
+              label:
+                "app.api.browser.navigate-page.form.fields.type.options.back" as const,
+              value: "back",
+            },
+            {
+              label:
+                "app.api.browser.navigate-page.form.fields.type.options.forward" as const,
+              value: "forward",
+            },
+            {
+              label:
+                "app.api.browser.navigate-page.form.fields.type.options.reload" as const,
+              value: "reload",
+            },
           ],
         },
         z

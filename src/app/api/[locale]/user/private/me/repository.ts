@@ -27,7 +27,6 @@ import { userRepository } from "../../repository";
 import type {
   MeDeleteRequestOutput,
   MeDeleteResponseOutput,
-  MeGetRequestOutput,
   MeGetResponseOutput,
   MePostRequestOutput,
   MePostResponseOutput,
@@ -47,7 +46,6 @@ export interface UserProfileRepository {
    * @returns User profile data
    */
   getProfile(
-    data: MeGetRequestOutput,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -97,7 +95,6 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
    * @returns User profile data
    */
   async getProfile(
-    data: MeGetRequestOutput,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -129,9 +126,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       }
 
       logger.debug("Successfully retrieved user profile", { userId });
-      return success({
-        user: userResponse.data,
-      });
+      return success(userResponse.data);
     } catch (error) {
       logger.error("Error getting user profile", parseError(error));
       const parsedError = parseError(error);

@@ -98,6 +98,7 @@ export type AnyNextAsyncPageComponent = (
  * @returns A synchronous Expo Router compatible component
  */
 export function createPageWrapperWithImport(
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Dynamic imports: Module exports are unknown until runtime. This is the standard TypeScript type for dynamic import() return values.
   importFn: () => Promise<Record<string, unknown>>,
 ): () => React.ReactElement {
   return function PageWrapper(): React.ReactElement {
@@ -144,6 +145,7 @@ export function createPageWrapperWithImport(
             } else {
               logger.error("Failed to load page", { error: parsedError });
               if (envClient.NODE_ENV !== "production") {
+                // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Development debugging: Re-throw in dev mode so developers see full stack trace. In production, error is logged and handled via state.
                 throw err;
               }
             }
@@ -448,6 +450,7 @@ export function createLayoutWrapperWithImport(
           } catch (err) {
             if (!cancelled) {
               logger.error("Failed to load layout", { error: parseError(err) });
+              // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- React error boundary: Layout errors must be thrown so React's error boundary can catch and display them properly to the user.
               throw err;
             }
           }

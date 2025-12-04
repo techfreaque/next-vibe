@@ -366,12 +366,16 @@ export class CliResourceManager {
   private performanceMonitor = new CliPerformanceMonitor();
   private cleanupRegistry = new ResourceCleanupRegistry();
   private resourceMonitor = new ResourceMonitor();
+  private abortController: AbortController | null = null;
 
   /**
    * Initialize CLI resources and monitoring
    */
   initialize(logger: EndpointLogger, locale: CountryLanguage): void {
     this.performanceMonitor.initialize();
+
+    // Create AbortController for request cancellation
+    this.abortController = new AbortController();
 
     // Register database cleanup - this is critical for preventing hanging
     this.cleanupRegistry.register(async () => {
@@ -388,6 +392,13 @@ export class CliResourceManager {
   }
 
   /**
+   * Get abort signal for request cancellation
+   */
+  getAbortSignal(): AbortSignal | undefined {
+    return this.abortController?.signal;
+  }
+
+  /**
    * Get performance monitor
    */
   getPerformanceMonitor(): CliPerformanceMonitor {
@@ -399,6 +410,11 @@ export class CliResourceManager {
    */
   private setupSignalHandlers(locale: CountryLanguage): void {
     const handleShutdown = async (): Promise<void> => {
+      // Abort any ongoing requests first
+      if (this.abortController) {
+        this.abortController.abort();
+      }
+
       const logger = createEndpointLogger(false, Date.now(), locale);
       try {
         await this.cleanupRegistry.cleanup(logger);
@@ -408,7 +424,14 @@ export class CliResourceManager {
       }
     };
 
-    process.on("SIGINT", () => void handleShutdown());
+    // Handle SIGINT but do nothing - just prevent vibe-runtime from exiting
+    // The child process (dev server) will handle SIGINT and manage cleanup
+    // We need to stay alive so the child can finish its cleanup properly
+    process.on("SIGINT", () => {
+      // Do nothing - child will handle cleanup and exit
+      // We stay alive to let the child finish properly
+    });
+
     process.on("SIGTERM", () => void handleShutdown());
     process.on("SIGHUP", () => void handleShutdown());
   }

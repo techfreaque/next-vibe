@@ -874,12 +874,14 @@ export function createFormEndpoint<
 
   // Return the form endpoints with proper typing
   return {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex generic types require unknown as intermediate step for type safety between incompatible generic structures.
     GET: getEndpoint as unknown as MethodSpecificEndpoint<
       TFields,
       Methods.GET,
       TExampleKey,
       TUserRoleValue
     >,
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex generic types require unknown as intermediate step for type safety between incompatible generic structures.
     POST: postEndpoint as unknown as MethodSpecificEndpoint<
       TFields,
       Methods.POST,

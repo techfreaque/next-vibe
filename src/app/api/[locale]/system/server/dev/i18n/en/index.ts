@@ -27,18 +27,7 @@ export const translations = {
         title: "Skip DB Reset",
         description: "Skip database reset operation",
       },
-      fastDbReset: {
-        title: "Fast DB Reset",
-        description: "Use fast database reset method",
-      },
-      skipHardReset: {
-        title: "Skip Hard Reset",
-        description: "Skip hard database reset",
-      },
-      force: {
-        title: "Force",
-        description: "Force operation even on errors",
-      },
+
       port: {
         title: "Port",
         description: "Port number for the development server",

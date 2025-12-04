@@ -171,6 +171,7 @@ export function validateHandlerRequestData<
  * Returns validated data or error
  */
 export function validateResponseData<TResponseOutput>(
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Schema validation: Response data can be any type until validated against schema, so unknown is correct.
   data: unknown,
   schema: z.ZodTypeAny,
   logger: EndpointLogger,

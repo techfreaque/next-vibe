@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
         z.boolean().default(false),
       ),
 
-      skipDbReset: requestDataField(
+      dbReset: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
@@ -82,38 +82,16 @@ const { POST } = createEndpoint({
           description:
             "app.api.system.server.dev.post.fields.skipDbReset.description",
         },
-        z.boolean().default(true),
-      ),
-
-      fastDbReset: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.dev.post.fields.fastDbReset.title",
-          description:
-            "app.api.system.server.dev.post.fields.fastDbReset.description",
-        },
         z.boolean().default(false),
       ),
-
-      skipHardReset: requestDataField(
+      // shortcut for dbReset
+      r: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.dev.post.fields.skipHardReset.title",
+          label: "app.api.system.server.dev.post.fields.skipDbReset.title",
           description:
-            "app.api.system.server.dev.post.fields.skipHardReset.description",
-        },
-        z.boolean().default(false),
-      ),
-
-      force: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.dev.post.fields.force.title",
-          description:
-            "app.api.system.server.dev.post.fields.force.description",
+            "app.api.system.server.dev.post.fields.skipDbReset.description",
         },
         z.boolean().default(false),
       ),
@@ -227,10 +205,8 @@ const { POST } = createEndpoint({
       default: {
         skipDbSetup: false,
         skipNextCommand: false,
-        skipDbReset: false,
-        fastDbReset: false,
-        skipHardReset: false,
-        force: false,
+        dbReset: false,
+        r: false,
         port: 3000,
         skipGeneratorWatcher: false,
         generatorWatcherInterval: 5000,
@@ -239,10 +215,8 @@ const { POST } = createEndpoint({
       quickStart: {
         skipDbSetup: true,
         skipNextCommand: false,
-        skipDbReset: true,
-        fastDbReset: false,
-        skipHardReset: true,
-        force: false,
+        dbReset: true,
+        r: true,
         port: 3000,
         skipGeneratorWatcher: true,
         generatorWatcherInterval: 5000,

@@ -30,9 +30,12 @@ export function wrapToolsForTRPC<T extends EndpointDefinitionsConstraint>(
       method,
       publicProcedure.query(async ({ input, ctx }) => {
         // Extract typed input
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- tRPC input typing: Request data and URL params can be any object structure from tRPC procedures, so unknown is correct for values.
         const typedInput = input as
           | {
+              // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
               data?: Record<string, unknown>;
+              // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
               urlPathParams?: Record<string, unknown>;
             }
           | undefined;
@@ -51,6 +54,7 @@ export function wrapToolsForTRPC<T extends EndpointDefinitionsConstraint>(
 
         // Streaming not supported in tRPC
         if (isStreamingResponse(result)) {
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- tRPC pattern: Throwing TRPCError is the standard way to send errors to tRPC clients. This is documented tRPC behavior for error handling.
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: ctx.t(

@@ -2,6 +2,7 @@ import type { ExplicitObjectType } from "next-vibe/shared/types/utils";
 
 import type { TranslationSchema } from "./config";
 import type { TranslatedKeyType } from "./scoped-translation";
+import type { translationsKeyTypesafety } from "@/config/debug";
 
 export interface TranslationElement {
   [key: string]: string | number | string[] | TranslationElement;
@@ -19,8 +20,6 @@ export type DotNotation<T> = (
 ) extends infer D
   ? Extract<D, string>
   : never;
-
-const translationsKeyTypesafety = false;
 
 // Type for all possible translation keys
 export type TranslationKey = typeof translationsKeyTypesafety extends true

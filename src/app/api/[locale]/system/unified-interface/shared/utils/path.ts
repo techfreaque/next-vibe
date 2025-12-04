@@ -27,6 +27,7 @@ function joinPath(path: readonly string[]): string {
   // Validate no segments contain underscores
   for (const segment of path) {
     if (segment.includes("_")) {
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time validation: This throw is intentional to catch developer configuration errors early during endpoint definition. Invalid paths would break AI tool calling, so we fail fast at build time rather than runtime.
       throw new Error(
         `Path segment contains underscore which conflicts with separator: "${segment}". ` +
           `Full path: ${[...path].join(" / ")}. ` +

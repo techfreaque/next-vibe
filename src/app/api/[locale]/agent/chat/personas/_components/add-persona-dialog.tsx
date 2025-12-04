@@ -201,7 +201,7 @@ export function AddPersonaDialog({
                     <SelectItem key={cat.id} value={cat.id}>
                       <Span className="flex items-center gap-2">
                         {renderIcon(cat.icon)}
-                        <Span>{cat.name}</Span>
+                        <Span>{t(cat.name)}</Span>
                       </Span>
                     </SelectItem>
                   ))}

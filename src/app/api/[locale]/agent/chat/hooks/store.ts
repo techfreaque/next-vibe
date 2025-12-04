@@ -13,12 +13,7 @@ import {
   saveThread as saveIncognitoThread,
 } from "../incognito/storage";
 import { ViewMode, type ViewModeValue } from "../enum";
-import { SEARCH_ALIAS } from "../../brave-search/definition";
-import { MEMORY_ADD_ALIAS, MEMORY_LIST_ALIAS } from "../memories/definition";
-import {
-  MEMORY_DELETE_ALIAS,
-  MEMORY_UPDATE_ALIAS,
-} from "../memories/[id]/definition";
+import { DEFAULT_TOOL_IDS } from "../config";
 import { aliasToPathMap } from "../../../system/generated/endpoint";
 
 export type { ChatMessage, ChatThread, ChatFolder };
@@ -95,13 +90,7 @@ const getDefaultSettings = (): ChatSettings => ({
   sidebarCollapsed: false,
   theme: "dark",
   viewMode: ViewMode.LINEAR,
-  enabledToolIds: [
-    aliasToPathMap[SEARCH_ALIAS],
-    aliasToPathMap[MEMORY_LIST_ALIAS],
-    aliasToPathMap[MEMORY_ADD_ALIAS],
-    aliasToPathMap[MEMORY_UPDATE_ALIAS],
-    aliasToPathMap[MEMORY_DELETE_ALIAS],
-  ],
+  enabledToolIds: [...DEFAULT_TOOL_IDS],
 });
 
 // Helper to load settings from localStorage (client-only, called after mount)
@@ -116,6 +105,29 @@ const loadSettings = async (): Promise<ChatSettings> => {
     const stored = await storage.getItem("chat-settings");
     if (stored) {
       const parsed = JSON.parse(stored) as Partial<ChatSettings>;
+
+      // Validate tool IDs against aliasToPathMap
+      // Filter out any tools that no longer exist
+      if (parsed.enabledToolIds && Array.isArray(parsed.enabledToolIds)) {
+        const validToolIds = parsed.enabledToolIds.filter((toolId) => {
+          // Check if the tool exists in aliasToPathMap
+          return toolId in aliasToPathMap;
+        });
+
+        // If some tools were filtered out, update localStorage
+        if (validToolIds.length !== parsed.enabledToolIds.length) {
+          const cleanedSettings = {
+            ...defaults,
+            ...parsed,
+            enabledToolIds: validToolIds,
+          };
+          // Save the cleaned settings back to localStorage
+          void saveSettings(cleanedSettings);
+          return cleanedSettings;
+        }
+
+        parsed.enabledToolIds = validToolIds;
+      }
 
       // User has stored settings - return them as-is without merging defaults
       // This preserves the user's explicit tool choices

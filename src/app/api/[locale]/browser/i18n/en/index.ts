@@ -2,7 +2,60 @@
  * Browser API translations (English)
  */
 
+import { translations as clickTranslations } from "../../click/i18n/en";
+import { translations as closePageTranslations } from "../../close-page/i18n/en";
+import { translations as dragTranslations } from "../../drag/i18n/en";
+import { translations as fillTranslations } from "../../fill/i18n/en";
+import { translations as fillFormTranslations } from "../../fill-form/i18n/en";
+import { translations as handleDialogTranslations } from "../../handle-dialog/i18n/en";
+import { translations as hoverTranslations } from "../../hover/i18n/en";
+import { translations as pressKeyTranslations } from "../../press-key/i18n/en";
+import { translations as uploadFileTranslations } from "../../upload-file/i18n/en";
+import { translations as listPagesTranslations } from "../../list-pages/i18n/en";
+import { translations as navigatePageTranslations } from "../../navigate-page/i18n/en";
+import { translations as newPageTranslations } from "../../new-page/i18n/en";
+import { translations as selectPageTranslations } from "../../select-page/i18n/en";
+import { translations as emulateTranslations } from "../../emulate/i18n/en";
+import { translations as resizePageTranslations } from "../../resize-page/i18n/en";
+import { translations as evaluateScriptTranslations } from "../../evaluate-script/i18n/en";
+import { translations as getConsoleMessageTranslations } from "../../get-console-message/i18n/en";
+import { translations as listConsoleMessagesTranslations } from "../../list-console-messages/i18n/en";
+import { translations as getNetworkRequestTranslations } from "../../get-network-request/i18n/en";
+import { translations as listNetworkRequestsTranslations } from "../../list-network-requests/i18n/en";
+import { translations as performanceAnalyzeInsightTranslations } from "../../performance-analyze-insight/i18n/en";
+import { translations as performanceStartTraceTranslations } from "../../performance-start-trace/i18n/en";
+import { translations as performanceStopTraceTranslations } from "../../performance-stop-trace/i18n/en";
+import { translations as takeScreenshotTranslations } from "../../take-screenshot/i18n/en";
+import { translations as takeSnapshotTranslations } from "../../take-snapshot/i18n/en";
+import { translations as waitForTranslations } from "../../wait-for/i18n/en";
+
 export const translations = {
+  click: clickTranslations,
+  "close-page": closePageTranslations,
+  drag: dragTranslations,
+  fill: fillTranslations,
+  "fill-form": fillFormTranslations,
+  "handle-dialog": handleDialogTranslations,
+  hover: hoverTranslations,
+  "press-key": pressKeyTranslations,
+  "upload-file": uploadFileTranslations,
+  "list-pages": listPagesTranslations,
+  "navigate-page": navigatePageTranslations,
+  "new-page": newPageTranslations,
+  "select-page": selectPageTranslations,
+  emulate: emulateTranslations,
+  "resize-page": resizePageTranslations,
+  "evaluate-script": evaluateScriptTranslations,
+  "get-console-message": getConsoleMessageTranslations,
+  "list-console-messages": listConsoleMessagesTranslations,
+  "get-network-request": getNetworkRequestTranslations,
+  "list-network-requests": listNetworkRequestsTranslations,
+  "performance-analyze-insight": performanceAnalyzeInsightTranslations,
+  "performance-start-trace": performanceStartTraceTranslations,
+  "performance-stop-trace": performanceStopTraceTranslations,
+  "take-screenshot": takeScreenshotTranslations,
+  "take-snapshot": takeSnapshotTranslations,
+  "wait-for": waitForTranslations,
   title: "Chrome DevTools MCP Tools",
   description:
     "Execute Chrome DevTools MCP tools for browser automation and debugging",
@@ -15,6 +68,16 @@ export const translations = {
     mcpTools: "MCP Tools",
     webDebugging: "Web Debugging",
     performanceAnalysis: "Performance Analysis",
+    inputAutomation: "Input Automation",
+    captureAutomation: "Capture Automation",
+    debugging: "Debugging",
+    dialogAutomation: "Dialog Automation",
+    navigationAutomation: "Navigation Automation",
+    networkAnalysis: "Network Analysis",
+    performanceAutomation: "Performance Automation",
+    scriptExecution: "Script Execution",
+    viewportAutomation: "Viewport Automation",
+    waitAutomation: "Wait Automation",
   },
 
   form: {

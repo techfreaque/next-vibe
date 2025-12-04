@@ -1,3 +1,5 @@
+"use client";
+
 import type { JSX } from "react";
 import * as React from "react";
 import { View, Text as RNText, Pressable } from "react-native";
@@ -136,118 +138,114 @@ export const Div = React.forwardRef<DivRefObject, Omit<DivProps, "ref">>(
     },
     ref,
   ): JSX.Element => {
-  const wrappedChildren = React.useMemo(
-    () => wrapTextChildren(children),
-    [children],
-  );
+    const wrappedChildren = React.useMemo(
+      () => wrapTextChildren(children),
+      [children],
+    );
 
-  const viewRef = React.useRef<View>(null);
+    const viewRef = React.useRef<View>(null);
 
-  React.useImperativeHandle(
-    ref,
-    (): DivRefObject | null => {
+    React.useImperativeHandle(ref, (): DivRefObject | null => {
       const node = viewRef.current;
       return createDivRefObject(node);
-    },
-    [],
-  );
+    }, []);
 
-  const handlePress = React.useCallback((): void => {
-    if (onClick) {
-      const event = createDivMouseEvent();
-      onClick(event);
+    const handlePress = React.useCallback((): void => {
+      if (onClick) {
+        const event = createDivMouseEvent();
+        onClick(event);
+      }
+    }, [onClick]);
+
+    const handlePressIn = React.useCallback((): void => {
+      if (onMouseEnter) {
+        const event = createDivMouseEvent();
+        onMouseEnter(event);
+      }
+    }, [onMouseEnter]);
+
+    const handlePressOut = React.useCallback((): void => {
+      if (onMouseLeave) {
+        const event = createDivMouseEvent();
+        onMouseLeave(event);
+      }
+    }, [onMouseLeave]);
+
+    const accessibilityRole = role as
+      | "none"
+      | "button"
+      | "link"
+      | "search"
+      | "image"
+      | "text"
+      | "adjustable"
+      | "imagebutton"
+      | "header"
+      | "summary"
+      | "alert"
+      | "checkbox"
+      | "combobox"
+      | "menu"
+      | "menubar"
+      | "menuitem"
+      | "progressbar"
+      | "radio"
+      | "radiogroup"
+      | "scrollbar"
+      | "spinbutton"
+      | "switch"
+      | "tab"
+      | "tablist"
+      | "timer"
+      | "toolbar"
+      | undefined;
+
+    // Use Pressable if any interaction handlers are present
+    if (
+      onClick ||
+      onMouseEnter ||
+      onMouseLeave ||
+      onTouchStart ||
+      onTouchEnd ||
+      onDrop ||
+      onDragOver ||
+      onDragLeave ||
+      onKeyDown
+    ) {
+      return (
+        <StyledPressable
+          {...applyStyleType({
+            nativeStyle: style ? convertCSSToViewStyle(style) : undefined,
+            className: className,
+          })}
+          ref={viewRef}
+          nativeID={id}
+          accessibilityLabel={ariaLabel || title}
+          accessibilityRole={accessibilityRole}
+          onPress={handlePress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
+          {wrappedChildren}
+        </StyledPressable>
+      );
     }
-  }, [onClick]);
 
-  const handlePressIn = React.useCallback((): void => {
-    if (onMouseEnter) {
-      const event = createDivMouseEvent();
-      onMouseEnter(event);
-    }
-  }, [onMouseEnter]);
-
-  const handlePressOut = React.useCallback((): void => {
-    if (onMouseLeave) {
-      const event = createDivMouseEvent();
-      onMouseLeave(event);
-    }
-  }, [onMouseLeave]);
-
-  const accessibilityRole = role as
-    | "none"
-    | "button"
-    | "link"
-    | "search"
-    | "image"
-    | "text"
-    | "adjustable"
-    | "imagebutton"
-    | "header"
-    | "summary"
-    | "alert"
-    | "checkbox"
-    | "combobox"
-    | "menu"
-    | "menubar"
-    | "menuitem"
-    | "progressbar"
-    | "radio"
-    | "radiogroup"
-    | "scrollbar"
-    | "spinbutton"
-    | "switch"
-    | "tab"
-    | "tablist"
-    | "timer"
-    | "toolbar"
-    | undefined;
-
-  // Use Pressable if any interaction handlers are present
-  if (
-    onClick ||
-    onMouseEnter ||
-    onMouseLeave ||
-    onTouchStart ||
-    onTouchEnd ||
-    onDrop ||
-    onDragOver ||
-    onDragLeave ||
-    onKeyDown
-  ) {
     return (
-      <StyledPressable
+      <StyledView
+        ref={viewRef}
         {...applyStyleType({
           nativeStyle: style ? convertCSSToViewStyle(style) : undefined,
           className: className,
         })}
-        ref={viewRef}
         nativeID={id}
         accessibilityLabel={ariaLabel || title}
         accessibilityRole={accessibilityRole}
-        onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
       >
         {wrappedChildren}
-      </StyledPressable>
+      </StyledView>
     );
-  }
-
-  return (
-    <StyledView
-      ref={viewRef}
-      {...applyStyleType({
-        nativeStyle: style ? convertCSSToViewStyle(style) : undefined,
-        className: className,
-      })}
-      nativeID={id}
-      accessibilityLabel={ariaLabel || title}
-      accessibilityRole={accessibilityRole}
-    >
-      {wrappedChildren}
-    </StyledView>
-  );
   },
 );

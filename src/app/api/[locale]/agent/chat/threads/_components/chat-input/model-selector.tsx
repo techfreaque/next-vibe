@@ -66,6 +66,7 @@ export function ModelSelector({
 
       // Build utility data for this model
       const utilityIconsMap: Record<string, IconValue> = {};
+      const utilityLabelsMap: Record<string, string> = {};
       const utilityOrdersMap: Record<string, number> = {};
       const utilityTitleKeys: string[] = [];
 
@@ -76,6 +77,7 @@ export function ModelSelector({
             // Use titleKey for grouping (will be translated by t() in UI)
             utilityTitleKeys.push(utility.titleKey);
             utilityIconsMap[utility.titleKey] = utility.icon;
+            utilityLabelsMap[utility.titleKey] = t(utility.titleKey);
             utilityOrdersMap[utility.titleKey] = utility.order;
           }
         });
@@ -96,6 +98,7 @@ export function ModelSelector({
         groupIcon: provider.icon,
         utilities: utilityTitleKeys,
         utilityIcons: utilityIconsMap,
+        utilityLabels: utilityLabelsMap,
         utilityOrders: utilityOrdersMap,
       };
     });

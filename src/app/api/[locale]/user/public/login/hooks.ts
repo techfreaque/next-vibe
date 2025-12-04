@@ -75,7 +75,6 @@ export function useLogin(
 ): LoginFormReturn {
   const { toast } = useToast();
   const router = useRouter();
-  useUser(logger); // Keep user state in sync
   const { t, locale } = useTranslation();
 
   // Minimal state - only keep what can't be stored in the form

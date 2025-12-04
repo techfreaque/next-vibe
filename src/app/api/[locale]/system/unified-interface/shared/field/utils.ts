@@ -28,6 +28,7 @@ import type { WidgetConfig } from "../widgets/configs";
 /**
  * Type guard to check if a value is a Zod schema
  */
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard: Must accept unknown to narrow any value to z.ZodTypeAny. This is the standard TypeScript pattern for type guards.
 function isZodSchema(value: unknown): value is z.ZodTypeAny {
   return typeof value === "object" && value !== null && "_def" in value;
 }
@@ -650,6 +651,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       typedField.ui.optional
     ) {
       const optionalSchema = objectSchema.nullable().optional();
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
       return optionalSchema as unknown as InferSchemaFromField<F, Usage>;
     }
 
@@ -685,6 +687,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         typedField.ui.optional
       ) {
         const optionalArraySchema = arraySchema.nullable().optional();
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
         return optionalArraySchema as unknown as InferSchemaFromField<F, Usage>;
       }
 
@@ -716,6 +719,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       // For array-optional, always apply nullable and optional
       const arrayOptionalSchema = z.array(childSchema).nullable().optional();
 
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
       return arrayOptionalSchema as unknown as InferSchemaFromField<F, Usage>;
     }
     return z.never() as InferSchemaFromField<F, Usage>;

@@ -13,11 +13,14 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import CountrySelector from "../../_components/country-selector";
+import type { MeGetResponseOutput } from "@/app/api/[locale]/user/private/me/definition";
 
 export function NewsletterSignupFooter({
   locale,
+  user,
 }: {
   locale: CountryLanguage;
+  user: MeGetResponseOutput | undefined;
 }): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -33,7 +36,7 @@ export function NewsletterSignupFooter({
     unsubscribe,
     isSubscribed,
     handleEmailChange,
-  } = useNewsletterManager();
+  } = useNewsletterManager(user);
 
   return (
     <Div>
@@ -58,7 +61,7 @@ export function NewsletterSignupFooter({
               subscribe(email);
             }
           }}
-          className="flex items-center flex flex-row gap-2 mb-3"
+          className="items-center flex flex-row gap-2 mb-3"
         >
           <Input<"email">
             type="email"
@@ -82,7 +85,7 @@ export function NewsletterSignupFooter({
                 ? showConfirmUnsubscribe
                   ? "bg-red-600 hover:bg-red-700"
                   : "border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-                : "bg-blue-600 bg-gradient-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
+                : "bg-blue-600 bg-linear-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
             }`}
             variant={
               isSubscribed && !showConfirmUnsubscribe ? "outline" : "default"

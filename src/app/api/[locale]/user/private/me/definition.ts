@@ -3,8 +3,10 @@
  * Production-ready endpoints for user profile management
  */
 
+import { dateSchema } from "next-vibe/shared/types/common.schema";
 import { z } from "zod";
 
+import { leadId } from "@/app/api/[locale]/leads/types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -18,9 +20,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import { completeUserSchema } from "../../types";
 import { UserRole } from "../../user-roles/enum";
+import { userRoleResponseSchema } from "../../user-roles/types";
 
 /**
  * GET /me - Retrieve current user profile
@@ -48,12 +51,110 @@ const { GET } = createEndpoint({
     },
     { response: true },
     {
-      user: responseField(
+      id: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.user.private.me.get.response.user.title" as const,
+          content: "app.api.user.private.me.get.response.id" as const,
         },
-        completeUserSchema,
+        z.uuid(),
+      ),
+      leadId: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.user.private.me.get.response.leadId" as const,
+        },
+        leadId.nullable(),
+      ),
+      isPublic: responseField(
+        {
+          type: WidgetType.BADGE,
+          text: "app.api.user.private.me.get.response.isPublic" as const,
+        },
+        z.literal(false),
+      ),
+      email: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.user.private.me.get.response.email" as const,
+        },
+        z.email({ message: "validationErrors.user.profile.email_invalid" }),
+      ),
+      privateName: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.user.private.me.get.response.privateName" as const,
+        },
+        z.string(),
+      ),
+      publicName: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.user.private.me.get.response.publicName" as const,
+        },
+        z.string(),
+      ),
+      locale: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.user.private.me.get.response.locale" as const,
+        },
+        z.string() as z.ZodType<CountryLanguage>,
+      ),
+      isActive: responseField(
+        {
+          type: WidgetType.BADGE,
+          text: "app.api.user.private.me.get.response.isActive" as const,
+        },
+        z.boolean().nullable(),
+      ),
+      emailVerified: responseField(
+        {
+          type: WidgetType.BADGE,
+          text: "app.api.user.private.me.get.response.emailVerified" as const,
+        },
+        z.boolean().nullable(),
+      ),
+      requireTwoFactor: responseField(
+        {
+          type: WidgetType.BADGE,
+          text: "app.api.user.private.me.get.response.requireTwoFactor" as const,
+        },
+        z.boolean().optional(),
+      ),
+      marketingConsent: responseField(
+        {
+          type: WidgetType.BADGE,
+          text: "app.api.user.private.me.get.response.marketingConsent" as const,
+        },
+        z.boolean().optional(),
+      ),
+      userRoles: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.user.private.me.get.response.userRoles" as const,
+        },
+        z.array(userRoleResponseSchema),
+      ),
+      createdAt: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.user.private.me.get.response.createdAt" as const,
+        },
+        dateSchema,
+      ),
+      updatedAt: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.user.private.me.get.response.updatedAt" as const,
+        },
+        dateSchema,
+      ),
+      stripeCustomerId: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.user.private.me.get.response.stripeCustomerId" as const,
+        },
+        z.string().nullable(),
       ),
     },
   ),
@@ -117,28 +218,26 @@ const { GET } = createEndpoint({
   examples: {
     responses: {
       default: {
-        user: {
-          id: "550e8400-e29b-41d4-a716-446655440000",
-          leadId: "550e8400-e29b-41d4-a716-446655440001",
-          isPublic: false as const,
-          email: "user@example.com",
-          privateName: "John Doe",
-          publicName: "JD",
-          locale: "en-GLOBAL" as const,
-          userRoles: [
-            {
-              id: "role-id",
-              role: UserRole.CUSTOMER,
-            },
-          ],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          requireTwoFactor: false,
-          marketingConsent: false,
-          isActive: true,
-          emailVerified: true,
-          stripeCustomerId: null,
-        },
+        id: "550e8400-e29b-41d4-a716-446655440000",
+        leadId: "550e8400-e29b-41d4-a716-446655440001",
+        isPublic: false as const,
+        email: "user@example.com",
+        privateName: "John Doe",
+        publicName: "JD",
+        locale: "en-GLOBAL" as const,
+        userRoles: [
+          {
+            id: "role-id",
+            role: UserRole.CUSTOMER,
+          },
+        ],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        requireTwoFactor: false,
+        marketingConsent: false,
+        isActive: true,
+        emailVerified: true,
+        stripeCustomerId: null,
       },
     },
   },
@@ -309,12 +408,111 @@ const { POST } = createEndpoint({
             },
             z.string().describe("Human-readable update status message"),
           ),
-          user: responseField(
+          // === USER FIELDS (FLATTENED) ===
+          id: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.update.response.user" as const,
+              content: "app.api.user.private.me.update.response.id" as const,
             },
-            completeUserSchema.describe("Updated user profile information"),
+            z.uuid(),
+          ),
+          leadId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.update.response.leadId" as const,
+            },
+            leadId.nullable(),
+          ),
+          isPublic: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.user.private.me.update.response.isPublic" as const,
+            },
+            z.literal(false),
+          ),
+          email: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.update.response.email" as const,
+            },
+            z.email({ message: "validationErrors.user.profile.email_invalid" }),
+          ),
+          privateName: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.update.response.privateName" as const,
+            },
+            z.string(),
+          ),
+          publicName: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.update.response.publicName" as const,
+            },
+            z.string(),
+          ),
+          locale: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.update.response.locale" as const,
+            },
+            z.string() as z.ZodType<CountryLanguage>,
+          ),
+          isActive: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.user.private.me.update.response.isActive" as const,
+            },
+            z.boolean().nullable(),
+          ),
+          emailVerified: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.user.private.me.update.response.emailVerified" as const,
+            },
+            z.boolean().nullable(),
+          ),
+          requireTwoFactor: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.user.private.me.update.response.requireTwoFactor" as const,
+            },
+            z.boolean().optional(),
+          ),
+          marketingConsent: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.user.private.me.update.response.marketingConsent" as const,
+            },
+            z.boolean().optional(),
+          ),
+          userRoles: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.update.response.userRoles" as const,
+            },
+            z.array(userRoleResponseSchema),
+          ),
+          createdAt: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.update.response.createdAt" as const,
+            },
+            dateSchema,
+          ),
+          updatedAt: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.update.response.updatedAt" as const,
+            },
+            dateSchema,
+          ),
+          stripeCustomerId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.update.response.stripeCustomerId" as const,
+            },
+            z.string().nullable(),
           ),
           changesSummary: objectField(
             {
@@ -466,28 +664,26 @@ const { POST } = createEndpoint({
         response: {
           success: true,
           message: "Profile updated successfully",
-          user: {
-            id: "550e8400-e29b-41d4-a716-446655440000",
-            leadId: "550e8400-e29b-41d4-a716-446655440001",
-            isPublic: false as const,
-            email: "customer@example.com",
-            privateName: "John Doe",
-            publicName: "JD",
-            locale: "en-GLOBAL" as const,
-            userRoles: [
-              {
-                id: "role-id",
-                role: UserRole.CUSTOMER,
-              },
-            ],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            requireTwoFactor: false,
-            marketingConsent: true,
-            isActive: true,
-            emailVerified: true,
-            stripeCustomerId: null,
-          },
+          id: "550e8400-e29b-41d4-a716-446655440000",
+          leadId: "550e8400-e29b-41d4-a716-446655440001",
+          isPublic: false as const,
+          email: "customer@example.com",
+          privateName: "John Doe",
+          publicName: "JD",
+          locale: "en-GLOBAL" as const,
+          userRoles: [
+            {
+              id: "role-id",
+              role: UserRole.CUSTOMER,
+            },
+          ],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          requireTwoFactor: false,
+          marketingConsent: true,
+          isActive: true,
+          emailVerified: true,
+          stripeCustomerId: null,
           changesSummary: {
             totalChanges: 3,
             changedFields: ["privateName", "publicName", "company"],
@@ -505,23 +701,21 @@ const { POST } = createEndpoint({
           success: false,
           message:
             "Profile update failed. Please check your inputs and try again.",
-          user: {
-            id: "550e8400-e29b-41d4-a716-446655440000",
-            leadId: "550e8400-e29b-41d4-a716-446655440001",
-            isPublic: false as const,
-            email: "user@example.com",
-            privateName: "John Doe",
-            publicName: "JD",
-            locale: "en-GLOBAL" as const,
-            userRoles: [],
-            createdAt: "",
-            updatedAt: "",
-            requireTwoFactor: false,
-            marketingConsent: false,
-            isActive: false,
-            emailVerified: false,
-            stripeCustomerId: null,
-          },
+          id: "550e8400-e29b-41d4-a716-446655440000",
+          leadId: "550e8400-e29b-41d4-a716-446655440001",
+          isPublic: false as const,
+          email: "user@example.com",
+          privateName: "John Doe",
+          publicName: "JD",
+          locale: "en-GLOBAL" as const,
+          userRoles: [],
+          createdAt: "",
+          updatedAt: "",
+          requireTwoFactor: false,
+          marketingConsent: false,
+          isActive: false,
+          emailVerified: false,
+          stripeCustomerId: null,
           changesSummary: {
             totalChanges: 0,
             changedFields: [],

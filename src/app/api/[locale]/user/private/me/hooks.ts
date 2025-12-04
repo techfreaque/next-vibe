@@ -31,6 +31,7 @@ import {
   type EnhancedMutationResult,
   useApiMutation,
 } from "../../../system/unified-interface/react/hooks/use-api-mutation";
+import type { JwtPayloadType } from "../../auth/types";
 
 /****************************
  * STATE KEYS
@@ -38,11 +39,9 @@ import {
 
 // Constants for state keys to avoid literal strings
 const USER_QUERY_ENABLED_KEY = "user_query_enabled";
-const USER_AUTH_CHECKED_KEY = "user_auth_checked";
 
 // Create typed state keys for user-related state
 const queryEnabledKey = createCustomStateKey<boolean>(USER_QUERY_ENABLED_KEY);
-const authCheckedKey = createCustomStateKey<boolean>(USER_AUTH_CHECKED_KEY);
 
 /****************************
  * QUERY HOOKS
@@ -68,13 +67,14 @@ export interface UseUserReturn {
   error: ErrorResponseType | undefined;
 }
 
-export function useUser(logger: EndpointLogger): UseUserReturn {
+export function useUser(
+  user: JwtPayloadType,
+  logger: EndpointLogger,
+): UseUserReturn {
   const [queryEnabled, setQueryEnabled] = useCustomState(
     queryEnabledKey,
-    false,
+    !!user.isPublic,
   );
-  const [authChecked, setAuthChecked] = useCustomState(authCheckedKey, false);
-
   const {
     data: userResponse,
     isLoading,
@@ -94,18 +94,17 @@ export function useUser(logger: EndpointLogger): UseUserReturn {
 
   // Enable query immediately - server will return 401 if not authenticated
   useEffect(() => {
-    if (!authChecked) {
+    if (!user.isPublic) {
       logger.debug("Enabling /me query - server will handle auth");
       setQueryEnabled(true);
-      setAuthChecked(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authChecked]);
+  }, [user.isPublic]);
 
   return {
     user: authUser,
     isLoggedIn: !!userResponse && !isError,
-    isLoading: isLoading || !authChecked,
+    isLoading: isLoading,
     refetch,
     error,
   };
@@ -129,7 +128,6 @@ export function useUpdateProfile(
   logger: EndpointLogger,
 ): EnhancedMutationResult<MePostResponseOutput, MePostRequestOutput, never> {
   const { toast } = useToast();
-  const { refetch } = useUser(logger);
   const { t } = useTranslation();
 
   return useApiMutation(meEndpoints.POST, logger, {
@@ -140,7 +138,6 @@ export function useUpdateProfile(
         variant: "default",
       });
 
-      await refetch();
     },
     onError: ({ error }) => {
       toast({

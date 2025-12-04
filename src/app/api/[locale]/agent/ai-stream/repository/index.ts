@@ -1844,22 +1844,23 @@ class AiStreamRepository implements IAiStreamRepository {
     const error: MessageResponseType =
       "error" in part && part.error
         ? part.error instanceof Error
-          ? {
-              message: "app.api.agent.aiStream.errors.toolExecutionError",
+          ? ({
+              message: "app.api.agent.chat.aiStream.errors.toolExecutionError",
               messageParams: { error: part.error.message },
-            }
+            } satisfies MessageResponseType)
           : typeof part.error === "object" &&
               part.error !== null &&
               "message" in part.error &&
               typeof part.error.message === "string"
             ? (part.error as MessageResponseType)
-            : {
-                message: "app.api.agent.aiStream.errors.toolExecutionError",
+            : ({
+                message:
+                  "app.api.agent.chat.aiStream.errors.toolExecutionError",
                 messageParams: { error: String(part.error) },
-              }
-        : {
-            message: "app.api.agent.aiStream.errors.toolExecutionFailed",
-          };
+              } satisfies MessageResponseType)
+        : ({
+            message: "app.api.agent.chat.aiStream.errors.toolExecutionFailed",
+          } satisfies MessageResponseType);
 
     logger.info("[AI Stream] Tool error event received", {
       toolName: part.toolName,
@@ -2089,7 +2090,7 @@ class AiStreamRepository implements IAiStreamRepository {
             : JSON.stringify(output);
 
       toolError = {
-        message: "app.api.agent.aiStream.errors.toolExecutionError",
+        message: "app.api.agent.chat.aiStream.errors.toolExecutionError",
         messageParams: { error: errorMessage },
       };
     }
@@ -2348,7 +2349,7 @@ class AiStreamRepository implements IAiStreamRepository {
 
     // Create structured error with translation key
     const structuredError: MessageResponseType = {
-      message: "app.api.agent.aiStream.errors.streamError",
+      message: "app.api.agent.chat.aiStream.errors.streamError",
       messageParams: { error: errorMessage },
     };
 

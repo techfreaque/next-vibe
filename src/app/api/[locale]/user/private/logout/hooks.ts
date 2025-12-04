@@ -12,7 +12,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 
-import { useUser } from "../me/hooks";
 import logoutEndpoints from "./definition";
 import { useApiMutation } from "../../../system/unified-interface/react/hooks/use-api-mutation";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
@@ -37,7 +36,6 @@ import { authClientRepository } from "../../auth/repository-client";
 export function useLogout(logger: EndpointLogger): () => void {
   const { toast } = useToast();
   const router = useRouter();
-  const { refetch } = useUser(logger);
   const { t, locale } = useTranslation();
 
   const logout = useApiMutation(logoutEndpoints.POST, logger, {
@@ -54,7 +52,6 @@ export function useLogout(logger: EndpointLogger): () => void {
       await apiClient.refetchEndpoint(definitions.GET, logger);
 
       router.push(`/${locale}/user/login`);
-      await refetch();
     },
     onError: async () => {
       // Even if the API call fails, we still want to log the user out locally
@@ -70,7 +67,6 @@ export function useLogout(logger: EndpointLogger): () => void {
       await apiClient.refetchEndpoint(definitions.GET, logger);
 
       router.push(`/${locale}/user/login`);
-      void refetch();
     },
   });
 

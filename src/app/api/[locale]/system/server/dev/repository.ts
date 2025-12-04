@@ -24,6 +24,7 @@ import { dockerOperationsRepository } from "../../db/utils/docker-operations/rep
 import { dbUtilsRepository } from "../../db/utils/repository";
 import type endpoints from "./definition";
 import { useTurbopack } from "@/config/constants";
+import { DEV_WATCHER_TASK_NAME } from "../../unified-interface/tasks/dev-watcher/task-runner";
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 
@@ -66,30 +67,53 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   private runningProcesses: Map<string, ChildProcess> = new Map();
 
   constructor() {
-    // Set up clean exit handlers
+    // Set up clean exit handlers for crashes only
     this.setupExitHandlers();
   }
 
   private setupExitHandlers(): void {
-    const cleanup = (): void => {
-      // Use process.stdout.write for immediate CLI output during shutdown
-      // eslint-disable-next-line i18next/no-literal-string
-      process.stdout.write("\n🛑 vibes have stopped\n");
+    // Only handle crashes - let SIGINT/SIGTERM propagate naturally
 
-      // Kill all running processes
-      for (const [, process] of this.runningProcesses) {
+    // Handle uncaught exceptions
+    process.on("uncaughtException", (error) => {
+      // eslint-disable-next-line i18next/no-literal-string
+      process.stderr.write(
+        `\n❌ Uncaught exception: ${error.message}\n${error.stack || ""}\n`,
+      );
+
+      // Kill child processes
+      for (const [_name, childProcess] of this.runningProcesses) {
         try {
-          process.kill("SIGTERM");
+          childProcess.kill("SIGTERM");
         } catch {
-          // Process might already be dead
+          // Ignore
         }
       }
 
-      process.exit(0);
-    };
+      process.exit(1);
+    });
 
-    process.on("SIGINT", cleanup);
-    process.on("SIGTERM", cleanup);
+    // Handle unhandled promise rejections
+    process.on("unhandledRejection", (reason) => {
+      const errorMsg =
+        reason instanceof Error ? reason.message : String(reason);
+      const stack = reason instanceof Error ? reason.stack : "";
+      // eslint-disable-next-line i18next/no-literal-string
+      process.stderr.write(
+        `\n❌ Unhandled promise rejection: ${errorMsg}\n${stack || ""}\n`,
+      );
+
+      // Kill child processes
+      for (const [_name, childProcess] of this.runningProcesses) {
+        try {
+          childProcess.kill("SIGTERM");
+        } catch {
+          // Ignore
+        }
+      }
+
+      process.exit(1);
+    });
   }
 
   /**
@@ -235,157 +259,257 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     const port =
       typeof data.port === "string" ? parseInt(data.port, 10) : data.port;
 
+    this.logStartupInfo(port, logger, data);
+
+    // Setup database if not skipped
+    const dbSetupSuccess = await this.setupDatabase(data, user, locale, logger);
+    if (!dbSetupSuccess) {
+      // Database setup failed critically, start Next.js anyway
+      return await this.startNextJsAndWait(port, logger);
+    }
+
+    // Start task runner if not skipped
+    await this.startTaskRunnerIfEnabled(data, locale, logger);
+
+    // Start Next.js and keep process alive
+    return await this.startNextJsAndWait(port, logger);
+  }
+
+  /**
+   * Log startup information
+   */
+  private logStartupInfo(
+    port: number,
+    logger: EndpointLogger,
+    data: RequestType,
+  ): void {
     logger.vibe("🚀 Starting development server");
     logger.vibe(
       `📍 Port: ${port} | Debug: ${logger.isDebugEnabled ? "ON" : "OFF (use --verbose to debug)"} | Tasks: ${data.skipTaskRunner ? "DISABLED" : "ENABLED"}`,
     );
+  }
 
-    // Database setup
-    if (!data.skipDbSetup) {
-      try {
-        const dockerCheckResult =
-          await dbUtilsRepository.isDockerAvailable(logger);
+  /**
+   * Setup database based on configuration
+   * Returns false if setup failed critically and Next.js should start immediately
+   */
+  private async setupDatabase(
+    data: RequestType,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<boolean> {
+    if (data.skipDbSetup) {
+      logger.vibe("⏭️ Database setup skipped");
+      return true;
+    }
 
-        if (dockerCheckResult.success && dockerCheckResult.data) {
-          // Reset database if not skipped
-          if (!data.skipDbReset) {
-            logger.vibe("🔄 Resetting database...");
+    try {
+      const dockerCheckResult =
+        await dbUtilsRepository.isDockerAvailable(logger);
 
-            try {
-              // Perform hard reset: stop containers, delete data, restart
-              await this.performHardDatabaseReset(logger, locale);
-              logger.vibe("✅ Database reset completed");
+      if (!dockerCheckResult.success || !dockerCheckResult.data) {
+        logger.vibe("⚠️ Docker unavailable (continuing anyway)");
+        logger.vibe("🔧 Install Docker to enable database functionality");
+        return true;
+      }
 
-              await databaseMigrationRepository.runMigrations(
-                {
-                  generate: true,
-                  redo: false,
-                  schema: "public",
-                  dryRun: false,
-                },
-                user,
-                locale,
-                logger,
-              );
-            } catch (error) {
-              // parseError is already imported at the top
-              const parsedError = parseError(error);
-              logger.vibe("❌ Database reset failed");
-              logger.error("Database reset error details", parsedError);
-              logger.vibe(`💡 Error: ${parsedError.message}`);
-              logger.vibe("🔧 Try running: vibe reset-db --force --hard");
-              // Start Next.js anyway
-              logger.vibe(`🌐 Starting Next.js on http://localhost:${port}`);
-              this.startNextJsProcess(port);
-              // Intentionally never resolve - keep process running indefinitely
-              return await new Promise<never>(() => undefined);
-            }
-          } else {
-            // Just start the database without reset
-            try {
-              // Use Docker operations repository to start the database
-              const dbStartResult =
-                await dockerOperationsRepository.dockerComposeUp(
-                  logger,
-                  locale,
-                  "docker-compose-dev.yml",
-                  60000, // Increased timeout for startup
-                );
+      // Perform database operations based on reset flag
+      const dbOperationSuccess = await this.performDatabaseOperations(
+        data,
+        user,
+        locale,
+        logger,
+      );
 
-              if (!dbStartResult.success) {
-                logger.vibe("❌ Failed to start database");
-                if (dbStartResult.message) {
-                  logger.error("Database startup error details", {
-                    error: dbStartResult.message,
-                  });
-                  logger.vibe(`💡 Error: ${dbStartResult.message}`);
-                }
-                logger.vibe(
-                  "🔧 Try running: docker compose -f docker-compose-dev.yml up -d",
-                );
-                logger.vibe(
-                  "🔧 Or check if Docker is running: docker --version",
-                );
-                // Start Next.js anyway
-                logger.vibe(`🌐 Starting Next.js on http://localhost:${port}`);
-                this.startNextJsProcess(port);
-                // Intentionally never resolve - keep process running indefinitely
-                return await new Promise<never>(() => undefined);
-              }
+      if (!dbOperationSuccess) {
+        return false; // Critical failure, start Next.js immediately
+      }
 
-              logger.vibe("✅ Database started");
-            } catch (error) {
-              const { parseError } = await import("next-vibe/shared/utils");
-              const parsedError = parseError(error);
-              logger.vibe("❌ Failed to start database");
-              logger.error("Database startup error details", parsedError);
-              logger.vibe(`💡 Error: ${parsedError.message}`);
-              logger.vibe(
-                "🔧 Try running: docker compose -f docker-compose-dev.yml up -d",
-              );
-              // Start Next.js anyway
-              logger.vibe(`🌐 Starting Next.js on http://localhost:${port}`);
-              this.startNextJsProcess(port);
-              // Intentionally never resolve - keep process running indefinitely
-              return await new Promise<never>(() => undefined);
-            }
-          }
+      logger.vibe("✅ Database ready");
+      return true;
+    } catch (error) {
+      const parsedError = parseError(error);
+      logger.vibe("❌ Database setup failed (continuing anyway)");
+      logger.error("Database setup error details", parsedError);
+      logger.vibe(`💡 Error: ${parsedError.message}`);
+      return true;
+    }
+  }
 
-          // Run migrations
-          await databaseMigrationRepository.runMigrations(
-            { generate: true, redo: false, schema: "public", dryRun: false },
-            user,
-            locale,
-            logger,
-          );
+  /**
+   * Perform database operations (reset or start) and migrations
+   * Returns false if critical failure occurred
+   */
+  private async performDatabaseOperations(
+    data: RequestType,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<boolean> {
+    try {
+      if (data.dbReset || data.r) {
+        await this.resetDatabase(user, locale, logger);
+      } else {
+        await this.startDatabaseWithoutReset(locale, logger);
+      }
 
-          // Seed database
-          await seedDatabase("dev", logger, locale);
-          logger.vibe("✅ Database ready");
-        } else {
-          logger.vibe("⚠️ Docker unavailable (continuing anyway)");
-          logger.vibe("🔧 Install Docker to enable database functionality");
-        }
-      } catch (error) {
-        const { parseError } = await import("next-vibe/shared/utils");
-        const parsedError = parseError(error);
-        logger.vibe("❌ Database setup failed (continuing anyway)");
-        logger.error("Database setup error details", parsedError);
+      // Run migrations and seed
+      await databaseMigrationRepository.runMigrations(
+        { generate: true, redo: false, schema: "public", dryRun: false },
+        user,
+        locale,
+        logger,
+      );
+
+      await seedDatabase("dev", logger, locale);
+      return true;
+    } catch (error) {
+      this.logDatabaseError(error, logger);
+      return false; // Critical failure
+    }
+  }
+
+  /**
+   * Reset database with hard reset
+   */
+  private async resetDatabase(
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    logger.vibe("🔄 Resetting database...");
+    await this.performHardDatabaseReset(logger, locale);
+    logger.vibe("✅ Database reset completed");
+
+    await databaseMigrationRepository.runMigrations(
+      {
+        generate: true,
+        redo: false,
+        schema: "public",
+        dryRun: false,
+      },
+      user,
+      locale,
+      logger,
+    );
+  }
+
+  /**
+   * Start database without reset
+   */
+  private async startDatabaseWithoutReset(
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const dbStartResult = await dockerOperationsRepository.dockerComposeUp(
+      logger,
+      locale,
+      "docker-compose-dev.yml",
+      60000,
+    );
+
+    if (!dbStartResult.success) {
+      logger.vibe("❌ Failed to start database");
+      if (dbStartResult.message) {
+        logger.error("Database startup error details", {
+          error: dbStartResult.message,
+        });
+        logger.vibe(`💡 Error: ${dbStartResult.message}`);
+      }
+      logger.vibe(
+        "🔧 Try running: docker compose -f docker-compose-dev.yml up -d",
+      );
+      logger.vibe("🔧 Or check if Docker is running: docker --version");
+      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Required for error handling flow
+      throw new Error("Failed to start database");
+    }
+
+    logger.vibe("✅ Database started");
+  }
+
+  /**
+   * Log database error with helpful suggestions
+   */
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Error handling: Database errors can be any type (Drizzle errors, connection errors, etc), so unknown is correct before narrowing.
+  private logDatabaseError(error: unknown, logger: EndpointLogger): void {
+    const parsedError = parseError(error);
+    logger.vibe("❌ Database operation failed");
+    logger.error("Database error details", parsedError);
+    logger.vibe(`💡 Error: ${parsedError.message}`);
+    logger.vibe("🔧 Try running: vibe dev -r");
+  }
+
+  /**
+   * Start task runner if enabled
+   */
+  private async startTaskRunnerIfEnabled(
+    data: RequestType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    if (data.skipTaskRunner) {
+      logger.vibe("⏭️ Task runner disabled");
+      return;
+    }
+
+    try {
+      await this.startUnifiedTaskRunner(locale, logger, data);
+      logger.vibe("✅ Task runner started in background");
+    } catch (error) {
+      const parsedError = parseError(error);
+      logger.vibe("⚠️ Task runner startup failed (continuing anyway)");
+      logger.error("Task runner startup error details", parsedError);
+      if (logger.isDebugEnabled) {
         logger.vibe(`💡 Error: ${parsedError.message}`);
       }
-    } else {
-      logger.vibe("⏭️ Database setup skipped");
     }
+  }
 
-    // Start task runner if not skipped
-    if (!data.skipTaskRunner) {
-      try {
-        // Load tasks and start the unified task runner
-        await this.startUnifiedTaskRunner(locale, logger, data);
-        logger.vibe("✅ Task runner started in background");
-      } catch (error) {
-        const { parseError } = await import("next-vibe/shared/utils");
-        const parsedError = parseError(error);
-        logger.vibe("⚠️ Task runner startup failed (continuing anyway)");
-        logger.error("Task runner startup error details", parsedError);
-        if (logger.isDebugEnabled) {
-          logger.vibe(`💡 Error: ${parsedError.message}`);
-        }
-      }
-    } else {
-      logger.vibe("⏭️ Task runner disabled");
-    }
-
+  /**
+   * Start Next.js and wait for it to exit
+   */
+  private async startNextJsAndWait(
+    port: number,
+    logger: EndpointLogger,
+  ): Promise<never> {
     logger.vibe(`🌐 Starting Next.js on http://localhost:${port}`);
-    logger.vibe("🎯 Ready for development! Press Ctrl+C to stop");
 
-    // Start Next.js - output goes directly to stdout (no prefix)
-    this.startNextJsProcess(port);
+    const nextProcess = this.startNextJsProcess(port);
 
-    // Never return - keep the process alive
+    // Set up SIGINT handler to prevent parent from exiting before child
+    // Both parent and child receive SIGINT from terminal, but we want to wait
+    // for child to finish cleanly before parent exits
+    // oxlint-disable-next-line consistent-function-scoping
+    const sigintHandler = (): void => {
+      // Do nothing - just prevent default exit behavior
+      // Child already received SIGINT from terminal and is shutting down
+      // We'll exit when child exits via the 'exit' event below
+    };
+    process.on("SIGINT", sigintHandler);
+
+    // Wait for Next.js to exit, then give time for buffered output
     return await new Promise<never>(() => {
-      // This promise never resolves, keeping the API call alive
-      // The processes handle their own output to stdout
+      nextProcess.on("exit", (code) => {
+        // Remove our SIGINT handler now that child has exited
+        process.removeListener("SIGINT", sigintHandler);
+
+        // Wait briefly for stdio streams to finish (child might have buffered output)
+        // This prevents terminal pollution from warnings like browserslist age warnings
+        setTimeout(() => {
+          // eslint-disable-next-line i18next/no-literal-string
+          process.stdout.write("\n🛑 vibes have stopped\n");
+          // Exit with the same code as Next.js
+          process.exit(code ?? 0);
+        }, 100);
+      });
+
+      nextProcess.on("error", (error) => {
+        process.removeListener("SIGINT", sigintHandler);
+        // eslint-disable-next-line i18next/no-literal-string
+        process.stderr.write(`❌ Next.js error: ${error.message}\n`);
+        process.exit(1);
+      });
     });
   }
 
@@ -459,15 +583,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     logger: EndpointLogger,
   ): Task[] {
     const filtered = allTasks.filter((task) => {
-      // Skip pulse runner in development (it's for production/serverless)
-      if (task.name === "pulse-runner") {
-        logger.debug("Skipping pulse-runner (not needed in development)");
-        return false;
-      }
-
-      // Skip dev-watcher if generator watcher is disabled
-      if (task.name === "dev-file-watcher" && data.skipGeneratorWatcher) {
-        logger.debug("Skipping dev-file-watcher (generator watcher disabled)");
+      if (DEV_WATCHER_TASK_NAME === task.name && data.skipGeneratorWatcher) {
+        logger.debug(
+          "Skipping generator watcher (disabled by skipGeneratorWatcher)",
+        );
         return false;
       }
 
@@ -477,37 +596,6 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         return false;
       }
 
-      // Include development-appropriate tasks
-      const devCategories = [
-        "development",
-        "system",
-        "generator",
-        "watch",
-        "build",
-        "test",
-      ];
-
-      if (devCategories.includes(task.category)) {
-        return true;
-      }
-
-      // Skip heavy production tasks that aren't needed in development
-      const skipInDev = [
-        "backup",
-        "cleanup",
-        "maintenance",
-        "monitoring",
-        "security",
-      ];
-
-      if (skipInDev.includes(task.category)) {
-        logger.debug(
-          `Skipping heavy task in development: ${task.name} (${task.category})`,
-        );
-        return false;
-      }
-
-      // Include other tasks by default (email, leads, etc. might be needed)
       return true;
     });
 
@@ -523,18 +611,23 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Start Next.js development server using spawn
    */
-  private startNextJsProcess(port: number): void {
+  private startNextJsProcess(port: number): ChildProcess {
     const turbo = useTurbopack ? ["--turbo"] : [];
     const nextProcess = spawn(
       "bun",
       ["run", "next", "dev", ...turbo, "--port", port.toString()],
       {
         stdio: "inherit", // Pass output directly to stdout/stderr
+        // Keep in same process group (default) so Ctrl+C propagates naturally
+        // When terminal sends SIGINT, both parent and child receive it
+        detached: false,
       },
     );
 
     // Store the process for cleanup
     this.runningProcesses.set("next-dev", nextProcess);
+
+    return nextProcess;
   }
 }
 

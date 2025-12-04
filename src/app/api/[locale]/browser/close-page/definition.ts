@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   category: "app.api.browser.category",
   tags: [
     "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.navigationAutomation",
+    "app.api.browser.tags.chromeDevTools",
   ],
 
   allowedRoles: [

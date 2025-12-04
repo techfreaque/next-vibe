@@ -96,9 +96,21 @@ const { POST } = createEndpoint({
             "app.api.browser.take-screenshot.form.fields.format.placeholder",
           columns: 4,
           options: [
-            { value: "png", label: "PNG" },
-            { value: "jpeg", label: "JPEG" },
-            { value: "webp", label: "WebP" },
+            {
+              value: "png",
+              label:
+                "app.api.browser.take-screenshot.form.fields.format.options.png" as const,
+            },
+            {
+              value: "jpeg",
+              label:
+                "app.api.browser.take-screenshot.form.fields.format.options.jpeg" as const,
+            },
+            {
+              value: "webp",
+              label:
+                "app.api.browser.take-screenshot.form.fields.format.options.webp" as const,
+            },
           ],
         },
         z

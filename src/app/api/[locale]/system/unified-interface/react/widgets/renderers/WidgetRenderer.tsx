@@ -1,6 +1,7 @@
 "use client";
 
 import type { JSX } from "react";
+import type { UseFormReturn, FieldValues } from "react-hook-form";
 
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -48,7 +49,7 @@ export interface WidgetRendererProps {
   /** Optional inline styles */
   style?: React.CSSProperties;
   /** Form instance (for form fields) */
-  form?: unknown;
+  form?: UseFormReturn<FieldValues>;
 }
 
 /**
@@ -121,7 +122,7 @@ function renderWidget(
     context: WidgetRenderContext;
     className?: string;
     style?: React.CSSProperties;
-    form?: unknown;
+    form?: UseFormReturn<FieldValues>;
   },
 ): JSX.Element {
   switch (widgetType) {

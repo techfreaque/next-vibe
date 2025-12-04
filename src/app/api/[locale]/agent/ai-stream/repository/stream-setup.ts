@@ -915,13 +915,13 @@ async function handleToolConfirmationInSetup(params: {
         });
       } else {
         toolError = {
-          message: "app.api.agent.aiStream.errors.toolExecutionError",
+          message: "app.api.agent.chat.aiStream.errors.toolExecutionError",
           messageParams: { error: "Tool does not have execute method" },
         };
       }
     } catch (error) {
       toolError = {
-        message: "app.api.agent.aiStream.errors.toolExecutionError",
+        message: "app.api.agent.chat.aiStream.errors.toolExecutionError",
         messageParams: {
           error: error instanceof Error ? error.message : String(error),
         },
@@ -969,7 +969,7 @@ async function handleToolConfirmationInSetup(params: {
       isConfirmed: false,
       waitingForConfirmation: false,
       error: {
-        message: "app.api.agent.aiStream.errors.userDeclinedTool",
+        message: "app.api.agent.chat.aiStream.errors.userDeclinedTool",
       },
     };
 

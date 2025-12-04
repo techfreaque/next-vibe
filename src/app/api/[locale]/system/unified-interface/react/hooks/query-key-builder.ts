@@ -23,6 +23,20 @@ interface SerializableObject {
 }
 
 /**
+ * Type guard to check if value is SerializableObject
+ */
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard: Must accept unknown to narrow any value to SerializableObject. This is the standard TypeScript pattern for type guards.
+function isSerializableObject(value: unknown): value is SerializableObject {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    !(value instanceof File) &&
+    !(value instanceof Blob)
+  );
+}
+
+/**
  * Build a stable query key for React Query cache
  * Used by both useApiQuery and updateEndpointData to ensure cache key consistency
  *
@@ -99,12 +113,11 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
       if (logger) {
         logger.error("Failed to stringify request data", parseError(err));
       }
-      requestDataKey =
-        typeof requestData === "object"
-          ? Object.keys(requestData as object)
-              .toSorted()
-              .join(",")
-          : String(requestData);
+      if (isSerializableObject(requestData)) {
+        requestDataKey = Object.keys(requestData).toSorted().join(",");
+      } else {
+        requestDataKey = String(requestData);
+      }
     }
   }
 
@@ -154,12 +167,11 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
       if (logger) {
         logger.error("Failed to stringify URL parameters", parseError(err));
       }
-      urlPathParamsKey =
-        typeof urlPathParams === "object"
-          ? Object.keys(urlPathParams as object)
-              .toSorted()
-              .join(",")
-          : String(urlPathParams);
+      if (isSerializableObject(urlPathParams)) {
+        urlPathParamsKey = Object.keys(urlPathParams).toSorted().join(",");
+      } else {
+        urlPathParamsKey = String(urlPathParams);
+      }
     }
   }
 

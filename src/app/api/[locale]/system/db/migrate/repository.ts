@@ -161,7 +161,7 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
       }
 
       const duration = Date.now() - startTime;
-      logger.info("Migrations completed successfully", { duration });
+      logger.info(`Migrations completed successfully in ${duration}ms`);
 
       return success({
         success: true,

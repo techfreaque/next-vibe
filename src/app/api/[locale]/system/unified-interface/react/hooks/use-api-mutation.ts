@@ -178,6 +178,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
 
       // If response is an error, throw it so React Query treats it as an error
       if (!response.success) {
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- React Query pattern: Throwing inside mutation function is the standard way to trigger onError callback. This is documented React Query behavior.
         throw response;
       }
 

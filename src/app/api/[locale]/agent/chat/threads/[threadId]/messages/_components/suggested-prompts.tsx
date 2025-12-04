@@ -9,11 +9,12 @@ import {
   DialogTrigger,
 } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
-import { H1 } from "next-vibe-ui/ui/typography";
+import { H1, H3 } from "next-vibe-ui/ui/typography";
 import { P } from "next-vibe-ui/ui/typography";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Span } from "next-vibe-ui/ui/span";
-import { MoreHorizontal } from "next-vibe-ui/ui/icons";
+import { ChevronDown, ChevronUp, MoreHorizontal } from "next-vibe-ui/ui/icons";
+import { Markdown } from "next-vibe-ui/ui/markdown";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
@@ -21,8 +22,10 @@ import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import {
   DEFAULT_PERSONAS,
+  DEFAULT_CATEGORIES,
   type Persona,
 } from "@/app/api/[locale]/agent/chat/personas/config";
+import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -48,6 +51,9 @@ export function SuggestedPrompts({
     FEATURED_PERSONAS[0],
   );
   const [modalOpen, setModalOpen] = useState(false);
+  const [expandedPersonaId, setExpandedPersonaId] = useState<string | null>(
+    null,
+  );
 
   const handlePersonaSelect = (persona: Persona): void => {
     setSelectedPersona(persona);
@@ -56,6 +62,10 @@ export function SuggestedPrompts({
 
   const handlePromptClick = (prompt: string): void => {
     onSelectPrompt(prompt, selectedPersona.id, selectedPersona.preferredModel);
+  };
+
+  const toggleExpanded = (personaId: string): void => {
+    setExpandedPersonaId((prev) => (prev === personaId ? null : personaId));
   };
 
   const prompts = selectedPersona.suggestedPrompts || [];
@@ -113,7 +123,7 @@ export function SuggestedPrompts({
             size="unset"
             className={`px-3 sm:px-4 py-2 rounded-full transition-all flex items-center gap-2 text-sm sm:text-base cursor-pointer ${
               selectedPersona.id === persona.id
-                ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30"
+                ? "bg-linear-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30"
                 : "hover:bg-accent border border-transparent"
             }`}
           >
@@ -138,39 +148,154 @@ export function SuggestedPrompts({
               </Span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogContent className="max-w-3xl max-h-[85vh]">
             <DialogHeader>
               <DialogTitle>
                 {t("app.chat.suggestedPrompts.selectPersona")}
               </DialogTitle>
             </DialogHeader>
-            <ScrollArea className="h-[60vh] pr-4">
-              <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {DEFAULT_PERSONAS.map((persona) => (
-                  <Button
-                    key={persona.id}
-                    onClick={(): void => handlePersonaSelect(persona)}
-                    variant="ghost"
-                    size="unset"
-                    className={`p-4 rounded-lg border transition-all text-left cursor-pointer ${
-                      selectedPersona.id === persona.id
-                        ? "border-purple-500 bg-purple-500/10"
-                        : "border-border hover:border-purple-500/50 hover:bg-accent"
-                    }`}
-                  >
-                    <Div className="flex items-center gap-3 mb-2">
-                      {React.createElement(getIconComponent(persona.icon), {
-                        className: "text-2xl",
-                      })}
-                      <Span className="font-semibold">{persona.name}</Span>
+            <ScrollArea className="h-[70vh] pr-4">
+              <Div className="flex flex-col gap-4">
+                {DEFAULT_PERSONAS.map((persona) => {
+                  const isExpanded = expandedPersonaId === persona.id;
+                  const categoryConfig = DEFAULT_CATEGORIES.find(
+                    (cat) => cat.id === persona.category,
+                  );
+                  const modelConfig = persona.preferredModel
+                    ? getModelById(persona.preferredModel)
+                    : null;
+
+                  return (
+                    <Div
+                      key={persona.id}
+                      className={`rounded-lg border transition-all ${
+                        selectedPersona.id === persona.id
+                          ? "border-purple-500 bg-purple-500/5"
+                          : "border-border hover:border-purple-500/50"
+                      }`}
+                    >
+                      {/* Header - clickable to select persona */}
+                      <Button
+                        onClick={(): void => handlePersonaSelect(persona)}
+                        variant="ghost"
+                        size="unset"
+                        className="w-full text-left p-4 hover:bg-accent/50 rounded-lg"
+                      >
+                        <Div className="flex items-start gap-4 w-full">
+                          {React.createElement(getIconComponent(persona.icon), {
+                            className: "text-3xl shrink-0",
+                          })}
+                          <Div className="flex-1 min-w-0">
+                            <H3 className="text-lg font-semibold mb-1">
+                              {t(persona.name)}
+                            </H3>
+                            <P className="text-sm text-muted-foreground">
+                              {t(persona.description)}
+                            </P>
+                            {/* Category and Model badges */}
+                            <Div className="flex flex-wrap gap-2 mt-2">
+                              {categoryConfig && (
+                                <Div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50 text-xs">
+                                  {React.createElement(
+                                    getIconComponent(categoryConfig.icon),
+                                    {
+                                      className: "text-sm",
+                                    },
+                                  )}
+                                  <Span>{t(categoryConfig.name)}</Span>
+                                </Div>
+                              )}
+                              {modelConfig && (
+                                <Div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50 text-xs">
+                                  {React.createElement(
+                                    getIconComponent(modelConfig.icon),
+                                    {
+                                      className: "text-sm",
+                                    },
+                                  )}
+                                  <Span>{modelConfig.name}</Span>
+                                </Div>
+                              )}
+                            </Div>
+                          </Div>
+                        </Div>
+                      </Button>
+
+                      {/* Toggle button for more details */}
+                      <Div className="px-4 pb-2">
+                        <Button
+                          onClick={(): void => toggleExpanded(persona.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-xs gap-2 h-8"
+                        >
+                          {React.createElement(
+                            isExpanded ? ChevronUp : ChevronDown,
+                            {
+                              className: "h-3.5 w-3.5 shrink-0",
+                            },
+                          )}
+                          <Span className="text-muted-foreground">
+                            {isExpanded
+                              ? t("app.chat.suggestedPrompts.hideDetails")
+                              : t("app.chat.suggestedPrompts.showDetails")}
+                          </Span>
+                        </Button>
+                      </Div>
+
+                      {/* Expanded details */}
+                      {isExpanded && (
+                        <Div className="px-4 pb-4 pt-2 border-t border-border">
+                          <Div className="flex flex-col gap-4">
+                            {/* System Prompt with Markdown */}
+                            {persona.systemPrompt && (
+                              <Div className="flex flex-col gap-2">
+                                <Span className="text-sm font-semibold">
+                                  {t(
+                                    "app.chat.suggestedPrompts.systemPromptLabel",
+                                  )}
+                                </Span>
+                                <Div className="prose prose-sm dark:prose-invert max-w-none bg-muted/30 p-3 rounded-md border border-border">
+                                  <Markdown content={persona.systemPrompt} />
+                                </Div>
+                              </Div>
+                            )}
+
+                            {/* Suggested Prompts - Same style as outside modal */}
+                            {persona.suggestedPrompts &&
+                              persona.suggestedPrompts.length > 0 && (
+                                <Div className="flex flex-col gap-2">
+                                  <Span className="text-sm font-semibold">
+                                    {t(
+                                      "app.chat.suggestedPrompts.suggestedPromptsLabel",
+                                    )}
+                                  </Span>
+                                  <Div className="flex flex-col gap-2">
+                                    {persona.suggestedPrompts.map(
+                                      (promptKey, idx) => (
+                                        <Button
+                                          key={idx}
+                                          onClick={(): void => {
+                                            handlePromptClick(t(promptKey));
+                                            setModalOpen(false);
+                                          }}
+                                          variant="ghost"
+                                          size="unset"
+                                          className="w-full text-left p-3 rounded-lg hover:bg-accent transition-all border border-border text-sm"
+                                        >
+                                          {t(promptKey)}
+                                        </Button>
+                                      ),
+                                    )}
+                                  </Div>
+                                </Div>
+                              )}
+                          </Div>
+                        </Div>
+                      )}
                     </Div>
-                    {persona.description && (
-                      <P className="text-sm text-muted-foreground">
-                        {persona.description}
-                      </P>
-                    )}
-                  </Button>
-                ))}
+                  );
+                })}
               </Div>
             </ScrollArea>
           </DialogContent>
