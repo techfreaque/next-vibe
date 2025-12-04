@@ -172,6 +172,7 @@ export { Shield } from "./Shield";
 export { ShieldOff, ShieldOffIcon } from "./ShieldOff";
 export { ShieldPlus } from "./ShieldPlus";
 export { ShoppingBag } from "./ShoppingBag";
+export { ShoppingCart } from "./ShoppingCart";
 export { Sparkles } from "./Sparkles";
 export { Square } from "./Square";
 export { Star } from "./Star";

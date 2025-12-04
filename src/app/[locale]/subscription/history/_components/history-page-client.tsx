@@ -17,6 +17,7 @@ import { SubscriptionHeader } from "@/app/api/[locale]/subscription/_components/
 import { SubscriptionStatusCard } from "@/app/api/[locale]/subscription/_components/subscription-status-card";
 import { HistoryTab } from "@/app/api/[locale]/subscription/_components/history-tab";
 import { PaymentStatusAlert } from "@/app/api/[locale]/subscription/_components/payment-status-alert";
+import { SubscriptionTabsNav } from "@/app/api/[locale]/subscription/_components/subscription-tabs-nav";
 
 interface HistoryPageClientProps {
   locale: CountryLanguage;
@@ -125,6 +126,9 @@ export function HistoryPageClient({
           initialSubscription={initialSubscription}
         />
       )}
+
+      {/* Tabs Navigation */}
+      <SubscriptionTabsNav locale={locale} />
 
       {/* History Tab Content */}
       <HistoryTab locale={locale} initialHistory={initialHistory} />

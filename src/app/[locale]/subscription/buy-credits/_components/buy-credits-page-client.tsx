@@ -17,6 +17,7 @@ import { SubscriptionHeader } from "@/app/api/[locale]/subscription/_components/
 import { SubscriptionStatusCard } from "@/app/api/[locale]/subscription/_components/subscription-status-card";
 import { BuyCreditsTab } from "@/app/api/[locale]/subscription/_components/buy-credits-tab";
 import { PaymentStatusAlert } from "@/app/api/[locale]/subscription/_components/payment-status-alert";
+import { SubscriptionTabsNav } from "@/app/api/[locale]/subscription/_components/subscription-tabs-nav";
 
 interface BuyCreditsPageClientProps {
   locale: CountryLanguage;
@@ -128,6 +129,9 @@ export function BuyCreditsPageClient({
           initialSubscription={initialSubscription}
         />
       )}
+
+      {/* Tabs Navigation */}
+      <SubscriptionTabsNav locale={locale} />
 
       {/* Buy Credits Tab Content */}
       <BuyCreditsTab

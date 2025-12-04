@@ -34,7 +34,7 @@ import {
  */
 export function ContainerWidget({
   value,
-  field: _field,
+  field,
   context,
   className,
   form,
@@ -90,7 +90,7 @@ export function ContainerWidget({
             const childField =
               "field" in child && typeof child.field === "object"
                 ? (child.field as UnifiedField)
-                : _field;
+                : field;
 
             return (
               <WidgetRenderer

@@ -17,6 +17,7 @@ import { SubscriptionHeader } from "@/app/api/[locale]/subscription/_components/
 import { SubscriptionStatusCard } from "@/app/api/[locale]/subscription/_components/subscription-status-card";
 import { OverviewTab } from "@/app/api/[locale]/subscription/_components/overview-tab";
 import { PaymentStatusAlert } from "@/app/api/[locale]/subscription/_components/payment-status-alert";
+import { SubscriptionTabsNav } from "@/app/api/[locale]/subscription/_components/subscription-tabs-nav";
 
 interface OverviewPageClientProps {
   locale: CountryLanguage;
@@ -128,6 +129,9 @@ export function OverviewPageClient({
           initialSubscription={initialSubscription}
         />
       )}
+
+      {/* Tabs Navigation */}
+      <SubscriptionTabsNav locale={locale} />
 
       {/* Overview Tab Content */}
       <OverviewTab
