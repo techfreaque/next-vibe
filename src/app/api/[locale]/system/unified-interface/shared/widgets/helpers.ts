@@ -79,27 +79,3 @@ export interface WidgetValidationResult {
     code: string;
   }>;
 }
-
-/**
- * Type guard to check if value is a plain object
- */
-export function isPlainObject(
-  value: unknown,
-): value is Record<string, unknown> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.prototype.toString.call(value) === "[object Object]"
-  );
-}
-
-/**
- * Type guard to check if object has a string property
- */
-export function hasStringProperty<K extends string>(
-  obj: unknown,
-  key: K,
-): obj is Record<K, string> {
-  return isPlainObject(obj) && key in obj && typeof obj[key] === "string";
-}

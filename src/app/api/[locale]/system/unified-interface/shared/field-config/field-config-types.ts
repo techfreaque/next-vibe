@@ -6,9 +6,11 @@
  */
 
 import type { Control, FieldPath, FieldValues } from "react-hook-form";
+import type { z } from "zod";
 
 import type { Countries } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
+import type { UnifiedField } from "../types/endpoint";
 
 export interface EndpointFormFieldProps<
   TFieldValues extends FieldValues,
@@ -20,9 +22,8 @@ export interface EndpointFormFieldProps<
   requiredFields?: string[]; // List of required field names
   theme?: RequiredFieldTheme;
   className?: string;
-  // TODO infer types and properly constrain
-  endpointFields?: unknown; // Endpoint fields structure for auto-inference
-  schema?: unknown; // Zod schema for validation
+  endpointFields?: UnifiedField; // Endpoint fields structure for auto-inference
+  schema?: z.ZodTypeAny; // Zod schema for validation
 }
 
 // Base field configuration

@@ -83,6 +83,7 @@ export function wrapToolsForTRPC<T extends EndpointDefinitionsConstraint>(
             depth++;
           }
 
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- tRPC pattern: Throwing TRPCError is the standard way to send errors to tRPC clients. This is documented tRPC behavior for error handling.
           throw new TRPCError({
             code:
               errorType === ErrorResponseTypes.UNAUTHORIZED

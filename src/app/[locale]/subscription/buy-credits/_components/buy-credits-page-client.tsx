@@ -6,9 +6,9 @@ import { Container } from "next-vibe-ui/ui/container";
 import { useRouter, useSearchParams } from "next-vibe-ui/hooks/use-navigation";
 import { useEffect, useState } from "react";
 import type { JSX } from "react";
-import type { TFunction } from "i18next";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import type { CreditBalance } from "@/app/api/[locale]/credits/repository";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 
@@ -28,7 +28,6 @@ interface BuyCreditsPageClientProps {
   packPrice: number;
   packCredits: number;
   freeCredits: number;
-  t: TFunction;
 }
 
 export function BuyCreditsPageClient({
@@ -41,8 +40,8 @@ export function BuyCreditsPageClient({
   packPrice,
   packCredits,
   freeCredits,
-  t,
 }: BuyCreditsPageClientProps): JSX.Element {
+  const { t } = simpleT(locale);
   const router = useRouter();
   const searchParams = useSearchParams();
   const [showAlert, setShowAlert] = useState(false);

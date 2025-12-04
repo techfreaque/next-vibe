@@ -33,8 +33,6 @@ export function useReferralCreate(): EndpointReturn<typeof definitions> {
           defaultValues: {
             code: "",
             label: undefined,
-            maxUses: undefined,
-            expiresAt: undefined,
           },
         },
       },

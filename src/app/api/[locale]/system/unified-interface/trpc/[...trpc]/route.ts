@@ -62,7 +62,7 @@ async function handler(
       path,
       type,
     }: {
-      error: { message: string; code: string; cause?: unknown };
+      error: { message: string; code: string; cause?: Error };
       path?: string;
       type: string;
     }) => {

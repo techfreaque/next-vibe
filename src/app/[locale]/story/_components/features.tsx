@@ -32,6 +32,17 @@ interface FeatureItem {
   description: string;
 }
 
+interface FeaturesProps {
+  locale: CountryLanguage;
+  modelCount: number;
+  subPrice: number;
+  subCredits: number;
+  subCurrency: string;
+  packPrice: number;
+  packCredits: number;
+  packCurrency: string;
+}
+
 /**
  * Features component.
  * Displays a list of features with icons, titles, and descriptions.
@@ -40,9 +51,14 @@ interface FeatureItem {
  */
 export default function Features({
   locale,
-}: {
-  locale: CountryLanguage;
-}): JSX.Element {
+  modelCount,
+  subPrice,
+  subCredits,
+  subCurrency,
+  packPrice,
+  packCredits,
+  packCurrency,
+}: FeaturesProps): JSX.Element {
   const { t } = simpleT(locale);
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -55,6 +71,7 @@ export default function Features({
       title: t("app.story._components.home.features.contentCreation.title"),
       description: t(
         "app.story._components.home.features.contentCreation.description",
+        { modelCount },
       ),
     },
     {
@@ -82,7 +99,9 @@ export default function Features({
     },
     {
       icon: <TrendingUp className="h-10 w-10 text-cyan-500" />,
-      title: t("app.story._components.home.features.growth.title"),
+      title: t("app.story._components.home.features.growth.title", {
+        modelCount,
+      }),
       description: t("app.story._components.home.features.growth.description"),
     },
     {
@@ -102,6 +121,14 @@ export default function Features({
       title: t("app.story._components.home.features.adCampaigns.title"),
       description: t(
         "app.story._components.home.features.adCampaigns.description",
+        {
+          subCurrency,
+          subPrice,
+          subCredits,
+          packCurrency,
+          packPrice,
+          packCredits,
+        },
       ),
     },
   ];

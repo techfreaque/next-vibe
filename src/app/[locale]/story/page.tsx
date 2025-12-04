@@ -11,6 +11,13 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { threadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
+import {
+  ProductIds,
+  productsRepository,
+  TOTAL_MODEL_COUNT,
+} from "@/app/api/[locale]/products/repository-client";
+import { languageConfig } from "@/i18n";
+import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
 import CallToAction from "./_components/call-to-action";
 import Features from "./_components/features";
@@ -113,6 +120,19 @@ export default async function HomePage({
   const activeUserCount = activeUserCountResponse.success ? activeUserCountResponse.data : 0;
   const totalConversations = totalConversationsResponse.success ? totalConversationsResponse.data : 0;
 
+  // Get pricing information for features section
+  const products = productsRepository.getProducts(locale);
+  const country = getCountryFromLocale(locale);
+  const countryInfo = languageConfig.countryInfo[country];
+
+  const SUBSCRIPTION_PRICE = products[ProductIds.SUBSCRIPTION].price;
+  const SUBSCRIPTION_CREDITS = products[ProductIds.SUBSCRIPTION].credits;
+  const PACK_PRICE = products[ProductIds.CREDIT_PACK].price;
+  const PACK_CREDITS = products[ProductIds.CREDIT_PACK].credits;
+
+  // Get currency symbol from languageConfig
+  const CURRENCY_SYMBOL = countryInfo.symbol;
+
   return (
     <Div role="main" className="flex min-h-screen flex-col w-full">
       {/* Hero Section */}
@@ -123,7 +143,16 @@ export default async function HomePage({
       />
 
       {/* Features Section */}
-      <Features locale={locale} />
+      <Features
+        locale={locale}
+        modelCount={TOTAL_MODEL_COUNT}
+        subPrice={SUBSCRIPTION_PRICE}
+        subCredits={SUBSCRIPTION_CREDITS}
+        subCurrency={CURRENCY_SYMBOL}
+        packPrice={PACK_PRICE}
+        packCredits={PACK_CREDITS}
+        packCurrency={CURRENCY_SYMBOL}
+      />
 
       {/* Pricing Section with Overview and Buy Credits */}
       <StoryPricingSection

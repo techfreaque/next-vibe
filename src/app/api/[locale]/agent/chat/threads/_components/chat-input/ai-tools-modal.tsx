@@ -237,7 +237,7 @@ export function AIToolsModal({
   const handleResetToDefault = (): void => {
     onToolsChange([...DEFAULT_TOOL_IDS]);
     logger.debug("AIToolsModal", "Reset to default tools", {
-      defaultToolIds: DEFAULT_TOOL_IDS,
+      defaultToolIds: [...DEFAULT_TOOL_IDS],
     });
   };
 

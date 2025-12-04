@@ -13,7 +13,6 @@ import { userRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { simpleT } from "@/i18n/core/shared";
 import {
   ProductIds,
   productsRepository,
@@ -51,7 +50,6 @@ export default async function HistoryPage({
   params,
 }: HistoryPageProps): Promise<JSX.Element> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
 
   // Check authentication
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -139,7 +137,6 @@ export default async function HistoryPage({
       initialHistory={history}
       initialSubscription={subscription}
       freeCredits={FREE_CREDITS}
-      t={t}
     />
   );
 }

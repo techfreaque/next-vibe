@@ -9,12 +9,32 @@
  */
 
 // Type definitions for Oxlint AST nodes
-interface OxlintASTNode {
+interface BaseASTNode {
   type: string;
-  [key: string]: unknown;
 }
 
-interface Property extends OxlintASTNode {
+interface Identifier extends BaseASTNode {
+  type: "Identifier";
+  name: string;
+}
+
+interface Literal extends BaseASTNode {
+  type: "Literal";
+  value: string | number | boolean | null;
+  raw?: string;
+}
+
+interface JSXElement extends BaseASTNode {
+  type: "JSXElement";
+}
+
+interface JSXFragment extends BaseASTNode {
+  type: "JSXFragment";
+}
+
+type OxlintASTNode = BaseASTNode | Identifier | Literal | JSXElement | JSXFragment | Property | ParenthesizedExpression;
+
+interface Property extends BaseASTNode {
   type: "Property";
   key?: OxlintASTNode;
   value?: OxlintASTNode;
@@ -22,7 +42,7 @@ interface Property extends OxlintASTNode {
   method?: boolean;
 }
 
-interface ParenthesizedExpression extends OxlintASTNode {
+interface ParenthesizedExpression extends BaseASTNode {
   type: "ParenthesizedExpression";
   expression?: OxlintASTNode;
 }
@@ -32,9 +52,11 @@ interface OxlintComment {
   value: string;
 }
 
+type RuleOption = string | number | boolean | Record<string, string | number | boolean>;
+
 interface OxlintRuleContext {
   report: (descriptor: { node: OxlintASTNode; message: string }) => void;
-  options?: unknown[];
+  options?: RuleOption[];
   getCommentsInside?: (node: OxlintASTNode) => OxlintComment[];
   getCommentsBefore?: (node: OxlintASTNode) => OxlintComment[];
   getFilename?: () => string;
@@ -84,19 +106,6 @@ function isAllowedPath(context: OxlintRuleContext): boolean {
 
   if (!filename) {
     return false;
-  }
-
-  // Normalize path separators
-  const normalizedPath = filename.replace(/\\/g, "/");
-
-  // Allow unified-interface system code (infrastructure)
-  if (normalizedPath.includes("/core/system/unified-interface/")) {
-    return true;
-  }
-
-  // Allow oxlint plugins (infrastructure)
-  if (normalizedPath.includes("/core/system/check/oxlint/plugins/")) {
-    return true;
   }
 
   return false;
@@ -158,13 +167,13 @@ function isIconKey(prop: OxlintASTNode): boolean {
     return false;
   }
   if (key.type === "Identifier") {
-    return (key as { name?: string }).name === "icon";
+    return (key as Identifier).name === "icon";
   }
   if (
     key.type === "Literal" &&
-    typeof (key as { value?: unknown }).value === "string"
+    typeof (key as Literal).value === "string"
   ) {
-    return (key as { value?: string }).value === "icon";
+    return (key as Literal).value === "icon";
   }
   return false;
 }

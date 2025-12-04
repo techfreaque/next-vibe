@@ -76,7 +76,7 @@ export interface EndpointRendererProps<
  * Recursively extracts fields from nested containers, preserving full paths
  */
 function extractAllFields(
-  fields: unknown,
+  fields: UnifiedField,
   parentPath = "",
 ): Array<[string, UnifiedField]> {
   if (!fields || typeof fields !== "object") {
@@ -85,7 +85,7 @@ function extractAllFields(
 
   const fieldsObj = fields as {
     type?: string;
-    children?: Record<string, unknown>;
+    children?: Record<string, UnifiedField>;
   };
 
   // Check if this is an object field with children
@@ -100,7 +100,7 @@ function extractAllFields(
       // Check if this is a container with nested fields
       const fieldDefObj = fieldDef as {
         type?: string;
-        children?: Record<string, unknown>;
+        children?: Record<string, UnifiedField>;
         ui?: { type?: string };
       };
 
@@ -212,7 +212,7 @@ export function EndpointRenderer<
       data={data?.[fieldName] ?? null}
       field={field}
       context={context}
-      form={form}
+      form={form as UseFormReturn<FieldValues>}
     />
   ));
 
@@ -225,7 +225,7 @@ export function EndpointRenderer<
       data={data?.[fieldName] ?? null}
       field={field}
       context={context}
-      form={form}
+      form={form as UseFormReturn<FieldValues>}
     />
   ));
 
