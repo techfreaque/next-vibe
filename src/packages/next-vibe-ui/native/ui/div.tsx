@@ -21,10 +21,29 @@ const StyledPressable = styled(Pressable, { className: "style" });
 export type DivProps = DivBaseProps & StyleType;
 
 // Create compatibility layer functions
-function createDivRefObject(_view: View | null): DivRefObject | null {
-  // React Native doesn't have DOM refs, return null for compatibility
+function createDivRefObject(_view: View | null): DivRefObject {
+  // React Native doesn't have DOM refs, return polyfill object for compatibility
   // The web version returns actual DOM Element refs
-  return null;
+  return {
+    focus: (): void => {
+      // No-op for React Native
+    },
+    blur: (): void => {
+      // No-op for React Native
+    },
+    scrollIntoView: (): void => {
+      // No-op for React Native
+    },
+    scrollTop: 0,
+    scrollHeight: 0,
+    clientHeight: 0,
+    addEventListener: (): void => {
+      // No-op for React Native
+    },
+    removeEventListener: (): void => {
+      // No-op for React Native
+    },
+  } as DivRefObject;
 }
 
 function createDivGenericTarget(): DivGenericTarget {
@@ -145,7 +164,7 @@ export const Div = React.forwardRef<DivRefObject, Omit<DivProps, "ref">>(
 
     const viewRef = React.useRef<View>(null);
 
-    React.useImperativeHandle(ref, (): DivRefObject | null => {
+    React.useImperativeHandle(ref, (): DivRefObject => {
       const node = viewRef.current;
       return createDivRefObject(node);
     }, []);

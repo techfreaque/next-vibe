@@ -95,7 +95,7 @@ export interface DivKeyboardEvent {
   type: string;
 }
 
-export type DivRefObject = Element & {
+export interface DivRefObject {
   focus?: () => void;
   blur?: () => void;
   scrollIntoView: (options?: {
@@ -116,7 +116,7 @@ export type DivRefObject = Element & {
     listener: (event: Event) => void,
     options?: boolean | EventListenerOptions,
   ) => void;
-};
+}
 
 export type DivProps = {
   children?: React.ReactNode;
@@ -165,7 +165,7 @@ export const Div = React.forwardRef<DivRefObject, DivProps>(
   ): JSX.Element => {
     return (
       <div
-        ref={ref}
+        ref={ref as React.Ref<HTMLDivElement>}
         className={className}
         style={style}
         role={role}

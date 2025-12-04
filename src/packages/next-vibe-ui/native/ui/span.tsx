@@ -21,10 +21,27 @@ const StyledPressable = styled(Pressable, { className: "style" });
 export type SpanProps = SpanBaseProps & StyleType;
 
 // Create compatibility layer functions
-function createSpanRefObject(_text: RNText | null): SpanRefObject | null {
-  // React Native doesn't have DOM refs, return null for compatibility
-  // The web version returns actual DOM Element refs
-  return null;
+function createSpanRefObject(_text: RNText | null): SpanRefObject {
+  return {
+    focus: (): void => {
+      // No-op for React Native
+    },
+    blur: (): void => {
+      // No-op for React Native
+    },
+    scrollIntoView: (): void => {
+      // No-op for React Native
+    },
+    scrollTop: 0,
+    scrollHeight: 0,
+    clientHeight: 0,
+    addEventListener: (): void => {
+      // No-op for React Native
+    },
+    removeEventListener: (): void => {
+      // No-op for React Native
+    },
+  };
 }
 
 function createSpanGenericTarget(): SpanGenericTarget {
@@ -116,7 +133,7 @@ export const Span = React.forwardRef<SpanRefObject, Omit<SpanProps, "ref">>(
   ): JSX.Element => {
     const textRef = React.useRef<RNText>(null);
 
-    React.useImperativeHandle(ref, (): SpanRefObject | null => {
+    React.useImperativeHandle(ref, (): SpanRefObject => {
       const node = textRef.current;
       return createSpanRefObject(node);
     }, []);

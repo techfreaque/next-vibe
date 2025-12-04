@@ -96,7 +96,7 @@ export interface SpanKeyboardEvent {
   type: string;
 }
 
-export type SpanRefObject = Element & {
+export interface SpanRefObject {
   focus?: () => void;
   blur?: () => void;
   scrollIntoView: (options?: {
@@ -117,7 +117,7 @@ export type SpanRefObject = Element & {
     listener: (event: Event) => void,
     options?: boolean | EventListenerOptions,
   ) => void;
-};
+}
 
 export type SpanProps = {
   children?: React.ReactNode;

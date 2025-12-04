@@ -37,14 +37,18 @@ export type InputProps<
 function createInputRefObject(
   input: TextInput | null,
   value: string | undefined,
-): InputRefObject | null {
-  if (!input) {
-    return null;
-  }
-
+): InputRefObject {
   return {
-    focus: (): void => input.focus(),
-    blur: (): void => input.blur(),
+    focus: (): void => {
+      if (input) {
+        input.focus();
+      }
+    },
+    blur: (): void => {
+      if (input) {
+        input.blur();
+      }
+    },
     select: (): void => {
       // React Native TextInput doesn't support select()
     },
@@ -145,7 +149,7 @@ function InputInner<
   // Handle ref forwarding
   React.useImperativeHandle(
     ref,
-    (): InputRefObject | null => {
+    (): InputRefObject => {
       return createInputRefObject(nativeRef.current, stringValue);
     },
     [stringValue],
