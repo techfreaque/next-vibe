@@ -12,7 +12,7 @@
  */
 
 import type { JSX } from "react";
-import { redirect } from "next/navigation";
+import { redirect } from "next-vibe-ui/lib/redirect";
 
 import { ChatProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";

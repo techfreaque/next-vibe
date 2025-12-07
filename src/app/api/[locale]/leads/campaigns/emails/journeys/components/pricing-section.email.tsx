@@ -18,7 +18,7 @@ import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import { getLocaleString } from "@/i18n/core/localization-utils";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { LucideEmailIcon } from "../../components";
+import { LucideEmailIcon } from "../../components.email";
 
 /**
  * Email-compatible plan icons matching the website pricing section

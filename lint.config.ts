@@ -77,6 +77,7 @@ export const oxlintConfig: OxlintConfig = {
 
   jsPlugins: [
     `${projectRoot}/src/app/api/[locale]/system/check/oxlint/plugins/restricted-syntax/src/index.ts`,
+    `${projectRoot}/src/app/api/[locale]/system/check/oxlint/plugins/jsx-capitalization/src/index.ts`,
     ...(enableI18n
       ? [
           `${projectRoot}/src/app/api/[locale]/system/check/oxlint/plugins/i18n/src/index.ts`,
@@ -272,6 +273,7 @@ export const oxlintConfig: OxlintConfig = {
     // Custom JS Plugin Rules
     // ========================================
     "oxlint-plugin-restricted/restricted-syntax": "error",
+    "oxlint-plugin-jsx-capitalization/jsx-capitalization": "error",
     "oxlint-plugin-i18n/no-literal-string": [
       "error",
       {

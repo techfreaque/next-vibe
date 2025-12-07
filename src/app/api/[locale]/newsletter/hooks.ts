@@ -163,8 +163,8 @@ export function useNewsletterManager(
     false,
   );
 
-  // Use user email if logged in, otherwise use manual input
-  const email: string = user ? user.email : manualEmail;
+  // Use user email if logged in (and private user), otherwise use manual input
+  const email: string = user && !user.isPublic ? user.email : manualEmail;
 
   // Improved email validation
   const isValidEmail = useCallback((emailToValidate: string): boolean => {

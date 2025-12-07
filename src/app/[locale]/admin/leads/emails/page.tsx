@@ -7,6 +7,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
+import { Strong } from "next-vibe-ui/ui/strong";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
@@ -102,15 +103,15 @@ export default async function LeadsEmailsPage({
                       <CardContent className="flex flex-col gap-3">
                         <Div className="text-sm text-gray-600 dark:text-gray-400">
                           <P>
-                            <strong>
+                            <Strong>
                               {t("app.admin.leads.leads.admin.emails.journey")}:
-                            </strong>{" "}
+                            </Strong>{" "}
                             {journey.info.name}
                           </P>
                           <P>
-                            <strong>
+                            <Strong>
                               {t("app.admin.leads.leads.admin.emails.stage")}:
-                            </strong>{" "}
+                            </Strong>{" "}
                             {getStageDisplayName(stage)}
                           </P>
                         </Div>

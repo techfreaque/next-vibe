@@ -30,6 +30,18 @@ export interface DrawerCloseProps {
   children?: React.ReactNode;
 }
 
+export interface DrawerTriggerRefObject {
+  click?: () => void;
+  focus?: () => void;
+  blur?: () => void;
+}
+
+export interface DrawerCloseRefObject {
+  click?: () => void;
+  focus?: () => void;
+  blur?: () => void;
+}
+
 export type DrawerOverlayProps = {
   children?: React.ReactNode;
 } & StyleType;
@@ -71,11 +83,65 @@ const Drawer = ({
 );
 Drawer.displayName = "Drawer";
 
-const DrawerTrigger = DrawerPrimitive.Trigger;
+const DrawerTrigger = React.forwardRef<DrawerTriggerRefObject, DrawerTriggerProps>(
+  ({ asChild, children }, ref) => {
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+    React.useImperativeHandle(ref, (): DrawerTriggerRefObject => {
+      const element = buttonRef.current;
+      if (!element) {
+        return {
+          click: (): void => undefined,
+          focus: (): void => undefined,
+          blur: (): void => undefined,
+        };
+      }
+      return {
+        click: (): void => element.click(),
+        focus: (): void => element.focus(),
+        blur: (): void => element.blur(),
+      };
+    }, []);
+
+    return (
+      <DrawerPrimitive.Trigger ref={buttonRef} asChild={asChild}>
+        {children}
+      </DrawerPrimitive.Trigger>
+    );
+  },
+);
+DrawerTrigger.displayName = "DrawerTrigger";
 
 const DrawerPortal = DrawerPrimitive.Portal;
 
-const DrawerClose = DrawerPrimitive.Close;
+const DrawerClose = React.forwardRef<DrawerCloseRefObject, DrawerCloseProps>(
+  ({ asChild, children }, ref) => {
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+    React.useImperativeHandle(ref, (): DrawerCloseRefObject => {
+      const element = buttonRef.current;
+      if (!element) {
+        return {
+          click: (): void => undefined,
+          focus: (): void => undefined,
+          blur: (): void => undefined,
+        };
+      }
+      return {
+        click: (): void => element.click(),
+        focus: (): void => element.focus(),
+        blur: (): void => element.blur(),
+      };
+    }, []);
+
+    return (
+      <DrawerPrimitive.Close ref={buttonRef} asChild={asChild}>
+        {children}
+      </DrawerPrimitive.Close>
+    );
+  },
+);
+DrawerClose.displayName = "DrawerClose";
 
 function DrawerOverlay({
   className,

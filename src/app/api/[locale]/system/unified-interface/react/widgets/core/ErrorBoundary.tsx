@@ -1,8 +1,15 @@
 "use client";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { AlertTriangle } from "next-vibe-ui/ui/icons";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "next-vibe-ui/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
+import { AlertTriangle } from "next-vibe-ui/ui/icons";
+import { Pre } from "next-vibe-ui/ui/pre";
 import React, { Component, type ErrorInfo, type ReactNode } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
@@ -86,16 +93,20 @@ export class WidgetErrorBoundary extends Component<
                 "app.api.system.unifiedInterface.react.widgets.errorBoundary.defaultMessage",
               )}
             {this.state.errorInfo && (
-              <details className="mt-2 text-xs">
-                <summary className="cursor-pointer">
-                  {t(
-                    "app.api.system.unifiedInterface.react.widgets.errorBoundary.errorDetails",
-                  )}
-                </summary>
-                <pre className="mt-2 overflow-auto p-2 bg-muted rounded">
-                  {this.state.errorInfo.componentStack}
-                </pre>
-              </details>
+              <Accordion type="single" collapsible className="mt-2 text-xs">
+                <AccordionItem value="details">
+                  <AccordionTrigger>
+                    {t(
+                      "app.api.system.unifiedInterface.react.widgets.errorBoundary.errorDetails",
+                    )}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <Pre className="mt-2 overflow-auto p-2 bg-muted rounded">
+                      {this.state.errorInfo.componentStack}
+                    </Pre>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             )}
           </AlertDescription>
         </Alert>

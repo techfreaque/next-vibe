@@ -4,10 +4,11 @@
  * Only persists user-initiated changes, not automatic switches
  */
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 import type { ChatMessage } from "../db";
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
 import { parseError } from "../../../shared/utils";
+import { storage } from "next-vibe-ui/lib/storage";
 
 const STORAGE_KEY_PREFIX = "chat_branch_state_";
 const STORAGE_VERSION = 1;
@@ -28,8 +29,8 @@ interface UseBranchPersistenceProps {
 }
 
 interface UseBranchPersistenceReturn {
-  // Load persisted state (call once on mount)
-  loadPersistedState: () => Record<string, number>;
+  // Load persisted state (call once on mount) - now async
+  loadPersistedState: () => Promise<Record<string, number>>;
   // Save state (only call for user-initiated changes)
   saveUserSelection: (parentId: string, index: number) => void;
   // Validate that indices are still valid given current messages
@@ -106,10 +107,12 @@ export function useBranchPersistence({
   );
 
   /**
-   * Load persisted branch state from localStorage
+   * Load persisted branch state from storage
    * Validates and sanitizes the data
    */
-  const loadPersistedState = useCallback((): Record<string, number> => {
+  const loadPersistedState = useCallback(async (): Promise<
+    Record<string, number>
+  > => {
     // Don't load state if no valid thread ID
     if (!threadId || threadId.length === 0) {
       return {};
@@ -117,7 +120,7 @@ export function useBranchPersistence({
 
     try {
       const key = getStorageKey();
-      const stored = localStorage.getItem(key);
+      const stored = await storage.getItem(key);
 
       if (!stored) {
         return {};
@@ -135,7 +138,7 @@ export function useBranchPersistence({
         typeof state.branchIndices !== "object"
       ) {
         logger.warn("[BranchPersistence] Invalid stored state, clearing");
-        localStorage.removeItem(key);
+        await storage.removeItem(key);
         return {};
       }
 
@@ -158,7 +161,7 @@ export function useBranchPersistence({
   }, [getStorageKey, threadId, validateIndices, logger]);
 
   /**
-   * Save user's branch selection to localStorage
+   * Save user's branch selection to storage
    * Only call this when user manually switches branches
    */
   const saveUserSelection = useCallback(
@@ -168,85 +171,52 @@ export function useBranchPersistence({
         return;
       }
 
-      try {
-        const key = getStorageKey();
-        let state: BranchState;
-
-        // Load existing state or create new
+      // Fire and forget async save
+      void (async (): Promise<void> => {
         try {
-          const stored = localStorage.getItem(key);
-          state = stored
-            ? JSON.parse(stored)
-            : {
-                version: STORAGE_VERSION,
-                threadId,
-                branchIndices: {},
-                userSelected: {},
-                lastUpdated: Date.now(),
-              };
-        } catch {
-          state = {
-            version: STORAGE_VERSION,
-            threadId,
-            branchIndices: {},
-            userSelected: {},
-            lastUpdated: Date.now(),
-          };
+          const key = getStorageKey();
+          let state: BranchState;
+
+          // Load existing state or create new
+          try {
+            const stored = await storage.getItem(key);
+            state = stored
+              ? JSON.parse(stored)
+              : {
+                  version: STORAGE_VERSION,
+                  threadId,
+                  branchIndices: {},
+                  userSelected: {},
+                  lastUpdated: Date.now(),
+                };
+          } catch {
+            state = {
+              version: STORAGE_VERSION,
+              threadId,
+              branchIndices: {},
+              userSelected: {},
+              lastUpdated: Date.now(),
+            };
+          }
+
+          // Update with new user selection
+          state.branchIndices[parentId] = index;
+          state.userSelected[parentId] = true; // Mark as user-selected
+          state.lastUpdated = Date.now();
+
+          // Save to storage
+          await storage.setItem(key, JSON.stringify(state));
+        } catch (error) {
+          // storage might be full or unavailable
+          logger.error(
+            "[BranchPersistence] Error saving state:",
+            parseError(error),
+          );
         }
-
-        // Update with new user selection
-        state.branchIndices[parentId] = index;
-        state.userSelected[parentId] = true; // Mark as user-selected
-        state.lastUpdated = Date.now();
-
-        // Save to localStorage
-        localStorage.setItem(key, JSON.stringify(state));
-      } catch (error) {
-        // localStorage might be full or unavailable
-        logger.error(
-          "[BranchPersistence] Error saving state:",
-          parseError(error),
-        );
-      }
+      })();
     },
     [getStorageKey, threadId, logger],
   );
-
-  /**
-   * Clean up old storage entries (optional maintenance)
-   * Removes entries older than 30 days
-   */
-  useEffect(() => {
-    const cleanupOldEntries = (): void => {
-      try {
-        const now = Date.now();
-        const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key?.startsWith(STORAGE_KEY_PREFIX)) {
-            try {
-              const stored = localStorage.getItem(key);
-              if (stored) {
-                const state: BranchState = JSON.parse(stored);
-                if (now - state.lastUpdated > thirtyDaysMs) {
-                  localStorage.removeItem(key);
-                }
-              }
-            } catch {
-              // Invalid entry, remove it
-              localStorage.removeItem(key);
-            }
-          }
-        }
-      } catch (error) {
-        logger.error("[BranchPersistence] Cleanup error:", parseError(error));
-      }
-    };
-
-    // Run cleanup once on mount
-    cleanupOldEntries();
-  }, [logger]);
 
   return {
     loadPersistedState,

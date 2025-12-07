@@ -4,6 +4,7 @@ import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
+import { Section } from "next-vibe-ui/ui/section";
 import { H2, P } from "next-vibe-ui/ui/typography";
 import type { FC } from "react";
 import { useInView } from "react-intersection-observer";
@@ -23,7 +24,7 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
   });
 
   return (
-    <section
+    <Section
       id="contact"
       className="container px-4 md:px-6 py-24 md:py-32"
       ref={ref}
@@ -75,7 +76,7 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
           </Div>
         </Div>
       </MotionDiv>
-    </section>
+    </Section>
   );
 };
 

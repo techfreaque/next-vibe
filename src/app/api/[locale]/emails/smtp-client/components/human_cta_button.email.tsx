@@ -5,8 +5,8 @@
 
 import type React from "react";
 
-import { TrackedLink } from "./tracked_link";
-import type { TrackingContext } from "./tracking_context";
+import { TrackedLink } from "./tracked_link.email";
+import type { TrackingContext } from "./tracking_context.email";
 
 /**
  * Human CTA Button Props

@@ -1,4 +1,5 @@
 "use client";
+import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
@@ -181,17 +182,16 @@ export function ChatSidebar({
   // Sort by pinned status (pinned first) and then by updatedAt (newest first)
   const filteredSearchThreads = useMemo(
     () =>
-      searchResults
-        .map((result) => threads[result.id])
-        .filter(Boolean)
-        .toSorted((a, b) => {
-          // Pinned threads come first
-          if (a.pinned !== b.pinned) {
-            return a.pinned ? -1 : 1;
-          }
-          // Then sort by updatedAt (newest first)
-          return b.updatedAt.getTime() - a.updatedAt.getTime();
-        }),
+      (
+        searchResults.map((result) => threads[result.id]).filter(Boolean) || []
+      ).toSorted((a, b) => {
+        // Pinned threads come first
+        if (a.pinned !== b.pinned) {
+          return a.pinned ? -1 : 1;
+        }
+        // Then sort by updatedAt (newest first)
+        return b.updatedAt.getTime() - a.updatedAt.getTime();
+      }),
     [searchResults, threads],
   );
 
@@ -230,6 +230,7 @@ export function ChatSidebar({
                       onClick={() => handleCreateThread(activeRootFolderId)}
                       disabled={isOnNewThreadPage}
                       className={`w-full h-10 sm:h-9 ${getButtonColorClasses(rootFolderColor)}`}
+                      data-tour={TOUR_DATA_ATTRS.NEW_CHAT_BUTTON}
                     >
                       <MessageSquarePlus className="h-4 w-4 mr-2" />
                       {t(getNewChatTranslationKey(activeRootFolderId))}

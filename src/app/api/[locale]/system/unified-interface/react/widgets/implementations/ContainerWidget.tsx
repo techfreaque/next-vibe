@@ -20,13 +20,13 @@ import {
 } from "../../../shared/widgets/types";
 import { extractContainerData } from "../../../shared/widgets/logic/container";
 import { WidgetType } from "../../../shared/types/enums";
-import type { UnifiedField } from "../../../shared/types/endpoint";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 import {
   extractLayoutConfig,
   getLayoutClassName,
   extractContainerDescription,
 } from "../../../shared/widgets/utils/widget-helpers";
+import type { UnifiedField } from "../../../shared/types/endpoint";
 
 /**
  * Container Widget Component
@@ -87,9 +87,9 @@ export function ContainerWidget({
                 : WidgetType.TEXT;
             const childData =
               "data" in child ? (child.data as WidgetData) : null;
-            const childField =
+            const childField: UnifiedField =
               "field" in child && typeof child.field === "object"
-                ? (child.field as UnifiedField)
+                ? child.field
                 : field;
 
             return (

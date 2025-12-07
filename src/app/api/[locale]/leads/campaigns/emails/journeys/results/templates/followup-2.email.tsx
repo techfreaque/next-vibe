@@ -4,15 +4,14 @@
  */
 
 import React from "react";
-
+import type { EmailRenderContext, EmailTemplateFunction } from "../../../types";
 import {
   CTAButton,
   EmailContent,
   EmailFooter,
   EmailHeader,
   EmailLayout,
-} from "../../../components";
-import type { EmailRenderContext, EmailTemplateFunction } from "../../../types";
+} from "../../../components.email";
 
 /**
  * Results Journey - Follow-up 2 Email

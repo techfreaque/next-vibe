@@ -116,7 +116,7 @@ export function getFolderColorClasses(color: string | null): {
  * Sort threads by pinned status (pinned first) and then by updatedAt (newest first)
  */
 function sortThreads(threads: ChatThread[]): ChatThread[] {
-  return threads.toSorted((a, b) => {
+  return (threads || []).toSorted((a, b) => {
     // Pinned threads come first
     if (a.pinned !== b.pinned) {
       return a.pinned ? -1 : 1;

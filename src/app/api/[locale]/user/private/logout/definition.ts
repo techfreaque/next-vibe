@@ -31,6 +31,7 @@ const { POST } = createEndpoint({
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
+    UserRole.AI_TOOL_OFF,
   ] as const,
   fields: objectField(
     {

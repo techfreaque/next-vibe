@@ -9,7 +9,7 @@ import {
 import { cn } from "next-vibe/shared/utils/utils";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
-import { TextClassContext } from "./text";
+import { Text, TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });
 
@@ -29,7 +29,7 @@ function Badge({
           className: cn(badgeVariants({ variant }), className),
         })}
       >
-        {children}
+        <Text>{children}</Text>
       </StyledView>
     </TextClassContext.Provider>
   );

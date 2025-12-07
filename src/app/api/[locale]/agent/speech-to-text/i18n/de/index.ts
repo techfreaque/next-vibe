@@ -8,7 +8,8 @@ export const translations: typeof enTranslations = {
   hotkey: {
     post: {
       title: "Sprache-zu-Text-Hotkey",
-      description: "Audio aufnehmen und transkribieren mit automatischer Texteinfügung",
+      description:
+        "Audio aufnehmen und transkribieren mit automatischer Texteinfügung",
       form: {
         title: "Hotkey-Konfiguration",
         description: "Sprache-zu-Text-Hotkey-Einstellungen konfigurieren",
@@ -47,7 +48,8 @@ export const translations: typeof enTranslations = {
       errors: {
         unauthorized: {
           title: "Nicht autorisiert",
-          description: "Sie müssen angemeldet sein, um diese Funktion zu nutzen",
+          description:
+            "Sie müssen angemeldet sein, um diese Funktion zu nutzen",
         },
         validation: {
           title: "Validierungsfehler",
@@ -135,10 +137,12 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Sprache zu Text",
-    description: "Konvertieren Sie Audio in Text mit KI-Transkription (~0,011 Credits pro Sekunde)",
+    description:
+      "Konvertieren Sie Audio in Text mit KI-Transkription (0,013 Credits pro Sekunde, 0,78 Credits pro Minute)",
     form: {
       title: "Audio-Transkription",
-      description: "Laden Sie eine Audiodatei zum Transkribieren hoch (Deepgram: ~0,011 Credits pro Sekunde)",
+      description:
+        "Laden Sie eine Audiodatei zum Transkribieren hoch (0,013 Credits pro Sekunde, 0,78 Credits pro Minute)",
     },
     fileUpload: {
       title: "Audiodatei-Upload",
@@ -190,7 +194,8 @@ export const translations: typeof enTranslations = {
       failed: "Transkription fehlgeschlagen",
       timeout: "Transkriptions-Zeitüberschreitung",
       creditsFailed: "Fehler beim Abziehen der Credits: {{error}}",
-      providerError: "Fehler beim Transkriptionsdienst. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support, wenn das Problem weiterhin besteht.",
+      providerError:
+        "Fehler beim Transkriptionsdienst. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support, wenn das Problem weiterhin besteht.",
     },
     success: {
       title: "Erfolg",

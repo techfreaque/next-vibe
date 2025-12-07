@@ -10,6 +10,7 @@ import { leadId } from "@/app/api/[locale]/leads/types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
+  objectUnionField,
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -26,7 +27,8 @@ import { UserRole } from "../../user-roles/enum";
 import { userRoleResponseSchema } from "../../user-roles/types";
 
 /**
- * GET /me - Retrieve current user profile
+ * GET /me - Retrieve current user profile or JWT payload
+ * Supports both authenticated users (full profile) and public users (JWT payload only)
  */
 const { GET } = createEndpoint({
   method: Methods.GET,
@@ -36,12 +38,13 @@ const { GET } = createEndpoint({
   category: "app.api.user.category" as const,
   tags: ["app.api.user.private.me.tag" as const],
   allowedRoles: [
+    UserRole.PUBLIC,
     UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
-  fields: objectField(
+  fields: objectUnionField(
     {
       type: WidgetType.CONTAINER,
       title: "app.api.user.private.me.get.response.title" as const,
@@ -50,113 +53,162 @@ const { GET } = createEndpoint({
       columns: 12,
     },
     { response: true },
-    {
-      id: responseField(
+    "isPublic",
+    [
+      // Public user variant (JWT payload only)
+      objectField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.me.get.response.id" as const,
+          type: WidgetType.CONTAINER,
+          title: "app.api.user.private.me.get.response.user.title" as const,
+          description:
+            "app.api.user.private.me.get.response.user.description" as const,
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
-        z.uuid(),
-      ),
-      leadId: responseField(
+        { response: true },
         {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.me.get.response.leadId" as const,
+          isPublic: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.user.private.me.get.response.isPublic" as const,
+            },
+            z.literal(true),
+          ),
+          leadId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.get.response.leadId" as const,
+            },
+            leadId,
+          ),
         },
-        leadId.nullable(),
       ),
-      isPublic: responseField(
+      // Private user variant (full profile)
+      objectField(
         {
-          type: WidgetType.BADGE,
-          text: "app.api.user.private.me.get.response.isPublic" as const,
+          type: WidgetType.CONTAINER,
+          title: "app.api.user.private.me.get.response.user.title" as const,
+          description:
+            "app.api.user.private.me.get.response.user.description" as const,
+          layoutType: LayoutType.GRID,
+          columns: 12,
         },
-        z.literal(false),
-      ),
-      email: responseField(
+        { response: true },
         {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.me.get.response.email" as const,
+          isPublic: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.user.private.me.get.response.isPublic" as const,
+            },
+            z.literal(false),
+          ),
+          id: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.get.response.id" as const,
+            },
+            z.uuid(),
+          ),
+          leadId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.get.response.leadId" as const,
+            },
+            leadId.nullable(),
+          ),
+          email: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.get.response.email" as const,
+            },
+            z.email({ message: "validationErrors.user.profile.email_invalid" }),
+          ),
+          privateName: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.user.private.me.get.response.privateName" as const,
+            },
+            z.string(),
+          ),
+          publicName: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.user.private.me.get.response.publicName" as const,
+            },
+            z.string(),
+          ),
+          locale: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.user.private.me.get.response.locale" as const,
+            },
+            z.string() as z.ZodType<CountryLanguage>,
+          ),
+          isActive: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.user.private.me.get.response.isActive" as const,
+            },
+            z.boolean().nullable(),
+          ),
+          emailVerified: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.user.private.me.get.response.emailVerified" as const,
+            },
+            z.boolean().nullable(),
+          ),
+          requireTwoFactor: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.user.private.me.get.response.requireTwoFactor" as const,
+            },
+            z.boolean(),
+          ),
+          marketingConsent: responseField(
+            {
+              type: WidgetType.BADGE,
+              text: "app.api.user.private.me.get.response.marketingConsent" as const,
+            },
+            z.boolean(),
+          ),
+          userRoles: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.user.private.me.get.response.userRoles" as const,
+            },
+            z.array(userRoleResponseSchema),
+          ),
+          createdAt: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.user.private.me.get.response.createdAt" as const,
+            },
+            dateSchema,
+          ),
+          updatedAt: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.user.private.me.get.response.updatedAt" as const,
+            },
+            dateSchema,
+          ),
+          stripeCustomerId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.user.private.me.get.response.stripeCustomerId" as const,
+            },
+            z.string().nullable(),
+          ),
         },
-        z.email({ message: "validationErrors.user.profile.email_invalid" }),
       ),
-      privateName: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.me.get.response.privateName" as const,
-        },
-        z.string(),
-      ),
-      publicName: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.me.get.response.publicName" as const,
-        },
-        z.string(),
-      ),
-      locale: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.me.get.response.locale" as const,
-        },
-        z.string() as z.ZodType<CountryLanguage>,
-      ),
-      isActive: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.user.private.me.get.response.isActive" as const,
-        },
-        z.boolean().nullable(),
-      ),
-      emailVerified: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.user.private.me.get.response.emailVerified" as const,
-        },
-        z.boolean().nullable(),
-      ),
-      requireTwoFactor: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.user.private.me.get.response.requireTwoFactor" as const,
-        },
-        z.boolean().optional(),
-      ),
-      marketingConsent: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.user.private.me.get.response.marketingConsent" as const,
-        },
-        z.boolean().optional(),
-      ),
-      userRoles: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.me.get.response.userRoles" as const,
-        },
-        z.array(userRoleResponseSchema),
-      ),
-      createdAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.me.get.response.createdAt" as const,
-        },
-        dateSchema,
-      ),
-      updatedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.me.get.response.updatedAt" as const,
-        },
-        dateSchema,
-      ),
-      stripeCustomerId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.user.private.me.get.response.stripeCustomerId" as const,
-        },
-        z.string().nullable(),
-      ),
-    },
+    ] as const,
   ),
 
   // === ERROR HANDLING ===
@@ -419,7 +471,8 @@ const { POST } = createEndpoint({
           leadId: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.update.response.leadId" as const,
+              content:
+                "app.api.user.private.me.update.response.leadId" as const,
             },
             leadId.nullable(),
           ),
@@ -440,21 +493,24 @@ const { POST } = createEndpoint({
           privateName: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.update.response.privateName" as const,
+              content:
+                "app.api.user.private.me.update.response.privateName" as const,
             },
             z.string(),
           ),
           publicName: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.update.response.publicName" as const,
+              content:
+                "app.api.user.private.me.update.response.publicName" as const,
             },
             z.string(),
           ),
           locale: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.update.response.locale" as const,
+              content:
+                "app.api.user.private.me.update.response.locale" as const,
             },
             z.string() as z.ZodType<CountryLanguage>,
           ),
@@ -489,28 +545,32 @@ const { POST } = createEndpoint({
           userRoles: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.update.response.userRoles" as const,
+              content:
+                "app.api.user.private.me.update.response.userRoles" as const,
             },
             z.array(userRoleResponseSchema),
           ),
           createdAt: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.update.response.createdAt" as const,
+              content:
+                "app.api.user.private.me.update.response.createdAt" as const,
             },
             dateSchema,
           ),
           updatedAt: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.update.response.updatedAt" as const,
+              content:
+                "app.api.user.private.me.update.response.updatedAt" as const,
             },
             dateSchema,
           ),
           stripeCustomerId: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.update.response.stripeCustomerId" as const,
+              content:
+                "app.api.user.private.me.update.response.stripeCustomerId" as const,
             },
             z.string().nullable(),
           ),
@@ -747,6 +807,7 @@ const { DELETE } = createEndpoint({
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
+    UserRole.AI_TOOL_OFF,
   ] as const,
   fields: objectField(
     {

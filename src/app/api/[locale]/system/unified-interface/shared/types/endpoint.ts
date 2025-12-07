@@ -203,6 +203,32 @@ type MatchesUsage<TUsage, TTargetUsage extends FieldUsage> =
  * COMPREHENSIVE SCHEMA INFERENCE: The complete type system
  * Back-propagates all 3 type parameters (Output, ZodType, Input) through the entire chain
  */
+/**
+ * Helper type to convert variant fields to Zod object schemas
+ */
+type InferVariantSchemas<
+  TVariants extends readonly ObjectField<
+    Record<string, UnifiedField<z.ZodTypeAny>>,
+    FieldUsageConfig
+  >[],
+  Usage extends FieldUsage,
+> = TVariants extends readonly [infer Head, ...infer Tail]
+  ? Head extends ObjectField<
+      Record<string, UnifiedField<z.ZodTypeAny>>,
+      FieldUsageConfig
+    >
+    ? Tail extends readonly ObjectField<
+        Record<string, UnifiedField<z.ZodTypeAny>>,
+        FieldUsageConfig
+      >[]
+      ? [
+          InferSchemaFromField<Head, Usage>,
+          ...InferVariantSchemas<Tail, Usage>,
+        ]
+      : [InferSchemaFromField<Head, Usage>]
+    : []
+  : [];
+
 export type InferSchemaFromField<F, Usage extends FieldUsage> =
   // Handle PrimitiveField
   F extends PrimitiveField<infer TSchemaInferred, FieldUsageConfig>
@@ -211,52 +237,92 @@ export type InferSchemaFromField<F, Usage extends FieldUsage> =
         ? TSchemaInferred
         : z.ZodNever
       : z.ZodNever
-    : // Handle ObjectField
-      F extends ObjectField<infer TChildren, FieldUsageConfig>
+    : // Handle ObjectUnionField
+      F extends ObjectUnionField<
+          infer TDiscriminator extends string,
+          infer TVariants,
+          FieldUsageConfig
+        >
       ? F extends { usage: infer TUsage }
         ? MatchesUsage<TUsage, Usage> extends true
-          ? z.ZodObject<{
-              [K in keyof TChildren as InferSchemaFromField<
-                TChildren[K],
-                Usage
-              > extends z.ZodNever
-                ? never
-                : K]: InferSchemaFromField<TChildren[K], Usage>;
-            }>
-          : z.ZodNever
-        : z.ZodNever
-      : // Handle ArrayField
-        F extends ArrayField<infer TChild, FieldUsageConfig>
-        ? F extends { usage: infer TUsage }
-          ? MatchesUsage<TUsage, Usage> extends true
-            ? z.ZodArray<
-                TChild extends UnifiedField<z.ZodTypeAny>
-                  ? InferSchemaFromField<TChild, Usage>
-                  : TChild extends z.ZodTypeAny
-                    ? TChild
-                    : z.ZodNever
+          ? TVariants extends readonly [
+              ObjectField<
+                Record<string, UnifiedField<z.ZodTypeAny>>,
+                FieldUsageConfig
+              >,
+              ObjectField<
+                Record<string, UnifiedField<z.ZodTypeAny>>,
+                FieldUsageConfig
+              >,
+              ...ObjectField<
+                Record<string, UnifiedField<z.ZodTypeAny>>,
+                FieldUsageConfig
+              >[],
+            ]
+            ? z.ZodDiscriminatedUnion<
+                InferVariantSchemas<TVariants, Usage> extends infer T
+                  ? T extends readonly [
+                      z.ZodObject<z.ZodRawShape>,
+                      z.ZodObject<z.ZodRawShape>,
+                      ...z.ZodObject<z.ZodRawShape>[],
+                    ]
+                    ? T
+                    : readonly [
+                        z.ZodObject<z.ZodRawShape>,
+                        z.ZodObject<z.ZodRawShape>,
+                      ]
+                  : readonly [z.ZodObject<z.ZodRawShape>, z.ZodObject<z.ZodRawShape>],
+                TDiscriminator
               >
             : z.ZodNever
           : z.ZodNever
-        : // Handle ArrayOptionalField
-          F extends ArrayOptionalField<infer TChild, FieldUsageConfig>
+        : z.ZodNever
+      : // Handle ObjectField
+        F extends ObjectField<infer TChildren, FieldUsageConfig>
+        ? F extends { usage: infer TUsage }
+          ? MatchesUsage<TUsage, Usage> extends true
+            ? z.ZodObject<{
+                [K in keyof TChildren as InferSchemaFromField<
+                  TChildren[K],
+                  Usage
+                > extends z.ZodNever
+                  ? never
+                  : K]: InferSchemaFromField<TChildren[K], Usage>;
+              }>
+            : z.ZodNever
+          : z.ZodNever
+        : // Handle ArrayField
+          F extends ArrayField<infer TChild, FieldUsageConfig>
           ? F extends { usage: infer TUsage }
             ? MatchesUsage<TUsage, Usage> extends true
-              ? z.ZodNullable<
-                  z.ZodArray<
-                    TChild extends UnifiedField<z.ZodTypeAny>
-                      ? InferSchemaFromField<TChild, Usage>
-                      : TChild extends z.ZodTypeAny
-                        ? TChild
-                        : z.ZodNever
-                  >
+              ? z.ZodArray<
+                  TChild extends UnifiedField<z.ZodTypeAny>
+                    ? InferSchemaFromField<TChild, Usage>
+                    : TChild extends z.ZodTypeAny
+                      ? TChild
+                      : z.ZodNever
                 >
               : z.ZodNever
             : z.ZodNever
-          : // Fallback: If F is not a UnifiedField but is a ZodTypeAny, return it directly
-            F extends z.ZodTypeAny
-            ? F
-            : z.ZodNever;
+          : // Handle ArrayOptionalField
+            F extends ArrayOptionalField<infer TChild, FieldUsageConfig>
+            ? F extends { usage: infer TUsage }
+              ? MatchesUsage<TUsage, Usage> extends true
+                ? z.ZodNullable<
+                    z.ZodArray<
+                      TChild extends UnifiedField<z.ZodTypeAny>
+                        ? InferSchemaFromField<TChild, Usage>
+                        : TChild extends z.ZodTypeAny
+                          ? TChild
+                          : z.ZodNever
+                    >
+                  >
+                : z.ZodNever
+              : z.ZodNever
+            : // Fallback: If F is not a UnifiedField but is a ZodTypeAny, return it directly
+              F extends z.ZodTypeAny
+              ? F
+              : z.ZodNever;
 
 /**
  * Infer the exact input type from a field structure for a specific usage
@@ -798,6 +864,29 @@ export interface ObjectOptionalField<
 }
 
 /**
+ * Object union field type for discriminated unions
+ * TDiscriminator is the name of the discriminator field (e.g., "isPublic")
+ * TVariants is an array of object variants (each must have a discriminator field)
+ * TUIConfig preserves the exact UI configuration type passed in
+ */
+export interface ObjectUnionField<
+  TDiscriminator extends string,
+  TVariants extends readonly [
+    ObjectField<Record<string, UnifiedField<z.ZodTypeAny>>, FieldUsageConfig>,
+    ...ObjectField<Record<string, UnifiedField<z.ZodTypeAny>>, FieldUsageConfig>[],
+  ],
+  TUsage extends FieldUsageConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
+> {
+  type: "object-union";
+  discriminator: TDiscriminator;
+  variants: TVariants;
+  usage: TUsage;
+  cache?: CacheStrategy;
+  ui: TUIConfig;
+}
+
+/**
  * Array field type with child preservation
  * TUIConfig preserves the exact UI configuration type passed in
  */
@@ -839,6 +928,14 @@ export type UnifiedField<TSchema extends z.ZodTypeAny = z.ZodTypeAny> =
   | ObjectField<Record<string, UnifiedField<z.ZodTypeAny>>, FieldUsageConfig>
   | ObjectOptionalField<
       Record<string, UnifiedField<z.ZodTypeAny>>,
+      FieldUsageConfig
+    >
+  | ObjectUnionField<
+      string,
+      readonly [
+        ObjectField<Record<string, UnifiedField<z.ZodTypeAny>>, FieldUsageConfig>,
+        ...ObjectField<Record<string, UnifiedField<z.ZodTypeAny>>, FieldUsageConfig>[],
+      ],
       FieldUsageConfig
     >
   | ArrayField<UnifiedField<z.ZodTypeAny> | z.ZodTypeAny, FieldUsageConfig>

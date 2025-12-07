@@ -20,7 +20,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { JwtPrivatePayloadType } from "../../auth/types";
+import type {
+  JwtPrivatePayloadType,
+  JwtPayloadType,
+} from "../../auth/types";
 import { users } from "../../db";
 import { UserDetailLevel } from "../../enum";
 import { userRepository } from "../../repository";
@@ -38,15 +41,15 @@ import type {
  */
 export interface UserProfileRepository {
   /**
-   * Get current user profile
+   * Get current user profile or JWT payload
    * @param data - Request data (empty for GET)
-   * @param user - User from JWT
+   * @param user - User from JWT (public or private)
    * @param locale - User locale
    * @param logger - Logger instance for debugging and monitoring
-   * @returns User profile data
+   * @returns User profile data (full for private, JWT payload for public)
    */
   getProfile(
-    user: JwtPrivatePayloadType,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<MeGetResponseOutput>>;
@@ -87,26 +90,36 @@ export interface UserProfileRepository {
  */
 export class UserProfileRepositoryImpl implements UserProfileRepository {
   /**
-   * Get current user profile
+   * Get current user profile or JWT payload
    * @param data - Request data (empty for GET)
-   * @param user - User from JWT
+   * @param user - User from JWT (public or private)
    * @param locale - User locale
    * @param logger - Logger instance for debugging and monitoring
-   * @returns User profile data
+   * @returns User profile data (full for private, JWT payload for public)
    */
   async getProfile(
-    user: JwtPrivatePayloadType,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<MeGetResponseOutput>> {
     try {
+      // Handle public users - return JWT payload only
+      if (user.isPublic) {
+        logger.debug("Getting public user JWT payload", { leadId: user.leadId });
+        return success({
+          isPublic: true,
+          leadId: user.leadId,
+        });
+      }
+
+      // Handle private users - return full profile
       if (!user.id) {
         return fail({
           message: "app.api.user.private.me.get.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
-      const userId: string = user.id; // We know it exists due to check above
+      const userId: string = user.id;
       logger.debug("Getting user profile", { userId });
 
       // Get complete user data
@@ -126,7 +139,10 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       }
 
       logger.debug("Successfully retrieved user profile", { userId });
-      return success(userResponse.data);
+      return success({
+        ...userResponse.data,
+        isPublic: false as const,
+      } as MeGetResponseOutput);
     } catch (error) {
       logger.error("Error getting user profile", parseError(error));
       const parsedError = parseError(error);
@@ -134,7 +150,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
         message: "app.api.user.private.me.get.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
-          userId: user.id ?? "unknown",
+          userId: user.isPublic ? "public" : user.id ?? "unknown",
           error: parsedError.message,
         },
       });
@@ -330,7 +346,6 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       }
 
       // Delete user from database
-      // In a real implementation, you might want to soft delete instead
       await db.delete(users).where(eq(users.id, userId));
 
       logger.debug("Successfully deleted user account", { userId });

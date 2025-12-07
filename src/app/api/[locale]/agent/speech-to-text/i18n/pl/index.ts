@@ -8,7 +8,8 @@ export const translations: typeof enTranslations = {
   hotkey: {
     post: {
       title: "Hotkey mowy na tekst",
-      description: "Nagrywaj i transkrybuj audio z automatycznym wstawianiem tekstu",
+      description:
+        "Nagrywaj i transkrybuj audio z automatycznym wstawianiem tekstu",
       form: {
         title: "Konfiguracja hotkey",
         description: "Skonfiguruj ustawienia hotkey mowy na tekst",
@@ -135,10 +136,12 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Mowa na tekst",
-    description: "Konwertuj audio na tekst za pomocą transkrypcji AI (~0,011 kredytów na sekundę)",
+    description:
+      "Konwertuj audio na tekst za pomocą transkrypcji AI (0,013 kredytów na sekundę, 0,78 kredytów na minutę)",
     form: {
       title: "Transkrypcja audio",
-      description: "Prześlij plik audio do transkrypcji (Deepgram: ~0,011 kredytów na sekundę)",
+      description:
+        "Prześlij plik audio do transkrypcji (0,013 kredytów na sekundę, 0,78 kredytów na minutę)",
     },
     fileUpload: {
       title: "Przesyłanie pliku audio",
@@ -190,7 +193,8 @@ export const translations: typeof enTranslations = {
       failed: "Transkrypcja nie powiodła się",
       timeout: "Przekroczono limit czasu transkrypcji",
       creditsFailed: "Nie udało się potrącić kredytów: {{error}}",
-      providerError: "Błąd usługi transkrypcji. Spróbuj ponownie lub skontaktuj się z pomocą techniczną, jeśli problem będzie się powtarzał.",
+      providerError:
+        "Błąd usługi transkrypcji. Spróbuj ponownie lub skontaktuj się z pomocą techniczną, jeśli problem będzie się powtarzał.",
     },
     success: {
       title: "Sukces",

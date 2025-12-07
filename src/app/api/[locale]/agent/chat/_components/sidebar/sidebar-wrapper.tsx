@@ -62,18 +62,19 @@ export function SidebarWrapper({
     return (
       <Div className="flex flex-row h-screen h-max-screen w-full">
         {/* Mobile Sidebar Container - Fixed Overlay (NO RESIZE) */}
-        <Div
-          suppressHydrationWarning
-          className={cn(
-            "fixed inset-y-0 left-0 z-50 bg-background border-r border-border transition-transform duration-200 ease-in-out",
-            SIDEBAR_WIDTH,
-            collapsed ? "-translate-x-full" : "translate-x-0",
-          )}
-        >
-          <Div className="h-full w-full bg-background">
-            <ChatSidebar user={user} locale={locale} logger={logger} />
+        {!collapsed && (
+          <Div
+            suppressHydrationWarning
+            className={cn(
+              "fixed inset-y-0 left-0 z-50 bg-background border-r border-border",
+              SIDEBAR_WIDTH,
+            )}
+          >
+            <Div className="h-full w-full bg-background">
+              <ChatSidebar user={user} locale={locale} logger={logger} />
+            </Div>
           </Div>
-        </Div>
+        )}
 
         {/* Mobile Overlay Backdrop */}
         {!collapsed && (

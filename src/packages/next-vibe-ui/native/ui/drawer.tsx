@@ -14,7 +14,9 @@ import { applyStyleType } from "../../web/utils/style-type";
 import type {
   DrawerRootProps,
   DrawerTriggerProps,
+  DrawerTriggerRefObject,
   DrawerCloseProps,
+  DrawerCloseRefObject,
   DrawerContentProps,
   DrawerHeaderProps,
   DrawerFooterProps,
@@ -53,10 +55,25 @@ export function Drawer({
 Drawer.displayName = "Drawer";
 
 export const DrawerTrigger = React.forwardRef<
-  React.ElementRef<typeof Pressable>,
+  DrawerTriggerRefObject,
   DrawerTriggerProps
 >(({ children, asChild }, ref) => {
   const { setOpen } = useDrawer();
+  const pressableRef = React.useRef<React.ElementRef<typeof Pressable>>(null);
+
+  React.useImperativeHandle(ref, (): DrawerTriggerRefObject => {
+    return {
+      click: (): void => {
+        setOpen(true);
+      },
+      focus: (): void => {
+        // No-op for React Native
+      },
+      blur: (): void => {
+        // No-op for React Native
+      },
+    };
+  }, [setOpen]);
 
   if (asChild && React.isValidElement(children)) {
     // Clone element with properly typed onPress handler
@@ -72,7 +89,7 @@ export const DrawerTrigger = React.forwardRef<
 
   return (
     <Pressable
-      ref={ref}
+      ref={pressableRef}
       onPress={() => {
         setOpen(true);
       }}
@@ -84,35 +101,49 @@ export const DrawerTrigger = React.forwardRef<
 
 DrawerTrigger.displayName = "DrawerTrigger";
 
-export const DrawerClose = React.forwardRef<
-  React.ElementRef<typeof Pressable>,
-  DrawerCloseProps
->(({ children, asChild }, ref) => {
-  const { setOpen } = useDrawer();
+export const DrawerClose = React.forwardRef<DrawerCloseRefObject, DrawerCloseProps>(
+  ({ children, asChild }, ref) => {
+    const { setOpen } = useDrawer();
+    const pressableRef = React.useRef<React.ElementRef<typeof Pressable>>(null);
 
-  if (asChild && React.isValidElement(children)) {
-    // Clone element with properly typed onPress handler
-    const childElement = children as React.ReactElement<{
-      onPress?: () => void;
-    }>;
-    return React.cloneElement(childElement, {
-      onPress: () => {
-        setOpen(false);
-      },
-    });
-  }
+    React.useImperativeHandle(ref, (): DrawerCloseRefObject => {
+      return {
+        click: (): void => {
+          setOpen(false);
+        },
+        focus: (): void => {
+          // No-op for React Native
+        },
+        blur: (): void => {
+          // No-op for React Native
+        },
+      };
+    }, [setOpen]);
 
-  return (
-    <Pressable
-      ref={ref}
-      onPress={() => {
-        setOpen(false);
-      }}
-    >
-      {children}
-    </Pressable>
-  );
-});
+    if (asChild && React.isValidElement(children)) {
+      // Clone element with properly typed onPress handler
+      const childElement = children as React.ReactElement<{
+        onPress?: () => void;
+      }>;
+      return React.cloneElement(childElement, {
+        onPress: () => {
+          setOpen(false);
+        },
+      });
+    }
+
+    return (
+      <Pressable
+        ref={pressableRef}
+        onPress={() => {
+          setOpen(false);
+        }}
+      >
+        {children}
+      </Pressable>
+    );
+  },
+);
 
 DrawerClose.displayName = "DrawerClose";
 

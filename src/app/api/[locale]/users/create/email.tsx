@@ -10,11 +10,6 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import React, { type JSX } from "react";
-
-import {
-  createTrackingContext,
-  EmailTemplate,
-} from "@/app/api/[locale]/emails/smtp-client/components";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -24,6 +19,8 @@ import type {
   UserCreateRequestOutput,
   UserCreateResponseOutput,
 } from "./definition";
+import { createTrackingContext } from "../../emails/smtp-client/components/tracking_context.email";
+import { EmailTemplate } from "../../emails/smtp-client/components/template.email";
 
 /**
  * Welcome Email Template Component

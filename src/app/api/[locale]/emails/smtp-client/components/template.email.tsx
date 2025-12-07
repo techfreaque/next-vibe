@@ -13,9 +13,9 @@ import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { TrackedLink } from "./tracked_link";
-import { TrackedPixel } from "./tracked_pixel";
-import type { TrackingContext } from "./tracking_context";
+import { TrackedLink } from "./tracked_link.email";
+import { TrackedPixel } from "./tracked_pixel.email";
+import type { TrackingContext } from "./tracking_context.email";
 
 interface EmailTemplateProps {
   title: string;

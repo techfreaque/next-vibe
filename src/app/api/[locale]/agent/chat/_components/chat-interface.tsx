@@ -11,7 +11,7 @@ import { AlertDialogHeader } from "next-vibe-ui/ui/alert-dialog";
 import { AlertDialogTitle } from "next-vibe-ui/ui/alert-dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -24,6 +24,7 @@ import { SidebarWrapper } from "./sidebar/sidebar-wrapper";
 import { TopBar } from "./sidebar/top-area/top-bar";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
+import { WelcomeTour } from "./welcome-tour/welcome-tour";
 
 interface ChatInterfaceProps {
   /** URL path segments from /threads/[...path] route (for logging/debugging only) */
@@ -55,6 +56,9 @@ export function ChatInterface({
   // Use server-provided user prop to determine authentication status immediately
   // This prevents hydration mismatch - no client-side delay
   const isAuthenticated = user !== undefined && !user.isPublic;
+
+  // Welcome tour authentication dialog state
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   // Redirect public users to incognito if they try to access PRIVATE or SHARED folders
   // PUBLIC users can access PUBLIC and INCOGNITO folders
@@ -130,6 +134,44 @@ export function ChatInterface({
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+      </ErrorBoundary>
+
+      {/* Authentication Dialog for Tour */}
+      <ErrorBoundary locale={locale}>
+        <AlertDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {t("app.chat.welcomeTour.authDialog.title")}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {t("app.chat.welcomeTour.authDialog.description")}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setAuthDialogOpen(false)}>
+                {t("app.chat.welcomeTour.authDialog.continueTour")}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  // Redirect to login with return URL to come back here
+                  window.location.href = `/${locale}/login?returnUrl=${encodeURIComponent(window.location.pathname)}`;
+                }}
+              >
+                {t("app.chat.welcomeTour.authDialog.signUp")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </ErrorBoundary>
+
+      {/* Welcome Tour */}
+      <ErrorBoundary locale={locale}>
+        <WelcomeTour
+          isAuthenticated={isAuthenticated}
+          locale={locale}
+          autoStart={true}
+        />
       </ErrorBoundary>
     </>
   );

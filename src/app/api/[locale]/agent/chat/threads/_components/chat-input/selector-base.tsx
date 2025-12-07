@@ -62,6 +62,8 @@ interface SelectorBaseProps<T = string> {
   buttonClassName?: string;
   triggerSize?: "default" | "sm" | "lg" | "icon";
   showTextAt?: "always" | "sm" | "md" | "lg" | "never";
+  dataTour?: string;
+  dataTourPrefix?: string; // For internal modal elements (e.g., "model-selector" -> "model-selector-search")
 }
 
 /**
@@ -93,6 +95,8 @@ export function SelectorBase<T extends string = string>({
   buttonClassName,
   triggerSize = "sm",
   showTextAt = "sm",
+  dataTour,
+  dataTourPrefix,
 }: SelectorBaseProps<T>): JSX.Element {
   const { t } = simpleT(locale);
   const [open, setOpen] = useState(false);
@@ -286,6 +290,7 @@ export function SelectorBase<T extends string = string>({
             buttonClassName,
           )}
           title={selectedOption?.name}
+          data-tour={dataTour}
         >
           {selectedOption ? (
             <>
@@ -345,6 +350,7 @@ export function SelectorBase<T extends string = string>({
                   })}
                   className="pl-9 h-10 sm:h-9 text-base sm:text-sm touch-manipulation"
                   autoComplete="off"
+                  data-tour={dataTourPrefix ? `${dataTourPrefix}-search` : undefined}
                 />
               </Div>
             </Div>
@@ -354,7 +360,10 @@ export function SelectorBase<T extends string = string>({
           {showAll && (
             <Div className="px-2.5 sm:px-3 py-2 border-b shrink-0 flex gap-2 items-center">
               {/* Group Mode Toggle */}
-              <Div className="flex gap-1 bg-muted rounded-md p-0.5">
+              <Div
+                className="flex gap-1 bg-muted rounded-md p-0.5"
+                data-tour={dataTourPrefix ? `${dataTourPrefix}-group` : undefined}
+              >
                 <Button
                   type="button"
                   variant={groupMode === "provider" ? "default" : "ghost"}
@@ -404,7 +413,10 @@ export function SelectorBase<T extends string = string>({
           {!showAll ? (
             /* Default List View - Favorites Always Visible */
             <Div className="overflow-y-auto max-h-[400px] overscroll-contain">
-              <Div className="p-1.5 sm:p-2">
+              <Div
+                className="p-1.5 sm:p-2"
+                data-tour={dataTourPrefix ? `${dataTourPrefix}-favorites` : undefined}
+              >
                 {favoriteOptions.length > 0 ? (
                   favoriteOptions.map((option) => (
                     <OptionListItem
@@ -434,7 +446,7 @@ export function SelectorBase<T extends string = string>({
               <Div className="p-3 sm:p-4 flex flex-col gap-5 sm:gap-6">
                 {/* Favorites Section - Always First */}
                 {favoriteOptions.length > 0 && (
-                  <Div>
+                  <Div data-tour={dataTourPrefix ? `${dataTourPrefix}-favorites` : undefined}>
                     <Div className="text-xs font-semibold text-muted-foreground mb-2.5 sm:mb-3 px-1">
                       {t("app.chat.selectorBase.favorites")}
                     </Div>

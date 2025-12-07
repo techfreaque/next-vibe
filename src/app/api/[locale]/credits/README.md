@@ -40,12 +40,12 @@ The Credits System manages user credits for paid features like:
 Different features cost different amounts:
 
 ```typescript
-// Example costs
+// Example costs (calculated from centralized pricing)
 AI Chat (GPT-4): 10 credits per message
 AI Chat (GPT-3.5): 1 credit per message
-Web Search: 1 credit per search
-Text-to-Speech: 5 credits per minute
-Speech-to-Text: 3 credits per minute
+Web Search: 0.65 credits per search
+Text-to-Speech: 0.52 credits per 1000 characters
+Speech-to-Text: 0.78 credits per minute (0.013 per second)
 ```
 
 ## For Developers

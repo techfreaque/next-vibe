@@ -5,6 +5,7 @@ import { usePathname } from "next-vibe-ui/hooks/use-navigation";
 import Link from "next/link";
 import type { JSX } from "react";
 import { cn } from "next-vibe/shared/utils/utils";
+import { Div } from "next-vibe-ui/ui/div";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -41,8 +42,8 @@ export function SubscriptionTabsNav({
   ];
 
   return (
-    <div className="inline-flex h-11 items-center justify-center rounded-lg bg-muted/50 p-1 text-muted-foreground border border-border w-full">
-      <div className="grid w-full grid-cols-3 gap-1">
+    <Div className="inline-flex h-11 items-center justify-center rounded-lg bg-muted/50 p-1 text-muted-foreground border border-border w-full">
+      <Div className="grid w-full grid-cols-3 gap-1">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = pathname === tab.href;
@@ -63,7 +64,7 @@ export function SubscriptionTabsNav({
             </Link>
           );
         })}
-      </div>
-    </div>
+      </Div>
+    </Div>
   );
 }

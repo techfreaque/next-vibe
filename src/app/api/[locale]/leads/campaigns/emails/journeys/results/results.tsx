@@ -12,7 +12,7 @@ import type { JourneyTemplateMap } from "../../types";
 // import { resultsFollowup2Email } from "./templates/followup-2";
 // import { resultsFollowup3Email } from "./templates/followup-3";
 // Import individual email templates
-import { resultsInitialEmail } from "./templates/initial-contact";
+import { resultsInitialEmail } from "./templates/initial-contact.email";
 // import { resultsNurtureEmail } from "./templates/nurture";
 // import { resultsReactivationEmail } from "./templates/reactivation";
 

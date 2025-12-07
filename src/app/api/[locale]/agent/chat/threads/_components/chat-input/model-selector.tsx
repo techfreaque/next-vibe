@@ -15,6 +15,7 @@ import type { ModelUtility } from "@/app/api/[locale]/agent/chat/model-access/mo
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 
 import { SelectorBase, type SelectorOption } from "./selector-base";
 import { useFavorites } from "./use-favorites";
@@ -117,6 +118,8 @@ export function ModelSelector({
       buttonClassName={buttonClassName}
       triggerSize={triggerSize}
       showTextAt={showTextAt}
+      dataTour={TOUR_DATA_ATTRS.MODEL_SELECTOR}
+      dataTourPrefix={TOUR_DATA_ATTRS.MODEL_SELECTOR}
     />
   );
 }

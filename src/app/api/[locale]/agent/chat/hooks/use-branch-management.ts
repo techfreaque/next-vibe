@@ -64,11 +64,13 @@ export function useBranchManagement({
     messageCountRef.current = 0;
 
     // Load persisted state for this thread
-    const persistedIndices = loadPersistedState();
-    setBranchIndices(persistedIndices);
+    void (async (): Promise<void> => {
+      const persistedIndices = await loadPersistedState();
+      setBranchIndices(persistedIndices);
 
-    // Mark as initialized
-    isInitializedRef.current = true;
+      // Mark as initialized
+      isInitializedRef.current = true;
+    })();
   }, [threadId, loadPersistedState]);
 
   /**

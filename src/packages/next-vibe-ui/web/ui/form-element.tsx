@@ -2,6 +2,13 @@ import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
 import type { StyleType } from "../utils/style-type";
 
+export interface FormElementRefObject {
+  submit?: () => void;
+  reset?: () => void;
+  focus?: () => void;
+  blur?: () => void;
+}
+
 export type FormElementProps = {
   onSubmit?: () => void | Promise<void>;
   children?: ReactNode;
@@ -14,11 +21,11 @@ export type FormElementProps = {
  */
 export const FormElement = forwardRef(function FormElement(
   { className, style, onSubmit, children }: FormElementProps,
-  ref: ForwardedRef<HTMLFormElement>,
+  ref: ForwardedRef<FormElementRefObject>,
 ) {
   return (
     <form
-      ref={ref}
+      ref={ref as React.Ref<HTMLFormElement>}
       className={className}
       style={style}
       onSubmit={(e) => {

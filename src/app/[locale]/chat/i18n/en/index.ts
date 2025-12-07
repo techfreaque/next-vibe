@@ -62,7 +62,7 @@ export const translations = {
     // Assistant Message Actions
     assistantMessageActions: {
       stopAudio: "Stop audio playback",
-      playAudio: "Play audio",
+      playAudio: "Play audio (+{{cost}} credits)",
       cancelLoading: "Cancel loading",
       answerAsAI: "Answer as AI model",
       deleteMessage: "Delete message",
@@ -219,7 +219,7 @@ export const translations = {
     speechInput: {
       stopRecording: "Stop recording",
       processing: "Processing...",
-      startVoiceInput: "Start voice input (Click to speak)",
+      startVoiceInput: "Start voice input (+{{cost}} credits/min)",
       recordingClickToStop: "Recording... Click to stop",
       transcribing: "Transcribing...",
     },
@@ -324,9 +324,9 @@ export const translations = {
   },
   searchToggle: {
     search: "Search",
-    enabledTitle: "Brave Search enabled (+1 credit per search)",
-    disabledTitle: "Brave Search disabled (+1 credit per search)",
-    creditIndicator: "+1",
+    enabledTitle: "Brave Search enabled (+0.65 credits per search)",
+    disabledTitle: "Brave Search disabled (+0.65 credits per search)",
+    creditIndicator: "+0.65",
   },
   toolsButton: {
     title: "Configure AI Tools",
@@ -1004,7 +1004,8 @@ export const translations = {
     actions: {
       loadingAudio: "Loading audio...",
       stopAudio: "Stop audio",
-      playAudio: "Play audio",
+      playAudio: "Play audio (+{{cost}} credits)",
+      cancelLoading: "Cancel loading",
       stop: "Stop",
       play: "Play",
       reply: "Reply",
@@ -1019,6 +1020,173 @@ export const translations = {
       copyReference: "Copy reference link",
       delete: "Delete",
       deleteMessage: "Delete this message",
+    },
+  },
+  welcomeTour: {
+    authDialog: {
+      title: "Unlock Private & Shared Folders",
+      description:
+        "To access your private and shared folders, you'll need to sign up or log in. Your chats will be synced across devices and kept secure.",
+      continueTour: "Continue Tour",
+      signUp: "Sign Up / Login",
+    },
+    welcome: {
+      title: "Welcome to {{appName}}!",
+      description:
+        "Your all-in-one AI chat platform. Connect with multiple AI models, organize conversations, and collaborate with others.",
+      subtitle: "Let's take a quick tour to get you started!",
+    },
+    modelSelector: {
+      title: "Choose Your AI Model",
+      description:
+        "Select from diverse AI models - each with unique strengths. From coding assistants to creative writers, analytical thinkers to uncensored conversationalists. Click to browse models grouped by provider or utility, search to find specific ones, and star your favorites for quick access!",
+      tip: "💡 Tip: Switch models anytime mid-conversation. Different topics work better with different models!",
+    },
+    modelSelectorFavorites: {
+      title: "Star Your Favorite Models",
+      description:
+        "Your most-used models appear here for instant access! Click the star on any model to add it to favorites. They'll always show first when you open the selector.",
+      tip: "⭐ Pro tip: Star 2-3 models you use regularly for the fastest workflow!",
+    },
+    modelSelectorSearch: {
+      title: "Search Any Model",
+      description:
+        "Looking for something specific? Type to instantly filter through all available models by name, provider, or description. Perfect when you know exactly what you want!",
+      tip: '🔍 Try searching by capability like "coding", "creative", or "uncensored"!',
+    },
+    modelSelectorGroup: {
+      title: "Browse by Provider or Utility",
+      description:
+        "Toggle between Provider mode (grouped by company like OpenAI, Anthropic) and Utility mode (grouped by purpose like Coding, Creative, Analytical). Choose the view that makes most sense to you!",
+      tip: "💡 Utility mode helps discover new models for specific tasks you hadn't considered!",
+    },
+    personaSelector: {
+      title: "Customize with Personas",
+      description:
+        "Shape how the AI responds with personas! Choose from built-in options like Professional, Creative, or Technical - or craft your own with custom instructions and preferred models. Browse by category, search, and star your favorites!",
+      tip: "💡 Tip: Combine any persona with any model for the perfect assistant!",
+    },
+    personaSelectorFavorites: {
+      title: "Star Your Favorite Personas",
+      description:
+        "Your go-to conversation styles appear here! Star the personas you use most often for quick access. Whether it's Professional for work or Creative for brainstorming, they're always ready.",
+      tip: "⭐ Pro tip: Create custom personas for recurring tasks and star them!",
+    },
+    personaSelectorSearch: {
+      title: "Find the Perfect Persona",
+      description:
+        "Search through all personas by name, category, or description. Quickly find that specialized assistant style you need for your current task!",
+      tip: '🔍 Try searching by mood like "friendly", "formal", or "concise"!',
+    },
+    personaSelectorGroup: {
+      title: "Browse by Source or Category",
+      description:
+        "Toggle between Source mode (Built-in vs Custom) and Category mode (Creative, Technical, Professional, etc.). Organize personas the way that makes sense for your workflow!",
+      tip: "💡 Category mode helps discover new conversation styles for different scenarios!",
+    },
+    rootFolders: {
+      title: "Organize with Root Folders",
+      description:
+        "Your chats are organized into 4 special folders, each with unique features:",
+      incognito: {
+        name: "Incognito",
+        suffix: "Never stored on servers",
+      },
+      public: {
+        name: "Public",
+        suffix: "Community forum for questions, ideas & collaboration",
+      },
+      private: {
+        name: "Private",
+        suffix: "Your personal, secure chats (requires login)",
+      },
+      shared: {
+        name: "Shared",
+        suffix: "Share with specific people (requires login)",
+      },
+    },
+    incognitoFolder: {
+      name: "Incognito",
+      suffix: "Folder",
+      description:
+        "Maximum privacy - chats stored only on THIS device, never on our servers. Browse freely, discuss sensitive topics, experiment without limits. Your data stays yours!",
+      note: "✓ No account required • ✓ No server storage • ✓ Complete privacy",
+    },
+    publicFolder: {
+      name: "Public",
+      suffix: "Folder",
+      description:
+        "The community hub! Ask questions, share discoveries, get feedback, or collaborate openly. All conversations here are visible to everyone - perfect for building knowledge together and engaging with the community.",
+      note: "✓ No account required • ✓ Everyone can see • ✓ Great for getting diverse input",
+    },
+    privateFolder: {
+      name: "Private",
+      suffix: "Folder",
+      description:
+        "Your personal AI workspace! Chats sync across all devices, stay organized with subfolders, and remain secure under your account. Perfect for ongoing projects, personal research, and work tasks.",
+      authPrompt: "🔓 Create a free account to unlock:",
+      login: "Login",
+      signUp: "Sign Up",
+    },
+    sharedFolder: {
+      name: "Shared",
+      suffix: "Folder",
+      description:
+        "Collaboration made easy! Create conversations and share them with specific people via link. Control who sees what with granular permissions. Perfect for teams, study groups, or getting expert feedback!",
+      authPrompt: "🔓 Create a free account to unlock:",
+      login: "Login",
+      signUp: "Sign Up",
+    },
+    newChatButton: {
+      title: "Start a New Conversation",
+      description:
+        "Click here anytime to begin a fresh chat! Conversations automatically save to your current folder. Create as many as you need - organization is easy!",
+      tip: "⚡ Quick tip: Press Ctrl+N (Cmd+N on Mac) to start a new chat instantly!",
+    },
+    sidebarLogin: {
+      title: "Unlock More Features",
+      description:
+        "Sign up for free to access Private and Shared folders, sync chats across devices, save your favorite models, and customize personas!",
+      tip: "💡 No account needed for Incognito and Public folders - use those anytime!",
+    },
+    chatInput: {
+      title: "Two Ways to Chat",
+      description:
+        "Start conversations your way - type or talk! The choice is yours:",
+      typing: {
+        title: "Type Your Message",
+        description:
+          "Press Enter to send, Shift+Enter for new lines. Full keyboard control!",
+      },
+      voice: {
+        title: "Voice Input",
+        description:
+          "Click the microphone button to speak naturally. Your words will be transcribed instantly!",
+      },
+    },
+    complete: {
+      title: "Ready to Chat! 🎊",
+      description:
+        "You're all set! Explore different models, try various personas, and organize chats your way. The AI is ready when you are - just start typing or speaking!",
+      help: "💬 Stuck? Just ask the AI for help - that's what it's here for!",
+    },
+    authUnlocked: {
+      unlocked: "Folder Unlocked!",
+      privateDescription:
+        "Welcome back! Your private folder is now accessible. All your chats here sync across devices and are encrypted for security.",
+      privateNote:
+        "You can create subfolders to organize your chats however you like!",
+      sharedDescription:
+        "Now you can create shareable chats! Generate a link to any thread and share it with specific people or teams.",
+      sharedNote:
+        "Perfect for collaboration, getting feedback, or sharing knowledge!",
+    },
+    buttons: {
+      back: "Back",
+      close: "Close",
+      last: "Finish",
+      next: "Next",
+      skip: "Skip Tour",
     },
   },
 };

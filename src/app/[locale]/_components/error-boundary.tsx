@@ -1,10 +1,19 @@
 "use client";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "next-vibe-ui/ui/accordion";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card } from "next-vibe-ui/ui/card";
 import { CardContent } from "next-vibe-ui/ui/card";
-import { H3, P } from "next-vibe-ui/ui/typography";
+import { Div } from "next-vibe-ui/ui/div";
 import { Info, RotateCcw } from "next-vibe-ui/ui/icons";
+import { Pre } from "next-vibe-ui/ui/pre";
+import { Span } from "next-vibe-ui/ui/span";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import type { ErrorInfo, JSX, ReactNode } from "react";
 import { Component } from "react";
 
@@ -56,7 +65,7 @@ export function DefaultErrorFallback({
   return (
     <Card className="border-destructive max-w-4xl mx-auto my-4">
       <CardContent className="pt-6">
-        <div className="flex flex-col items-center text-center mb-6">
+        <Div className="flex flex-col items-center text-center mb-6">
           <Info className="h-12 w-12 text-destructive mb-4" />
           <H3 className="text-xl font-semibold mb-2">
             {t("app.common.error.title")}
@@ -75,56 +84,62 @@ export function DefaultErrorFallback({
             <RotateCcw className="h-4 w-4" />
             {t("app.common.error.tryAgain")}
           </Button>
-        </div>
+        </Div>
 
         {/* Detailed Error Information */}
-        <div className="space-y-4 text-left">
-          <details className="group">
-            <summary className="cursor-pointer font-semibold text-sm hover:text-primary transition-colors select-none">
+        <Accordion type="multiple" collapsible className="space-y-4">
+          <AccordionItem value="stackTrace">
+            <AccordionTrigger className="text-sm font-semibold">
               {t("app.common.error.boundary.stackTrace")}
-            </summary>
-            <pre className="mt-2 p-4 bg-muted rounded-md text-xs overflow-auto max-h-64 border border-border">
-              {stackTrace}
-            </pre>
-          </details>
+            </AccordionTrigger>
+            <AccordionContent>
+              <Pre className="mt-2 p-4 bg-muted rounded-md text-xs overflow-auto max-h-64 border border-border">
+                {stackTrace}
+              </Pre>
+            </AccordionContent>
+          </AccordionItem>
 
-          <details className="group">
-            <summary className="cursor-pointer font-semibold text-sm hover:text-primary transition-colors select-none">
+          <AccordionItem value="componentStack">
+            <AccordionTrigger className="text-sm font-semibold">
               {t("app.common.error.boundary.componentStack")}
-            </summary>
-            <pre className="mt-2 p-4 bg-muted rounded-md text-xs overflow-auto max-h-64 border border-border">
-              {componentStack}
-            </pre>
-          </details>
+            </AccordionTrigger>
+            <AccordionContent>
+              <Pre className="mt-2 p-4 bg-muted rounded-md text-xs overflow-auto max-h-64 border border-border">
+                {componentStack}
+              </Pre>
+            </AccordionContent>
+          </AccordionItem>
 
-          <details className="group">
-            <summary className="cursor-pointer font-semibold text-sm hover:text-primary transition-colors select-none">
+          <AccordionItem value="errorDetails">
+            <AccordionTrigger className="text-sm font-semibold">
               {t("app.common.error.boundary.errorDetails")}
-            </summary>
-            <div className="mt-2 p-4 bg-muted rounded-md text-xs space-y-2 border border-border">
-              <div>
-                <span className="font-semibold">
-                  {t("app.common.error.boundary.name")}
-                </span>{" "}
-                {error.name}
-              </div>
-              <div>
-                <span className="font-semibold">
-                  {t("app.common.error.boundary.errorMessage")}
-                </span>{" "}
-                {error.message}
-              </div>
-              {error.cause !== undefined && (
-                <div>
-                  <span className="font-semibold">
-                    {t("app.common.error.boundary.cause")}
-                  </span>{" "}
-                  {String(error.cause)}
-                </div>
-              )}
-            </div>
-          </details>
-        </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <Div className="mt-2 p-4 bg-muted rounded-md text-xs space-y-2 border border-border">
+                <Div>
+                  <Span className="font-semibold">
+                    {t("app.common.error.boundary.name")}
+                  </Span>{" "}
+                  {error.name}
+                </Div>
+                <Div>
+                  <Span className="font-semibold">
+                    {t("app.common.error.boundary.errorMessage")}
+                  </Span>{" "}
+                  {error.message}
+                </Div>
+                {error.cause !== undefined && (
+                  <Div>
+                    <Span className="font-semibold">
+                      {t("app.common.error.boundary.cause")}
+                    </Span>{" "}
+                    {String(error.cause)}
+                  </Div>
+                )}
+              </Div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </CardContent>
     </Card>
   );

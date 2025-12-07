@@ -152,7 +152,7 @@ export default function Features({
     <Div
       id="features"
       className="container px-4 md:px-6 py-24 md:py-32"
-      ref={ref}
+      ref={ref as never}
     >
       <Div className="text-center mb-16">
         <MotionDiv

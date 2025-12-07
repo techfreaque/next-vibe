@@ -15,6 +15,7 @@ import {
 import { cn } from "next-vibe/shared/utils";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
+import { Nav } from "next-vibe-ui/ui/nav";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
@@ -76,8 +77,8 @@ export function LeadsNavigation({
 
   return (
     <Div className="border-b border-gray-200 dark:border-gray-700">
-      <nav
-        className="flex flex flex-row gap-8"
+      <Nav
+        className="flex flex-row gap-8"
         aria-label={t("app.admin.leads.leads.admin.tabs.overview")}
       >
         {navigationItems.map((item) => {
@@ -108,7 +109,7 @@ export function LeadsNavigation({
             </Link>
           );
         })}
-      </nav>
+      </Nav>
     </Div>
   );
 }

@@ -115,9 +115,9 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
       }
 
       // Get author name from first message
-      const firstMessage = messages
-        .filter((msg) => msg.role === "user")
-        .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime())[0];
+      const firstMessage = (
+        messages.filter((msg) => msg.role === "user") || []
+      ).toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime())[0];
       const authorName = firstMessage?.authorName
         ? `u/${firstMessage.authorName}`
         : "u/anonymous";
@@ -157,7 +157,7 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
     switch (sortMode) {
       case "hot":
         // Hot algorithm: score / (time + 2)^1.5
-        filtered = filtered.toSorted((a, b) => {
+        filtered = (filtered || []).toSorted((a, b) => {
           const hoursA =
             (Date.now() - a.timestamp.getTime()) / (1000 * 60 * 60) + 2;
           const hoursB =
@@ -170,20 +170,20 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
       case "rising":
         // Rising: recent with growing engagement
         filtered = filtered.filter((t) => t.isRising);
-        filtered = filtered.toSorted(
+        filtered = (filtered || []).toSorted(
           (a, b) => b.timestamp.getTime() - a.timestamp.getTime(),
         );
         break;
       case "new":
         // New: chronological
-        filtered = filtered.toSorted(
+        filtered = (filtered || []).toSorted(
           (a, b) => b.timestamp.getTime() - a.timestamp.getTime(),
         );
         break;
       case "following":
         // Following: threads from followed users (TODO: implement user following feature)
         // For now, show chronological until following is implemented
-        filtered = filtered.toSorted(
+        filtered = (filtered || []).toSorted(
           (a, b) => b.timestamp.getTime() - a.timestamp.getTime(),
         );
         break;
@@ -201,7 +201,7 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
     const threadMessages = Object.values(chat.messages).filter(
       (msg) => msg.threadId === threadId,
     );
-    const firstMessage = threadMessages.toSorted(
+    const firstMessage = (threadMessages || []).toSorted(
       (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
     )[0];
     if (firstMessage && chat.voteMessage) {

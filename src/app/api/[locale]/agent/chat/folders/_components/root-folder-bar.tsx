@@ -1,4 +1,5 @@
 "use client";
+import { TOUR_DATA_ATTRS, getFolderTourAttr } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -118,7 +119,10 @@ export function RootFolderBar({
   return (
     <>
       <Div className="overflow-x-auto">
-        <Div className="flex flex-row items-center gap-1 px-3 py-2 min-w-max">
+        <Div
+          className="flex flex-row items-center gap-1 px-3 py-2 min-w-max"
+          data-tour={TOUR_DATA_ATTRS.ROOT_FOLDERS}
+        >
           {rootFolders.map((folderConfig) => {
             const FolderIcon = getIconComponent(folderConfig.icon);
             const isActive = folderConfig.id === activeFolderId;
@@ -133,6 +137,7 @@ export function RootFolderBar({
                 className={`h-11 w-11 ${colorClasses}`}
                 onClick={() => handleClick(folderConfig.id)}
                 suppressHydrationWarning
+                data-tour={getFolderTourAttr(folderConfig.id)}
               >
                 <FolderIcon className="h-6 w-6 flex items-center justify-center" />
               </Button>

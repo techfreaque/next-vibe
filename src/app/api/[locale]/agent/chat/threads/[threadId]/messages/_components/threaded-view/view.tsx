@@ -310,6 +310,7 @@ export function ThreadedMessage({
               cancelLoading={cancelLoading}
               currentChunk={currentChunk}
               totalChunks={totalChunks}
+              ttsText={ttsText}
               userVote={userVote}
               voteScore={voteScore}
               onVoteMessage={onVoteMessage}

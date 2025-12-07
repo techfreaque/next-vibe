@@ -42,7 +42,7 @@ Like shadcn/ui, NextVibe gives you **full ownership**:
 
 ```bash
 - Bun 1.3.0+ (recommended) or Node.js 20+
-- PostgreSQL 14+ (auto-managed in dev mode)
+- Docker (auto-managed in dev mode)
 ```
 
 ### 1. Fork & Clone
@@ -74,7 +74,7 @@ vibe dev
 
 That's it! NextVibe automatically:
 
-- ✅ Starts PostgreSQL (if not running)
+- ✅ Starts PostgreSQL in Docker (if not running)
 - ✅ Runs migrations
 - ✅ Seeds development data
 - ✅ Starts Next.js dev server

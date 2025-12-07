@@ -56,38 +56,15 @@ export function LinkWidget({
     className,
   );
 
-  // For external links, we must use <a> tag with proper security attributes
-  // Next.js Link component doesn't support external URLs properly
-  if (isExternal) {
-    // For target="_blank", always use "noopener noreferrer" for security
-    if (openInNewTab) {
-      return (
-        // External link with target="_blank" - safe to use <a> tag
-        // eslint-disable-next-line @next/next/no-html-link-for-pages
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={commonClassName}
-          aria-label={text}
-        >
-          {linkContent}
-        </a>
-      );
-    }
-
-    // External link without target="_blank"
-    return (
-      // External link - safe to use <a> tag
-      // eslint-disable-next-line @next/next/no-html-link-for-pages
-      <a href={url} className={commonClassName} aria-label={text}>
-        {linkContent}
-      </a>
-    );
-  }
-
+  // Use Link component for both internal and external links
+  // It handles external URLs correctly with proper security attributes
   return (
-    <Link href={url} className={commonClassName}>
+    <Link
+      href={url}
+      className={commonClassName}
+      target={openInNewTab ? "_blank" : undefined}
+      rel={isExternal && openInNewTab ? "noopener noreferrer" : undefined}
+    >
       {linkContent}
     </Link>
   );

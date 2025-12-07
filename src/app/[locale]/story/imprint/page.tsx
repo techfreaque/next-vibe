@@ -2,6 +2,7 @@ import { Building, FileText, Info } from "next-vibe-ui/ui/icons";
 import type { Metadata, ResolvingMetadata } from "next";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Span } from "next-vibe-ui/ui/span";
+import { Strong } from "next-vibe-ui/ui/strong";
 import { Div } from "next-vibe-ui/ui/div";
 import { Li } from "next-vibe-ui/ui/li";
 import { Ul } from "next-vibe-ui/ui/ul";
@@ -189,7 +190,7 @@ export default async function ImprintPage({
             </P>
             <Div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
               <P>
-                <strong>{t("config.group.responsiblePerson.name")}</strong>
+                <Strong>{t("config.group.responsiblePerson.name")}</Strong>
               </P>
               <P>{t("config.group.address.addressIn1Line")}</P>
             </Div>

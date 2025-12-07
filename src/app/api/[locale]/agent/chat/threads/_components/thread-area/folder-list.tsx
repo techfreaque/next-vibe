@@ -34,39 +34,39 @@ export function FolderList({
 
   // Memoize direct children folders of the active root folder
   const childFolders = useMemo(() => {
-    const filtered = Object.values(folders).filter(
-      (folder) =>
-        folder.rootFolderId === activeRootFolderId && folder.parentId === null,
-    );
     return (
-      filtered.toSorted?.((a, b) => {
-        // First sort by sortOrder
-        if (a.sortOrder !== b.sortOrder) {
-          return a.sortOrder - b.sortOrder;
-        }
-        // If sortOrder is the same, use createdAt as tiebreaker for stable ordering
-        return a.createdAt.getTime() - b.createdAt.getTime();
-      }) || []
-    );
+      Object.values(folders).filter(
+        (folder) =>
+          folder.rootFolderId === activeRootFolderId &&
+          folder.parentId === null,
+      ) || []
+    ).toSorted((a, b) => {
+      // First sort by sortOrder
+      if (a.sortOrder !== b.sortOrder) {
+        return a.sortOrder - b.sortOrder;
+      }
+      // If sortOrder is the same, use createdAt as tiebreaker for stable ordering
+      return a.createdAt.getTime() - b.createdAt.getTime();
+    });
   }, [folders, activeRootFolderId]);
 
   // Memoize threads in the active root folder (not in any subfolder)
   // Sort by pinned status (pinned first) and then by updatedAt (newest first)
   const childThreads = useMemo(() => {
-    return Object.values(threads)
-      .filter(
+    return (
+      Object.values(threads).filter(
         (thread) =>
           thread.rootFolderId === activeRootFolderId &&
           thread.folderId === null,
-      )
-      .toSorted((a, b) => {
-        // Pinned threads come first
-        if (a.pinned !== b.pinned) {
-          return a.pinned ? -1 : 1;
-        }
-        // Then sort by updatedAt (newest first)
-        return b.updatedAt.getTime() - a.updatedAt.getTime();
-      });
+      ) || []
+    ).toSorted((a, b) => {
+      // Pinned threads come first
+      if (a.pinned !== b.pinned) {
+        return a.pinned ? -1 : 1;
+      }
+      // Then sort by updatedAt (newest first)
+      return b.updatedAt.getTime() - a.updatedAt.getTime();
+    });
   }, [threads, activeRootFolderId]);
 
   // Memoize grouped threads by time

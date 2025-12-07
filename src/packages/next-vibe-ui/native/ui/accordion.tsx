@@ -24,7 +24,7 @@ import { cn } from "next-vibe/shared/utils/utils";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
 import { ChevronDown } from "./icons/ChevronDown";
-import { TextClassContext } from "./text";
+import { Text, TextClassContext } from "./text";
 
 const StyledAnimatedView = styled(Animated.View, { className: "style" });
 const StyledPressable = styled(Pressable, { className: "style" });
@@ -182,7 +182,7 @@ export function AccordionTrigger({
                 ),
               })}
             >
-              {children}
+              <Text>{children}</Text>
               <StyledAnimatedView style={chevronStyle}>
                 <ChevronDown size={18} className="text-foreground shrink-0" />
               </StyledAnimatedView>

@@ -14,6 +14,7 @@ import type {
   InferSchemaFromField,
   ObjectField,
   ObjectOptionalField,
+  ObjectUnionField,
   PrimitiveField,
   UnifiedField,
 } from "../types/endpoint";
@@ -281,6 +282,63 @@ export function objectOptionalField<
 }
 
 /**
+ * Create a discriminated union object field
+ * Use for types that can be one of multiple shapes based on a discriminator field
+ *
+ * @example
+ * ```typescript
+ * objectUnionField(
+ *   { widget: "container" },
+ *   { response: true },
+ *   "isPublic",
+ *   [
+ *     objectField(
+ *       { widget: "container" },
+ *       { response: true },
+ *       {
+ *         isPublic: responseField({ widget: "boolean" }, z.literal(true)),
+ *         leadId: responseField({ widget: "text" }, z.uuid()),
+ *       }
+ *     ),
+ *     objectField(
+ *       { widget: "container" },
+ *       { response: true },
+ *       {
+ *         isPublic: responseField({ widget: "boolean" }, z.literal(false)),
+ *         id: responseField({ widget: "text" }, z.uuid()),
+ *         leadId: responseField({ widget: "text" }, z.uuid()),
+ *       }
+ *     ),
+ *   ]
+ * )
+ * ```
+ */
+export function objectUnionField<
+  TDiscriminator extends string,
+  TVariants extends readonly [
+    ObjectField<Record<string, UnifiedField<z.ZodTypeAny>>, FieldUsageConfig>,
+    ...ObjectField<Record<string, UnifiedField<z.ZodTypeAny>>, FieldUsageConfig>[],
+  ],
+  TUsage extends FieldUsageConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
+>(
+  ui: TUIConfig,
+  usage: TUsage,
+  discriminator: TDiscriminator,
+  variants: TVariants,
+  cache?: CacheStrategy,
+): ObjectUnionField<TDiscriminator, TVariants, TUsage, TUIConfig> {
+  return {
+    type: "object-union" as const,
+    discriminator,
+    variants,
+    usage,
+    ui,
+    cache,
+  };
+}
+
+/**
  * Create an optional array field containing repeated items
  * Use when the entire array can be absent/null/undefined
  */
@@ -423,6 +481,31 @@ type MakeOptional<T, IsOptional extends boolean> = IsOptional extends true
   : T;
 
 /**
+ * Infer union type from ObjectUnionField variants
+ */
+export type InferUnionType<
+  TVariants extends readonly ObjectField<
+    Record<string, UnifiedField<z.ZodTypeAny>>,
+    FieldUsageConfig
+  >[],
+  Usage extends FieldUsage,
+> = TVariants extends readonly [infer Head, ...infer Tail]
+  ? Head extends ObjectField<
+      Record<string, UnifiedField<z.ZodTypeAny>>,
+      FieldUsageConfig
+    >
+    ? Tail extends ObjectField<
+        Record<string, UnifiedField<z.ZodTypeAny>>,
+        FieldUsageConfig
+      >[]
+      ?
+          | InferFieldType<Head, Usage>
+          | InferUnionType<Tail, Usage>
+      : InferFieldType<Head, Usage>
+    : never
+  : never;
+
+/**
  * Infer field type based on usage
  */
 export type InferFieldType<F, Usage extends FieldUsage> =
@@ -472,26 +555,49 @@ export type InferFieldType<F, Usage extends FieldUsage> =
                 : never
               : never
         : F extends {
-              type: "object" | "object-optional";
-              children: infer C;
+              type: "object-union";
+              variants: infer TVariants;
               usage: infer U;
             }
-          ? Usage extends FieldUsage.Response
-            ? HasResponseUsage<U> extends true
-              ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
-              : never
-            : Usage extends FieldUsage.RequestData
-              ? HasRequestDataUsage<U> extends true
+          ? TVariants extends readonly ObjectField<
+              Record<string, UnifiedField<z.ZodTypeAny>>,
+              FieldUsageConfig
+            >[]
+            ? Usage extends FieldUsage.Response
+              ? HasResponseUsage<U> extends true
+                ? InferUnionType<TVariants, Usage>
+                : never
+              : Usage extends FieldUsage.RequestData
+                ? HasRequestDataUsage<U> extends true
+                  ? InferUnionType<TVariants, Usage>
+                  : never
+                : Usage extends FieldUsage.RequestUrlParams
+                  ? HasRequestUrlParamsUsage<U> extends true
+                    ? InferUnionType<TVariants, Usage>
+                    : never
+                  : never
+            : never
+          : F extends {
+                type: "object" | "object-optional";
+                children: infer C;
+                usage: infer U;
+              }
+            ? Usage extends FieldUsage.Response
+              ? HasResponseUsage<U> extends true
                 ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
                 : never
-              : Usage extends FieldUsage.RequestUrlParams
-                ? HasRequestUrlParamsUsage<U> extends true
+              : Usage extends FieldUsage.RequestData
+                ? HasRequestDataUsage<U> extends true
                   ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
                   : never
-                : never
-          : F extends { type: "object" | "object-optional"; children: infer C }
-            ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
-            : never
+                : Usage extends FieldUsage.RequestUrlParams
+                  ? HasRequestUrlParamsUsage<U> extends true
+                    ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
+                    : never
+                  : never
+            : F extends { type: "object" | "object-optional"; children: infer C }
+              ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
+              : never
     : never;
 
 /**
@@ -561,11 +667,21 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
   };
 
   interface FieldWithType {
-    type: "primitive" | "object" | "array" | "array-optional";
+    type:
+      | "primitive"
+      | "object"
+      | "object-union"
+      | "array"
+      | "array-optional";
     usage?: FieldUsageConfig;
     schema?: z.ZodTypeAny;
     children?: Record<string, UnifiedField<z.ZodTypeAny>>;
     child?: UnifiedField<z.ZodTypeAny>;
+    discriminator?: string;
+    variants?: readonly ObjectField<
+      Record<string, UnifiedField<z.ZodTypeAny>>,
+      FieldUsageConfig
+    >[];
     ui?: WidgetConfig;
   }
 
@@ -656,6 +772,57 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     }
 
     return objectSchema as InferSchemaFromField<F, Usage>;
+  }
+
+  if (typedField.type === "object-union") {
+    // Check if the union itself has the required usage
+    const unionHasUsage = typedField.usage ? hasUsage(typedField.usage) : true;
+
+    if (typedField.usage && !unionHasUsage) {
+      return z.never() as InferSchemaFromField<F, Usage>;
+    }
+
+    // Validate discriminator and variants exist
+    if (!typedField.discriminator || !typedField.variants) {
+      return z.never() as InferSchemaFromField<F, Usage>;
+    }
+
+    // Generate schemas for each variant
+    const variantSchemas: z.ZodObject<z.ZodRawShape>[] = [];
+
+    for (const variant of typedField.variants) {
+      // Generate schema for this variant using the same target usage
+      const variantSchema = generateSchemaForUsage(variant, targetUsage);
+
+      // Skip variants that don't match the usage
+      if (variantSchema instanceof z.ZodNever) {
+        continue;
+      }
+
+      // Ensure the variant schema is a ZodObject (required for discriminated unions)
+      if (variantSchema instanceof z.ZodObject) {
+        variantSchemas.push(variantSchema);
+      }
+    }
+
+    // If no variants matched the usage, return z.never()
+    if (variantSchemas.length === 0) {
+      return z.never() as InferSchemaFromField<F, Usage>;
+    }
+
+    // If only one variant, just return it (no need for union)
+    if (variantSchemas.length === 1) {
+      return variantSchemas[0] as InferSchemaFromField<F, Usage>;
+    }
+
+    // Create discriminated union with at least 2 variants
+    const unionSchema = z.discriminatedUnion(
+      typedField.discriminator,
+      variantSchemas as [z.ZodObject<z.ZodRawShape>, z.ZodObject<z.ZodRawShape>, ...z.ZodObject<z.ZodRawShape>[]],
+    );
+
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Schema generation requires type assertion for proper inference
+    return unionSchema as any as InferSchemaFromField<F, Usage>;
   }
 
   if (typedField.type === "array") {

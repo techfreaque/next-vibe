@@ -16,6 +16,8 @@ import type {
   MethodHandlerConfig,
   GenericHandlerReturnType as GenericHandlerReturnTypeImport,
 } from "./handler";
+import type { NextHandlerReturnType } from "../../../next-api/handler";
+import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 /**
  * Base constraint for endpoint definitions
@@ -97,13 +99,40 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
 ): EndpointsHandlerReturn<T> {
   const { endpoint: definitions, ...methodConfigs } = config;
 
-  // Build the result object dynamically
-  // The return type verifies correctness - this allows flexible construction
-  const result: Partial<EndpointsHandlerReturn<T>> & {
-    tools: Partial<ToolsObject<T>>;
-  } = {
-    tools: {},
+  // Build the result object dynamically with flexible typing
+  // We construct the result object gradually and assert the final type at return
+  // This pattern is necessary because TypeScript cannot properly track conditional
+  // types during dynamic object construction
+  type FlexibleResult = Record<
+    string,
+    | NextHandlerReturnType<
+        ResponseType<Record<string, string | number | boolean>>,
+        Record<string, string> & { locale: CountryLanguage }
+      >
+    | Record<
+        string,
+        GenericHandlerReturnTypeImport<
+          Record<string, string | number | boolean>,
+          ResponseType<Record<string, string | number | boolean>>,
+          Record<string, string> & { locale: CountryLanguage },
+          readonly UserRoleValue[]
+        >
+      >
+  > & {
+    tools: Record<
+      string,
+      GenericHandlerReturnTypeImport<
+        Record<string, string | number | boolean>,
+        ResponseType<Record<string, string | number | boolean>>,
+        Record<string, string> & { locale: CountryLanguage },
+        readonly UserRoleValue[]
+      >
+    >;
   };
+
+  const result: FlexibleResult = {
+    tools: {} as FlexibleResult["tools"],
+  } as FlexibleResult;
 
   // Process GET method
   if (Methods.GET in definitions && Methods.GET in methodConfigs) {

@@ -6,11 +6,6 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type React from "react";
-
-import {
-  createTrackingContext,
-  EmailTemplate,
-} from "@/app/api/[locale]/emails/smtp-client/components";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -22,6 +17,8 @@ import type {
   ResetPasswordConfirmPostRequestOutput,
   ResetPasswordConfirmPostResponseOutput,
 } from "./definition";
+import { createTrackingContext } from "@/app/api/[locale]/emails/smtp-client/components/tracking_context.email";
+import { EmailTemplate } from "@/app/api/[locale]/emails/smtp-client/components/template.email";
 
 function renderPasswordResetConfirmEmailContent(
   t: TFunction,

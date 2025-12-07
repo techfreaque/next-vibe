@@ -10,14 +10,14 @@ import { SubscriptionPlan } from "@/app/api/[locale]/subscription/enum";
 import { formatCurrencyNoDecimals } from "@/i18n/core/localization-utils";
 import { getCountryFromLocale } from "@/i18n/core/translation-utils";
 
+import type { EmailRenderContext, EmailTemplateFunction } from "../../../types";
 import {
   CTAButton,
   EmailContent,
   EmailFooter,
   EmailHeader,
   EmailLayout,
-} from "../../../components";
-import type { EmailRenderContext, EmailTemplateFunction } from "../../../types";
+} from "../../../components.email";
 
 /**
  * Results Journey - Reactivation Email

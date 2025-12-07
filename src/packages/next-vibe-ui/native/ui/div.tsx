@@ -34,6 +34,9 @@ function createDivRefObject(_view: View | null): DivRefObject {
     scrollIntoView: (): void => {
       // No-op for React Native
     },
+    scrollTo: (): void => {
+      // No-op for React Native
+    },
     scrollTop: 0,
     scrollHeight: 0,
     clientHeight: 0,

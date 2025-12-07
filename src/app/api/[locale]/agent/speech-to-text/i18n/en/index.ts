@@ -133,10 +133,12 @@ export const translations = {
   },
   post: {
     title: "Speech to Text",
-    description: "Convert audio to text using AI transcription (~0.011 credits per second)",
+    description:
+      "Convert audio to text using AI transcription (0.013 credits per second, 0.78 credits per minute)",
     form: {
       title: "Audio Transcription",
-      description: "Upload an audio file to transcribe (Deepgram: ~0.011 credits per second)",
+      description:
+        "Upload an audio file to transcribe (0.013 credits per second, 0.78 credits per minute)",
     },
     fileUpload: {
       title: "Audio File Upload",
@@ -188,7 +190,8 @@ export const translations = {
       failed: "Transcription failed",
       timeout: "Transcription timeout",
       creditsFailed: "Failed to deduct credits: {{error}}",
-      providerError: "Transcription service error. Please try again or contact support if the issue persists.",
+      providerError:
+        "Transcription service error. Please try again or contact support if the issue persists.",
     },
     success: {
       title: "Success",

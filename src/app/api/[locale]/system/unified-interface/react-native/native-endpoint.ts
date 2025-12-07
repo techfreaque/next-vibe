@@ -185,6 +185,20 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
       "Content-Type": "application/json",
     };
 
+    // Get auth token from native storage and include in request
+    try {
+      const { storage } = await import("next-vibe-ui/lib/storage");
+      const token = await storage.getItem("@auth/token");
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+    } catch (storageError) {
+      logger.debug("Could not get auth token from storage", {
+        error: parseError(storageError),
+      });
+      // Continue without auth token - endpoint may not require it
+    }
+
     let fetchUrl = url;
     let fetchOptions: RequestInit = {
       method: endpoint.method,

@@ -7,6 +7,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { ChevronDown } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
@@ -100,21 +101,11 @@ export function GroupedListWidget({
                   {itemCount}
                 </Span>
               </Div>
-              <svg
+              <ChevronDown
                 className={`h-5 w-5 text-gray-500 transition-transform ${
                   isExpanded ? "rotate-180" : ""
                 }`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+              />
             </Button>
 
             {/* Group Summary */}

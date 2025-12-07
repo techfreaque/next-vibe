@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronLeft } from "next-vibe-ui/ui/icons";
+import { BarChart3, Check, ChevronLeft, Clock } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { H1, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -101,19 +101,7 @@ export default async function SignUpPage({
               <Div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 mb-6">
                 <Div className="flex items-start mb-4">
                   <Div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full mr-4">
-                    <svg
-                      className="h-6 w-6 text-green-600 dark:text-green-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <Check className="h-6 w-6 text-green-600 dark:text-green-400" />
                   </Div>
                   <Div>
                     <H3 className="font-semibold text-lg mb-1">
@@ -131,19 +119,7 @@ export default async function SignUpPage({
 
                 <Div className="flex items-start mb-4">
                   <Div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full mr-4">
-                    <svg
-                      className="h-6 w-6 text-blue-600 dark:text-blue-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                      />
-                    </svg>
+                    <BarChart3 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </Div>
                   <Div>
                     <H3 className="font-semibold text-lg mb-1">
@@ -161,19 +137,7 @@ export default async function SignUpPage({
 
                 <Div className="flex items-start">
                   <Div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-full mr-4">
-                    <svg
-                      className="h-6 w-6 text-purple-600 dark:text-purple-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    <Clock className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                   </Div>
                   <Div>
                     <H3 className="font-semibold text-lg mb-1">

@@ -75,8 +75,8 @@ export const translations = {
         },
         features: {
           title: "Features",
-          searchLabel: "Brave Search",
-          ttsLabel: "Text-to-Speech (per 1000 chars)",
+          searchLabel: "Brave Search (per search)",
+          ttsLabel: "Text-to-Speech (per 1000 characters)",
           sttLabel: "Speech-to-Text (per minute)",
           costFormat: "{{value}} {{unit}}",
           creditsUnit: "credits",

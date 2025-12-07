@@ -10,6 +10,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useLogout } from "@/app/api/[locale]/user/private/logout/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 
 interface UserMenuProps {
   user: JwtPayloadType | undefined;
@@ -26,6 +27,7 @@ export function UserMenu({ user, locale, logger }: UserMenuProps): JSX.Element {
         variant="ghost"
         size="sm"
         className="w-full justify-start h-8 px-2"
+        dataTour={TOUR_DATA_ATTRS.SIDEBAR_LOGIN}
       >
         <User className="h-3.5 w-3.5 mr-2" />
         {t("app.chat.components.sidebar.login")}

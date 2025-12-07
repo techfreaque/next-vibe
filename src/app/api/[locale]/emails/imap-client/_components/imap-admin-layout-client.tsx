@@ -17,6 +17,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { cn } from "next-vibe/shared/utils";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Span } from "next-vibe-ui/ui/span";
+import { Nav } from "next-vibe-ui/ui/nav";
 import { Div } from "next-vibe-ui/ui/div";
 import { H2 } from "next-vibe-ui/ui/typography";
 import { P } from "next-vibe-ui/ui/typography";
@@ -110,8 +111,8 @@ export function ImapAdminLayoutClient({
 
             {/* Sub Navigation Tabs */}
             <Div className="border-b border-gray-200 dark:border-gray-700">
-              <nav
-                className="flex flex flex-row gap-8"
+              <Nav
+                className="flex flex-row gap-8"
                 aria-label={t("app.admin.emails.imap.title")}
               >
                 {subNavigationItems.map((item) => {
@@ -141,7 +142,7 @@ export function ImapAdminLayoutClient({
                     </Link>
                   );
                 })}
-              </nav>
+              </Nav>
             </Div>
 
             {/* Current Sub-Section Description */}

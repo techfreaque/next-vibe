@@ -34,7 +34,7 @@ export function useInputHeight(
       }
     });
 
-    resizeObserver.observe(inputContainerRef.current);
+    resizeObserver.observe(inputContainerRef.current as Element);
 
     return (): void => {
       resizeObserver.disconnect();

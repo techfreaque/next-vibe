@@ -10,8 +10,8 @@ import {
   prepareTextForTTS,
   stripThinkTags,
 } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
-import textToSpeechDefinition from "@/app/api/[locale]/agent/text-to-speech/definition";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
+import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -76,8 +76,8 @@ export function AssistantMessageActions({
     deductCredits,
   });
 
-  // Get credit cost from definition
-  const ttsCreditCost = textToSpeechDefinition.POST.credits ?? 0;
+  // Calculate TTS credit cost based on text length
+  const ttsCreditCost = ttsText.length * FEATURE_COSTS.TTS;
 
   return (
     <Div
@@ -121,7 +121,9 @@ export function AssistantMessageActions({
               ? totalChunks > 1
                 ? `${t("app.chat.common.assistantMessageActions.stopAudio")} (${currentChunk}/${totalChunks})`
                 : t("app.chat.common.assistantMessageActions.stopAudio")
-              : `${t("app.chat.common.assistantMessageActions.playAudio")} (+${ttsCreditCost})`
+              : t("app.chat.common.assistantMessageActions.playAudio", {
+                  cost: ttsCreditCost.toFixed(2),
+                })
         }
         className={cn(
           isLoading && "text-orange-400 hover:text-orange-300",

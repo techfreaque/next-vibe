@@ -2,7 +2,9 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
+import { Pre } from "next-vibe-ui/ui/pre";
 import { Span } from "next-vibe-ui/ui/span";
+import { Code } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { type WidgetComponentProps } from "../../../shared/widgets/types";
@@ -48,13 +50,13 @@ export function CodeOutputWidget({
           {language}
         </Span>
       </Div>
-      <pre
+      <Pre
         className={cn(
           "overflow-x-auto p-4 font-mono text-sm",
           theme === "dark" ? "text-slate-100" : "text-slate-900",
         )}
       >
-        <code>
+        <Code>
           {lines.map((line: string, index: number) => {
             const lineNumber = index + 1;
             const highlighted = isLineHighlighted(lineNumber, highlightLines);
@@ -76,8 +78,8 @@ export function CodeOutputWidget({
               </Div>
             );
           })}
-        </code>
-      </pre>
+        </Code>
+      </Pre>
     </Div>
   );
 }

@@ -54,9 +54,6 @@ export function LinkCardWidget({
   const displayDescription = snippet ?? description;
   const isExternal = isExternalUrl(url);
 
-  // Always use external links for openInNewTab to avoid eslint errors
-  const shouldUseExternalLink = isExternal || openInNewTab;
-
   return (
     <Card
       className={cn(
@@ -65,95 +62,49 @@ export function LinkCardWidget({
         className,
       )}
     >
-      {shouldUseExternalLink ? (
-        // External link or new tab - safe to use <a> tag
-        // eslint-disable-next-line @next/next/no-html-link-for-pages
-        <a
-          href={url}
-          target={openInNewTab ? "_blank" : undefined}
-          rel={openInNewTab ? "noopener noreferrer" : undefined}
-          className={cn(
-            "block focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg",
-            !context.isInteractive && "pointer-events-none",
-          )}
-        >
-          <CardHeader className="pb-3">
-            <Div className="flex items-start justify-between gap-2">
-              <Div className="min-w-0 flex-1">
-                <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                  <Span className="truncate transition-colors group-hover/card:text-primary">
-                    {title}
-                  </Span>
-                  <ExternalLink className="h-4 w-4 shrink-0 opacity-50 transition-opacity group-hover/card:opacity-100" />
-                </CardTitle>
-                <Div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                  {source && <Span className="font-medium">{source}</Span>}
-                  {age && source && <Span>•</Span>}
-                  {age && <Span>{age}</Span>}
-                </Div>
+      <Link
+        href={url}
+        target={openInNewTab ? "_blank" : undefined}
+        rel={isExternal && openInNewTab ? "noopener noreferrer" : undefined}
+        className={cn(
+          "block focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg",
+          !context.isInteractive && "pointer-events-none",
+        )}
+      >
+        <CardHeader className="pb-3">
+          <Div className="flex items-start justify-between gap-2">
+            <Div className="min-w-0 flex-1">
+              <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                <Span className="truncate transition-colors group-hover/card:text-primary">
+                  {title}
+                </Span>
+                <ExternalLink className="h-4 w-4 shrink-0 opacity-50 transition-opacity group-hover/card:opacity-100" />
+              </CardTitle>
+              <Div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                {source && <Span className="font-medium">{source}</Span>}
+                {age && source && <Span>•</Span>}
+                {age && <Span>{age}</Span>}
               </Div>
-              {thumbnail && (
-                <Image
-                  src={thumbnail}
-                  alt={title}
-                  width={64}
-                  height={64}
-                  className="w-16 h-16 object-cover rounded shrink-0"
-                />
-              )}
             </Div>
-          </CardHeader>
-          {displayDescription && (
-            <CardContent className="pt-0">
-              <CardDescription className="line-clamp-3 text-sm">
-                {displayDescription}
-              </CardDescription>
-            </CardContent>
-          )}
-        </a>
-      ) : (
-        <Link
-          href={url}
-          className={cn(
-            "block focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg",
-            !context.isInteractive && "pointer-events-none",
-          )}
-        >
-          <CardHeader className="pb-3">
-            <Div className="flex items-start justify-between gap-2">
-              <Div className="min-w-0 flex-1">
-                <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                  <Span className="truncate transition-colors group-hover/card:text-primary">
-                    {title}
-                  </Span>
-                  <ExternalLink className="h-4 w-4 shrink-0 opacity-50 transition-opacity group-hover/card:opacity-100" />
-                </CardTitle>
-                <Div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                  {source && <Span className="font-medium">{source}</Span>}
-                  {age && source && <Span>•</Span>}
-                  {age && <Span>{age}</Span>}
-                </Div>
-              </Div>
-              {thumbnail && (
-                <Image
-                  src={thumbnail}
-                  alt={title}
-                  width={64}
-                  height={64}
-                  className="w-16 h-16 object-cover rounded shrink-0"
-                />
-              )}
-            </Div>
-          </CardHeader>
-          {displayDescription && (
-            <CardContent className="pt-0">
-              <CardDescription className="line-clamp-3 text-sm">
-                {displayDescription}
-              </CardDescription>
-            </CardContent>
-          )}
-        </Link>
-      )}
+            {thumbnail && (
+              <Image
+                src={thumbnail}
+                alt={title}
+                width={64}
+                height={64}
+                className="w-16 h-16 object-cover rounded shrink-0"
+              />
+            )}
+          </Div>
+        </CardHeader>
+        {displayDescription && (
+          <CardContent className="pt-0">
+            <CardDescription className="line-clamp-3 text-sm">
+              {displayDescription}
+            </CardDescription>
+          </CardContent>
+        )}
+      </Link>
     </Card>
   );
 }

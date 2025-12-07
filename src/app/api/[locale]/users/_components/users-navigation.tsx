@@ -10,6 +10,7 @@ import { cn } from "next-vibe/shared/utils";
 import { Link as NextLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
+import { Nav } from "next-vibe-ui/ui/nav";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -54,8 +55,8 @@ export function UsersNavigation({
 
   return (
     <Div className="border-b border-gray-200 dark:border-gray-700">
-      <nav
-        className="flex flex flex-row gap-8"
+      <Nav
+        className="flex flex-row gap-8"
         aria-label={t("app.admin.users.tabs.overview")}
       >
         {navigationItems.map((item) => {
@@ -86,7 +87,7 @@ export function UsersNavigation({
             </NextLink>
           );
         })}
-      </nav>
+      </Nav>
     </Div>
   );
 }

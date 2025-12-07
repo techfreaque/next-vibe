@@ -19,9 +19,9 @@ import {
   EmailHeader,
   EmailImage,
   EmailLayout,
-} from "../../../components";
+} from "../../../components.email";
 import type { EmailRenderContext, EmailTemplateFunction } from "../../../types";
-import { EmailPricingSection } from "../../components/pricing-section";
+import { EmailPricingSection } from "../../components/pricing-section.email";
 
 /**
  * Format currency without decimal places for leads pricing

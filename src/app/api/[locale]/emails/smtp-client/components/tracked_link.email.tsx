@@ -12,7 +12,7 @@ import {
   generateTrackingLinkUrl,
   isTrackingUrl,
 } from "../../../leads/tracking/utils";
-import { type TrackingContext } from "./tracking_context";
+import { type TrackingContext } from "./tracking_context.email";
 
 /**
  * TrackedLink Component Props

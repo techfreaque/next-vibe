@@ -20,6 +20,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 
 /**
  * Freshness options for search results
@@ -49,8 +50,8 @@ const { GET } = createEndpoint({
     firstCliArgKey: "query",
   },
 
-  // Credit cost
-  credits: 1, // 1 credit per search
+  // Credit cost - use calculated price from centralized pricing
+  credits: FEATURE_COSTS.BRAVE_SEARCH, // 0.65 credits per search
 
   // AI Tool metadata
   aiTool: {

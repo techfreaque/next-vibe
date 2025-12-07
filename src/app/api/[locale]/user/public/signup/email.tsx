@@ -12,16 +12,14 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { contactClientRepository } from "../../../contact/repository-client";
-import {
-  createTrackingContext,
-  EmailTemplate,
-} from "../../../emails/smtp-client/components";
 import { UserDetailLevel } from "../../enum";
 import { userRepository } from "../../repository";
 import {
   type SignupPostRequestOutput,
   type SignupPostResponseOutput,
 } from "./definition";
+import { createTrackingContext } from "../../../emails/smtp-client/components/tracking_context.email";
+import { EmailTemplate } from "../../../emails/smtp-client/components/template.email";
 
 // Constants for email templates
 const CONSULTATION_DURATION = {

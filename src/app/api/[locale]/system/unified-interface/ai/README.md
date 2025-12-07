@@ -253,7 +253,7 @@ Tools can define costs:
 tool: {
   displayName: "Search the Web",
   icon: "search",
-  cost: 1, // 1 credit per use
+  cost: 0.65, // 0.65 credits per search (from FEATURE_COSTS)
 }
 ```
 

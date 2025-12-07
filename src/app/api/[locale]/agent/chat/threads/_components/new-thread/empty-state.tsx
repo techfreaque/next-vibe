@@ -246,7 +246,7 @@ export function ChatEmptyState({
                 <Div className="text-base">
                   {React.createElement(getIconComponent(persona.icon))}
                 </Div>
-                <span className="text-sm">{t(persona.name)}</span>
+                <Span className="text-sm">{t(persona.name)}</Span>
               </Button>
             ))}
 
@@ -259,9 +259,9 @@ export function ChatEmptyState({
                   className="flex gap-2 border border-transparent"
                 >
                   <MoreHorizontal className="h-4 w-4" />
-                  <span className="text-sm">
+                  <Span className="text-sm">
                     {t("app.chat.suggestedPrompts.more")}
-                  </span>
+                  </Span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-3xl max-h-[85vh]">
@@ -434,7 +434,7 @@ export function ChatEmptyState({
                   size="unset"
                   className={`w-full p-4 border ${getColorClasses("border").replace("/50", "/20")} ${getColorClasses("hover-bg")}`}
                 >
-                  <span className="text-sm">{t(promptKey)}</span>
+                  <Span className="text-sm">{t(promptKey)}</Span>
                 </Button>
               ))}
           </Div>

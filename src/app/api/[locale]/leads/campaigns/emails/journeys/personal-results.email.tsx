@@ -7,18 +7,16 @@
 import { Section } from "@react-email/components";
 import React from "react";
 
-import {
-  HumanCTAButton,
-  HumanEmailLayout,
-  HumanText,
-} from "../../../../emails/smtp-client/components";
 import { EmailCampaignStage } from "../../../enum";
 import type {
   EmailRenderContext,
   EmailTemplateFunction,
   JourneyTemplateMap,
 } from "../types";
-import { EmailPricingSection } from "./components/pricing-section";
+import { EmailPricingSection } from "./components/pricing-section.email";
+import { HumanEmailLayout } from "@/app/api/[locale]/emails/smtp-client/components/human_email_layout.email";
+import { HumanText } from "@/app/api/[locale]/emails/smtp-client/components/human_text.email";
+import { HumanCTAButton } from "@/app/api/[locale]/emails/smtp-client/components/human_cta_button.email";
 
 /**
  * Personal Practical Journey - Initial Contact Email

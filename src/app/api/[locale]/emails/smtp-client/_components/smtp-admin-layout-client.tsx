@@ -12,6 +12,7 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
+import { Nav } from "next-vibe-ui/ui/nav";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { H2 } from "next-vibe-ui/ui/typography";
 import type { ComponentType, JSX, ReactNode } from "react";
@@ -80,8 +81,8 @@ export function SmtpAdminLayoutClient({
 
             {/* Sub Navigation Tabs */}
             <Div className="border-b border-gray-200 dark:border-gray-700">
-              <nav
-                className="flex flex flex-row gap-8"
+              <Nav
+                className="flex flex-row gap-8"
                 aria-label={t("app.admin.emails.smtp.list.title")}
               >
                 {subNavigationItems.map((item) => {
@@ -111,7 +112,7 @@ export function SmtpAdminLayoutClient({
                     </Link>
                   );
                 })}
-              </nav>
+              </Nav>
             </Div>
 
             {/* Current Sub-Section Description */}

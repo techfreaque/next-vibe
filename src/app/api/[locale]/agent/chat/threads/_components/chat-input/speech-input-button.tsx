@@ -17,6 +17,7 @@ import React, { useEffect } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useEdenAISpeech } from "@/app/api/[locale]/agent/speech-to-text/hooks";
+import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -30,6 +31,7 @@ interface SpeechInputButtonProps {
   locale: CountryLanguage;
   className?: string;
   logger: EndpointLogger;
+  dataTour?: string;
 }
 
 export function SpeechInputButton({
@@ -39,6 +41,7 @@ export function SpeechInputButton({
   locale,
   className,
   logger,
+  dataTour,
 }: SpeechInputButtonProps): JSX.Element {
   const { deductCredits, input, setInput } = useChatContext();
 
@@ -51,6 +54,9 @@ export function SpeechInputButton({
   // Use custom handler if provided, otherwise use default
   const onTranscript = customOnTranscript || defaultOnTranscript;
   const { t } = simpleT(locale);
+
+  // Calculate STT credit cost per minute for display
+  const sttCreditCostPerMinute = (FEATURE_COSTS.STT * 60).toFixed(2);
 
   const {
     isRecording,
@@ -98,10 +104,11 @@ export function SpeechInputButton({
               type="button"
               size="icon"
               variant={isRecording ? "destructive" : "ghost"}
+              data-tour={dataTour}
               onClick={handleToggleRecording}
               disabled={isDisabled}
               className={cn(
-                "h-9 w-9 flex-shrink-0 transition-all",
+                "h-9 w-9 shrink-0 transition-all",
                 isActive && "animate-pulse",
                 className,
               )}
@@ -120,7 +127,9 @@ export function SpeechInputButton({
               ? t("app.chat.input.speechInput.stopRecording")
               : isProcessing
                 ? t("app.chat.input.speechInput.processing")
-                : t("app.chat.input.speechInput.startVoiceInput")}
+                : t("app.chat.input.speechInput.startVoiceInput", {
+                    cost: sttCreditCostPerMinute,
+                  })}
           </TooltipContent>
         </Tooltip>
 
@@ -160,7 +169,7 @@ export function SpeechInputButton({
                 size="icon"
                 variant="ghost"
                 onClick={clearError}
-                className="h-5 w-5 p-0 hover:bg-destructive/10 flex-shrink-0"
+                className="h-5 w-5 p-0 hover:bg-destructive/10 shrink-0"
                 aria-label="Dismiss error"
               >
                 <X className="h-3 w-3 text-destructive" />

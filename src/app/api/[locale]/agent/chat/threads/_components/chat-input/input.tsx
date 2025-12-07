@@ -23,6 +23,7 @@ import { PersonaSelector } from "@/app/api/[locale]/agent/chat/personas/_compone
 import { SearchToggle } from "./search-toggle";
 import { SpeechInputButton } from "./speech-input-button";
 import { ToolsButton } from "./tools-button";
+import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 
 interface ChatInputV2Props {
   locale: CountryLanguage;
@@ -73,7 +74,7 @@ export function ChatInput({
       )}
     >
       {/* Input Area */}
-      <Div className="relative mb-2 sm:mb-3">
+      <Div className="relative mb-2 sm:mb-3" data-tour={TOUR_DATA_ATTRS.CHAT_INPUT}>
         <Textarea
           ref={inputRef}
           value={value}
@@ -153,6 +154,7 @@ export function ChatInput({
             lang={speechLang}
             locale={locale}
             logger={logger}
+            dataTour={TOUR_DATA_ATTRS.SPEECH_INPUT}
           />
 
           {/* Send/Stop Button */}

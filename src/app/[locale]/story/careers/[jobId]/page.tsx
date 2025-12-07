@@ -10,6 +10,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { Ul } from "next-vibe-ui/ui/ul";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import { Separator } from "next-vibe-ui/ui/separator";
+import { Section } from "next-vibe-ui/ui/section";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
@@ -306,7 +307,7 @@ export default async function JobPostingPage({
           <Div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             <Div className="lg:col-span-3">
               <Div className="flex flex-col gap-8">
-                <section>
+                <Section>
                   <H2 className="text-2xl font-bold mb-4">
                     {t(
                       "app.story._components.home.careers.jobDetail.jobOverview",
@@ -315,9 +316,9 @@ export default async function JobPostingPage({
                   <P className="text-gray-700 dark:text-gray-300">
                     {job.longDescription}
                   </P>
-                </section>
+                </Section>
 
-                <section>
+                <Section>
                   <H2 className="text-2xl font-bold mb-4">
                     {t(
                       "app.story._components.home.careers.jobDetail.responsibilities",
@@ -335,9 +336,9 @@ export default async function JobPostingPage({
                       ),
                     )}
                   </Ul>
-                </section>
+                </Section>
 
-                <section>
+                <Section>
                   <H2 className="text-2xl font-bold mb-4">
                     {t(
                       "app.story._components.home.careers.jobDetail.requirements",
@@ -355,9 +356,9 @@ export default async function JobPostingPage({
                       ),
                     )}
                   </Ul>
-                </section>
+                </Section>
 
-                <section>
+                <Section>
                   <H2 className="text-2xl font-bold mb-4">
                     {t(
                       "app.story._components.home.careers.jobDetail.qualifications",
@@ -399,9 +400,9 @@ export default async function JobPostingPage({
                       ),
                     )}
                   </Ul>
-                </section>
+                </Section>
 
-                <section>
+                <Section>
                   <H2 className="text-2xl font-bold mb-4">
                     {t("app.story._components.home.careers.benefits.title")}
                   </H2>
@@ -463,7 +464,7 @@ export default async function JobPostingPage({
                       </CardContent>
                     </Card>
                   </Div>
-                </section>
+                </Section>
               </Div>
             </Div>
 

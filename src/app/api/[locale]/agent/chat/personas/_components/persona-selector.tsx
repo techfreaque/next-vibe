@@ -6,6 +6,7 @@ import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import {
   type IconKey,
   type IconValue,
@@ -290,6 +291,8 @@ export function PersonaSelector({
         buttonClassName={buttonClassName}
         triggerSize={triggerSize}
         showTextAt={showTextAt}
+        dataTour={TOUR_DATA_ATTRS.PERSONA_SELECTOR}
+        dataTourPrefix={TOUR_DATA_ATTRS.PERSONA_SELECTOR}
       />
 
       {/* Add Custom Persona Dialog */}

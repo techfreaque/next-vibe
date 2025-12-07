@@ -7,6 +7,7 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useCallback, useMemo } from "react";
 
@@ -205,9 +206,9 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                 >
                   <Copy className="h-4 w-4" />
                   {copiedSystemPrompt && (
-                    <span className="ml-1 text-xs text-purple-400">
+                    <Span className="ml-1 text-xs text-purple-400">
                       {t("app.chat.debugView.copied")}
-                    </span>
+                    </Span>
                   )}
                 </Button>
                 <Button

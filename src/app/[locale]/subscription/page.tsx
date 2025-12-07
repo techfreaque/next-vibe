@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { redirect } from "next-vibe-ui/lib/redirect";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface SubscriptionPageProps {

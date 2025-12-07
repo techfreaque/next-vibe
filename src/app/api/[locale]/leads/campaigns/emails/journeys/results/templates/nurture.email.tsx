@@ -10,7 +10,7 @@ import {
   EmailContent,
   EmailFooter,
   EmailLayout,
-} from "../../../components";
+} from "../../../components.email";
 import type { EmailRenderContext, EmailTemplateFunction } from "../../../types";
 
 /**

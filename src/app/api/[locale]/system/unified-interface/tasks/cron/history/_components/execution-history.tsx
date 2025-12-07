@@ -6,6 +6,12 @@
 "use client";
 
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "next-vibe-ui/ui/accordion";
+import {
   AlertCircle,
   CheckCircle,
   Clock,
@@ -13,16 +19,16 @@ import {
   RefreshCw,
   XCircle,
 } from "next-vibe-ui/ui/icons";
-import { cn } from "next-vibe/shared/utils";
-import { Form } from "next-vibe-ui/ui/form/form";
-import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+import { Span } from "next-vibe-ui/ui/span";
 import { H4, P } from "next-vibe-ui/ui/typography";
+import { cn } from "next-vibe/shared/utils";
 import type React from "react";
 
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
@@ -338,24 +344,28 @@ export function ExecutionHistory({
 
                 {execution.error && (
                   <Div className="mt-3">
-                    <details className="group">
-                      <summary className="cursor-pointer text-sm font-medium text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
-                        {t(
-                          "app.admin.cron.cronErrors.admin.interface.executionHistory.errorDetails",
-                        )}
-                      </summary>
-                      <Div className="text-xs bg-red-50 dark:bg-red-900/20 p-3 rounded border border-red-200 dark:border-red-800 mt-2 overflow-x-auto max-h-40 text-red-800 dark:text-red-300">
-                        <Div className="mb-2 font-medium">
-                          {execution.error.message}
-                        </Div>
-                        {execution.error.errorType && (
-                          <Div className="text-xs opacity-75">
-                            {t("app.admin.cron.executionHistory.errorType")}:{" "}
-                            {execution.error.errorType}
+                    <Accordion type="single" collapsible>
+                      <AccordionItem value="error">
+                        <AccordionTrigger className="text-sm font-medium text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                          {t(
+                            "app.admin.cron.cronErrors.admin.interface.executionHistory.errorDetails",
+                          )}
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <Div className="text-xs bg-red-50 dark:bg-red-900/20 p-3 rounded border border-red-200 dark:border-red-800 mt-2 overflow-x-auto max-h-40 text-red-800 dark:text-red-300">
+                            <Div className="mb-2 font-medium">
+                              {execution.error.message}
+                            </Div>
+                            {execution.error.errorType && (
+                              <Div className="text-xs opacity-75">
+                                {t("app.admin.cron.executionHistory.errorType")}:{" "}
+                                {execution.error.errorType}
+                              </Div>
+                            )}
                           </Div>
-                        )}
-                      </Div>
-                    </details>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </Div>
                 )}
               </Div>

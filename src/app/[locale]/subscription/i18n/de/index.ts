@@ -78,7 +78,7 @@ export const translations: typeof enTranslations = {
         },
         features: {
           title: "Funktionen",
-          searchLabel: "Brave-Suche",
+          searchLabel: "Brave-Suche (pro Suche)",
           ttsLabel: "Text-zu-Sprache (pro 1000 Zeichen)",
           sttLabel: "Sprache-zu-Text (pro Minute)",
           costFormat: "{{value}} {{unit}}",

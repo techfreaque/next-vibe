@@ -12,11 +12,6 @@ import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/em
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
-
-import {
-  createTrackingContext,
-  EmailTemplate,
-} from "../../../../emails/smtp-client/components";
 import { UserDetailLevel } from "../../../enum";
 import { userRepository } from "../../../repository";
 import { passwordRepository } from "../repository";
@@ -24,6 +19,8 @@ import type {
   ResetPasswordRequestPostRequestOutput,
   ResetPasswordRequestPostResponseOutput,
 } from "./definition";
+import { createTrackingContext } from "@/app/api/[locale]/emails/smtp-client/components/tracking_context.email";
+import { EmailTemplate } from "@/app/api/[locale]/emails/smtp-client/components/template.email";
 
 function renderPasswordResetRequestEmailContent(
   t: TFunction,

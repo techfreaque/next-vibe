@@ -7,11 +7,10 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import { env } from "@/config/env";
 import { contactClientRepository } from "../contact/repository-client";
-import {
-  createTrackingContext,
-  EmailTemplate,
-} from "../emails/smtp-client/components";
+
 import { SubscriptionPlan, SubscriptionStatus } from "./enum";
+import { EmailTemplate } from "../emails/smtp-client/components/template.email";
+import { createTrackingContext } from "../emails/smtp-client/components/tracking_context.email";
 
 /**
  * Email function type for subscription success notifications

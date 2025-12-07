@@ -3,6 +3,9 @@
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { H1, H2, P } from "next-vibe-ui/ui/typography";
+import { Span } from "next-vibe-ui/ui/span";
+import { Input } from "next-vibe-ui/ui/input";
+import { Button } from "next-vibe-ui/ui/button";
 import { useMemo, useState } from "react";
 import type { JSX } from "react";
 
@@ -58,9 +61,9 @@ function EndpointExecutor({
       <Card>
         <CardContent className="mt-6">
           <Div className="flex items-center gap-2 mb-2">
-            <span className="px-2 py-1 text-xs font-mono font-semibold rounded bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100">
+            <Span className="px-2 py-1 text-xs font-mono font-semibold rounded bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100">
               {endpoint.method}
-            </span>
+            </Span>
             <P className="font-mono text-sm text-gray-600 dark:text-gray-400">
               {Array.isArray(endpoint.path)
                 ? endpoint.path.join("/")
@@ -178,7 +181,7 @@ export function HelpInteractiveView({
                 </H2>
 
                 {/* Search */}
-                <input
+                <Input
                   type="text"
                   placeholder="Search endpoints..."
                   value={searchQuery}
@@ -200,7 +203,7 @@ export function HelpInteractiveView({
                             ? selectedEndpoint.path.join("_")
                             : null;
                           return (
-                            <button
+                            <Button
                               key={`${toolName}-${idx}`}
                               onClick={() => {
                                 setSelectedEndpoint(ep);
@@ -225,7 +228,7 @@ export function HelpInteractiveView({
                                   {ep.aliases.join(", ")}
                                 </Div>
                               )}
-                            </button>
+                            </Button>
                           );
                         })}
                       </Div>

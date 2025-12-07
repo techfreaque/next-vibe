@@ -13,6 +13,7 @@ import { H2, P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "next-vibe-ui/ui/dialog";
+import { Iframe } from "next-vibe-ui/ui/iframe";
 import type React from "react";
 import { useEffect, useState } from "react";
 
@@ -153,7 +154,7 @@ export function EmailPreviewClient({
 
               {/* Email HTML Content */}
               <Div className="bg-white">
-                <iframe
+                <Iframe
                   srcDoc={renderedHtml}
                   className="w-full h-[600px] border-0"
                   title={t("app.admin.leads.leads.admin.emails.preview_title")}

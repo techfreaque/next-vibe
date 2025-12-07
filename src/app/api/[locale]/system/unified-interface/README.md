@@ -176,8 +176,8 @@ Set credit costs for your endpoints:
 
 ```typescript
 credits: 0; // Free
-credits: 1; // Cheap (e.g., web search)
-credits: 5; // Medium (e.g., text-to-speech)
+credits: 0.65; // Web search (calculated from FEATURE_COSTS)
+credits: 0.52; // Text-to-speech per 1000 chars (calculated)
 credits: 10; // Expensive (e.g., GPT-4 message)
 ```
 
@@ -225,7 +225,7 @@ Automatically translated in:
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "web", "brave-search"],
-  credits: 1, // 1 credit per search
+  credits: FEATURE_COSTS.BRAVE_SEARCH, // 0.65 credits per search
 
   aiTool: {
     displayName: "Search the Web",

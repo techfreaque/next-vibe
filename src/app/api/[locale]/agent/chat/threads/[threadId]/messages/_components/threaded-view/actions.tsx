@@ -23,6 +23,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { useMessageActions } from "../hooks/use-message-actions";
+import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 
 interface ThreadedMessageActionsProps {
   message: ChatMessage;
@@ -39,6 +40,7 @@ interface ThreadedMessageActionsProps {
   cancelLoading: () => void;
   currentChunk: number;
   totalChunks: number;
+  ttsText: string;
   // Vote props
   userVote: "up" | "down" | null;
   voteScore: number;
@@ -68,6 +70,7 @@ export function ThreadedMessageActions({
   cancelLoading,
   currentChunk,
   totalChunks,
+  ttsText,
   userVote,
   voteScore,
   onVoteMessage,
@@ -79,6 +82,9 @@ export function ThreadedMessageActions({
   isAnswering,
 }: ThreadedMessageActionsProps): JSX.Element | null {
   const { t } = simpleT(locale);
+
+  // Calculate TTS credit cost based on text length
+  const ttsCreditCost = ttsText.length * FEATURE_COSTS.TTS;
 
   // Don't show actions if in edit/retry/answer mode
   if (isEditing || isRetrying || isAnswering) {
@@ -169,10 +175,16 @@ export function ThreadedMessageActions({
           )}
           title={
             isTTSLoading
-              ? t("app.chat.threadedView.actions.cancelLoading")
+              ? totalChunks > 1
+                ? `${t("app.chat.threadedView.actions.cancelLoading")} (${currentChunk}/${totalChunks})`
+                : t("app.chat.threadedView.actions.cancelLoading")
               : isPlaying
-                ? t("app.chat.threadedView.actions.stopAudio")
-                : t("app.chat.threadedView.actions.playAudio")
+                ? totalChunks > 1
+                  ? `${t("app.chat.threadedView.actions.stopAudio")} (${currentChunk}/${totalChunks})`
+                  : t("app.chat.threadedView.actions.stopAudio")
+                : t("app.chat.threadedView.actions.playAudio", {
+                    cost: ttsCreditCost.toFixed(2),
+                  })
           }
         >
           {isTTSLoading ? (
