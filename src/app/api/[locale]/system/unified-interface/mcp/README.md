@@ -78,8 +78,8 @@ AI Assistant → MCP Protocol (JSON-RPC/STDIO) → Tool Registry → Route Handl
 Tools are named using API path structure:
 
 ```
-/user/create (POST) → v1_core_user_create_POST
-/leads/list (GET)    → v1_core_leads_list_GET
+/user/create (POST) → user_create_POST
+/leads/list (GET)    → leads_list_GET
 ```
 
 Custom aliases can be defined in `definition.ts`:

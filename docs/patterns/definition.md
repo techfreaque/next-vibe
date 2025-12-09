@@ -654,7 +654,7 @@ status: requestDataField(
 ### Key Structure
 
 ```text
-app.api.v1.{domain}.{subdomain}.{action}.{field}.{property}
+app.api.{domain}.{subdomain}.{action}.{field}.{property}
 ```
 
 ### Examples by Widget Type

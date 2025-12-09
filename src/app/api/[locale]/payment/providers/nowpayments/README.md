@@ -204,7 +204,7 @@ Webhooks are automatically processed through the unified payment repository:
 
 ```typescript
 // Webhook route automatically calls paymentRepository.handleWebhook()
-POST / api / [locale] / v1 / core / payment / providers / nowpayments / webhook;
+POST /api/[locale]/payment/providers/nowpayments/webhook
 ```
 
 The webhook handler:

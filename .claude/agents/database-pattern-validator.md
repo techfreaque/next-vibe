@@ -23,7 +23,7 @@ You are a Database Architecture Validation Specialist for a Next.js application 
 **SCOPE RESTRICTIONS:**
 
 - **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
-- **ONLY work within `src/app/api/[locale]/v1/` paths**
+- **ONLY work within `src/app/api/[locale]/` paths**
 - **Work at SUBDOMAIN level only** - never on entire domains
 
 **REQUIRED**: Must be activated with a specific API subdomain path.
@@ -38,7 +38,7 @@ Examples:
 ### 1. Initial Vibe Check (MANDATORY)
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 Use `vibe` directly (globally available). Optionally use `--fix` or `--timeout 90` flags. Fix critical errors before proceeding.
@@ -61,14 +61,14 @@ Read `/docs/patterns/database.md` for complete patterns before making changes.
 **After EVERY modification:**
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 ### 4. Final Validation (MANDATORY)
 
 ```bash
 # MUST pass with 0 errors
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Requirements:**

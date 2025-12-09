@@ -124,7 +124,7 @@ export const StatusOpts = [...];             // Must end with Options
 ### Pattern Structure
 
 ```
-app.api.v1.{domain}.{subdomain}.enums.{enumName}.{value}
+app.api.{domain}.{subdomain}.enums.{enumName}.{value}
 ```
 
 **Examples:**
@@ -511,9 +511,9 @@ export const {
   options: ThemeOptions,
   Value: ThemeValue,
 } = createEnumOptions({
-  LIGHT: "app.api.v1.user.enums.theme.light",
-  DARK: "app.api.v1.user.enums.theme.dark",
-  AUTO: "app.api.v1.user.enums.theme.auto",
+  LIGHT: "app.api.user.enums.theme.light",
+  DARK: "app.api.user.enums.theme.dark",
+  AUTO: "app.api.user.enums.theme.auto",
 });
 
 export const ThemeDB = [Theme.LIGHT, Theme.DARK, Theme.AUTO] as const;
@@ -560,7 +560,7 @@ export const users = pgTable("users", {
 **Step 5: Run Vibe Check**
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 ### Common Migrations
@@ -620,7 +620,7 @@ status: text("status", { enum: StatusDB }).default(Status.PENDING);
 #### 1. Initial Vibe Check (MANDATORY)
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 Fix critical errors before proceeding.
@@ -656,14 +656,14 @@ Document progress: "Created 2 enum files → Added 15 translation keys → Remov
 #### 4. After EVERY Modification
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 #### 5. Final Validation (MANDATORY)
 
 ```bash
 # Must pass with 0 errors
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Requirements:**

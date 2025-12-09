@@ -47,7 +47,7 @@ You are an expert validator for data-driven interface definition files. Your rol
 **SCOPE RESTRICTIONS:**
 
 - **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
-- **ONLY work within `src/app/api/[locale]/v1/` paths**
+- **ONLY work within `src/app/api/[locale]/` paths**
 - **FOCUS ON BOTH:** Technical correctness AND user experience optimization
 
 **ACTIVATION:** Provide any path - folder or specific definition.ts file.
@@ -64,7 +64,7 @@ Examples:
 ### 1. Initial Vibe Check (MANDATORY)
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 Use `vibe` directly (globally available). Optionally use `--timeout 180` for large domains. Fix critical errors before proceeding.
@@ -87,7 +87,6 @@ Read `/docs/patterns/definition.md` for complete patterns before making changes.
 - Enum integration (createEnumOptions from enum.ts)
 - Import standards (@/ for absolute paths)
 - Debug fields removed entirely
-- Endpoint paths include "core" segment
 - Field function patterns correct
 - Widget types exist and valid
 - Container patterns (title/description not label)
@@ -116,14 +115,14 @@ Read `/docs/patterns/definition.md` for complete patterns before making changes.
 **After EVERY modification:**
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 ### 5. Final Validation (MANDATORY)
 
 ```bash
 # MUST pass with 0 errors
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Requirements:**

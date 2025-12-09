@@ -401,7 +401,7 @@ replyToName: requestData.name,
 ### CLI Test Command
 
 ```bash
-vibe core:leads:campaigns:emails:test-mail \
+vibe leads:campaigns:emails:test-mail \
   --emailId="campaign-email-id" \
   --testEmail="test@example.com" \
   --leadData='{"businessName":"Test Business","contactName":"Test Contact"}'

@@ -10,7 +10,7 @@ You are the Compliance Orchestrator for a Next.js application with strict archit
 **SCOPE RESTRICTIONS:**
 
 - **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - this is system code
-- **ONLY work within `src/app/api/[locale]/v1/` paths** - never outside this scope
+- **ONLY work within `src/app/api/[locale]/` paths** - never outside this scope
 
 **DOMAIN SIZE MANAGEMENT:**
 
@@ -30,7 +30,7 @@ You are the Compliance Orchestrator for a Next.js application with strict archit
 **VIBE CHECK COMMAND STANDARDS:**
 
 - Use global `vibe` command only (no yarn/bun/tsx prefixes)
-- Format: `vibe check src/app/api/[locale]/v1/{domain}/{subdomain}`
+- Format: `vibe check src/app/api/[locale]/{domain}/{subdomain}`
 - If timeout: reduce scope or increase timeout with `--timeout 180`
 - Fix order: compilation errors → type safety → code quality
 - Document progress: "Initial: X errors → After fixes: Y errors → Final: 0 errors"
@@ -80,10 +80,10 @@ Examples:
 
 ```bash
 # 1. Identify subdomains with route.ts files (foundation priority)
-find src/app/api/[locale]/v1/{domain} -name "route.ts" | head -3
+find src/app/api/[locale]/{domain} -name "route.ts" | head -3
 
 # 2. Run individual vibe checks to assess complexity
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 
 # 3. Focus on foundation issues first: paths, debug fields, basic types
 # 4. Skip complex email/SMS template issues for later specialized work
@@ -103,7 +103,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 ```bash
 # For each subdomain discovered:
-"Migrate services in src/app/api/[locale]/v1/{domain}/{subdomain}"
+"Migrate services in src/app/api/[locale]/{domain}/{subdomain}"
 ```
 
 **Expected Outcomes:**
@@ -124,7 +124,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
    ```bash
    # Every agent must start with this
-   vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+   vibe check src/app/api/[locale]/{domain}/{subdomain}
    ```
 
    - Establish baseline error count
@@ -135,7 +135,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
    ```bash
    # After EVERY file creation/modification
-   vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+   vibe check src/app/api/[locale]/{domain}/{subdomain}
    ```
 
    - Run after creating definition.ts, repository.ts, enum.ts files
@@ -147,7 +147,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
    ```bash
    # After completing major operations
-   vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+   vibe check src/app/api/[locale]/{domain}/{subdomain}
    ```
 
    - Track error reduction progress
@@ -158,7 +158,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
    ```bash
    # Before completing agent work - MUST PASS WITH 0 ERRORS
-   vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+   vibe check src/app/api/[locale]/{domain}/{subdomain}
    ```
 
    - Zero tolerance for remaining errors
@@ -171,14 +171,14 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 ```bash
 # Establish domain baseline
-vibe check src/app/api/[locale]/v1/{domain}
+vibe check src/app/api/[locale]/{domain}
 ```
 
 **After each agent completes:**
 
 ```bash
 # Validate agent work quality
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Progress tracking between agents:**
@@ -191,7 +191,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 ```bash
 # Complete domain validation
-vibe check src/app/api/[locale]/v1/{domain}
+vibe check src/app/api/[locale]/{domain}
 ```
 
 - Must pass with zero errors
@@ -201,7 +201,7 @@ vibe check src/app/api/[locale]/v1/{domain}
 **Validation per subdomain:**
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 # Must pass for each subdomain before proceeding to Phase 2
 ```
 
@@ -211,7 +211,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 ```bash
 # For each subdomain with repository.ts:
-"Check repositories in src/app/api/[locale]/v1/{domain}/{subdomain}"
+"Check repositories in src/app/api/[locale]/{domain}/{subdomain}"
 ```
 
 **Expected Outcomes:**
@@ -225,7 +225,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 **Validation per subdomain:**
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 # Must pass for each subdomain before proceeding to Phase 3
 ```
 
@@ -235,7 +235,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 ```bash
 # For each subdomain with enum.ts:
-"Check enums in src/app/api/[locale]/v1/{domain}/{subdomain}"
+"Check enums in src/app/api/[locale]/{domain}/{subdomain}"
 ```
 
 **Expected Outcomes:**
@@ -249,7 +249,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 **Validation per subdomain:**
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 # Must pass for each subdomain before proceeding to Phase 4
 ```
 
@@ -259,7 +259,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 ```bash
 # For each subdomain with type imports:
-"Fix type imports in src/app/api/[locale]/v1/{domain}/{subdomain}"
+"Fix type imports in src/app/api/[locale]/{domain}/{subdomain}"
 ```
 
 **Expected Outcomes:**
@@ -273,7 +273,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 **Validation per subdomain:**
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 # Must pass for each subdomain before proceeding to Phase 5
 ```
 
@@ -283,7 +283,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 ```bash
 # For each subdomain with definition.ts:
-"Validate src/app/api/[locale]/v1/{domain}/{subdomain}"
+"Validate src/app/api/[locale]/{domain}/{subdomain}"
 ```
 
 **Expected Outcomes:**
@@ -299,7 +299,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 **Validation per subdomain:**
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 # Must pass for each subdomain before proceeding to Phase 6
 ```
 
@@ -309,7 +309,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 ```bash
 # For each subdomain with definition.ts:
-"Optimize UI definitions in src/app/api/[locale]/v1/{domain}/{subdomain}"
+"Optimize UI definitions in src/app/api/[locale]/{domain}/{subdomain}"
 ```
 
 **Expected Outcomes:**
@@ -324,7 +324,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 **Validation per subdomain:**
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 # Must pass for each subdomain before proceeding to Phase 7
 ```
 
@@ -334,7 +334,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 ```bash
 # For each subdomain with i18n files:
-"Check translations in src/app/api/[locale]/v1/{domain}/{subdomain}"
+"Check translations in src/app/api/[locale]/{domain}/{subdomain}"
 ```
 
 **Expected Outcomes:**
@@ -349,7 +349,7 @@ vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
 
 ```bash
 # After all subdomains pass, validate entire domain
-vibe check src/app/api/[locale]/v1/{domain}
+vibe check src/app/api/[locale]/{domain}
 # Must achieve zero errors for perfect compliance
 ```
 

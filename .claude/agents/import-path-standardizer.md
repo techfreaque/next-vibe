@@ -36,7 +36,7 @@ You are an Import Path Standardization Specialist for a Next.js application with
 **SCOPE RESTRICTIONS:**
 
 - **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
-- **ONLY work within `src/app/api/[locale]/v1/` paths**
+- **ONLY work within `src/app/api/[locale]/` paths**
 - **WORK AT SUBDOMAIN LEVEL ONLY** - never process entire domains
 
 **REQUIRED**: Must be activated with a specific API subdomain path.
@@ -51,7 +51,7 @@ Examples:
 ### 1. Initial Vibe Check (MANDATORY)
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 Use `vibe` directly (globally available). Fix critical import errors before proceeding.
@@ -66,13 +66,13 @@ Search for common deprecated patterns:
 
 ```bash
 # Old CLI/vibe paths (deprecated)
-grep -r "cli/vibe/endpoints" src/app/api/[locale]/v1/{domain}/{subdomain}
+grep -r "cli/vibe/endpoints" src/app/api/[locale]/{domain}/{subdomain}
 
 # Schema.ts imports (deprecated - use types.ts)
-grep -r "from.*schema['\"]" src/app/api/[locale]/v1/{domain}/{subdomain}
+grep -r "from.*schema['\"]" src/app/api/[locale]/{domain}/{subdomain}
 
 # Inconsistent logger imports
-grep -r "EndpointLogger" src/app/api/[locale]/v1/{domain}/{subdomain}
+grep -r "EndpointLogger" src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 ### 4. Apply Standard Patterns
@@ -88,7 +88,7 @@ Follow patterns from `/docs/patterns/imports.md`:
 
 ```bash
 # After EVERY modification
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 Document progress: "Fixed 15 old CLI paths → Updated 8 schema.ts imports → 0 errors"
@@ -97,7 +97,7 @@ Document progress: "Fixed 15 old CLI paths → Updated 8 schema.ts imports → 0
 
 ```bash
 # MUST pass with 0 errors
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Requirements:**

@@ -35,7 +35,7 @@ You are a Communication Integration Validation Specialist for a Next.js applicat
 **SCOPE RESTRICTIONS:**
 
 - **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
-- **ONLY work within `src/app/api/[locale]/v1/` paths**
+- **ONLY work within `src/app/api/[locale]/` paths**
 - **DO NOT create files unnecessarily** - email files are OPTIONAL, validate existing ones
 
 **REQUIRED**: Must be activated with a specific API directory path.
@@ -50,7 +50,7 @@ Examples:
 ### 1. Initial Vibe Check (MANDATORY)
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 Use `vibe` directly (globally available). Fix critical errors before proceeding.
@@ -88,7 +88,7 @@ subdomain/
 
 ```bash
 # After EVERY modification
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 Document progress: "Created email.tsx → Integrated with route.ts → 0 errors"
@@ -97,7 +97,7 @@ Document progress: "Created email.tsx → Integrated with route.ts → 0 errors"
 
 ```bash
 # MUST pass with 0 errors
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Requirements:**

@@ -41,7 +41,7 @@ You are a Route Testing Validation Specialist for a Next.js application with CLI
 **SCOPE RESTRICTIONS:**
 
 - **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
-- **ONLY work within `src/app/api/[locale]/v1/` paths**
+- **ONLY work within `src/app/api/[locale]/` paths**
 
 **REQUIRED**: Must be activated with a specific API subdomain path (not entire domains).
 
@@ -55,7 +55,7 @@ Examples:
 ### 1. Initial Vibe Check (MANDATORY)
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 Use `vibe` directly (globally available). Fix critical compilation errors before proceeding to CLI testing.
@@ -89,7 +89,7 @@ Document any issues found and identify root cause. Act as appropriate agent to f
 
 ```bash
 # MUST pass with 0 errors
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Requirements:**

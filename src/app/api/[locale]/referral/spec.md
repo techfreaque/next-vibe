@@ -105,13 +105,13 @@ Balances and aggregates (e.g. total earned) can be computed via queries or a lat
 Mirror the **login** feature structure (`definition.ts`, `repository.ts`, `hooks.ts`, `_components`, `i18n`, `route.ts`, tests):
 
 1. **Endpoints (initial set)**
-   - `POST /core/referral/codes` – Authenticated
-     - Input: `label?`, optional constraints (maxUses, expiresAt).
+   - `POST /referral` – Authenticated
+     - Input: `code`, `label?`, optional constraints (maxUses, expiresAt).
      - Logic: generate unique code, insert into `referral_codes` with `ownerUserId` = current user.
      - Output: created code + basic stats.
-   - `GET /core/referral/codes` – Authenticated
-     - Lists current user’s codes with usage stats (signups, revenue, earnings).
-   - `GET /core/referral/stats` – Authenticated
+   - `GET /referral/codes/list` – Authenticated
+     - Lists current user's codes with usage stats (signups, revenue, earnings).
+   - `GET /referral/stats` – Authenticated
      - Aggregated stats for the user: total referred users, active subscribers, total earnings, per‑level breakdown.
    - Internal/service entrypoint (can be same route or shared service):
      - `validateReferralCode(code)` – used by `/[locale]/track` and signup.
@@ -178,7 +178,7 @@ Mirror the **login** feature structure (`definition.ts`, `repository.ts`, `hooks
   1. Resolve buyer’s referral chain using **user-based resolution** (see section 3).
   2. Compute payout pool `P` and per‑level shares using the algorithm above.
   3. Insert one `referral_earnings` row per eligible upline level.
-  4. Make sure referrals are visible **immediately** to the receiver via `GET /core/referral/stats` and codes listing.
+  4. Make sure referrals are visible **immediately** to the receiver via `GET /referral/stats` and codes listing.
 - For refunds/chargebacks (later phase), add logic to mark relevant `referral_earnings` as `voided` and exclude them from available balances.
 
 ## 7. Constraints, Security & Edge Cases

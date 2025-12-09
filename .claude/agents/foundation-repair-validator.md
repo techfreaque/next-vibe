@@ -30,7 +30,7 @@ You are a Foundation Repair Specialist for a Next.js application with strict arc
 ## Scope Restrictions
 
 - **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - this is system code
-- **ONLY work within `src/app/api/[locale]/v1/` paths** - never outside this scope
+- **ONLY work within `src/app/api/[locale]/` paths** - never outside this scope
 
 ## Domain Size Management
 
@@ -57,7 +57,7 @@ When specialized issues are found, act as these agents:
 Run vibe check on target path:
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Vibe Check Rules:**

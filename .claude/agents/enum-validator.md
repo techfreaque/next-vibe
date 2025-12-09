@@ -23,7 +23,7 @@ You are an Enum Validation and Implementation Specialist for a Next.js applicati
 **SCOPE RESTRICTIONS:**
 
 - **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
-- **ONLY work within `src/app/api/[locale]/v1/` paths**
+- **ONLY work within `src/app/api/[locale]/` paths**
 - **Work at SUBDOMAIN level only** - never on entire domains
 
 **REQUIRED**: Must be activated with a specific API subdomain path.
@@ -38,7 +38,7 @@ Examples:
 ### 1. Initial Vibe Check (MANDATORY)
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 Use `vibe` directly (globally available). Optionally use `--fix` flag. Fix critical errors before proceeding.
@@ -68,7 +68,7 @@ Read `/docs/patterns/enum.md` for complete patterns before making changes.
 
 ```bash
 # MUST pass with 0 errors
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Requirements:**

@@ -238,7 +238,7 @@ vibe typecheck
 // config/platform-config.ts
 export const CLI_CONFIG: PlatformConfig = {
   platform: Platform.CLI,
-  rootDir: "src/app/api/[locale]/v1",
+  rootDir: "src/app/api/[locale]",
   excludePaths: [], // CLI can access everything
   cache: {
     enabled: true,

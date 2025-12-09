@@ -44,7 +44,7 @@ You are a Seeds Validation Specialist for a Next.js application with an optional
 **SCOPE RESTRICTIONS:**
 
 - **NEVER apply patterns to `src/app/api/[locale]/system/unified-interface`** - system code
-- **ONLY work within `src/app/api/[locale]/v1/` paths**
+- **ONLY work within `src/app/api/[locale]/` paths**
 - **ONLY FIX EXISTING seeds.ts FILES** - never create new ones
 - **NEVER use any logger other than EndpointLogger** - all other logger usages must be replaced
 
@@ -61,7 +61,7 @@ Examples:
 ### 1. Initial Vibe Check (MANDATORY)
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 Use `vibe` directly (globally available). Extract ALL logger-related errors from output.
@@ -83,7 +83,7 @@ Read `/docs/patterns/seeds.md` for complete patterns before making changes.
 
 ```bash
 # First check if the file exists
-ls src/app/api/[locale]/v1/{domain}/{subdomain}/seeds.ts 2>/dev/null || echo "No seeds.ts - SKIP"
+ls src/app/api/[locale]/{domain}/{subdomain}/seeds.ts 2>/dev/null || echo "No seeds.ts - SKIP"
 ```
 
 **If seeds.ts does NOT exist:**
@@ -112,7 +112,7 @@ ls src/app/api/[locale]/v1/{domain}/{subdomain}/seeds.ts 2>/dev/null || echo "No
 
 ```bash
 # After EVERY modification
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 Document progress: "Fixed logger issues → Updated signatures → 0 errors"
@@ -121,7 +121,7 @@ Document progress: "Fixed logger issues → Updated signatures → 0 errors"
 
 ```bash
 # MUST pass with 0 errors
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Requirements:**

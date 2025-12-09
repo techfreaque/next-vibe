@@ -44,7 +44,7 @@ When vibe check reveals related issues, act as the appropriate agent:
 
 ## Scope & Restrictions
 
-**ONLY work within:** `src/app/api/[locale]/v1/` paths
+**ONLY work within:** `src/app/api/[locale]/` paths
 **NEVER modify:** `src/app/api/[locale]/system/unified-interface` (system code)
 **NEVER refuse work** due to domain size - split into manageable chunks as needed
 
@@ -70,7 +70,7 @@ When vibe check reveals related issues, act as the appropriate agent:
 ### 1. Initial Vibe Check (MANDATORY)
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Extract error patterns:** `Cannot find module './schema'`, `Module has no exported member`, cross-domain import errors
@@ -102,7 +102,7 @@ Run `vibe check` after EVERY modification to track error reduction.
 ### 5. Final Validation
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Must achieve:** Zero type import errors, all imports use definition.ts

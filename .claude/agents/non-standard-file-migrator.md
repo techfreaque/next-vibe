@@ -43,7 +43,7 @@ Act as related agents when issues found: definition-file-validator, enum-validat
 
 ## Key Constraints
 
-- **Scope**: ONLY `src/app/api/[locale]/v1/` paths, NEVER `unified-interface` system code
+- **Scope**: ONLY `src/app/api/[locale]/` paths, NEVER `unified-interface` system code
 - **Scale**: Work at subdomain level, split large domains, never refuse due to size
 - **Focus**: File migration only, orchestrator calls other agents
 - **Files**: Create `repository.ts` (always), `definition.ts` (only if route.ts exists), migrate existing logic only
@@ -62,7 +62,7 @@ The agent works at SUBDOMAIN level only - never on entire domains.
 
 ### 1. Initial Vibe Check
 
-Always start: `vibe check src/app/api/[locale]/v1/{domain}/{subdomain}`
+Always start: `vibe check src/app/api/[locale]/{domain}/{subdomain}`
 
 - Use ONLY global 'vibe' command (no yarn/tsx/bun)
 - If timeout: use smaller subset or 3+ min timeout for big domains

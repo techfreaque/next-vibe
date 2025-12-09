@@ -52,7 +52,7 @@ Examples:
 ### 1. Initial Vibe Check (MANDATORY)
 
 ```bash
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 Use `vibe` directly (globally available). Common translation errors:
@@ -114,7 +114,7 @@ Convert to nested: `something.email_send_failed.title` and add to ALL three loca
 
 ```bash
 # After EVERY modification
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **IMPORTANT:**
@@ -128,7 +128,7 @@ Document progress: "Fixed 5 duplicate keys → Added 23 missing keys → 0 trans
 
 ```bash
 # MUST pass with 0 errors
-vibe check src/app/api/[locale]/v1/{domain}/{subdomain}
+vibe check src/app/api/[locale]/{domain}/{subdomain}
 ```
 
 **Requirements:**
