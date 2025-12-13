@@ -43,6 +43,7 @@ const testPublicEndpoint = createEndpoint({
   title: "test" as any,
   description: "test" as any,
   category: "test" as any,
+  icon: "test-tube",
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
@@ -68,6 +69,7 @@ const testAdminEndpoint = createEndpoint({
   title: "test" as any,
   description: "test" as any,
   category: "test" as any,
+  icon: "test-tube",
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
   fields: objectField(
@@ -113,6 +115,7 @@ const testResponseEndpoint = createEndpoint({
   title: "test" as any,
   description: "test" as any,
   category: "test" as any,
+  icon: "test-tube",
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(

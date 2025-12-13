@@ -18,8 +18,6 @@ export const { POST, tools } = endpointsHandler({
     email: undefined,
     handler: async ({
       data,
-      user,
-      locale,
       logger,
     }): Promise<ResponseType<ListNetworkRequestsResponseOutput>> => {
       return executeMCPTool(
@@ -32,9 +30,7 @@ export const { POST, tools } = endpointsHandler({
             includePreservedRequests: data.includePreservedRequests,
           }),
         },
-        user,
         logger,
-        locale,
       );
     },
   },

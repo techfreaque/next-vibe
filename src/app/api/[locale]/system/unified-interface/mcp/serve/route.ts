@@ -8,8 +8,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: serveDefinition,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) => {
-      return await mcpServeRepository.startServer(data, user, logger, locale);
+    handler: async ({ logger, locale }) => {
+      return await mcpServeRepository.startServer(logger, locale);
     },
   },
 });

@@ -72,7 +72,6 @@ function H1({
   id,
   role,
   "aria-label": ariaLabel,
-
   accessibilityLabel,
   accessibilityRole,
   testID,
@@ -106,7 +105,6 @@ function H2({
   id,
   role,
   "aria-label": ariaLabel,
-
   accessibilityLabel,
   accessibilityRole,
   testID,
@@ -140,7 +138,6 @@ function H3({
   id,
   role,
   "aria-label": ariaLabel,
-
   accessibilityLabel,
   accessibilityRole,
   testID,
@@ -174,7 +171,6 @@ function H4({
   id,
   role,
   "aria-label": ariaLabel,
-
   accessibilityLabel,
   accessibilityRole,
   testID,
@@ -208,7 +204,6 @@ function P({
   id,
   role,
   "aria-label": ariaLabel,
-
   accessibilityLabel,
   accessibilityRole,
   testID,
@@ -239,7 +234,6 @@ function BlockQuote({
   id,
   role,
   "aria-label": ariaLabel,
-
   accessibilityLabel,
   accessibilityRole,
   testID,
@@ -273,7 +267,6 @@ function Code({
   id,
   role,
   "aria-label": ariaLabel,
-
   accessibilityLabel,
   accessibilityRole,
   testID,
@@ -307,7 +300,6 @@ function Lead({
   id,
   role,
   "aria-label": ariaLabel,
-
   accessibilityLabel,
   accessibilityRole,
   testID,
@@ -338,7 +330,6 @@ function Large({
   id,
   role,
   "aria-label": ariaLabel,
-
   accessibilityLabel,
   accessibilityRole,
   testID,
@@ -369,7 +360,6 @@ function Small({
   id,
   role,
   "aria-label": ariaLabel,
-
   accessibilityLabel,
   accessibilityRole,
   testID,
@@ -403,7 +393,6 @@ function Muted({
   id,
   role,
   "aria-label": ariaLabel,
-
   accessibilityLabel,
   accessibilityRole,
   testID,

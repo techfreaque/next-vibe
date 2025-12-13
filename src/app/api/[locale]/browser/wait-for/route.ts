@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: waitForEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, logger }) => {
       return executeWaitFor(
         {
           toolName: "wait-for",
@@ -21,9 +21,7 @@ export const { POST, tools } = endpointsHandler({
             timeout: data.timeout,
           }),
         },
-        user,
         logger,
-        locale,
       );
     },
   },

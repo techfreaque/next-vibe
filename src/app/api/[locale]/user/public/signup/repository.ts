@@ -36,8 +36,6 @@ import {
 } from "../../user-roles/enum";
 import { userRolesRepository } from "../../user-roles/repository";
 import type {
-  SignupGetRequestOutput,
-  SignupGetResponseOutput,
   SignupPostRequestOutput,
   SignupPostResponseOutput,
 } from "./definition";
@@ -64,21 +62,6 @@ export interface SignupRepository {
     request: NextRequest | undefined,
     platform: Platform,
   ): Promise<ResponseType<SignupPostResponseOutput>>;
-
-  /**
-   * Check if email is already registered
-   * @param data - Email check data
-   * @param user - User from JWT (public user)
-   * @param locale - User locale
-   * @param logger - Logger instance for debugging and monitoring
-   * @returns Success or error result
-   */
-  checkEmailAvailability(
-    data: SignupGetRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SignupGetResponseOutput>>;
 }
 
 /**
@@ -105,12 +88,22 @@ export class SignupRepositoryImpl implements SignupRepository {
     const { t } = simpleT(locale);
 
     try {
-      logger.debug("Registering new user", { email: data.personalInfo.email });
+      // Extract fields from flat structure
+      const formCard = data.formCard;
+      const email = formCard.email;
+      const password = formCard.password;
+      const confirmPassword = formCard.confirmPassword;
+      const privateName = formCard.privateName;
+      const publicName = formCard.publicName;
+      const subscribeToNewsletter = formCard.subscribeToNewsletter ?? false;
+      const referralCode = formCard.referralCode;
+
+      logger.debug("Registering new user", { email });
 
       // Validate password match
-      if (data.security.password !== data.security.confirmPassword) {
+      if (password !== confirmPassword) {
         logger.debug("Registration failed: Passwords do not match", {
-          email: data.personalInfo.email,
+          email,
         });
         return fail({
           message: "app.api.user.auth.errors.validation_failed",
@@ -126,7 +119,7 @@ export class SignupRepositoryImpl implements SignupRepository {
 
       // Check if email already exists
       const emailCheckResponse = await this.checkEmailAvailabilityInternal(
-        data.personalInfo.email,
+        email,
         locale,
         logger,
       );
@@ -144,9 +137,9 @@ export class SignupRepositoryImpl implements SignupRepository {
         });
       }
 
-      // Create the user account
+      // Create the user account with extracted data
       const result = await this.createUserInternal(
-        data,
+        { email, password, privateName, publicName, subscribeToNewsletter },
         user.leadId,
         locale,
         logger,
@@ -162,32 +155,26 @@ export class SignupRepositoryImpl implements SignupRepository {
 
       const userData = result.data;
       logger.debug("User registration completed successfully", {
-        email: data.personalInfo.email,
+        email,
         userId: userData.id,
         leadId: user.leadId,
       });
 
       // Auto-login: Create session and store auth token
       // Link leadId to user
-      await leadAuthRepository.linkLeadToUser(
-        user.leadId,
-        userData.id,
-        locale,
-        logger,
-      );
+      await leadAuthRepository.linkLeadToUser(user.leadId, userData.id, logger);
 
       // Link referral code if provided manually in form
       const { referralRepository } =
         await import("../../../referral/repository");
-      if (data.referralCode) {
+      if (referralCode) {
         logger.debug("Linking manual referral code to lead", {
-          referralCode: data.referralCode,
+          referralCode,
           leadId: user.leadId,
         });
         await referralRepository.linkReferralToLead(
           user.leadId,
-          data.referralCode,
-          locale,
+          referralCode,
           logger,
         );
       }
@@ -196,7 +183,6 @@ export class SignupRepositoryImpl implements SignupRepository {
       await referralRepository.convertLeadReferralToUser(
         userData.id,
         user.leadId,
-        locale,
         logger,
       );
 
@@ -295,36 +281,17 @@ export class SignupRepositoryImpl implements SignupRepository {
         }
       }
 
-      const nextSteps = [
-        "app.api.user.public.signup.success.nextSteps.profile",
-        "app.api.user.public.signup.success.nextSteps.explore",
-      ];
-
-      // Add warning if credit merge failed - user should contact support
+      // Log warning if credit merge failed - user should contact support
       if (creditMergeFailed) {
-        nextSteps.unshift(
-          "app.api.user.public.signup.success.nextSteps.creditMergeWarning",
+        logger.warn(
+          "User registered but credit merge failed - manual intervention may be needed",
+          { userId: userData.id },
         );
       }
 
+      // Return simple message response
       return success<SignupPostResponseOutput>({
-        response: {
-          success: true,
-          message: "app.api.user.public.signup.success.message",
-          user: {
-            id: userData.id,
-            email: userData.email,
-            privateName: userData.privateName,
-            publicName: userData.publicName,
-            verificationRequired: false,
-          },
-          verificationInfo: {
-            emailSent: false,
-            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-            checkSpamFolder: false,
-          },
-          nextSteps,
-        },
+        message: "app.api.user.public.signup.success.message",
       });
     } catch (error) {
       logger.error("Registration error", parseError(error));
@@ -333,7 +300,7 @@ export class SignupRepositoryImpl implements SignupRepository {
         message: "app.api.user.public.signup.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
-          email: data.personalInfo.email,
+          email: data.formCard?.email ?? "unknown",
           error: parsedError.message,
         },
       });
@@ -341,58 +308,8 @@ export class SignupRepositoryImpl implements SignupRepository {
   }
 
   /**
-   * Check if email is already registered
-   * @param data - Email check data
-   * @param user - User from JWT (public user)
-   * @param locale - User locale
-   * @param logger - Logger instance for debugging and monitoring
-   * @returns Success or error result
-   */
-  async checkEmailAvailability(
-    data: SignupGetRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SignupGetResponseOutput>> {
-    try {
-      logger.debug("Checking email availability", { email: data.email });
-
-      const isEmailTaken = await this.checkEmailAvailabilityInternal(
-        data.email,
-        locale,
-        logger,
-      );
-      if (!isEmailTaken.success) {
-        return isEmailTaken;
-      }
-
-      logger.debug("Email availability check completed", {
-        email: data.email,
-        available: !isEmailTaken.data,
-      });
-
-      return success<SignupGetResponseOutput>({
-        response: {
-          available: !isEmailTaken.data, // false if taken, true if available
-          message: isEmailTaken.data
-            ? "app.api.user.public.signup.emailCheck.taken"
-            : "app.api.user.public.signup.emailCheck.available",
-        },
-      });
-    } catch (error) {
-      logger.error("Error checking email availability", parseError(error));
-      const parsedError = parseError(error);
-      return fail({
-        message: "app.api.user.public.signup.emailCheck.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { email: data.email, error: parsedError.message },
-      });
-    }
-  }
-
-  /**
    * Internal helper: Create a new user account
-   * @param userInput - User registration data
+   * @param userInput - User registration data (extracted from form)
    * @param leadId - Lead ID from JWT payload
    * @param locale - User locale
    * @param logger - Logger instance
@@ -400,52 +317,21 @@ export class SignupRepositoryImpl implements SignupRepository {
    * @returns Success or error result
    */
   private async createUserInternal(
-    userInput: SignupPostRequestOutput,
+    userInput: {
+      email: string;
+      password: string;
+      privateName: string;
+      publicName: string;
+      subscribeToNewsletter: boolean;
+    },
     leadId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
     role: UserRoleValue = UserRole.CUSTOMER,
   ): Promise<ResponseType<StandardUserType>> {
     try {
-      // Extract data from nested structure
-      const email = userInput.personalInfo.email;
-      const password = userInput.security.password;
-      const privateName = userInput.personalInfo.privateName;
-      const publicName = userInput.personalInfo.publicName;
-      const confirmPassword = userInput.security.confirmPassword;
-      const subscribeToNewsletter =
-        userInput.consent.subscribeToNewsletter || false;
-
-      // Check if email is already registered
-      const emailCheckResult = await this.checkEmailAvailabilityInternal(
-        email,
-        locale,
-        logger,
-      );
-
-      if (!emailCheckResult.success) {
-        return emailCheckResult;
-      }
-
-      if (emailCheckResult.data) {
-        logger.debug("Registration failed: Email already registered", {
-          email,
-        });
-        return fail({
-          message: "app.api.user.public.signup.errors.conflict.title",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { email },
-        });
-      }
-
-      // Validate password confirmation
-      if (password !== confirmPassword) {
-        logger.debug("Registration failed: Passwords do not match", { email });
-        return fail({
-          message: "app.api.user.auth.errors.validation_failed",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        });
-      }
+      const { email, password, privateName, publicName, subscribeToNewsletter } =
+        userInput;
 
       // Create user data object
       const userData = {
@@ -529,7 +415,7 @@ export class SignupRepositoryImpl implements SignupRepository {
         message: "app.api.user.public.signup.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
-          email: userInput.personalInfo.email,
+          email: userInput.email,
           error: parseError(error).message,
         },
       });
@@ -591,8 +477,6 @@ export class SignupRepositoryImpl implements SignupRepository {
       const convertResult = await leadsRepository.convertLead(
         leadId,
         { email, userId },
-        user,
-        locale,
         logger,
       );
 

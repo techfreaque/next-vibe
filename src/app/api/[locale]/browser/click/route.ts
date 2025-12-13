@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: clickEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, logger }) => {
       return executeClick<ClickResponseOutput>(
         {
           toolName: "click",
@@ -21,9 +21,7 @@ export const { POST, tools } = endpointsHandler({
             dblClick: data.dblClick,
           }),
         },
-        user,
         logger,
-        locale,
       );
     },
   },

@@ -4,7 +4,6 @@
  */
 
 import type { CountryLanguage } from "@/i18n/core/config";
-
 import type { BrowserRequestInput, BrowserResponseOutput } from "./definition";
 import type { BrowserToolValue } from "./enum";
 import { BrowserTool } from "./enum";

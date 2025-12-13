@@ -167,7 +167,7 @@ export const translations: typeof enTranslations = {
     breakdown: "Credit-Aufschlüsselung",
     navigation: {
       profile: "Profil",
-      subscription: "Abonnement",
+      subscription: "Abonnement & Credits",
       referral: "Empfehlungsprogramm",
       about: "Über",
       help: "Hilfe",
@@ -1031,8 +1031,8 @@ export const translations: typeof enTranslations = {
     result: "Ergebnis",
     error: "Fehler",
     executing: "Wird ausgeführt...",
-    creditsUsed: "{{count}} Guthaben",
-    creditsUsed_other: "{{count}} Guthaben",
+    creditsUsed_one: "{{cost}} Guthaben",
+    creditsUsed_other: "{{cost}} Guthaben",
     status: {
       error: "Fehler",
       executing: "Wird ausgeführt...",
@@ -1061,105 +1061,108 @@ export const translations: typeof enTranslations = {
     authDialog: {
       title: "Private & Geteilte Ordner freischalten",
       description:
-        "Um auf deine privaten und geteilten Ordner zugreifen zu können, musst du dich einloggen oder registrieren. Deine Chats werden dann auf allen Geräten synchronisiert und sicher gespeichert.",
+        "Registriere dich oder melde dich an, um auf private und geteilte Ordner zuzugreifen. Deine Chats werden über Geräte synchronisiert.",
       continueTour: "Tour fortsetzen",
       signUp: "Registrieren / Einloggen",
     },
     welcome: {
       title: "Willkommen bei {{appName}}!",
       description:
-        "Deine All-in-One KI-Chat-Plattform. Chatte mit verschiedenen KI-Modellen, organisiere deine Gespräche und arbeite mit anderen zusammen.",
-      subtitle: "Lass uns kurz die wichtigsten Features durchgehen!",
+        "Befreie dich von KI-Zensur. Zugriff auf GPT-5.1, Claude Sonnet und unzensierte Modelle, trainiert auf WikiLeaks und nicht-mainstream Daten. Privat, anonym oder öffentlich chatten. Deine Plattform, deine Regeln.",
+      subtitle: "Lass uns erkunden, was uns anders macht:",
     },
     modelSelector: {
       title: "Wähle dein KI-Modell",
       description:
-        "Wähle aus verschiedenen KI-Modellen - jedes hat seine eigenen Stärken. Von Coding-Assistenten über kreative Texter bis hin zu analytischen Denkern oder unzensierten Gesprächspartnern. Durchsuche sie nach Anbieter oder Funktion, nutze die Suche oder markiere deine Favoriten!",
-      tip: "💡 Tipp: Du kannst jederzeit während eines Gesprächs das Modell wechseln. Verschiedene Themen funktionieren besser mit verschiedenen Modellen!",
+        "Im Gegensatz zu ChatGPT bist du nicht an eine KI gebunden. Wechsle zwischen GPT-5.1, Claude Sonnet, DeepSeek und unzensierten Modellen wie Gab Arya und UncensoredLM. Jedes Modell bietet einzigartige Perspektiven und Fähigkeiten.",
+      tip: "Mainstream für Sicherheit, unzensiert für Wahrheit. Mische nach Bedarf.",
     },
     personaSelector: {
-      title: "Personalisiere mit Personas",
+      title: "Passe KI-Verhalten an",
       description:
-        "Bestimme den Charakter der KI mit Personas! Wähle aus vordefinierten wie Professional, Creative oder Technical - oder erstelle eigene mit individuellen Anweisungen und bevorzugten Modellen. Durchsuche, filtere und markiere deine Favoriten!",
-      tip: "💡 Tipp: Kombiniere jede Persona mit jedem Modell für deinen perfekten Assistenten!",
+        "Personas formen, wie die KI antwortet. Nutze integrierte Stile oder erstelle eigene Personas mit deinen Anweisungen und bevorzugten Modellen.",
+      tip: "Kombiniere jede Persona mit jedem Modell für den perfekten Assistenten.",
     },
     modelSelectorFavorites: {
-      title: "Markiere deine Lieblingsmodelle",
+      title: "Markiere deine Favoriten",
       description:
-        "Deine meistgenutzten Modelle erscheinen hier für schnellen Zugriff! Klick einfach auf den Stern, um ein Modell zu favorisieren. Favoriten werden immer ganz oben angezeigt.",
-      tip: "⭐ Profi-Tipp: Markiere 2-3 Modelle, die du regelmäßig nutzt - so geht's am schnellsten!",
+        "Modell gefunden, das du liebst? Markiere es für sofortigen Zugriff. Mische Mainstream und unzensierte Modelle nach Bedarf.",
+    },
+    modelSelectorShowAll: {
+      title: "Durchsuche vollständige Bibliothek",
+      description:
+        "Erkunde alle verfügbaren Modelle mit Suche und Filtern. Entdecke unzensierte Alternativen zu Mainstream-KIs.",
     },
     modelSelectorSearch: {
-      title: "Alle Modelle durchsuchen",
+      title: "Finde spezifische Modelle",
       description:
-        "Suchst du etwas Bestimmtes? Tippe einfach los, um nach Name, Anbieter oder Beschreibung zu filtern. Perfekt, wenn du genau weißt, was du brauchst!",
-      tip: '🔍 Probier mal die Suche nach Fähigkeiten wie "Coding", "kreativ" oder "unzensiert"!',
+        "Suche nach Name, Anbieter oder Fähigkeit. Probiere 'unzensiert', 'coding' oder 'kreativ'.",
     },
     modelSelectorGroup: {
-      title: "Nach Anbieter oder Funktion gruppieren",
+      title: "Gruppiere nach Anbieter oder Zweck",
       description:
-        "Wechsle zwischen Anbieter-Ansicht (gruppiert nach Firma wie OpenAI, Anthropic) und Funktions-Ansicht (gruppiert nach Zweck wie Coding, Kreativ, Analytisch). Wähle die Ansicht, die für dich passt!",
-      tip: "💡 Die Funktions-Ansicht hilft dir, neue Modelle für bestimmte Aufgaben zu entdecken!",
+        "Zeige Modelle gruppiert nach Firma (OpenAI, Anthropic) oder nach Anwendungsfall (Coding, Unzensiert, Kreativ).",
     },
     personaSelectorFavorites: {
-      title: "Markiere deine Lieblings-Personas",
+      title: "Markiere deine Personas",
       description:
-        "Deine bevorzugten Gesprächsstile erscheinen hier! Markiere die Personas, die du am häufigsten nutzt, für schnellen Zugriff. Ob Professional für die Arbeit oder Creative zum Brainstorming - immer griffbereit.",
-      tip: "⭐ Profi-Tipp: Erstelle eigene Personas für wiederkehrende Aufgaben und markiere sie!",
+        "Speichere deine Lieblings-Gesprächsstile für schnellen Zugriff.",
+    },
+    personaSelectorShowAll: {
+      title: "Durchsuche alle Personas",
+      description:
+        "Erkunde die vollständige Persona-Bibliothek. Erstelle eigene Personas für deinen Workflow.",
     },
     personaSelectorSearch: {
-      title: "Finde die perfekte Persona",
-      description:
-        "Durchsuche alle Personas nach Name, Kategorie oder Beschreibung. Finde schnell den passenden Assistenten-Stil für deine aktuelle Aufgabe!",
-      tip: '🔍 Probier mal die Suche nach Stimmungen wie "freundlich", "formal" oder "prägnant"!',
+      title: "Finde Personas",
+      description: "Suche nach Name, Kategorie oder Beschreibung.",
     },
     personaSelectorGroup: {
-      title: "Nach Quelle oder Kategorie gruppieren",
+      title: "Gruppiere Personas",
       description:
-        "Wechsle zwischen Quellen-Ansicht (Integriert vs. Eigene) und Kategorie-Ansicht (Kreativ, Technisch, Professional usw.). Organisiere Personas so, wie es für dich am besten passt!",
-      tip: "💡 Die Kategorie-Ansicht hilft dir, neue Gesprächsstile für verschiedene Szenarien zu entdecken!",
+        "Zeige nach Quelle (Integriert vs. Deine Eigenen) oder nach Kategorie (Kreativ, Technisch, Professional).",
     },
     rootFolders: {
-      title: "Organisiere deine Chats mit Ordnern",
+      title: "4 Wege zu chatten",
       description:
-        "Deine Chats sind in 4 speziellen Ordnern organisiert - jeder mit eigenen Funktionen:",
-      incognito: {
-        name: "Inkognito",
-        suffix: "Wird niemals auf Servern gespeichert",
-      },
-      public: {
-        name: "Öffentlich",
-        suffix: "Community-Forum für Fragen, Ideen & Zusammenarbeit",
-      },
+        "Wähle dein Privatsphäre-Level - von völlig anonym bis kollaborativ:",
       private: {
         name: "Privat",
-        suffix: "Deine persönlichen, sicheren Chats (Login erforderlich)",
+        suffix: "Dein persönlicher Workspace",
+      },
+      incognito: {
+        name: "Inkognito",
+        suffix: "Zero-Knowledge-Privatsphäre",
       },
       shared: {
         name: "Geteilt",
-        suffix: "Mit bestimmten Personen teilen (Login erforderlich)",
+        suffix: "Kontrollierte Zusammenarbeit",
+      },
+      public: {
+        name: "Öffentlich",
+        suffix: "Meinungsfreiheits-Forum",
       },
     },
     incognitoFolder: {
       name: "Inkognito",
       suffix: "Ordner",
       description:
-        "Maximale Privatsphäre - Chats werden nur auf DIESEM Gerät gespeichert, niemals auf unseren Servern. Surfe frei, diskutiere sensible Themen, experimentiere ohne Grenzen. Deine Daten gehören dir!",
-      note: "✓ Kein Konto nötig • ✓ Keine Server-Speicherung • ✓ 100% privat",
+        "Maximale Privatsphäre. Chat-Verlauf nur auf deinem Gerät gespeichert, nie auf unseren Servern. Nachrichten von KI verarbeitet, dann sofort verworfen. Perfekt für sensible Themen mit unzensierten Modellen.",
+      note: "Kein Konto • Kein Verlauf gespeichert • Nur lokal",
     },
     publicFolder: {
       name: "Öffentlich",
       suffix: "Ordner",
       description:
-        "Das Community-Hub! Stelle Fragen, teile Entdeckungen, hole Feedback ein oder arbeite offen zusammen. Alle Konversationen hier sind für jeden sichtbar - perfekt für gemeinsamen Wissensaufbau und Community-Austausch.",
-      note: "✓ Kein Konto nötig • ✓ Für alle sichtbar • ✓ Ideal für vielfältige Meinungen",
+        "Offenes KI-Forum geschützt durch Meinungsfreiheits-Prinzipien. Chatte mit KI und anderen Nutzern öffentlich. Teile Wissen, debattiere Ideen, erhalte diverse Perspektiven.",
+      note: "Kein Konto • Meinungsfreiheit als Basis • Community-getrieben",
     },
     privateFolder: {
       name: "Privat",
       suffix: "Ordner",
       description:
-        "Dein persönlicher KI-Arbeitsbereich! Chats synchronisieren sich über alle Geräte, bleiben mit Unterordnern organisiert und sind sicher unter deinem Konto geschützt. Perfekt für laufende Projekte, persönliche Recherchen und Arbeitsaufgaben.",
-      authPrompt: "🔓 Erstelle ein kostenloses Konto zum Freischalten:",
+        "Dein persönlicher KI-Workspace. Über alle Geräte synchronisiert, mit Unterordnern organisiert. Perfekt für laufende Projekte und Recherchen.",
+      authPrompt: "Konto erforderlich:",
       login: "Anmelden",
       signUp: "Registrieren",
     },
@@ -1167,54 +1170,55 @@ export const translations: typeof enTranslations = {
       name: "Geteilt",
       suffix: "Ordner",
       description:
-        "Zusammenarbeit leicht gemacht! Erstelle Konversationen und teile sie mit bestimmten Personen per Link. Steuere mit granularen Berechtigungen, wer was sehen darf. Perfekt für Teams, Lerngruppen oder Experten-Feedback!",
-      authPrompt: "🔓 Erstelle ein kostenloses Konto zum Freischalten:",
+        "Arbeite mit bestimmten Personen zusammen. Teile Konversationen per Link, kontrolliere wer lesen oder schreiben kann. Ideal für Teams und Experten-Feedback.",
+      authPrompt: "Konto erforderlich:",
       login: "Anmelden",
       signUp: "Registrieren",
     },
     newChatButton: {
       title: "Neue Konversation starten",
       description:
-        "Klick hier, um jederzeit einen neuen Chat zu beginnen! Konversationen werden automatisch in deinem aktuellen Ordner gespeichert. Erstelle so viele, wie du brauchst - die Organisation ist kinderleicht!",
-      tip: "⚡ Schnell-Tipp: Drücke Strg+N (Cmd+N auf Mac), um sofort einen neuen Chat zu starten!",
+        "Klicke hier, um einen frischen Chat zu beginnen. Alle Konversationen werden automatisch im aktuellen Ordner gespeichert.",
+      tip: "Jeder Ordner hat seinen eigenen Chat-Verlauf.",
     },
     sidebarLogin: {
-      title: "Weitere Funktionen freischalten",
+      title: "Kostenloses Konto erstellen",
       description:
-        "Melde dich kostenlos an, um auf Private und Geteilte Ordner zuzugreifen, Chats über Geräte zu synchronisieren, deine Lieblingsmodelle zu speichern und Personas anzupassen!",
-      tip: "💡 Kein Konto für Inkognito- und Öffentliche Ordner nötig - nutze diese jederzeit!",
+        "Schalte Private und Geteilte Ordner frei, synchronisiere über alle Geräte, speichere Lieblings-Modelle und Personas. Inkognito und Öffentlich bleiben ohne Konto verfügbar.",
+      tip: "Bleibe anonym oder synchronisiere alles. Deine Wahl.",
+    },
+    subscriptionButton: {
+      title: "Unbegrenzter KI-Zugang",
+      description:
+        "Erhalte alles, was ChatGPT bietet PLUS unzensierte Modelle, öffentliche Foren und echte Privatsphäre. 800 monatliche Credits für €8. Zugriff auf alle Modelle, keine Einschränkungen.",
+      tip: "Ein Abo. Alle Mainstream- und unzensierten Modelle. Keine Grenzen.",
     },
     chatInput: {
-      title: "Zwei Wege zum Chatten",
-      description:
-        "Starte Konversationen auf deine Art - tippen oder sprechen! Die Wahl liegt bei dir:",
+      title: "Beginne zu chatten",
+      description: "Tippe oder sprich - beides funktioniert nahtlos:",
       typing: {
-        title: "Nachricht eingeben",
-        description:
-          "Drücke Enter zum Senden, Shift+Enter für neue Zeilen. Volle Tastaturkontrolle!",
+        title: "Nachrichten tippen",
+        description: "Enter zum Senden, Shift+Enter für neue Zeile",
       },
       voice: {
         title: "Spracheingabe",
-        description:
-          "Klick auf das Mikrofon-Symbol, um natürlich zu sprechen. Deine Worte werden sofort transkribiert!",
+        description: "Klicke auf Mikrofon-Symbol, um natürlich zu sprechen",
       },
     },
     complete: {
-      title: "Bereit zum Chatten! 🎊",
+      title: "Alles bereit!",
       description:
-        "Alles bereit! Erkunde verschiedene Modelle, probiere verschiedene Personas aus und organisiere Chats nach deiner Art. Die KI ist bereit, wenn du es bist - fang einfach an zu tippen oder zu sprechen!",
-      help: "💬 Hängst du fest? Frag einfach die KI um Hilfe - dafür ist sie da!",
+        "Du hast jetzt Zugriff auf Mainstream und unzensierte KI-Modelle, private und öffentliche Chat-Modi und volle Kontrolle über deine Daten. Fang an zu erkunden!",
+      help: "Fragen? Frag jedes KI-Modell um Hilfe.",
     },
     authUnlocked: {
       unlocked: "Ordner freigeschaltet!",
       privateDescription:
-        "Willkommen zurück! Dein privater Ordner ist jetzt zugänglich. Alle deine Chats hier werden geräteübergreifend synchronisiert und verschlüsselt gespeichert.",
-      privateNote:
-        "Du kannst Unterordner erstellen, um deine Chats nach Belieben zu organisieren!",
+        "Dein Privater Ordner ist jetzt aktiv. Alle Chats synchronisieren über Geräte und bleiben in Unterordnern organisiert.",
+      privateNote: "Perfekt für laufende Projekte und persönliche Recherchen.",
       sharedDescription:
-        "Jetzt kannst du teilbare Chats erstellen! Generiere einen Link zu jedem Thread und teile ihn mit bestimmten Personen oder Teams.",
-      sharedNote:
-        "Perfekt für Zusammenarbeit, Feedback einholen oder Wissen teilen!",
+        "Geteilter Ordner freigeschaltet! Erstelle Konversationen und teile per Link mit granularer Berechtigungskontrolle.",
+      sharedNote: "Ideal für Team-Zusammenarbeit und Experten-Feedback.",
     },
     buttons: {
       back: "Zurück",

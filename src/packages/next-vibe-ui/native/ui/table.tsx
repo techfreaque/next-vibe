@@ -2,7 +2,7 @@ import * as TablePrimitive from "@rn-primitives/table";
 import { styled } from "nativewind";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
-import { View as RNView, Text as RNText } from "react-native";
+import { View as RNView, Text as RNText, Pressable } from "react-native";
 
 // MUST import ALL props interfaces from web version (NO local type definitions)
 import type {
@@ -146,9 +146,10 @@ function TableRow({
   style,
   children,
   onClick,
-  onKeyDown: _onKeyDown, // Native doesn't support keyboard events
-  role: _role, // Native doesn't support ARIA role
-  tabIndex: _tabIndex, // Native doesn't support tabIndex
+  // Extract web-only props to prevent passing to native primitives
+  onKeyDown,
+  role,
+  tabIndex,
   ...props
 }: TableRowProps): React.JSX.Element {
   const nativeStyle: ViewStyle | undefined = style
@@ -166,6 +167,25 @@ function TableRow({
         ),
       })}
       onPress={onClick}
+      accessibilityRole={role as "button" | "link" | "none" | undefined}
+      accessible={tabIndex !== undefined ? tabIndex >= 0 : undefined}
+      onAccessibilityAction={
+        onKeyDown
+          ? (event): void => {
+              if (event.nativeEvent.actionName === "activate") {
+                onKeyDown({
+                  key: "Enter",
+                  preventDefault: (): void => {
+                    return undefined;
+                  },
+                  stopPropagation: (): void => {
+                    return undefined;
+                  },
+                } as Parameters<typeof onKeyDown>[0]);
+              }
+            }
+          : undefined
+      }
       {...props}
     >
       {children}
@@ -178,12 +198,13 @@ function TableHead({
   className,
   style,
   width,
-  onClick: _onClick,
-  onKeyDown: _onKeyDown,
-  role: _role,
-  tabIndex: _tabIndex,
   children,
-  "aria-sort": _ariaSort,
+  // Extract web-only props for native handling
+  onClick,
+  onKeyDown,
+  role,
+  tabIndex,
+  "aria-sort": ariaSort,
   ...props
 }: TableHeadProps): React.JSX.Element {
   const computedStyle: ViewStyle = {
@@ -193,21 +214,59 @@ function TableHead({
       : {}),
   };
 
-  // Note: onClick, onKeyDown, role, tabIndex, and aria-sort are not supported in React Native
-  // They're accepted in the interface for cross-platform compatibility but not used
+  const isInteractive = onClick || onKeyDown;
+
+  const headContent = (
+    <StyledTableHead
+      className={cn(
+        "h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        className,
+      )}
+      style={computedStyle}
+      accessibilityRole={role as "header" | "none" | undefined}
+      accessible={tabIndex !== undefined ? tabIndex >= 0 : undefined}
+      accessibilityValue={ariaSort ? { text: ariaSort } : undefined}
+      {...props}
+    >
+      {renderTableCellChildren(children)}
+    </StyledTableHead>
+  );
+
+  if (isInteractive) {
+    return (
+      <TextClassContext.Provider value="text-muted-foreground">
+        <Pressable
+          onPress={onClick}
+          accessibilityRole={role as "button" | "link" | "none" | undefined}
+          accessible={tabIndex !== undefined ? tabIndex >= 0 : undefined}
+          accessibilityValue={ariaSort ? { text: ariaSort } : undefined}
+          onAccessibilityAction={
+            onKeyDown
+              ? (event): void => {
+                  if (event.nativeEvent.actionName === "activate") {
+                    onKeyDown({
+                      key: "Enter",
+                      preventDefault: (): void => {
+                        return undefined;
+                      },
+                      stopPropagation: (): void => {
+                        return undefined;
+                      },
+                    } as Parameters<typeof onKeyDown>[0]);
+                  }
+                }
+              : undefined
+          }
+        >
+          {headContent}
+        </Pressable>
+      </TextClassContext.Provider>
+    );
+  }
 
   return (
     <TextClassContext.Provider value="text-muted-foreground">
-      <StyledTableHead
-        className={cn(
-          "h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-          className,
-        )}
-        style={computedStyle}
-        {...props}
-      >
-        {renderTableCellChildren(children)}
-      </StyledTableHead>
+      {headContent}
     </TextClassContext.Provider>
   );
 }
@@ -217,15 +276,11 @@ function TableCell({
   className,
   style,
   children,
-  colSpan: _colSpan,
   ...props
 }: TableCellProps): React.JSX.Element {
   const nativeStyle: ViewStyle | undefined = style
     ? convertCSSToViewStyle(style)
     : undefined;
-
-  // Note: colSpan is not supported in React Native table primitives
-  // It's accepted in the interface for cross-platform compatibility but not used
 
   return (
     <StyledTableCell

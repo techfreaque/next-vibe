@@ -53,6 +53,7 @@ const { POST } = createEndpoint({
     "app.api.leads.tags.leads" as const,
   ],
   allowedRoles: [UserRole.ADMIN] as const,
+  icon: "arrow-up",
   aliases: ["leads-import", "import-leads"] as const,
 
   cli: {

@@ -30,6 +30,7 @@ const pulseExecuteEndpoint = createEndpoint({
   title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.title",
   description:
     "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.description",
+  icon: "activity",
   category:
     "app.api.system.unifiedInterface.tasks.pulseSystem.execute.category",
   allowedRoles: [UserRole.ADMIN],

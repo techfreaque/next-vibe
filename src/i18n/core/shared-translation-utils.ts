@@ -60,7 +60,6 @@ export function processTranslationValue<K extends string>(
   value: NestedValue | undefined,
   key: K,
   params?: TParams,
-  _context?: string,
 ): string {
   // If value is undefined, return the key as fallback
   if (value === undefined || value === null) {

@@ -35,6 +35,7 @@ import type {
 } from "./repository";
 import type { CreditTypeIdentifierValue } from "./enum";
 import type { CreditPackCheckoutSession } from "../payment/providers/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Native Credit Repository Implementation
@@ -51,15 +52,17 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
 
   async getCreditBalanceForUser(
     user: JwtPayloadType,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditBalance>> {
+    logger.debug("Getting credit balance for user", { userId: user.id, locale });
     // Use typesafe nativeEndpoint() with endpoint definition
     // This provides full type inference from the endpoint's schema
     const response = await nativeEndpoint(
       getCreditsEndpoint,
       {},
       logger,
-      "en-GLOBAL", // Locale not strictly needed for credit data
+      locale,
     );
 
     if (response.success) {
@@ -169,6 +172,7 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
 
   async getTransactions(
     userId: string,
+    leadId: string,
     limit: number,
     offset: number,
     logger: EndpointLogger,
@@ -180,6 +184,7 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
   > {
     logger.error("getTransactions not implemented on native");
     void userId;
+    void leadId;
     void limit;
     void offset;
     return await Promise.resolve(

@@ -78,6 +78,10 @@ export const translations: typeof enTranslations = {
       error: "Błąd pobierania wszystkich połączonych leadów",
     },
   },
+  errors: {
+    cannotLinkLeadToItself: "Nie można powiązać leada z samym sobą",
+    linkFailed: "Nie udało się powiązać leadów",
+  },
   batch: batchTranslations,
   campaigns: campaignsTranslations,
   create: createTranslations,

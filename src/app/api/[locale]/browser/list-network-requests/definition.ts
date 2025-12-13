@@ -26,6 +26,7 @@ const { POST } = createEndpoint({
   title: "app.api.browser.list-network-requests.title",
   description: "app.api.browser.list-network-requests.description",
   category: "app.api.browser.category",
+  icon: "network",
   tags: [
     "app.api.browser.tags.browserAutomation",
     "app.api.browser.tags.networkAnalysis",

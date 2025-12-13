@@ -176,7 +176,7 @@ export function isValidFieldPath<TFields>(
       !current ||
       typeof current !== "object" ||
       !("type" in current) ||
-      current.type !== "object" ||
+      (current.type !== "object" && current.type !== "object-optional") ||
       !("children" in current)
     ) {
       return false;
@@ -208,8 +208,8 @@ export function getFieldStructureByPath(
       return null;
     }
 
-    // Navigate through object children
-    if (current.type === "object" && current.children) {
+    // Navigate through object children (both object and object-optional)
+    if ((current.type === "object" || current.type === "object-optional") && current.children) {
       current = current.children[part];
     } else {
       return null;

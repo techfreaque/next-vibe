@@ -13,14 +13,9 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import { imapConfigurations } from "./db";
 import type {
-  ConfigGetRequestOutput,
   ConfigGetResponseOutput,
   ConfigUpdateRequestOutput,
   ConfigUpdateResponseOutput,
@@ -63,28 +58,16 @@ const DEFAULT_IMAP_CONFIG = {
 };
 
 export interface ImapConfigRepository {
-  getConfig(
-    data: ConfigGetRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): ResponseType<ConfigGetResponseOutput>;
+  getConfig(logger: EndpointLogger): ResponseType<ConfigGetResponseOutput>;
 
   updateConfig(
     data: ConfigUpdateRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<ConfigUpdateResponseOutput>;
 }
 
 export class ImapConfigRepositoryImpl implements ImapConfigRepository {
-  getConfig(
-    data: ConfigGetRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): ResponseType<ConfigGetResponseOutput> {
+  getConfig(logger: EndpointLogger): ResponseType<ConfigGetResponseOutput> {
     try {
       logger.debug("Getting IMAP configuration");
 
@@ -115,8 +98,6 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
 
   updateConfig(
     data: ConfigUpdateRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<ConfigUpdateResponseOutput> {
     try {
@@ -149,18 +130,6 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
         message: "app.api.emails.imapClient.config.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
-      });
-    }
-  }
-
-  private async createDefaultConfig(logger: EndpointLogger): Promise<void> {
-    try {
-      await db.insert(imapConfigurations).values(DEFAULT_IMAP_CONFIG);
-      logger.debug("Default IMAP configuration created");
-    } catch (error) {
-      const parsedError = parseError(error);
-      logger.error("Failed to create default IMAP configuration", {
-        error: parsedError.message,
       });
     }
   }

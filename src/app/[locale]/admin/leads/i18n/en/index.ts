@@ -44,6 +44,7 @@ export const translations = {
       },
       actions: {
         refresh: "Refresh",
+        reset: "Reset",
         retry: "Retry",
         export: "Export",
         exportCsv: "Export as CSV",
@@ -421,10 +422,13 @@ export const translations = {
         },
       },
       import: {
+        label: "Import",
+        description: "Import leads from CSV files",
         button: "Import Leads",
         title: "Import Leads from CSV",
-        description:
-          "Upload a CSV file to import leads into your campaign system",
+        actions: {
+          import: "Import",
+        },
         template: {
           title: "Download Template",
           description: "Get the CSV template with required columns",
@@ -813,6 +817,8 @@ export const translations = {
           "Configure and monitor A/B testing for email campaigns",
         campaignStarter: "Campaign Starter",
         campaignStarter_description: "Configure campaign starter settings",
+        import: "Import",
+        import_description: "Import leads from CSV files",
       },
     },
     campaign: {

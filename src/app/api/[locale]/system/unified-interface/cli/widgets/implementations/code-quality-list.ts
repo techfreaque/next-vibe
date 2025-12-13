@@ -5,8 +5,6 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   extractCodeQualityListData,
   groupCodeQualityItems,
@@ -21,7 +19,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
 /**
  * Configuration for code quality list widget
@@ -33,14 +31,12 @@ interface CodeQualityConfig {
   maxItemsPerGroup: number;
 }
 
-export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.CODE_QUALITY_LIST;
-  }
+export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.CODE_QUALITY_LIST> {
+  readonly widgetType = WidgetType.CODE_QUALITY_LIST;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
+  render(props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_LIST>): string {
+    const { value, context } = props;
     const t = context.t;
-    const { field, value } = input;
 
     // Extract data using shared logic
     const data = extractCodeQualityListData(value);
@@ -56,15 +52,14 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer {
     }
 
     // Render using extracted data
-    return this.renderCodeQualityList(data, field, context);
+    return this.renderCodeQualityList(data, context);
   }
 
   private renderCodeQualityList(
     data: ProcessedCodeQualityList,
-    field: UnifiedField,
     context: WidgetRenderContext,
   ): string {
-    const config = this.getConfig(field);
+    const config = this.getConfig();
     let output = "";
 
     // Group data by file using shared logic
@@ -84,7 +79,7 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer {
     return output.trim();
   }
 
-  private getConfig(_field: UnifiedField): CodeQualityConfig {
+  private getConfig(): CodeQualityConfig {
     return {
       groupBy: "file",
       sortBy: "severity",

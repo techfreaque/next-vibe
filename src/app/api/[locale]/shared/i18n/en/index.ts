@@ -65,6 +65,7 @@ export const translations = {
     invalid_status_error: "Invalid Status",
     invalid_response_error: "Invalid Response",
     payment_failed: "Payment Failed",
+    payment_required: "Payment Required",
     partial_failure: "Partial Failure",
   },
   errors: {

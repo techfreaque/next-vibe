@@ -13,9 +13,9 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { languageConfig } from "@/i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { ManifestResponseOutput } from "./definition";
@@ -55,7 +55,7 @@ export interface ManifestRepository {
   generateManifest(
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ManifestResponseOutput>>;
+  ): ResponseType<ManifestResponseOutput>;
 }
 
 /**
@@ -65,10 +65,10 @@ export class ManifestRepositoryImpl implements ManifestRepository {
   /**
    * Generate localized web app manifest
    */
-  async generateManifest(
+  generateManifest(
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ManifestResponseOutput>> {
+  ): ResponseType<ManifestResponseOutput> {
     try {
       logger.debug("Generating manifest for locale", { locale });
 
@@ -95,25 +95,27 @@ export class ManifestRepositoryImpl implements ManifestRepository {
         short_name: t("config.appName"),
         description: t("app.api.manifest.description"),
         start_url: `/${locale}`,
-        display: MANIFEST_CONSTANTS.DISPLAY,
+        display: t(MANIFEST_CONSTANTS.DISPLAY),
         background_color: MANIFEST_CONSTANTS.BACKGROUND_COLOR,
         theme_color: MANIFEST_CONSTANTS.THEME_COLOR,
-        orientation: MANIFEST_CONSTANTS.ORIENTATION,
+        orientation: t(MANIFEST_CONSTANTS.ORIENTATION),
         scope: `/${locale}/`,
         lang: manifestLang,
-        categories: [...MANIFEST_CONSTANTS.CATEGORIES],
+        categories: MANIFEST_CONSTANTS.CATEGORIES.map((category) =>
+          t(category),
+        ),
         icons: [
           {
             src: "/images/placeholder-logo.png",
             sizes: MANIFEST_CONSTANTS.ICON_SIZES.SMALL,
             type: MANIFEST_CONSTANTS.ICON_TYPE,
-            purpose: MANIFEST_CONSTANTS.ICON_PURPOSE,
+            purpose: t(MANIFEST_CONSTANTS.ICON_PURPOSE),
           },
           {
             src: "/images/placeholder-logo.png",
             sizes: MANIFEST_CONSTANTS.ICON_SIZES.LARGE,
             type: MANIFEST_CONSTANTS.ICON_TYPE,
-            purpose: MANIFEST_CONSTANTS.ICON_PURPOSE,
+            purpose: t(MANIFEST_CONSTANTS.ICON_PURPOSE),
           },
         ],
       };
@@ -123,7 +125,7 @@ export class ManifestRepositoryImpl implements ManifestRepository {
         language: manifestLang,
       });
 
-      return await Promise.resolve(success({ response: manifest }));
+      return success(manifest);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to generate manifest", {

@@ -63,7 +63,6 @@ const TextareaInner = (
     onBlur,
     onFocus,
     minRows = 4,
-    maxRows: _maxRows,
     disabled,
     placeholder,
     value,
@@ -71,11 +70,14 @@ const TextareaInner = (
     readOnly,
     maxLength,
     rows,
-    required: _required,
-    name: _name,
-    id: _id,
-    title: _title,
-    onKeyDown: _onKeyDown,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+    required, // Intentionally extracted - not used in React Native
+    name: nameAttr,
+    id: idAttr,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+    title, // Intentionally extracted - not used in React Native
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+    onKeyDown, // Intentionally extracted - not used in React Native
   }: Omit<TextareaProps, "ref">,
   ref: React.ForwardedRef<TextareaRefObject>,
 ): React.JSX.Element => {
@@ -114,8 +116,8 @@ const TextareaInner = (
         const changeEvent: TextareaChangeEvent = {
           target: {
             value: text,
-            name: _name,
-            id: _id,
+            name: nameAttr,
+            id: idAttr,
           },
           currentTarget: {
             addEventListener: () => {},
@@ -147,7 +149,7 @@ const TextareaInner = (
         onChange(changeEvent);
       }
     },
-    [onChangeText, onChange, _name, _id],
+    [onChangeText, onChange, nameAttr, idAttr],
   );
 
   // Handle blur events

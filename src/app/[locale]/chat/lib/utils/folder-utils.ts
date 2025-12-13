@@ -31,8 +31,7 @@ export function getFolderIcon(
   customIcon?: IconValue | null,
 ): IconValue {
   if (isDefaultFolder(folderId)) {
-    const config = DEFAULT_FOLDER_CONFIGS.find((c) => c.id === folderId);
-    return config?.icon || "folder";
+    return DEFAULT_FOLDER_CONFIGS[folderId].icon;
   }
   return customIcon || "folder";
 }
@@ -47,8 +46,7 @@ export function getFolderColor(
   customColor?: string | null,
 ): string | null {
   if (isDefaultFolder(folderId)) {
-    const config = DEFAULT_FOLDER_CONFIGS.find((c) => c.id === folderId);
-    return config?.color || null;
+    return DEFAULT_FOLDER_CONFIGS[folderId].color;
   }
   return customColor || null;
 }
@@ -66,10 +64,7 @@ export function getFolderDisplayName(
 
   // For default folders, always use the translation key from config
   if (isDefaultFolder(folder.id)) {
-    const config = DEFAULT_FOLDER_CONFIGS.find((c) => c.id === folder.id);
-    if (config) {
-      return t(config.translationKey);
-    }
+    return t(DEFAULT_FOLDER_CONFIGS[folder.id].translationKey);
   }
 
   // For custom folders, use the stored name

@@ -57,6 +57,36 @@ export const translations: typeof enTranslations = {
     placeholder: "absender@example.com",
   },
 
+  campaignTypes: {
+    label: "Kampagnentypen",
+    description: "Arten von E-Mail-Kampagnen, die dieses Konto senden kann",
+    placeholder: "Kampagnentypen auswählen",
+  },
+
+  emailJourneyVariants: {
+    label: "Journey-Varianten",
+    description: "E-Mail-Journey-Varianten, die dieses Konto unterstützt",
+    placeholder: "Journey-Varianten auswählen",
+  },
+
+  emailCampaignStages: {
+    label: "Kampagnenphasen",
+    description: "Kampagnenphasen, die dieses Konto verarbeitet",
+    placeholder: "Kampagnenphasen auswählen",
+  },
+
+  countries: {
+    label: "Länder",
+    description: "Länder, an die dieses Konto senden kann",
+    placeholder: "Länder auswählen",
+  },
+
+  languages: {
+    label: "Sprachen",
+    description: "Von diesem Konto unterstützte Sprachen",
+    placeholder: "Sprachen auswählen",
+  },
+
   response: {
     account: {
       title: "SMTP-Konto erstellt",
@@ -75,6 +105,11 @@ export const translations: typeof enTranslations = {
       totalEmailsSent: "Gesendete E-Mails gesamt",
       createdAt: "Erstellt am",
       updatedAt: "Aktualisiert am",
+      campaignTypes: "Kampagnentypen",
+      emailJourneyVariants: "Journey-Varianten",
+      emailCampaignStages: "Kampagnenphasen",
+      countries: "Länder",
+      languages: "Sprachen",
     },
     accountSummary: {
       title: "Kontozusammenfassung",

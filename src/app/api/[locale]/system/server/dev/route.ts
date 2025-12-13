@@ -13,9 +13,9 @@ import endpoints from "./definition";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, locale, logger }) => {
       const { devRepository } = await import("./repository");
-      return await devRepository.execute(data, user, locale, logger);
+      return await devRepository.execute(data, locale, logger);
     },
   },
 });

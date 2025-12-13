@@ -8,9 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../user/auth/types";
 import { leadsRepository } from "../repository";
 import type {
   BatchDeleteRequestOutput,
@@ -25,15 +23,11 @@ import type {
 export interface BatchRepository {
   batchUpdateLeads(
     data: BatchUpdateRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<BatchUpdateResponseData>>;
 
   batchDeleteLeads(
     data: BatchDeleteRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<BatchDeleteResponseData>>;
 }
@@ -47,17 +41,14 @@ class BatchRepositoryImpl implements BatchRepository {
    */
   async batchUpdateLeads(
     data: BatchUpdateRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<BatchUpdateResponseData>> {
     logger.debug("Batch update leads operation", {
-      userId: user.id,
       dataKeys: Object.keys(data),
     });
 
     // Delegate to main leads repository
-    return await leadsRepository.batchUpdateLeads(data, user, locale, logger);
+    return await leadsRepository.batchUpdateLeads(data, logger);
   }
 
   /**
@@ -65,17 +56,14 @@ class BatchRepositoryImpl implements BatchRepository {
    */
   async batchDeleteLeads(
     data: BatchDeleteRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<BatchDeleteResponseData>> {
     logger.debug("Batch delete leads operation", {
-      userId: user.id,
       dataKeys: Object.keys(data),
     });
 
     // Delegate to main leads repository
-    return await leadsRepository.batchDeleteLeads(data, user, locale, logger);
+    return await leadsRepository.batchDeleteLeads(data, logger);
   }
 }
 

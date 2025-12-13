@@ -66,6 +66,7 @@ export const { POST } = createEndpoint({
     "app.api.system.generators.generateTrpcRouter.validation.tags.trpc",
     "app.api.system.generators.generateTrpcRouter.validation.tags.validation",
   ],
+  icon: "code",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

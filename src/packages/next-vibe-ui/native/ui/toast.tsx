@@ -42,13 +42,12 @@ const StyledPressable = styled(Pressable, { className: "style" });
 
 export function ToastProvider({
   children,
-  swipeDirection: _swipeDirection,
-  swipeThreshold: _swipeThreshold,
-  duration: _duration,
-  label: _label,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  duration, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  label, // Intentionally extracted - not used in React Native
 }: ToastProviderProps): React.JSX.Element {
   // Native implementation: Toast management handled by context/hooks
-  // Props stored for potential future gesture handling
   return <>{children}</>;
 }
 ToastProvider.displayName = "ToastProvider";
@@ -56,11 +55,11 @@ ToastProvider.displayName = "ToastProvider";
 export function ToastViewport({
   className,
   style,
-  hotkey: _hotkey,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  hotkey, // Intentionally extracted - not used in React Native
   label,
 }: ToastViewportProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
-  // Native implementation: Viewport is a positioned container
   return (
     <StyledView
       {...applyStyleType({
@@ -77,7 +76,8 @@ export function ToastViewport({
 ToastViewport.displayName = "ToastViewport";
 
 export function Toast({
-  type: _type,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  type, // Intentionally extracted - not used in React Native
   open,
   onOpenChange,
   defaultOpen,
@@ -105,14 +105,6 @@ export function Toast({
       return () => clearTimeout(timer);
     }
   }, [duration, isOpen, onOpenChange]);
-
-  const _handleOpenChange = React.useCallback(
-    (newOpen: boolean) => {
-      setIsOpen(newOpen);
-      onOpenChange?.(newOpen);
-    },
-    [onOpenChange],
-  );
 
   if (!isOpen) {
     return <></>;
@@ -192,10 +184,10 @@ ToastClose.displayName = "ToastClose";
 
 export function ToastTitle({
   className,
-  style: _style,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Not passed to sub-component due to StyleType discriminated union
+  style, // Intentionally extracted - not passed to sub-component due to StyleType discriminated union
   children,
 }: ToastTitleProps): React.JSX.Element {
-  // Note: style prop is not passed to sub-component due to StyleType discriminated union
   // Native uses className for styling via NativeWind (either style OR className, not both)
   return (
     <Span
@@ -209,10 +201,10 @@ ToastTitle.displayName = "ToastTitle";
 
 export function ToastDescription({
   className,
-  style: _style,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Not passed to sub-component due to StyleType discriminated union
+  style, // Intentionally extracted - not passed to sub-component due to StyleType discriminated union
   children,
 }: ToastDescriptionProps): React.JSX.Element {
-  // Note: style prop is not passed to sub-component due to StyleType discriminated union
   // Native uses className for styling via NativeWind (either style OR className, not both)
   return (
     <Span className={cn("text-sm opacity-90 text-foreground", className)}>

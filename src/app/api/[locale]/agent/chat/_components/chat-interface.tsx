@@ -27,15 +27,10 @@ import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { WelcomeTour } from "./welcome-tour/welcome-tour";
 
 interface ChatInterfaceProps {
-  /** URL path segments from /threads/[...path] route (for logging/debugging only) */
-  urlPath?: string[];
   user: JwtPayloadType | undefined;
 }
 
-export function ChatInterface({
-  urlPath: _urlPath,
-  user,
-}: ChatInterfaceProps): JSX.Element {
+export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
   const chat = useChatContext();
 
   // Destructure what we need from the chat context

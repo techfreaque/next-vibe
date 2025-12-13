@@ -18,6 +18,9 @@ import type {
 import {
   useAvailableMethods,
   usePrimaryMutationMethod,
+  mergeReadOptions,
+  mergeCreateOptions,
+  mergeDeleteOptions,
 } from "./endpoint-utils";
 import { useEndpointCreate } from "./use-endpoint-create";
 import { useEndpointDelete } from "./use-endpoint-delete";
@@ -71,23 +74,36 @@ export function useEndpoint<
 
   const deleteEndpoint = endpoints.DELETE ?? null;
 
+  // Merge endpoint options with hook options (hook options take priority)
+  const mergedReadOptions = useMemo(() => {
+    const endpointReadOptions = readEndpoint?.options as
+      | Record<string, unknown>
+      | undefined;
+    return mergeReadOptions(
+      endpointReadOptions,
+      options.read as Record<string, unknown> | undefined,
+    );
+  }, [readEndpoint?.options, options.read]);
+
   // Compute read options with defaults
   const readQueryEnabled =
-    options.read?.queryOptions?.enabled ??
+    (mergedReadOptions.queryOptions?.enabled as boolean | undefined) ??
     options.enabled ??
     options.queryOptions?.enabled ??
     true;
   const readUrlPathParams =
-    options.read?.urlPathParams ??
+    mergedReadOptions.urlPathParams ??
     options.urlPathParams ??
     options.queryOptions?.urlPathParams;
   const readStaleTime =
-    options.read?.queryOptions?.staleTime ??
+    (mergedReadOptions.queryOptions?.staleTime as number | undefined) ??
     options.staleTime ??
     options.queryOptions?.staleTime ??
     5 * 60 * 1000;
   const readRefetchOnWindowFocus =
-    options.read?.queryOptions?.refetchOnWindowFocus ??
+    (mergedReadOptions.queryOptions?.refetchOnWindowFocus as
+      | boolean
+      | undefined) ??
     options.refetchOnWindowFocus ??
     options.queryOptions?.refetchOnWindowFocus ??
     true;
@@ -96,10 +112,18 @@ export function useEndpoint<
   // Use read hook for GET endpoints
   const read = useEndpointRead(readEndpoint, logger, {
     formOptions: {
-      persistForm: options.read?.formOptions?.persistForm ?? false,
-      persistenceKey: options.read?.formOptions?.persistenceKey,
-      autoSubmit: options.read?.formOptions?.autoSubmit,
-      debounceMs: options.read?.formOptions?.debounceMs,
+      persistForm:
+        (mergedReadOptions.formOptions?.persistForm as boolean | undefined) ??
+        false,
+      persistenceKey: mergedReadOptions.formOptions?.persistenceKey as
+        | string
+        | undefined,
+      autoSubmit: mergedReadOptions.formOptions?.autoSubmit as
+        | boolean
+        | undefined,
+      debounceMs: mergedReadOptions.formOptions?.debounceMs as
+        | number
+        | undefined,
     },
     queryOptions: {
       enabled: readQueryEnabled,
@@ -114,7 +138,7 @@ export function useEndpoint<
       clearStorageAfterSubmit: false,
     },
     initialState:
-      options.read?.initialState ?? options.filterOptions?.initialFilters,
+      mergedReadOptions.initialState ?? options.filterOptions?.initialFilters,
     initialData: options.read?.initialData,
   });
 
@@ -126,16 +150,33 @@ export function useEndpoint<
     return undefined;
   }, [autoPrefillEnabled, read?.response]);
 
+  // Merge endpoint create options with hook options (hook options take priority)
+  const mergedCreateOptions = useMemo(() => {
+    const endpointCreateOptions = primaryEndpoint?.options as
+      | Record<string, unknown>
+      | undefined;
+    return mergeCreateOptions(
+      endpointCreateOptions,
+      options.create as Record<string, unknown> | undefined,
+    );
+  }, [primaryEndpoint?.options, options.create]);
+
   // Compute create options with defaults
   const createUrlPathParams =
-    options.create?.urlPathParams ?? options.urlPathParams ?? readUrlPathParams;
+    mergedCreateOptions.urlPathParams ??
+    options.urlPathParams ??
+    readUrlPathParams;
 
   // Build create options - keep types flowing from original options
   const createFormOptions = {
-    persistForm: options.create?.formOptions?.persistForm ?? false,
-    persistenceKey: options.create?.formOptions?.persistenceKey,
+    persistForm:
+      (mergedCreateOptions.formOptions?.persistForm as boolean | undefined) ??
+      false,
+    persistenceKey: mergedCreateOptions.formOptions?.persistenceKey as
+      | string
+      | undefined,
     defaultValues:
-      options.create?.formOptions?.defaultValues ??
+      mergedCreateOptions.formOptions?.defaultValues ??
       options.defaultValues ??
       options.formOptions?.defaultValues,
   };
@@ -149,31 +190,37 @@ export function useEndpoint<
     return createFormOptions.defaultValues;
   }, [autoPrefillData, createFormOptions.defaultValues]);
 
-  // Note: Type assertion necessary due to TypeScript limitation with conditional types.
-  // PrimaryMutationTypes<T> and PrimaryEndpoint are structurally equivalent (both derived from T),
-  // but TypeScript cannot prove this through its type system. The assertion is safe because:
-  // 1. Both types are extracted from the same generic T
-  // 2. UseEndpointOptions<T> ensures options match the endpoint types at compile time
-  // 3. Runtime behavior is correct as types are structurally compatible
-  type CreateOptions = typeof options.create extends undefined
-    ? Record<string, never>
-    : typeof options.create;
-
   const createOperation = primaryEndpoint
     ? useEndpointCreate<PrimaryEndpoint>(
         primaryEndpoint as PrimaryEndpoint | null,
         logger,
         {
-          ...(options.create as CreateOptions),
+          formOptions: createFormOptions,
+          mutationOptions: mergedCreateOptions.mutationOptions,
           urlPathParams: createUrlPathParams,
-          autoPrefillData: autoPrefillData ?? options.create?.autoPrefillData,
+          autoPrefillData:
+            autoPrefillData ??
+            mergedCreateOptions.autoPrefillData ??
+            options.create?.autoPrefillData,
+          initialState: mergedCreateOptions.initialState,
         } as Parameters<typeof useEndpointCreate<PrimaryEndpoint>>[2],
       )
     : null;
 
+  // Merge endpoint delete options with hook options (hook options take priority)
+  const mergedDeleteOptions = useMemo(() => {
+    const endpointDeleteOptions = deleteEndpoint?.options as
+      | Record<string, unknown>
+      | undefined;
+    return mergeDeleteOptions(
+      endpointDeleteOptions,
+      options.delete as Record<string, unknown> | undefined,
+    );
+  }, [deleteEndpoint?.options, options.delete]);
+
   const deleteOperation = useEndpointDelete(deleteEndpoint, logger, {
-    mutationOptions: options.delete?.mutationOptions ?? {},
-    urlPathParams: options.delete?.urlPathParams ?? options.urlPathParams,
+    mutationOptions: mergedDeleteOptions.mutationOptions ?? {},
+    urlPathParams: mergedDeleteOptions.urlPathParams ?? options.urlPathParams,
   });
 
   const isLoading =

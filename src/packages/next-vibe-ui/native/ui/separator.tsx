@@ -21,7 +21,8 @@ export function Separator({
   className,
   style,
   orientation = "horizontal",
-  decorative: _decorative = true,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  decorative = true, // Intentionally extracted - not used in React Native
 }: SeparatorRootProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 

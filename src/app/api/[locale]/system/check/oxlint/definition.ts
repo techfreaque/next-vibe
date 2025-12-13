@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.check.oxlint.description",
   category: "app.api.system.check.oxlint.category",
   tags: ["app.api.system.check.oxlint.tag"],
+  icon: "shield",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

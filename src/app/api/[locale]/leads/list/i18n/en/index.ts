@@ -6,6 +6,10 @@ export const translations = {
       title: "Lead List Filters",
       description: "Configure filters for lead list",
     },
+    actions: {
+      refresh: "Refresh",
+      refreshing: "Refreshing...",
+    },
     page: {
       label: "Page Number",
       description: "Page number for pagination",

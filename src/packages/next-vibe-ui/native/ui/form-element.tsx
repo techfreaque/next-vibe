@@ -26,7 +26,9 @@ export const FormElement = forwardRef(function FormElement(
   ref: ForwardedRef<FormElementRefObject>,
 ) {
   // Extract web-specific props that don't apply to View
-  const { onSubmit: _onSubmit, className, children } = props;
+  // onSubmit is destructured to exclude it from props (not used in React Native)
+  const { onSubmit: _, className, children } = props;
+  void _; // Explicitly mark as intentionally unused
   const viewRef = useRef<View>(null);
 
   useImperativeHandle(ref, (): FormElementRefObject => {

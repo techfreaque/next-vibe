@@ -15,8 +15,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: guardDestroyEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, locale, logger }) => {
-      return guardDestroyRepository.destroyGuard(data, user, locale, logger);
+    handler: ({ data, logger }) => {
+      return guardDestroyRepository.destroyGuard(data, logger);
     },
   },
 });

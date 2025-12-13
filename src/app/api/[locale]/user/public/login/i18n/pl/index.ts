@@ -8,6 +8,10 @@ export const translations: typeof enTranslations = {
   description: "Endpoint logowania użytkownika",
   tag: "Uwierzytelnianie",
   options: optionsTranslations,
+  actions: {
+    submit: "Zaloguj",
+    submitting: "Logowanie...",
+  },
   fields: {
     email: {
       label: "E-mail",
@@ -15,6 +19,7 @@ export const translations: typeof enTranslations = {
       placeholder: "Wprowadź e-mail",
       help: "Wprowadź adres e-mail powiązany z Twoim kontem",
       validation: {
+        required: "E-mail jest wymagany",
         invalid: "Proszę wprowadzić prawidłowy adres e-mail",
       },
     },
@@ -59,6 +64,10 @@ export const translations: typeof enTranslations = {
       description: "Zaawansowane ustawienia logowania",
     },
   },
+  footer: {
+    forgotPassword: "Zapomniałeś hasła?",
+    createAccount: "Nie masz konta? Zarejestruj się",
+  },
   response: {
     title: "Odpowiedź logowania",
     description: "Dane odpowiedzi logowania",
@@ -83,6 +92,7 @@ export const translations: typeof enTranslations = {
       loginLocation: "Lokalizacja logowania",
     },
     nextSteps: {
+      title: "Następne kroki",
       item: "Następne kroki",
     },
   },
@@ -138,6 +148,7 @@ export const translations: typeof enTranslations = {
   success: {
     title: "Logowanie pomyślne",
     description: "Zostałeś zalogowany",
+    message: "Witaj ponownie! Pomyślnie się zalogowałeś.",
   },
   token: {
     save: {

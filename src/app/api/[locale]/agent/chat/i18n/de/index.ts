@@ -51,6 +51,19 @@ export const translations: typeof enTranslations = {
       debug: "Debug",
     },
   },
+  components: {
+    sidebar: {
+      login: "Anmelden",
+      logout: "Abmelden",
+      footer: {
+        account: "Konto",
+        profile: "Profil",
+        balance: "Guthaben",
+        buy: "Kaufen",
+        freeCreditsLeft: "Kostenlose Credits",
+      },
+    },
+  },
   common: {
     newChat: "Neuer Chat",
     privateChats: "Private Chats",
@@ -128,7 +141,8 @@ export const translations: typeof enTranslations = {
           },
           suggestedPrompts: {
             label: "Vorgeschlagene Prompts (optional)",
-            description: "Fügen Sie bis zu 4 Beispiel-Prompts hinzu, um Benutzern den Einstieg zu erleichtern",
+            description:
+              "Fügen Sie bis zu 4 Beispiel-Prompts hinzu, um Benutzern den Einstieg zu erleichtern",
             placeholder: "Beispiel-Prompt {{number}}",
           },
         },
@@ -247,6 +261,10 @@ export const translations: typeof enTranslations = {
         "FreedomGPT Liberty - Unzensiertes KI-Modell mit Fokus auf freie Meinungsäußerung und kreative Inhalte",
       gabAiArya:
         "Gab AI Arya - Unzensiertes Konversations-KI-Modell mit freier Meinungsäußerung und kreativen Fähigkeiten",
+      gemini3Pro:
+        "Google Gemini 3 Pro - Fortgeschrittenes multimodales KI-Modell mit großem Kontextfenster",
+      deepseekV32:
+        "DeepSeek V3.2 - Hochleistungs-Reasoning-Modell mit erweiterten Coding-Fähigkeiten",
     },
   },
 };

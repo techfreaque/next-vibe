@@ -57,7 +57,7 @@ export function UsersPagination({
     if (!usersEndpoint.read) {
       return;
     }
-    usersEndpoint.read.form.setValue("searchAndPagination.page", page);
+    usersEndpoint.read.form.setValue("paginationInfo.page", page);
   };
 
   const handleLimitChange = (limit: string): void => {
@@ -65,10 +65,10 @@ export function UsersPagination({
       return;
     }
     usersEndpoint.read.form.setValue(
-      "searchAndPagination.limit",
+      "paginationInfo.limit",
       parseInt(limit, 10),
     );
-    usersEndpoint.read.form.setValue("searchAndPagination.page", 1); // Reset to first page
+    usersEndpoint.read.form.setValue("paginationInfo.page", 1); // Reset to first page
   };
 
   const startItem = (currentPage - 1) * currentLimit + 1;

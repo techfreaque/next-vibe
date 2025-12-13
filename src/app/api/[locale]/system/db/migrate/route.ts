@@ -14,10 +14,9 @@ import { databaseMigrationRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: migrateEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) => {
+    handler: ({ data, locale, logger }) => {
       return databaseMigrationRepository.runMigrations(
         data,
-        user,
         locale,
         logger,
       );

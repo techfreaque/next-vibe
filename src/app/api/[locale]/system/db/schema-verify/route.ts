@@ -14,8 +14,8 @@ import { schemaVerifyRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: schemaVerifyEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) => {
-      return schemaVerifyRepository.execute(data, user, locale, logger);
+    handler: ({ data, locale, logger }) => {
+      return schemaVerifyRepository.execute(data, locale, logger);
     },
   },
 });

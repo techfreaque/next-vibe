@@ -46,6 +46,7 @@ const { POST } = createEndpoint({
     "app.api.system.translations.tags.restore",
     "app.api.system.translations.tags.i18n",
   ],
+  icon: "globe",
 
   // CLI configuration
   aliases: ["translations:restore"],

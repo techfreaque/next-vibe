@@ -167,7 +167,6 @@ function renderField(key: string, value: ToolCallResult, depth = 0): JSX.Element
 export function RequestFieldsRenderer({
   args,
   locale,
-  context: _context,
 }: RequestFieldsRendererProps): JSX.Element {
   const { t } = simpleT(locale);
 

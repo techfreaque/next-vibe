@@ -31,6 +31,7 @@ const { POST } = createEndpoint({
   title: "app.api.emails.smsService.send.title",
   description: "app.api.emails.smsService.send.description",
   category: "app.api.emails.category",
+  icon: "message-circle",
   tags: ["app.api.emails.smsService.tag"],
   allowedRoles: [UserRole.ADMIN],
 

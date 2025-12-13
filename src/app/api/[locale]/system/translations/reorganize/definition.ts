@@ -46,6 +46,7 @@ const { POST } = createEndpoint({
     "app.api.system.translations.tags.maintenance",
     "app.api.system.translations.tags.i18n",
   ],
+  icon: "languages",
 
   // CLI configuration
   aliases: ["translations:reorganize"],

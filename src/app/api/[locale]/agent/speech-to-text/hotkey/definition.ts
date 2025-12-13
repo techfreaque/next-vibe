@@ -19,13 +19,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-
-import {
-  SttLanguage,
-  SttLanguageOptions,
-  SttProvider,
-  SttProviderOptions,
-} from "../enum";
 import { HotkeyAction, HotkeyActionOptions } from "./enum";
 
 /**
@@ -36,6 +29,7 @@ const { POST } = createEndpoint({
   path: ["agent", "speech-to-text", "hotkey"],
   title: "app.api.agent.speechToText.hotkey.post.title" as const,
   description: "app.api.agent.speechToText.hotkey.post.description" as const,
+  icon: "mic",
   category: "app.api.agent.category" as const,
   tags: [
     "app.api.agent.chat.tags.speech" as const,
@@ -83,33 +77,19 @@ const { POST } = createEndpoint({
         z.enum(HotkeyAction).optional(),
       ),
 
-      provider: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.agent.speechToText.hotkey.post.provider.label" as const,
-          description:
-            "app.api.agent.speechToText.hotkey.post.provider.description" as const,
-          columns: 6,
-          options: SttProviderOptions,
-        },
-        z.enum(SttProvider).default(SttProvider.OPENAI),
-      ),
-
-      language: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.agent.speechToText.hotkey.post.language.label" as const,
-          description:
-            "app.api.agent.speechToText.hotkey.post.language.description" as const,
-          columns: 6,
-          options: SttLanguageOptions,
-        },
-        z.enum(SttLanguage).default(SttLanguage.EN),
-      ),
+      // provider: requestDataField(
+      //   {
+      //     type: WidgetType.FORM_FIELD,
+      //     fieldType: FieldDataType.SELECT,
+      //     label:
+      //       "app.api.agent.speechToText.hotkey.post.provider.label" as const,
+      //     description:
+      //       "app.api.agent.speechToText.hotkey.post.provider.description" as const,
+      //     columns: 6,
+      //     options: SttProviderOptions,
+      //   },
+      //   z.enum(SttProvider).default(SttProvider.OPENAI),
+      // ),
 
       insertPrefix: requestDataField(
         {
@@ -269,8 +249,6 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         action: HotkeyAction.START,
-        provider: SttProvider.OPENAI,
-        language: SttLanguage.EN,
         insertPrefix: "",
         insertSuffix: " ",
       },

@@ -9,6 +9,10 @@ export const translations: typeof enTranslations = {
   description: "Benutzeranmeldung Endpunkt",
   tag: "Authentifizierung",
   options: optionsTranslations,
+  actions: {
+    submit: "Anmelden",
+    submitting: "Wird angemeldet...",
+  },
   fields: {
     email: {
       label: "E-Mail",
@@ -16,6 +20,7 @@ export const translations: typeof enTranslations = {
       placeholder: "E-Mail eingeben",
       help: "Geben Sie die E-Mail-Adresse ein, die mit Ihrem Konto verknüpft ist",
       validation: {
+        required: "E-Mail ist erforderlich",
         invalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
       },
     },
@@ -60,6 +65,10 @@ export const translations: typeof enTranslations = {
       description: "Erweiterte Anmeldeeinstellungen",
     },
   },
+  footer: {
+    forgotPassword: "Passwort vergessen?",
+    createAccount: "Noch kein Konto? Registrieren",
+  },
   response: {
     title: "Anmeldungsantwort",
     description: "Anmeldungsantwortdaten",
@@ -84,6 +93,7 @@ export const translations: typeof enTranslations = {
       loginLocation: "Anmeldeort",
     },
     nextSteps: {
+      title: "Nächste Schritte",
       item: "Nächste Schritte",
     },
   },
@@ -140,6 +150,7 @@ export const translations: typeof enTranslations = {
   success: {
     title: "Anmeldung erfolgreich",
     description: "Sie wurden erfolgreich angemeldet",
+    message: "Willkommen zurück! Sie haben sich erfolgreich angemeldet.",
   },
   token: {
     save: {

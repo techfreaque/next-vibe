@@ -37,8 +37,22 @@ export async function middleware(
 
   // If we need to redirect for locale, do it now
   if (detectedLocale) {
-    const newPath =
-      path === "/" ? `/${detectedLocale}` : `/${detectedLocale}${path}`;
+    let newPath: string;
+
+    // Handle API routes: /api/... -> /api/[locale]/...
+    if (path.startsWith("/api/") || path === "/api") {
+      const apiPath = path === "/api" ? "" : path.slice(4); // Remove "/api"
+      newPath = `/api/${detectedLocale}${apiPath}`;
+    }
+    // Handle root path: / -> /[locale]
+    else if (path === "/") {
+      newPath = `/${detectedLocale}`;
+    }
+    // Handle regular paths: /... -> /[locale]/...
+    else {
+      newPath = `/${detectedLocale}${path}`;
+    }
+
     return NextResponseClass.redirect(new URL(newPath, request.url));
   }
 

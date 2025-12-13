@@ -677,7 +677,6 @@ async function buildMessageContext(params: {
     // Non-incognito mode: fetch history from database filtered by branch
     const history = await fetchMessageHistory(
       params.threadId,
-      params.userId,
       params.logger,
       params.parentMessageId ?? null, // Pass parent message ID for branch filtering, convert undefined to null
     );

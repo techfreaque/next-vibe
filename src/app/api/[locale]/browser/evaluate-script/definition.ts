@@ -26,6 +26,7 @@ const { POST } = createEndpoint({
   title: "app.api.browser.evaluate-script.title",
   description: "app.api.browser.evaluate-script.description",
   category: "app.api.browser.category",
+  icon: "code",
   tags: [
     "app.api.browser.tags.browserAutomation",
     "app.api.browser.tags.scriptExecution",

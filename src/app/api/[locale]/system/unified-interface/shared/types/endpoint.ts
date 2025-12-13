@@ -291,7 +291,25 @@ export type InferSchemaFromField<F, Usage extends FieldUsage> =
               }>
             : z.ZodNever
           : z.ZodNever
-        : // Handle ArrayField
+        : // Handle ObjectOptionalField
+          F extends ObjectOptionalField<infer TChildren, FieldUsageConfig>
+          ? F extends { usage: infer TUsage }
+            ? MatchesUsage<TUsage, Usage> extends true
+              ? z.ZodOptional<
+                  z.ZodNullable<
+                    z.ZodObject<{
+                      [K in keyof TChildren as InferSchemaFromField<
+                        TChildren[K],
+                        Usage
+                      > extends z.ZodNever
+                        ? never
+                        : K]: InferSchemaFromField<TChildren[K], Usage>;
+                    }>
+                  >
+                >
+              : z.ZodNever
+            : z.ZodNever
+          : // Handle ArrayField
           F extends ArrayField<infer TChild, FieldUsageConfig>
           ? F extends { usage: infer TUsage }
             ? MatchesUsage<TUsage, Usage> extends true
@@ -429,25 +447,54 @@ export type InferSchemaFromFieldForMethod<
             }>
           : z.ZodNever
         : z.ZodNever
-      : // Handle ArrayField
-        F extends ArrayField<infer TChild, FieldUsageConfig>
+      : // Handle ObjectOptionalField
+        F extends ObjectOptionalField<infer TChildren, FieldUsageConfig>
         ? F extends { usage: infer TUsage }
           ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
-            ? z.ZodArray<
-                TChild extends UnifiedField<z.ZodTypeAny>
-                  ? InferSchemaFromFieldForMethod<
-                      TChild,
-                      Method,
-                      Usage,
-                      z.ZodTypeAny
-                    >
-                  : TChild extends z.ZodTypeAny
-                    ? TChild
-                    : z.ZodNever
+            ? z.ZodOptional<
+                z.ZodNullable<
+                  z.ZodObject<{
+                    [K in keyof TChildren as TChildren[K] extends UnifiedField<z.ZodTypeAny>
+                      ? InferSchemaFromFieldForMethod<
+                          TChildren[K],
+                          Method,
+                          Usage,
+                          z.ZodTypeAny
+                        > extends z.ZodNever
+                        ? never
+                        : K
+                      : never]: TChildren[K] extends UnifiedField<z.ZodTypeAny>
+                      ? InferSchemaFromFieldForMethod<
+                          TChildren[K],
+                          Method,
+                          Usage,
+                          z.ZodTypeAny
+                        >
+                      : never;
+                  }>
+                >
               >
             : z.ZodNever
           : z.ZodNever
-        : // Handle ArrayOptionalField
+        : // Handle ArrayField
+          F extends ArrayField<infer TChild, FieldUsageConfig>
+          ? F extends { usage: infer TUsage }
+            ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
+              ? z.ZodArray<
+                  TChild extends UnifiedField<z.ZodTypeAny>
+                    ? InferSchemaFromFieldForMethod<
+                        TChild,
+                        Method,
+                        Usage,
+                        z.ZodTypeAny
+                      >
+                    : TChild extends z.ZodTypeAny
+                      ? TChild
+                      : z.ZodNever
+                >
+              : z.ZodNever
+            : z.ZodNever
+          : // Handle ArrayOptionalField
           F extends ArrayOptionalField<infer TChild, FieldUsageConfig>
           ? F extends { usage: infer TUsage }
             ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
@@ -919,6 +966,20 @@ export interface ArrayOptionalField<
 }
 
 /**
+ * Widget Field
+ * UI-only field with no schema (buttons, alerts, static content)
+ */
+export interface WidgetField<
+  TUsage extends FieldUsageConfig,
+  TUIConfig extends WidgetConfig = WidgetConfig,
+> {
+  type: "widget";
+  usage: TUsage;
+  cache?: CacheStrategy;
+  ui: TUIConfig;
+}
+
+/**
  * Unified field type that supports all field configurations with enhanced type preservation
  * The union accepts any ObjectField or ArrayField regardless of their type parameters
  * Type inference is preserved through the actual field definitions, not through constraints
@@ -942,4 +1003,5 @@ export type UnifiedField<TSchema extends z.ZodTypeAny = z.ZodTypeAny> =
   | ArrayOptionalField<
       UnifiedField<z.ZodTypeAny> | z.ZodTypeAny,
       FieldUsageConfig
-    >;
+    >
+  | WidgetField<FieldUsageConfig>;

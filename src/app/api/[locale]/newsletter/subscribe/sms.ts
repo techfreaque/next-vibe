@@ -21,10 +21,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { smsServiceRepository } from "../../emails/sms-service/repository";
 import { CampaignType } from "../../emails/smtp-client/enum";
-import type {
-  SubscribePostRequestOutput as NewsletterSubscriptionType,
-  SubscribePostResponseOutput as NewsletterSubscriptionResponseType,
-} from "./definition";
+import type { SubscribePostRequestOutput as NewsletterSubscriptionType } from "./definition";
 
 /**
  * SMS Service Repository Interface for Newsletter Subscriptions
@@ -32,7 +29,6 @@ import type {
 export interface NewsletterSubscribeSmsService {
   sendWelcomeSms(
     subscriptionData: NewsletterSubscriptionType,
-    responseData: NewsletterSubscriptionResponseType,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -40,7 +36,6 @@ export interface NewsletterSubscribeSmsService {
 
   sendAdminNotificationSms(
     subscriptionData: NewsletterSubscriptionType,
-    responseData: NewsletterSubscriptionResponseType,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -56,14 +51,14 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
    */
   async sendWelcomeSms(
     subscriptionData: NewsletterSubscriptionType,
-    responseData: NewsletterSubscriptionResponseType,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
     try {
-      // Extract phone number from user profile if available
-      const userPhone = (user as { phone?: string } | null)?.phone;
+      // Phone number field not yet implemented in user schema
+      // TODO: Add phone field to user type when SMS feature is fully implemented
+      const userPhone: string | undefined = undefined;
 
       if (!userPhone) {
         logger.debug("No phone number available for newsletter welcome SMS", {
@@ -90,8 +85,7 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
           message,
           campaignType: CampaignType.NEWSLETTER,
         },
-        user || { isPublic: true },
-        locale,
+        user,
         logger,
       );
 
@@ -120,7 +114,6 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
    */
   async sendAdminNotificationSms(
     subscriptionData: NewsletterSubscriptionType,
-    responseData: NewsletterSubscriptionResponseType,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -162,8 +155,7 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
           message,
           campaignType: CampaignType.NOTIFICATION,
         },
-        user || { id: crypto.randomUUID(), isPublic: false },
-        locale,
+        user,
         logger,
       );
 
@@ -229,14 +221,12 @@ export const newsletterSubscribeSmsService =
  */
 export const sendWelcomeSms = async (
   subscriptionData: NewsletterSubscriptionType,
-  responseData: NewsletterSubscriptionResponseType,
   user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
   return await newsletterSubscribeSmsService.sendWelcomeSms(
     subscriptionData,
-    responseData,
     user,
     locale,
     logger,
@@ -245,14 +235,12 @@ export const sendWelcomeSms = async (
 
 export const sendAdminNotificationSms = async (
   subscriptionData: NewsletterSubscriptionType,
-  responseData: NewsletterSubscriptionResponseType,
   user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
   return await newsletterSubscribeSmsService.sendAdminNotificationSms(
     subscriptionData,
-    responseData,
     user,
     locale,
     logger,

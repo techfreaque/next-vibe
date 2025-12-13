@@ -30,6 +30,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.dev.typecheck.description",
   category: "app.api.system.dev.category",
   tags: ["app.api.system.dev.category"],
+  icon: "sparkles",
 
   // === ROLES ===
   allowedRoles: [

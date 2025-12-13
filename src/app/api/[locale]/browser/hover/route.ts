@@ -16,8 +16,6 @@ export const { POST, tools } = endpointsHandler({
     email: undefined,
     handler: async ({
       data,
-      user,
-      locale,
       logger,
     }): Promise<ResponseType<HoverResponseOutput>> => {
       return executeMCPTool(
@@ -27,9 +25,7 @@ export const { POST, tools } = endpointsHandler({
             uid: data.uid,
           }),
         },
-        user,
         logger,
-        locale,
       );
     },
   },

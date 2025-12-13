@@ -14,8 +14,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   ResetTaskManagementRequestOutput,
@@ -64,8 +62,6 @@ interface TaskResult {
 export interface ResetTaskManagementRepository {
   executeTaskOperation(
     data: ResetTaskManagementRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ResetTaskManagementResponseOutput>>;
 
@@ -115,8 +111,6 @@ export class ResetTaskManagementRepositoryImpl implements ResetTaskManagementRep
    */
   async executeTaskOperation(
     data: ResetTaskManagementRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ResetTaskManagementResponseOutput>> {
     try {

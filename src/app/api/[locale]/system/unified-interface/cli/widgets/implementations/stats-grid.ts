@@ -4,21 +4,16 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { MetricConfig, WidgetRenderContext } from "../core/types";
-import type {
-  WidgetData,
-  WidgetInput,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.STATS_GRID;
-  }
+export class StatsGridWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.STATS_GRID> {
+  readonly widgetType = WidgetType.STATS_GRID;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { field, value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.STATS_GRID>): string {
+    const { field, value, context } = props;
     const indent = this.createIndent(context.depth, context);
 
     // Handle object with multiple stats
@@ -150,10 +145,4 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer {
     return context.options.useColors ? "ℹ️ " : "i ";
   }
 
-  private getMetricConfig(): MetricConfig {
-    return {
-      format: "number",
-      precision: 0,
-    };
-  }
 }

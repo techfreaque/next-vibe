@@ -12,7 +12,6 @@ import React from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { getLocaleString } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
@@ -45,7 +44,6 @@ export function MessageEditor({
   // Get props from context instead of prop drilling
   const { selectedModel, selectedPersona } = useChatContext();
 
-  const speechLang = getLocaleString(locale);
   const { t } = simpleT(locale);
 
   // Use custom hook for editor logic
@@ -134,7 +132,6 @@ export function MessageEditor({
                 editor.setContent(newContent);
               }}
               disabled={editor.isLoading}
-              lang={speechLang}
               locale={locale}
               logger={logger}
             />

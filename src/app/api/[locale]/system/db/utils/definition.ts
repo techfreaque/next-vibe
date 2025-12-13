@@ -31,6 +31,7 @@ const { GET } = createEndpoint({
   description: "app.api.system.db.utils.description",
   category: "app.api.system.db.category",
   tags: ["app.api.system.db.utils.tag"],
+  icon: "database",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

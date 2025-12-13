@@ -28,7 +28,7 @@ interface ModelSelectorProps {
   className?: string;
   buttonClassName?: string;
   triggerSize?: "default" | "sm" | "lg" | "icon";
-  showTextAt?: "always" | "sm" | "md" | "lg" | "never";
+  showTextAt?: "always" | "sm" | "md" | "lg" | "@sm" | "@md" | "@lg" | "never";
 }
 
 const STORAGE_KEY = "chat-favorite-models";

@@ -14,8 +14,8 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, logger, locale }) => {
-      return await referralRepository.getReferralStats(user.id, locale, logger);
+    handler: async ({ user, logger }) => {
+      return await referralRepository.getReferralStats(user.id, logger);
     },
   },
 });

@@ -30,17 +30,17 @@ export const { POST, tools } = endpointsHandler({
       },
     ],
     handler: async ({ data, user, locale, logger }) => {
-      const result = await repository.unsubscribe(data, user, locale, logger);
+      const result = await repository.unsubscribe(data, locale, logger);
 
       // Send SMS notifications after successful unsubscription (fire-and-forget)
       if (result.success) {
-        sendConfirmationSms(data, result.data, user, locale, logger).catch(
+        sendConfirmationSms(data, user, locale, logger).catch(
           (smsError: Error) =>
             logger.debug("Confirmation SMS failed but continuing", {
               smsError,
             }),
         );
-        sendAdminNotificationSms(data, result.data, user, locale, logger).catch(
+        sendAdminNotificationSms(data, user, locale, logger).catch(
           (smsError: Error) =>
             logger.debug("Admin SMS failed but continuing", { smsError }),
         );

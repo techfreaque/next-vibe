@@ -14,11 +14,10 @@ import { imapConfigRepository as repository } from "./repository";
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, user, locale, logger }) =>
-      repository.getConfig(data, user, locale, logger),
+    handler: ({ logger }) => repository.getConfig(logger),
   },
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) =>
-      repository.updateConfig(data, user, locale, logger),
+    handler: ({ data, logger }) =>
+      repository.updateConfig(data, logger),
   },
 });

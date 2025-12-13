@@ -393,13 +393,14 @@ export class FileGenerator {
 
     // Convert kebab-case folder names to camelCase
     // e.g., unified-interface -> unifiedInterface, react-native -> reactNative
-    key = key.replace(/\/([a-z0-9-]+)/g, (match, segment) => {
-      // Convert kebab-case to camelCase
+    key = key.replace(/\/([a-z0-9-]+)/g, (fullMatch: string, segment: string) => {
+      // Convert kebab-case to camelCase (use fullMatch to verify it starts with /)
       const camelCased = segment.replace(
         /-([a-z0-9])/g,
-        (_: string, letter: string) => letter.toUpperCase(),
+        (hyphenAndChar: string, letter: string) =>
+          hyphenAndChar.length > 1 ? letter.toUpperCase() : hyphenAndChar,
       );
-      return `/${camelCased}`;
+      return fullMatch.startsWith("/") ? `/${camelCased}` : camelCased;
     });
 
     // Convert to dot notation
@@ -429,6 +430,7 @@ export class FileGenerator {
     sanitized = sanitized.replace(/^_/, "");
 
     // Convert kebab-case to camelCase: unified-interface -> unifiedUi
+    // oxlint-disable-next-line no-unused-vars
     sanitized = sanitized.replace(/-([a-z])/g, (_, letter: string) =>
       letter.toUpperCase(),
     );

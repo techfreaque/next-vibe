@@ -13,11 +13,10 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) => {
+    handler: async ({ data, user, logger }) => {
       return await referralRepository.createReferralCode(
         user.id,
         data,
-        locale,
         logger,
       );
     },

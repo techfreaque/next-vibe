@@ -40,7 +40,9 @@ export const translations: typeof enTranslations = {
     getOrCreateLeadFailed: "Nie udało się pobrać lub utworzyć leada",
     addCreditsFailed: "Nie udało się dodać kredytów",
     deductCreditsFailed: "Nie udało się odjąć kredytów",
-    insufficientCredits: "Niewystarczające kredyty",
+    insufficientCredits:
+      "Niewystarczające kredyty. Potrzebujesz {{cost}} kredytów, aby użyć tej funkcji.",
+    deductionFailed: "Nie udało się odjąć {{cost}} kredytów. Spróbuj ponownie.",
     getTransactionsFailed: "Nie udało się pobrać transakcji kredytowych",
     invalidIdentifier: "Nieprawidłowy identyfikator użytkownika lub leada",
     userNotFound: "Nie znaleziono użytkownika",

@@ -222,8 +222,63 @@ export function calculateStatCount(
  */
 export function extractGroupedListData(
   value: WidgetData,
+  config?: { groupBy?: string; sortBy?: string },
 ): ProcessedGroupedList | null {
-  // Narrow to object type first
+  // Handle direct array input
+  if (Array.isArray(value)) {
+    const items = value as GroupedListItem[];
+    if (items.length === 0) {
+      return null;
+    }
+
+    // Use groupBy from config, fallback to "status", or create single group
+    const groupByField = config?.groupBy ?? "status";
+    if (groupByField in items[0]) {
+      const grouped = groupListData(items, groupByField);
+      let autoGroups = [...grouped.entries()].map(
+        ([key, groupItems]) => ({
+          key,
+          label: key,
+          items: groupItems,
+        }),
+      );
+
+      // Apply sorting if sortBy is specified
+      const sortBy = config?.sortBy;
+      if (sortBy) {
+        autoGroups = autoGroups.map((group) => ({
+          ...group,
+          items: sortGroupedItems(group.items, sortBy),
+        }));
+      }
+
+      return {
+        groups: autoGroups,
+        maxItemsPerGroup: undefined,
+        showGroupSummary: false,
+      };
+    } else {
+      // Single group with all items
+      let allItems = items;
+      if (config?.sortBy) {
+        allItems = sortGroupedItems(items, config.sortBy);
+      }
+
+      return {
+        groups: [
+          {
+            key: "all",
+            label: "All Items",
+            items: allItems,
+          },
+        ],
+        maxItemsPerGroup: undefined,
+        showGroupSummary: false,
+      };
+    }
+  }
+
+  // Narrow to object type
   const isObject =
     typeof value === "object" && value !== null && !Array.isArray(value);
 
@@ -243,7 +298,87 @@ export function extractGroupedListData(
       ? value.showGroupSummary
       : false;
 
+  // If no groups found, try to find an array property to auto-group
   if (!groups || groups.length === 0) {
+    // Look for array properties in the value object (direct or nested)
+    let arrayKeys = Object.keys(value).filter((key) =>
+      Array.isArray(value[key]),
+    );
+
+    // If no direct arrays found, check nested objects (common pattern: { response: { items: [...] } })
+    if (arrayKeys.length === 0) {
+      for (const key of Object.keys(value)) {
+        const nestedValue = value[key];
+        if (
+          typeof nestedValue === "object" &&
+          nestedValue !== null &&
+          !Array.isArray(nestedValue)
+        ) {
+          const nestedArrayKeys = Object.keys(nestedValue).filter((nestedKey) =>
+            Array.isArray(nestedValue[nestedKey]),
+          );
+          if (nestedArrayKeys.length > 0) {
+            // Found nested array, use the nested object as the value
+            return extractGroupedListData(nestedValue, config);
+          }
+        }
+      }
+    }
+
+    if (arrayKeys.length > 0) {
+      // Use the first array found (commonly: leads, items, results, etc.)
+      const arrayKey = arrayKeys[0];
+      const items = value[arrayKey] as GroupedListItem[];
+
+      if (items.length > 0) {
+        // Use groupBy from config, fallback to "status", or create single group
+        const groupByField = config?.groupBy || "status";
+        if (groupByField in items[0]) {
+          const grouped = groupListData(items, groupByField);
+          let autoGroups = [...grouped.entries()].map(
+            ([key, groupItems]) => ({
+              key,
+              label: key,
+              items: groupItems,
+            }),
+          );
+
+          // Apply sorting if sortBy is specified
+          const sortBy = config?.sortBy;
+          if (sortBy) {
+            autoGroups = autoGroups.map((group) => ({
+              ...group,
+              items: sortGroupedItems(group.items, sortBy),
+            }));
+          }
+
+          return {
+            groups: autoGroups,
+            maxItemsPerGroup,
+            showGroupSummary: false,
+          };
+        } else {
+          // Single group with all items
+          let allItems = items;
+          if (config?.sortBy) {
+            allItems = sortGroupedItems(items, config.sortBy);
+          }
+
+          return {
+            groups: [
+              {
+                key: "all",
+                label: "All Items",
+                items: allItems,
+              },
+            ],
+            maxItemsPerGroup,
+            showGroupSummary: false,
+          };
+        }
+      }
+    }
+
     return null;
   }
 

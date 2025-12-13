@@ -32,6 +32,7 @@ const { GET } = createEndpoint({
   title: "app.api.emails.imapClient.health.health.get.title",
   description: "app.api.emails.imapClient.health.health.get.description",
   category: "app.api.emails.imapClient.category",
+  icon: "activity",
   tags: [
     "app.api.emails.imapClient.tags.health",
     "app.api.emails.imapClient.tags.monitoring",

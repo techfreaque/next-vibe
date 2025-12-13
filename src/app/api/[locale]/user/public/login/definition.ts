@@ -17,6 +17,7 @@ import {
   objectField,
   requestDataField,
   responseField,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 
 import { UserRole } from "../../user-roles/enum";
@@ -27,27 +28,27 @@ const { POST } = createEndpoint({
   path: ["user", "public", "login"],
   title: "app.api.user.public.login.title",
   description: "app.api.user.public.login.description",
+  icon: "log-in",
   category: "app.api.user.category",
   tags: ["app.api.user.public.login.tag"],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.user.public.login.title",
-      description: "app.api.user.public.login.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
+      title: "app.user.other.login.auth.login.title",
+      description: "app.user.other.login.auth.login.subtitle",
+      layoutType: LayoutType.STACKED,
+      noCard: true,
     },
     { request: "data", response: true },
     {
-      // === MAIN LOGIN CREDENTIALS ===
-      credentials: objectField(
+      // === FORM CARD (contains all form elements, button, and footer links) ===
+      formCard: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.user.public.login.groups.credentials.title",
-          description:
-            "app.api.user.public.login.groups.credentials.description",
-          layoutType: LayoutType.VERTICAL,
+          layoutType: LayoutType.STACKED,
+          gap: "4",
+          order: 1,
         },
         { request: "data" },
         {
@@ -60,9 +61,17 @@ const { POST } = createEndpoint({
               placeholder: "app.api.user.public.login.fields.email.placeholder",
               columns: 12,
               helpText: "app.api.user.public.login.fields.email.description",
+              order: 1,
             },
             z
-              .string()
+              .string({
+                error:
+                  "app.api.user.public.login.fields.email.validation.required" satisfies TranslationKey,
+              })
+              .min(1, {
+                message:
+                  "app.api.user.public.login.fields.email.validation.required" satisfies TranslationKey,
+              })
               .email({
                 message:
                   "app.api.user.public.login.fields.email.validation.invalid" satisfies TranslationKey,
@@ -81,25 +90,19 @@ const { POST } = createEndpoint({
                 "app.api.user.public.login.fields.password.placeholder",
               columns: 12,
               helpText: "app.api.user.public.login.fields.password.description",
+              order: 2,
             },
-            z.string().min(1, {
-              message:
-                "app.api.user.public.login.fields.password.validation.required" satisfies TranslationKey,
-            }),
+            z
+              .string({
+                error:
+                  "app.api.user.public.login.fields.password.validation.required" satisfies TranslationKey,
+              })
+              .min(1, {
+                message:
+                  "app.api.user.public.login.fields.password.validation.required" satisfies TranslationKey,
+              }),
           ),
-        },
-      ),
 
-      // === LOGIN OPTIONS ===
-      options: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.user.public.login.groups.options.title",
-          description: "app.api.user.public.login.groups.options.description",
-          layoutType: LayoutType.HORIZONTAL,
-        },
-        { request: "data" },
-        {
           rememberMe: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
@@ -108,112 +111,80 @@ const { POST } = createEndpoint({
               columns: 12,
               helpText:
                 "app.api.user.public.login.fields.rememberMe.description",
+              order: 3,
             },
             z.boolean().optional().default(false),
+          ),
+
+          // === FORM ALERT (shows validation and API errors) ===
+          formAlert: widgetField(
+            {
+              type: WidgetType.FORM_ALERT,
+              order: 4,
+            },
+            { request: "data" },
+          ),
+
+          // === SUBMIT BUTTON (inside card) ===
+          submitButton: widgetField(
+            {
+              type: WidgetType.SUBMIT_BUTTON,
+              text: "app.api.user.public.login.actions.submit",
+              loadingText: "app.api.user.public.login.actions.submitting",
+              icon: "log-in",
+              variant: "default",
+              size: "default",
+              order: 5,
+            },
+            { request: "data" },
+          ),
+
+          // === FOOTER LINKS (inside card, below button) ===
+          footerLinks: objectField(
+            {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.STACKED,
+              gap: "2",
+              noCard: true,
+              order: 6,
+            },
+            { request: "data" },
+            {
+              forgotPassword: widgetField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.user.public.login.footer.forgotPassword",
+                  format: "link",
+                  href: "/user/reset-password",
+                  textAlign: "center",
+                  columns: 12,
+                },
+                { request: "data" },
+              ),
+              createAccount: widgetField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.user.public.login.footer.createAccount",
+                  format: "link",
+                  href: "/user/signup",
+                  textAlign: "center",
+                  columns: 12,
+                },
+                { request: "data" },
+              ),
+            },
           ),
         },
       ),
 
-      // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.BADGE,
-          text: "app.api.user.public.login.response.success",
-        },
-        z.boolean(),
-      ),
+      // === RESPONSE ALERT (outside card) ===
       message: responseField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.user.public.login.response.message",
+          type: WidgetType.ALERT,
+          variant: "default",
+          order: 2,
         },
         z.string(),
-      ),
-      user: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.user.public.login.response.user.title",
-          description: "app.api.user.public.login.response.user.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          id: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.public.login.response.user.id",
-            },
-            z.string(),
-          ),
-          email: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.public.login.response.user.email",
-            },
-            z.string().describe("User email address"),
-          ),
-          privateName: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.public.login.response.user.privateName",
-            },
-            z.string(),
-          ),
-          publicName: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.user.public.login.response.user.publicName",
-            },
-            z.string(),
-          ),
-        },
-      ),
-      sessionInfo: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.user.public.login.response.sessionInfo.title",
-          description:
-            "app.api.user.public.login.response.sessionInfo.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          expiresAt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.login.response.sessionInfo.expiresAt",
-            },
-            z.string().describe("When the session expires (human-readable)"),
-          ),
-          rememberMeActive: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.user.public.login.response.sessionInfo.rememberMeActive",
-            },
-            z.boolean().describe("Whether remember me is active"),
-          ),
-          loginLocation: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.login.response.sessionInfo.loginLocation",
-            },
-            z.string().optional().describe("Approximate login location"),
-          ),
-        },
-      ),
-      nextSteps: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.user.public.login.response.nextSteps.item",
-        },
-        z
-          .array(z.string())
-          .optional()
-          .describe("Recommended actions for the user after login"),
       ),
     },
   ),
@@ -268,125 +239,52 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        credentials: {
+        formCard: {
           email: "customer@example.com",
           password: "password123",
-        },
-        options: {
           rememberMe: true,
+          footerLinks: {},
         },
       },
       failed: {
-        credentials: {
+        formCard: {
           email: "customer@example.com",
           password: "wrongpassword",
-        },
-        options: {
           rememberMe: true,
+          footerLinks: {},
         },
       },
       withAdvanced: {
-        credentials: {
+        formCard: {
           email: "customer@example.com",
           password: "password123",
-        },
-        options: {
           rememberMe: false,
+          footerLinks: {},
         },
       },
       accountLocked: {
-        credentials: {
+        formCard: {
           email: "customer@example.com",
           password: "password123",
-        },
-        options: {
           rememberMe: true,
+          footerLinks: {},
         },
       },
     },
     responses: {
       default: {
-        success: true,
         message: "Welcome back! You have successfully logged in.",
-        user: {
-          id: "123e4567-e89b-12d3-a456-426614174000",
-          email: "customer@example.com",
-          privateName: "John Doe",
-          publicName: "John D.",
-        },
-        sessionInfo: {
-          expiresAt: "7 days from now",
-          rememberMeActive: true,
-          loginLocation: "San Francisco, CA",
-        },
-        nextSteps: [
-          "Explore your dashboard",
-          "Check your profile settings",
-          "Review recent activity",
-        ],
       },
       failed: {
-        success: false,
         message:
           "Invalid email or password. Please check your credentials and try again.",
-        user: {
-          id: "",
-          email: "",
-          privateName: "",
-          publicName: "",
-        },
-        sessionInfo: {
-          expiresAt: "",
-          rememberMeActive: false,
-          loginLocation: undefined,
-        },
-        nextSteps: [
-          "Verify your email address is correct",
-          "Check if Caps Lock is enabled",
-          "Use 'Forgot Password' if you can't remember your password",
-          "Contact support if you continue having issues",
-        ],
       },
       withAdvanced: {
-        success: true,
         message: "Welcome back! You have successfully logged in.",
-        user: {
-          id: "123e4567-e89b-12d3-a456-426614174000",
-          email: "customer@example.com",
-          privateName: "John Doe",
-          publicName: "John D.",
-        },
-        sessionInfo: {
-          expiresAt: "7 days from now",
-          rememberMeActive: false,
-          loginLocation: "San Francisco, CA",
-        },
-        nextSteps: [
-          "Explore your dashboard",
-          "Check your profile settings",
-          "Review recent activity",
-        ],
       },
       accountLocked: {
-        success: false,
         message:
           "Your account has been temporarily locked due to multiple failed login attempts.",
-        user: {
-          id: "",
-          email: "",
-          privateName: "",
-          publicName: "",
-        },
-        sessionInfo: {
-          expiresAt: "",
-          rememberMeActive: false,
-          loginLocation: undefined,
-        },
-        nextSteps: [
-          "Wait 15 minutes before trying again",
-          "Use password reset to regain access immediately",
-          "Contact support if you believe this is an error",
-        ],
       },
     },
   },

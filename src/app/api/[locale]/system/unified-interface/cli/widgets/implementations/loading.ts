@@ -4,22 +4,19 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   extractLoadingData,
   formatProgressBar,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/loading";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps } from "../core/types";
 
-export class LoadingWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.LOADING;
-  }
+export class LoadingWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LOADING> {
+  readonly widgetType = WidgetType.LOADING;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.LOADING>): string {
+    const { value, context } = props;
     const indent = this.createIndent(context.depth, context);
 
     // Extract data using shared logic

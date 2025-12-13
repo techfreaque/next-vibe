@@ -24,10 +24,9 @@ import {
 
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { type CountryLanguage } from "@/i18n/core/config";
 
 import { GET as getSubscriptionEndpoint } from "./definition";
-// Import the interface for type compatibility
 import type { SubscriptionRepository } from "./repository";
 import type {
   SubscriptionDeleteRequestOutput,
@@ -52,16 +51,19 @@ class SubscriptionRepositoryNativeImpl implements SubscriptionRepository {
   }
 
   async getSubscription(
-    userId: string,
+    userId: string, // Parameter exists for interface consistency with server implementation
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SubscriptionGetResponseOutput>> {
+    logger.debug("getSubscription called on native", { userId });
     // Use typesafe nativeEndpoint() with endpoint definition
     // This provides full type inference from the endpoint's schema
+    // Note: userId is implicit from authentication context in nativeEndpoint
     const response = await nativeEndpoint(
       getSubscriptionEndpoint,
       {},
       logger,
-      "en-GLOBAL", // Locale not strictly needed for subscription data
+      locale,
     );
 
     if (response.success) {
@@ -87,12 +89,11 @@ class SubscriptionRepositoryNativeImpl implements SubscriptionRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionPostResponseOutput>> {
+    // Parameters exist for interface consistency with server implementation
     logger.error(
       "createSubscription not implemented on native - use checkout flow",
+      { userId, locale, dataKeys: Object.keys(data || {}) },
     );
-    void data;
-    void userId;
-    void locale;
     return await Promise.resolve(
       this.createNotImplementedError<SubscriptionPostResponseOutput>(
         "createSubscription",
@@ -106,10 +107,12 @@ class SubscriptionRepositoryNativeImpl implements SubscriptionRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionPutResponseOutput>> {
-    logger.error("updateSubscription not implemented on native");
-    void data;
-    void userId;
-    void locale;
+    // Parameters exist for interface consistency with server implementation
+    logger.error("updateSubscription not implemented on native", {
+      userId,
+      locale,
+      dataKeys: Object.keys(data || {}),
+    });
     return await Promise.resolve(
       this.createNotImplementedError<SubscriptionPutResponseOutput>(
         "updateSubscription",
@@ -123,10 +126,12 @@ class SubscriptionRepositoryNativeImpl implements SubscriptionRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean; message: string }>> {
-    logger.error("cancelSubscription not implemented on native");
-    void data;
-    void userId;
-    void locale;
+    // Parameters exist for interface consistency with server implementation
+    logger.error("cancelSubscription not implemented on native", {
+      userId,
+      locale,
+      dataKeys: Object.keys(data || {}),
+    });
     return await Promise.resolve(
       this.createNotImplementedError<{ success: boolean; message: string }>(
         "cancelSubscription",

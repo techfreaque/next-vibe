@@ -15,7 +15,7 @@ export const { GET, POST, tools } = endpointsHandler({
     handler: () => sideTasksRepository.getStatus(),
   },
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) =>
-      sideTasksRepository.handleAction(data, user, locale, logger),
+    handler: ({ data, logger }) =>
+      sideTasksRepository.handleAction(data, logger),
   },
 });

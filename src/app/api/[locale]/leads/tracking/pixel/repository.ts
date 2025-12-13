@@ -69,17 +69,10 @@ export class PixelTrackingRepository {
       // This ensures the pixel loads quickly even if database is slow
       setImmediate(async () => {
         try {
-          // Import user factory for mock user
-          const { createMockUser } =
-            await import("@/app/api/[locale]/system/unified-interface/cli/auth/cli-user");
-          const mockUser = createMockUser();
-
           const result = await leadTrackingRepository.handleTrackingPixel(
             leadId,
             campaignId,
             clientInfo,
-            mockUser,
-            "en-GLOBAL",
             logger,
           );
 

@@ -52,6 +52,74 @@ export type ValidationMode =
   | "all";
 
 /**
+ * Options for read (GET) operations at the endpoint level
+ * These options will be merged with hook-provided options (hook options take priority)
+ */
+export interface EndpointReadOptions<TRequest, TUrlVariables> {
+  /** Form options for query forms (filtering, search, etc.) */
+  formOptions?: {
+    defaultValues?: Partial<TRequest>;
+    persistForm?: boolean;
+    persistenceKey?: string;
+    autoSubmit?: boolean;
+    debounceMs?: number;
+  };
+  /** Query options for data fetching */
+  queryOptions?: {
+    enabled?: boolean;
+    staleTime?: number;
+    cacheTime?: number;
+    refetchOnWindowFocus?: boolean;
+    disableLocalCache?: boolean;
+    cacheDuration?: number;
+    deduplicateRequests?: boolean;
+    refreshDelay?: number;
+    forceRefresh?: boolean;
+    backgroundRefresh?: boolean;
+  };
+  /** URL path parameters for the read endpoint */
+  urlPathParams?: TUrlVariables;
+  /** Initial state for the form */
+  initialState?: Partial<TRequest>;
+}
+
+/**
+ * Options for create/update (POST/PUT/PATCH) operations at the endpoint level
+ * These options will be merged with hook-provided options (hook options take priority)
+ */
+export interface EndpointCreateOptions<TRequest, TUrlVariables> {
+  /** Form options for mutation forms */
+  formOptions?: {
+    defaultValues?: Partial<TRequest>;
+    persistForm?: boolean;
+    persistenceKey?: string;
+  };
+  /** Mutation options for create/update operations */
+  mutationOptions?: {
+    invalidateQueries?: string[];
+  };
+  /** URL path parameters for the create endpoint */
+  urlPathParams?: TUrlVariables;
+  /** Data to auto-prefill the form with */
+  autoPrefillData?: Partial<TRequest>;
+  /** Initial state for the form */
+  initialState?: Partial<TRequest>;
+}
+
+/**
+ * Options for delete (DELETE) operations at the endpoint level
+ * These options will be merged with hook-provided options (hook options take priority)
+ */
+export interface EndpointDeleteOptions<TUrlVariables> {
+  /** Mutation options for delete operations */
+  mutationOptions?: {
+    invalidateQueries?: string[];
+  };
+  /** URL path parameters for the delete endpoint */
+  urlPathParams?: TUrlVariables;
+}
+
+/**
  * Core endpoint definition with complete type inference from TFields:
  * All Input/Output types are automatically inferred from the unified field structure:
  * - TRequestInput/Output: Inferred from fields with FieldUsage.RequestData
@@ -92,20 +160,8 @@ export interface ApiEndpoint<
    * Credit cost for this endpoint (0 = free, undefined = free)
    */
   readonly credits?: number;
-
-  // AI Tool metadata for AI agent integration
-  readonly aiTool?: {
-    /** Instructions for AI on how to use this tool */
-    instructions: string;
-    /** Display name for the tool */
-    displayName: string;
-    /** Icon identifier */
-    icon: IconValue;
-    /** Color for UI display */
-    color: string;
-    /** Priority for tool selection (higher = more important) */
-    priority: number;
-  };
+  /** Icon identifier */
+  readonly icon: IconValue;
 
   // Unified fields for schema generation
   readonly fields: TFields;
@@ -180,6 +236,30 @@ export interface ApiEndpoint<
     title: TranslationKey;
     description: TranslationKey;
   };
+
+  // Method-specific options that will be merged with hook-provided options
+  // Hook options take priority over endpoint options
+  readonly options?: TMethod extends Methods.GET
+    ? EndpointReadOptions<
+        ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
+        ExtractOutput<
+          InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+        >
+      >
+    : TMethod extends Methods.POST | Methods.PUT | Methods.PATCH
+      ? EndpointCreateOptions<
+          ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
+          ExtractOutput<
+            InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+          >
+        >
+      : TMethod extends Methods.DELETE
+        ? EndpointDeleteOptions<
+            ExtractOutput<
+              InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+            >
+          >
+        : never;
 }
 
 // --- COMPILE-TIME TYPE INFERENCE FROM UNIFIED FIELDS ---
@@ -405,7 +485,8 @@ export function createEndpoint<
     aliases: config.aliases,
     cli: config.cli,
     credits: config.credits,
-    aiTool: config.aiTool,
+    icon: config.icon,
+    options: config.options,
     requestSchema,
     responseSchema,
     requestUrlPathParamsSchema: requestUrlSchema,

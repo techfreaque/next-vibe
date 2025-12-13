@@ -67,6 +67,7 @@ export const translations: typeof enTranslations = {
     invalid_status_error: "Nieprawidłowy status",
     invalid_response_error: "Nieprawidłowa odpowiedź",
     payment_failed: "Płatność nie powiodła się",
+    payment_required: "Wymagana płatność",
     partial_failure: "Częściowa awaria",
   },
   errors: {

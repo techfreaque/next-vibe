@@ -14,12 +14,13 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import { getNewsletterSubscriptionStatus } from "@/app/api/[locale]/leads/enum";
 import { leadsRepository } from "@/app/api/[locale]/leads/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { newsletterSubscriptions } from "../db";
@@ -68,12 +69,7 @@ export class NewsletterSubscribeRepositoryImpl implements NewsletterSubscribeRep
           },
         );
 
-        const leadResult = await leadsRepository.getLeadById(
-          leadId,
-          user,
-          locale,
-          logger,
-        );
+        const leadResult = await leadsRepository.getLeadById(leadId, logger);
         if (leadResult.success) {
           logger.debug("app.api.newsletter.subscribe.repository.lead_found", {
             leadId,
@@ -98,8 +94,6 @@ export class NewsletterSubscribeRepositoryImpl implements NewsletterSubscribeRep
           const updateResult = await leadsRepository.updateLead(
             leadId,
             updateData,
-            user,
-            locale,
             logger,
           );
 

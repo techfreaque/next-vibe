@@ -15,22 +15,18 @@ export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: async ({ urlPathParams, user, locale, logger }) => {
+    handler: async ({ urlPathParams, logger }) => {
       return await imapMessagesRepository.getMessageByIdFormatted(
         { id: urlPathParams.id },
-        user,
-        locale,
         logger,
       );
     },
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: async ({ urlPathParams, data, user, locale, logger }) => {
+    handler: async ({ urlPathParams, data, logger }) => {
       return await imapMessagesRepository.updateMessageFormatted(
         { messageId: urlPathParams.id, updates: data },
-        user,
-        locale,
         logger,
       );
     },

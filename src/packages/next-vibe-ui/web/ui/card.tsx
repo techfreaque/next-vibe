@@ -13,8 +13,8 @@ export type CardProps = CardCommonBaseProps;
 export function Card({
   className,
   style,
-  id,
   children,
+  id,
 }: CardProps): React.JSX.Element {
   return (
     <div
@@ -36,8 +36,8 @@ export type CardHeaderProps = CardCommonBaseProps;
 export function CardHeader({
   className,
   style,
-  id,
   children,
+  id,
 }: CardHeaderProps): React.JSX.Element {
   return (
     <div
@@ -56,8 +56,8 @@ export type CardTitleProps = CardCommonBaseProps;
 export function CardTitle({
   className,
   style,
-  id,
   children,
+  id,
 }: CardTitleProps): React.JSX.Element {
   return (
     <div
@@ -79,8 +79,8 @@ export type CardDescriptionProps = CardCommonBaseProps;
 export function CardDescription({
   className,
   style,
-  id,
   children,
+  id,
 }: CardDescriptionProps): React.JSX.Element {
   return (
     <div
@@ -99,8 +99,8 @@ export type CardContentProps = CardCommonBaseProps;
 export function CardContent({
   className,
   style,
-  id,
   children,
+  id,
 }: CardContentProps): React.JSX.Element {
   return (
     <div id={id} className={cn("p-6 pt-0", className)} style={style}>
@@ -115,8 +115,8 @@ export type CardFooterProps = CardCommonBaseProps;
 export function CardFooter({
   className,
   style,
-  id,
   children,
+  id,
 }: CardFooterProps): React.JSX.Element {
   return (
     <div

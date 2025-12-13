@@ -28,13 +28,8 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
         ignoreErrors: true, // Don't fail batch operation if notification email fails
       },
     ],
-    handler: async ({ data, user, locale, logger }) => {
-      const result = await batchRepository.batchUpdateLeads(
-        data,
-        user,
-        locale,
-        logger,
-      );
+    handler: async ({ data, logger }) => {
+      const result = await batchRepository.batchUpdateLeads(data, logger);
       // Wrap the response data in the expected structure
       if (result.success && result.data) {
         return success({
@@ -54,13 +49,8 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
         ignoreErrors: true, // Don't fail batch operation if notification email fails
       },
     ],
-    handler: async ({ data, user, locale, logger }) => {
-      const result = await batchRepository.batchDeleteLeads(
-        data,
-        user,
-        locale,
-        logger,
-      );
+    handler: async ({ data, logger }) => {
+      const result = await batchRepository.batchDeleteLeads(data, logger);
       // Wrap the response data in the expected structure
       if (result.success && result.data) {
         return success({

@@ -28,6 +28,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.guard.destroy.description",
   category: "app.api.system.guard.category",
   tags: ["app.api.system.guard.destroy.tag"],
+  icon: "shield",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: dragEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, logger }) => {
       return executeDrag<DragResponseOutput>(
         {
           toolName: "drag",
@@ -21,9 +21,7 @@ export const { POST, tools } = endpointsHandler({
             to_uid: data.to_uid,
           }),
         },
-        user,
         logger,
-        locale,
       );
     },
   },

@@ -19,11 +19,10 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { Countries, Languages } from "@/i18n/core/config";
 import {
-  CountriesArr,
+  Countries,
   CountriesOptions,
-  LanguagesArr,
+  Languages,
   LanguagesOptions,
 } from "@/i18n/core/config";
 
@@ -54,6 +53,7 @@ const { GET } = createEndpoint({
   category: "app.api.leads.category",
   tags: ["app.api.leads.tags.leads", "app.api.leads.tags.export"],
   allowedRoles: [UserRole.ADMIN],
+  icon: "download",
 
   fields: objectField(
     {
@@ -101,7 +101,7 @@ const { GET } = createEndpoint({
           options: CountriesOptions,
           columns: 6,
         },
-        z.enum(CountriesArr).optional(),
+        z.enum(Countries).optional(),
       ),
 
       language: requestDataField(
@@ -113,7 +113,7 @@ const { GET } = createEndpoint({
           options: LanguagesOptions,
           columns: 6,
         },
-        z.enum(LanguagesArr).optional(),
+        z.enum(Languages).optional(),
       ),
 
       source: requestDataField(

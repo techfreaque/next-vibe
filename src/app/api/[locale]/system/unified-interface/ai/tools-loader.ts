@@ -10,9 +10,9 @@ import { jsonSchema, tool, type JSONSchema7 } from "ai";
 import { z } from "zod";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { Platform } from "../shared/types/platform";

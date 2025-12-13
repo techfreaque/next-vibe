@@ -77,9 +77,11 @@ export function RootFolderBar({
   isAuthenticated,
   locale,
 }: RootFolderBarProps): JSX.Element {
-  // Get root folders from DEFAULT_FOLDER_CONFIGS
+  // Get root folders from DEFAULT_FOLDER_CONFIGS (convert object to array, sorted by order)
   // Show all folders to all users, but disable PRIVATE and SHARED for public users
-  const rootFolders = DEFAULT_FOLDER_CONFIGS;
+  const rootFolders = Object.values(DEFAULT_FOLDER_CONFIGS).toSorted(
+    (a, b) => a.order - b.order,
+  );
 
   // State for modal
   const [modalOpen, setModalOpen] = useState(false);

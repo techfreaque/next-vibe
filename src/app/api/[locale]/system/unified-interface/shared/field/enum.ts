@@ -40,7 +40,7 @@ export function createEnumOptions<
   const enumObj = createEnumObjectWithKeyValues(enumMap);
 
   const optionsArray = Object.entries(enumMap).map(
-    ([_key, translationValue]) => ({
+    ([, translationValue]) => ({
       value: translationValue,
       label: translationValue,
     }),

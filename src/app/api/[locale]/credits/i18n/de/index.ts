@@ -40,7 +40,10 @@ export const translations: typeof enTranslations = {
     getOrCreateLeadFailed: "Fehler beim Abrufen oder Erstellen des Leads",
     addCreditsFailed: "Fehler beim Hinzufügen von Credits",
     deductCreditsFailed: "Fehler beim Abziehen von Credits",
-    insufficientCredits: "Unzureichende Credits",
+    insufficientCredits:
+      "Unzureichende Credits. Sie benötigen {{cost}} Credits, um diese Funktion zu nutzen.",
+    deductionFailed:
+      "Fehler beim Abziehen von {{cost}} Credits. Bitte versuchen Sie es erneut.",
     getTransactionsFailed: "Fehler beim Abrufen der Credit-Transaktionen",
     invalidIdentifier: "Ungültige Benutzer- oder Lead-Kennung",
     userNotFound: "Benutzer nicht gefunden",

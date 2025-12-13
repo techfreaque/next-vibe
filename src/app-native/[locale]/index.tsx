@@ -18,6 +18,5 @@ import { createPageWrapperWithImport } from "@/app/api/[locale]/system/unified-i
 /**
  * Wrapper component that dynamically imports and converts Expo Router's synchronous params
  * to Next.js 15's async params format
- * Note: Chat is accessed through /threads route, not /chat
  */
 export default createPageWrapperWithImport(() => import("@/app/[locale]/page"));

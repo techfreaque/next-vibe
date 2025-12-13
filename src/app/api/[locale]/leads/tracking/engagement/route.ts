@@ -28,11 +28,10 @@ export const { GET, POST, tools } = endpointsHandler({
     },
   },
   [Methods.GET]: {
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, user, logger }) => {
       return await leadTrackingRepository.handleClickTracking(
         data,
         user,
-        locale,
         logger,
       );
     },

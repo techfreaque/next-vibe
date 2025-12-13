@@ -12,7 +12,7 @@ import { cronStatusRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ data, user, locale, logger }) =>
-      cronStatusRepository.getStatus(data, user, locale, logger),
+    handler: ({ data, user, logger }) =>
+      cronStatusRepository.getStatus(data, user, logger),
   },
 });

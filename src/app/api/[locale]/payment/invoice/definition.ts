@@ -31,6 +31,7 @@ const { POST } = createEndpoint({
   title: "app.api.payment.invoice.post.title" as const,
   description: "app.api.payment.invoice.post.description" as const,
   category: "app.api.payment.category" as const,
+  icon: "receipt" as const,
   tags: [
     "app.api.payment.tags.payment" as const,
     "app.api.payment.tags.info" as const,

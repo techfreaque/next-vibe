@@ -4,47 +4,39 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
-import type {
-  WidgetData,
-  WidgetInput,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class SectionWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.SECTION;
-  }
+export class SectionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.SECTION> {
+  readonly widgetType = WidgetType.SECTION;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { field, value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.SECTION>): string {
+    const { value, context } = props;
 
-    // Handle object with nested fields
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      return this.renderSection(value, field, context);
+      return this.renderSection(value, props, context);
     }
 
-    // Fallback
     return JSON.stringify(value);
   }
 
   private renderSection(
     value: { [key: string]: WidgetData },
-    field: UnifiedField,
+    props: CLIWidgetProps<typeof WidgetType.SECTION>,
     context: WidgetRenderContext,
   ): string {
     const result: string[] = [];
+    const { field } = props;
+    const { title: titleKey } = field.ui;
 
-    // Skip rendering if section is empty (no items or all values are empty)
     if (this.isSectionEmpty(value)) {
       return "";
     }
 
-    if ("title" in field.ui && field.ui.title) {
-      const title = context.t(field.ui.title);
-
+    if (titleKey) {
+      const title = context.t(titleKey);
       result.push("");
       result.push(this.styleText(title.toUpperCase(), "bold", context));
       result.push(this.styleText("─".repeat(50), "dim", context));
@@ -60,10 +52,12 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer {
         const childField = field.children[key];
         const renderer = context.getRenderer(childField.ui.type);
         if (renderer) {
-          const rendered = renderer.render(
-            { field: childField, value: val, context },
+          const rendered = renderer.render({
+            widgetType: childField.ui.type,
+            field: childField,
+            value: val,
             context,
-          );
+          });
           if (rendered) {
             result.push(rendered);
           }

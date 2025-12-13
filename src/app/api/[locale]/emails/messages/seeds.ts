@@ -7,8 +7,8 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { translations } from "@/config/i18n/en";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserDetailLevel } from "../../user/enum";
 import { userRepository } from "../../user/repository";

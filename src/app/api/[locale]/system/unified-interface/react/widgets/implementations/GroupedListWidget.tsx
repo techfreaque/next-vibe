@@ -1,8 +1,3 @@
-/**
- * Grouped List Widget
- * Displays grouped lists of items
- */
-
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
@@ -12,7 +7,8 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
+import type { WidgetType } from "../../../shared/types/enums";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import {
   extractGroupedListData,
   getDisplayItems,
@@ -21,18 +17,20 @@ import {
 import { formatDisplayValue } from "../../../shared/widgets/utils/formatting";
 
 /**
- * Grouped List Widget Component
+ * Displays items grouped by a field with expandable sections.
  */
 export function GroupedListWidget({
   value,
-  field: _field,
-  context: _context,
+  field,
   className = "",
-}: WidgetComponentProps): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.GROUPED_LIST>): JSX.Element {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
-  // Extract data using shared logic
-  const data = extractGroupedListData(value);
+  const { groupBy, sortBy } = field.ui;
+  const config =
+    field.type === "array" && groupBy ? { groupBy, sortBy } : undefined;
+
+  const data = extractGroupedListData(value, config);
 
   useEffect(() => {
     if (data && data.groups.length > 0) {
@@ -42,7 +40,6 @@ export function GroupedListWidget({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.groups.length]);
 
-  // Handle null case
   if (!data) {
     return <Div className={className}>—</Div>;
   }
@@ -86,7 +83,6 @@ export function GroupedListWidget({
             key={groupKey}
             className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
           >
-            {/* Group Header */}
             <Button
               variant="ghost"
               onClick={() => toggleGroup(groupKey)}
@@ -108,7 +104,6 @@ export function GroupedListWidget({
               />
             </Button>
 
-            {/* Group Summary */}
             {showGroupSummary && groupSummary && (
               <Div className="border-b border-gray-200 bg-gray-50 px-4 py-2 dark:border-gray-700 dark:bg-gray-750">
                 <Div className="flex flex-wrap gap-4">
@@ -126,7 +121,6 @@ export function GroupedListWidget({
               </Div>
             )}
 
-            {/* Group Items */}
             {isExpanded && (
               <Div className="divide-y divide-gray-200 dark:divide-gray-700">
                 {displayItems.map((item, itemIndex: number) => {
@@ -151,7 +145,6 @@ export function GroupedListWidget({
                   );
                 })}
 
-                {/* Show More Button */}
                 {!isExpanded && remainingCount > 0 && (
                   <Button
                     variant="ghost"

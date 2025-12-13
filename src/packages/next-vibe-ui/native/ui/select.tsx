@@ -35,12 +35,14 @@ export function Select({
   value,
   defaultValue,
   onValueChange,
-  open: _open,
-  defaultOpen: _defaultOpen,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  defaultOpen, // Intentionally extracted - not used in React Native
   onOpenChange,
   disabled,
-  name: _name,
-  required: _required,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  name, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  required, // Intentionally extracted - not used in React Native
 }: SelectRootProps): React.JSX.Element {
   // Convert string value to Option for native primitive
   const nativeValue = value ? { label: value, value } : undefined;
@@ -122,7 +124,6 @@ export function SelectTrigger({
   style,
   children,
   disabled,
-  id: _id,
   ...props
 }: SelectTriggerProps): React.JSX.Element {
   const nativeStyle: ViewStyle | undefined = style
@@ -151,7 +152,6 @@ SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
 export function SelectScrollUpButton({
   className,
-  style: _style, // Native doesn't support inline styles
   children,
   ...props
 }: SelectLabelProps): React.JSX.Element {
@@ -171,7 +171,6 @@ SelectScrollUpButton.displayName = "SelectScrollUpButton";
 
 export function SelectScrollDownButton({
   className,
-  style: _style, // Native doesn't support inline styles
   children,
   ...props
 }: SelectLabelProps): React.JSX.Element {
@@ -196,7 +195,6 @@ export function SelectContent({
   position = "popper",
   ...props
 }: SelectContentProps): React.JSX.Element {
-  const { open: _open } = SelectPrimitive.useRootContext();
   const nativeStyle: ViewStyle | undefined = style
     ? convertCSSToViewStyle(style)
     : undefined;

@@ -7,6 +7,7 @@
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { ChartWidget } from "../implementations/ChartWidget";
 import { CodeOutputWidget } from "../implementations/CodeOutputWidget";
 import { CodeQualityListWidget } from "../implementations/CodeQualityListWidget";
 import { ContainerWidget } from "../implementations/ContainerWidget";
@@ -21,6 +22,7 @@ import { LinkWidget } from "../implementations/LinkWidget";
 import { MarkdownWidget } from "../implementations/MarkdownWidget";
 import { MetricCardWidget } from "../implementations/MetricCardWidget";
 import { SectionWidget } from "../implementations/SectionWidget";
+import { StatWidget } from "../implementations/StatWidget";
 import { StatsGridWidget } from "../implementations/StatsGridWidget";
 import { TextWidget } from "../implementations/TextWidget";
 import { TitleWidget } from "../implementations/TitleWidget";
@@ -52,8 +54,10 @@ export function registerAllWidgets(): void {
   widgetRegistry.register(WidgetType.GROUPED_LIST, GroupedListWidget);
 
   // Metric widgets
+  widgetRegistry.register(WidgetType.STAT, StatWidget);
   widgetRegistry.register(WidgetType.METRIC_CARD, MetricCardWidget);
   widgetRegistry.register(WidgetType.STATS_GRID, StatsGridWidget);
+  widgetRegistry.register(WidgetType.CHART, ChartWidget);
 
   // Layout widgets
   widgetRegistry.register(WidgetType.CONTAINER, ContainerWidget);

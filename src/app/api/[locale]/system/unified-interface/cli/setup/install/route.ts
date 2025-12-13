@@ -14,7 +14,7 @@ import { setupInstallRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: installEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) => {
+    handler: ({ data, user, logger, locale }) => {
       logger.debug("Setup install operation started", {
         force: data.force,
         verbose: data.verbose,

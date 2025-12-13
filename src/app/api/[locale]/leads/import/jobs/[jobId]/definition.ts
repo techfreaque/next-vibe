@@ -35,6 +35,7 @@ const { PATCH } = createEndpoint({
   category: "app.api.leads.category",
   tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
   allowedRoles: [UserRole.ADMIN],
+  icon: "upload",
 
   fields: objectField(
     {
@@ -416,6 +417,7 @@ const { DELETE } = createEndpoint({
   category: "app.api.leads.category",
   tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
   allowedRoles: [UserRole.ADMIN],
+  icon: "upload",
 
   fields: objectField(
     {

@@ -26,22 +26,22 @@ export function UserMenu({ user, locale, logger }: UserMenuProps): JSX.Element {
       <Button
         variant="ghost"
         size="sm"
-        className="w-full justify-start h-8 px-2"
-        dataTour={TOUR_DATA_ATTRS.SIDEBAR_LOGIN}
+        className="w-full justify-start"
+        data-tour={TOUR_DATA_ATTRS.SIDEBAR_LOGIN}
       >
         <User className="h-3.5 w-3.5 mr-2" />
-        {t("app.chat.components.sidebar.login")}
+        {t("app.api.agent.chat.components.sidebar.login")}
       </Button>
     </Link>
   ) : (
     <Button
       variant="ghost"
       size="sm"
-      className="w-full justify-start h-8 px-2"
+      className="w-full justify-start"
       onClick={logout}
     >
       <LogOut className="h-3.5 w-3.5 mr-2" />
-      {t("app.chat.components.sidebar.logout")}
+      {t("app.api.agent.chat.components.sidebar.logout")}
     </Button>
   );
 }

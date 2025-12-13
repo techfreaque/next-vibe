@@ -237,7 +237,8 @@ export function CronTasksTable({
   if (loading) {
     return (
       <Div className="flex flex-col gap-4">
-        {Array.from({ length: 5 }, (_, i) => (
+        {/* eslint-disable-next-line @typescript-eslint/no-unused-vars -- Array.from callback requires first parameter */}
+        {Array.from({ length: 5 }).map((unused, i) => (
           <Skeleton key={i} className="h-16 w-full" />
         ))}
       </Div>

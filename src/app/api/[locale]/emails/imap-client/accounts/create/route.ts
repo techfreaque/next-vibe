@@ -15,7 +15,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, locale, logger }) =>
-      imapAccountsRepository.createAccount(data, user, locale, logger),
+    handler: ({ data, user, logger }) =>
+      imapAccountsRepository.createAccount(data, user, logger),
   },
 });

@@ -14,9 +14,8 @@ import { generateExpoIndexesRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: generateEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) => {
-      logger.debug("Generate Expo indexes started");
-      return generateExpoIndexesRepository.generate(data, user, locale);
+    handler: ({ user, locale }) => {
+      return generateExpoIndexesRepository.generate(user, locale);
     },
   },
 });

@@ -32,6 +32,7 @@ export const { GET } = createEndpoint({
   title: "app.api.system.unifiedInterface.tasks.cronSystem.history.get.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.history.get.description",
+  icon: "clock",
   category: "app.api.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN],
   tags: ["app.api.system.unifiedInterface.tasks.type.cron"],

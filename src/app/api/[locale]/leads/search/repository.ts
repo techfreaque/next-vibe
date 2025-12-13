@@ -13,9 +13,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../user/auth/types";
 import { LeadSortField, SortOrder } from "../enum";
 import { leadsRepository } from "../repository";
 import type { LeadSearchGetResponseOutput } from "./definition";
@@ -40,8 +38,6 @@ type SearchResponseType = LeadSearchGetResponseOutput;
 export interface LeadSearchRepository {
   searchLeads(
     data: SearchRequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SearchResponseType>>;
 }
@@ -55,12 +51,9 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
    */
   async searchLeads(
     data: SearchRequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SearchResponseType>> {
     logger.debug("Searching leads", {
-      userId: user.id,
       searchTerm: data.search,
       limit: data.limit,
       offset: data.offset,
@@ -73,12 +66,8 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
     // Use the existing listLeads method with search filter
     const searchResult = await leadsRepository.listLeads(
       {
-        searchPagination: {
-          search: data.search ?? undefined,
-          page: Math.floor(offset / limit) + 1,
-          limit: limit,
-        },
         statusFilters: {
+          search: data.search ?? undefined,
           status: undefined, // Search all statuses
           currentCampaignStage: undefined,
           source: undefined,
@@ -91,9 +80,11 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
           sortBy: LeadSortField.CREATED_AT,
           sortOrder: SortOrder.DESC,
         },
+        paginationInfo: {
+          page: Math.floor(offset / limit) + 1,
+          limit: limit,
+        },
       },
-      user,
-      locale,
       logger,
     );
 
@@ -144,7 +135,7 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
     return success({
       response: {
         leads: transformedLeads,
-        total: responseData.total,
+        total: searchResult.data.paginationInfo.total,
         hasMore,
       },
     });

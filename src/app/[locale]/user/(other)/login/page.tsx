@@ -3,19 +3,18 @@ import { redirect } from "next-vibe-ui/lib/redirect";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
-import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { loginRepository } from "@/app/api/[locale]/user/public/login/repository";
 import { userRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
-import { LoginForm } from "@/app/api/[locale]/user/public/login/_components/login-form";
 import { envClient } from "@/config/env-client";
+import { LoginForm } from "@/app/api/[locale]/user/public/login/_components/login-form";
+import { loginRepository } from "@/app/api/[locale]/user/public/login/repository";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -63,6 +62,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
+/**
+ * Login Page Component
+ */
 export default async function LoginPage({
   params,
   searchParams,
@@ -71,6 +73,7 @@ export default async function LoginPage({
   const { callbackUrl } = await searchParams;
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
+
   // Check if user is already logged in using repository-first pattern
   // Allow both PUBLIC and CUSTOMER roles for login page
   const verifiedUserResponse = await userRepository.getUserByAuth(
@@ -78,13 +81,13 @@ export default async function LoginPage({
     locale,
     logger,
   );
+
   // Redirect if already authenticated (not public)
   if (
     verifiedUserResponse.success &&
     verifiedUserResponse.data &&
     !verifiedUserResponse.data.isPublic
   ) {
-    // If there's a callback URL, use it
     const userId = verifiedUserResponse.data.id;
     if (userId) {
       if (callbackUrl) {
@@ -117,19 +120,7 @@ export default async function LoginPage({
         <ArrowLeft className="mr-2 h-4 w-4" />
         {t("app.user.common.backToHome")}
       </Link>
-      <Div className="">
-        <Div className="order-1 md:order-2 text-center">
-          <Div className="mb-8">
-            <H1 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-r from-cyan-500 to-blue-600">
-              {t("app.user.other.login.auth.login.title")}
-            </H1>
-            <P className="text-gray-600 dark:text-gray-300 text-lg mb-6">
-              {t("app.user.other.login.auth.login.subtitle")}
-            </P>
-          </Div>
-        </Div>
-        <LoginForm locale={locale} loginOptions={loginOptionsResponse.data} />
-      </Div>
+      <LoginForm locale={locale} callbackUrl={callbackUrl} />
     </>
   );
 }

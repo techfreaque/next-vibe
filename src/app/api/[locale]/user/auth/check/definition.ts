@@ -24,6 +24,7 @@ const { GET } = createEndpoint({
   path: ["user", "auth", "check"],
   title: "app.api.user.auth.check.get.title" as const,
   description: "app.api.user.auth.check.get.description" as const,
+  icon: "shield",
   category: "app.api.user.category" as const,
   tags: ["app.api.user.search.tag" as const],
   allowedRoles: [

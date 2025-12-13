@@ -18,7 +18,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   UserDeleteRequestOutput,
@@ -32,7 +31,6 @@ export interface UserByIdRepository {
   getUserById(
     data: { id: string },
     user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserGetResponseOutput>>;
 
@@ -46,7 +44,6 @@ export interface UserByIdRepository {
   deleteUser(
     data: { id: string },
     user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserDeleteResponseOutput>>;
 }
@@ -55,7 +52,6 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
   async getUserById(
     data: { id: string },
     user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserGetResponseOutput>> {
     try {
@@ -248,7 +244,6 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
   async deleteUser(
     data: UserDeleteRequestOutput,
     user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserDeleteResponseOutput>> {
     try {

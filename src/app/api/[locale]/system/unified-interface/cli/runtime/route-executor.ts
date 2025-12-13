@@ -8,8 +8,8 @@ import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type z from "zod";
 
-import { type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
@@ -813,7 +813,8 @@ export class RouteDelegationHandler {
       // Convert kebab-case to camelCase (e.g., skip-generation -> skipGeneration)
       const camelCaseKey = key.replace(
         /-([a-z])/g,
-        (_match, letter: string): string => letter.toUpperCase(),
+        // oxlint-disable-next-line no-unused-vars
+        (_, letter: string): string => letter.toUpperCase(),
       );
 
       // Convert string boolean values to actual booleans if not already parsed

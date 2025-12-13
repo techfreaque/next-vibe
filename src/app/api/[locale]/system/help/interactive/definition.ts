@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
     "app.api.system.help.interactive.post.tags.system",
     "app.api.system.help.interactive.post.tags.help",
   ],
+  icon: "book",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.PRODUCTION_OFF,

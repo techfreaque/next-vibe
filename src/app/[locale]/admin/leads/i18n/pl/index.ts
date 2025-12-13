@@ -46,6 +46,7 @@ export const translations: typeof enTranslations = {
       },
       actions: {
         refresh: "Odśwież",
+        reset: "Resetuj",
         retry: "Ponów",
         export: "Eksportuj",
         exportCsv: "Eksportuj jako CSV",
@@ -428,10 +429,13 @@ export const translations: typeof enTranslations = {
         },
       },
       import: {
+        label: "Importuj",
+        description: "Importuj leady z plików CSV",
         button: "Importuj Leady",
         title: "Importuj Leady z CSV",
-        description:
-          "Prześlij plik CSV, aby zaimportować leady do systemu kampanii",
+        actions: {
+          import: "Importuj",
+        },
         template: {
           title: "Pobierz Szablon",
           description: "Pobierz szablon CSV z wymaganymi kolumnami",
@@ -823,6 +827,8 @@ export const translations: typeof enTranslations = {
           "Konfiguruj i monitoruj testy A/B dla kampanii e-mailowych",
         campaignStarter: "Starter Kampanii",
         campaignStarter_description: "Konfiguruj ustawienia startera kampanii",
+        import: "Importuj",
+        import_description: "Importuj leady z plików CSV",
       },
     },
     campaign: {

@@ -15,6 +15,7 @@ export const { GET, tools } = endpointsHandler({
     handler: async ({ data, user, logger }) => {
       return await creditRepository.getTransactions(
         user.id,
+        user.leadId,
         data.limit,
         data.offset,
         logger,

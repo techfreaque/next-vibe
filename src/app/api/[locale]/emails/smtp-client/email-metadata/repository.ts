@@ -16,9 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../../user/auth/types";
 import { emails } from "../../messages/db";
 import { EmailStatus } from "../../messages/enum";
 import type {
@@ -34,15 +32,11 @@ import type {
 export interface EmailMetadataRepository {
   storeEmailMetadata(
     data: StoreEmailMetadataRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<StoreEmailMetadataResponseOutput>>;
 
   updateEmailEngagement(
     data: UpdateEmailEngagementRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UpdateEmailEngagementResponseOutput>>;
 }
@@ -56,8 +50,6 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
    */
   async storeEmailMetadata(
     data: StoreEmailMetadataRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<StoreEmailMetadataResponseOutput>> {
     try {
@@ -139,8 +131,6 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
    */
   async updateEmailEngagement(
     data: UpdateEmailEngagementRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UpdateEmailEngagementResponseOutput>> {
     try {

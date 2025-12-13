@@ -159,7 +159,6 @@ export function GroupedAssistantMessage({
                   toolCall={message.metadata.toolCall}
                   locale={locale}
                   threadId={message.threadId}
-                  hasContent={hasContentAfter}
                   messageId={message.id}
                   collapseState={collapseState}
                 />

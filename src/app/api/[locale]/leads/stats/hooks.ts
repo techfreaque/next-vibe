@@ -13,8 +13,7 @@ import {
 import { useCallback, useMemo } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useTranslation } from "@/i18n/core/client";
+import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   CountryFilter,
   type CountryLanguage,
@@ -39,28 +38,17 @@ import type {
  * Basic endpoint hook for leads statistics
  */
 export type LeadsStatsEndpointReturn = EndpointReturn<typeof definitions>;
-export function useLeadsStatsEndpoint(params?: {
-  enabled?: boolean;
-}): LeadsStatsEndpointReturn {
-  const { locale } = useTranslation();
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
-
+export function useLeadsStatsEndpoint(
+  logger: EndpointLogger,
+  enabled = true,
+): LeadsStatsEndpointReturn {
   const queryOptions = useMemo(
     () => ({
-      enabled: params?.enabled !== false,
-      refetchOnWindowFocus: false,
-      staleTime: 30 * 1000, // 30 seconds
-    }),
-    [params?.enabled],
-  );
-
-  return useEndpoint(
-    definitions,
-    {
-      queryOptions,
+      queryOptions: {
+        enabled: enabled !== false,
+        refetchOnWindowFocus: false,
+        staleTime: 30 * 1000, // 30 seconds
+      },
       filterOptions: {
         initialFilters: {
           timePeriod: TimePeriod.DAY,
@@ -76,17 +64,22 @@ export function useLeadsStatsEndpoint(params?: {
           sortOrder: SortOrder.DESC,
         },
       },
-    },
-    logger,
+    }),
+    [enabled],
   );
+
+  return useEndpoint(definitions, queryOptions, logger);
 }
 
 /**
  * Advanced hook for leads statistics with all business logic
  * Handles filtering, data transformation, and state management
  */
-export function useLeadsStats(locale: CountryLanguage): UseLeadsStatsReturn {
-  const endpoint = useLeadsStatsEndpoint();
+export function useLeadsStats(
+  locale: CountryLanguage,
+  logger: EndpointLogger,
+): UseLeadsStatsReturn {
+  const endpoint = useLeadsStatsEndpoint(logger);
 
   /**
    * Refresh stats data

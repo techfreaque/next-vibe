@@ -5,7 +5,6 @@
 
 import "server-only";
 
-import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
@@ -20,10 +19,7 @@ import type { Platform } from "@/app/api/[locale]/system/unified-interface/share
 import { authRepository } from "../../auth/repository";
 import type { JwtPrivatePayloadType } from "../../auth/types";
 import { sessionRepository } from "../session/repository";
-import type {
-  LogoutPostRequestOutput,
-  LogoutPostResponseOutput,
-} from "./definition";
+import type { LogoutPostResponseOutput } from "./definition";
 
 /**
  * Logout repository interface
@@ -31,17 +27,13 @@ import type {
 export interface LogoutRepository {
   /**
    * Logout a user
-   * @param data - Request data (empty for logout)
    * @param user - User from JWT
-   * @param request - Next.js request object (optional for CLI context)
    * @param logger - Logger instance for debugging and monitoring
    * @param platform - Platform context (web, cli, ai-tool, etc.)
    * @returns Success message
    */
   logout(
-    data: LogoutPostRequestOutput,
     user: JwtPrivatePayloadType,
-    request: NextRequest | undefined,
     logger: EndpointLogger,
     platform: Platform,
   ): Promise<ResponseType<LogoutPostResponseOutput>>;
@@ -53,22 +45,16 @@ export interface LogoutRepository {
 export class LogoutRepositoryImpl implements LogoutRepository {
   /**
    * Logout a user
-   * @param data - Request data (empty for logout)
    * @param user - User from JWT
-   * @param request - Next.js request object (optional for CLI context)
    * @param logger - Logger instance for debugging and monitoring
    * @param platform - Platform context (web, cli, ai-tool, etc.)
    * @returns Success message
    */
   async logout(
-    data: LogoutPostRequestOutput,
     user: JwtPrivatePayloadType,
-    request: NextRequest | undefined,
     logger: EndpointLogger,
     platform: Platform,
   ): Promise<ResponseType<LogoutPostResponseOutput>> {
-    // Removed locale parameter - translation keys handled by client
-
     try {
       if (!user.id) {
         return fail({

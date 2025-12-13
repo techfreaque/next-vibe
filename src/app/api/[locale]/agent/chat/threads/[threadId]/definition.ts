@@ -35,6 +35,7 @@ const { GET } = createEndpoint({
 
   title: "app.api.agent.chat.threads.threadId.get.title" as const,
   description: "app.api.agent.chat.threads.threadId.get.description" as const,
+  icon: "message-square",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.threads" as const],
 
@@ -293,6 +294,7 @@ const { PATCH } = createEndpoint({
 
   title: "app.api.agent.chat.threads.threadId.patch.title" as const,
   description: "app.api.agent.chat.threads.threadId.patch.description" as const,
+  icon: "message-square",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.threads" as const],
 
@@ -708,6 +710,7 @@ const { DELETE } = createEndpoint({
   title: "app.api.agent.chat.threads.threadId.delete.title" as const,
   description:
     "app.api.agent.chat.threads.threadId.delete.description" as const,
+  icon: "message-square",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.threads" as const],
 

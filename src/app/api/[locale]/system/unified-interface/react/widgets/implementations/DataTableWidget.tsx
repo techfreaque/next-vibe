@@ -1,8 +1,3 @@
-/**
- * Data Table Widget
- * Handles both request mode (column selector) and response mode (table display)
- */
-
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
@@ -20,7 +15,8 @@ import { useEffect, useState } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
+import type { WidgetType } from "../../../shared/types/enums";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import {
   extractDataTableData,
   formatCellValue,
@@ -32,29 +28,24 @@ import {
 } from "../../../shared/widgets/utils/widget-helpers";
 
 /**
- * Data Table Widget Component
+ * Renders sortable data table with column headers.
  */
 export const DataTableWidget = ({
   value,
-  field: _field,
+  field,
   context,
   className = "",
   form,
-}: WidgetComponentProps): JSX.Element => {
-  // Check if field has request usage
-  const hasRequestUsage = _field.usage && "request" in _field.usage;
+}: ReactWidgetProps<typeof WidgetType.DATA_TABLE>): JSX.Element => {
+  const hasRequestUsage = field.usage && "request" in field.usage;
 
-  // If field supports request and form exists, could render column selector
   if (hasRequestUsage && form) {
-    // For now, just pass through to response mode
     // TODO: Implement column selector UI
-    // This would render checkboxes for selecting which columns to display
   }
   const { t } = simpleT(context.locale);
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  // Extract data using shared logic
   const data = extractDataTableData(value);
   const sortConfig = extractTableSortConfig(value);
 
@@ -63,14 +54,12 @@ export const DataTableWidget = ({
     setSortOrder(sortConfig.sortOrder);
   }, [sortConfig.sortBy, sortConfig.sortOrder]);
 
-  // Handle null case
   if (!data) {
     return <Div className={className}>—</Div>;
   }
 
   const { rows, columns } = data;
 
-  // Handle column sort
   const handleSort = (columnKey: string): void => {
     if (sortBy === columnKey) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -80,7 +69,6 @@ export const DataTableWidget = ({
     }
   };
 
-  // Sort rows using shared logic
   const sortedRows = sortTableRows(rows, sortBy, sortOrder);
 
   return (
@@ -92,14 +80,13 @@ export const DataTableWidget = ({
               const key = column.key;
               const label = column.label;
 
-              // Extract column configuration using shared logic
               const columnConfig = extractColumnConfig(value, key);
               const { align, sortable, width } = columnConfig;
 
               return (
                 <TableHead
                   key={key}
-                  className={`px-6 py-3 text-${align} text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 ${
+                  className={`px-6 py-3 ${align} text-xs font-medium tracking-wider text-gray-500 dark:text-gray-400 ${
                     sortable
                       ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                       : ""
@@ -150,7 +137,6 @@ export const DataTableWidget = ({
                 {columns.map((column) => {
                   const key = column.key;
 
-                  // Extract column configuration using shared logic
                   const columnConfig = extractColumnConfig(value, key);
                   const { align, format } = columnConfig;
 

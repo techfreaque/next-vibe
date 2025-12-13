@@ -19,7 +19,6 @@ export interface SettingsOperations {
   setTemperature: (temp: number) => void;
   setMaxTokens: (tokens: number) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
-  setSidebarCollapsed: (collapsed: boolean) => void;
   setTheme: (theme: "light" | "dark") => void;
   setViewMode: (mode: ChatSettings["viewMode"]) => void;
   setEnabledToolIds: (toolIds: string[]) => void;
@@ -79,13 +78,6 @@ export function useSettings(deps: {
     [chatStore],
   );
 
-  const setSidebarCollapsed = useCallback(
-    (collapsed: boolean) => {
-      chatStore.updateSettings({ sidebarCollapsed: collapsed });
-    },
-    [chatStore],
-  );
-
   const setTheme = useCallback(
     (newTheme: "light" | "dark") => {
       setNextTheme(newTheme);
@@ -115,7 +107,6 @@ export function useSettings(deps: {
     setTemperature,
     setMaxTokens,
     setTTSAutoplay,
-    setSidebarCollapsed,
     setTheme,
     setViewMode,
     setEnabledToolIds,

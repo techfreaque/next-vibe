@@ -7,6 +7,10 @@ export const translations = {
   description: "User login endpoint",
   tag: "Authentication",
   options: optionsTranslations,
+  actions: {
+    submit: "Login",
+    submitting: "Logging in...",
+  },
   fields: {
     email: {
       label: "Email",
@@ -14,6 +18,7 @@ export const translations = {
       placeholder: "Enter your email",
       help: "Enter the email address associated with your account",
       validation: {
+        required: "Email is required",
         invalid: "Please enter a valid email address",
       },
     },
@@ -58,6 +63,10 @@ export const translations = {
       description: "Advanced login settings",
     },
   },
+  footer: {
+    forgotPassword: "Forgot password?",
+    createAccount: "Don't have an account? Sign up",
+  },
   response: {
     title: "Login Response",
     description: "Login response data",
@@ -82,6 +91,7 @@ export const translations = {
       loginLocation: "Login Location",
     },
     nextSteps: {
+      title: "Next Steps",
       item: "Next Steps",
     },
   },
@@ -137,6 +147,7 @@ export const translations = {
   success: {
     title: "Login Successful",
     description: "You have been logged in",
+    message: "Welcome back! You have successfully logged in.",
   },
   token: {
     save: {

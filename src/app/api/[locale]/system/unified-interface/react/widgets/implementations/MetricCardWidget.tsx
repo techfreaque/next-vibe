@@ -10,7 +10,8 @@ import { CardHeader } from "next-vibe-ui/ui/card";
 import { CardTitle } from "next-vibe-ui/ui/card";
 import type { JSX } from "react";
 
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
+import type { WidgetType } from "../../../shared/types/enums";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { extractMetricCardData } from "../../../shared/widgets/logic/metric-card";
 import {
   extractMetricUnit,
@@ -18,19 +19,15 @@ import {
 } from "../../../shared/widgets/utils/widget-helpers";
 
 /**
- * Metric Card Widget Component
- * Displays a single metric with optional trend indicator
+ * Displays a single metric with optional trend indicator.
  */
 export function MetricCardWidget({
   value,
-  field: _field,
   context,
   className,
-}: WidgetComponentProps): JSX.Element {
-  // Extract data using shared logic
+}: ReactWidgetProps<typeof WidgetType.METRIC_CARD>): JSX.Element {
   const data = extractMetricCardData(value);
 
-  // Handle null case
   if (!data) {
     return (
       <Div className={cn("text-muted-foreground italic", className)}>—</Div>
@@ -38,8 +35,6 @@ export function MetricCardWidget({
   }
 
   const { value: metricValue, label, icon, color, trend } = data;
-
-  // Extract unit using shared logic
   const unit = extractMetricUnit(value);
 
   const displayValue =
@@ -49,8 +44,6 @@ export function MetricCardWidget({
 
   const trendDirection = trend?.direction;
   const trendValue = trend?.value;
-
-  // Get trend color class using shared logic
   const trendColorClassName = getTrendColorClassName(trendDirection);
 
   const TrendIcon =
@@ -62,7 +55,7 @@ export function MetricCardWidget({
 
   return (
     <Card className={className}>
-      <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+      <CardHeader className="flex flex-col items-center justify-between gap-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {label}
         </CardTitle>

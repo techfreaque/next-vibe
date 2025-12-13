@@ -97,6 +97,7 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
       const subscriptionResult = await subscriptionRepository.getSubscription(
         userId,
         logger,
+        locale,
       );
 
       if (!subscriptionResult.success) {

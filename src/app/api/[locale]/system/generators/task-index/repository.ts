@@ -75,7 +75,6 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       const validationResult = await this.validateTaskFiles(
         taskFiles,
         taskRunnerFiles,
-        sideTaskFiles,
         logger,
       );
       if (!validationResult.success) {
@@ -157,7 +156,6 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
   private async validateTaskFiles(
     taskFiles: string[],
     taskRunnerFiles: string[],
-    _sideTaskFiles: string[],
     logger: EndpointLogger,
   ): Promise<{ success: boolean; error?: string }> {
     try {

@@ -41,8 +41,6 @@ interface UseTTSAudioReturn {
 
 export function useTTSAudio({
   text,
-  enabled: _enabled,
-  isStreaming: _isStreaming = false,
   locale,
   onError,
   logger,
@@ -349,7 +347,7 @@ export function useTTSAudio({
 
       // Remove event listeners to prevent memory leaks
       audio.removeEventListener("ended", onEnded);
-      audio.removeEventListener("error", onError);
+      audio.removeEventListener("error", onAudioError);
 
       // Move to next chunk
       currentPlayingIndexRef.current++;
@@ -400,7 +398,7 @@ export function useTTSAudio({
       }
     };
 
-    const onError = (_err: Event): void => {
+    const onAudioError = (): void => {
       const audioError = new Error(t("app.chat.hooks.tts.failed-to-play"));
       logger.error(
         `TTS: Chunk ${nextIndex + 1} playback error`,
@@ -409,7 +407,7 @@ export function useTTSAudio({
 
       // Remove event listeners
       audio.removeEventListener("ended", onEnded);
-      audio.removeEventListener("error", onError);
+      audio.removeEventListener("error", onAudioError);
 
       setError(t("app.chat.hooks.tts.failed-to-play"));
       setIsPlaying(false);
@@ -417,7 +415,7 @@ export function useTTSAudio({
     };
 
     audio.addEventListener("ended", onEnded);
-    audio.addEventListener("error", onError);
+    audio.addEventListener("error", onAudioError);
 
     // Play audio
     logger.debug(`TTS: Starting audio.play() for chunk ${nextIndex + 1}`);
@@ -434,7 +432,7 @@ export function useTTSAudio({
 
         // Remove event listeners
         audio.removeEventListener("ended", onEnded);
-        audio.removeEventListener("error", onError);
+        audio.removeEventListener("error", onAudioError);
         audio.removeEventListener("loadedmetadata", onLoadedMetadata);
 
         setError(t("app.chat.hooks.tts.failed-to-play"));

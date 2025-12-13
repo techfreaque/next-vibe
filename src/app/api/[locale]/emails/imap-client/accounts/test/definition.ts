@@ -33,6 +33,7 @@ const { POST } = createEndpoint({
   description: "app.api.emails.imapClient.accounts.test.description",
   category: "app.api.emails.category",
   tags: ["app.api.emails.imapClient.accounts.tag"],
+  icon: "inbox",
   allowedRoles: [UserRole.ADMIN],
 
   fields: objectField(

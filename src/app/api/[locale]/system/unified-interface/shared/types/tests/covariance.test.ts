@@ -261,10 +261,9 @@ type Test6_2_Result = Test6_2_FunctionParam extends (
 const test6_2: Test6_2_Result = "✓ PASS";
 
 // Test 6.3: Constraint in nested generic
-type Test6_3_NestedGeneric<
-  _TFields,
-  TEndpoint extends CreateApiEndpointAny,
-> = TEndpoint;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Type parameter used for constraint testing
+type Test6_3_NestedGeneric<TFields, TEndpoint extends CreateApiEndpointAny> =
+  TEndpoint;
 
 type Test6_3_Result =
   Test6_3_NestedGeneric<

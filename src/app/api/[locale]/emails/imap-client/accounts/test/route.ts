@@ -15,11 +15,10 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, locale, logger }) => {
+    handler: ({ data, user, logger }) => {
       return imapAccountsRepository.testAccountConnection(
         { id: data.accountId },
         user,
-        locale,
         logger,
       );
     },

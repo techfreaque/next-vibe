@@ -13,8 +13,8 @@ import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interf
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { executeQuery } from "./query-executor";
 import type { ApiMutationOptions, ApiQueryOptions } from "./types";
@@ -377,6 +377,44 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 }));
 
 /**
+ * Helper to deserialize query params that were serialized when stored
+ * This parses JSON strings back to objects for nested data structures
+ */
+export function deserializeQueryParams<T>(
+  params: FormQueryParams | undefined,
+): T {
+  if (!params) {
+    return {} as T;
+  }
+
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Storage deserialization requires generic type handling
+  const result: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(params)) {
+    if (typeof value === "string") {
+      // Try to parse as JSON (for nested objects that were stringified)
+      if (
+        (value.startsWith("{") && value.endsWith("}")) ||
+        (value.startsWith("[") && value.endsWith("]"))
+      ) {
+        try {
+          result[key] = JSON.parse(value);
+        } catch {
+          // Not valid JSON, keep as string
+          result[key] = value;
+        }
+      } else {
+        result[key] = value;
+      }
+    } else {
+      result[key] = value;
+    }
+  }
+
+  return result as T;
+}
+
+/**
  * Non-hook version for fetching data outside of React components
  * Use this in regular functions instead of useApiQuery
  */
@@ -553,22 +591,6 @@ export const apiClient = {
       statusMessage: data.message,
       lastFetchTime: Date.now(),
     } as QueryStoreType<TResponse>;
-  },
-
-  /**
-   * Get current mutation state - deprecated, mutations are not stored in Zustand anymore
-   * @deprecated Use React Query's useMutation hook instead
-   */
-  getMutationState: <
-    TUserRoleValue extends readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Infrastructure: Generic endpoint type requires 'any' for TFields parameter to accept all endpoint field configurations
-    TEndpoint extends CreateApiEndpoint<string, Methods, TUserRoleValue, any>,
-  >(
-    _endpoint: TEndpoint,
-  ): MutationStoreType<TEndpoint["types"]["ResponseOutput"]> | undefined => {
-    // Mutations are no longer stored in Zustand
-    // This function is kept for backward compatibility but returns undefined
-    return undefined;
   },
 
   /**

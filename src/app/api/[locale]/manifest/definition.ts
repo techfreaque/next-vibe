@@ -43,6 +43,7 @@ const { GET } = createEndpoint({
 
   title: "app.api.manifest.title",
   description: "app.api.manifest.description",
+  icon: "file-text",
   category: "app.api.manifest.category",
   tags: [
     "app.api.manifest.tags.manifest",
@@ -58,149 +59,137 @@ const { GET } = createEndpoint({
     },
     { response: true },
     {
-      // === RESPONSE FIELDS ===
-      response: objectField(
+      name: responseField(
         {
-          type: WidgetType.CONTAINER,
-          title: "app.api.manifest.response.title",
-          description: "app.api.manifest.response.description",
-          layoutType: LayoutType.STACKED,
+          type: WidgetType.TEXT,
+          content: "app.api.manifest.response.title",
         },
-        { response: true },
+        z.string(),
+      ),
+      short_name: responseField(
         {
-          name: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.manifest.response.title",
-            },
-            z.string(),
-          ),
-          short_name: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.manifest.response.title",
-            },
-            z.string(),
-          ),
-          description: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.manifest.response.description",
-            },
-            z.string(),
-          ),
-          start_url: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.manifest.response.title",
-            },
-            z.string(),
-          ),
-          display: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.manifest.response.display",
-              variant: ComponentVariant.DEFAULT,
-            },
-            z.enum(WebAppDisplayMode),
-          ),
-          background_color: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.manifest.response.title",
-            },
-            z.string(),
-          ),
-          theme_color: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.manifest.response.title",
-            },
-            z.string(),
-          ),
-          orientation: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.manifest.response.orientation",
-              variant: ComponentVariant.DEFAULT,
-            },
-            z.enum(WebAppOrientation),
-          ),
-          scope: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.manifest.response.title",
-            },
-            z.string(),
-          ),
-          lang: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.manifest.response.title",
-            },
-            z.string(),
-          ),
-          categories: responseField(
-            {
-              type: WidgetType.BADGE,
-              text: "app.api.manifest.response.categories",
-              variant: ComponentVariant.DEFAULT,
-            },
-            z.array(z.enum(WebAppCategory)),
-          ),
-          icons: responseArrayField(
-            {
-              type: WidgetType.DATA_CARDS,
-              cardConfig: {
-                title: "app.api.manifest.response.title",
-              },
-              layout: {
-                type: LayoutType.GRID,
-                columns: 2,
-              },
-            },
-            objectField(
+          type: WidgetType.TEXT,
+          content: "app.api.manifest.response.title",
+        },
+        z.string(),
+      ),
+      description: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.manifest.response.description",
+        },
+        z.string(),
+      ),
+      start_url: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.manifest.response.title",
+        },
+        z.string(),
+      ),
+      display: responseField(
+        {
+          type: WidgetType.BADGE,
+          text: "app.api.manifest.response.display",
+          variant: ComponentVariant.DEFAULT,
+        },
+        z.string(),
+      ),
+      background_color: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.manifest.response.title",
+        },
+        z.string(),
+      ),
+      theme_color: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.manifest.response.title",
+        },
+        z.string(),
+      ),
+      orientation: responseField(
+        {
+          type: WidgetType.BADGE,
+          text: "app.api.manifest.response.orientation",
+          variant: ComponentVariant.DEFAULT,
+        },
+        z.string(),
+      ),
+      scope: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.manifest.response.title",
+        },
+        z.string(),
+      ),
+      lang: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.manifest.response.title",
+        },
+        z.string(),
+      ),
+      categories: responseField(
+        {
+          type: WidgetType.BADGE,
+          text: "app.api.manifest.response.categories",
+          variant: ComponentVariant.DEFAULT,
+        },
+        z.array(z.string()),
+      ),
+      icons: responseArrayField(
+        {
+          type: WidgetType.DATA_CARDS,
+          cardConfig: {
+            title: "app.api.manifest.response.title",
+          },
+          layout: {
+            type: LayoutType.GRID,
+            columns: 2,
+          },
+        },
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            title: "app.api.manifest.response.title",
+            description: "app.api.manifest.response.description",
+            layoutType: LayoutType.STACKED,
+          },
+          { response: true },
+          {
+            src: responseField(
               {
-                type: WidgetType.CONTAINER,
-                title: "app.api.manifest.response.title",
-                description: "app.api.manifest.response.description",
-                layoutType: LayoutType.STACKED,
+                type: WidgetType.TEXT,
+                content: "app.api.manifest.response.title",
               },
-              { response: true },
-              {
-                src: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content: "app.api.manifest.response.title",
-                  },
-                  z.string(),
-                ),
-                sizes: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content: "app.api.manifest.response.title",
-                  },
-                  z.string(),
-                ),
-                type: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content: "app.api.manifest.response.title",
-                  },
-                  z.string(),
-                ),
-                purpose: responseField(
-                  {
-                    type: WidgetType.BADGE,
-                    text: "app.api.manifest.response.iconPurpose",
-                    variant: ComponentVariant.DEFAULT,
-                  },
-                  z.enum(IconPurpose),
-                ),
-              },
+              z.string(),
             ),
-          ),
-        },
+            sizes: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.manifest.response.title",
+              },
+              z.string(),
+            ),
+            type: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.manifest.response.title",
+              },
+              z.string(),
+            ),
+            purpose: responseField(
+              {
+                type: WidgetType.BADGE,
+                text: "app.api.manifest.response.iconPurpose",
+                variant: ComponentVariant.DEFAULT,
+              },
+              z.string(),
+            ),
+          },
+        ),
       ),
     },
   ),
@@ -252,103 +241,97 @@ const { GET } = createEndpoint({
   examples: {
     responses: {
       empty: {
-        response: {
-          name: "Social Media Service",
-          short_name: "SMS",
-          description: "A comprehensive social media management platform",
-          start_url: "/en-GLOBAL",
-          display: WebAppDisplayMode.STANDALONE,
-          background_color: "#ffffff",
-          theme_color: "#0EA5E9",
-          orientation: WebAppOrientation.PORTRAIT_PRIMARY,
-          scope: "/en-GLOBAL/",
-          lang: "en",
-          categories: [
-            WebAppCategory.SOCIAL,
-            WebAppCategory.PRODUCTIVITY,
-            WebAppCategory.BUSINESS,
-          ],
-          icons: [
-            {
-              src: "/images/placeholder-logo.png",
-              sizes: "192x192",
-              type: "image/png",
-              purpose: IconPurpose.MASKABLE_ANY,
-            },
-            {
-              src: "/images/placeholder-logo.png",
-              sizes: "512x512",
-              type: "image/png",
-              purpose: IconPurpose.MASKABLE_ANY,
-            },
-          ],
-        },
+        name: "Social Media Service",
+        short_name: "SMS",
+        description: "A comprehensive social media management platform",
+        start_url: "/en-GLOBAL",
+        display: WebAppDisplayMode.STANDALONE,
+        background_color: "#ffffff",
+        theme_color: "#0EA5E9",
+        orientation: WebAppOrientation.PORTRAIT_PRIMARY,
+        scope: "/en-GLOBAL/",
+        lang: "en",
+        categories: [
+          WebAppCategory.SOCIAL,
+          WebAppCategory.PRODUCTIVITY,
+          WebAppCategory.BUSINESS,
+        ],
+        icons: [
+          {
+            src: "/images/placeholder-logo.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: IconPurpose.MASKABLE_ANY,
+          },
+          {
+            src: "/images/placeholder-logo.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: IconPurpose.MASKABLE_ANY,
+          },
+        ],
       },
       basic: {
-        response: {
-          name: "Social Media Service",
-          short_name: "SMS",
-          description: "A comprehensive social media management platform",
-          start_url: "/de-DE",
-          display: WebAppDisplayMode.STANDALONE,
-          background_color: "#ffffff",
-          theme_color: "#0EA5E9",
-          orientation: WebAppOrientation.PORTRAIT_PRIMARY,
-          scope: "/de-DE/",
-          lang: "de",
-          categories: [
-            WebAppCategory.SOCIAL,
-            WebAppCategory.PRODUCTIVITY,
-            WebAppCategory.BUSINESS,
-          ],
-          icons: [
-            {
-              src: "/images/placeholder-logo.png",
-              sizes: "192x192",
-              type: "image/png",
-              purpose: IconPurpose.MASKABLE_ANY,
-            },
-            {
-              src: "/images/placeholder-logo.png",
-              sizes: "512x512",
-              type: "image/png",
-              purpose: IconPurpose.MASKABLE_ANY,
-            },
-          ],
-        },
+        name: "Social Media Service",
+        short_name: "SMS",
+        description: "A comprehensive social media management platform",
+        start_url: "/de-DE",
+        display: WebAppDisplayMode.STANDALONE,
+        background_color: "#ffffff",
+        theme_color: "#0EA5E9",
+        orientation: WebAppOrientation.PORTRAIT_PRIMARY,
+        scope: "/de-DE/",
+        lang: "de",
+        categories: [
+          WebAppCategory.SOCIAL,
+          WebAppCategory.PRODUCTIVITY,
+          WebAppCategory.BUSINESS,
+        ],
+        icons: [
+          {
+            src: "/images/placeholder-logo.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: IconPurpose.MASKABLE_ANY,
+          },
+          {
+            src: "/images/placeholder-logo.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: IconPurpose.MASKABLE_ANY,
+          },
+        ],
       },
       advanced: {
-        response: {
-          name: "Social Media Service",
-          short_name: "SMS",
-          description: "A comprehensive social media management platform",
-          start_url: "/pl-PL",
-          display: WebAppDisplayMode.STANDALONE,
-          background_color: "#ffffff",
-          theme_color: "#0EA5E9",
-          orientation: WebAppOrientation.PORTRAIT_PRIMARY,
-          scope: "/pl-PL/",
-          lang: "pl",
-          categories: [
-            WebAppCategory.SOCIAL,
-            WebAppCategory.PRODUCTIVITY,
-            WebAppCategory.BUSINESS,
-          ],
-          icons: [
-            {
-              src: "/images/placeholder-logo.png",
-              sizes: "192x192",
-              type: "image/png",
-              purpose: IconPurpose.MASKABLE_ANY,
-            },
-            {
-              src: "/images/placeholder-logo.png",
-              sizes: "512x512",
-              type: "image/png",
-              purpose: IconPurpose.MASKABLE_ANY,
-            },
-          ],
-        },
+        name: "Social Media Service",
+        short_name: "SMS",
+        description: "A comprehensive social media management platform",
+        start_url: "/pl-PL",
+        display: WebAppDisplayMode.STANDALONE,
+        background_color: "#ffffff",
+        theme_color: "#0EA5E9",
+        orientation: WebAppOrientation.PORTRAIT_PRIMARY,
+        scope: "/pl-PL/",
+        lang: "pl",
+        categories: [
+          WebAppCategory.SOCIAL,
+          WebAppCategory.PRODUCTIVITY,
+          WebAppCategory.BUSINESS,
+        ],
+        icons: [
+          {
+            src: "/images/placeholder-logo.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: IconPurpose.MASKABLE_ANY,
+          },
+          {
+            src: "/images/placeholder-logo.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: IconPurpose.MASKABLE_ANY,
+          },
+        ],
       },
     },
   },

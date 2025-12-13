@@ -15,8 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { TestRequestOutput, TestResponseOutput } from "./definition";
 
@@ -26,8 +24,6 @@ import type { TestRequestOutput, TestResponseOutput } from "./definition";
 interface TestRepositoryInterface {
   execute(
     data: TestRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ApiResponseType<TestResponseOutput>>;
 }
@@ -38,8 +34,6 @@ interface TestRepositoryInterface {
 class TestRepositoryImpl implements TestRepositoryInterface {
   async execute(
     data: TestRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ApiResponseType<TestResponseOutput>> {
     logger.info("system.check.testing.test.execute.start");

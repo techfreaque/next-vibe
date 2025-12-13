@@ -285,7 +285,6 @@ export function ThreadedMessage({
                 messageGroup={messageGroup}
                 depth={depth}
                 locale={locale}
-                logger={logger}
                 collapseState={collapseState}
                 currentUserId={currentUserId}
                 onUserIdHover={(userId, position) => {
@@ -299,10 +298,8 @@ export function ThreadedMessage({
             <ThreadedMessageActions
               message={message}
               locale={locale}
-              logger={logger}
               messageActions={messageActions}
               isTouch={isTouch}
-              currentUserId={currentUserId}
               isTTSLoading={isTTSLoading}
               isPlaying={isPlaying}
               playAudio={playAudio}

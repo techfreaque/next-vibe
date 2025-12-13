@@ -631,10 +631,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   await db.delete(leads).where(sql`${leads.metadata}->>'generated' = 'true'`);
 
   // Generate random leads using the defined constant
-  const sampleLeads: NewLead[] = Array.from(
-    { length: RANDOM_LEADS_COUNT },
-    (_, index) => generateRandomLead(index),
-  );
+  const sampleLeads: NewLead[] = [];
+  for (let index = 0; index < RANDOM_LEADS_COUNT; index++) {
+    sampleLeads.push(generateRandomLead(index));
+  }
 
   // Insert sample leads
   const insertedLeads = await db

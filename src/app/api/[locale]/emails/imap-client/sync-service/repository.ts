@@ -21,9 +21,7 @@ import type { NewEmail } from "@/app/api/[locale]/emails/messages/db";
 import { emails } from "@/app/api/[locale]/emails/messages/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../../user/auth/types";
 import { EmailType } from "../../messages/enum";
 import { imapConnectionRepository } from "../connection/repository";
 import type { NewImapFolder } from "../db";
@@ -34,7 +32,6 @@ import type {
   SyncAccountFoldersResponseOutput,
   SyncAccountRequestOutput,
   SyncAccountResponseOutput,
-  SyncAllAccountsRequestOutput,
   SyncAllAccountsResponseOutput,
   SyncFolderMessagesRequestOutput,
   SyncFolderMessagesResponseOutput,
@@ -57,30 +54,21 @@ const IMAP_FLAGS = {
  */
 export interface ImapSyncRepository {
   syncAllAccounts(
-    data: SyncAllAccountsRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SyncAllAccountsResponseOutput>>;
 
   syncAccount(
     data: SyncAccountRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SyncAccountResponseOutput>>;
 
   syncAccountFolders(
     data: SyncAccountFoldersRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SyncAccountFoldersResponseOutput>>;
 
   syncFolderMessages(
     data: SyncFolderMessagesRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SyncFolderMessagesResponseOutput>>;
 }
@@ -93,9 +81,6 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
    * Sync all enabled IMAP accounts
    */
   async syncAllAccounts(
-    data: SyncAllAccountsRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SyncAllAccountsResponseOutput>> {
     const startTime = Date.now();
@@ -138,8 +123,6 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           // Sync account
           const accountResult = await this.syncAccount(
             { account },
-            user,
-            locale,
             logger,
           );
 
@@ -260,8 +243,6 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
    */
   async syncAccount(
     data: SyncAccountRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SyncAccountResponseOutput>> {
     const startTime = Date.now();
@@ -281,8 +262,6 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       // Test connection first
       const connectionResult = await imapConnectionRepository.testConnection(
         { account: data.account },
-        user,
-        locale,
         logger,
       );
       if (!connectionResult.success) {
@@ -297,8 +276,6 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       // Sync folders
       const folderResult = await this.syncAccountFolders(
         { account: data.account },
-        user,
-        locale,
         logger,
       );
       if (folderResult.success) {
@@ -325,8 +302,6 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
         try {
           const messageResult = await this.syncFolderMessages(
             { account: data.account, folder },
-            user,
-            locale,
             logger,
           );
           if (messageResult.success) {
@@ -406,8 +381,6 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
    */
   async syncAccountFolders(
     data: SyncAccountFoldersRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SyncAccountFoldersResponseOutput>> {
     const startTime = Date.now();
@@ -422,8 +395,6 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       // Get folders from IMAP server
       const remoteFoldersResult = await imapConnectionRepository.listFolders(
         { account: data.account },
-        user,
-        locale,
         logger,
       );
 
@@ -558,8 +529,6 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
    */
   async syncFolderMessages(
     data: SyncFolderMessagesRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SyncFolderMessagesResponseOutput>> {
     const startTime = Date.now();
@@ -579,8 +548,6 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
             folderPath: data.folder.path,
             options: { limit: data.account.maxMessages || 1000 },
           },
-          user,
-          locale,
           logger,
         );
       if (!remoteMessagesResponse.success) {

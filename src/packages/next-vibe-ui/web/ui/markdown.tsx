@@ -113,7 +113,8 @@ export function Markdown({
   const [expandedThinking, setExpandedThinking] = useState<Set<number>>(() => {
     if (!hasContent && allThinkingSections.length > 0) {
       // If no content yet, expand all thinking sections by default
-      return new Set(allThinkingSections.map((_, i) => i));
+      // Create a set of indices from 0 to allThinkingSections.length - 1
+      return new Set(Array.from({ length: allThinkingSections.length }).keys());
     }
     return new Set();
   });
@@ -127,6 +128,7 @@ export function Markdown({
       // Content arrived - auto-collapse all thinking sections
       setExpandedThinking(new Set());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- allThinkingSections.length is intentionally used to avoid re-rendering on array reference changes
   }, [hasContent, userToggledThinking, allThinkingSections.length]);
 
   const toggleThinking = (index: number): void => {
@@ -179,13 +181,13 @@ export function Markdown({
       {/* Render thinking sections if any - NEW ARCHITECTURE: ReasoningDisplay design */}
       {allThinkingSections.length > 0 && (
         <div className="mb-3 space-y-3">
-          {allThinkingSections.map((thinking, index) => {
-            const isExpanded = isThinkingExpanded(index);
+          {allThinkingSections.map((thinking, thinkIndex) => {
+            const isExpanded = isThinkingExpanded(thinkIndex);
             const isIncomplete =
-              index === allThinkingSections.length - 1 && incompleteThinking;
+              thinkIndex === allThinkingSections.length - 1 && incompleteThinking;
             return (
               <div
-                key={index}
+                key={thinkIndex}
                 className={cn(
                   "rounded-lg border transition-all",
                   isExpanded
@@ -195,7 +197,7 @@ export function Markdown({
               >
                 {/* Header - Always visible */}
                 <button
-                  onClick={() => toggleThinking(index)}
+                  onClick={() => toggleThinking(thinkIndex)}
                   className={cn(
                     "w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-primary",
                     "hover:bg-primary/5 transition-colors rounded-lg",

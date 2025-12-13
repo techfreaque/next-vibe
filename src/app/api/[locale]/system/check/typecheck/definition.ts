@@ -30,6 +30,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.check.typecheck.description",
   category: "app.api.system.check.typecheck.category",
   tags: ["app.api.system.check.typecheck.tag"],
+  icon: "check-circle",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

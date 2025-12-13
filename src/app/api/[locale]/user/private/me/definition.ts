@@ -35,6 +35,7 @@ const { GET } = createEndpoint({
   path: ["user", "private", "me"],
   title: "app.api.user.private.me.get.title" as const,
   description: "app.api.user.private.me.get.description" as const,
+  icon: "user",
   category: "app.api.user.category" as const,
   tags: ["app.api.user.private.me.tag" as const],
   allowedRoles: [
@@ -303,6 +304,7 @@ const { POST } = createEndpoint({
   path: ["user", "private", "me"],
   title: "app.api.user.private.me.update.title" as const,
   description: "app.api.user.private.me.update.description" as const,
+  icon: "user-check" as const,
   category: "app.api.user.category" as const,
   tags: ["app.api.user.private.me.tag" as const],
   allowedRoles: [
@@ -800,6 +802,7 @@ const { DELETE } = createEndpoint({
   path: ["user", "private", "me"],
   title: "app.api.user.private.me.delete.title" as const,
   description: "app.api.user.private.me.delete.description" as const,
+  icon: "user-x" as const,
   category: "app.api.user.category" as const,
   tags: ["app.api.user.private.me.tag" as const],
   allowedRoles: [

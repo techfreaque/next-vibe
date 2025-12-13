@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, eq, ilike, not, or } from "drizzle-orm";
+import { and, count, eq, ilike, inArray, not, or } from "drizzle-orm";
 import {
   success,
   ErrorResponseTypes,
@@ -18,10 +18,11 @@ import { hashPassword } from "next-vibe/shared/utils/password";
 import { db } from "@/app/api/[locale]/system/db";
 import type { DbId } from "@/app/api/[locale]/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { leadAuthRepository } from "../leads/auth/repository";
+import { userLeadLinks } from "../leads/db";
 import { authRepository } from "./auth/repository";
 import type { NewUser, User } from "./db";
 import { users } from "./db";
@@ -531,10 +532,17 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       const rolesMap = rolesMapResponse.data;
 
+      // Batch fetch leadIds for all users
+      const leadLinks = await db
+        .select({ userId: userLeadLinks.userId, leadId: userLeadLinks.leadId })
+        .from(userLeadLinks)
+        .where(inArray(userLeadLinks.userId, userIds));
+      const leadIdMap = new Map(leadLinks.map((l) => [l.userId, l.leadId]));
+
       // Map to StandardUserType with all required fields
       const mappedResults: StandardUserType[] = searchResults.map((user) => ({
         id: user.id,
-        leadId: null,
+        leadId: leadIdMap.get(user.id) ?? "",
         isPublic: false,
         privateName: user.privateName,
         publicName: user.publicName,
@@ -597,10 +605,17 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       const rolesMap = rolesMapResponse.data;
 
+      // Batch fetch leadIds for all users
+      const leadLinks = await db
+        .select({ userId: userLeadLinks.userId, leadId: userLeadLinks.leadId })
+        .from(userLeadLinks)
+        .where(inArray(userLeadLinks.userId, userIds));
+      const leadIdMap = new Map(leadLinks.map((l) => [l.userId, l.leadId]));
+
       // Map to StandardUserType with all required fields
       const mappedResults: StandardUserType[] = allUsers.map((user) => ({
         id: user.id,
-        leadId: null,
+        leadId: leadIdMap.get(user.id) ?? user.id,
         privateName: user.privateName,
         publicName: user.publicName,
         email: user.email,

@@ -17,11 +17,9 @@ function Ul({
   onClick,
   onMouseEnter,
   onMouseLeave,
-  id: _id,
   role,
   "aria-label": ariaLabel,
-  "aria-labelledby": _ariaLabelledby,
-  "aria-describedby": _ariaDescribedby,
+  id,
 }: UlProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
@@ -91,6 +89,7 @@ function Ul({
         onPressOut={handlePressOut}
         accessibilityRole={accessibilityRole}
         accessibilityLabel={ariaLabel}
+        nativeID={id}
       >
         {children}
       </StyledPressable>
@@ -102,6 +101,7 @@ function Ul({
       {...applyStyleType({ nativeStyle, className: cn(className) })}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={ariaLabel}
+      nativeID={id}
     >
       {children}
     </StyledView>

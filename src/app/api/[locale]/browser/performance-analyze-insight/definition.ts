@@ -26,6 +26,7 @@ const { POST } = createEndpoint({
   title: "app.api.browser.performance-analyze-insight.title",
   description: "app.api.browser.performance-analyze-insight.description",
   category: "app.api.browser.category",
+  icon: "trending-up",
   tags: [
     "app.api.browser.tags.browserAutomation",
     "app.api.browser.tags.performanceAutomation",

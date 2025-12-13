@@ -16,7 +16,6 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { Countries, Languages } from "@/i18n/core/config";
 
 import { db } from "../../system/db";
 import { SortOrder } from "../imap-client/enum";
@@ -37,9 +36,6 @@ import type {
   EmailsListResponseOutput,
 } from "./list/definition";
 
-// Define the proper type for locale to match standardized patterns
-type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
-
 /**
  * Emails Repository Interface
  */
@@ -47,14 +43,12 @@ export interface EmailsRepository {
   getEmails(
     data: EmailsListRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailsListResponseOutput>>;
 
   getEmailById(
     urlPathParams: EmailGetGETUrlVariablesOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailGetGETResponseOutput>>;
 
@@ -74,7 +68,6 @@ class EmailsRepositoryImpl implements EmailsRepository {
   async getEmails(
     data: EmailsListRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailsListResponseOutput>> {
     try {
@@ -271,7 +264,6 @@ class EmailsRepositoryImpl implements EmailsRepository {
   async getEmailById(
     urlPathParams: EmailGetGETUrlVariablesOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailGetGETResponseOutput>> {
     try {

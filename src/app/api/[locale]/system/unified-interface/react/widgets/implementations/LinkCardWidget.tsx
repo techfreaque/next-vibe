@@ -12,20 +12,19 @@ import { CardHeader } from "next-vibe-ui/ui/card";
 import { CardTitle } from "next-vibe-ui/ui/card";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
+import type { WidgetType } from "../../../shared/types/enums";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { extractLinkCardData } from "../../../shared/widgets/logic/link-card";
 import { isExternalUrl } from "../../../shared/widgets/utils/widget-helpers";
 
 /**
- * Link Card Widget Component
- * Renders a card with link information, perfect for search results
+ * Renders a card with link information, ideal for search results.
  */
 export function LinkCardWidget({
   value,
-  field: _field,
   context,
   className,
-}: WidgetComponentProps): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.LINK_CARD>): JSX.Element {
   // Extract data using shared logic
   const data = extractLinkCardData(value);
 

@@ -6,6 +6,10 @@ export const translations: typeof enTranslations = {
   title: "Benutzerregistrierung",
   description: "Benutzerregistrierungs-Endpunkt",
   tag: "Authentifizierung",
+  actions: {
+    submit: "Konto erstellen",
+    submitting: "Konto wird erstellt...",
+  },
   fields: {
     firstName: {
       label: "Vorname",
@@ -24,24 +28,44 @@ export const translations: typeof enTranslations = {
       description: "Privater Name des Benutzers",
       placeholder: "Privaten Namen eingeben",
       help: "Geben Sie Ihren privaten Namen für interne Zwecke ein",
+      validation: {
+        required: "Privater Name ist erforderlich",
+        minLength: "Name muss mindestens 2 Zeichen lang sein",
+        maxLength: "Name darf nicht länger als 100 Zeichen sein",
+      },
     },
     publicName: {
       label: "Öffentlicher Name",
       description: "Öffentlicher Name des Benutzers",
       placeholder: "Öffentlichen Namen eingeben",
       help: "Geben Sie Ihren öffentlichen Namen ein, wie er anderen angezeigt wird",
+      validation: {
+        required: "Öffentlicher Name ist erforderlich",
+        minLength: "Anzeigename muss mindestens 2 Zeichen lang sein",
+        maxLength: "Anzeigename darf nicht länger als 100 Zeichen sein",
+      },
     },
     email: {
       label: "E-Mail",
       description: "E-Mail-Adresse des Benutzers",
       placeholder: "E-Mail-Adresse eingeben",
       help: "Dies wird Ihre Login-E-Mail und primäre Kontaktmethode sein",
+      validation: {
+        required: "E-Mail ist erforderlich",
+        invalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      },
     },
     password: {
       label: "Passwort",
       description: "Benutzerpasswort",
       placeholder: "Passwort eingeben",
       help: "Passwort muss mindestens 8 Zeichen haben",
+      validation: {
+        required: "Passwort ist erforderlich",
+        minLength: "Passwort muss mindestens 8 Zeichen lang sein",
+        complexity:
+          "Passwort muss Großbuchstaben, Kleinbuchstaben und eine Zahl enthalten",
+      },
     },
     confirmPassword: {
       label: "Passwort bestätigen",
@@ -49,6 +73,8 @@ export const translations: typeof enTranslations = {
       placeholder: "Passwort erneut eingeben",
       help: "Geben Sie Ihr Passwort erneut ein, um es zu bestätigen",
       validation: {
+        required: "Bitte bestätigen Sie Ihr Passwort",
+        minLength: "Passwort muss mindestens 8 Zeichen lang sein",
         mismatch: "Passwörter stimmen nicht überein",
       },
     },
@@ -111,6 +137,13 @@ export const translations: typeof enTranslations = {
       help: "Wenn Sie einen Empfehlungscode haben, geben Sie ihn hier ein",
     },
   },
+  form: {
+    title: "Konto erstellen",
+    description: "Treten Sie der Community für unzensierte KI-Gespräche bei",
+  },
+  footer: {
+    alreadyHaveAccount: "Haben Sie bereits ein Konto? Anmelden",
+  },
   groups: {
     personalInfo: {
       title: "Persönliche Informationen",
@@ -139,17 +172,45 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     title: "Anmeldefehler",
+    validation: {
+      title: "Validierungsfehler",
+      description: "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut",
+    },
+    unauthorized: {
+      title: "Nicht autorisiert",
+      description: "Authentifizierung erforderlich",
+    },
+    server: {
+      title: "Serverfehler",
+      description: "Ein interner Serverfehler ist aufgetreten",
+    },
+    unknown: {
+      title: "Unbekannter Fehler",
+      description: "Ein unerwarteter Fehler ist aufgetreten",
+    },
     conflict: {
       title: "Kontokonflikt",
       description: "Konto existiert bereits",
     },
-    internal: {
-      title: "Interner Fehler",
-      description: "Ein interner Fehler ist aufgetreten",
+    forbidden: {
+      title: "Zugriff verweigert",
+      description: "Zugriff verweigert",
     },
     network: {
       title: "Netzwerkfehler",
       description: "Netzwerkfehler aufgetreten",
+    },
+    notFound: {
+      title: "Nicht gefunden",
+      description: "Ressource nicht gefunden",
+    },
+    unsaved: {
+      title: "Nicht gespeicherte Änderungen",
+      description: "Sie haben nicht gespeicherte Änderungen",
+    },
+    internal: {
+      title: "Interner Fehler",
+      description: "Ein interner Fehler ist aufgetreten",
     },
   },
   emailCheck: {

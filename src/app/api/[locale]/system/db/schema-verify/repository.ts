@@ -12,7 +12,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -28,7 +27,6 @@ type SchemaVerifyResponseType = typeof endpoints.POST.types.ResponseOutput;
 export interface SchemaVerifyRepositoryInterface {
   execute(
     data: RequestType,
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SchemaVerifyResponseType>>;
@@ -40,10 +38,8 @@ export interface SchemaVerifyRepositoryInterface {
 export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterface {
   async execute(
     data: RequestType,
-    _user: JwtPayloadType,
     locale: CountryLanguage,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _logger: EndpointLogger,
+    logger: EndpointLogger,
   ): Promise<ResponseType<SchemaVerifyResponseType>> {
     const outputs: string[] = [];
     const issues: string[] = [];
@@ -118,8 +114,8 @@ export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterfa
 
       return success(response);
     } catch (error) {
-      parseError(error);
-
+      const parsedError = parseError(error);
+      logger.error("Schema verification failed", parsedError);
       return fail({
         message: "app.api.system.db.schemaVerify.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

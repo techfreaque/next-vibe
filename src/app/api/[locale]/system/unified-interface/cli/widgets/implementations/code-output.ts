@@ -5,7 +5,6 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   getCodeOutputConfig,
   groupCodeOutputData,
@@ -20,7 +19,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
 // Default severity icon constants
 const DEFAULT_SEVERITY_ICONS = {
@@ -31,18 +30,16 @@ const DEFAULT_SEVERITY_ICONS = {
   SPARKLE: "✨ ",
 } as const;
 
-export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.CODE_OUTPUT;
-  }
+export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.CODE_OUTPUT> {
+  readonly widgetType = WidgetType.CODE_OUTPUT;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { field, value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.CODE_OUTPUT>): string {
+    const { field, value, context } = props;
     // Use shared logic to extract config
     const config = getCodeOutputConfig(field);
 
     if (!Array.isArray(value) || value.length === 0) {
-      return this.renderEmptyState(config, context);
+      return this.renderEmptyState(context);
     }
 
     const typedData: CodeOutputItem[] = value.filter(
@@ -63,7 +60,6 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private renderEmptyState(
-    config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
     const t = context.t;

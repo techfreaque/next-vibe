@@ -46,6 +46,7 @@ const { PATCH } = createEndpoint({
   method: Methods.PATCH,
   path: ["leads", "batch"],
   allowedRoles: [UserRole.ADMIN],
+  icon: "users",
 
   title: "app.api.leads.batch.patch.title" as const,
   description: "app.api.leads.batch.patch.description" as const,
@@ -432,6 +433,7 @@ const { DELETE } = createEndpoint({
 
   title: "app.api.leads.batch.delete.title" as const,
   description: "app.api.leads.batch.delete.description" as const,
+  icon: "user-x" as const,
   category: "app.api.leads.category" as const,
   tags: [
     "app.api.leads.tags.leads" as const,

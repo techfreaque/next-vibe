@@ -16,7 +16,6 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CodesListGetResponseOutput } from "./codes/list/definition";
 import {
@@ -57,39 +56,33 @@ export interface ReferralRepository {
   createReferralCode(
     userId: string,
     data: ReferralPostRequestOutput,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ReferralPostResponseOutput>>;
 
   getUserReferralCodes(
     userId: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CodesListGetResponseOutput>>;
 
   validateReferralCode(
     code: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ id: string; ownerUserId: string }>>;
 
   linkReferralToLead(
     leadId: string,
     referralCode: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LinkToLeadPostResponseOutput>>;
 
   convertLeadReferralToUser(
     userId: string,
     leadId: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>>;
 
   getReferralStats(
     userId: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<StatsGetResponseOutput>>;
 
@@ -97,7 +90,6 @@ export interface ReferralRepository {
     userId: string,
     limit: number,
     offset: number,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EarningsListGetResponseOutput>>;
 
@@ -106,7 +98,6 @@ export interface ReferralRepository {
     userId: string,
     amountCents: number,
     currency: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>>;
 }
@@ -121,7 +112,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   async createReferralCode(
     userId: string,
     data: ReferralPostRequestOutput,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ReferralPostResponseOutput>> {
     try {
@@ -184,7 +174,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
    */
   async getUserReferralCodes(
     userId: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CodesListGetResponseOutput>> {
     try {
@@ -227,7 +216,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
    */
   async validateReferralCode(
     code: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ id: string; ownerUserId: string }>> {
     try {
@@ -275,7 +263,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   async linkReferralToLead(
     leadId: string,
     referralCode: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LinkToLeadPostResponseOutput>> {
     try {
@@ -284,7 +271,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
       // Validate referral code
       const codeResult = await this.validateReferralCode(
         referralCode,
-        locale,
         logger,
       );
       if (!codeResult.success) {
@@ -336,7 +322,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   async convertLeadReferralToUser(
     userId: string,
     leadId: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
@@ -430,7 +415,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
    */
   async getReferralStats(
     userId: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<StatsGetResponseOutput>> {
     try {
@@ -484,7 +468,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
     userId: string,
     limit: number,
     offset: number,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EarningsListGetResponseOutput>> {
     try {
@@ -535,7 +518,6 @@ export class ReferralRepositoryImpl implements ReferralRepository {
     userId: string,
     amountCents: number,
     currency: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {

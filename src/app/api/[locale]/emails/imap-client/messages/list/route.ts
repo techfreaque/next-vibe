@@ -18,7 +18,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: ({ urlPathParams, user, locale, logger }) =>
-      imapMessagesRepository.listMessages(urlPathParams, user, locale, logger),
+    handler: ({ urlPathParams, user, logger }) =>
+      imapMessagesRepository.listMessages(urlPathParams, user, logger),
   },
 });

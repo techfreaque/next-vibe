@@ -40,6 +40,7 @@ const { GET } = createEndpoint({
   title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.description",
+  icon: "clock",
   category: "app.api.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN],
   aliases: ["cron:stats", "tasks:cron:stats"],

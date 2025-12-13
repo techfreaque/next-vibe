@@ -33,7 +33,7 @@ export function createGabAI(): {
   const apiKey = env.GAB_AI_API_KEY || "";
 
   return {
-    chat: (_modelId: string) => {
+    chat: () => {
       // Use OpenAI's internal implementation with custom config
       // This gives us their message/tool/stream parsing logic for free
       // Gab AI uses "arya" as the model name

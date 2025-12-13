@@ -11,7 +11,7 @@ import { databaseMigrateProdRepository as repository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) =>
-      repository.runProductionMigrations(data, user, locale, logger),
+    handler: ({ data, locale, logger }) =>
+      repository.runProductionMigrations(data, locale, logger),
   },
 });

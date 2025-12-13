@@ -18,8 +18,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cronTasks } from "../../cron/db";
 import {
@@ -185,15 +183,11 @@ function formatTaskResponse(
 export interface ICronTasksListRepository {
   getTasks(
     data: CronTaskListRequestOutput,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskListResponseOutput>>;
 
   createTask(
     data: CronTaskCreateRequestOutput,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskCreateResponseOutput>>;
 }
@@ -204,8 +198,6 @@ export interface ICronTasksListRepository {
 class CronTasksListRepositoryImpl implements ICronTasksListRepository {
   async getTasks(
     data: CronTaskListRequestOutput,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskListResponseOutput>> {
     try {
@@ -298,8 +290,6 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
 
   async createTask(
     data: CronTaskCreateRequestOutput,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskCreateResponseOutput>> {
     try {

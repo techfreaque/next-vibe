@@ -8,10 +8,9 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, logger, locale }) => {
+    handler: async ({ user, logger }) => {
       return await referralRepository.getUserReferralCodes(
         user.id,
-        locale,
         logger,
       );
     },

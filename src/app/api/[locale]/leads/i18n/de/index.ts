@@ -78,6 +78,10 @@ export const translations: typeof enTranslations = {
       error: "Fehler beim Abrufen aller verknüpften Leads",
     },
   },
+  errors: {
+    cannotLinkLeadToItself: "Lead kann nicht mit sich selbst verknüpft werden",
+    linkFailed: "Fehler beim Verknüpfen der Leads",
+  },
   batch: batchTranslations,
   campaigns: campaignsTranslations,
   create: createTranslations,

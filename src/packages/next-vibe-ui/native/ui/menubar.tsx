@@ -388,12 +388,9 @@ MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName;
 
 export function MenubarShortcut({
   className,
-  style: _style,
   children,
   ...props
 }: MenubarShortcutProps): React.JSX.Element {
-  // Note: style prop is not passed to sub-component due to StyleType discriminated union
-  // Native uses className for styling via NativeWind (either style OR className, not both)
   return (
     <Span
       className={cn(

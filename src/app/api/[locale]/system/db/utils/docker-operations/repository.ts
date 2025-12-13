@@ -260,6 +260,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       let timeoutId: ReturnType<typeof setTimeout>;
 
       // Set up timeout
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- resolve intentionally unused, only reject is needed for timeout
       const timeoutPromise = new Promise<void>((_resolve, reject) => {
         timeoutId = setTimeout(() => {
           if (resolved) {

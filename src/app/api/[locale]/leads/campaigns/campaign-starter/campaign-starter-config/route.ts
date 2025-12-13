@@ -24,11 +24,9 @@ export const { GET, PUT, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ user, logger }) => {
       const result = await campaignStarterConfigRepository.getConfig(
-        data,
         user,
-        locale,
         logger,
       );
       // Wrap the response data in the expected structure

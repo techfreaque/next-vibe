@@ -15,7 +15,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   objectField,
-  objectOptionalField,
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -30,6 +29,7 @@ const { POST } = createEndpoint({
   path: ["user", "public", "reset-password", "request"],
   title: "app.api.user.public.resetPassword.request.title" as const,
   description: "app.api.user.public.resetPassword.request.description" as const,
+  icon: "lock",
   category: "app.api.user.category" as const,
   tags: ["app.api.user.public.resetPassword.request.tag" as const],
   allowedRoles: [UserRole.PUBLIC] as const,

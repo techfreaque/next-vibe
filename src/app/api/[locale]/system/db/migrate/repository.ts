@@ -16,7 +16,6 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -33,7 +32,6 @@ type MigrateResponseType = typeof migrateEndpoints.POST.types.ResponseOutput;
 export interface DatabaseMigrationRepository {
   runMigrations(
     data: MigrateRequestType,
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateResponseType>>;
@@ -43,7 +41,6 @@ export interface DatabaseMigrationRepository {
    */
   repairMigrations(
     options: { force?: boolean; dryRun?: boolean; reset?: boolean },
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ repaired: boolean; message: string }>>;
@@ -53,7 +50,6 @@ export interface DatabaseMigrationRepository {
    */
   runProductionMigrations(
     options: { force?: boolean; backup?: boolean },
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<{ migrated: boolean; message: string }>;
@@ -63,7 +59,6 @@ export interface DatabaseMigrationRepository {
    */
   syncMigrations(
     options: { force?: boolean; direction?: "up" | "down" },
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<{ synced: boolean; message: string }>;
@@ -76,10 +71,10 @@ export interface DatabaseMigrationRepository {
 export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationRepository {
   async runMigrations(
     data: MigrateRequestType,
-    _user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateResponseType>> {
+    const { t } = simpleT(locale);
     const startTime = Date.now();
 
     try {
@@ -96,7 +91,9 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
             message: "app.api.system.db.migrate.post.errors.network.title",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
-              error: `Generation failed: ${generateResult.error.message}`,
+              error: t("app.api.system.db.migrate.errors.generationFailed", {
+                message: generateResult.error.message,
+              }),
             },
           });
         }
@@ -108,7 +105,10 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
             message: "app.api.system.db.migrate.post.errors.network.title",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
-              error: `Generation failed with exit code ${generateResult.status}: ${errorOutput}`,
+              error: t("app.api.system.db.migrate.errors.generationFailedWithCode", {
+                code: String(generateResult.status ?? "unknown"),
+                output: errorOutput,
+              }),
             },
           });
         }
@@ -139,7 +139,9 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
           message: "app.api.system.db.migrate.post.errors.network.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error: `Migration failed: ${pushResult.error.message}`,
+            error: t("app.api.system.db.migrate.errors.migrationFailed", {
+              message: pushResult.error.message,
+            }),
           },
         });
       }
@@ -192,7 +194,6 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
    */
   async repairMigrations(
     options: { force?: boolean; dryRun?: boolean; reset?: boolean },
-    _user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ repaired: boolean; message: string }>> {
@@ -228,7 +229,6 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
    */
   runProductionMigrations(
     options: { force?: boolean; backup?: boolean },
-    _user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<{ migrated: boolean; message: string }> {
@@ -258,7 +258,6 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
    */
   syncMigrations(
     options: { force?: boolean; direction?: "up" | "down" },
-    _user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<{ synced: boolean; message: string }> {

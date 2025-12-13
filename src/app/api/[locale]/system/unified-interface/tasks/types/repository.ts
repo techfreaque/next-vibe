@@ -6,6 +6,7 @@
 
 import "server-only";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
@@ -19,7 +20,6 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   JwtPayloadType,
@@ -316,7 +316,7 @@ export interface TaskRunnerManager {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<void>;
-  stop(_locale: CountryLanguage): Promise<ResponseType<void>>;
+  stop(locale: CountryLanguage): Promise<ResponseType<void>>;
   getStatus(): {
     running: boolean;
     activeTasks: string[];

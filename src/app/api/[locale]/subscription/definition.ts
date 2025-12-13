@@ -38,6 +38,7 @@ const { GET } = createEndpoint({
   path: ["subscription"],
   title: "app.api.subscription.get.title" as const,
   description: "app.api.subscription.get.description" as const,
+  icon: "crown",
   category: "app.api.subscription.category" as const,
   tags: [
     "app.api.subscription.tags.subscription" as const,
@@ -231,6 +232,7 @@ const { POST } = createEndpoint({
   path: ["subscription"],
   title: "app.api.subscription.post.title" as const,
   description: "app.api.subscription.post.description" as const,
+  icon: "package-plus" as const,
   category: "app.api.subscription.category" as const,
   tags: [
     "app.api.subscription.tags.subscription" as const,
@@ -456,6 +458,7 @@ const { PUT } = createEndpoint({
   path: ["subscription"],
   title: "app.api.subscription.put.title" as const,
   description: "app.api.subscription.form.fields.planId.description" as const,
+  icon: "package-check" as const,
   category: "app.api.subscription.category" as const,
   tags: [
     "app.api.subscription.tags.subscription" as const,
@@ -681,6 +684,7 @@ const { DELETE } = createEndpoint({
   path: ["subscription"],
   title: "app.api.subscription.delete.title" as const,
   description: "app.api.subscription.delete.description" as const,
+  icon: "package-x" as const,
   category: "app.api.subscription.category" as const,
   tags: [
     "app.api.subscription.tags.subscription" as const,

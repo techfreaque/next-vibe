@@ -33,13 +33,15 @@ const StyledView = styled(View, { className: "style" });
 const StyledPressable = styled(Pressable, { className: "style" });
 const StyledScrollView = styled(ScrollView, { className: "style" });
 const StyledTextInput = styled(TextInput, { className: "style" });
+const StyledText = styled(RNText, { className: "style" });
 
 function Command({
   className,
   style,
   children,
   id,
-  shouldFilter: _shouldFilter,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  shouldFilter, // Intentionally extracted - not used in React Native
 }: CommandProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
@@ -172,11 +174,11 @@ function CommandGroup({
         ),
       })}
     >
-      {heading && (
-        <RNText className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+      {heading ? (
+        <StyledText className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
           {heading}
-        </RNText>
-      )}
+        </StyledText>
+      ) : null}
       {children}
     </StyledView>
   );

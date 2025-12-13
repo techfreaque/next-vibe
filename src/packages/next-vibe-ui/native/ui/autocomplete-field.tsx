@@ -15,16 +15,14 @@ import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
 
-// Import cross-platform types from web
 import type {
   AutocompleteOptionBase,
   AutocompleteFieldPropsBase,
   AutocompleteFieldProps,
 } from "@/packages/next-vibe-ui/web/ui/autocomplete-field";
-import { FormFieldCategory } from "@/packages/next-vibe-ui/web/ui/autocomplete-field";
 
-// Re-export FormFieldCategory
-export { FormFieldCategory };
+// Re-export enum for type parity with web
+export { FormFieldCategory } from "@/packages/next-vibe-ui/web/ui/autocomplete-field";
 
 export function AutocompleteField({
   value = "",
@@ -37,7 +35,6 @@ export function AutocompleteField({
   disabled = false,
   className,
   style,
-  name: _name,
 }: AutocompleteFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");

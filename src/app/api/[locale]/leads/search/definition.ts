@@ -64,6 +64,7 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["leads", "search"],
   allowedRoles: [UserRole.ADMIN],
+  icon: "search",
 
   title: "app.api.leads.search.get.title" as const,
   description: "app.api.leads.search.get.description" as const,

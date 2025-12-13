@@ -36,6 +36,7 @@ const { POST } = createEndpoint({
   title: "app.api.subscription.checkout.title" as const,
   description: "app.api.subscription.checkout.description" as const,
   category: "app.api.subscription.category" as const,
+  icon: "credit-card" as const,
   tags: [
     "app.api.subscription.checkout.tags.subscription" as const,
     "app.api.subscription.checkout.tags.checkout" as const,

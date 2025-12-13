@@ -134,7 +134,8 @@ export function format<
   T extends Record<string, string | number | boolean | null | undefined>,
 >(strings: string[], values: T): string[] {
   return strings.map((part) =>
-    part.replace(/{(\w+)}/g, (_, key: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Required by replace() API
+    part.replace(/{(\w+)}/g, (match, key: string) => {
       const value = values[key];
       if (value === null || value === undefined) {
         return "";

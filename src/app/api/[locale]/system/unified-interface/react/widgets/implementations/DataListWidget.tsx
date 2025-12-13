@@ -4,37 +4,46 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe-ui/ui/table";
 import { Title } from "next-vibe-ui/ui/title";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
+import type { WidgetType } from "../../../shared/types/enums";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import {
   extractDataListData,
   getListDisplayItems,
   getRemainingListItemsCount,
   type ListItem,
 } from "../../../shared/widgets/logic/data-list";
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
+import type { UnifiedField } from "../../../shared/types/endpoint";
+import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**
- * Data List Widget Component
- * Displays a vertical list with optional bullets and title
+ * Displays data in either list view (table) or grid view with toggle.
  */
 export function DataListWidget({
   value,
-  field: _field,
+  field,
   context,
   className,
-}: WidgetComponentProps): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.DATA_LIST>): JSX.Element {
   const { t } = simpleT(context.locale);
   const [showAll, setShowAll] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
-  // Extract data using shared logic
   const data = extractDataListData(value);
 
-  // Handle null case
   if (!data) {
     return (
       <Div className={cn("text-muted-foreground italic", className)}>
@@ -43,58 +52,220 @@ export function DataListWidget({
     );
   }
 
-  const { items, title, showBullets, maxItems } = data;
+  const { items, title, maxItems } = data;
 
-  // Get display items based on showAll state and maxItems limit
+  let fieldDefinitions: Record<string, UnifiedField> = {};
+  if (
+    "type" in field &&
+    (field.type === "array" || field.type === "array-optional")
+  ) {
+    if ("child" in field && field.child) {
+      const childField = field.child as UnifiedField;
+      if (
+        "type" in childField &&
+        (childField.type === "object" || childField.type === "object-optional")
+      ) {
+        if ("children" in childField && childField.children) {
+          fieldDefinitions = childField.children as Record<
+            string,
+            UnifiedField
+          >;
+        }
+      }
+    }
+  }
+
   const displayItems = showAll ? items : getListDisplayItems(items, maxItems);
   const remainingCount = getRemainingListItemsCount(items.length, maxItems);
   const hasMore = !showAll && remainingCount > 0;
 
   return (
     <Div className={cn("flex flex-col gap-3", className)}>
-      {title && (
-        <Title level={3} className="mb-2">
-          {title}
-        </Title>
+      <Div className="flex items-center justify-between">
+        {title && (
+          <Title level={3} className="mb-0">
+            {title}
+          </Title>
+        )}
+        <Div className="flex gap-1 rounded-md border border-gray-200 p-1 dark:border-gray-700">
+          <Button
+            variant={viewMode === "list" ? "default" : "ghost"}
+            size="sm"
+            onClick={() => setViewMode("list")}
+            className="h-8 px-3"
+          >
+            {t(
+              "app.api.system.unifiedInterface.react.widgets.dataList.viewList",
+            )}
+          </Button>
+          <Button
+            variant={viewMode === "grid" ? "default" : "ghost"}
+            size="sm"
+            onClick={() => setViewMode("grid")}
+            className="h-8 px-3"
+          >
+            {t(
+              "app.api.system.unifiedInterface.react.widgets.dataList.viewGrid",
+            )}
+          </Button>
+        </Div>
+      </Div>
+
+      {viewMode === "list" && (
+        <Div className="overflow-x-auto">
+          <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <TableHeader className="bg-gray-50 dark:bg-gray-800">
+              <TableRow>
+                {Object.entries(fieldDefinitions).map(([key, fieldDef]) => {
+                  const fieldUi = fieldDef?.ui;
+                  // Check for label first, then fallback to content/text/href, then key
+                  let label = key;
+                  if (fieldUi) {
+                    if ("label" in fieldUi && typeof fieldUi.label === "string") {
+                      label = t(fieldUi.label);
+                    } else if (
+                      "content" in fieldUi &&
+                      typeof fieldUi.content === "string"
+                    ) {
+                      label = t(fieldUi.content);
+                    } else if (
+                      "text" in fieldUi &&
+                      typeof fieldUi.text === "string"
+                    ) {
+                      label = t(fieldUi.text);
+                    } else if (
+                      "href" in fieldUi &&
+                      typeof fieldUi.href === "string"
+                    ) {
+                      // For LINK widgets that use href as the label key
+                      label = t(fieldUi.href);
+                    }
+                  }
+
+                  return (
+                    <TableHead
+                      key={key}
+                      className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 dark:text-gray-400"
+                    >
+                      {label}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
+              {displayItems.map((item: ListItem, index: number) => {
+                if (!item || typeof item !== "object") {
+                  return null;
+                }
+
+                return (
+                  <TableRow
+                    key={index}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
+                    {Object.entries(fieldDefinitions).map(([key, fieldDef]) => {
+                      const cellValue = key in item ? item[key] : null;
+
+                      return (
+                        <TableCell
+                          key={key}
+                          className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100"
+                        >
+                          {fieldDef ? (
+                            <WidgetRenderer
+                              widgetType={fieldDef.ui.type}
+                              data={cellValue}
+                              field={fieldDef}
+                              context={context}
+                            />
+                          ) : (
+                            <Span className="text-gray-600 dark:text-gray-400">
+                              {String(cellValue ?? "—")}
+                            </Span>
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Div>
       )}
 
-      <Div
-        className={cn(
-          "flex flex-col gap-2",
-          showBullets && "list-none space-y-2",
-        )}
-      >
-        {displayItems.map((item: ListItem, index: number) => (
-          <Div
-            key={index}
-            className={cn(
-              "flex gap-3 rounded-md p-3 hover:bg-gray-50 dark:hover:bg-gray-800",
-              showBullets && "relative pl-6",
-            )}
-          >
-            {showBullets && (
-              <Span className="absolute left-2 top-4 h-1.5 w-1.5 rounded-full bg-gray-400 dark:bg-gray-500" />
-            )}
+      {viewMode === "grid" && (
+        <Div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          {displayItems.map((card, index: number) => (
+            <Div
+              key={index}
+              className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+            >
+              <Div className="p-4">
+                <Div className="flex flex-col gap-2">
+                  {card &&
+                    typeof card === "object" &&
+                    Object.entries(card).map(([key, cardValue]) => {
+                      const fieldDef = fieldDefinitions[key];
+                      const fieldUi = fieldDef?.ui;
+                      // Check for label first, then fallback to content/text/href, then key
+                      let label = key;
+                      if (fieldUi) {
+                        if (
+                          "label" in fieldUi &&
+                          typeof fieldUi.label === "string"
+                        ) {
+                          label = t(fieldUi.label);
+                        } else if (
+                          "content" in fieldUi &&
+                          typeof fieldUi.content === "string"
+                        ) {
+                          label = t(fieldUi.content);
+                        } else if (
+                          "text" in fieldUi &&
+                          typeof fieldUi.text === "string"
+                        ) {
+                          label = t(fieldUi.text);
+                        } else if (
+                          "href" in fieldUi &&
+                          typeof fieldUi.href === "string"
+                        ) {
+                          label = t(fieldUi.href);
+                        }
+                      }
 
-            <Div className="flex-1">
-              <Div className="grid gap-x-4 gap-y-1 sm:grid-cols-2 lg:grid-cols-3">
-                {Object.entries(item).map(([key, itemValue]) => (
-                  <Div key={key} className="text-sm">
-                    <Span className="font-medium text-gray-700 dark:text-gray-300">
-                      {key}:{" "}
-                    </Span>
-                    <Span className="text-gray-600 dark:text-gray-400">
-                      {typeof itemValue === "object" && itemValue !== null
-                        ? JSON.stringify(itemValue)
-                        : String(itemValue ?? "")}
-                    </Span>
-                  </Div>
-                ))}
+                      return (
+                        <Div
+                          key={key}
+                          className="flex justify-between gap-4 text-sm"
+                        >
+                          <Span className="font-medium text-gray-700 dark:text-gray-300">
+                            {label}:
+                          </Span>
+                          <Div className="text-right">
+                            {fieldDef ? (
+                              <WidgetRenderer
+                                widgetType={fieldDef.ui.type}
+                                data={cardValue}
+                                field={fieldDef}
+                                context={context}
+                              />
+                            ) : (
+                              <Span className="text-gray-600 dark:text-gray-400">
+                                {String(cardValue ?? "—")}
+                              </Span>
+                            )}
+                          </Div>
+                        </Div>
+                      );
+                    })}
+                </Div>
               </Div>
             </Div>
-          </Div>
-        ))}
-      </Div>
+          ))}
+        </Div>
+      )}
 
       {hasMore && (
         <Button

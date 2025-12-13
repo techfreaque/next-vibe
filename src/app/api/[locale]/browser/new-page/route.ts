@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: newPageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, logger }) => {
       return executeMCPTool(
         {
           toolName: "new-page",
@@ -21,9 +21,7 @@ export const { POST, tools } = endpointsHandler({
             timeout: data.timeout,
           }),
         },
-        user,
         logger,
-        locale,
       );
     },
   },

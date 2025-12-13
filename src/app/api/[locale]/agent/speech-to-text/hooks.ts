@@ -11,15 +11,14 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import speechToTextDefinitions from "./definition";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface UseEdenAISpeechOptions {
   onTranscript?: (text: string) => void;
   onError?: (error: string) => void;
-  lang?: string;
   locale: CountryLanguage;
   logger: EndpointLogger;
   deductCredits: (creditCost: number, feature: string) => void;
@@ -40,7 +39,6 @@ interface UseEdenAISpeechReturn {
 export function useEdenAISpeech({
   onTranscript,
   onError,
-  lang = "en-US",
   locale,
   logger,
   deductCredits,
@@ -110,9 +108,6 @@ export function useEdenAISpeech({
         type: mediaRecorderRef.current?.mimeType || "audio/webm",
       });
 
-      // Convert lang (en-US) to language code (en)
-      const languageCode = lang.split("-")[0] || "en";
-
       // Create a File object from the blob
       const audioFile = new File([audioBlob], "recording.webm", {
         type: audioBlob.type,
@@ -122,13 +117,10 @@ export function useEdenAISpeech({
       logger.debug("STT: Submitting audio", {
         fileSize: audioFile.size,
         provider: "openai",
-        languageCode,
       });
 
       // Set form values - set the nested object structure directly
       endpoint.create.form.setValue("fileUpload", { file: audioFile });
-      endpoint.create.form.setValue("provider", "openai");
-      endpoint.create.form.setValue("language", languageCode);
 
       // Submit form with callbacks
       await endpoint.create.submitForm({
@@ -191,16 +183,7 @@ export function useEdenAISpeech({
       setIsProcessing(false);
       cleanup();
     }
-  }, [
-    lang,
-    endpoint,
-    logger,
-    t,
-    onTranscript,
-    onError,
-    cleanup,
-    deductCredits,
-  ]);
+  }, [endpoint, logger, t, onTranscript, onError, cleanup, deductCredits]);
 
   const startRecording = useCallback(async (): Promise<void> => {
     try {

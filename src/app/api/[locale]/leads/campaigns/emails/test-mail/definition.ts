@@ -51,6 +51,7 @@ const { POST } = createEndpoint({
   category: "app.api.leads.category",
   tags: ["app.api.leads.tags.campaigns", "app.api.leads.tags.leads"],
   allowedRoles: [UserRole.ADMIN],
+  icon: "send",
 
   fields: objectField(
     {

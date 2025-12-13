@@ -133,6 +133,7 @@ export function useThreadOperations(
 
         // Delete from streaming store
         if (streamStore.threads[threadId]) {
+          // eslint-disable-next-line no-unused-vars -- Destructuring pattern to omit property
           const { [threadId]: _deleted, ...remainingThreads } =
             streamStore.threads;
           streamStore.reset();

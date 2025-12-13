@@ -27,7 +27,8 @@ export const chromeMCPConfig: ChromeMCPConfig = {
   args: [
     "chrome-devtools-mcp@latest",
     "--executablePath=/usr/bin/chromium",
-    "--isolated=true",
+    "--isolated=false",
+    // "--user-data-dir",
     "--chromeArg=--enable-features=UseOzonePlatform",
     "--chromeArg=--ozone-platform=wayland",
     "--chromeArg=--no-sandbox",

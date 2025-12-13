@@ -277,7 +277,6 @@ export async function test(
  */
 export async function prod(
   logger: EndpointLogger,
-  _locale: CountryLanguage,
 ): Promise<void> {
   logger.debug("🌱 Seeding users management data for production environment");
 

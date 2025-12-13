@@ -26,6 +26,7 @@ const { POST } = createEndpoint({
   title: "app.api.browser.fill-form.title",
   description: "app.api.browser.fill-form.description",
   category: "app.api.browser.category",
+  icon: "pen-tool",
   tags: [
     "app.api.browser.tags.browserAutomation",
     "app.api.browser.tags.inputAutomation",

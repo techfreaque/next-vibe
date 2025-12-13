@@ -375,7 +375,6 @@ export function FlatMessage({
               toolCall={message.metadata.toolCall}
               locale={locale}
               threadId={message.threadId}
-              hasContent={false}
               messageId={message.id}
               collapseState={collapseState}
             />
@@ -407,7 +406,6 @@ export function FlatMessage({
                   toolCall={msg.metadata.toolCall}
                   locale={locale}
                   threadId={msg.threadId}
-                  hasContent={hasContentAfter}
                   messageId={msg.id}
                   collapseState={collapseState}
                 />

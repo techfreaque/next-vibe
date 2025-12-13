@@ -154,6 +154,7 @@ export const translations: typeof enTranslations = {
       description: "Abonnement nicht gefunden",
     },
     not_found: "Abonnement nicht gefunden",
+    not_found_description: "Das angeforderte Abonnement konnte nicht gefunden werden",
     server: {
       title: "Serverfehler",
       description: "Interner Serverfehler aufgetreten",
@@ -176,6 +177,8 @@ export const translations: typeof enTranslations = {
     },
     use_checkout_flow:
       "Bitte verwenden Sie den Checkout-Ablauf, um Abonnements zu kaufen",
+    use_checkout_flow_description:
+      "Die direkte Erstellung von Abonnements ist nicht erlaubt. Bitte nutzen Sie den Checkout-Prozess.",
     sync_failed:
       "Synchronisierung des Abonnements mit Datenbank fehlgeschlagen",
     database_error: "Datenbankfehler aufgetreten",

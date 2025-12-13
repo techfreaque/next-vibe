@@ -123,6 +123,7 @@ export enum WidgetType {
   ACTION_LIST = "action_list",
 
   // Stats widgets
+  STAT = "stat", // Simple stat display: number + label from field definition
   METRIC_CARD = "metric_card",
   STATS_GRID = "stats_grid",
   CHART = "chart",
@@ -133,6 +134,14 @@ export enum WidgetType {
   ERROR = "error",
   EMPTY_STATE = "empty_state",
   STATUS_INDICATOR = "status_indicator",
+  ALERT = "alert",
+  FORM_ALERT = "form_alert",
+
+  // Interactive action widgets
+  SUBMIT_BUTTON = "submit_button",
+
+  // Form feedback widgets
+  PASSWORD_STRENGTH = "password_strength",
 
   // Custom widgets
   CUSTOM = "custom",

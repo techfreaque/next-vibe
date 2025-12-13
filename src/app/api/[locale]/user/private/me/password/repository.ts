@@ -241,10 +241,10 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
    * Verify 2FA code
    * This is a placeholder implementation. In production, use a library like 'speakeasy'
    * @param code - The 2FA code provided by the user
-   * @param secret - The 2FA secret stored in the database
+   * @param secret - The 2FA secret stored in the database (currently unused in placeholder implementation)
    * @returns boolean indicating if the code is valid
    */
-  private verify2FACode(code: string, _secret: string): boolean {
+  private verify2FACode(code: string, secret: string): boolean {
     // Placeholder implementation
     // In production, use: speakeasy.totp.verify({ secret, token: code, window: 1 })
     // For now, we'll just validate the format (6 digits)
@@ -255,9 +255,11 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
 
     // TODO: Implement actual TOTP verification using speakeasy or similar library
     // This is a security-critical operation and should use proper time-based one-time password verification
+    // The 'secret' parameter will be used once proper TOTP verification is implemented
 
     // For development purposes only - this would never be used in production
     // In production, you must implement proper TOTP verification
+    void secret; // Acknowledge unused parameter in placeholder implementation
     return true; // Placeholder - always returns true for development
   }
 

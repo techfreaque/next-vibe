@@ -107,6 +107,7 @@ export default async function HomePage({
     const subscriptionResponse = await subscriptionRepository.getSubscription(
       userResponse.data.id,
       logger,
+      locale,
     );
     subscription = subscriptionResponse?.success
       ? subscriptionResponse.data
@@ -114,11 +115,17 @@ export default async function HomePage({
   }
 
   // Fetch stats for hero section (cached for 24h)
-  const activeUserCountResponse = await userRepository.getActiveUserCount(logger);
-  const totalConversationsResponse = await threadsRepository.getTotalConversationsCount(logger);
+  const activeUserCountResponse =
+    await userRepository.getActiveUserCount(logger);
+  const totalConversationsResponse =
+    await threadsRepository.getTotalConversationsCount(logger);
 
-  const activeUserCount = activeUserCountResponse.success ? activeUserCountResponse.data : 0;
-  const totalConversations = totalConversationsResponse.success ? totalConversationsResponse.data : 0;
+  const activeUserCount = activeUserCountResponse.success
+    ? activeUserCountResponse.data
+    : 0;
+  const totalConversations = totalConversationsResponse.success
+    ? totalConversationsResponse.data
+    : 0;
 
   // Get pricing information for features section
   const products = productsRepository.getProducts(locale);

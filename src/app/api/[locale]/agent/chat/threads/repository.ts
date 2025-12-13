@@ -327,7 +327,6 @@ export interface ThreadsRepositoryInterface {
   listThreads(
     data: ThreadListRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadListResponseOutput>>;
 
@@ -354,7 +353,6 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
   async listThreads(
     data: ThreadListRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadListResponseOutput>> {
     try {

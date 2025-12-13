@@ -51,8 +51,9 @@ const numericNumber = customType<{
  * Each transaction type has specific metadata requirements
  */
 export interface FreeGrantMetadata {
-  reason: "initial_grant" | "admin_grant";
+  reason: "initial_grant" | "admin_grant" | "monthly_reset";
   freeCreditsRemaining: number;
+  totalPoolFreeCredits?: number;
 }
 
 export interface FreeResetMetadata {
@@ -142,7 +143,28 @@ export interface CreditPackMetadata {
 /**
  * Credit Wallets Table
  * Single wallet per user OR lead (not both)
- * Tracks balance and free tier credits
+ *
+ * ARCHITECTURE RULES:
+ * 1. User wallets: ONLY paid credits (balance field)
+ *    - freeCreditsRemaining always 0
+ *    - Only authenticated users can purchase credits
+ *
+ * 2. Lead wallets: ONLY free credits
+ *    - freeCreditsRemaining can be 0-20 per wallet
+ *    - balance always 0
+ *    - Leads cannot purchase credits
+ *
+ * 3. Wallet Linking:
+ *    - Lead-to-lead: via leadLeadLinks table
+ *    - Lead-to-user: via userLeadLinks table
+ *
+ * 4. Free Credit Pool:
+ *    - Max 20 free credits can be spent per pool per period
+ *    - Enforced at deduction time by tracking spending
+ *
+ * 5. Credit Deduction Priority:
+ *    - Free credits from lead wallets (up to 20 per period)
+ *    - Paid credits from user wallet (expiring first, then permanent)
  */
 export const creditWallets = pgTable(
   "credit_wallets",
@@ -155,11 +177,12 @@ export const creditWallets = pgTable(
     leadId: uuid("lead_id").references(() => leads.id, { onDelete: "cascade" }),
 
     // Total balance from credit packs (subscription + permanent + bonus)
-    balance: numericNumber("balance")
-      .notNull()
-      .default(0),
+    // Both user and lead wallets can have paid credits
+    balance: numericNumber("balance").notNull().default(0),
 
-    // Free tier tracking (20 credits per month)
+    // Free tier tracking (20 credits per month SHARED across linked leads)
+    // CRITICAL: User wallets MUST have freeCreditsRemaining = 0 (enforced in repository)
+    // CRITICAL: Lead wallets share a pool of max 20 credits across ALL linked leads
     freeCreditsRemaining: numericNumber("free_credits_remaining")
       .notNull()
       .default(20),
@@ -197,10 +220,8 @@ export const creditPacks = pgTable(
       .references(() => creditWallets.id, { onDelete: "cascade" }),
 
     // Pack details
-    originalAmount: numericNumber("original_amount")
-      .notNull(), // Initial amount purchased
-    remaining: numericNumber("remaining")
-      .notNull(), // Current remaining credits
+    originalAmount: numericNumber("original_amount").notNull(), // Initial amount purchased
+    remaining: numericNumber("remaining").notNull(), // Current remaining credits
     type: text("type", {
       enum: ["subscription", "permanent", "bonus"],
     }).notNull(),

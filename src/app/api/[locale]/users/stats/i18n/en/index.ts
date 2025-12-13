@@ -7,6 +7,26 @@ export const translations = {
     title: "User Statistics Dashboard",
     description: "View comprehensive user analytics and statistics",
   },
+  actions: {
+    refresh: "Refresh",
+    refreshing: "Refreshing...",
+  },
+  basicFilters: {
+    title: "Basic Filters",
+    description: "Filter users by status and role",
+  },
+  subscriptionFilters: {
+    title: "Subscription Filters",
+    description: "Filter by subscription and payment",
+  },
+  locationFilters: {
+    title: "Location Filters",
+    description: "Filter by country and language",
+  },
+  timePeriodOptions: {
+    title: "Time Period Options",
+    description: "Configure time period and chart settings",
+  },
   sections: {
     filterOptions: {
       title: "Filter Options",
@@ -53,35 +73,43 @@ export const translations = {
       label: "Time Period",
       description: "Select the time period for statistics",
     },
+    subscriptionStatus: {
+      label: "Subscription Status",
+      description: "Filter by subscription status",
+    },
+    paymentMethod: {
+      label: "Payment Method",
+      description: "Filter by payment method",
+    },
   },
   response: {
     overviewStats: {
       title: "Overview Statistics",
       description: "General user statistics overview",
       totalUsers: {
-        content: "Total Users",
+        label: "Total Users",
       },
       activeUsers: {
-        content: "Active Users",
+        label: "Active Users",
       },
       inactiveUsers: {
-        content: "Inactive Users",
+        label: "Inactive Users",
       },
       newUsers: {
-        content: "New Users",
+        label: "New Users",
       },
     },
     emailStats: {
       title: "Email Statistics",
       description: "User email verification statistics",
       emailVerifiedUsers: {
-        content: "Email Verified Users",
+        label: "Verified Emails",
       },
       emailUnverifiedUsers: {
-        content: "Email Unverified Users",
+        label: "Unverified Emails",
       },
       verificationRate: {
-        content: "Email Verification Rate",
+        label: "Verification Rate",
       },
     },
     profileStats: {
@@ -110,64 +138,82 @@ export const translations = {
         },
       },
     },
-    integrationStats: {
-      title: "Integration Statistics",
-      description: "External service integration statistics",
-      usersWithStripeId: {
-        content: "Users with Stripe ID",
+    subscriptionStats: {
+      title: "Subscription Statistics",
+      description: "User subscription distribution statistics",
+      activeSubscriptions: {
+        label: "Active",
       },
-      usersWithoutStripeId: {
-        content: "Users without Stripe ID",
+      canceledSubscriptions: {
+        label: "Canceled",
       },
-      stripeIntegrationRate: {
-        content: "Stripe Integration Rate",
+      expiredSubscriptions: {
+        label: "Expired",
       },
-      usersWithLeadId: {
-        content: "Users with Lead ID",
+      noSubscription: {
+        label: "No Subscription",
       },
-      usersWithoutLeadId: {
-        content: "Users without Lead ID",
+      subscriptionChart: {
+        label: "Subscription Distribution",
+        description: "Visual breakdown of subscription statuses",
       },
-      leadAssociationRate: {
-        content: "Lead Association Rate",
+    },
+    paymentStats: {
+      title: "Payment Statistics",
+      description: "Revenue and transaction statistics",
+      totalRevenue: {
+        label: "Total Revenue",
+      },
+      transactionCount: {
+        label: "Transactions",
+      },
+      averageOrderValue: {
+        label: "Avg. Order Value",
+      },
+      refundRate: {
+        label: "Refund Rate",
       },
     },
     roleStats: {
       title: "Role Statistics",
       description: "User role distribution statistics",
       publicUsers: {
-        content: "Public Users",
+        label: "Public",
       },
       customerUsers: {
-        content: "Customer Users",
+        label: "Customers",
       },
       partnerAdminUsers: {
-        content: "Partner Admin Users",
+        label: "Partner Admins",
       },
       partnerEmployeeUsers: {
-        content: "Partner Employee Users",
+        label: "Partner Staff",
       },
       adminUsers: {
-        content: "Admin Users",
+        label: "Admins",
+      },
+      roleChart: {
+        label: "Role Distribution",
+        description: "Visual breakdown of users by role",
       },
     },
     timeStats: {
       title: "Time-based Statistics",
       description: "User creation and growth statistics over time",
       usersCreatedToday: {
-        content: "Users Created Today",
+        label: "Today",
       },
       usersCreatedThisWeek: {
-        content: "Users Created This Week",
+        label: "This Week",
       },
       usersCreatedThisMonth: {
-        content: "Users Created This Month",
+        label: "This Month",
       },
       usersCreatedLastMonth: {
-        content: "Users Created Last Month",
+        label: "Last Month",
       },
       growthRate: {
-        content: "Growth Rate",
+        label: "Growth Rate",
       },
     },
     companyStats: {
@@ -277,28 +323,32 @@ export const translations = {
     growthMetrics: {
       title: "Growth Metrics",
       description: "User growth and conversion metrics",
+      growthChart: {
+        label: "User Growth Over Time",
+        description: "Visual representation of user creation trends",
+      },
     },
     performanceRates: {
       title: "Performance Rates",
       description: "User performance and conversion metrics",
       growthRate: {
-        content: "Growth Rate",
+        label: "Growth Rate",
       },
       leadToUserConversionRate: {
-        content: "Lead to User Conversion Rate",
+        label: "Lead Conversion",
       },
       retentionRate: {
-        content: "User Retention Rate",
+        label: "Retention Rate",
       },
     },
     businessInsights: {
       title: "Business Insights",
       description: "Business intelligence and analytics",
       uniqueCompanies: {
-        content: "Unique Companies",
+        label: "Unique Companies",
       },
       generatedAt: {
-        content: "Statistics Generated At",
+        label: "Generated At",
       },
     },
   },

@@ -828,7 +828,6 @@ export async function canManageThreadPermissions(
  */
 export async function canReadMessage(
   user: JwtPayloadType,
-  message: ChatMessage,
   thread: ChatThread,
   folder: ChatFolder | null,
   logger: EndpointLogger,

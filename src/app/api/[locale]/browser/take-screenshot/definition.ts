@@ -26,6 +26,7 @@ const { POST } = createEndpoint({
   title: "app.api.browser.take-screenshot.title",
   description: "app.api.browser.take-screenshot.description",
   category: "app.api.browser.category",
+  icon: "camera",
   tags: [
     "app.api.browser.tags.browserAutomation",
     "app.api.browser.tags.captureAutomation",

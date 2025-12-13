@@ -41,9 +41,7 @@ class UserRolesRepositoryNativeImpl implements UserRolesRepository {
     userId: DbId,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserRole[]>> {
-    logger.warn(
-      "findByUserId not implemented on native - not used in page.tsx",
-    );
+    logger.warn("findByUserId not implemented on native", { userId });
     return await Promise.resolve(
       this.createNotImplementedError<UserRole[]>("findByUserId"),
     );
@@ -53,9 +51,9 @@ class UserRolesRepositoryNativeImpl implements UserRolesRepository {
     userIds: DbId[],
     logger: EndpointLogger,
   ): Promise<ResponseType<Map<DbId, UserRole[]>>> {
-    logger.warn(
-      "findByUserIds not implemented on native - not used in page.tsx",
-    );
+    logger.warn("findByUserIds not implemented on native", {
+      userIdsCount: userIds.length,
+    });
     return await Promise.resolve(
       this.createNotImplementedError<Map<DbId, UserRole[]>>("findByUserIds"),
     );
@@ -65,9 +63,7 @@ class UserRolesRepositoryNativeImpl implements UserRolesRepository {
     userId: DbId,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
-    logger.warn(
-      "deleteByUserId not implemented on native - not used in page.tsx",
-    );
+    logger.warn("deleteByUserId not implemented on native", { userId });
     return await Promise.resolve(
       this.createNotImplementedError<void>("deleteByUserId"),
     );
@@ -78,9 +74,10 @@ class UserRolesRepositoryNativeImpl implements UserRolesRepository {
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
   ): Promise<ResponseType<UserRole>> {
-    logger.warn(
-      "findByUserIdAndRole not implemented on native - not used in page.tsx",
-    );
+    logger.warn("findByUserIdAndRole not implemented on native", {
+      userId,
+      role: String(role),
+    });
     return await Promise.resolve(
       this.createNotImplementedError<UserRole>("findByUserIdAndRole"),
     );
@@ -90,7 +87,10 @@ class UserRolesRepositoryNativeImpl implements UserRolesRepository {
     data: NewUserRole,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserRole>> {
-    logger.warn("addRole not implemented on native - not used in page.tsx");
+    logger.warn("addRole not implemented on native", {
+      userId: data.userId,
+      role: String(data.role),
+    });
     return await Promise.resolve(
       this.createNotImplementedError<UserRole>("addRole"),
     );
@@ -101,7 +101,10 @@ class UserRolesRepositoryNativeImpl implements UserRolesRepository {
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
-    logger.warn("removeRole not implemented on native - not used in page.tsx");
+    logger.warn("removeRole not implemented on native", {
+      userId,
+      role: String(role),
+    });
     return await Promise.resolve(
       this.createNotImplementedError<boolean>("removeRole"),
     );
@@ -112,7 +115,10 @@ class UserRolesRepositoryNativeImpl implements UserRolesRepository {
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
-    logger.warn("hasRole not implemented on native - not used in page.tsx");
+    logger.warn("hasRole not implemented on native", {
+      userId,
+      role: String(role),
+    });
     return await Promise.resolve(
       this.createNotImplementedError<boolean>("hasRole"),
     );
@@ -122,9 +128,7 @@ class UserRolesRepositoryNativeImpl implements UserRolesRepository {
     userId: DbId,
     logger: EndpointLogger,
   ): Promise<ResponseType<(typeof UserPermissionRoleValue)[]>> {
-    logger.warn(
-      "getUserRoles not implemented on native - not used in page.tsx",
-    );
+    logger.warn("getUserRoles not implemented on native", { userId });
     return await Promise.resolve(
       this.createNotImplementedError<(typeof UserPermissionRoleValue)[]>(
         "getUserRoles",

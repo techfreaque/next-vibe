@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.check.vibeCheck.description",
   category: "app.api.system.check.vibeCheck.category",
   tags: ["app.api.system.check.vibeCheck.tag"],
+  icon: "wrench",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

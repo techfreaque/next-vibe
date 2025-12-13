@@ -45,6 +45,7 @@ const { GET } = createEndpoint({
   title: "app.api.emails.messages.list.title",
   description: "app.api.emails.messages.list.description",
   category: "app.api.emails.category",
+  icon: "file-text",
   tags: ["app.api.emails.messages.tag"],
   allowedRoles: [UserRole.ADMIN],
 

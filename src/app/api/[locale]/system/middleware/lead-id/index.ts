@@ -13,7 +13,7 @@ import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
 import { env } from "@/config/env";
 import { Environment } from "next-vibe/shared/utils";
 
-import { isApiRoute, shouldSkipPath } from "../utils";
+import { shouldSkipPath } from "../utils";
 import { createEndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import { leadAuthRepository } from "../../../leads/auth/repository";
 
@@ -27,11 +27,6 @@ const UUID_REGEX =
  */
 export function checkLeadId(request: NextRequest): "skip" | null {
   const path = request.nextUrl.pathname;
-
-  // Skip for API routes (they handle their own leadId logic)
-  if (isApiRoute(path)) {
-    return "skip";
-  }
 
   // Skip for static files
   if (shouldSkipPath(path)) {

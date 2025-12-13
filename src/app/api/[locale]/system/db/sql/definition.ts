@@ -28,6 +28,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.db.sql.post.description",
   category: "app.api.system.db.category",
   tags: ["app.api.system.db.sql.tag"],
+  icon: "terminal",
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF],
   aliases: ["sql", "db:sql"],
 

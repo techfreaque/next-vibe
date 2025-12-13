@@ -180,6 +180,58 @@ export function CreateSmtpAccountForm({
                     requiredColor: "red",
                   }}
                 />
+
+                <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <EndpointFormField
+                    name="emailConfig.campaignTypes"
+                    endpointFields={createDefinition.POST.fields}
+                    control={endpoint.create.form.control}
+                    theme={{
+                      style: "none",
+                      showAllRequired: false,
+                    }}
+                  />
+
+                  <EndpointFormField
+                    name="emailConfig.emailJourneyVariants"
+                    endpointFields={createDefinition.POST.fields}
+                    control={endpoint.create.form.control}
+                    theme={{
+                      style: "none",
+                      showAllRequired: false,
+                    }}
+                  />
+
+                  <EndpointFormField
+                    name="emailConfig.emailCampaignStages"
+                    endpointFields={createDefinition.POST.fields}
+                    control={endpoint.create.form.control}
+                    theme={{
+                      style: "none",
+                      showAllRequired: false,
+                    }}
+                  />
+
+                  <EndpointFormField
+                    name="emailConfig.countries"
+                    endpointFields={createDefinition.POST.fields}
+                    control={endpoint.create.form.control}
+                    theme={{
+                      style: "none",
+                      showAllRequired: false,
+                    }}
+                  />
+
+                  <EndpointFormField
+                    name="emailConfig.languages"
+                    endpointFields={createDefinition.POST.fields}
+                    control={endpoint.create.form.control}
+                    theme={{
+                      style: "none",
+                      showAllRequired: false,
+                    }}
+                  />
+                </Div>
               </FormFieldGroup>
 
               {/* Form Alert for errors and success */}

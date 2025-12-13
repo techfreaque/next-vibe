@@ -25,18 +25,16 @@ import type {
   PulseHealth,
   PulseNotification,
 } from "./db";
+import type { PulseStatusResponseOutput } from "./status/definition";
 
 /**
  * Public Interface for Pulse Health Repository
  */
 export interface IPulseHealthRepository {
   // Health management
-  getCurrentHealth(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PulseHealth | null>>;
+  getCurrentHealth(): Promise<ResponseType<PulseHealth | null>>;
   updateHealth(
     updates: Partial<PulseHealth>,
-    logger: EndpointLogger,
   ): Promise<ResponseType<PulseHealth>>;
   createHealthRecord(
     health: NewPulseHealth,
@@ -46,37 +44,23 @@ export interface IPulseHealthRepository {
   // Pulse execution management
   createExecution(
     execution: NewPulseExecution,
-    logger: EndpointLogger,
   ): Promise<ResponseType<PulseExecution>>;
   updateExecution(
     id: string,
     updates: Partial<PulseExecution>,
-    logger: EndpointLogger,
   ): Promise<ResponseType<PulseExecution>>;
-  getRecentExecutions(
-    logger: EndpointLogger,
-    limit?: number,
-  ): Promise<ResponseType<PulseExecution[]>>;
-  getExecutionById(
-    id: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PulseExecution | null>>;
+  getRecentExecutions(limit?: number): Promise<ResponseType<PulseExecution[]>>;
+  getExecutionById(id: string): Promise<ResponseType<PulseExecution | null>>;
 
   // Notification management
   createNotification(
     notification: NewPulseNotification,
-    logger: EndpointLogger,
   ): Promise<ResponseType<PulseNotification>>;
-  getUnsentNotifications(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PulseNotification[]>>;
-  markNotificationSent(
-    id: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PulseNotification>>;
+  getUnsentNotifications(): Promise<ResponseType<PulseNotification[]>>;
+  markNotificationSent(id: string): Promise<ResponseType<PulseNotification>>;
 
   // Health statistics
-  getHealthStatistics(logger: EndpointLogger): Promise<
+  getHealthStatistics(): Promise<
     ResponseType<{
       currentStatus: string;
       totalExecutions: number;
@@ -91,10 +75,7 @@ export interface IPulseHealthRepository {
  * Implementation of Pulse Health Repository
  */
 export class PulseHealthRepository implements IPulseHealthRepository {
-  async getCurrentHealth(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _logger: EndpointLogger,
-  ): Promise<ResponseType<PulseHealth | null>> {
+  async getCurrentHealth(): Promise<ResponseType<PulseHealth | null>> {
     try {
       const health = await db
         .select()
@@ -113,11 +94,10 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
   async updateHealth(
     updates: Partial<PulseHealth>,
-    logger: EndpointLogger,
   ): Promise<ResponseType<PulseHealth>> {
     try {
       // Get the current health record
-      const currentHealthResponse = await this.getCurrentHealth(logger);
+      const currentHealthResponse = await this.getCurrentHealth();
       if (!currentHealthResponse.success || !currentHealthResponse.data) {
         // If no health record exists, cannot update - require a full create
         return fail({
@@ -162,8 +142,6 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
   async createExecution(
     execution: NewPulseExecution,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _logger: EndpointLogger,
   ): Promise<ResponseType<PulseExecution>> {
     try {
       const [newExecution] = await db
@@ -182,8 +160,6 @@ export class PulseHealthRepository implements IPulseHealthRepository {
   async updateExecution(
     id: string,
     updates: Partial<PulseExecution>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _logger: EndpointLogger,
   ): Promise<ResponseType<PulseExecution>> {
     try {
       const [updatedExecution] = await db
@@ -209,7 +185,6 @@ export class PulseHealthRepository implements IPulseHealthRepository {
   }
 
   async getRecentExecutions(
-    _logger: EndpointLogger,
     limit = 50,
   ): Promise<ResponseType<PulseExecution[]>> {
     try {
@@ -230,8 +205,6 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
   async getExecutionById(
     id: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _logger: EndpointLogger,
   ): Promise<ResponseType<PulseExecution | null>> {
     try {
       const execution = await db
@@ -251,8 +224,6 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
   async createNotification(
     notification: NewPulseNotification,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _logger: EndpointLogger,
   ): Promise<ResponseType<PulseNotification>> {
     try {
       const [newNotification] = await db
@@ -268,10 +239,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
     }
   }
 
-  async getUnsentNotifications(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _logger: EndpointLogger,
-  ): Promise<ResponseType<PulseNotification[]>> {
+  async getUnsentNotifications(): Promise<ResponseType<PulseNotification[]>> {
     try {
       const notifications = await db
         .select()
@@ -290,8 +258,6 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
   async markNotificationSent(
     id: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _logger: EndpointLogger,
   ): Promise<ResponseType<PulseNotification>> {
     try {
       const [updatedNotification] = await db
@@ -316,7 +282,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
     }
   }
 
-  async getHealthStatistics(logger: EndpointLogger): Promise<
+  async getHealthStatistics(): Promise<
     ResponseType<{
       currentStatus: string;
       totalExecutions: number;
@@ -327,7 +293,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
   > {
     try {
       // Get current health
-      const currentHealthResponse = await this.getCurrentHealth(logger);
+      const currentHealthResponse = await this.getCurrentHealth();
       if (!currentHealthResponse.success) {
         return fail({
           message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
@@ -363,11 +329,14 @@ export class PulseHealthRepository implements IPulseHealthRepository {
    * Execute a pulse cycle with the given options
    * Merged functionality from old system
    */
-  async executePulse(options: {
-    dryRun?: boolean;
-    taskNames?: string[];
-    force?: boolean;
-  }): Promise<
+  async executePulse(
+    options: {
+      dryRun?: boolean;
+      taskNames?: string[];
+      force?: boolean;
+    },
+    logger: EndpointLogger,
+  ): Promise<
     ResponseType<{
       success: boolean;
       summary: {
@@ -412,6 +381,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         await this.recordPulseExecution(
           summary.tasksFailed.length === 0,
           summary.totalExecutionTimeMs,
+          logger,
         );
       }
 
@@ -436,11 +406,10 @@ export class PulseHealthRepository implements IPulseHealthRepository {
   async recordPulseExecution(
     isSuccessful: boolean,
     executionTimeMs: number,
+    logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
-      const currentHealthResponse = await this.getCurrentHealth(
-        {} as EndpointLogger,
-      );
+      const currentHealthResponse = await this.getCurrentHealth();
 
       if (!currentHealthResponse.success || !currentHealthResponse.data) {
         // Create initial health record
@@ -461,7 +430,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
             lastAlertAt: null,
             isMaintenanceMode: false,
           },
-          {} as EndpointLogger,
+          logger,
         );
       } else {
         // Update existing health record
@@ -474,25 +443,22 @@ export class PulseHealthRepository implements IPulseHealthRepository {
           (newTotalSuccesses / newTotalExecutions) * 10000,
         );
 
-        await this.updateHealth(
-          {
-            lastPulseAt: new Date(),
-            consecutiveFailures: isSuccessful
-              ? 0
-              : health.consecutiveFailures + 1,
-            avgExecutionTimeMs: Math.round(
-              (health.avgExecutionTimeMs || 0 + executionTimeMs) / 2,
-            ),
-            successRate: newSuccessRate,
-            totalExecutions: newTotalExecutions,
-            totalSuccesses: newTotalSuccesses,
-            totalFailures: newTotalFailures,
-            status: isSuccessful
-              ? PulseHealthStatus.HEALTHY
-              : PulseHealthStatus.WARNING,
-          },
-          {} as EndpointLogger,
-        );
+        await this.updateHealth({
+          lastPulseAt: new Date(),
+          consecutiveFailures: isSuccessful
+            ? 0
+            : health.consecutiveFailures + 1,
+          avgExecutionTimeMs: Math.round(
+            (health.avgExecutionTimeMs || 0 + executionTimeMs) / 2,
+          ),
+          successRate: newSuccessRate,
+          totalExecutions: newTotalExecutions,
+          totalSuccesses: newTotalSuccesses,
+          totalFailures: newTotalFailures,
+          status: isSuccessful
+            ? PulseHealthStatus.HEALTHY
+            : PulseHealthStatus.WARNING,
+        });
       }
 
       return success(undefined);
@@ -505,64 +471,27 @@ export class PulseHealthRepository implements IPulseHealthRepository {
   }
 
   /**
-   * Get the current pulse health status
+   * Get the current pulse health status for the status endpoint
    */
-  async getHealthStatus(_logger: EndpointLogger): Promise<
-    ResponseType<{
-      status: string;
-      lastPulseAt: string | null;
-      consecutiveFailures: number;
-      avgExecutionTimeMs: number | null;
-      successRate: number | null;
-      totalExecutions: number;
-      totalSuccesses: number;
-      totalFailures: number;
-      metadata: Record<string, string | number | boolean> | null;
-      alertsSent: number;
-      lastAlertAt: string | null;
-      isMaintenanceMode: boolean;
-      createdAt: string;
-      updatedAt: string;
-    }>
-  > {
-    try {
-      const healthResponse = await this.getCurrentHealth(_logger);
+  async getHealthStatus(): Promise<ResponseType<PulseStatusResponseOutput>> {
+    const healthResponse = await this.getCurrentHealth();
 
-      if (!healthResponse.success || !healthResponse.data) {
-        return fail({
-          message: ErrorResponseTypes.NOT_FOUND.errorKey,
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      const health = healthResponse.data;
-      const response = {
-        status: health.status,
-        lastPulseAt: health.lastPulseAt?.toISOString() || null,
-        consecutiveFailures: health.consecutiveFailures,
-        avgExecutionTimeMs: health.avgExecutionTimeMs,
-        successRate: health.successRate,
-        totalExecutions: health.totalExecutions,
-        totalSuccesses: health.totalSuccesses,
-        totalFailures: health.totalFailures,
-        metadata: (health.metadata || null) as Record<
-          string,
-          string | number | boolean
-        > | null,
-        alertsSent: health.alertsSent,
-        lastAlertAt: health.lastAlertAt?.toISOString() || null,
-        isMaintenanceMode: health.isMaintenanceMode,
-        createdAt: health.createdAt.toISOString(),
-        updatedAt: health.updatedAt.toISOString(),
-      };
-
-      return success(response);
-    } catch {
-      return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    if (!healthResponse.success || !healthResponse.data) {
+      return success<PulseStatusResponseOutput>({
+        status: "UNKNOWN",
+        lastPulseAt: null,
+        successRate: null,
+        totalExecutions: 0,
       });
     }
+
+    const health = healthResponse.data;
+    return success<PulseStatusResponseOutput>({
+      status: health.status,
+      lastPulseAt: health.lastPulseAt?.toISOString() ?? null,
+      successRate: health.successRate,
+      totalExecutions: health.totalExecutions,
+    });
   }
 }
 

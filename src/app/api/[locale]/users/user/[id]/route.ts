@@ -37,7 +37,6 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
       return await userByIdRepository.getUserById(
         { id: props.urlPathParams.id },
         props.user,
-        props.locale,
         props.logger,
       );
     },
@@ -65,7 +64,6 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
       return await userByIdRepository.deleteUser(
         { id: props.urlPathParams.id },
         props.user,
-        props.locale,
         props.logger,
       );
     },

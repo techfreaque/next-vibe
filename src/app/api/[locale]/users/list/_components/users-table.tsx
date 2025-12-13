@@ -77,7 +77,7 @@ export function UsersTable({
           : date;
       return dateObj.toLocaleDateString(locale);
     },
-    [locale, t],
+    [t, locale],
   );
 
   if (isLoading && users.length === 0) {
@@ -96,7 +96,8 @@ export function UsersTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Array.from({ length: 5 }).map((_, index) => (
+            {/* eslint-disable-next-line @typescript-eslint/no-unused-vars -- Array.from callback requires first parameter */}
+            {Array.from({ length: 5 }).map((unused, index) => (
               <TableRow key={index}>
                 <TableCell>
                   <Div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />

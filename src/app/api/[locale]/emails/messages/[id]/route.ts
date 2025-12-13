@@ -15,7 +15,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: ({ urlPathParams, user, locale, logger }) =>
-      emailsRepository.getEmailById(urlPathParams, user, locale, logger),
+    handler: ({ urlPathParams, user, logger }) =>
+      emailsRepository.getEmailById(urlPathParams, user, logger),
   },
 });

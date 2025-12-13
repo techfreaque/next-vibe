@@ -117,7 +117,18 @@ export const oxlintConfig: OxlintConfig = {
     // TypeScript Rules
     // ========================================
     "typescript/no-explicit-any": "error",
-    "typescript/no-unused-vars": "error",
+    "typescript/no-unused-vars": [
+      "error",
+      {
+        vars: "all",
+        args: "all",
+        caughtErrors: "none",
+        ignoreRestSiblings: false,
+        // Do NOT ignore underscore-prefixed vars - they must be used or removed
+        argsIgnorePattern: "^$",
+        varsIgnorePattern: "^$",
+      },
+    ],
     "typescript/no-inferrable-types": "error",
     "typescript/consistent-type-imports": "error",
     "typescript/no-empty-function": "error",

@@ -20,15 +20,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type {
-  JwtPrivatePayloadType,
-  JwtPayloadType,
-} from "../../auth/types";
+import type { JwtPrivatePayloadType, JwtPayloadType } from "../../auth/types";
 import { users } from "../../db";
 import { UserDetailLevel } from "../../enum";
 import { userRepository } from "../../repository";
 import type {
-  MeDeleteRequestOutput,
   MeDeleteResponseOutput,
   MeGetResponseOutput,
   MePostRequestOutput,
@@ -78,7 +74,6 @@ export interface UserProfileRepository {
    * @returns ResponseType with deletion status
    */
   deleteAccount(
-    data: MeDeleteRequestOutput,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -105,7 +100,9 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
     try {
       // Handle public users - return JWT payload only
       if (user.isPublic) {
-        logger.debug("Getting public user JWT payload", { leadId: user.leadId });
+        logger.debug("Getting public user JWT payload", {
+          leadId: user.leadId,
+        });
         return success({
           isPublic: true,
           leadId: user.leadId,
@@ -150,7 +147,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
         message: "app.api.user.private.me.get.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
-          userId: user.isPublic ? "public" : user.id ?? "unknown",
+          userId: user.isPublic ? "public" : (user.id ?? "unknown"),
           error: parsedError.message,
         },
       });
@@ -314,7 +311,6 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
    * @returns ResponseType with deletion status
    */
   async deleteAccount(
-    data: MeDeleteRequestOutput,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,

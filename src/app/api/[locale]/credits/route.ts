@@ -12,8 +12,8 @@ import { creditRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: async ({ user, logger }) => {
-      return await creditRepository.getCreditBalanceForUser(user, logger);
+    handler: async ({ user, locale, logger }) => {
+      return await creditRepository.getCreditBalanceForUser(user, locale, logger);
     },
   },
 });

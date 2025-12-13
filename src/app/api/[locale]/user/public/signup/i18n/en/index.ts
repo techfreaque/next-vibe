@@ -5,6 +5,14 @@ export const translations = {
   title: "User Signup",
   description: "User registration endpoint",
   tag: "Authentication",
+  form: {
+    title: "Create Your Account",
+    description: "Join the community for uncensored AI conversations",
+  },
+  actions: {
+    submit: "Create Account",
+    submitting: "Creating Account...",
+  },
   fields: {
     firstName: {
       label: "First Name",
@@ -20,27 +28,47 @@ export const translations = {
     },
     privateName: {
       label: "Private Name",
-      description: "User's private name",
-      placeholder: "Enter private name",
+      description: "Your full name (visible only to you)",
+      placeholder: "Enter your name",
       help: "Enter your private name for internal use",
+      validation: {
+        required: "Private name is required",
+        minLength: "Name must be at least 2 characters",
+        maxLength: "Name must be less than 100 characters",
+      },
     },
     publicName: {
-      label: "Public Name",
-      description: "User's public name",
-      placeholder: "Enter public name",
+      label: "Display Name",
+      description: "Your public display name",
+      placeholder: "Enter display name",
       help: "Enter your public name as it will be displayed to others",
+      validation: {
+        required: "Display name is required",
+        minLength: "Display name must be at least 2 characters",
+        maxLength: "Display name must be less than 100 characters",
+      },
     },
     email: {
       label: "Email",
-      description: "User's email address",
+      description: "Your email address",
       placeholder: "Enter email address",
       help: "This will be your login email and primary contact method",
+      validation: {
+        required: "Email is required",
+        invalid: "Please enter a valid email address",
+      },
     },
     password: {
       label: "Password",
-      description: "User's password",
+      description: "Create a secure password",
       placeholder: "Enter password",
-      help: "Password must be at least 8 characters",
+      help: "Password must be at least 8 characters with uppercase, lowercase, and number",
+      validation: {
+        required: "Password is required",
+        minLength: "Password must be at least 8 characters",
+        complexity:
+          "Password must contain uppercase, lowercase, and a number",
+      },
     },
     confirmPassword: {
       label: "Confirm Password",
@@ -48,6 +76,8 @@ export const translations = {
       placeholder: "Re-enter password",
       help: "Re-enter your password to confirm it matches",
       validation: {
+        required: "Please confirm your password",
+        minLength: "Password must be at least 8 characters",
         mismatch: "Passwords do not match",
       },
     },
@@ -135,19 +165,50 @@ export const translations = {
       description: "Additional configuration options",
     },
   },
+  footer: {
+    alreadyHaveAccount: "Already have an account? Sign in",
+  },
   errors: {
     title: "Signup Error",
+    validation: {
+      title: "Validation Error",
+      description: "Please check your input and try again",
+    },
+    unauthorized: {
+      title: "Unauthorized",
+      description: "Authentication required",
+    },
+    server: {
+      title: "Server Error",
+      description: "Internal server error occurred",
+    },
+    unknown: {
+      title: "Unknown Error",
+      description: "An unexpected error occurred",
+    },
     conflict: {
       title: "Account Conflict",
-      description: "Account already exists",
+      description: "An account with this email already exists",
     },
-    internal: {
-      title: "Internal Error",
-      description: "An internal error occurred",
+    forbidden: {
+      title: "Forbidden",
+      description: "Access denied",
     },
     network: {
       title: "Network Error",
       description: "Network error occurred",
+    },
+    notFound: {
+      title: "Not Found",
+      description: "Resource not found",
+    },
+    unsaved: {
+      title: "Unsaved Changes",
+      description: "You have unsaved changes",
+    },
+    internal: {
+      title: "Internal Error",
+      description: "An internal error occurred",
     },
   },
   emailCheck: {

@@ -138,7 +138,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
               );
             }
           } else {
-            const _smsData: SendSmsParams = {
+            const smsParams: SendSmsParams = {
               ...result.data,
               message:
                 options?.enableTruncation &&
@@ -147,7 +147,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
                   : result.data.message,
             };
 
-            const smsResponse = await sendSms(_smsData, logger);
+            const smsResponse = await sendSms(smsParams, logger);
             processedCount++;
 
             if (!smsData.ignoreErrors && !smsResponse.success) {

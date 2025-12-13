@@ -8,25 +8,21 @@ import type { JSX } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
+import type { WidgetType } from "../../../shared/types/enums";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { extractTitleData } from "../../../shared/widgets/logic/title";
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
 
 /**
- * Title Widget Component
- * Renders H1-H6 headings with optional subtitle and alignment
+ * Renders H1-H6 headings with optional subtitle and alignment.
  */
 export function TitleWidget({
   value,
-  field: _field,
   context,
   className,
-}: WidgetComponentProps): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.TITLE>): JSX.Element {
   const { t } = simpleT(context.locale);
-
-  // Extract data using shared logic
   const data = extractTitleData(value);
 
-  // Handle null case
   if (!data) {
     return (
       <Div className={cn("text-muted-foreground italic", className)}>
@@ -37,7 +33,6 @@ export function TitleWidget({
 
   const { text, level, subtitle, align } = data;
 
-  // Determine alignment class
   const alignmentClass = align
     ? {
         left: "text-left",

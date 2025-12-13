@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   title: "app.api.system.unifiedInterface.cli.setup.uninstall.post.title",
   description:
     "app.api.system.unifiedInterface.cli.setup.uninstall.post.description",
+  icon: "package",
   category: "app.api.system.unifiedInterface.cli.setup.uninstall.post.title",
   tags: ["app.api.system.unifiedInterface.cli.setup.uninstall.post.title"],
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],

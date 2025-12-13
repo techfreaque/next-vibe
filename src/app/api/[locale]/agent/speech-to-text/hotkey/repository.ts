@@ -75,8 +75,6 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     logger.info("Handling hotkey action", {
       action: data.action,
-      provider: data.provider,
-      language: data.language,
       userId: user.isPublic ? user.leadId : user.id,
     });
 
@@ -113,13 +111,13 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
       // Handle action
       switch (data.action) {
         case HotkeyAction.START:
-          return await this.handleStart(session, data, logger);
+          return await this.handleStart(session, logger);
 
         case HotkeyAction.STOP:
-          return await this.handleStop(session, data, user, locale, logger);
+          return await this.handleStop(session, user, logger);
 
         case HotkeyAction.TOGGLE:
-          return await this.handleToggle(session, data, user, locale, logger);
+          return await this.handleToggle(session, user, logger);
 
         case HotkeyAction.STATUS:
           return this.handleStatus(session, logger);
@@ -196,11 +194,6 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
       // Call existing STT repository
       const result = await speechToTextRepository.transcribeAudio(
         audioFile,
-        {
-          provider: data.provider,
-          language: data.language,
-          fileUpload: { file: audioFile },
-        },
         user,
         locale,
         logger,
@@ -230,7 +223,6 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
    */
   private async handleStart(
     session: SpeechHotkeySession,
-    data: SttHotkeyPostRequestOutput,
     logger: EndpointLogger,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (session.isRecording) {
@@ -259,9 +251,7 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
    */
   private async handleStop(
     session: SpeechHotkeySession,
-    data: SttHotkeyPostRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (!session.isRecording) {
@@ -311,15 +301,13 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
    */
   private async handleToggle(
     session: SpeechHotkeySession,
-    data: SttHotkeyPostRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (session.isRecording) {
-      return await this.handleStop(session, data, user, locale, logger);
+      return await this.handleStop(session, user, logger);
     } else {
-      return await this.handleStart(session, data, logger);
+      return await this.handleStart(session, logger);
     }
   }
 

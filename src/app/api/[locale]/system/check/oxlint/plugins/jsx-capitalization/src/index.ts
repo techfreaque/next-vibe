@@ -49,7 +49,7 @@ interface OxlintComment {
 
 interface OxlintRuleContext {
   report: (descriptor: { node: OxlintASTNode; message: string }) => void;
-  options?: unknown[];
+  options?: Array<Record<string, string | number | boolean>>;
   getCommentsInside?: (node: OxlintASTNode) => OxlintComment[];
   getCommentsBefore?: (node: OxlintASTNode) => OxlintComment[];
   getFilename?: () => string;

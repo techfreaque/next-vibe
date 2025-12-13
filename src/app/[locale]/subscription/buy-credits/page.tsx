@@ -78,6 +78,7 @@ export default async function BuyCreditsPage({
   if (userResponse.success && userResponse.data && userResponse.data.leadId) {
     const creditsResponse = await creditRepository.getCreditBalanceForUser(
       userResponse.data,
+      locale,
       logger,
     );
     credits = creditsResponse.success ? creditsResponse.data : null;
@@ -93,6 +94,7 @@ export default async function BuyCreditsPage({
     const subscriptionResponse = await subscriptionRepository.getSubscription(
       userResponse.data.id,
       logger,
+      locale,
     );
     subscription = subscriptionResponse.success
       ? subscriptionResponse.data
@@ -107,6 +109,14 @@ export default async function BuyCreditsPage({
   const PACK_CREDITS = products[ProductIds.CREDIT_PACK].credits;
   const FREE_CREDITS = products[ProductIds.FREE_TIER].credits;
 
+  // Get yearly subscription price
+  const yearlySubscription = productsRepository.getProduct(
+    ProductIds.SUBSCRIPTION,
+    locale,
+    "year",
+  );
+  const YEARLY_SUBSCRIPTION_PRICE = yearlySubscription.price;
+
   return (
     <BuyCreditsPageClient
       locale={locale}
@@ -118,6 +128,7 @@ export default async function BuyCreditsPage({
       packPrice={PACK_PRICE}
       packCredits={PACK_CREDITS}
       freeCredits={FREE_CREDITS}
+      yearlySubscriptionPrice={YEARLY_SUBSCRIPTION_PRICE}
     />
   );
 }

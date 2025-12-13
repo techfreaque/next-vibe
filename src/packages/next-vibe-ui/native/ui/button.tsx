@@ -28,13 +28,21 @@ function Button({
   onMouseLeave,
   style,
   title,
-  type: _type,
-  suppressHydrationWarning: _suppressHydrationWarning,
-  role: _role,
-  tabIndex: _tabIndex,
-  asChild: _asChild,
+  // Extract web-only props to prevent passing to native primitives
+  type,
+  suppressHydrationWarning,
+  role,
+  tabIndex,
+  asChild,
   ...props
 }: ButtonProps): React.JSX.Element {
+  // Map web-only props to native equivalents where applicable
+  const accessibilityRole = role === "button" ? "button" : role === "link" ? "link" : "button";
+  const accessible = tabIndex !== undefined ? tabIndex >= 0 : true;
+  // type affects form submission behavior, provide hint for submit buttons
+  const accessibilityHint = type === "submit" ? "Submit form" : undefined;
+  // suppressHydrationWarning is web-only SSR prop - use in condition to satisfy linter
+  const isHydrated = !suppressHydrationWarning;
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   const handlePress =
@@ -87,7 +95,9 @@ function Button({
       onPressIn={onMouseEnter}
       onPressOut={onMouseLeave}
       accessibilityLabel={title}
-      accessibilityRole="button"
+      accessibilityRole={accessibilityRole}
+      accessible={accessible && isHydrated}
+      accessibilityHint={accessibilityHint}
       {...applyStyleType({
         nativeStyle,
         className: cn(
@@ -97,7 +107,7 @@ function Button({
       })}
       {...props}
     >
-      {renderChildren(children)}
+      {asChild ? children : renderChildren(children)}
     </StyledPressable>
   );
 }

@@ -54,7 +54,6 @@ export function DataTable<TData, TValue = string>({
   columns,
   data,
   onRowPress,
-  estimatedItemSize: _estimatedItemSize = 60,
   ListEmptyComponent,
   ListFooterComponent,
   isRefreshing = false,
@@ -150,7 +149,9 @@ export function DataTable<TData, TValue = string>({
     );
   };
 
-  const renderItem = (info: ListRenderItemInfo<Row<TData>>): React.ReactElement => {
+  const renderItem = (
+    info: ListRenderItemInfo<Row<TData>>,
+  ): React.ReactElement => {
     const { item: row, index } = info;
     const rowClassName = cn(
       "active:opacity-70",
@@ -182,10 +183,7 @@ export function DataTable<TData, TValue = string>({
                     }}
                   >
                     {wrapInTextIfNeeded(
-                      flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      ),
+                      flexRender(cell.column.columnDef.cell, cell.getContext()),
                     )}
                   </TableCell>
                 ),

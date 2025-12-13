@@ -225,11 +225,8 @@ function DropdownMenuItem({
   style,
   inset,
   children,
-  onSelect: _onSelect, // Web-only: native handles internally via onPress
   disabled,
   asChild,
-  onClick: _onClick, // Filter out web-only props
-  key: _key, // Filter out web-only props
   // Filter out web-only props
 }: DropdownMenuItemProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -393,16 +390,13 @@ DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
 
 function DropdownMenuShortcut({
   className,
-  style: _style,
   children,
   ...props
 }: DropdownMenuShortcutProps): React.JSX.Element {
-  // Note: style prop is not passed to sub-component due to StyleType discriminated union
-  // Native uses className for styling via NativeWind (either style OR className, not both)
   return (
     <Span
       className={cn(
-        "ml-auto text-xs text-sm tracking-widest text-muted-foreground",
+        "ml-auto text-sm tracking-widest text-muted-foreground",
         className,
       )}
       {...props}

@@ -5,11 +5,10 @@
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
 // Severity icon constants
 const SEVERITY_ICONS = {
@@ -52,14 +51,12 @@ interface CardItem {
   file?: string;
 }
 
-export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.DATA_CARDS;
-  }
+export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_CARDS> {
+  readonly widgetType = WidgetType.DATA_CARDS;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
+  render(props: CLIWidgetProps<typeof WidgetType.DATA_CARDS>): string {
+    const { field, value, context } = props;
     const t = context.t;
-    const { field, value } = input;
 
     // Type narrow to array for data cards
     if (!Array.isArray(value) || value.length === 0) {
@@ -92,7 +89,7 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
       case "code-issue":
         return this.renderCodeIssueCards(typedData, config, context);
       default:
-        return this.renderDefaultCards(typedData, config, context);
+        return this.renderDefaultCards(typedData, context);
     }
   }
 
@@ -311,7 +308,6 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer {
    */
   private renderDefaultCards(
     data: CardItem[],
-    config: CardConfig,
     context: WidgetRenderContext,
   ): string {
     const result: string[] = [];

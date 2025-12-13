@@ -33,7 +33,7 @@ export default async function ImapMessageDetailPage({
   const { t } = simpleT(locale);
 
   // Require admin user authentication
-  const user = await requireAdminUser(
+  await requireAdminUser(
     locale,
     `/${locale}/admin/emails/imap/messages/${id}`,
   );
@@ -42,8 +42,6 @@ export default async function ImapMessageDetailPage({
   const logger = createEndpointLogger(false, Date.now(), locale);
   const messageResponse = await imapMessagesRepository.getMessageById(
     { id },
-    user,
-    locale,
     logger,
   );
 

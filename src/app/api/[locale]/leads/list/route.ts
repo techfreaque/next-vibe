@@ -12,7 +12,6 @@ import { leadsListRepository as repository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, user, logger, locale }) =>
-      repository.listLeads(data, user, logger, locale),
+    handler: ({ data, logger }) => repository.listLeads(data, logger),
   },
 });

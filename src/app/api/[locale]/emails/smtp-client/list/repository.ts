@@ -17,7 +17,6 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { Countries, Languages } from "@/i18n/core/config";
 
 import { SortOrder } from "../../messages/enum";
 import { smtpAccounts } from "../db";
@@ -27,14 +26,10 @@ import type {
   SmtpAccountsListGETResponseOutput,
 } from "./definition";
 
-// Define the proper type for locale to match standardized patterns
-type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
-
 interface SmtpAccountsListRepository {
   listSmtpAccounts(
     data: SmtpAccountsListGETRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpAccountsListGETResponseOutput>>;
 }
@@ -50,7 +45,6 @@ class SmtpAccountsListRepositoryImpl implements SmtpAccountsListRepository {
   async listSmtpAccounts(
     data: SmtpAccountsListGETRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpAccountsListGETResponseOutput>> {
     try {

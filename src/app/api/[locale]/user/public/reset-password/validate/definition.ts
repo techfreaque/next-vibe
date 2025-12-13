@@ -30,6 +30,7 @@ const { GET } = createEndpoint({
   title: "app.api.user.public.resetPassword.validate.title" as const,
   description:
     "app.api.user.public.resetPassword.validate.description" as const,
+  icon: "shield",
   category: "app.api.user.category" as const,
   tags: ["app.api.user.public.resetPassword.validate.tag" as const],
   allowedRoles: [UserRole.PUBLIC] as const,

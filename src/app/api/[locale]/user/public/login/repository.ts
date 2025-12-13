@@ -134,8 +134,7 @@ export class LoginRepositoryImpl implements LoginRepository {
     platform: Platform,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     // Extract data from request
-    const { email, password } = data.credentials;
-    const { rememberMe } = data.options;
+    const { email, password, rememberMe } = data.formCard;
 
     // Get leadId from user prop (JWT payload) - always present
     const leadId = user.leadId;
@@ -264,8 +263,6 @@ export class LoginRepositoryImpl implements LoginRepository {
         leadId,
         email,
         userResponse.data.id,
-        user,
-        locale,
         logger,
       );
 
@@ -398,7 +395,7 @@ export class LoginRepositoryImpl implements LoginRepository {
 
       // Link the leadId to the user
       // This ensures the userLeads table has the relationship for credit lookups
-      await leadAuthRepository.linkLeadToUser(leadId, userId, locale, logger);
+      await leadAuthRepository.linkLeadToUser(leadId, userId, logger);
 
       // Merge lead wallet into user wallet immediately
       // This ensures user gets their pre-login credits
@@ -466,20 +463,7 @@ export class LoginRepositoryImpl implements LoginRepository {
 
       // Create the response data - LoginPostResponseOutput
       const responseData: LoginPostResponseOutput = {
-        success: true,
         message: "app.api.user.public.login.success.message",
-        user: {
-          id: userResponse.data.id,
-          email: userResponse.data.email,
-          privateName: userResponse.data.privateName,
-          publicName: userResponse.data.publicName,
-        },
-        sessionInfo: {
-          expiresAt: expiresAt.toISOString(),
-          rememberMeActive: rememberMe,
-          loginLocation: "web",
-        },
-        nextSteps: ["app.api.user.public.login.success.nextSteps.dashboard"],
       };
 
       // Store auth token using platform-specific handler
@@ -633,15 +617,14 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param leadId - Lead ID from tracking if available
    * @param email - User email
    * @param userId - User ID
-   * @param publicUser - Public user from handler (for type safety)
+   * @param locale - User locale
    * @param logger - Logger instance
+   * @param user - JWT payload for authorization
    */
   private async handleLeadConversion(
     leadId: string,
     email: string,
     userId: string,
-    publicUser: JWTPublicPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<void> {
     try {
@@ -652,15 +635,12 @@ export class LoginRepositoryImpl implements LoginRepository {
       });
 
       // Convert lead with both email (for anonymous leads) and userId (for user relationship)
-      // Pass publicUser from handler to maintain type safety
       const convertResult = await leadsRepository.convertLead(
         leadId,
         {
           email,
           userId,
         },
-        publicUser,
-        locale,
         logger,
       );
 

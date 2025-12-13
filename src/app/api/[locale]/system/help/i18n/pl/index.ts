@@ -37,6 +37,11 @@ export const translations = {
       title: "Sukces",
       description: "Tryb interaktywny uruchomiony pomyślnie",
     },
+    grouping: {
+      category: "Kategoria",
+      tags: "Tagi",
+      path: "Ścieżka",
+    },
   },
   post: {
     title: "Pokaż informacje pomocy",

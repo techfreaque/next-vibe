@@ -76,7 +76,7 @@ export function useCredits(
    * Deduct credits optimistically following the correct priority order
    */
   const deductCredits = useCallback(
-    (creditCost: number, _feature: string) => {
+    (creditCost: number) => {
       if (creditCost <= 0) {
         return;
       }

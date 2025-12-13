@@ -15,8 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type guardDestroyEndpoints from "./definition";
 
@@ -31,8 +29,6 @@ type GuardDestroyResponseType =
 export interface GuardDestroyRepository {
   destroyGuard(
     data: GuardDestroyRequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<GuardDestroyResponseType>;
 }
@@ -43,8 +39,6 @@ export interface GuardDestroyRepository {
 export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
   destroyGuard(
     data: GuardDestroyRequestType,
-    _user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<GuardDestroyResponseType> {
     try {
@@ -53,7 +47,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
 
       // Handle dry run
       if (data.dryRun) {
-        return this.handleDryRun(data, locale, logger);
+        return this.handleDryRun(logger);
       }
 
       if (data.guardId) {
@@ -84,8 +78,6 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
   }
 
   private handleDryRun(
-    data: GuardDestroyRequestType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<GuardDestroyResponseType> {
     logger.info("Executing dry run for guard destruction");

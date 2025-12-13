@@ -56,7 +56,7 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
 
   // Get locale-specific pricing for starter plan
   const country = getCountryFromLocale(locale);
-  const allPlans = getPricingPlansArray(locale);
+  const allPlans = getPricingPlansArray();
   const starterPlan = allPlans.find(
     (plan) => plan.id === SubscriptionPlan.SUBSCRIPTION,
   );

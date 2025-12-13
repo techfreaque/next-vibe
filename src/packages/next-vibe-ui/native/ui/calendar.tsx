@@ -30,12 +30,18 @@ export function Calendar({
   style,
   children,
   selected,
-  onSelect: _onSelect,
-  mode: _mode,
-  disabled: _disabled,
-  showOutsideDays: _showOutsideDays,
-  classNames: _classNames,
-  components: _components,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  onSelect, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  mode, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  disabled, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  showOutsideDays, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  classNames, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  components, // Intentionally extracted - not used in React Native
 }: CalendarProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   // TODO: Implement full calendar functionality with a React Native date picker library

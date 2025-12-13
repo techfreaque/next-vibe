@@ -26,6 +26,7 @@ const { POST } = createEndpoint({
   path: ["user", "private", "me", "password"],
   title: "app.api.user.private.me.password.title" as const,
   description: "app.api.user.private.me.password.description" as const,
+  icon: "lock",
   category: "app.api.user.category" as const,
   tags: ["app.api.user.private.me.password.tag" as const],
   allowedRoles: [

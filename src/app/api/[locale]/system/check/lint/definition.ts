@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.check.lint.description",
   category: "app.api.system.check.lint.category",
   tags: ["app.api.system.check.lint.tag"],
+  icon: "bug",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

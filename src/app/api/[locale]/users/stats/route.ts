@@ -18,13 +18,8 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: async ({ data, user, locale, logger }) => {
-      return await usersStatsRepository.getUserStats(
-        data,
-        user,
-        locale,
-        logger,
-      );
+    handler: async ({ data, logger }) => {
+      return await usersStatsRepository.getUserStats(data, logger);
     },
   },
 });

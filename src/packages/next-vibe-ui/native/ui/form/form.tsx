@@ -30,8 +30,6 @@ import type {
 
 import { Label } from "../label";
 import { P } from "../typography";
-import { convertCSSToViewStyle } from "../../utils/style-converter";
-import { applyStyleType } from "../../../web/utils/style-type";
 
 // ============================================================================
 // STYLED COMPONENTS
@@ -136,38 +134,18 @@ const useFormField = (): UseFormFieldReturn => {
  * TYPE COMPATIBILITY: FormItemProps is HTMLAttributes<HTMLDivElement> on web.
  * We accept all props and filter to native-compatible ones internally.
  */
-function FormItem({
-  className,
-  style,
-  ...props
-}: FormItemProps): React.JSX.Element {
+function FormItem({ className, children }: FormItemProps): React.JSX.Element {
   const id = React.useId();
-  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
-
-  // Filter to only props compatible with View
-  // React Native View doesn't support all HTML attributes
-  const { children } = props;
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <StyledView
-        {...applyStyleType({
-          nativeStyle,
-          className: cn("space-y-1", className),
-        })}
-      >
-        {children}
-      </StyledView>
+      <StyledView className={cn("space-y-1", className)}>{children}</StyledView>
     </FormItemContext.Provider>
   );
 }
 FormItem.displayName = "FormItem";
 
-function FormLabel({
-  className,
-  children,
-  htmlFor: _htmlFor,
-}: FormLabelProps): React.JSX.Element {
+function FormLabel({ className, children }: FormLabelProps): React.JSX.Element {
   const { error, formItemId } = useFormField();
 
   return (
@@ -214,13 +192,9 @@ FormControl.displayName = "FormControl";
  */
 function FormDescription({
   className,
-  style: _style,
-  ...props
+  children,
 }: FormDescriptionProps): React.JSX.Element {
   const { formDescriptionId } = useFormField();
-
-  // Filter to only props compatible with Text
-  const { children } = props;
 
   // Note: style prop is not passed due to StyleType discriminated union
   return (
@@ -246,9 +220,7 @@ FormDescription.displayName = "FormDescription";
  */
 function FormMessage({
   className,
-  style: _style,
   children,
-  ..._props
 }: FormMessageProps): React.JSX.Element | null {
   const { error, formMessageId } = useFormField();
   const { t } = useTranslation();

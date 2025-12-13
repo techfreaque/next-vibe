@@ -125,6 +125,10 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Migrationskonflikt erkannt",
     },
+    generationFailed: "Migrationen konnten nicht generiert werden: {{message}}",
+    generationFailedWithCode:
+      "Migrationsgenerierung fehlgeschlagen mit Code {{code}}: {{output}}",
+    migrationFailed: "Migrationen konnten nicht ausgeführt werden: {{message}}",
   },
   success: {
     title: "Migration erfolgreich",

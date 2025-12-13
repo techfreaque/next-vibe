@@ -13,15 +13,12 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../../user/auth/types";
 import { imapSyncRepository } from "../sync-service/repository";
 import type {
   ExecuteImapSyncRequestOutput,
   ExecuteImapSyncResponseOutput,
   TaskResultType,
-  ValidateImapSyncRequestOutput,
   ValidateImapSyncResponseOutput,
 } from "./types";
 
@@ -31,15 +28,10 @@ import type {
 export interface ImapSyncTaskRepository {
   executeImapSync(
     data: ExecuteImapSyncRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ExecuteImapSyncResponseOutput>>;
 
   validateImapSync(
-    data: ValidateImapSyncRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<ValidateImapSyncResponseOutput>;
 }
@@ -53,8 +45,6 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
    */
   async executeImapSync(
     data: ExecuteImapSyncRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ExecuteImapSyncResponseOutput>> {
     logger.info("tasks.imap_sync.start", {
@@ -68,9 +58,6 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
       // For now, we'll execute a simplified sync all accounts operation
       // In a real implementation, this would get specific accounts based on config
       const syncResult = await imapSyncRepository.syncAllAccounts(
-        {}, // Empty data for sync all
-        user,
-        locale,
         logger,
       );
 
@@ -129,9 +116,6 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
    * Validate IMAP sync task
    */
   validateImapSync(
-    data: ValidateImapSyncRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<ValidateImapSyncResponseOutput> {
     try {

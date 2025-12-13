@@ -6,7 +6,6 @@
 "use client";
 
 import {
-  Calendar,
   Clock,
   Home,
   Mail,
@@ -73,12 +72,6 @@ export function AdminLayoutClient({
       href: `/${locale}/admin/users` as const,
       icon: Users,
       current: pathname.startsWith(`/${locale}/admin/users`),
-    },
-    {
-      name: t("app.admin.components.navigation.consultations"),
-      href: `/${locale}/admin/consultations` as const,
-      icon: Calendar,
-      current: pathname.startsWith(`/${locale}/admin/consultations`),
     },
     {
       name: t("app.admin.components.navigation.emails"),

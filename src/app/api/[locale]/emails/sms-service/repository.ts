@@ -15,12 +15,8 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { Countries, Languages } from "@/i18n/core/config";
 
 import type { SmsSendRequestOutput, SmsSendResponseOutput } from "./definition";
-
-// Define the proper type for locale to match standardized patterns
-type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
 
 /**
  * SMS Service Repository Interface
@@ -29,7 +25,6 @@ export interface SmsServiceRepository {
   sendSms(
     data: SmsSendRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmsSendResponseOutput>>;
 }
@@ -42,7 +37,6 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
   async sendSms(
     data: SmsSendRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmsSendResponseOutput>> {
     try {

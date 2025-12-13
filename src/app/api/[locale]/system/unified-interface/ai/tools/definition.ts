@@ -38,6 +38,7 @@ const { GET } = createEndpoint({
   title: "app.api.system.unifiedInterface.ai.tools.get.title" as const,
   description:
     "app.api.system.unifiedInterface.ai.tools.get.description" as const,
+  icon: "wand",
   category: "app.api.system.unifiedInterface.ai.tools.category" as const,
   tags: ["app.api.system.unifiedInterface.ai.tools.tags.tools" as const],
   allowedRoles: [

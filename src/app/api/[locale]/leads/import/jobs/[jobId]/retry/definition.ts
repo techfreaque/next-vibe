@@ -32,6 +32,7 @@ const { POST } = createEndpoint({
   category: "app.api.leads.category",
   tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
   allowedRoles: [UserRole.ADMIN] as const,
+  icon: "rotate-ccw",
 
   fields: objectField(
     {

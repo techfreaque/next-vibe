@@ -7,25 +7,21 @@ import type { JSX } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
+import type { WidgetType } from "../../../shared/types/enums";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { extractMarkdownData } from "../../../shared/widgets/logic/markdown";
 
 /**
- * Markdown Widget Component
- * Renders markdown content with optional sanitization
+ * Renders markdown content with optional sanitization.
  */
 export function MarkdownWidget({
   value,
-  field: _field,
   context,
   className,
-}: WidgetComponentProps): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.MARKDOWN>): JSX.Element {
   const { t } = simpleT(context.locale);
-
-  // Extract data using shared logic
   const data = extractMarkdownData(value);
 
-  // Handle null case
   if (!data) {
     return (
       <Div className={cn("text-muted-foreground italic", className)}>

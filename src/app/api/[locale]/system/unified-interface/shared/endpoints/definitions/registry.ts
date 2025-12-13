@@ -2,8 +2,8 @@ import { endpoints } from "@/app/api/[locale]/system/generated/endpoints";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CreateApiEndpointAny } from "../../types/endpoint";
 import { Methods } from "../../types/enums";

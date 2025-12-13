@@ -32,6 +32,7 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["leads", "campaigns", "campaign-starter", "campaign-starter-config"],
   allowedRoles: [UserRole.ADMIN],
+  icon: "rocket",
 
   title:
     "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.title" as const,
@@ -281,6 +282,7 @@ const { PUT } = createEndpoint({
   method: Methods.PUT,
   path: ["leads", "campaigns", "campaign-starter", "campaign-starter-config"],
   allowedRoles: [UserRole.ADMIN],
+  icon: "rocket",
 
   title:
     "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.title" as const,

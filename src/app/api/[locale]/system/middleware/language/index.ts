@@ -6,9 +6,8 @@
 
 import type { NextRequest } from "next/server";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { LOCALE_COOKIE_NAME } from "@/config/constants";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 export interface LanguageMiddlewareOptions {
   /**
@@ -66,12 +65,17 @@ export function detectLocale(
   const pathParts = path.split("/").filter(Boolean);
   const pathFirstPart = pathParts[0] || "";
 
+  // For API routes, check the second path segment (/api/[locale]/...)
+  // For regular routes, check the first path segment (/[locale]/...)
+  const isApiRoute = pathFirstPart === "api";
+  const localeSegment = isApiRoute ? pathParts[1] : pathFirstPart;
+
   // Check if the path starts with a valid locale
   const isValidLocalePrefix =
-    pathFirstPart &&
+    localeSegment &&
     supportedLocales.some((locale) => {
       const normalizedLocale = locale.toLowerCase();
-      const normalizedPathPart = pathFirstPart.toLowerCase();
+      const normalizedPathPart = localeSegment.toLowerCase();
       return normalizedPathPart === normalizedLocale;
     });
 

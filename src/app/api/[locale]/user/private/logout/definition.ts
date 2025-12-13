@@ -24,6 +24,7 @@ const { POST } = createEndpoint({
   path: ["user", "private", "logout"],
   title: "app.api.user.private.logout.title" as const,
   description: "app.api.user.private.logout.description" as const,
+  icon: "log-out",
   category: "app.api.user.category" as const,
   tags: ["app.api.user.private.logout.tag" as const],
   allowedRoles: [

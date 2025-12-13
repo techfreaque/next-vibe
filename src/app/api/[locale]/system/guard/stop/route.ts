@@ -14,8 +14,8 @@ import { guardStopRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: guardStopEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) => {
-      return guardStopRepository.stopGuard(data, user, locale, logger);
+    handler: ({ data, logger }) => {
+      return guardStopRepository.stopGuard(data, logger);
     },
   },
 });

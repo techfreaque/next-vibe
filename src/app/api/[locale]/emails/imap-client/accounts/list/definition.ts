@@ -45,6 +45,7 @@ const { GET } = createEndpoint({
   category: "app.api.emails.category",
   tags: ["app.api.emails.imapClient.accounts.tag"],
 
+  icon: "inbox",
   allowedRoles: [UserRole.ADMIN],
 
   fields: objectField(

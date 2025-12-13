@@ -15,8 +15,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { performance } from "node:perf_hooks";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getCurrentEnvironmentInfo } from "../environment";
 import type {
@@ -30,8 +28,6 @@ import type {
 export interface HealthCheckRepositoryInterface {
   checkHealth(
     data: HealthCheckRequestOutput,
-    user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<HealthCheckResponseOutput>>;
 }
@@ -44,8 +40,6 @@ export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface
 
   async checkHealth(
     data: HealthCheckRequestOutput,
-    user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<HealthCheckResponseOutput>> {
     const checkStart = performance.now();

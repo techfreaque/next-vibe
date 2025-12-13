@@ -5,7 +5,7 @@ import signupEndpoints from "./definition";
 import { renderAdminSignupNotification, renderRegisterMail } from "./email";
 import { signupRepository } from "./repository";
 
-export const { GET, POST, tools } = endpointsHandler({
+export const { POST, tools } = endpointsHandler({
   endpoint: signupEndpoints,
   [Methods.POST]: {
     email: [
@@ -26,17 +26,6 @@ export const { GET, POST, tools } = endpointsHandler({
         logger,
         request,
         platform,
-      );
-    },
-  },
-  [Methods.GET]: {
-    email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
-      return await signupRepository.checkEmailAvailability(
-        data,
-        user,
-        locale,
-        logger,
       );
     },
   },

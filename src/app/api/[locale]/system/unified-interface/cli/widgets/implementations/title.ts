@@ -10,16 +10,13 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/title";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class TitleWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.TITLE;
-  }
+export class TitleWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TITLE> {
+  readonly widgetType = WidgetType.TITLE;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.TITLE>): string {
+    const { value, context } = props;
 
     // Extract data using shared logic
     const data = extractTitleData(value);

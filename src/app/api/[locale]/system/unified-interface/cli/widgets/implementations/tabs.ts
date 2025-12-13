@@ -4,22 +4,19 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   extractTabsData,
   getActiveTab,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/tabs";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps } from "../core/types";
 
-export class TabsWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.TABS;
-  }
+export class TabsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TABS> {
+  readonly widgetType = WidgetType.TABS;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.TABS>): string {
+    const { value, context } = props;
     const indent = this.createIndent(context.depth, context);
 
     // Extract data using shared logic

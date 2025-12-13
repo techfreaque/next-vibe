@@ -15,7 +15,6 @@ import { useChatPermissions } from "@/app/api/[locale]/agent/chat/hooks/use-chat
 import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { getLocaleString } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
 
 import { ModelSelector } from "./model-selector";
@@ -55,7 +54,6 @@ export function ChatInput({
   const { canPost, noPermissionReason } = useChatPermissions(chat, locale);
 
   const { t } = simpleT(locale);
-  const speechLang = getLocaleString(locale);
 
   // Check if current model supports tools (for search toggle visibility)
   const currentModel = getModelById(selectedModel);
@@ -68,13 +66,14 @@ export function ChatInput({
     <Form
       onSubmit={onSubmit}
       className={cn(
-        "p-2 sm:p-3 md:p-4 bg-blue-200/70 dark:bg-blue-950/70 backdrop-blur",
+        "@container",
+        "p-2 @sm:p-3 @md:p-4 bg-blue-200/70 dark:bg-blue-950/70 backdrop-blur",
         "border border-border rounded-t-lg",
         className,
       )}
     >
       {/* Input Area */}
-      <Div className="relative mb-2 sm:mb-3" data-tour={TOUR_DATA_ATTRS.CHAT_INPUT}>
+      <Div className="relative mb-2 @sm:mb-3" data-tour={TOUR_DATA_ATTRS.CHAT_INPUT}>
         <Textarea
           ref={inputRef}
           value={value}
@@ -90,9 +89,9 @@ export function ChatInput({
           title={!canPost ? noPermissionReason : undefined}
         />
 
-        {/* Hint Text - Shows when textarea is empty - Hidden on mobile */}
+        {/* Hint Text - Shows when textarea is empty - Hidden on small containers */}
         {!value && canPost && (
-          <Div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden sm:block">
+          <Div className="absolute top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden @sm:block">
             {t("app.chat.input.keyboardShortcuts.press")}{" "}
             <Kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
               {t("app.chat.input.keyboardShortcuts.enter")}
@@ -114,27 +113,27 @@ export function ChatInput({
       </Div>
 
       {/* Controls - ALL IN ONE LINE */}
-      <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 flex-nowrap">
+      <Div className="flex flex-row items-center gap-1 @sm:gap-1.5 @md:gap-2 flex-nowrap">
         {/* Left side: Model & Persona Selectors */}
-        <Div className="flex flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 flex-1 min-w-0">
-          {/* Model Selector - text hidden last (on smallest screens) */}
+        <Div className="flex flex-row items-center gap-0.5 @sm:gap-1 @md:gap-1.5 flex-1 min-w-0">
+          {/* Model Selector - text hidden last (on smallest containers) */}
           <ModelSelector
             value={selectedModel}
             onChange={onModelChange}
             locale={locale}
             logger={logger}
-            buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
-            showTextAt="sm"
+            buttonClassName="px-1.5 @sm:px-2 @md:px-3 min-h-8 h-8 @sm:min-h-9 @sm:h-9"
+            showTextAt="@md"
           />
 
-          {/* Persona Selector - text hidden first (on smaller screens) */}
+          {/* Persona Selector - text hidden first (on smaller containers) */}
           <PersonaSelector
             value={selectedPersona}
             onChange={onPersonaChange}
             locale={locale}
             logger={logger}
-            buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
-            showTextAt="md"
+            buttonClassName="px-1.5 @sm:px-2 @md:px-3 min-h-8 h-8 @sm:min-h-9 @sm:h-9"
+            showTextAt="@xl"
           />
 
           {/* Search Toggle and Tools - Only show if model supports tools */}
@@ -147,11 +146,10 @@ export function ChatInput({
         </Div>
 
         {/* Right side: Speech Input & Send/Stop Button */}
-        <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 shrink-0">
+        <Div className="flex flex-row items-center gap-1 @sm:gap-1.5 @md:gap-2 shrink-0">
           {/* Speech Input Button */}
           <SpeechInputButton
             disabled={isInputDisabled}
-            lang={speechLang}
             locale={locale}
             logger={logger}
             dataTour={TOUR_DATA_ATTRS.SPEECH_INPUT}
@@ -163,25 +161,25 @@ export function ChatInput({
               type="button"
               size="icon"
               onClick={onStop}
-              className="h-8 w-8 sm:h-9 sm:w-9 shrink-0"
+              className="h-8 w-8 @sm:h-9 @sm:w-9 shrink-0"
               variant="destructive"
               title={t("app.chat.actions.stopGeneration")}
             >
-              <Square className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <Square className="h-3.5 w-3.5 @sm:h-4 @sm:w-4" />
             </Button>
           ) : (
             <Button
               type="submit"
               size="icon"
               disabled={!value.trim() || isInputDisabled}
-              className="h-8 w-8 sm:h-9 sm:w-9 shrink-0"
+              className="h-8 w-8 @sm:h-9 @sm:w-9 shrink-0"
               title={
                 !canPost
                   ? noPermissionReason || t("app.chat.input.noPermission")
                   : t("app.chat.actions.sendMessage")
               }
             >
-              <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <Send className="h-3.5 w-3.5 @sm:h-4 @sm:w-4" />
             </Button>
           )}
         </Div>

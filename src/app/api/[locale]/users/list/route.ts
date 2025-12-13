@@ -30,7 +30,6 @@ export const { GET, tools } = endpointsHandler({
       return await userListRepository.listUsers(
         props.data,
         props.user,
-        props.locale,
         props.logger,
       );
     },

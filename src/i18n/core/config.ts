@@ -133,7 +133,7 @@ export const LanguageFilterOptions = [
  * Convert country filter - handles CountryFilter and returns string or null
  */
 export function convertCountryFilter(
-  country: CountryFilter | undefined,
+  country: CountryFilter | Countries | undefined,
 ): Countries | null {
   if (!country || country === CountryFilter.ALL) {
     return null;
@@ -145,7 +145,7 @@ export function convertCountryFilter(
  * Convert language filter - handles LanguageFilter and returns string or null
  */
 export function convertLanguageFilter(
-  language: LanguageFilter | undefined,
+  language: LanguageFilter | Languages | undefined,
 ): Languages | null {
   if (!language || language === LanguageFilter.ALL) {
     return null;

@@ -624,6 +624,7 @@ export function useMessageOperations(
         chatStore.deleteMessage(messageId);
 
         if (streamStore.streamingMessages[messageId]) {
+          // eslint-disable-next-line no-unused-vars -- Destructuring pattern to omit property
           const { [messageId]: _deleted, ...remainingMessages } =
             streamStore.streamingMessages;
           streamStore.reset();
@@ -702,6 +703,7 @@ export function useMessageOperations(
         chatStore.deleteMessage(messageId);
 
         if (streamStore.streamingMessages[messageId]) {
+          // eslint-disable-next-line no-unused-vars -- Destructuring pattern to omit property
           const { [messageId]: _deleted, ...remainingMessages } =
             streamStore.streamingMessages;
           streamStore.reset();

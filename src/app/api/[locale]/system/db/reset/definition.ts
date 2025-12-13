@@ -31,6 +31,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.db.reset.post.description",
   category: "app.api.system.db.category",
   tags: ["app.api.system.db.reset.tag"],
+  icon: "rotate-ccw",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

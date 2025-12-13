@@ -3,15 +3,13 @@
  * Handles DATA_TABLE widget type with column definitions and formatting
  */
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type {
-  WidgetData,
-  WidgetInput,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import {
   extractDataTableData,
   formatCellValue,
@@ -19,16 +17,39 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/data-table";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { TableRenderConfig, WidgetRenderContext } from "../core/types";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class DataTableWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.DATA_TABLE;
-  }
+/**
+ * CLI-specific table rendering configuration.
+ * Derived from DataTableWidgetConfig but includes CLI-specific formatting.
+ */
+interface TableRenderConfig {
+  columns: Array<{
+    key: string;
+    label: string;
+    type: FieldDataType;
+    width?: string;
+    align?: "left" | "center" | "right";
+    formatter?: (value: WidgetData) => string;
+  }>;
+  pagination?: {
+    enabled: boolean;
+    pageSize: number;
+  };
+  sorting?: {
+    enabled: boolean;
+    defaultSort?: { key: string; direction: "asc" | "desc" };
+  };
+  filtering?: {
+    enabled: boolean;
+  };
+}
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { field, value } = input;
+export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_TABLE> {
+  readonly widgetType = WidgetType.DATA_TABLE;
+
+  render(props: CLIWidgetProps<typeof WidgetType.DATA_TABLE>): string {
+    const { field, value, context } = props;
     const t = context.t;
 
     // Extract data using shared logic

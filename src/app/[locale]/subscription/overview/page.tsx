@@ -77,6 +77,7 @@ export default async function OverviewPage({
   if (userResponse.success && userResponse.data && userResponse.data.leadId) {
     const creditsResponse = await creditRepository.getCreditBalanceForUser(
       userResponse.data,
+      locale,
       logger,
     );
     credits = creditsResponse.success ? creditsResponse.data : null;
@@ -92,6 +93,7 @@ export default async function OverviewPage({
     const subscriptionResponse = await subscriptionRepository.getSubscription(
       userResponse.data.id,
       logger,
+      locale,
     );
     subscription = subscriptionResponse.success
       ? subscriptionResponse.data

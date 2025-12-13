@@ -65,10 +65,7 @@ function sortStagesByPriority(
 /**
  * Check if a stage should be processed based on configuration
  */
-function shouldProcessStage(
-  stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
-  config: EmailCampaignConfigType,
-): boolean {
+function shouldProcessStage(config: EmailCampaignConfigType): boolean {
   // Check if current time is within enabled hours
   const now = new Date();
   const currentHour = now.getHours();
@@ -252,7 +249,7 @@ export async function execute(
 
     // Get enabled stages sorted by priority
     const stagesToProcess = sortStagesByPriority(
-      config.enabledStages.filter((stage) => shouldProcessStage(stage, config)),
+      config.enabledStages.filter(() => shouldProcessStage(config)),
     );
 
     logger.debug("Processing stages in order", {

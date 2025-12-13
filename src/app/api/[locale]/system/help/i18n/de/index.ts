@@ -41,6 +41,11 @@ export const translations: typeof enTranslations = {
       title: "Erfolg",
       description: "Interaktiver Modus erfolgreich gestartet",
     },
+    grouping: {
+      category: "Kategorie",
+      tags: "Tags",
+      path: "Pfad",
+    },
   },
   post: {
     title: "Hilfeinformationen anzeigen",

@@ -10,12 +10,8 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { MCPServer } from "../server/server";
-import type {
-  MCPServeRequestOutput,
-  MCPServeResponseInput,
-} from "./definition";
+import type { MCPServeResponseInput } from "./definition";
 
 class MCPServeRepository {
   /**
@@ -23,8 +19,6 @@ class MCPServeRepository {
    * Note: This function never returns as the MCP server takes over the process
    */
   async startServer(
-    data: MCPServeRequestOutput,
-    user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<MCPServeResponseInput>> {

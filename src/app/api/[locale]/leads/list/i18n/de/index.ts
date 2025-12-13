@@ -8,6 +8,10 @@ export const translations: typeof enTranslations = {
       title: "Lead-Listen-Filter",
       description: "Filter für Lead-Liste konfigurieren",
     },
+    actions: {
+      refresh: "Aktualisieren",
+      refreshing: "Aktualisierung...",
+    },
     page: {
       label: "Seitennummer",
       description: "Seitennummer für Paginierung",

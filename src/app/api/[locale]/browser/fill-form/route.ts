@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: fillFormEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, logger }) => {
       return executeFillForm(
         {
           toolName: "fill-form",
@@ -20,9 +20,7 @@ export const { POST, tools } = endpointsHandler({
             elements: data.elements,
           }),
         },
-        user,
         logger,
-        locale,
       );
     },
   },

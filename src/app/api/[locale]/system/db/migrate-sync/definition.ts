@@ -28,6 +28,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.db.migrateSync.post.description",
   category: "app.api.system.db.category",
   tags: ["app.api.system.db.migrateSync.tag"],
+  icon: "refresh-cw",
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: ["migrate-sync", "db:migrate-sync"],
 

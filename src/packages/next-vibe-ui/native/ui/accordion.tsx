@@ -86,7 +86,7 @@ export function Accordion({
   const singleDefaultValue =
     typeof defaultValue === "string" ? defaultValue : undefined;
 
-  const [_value, setValue] = React.useState(singleDefaultValue ?? "");
+  const [, setValue] = React.useState(singleDefaultValue ?? "");
   const handleValueChange = React.useCallback(
     (newValue: string | undefined) => {
       setValue(newValue ?? "");

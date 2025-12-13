@@ -28,6 +28,7 @@ const { GET } = createEndpoint({
   title: "app.api.agent.chat.threads.threadId.permissions.get.title" as const,
   description:
     "app.api.agent.chat.threads.threadId.permissions.get.description" as const,
+  icon: "shield",
   category: "app.api.agent.chat.category" as const,
   tags: [
     "app.api.agent.chat.tags.threads" as const,
@@ -214,6 +215,7 @@ const { PATCH } = createEndpoint({
   title: "app.api.agent.chat.threads.threadId.permissions.patch.title" as const,
   description:
     "app.api.agent.chat.threads.threadId.permissions.patch.description" as const,
+  icon: "shield",
   category: "app.api.agent.chat.category" as const,
   tags: [
     "app.api.agent.chat.tags.threads" as const,

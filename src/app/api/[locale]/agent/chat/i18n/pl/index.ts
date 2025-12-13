@@ -51,6 +51,19 @@ export const translations: typeof enTranslations = {
       debug: "Debug",
     },
   },
+  components: {
+    sidebar: {
+      login: "Zaloguj się",
+      logout: "Wyloguj się",
+      footer: {
+        account: "Konto",
+        profile: "Profil",
+        balance: "Saldo",
+        buy: "Kup",
+        freeCreditsLeft: "Darmowe kredyty",
+      },
+    },
+  },
   common: {
     newChat: "Nowy czat",
     privateChats: "Prywatne czaty",
@@ -128,7 +141,8 @@ export const translations: typeof enTranslations = {
           },
           suggestedPrompts: {
             label: "Sugerowane prompty (opcjonalne)",
-            description: "Dodaj do 4 przykładowych promptów, aby pomóc użytkownikom rozpocząć",
+            description:
+              "Dodaj do 4 przykładowych promptów, aby pomóc użytkownikom rozpocząć",
             placeholder: "Przykładowy prompt {{number}}",
           },
         },
@@ -247,6 +261,10 @@ export const translations: typeof enTranslations = {
         "FreedomGPT Liberty - Niecenzurowany model AI skoncentrowany na wolności wypowiedzi i treściach kreatywnych",
       gabAiArya:
         "Gab AI Arya - Niecenzurowany model konwersacyjny AI z wolnością wypowiedzi i kreatywnymi możliwościami",
+      gemini3Pro:
+        "Google Gemini 3 Pro - Zaawansowany multimodalny model AI z dużym oknem kontekstowym",
+      deepseekV32:
+        "DeepSeek V3.2 - Wysokowydajny model rozumowania z zaawansowanymi możliwościami kodowania",
     },
   },
 };

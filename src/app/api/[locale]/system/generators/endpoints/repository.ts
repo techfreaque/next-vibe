@@ -15,8 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type endpoints from "./definition";
 // Import options utilities from the consolidated options repository
@@ -44,8 +42,6 @@ type ResponseOutputType = typeof endpoints.POST.types.ResponseOutput;
 export interface FunctionalGeneratorsRepository {
   runGenerators(
     data: RequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<ResponseOutputType>>;
 
@@ -111,8 +107,6 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
    */
   async runGenerators(
     data: RequestType,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<ResponseOutputType>> {
     try {
@@ -140,7 +134,7 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
       } else {
         try {
           output.push("📝 Generating endpoints...");
-          await this.generateEndpoints(rootDir, logger);
+          await this.generateEndpoints(logger);
           output.push("✅ Endpoints generated successfully");
           results.endpoints = true;
           generatorsRun++;
@@ -157,7 +151,7 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
       } else {
         try {
           output.push("🌱 Generating seeds...");
-          await this.generateSeeds(rootDir, logger);
+          await this.generateSeeds(logger);
           output.push("✅ Seeds generated successfully");
           results.seeds = true;
           generatorsRun++;
@@ -174,7 +168,7 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
       } else {
         try {
           output.push("⏰ Generating cron tasks...");
-          await this.generateCronTasks(rootDir, logger);
+          await this.generateCronTasks(logger);
           output.push("✅ Cron tasks generated successfully");
           results.cronTasks = true;
           generatorsRun++;
@@ -191,7 +185,7 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
       } else {
         try {
           output.push("🔄 Generating tRPC router...");
-          await this.generateTRPCRouterDev(rootDir, logger);
+          await this.generateTRPCRouterDev(logger);
           output.push("✅ tRPC router generated successfully");
           results.trpcRouter = true;
           generatorsRun++;
@@ -253,7 +247,6 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
    * Generate endpoints
    */
   private async generateEndpoints(
-    rootDir: string,
     logger: EndpointLogger,
   ): Promise<void> {
     try {
@@ -275,7 +268,6 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
    * Generate seeds
    */
   private async generateSeeds(
-    rootDir: string,
     logger: EndpointLogger,
   ): Promise<void> {
     try {
@@ -297,7 +289,6 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
    * Generate cron tasks
    */
   private async generateCronTasks(
-    rootDir: string,
     logger: EndpointLogger,
   ): Promise<void> {
     try {
@@ -319,7 +310,6 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
    * Generate tRPC router (development mode)
    */
   private async generateTRPCRouterDev(
-    rootDir: string,
     logger: EndpointLogger,
   ): Promise<void> {
     try {
@@ -347,11 +337,9 @@ export const functionalGeneratorsRepository =
 export const endpointsGeneratorRepository = {
   generateEndpoints: (
     data: RequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<ResponseOutputType>> =>
-    functionalGeneratorsRepository.runGenerators(data, user, locale, logger),
+    functionalGeneratorsRepository.runGenerators(data, logger),
 };
 
 // Export the main function for backward compatibility
@@ -360,15 +348,12 @@ export const runFunctionalGenerators = async (
   logger: EndpointLogger,
 ): Promise<void> => {
   try {
-    const rootDir = options.rootDir || process.cwd();
-
     // Step 1: Generate endpoints
     if (options.skipEndpoints) {
       logger.debug("⏭️ Skipping endpoints generation");
     } else {
       logger.debug("📝 Generating endpoints...");
       await functionalGeneratorsRepository["generateEndpoints"](
-        rootDir,
         logger,
       );
       logger.debug("✅ Endpoints generated successfully");
@@ -379,7 +364,7 @@ export const runFunctionalGenerators = async (
       logger.debug("⏭️ Skipping seeds generation");
     } else {
       logger.debug("🌱 Generating seeds...");
-      await functionalGeneratorsRepository["generateSeeds"](rootDir, logger);
+      await functionalGeneratorsRepository["generateSeeds"](logger);
       logger.debug("✅ Seeds generated successfully");
     }
 
@@ -389,7 +374,6 @@ export const runFunctionalGenerators = async (
     } else {
       logger.debug("⏰ Generating cron tasks...");
       await functionalGeneratorsRepository["generateCronTasks"](
-        rootDir,
         logger,
       );
       logger.debug("✅ Cron tasks generated successfully");
@@ -401,7 +385,6 @@ export const runFunctionalGenerators = async (
     } else {
       logger.debug("🔄 Generating tRPC router...");
       await functionalGeneratorsRepository["generateTRPCRouterDev"](
-        rootDir,
         logger,
       );
       logger.debug("✅ tRPC router generated successfully");

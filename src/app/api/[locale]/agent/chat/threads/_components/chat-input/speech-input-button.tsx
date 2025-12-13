@@ -27,7 +27,6 @@ interface SpeechInputButtonProps {
   /** Optional custom transcript handler. If not provided, appends to main chat input from context */
   onTranscript?: (text: string) => void;
   disabled?: boolean;
-  lang?: string;
   locale: CountryLanguage;
   className?: string;
   logger: EndpointLogger;
@@ -37,7 +36,6 @@ interface SpeechInputButtonProps {
 export function SpeechInputButton({
   onTranscript: customOnTranscript,
   disabled = false,
-  lang,
   locale,
   className,
   logger,
@@ -71,7 +69,6 @@ export function SpeechInputButton({
     onError: (err: string) => {
       logger.error("app.chat.speech.error", err);
     },
-    lang,
     locale,
     logger,
     deductCredits,

@@ -20,8 +20,8 @@ import { smtpSendingRepository } from "@/app/api/[locale]/emails/smtp-client/sen
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { LeadWithEmailType } from "../../../types";
 import { emailService } from "../index";
@@ -165,8 +165,6 @@ class TestEmailRepository {
             senderName: t("config.appName"),
             selectionCriteria,
           },
-          user,
-          emailLocale,
           logger,
         );
 

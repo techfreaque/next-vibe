@@ -6,28 +6,35 @@
 import chalk from "chalk";
 
 import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type {
   WidgetData,
-  WidgetInput,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
+  CLIWidgetProps,
   DataFormatter,
   WidgetRenderContext,
   WidgetRenderer,
 } from "./types";
 
-export abstract class BaseWidgetRenderer implements WidgetRenderer {
+/**
+ * Base widget renderer with common utilities.
+ * Generic over WidgetType T to enable type-safe props within each implementation.
+ */
+export abstract class BaseWidgetRenderer<T extends WidgetType = WidgetType>
+  implements WidgetRenderer<T>
+{
+  abstract readonly widgetType: T;
   protected formatter: DataFormatter;
 
   constructor() {
     this.formatter = new DefaultDataFormatter();
   }
 
-  abstract canRender(widgetType: string): boolean;
-  abstract render(input: WidgetInput, context: WidgetRenderContext): string;
+  abstract render(props: CLIWidgetProps<T>): string;
 
   /**
    * Create indentation for the given depth
@@ -41,7 +48,15 @@ export abstract class BaseWidgetRenderer implements WidgetRenderer {
    */
   protected styleText(
     text: string,
-    style: "bold" | "dim" | "underline" | "red" | "green" | "yellow" | "blue",
+    style:
+      | "bold"
+      | "dim"
+      | "underline"
+      | "italic"
+      | "red"
+      | "green"
+      | "yellow"
+      | "blue",
     context: WidgetRenderContext,
   ): string {
     if (!context.options.useColors) {
@@ -55,6 +70,8 @@ export abstract class BaseWidgetRenderer implements WidgetRenderer {
         return chalk.dim(text);
       case "underline":
         return chalk.underline(text);
+      case "italic":
+        return chalk.italic(text);
       case "red":
         return chalk.red(text);
       case "green":

@@ -165,7 +165,8 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
           </CardHeader>
           <CardContent>
             <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {Array.from({ length: 8 }).map((_, i) => (
+              {/* eslint-disable-next-line @typescript-eslint/no-unused-vars -- Array.from callback requires first parameter */}
+              {Array.from({ length: 8 }, (unused, i) => (
                 <Skeleton key={i} className="h-10 w-full" />
               ))}
             </Div>
@@ -174,7 +175,8 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* Stats Cards Skeleton */}
         <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, i) => (
+          {/* eslint-disable-next-line @typescript-eslint/no-unused-vars -- Array.from callback requires first parameter */}
+          {Array.from({ length: 8 }).map((unused, i) => (
             <Card key={i}>
               <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
                 <Skeleton className="h-4 w-24" />
@@ -193,7 +195,8 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
           <CardHeader>
             <Skeleton className="h-5 w-32" />
             <Div className="flex flex flex-row gap-2 mt-4">
-              {Array.from({ length: 4 }).map((_, i) => (
+              {/* eslint-disable-next-line @typescript-eslint/no-unused-vars -- Array.from callback requires first parameter */}
+              {Array.from({ length: 4 }).map((unused, i) => (
                 <Skeleton key={i} className="h-8 w-20" />
               ))}
             </Div>

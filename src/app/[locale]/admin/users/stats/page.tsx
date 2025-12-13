@@ -1,18 +1,14 @@
 /**
  * Users Stats Page
- * Server component for users statistics and analytics
+ * Server component for users statistics and analytics using EndpointRenderer
  */
 
-import { BarChart3 } from "next-vibe-ui/ui/icons";
 import type { Metadata } from "next";
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
 import type React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { UsersStatsClient } from "@/app/api/[locale]/users/stats/_components/users-stats-client";
+import { UsersStatsClientPage } from "./page-client";
 
 interface UsersStatsPageProps {
   params: Promise<{
@@ -36,22 +32,6 @@ export default async function UsersStatsPage({
   params,
 }: UsersStatsPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
 
-  return (
-    <Div className="flex flex-col gap-6">
-      {/* Stats Content */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5" />
-            {t("app.admin.users.stats.title")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <UsersStatsClient locale={locale} />
-        </CardContent>
-      </Card>
-    </Div>
-  );
+  return <UsersStatsClientPage locale={locale} />;
 }

@@ -77,7 +77,6 @@ export async function calculateMessageDepth(
  */
 export async function fetchMessageHistory(
   threadId: string,
-  userId: string,
   logger: EndpointLogger,
   parentMessageId: string | null,
 ): Promise<ChatMessage[]> {

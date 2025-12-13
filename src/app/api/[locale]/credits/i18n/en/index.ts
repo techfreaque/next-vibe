@@ -40,7 +40,9 @@ export const translations = {
     getOrCreateLeadFailed: "Failed to get or create lead",
     addCreditsFailed: "Failed to add credits",
     deductCreditsFailed: "Failed to deduct credits",
-    insufficientCredits: "Insufficient credits",
+    insufficientCredits:
+      "Insufficient credits. You need {{cost}} credits to use this feature.",
+    deductionFailed: "Failed to deduct {{cost}} credits. Please try again.",
     getTransactionsFailed: "Failed to get credit transactions",
     invalidIdentifier: "Invalid user or lead identifier",
     userNotFound: "User not found",

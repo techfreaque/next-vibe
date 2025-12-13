@@ -44,19 +44,11 @@ export function Switch({
   onCheckedChange,
   disabled,
   defaultChecked,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  name,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  value,
   className,
   style,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  required,
-  id,
   onBlur,
   children,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  
+  id,
 }: SwitchRootProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   const { colorScheme } = useColorScheme();

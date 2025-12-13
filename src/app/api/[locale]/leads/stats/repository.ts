@@ -33,7 +33,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 import {
   convertCountryFilter,
   convertLanguageFilter,
@@ -41,7 +40,6 @@ import {
   LanguageFilter,
 } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../user/auth/types";
 import { emailCampaigns, leads } from "../db";
 import type { LeadSource } from "../enum";
 import {
@@ -124,8 +122,6 @@ const mapLeadStatusToActivityType = (
 export interface LeadsStatsRepository {
   getLeadsStats(
     data: LeadsStatsRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadsStatsResponseOutput>>;
 }
@@ -136,8 +132,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   async getLeadsStats(
     data: LeadsStatsRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadsStatsResponseOutput>> {
     // Initialize date variables for error handling scope
@@ -145,7 +139,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     let dateTo: Date | undefined;
 
     try {
-      logger.debug("Getting leads stats", { userId: user.id });
+      logger.debug("Getting leads stats");
 
       // Get date range from preset
       const dateRange = getDateRangeFromPreset(data.dateRangePreset);
@@ -199,7 +193,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       logger.error("Error getting leads stats", {
         error: errorDetails.message,
         stack: errorDetails.stack,
-        userId: user.id,
         dateRange: {
           from: dateFrom?.toISOString(),
           to: dateTo?.toISOString(),
@@ -974,7 +967,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           type: "line" as ChartType,
           data: await this.calculateEngagementScore(
             intervals,
-            whereConditions,
             timePeriod,
             filters,
             logger,
@@ -986,7 +978,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           type: "line" as ChartType,
           data: await this.calculateLeadVelocity(
             intervals,
-            whereConditions,
             timePeriod,
             filters,
             logger,
@@ -998,7 +989,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           type: "line" as ChartType,
           data: await this.calculateDataCompleteness(
             intervals,
-            whereConditions,
             timePeriod,
             filters,
             logger,
@@ -2383,7 +2373,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async calculateEngagementScore(
     intervals: Array<{ start: Date; end: Date; label: string }>,
-    _whereConditions: SQL | undefined,
     timePeriod: TimePeriod,
     filters: LeadsStatsRequestOutput,
     logger: EndpointLogger,
@@ -2469,7 +2458,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async calculateLeadVelocity(
     intervals: Array<{ start: Date; end: Date; label: string }>,
-    _whereConditions: SQL | undefined,
     timePeriod: TimePeriod,
     filters: LeadsStatsRequestOutput,
     logger: EndpointLogger,
@@ -2571,7 +2559,6 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    */
   private async calculateDataCompleteness(
     intervals: Array<{ start: Date; end: Date; label: string }>,
-    _whereConditions: SQL | undefined,
     timePeriod: TimePeriod,
     filters: LeadsStatsRequestOutput,
     logger: EndpointLogger,

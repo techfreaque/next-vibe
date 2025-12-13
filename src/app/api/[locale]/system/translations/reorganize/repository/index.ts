@@ -10,8 +10,8 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { languageDefaults } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { languageDefaults } from "@/i18n";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -1610,13 +1610,11 @@ export class TranslationReorganizeRepositoryImpl {
   /**
    * Update main index structure: replace section imports with location-based imports
    * @param groups - Map of location paths to translation objects
-   * @param _languages - Array of available languages (unused in current implementation)
    * @param logger - Logger instance for debugging
    * @returns True if the main index was successfully updated
    */
   private updateMainIndexStructure(
     groups: Map<string, TranslationObject>,
-    _languages: string[],
     logger: EndpointLogger,
   ): boolean {
     try {
@@ -1770,7 +1768,6 @@ export class TranslationReorganizeRepositoryImpl {
    * @returns Response containing translation statistics
    */
   async getTranslationStats(
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{

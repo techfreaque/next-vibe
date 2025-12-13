@@ -49,7 +49,6 @@ export type {
 export function AnimatePresence({
   children,
   mode,
-  initial: _initial,
   onExitComplete,
 }: AnimatePresenceProps): React.JSX.Element {
   // Moti AnimatePresence doesn't support mode directly, but we can handle initial and onExitComplete

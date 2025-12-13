@@ -34,6 +34,7 @@ const { GET } = createEndpoint({
 
   title: "app.api.agent.chat.threads.search.get.title" as const,
   description: "app.api.agent.chat.threads.search.get.description" as const,
+  icon: "search",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.threads" as const],
 

@@ -19,7 +19,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: ({ data, user, locale, logger }) =>
+    handler: ({ data, user, logger }) =>
       imapFoldersRepository.listFolders(
         {
           page: data.page ?? 1,
@@ -32,7 +32,6 @@ export const { GET, tools } = endpointsHandler({
           syncStatus: data.syncStatus,
         },
         user,
-        locale,
         logger,
       ),
   },

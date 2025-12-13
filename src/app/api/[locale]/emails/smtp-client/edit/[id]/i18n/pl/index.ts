@@ -71,6 +71,31 @@ export const translations: typeof enTranslations = {
       description: "Priorytet konta (1-100)",
       placeholder: "10",
     },
+    campaignTypes: {
+      label: "Typy kampanii",
+      description: "Typy kampanii e-mailowych, które to konto może wysyłać",
+      placeholder: "Wybierz typy kampanii",
+    },
+    emailJourneyVariants: {
+      label: "Warianty ścieżki",
+      description: "Warianty ścieżki e-mail obsługiwane przez to konto",
+      placeholder: "Wybierz warianty ścieżki",
+    },
+    emailCampaignStages: {
+      label: "Etapy kampanii",
+      description: "Etapy kampanii obsługiwane przez to konto",
+      placeholder: "Wybierz etapy kampanii",
+    },
+    countries: {
+      label: "Kraje",
+      description: "Kraje, do których to konto może wysyłać",
+      placeholder: "Wybierz kraje",
+    },
+    languages: {
+      label: "Języki",
+      description: "Języki obsługiwane przez to konto",
+      placeholder: "Wybierz języki",
+    },
   },
   response: {
     account: {
@@ -93,6 +118,11 @@ export const translations: typeof enTranslations = {
       lastUsedAt: "Ostatnio Używane",
       createdAt: "Utworzone",
       updatedAt: "Zaktualizowane",
+      campaignTypes: "Typy kampanii",
+      emailJourneyVariants: "Warianty ścieżki",
+      emailCampaignStages: "Etapy kampanii",
+      countries: "Kraje",
+      languages: "Języki",
     },
   },
   errors: {

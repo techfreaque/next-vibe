@@ -11,6 +11,7 @@ import {
   Mail,
   Settings,
   TestTube,
+  Upload,
 } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Link } from "next-vibe-ui/ui/link";
@@ -72,6 +73,13 @@ export function LeadsNavigation({
       description: t(
         "app.admin.leads.leads.admin.tabs.campaignStarter_description",
       ),
+    },
+    {
+      key: CurrentPageType.import,
+      href: `/${locale}/admin/leads/import` as const,
+      icon: Upload,
+      label: t("app.admin.leads.leads.admin.import.label"),
+      description: t("app.admin.leads.leads.admin.import.description"),
     },
   ] as const;
 

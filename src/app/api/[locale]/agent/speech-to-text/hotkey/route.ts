@@ -37,7 +37,7 @@ export const { POST, tools } = endpointsHandler({
 
       // Start daemon that never returns
       // This will keep the CLI running and listening for hotkeys
-      return await startHotkeyDaemon(data, user, locale, logger, async () => {
+      return await startHotkeyDaemon(logger, async () => {
         // Toggle STT on hotkey press
         await sttHotkeyRepository.handleHotkeyAction(
           { ...data, action: HotkeyAction.TOGGLE },

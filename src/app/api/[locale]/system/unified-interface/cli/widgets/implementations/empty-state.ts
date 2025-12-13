@@ -4,19 +4,16 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import { extractEmptyStateData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/empty-state";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps } from "../core/types";
 
-export class EmptyStateWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.EMPTY_STATE;
-  }
+export class EmptyStateWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.EMPTY_STATE> {
+  readonly widgetType = WidgetType.EMPTY_STATE;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.EMPTY_STATE>): string {
+    const { value, context } = props;
     const indent = this.createIndent(context.depth, context);
 
     // Extract data using shared logic

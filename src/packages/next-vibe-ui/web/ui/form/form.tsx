@@ -11,7 +11,6 @@ import type {
   UseFormReturn,
 } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
-import type { StyleType } from "../../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -49,9 +48,10 @@ export interface UseFormFieldReturn {
   formDescriptionId: string;
   formMessageId: string;
 }
-export type FormItemProps = {
+export interface FormItemProps {
   children?: React.ReactNode;
-} & StyleType;
+  className?: string;
+}
 
 export type FormLabelProps = LabelRootProps;
 
@@ -60,13 +60,15 @@ export interface FormControlProps {
   asChild?: boolean;
 }
 
-export type FormDescriptionProps = {
+export interface FormDescriptionProps {
   children?: React.ReactNode;
-} & StyleType;
+  className?: string;
+}
 
-export type FormMessageProps = {
+export interface FormMessageProps {
   children?: React.ReactNode;
-} & StyleType;
+  className?: string;
+}
 
 export type FormFieldProps<
   TFieldValues extends FieldValues,

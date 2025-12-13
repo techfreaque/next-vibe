@@ -13,7 +13,6 @@ import { useTranslation } from "@/i18n/core/client";
 import { useIsMobile } from "../hooks/use-mobile";
 import { Button } from "./button";
 import { PanelLeft } from "./icons/PanelLeft";
-import { Input } from "./input";
 
 import { Separator } from "./separator";
 import { Sheet, SheetContent } from "./sheet";
@@ -326,7 +325,7 @@ function Sidebar({
   children,
   ...props
 }: SidebarProps): React.JSX.Element {
-  const { isMobile, state: _state, openMobile, setOpenMobile } = useSidebar();
+  const { isMobile, openMobile, setOpenMobile } = useSidebar();
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   if (collapsible === "none") {
@@ -376,7 +375,7 @@ function Sidebar({
           "group-data-[collapsible=offcanvas]:w-0",
           "group-data-[side=right]:rotate-180",
           variant === "floating" || variant === "inset"
-            ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]"
+            ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(var(--spacing-4)))]"
             : "group-data-[collapsible=icon]:w-[--sidebar-width-icon]",
         )}
       />
@@ -388,7 +387,7 @@ function Sidebar({
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
           // Adjust the padding for floating and inset variants.
           variant === "floating" || variant === "inset"
-            ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
+            ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(var(--spacing-4))+2px)]"
             : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l",
           className,
         )}
@@ -445,7 +444,7 @@ export function TopBar({
   children: React.ReactNode;
 }): React.JSX.Element {
   return (
-    <StyledView className="absolute top-4 left-4 z-[51] flex flex-row gap-1">
+    <StyledView className="absolute top-4 left-4 z-51 flex flex-row gap-1">
       {children}
     </StyledView>
   );
@@ -511,25 +510,6 @@ export function SidebarInset({
 }
 SidebarInset.displayName = "SidebarInset";
 
-function SidebarInput({
-  className,
-  style: _style,
-  ...props
-}: React.ComponentProps<typeof Input>): React.JSX.Element {
-  // Note: style prop is not passed to Input due to StyleType discriminated union
-  // Input uses className for styling via NativeWind (either style OR className, not both)
-  return (
-    <Input
-      className={cn(
-        "h-8 w-full bg-background shadow-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-SidebarInput.displayName = "SidebarInput";
-
 const SidebarHeader = React.forwardRef<
   View,
   ViewProps & { className?: string; style?: React.CSSProperties }
@@ -568,16 +548,13 @@ SidebarFooter.displayName = "SidebarFooter";
 
 const SidebarSeparator = React.forwardRef<
   View,
-  React.ComponentPropsWithoutRef<typeof Separator> &
-    ViewProps & { style?: React.CSSProperties }
->(({ className, style: _style, ...props }, ref) => {
-  // Note: style prop is not passed to Separator due to StyleType discriminated union
-  // Separator uses className for styling via NativeWind (either style OR className, not both)
+  React.ComponentPropsWithoutRef<typeof Separator> & ViewProps
+>(({ className, orientation,  }, ref) => {
   return (
     <StyledView ref={ref}>
       <Separator
         className={cn("mx-2 w-auto bg-sidebar-border", className)}
-        {...props}
+        orientation={orientation}
       />
     </StyledView>
   );
@@ -748,7 +725,6 @@ const SidebarMenuButton = React.forwardRef<
   (
     {
       asChild = false,
-      isActive: _isActive = false,
       variant = "default",
       size = "default",
       tooltip,
@@ -946,40 +922,28 @@ const SidebarMenuSubButton = React.forwardRef<
     className?: string;
     style?: React.CSSProperties;
   }
->(
-  (
-    {
-      asChild = false,
-      size = "md",
-      isActive: _isActive = false,
-      className,
-      style,
-      ...props
-    },
-    ref,
-  ) => {
-    const Comp = asChild ? Slot.Pressable : StyledPressable;
-    const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+>(({ asChild = false, size = "md", className, style, ...props }, ref) => {
+  const Comp = asChild ? Slot.Pressable : StyledPressable;
+  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
-    return (
-      <Comp
-        ref={ref}
-        {...applyStyleType({
-          nativeStyle,
-          className: cn(
-            "flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground",
-            "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
-            size === "sm" && "text-xs",
-            size === "md" && "text-sm",
-            "group-data-[collapsible=icon]:hidden",
-            className,
-          ),
-        })}
-        {...props}
-      />
-    );
-  },
-);
+  return (
+    <Comp
+      ref={ref}
+      {...applyStyleType({
+        nativeStyle,
+        className: cn(
+          "flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground",
+          "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
+          size === "sm" && "text-xs",
+          size === "md" && "text-sm",
+          "group-data-[collapsible=icon]:hidden",
+          className,
+        ),
+      })}
+      {...props}
+    />
+  );
+});
 SidebarMenuSubButton.displayName = "SidebarMenuSubButton";
 
 export {
@@ -991,7 +955,6 @@ export {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarInput,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuBadge,
@@ -1044,9 +1007,9 @@ export function SidebarLayout({
   collapsed = false,
   onCollapsedChange,
   closeSidebarLabel = "Close sidebar",
-  className: _className,
   sidebarClassName,
-  contentClassName: _contentClassName,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  contentClassName, // Intentionally extracted - not used in React Native
   topBarLeft,
   topBarRight,
 }: SidebarLayoutProps): React.JSX.Element {

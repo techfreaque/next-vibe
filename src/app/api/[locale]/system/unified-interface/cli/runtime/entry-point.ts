@@ -8,8 +8,8 @@
 
 import { parseError } from "next-vibe/shared/utils";
 
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";

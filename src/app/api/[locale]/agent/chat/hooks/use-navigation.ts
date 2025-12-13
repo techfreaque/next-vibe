@@ -87,7 +87,6 @@ export function useNavigation(
   locale: CountryLanguage,
   logger: EndpointLogger,
   threads: Record<string, ChatThread>,
-  _folders: Record<string, { rootFolderId: DefaultFolderId }>,
 ): NavigationOperations {
   const router = useRouter();
 

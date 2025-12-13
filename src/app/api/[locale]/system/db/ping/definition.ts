@@ -28,6 +28,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.db.ping.post.description",
   category: "app.api.system.db.category",
   tags: ["app.api.system.db.ping.tag"],
+  icon: "database",
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: ["ping", "db:ping"],
 

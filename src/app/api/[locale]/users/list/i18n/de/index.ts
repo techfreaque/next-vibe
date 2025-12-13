@@ -1,43 +1,41 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Benutzer auflisten",
-  description: "Benutzer auflisten und durchsuchen mit Filterung",
-  category: "Benutzer",
-  tag: "Liste",
-  container: {
+  get: {
     title: "Benutzerliste",
     description: "Benutzer durchsuchen und filtern",
-  },
-  fields: {
-    limit: {
-      label: "Grenze",
-      description: "Anzahl der zurückzugebenden Benutzer",
-      placeholder: "Grenze eingeben...",
+    form: {
+      title: "Benutzerverwaltung",
+      description: "Benutzer verwalten und filtern",
     },
-    page: {
-      label: "Seite",
-      description: "Seitenzahl für Paginierung",
-      placeholder: "Seitenzahl eingeben...",
+    actions: {
+      refresh: "Aktualisieren",
+      refreshing: "Aktualisiere...",
     },
-    offset: {
-      label: "Versatz",
-      description: "Anzahl der zu überspringenden Benutzer",
+    // Search & Filters section
+    searchFilters: {
+      title: "Suche & Filter",
+      description: "Benutzer nach Kriterien durchsuchen und filtern",
     },
     search: {
       label: "Suchen",
       description: "Benutzer nach Name oder E-Mail durchsuchen",
-      placeholder: "Suchbegriff eingeben...",
+      placeholder: "Benutzer suchen...",
     },
     status: {
-      label: "Status-Filter",
+      label: "Status",
       description: "Benutzer nach Status filtern",
       placeholder: "Status auswählen...",
     },
     role: {
-      label: "Rollen-Filter",
+      label: "Rolle",
       description: "Benutzer nach Rolle filtern",
       placeholder: "Rolle auswählen...",
+    },
+    // Sorting section
+    sortingOptions: {
+      title: "Sortierung",
+      description: "Ergebnissortierung konfigurieren",
     },
     sortBy: {
       label: "Sortieren nach",
@@ -47,8 +45,84 @@ export const translations: typeof enTranslations = {
     sortOrder: {
       label: "Sortierreihenfolge",
       description: "Sortierrichtung",
-      placeholder: "Sortierreihenfolge auswählen...",
+      placeholder: "Sortierrichtung auswählen...",
     },
+    // Response section
+    response: {
+      title: "Benutzer",
+      description: "Liste der Benutzer, die den Kriterien entsprechen",
+      users: {
+        id: "Benutzer-ID",
+        email: "E-Mail",
+        privateName: "Privater Name",
+        publicName: "Öffentlicher Name",
+        isActive: "Aktiv",
+        emailVerified: "Verifiziert",
+        createdAt: "Erstellt",
+        updatedAt: "Aktualisiert",
+      },
+      totalCount: "Benutzer insgesamt",
+      pageCount: "Seiten insgesamt",
+    },
+    // Pagination section
+    page: {
+      label: "Seite",
+    },
+    limit: {
+      label: "Pro Seite",
+    },
+    // Error messages
+    errors: {
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Sie müssen angemeldet sein, um Benutzer anzuzeigen",
+      },
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Parameter angegeben",
+      },
+      forbidden: {
+        title: "Zugriff verboten",
+        description: "Sie haben keine Berechtigung, Benutzer anzuzeigen",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Benutzer konnten nicht abgerufen werden",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
+      },
+      conflict: {
+        title: "Konfliktfehler",
+        description: "Benutzer können aufgrund von Konflikten nicht aufgelistet werden",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Keine Verbindung zum Server möglich",
+      },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Keine Benutzer gefunden",
+      },
+      unsavedChanges: {
+        title: "Ungespeicherte Änderungen",
+        description: "Sie haben ungespeicherte Änderungen",
+      },
+    },
+    success: {
+      title: "Erfolg",
+      description: "Benutzer erfolgreich abgerufen",
+    },
+  },
+  // Legacy keys for backward compatibility
+  title: "Benutzer auflisten",
+  description: "Benutzer auflisten und durchsuchen mit Filterung",
+  category: "Benutzer",
+  tag: "Liste",
+  container: {
+    title: "Benutzerliste",
+    description: "Benutzer durchsuchen und filtern",
   },
   response: {
     summary: {
@@ -131,15 +205,15 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
+    title: "Liste",
+    description: "Listen-Endpunkt",
     form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+      title: "Listenkonfiguration",
+      description: "Listenparameter konfigurieren",
     },
     response: {
       title: "Antwort",
-      description: "Antwortdaten",
+      description: "Listen-Antwortdaten",
     },
     errors: {
       unauthorized: {

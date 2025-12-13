@@ -21,16 +21,6 @@ import {
 import { createTrackingContext } from "../../../emails/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "../../../emails/smtp-client/components/template.email";
 
-// Constants for email templates
-const CONSULTATION_DURATION = {
-  minDurationMinutes: 30,
-  maxDurationMinutes: 60,
-};
-
-const BUSINESS_FORM_TIME = {
-  completionTimeMinutes: 10,
-};
-
 function renderWelcomeEmailContent(
   t: TFunction,
   locale: CountryLanguage,
@@ -41,8 +31,8 @@ function renderWelcomeEmailContent(
   // Create tracking context for user signup emails with leadId and userId
   const tracking = createTrackingContext(
     locale,
-    leadId, // leadId from signup form
-    user.id, // userId for signup emails
+    leadId,
+    user.id,
     undefined, // no campaignId for transactional emails
     baseUrl,
   );
@@ -154,7 +144,7 @@ export const renderRegisterMail: EmailFunctionType<
 > = async ({ requestData, locale, t, logger }) => {
   const baseUrl = env.NEXT_PUBLIC_APP_URL;
   const userResponse = await userRepository.getUserByEmail(
-    requestData.personalInfo.email,
+    requestData.formCard.email,
     UserDetailLevel.STANDARD,
     locale,
     logger,
@@ -163,7 +153,7 @@ export const renderRegisterMail: EmailFunctionType<
     return fail({
       message: "app.api.user.errors.not_found",
       errorType: ErrorResponseTypes.NOT_FOUND,
-      messageParams: { email: requestData.personalInfo.email },
+      messageParams: { email: requestData.formCard.email },
       cause: userResponse,
     });
   }
@@ -175,13 +165,7 @@ export const renderRegisterMail: EmailFunctionType<
     subject: t("app.api.user.public.signup.email.subject", {
       appName: t("config.appName"),
     }),
-    jsx: renderWelcomeEmailContent(
-      t,
-      locale,
-      user,
-      baseUrl,
-      requestData.advanced?.leadId || "",
-    ),
+    jsx: renderWelcomeEmailContent(t, locale, user, baseUrl, user.leadId),
   });
 };
 
@@ -500,7 +484,7 @@ export const renderAdminSignupNotification: EmailFunctionType<
   Record<string, string>
 > = async ({ requestData, locale, t, logger }) => {
   const userResponse = await userRepository.getUserByEmail(
-    requestData.personalInfo.email,
+    requestData.formCard.email,
     UserDetailLevel.STANDARD,
     locale,
     logger,
@@ -509,7 +493,7 @@ export const renderAdminSignupNotification: EmailFunctionType<
     return fail({
       message: "app.api.user.errors.not_found",
       errorType: ErrorResponseTypes.NOT_FOUND,
-      messageParams: { email: requestData.personalInfo.email },
+      messageParams: { email: requestData.formCard.email },
       cause: userResponse,
     });
   }
@@ -523,7 +507,7 @@ export const renderAdminSignupNotification: EmailFunctionType<
     }),
     jsx: renderAdminNotificationEmailContent(t, locale, user, {
       signupType: [], // signupType removed from form, defaulting to empty array
-      subscribeToNewsletter: requestData.consent?.subscribeToNewsletter,
+      subscribeToNewsletter: requestData.formCard.subscribeToNewsletter,
     }),
   });
 };

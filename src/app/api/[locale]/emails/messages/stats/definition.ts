@@ -51,6 +51,7 @@ const { GET } = createEndpoint({
   title: "app.api.emails.messages.stats.get.title",
   description: "app.api.emails.messages.stats.get.description",
   category: "app.api.emails.category",
+  icon: "bar-chart-3",
   tags: ["app.api.emails.tags.stats", "app.api.emails.tags.analytics"],
 
   fields: objectField(

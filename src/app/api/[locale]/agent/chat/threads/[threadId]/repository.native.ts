@@ -25,7 +25,6 @@ import {
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { GET as getThreadEndpoint } from "./definition";
 import type { ThreadByIdRepositoryInterface } from "./repository";
@@ -35,6 +34,7 @@ import type {
   ThreadPatchRequestOutput,
   ThreadPatchResponseOutput,
 } from "./definition";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Native Thread by ID Repository Implementation
@@ -52,6 +52,7 @@ class ThreadByIdRepositoryNativeImpl implements ThreadByIdRepositoryInterface {
 
   async getThreadById(
     threadId: string,
+    // oxlint-disable-next-line no-unused-vars
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -86,14 +87,13 @@ class ThreadByIdRepositoryNativeImpl implements ThreadByIdRepositoryInterface {
     data: ThreadPatchRequestOutput,
     threadId: string,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadPatchResponseOutput>> {
-    logger.error("updateThread not implemented on native");
-    void data;
-    void threadId;
-    void user;
-    void locale;
+    logger.error("updateThread not implemented on native", {
+      threadId,
+      userId: user.isPublic ? "public" : user.id,
+      data,
+    });
     return await Promise.resolve(
       this.createNotImplementedError<ThreadPatchResponseOutput>("updateThread"),
     );
@@ -102,13 +102,12 @@ class ThreadByIdRepositoryNativeImpl implements ThreadByIdRepositoryInterface {
   async deleteThread(
     threadId: string,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadDeleteResponseOutput>> {
-    logger.error("deleteThread not implemented on native");
-    void threadId;
-    void user;
-    void locale;
+    logger.error("deleteThread not implemented on native", {
+      threadId,
+      userId: user.isPublic ? "public" : user.id,
+    });
     return await Promise.resolve(
       this.createNotImplementedError<ThreadDeleteResponseOutput>(
         "deleteThread",

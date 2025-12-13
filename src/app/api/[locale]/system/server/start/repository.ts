@@ -8,6 +8,7 @@
 // CLI output messages don't need internationalization
 // Process environment access is required for server configuration
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
 
@@ -21,7 +22,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { databaseMigrationRepository } from "../../db/migrate/repository";
 import type {
@@ -149,7 +149,6 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
               redo: false,
               schema: "public",
             },
-            user,
             locale,
             logger,
           );

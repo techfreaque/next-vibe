@@ -12,6 +12,7 @@ import { useTranslation } from "@/i18n/core/client";
 
 import { executeQuery } from "./query-executor";
 import { buildQueryKey } from "./query-key-builder";
+import { useApiStore, deserializeQueryParams } from "./store";
 import type { ApiQueryReturn } from "./types";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 
@@ -111,6 +112,19 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
   const query = useQuery({
     queryKey,
     queryFn: async () => {
+      // Read fresh value from the Zustand store directly using getState()
+      // This ensures we always get the latest value, even when refetch() is called
+      // immediately after a store update (before React re-renders)
+      const store = useApiStore.getState();
+      const formId = store.getFormId(endpoint);
+      const storedParams = store.getFormQueryParams(formId);
+
+      // Use stored params if available, otherwise fall back to the prop value
+      // Deserialize any JSON-stringified nested objects
+      const currentRequestData = storedParams
+        ? deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(storedParams)
+        : requestData;
+
       logger.info("useApiQuery: Executing query", {
         endpointPath: endpoint.path.join("/"),
         queryKeyString: JSON.stringify(queryKey),
@@ -119,7 +133,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
       const response = await executeQuery({
         endpoint: endpoint as never,
         logger,
-        requestData: requestData as never,
+        requestData: currentRequestData as never,
         pathParams: urlPathParams as never,
         locale,
         options: {

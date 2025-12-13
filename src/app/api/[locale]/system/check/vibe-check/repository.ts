@@ -15,7 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { oxlintRepository } from "../oxlint/repository";
 import { typecheckRepository } from "../typecheck/repository";
@@ -30,7 +29,6 @@ import type {
 export interface VibeCheckRepository {
   execute(
     data: VibeCheckRequestOutput,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<VibeCheckResponseOutput>>;
 }
@@ -41,7 +39,6 @@ export interface VibeCheckRepository {
 export class VibeCheckRepositoryImpl implements VibeCheckRepository {
   async execute(
     data: VibeCheckRequestOutput,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<BaseResponseType<VibeCheckResponseOutput>> {
     try {
@@ -74,7 +71,6 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
                     fix: data.fix || false,
                     timeout: data.timeout,
                   },
-                  locale,
                   logger,
                 )
                 .then((result) => {

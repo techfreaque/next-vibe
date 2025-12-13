@@ -190,11 +190,10 @@ export async function dev(
         .limit(1);
 
       if (existingUserLeadLinks.length === 0) {
-        // Link to user
         await db.insert(userLeadLinks).values({
           userId: user.id,
           leadId,
-          linkReason: "seed_creation",
+          linkReason: "manual",
         });
         logger.debug(`Linked lead ${leadId} to user ${user.id}`);
       } else {
@@ -304,7 +303,6 @@ export async function dev(
           code: "FRIEND2024",
           label: "Test Referral Code",
         },
-        locale,
         logger,
       );
 
@@ -369,7 +367,9 @@ export async function dev(
 /**
  * Test seed function for auth module
  */
-export async function test(logger: EndpointLogger): Promise<void> {
+export async function test(
+  logger: EndpointLogger,
+): Promise<void> {
   logger.debug("🌱 Seeding auth data for test environment");
 
   // Create test users
@@ -503,7 +503,9 @@ export async function test(logger: EndpointLogger): Promise<void> {
 /**
  * Production seed function for auth module
  */
-export async function prod(logger: EndpointLogger): Promise<void> {
+export async function prod(
+  logger: EndpointLogger,
+): Promise<void> {
   logger.debug("🌱 Seeding auth data for production environment");
 
   // Create admin user

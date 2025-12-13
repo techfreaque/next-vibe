@@ -69,6 +69,31 @@ export const translations = {
       description: "Account priority (1-100)",
       placeholder: "10",
     },
+    campaignTypes: {
+      label: "Campaign Types",
+      description: "Types of email campaigns this account can send",
+      placeholder: "Select campaign types",
+    },
+    emailJourneyVariants: {
+      label: "Journey Variants",
+      description: "Email journey variants this account supports",
+      placeholder: "Select journey variants",
+    },
+    emailCampaignStages: {
+      label: "Campaign Stages",
+      description: "Campaign stages this account handles",
+      placeholder: "Select campaign stages",
+    },
+    countries: {
+      label: "Countries",
+      description: "Countries this account can send to",
+      placeholder: "Select countries",
+    },
+    languages: {
+      label: "Languages",
+      description: "Languages supported by this account",
+      placeholder: "Select languages",
+    },
   },
   response: {
     account: {
@@ -91,6 +116,11 @@ export const translations = {
       lastUsedAt: "Last Used At",
       createdAt: "Created At",
       updatedAt: "Updated At",
+      campaignTypes: "Campaign Types",
+      emailJourneyVariants: "Journey Variants",
+      emailCampaignStages: "Campaign Stages",
+      countries: "Countries",
+      languages: "Languages",
     },
   },
   errors: {

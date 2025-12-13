@@ -20,8 +20,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { SttLanguageOptions, SttProviderOptions } from "./enum";
-
 /**
  * Speech-to-Text Endpoint (POST)
  * Transcribes audio to text using Eden AI
@@ -37,6 +35,7 @@ const { POST } = createEndpoint({
   ],
   title: "app.api.agent.speechToText.post.title",
   description: "app.api.agent.speechToText.post.description",
+  icon: "mic",
   category: "app.api.agent.category",
   tags: [
     "app.api.agent.tags.speech",
@@ -95,29 +94,18 @@ const { POST } = createEndpoint({
         },
       ),
 
-      // === CONFIG FIELDS ===
-      provider: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.speechToText.post.provider.label",
-          description: "app.api.agent.speechToText.post.provider.description",
-          columns: 6,
-          options: SttProviderOptions,
-        },
-        z.string().default("openai"),
-      ),
-      language: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.speechToText.post.language.label",
-          description: "app.api.agent.speechToText.post.language.description",
-          columns: 6,
-          options: SttLanguageOptions,
-        },
-        z.string().default("en"),
-      ),
+      // // === CONFIG FIELDS ===
+      // provider: requestDataField(
+      //   {
+      //     type: WidgetType.FORM_FIELD,
+      //     fieldType: FieldDataType.SELECT,
+      //     label: "app.api.agent.speechToText.post.provider.label",
+      //     description: "app.api.agent.speechToText.post.provider.description",
+      //     columns: 6,
+      //     options: SttProviderOptions,
+      //   },
+      //   z.string().default("openai"),
+      // ),
 
       // === RESPONSE FIELDS ===
       response: objectField(
@@ -216,8 +204,6 @@ const { POST } = createEndpoint({
         fileUpload: {
           file: new File([""], "audio.mp3", { type: "audio/mpeg" }),
         },
-        provider: "openai",
-        language: "en",
       },
     },
     responses: {

@@ -1,194 +1,128 @@
 /**
  * Users Stats Repository
- * Handles database operations for user statistics as historical charts
  */
 
 import "server-only";
 
-import {
-  and,
-  eq,
-  gte,
-  ilike,
-  isNotNull,
-  isNull,
-  lte,
-  or,
-  type SQL,
-  sql,
-} from "drizzle-orm";
+import { and, eq, gte, ilike, lte, or, type SQL, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
+
 import {
   DateRangePreset,
   getDateRangeFromPreset,
-} from "next-vibe/shared/types/stats-filtering.schema";
-import { parseError } from "next-vibe/shared/utils";
+  TimePeriod,
+} from "@/app/api/[locale]/shared/stats-filtering";
 
 import { userLeadLinks } from "@/app/api/[locale]/leads/db";
+import { paymentRefunds, paymentTransactions } from "@/app/api/[locale]/payment/db";
+import { PaymentStatus } from "@/app/api/[locale]/payment/enum";
+import { subscriptions } from "@/app/api/[locale]/subscription/db";
+import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { userRoles, users } from "@/app/api/[locale]/user/db";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import { UserRoleFilter, UserStatusFilter } from "../enum";
+import type {
+  UserStatsRequestOutput,
+  UserStatsResponseOutput,
+} from "./definition";
+import {
+  PaymentMethodFilter,
+  SubscriptionStatusFilter,
+  UserRoleFilter,
+  UserStatusFilter,
+} from "../enum";
 
-// Manual types to fix the definition issues
-interface UserStatsRequest {
-  status?: string;
-  role?: string;
-  country?: string;
-  language?: string;
-  search?: string;
-  emailVerified?: boolean;
-  isActive?: boolean;
-  hasLeadId?: boolean;
-  hasStripeCustomerId?: boolean;
-  preferredContactMethod?: string;
-  hasPhone?: boolean;
-  hasBio?: boolean;
-  hasWebsite?: boolean;
-  hasJobTitle?: boolean;
-  dateRangePreset?: string;
-  dateFrom?: string;
-  dateTo?: string;
-}
-
-interface UsersStatsResponse {
-  // Nested structures
-  overviewStats: {
-    totalUsers: number;
-    activeUsers: number;
-    inactiveUsers: number;
-    newUsers: number;
-  };
-  emailStats: {
-    emailVerifiedUsers: number;
-    emailUnverifiedUsers: number;
-    verificationRate: number;
-  };
-  integrationStats: {
-    usersWithStripeId: number;
-    usersWithoutStripeId: number;
-    stripeIntegrationRate: number;
-    usersWithLeadId: number;
-    usersWithoutLeadId: number;
-    leadAssociationRate: number;
-  };
-  roleDistribution: {
-    usersByRole: { [key: string]: number };
-    publicUsers: number;
-    customerUsers: number;
-    partnerAdminUsers: number;
-    partnerEmployeeUsers: number;
-    adminUsers: number;
-  };
-  growthMetrics: {
-    timeSeriesData: {
-      usersCreatedToday: number;
-      usersCreatedThisWeek: number;
-      usersCreatedThisMonth: number;
-      usersCreatedLastMonth: number;
-    };
-    performanceRates: {
-      growthRate: number;
-      leadToUserConversionRate: number;
-      retentionRate: number;
-    };
-  };
-  businessInsights: {
-    generatedAt: string;
-  };
-
-  // Flat fields for backward compatibility
-  totalUsers: number;
-  activeUsers: number;
-  inactiveUsers: number;
-  newUsers: number;
-  emailVerifiedUsers: number;
-  emailUnverifiedUsers: number;
-  verificationRate: number;
-  usersWithStripeId: number;
-  usersWithoutStripeId: number;
-  stripeIntegrationRate: number;
-  usersWithLeadId: number;
-  usersWithoutLeadId: number;
-  leadAssociationRate: number;
-  usersByRole: { [key: string]: number };
-  publicUsers: number;
-  customerUsers: number;
-  partnerAdminUsers: number;
-  partnerEmployeeUsers: number;
-  adminUsers: number;
-  usersCreatedToday: number;
-  usersCreatedThisWeek: number;
-  usersCreatedThisMonth: number;
-  usersCreatedLastMonth: number;
-  growthRate: number;
-  leadToUserConversionRate: number;
-  retentionRate: number;
-  generatedAt: string;
-}
-
-/**
- * Users Stats Repository Interface
- */
 export interface UsersStatsRepository {
   getUserStats(
-    data: UserStatsRequest,
-    user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
+    data: UserStatsRequestOutput | undefined,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UsersStatsResponse>>;
+  ): Promise<ResponseType<UserStatsResponseOutput>>;
 }
 
-/**
- * Users Stats Repository Implementation
- */
 class UsersStatsRepositoryImpl implements UsersStatsRepository {
-  /**
-   * Get comprehensive user statistics as historical charts with extensive filtering
-   */
+  private getDateTruncFormat(timePeriod: typeof TimePeriod[keyof typeof TimePeriod]): string {
+    switch (timePeriod) {
+      case TimePeriod.DAY:
+        return "day";
+      case TimePeriod.WEEK:
+        return "week";
+      case TimePeriod.MONTH:
+        return "month";
+      case TimePeriod.QUARTER:
+        return "quarter";
+      case TimePeriod.YEAR:
+        return "year";
+      default:
+        return "day";
+    }
+  }
+
+  private formatPeriodLabel(period: string, timePeriod: typeof TimePeriod[keyof typeof TimePeriod]): string {
+    const date = new Date(period);
+    switch (timePeriod) {
+      case TimePeriod.DAY:
+        return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      case TimePeriod.WEEK:
+        return `Week ${this.getWeekNumber(date)}`;
+      case TimePeriod.MONTH:
+        return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+      case TimePeriod.QUARTER:
+        return `Q${Math.floor(date.getMonth() / 3) + 1} ${date.getFullYear()}`;
+      case TimePeriod.YEAR:
+        return date.getFullYear().toString();
+      default:
+        return period;
+    }
+  }
+
+  private getWeekNumber(date: Date): number {
+    const startOfYear = new Date(date.getFullYear(), 0, 1);
+    const diff = date.getTime() - startOfYear.getTime();
+    const oneWeek = 7 * 24 * 60 * 60 * 1000;
+    return Math.ceil((diff + startOfYear.getDay() * 24 * 60 * 60 * 1000) / oneWeek);
+  }
+
   async getUserStats(
-    rawQuery: UserStatsRequest,
-    user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
+    rawQuery: UserStatsRequestOutput | undefined,
     logger: EndpointLogger,
-  ): Promise<ResponseType<UsersStatsResponse>> {
+  ): Promise<ResponseType<UserStatsResponseOutput>> {
     try {
-      // Apply defaults to handle optional properties from apiHandler
+      // Extract nested filters with type safety
+      const basicFilters = rawQuery?.basicFilters;
+      const subscriptionFilters = rawQuery?.subscriptionFilters;
+      const locationFilters = rawQuery?.locationFilters;
+      const timePeriodOptions = rawQuery?.timePeriodOptions;
+
       const query = {
-        ...rawQuery,
+        search: basicFilters?.search,
+        status: basicFilters?.status ?? UserStatusFilter.ALL,
+        role: basicFilters?.role ?? UserRoleFilter.ALL,
+        subscriptionStatus:
+          subscriptionFilters?.subscriptionStatus ??
+          SubscriptionStatusFilter.ALL,
+        paymentMethod:
+          subscriptionFilters?.paymentMethod ?? PaymentMethodFilter.ALL,
+        country: locationFilters?.country,
+        language: locationFilters?.language,
         dateRangePreset:
-          rawQuery.dateRangePreset ?? DateRangePreset.LAST_30_DAYS,
-        status: rawQuery.status ?? UserStatusFilter.ALL,
-        role: rawQuery.role ?? UserRoleFilter.ALL,
+          timePeriodOptions?.dateRangePreset ?? DateRangePreset.LAST_30_DAYS,
       };
 
-      logger.debug(
-        "Fetching user statistics with comprehensive filters",
-        query,
-      );
+      logger.debug("Fetching user statistics", query);
 
-      // Calculate date range
-      const dateRange =
-        query.dateFrom && query.dateTo
-          ? { from: new Date(query.dateFrom), to: new Date(query.dateTo) }
-          : getDateRangeFromPreset(query.dateRangePreset as DateRangePreset);
+      const dateRange = getDateRangeFromPreset(query.dateRangePreset);
 
-      // Build comprehensive where conditions for filtering
-      const whereConditions = [];
-
-      // Date range filter
+      const whereConditions: SQL[] = [];
       whereConditions.push(gte(users.createdAt, dateRange.from));
       whereConditions.push(lte(users.createdAt, dateRange.to));
 
-      // Status filter
       if (query.status && query.status !== UserStatusFilter.ALL) {
         switch (query.status) {
           case UserStatusFilter.ACTIVE:
@@ -196,6 +130,14 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
             break;
           case UserStatusFilter.INACTIVE:
             whereConditions.push(eq(users.isActive, false));
+            break;
+          case UserStatusFilter.PENDING:
+            whereConditions.push(eq(users.isActive, false));
+            whereConditions.push(eq(users.emailVerified, false));
+            break;
+          case UserStatusFilter.SUSPENDED:
+            whereConditions.push(eq(users.isActive, false));
+            whereConditions.push(eq(users.emailVerified, true));
             break;
           case UserStatusFilter.EMAIL_VERIFIED:
             whereConditions.push(eq(users.emailVerified, true));
@@ -206,200 +148,101 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         }
       }
 
-      // Search filter
       if (query.search) {
+        const searchCondition = or(
+          ilike(users.privateName, `%${query.search}%`),
+          ilike(users.publicName, `%${query.search}%`),
+          ilike(users.email, `%${query.search}%`),
+        );
+        if (searchCondition) {
+          whereConditions.push(searchCondition);
+        }
+      }
+
+      if (query.role && query.role !== UserRoleFilter.ALL) {
         whereConditions.push(
-          or(
-            ilike(users.privateName, `%${query.search}%`),
-            ilike(users.publicName, `%${query.search}%`),
-            ilike(users.email, `%${query.search}%`),
-          ),
+          sql`${users.id} IN (SELECT user_id FROM user_roles WHERE role = ${query.role})`,
         );
       }
 
-      // Additional user property filters
-      if (query.emailVerified !== undefined) {
-        whereConditions.push(eq(users.emailVerified, query.emailVerified));
+      if (query.country) {
+        whereConditions.push(ilike(users.locale, `%-${query.country}`));
       }
 
-      if (query.isActive !== undefined) {
-        whereConditions.push(eq(users.isActive, query.isActive));
+      if (query.language) {
+        whereConditions.push(ilike(users.locale, `${query.language}-%`));
       }
 
-      if (query.hasStripeCustomerId !== undefined) {
-        if (query.hasStripeCustomerId) {
-          whereConditions.push(isNotNull(users.stripeCustomerId));
+      if (
+        query.subscriptionStatus &&
+        query.subscriptionStatus !== SubscriptionStatusFilter.ALL
+      ) {
+        if (
+          query.subscriptionStatus === SubscriptionStatusFilter.NO_SUBSCRIPTION
+        ) {
+          whereConditions.push(
+            sql`${users.id} NOT IN (SELECT user_id FROM subscriptions)`,
+          );
         } else {
-          whereConditions.push(isNull(users.stripeCustomerId));
+          whereConditions.push(
+            sql`${users.id} IN (SELECT user_id FROM subscriptions WHERE status = ${query.subscriptionStatus})`,
+          );
+        }
+      }
+
+      if (
+        query.paymentMethod &&
+        query.paymentMethod !== PaymentMethodFilter.ALL
+      ) {
+        if (query.paymentMethod === PaymentMethodFilter.NO_PAYMENT_METHOD) {
+          whereConditions.push(
+            sql`${users.id} NOT IN (SELECT user_id FROM payment_methods)`,
+          );
+        } else if (query.paymentMethod === PaymentMethodFilter.CRYPTO) {
+          whereConditions.push(
+            sql`${users.id} IN (SELECT user_id FROM payment_transactions WHERE provider = 'NOWPAYMENTS')`,
+          );
+        } else {
+          whereConditions.push(
+            sql`${users.id} IN (SELECT user_id FROM payment_methods WHERE type = ${query.paymentMethod})`,
+          );
         }
       }
 
       const whereClause =
         whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
-      // Generate user statistics
-      const currentPeriodStats = await this.generateCurrentPeriodStats(
-        whereClause,
-        logger,
-      );
-
-      // Structure response according to the new nested definition
-      const response: UsersStatsResponse = {
-        // Nested overview stats
-        overviewStats: {
-          totalUsers: currentPeriodStats.totalUsers,
-          activeUsers: currentPeriodStats.activeUsers,
-          inactiveUsers: currentPeriodStats.inactiveUsers,
-          newUsers: currentPeriodStats.newUsers,
-        },
-
-        // Nested email stats
-        emailStats: {
-          emailVerifiedUsers: currentPeriodStats.emailVerifiedUsers,
-          emailUnverifiedUsers: currentPeriodStats.emailUnverifiedUsers,
-          verificationRate: currentPeriodStats.verificationRate,
-        },
-
-        // Nested integration stats
-        integrationStats: {
-          usersWithStripeId: currentPeriodStats.usersWithStripeId,
-          usersWithoutStripeId: currentPeriodStats.usersWithoutStripeId,
-          stripeIntegrationRate: currentPeriodStats.stripeIntegrationRate,
-          usersWithLeadId: currentPeriodStats.usersWithLeadId,
-          usersWithoutLeadId: currentPeriodStats.usersWithoutLeadId,
-          leadAssociationRate: currentPeriodStats.leadAssociationRate,
-        },
-
-        // Nested role distribution
-        roleDistribution: {
-          usersByRole: currentPeriodStats.usersByRole,
-          publicUsers: currentPeriodStats.publicUsers,
-          customerUsers: currentPeriodStats.customerUsers,
-          partnerAdminUsers: currentPeriodStats.partnerAdminUsers,
-          partnerEmployeeUsers: currentPeriodStats.partnerEmployeeUsers,
-          adminUsers: currentPeriodStats.adminUsers,
-        },
-
-        // Nested growth metrics
-        growthMetrics: {
-          timeSeriesData: {
-            usersCreatedToday: currentPeriodStats.usersCreatedToday,
-            usersCreatedThisWeek: currentPeriodStats.usersCreatedThisWeek,
-            usersCreatedThisMonth: currentPeriodStats.usersCreatedThisMonth,
-            usersCreatedLastMonth: currentPeriodStats.usersCreatedLastMonth,
-          },
-          performanceRates: {
-            growthRate: currentPeriodStats.growthRate,
-            leadToUserConversionRate:
-              currentPeriodStats.leadToUserConversionRate,
-            retentionRate: currentPeriodStats.retentionRate,
-          },
-        },
-
-        // Nested business insights
-        businessInsights: {
-          generatedAt: new Date().toISOString(),
-        },
-
-        // Keep backward compatibility with flat fields
-        totalUsers: currentPeriodStats.totalUsers,
-        activeUsers: currentPeriodStats.activeUsers,
-        inactiveUsers: currentPeriodStats.inactiveUsers,
-        newUsers: currentPeriodStats.newUsers,
-        emailVerifiedUsers: currentPeriodStats.emailVerifiedUsers,
-        emailUnverifiedUsers: currentPeriodStats.emailUnverifiedUsers,
-        verificationRate: currentPeriodStats.verificationRate,
-        usersWithStripeId: currentPeriodStats.usersWithStripeId,
-        usersWithoutStripeId: currentPeriodStats.usersWithoutStripeId,
-        stripeIntegrationRate: currentPeriodStats.stripeIntegrationRate,
-        usersWithLeadId: currentPeriodStats.usersWithLeadId,
-        usersWithoutLeadId: currentPeriodStats.usersWithoutLeadId,
-        leadAssociationRate: currentPeriodStats.leadAssociationRate,
-        usersByRole: currentPeriodStats.usersByRole,
-        publicUsers: currentPeriodStats.publicUsers,
-        customerUsers: currentPeriodStats.customerUsers,
-        partnerAdminUsers: currentPeriodStats.partnerAdminUsers,
-        partnerEmployeeUsers: currentPeriodStats.partnerEmployeeUsers,
-        adminUsers: currentPeriodStats.adminUsers,
-        usersCreatedToday: currentPeriodStats.usersCreatedToday,
-        usersCreatedThisWeek: currentPeriodStats.usersCreatedThisWeek,
-        usersCreatedThisMonth: currentPeriodStats.usersCreatedThisMonth,
-        usersCreatedLastMonth: currentPeriodStats.usersCreatedLastMonth,
-        growthRate: currentPeriodStats.growthRate,
-        leadToUserConversionRate: currentPeriodStats.leadToUserConversionRate,
-        retentionRate: currentPeriodStats.retentionRate,
-        generatedAt: new Date().toISOString(),
-      };
-
+      const timePeriod = timePeriodOptions?.timePeriod ?? TimePeriod.DAY;
+      const response = await this.buildResponse(whereClause, dateRange, timePeriod);
       return success(response);
     } catch (error) {
       logger.error("Error fetching user statistics", parseError(error));
       return fail({
-        message: "app.api.users.list.post.errors.server.title",
+        message: "app.api.users.stats.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
     }
   }
 
-  /**
-   * Generate current period statistics
-   */
-  private async generateCurrentPeriodStats(
+  private async buildResponse(
     whereClause: SQL | undefined,
-    logger: EndpointLogger,
-  ): Promise<{
-    totalUsers: number;
-    activeUsers: number;
-    inactiveUsers: number;
-    newUsers: number;
-    emailVerifiedUsers: number;
-    emailUnverifiedUsers: number;
-    verificationRate: number;
-    usersWithStripeId: number;
-    usersWithoutStripeId: number;
-    stripeIntegrationRate: number;
-    usersWithLeadId: number;
-    usersWithoutLeadId: number;
-    leadAssociationRate: number;
-    usersByRole: { [key: string]: number };
-    publicUsers: number;
-    customerUsers: number;
-    partnerAdminUsers: number;
-    partnerEmployeeUsers: number;
-    adminUsers: number;
-    usersCreatedToday: number;
-    usersCreatedThisWeek: number;
-    usersCreatedThisMonth: number;
-    usersCreatedLastMonth: number;
-    growthRate: number;
-    leadToUserConversionRate: number;
-    retentionRate: number;
-  }> {
-    // Get basic user counts
-    const baseQuery = db
+    dateRange: { from: Date; to: Date },
+    timePeriod: typeof TimePeriod[keyof typeof TimePeriod],
+  ): Promise<UserStatsResponseOutput> {
+    const [basicCounts] = await db
       .select({
         totalUsers: sql<number>`count(*)::int`,
         activeUsers: sql<number>`count(*) filter (where ${users.isActive} = true)::int`,
         inactiveUsers: sql<number>`count(*) filter (where ${users.isActive} = false)::int`,
         emailVerifiedUsers: sql<number>`count(*) filter (where ${users.emailVerified} = true)::int`,
         emailUnverifiedUsers: sql<number>`count(*) filter (where ${users.emailVerified} = false)::int`,
-        usersWithStripeId: sql<number>`count(*) filter (where ${users.stripeCustomerId} is not null)::int`,
-        usersWithoutStripeId: sql<number>`count(*) filter (where ${users.stripeCustomerId} is null)::int`,
       })
-      .from(users);
+      .from(users)
+      .where(whereClause);
 
-    const [basicCounts] = (await baseQuery.where(whereClause)) ?? {
-      totalUsers: 0,
-      activeUsers: 0,
-      inactiveUsers: 0,
-      emailVerifiedUsers: 0,
-      emailUnverifiedUsers: 0,
-      usersWithStripeId: 0,
-      usersWithoutStripeId: 0,
-    };
+    const totalUsers = basicCounts?.totalUsers ?? 0;
 
-    // Get users with lead IDs using the userLeadLinks junction table
     const [leadStats] = await db
       .select({
         usersWithLeadId: sql<number>`count(distinct ${userLeadLinks.userId})::int`,
@@ -408,18 +251,64 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       .innerJoin(users, eq(userLeadLinks.userId, users.id))
       .where(whereClause ? sql`${whereClause}` : undefined);
 
-    const usersWithLeadIdCount = leadStats?.usersWithLeadId ?? 0;
-    const usersWithoutLeadIdCount =
-      basicCounts.totalUsers - usersWithLeadIdCount;
+    const usersWithLeadId = leadStats?.usersWithLeadId ?? 0;
 
-    // Get time-based metrics
+    // Subscription stats - filter by subscription createdAt
+    const [subscriptionCounts] = await db
+      .select({
+        activeSubscriptions: sql<number>`count(*) filter (where ${subscriptions.status} = ${SubscriptionStatus.ACTIVE})::int`,
+        canceledSubscriptions: sql<number>`count(*) filter (where ${subscriptions.status} = ${SubscriptionStatus.CANCELED})::int`,
+        expiredSubscriptions: sql<number>`count(*) filter (where ${subscriptions.status} IN (${SubscriptionStatus.INCOMPLETE_EXPIRED}, ${SubscriptionStatus.UNPAID}))::int`,
+        totalWithSubscription: sql<number>`count(*)::int`,
+      })
+      .from(subscriptions)
+      .where(and(
+        gte(subscriptions.createdAt, dateRange.from),
+        lte(subscriptions.createdAt, dateRange.to),
+      ));
+
+    const activeSubscriptions = subscriptionCounts?.activeSubscriptions ?? 0;
+    const canceledSubscriptions = subscriptionCounts?.canceledSubscriptions ?? 0;
+    const expiredSubscriptions = subscriptionCounts?.expiredSubscriptions ?? 0;
+    const totalWithSubscription = subscriptionCounts?.totalWithSubscription ?? 0;
+    const noSubscription = totalUsers - totalWithSubscription;
+
+    // Payment stats - filter by transaction createdAt
+    const [paymentCounts] = await db
+      .select({
+        totalRevenue: sql<number>`coalesce(sum(${paymentTransactions.amount}::numeric) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}), 0)::int`,
+        transactionCount: sql<number>`count(*) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED})::int`,
+      })
+      .from(paymentTransactions)
+      .where(and(
+        gte(paymentTransactions.createdAt, dateRange.from),
+        lte(paymentTransactions.createdAt, dateRange.to),
+      ));
+
+    const [refundCounts] = await db
+      .select({
+        refundedAmount: sql<number>`coalesce(sum(${paymentRefunds.amount}::numeric), 0)::int`,
+        refundCount: sql<number>`count(*)::int`,
+      })
+      .from(paymentRefunds)
+      .where(and(
+        gte(paymentRefunds.createdAt, dateRange.from),
+        lte(paymentRefunds.createdAt, dateRange.to),
+      ));
+
+    const totalRevenue = paymentCounts?.totalRevenue ?? 0;
+    const transactionCount = paymentCounts?.transactionCount ?? 0;
+    const refundCount = refundCounts?.refundCount ?? 0;
+    const averageOrderValue = transactionCount > 0 ? Math.round(totalRevenue / transactionCount) : 0;
+    const refundRate = transactionCount > 0 ? refundCount / transactionCount : 0;
+
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const thisWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-    const [timeBased] = (await db
+    const [timeBased] = await db
       .select({
         newUsers: sql<number>`count(*)::int`,
         usersCreatedToday: sql<number>`count(*) filter (where ${users.createdAt} >= ${today})::int`,
@@ -428,31 +317,29 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         usersCreatedLastMonth: sql<number>`count(*) filter (where ${users.createdAt} >= ${lastMonth} and ${users.createdAt} < ${thisMonth})::int`,
       })
       .from(users)
-      .where(whereClause)) ?? [
-      {
-        newUsers: 0,
-        usersCreatedToday: 0,
-        usersCreatedThisWeek: 0,
-        usersCreatedThisMonth: 0,
-        usersCreatedLastMonth: 0,
-      },
-    ];
+      .where(whereClause);
 
-    // Calculate rates
-    const totalUsers = basicCounts.totalUsers;
-    const verificationRate =
-      totalUsers > 0 ? basicCounts.emailVerifiedUsers / totalUsers : 0;
-    const stripeIntegrationRate =
-      totalUsers > 0 ? basicCounts.usersWithStripeId / totalUsers : 0;
+    // Generate historical chart data based on the selected time period
+    const dateTruncFormat = this.getDateTruncFormat(timePeriod);
+    const historicalData = await db
+      .select({
+        period: sql<string>`date_trunc(${dateTruncFormat}, ${users.createdAt})::text`,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(users)
+      .where(and(
+        gte(users.createdAt, dateRange.from),
+        lte(users.createdAt, dateRange.to),
+      ))
+      .groupBy(sql`date_trunc(${dateTruncFormat}, ${users.createdAt})`)
+      .orderBy(sql`date_trunc(${dateTruncFormat}, ${users.createdAt})`);
 
-    // Calculate growth rate (month-over-month)
-    const growthRate =
-      timeBased.usersCreatedLastMonth > 0
-        ? (timeBased.usersCreatedThisMonth - timeBased.usersCreatedLastMonth) /
-          timeBased.usersCreatedLastMonth
-        : 0;
+    const growthChart = historicalData.map((item) => ({
+      x: this.formatPeriodLabel(item.period, timePeriod),
+      y: item.count,
+      label: this.formatPeriodLabel(item.period, timePeriod),
+    }));
 
-    // Get role distribution
     const roleStats = await db
       .select({
         role: userRoles.role,
@@ -463,100 +350,126 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       .where(whereClause)
       .groupBy(userRoles.role);
 
-    const usersByRole = Object.fromEntries(
-      roleStats.map((item) => [item.role, item.count]),
-    );
+    const roleCounts = {
+      publicUsers: 0,
+      customerUsers: 0,
+      partnerAdminUsers: 0,
+      partnerEmployeeUsers: 0,
+      adminUsers: 0,
+    };
 
-    // Extract specific role counts
-    const publicUsers = usersByRole.PUBLIC || 0;
-    const customerUsers = usersByRole.CUSTOMER || 0;
-    const partnerAdminUsers = usersByRole.PARTNER_ADMIN || 0;
-    const partnerEmployeeUsers = usersByRole.PARTNER_EMPLOYEE || 0;
-    const adminUsers = usersByRole.ADMIN || 0;
+    const roleChart: Array<{ x: string; y: number; label: string }> = [];
 
-    // Calculate more accurate conversion and retention rates
-    const leadToUserConversionRate = this.calculateLeadToUserConversionRate(
-      usersWithLeadIdCount,
-      totalUsers,
-    );
-    const retentionRate = await this.calculateRetentionRate(
-      whereClause,
-      logger,
-    );
+    for (const item of roleStats) {
+      const roleKey = item.role;
+      const count = item.count;
+      const lastPart = roleKey.split(".").pop() ?? "";
+
+      switch (lastPart) {
+        case "public":
+          roleCounts.publicUsers = count;
+          break;
+        case "customer":
+          roleCounts.customerUsers = count;
+          break;
+        case "partnerAdmin":
+          roleCounts.partnerAdminUsers = count;
+          break;
+        case "partnerEmployee":
+          roleCounts.partnerEmployeeUsers = count;
+          break;
+        case "admin":
+          roleCounts.adminUsers = count;
+          break;
+      }
+
+      roleChart.push({ x: roleKey, y: count, label: roleKey });
+    }
+
+    roleChart.sort((a, b) => b.y - a.y);
+
+    const verificationRate =
+      totalUsers > 0 ? (basicCounts?.emailVerifiedUsers ?? 0) / totalUsers : 0;
+    const leadAssociationRate =
+      totalUsers > 0 ? usersWithLeadId / totalUsers : 0;
+    const growthRate =
+      (timeBased?.usersCreatedLastMonth ?? 0) > 0
+        ? ((timeBased?.usersCreatedThisMonth ?? 0) -
+            (timeBased?.usersCreatedLastMonth ?? 0)) /
+          (timeBased?.usersCreatedLastMonth ?? 1)
+        : 0;
+    const retentionRate =
+      totalUsers > 0 ? (basicCounts?.activeUsers ?? 0) / totalUsers : 0;
 
     return {
-      totalUsers,
-      activeUsers: basicCounts.activeUsers,
-      inactiveUsers: basicCounts.inactiveUsers,
-      newUsers: timeBased.newUsers,
-      emailVerifiedUsers: basicCounts.emailVerifiedUsers,
-      emailUnverifiedUsers: basicCounts.emailUnverifiedUsers,
-      verificationRate,
-      usersWithStripeId: basicCounts.usersWithStripeId,
-      usersWithoutStripeId: basicCounts.usersWithoutStripeId,
-      stripeIntegrationRate,
-      usersWithLeadId: usersWithLeadIdCount,
-      usersWithoutLeadId: usersWithoutLeadIdCount,
-      leadAssociationRate:
-        totalUsers > 0 ? usersWithLeadIdCount / totalUsers : 0,
-      usersByRole,
-      publicUsers,
-      customerUsers,
-      partnerAdminUsers,
-      partnerEmployeeUsers,
-      adminUsers,
-      usersCreatedToday: timeBased.usersCreatedToday,
-      usersCreatedThisWeek: timeBased.usersCreatedThisWeek,
-      usersCreatedThisMonth: timeBased.usersCreatedThisMonth,
-      usersCreatedLastMonth: timeBased.usersCreatedLastMonth,
-      growthRate,
-      leadToUserConversionRate,
-      retentionRate,
+      overviewStats: {
+        totalUsers,
+        activeUsers: basicCounts?.activeUsers ?? 0,
+        inactiveUsers: basicCounts?.inactiveUsers ?? 0,
+        newUsers: timeBased?.newUsers ?? 0,
+      },
+      emailStats: {
+        emailVerifiedUsers: basicCounts?.emailVerifiedUsers ?? 0,
+        emailUnverifiedUsers: basicCounts?.emailUnverifiedUsers ?? 0,
+        verificationRate,
+      },
+      subscriptionStats: {
+        activeSubscriptions,
+        canceledSubscriptions,
+        expiredSubscriptions,
+        noSubscription,
+        subscriptionChart: [
+          {
+            x: "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
+            y: activeSubscriptions,
+            label: "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
+          },
+          {
+            x: "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
+            y: canceledSubscriptions,
+            label: "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
+          },
+          {
+            x: "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
+            y: expiredSubscriptions,
+            label: "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
+          },
+          {
+            x: "app.api.users.stats.response.subscriptionStats.noSubscription.label",
+            y: noSubscription,
+            label: "app.api.users.stats.response.subscriptionStats.noSubscription.label",
+          },
+        ],
+      },
+      paymentStats: {
+        totalRevenue,
+        transactionCount,
+        averageOrderValue,
+        refundRate,
+      },
+      roleDistribution: {
+        ...roleCounts,
+        roleChart,
+      },
+      growthMetrics: {
+        timeSeriesData: {
+          usersCreatedToday: timeBased?.usersCreatedToday ?? 0,
+          usersCreatedThisWeek: timeBased?.usersCreatedThisWeek ?? 0,
+          usersCreatedThisMonth: timeBased?.usersCreatedThisMonth ?? 0,
+          usersCreatedLastMonth: timeBased?.usersCreatedLastMonth ?? 0,
+        },
+        performanceRates: {
+          growthRate,
+          leadToUserConversionRate: leadAssociationRate,
+          retentionRate,
+        },
+        growthChart,
+      },
+      businessInsights: {
+        generatedAt: new Date().toISOString(),
+      },
     };
   }
-
-  /**
-   * Calculate lead to user conversion rate
-   * Returns the ratio of users with associated leads
-   */
-  private calculateLeadToUserConversionRate(
-    usersWithLeadIdCount: number,
-    totalUsers: number,
-  ): number {
-    return totalUsers > 0 ? usersWithLeadIdCount / totalUsers : 0;
-  }
-
-  /**
-   * Calculate user retention rate
-   */
-  private async calculateRetentionRate(
-    whereClause: SQL | undefined,
-    logger: EndpointLogger,
-  ): Promise<number> {
-    try {
-      // Calculate retention based on active users vs total users
-      const [retentionStats] = await db
-        .select({
-          totalUsers: sql<number>`count(*)::int`,
-          activeUsers: sql<number>`count(case when ${users.isActive} = true then 1 end)::int`,
-        })
-        .from(users)
-        .where(whereClause);
-
-      return retentionStats.totalUsers > 0
-        ? retentionStats.activeUsers / retentionStats.totalUsers
-        : 0;
-    } catch (error) {
-      logger.error("Error calculating retention rate", parseError(error));
-      return 0.85; // Default fallback
-    }
-  }
-
-  // Note: Historical data generation methods have been removed as they are not
-  // part of the current API definition. They can be re-added if needed.
 }
 
-/**
- * Default repository instance
- */
 export const usersStatsRepository = new UsersStatsRepositoryImpl();

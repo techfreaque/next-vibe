@@ -29,7 +29,6 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { ActivityType, UserAssociation } from "../../../leads/enum";
@@ -71,7 +70,6 @@ interface EmailStatsRepository {
   getStats(
     data: EmailStatsGetRequestTypeOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailStatsGetResponseTypeOutput>>;
 }
@@ -86,9 +84,9 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   async getStats(
     data: EmailStatsGetRequestTypeOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailStatsGetResponseTypeOutput>> {
+    logger.debug("Getting email stats", { userId: user.isPublic ? "public" : user.id, timePeriod: data.timePeriod, dateRangePreset: data.dateRangePreset });
     const timePeriod = (data.timePeriod ?? TimePeriod.DAY) as TimePeriod;
     const dateRangePreset = (data.dateRangePreset ??
       DateRangePreset.LAST_30_DAYS) as DateRangePreset;

@@ -8,21 +8,24 @@ import type { JSX } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
+import { WidgetType } from "../../../shared/types/enums";
+import type {
+  ReactWidgetProps,
+  NarrowedField,
+} from "../../../shared/widgets/types";
 import { extractLinkListData } from "../../../shared/widgets/logic/link-list";
 import { LinkCardWidget } from "./LinkCardWidget";
 import { getGridClassName } from "../../../shared/widgets/utils/widget-helpers";
 
 /**
- * Link List Widget Component
- * Renders a list or grid of link cards
+ * Renders a list or grid of link cards.
  */
 export function LinkListWidget({
   value,
-  field: _field,
+  field,
   context,
   className,
-}: WidgetComponentProps): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.LINK_LIST>): JSX.Element {
   const { t } = simpleT(context.locale);
 
   // Extract data using shared logic
@@ -65,9 +68,12 @@ export function LinkListWidget({
           return (
             <LinkCardWidget
               key={item.url ?? index}
+              widgetType={WidgetType.LINK_CARD}
               value={item}
               context={context}
-              field={_field}
+              field={
+                field as unknown as NarrowedField<typeof WidgetType.LINK_CARD>
+              }
             />
           );
         })}

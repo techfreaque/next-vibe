@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.server.start.post.description",
   category: "app.api.system.server.category",
   tags: ["app.api.system.server.start.tags.start"],
+  icon: "zap",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,

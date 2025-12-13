@@ -21,9 +21,11 @@ import type {
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 
 import type { ApiStore, FormQueryParams } from "./store";
 import { useApiStore } from "./store";
+import { deserializeQueryParams } from "./store";
 import type {
   ApiQueryFormOptions,
   ApiQueryFormReturn,
@@ -118,31 +120,75 @@ export function useApiQueryForm<
   // For query state - use number type instead of NodeJS.Timeout
   const debounceTimerRef = useRef<number | null>(null);
 
+  // Create base form configuration
+  type FormData = ExtractOutput<
+    InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+  >;
+
+  // Recursively extract default values from the Zod schema
+  // This traverses the entire schema tree and builds an object with all default values
+  // Works even when the top-level schema has required fields without defaults
+  const schemaDefaultValues = useMemo(() => {
+    // Step 1: Extract defaults recursively from schema structure
+    // Use forFormInit=true to get empty defaults for primitives (e.g., "" for strings)
+    // This ensures required fields are initialized with proper empty values
+    const extracted = extractSchemaDefaults<FormData>(endpoint.requestSchema, logger, "", true);
+    const baseDefaults = (extracted ?? {}) as FormData;
+
+    // Step 2: Pass through Zod's parse to validate and apply transformations
+    // This ensures coercions (z.coerce.number()) and other transforms work
+    const parsed = endpoint.requestSchema.safeParse(baseDefaults);
+    if (parsed.success) {
+      return parsed.data as FormData;
+    }
+
+    // If validation fails, return the extracted defaults as-is
+    return baseDefaults;
+  }, [endpoint.requestSchema, logger]);
+
+  // Merge schema defaults with provided defaultValues
+  const mergedDefaultValues = useMemo(() => {
+    const provided = restFormOptions.defaultValues as FormData | undefined;
+    if (provided && Object.keys(provided).length > 0) {
+      // Merge provided values over schema defaults
+      return { ...schemaDefaultValues, ...provided };
+    }
+    return schemaDefaultValues;
+  }, [schemaDefaultValues, restFormOptions.defaultValues]);
+
   // Get query params reactively using a memoized selector with stable default
-  // Use formOptions.defaultValues as the default query params instead of empty object
+  // Use mergedDefaultValues (schema defaults + provided defaults) as the default query params
   const defaultQueryParams = useMemo(
     () =>
-      (restFormOptions.defaultValues as ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-      >) ||
+      mergedDefaultValues ||
       ({} as ExtractOutput<
         InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
       >),
-    [restFormOptions.defaultValues],
+    [mergedDefaultValues],
   );
-  const queryParamsSelector = useMemo(
+  // Selector must return stable references - just get raw params from store
+  const rawQueryParamsSelector = useMemo(
     () =>
-      (
-        state: ApiStore,
-      ): ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-      > =>
-        (state.forms[formId]?.queryParams as ExtractOutput<
-          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-        >) ?? defaultQueryParams,
-    [formId, defaultQueryParams],
+      (state: ApiStore): FormQueryParams | undefined =>
+        state.forms[formId]?.queryParams,
+    [formId],
   );
-  const queryParams = useApiStore(queryParamsSelector);
+  const rawQueryParams = useApiStore(rawQueryParamsSelector);
+
+  // Deserialize outside selector to avoid infinite loop from new object references
+  const queryParams = useMemo((): ExtractOutput<
+    InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+  > => {
+    if (!rawQueryParams) {
+      return defaultQueryParams;
+    }
+    // Deserialize JSON-stringified nested objects back to their original form
+    return deserializeQueryParams<
+      ExtractOutput<
+        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+      >
+    >(rawQueryParams);
+  }, [rawQueryParams, defaultQueryParams]);
 
   // Create a function to update query params in the store
   const setQueryParams = useCallback(
@@ -216,14 +262,11 @@ export function useApiQueryForm<
   const setFormErrorStore = useApiStore((state) => state.setFormError);
   const clearFormErrorStore = useApiStore((state) => state.clearFormError);
 
-  // Create base form configuration
-  type FormData = ExtractOutput<
-    InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-  >;
-
+  // Create form configuration with schema defaults
   const formConfig = {
     ...restFormOptions,
     resolver: zodResolver(endpoint.requestSchema),
+    defaultValues: mergedDefaultValues,
   };
 
   // Generate a storage key based on the endpoint if not provided
@@ -231,8 +274,14 @@ export function useApiQueryForm<
     persistenceKey ||
     `query-form-${endpoint.path.join("-")}-${endpoint.method}`;
 
-  // Initialize form with the proper configuration
-  const formMethods = useForm<FormData>(formConfig);
+  // Note: formConfig already includes merged default values
+  const formConfigWithDefaults = {
+    ...formConfig,
+    defaultValues: mergedDefaultValues,
+  };
+
+  // Initialize form with the proper configuration including schema defaults
+  const formMethods = useForm<FormData>(formConfigWithDefaults);
   const { watch } = formMethods;
 
   // Implement form persistence directly
@@ -570,10 +619,12 @@ export function useApiQueryForm<
         // Clear any previous errors
         clearFormError();
 
-        // Update query params immediately
+        // Update query params in the store
+        // The useApiQuery hook reads directly from the store using getState(),
+        // so the refetch will use the updated values immediately
         setQueryParams(formData);
 
-        // Refetch with the new params
+        // Refetch with the new params (reads from store directly)
         const response = await query.refetch();
         // Convert the response to a proper ResponseType
         const result =

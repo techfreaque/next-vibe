@@ -9,6 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   requestDataField,
+  requestResponseField,
   requestUrlPathParamsField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -20,8 +21,23 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import {
+  Countries,
+  CountriesOptions,
+  LanguagesOptions,
+  Languages,
+} from "@/i18n/core/config";
+
+import {
+  EmailCampaignStage,
+  EmailCampaignStageOptions,
+  EmailJourneyVariant,
+  EmailJourneyVariantOptions,
+} from "../../../../leads/enum";
 import { UserRole } from "../../../../user/user-roles/enum";
 import {
+  CampaignType,
+  CampaignTypeOptions,
   SmtpAccountStatus,
   SmtpHealthStatus,
   SmtpSecurityType,
@@ -137,6 +153,44 @@ const accountResponseFields = {
     },
     z.string().datetime(),
   ),
+  campaignTypes: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.emails.smtpClient.edit.id.response.account.campaignTypes",
+    },
+    z.array(z.enum(CampaignType)).optional(),
+  ),
+  emailJourneyVariants: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.emails.smtpClient.edit.id.response.account.emailJourneyVariants",
+    },
+    z.array(z.enum(EmailJourneyVariant)).optional(),
+  ),
+  emailCampaignStages: responseField(
+    {
+      type: WidgetType.TEXT,
+      content:
+        "app.api.emails.smtpClient.edit.id.response.account.emailCampaignStages",
+    },
+    z.array(z.enum(EmailCampaignStage)).optional(),
+  ),
+  countries: responseField(
+    {
+      type: WidgetType.TEXT,
+      content: "app.api.emails.smtpClient.edit.id.response.account.countries",
+    },
+    z.array(z.enum(Countries)).optional(),
+  ),
+  languages: responseField(
+    {
+      type: WidgetType.TEXT,
+      content: "app.api.emails.smtpClient.edit.id.response.account.languages",
+    },
+    z.array(z.enum(Languages)).optional(),
+  ),
 };
 
 /**
@@ -148,6 +202,7 @@ const { GET } = createEndpoint({
   title: "app.api.emails.smtpClient.edit.id.get.title",
   description: "app.api.emails.smtpClient.edit.id.get.description",
   category: "app.api.emails.smtpClient.category",
+  icon: "server",
   tags: ["app.api.emails.smtpClient.tag"],
   allowedRoles: [UserRole.ADMIN],
 
@@ -287,6 +342,7 @@ const { PUT } = createEndpoint({
   title: "app.api.emails.smtpClient.edit.id.put.title",
   description: "app.api.emails.smtpClient.edit.id.put.description",
   category: "app.api.emails.smtpClient.category",
+  icon: "server",
   tags: ["app.api.emails.smtpClient.tag"],
   allowedRoles: [UserRole.ADMIN],
 
@@ -453,6 +509,84 @@ const { PUT } = createEndpoint({
               columns: 6,
             },
             z.number().int().min(1).max(100).optional(),
+          ),
+
+          campaignTypes: requestResponseField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label:
+                "app.api.emails.smtpClient.edit.id.fields.campaignTypes.label",
+              description:
+                "app.api.emails.smtpClient.edit.id.fields.campaignTypes.description",
+              placeholder:
+                "app.api.emails.smtpClient.edit.id.fields.campaignTypes.placeholder",
+              columns: 6,
+              options: CampaignTypeOptions,
+            },
+            z.array(z.enum(CampaignType)).optional(),
+          ),
+
+          emailJourneyVariants: requestResponseField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label:
+                "app.api.emails.smtpClient.edit.id.fields.emailJourneyVariants.label",
+              description:
+                "app.api.emails.smtpClient.edit.id.fields.emailJourneyVariants.description",
+              placeholder:
+                "app.api.emails.smtpClient.edit.id.fields.emailJourneyVariants.placeholder",
+              columns: 6,
+              options: EmailJourneyVariantOptions,
+            },
+            z.array(z.enum(EmailJourneyVariant)).optional(),
+          ),
+
+          emailCampaignStages: requestResponseField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label:
+                "app.api.emails.smtpClient.edit.id.fields.emailCampaignStages.label",
+              description:
+                "app.api.emails.smtpClient.edit.id.fields.emailCampaignStages.description",
+              placeholder:
+                "app.api.emails.smtpClient.edit.id.fields.emailCampaignStages.placeholder",
+              columns: 6,
+              options: EmailCampaignStageOptions,
+            },
+            z.array(z.enum(EmailCampaignStage)).optional(),
+          ),
+
+          countries: requestResponseField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label: "app.api.emails.smtpClient.edit.id.fields.countries.label",
+              description:
+                "app.api.emails.smtpClient.edit.id.fields.countries.description",
+              placeholder:
+                "app.api.emails.smtpClient.edit.id.fields.countries.placeholder",
+              columns: 6,
+              options: CountriesOptions,
+            },
+            z.array(z.enum(["GLOBAL", "DE", "PL", "US"])).optional(),
+          ),
+
+          languages: requestResponseField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label: "app.api.emails.smtpClient.edit.id.fields.languages.label",
+              description:
+                "app.api.emails.smtpClient.edit.id.fields.languages.description",
+              placeholder:
+                "app.api.emails.smtpClient.edit.id.fields.languages.placeholder",
+              columns: 6,
+              options: LanguagesOptions,
+            },
+            z.array(z.enum(Languages)).optional(),
           ),
         },
       ),

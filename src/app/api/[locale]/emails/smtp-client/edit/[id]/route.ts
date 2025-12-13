@@ -15,33 +15,19 @@ export const { GET, PUT, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: ({ urlPathParams, user, locale, logger }) =>
+    handler: ({ urlPathParams, user, logger }) =>
       smtpAccountEditRepository.getSmtpAccount(
         urlPathParams,
         user,
-        locale,
         logger,
       ),
   },
   [Methods.PUT]: {
     email: undefined, // No emails for PUT requests
-    handler: ({ data, urlPathParams, user, locale, logger }) => {
-      const updateData = {
-        id: urlPathParams.id,
-        name: data.updates.name,
-        description: data.updates.description,
-        host: data.updates.host,
-        port: data.updates.port,
-        securityType: data.updates.securityType,
-        username: data.updates.username,
-        password: data.updates.password,
-        fromEmail: data.updates.fromEmail,
-        priority: data.updates.priority,
-      };
+    handler: ({ data, urlPathParams, user, logger }) => {
       return smtpAccountEditRepository.updateSmtpAccount(
-        updateData,
+        { ...data, id: urlPathParams.id },
         user,
-        locale,
         logger,
       );
     },

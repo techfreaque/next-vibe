@@ -40,9 +40,7 @@ export async function generateMetadata({
     category: "app.subscription.meta.subscription.category",
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/subscription-plans.jpg`,
     imageAlt: "app.subscription.meta.subscription.imageAlt",
-    keywords: [
-      "app.subscription.meta.subscription.keywords.billing",
-    ],
+    keywords: ["app.subscription.meta.subscription.keywords.billing"],
   });
 }
 
@@ -81,6 +79,7 @@ export default async function HistoryPage({
   if (userResponse.success && userResponse.data && userResponse.data.leadId) {
     const creditsResponse = await creditRepository.getCreditBalanceForUser(
       userResponse.data,
+      locale,
       logger,
     );
     credits = creditsResponse.success ? creditsResponse.data : null;
@@ -89,9 +88,10 @@ export default async function HistoryPage({
   // Fetch transaction history
   if (userResponse.success && userResponse.data && userResponse.data.leadId) {
     if (isAuthenticated && "id" in userResponse.data && userResponse.data.id) {
-      // Authenticated users: fetch by userId
+      // Authenticated users: fetch by userId and leadId
       const historyResponse = await creditRepository.getTransactions(
         userResponse.data.id,
+        userResponse.data.leadId,
         50, // limit
         0, // offset
         logger,
@@ -119,6 +119,7 @@ export default async function HistoryPage({
     const subscriptionResponse = await subscriptionRepository.getSubscription(
       userResponse.data.id,
       logger,
+      locale,
     );
     subscription = subscriptionResponse.success
       ? subscriptionResponse.data

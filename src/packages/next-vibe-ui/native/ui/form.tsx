@@ -54,6 +54,7 @@ import { Span } from "./span";
 // Styled components for NativeWind support
 const StyledView = styled(View, { className: "style" });
 const StyledAnimatedText = styled(Animated.Text, { className: "style" });
+const StyledPressable = styled(Pressable, { className: "style" });
 
 const Form = FormProvider;
 
@@ -84,12 +85,12 @@ const useFormField = (): UseFormFieldReturn => {
     throw new Error("useFormField should be used within <FormField>");
   }
 
-  const fieldState = getFieldState(fieldContext.name, formState);
-
   if (!itemContext) {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     throw new Error("useFormField should be used within <FormItem>");
   }
+
+  const fieldState = getFieldState(fieldContext.name, formState);
 
   const { id } = itemContext;
 
@@ -109,7 +110,6 @@ const FormItemContext = React.createContext<FormItemContextValue | undefined>(
 
 function FormItem({
   className,
-  style: _style,
   children,
 }: FormItemProps): JSX.Element {
   const id = React.useId();
@@ -126,7 +126,8 @@ FormItem.displayName = "FormItem";
 function FormLabel({
   className,
   children,
-  htmlFor: _htmlFor,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  htmlFor, // Intentionally extracted - not used in React Native
 }: LabelRootProps): JSX.Element {
   const { error, formItemId } = useFormField();
   const labelClassName = cn("px-px", error && "text-destructive", className);
@@ -184,8 +185,14 @@ function FormInput({
   label,
   description,
   onChange,
-  style: _style,
-  ...props
+  style,
+  className,
+  value,
+  defaultValue,
+  placeholder,
+  disabled,
+  type,
+  id,
 }: Omit<React.ComponentPropsWithoutRef<typeof Input>, "onChangeText"> & {
   label?: string;
   description?: string;
@@ -194,7 +201,6 @@ function FormInput({
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
-  // Note: style prop is excluded due to StyleType discriminated union
   return (
     <FormItem>
       {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
@@ -208,7 +214,13 @@ function FormInput({
         }
         aria-invalid={!!error}
         onChangeText={onChange}
-        {...props}
+        {...(className ? { className } : style ? { style } : {})}
+        value={value}
+        defaultValue={defaultValue}
+        placeholder={placeholder}
+        disabled={disabled}
+        type={type}
+        id={id}
       />
       {!!description && <FormDescription>{description}</FormDescription>}
       <FormMessage />
@@ -222,8 +234,17 @@ function FormTextarea({
   label,
   description,
   onChange,
-  style: _style,
-  ...props
+  style,
+  className,
+  value,
+  defaultValue,
+  placeholder,
+  disabled,
+  readOnly,
+  variant,
+  rows,
+  minRows,
+  maxLength,
 }: Omit<React.ComponentPropsWithoutRef<typeof Textarea>, "onChangeText"> & {
   label?: string;
   description?: string;
@@ -232,7 +253,6 @@ function FormTextarea({
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
-  // Note: style prop is excluded due to StyleType discriminated union
   return (
     <FormItem>
       {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
@@ -246,7 +266,16 @@ function FormTextarea({
         }
         aria-invalid={!!error}
         onChangeText={onChange}
-        {...props}
+        {...(className ? { className } : style ? { style } : {})}
+        value={value}
+        defaultValue={defaultValue}
+        placeholder={placeholder}
+        disabled={disabled}
+        readOnly={readOnly}
+        variant={variant}
+        rows={rows}
+        minRows={minRows}
+        maxLength={maxLength}
       />
       {!!description && <FormDescription>{description}</FormDescription>}
       <FormMessage />
@@ -261,8 +290,9 @@ function FormCheckbox({
   description,
   value,
   onChange,
-  style: _style,
-  ...props
+  style,
+  className,
+  disabled,
 }: Omit<
   React.ComponentPropsWithoutRef<typeof Checkbox>,
   "checked" | "onCheckedChange"
@@ -291,7 +321,8 @@ function FormCheckbox({
           aria-invalid={!!error}
           onCheckedChange={onChange}
           checked={value}
-          {...props}
+          {...(className ? { className } : style ? { style } : {})}
+          disabled={disabled}
         />
         {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
       </StyledView>
@@ -337,14 +368,14 @@ function FormDatePicker({
               {value ? new Date(value).toLocaleDateString() : "Pick a date"}
             </Span>
             {!!value && (
-              <Pressable
+              <StyledPressable
                 className={clearButtonClassName}
                 onPress={(): void => {
                   onChange?.("");
                 }}
               >
                 <X size={18} />
-              </Pressable>
+              </StyledPressable>
             )}
           </Button>
         </BottomSheetOpenTrigger>
@@ -372,8 +403,11 @@ function FormRadioGroup({
   description,
   value,
   onChange,
-  style: _style,
-  ...props
+  style,
+  className,
+  disabled,
+  defaultValue,
+  children,
 }: Omit<
   React.ComponentPropsWithoutRef<typeof RadioGroup>,
   "onValueChange" | "value"
@@ -386,7 +420,6 @@ function FormRadioGroup({
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
-  // Note: style prop is excluded due to StyleType discriminated union
   return (
     <FormItem className="gap-3">
       <View>
@@ -403,8 +436,12 @@ function FormRadioGroup({
         aria-invalid={!!error}
         onValueChange={onChange}
         value={value}
-        {...props}
-      />
+        {...(className ? { className } : style ? { style } : {})}
+        disabled={disabled}
+        defaultValue={defaultValue}
+      >
+        {children}
+      </RadioGroup>
       <FormMessage />
     </FormItem>
   );
@@ -519,8 +556,11 @@ function FormSwitch({
   description,
   value,
   onChange,
-  style: _style,
-  ...props
+  style,
+  className,
+  disabled,
+  defaultChecked,
+  id,
 }: Omit<
   React.ComponentPropsWithoutRef<typeof Switch>,
   "checked" | "onCheckedChange"
@@ -536,7 +576,6 @@ function FormSwitch({
   const formItemClassName = "px-1";
   const viewClassName = "flex-row gap-3 items-center";
 
-  // Note: style prop is excluded due to StyleType discriminated union
   return (
     <FormItem className={formItemClassName}>
       <StyledView className={viewClassName}>
@@ -550,7 +589,10 @@ function FormSwitch({
           aria-invalid={!!error}
           onCheckedChange={onChange}
           checked={value}
-          {...props}
+          {...(className ? { className } : style ? { style } : {})}
+          disabled={disabled}
+          defaultChecked={defaultChecked}
+          id={id}
         />
         {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
       </StyledView>

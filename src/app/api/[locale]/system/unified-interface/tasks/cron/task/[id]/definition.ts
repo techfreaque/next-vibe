@@ -42,6 +42,7 @@ const { GET } = createEndpoint({
   title: "app.api.system.unifiedInterface.tasks.cronSystem.task.get.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.task.get.description",
+  icon: "clock",
   category: "app.api.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN],
   tags: ["app.api.system.unifiedInterface.tasks.cronSystem.task.get.title"],
@@ -198,6 +199,7 @@ const { PUT } = createEndpoint({
   title: "app.api.system.unifiedInterface.tasks.cronSystem.task.put.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.task.put.description",
+  icon: "clock",
   category: "app.api.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN],
   tags: ["app.api.system.unifiedInterface.tasks.cronSystem.task.put.title"],
@@ -479,6 +481,7 @@ const { DELETE } = createEndpoint({
   title: "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.title",
   description:
     "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.description",
+  icon: "clock",
   category: "app.api.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN],
   tags: ["app.api.system.unifiedInterface.tasks.cronSystem.task.delete.title"],

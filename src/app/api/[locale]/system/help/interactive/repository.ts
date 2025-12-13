@@ -5,6 +5,7 @@
 
 import "server-only";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import { confirm, select } from "@inquirer/prompts";
 import {
   fail,
@@ -21,7 +22,6 @@ import {
   UserPermissionRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { definitionsRegistry } from "../../unified-interface/shared/endpoints/definitions/registry";

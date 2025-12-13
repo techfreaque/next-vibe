@@ -25,7 +25,6 @@ export function KeyboardAvoidingView({
   behavior,
   keyboardVerticalOffset = 0,
   style,
-  ..._rest
 }: KeyboardAvoidingViewProps): React.JSX.Element {
   // Convert web CSSProperties to native ViewStyle if style is provided
   const nativeStyle: ViewStyle | undefined = style

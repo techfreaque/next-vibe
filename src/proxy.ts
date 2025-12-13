@@ -11,7 +11,7 @@ import { middleware } from "./app/api/[locale]/system/middleware";
 import type { languageDefaults } from "./i18n";
 import type { Countries, CountryLanguage, Languages } from "./i18n/core/config";
 
-const availableCountries: Countries[] = ["DE", "PL", "GLOBAL"];
+const availableCountries: Countries[] = ["DE", "PL", "GLOBAL", "US"];
 const availableLanguages: Languages[] = ["de", "pl", "en"];
 const defaultLocale: `${typeof languageDefaults.language}-${typeof languageDefaults.country}` =
   "en-GLOBAL";
@@ -50,6 +50,6 @@ export const config = {
   matcher: [
     // Match all paths except static files and API routes
     "/",
-    "/((?!api|_next/static|_next/image|image|images|favicon.ico|robots.txt|sitemap.xml).*)",
+    "/((?!_next/static|_next/image|image|images|favicon.ico|robots.txt|sitemap.xml).*)",
   ],
 };

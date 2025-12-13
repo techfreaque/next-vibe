@@ -160,10 +160,9 @@ program
   .description("Show current release status")
   .action(() => {
     const logger = createEndpointLogger(false, Date.now(), locale);
-    const { t } = simpleT(locale);
     try {
       const rootDir = process.cwd();
-      showReleaseStatusCommand(logger, rootDir, t);
+      showReleaseStatusCommand(logger, rootDir);
     } catch (error) {
       handleError(logger, "Show status failed:", error);
     }
@@ -275,7 +274,7 @@ async function runInteractiveMode(logger: EndpointLogger): Promise<void> {
         await continueReleaseCommand(logger, rootDir, t);
         break;
       case "show-status":
-        showReleaseStatusCommand(logger, rootDir, t);
+        showReleaseStatusCommand(logger, rootDir);
         break;
     }
 

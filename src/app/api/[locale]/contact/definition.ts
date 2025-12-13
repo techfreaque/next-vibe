@@ -38,6 +38,7 @@ const { POST } = createEndpoint({
   title: "app.api.contact.title",
   description: "app.api.contact.description",
   category: "app.api.contact.category",
+  icon: "mail",
   tags: [
     "app.api.contact.tags.contactForm",
     "app.api.contact.tags.contactUs",

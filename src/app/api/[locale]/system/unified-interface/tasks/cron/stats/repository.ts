@@ -13,7 +13,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   CronStatsGetRequestOutput,
@@ -28,7 +27,6 @@ export interface ICronStatsRepository {
   getStats(
     data: CronStatsGetRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronStatsGetResponseOutput>>;
 }
@@ -40,7 +38,6 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
   async getStats(
     data: CronStatsGetRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronStatsGetResponseOutput>> {
     try {

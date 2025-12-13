@@ -88,14 +88,52 @@ export function extractLayoutConfig(value: WidgetData): LayoutConfig {
 export function getLayoutClassName(config: LayoutConfig): string {
   const { type, gap, columns } = config;
 
+  // JIT-safe gap classes mapping
+  const gapClassMap: Record<string, string> = {
+    "0": "gap-0",
+    "1": "gap-1",
+    "2": "gap-2",
+    "3": "gap-3",
+    "4": "gap-4",
+    "5": "gap-5",
+    "6": "gap-6",
+    "7": "gap-7",
+    "8": "gap-8",
+    "9": "gap-9",
+    "10": "gap-10",
+    "11": "gap-11",
+    "12": "gap-12",
+  };
+
+  // JIT-safe grid-cols classes mapping
+  const gridColsMap: Record<number, string> = {
+    1: "grid-cols-1",
+    2: "grid-cols-2",
+    3: "grid-cols-3",
+    4: "grid-cols-4",
+    5: "grid-cols-5",
+    6: "grid-cols-6",
+    7: "grid-cols-7",
+    8: "grid-cols-8",
+    9: "grid-cols-9",
+    10: "grid-cols-10",
+    11: "grid-cols-11",
+    12: "grid-cols-12",
+  };
+
+  const gapClass = gapClassMap[gap] ?? "gap-4";
+
   switch (type) {
     case "grid":
-      return `grid gap-${gap} ${columns ? `grid-cols-${columns}` : "grid-cols-1"}`;
+      const gridColsClass = columns
+        ? (gridColsMap[columns] ?? "grid-cols-1")
+        : "grid-cols-1";
+      return `grid ${gapClass} ${gridColsClass}`;
     case "flex":
-      return `flex flex-wrap gap-${gap}`;
+      return `flex items-center ${gapClass}`;
     case "stack":
     default:
-      return `flex flex-col gap-${gap}`;
+      return `flex flex-col ${gapClass}`;
   }
 }
 
@@ -185,9 +223,7 @@ export function extractMetricUnit(value: WidgetData): string | undefined {
  * Get trend color class name
  * Used by: MetricCardWidget
  */
-export function getTrendColorClassName(
-  direction?: TrendDirection,
-): string {
+export function getTrendColorClassName(direction?: TrendDirection): string {
   switch (direction) {
     case "up":
       return "text-green-600 dark:text-green-400";
@@ -219,7 +255,7 @@ export function getSeverityVariant(severity: SeverityType): BadgeVariant {
  * Used by: DataTableWidget
  */
 export interface ColumnConfig {
-  align: "left" | "center" | "right";
+  align: "text-left" | "text-center" | "text-right";
   sortable: boolean;
   width?: string | number;
   format?: (value: WidgetData) => WidgetData;
@@ -230,7 +266,7 @@ export function extractColumnConfig(
   columnKey: string,
 ): ColumnConfig {
   const defaultConfig: ColumnConfig = {
-    align: "left",
+    align: "text-left",
     sortable: false,
   };
 
@@ -255,8 +291,8 @@ export function extractColumnConfig(
 
   const align =
     "align" in rawColumn && typeof rawColumn.align === "string"
-      ? (rawColumn.align as "left" | "center" | "right")
-      : "left";
+      ? (rawColumn.align as "text-left" | "text-center" | "text-right")
+      : "text-left";
 
   const sortable =
     "sortable" in rawColumn && typeof rawColumn.sortable === "boolean"
@@ -338,9 +374,7 @@ export function extractTableSortConfig(value: WidgetData): TableSortConfig {
       : undefined;
 
   const sortBy =
-    "sortBy" in value && typeof value.sortBy === "string"
-      ? value.sortBy
-      : null;
+    "sortBy" in value && typeof value.sortBy === "string" ? value.sortBy : null;
 
   const sortOrder =
     "sortOrder" in value &&

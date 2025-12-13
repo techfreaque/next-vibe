@@ -8,9 +8,7 @@ import {
   fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { browserRepository } from "../repository";
 import type {
@@ -60,9 +58,7 @@ export function filterUndefinedArgs<
  */
 export async function executeMCPTool<T>(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<T>> {
   try {
     // Prepare request data for main browser repository
@@ -71,12 +67,10 @@ export async function executeMCPTool<T>(
       arguments: JSON.stringify(params.args),
     };
 
-    // Call main browser repository - pass user as-is
+    // Call main browser repository
     const result = await browserRepository.executeTool(
       requestData,
-      user,
       logger,
-      locale,
     );
 
     if (!result.success) {
@@ -103,45 +97,35 @@ export async function executeMCPTool<T>(
 
 export async function executeClick<T = BrowserResponseOutput>(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<T>> {
-  return executeMCPTool<T>(params, user, logger, locale);
+  return executeMCPTool<T>(params, logger);
 }
 
 export async function executeClosePage<T = BrowserResponseOutput>(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<T>> {
-  return executeMCPTool<T>(params, user, logger, locale);
+  return executeMCPTool<T>(params, logger);
 }
 
 export async function executeDrag<T = BrowserResponseOutput>(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<T>> {
-  return executeMCPTool<T>(params, user, logger, locale);
+  return executeMCPTool<T>(params, logger);
 }
 
 export async function executeFill<T = BrowserResponseOutput>(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<T>> {
-  return executeMCPTool<T>(params, user, logger, locale);
+  return executeMCPTool<T>(params, logger);
 }
 
 export async function executeEmulate(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<
   ResponseType<{
     success: boolean;
@@ -154,14 +138,12 @@ export async function executeEmulate(
     executionId?: string;
   }>
 > {
-  return executeMCPTool(params, user, logger, locale);
+  return executeMCPTool(params, logger);
 }
 
 export async function executeEvaluateScript(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<
   ResponseType<{
     success: boolean;
@@ -174,14 +156,12 @@ export async function executeEvaluateScript(
     executionId?: string;
   }>
 > {
-  return executeMCPTool(params, user, logger, locale);
+  return executeMCPTool(params, logger);
 }
 
 export async function executeFillForm(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<
   ResponseType<{
     success: boolean;
@@ -197,14 +177,12 @@ export async function executeFillForm(
     executionId?: string;
   }>
 > {
-  return executeMCPTool(params, user, logger, locale);
+  return executeMCPTool(params, logger);
 }
 
 export async function executeGetConsoleMessage(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<
   ResponseType<{
     success: boolean;
@@ -220,140 +198,110 @@ export async function executeGetConsoleMessage(
     executionId?: string;
   }>
 > {
-  return executeMCPTool(params, user, logger, locale);
+  return executeMCPTool(params, logger);
 }
 
 export async function executeGetNetworkRequest(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
 }
 
 export async function executeHandleDialog(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
 }
 
 export async function executeHover(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
 }
 
 export async function executeListConsoleMessages(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
 }
 
 export async function executeListNetworkRequests(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
 }
 
 export async function executeListPages(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
 }
 
 export async function executeNavigatePage(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
 }
 
 export async function executeNewPage(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
 }
 
 export async function executePerformanceAnalyzeInsight(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
 }
 
 export async function executePerformanceStartTrace(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
 }
 
 export async function executePerformanceStopTrace(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
 }
 
-export async function executePressKey(
+export async function executePressKey<T = BrowserResponseOutput>(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+): Promise<ResponseType<T>> {
+  return executeMCPTool<T>(params, logger);
 }
 
-export async function executeResizePage(
+export async function executeResizePage<T = BrowserResponseOutput>(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+): Promise<ResponseType<T>> {
+  return executeMCPTool<T>(params, logger);
 }
 
-export async function executeSelectPage(
+export async function executeSelectPage<T = BrowserResponseOutput>(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, user, logger, locale);
+): Promise<ResponseType<T>> {
+  return executeMCPTool<T>(params, logger);
 }
 
 export async function executeTakeScreenshot(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<
   ResponseType<{
     success: boolean;
@@ -367,14 +315,12 @@ export async function executeTakeScreenshot(
     executionId?: string;
   }>
 > {
-  return executeMCPTool(params, user, logger, locale);
+  return executeMCPTool(params, logger);
 }
 
 export async function executeTakeSnapshot(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<
   ResponseType<{
     success: boolean;
@@ -388,14 +334,12 @@ export async function executeTakeSnapshot(
     executionId?: string;
   }>
 > {
-  return executeMCPTool(params, user, logger, locale);
+  return executeMCPTool(params, logger);
 }
 
 export async function executeUploadFile(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<
   ResponseType<{
     success: boolean;
@@ -407,14 +351,12 @@ export async function executeUploadFile(
     executionId?: string;
   }>
 > {
-  return executeMCPTool(params, user, logger, locale);
+  return executeMCPTool(params, logger);
 }
 
 export async function executeWaitFor(
   params: MCPToolParams,
-  user: JwtPayloadType | null,
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<
   ResponseType<{
     success: boolean;
@@ -426,5 +368,5 @@ export async function executeWaitFor(
     executionId?: string;
   }>
 > {
-  return executeMCPTool(params, user, logger, locale);
+  return executeMCPTool(params, logger);
 }

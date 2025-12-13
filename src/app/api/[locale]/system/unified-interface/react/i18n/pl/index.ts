@@ -21,6 +21,8 @@ export const translations: typeof enTranslations = {
       noData: "Brak dostępnych danych",
       showMore: "Pokaż {{count}} więcej",
       showLess: "Pokaż mniej",
+      viewList: "Widok listy",
+      viewGrid: "Widok siatki",
     },
     linkList: {
       noResults: "Nie znaleziono wyników",

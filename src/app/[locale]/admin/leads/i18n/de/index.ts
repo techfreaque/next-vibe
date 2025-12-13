@@ -46,6 +46,7 @@ export const translations: typeof enTranslations = {
       },
       actions: {
         refresh: "Aktualisieren",
+        reset: "Zurücksetzen",
         retry: "Wiederholen",
         export: "Exportieren",
         exportCsv: "Als CSV exportieren",
@@ -433,10 +434,13 @@ export const translations: typeof enTranslations = {
         },
       },
       import: {
+        label: "Importieren",
+        description: "Leads aus CSV-Dateien importieren",
         button: "Leads importieren",
         title: "Leads aus CSV importieren",
-        description:
-          "Laden Sie eine CSV-Datei hoch, um Leads in Ihr Kampagnensystem zu importieren",
+        actions: {
+          import: "Importieren",
+        },
         template: {
           title: "Vorlage herunterladen",
           description:
@@ -837,6 +841,8 @@ export const translations: typeof enTranslations = {
         campaignStarter: "Kampagnen-Starter",
         campaignStarter_description:
           "Kampagnen-Starter-Einstellungen konfigurieren",
+        import: "Importieren",
+        import_description: "Leads aus CSV-Dateien importieren",
       },
     },
     campaign: {

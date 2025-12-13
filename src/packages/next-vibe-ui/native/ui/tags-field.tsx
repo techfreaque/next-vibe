@@ -33,7 +33,6 @@ export function TagsField({
   disabled = false,
   className,
   style,
-  name: _name,
 }: TagsFieldProps): React.JSX.Element {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState("");
@@ -134,7 +133,7 @@ export function TagsField({
     >
       <View
         className={cn(
-          "min-h-[48px] w-full rounded-md border border-input bg-background px-3 py-2",
+          "min-h-12 w-full rounded-md border border-input bg-background px-3 py-2",
           disabled && "cursor-not-allowed opacity-50",
           "flex-row flex-wrap gap-2 items-center",
         )}

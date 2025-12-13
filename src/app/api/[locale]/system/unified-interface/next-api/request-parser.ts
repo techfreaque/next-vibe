@@ -11,19 +11,78 @@ import type { EndpointLogger } from "../shared/logger/endpoint";
 import { parseError } from "../../../shared/utils";
 
 /**
- * Parse search params and convert dot notation to nested objects
- * Example: ?user.name=John&user.age=30 => { user: { name: "John", age: "30" } }
+ * Parsed JSON value type - recursive type for any JSON-compatible structure
  */
-export function parseSearchParams(
-  searchParams: URLSearchParams,
-): Record<string, string | Record<string, string>> {
-  const result: Record<string, string | Record<string, string>> = {};
+type ParsedValue =
+  | string
+  | number
+  | boolean
+  | null
+  | ParsedObject
+  | readonly ParsedValue[];
+// eslint-disable-next-line typescript-eslint/consistent-type-definitions
+interface ParsedObject {
+  [key: string]: ParsedValue;
+}
+type ParsedArray = readonly ParsedValue[];
+
+/**
+ * Try to parse a value as JSON or coerce to appropriate type
+ * Handles JSON objects/arrays, booleans, and numbers
+ */
+function tryParseValue(value: string): ParsedValue {
+  // Check if value looks like JSON (starts with { or [)
+  if (
+    (value.startsWith("{") && value.endsWith("}")) ||
+    (value.startsWith("[") && value.endsWith("]"))
+  ) {
+    try {
+      return JSON.parse(value) as ParsedObject | ParsedArray;
+    } catch {
+      // If parsing fails, return original string
+      return value;
+    }
+  }
+
+  // Coerce boolean strings
+  if (value === "true") {
+    return true;
+  }
+  if (value === "false") {
+    return false;
+  }
+
+  // Coerce numeric strings (integers and floats)
+  if (/^-?\d+$/.test(value)) {
+    const parsed = parseInt(value, 10);
+    if (!isNaN(parsed)) {
+      return parsed;
+    }
+  }
+  if (/^-?\d+\.\d+$/.test(value)) {
+    const parsed = parseFloat(value);
+    if (!isNaN(parsed)) {
+      return parsed;
+    }
+  }
+
+  return value;
+}
+
+/**
+ * Parse search params and convert dot notation to nested objects
+ * Also handles JSON-stringified values for complex nested objects
+ * Example: ?user.name=John&user.age=30 => { user: { name: "John", age: "30" } }
+ * Example: ?filters={"status":"active"} => { filters: { status: "active" } }
+ */
+export function parseSearchParams(searchParams: URLSearchParams): ParsedObject {
+  const result: ParsedObject = {};
 
   for (const [key, value] of searchParams.entries()) {
     if (key.includes(".")) {
       // Handle dot notation for nested objects
       const parts = key.split(".");
-      let current: Record<string, string | Record<string, string>> = result;
+      let current: ParsedObject = result;
 
       for (let i = 0; i < parts.length - 1; i++) {
         const part = parts[i];
@@ -31,17 +90,17 @@ export function parseSearchParams(
           if (!(part in current)) {
             current[part] = {};
           }
-          current = current[part] as Record<string, string>;
+          current = current[part] as ParsedObject;
         }
       }
 
       const lastPart = parts[parts.length - 1];
       if (lastPart) {
-        current[lastPart] = value;
+        current[lastPart] = tryParseValue(value);
       }
     } else {
-      // Simple key-value pair
-      result[key] = value;
+      // Simple key-value pair - try to parse as appropriate type
+      result[key] = tryParseValue(value);
     }
   }
 

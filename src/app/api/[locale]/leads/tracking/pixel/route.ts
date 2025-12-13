@@ -7,8 +7,8 @@ import type { NextRequest } from "next/server";
 import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { env } from "@/config/env";
 
 import { pixelTrackingRepository } from "./repository";
 

@@ -47,6 +47,7 @@ const { GET } = createEndpoint({
   description: "app.api.agent.chat.folders.get.description" as const,
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.folders" as const],
+  icon: "folder" as const,
 
   fields: objectField(
     {
@@ -454,6 +455,7 @@ const { POST } = createEndpoint({
   description: "app.api.agent.chat.folders.post.description" as const,
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.folders" as const],
+  icon: "folder-plus" as const,
 
   fields: objectField(
     {

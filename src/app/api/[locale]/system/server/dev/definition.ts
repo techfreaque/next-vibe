@@ -33,6 +33,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.server.dev.post.description",
   category: "app.api.system.server.category",
   tags: ["app.api.system.server.enum.mode.development"],
+  icon: "code",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

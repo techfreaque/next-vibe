@@ -34,9 +34,7 @@ import type { CampaignStarterConfigType as CampaignStarterConfigWithCronType } f
  */
 export interface ICampaignStarterConfigRepository {
   getConfig(
-    data: Record<string, never>,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigWithCronType>>;
 
@@ -212,9 +210,7 @@ class CampaignStarterConfigRepositoryImpl implements ICampaignStarterConfigRepos
    * Get campaign starter configuration
    */
   async getConfig(
-    data: Record<string, never>,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigWithCronType>> {
     try {
@@ -223,7 +219,6 @@ class CampaignStarterConfigRepositoryImpl implements ICampaignStarterConfigRepos
       logger.info("Fetching campaign starter config", {
         environment,
         userId: user.id,
-        locale,
       });
 
       // Try to get config from database

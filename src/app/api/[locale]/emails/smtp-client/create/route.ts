@@ -15,7 +15,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined, // No emails for POST requests
-    handler: ({ data, user, locale, logger }) =>
-      smtpAccountCreateRepository.createSmtpAccount(data, user, locale, logger),
+    handler: ({ data, user, logger }) =>
+      smtpAccountCreateRepository.createSmtpAccount(data, user, logger),
   },
 });

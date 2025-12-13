@@ -15,11 +15,8 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ locale, logger }) => {
-      return await translationReorganizeRepository.getTranslationStats(
-        locale,
-        logger,
-      );
+    handler: async ({ logger }) => {
+      return await translationReorganizeRepository.getTranslationStats(logger);
     },
   },
 });

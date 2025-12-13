@@ -133,7 +133,7 @@ class MessageRepository implements MessageRepositoryInterface {
       }
 
       // Check if user can read this message
-      if (!(await canReadMessage(user, message, thread, folder, logger))) {
+      if (!(await canReadMessage(user, thread, folder, logger))) {
         return fail({
           message:
             "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.forbidden.title" as const,

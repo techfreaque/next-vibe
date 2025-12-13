@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   title: "app.api.newsletter.unsubscribe.post.title" as const,
   description: "app.api.newsletter.unsubscribe.post.description" as const,
   category: "app.api.newsletter.unsubscribe.category" as const,
+  icon: "bell-off",
   tags: ["app.api.newsletter.unsubscribe.tags.newsletter" as const],
   allowedRoles: [
     UserRole.PUBLIC,

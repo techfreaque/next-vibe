@@ -484,6 +484,7 @@ async function renderedComponent(
 }
 
 function isAsyncComponent(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _PageComponent: AnyNextComponent,
 ): _PageComponent is AnyNextAsyncPageComponent {
   return true;

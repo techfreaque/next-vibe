@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   title: "app.api.system.unifiedInterface.cli.setup.install.post.title",
   description:
     "app.api.system.unifiedInterface.cli.setup.install.post.description",
+  icon: "download",
   category: "app.api.system.unifiedInterface.cli.setup.install.post.title",
   tags: ["app.api.system.unifiedInterface.cli.setup.install.post.title"],
   allowedRoles: [
@@ -40,7 +41,7 @@ const { POST } = createEndpoint({
   ],
   aliases: ["install", "setup"],
   method: Methods.POST,
-  path: ["setup", "install"],
+  path: ["system", "unified-interface", "cli", "setup", "install"],
   examples: {
     requests: {
       default: {

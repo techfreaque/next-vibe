@@ -14,7 +14,7 @@ import { loginRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, request, logger, platform }) =>
+    handler: ({ data, user, request, logger, platform, locale }) =>
       loginRepository.login(data, user, locale, request, logger, platform),
   },
 });

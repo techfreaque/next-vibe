@@ -8,6 +8,10 @@ export const translations: typeof enTranslations = {
       title: "Filtry listy leadów",
       description: "Skonfiguruj filtry dla listy leadów",
     },
+    actions: {
+      refresh: "Odśwież",
+      refreshing: "Odświeżanie...",
+    },
     page: {
       label: "Numer strony",
       description: "Numer strony dla paginacji",

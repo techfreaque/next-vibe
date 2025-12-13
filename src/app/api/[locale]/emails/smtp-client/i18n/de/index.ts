@@ -17,6 +17,10 @@ export const translations: typeof enTranslations = {
   emailHandling: emailHandlingTranslations,
   sending: {
     errors: {
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung für SMTP-Sendevorgänge erforderlich",
+      },
       server: {
         title: "Server-Fehler",
         description: "Ein Fehler ist auf dem SMTP-Server aufgetreten",

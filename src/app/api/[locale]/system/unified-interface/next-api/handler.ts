@@ -10,8 +10,8 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import {
   wrapSuccessResponse,
   wrapErrorResponse,

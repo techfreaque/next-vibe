@@ -43,6 +43,7 @@ const sideTasksPostEndpoint = createEndpoint({
   title: "app.api.system.unifiedInterface.tasks.sideTasks.get.title",
   description:
     "app.api.system.unifiedInterface.tasks.sideTasks.get.description",
+  icon: "list",
   category: "app.api.system.unifiedInterface.tasks.sideTasks.category",
   tags: ["app.api.system.unifiedInterface.tasks.sideTasks.tags.sidetasks"],
   allowedRoles: [UserRole.ADMIN],
@@ -307,6 +308,7 @@ const sideTasksGetEndpoint = createEndpoint({
   title: "app.api.system.unifiedInterface.tasks.sideTasks.get.title",
   description:
     "app.api.system.unifiedInterface.tasks.sideTasks.get.description",
+  icon: "list",
   category: "app.api.system.unifiedInterface.tasks.category",
   tags: ["app.api.system.unifiedInterface.tasks.sideTasks.tags.sidetasks"],
   allowedRoles: [UserRole.ADMIN],

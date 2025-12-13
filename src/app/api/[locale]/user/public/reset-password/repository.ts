@@ -20,8 +20,8 @@ import {
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { env } from "@/config/env";
 
 import { UserDetailLevel } from "../../enum";
 import { passwordUpdateRepository } from "../../private/me/password/repository";

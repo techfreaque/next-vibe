@@ -13,7 +13,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -34,7 +33,6 @@ class HelpRepository {
   execute(
     data: HelpRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
     platform: Platform,
   ): ResponseType<HelpResponseOutput> {

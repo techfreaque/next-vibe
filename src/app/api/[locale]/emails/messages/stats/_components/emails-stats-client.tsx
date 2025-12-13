@@ -29,8 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
-import type { JSX } from "react";
-import { useEffect } from "react";
+import { type JSX, useMemo } from "react";
 
 import type { EmailStatsGetResponseTypeOutput } from "@/app/api/[locale]/emails/messages/stats/definition";
 import { useEmailMessagesStats } from "@/app/api/[locale]/emails/messages/stats/hooks";
@@ -65,13 +64,11 @@ export function EmailsStatsClient({
   const { t } = simpleT(locale);
 
   // Create logger and endpoint
-  const logger = createEndpointLogger(false, Date.now(), locale);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
   const endpoint = useEmailMessagesStats(logger);
-
-  // Auto-fetch on mount
-  useEffect(() => {
-    void endpoint.read.refetch();
-  }, [endpoint.read]);
 
   const stats = endpoint.read.response as
     | EmailStatsGetResponseTypeOutput
@@ -91,37 +88,42 @@ export function EmailsStatsClient({
           </CardHeader>
           <CardContent>
             <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
+              {Array.from({ length: 6 }, (item, i) => {
+                void item;
+                return <Skeleton key={i} className="h-10 w-full" />;
+              })}
             </Div>
           </CardContent>
         </Card>
 
         {/* Key Metrics Skeleton */}
         <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Card key={i}>
-              <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-4" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-16 mb-2" />
-                <Skeleton className="h-3 w-32" />
-              </CardContent>
-            </Card>
-          ))}
+          {Array.from({ length: 8 }, (item, i) => {
+            void item;
+            return (
+              <Card key={i}>
+                <CardHeader className="flex flex-row items-center justify-between gap-0 pb-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-4" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-16 mb-2" />
+                  <Skeleton className="h-3 w-32" />
+                </CardContent>
+              </Card>
+            );
+          })}
         </Div>
 
         {/* Tabs Skeleton */}
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-32" />
-            <Div className="flex flex flex-row gap-2 mt-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-8 w-20" />
-              ))}
+            <Div className="flexflex-row gap-2 mt-4">
+              {Array.from({ length: 4 }, (item, i) => {
+                void item;
+                return <Skeleton key={i} className="h-8 w-20" />;
+              })}
             </Div>
           </CardHeader>
           <CardContent>
@@ -150,7 +152,7 @@ export function EmailsStatsClient({
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.totalEmails")}
             </CardTitle>
@@ -169,7 +171,7 @@ export function EmailsStatsClient({
 
         {/* Delivered Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.metrics.deliveredEmails")}
             </CardTitle>
@@ -188,7 +190,7 @@ export function EmailsStatsClient({
 
         {/* Opened Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.openedEmails")}
             </CardTitle>
@@ -207,7 +209,7 @@ export function EmailsStatsClient({
 
         {/* Clicked Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.clickedEmails")}
             </CardTitle>
@@ -226,7 +228,7 @@ export function EmailsStatsClient({
 
         {/* Bounced Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.bouncedEmails")}
             </CardTitle>
@@ -245,7 +247,7 @@ export function EmailsStatsClient({
 
         {/* Failed Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.failedEmails")}
             </CardTitle>
@@ -264,7 +266,7 @@ export function EmailsStatsClient({
 
         {/* Draft Emails */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.draftEmails")}
             </CardTitle>
@@ -285,7 +287,7 @@ export function EmailsStatsClient({
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Emails with User ID */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.metrics.emailsWithUserId")}
             </CardTitle>
@@ -306,7 +308,7 @@ export function EmailsStatsClient({
 
         {/* Emails with Lead ID */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.metrics.emailsWithLeadId")}
             </CardTitle>
@@ -327,7 +329,7 @@ export function EmailsStatsClient({
 
         {/* Emails with Errors */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.emails.stats.admin.stats.metrics.emailsWithErrors")}
             </CardTitle>
@@ -348,7 +350,7 @@ export function EmailsStatsClient({
 
         {/* Average Retry Count */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t(
                 "app.admin.emails.stats.admin.stats.metrics.averageRetryCount",
@@ -372,7 +374,7 @@ export function EmailsStatsClient({
       <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Average Processing Time */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t(
                 "app.admin.emails.stats.admin.stats.metrics.averageProcessingTime",
@@ -394,7 +396,7 @@ export function EmailsStatsClient({
 
         {/* Average Delivery Time */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t(
                 "app.admin.emails.stats.admin.stats.metrics.averageDeliveryTime",

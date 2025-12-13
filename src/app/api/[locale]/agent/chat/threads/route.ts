@@ -32,7 +32,6 @@ export const { GET, POST, tools } = endpointsHandler({
       return await threadsRepository.listThreads(
         props.data,
         props.user,
-        props.locale,
         props.logger,
       );
     },

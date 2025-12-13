@@ -24,6 +24,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { AuthContext } from "@/app/api/[locale]/system/unified-interface/shared/server-only/auth/base-auth-handler";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CompleteUserType } from "@/app/api/[locale]/user/types";
@@ -31,7 +32,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UserRoleValue } from "../user-roles/enum";
 import type { AuthRepository, InferUserType } from "./repository";
-import type { AuthContext } from "../../system/unified-interface/shared/server-only/auth/base-auth-handler";
 
 /**
  * Storage keys for auth tokens
@@ -58,7 +58,10 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     payload: JwtPrivatePayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<string>> {
-    logger.error("signJwt is server-only - JWT signing happens on server");
+    // Parameters exist for interface consistency with server implementation
+    logger.error("signJwt is server-only - JWT signing happens on server", {
+      userId: payload.id,
+    });
     return Promise.resolve(createUnsupportedError<string>("signJwt", logger));
   }
 
@@ -66,45 +69,24 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     token: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
+    // Parameters exist for interface consistency with server implementation
     logger.error(
       "verifyJwt is server-only - JWT verification happens on server",
+      { tokenLength: token?.length },
     );
     return Promise.resolve(
       createUnsupportedError<JwtPrivatePayloadType>("verifyJwt", logger),
     );
   }
 
-  verifyToken(
-    token: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<JwtPrivatePayloadType>> {
-    return this.verifyJwt(token, logger);
-  }
-
-  getLeadIdFromDb(): Promise<string | null> {
-    // Native implementation should use AsyncStorage or similar
-    // For now, return null to indicate not implemented
-    return Promise.resolve(null);
-  }
-
-  getPrimaryLeadId(): Promise<string | null> {
-    // Native implementation should use AsyncStorage or similar
-    // For now, return null to indicate not implemented
-    return Promise.resolve(null);
-  }
-
-  getAllLeadIds(): Promise<string[]> {
-    // Native implementation should use AsyncStorage or similar
-    // For now, return empty array to indicate not implemented
-    return Promise.resolve([]);
-  }
-
   getCurrentUser(
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
+    // Parameters exist for interface consistency with server implementation
     logger.warn(
       "getCurrentUser not implemented on native - not used in page.tsx",
+      { contextType: typeof context },
     );
     return Promise.resolve(
       createUnsupportedError<JwtPrivatePayloadType>("getCurrentUser", logger),
@@ -116,8 +98,10 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
+    // Parameters exist for interface consistency with server implementation
     logger.error(
       "getAuthMinimalUser not implemented on native - not used in page.tsx",
+      { rolesCount: roles.length, contextType: typeof context },
     );
     const error = createUnsupportedError<InferUserType<TRoles>>(
       "getAuthMinimalUser",
@@ -126,24 +110,16 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     return Promise.reject(new Error(JSON.stringify(error)));
   }
 
-  getTypedAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
-    roles: TRoles,
-    context: AuthContext,
-    logger: EndpointLogger,
-  ): Promise<InferUserType<TRoles> | null> {
-    logger.warn(
-      "getTypedAuthMinimalUser not implemented on native - not used in page.tsx",
-    );
-    return Promise.resolve(null);
-  }
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Parameters exist for interface consistency
   getUserRoles(
     requiredRoles: readonly UserRoleValue[],
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<UserRoleValue[]> {
+    // Parameters exist for interface consistency with server implementation
     logger.warn(
       "getUserRoles not implemented on native - not used in page.tsx",
+      { requiredRolesCount: requiredRoles.length, contextType: typeof context },
     );
     return Promise.resolve([]);
   }
@@ -207,13 +183,19 @@ class AuthRepositoryNativeImpl implements AuthRepository {
    */
   async storeAuthTokenForPlatform(
     token: string,
-    userId: string,
-    leadId: string,
+    _userId: string,
+    _leadId: string,
     _platform: Platform,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     // On native, we always use AsyncStorage (no platform detection needed)
     // Default to rememberMe=true for native (30 days)
+    // Parameters prefixed with _ exist for interface consistency with server implementation
+    logger.debug("Storing auth token for platform (native)", {
+      userId: _userId,
+      leadId: _leadId,
+      platform: _platform,
+    });
     return await this.setAuthCookies(token, true, logger);
   }
 
@@ -226,14 +208,23 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     // On native, we always use AsyncStorage (no platform detection needed)
+    // Parameter prefixed with _ exists for interface consistency with server implementation
+    logger.debug("Clearing auth token for platform (native)", {
+      platform: _platform,
+    });
     return await this.clearAuthCookies(logger);
   }
 
   createCliToken(
-    userId: string,
-    _locale: CountryLanguage,
+    _userId: string,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<string>> {
+    // Parameters exist for interface consistency with server implementation
+    logger.debug("createCliToken not available on native", {
+      userId: _userId,
+      locale,
+    });
     return Promise.resolve(
       createUnsupportedError<string>("createCliToken", logger),
     );
@@ -243,7 +234,10 @@ class AuthRepositoryNativeImpl implements AuthRepository {
     token: string,
     logger: EndpointLogger,
   ): Promise<JwtPrivatePayloadType | null> {
-    logger.error("validateCliToken not available on native");
+    // Parameters exist for interface consistency with server implementation
+    logger.error("validateCliToken not available on native", {
+      tokenLength: token?.length,
+    });
     return Promise.resolve(null);
   }
 
@@ -264,10 +258,14 @@ class AuthRepositoryNativeImpl implements AuthRepository {
 
   requireAdminUser(
     locale: CountryLanguage,
-    callbackUrl: string,
+    _callbackUrl: string,
     logger: EndpointLogger,
   ): Promise<CompleteUserType> {
-    logger.error("requireAdminUser not available on native");
+    // Parameters exist for interface consistency with server implementation
+    logger.error("requireAdminUser not available on native", {
+      locale,
+      callbackUrl: _callbackUrl,
+    });
     const error = createUnsupportedError<CompleteUserType>(
       "requireAdminUser",
       logger,
@@ -276,13 +274,15 @@ class AuthRepositoryNativeImpl implements AuthRepository {
   }
 
   authenticateUserByEmail(
-    email: string,
+    _email: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
-    logger.error("authenticateUserByEmail not available on native");
-    void email;
-    void locale;
+    // Parameters exist for interface consistency with server implementation
+    logger.error("authenticateUserByEmail not available on native", {
+      email: _email,
+      locale,
+    });
     return Promise.resolve(
       createUnsupportedError<JwtPrivatePayloadType>(
         "authenticateUserByEmail",

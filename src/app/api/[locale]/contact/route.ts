@@ -29,7 +29,6 @@ export const { POST, tools } = endpointsHandler({
       const result = await contactRepository.submitContactForm(
         data,
         user,
-        locale,
         logger,
       );
 

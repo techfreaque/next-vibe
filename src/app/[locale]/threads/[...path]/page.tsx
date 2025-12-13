@@ -14,9 +14,11 @@
 import type { JSX } from "react";
 import { redirect } from "next-vibe-ui/lib/redirect";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import { ChatProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
-import { getFolder } from "@/app/api/[locale]/agent/chat/folders/[id]/repository";
+import { folderRepository } from "@/app/api/[locale]/agent/chat/folders/[id]/repository";
 import { rootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/root-permissions/repository";
 import { threadByIdRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/repository";
 import { creditRepository } from "@/app/api/[locale]/credits/repository";
@@ -24,7 +26,6 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { userRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { ChatInterface } from "@/app/api/[locale]/agent/chat/_components/chat-interface";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
@@ -60,6 +61,7 @@ export default async function ThreadsPathPage({
   if (userResponse.success && userResponse.data) {
     const creditsResponse = await creditRepository.getCreditBalanceForUser(
       userResponse.data,
+      locale,
       logger,
     );
     initialCredits = creditsResponse.success ? creditsResponse.data : null;
@@ -96,11 +98,7 @@ export default async function ThreadsPathPage({
 
     if (!threadResponse.success) {
       // Not a thread, check if it's a folder
-      const folderResponse = await getFolder(
-        user,
-        { id: initialThreadId },
-        logger,
-      );
+      const folderResponse = await folderRepository.getFolder(user, { id: initialThreadId }, logger);
 
       if (folderResponse.success) {
         // It's a folder! Correct the parsed values
@@ -165,7 +163,7 @@ export default async function ThreadsPathPage({
       initialCredits={creditsToUse}
       rootFolderPermissions={rootFolderPermissions}
     >
-      <ChatInterface urlPath={path} user={user} />
+      <ChatInterface user={user} />
     </ChatProvider>
   );
 }

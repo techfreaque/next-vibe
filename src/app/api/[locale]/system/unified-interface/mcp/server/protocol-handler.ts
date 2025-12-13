@@ -7,9 +7,9 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import { getCliUser } from "@/app/api/[locale]/system/unified-interface/cli/auth/cli-user";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { Platform } from "../../shared/types/platform";

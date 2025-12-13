@@ -7,7 +7,8 @@ import { Span } from "next-vibe-ui/ui/span";
 import { Code } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
+import type { WidgetType } from "../../../shared/types/enums";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import {
   extractCodeOutputData,
   splitCodeIntoLines,
@@ -15,19 +16,15 @@ import {
 } from "../../../shared/widgets/logic/code-output";
 
 /**
- * Code Output Widget Component
- * Displays code with syntax highlighting
+ * Displays code with syntax highlighting and optional line numbers.
  */
 export function CodeOutputWidget({
   value,
-  field: _field,
   context,
   className,
-}: WidgetComponentProps): JSX.Element {
-  // Extract data using shared logic
+}: ReactWidgetProps<typeof WidgetType.CODE_OUTPUT>): JSX.Element {
   const data = extractCodeOutputData(value, context.theme ?? "light");
 
-  // Handle null case
   if (!data) {
     return (
       <Div className={cn("italic p-4 text-muted-foreground", className)}>—</Div>

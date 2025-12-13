@@ -18,13 +18,9 @@ function Ol({
   onMouseEnter,
   onMouseLeave,
   start,
-  reversed: _reversed,
-  type: _type,
-  id: _id,
   role,
   "aria-label": ariaLabel,
-  "aria-labelledby": _ariaLabelledby,
-  "aria-describedby": _ariaDescribedby,
+  id,
 }: OlProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
@@ -98,6 +94,7 @@ function Ol({
         accessibilityRole={accessibilityRole}
         accessibilityLabel={ariaLabel}
         accessibilityValue={start !== undefined ? { text: String(start) } : undefined}
+        nativeID={id}
       >
         {children}
       </StyledPressable>
@@ -110,6 +107,7 @@ function Ol({
       accessibilityRole={accessibilityRole}
       accessibilityLabel={ariaLabel}
       accessibilityValue={start !== undefined ? { text: String(start) } : undefined}
+      nativeID={id}
     >
       {children}
     </StyledView>

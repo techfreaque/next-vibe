@@ -9,9 +9,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { UserCreateResponseOutput } from "./definition";
@@ -49,15 +47,11 @@ function getSmsMessage(
 export interface UserCreateSmsService {
   sendWelcomeSms(
     userData: UserCreateResponseOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>>;
 
   sendVerificationSms(
     userData: UserCreateResponseOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>>;
 }
@@ -71,8 +65,6 @@ export class UserCreateSmsServiceImpl implements UserCreateSmsService {
    */
   sendWelcomeSms(
     userData: UserCreateResponseOutput,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
     // SMS functionality not available - phone field not in schema
@@ -95,8 +87,6 @@ export class UserCreateSmsServiceImpl implements UserCreateSmsService {
    */
   sendVerificationSms(
     userData: UserCreateResponseOutput,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
     // SMS functionality not available - phone field not in schema
@@ -159,28 +149,14 @@ export const userCreateSmsService = new UserCreateSmsServiceImpl();
  */
 export const sendWelcomeSms = async (
   userData: UserCreateResponseOutput,
-  user: JwtPayloadType,
-  locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
-  return await userCreateSmsService.sendWelcomeSms(
-    userData,
-    user,
-    locale,
-    logger,
-  );
+  return await userCreateSmsService.sendWelcomeSms(userData, logger);
 };
 
 export const sendVerificationSms = async (
   userData: UserCreateResponseOutput,
-  user: JwtPayloadType,
-  locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
-  return await userCreateSmsService.sendVerificationSms(
-    userData,
-    user,
-    locale,
-    logger,
-  );
+  return await userCreateSmsService.sendVerificationSms(userData, logger);
 };

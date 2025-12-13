@@ -16,7 +16,6 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { imapAccountsRepository } from "../accounts/repository";
@@ -28,19 +27,14 @@ import {
   ImapSyncStatus,
   SortOrder,
 } from "../enum";
-import type {
-  ImapHealthGetRequestOutput,
-  ImapHealthGetResponseOutput,
-} from "./definition";
+import type { ImapHealthGetResponseOutput } from "./definition";
 
 /**
  * IMAP Health Repository Interface
  */
 export interface ImapHealthRepository {
   getHealthStatus(
-    data: ImapHealthGetRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapHealthGetResponseOutput>>;
 }
@@ -53,9 +47,7 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
    * Get current IMAP server health status
    */
   async getHealthStatus(
-    data: ImapHealthGetRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapHealthGetResponseOutput>> {
     try {
@@ -71,7 +63,6 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
           limit: 1000, // Get all accounts for stats
         },
         user,
-        locale,
         logger,
       );
 

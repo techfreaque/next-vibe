@@ -32,6 +32,7 @@ const { POST } = createEndpoint({
     "app.api.system.db.utils.dockerOperations.tags.docker",
     "app.api.system.db.utils.dockerOperations.tags.utils",
   ],
+  icon: "box",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

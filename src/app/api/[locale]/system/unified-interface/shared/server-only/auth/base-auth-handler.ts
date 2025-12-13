@@ -2,9 +2,9 @@ import "server-only";
 
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Platform } from "../../types/platform";

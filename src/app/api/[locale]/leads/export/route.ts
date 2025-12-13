@@ -12,8 +12,8 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger, t }) => {
-      return await leadsRepository.exportLeads(data, user, locale, logger, t);
+    handler: async ({ data, logger, t }) => {
+      return await leadsRepository.exportLeads(data, logger, t);
     },
   },
 });

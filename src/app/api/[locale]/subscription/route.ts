@@ -14,9 +14,12 @@ export const { GET, POST, PUT, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, logger }) => {
-      const userId = authRepository.requireUserId(user);
-      return await subscriptionRepository.getSubscription(userId, logger);
+    handler: async ({ user, logger, locale }) => {
+      return await subscriptionRepository.getSubscription(
+        user.id,
+        logger,
+        locale,
+      );
     },
   },
   [Methods.POST]: {

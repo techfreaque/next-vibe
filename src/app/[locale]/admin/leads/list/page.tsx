@@ -1,15 +1,11 @@
 /**
  * Leads List Page
- * Uses form-based filtering pattern similar to cron execution history
+ * Uses EndpointsPage component for complete endpoint handling
  */
 
 import type { JSX } from "react";
-import { Div } from "next-vibe-ui/ui/div";
-import { P } from "next-vibe-ui/ui/typography";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-
 import { LeadsListClient } from "@/app/api/[locale]/leads/list/_components/leads-list-client";
 
 export default async function LeadsListPage({
@@ -18,19 +14,6 @@ export default async function LeadsListPage({
   params: Promise<{ locale: CountryLanguage }>;
 }): Promise<JSX.Element> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
 
-  return (
-    <Div className="flex flex-col gap-6">
-      {/* Page Description */}
-      <Div>
-        <P className="text-gray-600 dark:text-gray-400">
-          {t("app.admin.leads.leads.list.description")}
-        </P>
-      </Div>
-
-      {/* Client Component handles all interactions */}
-      <LeadsListClient locale={locale} />
-    </Div>
-  );
+  return <LeadsListClient locale={locale} />;
 }

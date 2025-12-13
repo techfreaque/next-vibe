@@ -15,10 +15,8 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { db } from "../../system/db";
-import type { JwtPayloadType } from "../../user/auth/types";
 import { newsletterSubscriptions } from "../db";
 import { NewsletterSubscriptionStatus } from "../enum";
 import type {
@@ -29,8 +27,6 @@ import type {
 export interface NewsletterStatusRepository {
   getStatus(
     data: StatusGetRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<StatusGetResponseOutput>>;
 }
@@ -38,8 +34,6 @@ export interface NewsletterStatusRepository {
 export class NewsletterStatusRepositoryImpl implements NewsletterStatusRepository {
   async getStatus(
     data: StatusGetRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<StatusGetResponseOutput>> {
     try {

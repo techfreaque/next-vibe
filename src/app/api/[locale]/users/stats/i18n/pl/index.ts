@@ -9,6 +9,26 @@ export const translations: typeof enTranslations = {
     title: "Panel statystyk użytkowników",
     description: "Wyświetl kompleksowe analizy i statystyki użytkowników",
   },
+  actions: {
+    refresh: "Odśwież",
+    refreshing: "Odświeżanie...",
+  },
+  basicFilters: {
+    title: "Podstawowe filtry",
+    description: "Filtruj użytkowników według statusu i roli",
+  },
+  subscriptionFilters: {
+    title: "Filtry subskrypcji",
+    description: "Filtruj według subskrypcji i płatności",
+  },
+  locationFilters: {
+    title: "Filtry lokalizacji",
+    description: "Filtruj według kraju i języka",
+  },
+  timePeriodOptions: {
+    title: "Opcje okresu czasu",
+    description: "Skonfiguruj okres czasu i ustawienia wykresów",
+  },
   sections: {
     filterOptions: {
       title: "Opcje filtrów",
@@ -55,35 +75,43 @@ export const translations: typeof enTranslations = {
       label: "Okres czasu",
       description: "Wybierz okres czasu dla statystyk",
     },
+    subscriptionStatus: {
+      label: "Status subskrypcji",
+      description: "Filtruj według statusu subskrypcji",
+    },
+    paymentMethod: {
+      label: "Metoda płatności",
+      description: "Filtruj według metody płatności",
+    },
   },
   response: {
     overviewStats: {
       title: "Statystyki przeglądowe",
       description: "Przegląd ogólnych statystyk użytkowników",
       totalUsers: {
-        content: "Łączna liczba użytkowników",
+        label: "Łącznie użytkowników",
       },
       activeUsers: {
-        content: "Aktywni użytkownicy",
+        label: "Aktywni użytkownicy",
       },
       inactiveUsers: {
-        content: "Nieaktywni użytkownicy",
+        label: "Nieaktywni użytkownicy",
       },
       newUsers: {
-        content: "Nowi użytkownicy",
+        label: "Nowi użytkownicy",
       },
     },
     emailStats: {
       title: "Statystyki e-mail",
       description: "Statystyki weryfikacji e-mail użytkowników",
       emailVerifiedUsers: {
-        content: "Użytkownicy z weryfikowanym e-mailem",
+        label: "Zweryfikowane e-maile",
       },
       emailUnverifiedUsers: {
-        content: "Użytkownicy z nieweryfikowanym e-mailem",
+        label: "Niezweryfikowane e-maile",
       },
       verificationRate: {
-        content: "Wskaźnik weryfikacji e-mail",
+        label: "Wskaźnik weryfikacji",
       },
     },
     profileStats: {
@@ -112,64 +140,82 @@ export const translations: typeof enTranslations = {
         },
       },
     },
-    integrationStats: {
-      title: "Statystyki integracji",
-      description: "Statystyki integracji z zewnętrznymi serwisami",
-      usersWithStripeId: {
-        content: "Użytkownicy z identyfikatorem Stripe",
+    subscriptionStats: {
+      title: "Statystyki subskrypcji",
+      description: "Statystyki dystrybucji subskrypcji użytkowników",
+      activeSubscriptions: {
+        label: "Aktywne",
       },
-      usersWithoutStripeId: {
-        content: "Użytkownicy bez identyfikatora Stripe",
+      canceledSubscriptions: {
+        label: "Anulowane",
       },
-      stripeIntegrationRate: {
-        content: "Wskaźnik integracji ze Stripe",
+      expiredSubscriptions: {
+        label: "Wygasłe",
       },
-      usersWithLeadId: {
-        content: "Użytkownicy z identyfikatorem leada",
+      noSubscription: {
+        label: "Brak subskrypcji",
       },
-      usersWithoutLeadId: {
-        content: "Użytkownicy bez identyfikatora leada",
+      subscriptionChart: {
+        label: "Dystrybucja subskrypcji",
+        description: "Wizualny podział statusów subskrypcji",
       },
-      leadAssociationRate: {
-        content: "Wskaźnik powiązania z leadami",
+    },
+    paymentStats: {
+      title: "Statystyki płatności",
+      description: "Statystyki przychodów i transakcji",
+      totalRevenue: {
+        label: "Całkowity przychód",
+      },
+      transactionCount: {
+        label: "Transakcje",
+      },
+      averageOrderValue: {
+        label: "Śr. wart. zamówienia",
+      },
+      refundRate: {
+        label: "Wskaźnik zwrotów",
       },
     },
     roleStats: {
       title: "Statystyki ról",
       description: "Statystyki dystrybucji ról użytkowników",
       publicUsers: {
-        content: "Użytkownicy publiczni",
+        label: "Publiczni",
       },
       customerUsers: {
-        content: "Użytkownicy-klienci",
+        label: "Klienci",
       },
       partnerAdminUsers: {
-        content: "Administratorzy partnerów",
+        label: "Admini partnerów",
       },
       partnerEmployeeUsers: {
-        content: "Pracownicy partnerów",
+        label: "Personel partnerów",
       },
       adminUsers: {
-        content: "Administratorzy",
+        label: "Admini",
+      },
+      roleChart: {
+        label: "Dystrybucja ról",
+        description: "Wizualny podział użytkowników według roli",
       },
     },
     timeStats: {
       title: "Statystyki czasowe",
       description: "Statystyki tworzenia użytkowników i wzrostu w czasie",
       usersCreatedToday: {
-        content: "Użytkownicy utworzeni dzisiaj",
+        label: "Dzisiaj",
       },
       usersCreatedThisWeek: {
-        content: "Użytkownicy utworzeni w tym tygodniu",
+        label: "Ten tydzień",
       },
       usersCreatedThisMonth: {
-        content: "Użytkownicy utworzeni w tym miesiącu",
+        label: "Ten miesiąc",
       },
       usersCreatedLastMonth: {
-        content: "Użytkownicy utworzeni w zeszłym miesiącu",
+        label: "Zeszły miesiąc",
       },
       growthRate: {
-        content: "Wskaźnik wzrostu",
+        label: "Wskaźnik wzrostu",
       },
     },
     companyStats: {
@@ -279,28 +325,32 @@ export const translations: typeof enTranslations = {
     growthMetrics: {
       title: "Metryki wzrostu",
       description: "Metryki wzrostu i konwersji użytkowników",
+      growthChart: {
+        label: "Wzrost użytkowników w czasie",
+        description: "Wizualna reprezentacja trendów tworzenia użytkowników",
+      },
     },
     performanceRates: {
       title: "Wskaźniki wydajności",
       description: "Metryki wydajności i konwersji użytkowników",
       growthRate: {
-        content: "Wskaźnik wzrostu",
+        label: "Wskaźnik wzrostu",
       },
       leadToUserConversionRate: {
-        content: "Wskaźnik konwersji lead-użytkownik",
+        label: "Konwersja leadów",
       },
       retentionRate: {
-        content: "Wskaźnik zatrzymania użytkowników",
+        label: "Wskaźnik retencji",
       },
     },
     businessInsights: {
       title: "Wgląd biznesowy",
       description: "Business intelligence i analityka",
       uniqueCompanies: {
-        content: "Unikalne firmy",
+        label: "Unikalne firmy",
       },
       generatedAt: {
-        content: "Statystyki wygenerowane o",
+        label: "Wygenerowano",
       },
     },
   },

@@ -31,11 +31,11 @@ export const { POST, tools } = endpointsHandler({
 
       // Send SMS notifications after successful subscription (fire-and-forget)
       if (result.success) {
-        sendWelcomeSms(data, result.data, user, locale, logger).catch(
+        sendWelcomeSms(data, user, locale, logger).catch(
           (smsError: Error) =>
             logger.debug("Welcome SMS failed but continuing", { smsError }),
         );
-        sendAdminNotificationSms(data, result.data, user, locale, logger).catch(
+        sendAdminNotificationSms(data, user, locale, logger).catch(
           (smsError: Error) =>
             logger.debug("Admin SMS failed but continuing", { smsError }),
         );

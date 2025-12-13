@@ -8,7 +8,6 @@ import { cpus, freemem, totalmem } from "node:os";
 import { dirname, extname, join, relative, resolve } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import { success } from "../../../shared/types/response.schema";
@@ -121,7 +120,6 @@ interface WorkerResult {
 export interface OxlintRepositoryInterface {
   execute(
     data: OxlintRequestOutput,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ApiResponseType<OxlintResponseOutput>>;
 }
@@ -132,7 +130,6 @@ export interface OxlintRepositoryInterface {
 export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   async execute(
     data: OxlintRequestOutput,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ApiResponseType<OxlintResponseOutput>> {
     const startTime = Date.now();
@@ -216,7 +213,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       // Execute workers in parallel
       const workerResults = await this.executeWorkersInParallel(
         workerTasks,
-        locale,
         logger,
       );
 
@@ -537,14 +533,13 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
    */
   private async executeWorkersInParallel(
     tasks: WorkerTask[],
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<WorkerResult[]> {
     const results: WorkerResult[] = [];
 
     // Execute all workers in parallel
     const workerPromises = tasks.map((task) =>
-      this.executeWorker(task, locale, logger),
+      this.executeWorker(task, logger),
     );
 
     const workerResults = await Promise.allSettled(workerPromises);
@@ -583,7 +578,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
    */
   private async executeWorker(
     task: WorkerTask,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<WorkerResult> {
     const startTime = Date.now();
@@ -630,7 +624,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         // Run both oxlint --fix and prettier in parallel
         const [fixResult, prettierResult] = await Promise.allSettled([
           this.runOxlintCommand(fixArgs, task, logger),
-          this.runPrettierFix(task.files, OXLINT_CONFIG_PATH, logger),
+          this.runPrettierFix(task.files, logger),
         ]);
 
         // Handle oxlint result
@@ -936,13 +930,21 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
           column = label.span.column;
         }
 
+        // Custom message for no-unused-vars
+        let message = diagnostic.message;
+        if (diagnostic.code?.includes("no-unused-vars")) {
+          const match = diagnostic.message.match(/'([^']+)'/);
+          const name = match ? match[1] : "Variable";
+          message = `'${name}' is unused. Either use it or remove it.`;
+        }
+
         issues.push({
           file: relativePath,
           line,
           column,
           rule: diagnostic.code,
           severity,
-          message: diagnostic.message,
+          message,
           type: "lint",
         });
       }
@@ -1000,7 +1002,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
 
     const { spawn } = await import("node:child_process");
 
-    return await new Promise((resolve, _reject) => {
+    return await new Promise((resolve) => {
       /* eslint-disable i18next/no-literal-string */
       const configArgs = Object.entries(prettierConfig).flatMap(
         ([key, value]) => {
@@ -1070,7 +1072,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
    */
   private async runPrettierFix(
     files: string[],
-    _cacheDir: string,
     logger: EndpointLogger,
   ): Promise<void> {
     // Get prettier config from oxlint.config.ts

@@ -30,6 +30,7 @@ const { POST } = createEndpoint({
   title: "app.api.stripe.title" as const,
   description: "app.api.stripe.description" as const,
   category: "app.api.stripe.category" as const,
+  icon: "credit-card" as const,
   tags: [
     "app.api.stripe.tags.stripe" as const,
     "app.api.stripe.tags.cli" as const,

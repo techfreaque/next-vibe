@@ -20,12 +20,9 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ImapFolder } from "../db";
 import { imapAccounts, imapFolders } from "../db";
-// Note: Removed problematic type imports from definition.ts
-// These types should be defined locally or imported from proper sources
 import { ImapSyncStatus, ImapSyncStatusFilter } from "../enum";
 import type { ImapFoldersListResponseOutput } from "./list/definition";
 import type { FoldersSyncResponseOutput } from "./sync/definition";
@@ -65,28 +62,23 @@ export interface ImapFoldersRepository {
   listFolders(
     data: ImapFolderQueryType,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapFoldersListResponseOutput>>;
 
   getFolderById(
     data: { id: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapFoldersListResponseOutput["folders"][number]>>;
 
   syncFolders(
     data: ImapFolderSyncType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<FoldersSyncResponseOutput>>;
 
   getFoldersByAccountId(
     data: { accountId: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapFoldersListResponseOutput>>;
 
@@ -95,7 +87,6 @@ export interface ImapFoldersRepository {
     syncStatus: string,
     syncError: ErrorResponseType | null,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean }>>;
 
@@ -103,7 +94,6 @@ export interface ImapFoldersRepository {
     folderId: string,
     counts: { totalMessages: number; unreadMessages: number },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean }>>;
 }
@@ -139,7 +129,6 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
   async listFolders(
     data: ImapFolderQueryType,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapFoldersListResponseOutput>> {
     try {
@@ -242,7 +231,6 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
   async getFolderById(
     data: { id: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapFoldersListResponseOutput["folders"][number]>> {
     try {
@@ -285,14 +273,11 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
    */
   async syncFolders(
     data: ImapFolderSyncType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<FoldersSyncResponseOutput>> {
     try {
       logger.debug("app.api.emails.imapClient.folders.sync.info.start", {
         accountId: data.accountId,
-        userId: user.id,
       });
 
       // Implement actual folder sync using the sync service
@@ -317,8 +302,6 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         // Sync folders for the specific account
         const syncResult = await imapSyncRepository.syncAccountFolders(
           { account: account[0] },
-          user,
-          locale,
           logger,
         );
 
@@ -378,7 +361,6 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
   async getFoldersByAccountId(
     data: { accountId: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapFoldersListResponseOutput>> {
     try {
@@ -424,7 +406,6 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     syncStatus: keyof typeof ImapSyncStatus,
     syncError: ErrorResponseType | null,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean }>> {
     try {
@@ -478,7 +459,6 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     folderId: string,
     counts: { totalMessages: number; unreadMessages: number },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean }>> {
     try {

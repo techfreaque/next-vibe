@@ -31,14 +31,17 @@ import { StatsGridWidgetRenderer } from "../implementations/stats-grid";
 import { TabsWidgetRenderer } from "../implementations/tabs";
 import { TextWidgetRenderer } from "../implementations/text";
 import { TitleWidgetRenderer } from "../implementations/title";
-import type { WidgetRenderContext, WidgetRenderer } from "./types";
+import type { CLIWidgetPropsUnion, WidgetRenderContext, WidgetRenderer } from "./types";
 
 /**
- * Widget registry that manages all available widget renderers
+ * Widget registry that manages all available widget renderers.
+ * Uses type assertions for storage since each renderer has a specific generic type.
  */
 export class WidgetRegistry {
-  private renderers: WidgetRenderer[] = [];
-  private fallbackRenderer: WidgetRenderer;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private renderers: WidgetRenderer<any>[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private fallbackRenderer: WidgetRenderer<any>;
 
   constructor() {
     this.registerDefaultRenderers();
@@ -79,15 +82,17 @@ export class WidgetRegistry {
   /**
    * Register a new widget renderer
    */
-  register(renderer: WidgetRenderer): void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  register(renderer: WidgetRenderer<any>): void {
     this.renderers.push(renderer);
   }
 
   /**
    * Find the appropriate renderer for a widget type
    */
-  getRenderer(widgetType: WidgetType): WidgetRenderer {
-    const renderer = this.renderers.find((r) => r.canRender(widgetType));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getRenderer(widgetType: WidgetType): WidgetRenderer<any> {
+    const renderer = this.renderers.find((r) => r.widgetType === widgetType);
     return renderer || this.fallbackRenderer;
   }
 
@@ -96,7 +101,15 @@ export class WidgetRegistry {
    */
   render(input: WidgetInput, context: WidgetRenderContext): string {
     const renderer = this.getRenderer(input.field.ui.type);
-    return renderer.render(input, context);
+    // Type assertion needed because registry handles all widget types dynamically
+    // The renderer's widgetType ensures props are handled correctly
+    const props = {
+      widgetType: input.field.ui.type,
+      field: input.field,
+      value: input.value,
+      context,
+    } as CLIWidgetPropsUnion;
+    return renderer.render(props);
   }
 
   /**

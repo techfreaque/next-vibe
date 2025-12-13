@@ -1,41 +1,39 @@
 export const translations = {
-  title: "List Users",
-  description: "List and search users with filtering",
-  category: "Users",
-  tag: "List",
-  container: {
+  get: {
     title: "User List",
     description: "Search and filter users",
-  },
-  fields: {
-    limit: {
-      label: "Limit",
-      description: "Number of users to return",
-      placeholder: "Enter limit...",
+    form: {
+      title: "User Management",
+      description: "Manage and filter users",
     },
-    page: {
-      label: "Page",
-      description: "Page number for pagination",
-      placeholder: "Enter page number...",
+    actions: {
+      refresh: "Refresh",
+      refreshing: "Refreshing...",
     },
-    offset: {
-      label: "Offset",
-      description: "Number of users to skip",
+    // Search & Filters section
+    searchFilters: {
+      title: "Search & Filters",
+      description: "Search and filter users by criteria",
     },
     search: {
       label: "Search",
       description: "Search users by name or email",
-      placeholder: "Enter search term...",
+      placeholder: "Search users...",
     },
     status: {
-      label: "Status Filter",
+      label: "Status",
       description: "Filter users by status",
       placeholder: "Select status...",
     },
     role: {
-      label: "Role Filter",
+      label: "Role",
       description: "Filter users by role",
       placeholder: "Select role...",
+    },
+    // Sorting section
+    sortingOptions: {
+      title: "Sorting",
+      description: "Configure result sorting",
     },
     sortBy: {
       label: "Sort By",
@@ -47,6 +45,82 @@ export const translations = {
       description: "Sort direction",
       placeholder: "Select sort order...",
     },
+    // Response section
+    response: {
+      title: "Users",
+      description: "List of users matching criteria",
+      users: {
+        id: "User ID",
+        email: "Email",
+        privateName: "Private Name",
+        publicName: "Public Name",
+        isActive: "Active",
+        emailVerified: "Verified",
+        createdAt: "Created",
+        updatedAt: "Updated",
+      },
+      totalCount: "Total Users",
+      pageCount: "Total Pages",
+    },
+    // Pagination section
+    page: {
+      label: "Page",
+    },
+    limit: {
+      label: "Per Page",
+    },
+    // Error messages
+    errors: {
+      unauthorized: {
+        title: "Unauthorized",
+        description: "You must be logged in to view users",
+      },
+      validation: {
+        title: "Validation Error",
+        description: "Invalid parameters provided",
+      },
+      forbidden: {
+        title: "Access Forbidden",
+        description: "You don't have permission to view users",
+      },
+      server: {
+        title: "Server Error",
+        description: "Unable to retrieve users",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred",
+      },
+      conflict: {
+        title: "Conflict Error",
+        description: "Unable to list users due to conflicts",
+      },
+      network: {
+        title: "Network Error",
+        description: "Unable to connect to the server",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "No users found",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+    },
+    success: {
+      title: "Success",
+      description: "Users retrieved successfully",
+    },
+  },
+  // Legacy keys for backward compatibility
+  title: "List Users",
+  description: "List and search users with filtering",
+  category: "Users",
+  tag: "List",
+  container: {
+    title: "User List",
+    description: "Search and filter users",
   },
   response: {
     summary: {

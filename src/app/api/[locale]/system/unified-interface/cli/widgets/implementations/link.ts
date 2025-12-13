@@ -4,22 +4,19 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   extractLinkData,
   type ProcessedLink,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/link";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class LinkWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.LINK;
-  }
+export class LinkWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LINK> {
+  readonly widgetType = WidgetType.LINK;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.LINK>): string {
+    const { value, context } = props;
     const t = context.t;
 
     // Extract data using shared logic

@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: closePageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, logger }) => {
       return executeClosePage<ClosePageResponseOutput>(
         {
           toolName: "close-page",
@@ -20,9 +20,7 @@ export const { POST, tools } = endpointsHandler({
             pageIdx: data.pageIdx,
           }),
         },
-        user,
         logger,
-        locale,
       );
     },
   },

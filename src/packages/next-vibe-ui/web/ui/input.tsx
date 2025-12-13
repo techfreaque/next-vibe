@@ -184,7 +184,6 @@ function InputInner<
     step,
     maxLength,
     autoComplete,
-    autoCorrect: _autoCorrect,
     spellCheck,
     accept,
     onChange,
@@ -194,43 +193,16 @@ function InputInner<
     onClick,
     onKeyPress,
     onKeyDown,
-    autoCapitalize: _autoCapitalize,
-    secureTextEntry: _secureTextEntry,
-    keyboardType: _keyboardType,
-    editable: _editable,
     name,
     id,
     "aria-label": ariaLabel,
+    ...restProps
   }: InputProps<T>,
   ref: React.ForwardedRef<InputRefObject>,
 ): React.JSX.Element {
-  const inputRef = React.useRef<HTMLInputElement>(null);
-
-  React.useImperativeHandle(
-    ref,
-    (): InputRefObject => {
-      const element = inputRef.current;
-      if (!element) {
-        return {
-          focus: (): void => undefined,
-          blur: (): void => undefined,
-          select: (): void => undefined,
-          value: "",
-        };
-      }
-      return {
-        focus: (): void => element.focus(),
-        blur: (): void => element.blur(),
-        select: (): void => element.select(),
-        value: element.value,
-      };
-    },
-    [],
-  );
-
   return (
     <input
-      ref={inputRef}
+      ref={ref as React.Ref<HTMLInputElement>}
       type={type}
       value={value !== undefined ? String(value) : undefined}
       defaultValue={
@@ -255,6 +227,7 @@ function InputInner<
         className,
       )}
       style={style}
+      {...restProps}
       onChange={(e) => {
         const rawValue = e.target.value;
         const typedValue: InferValueType<T> = (

@@ -15,8 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type guardStatusEndpoints from "./definition";
 
@@ -31,8 +29,6 @@ type GuardStatusResponseType =
 export interface GuardStatusRepository {
   getStatus(
     data: GuardStatusRequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<GuardStatusResponseType>;
 }
@@ -43,8 +39,6 @@ export interface GuardStatusRepository {
 export class GuardStatusRepositoryImpl implements GuardStatusRepository {
   getStatus(
     data: GuardStatusRequestType,
-    _user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<GuardStatusResponseType> {
     try {

@@ -42,6 +42,7 @@ const { POST } = createEndpoint({
     "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.title" as const,
   description:
     "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.description" as const,
+  icon: "thumbs-up",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.messages" as const],
 

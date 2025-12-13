@@ -20,8 +20,8 @@ export function Command({
   className,
   style,
   children,
-  id,
   shouldFilter,
+  id,
 }: CommandProps): React.JSX.Element {
   return (
     <CommandPrimitive

@@ -21,6 +21,7 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { emailCampaigns } from "../../../leads/db";
 import type { JwtPayloadType } from "../../../user/auth/types";
@@ -49,8 +50,6 @@ import type {
 export interface SmtpSendingRepository {
   sendEmail(
     data: SmtpSendRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpSendResponseOutput>>;
 
@@ -418,8 +417,6 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
    */
   async sendEmail(
     data: SmtpSendRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpSendResponseOutput>> {
     try {
@@ -1053,11 +1050,31 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpCapacityResponseOutput>> {
     try {
-      // Get all active SMTP accounts
-      const accounts = await db
-        .select()
-        .from(smtpAccounts)
-        .where(eq(smtpAccounts.status, SmtpAccountStatus.ACTIVE));
+      const { t } = simpleT(locale);
+
+      // Check user authorization
+      if (user.isPublic) {
+        return fail({
+          message: t("app.api.emails.smtpClient.sending.errors.unauthorized.title"),
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
+      }
+
+      // Get SMTP accounts - filter by accountId if provided
+      const accounts = data.accountId
+        ? await db
+            .select()
+            .from(smtpAccounts)
+            .where(
+              and(
+                eq(smtpAccounts.status, SmtpAccountStatus.ACTIVE),
+                eq(smtpAccounts.id, data.accountId),
+              ),
+            )
+        : await db
+            .select()
+            .from(smtpAccounts)
+            .where(eq(smtpAccounts.status, SmtpAccountStatus.ACTIVE));
 
       if (accounts.length === 0) {
         return success({

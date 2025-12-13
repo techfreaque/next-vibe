@@ -47,12 +47,17 @@ export function AdvancedPreview(): JSX.Element {
             <H3>Scroll Area</H3>
             <ScrollArea className="h-[200px] w-full rounded-md border p-4">
               <Div className="space-y-4">
-                {Array.from({ length: 20 }).map((_, i) => (
-                  <P key={i}>
-                    Scrollable content item {i + 1}. This is a long piece of
-                    text to demonstrate scrolling behavior.
-                  </P>
-                ))}
+                {
+                  // oxlint-disable-next-line no-unused-vars
+                  Array.from({ length: 20 }, (item, i) => {
+                    return (
+                      <P key={i}>
+                        Scrollable content item {i + 1}. This is a long piece of
+                        text to demonstrate scrolling behavior.
+                      </P>
+                    );
+                  })
+                }
               </Div>
             </ScrollArea>
           </Div>

@@ -68,14 +68,18 @@ export const STT_COST_PER_SECOND = STT_COST_PER_SECOND_USD / CREDIT_VALUE_USD;
  * Base: $5.00/1,000 requests
  * With 30% markup: $6.50/1,000 requests
  * Per request: $0.0065 = 0.65 credits
+ *
+ * NOTE: Rounded to 2 decimal places to avoid floating point display issues
  */
 const BRAVE_SEARCH_BASE_COST_PER_1000_USD = 5.0;
 const BRAVE_SEARCH_COST_WITH_MARKUP_USD =
   BRAVE_SEARCH_BASE_COST_PER_1000_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
 const BRAVE_SEARCH_COST_PER_REQUEST_USD =
   BRAVE_SEARCH_COST_WITH_MARKUP_USD / 1000;
-export const BRAVE_SEARCH_COST_PER_REQUEST =
+const BRAVE_SEARCH_COST_CALCULATED =
   BRAVE_SEARCH_COST_PER_REQUEST_USD / CREDIT_VALUE_USD;
+export const BRAVE_SEARCH_COST_PER_REQUEST =
+  Math.round(BRAVE_SEARCH_COST_CALCULATED * 100) / 100;
 
 /**
  * Feature Costs Object
@@ -452,7 +456,7 @@ export function getPlanPriceForCountry(
  * Calculate average savings percentage when choosing annual over monthly billing
  */
 export function calculateSavingsPercent(locale: CountryLanguage): number {
-  const plans = getPricingPlansArray(locale);
+  const plans = getPricingPlansArray();
   const country = getCountryFromLocale(locale);
   let totalSavingsPercent = 0;
   let validPlansCount = 0;
@@ -480,7 +484,6 @@ export function calculateSavingsPercent(locale: CountryLanguage): number {
  * Note: Icons are lazy-loaded to avoid circular dependencies
  */
 function buildPricingPlans(
-  locale: CountryLanguage,
   icon?: JSX.Element,
 ): Record<typeof SubscriptionPlanValue, PricingPlan> {
   const definitions = productsRepository.getProductDefinitions();
@@ -542,10 +545,9 @@ function buildPricingPlans(
  * Get all pricing plans for a locale as a record
  */
 export function getPricingPlans(
-  locale: CountryLanguage,
   icon?: JSX.Element,
 ): Record<typeof SubscriptionPlanValue, PricingPlan> {
-  return buildPricingPlans(locale, icon);
+  return buildPricingPlans(icon);
 }
 
 /**
@@ -553,20 +555,18 @@ export function getPricingPlans(
  */
 export function getPlanDetails(
   planId: typeof SubscriptionPlanValue,
-  locale: CountryLanguage,
   icon?: JSX.Element,
 ): PricingPlan {
-  return getPricingPlans(locale, icon)[planId];
+  return getPricingPlans(icon)[planId];
 }
 
 /**
  * Get all pricing plans as an array
  */
 export function getPricingPlansArray(
-  locale: CountryLanguage,
   icon?: JSX.Element,
 ): PricingPlan[] {
-  return Object.values(getPricingPlans(locale, icon));
+  return Object.values(getPricingPlans(icon));
 }
 
 /**

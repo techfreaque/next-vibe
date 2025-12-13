@@ -88,7 +88,6 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         },
         user ||
           ({ id: crypto.randomUUID(), isPublic: false } as JwtPayloadType),
-        locale,
         logger,
       );
 
@@ -153,7 +152,6 @@ export class ContactSmsServiceImpl implements ContactSmsService {
           campaignType: CampaignType.TRANSACTIONAL,
         },
         user || ({ isPublic: true } as JwtPayloadType),
-        locale,
         logger,
       );
 

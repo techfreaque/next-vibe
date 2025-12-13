@@ -14,8 +14,6 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { BrowserRequestOutput, BrowserResponseOutput } from "./definition";
 import { BrowserTool, BrowserToolStatus } from "./enum";
@@ -60,16 +58,12 @@ export interface BrowserRepository {
   /**
    * Execute a Chrome DevTools MCP tool
    * @param data - Request data (tool and arguments)
-   * @param user - User from authentication (may be null for public endpoints)
    * @param logger - Logger instance for debugging and monitoring
-   * @param locale - Locale for error messages
    * @returns Tool execution result
    */
   executeTool(
     data: BrowserRequestOutput,
-    user: JwtPayloadType | null,
     logger: EndpointLogger,
-    locale: CountryLanguage,
   ): Promise<ResponseType<BrowserResponseOutput>>;
 }
 
@@ -119,9 +113,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
    */
   async executeTool(
     data: BrowserRequestOutput,
-    _user: JwtPayloadType | null,
     logger: EndpointLogger,
-    _locale: CountryLanguage,
   ): Promise<ResponseType<BrowserResponseOutput>> {
     logger.info("[Browser Repository] Executing Chrome DevTools tool", {
       tool: data.tool,

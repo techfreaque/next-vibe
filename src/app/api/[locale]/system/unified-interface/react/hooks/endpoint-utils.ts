@@ -136,3 +136,184 @@ export function determineFormDataPriority<T>(
     hasUnsavedChanges,
   };
 }
+
+/**
+ * Deep merge utility that merges two objects recursively
+ * Hook options take priority over endpoint options
+ */
+function deepMerge<T>(
+  endpointOptions: T | undefined,
+  hookOptions: T | undefined,
+): T | undefined {
+  if (!endpointOptions && !hookOptions) {
+    return undefined;
+  }
+  if (!endpointOptions) {
+    return hookOptions;
+  }
+  if (!hookOptions) {
+    return endpointOptions;
+  }
+
+  // If both are objects, merge them recursively
+  if (
+    typeof endpointOptions === "object" &&
+    typeof hookOptions === "object" &&
+    !Array.isArray(endpointOptions) &&
+    !Array.isArray(hookOptions)
+  ) {
+    const result = { ...endpointOptions } as T;
+    for (const key in hookOptions) {
+      if (Object.prototype.hasOwnProperty.call(hookOptions, key)) {
+        const endpointValue = (endpointOptions as Record<string, unknown>)[key];
+        const hookValue = (hookOptions as Record<string, unknown>)[key];
+
+        // Hook value takes priority, but merge nested objects
+        if (hookValue !== undefined) {
+          if (
+            typeof endpointValue === "object" &&
+            typeof hookValue === "object" &&
+            !Array.isArray(endpointValue) &&
+            !Array.isArray(hookValue)
+          ) {
+            (result as Record<string, unknown>)[key] = deepMerge(
+              endpointValue,
+              hookValue,
+            );
+          } else {
+            (result as Record<string, unknown>)[key] = hookValue;
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  // For non-objects, hook options take priority
+  return hookOptions;
+}
+
+/**
+ * Merge endpoint read options with hook-provided read options
+ * Hook options take priority over endpoint options
+ */
+export function mergeReadOptions<TRequest, TUrlVariables>(
+  endpointOptions:
+    | {
+        formOptions?: Record<string, unknown>;
+        queryOptions?: Record<string, unknown>;
+        urlPathParams?: TUrlVariables;
+        initialState?: Partial<TRequest>;
+      }
+    | undefined,
+  hookOptions:
+    | {
+        formOptions?: Record<string, unknown>;
+        queryOptions?: Record<string, unknown>;
+        urlPathParams?: TUrlVariables;
+        initialState?: Partial<TRequest>;
+      }
+    | undefined,
+): {
+  formOptions?: Record<string, unknown>;
+  queryOptions?: Record<string, unknown>;
+  urlPathParams?: TUrlVariables;
+  initialState?: Partial<TRequest>;
+} {
+  return {
+    formOptions: deepMerge(
+      endpointOptions?.formOptions,
+      hookOptions?.formOptions,
+    ),
+    queryOptions: deepMerge(
+      endpointOptions?.queryOptions,
+      hookOptions?.queryOptions,
+    ),
+    urlPathParams: hookOptions?.urlPathParams ?? endpointOptions?.urlPathParams,
+    initialState: deepMerge(
+      endpointOptions?.initialState,
+      hookOptions?.initialState,
+    ),
+  };
+}
+
+/**
+ * Merge endpoint create options with hook-provided create options
+ * Hook options take priority over endpoint options
+ */
+export function mergeCreateOptions<TRequest, TUrlVariables>(
+  endpointOptions:
+    | {
+        formOptions?: Record<string, unknown>;
+        mutationOptions?: Record<string, unknown>;
+        urlPathParams?: TUrlVariables;
+        autoPrefillData?: Partial<TRequest>;
+        initialState?: Partial<TRequest>;
+      }
+    | undefined,
+  hookOptions:
+    | {
+        formOptions?: Record<string, unknown>;
+        mutationOptions?: Record<string, unknown>;
+        urlPathParams?: TUrlVariables;
+        autoPrefillData?: Partial<TRequest>;
+        initialState?: Partial<TRequest>;
+      }
+    | undefined,
+): {
+  formOptions?: Record<string, unknown>;
+  mutationOptions?: Record<string, unknown>;
+  urlPathParams?: TUrlVariables;
+  autoPrefillData?: Partial<TRequest>;
+  initialState?: Partial<TRequest>;
+} {
+  return {
+    formOptions: deepMerge(
+      endpointOptions?.formOptions,
+      hookOptions?.formOptions,
+    ),
+    mutationOptions: deepMerge(
+      endpointOptions?.mutationOptions,
+      hookOptions?.mutationOptions,
+    ),
+    urlPathParams: hookOptions?.urlPathParams ?? endpointOptions?.urlPathParams,
+    autoPrefillData: deepMerge(
+      endpointOptions?.autoPrefillData,
+      hookOptions?.autoPrefillData,
+    ),
+    initialState: deepMerge(
+      endpointOptions?.initialState,
+      hookOptions?.initialState,
+    ),
+  };
+}
+
+/**
+ * Merge endpoint delete options with hook-provided delete options
+ * Hook options take priority over endpoint options
+ */
+export function mergeDeleteOptions<TUrlVariables>(
+  endpointOptions:
+    | {
+        mutationOptions?: Record<string, unknown>;
+        urlPathParams?: TUrlVariables;
+      }
+    | undefined,
+  hookOptions:
+    | {
+        mutationOptions?: Record<string, unknown>;
+        urlPathParams?: TUrlVariables;
+      }
+    | undefined,
+): {
+  mutationOptions?: Record<string, unknown>;
+  urlPathParams?: TUrlVariables;
+} {
+  return {
+    mutationOptions: deepMerge(
+      endpointOptions?.mutationOptions,
+      hookOptions?.mutationOptions,
+    ),
+    urlPathParams: hookOptions?.urlPathParams ?? endpointOptions?.urlPathParams,
+  };
+}

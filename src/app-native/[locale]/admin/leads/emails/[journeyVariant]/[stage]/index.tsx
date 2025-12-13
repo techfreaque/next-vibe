@@ -19,7 +19,4 @@ import { createPageWrapperWithImport } from "@/app/api/[locale]/system/unified-i
  * Wrapper component that dynamically imports and converts Expo Router's synchronous params
  * to Next.js 15's async params format
  */
-export default createPageWrapperWithImport(
-  () =>
-    import("@/app/[locale]/admin/leads/emails/[journeyVariant]/[stage]/page"),
-);
+export default createPageWrapperWithImport(() => import("@/app/[locale]/admin/leads/emails/[journeyVariant]/[stage]/page"));

@@ -26,6 +26,7 @@ const { POST } = createEndpoint({
   title: "app.api.browser.handle-dialog.title",
   description: "app.api.browser.handle-dialog.description",
   category: "app.api.browser.category",
+  icon: "message-square",
   tags: [
     "app.api.browser.tags.browserAutomation",
     "app.api.browser.tags.dialogAutomation",

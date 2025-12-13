@@ -12,11 +12,9 @@ import { pulseExecuteRepository } from "./execute/repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, locale, logger }) => {
       return await pulseExecuteRepository.executePulse(
         data,
-        user,
         locale,
         logger,
       );

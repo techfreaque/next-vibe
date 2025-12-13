@@ -15,17 +15,13 @@ export const { POST, tools } = endpointsHandler({
   endpoint: performanceStopTraceEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
-      // Explicitly void unused data to satisfy linter
-      void data;
+    handler: async ({ logger }) => {
       return executeMCPTool(
         {
           toolName: "performance-stop-trace",
           args: filterUndefinedArgs({}),
         },
-        user,
         logger,
-        locale,
       ) as Promise<ResponseType<PerformanceStopTraceResponseOutput>>;
     },
   },

@@ -51,13 +51,11 @@ export interface LeadAuthRepository {
   linkLeadToUser(
     leadId: string,
     userId: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>>;
 
   validateLeadId(
     leadId: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<boolean>;
 
@@ -73,12 +71,6 @@ export interface LeadAuthRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<string>;
-
-  setLeadIdCookie(
-    leadId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): ResponseType<void>;
 
   getUserLeadIds(userId: string, logger: EndpointLogger): Promise<string[]>;
 }
@@ -99,7 +91,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
   ): Promise<{ leadId: string; isNew: boolean }> {
     // If cookie has leadId, validate it
     if (cookieLeadId) {
-      const isValid = await this.validateLeadId(cookieLeadId, locale, logger);
+      const isValid = await this.validateLeadId(cookieLeadId, logger);
       if (isValid) {
         logger.debug("Valid lead cookie found", { leadId: cookieLeadId });
         return { leadId: cookieLeadId, isNew: false };
@@ -158,11 +150,9 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
   async linkLeadToUser(
     leadId: string,
     userId: string,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
-      // Try to insert (UNIQUE constraint handles duplicates)
       await db
         .insert(userLeadLinks)
         .values({
@@ -170,7 +160,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
           leadId,
           linkReason: "signup",
         })
-        .onConflictDoNothing(); // Silently ignore if already exists
+        .onConflictDoNothing();
 
       // Update lead status to SIGNED_UP if not already
       await db
@@ -195,7 +185,6 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
    */
   async validateLeadId(
     leadId: string,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<boolean> {
     try {
@@ -224,7 +213,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
   ): Promise<string> {
     // If leadId provided, validate it
     if (leadId) {
-      const isValid = await this.validateLeadId(leadId, locale, logger);
+      const isValid = await this.validateLeadId(leadId, logger);
       if (isValid) {
         return leadId;
       }
@@ -356,16 +345,11 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         })
         .returning();
 
-      // Link to user
       await db.insert(userLeadLinks).values({
         userId,
         leadId: fallbackLead.id,
-        linkReason: "fallback_creation",
+        linkReason: "manual",
       });
-
-      // Create credit wallet for fallback lead
-      const { creditRepository } = await import("../../credits/repository");
-      await creditRepository.getLeadBalance(fallbackLead.id, logger);
 
       return fallbackLead.id;
     }
@@ -390,7 +374,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         .values({
           userId,
           leadId: existingLead.id,
-          linkReason: "existing_lead_linked",
+          linkReason: "login",
         })
         .onConflictDoNothing();
 
@@ -410,39 +394,18 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
       })
       .returning();
 
-    // Link to user
     await db
       .insert(userLeadLinks)
       .values({
         userId,
         leadId: newLead.id,
-        linkReason: "user_creation",
+        linkReason: "signup",
       })
       .onConflictDoNothing();
 
     logger.debug("Created lead for user", { userId, leadId: newLead.id });
 
-    // Create credit wallet for new lead
-    const { creditRepository } = await import("../../credits/repository");
-    await creditRepository.getLeadBalance(newLead.id, logger);
-
     return newLead.id;
-  }
-
-  /**
-   * Set leadId cookie (server-side)
-   * @deprecated Platform-specific auth handlers now manage lead ID storage
-   */
-  setLeadIdCookie(
-    leadId: string,
-    _locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): ResponseType<void> {
-    logger.debug(
-      "setLeadIdCookie is deprecated - lead ID storage is handled by platform-specific auth handlers",
-      { leadId },
-    );
-    return success(undefined);
   }
 
   /**

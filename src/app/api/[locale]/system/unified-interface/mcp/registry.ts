@@ -10,9 +10,9 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
 import { Platform } from "../shared/types/platform";

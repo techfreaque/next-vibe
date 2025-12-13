@@ -1,161 +1,414 @@
 "use client";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "next-vibe-ui/ui/accordion";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { H1, H2, P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
+import { H1, P } from "next-vibe-ui/ui/typography";
 import { Input } from "next-vibe-ui/ui/input";
 import { Button } from "next-vibe-ui/ui/button";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { JSX } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
-import { useApiForm } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation-form";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import type { TranslationKey } from "@/i18n/core/static-types";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import { definitionsRegistry } from "../../../unified-interface/shared/endpoints/definitions/registry";
+import { Platform } from "../../../unified-interface/shared/types/platform";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
+type GroupingMode = "category" | "tags" | "path";
 
 interface HelpInteractiveViewProps {
   locale: CountryLanguage;
-  endpoints: CreateApiEndpointAny[];
+  user: JwtPayloadType;
+  initialEndpointId?: string;
 }
 
 /**
- * Endpoint Executor Component
- * Renders a single endpoint with form and results
- * Widgets decide what to show based on data state
+ * Tree node for nested path structure
  */
-function EndpointExecutor({
-  endpoint,
-  locale,
-}: {
-  endpoint: CreateApiEndpointAny;
-  locale: CountryLanguage;
-}): JSX.Element {
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+interface PathTreeNode {
+  name: string;
+  endpoints: CreateApiEndpointAny[];
+  children: Record<string, PathTreeNode>;
+}
 
-  const [responseData, setResponseData] = useState<Record<
-    string,
-    WidgetData
-  > | null>(null);
+/**
+ * Build a tree structure from endpoint paths
+ */
+function buildPathTree(endpoints: CreateApiEndpointAny[]): PathTreeNode {
+  const root: PathTreeNode = { name: "root", endpoints: [], children: {} };
 
-  const { form, submitForm, isSubmitting, submitError } = useApiForm(
-    endpoint,
-    logger,
-    { persistForm: false },
-    {
-      onSuccess: ({ responseData: data }) => {
-        setResponseData(data as Record<string, WidgetData>);
-      },
-    },
-  );
+  for (const ep of endpoints) {
+    let current = root;
+    for (let i = 0; i < ep.path.length; i++) {
+      const segment = ep.path[i];
+      if (!current.children[segment]) {
+        current.children[segment] = {
+          name: segment,
+          endpoints: [],
+          children: {},
+        };
+      }
+      current = current.children[segment];
 
-  return (
-    <Div className="space-y-6">
-      {/* Endpoint info */}
-      <Card>
-        <CardContent className="mt-6">
-          <Div className="flex items-center gap-2 mb-2">
-            <Span className="px-2 py-1 text-xs font-mono font-semibold rounded bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100">
-              {endpoint.method}
-            </Span>
-            <P className="font-mono text-sm text-gray-600 dark:text-gray-400">
-              {Array.isArray(endpoint.path)
-                ? endpoint.path.join("/")
-                : endpoint.path}
-            </P>
-          </Div>
-          {endpoint.title && (
-            <H2 className="text-xl font-bold mb-2">{endpoint.title}</H2>
-          )}
-          {endpoint.description && (
-            <P className="text-gray-600 dark:text-gray-400">
-              {endpoint.description}
-            </P>
-          )}
-        </CardContent>
-      </Card>
+      // Add endpoint at its final path segment
+      if (i === ep.path.length - 1) {
+        current.endpoints.push(ep);
+      }
+    }
+  }
 
-      {/* Single renderer - widgets decide what to show based on data */}
-      <Card>
-        <CardContent className="mt-6">
-          <EndpointRenderer
-            endpoint={endpoint}
-            form={form}
-            onSubmit={submitForm}
-            data={responseData ?? undefined}
-            locale={locale}
-            isSubmitting={isSubmitting}
-          />
-        </CardContent>
-      </Card>
+  return root;
+}
 
-      {/* Error */}
-      {submitError && (
-        <Card className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-          <CardContent className="mt-6">
-            <P className="text-red-600 dark:text-red-400">
-              {submitError.message}
-            </P>
-          </CardContent>
-        </Card>
-      )}
-    </Div>
-  );
+/**
+ * Generate endpoint ID from endpoint (path_parts_METHOD)
+ * Format: browser_handle-dialog_POST or system_setup_status_POST
+ */
+function getEndpointId(ep: CreateApiEndpointAny): string {
+  return `${ep.path.join("_")}_${ep.method}`;
+}
+
+/**
+ * Helper function to wrap an endpoint in the format expected by EndpointsPage
+ */
+function wrapEndpoint(endpoint: CreateApiEndpointAny): {
+  GET?: CreateApiEndpointAny;
+  POST?: CreateApiEndpointAny;
+  DELETE?: CreateApiEndpointAny;
+} {
+  const method = endpoint.method;
+  if (method === "GET") {
+    return { GET: endpoint };
+  }
+  if (method === "POST") {
+    return { POST: endpoint };
+  }
+  if (method === "DELETE") {
+    return { DELETE: endpoint };
+  }
+  // Default to POST if method is not recognized
+  return { POST: endpoint };
 }
 
 /**
  * Help Interactive View Component
  * Browse and execute all ~140 endpoint definitions interactively
  */
+/**
+ * Recursive component to render nested path tree
+ */
+function PathTreeAccordion({
+  node,
+  locale,
+  selectedEndpoint,
+  handleSelectEndpoint,
+  depth = 0,
+}: {
+  node: PathTreeNode;
+  locale: CountryLanguage;
+  selectedEndpoint: CreateApiEndpointAny | null;
+  handleSelectEndpoint: (ep: CreateApiEndpointAny) => void;
+  depth?: number;
+}): JSX.Element {
+  // oxlint-disable-next-line no-array-sort
+  const childKeys = Object.keys(node.children).sort();
+  const hasChildren = childKeys.length > 0;
+  const hasEndpoints = node.endpoints.length > 0;
+
+  return (
+    <Div
+      className={
+        depth > 0 ? "pl-3 border-l border-gray-200 dark:border-gray-700" : ""
+      }
+    >
+      {/* Render endpoints at this level */}
+      {hasEndpoints && (
+        <Div className="space-y-1 mb-2">
+          {node.endpoints.map((ep) => {
+            const endpointId = getEndpointId(ep);
+            const isSelected =
+              selectedEndpoint &&
+              getEndpointId(selectedEndpoint) === endpointId;
+
+            return (
+              <Link
+                key={endpointId}
+                href={`/${locale}/help/interactive/${encodeURIComponent(endpointId)}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleSelectEndpoint(ep);
+                }}
+                className={`block w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
+                  isSelected
+                    ? "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100"
+                    : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                }`}
+              >
+                <Div className="flex items-center gap-2">
+                  <Span className="font-mono text-xs text-gray-500 dark:text-gray-400 w-12">
+                    {ep.method}
+                  </Span>
+                  <Span className="font-medium truncate text-xs">
+                    {ep.path[ep.path.length - 1]}
+                  </Span>
+                </Div>
+              </Link>
+            );
+          })}
+        </Div>
+      )}
+
+      {/* Render child folders */}
+      {hasChildren && (
+        <Accordion type="multiple" defaultValue={[]} className="w-full">
+          {childKeys.map((childKey) => {
+            const child = node.children[childKey];
+            const childCount = countEndpoints(child);
+
+            return (
+              <AccordionItem
+                key={childKey}
+                value={childKey}
+                className="border-b-0"
+              >
+                <AccordionTrigger className="py-1.5 text-sm hover:no-underline">
+                  <Div className="flex items-center gap-2">
+                    <Span className="font-medium text-gray-700 dark:text-gray-300">
+                      {childKey}
+                    </Span>
+                    <Span className="text-xs font-normal text-gray-400 dark:text-gray-500">
+                      ({childCount})
+                    </Span>
+                  </Div>
+                </AccordionTrigger>
+                <AccordionContent className="pb-1">
+                  <PathTreeAccordion
+                    node={child}
+                    locale={locale}
+                    selectedEndpoint={selectedEndpoint}
+                    handleSelectEndpoint={handleSelectEndpoint}
+                    depth={depth + 1}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
+      )}
+    </Div>
+  );
+}
+
+// Count total endpoints in this branch
+const countEndpoints = (n: PathTreeNode): number => {
+  let count = n.endpoints.length;
+  for (const child of Object.values(n.children)) {
+    count += countEndpoints(child);
+  }
+  return count;
+};
+
 export function HelpInteractiveView({
   locale,
-  endpoints,
+  user,
+  initialEndpointId,
 }: HelpInteractiveViewProps): JSX.Element {
   const { t } = simpleT(locale);
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [groupingMode, setGroupingMode] = useState<GroupingMode>("path");
   const [selectedEndpoint, setSelectedEndpoint] =
     useState<CreateApiEndpointAny | null>(null);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
 
-  // Use endpoints passed from server (already filtered by user permissions)
-  const allEndpoints = useMemo(() => {
-    return endpoints;
+  // Fetch endpoints server-side with user permissions
+  const endpoints = useMemo(
+    () =>
+      user
+        ? definitionsRegistry.getEndpointsForUser(
+            Platform.NEXT_PAGE,
+            user,
+            logger,
+          )
+        : [],
+    [user, logger],
+  );
+
+  // Create endpoint lookup map
+  const endpointMap = useMemo(() => {
+    const map = new Map<string, CreateApiEndpointAny>();
+    for (const ep of endpoints) {
+      map.set(getEndpointId(ep), ep);
+    }
+    return map;
   }, [endpoints]);
 
-  // Filter endpoints based on search
+  // Set initial endpoint from URL
+  useEffect(() => {
+    if (initialEndpointId && !selectedEndpoint) {
+      const ep = endpointMap.get(initialEndpointId);
+      if (ep) {
+        setSelectedEndpoint(ep);
+      }
+    }
+  }, [initialEndpointId, endpointMap, selectedEndpoint]);
+
+  // Handle endpoint selection with URL update
+  const handleSelectEndpoint = useCallback(
+    (ep: CreateApiEndpointAny) => {
+      setSelectedEndpoint(ep);
+      const endpointId = getEndpointId(ep);
+      router.push(
+        `/${locale}/help/interactive/${encodeURIComponent(endpointId)}`,
+        {
+          scroll: false,
+        },
+      );
+    },
+    [locale, router],
+  );
+
+  // Filter endpoints based on search (searches keys and translated values)
   const filteredEndpoints = useMemo(() => {
     if (!searchQuery) {
-      return allEndpoints;
+      return endpoints;
     }
     const query = searchQuery.toLowerCase();
-    return allEndpoints.filter((ep) => {
+    return endpoints.filter((ep) => {
       const toolName = ep.path.join("_");
-      return (
-        toolName.toLowerCase().includes(query) ||
-        ep.title?.toLowerCase().includes(query) ||
-        ep.description?.toLowerCase().includes(query) ||
-        ep.category?.toLowerCase().includes(query)
-      );
-    });
-  }, [allEndpoints, searchQuery]);
+      const pathSlash = ep.path.join("/");
 
-  // Group by category
-  const groupedEndpoints = useMemo(() => {
-    const groups: Record<string, CreateApiEndpointAny[]> = {};
-    for (const ep of filteredEndpoints) {
-      const category = ep.category || "Other";
-      if (!groups[category]) {
-        groups[category] = [];
+      // Search in path (both formats)
+      if (toolName.toLowerCase().includes(query)) {
+        return true;
       }
-      groups[category].push(ep);
-    }
-    return groups;
+      if (pathSlash.toLowerCase().includes(query)) {
+        return true;
+      }
+
+      // Search in title (key and translated)
+      if (ep.title?.toLowerCase().includes(query)) {
+        return true;
+      }
+      if (
+        t(ep.title as TranslationKey)
+          .toLowerCase()
+          .includes(query)
+      ) {
+        return true;
+      }
+
+      // Search in description (key and translated)
+      if (ep.description?.toLowerCase().includes(query)) {
+        return true;
+      }
+      if (
+        t(ep.description as TranslationKey)
+          .toLowerCase()
+          .includes(query)
+      ) {
+        return true;
+      }
+
+      // Search in category (key and translated)
+      if (ep.category?.toLowerCase().includes(query)) {
+        return true;
+      }
+      if (
+        t(ep.category as TranslationKey)
+          .toLowerCase()
+          .includes(query)
+      ) {
+        return true;
+      }
+
+      // Search in aliases
+      if (ep.aliases?.some((alias) => alias.toLowerCase().includes(query))) {
+        return true;
+      }
+
+      // Search in tags (keys and translated)
+      if (ep.tags?.some((tag) => tag.toLowerCase().includes(query))) {
+        return true;
+      }
+      if (
+        ep.tags?.some((tag) =>
+          t(tag as TranslationKey)
+            .toLowerCase()
+            .includes(query),
+        )
+      ) {
+        return true;
+      }
+
+      // Search in method
+      if (ep.method.toLowerCase().includes(query)) {
+        return true;
+      }
+
+      return false;
+    });
+  }, [endpoints, searchQuery, t]);
+
+  // Build path tree for nested navigation
+  const pathTree = useMemo(() => {
+    return buildPathTree(filteredEndpoints);
   }, [filteredEndpoints]);
+
+  // Group endpoints based on selected grouping mode (for category and tags)
+  const groupedEndpoints = useMemo(() => {
+    if (groupingMode === "path") {
+      return {}; // Path mode uses tree structure instead
+    }
+
+    const groups: Record<string, CreateApiEndpointAny[]> = {};
+
+    for (const ep of filteredEndpoints) {
+      let groupKey: string;
+
+      switch (groupingMode) {
+        case "tags":
+          // Group by first tag, or "Uncategorized" if no tags
+          groupKey =
+            ep.tags && ep.tags.length > 0 ? ep.tags[0] : "Uncategorized";
+          break;
+        case "category":
+        default:
+          groupKey = ep.category;
+          break;
+      }
+
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(ep);
+    }
+
+    // Sort groups alphabetically
+    const sortedGroups: Record<string, CreateApiEndpointAny[]> = {};
+    // oxlint-disable-next-line no-array-sort
+    for (const key of Object.keys(groups).sort()) {
+      sortedGroups[key] = groups[key];
+    }
+
+    return sortedGroups;
+  }, [filteredEndpoints, groupingMode]);
 
   return (
     <Div className="min-h-screen bg-linear-to-b from-blue-50 to-white dark:from-gray-950 dark:to-gray-900 py-16 px-4">
@@ -166,7 +419,7 @@ export function HelpInteractiveView({
           </H1>
           <P className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             {t("app.api.system.help.interactive.ui.description")}{" "}
-            {allEndpoints.length}{" "}
+            {endpoints.length}{" "}
             {t("app.api.system.help.interactive.ui.availableEndpoints")}
           </P>
         </Div>
@@ -176,9 +429,9 @@ export function HelpInteractiveView({
           <Div className="lg:col-span-1">
             <Card className="sticky top-4">
               <CardContent className="mt-6">
-                <H2 className="text-lg font-semibold mb-4">
+                <P className="text-lg font-semibold mb-4">
                   {t("app.api.system.help.interactive.ui.endpointsLabel")}
-                </H2>
+                </P>
 
                 {/* Search */}
                 <Input
@@ -189,51 +442,115 @@ export function HelpInteractiveView({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md mb-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 />
 
-                {/* Endpoint list */}
-                <Div className="max-h-[600px] overflow-y-auto space-y-4">
-                  {Object.entries(groupedEndpoints).map(([category, eps]) => (
-                    <Div key={category}>
-                      <P className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                        {category}
-                      </P>
-                      <Div className="space-y-1">
-                        {eps.map((ep, idx) => {
-                          const toolName = ep.path.join("_");
-                          const selectedToolName = selectedEndpoint
-                            ? selectedEndpoint.path.join("_")
-                            : null;
-                          return (
-                            <Button
-                              key={`${toolName}-${idx}`}
-                              onClick={() => {
-                                setSelectedEndpoint(ep);
-                              }}
-                              className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                                selectedToolName === toolName
-                                  ? "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100"
-                                  : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-                              }`}
-                            >
-                              <Div className="font-mono text-xs text-gray-500 dark:text-gray-400">
-                                {ep.method}
-                              </Div>
-                              <Div className="font-medium truncate">
-                                {toolName.replace(/_/g, "/")}
-                              </Div>
-                              {ep.aliases && ep.aliases.length > 0 && (
-                                <Div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                  {t(
-                                    "app.api.system.help.interactive.ui.aliasesLabel",
-                                  )}{" "}
-                                  {ep.aliases.join(", ")}
-                                </Div>
-                              )}
-                            </Button>
-                          );
-                        })}
-                      </Div>
-                    </Div>
-                  ))}
+                {/* Grouping mode selector */}
+                <Div className="flex gap-1 mb-4">
+                  <Button
+                    size="sm"
+                    variant={groupingMode === "category" ? "default" : "ghost"}
+                    onClick={() => setGroupingMode("category")}
+                    className="text-xs"
+                  >
+                    {t("app.api.system.help.interactive.grouping.category")}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={groupingMode === "tags" ? "default" : "ghost"}
+                    onClick={() => setGroupingMode("tags")}
+                    className="text-xs"
+                  >
+                    {t("app.api.system.help.interactive.grouping.tags")}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={groupingMode === "path" ? "default" : "ghost"}
+                    onClick={() => setGroupingMode("path")}
+                    className="text-xs"
+                  >
+                    {t("app.api.system.help.interactive.grouping.path")}
+                  </Button>
+                </Div>
+
+                {/* Endpoint list with accordion */}
+                <Div className="max-h-[600px] overflow-y-auto">
+                  {groupingMode === "path" ? (
+                    /* Nested path tree view */
+                    <PathTreeAccordion
+                      node={pathTree}
+                      locale={locale}
+                      selectedEndpoint={selectedEndpoint}
+                      handleSelectEndpoint={handleSelectEndpoint}
+                    />
+                  ) : (
+                    /* Category/Tags flat accordion view */
+                    <Accordion
+                      type="multiple"
+                      defaultValue={[]}
+                      className="w-full"
+                    >
+                      {Object.entries(groupedEndpoints).map(([group, eps]) => (
+                        <AccordionItem
+                          key={group}
+                          value={group}
+                          className="border-b-0"
+                        >
+                          <AccordionTrigger className="py-2 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:no-underline">
+                            <Div className="flex items-center gap-2">
+                              <Span>
+                                {/* Both category and tags are translation keys */}
+                                {t(group as TranslationKey)}
+                              </Span>
+                              <Span className="text-xs font-normal text-gray-400 dark:text-gray-500">
+                                ({eps.length})
+                              </Span>
+                            </Div>
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-2">
+                            <Div className="space-y-1 pl-2">
+                              {eps.map((ep) => {
+                                const endpointId = getEndpointId(ep);
+                                const toolName = ep.path.join("_");
+                                const isSelected =
+                                  selectedEndpoint &&
+                                  getEndpointId(selectedEndpoint) ===
+                                    endpointId;
+
+                                return (
+                                  <Link
+                                    key={endpointId}
+                                    href={`/${locale}/help/interactive/${encodeURIComponent(endpointId)}`}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleSelectEndpoint(ep);
+                                    }}
+                                    className={`block w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                                      isSelected
+                                        ? "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100"
+                                        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                                    }`}
+                                  >
+                                    <Div className="font-mono text-xs text-gray-500 dark:text-gray-400">
+                                      {ep.method}
+                                    </Div>
+                                    <Div className="font-medium truncate">
+                                      {toolName.replace(/_/g, "/")}
+                                    </Div>
+                                    {ep.aliases && ep.aliases.length > 0 && (
+                                      <Div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        {t(
+                                          "app.api.system.help.interactive.ui.aliasesLabel",
+                                        )}{" "}
+                                        {ep.aliases.join(", ")}
+                                      </Div>
+                                    )}
+                                  </Link>
+                                );
+                              })}
+                            </Div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  )}
                 </Div>
               </CardContent>
             </Card>
@@ -252,7 +569,18 @@ export function HelpInteractiveView({
             )}
 
             {selectedEndpoint && (
-              <EndpointExecutor endpoint={selectedEndpoint} locale={locale} />
+              <EndpointsPage
+                key={getEndpointId(selectedEndpoint)}
+                endpoint={wrapEndpoint(selectedEndpoint)}
+                locale={locale}
+                endpointOptions={{
+                  queryOptions: {
+                    enabled: selectedEndpoint.method.toUpperCase() === "GET",
+                    refetchOnWindowFocus: false,
+                    staleTime: 5 * 60 * 1000, // 5 minutes
+                  },
+                }}
+              />
             )}
           </Div>
         </Div>

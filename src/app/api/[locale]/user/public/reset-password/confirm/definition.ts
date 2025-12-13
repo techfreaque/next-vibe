@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   path: ["user", "public", "reset-password", "confirm"],
   title: "app.api.user.public.resetPassword.confirm.title" as const,
   description: "app.api.user.public.resetPassword.confirm.description" as const,
+  icon: "lock",
   category: "app.api.user.category" as const,
   tags: ["app.api.user.public.resetPassword.confirm.tag" as const],
   allowedRoles: [UserRole.PUBLIC] as const,

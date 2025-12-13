@@ -26,7 +26,7 @@ const devServerIp = Constants.expoConfig?.hostUri?.split(":")[0] ?? "localhost";
 export const envClient: EnvFrontend = {
   // Access environment variables from React Native's environment
   // These should be configured in the React Native app (e.g., via react-native-config or expo-constants)
-  NODE_ENV: Environment.DEVELOPMENT,
+  NODE_ENV: __DEV__ ? Environment.DEVELOPMENT : Environment.PRODUCTION,
   NEXT_PUBLIC_APP_URL: `http://${devServerIp}:3000`,
   NEXT_PUBLIC_TEST_SERVER_URL: `http://${devServerIp}:3000`,
   NEXT_PUBLIC_DEBUG_PRODUCTION: false,

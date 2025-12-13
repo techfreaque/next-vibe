@@ -15,7 +15,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: takeScreenshotEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, logger }) => {
       return executeTakeScreenshot(
         {
           toolName: "take-screenshot",
@@ -27,9 +27,7 @@ export const { POST, tools } = endpointsHandler({
             filePath: data.filePath,
           }),
         },
-        user,
         logger,
-        locale,
       );
     },
   },

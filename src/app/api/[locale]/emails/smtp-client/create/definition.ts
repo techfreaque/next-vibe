@@ -19,8 +19,22 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import {
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
+
+import {
+  EmailCampaignStage,
+  EmailCampaignStageOptions,
+  EmailJourneyVariant,
+  EmailJourneyVariantOptions,
+} from "../../../leads/enum";
 import { UserRole } from "../../../user/user-roles/enum";
 import {
+  CampaignType,
+  CampaignTypeOptions,
   SmtpAccountStatus,
   SmtpHealthStatus,
   SmtpSecurityType,
@@ -36,6 +50,7 @@ const { POST } = createEndpoint({
   title: "app.api.emails.smtpClient.create.title",
   description: "app.api.emails.smtpClient.create.description",
   category: "app.api.emails.category",
+  icon: "server",
   tags: ["app.api.emails.smtpClient.tag"],
   allowedRoles: [UserRole.ADMIN],
 
@@ -206,6 +221,83 @@ const { POST } = createEndpoint({
             },
             z.email(),
           ),
+
+          campaignTypes: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label: "app.api.emails.smtpClient.create.campaignTypes.label",
+              description:
+                "app.api.emails.smtpClient.create.campaignTypes.description",
+              placeholder:
+                "app.api.emails.smtpClient.create.campaignTypes.placeholder",
+              columns: 6,
+              options: CampaignTypeOptions,
+            },
+            z.array(z.enum(CampaignType)).optional(),
+          ),
+
+          emailJourneyVariants: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label:
+                "app.api.emails.smtpClient.create.emailJourneyVariants.label",
+              description:
+                "app.api.emails.smtpClient.create.emailJourneyVariants.description",
+              placeholder:
+                "app.api.emails.smtpClient.create.emailJourneyVariants.placeholder",
+              columns: 6,
+              options: EmailJourneyVariantOptions,
+            },
+            z.array(z.enum(EmailJourneyVariant)).optional(),
+          ),
+
+          emailCampaignStages: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label:
+                "app.api.emails.smtpClient.create.emailCampaignStages.label",
+              description:
+                "app.api.emails.smtpClient.create.emailCampaignStages.description",
+              placeholder:
+                "app.api.emails.smtpClient.create.emailCampaignStages.placeholder",
+              columns: 6,
+              options: EmailCampaignStageOptions,
+            },
+            z.array(z.enum(EmailCampaignStage)).optional(),
+          ),
+
+          countries: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label: "app.api.emails.smtpClient.create.countries.label",
+              description:
+                "app.api.emails.smtpClient.create.countries.description",
+              placeholder:
+                "app.api.emails.smtpClient.create.countries.placeholder",
+              columns: 6,
+              options: CountriesOptions,
+            },
+            z.array(z.enum(["GLOBAL", "DE", "PL", "US"])).optional(),
+          ),
+
+          languages: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.MULTISELECT,
+              label: "app.api.emails.smtpClient.create.languages.label",
+              description:
+                "app.api.emails.smtpClient.create.languages.description",
+              placeholder:
+                "app.api.emails.smtpClient.create.languages.placeholder",
+              columns: 6,
+              options: LanguagesOptions,
+            },
+            z.array(z.enum(Languages)).optional(),
+          ),
         },
       ),
 
@@ -326,6 +418,46 @@ const { POST } = createEndpoint({
                   text: "app.api.emails.smtpClient.create.response.account.healthCheckStatus",
                 },
                 z.enum(SmtpHealthStatus).nullable(),
+              ),
+              campaignTypes: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.smtpClient.create.response.account.campaignTypes",
+                },
+                z.array(z.enum(CampaignType)).optional(),
+              ),
+              emailJourneyVariants: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.smtpClient.create.response.account.emailJourneyVariants",
+                },
+                z.array(z.enum(EmailJourneyVariant)).optional(),
+              ),
+              emailCampaignStages: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.smtpClient.create.response.account.emailCampaignStages",
+                },
+                z.array(z.enum(EmailCampaignStage)).optional(),
+              ),
+              countries: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.smtpClient.create.response.account.countries",
+                },
+                z.array(z.enum(["GLOBAL", "DE", "PL", "US"])).optional(),
+              ),
+              languages: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.emails.smtpClient.create.response.account.languages",
+                },
+                z.array(z.enum(["en", "de", "pl"])).optional(),
               ),
             },
           ),

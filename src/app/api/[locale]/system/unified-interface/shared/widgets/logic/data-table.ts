@@ -4,9 +4,10 @@
  * Used by both React and CLI implementations
  */
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { WidgetData } from "../types";
 import type { UnifiedField } from "../../types/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { FieldDataType, WidgetType } from "../../types/enums";
 
 /**

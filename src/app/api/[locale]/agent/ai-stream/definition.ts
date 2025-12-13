@@ -46,6 +46,7 @@ const { POST } = createEndpoint({
 
   title: "app.api.agent.chat.aiStream.post.title",
   description: "app.api.agent.chat.aiStream.post.description",
+  icon: "sparkles",
   category: "app.api.agent.category",
   tags: [
     "app.api.agent.tags.streaming",

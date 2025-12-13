@@ -44,6 +44,7 @@ const { GET, POST } = createFormEndpoint({
     GET: {
       title: "app.api.payment.get.title",
       description: "app.api.payment.get.description",
+      icon: "credit-card",
       tags: [
         "app.api.payment.tags.payment",
         "app.api.payment.tags.stripe",
@@ -53,6 +54,7 @@ const { GET, POST } = createFormEndpoint({
     POST: {
       title: "app.api.payment.create.title",
       description: "app.api.payment.create.description",
+      icon: "shopping-cart",
       tags: [
         "app.api.payment.tags.payment",
         "app.api.payment.tags.stripe",

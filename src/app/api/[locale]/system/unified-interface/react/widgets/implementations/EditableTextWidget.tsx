@@ -11,27 +11,24 @@ import { useState } from "react";
 
 import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
+import type { WidgetType } from "../../../shared/types/enums";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { extractEditableTextData } from "../../../shared/widgets/logic/editable-text";
 import { useWidgetActions } from "../renderers/ToolActionHandler";
 
 /**
- * Editable Text Widget Component
- * Text display with inline editing capability
+ * Text display with inline editing capability.
  */
 export function EditableTextWidget({
   value: data,
-  field: _field,
   context,
   onAction,
   className,
-}: WidgetComponentProps): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.MARKDOWN_EDITOR>): JSX.Element {
   const extractedData = extractEditableTextData(data);
 
   if (!extractedData) {
-    return (
-      <Span className={cn("text-foreground", className)}>—</Span>
-    );
+    return <Span className={cn("text-foreground", className)}>—</Span>;
   }
 
   const { value, placeholder, readonly } = extractedData;
@@ -50,7 +47,7 @@ export function EditableTextWidget({
         type: "edit",
         fieldName: "value",
         oldValue: value,
-        newValue: editValue
+        newValue: editValue,
       });
       setIsEditing(false);
     } catch {
@@ -73,7 +70,9 @@ export function EditableTextWidget({
 
   if (!context.isInteractive || readonly) {
     return (
-      <Span className={cn("text-foreground", className)}>{value || placeholder || "—"}</Span>
+      <Span className={cn("text-foreground", className)}>
+        {value || placeholder || "—"}
+      </Span>
     );
   }
 

@@ -58,6 +58,7 @@ interface BuyCreditsTabProps {
   subscriptionCredits: number;
   packPrice: number;
   packCredits: number;
+  yearlySubscriptionPrice: number;
 }
 
 export function BuyCreditsTab({
@@ -68,6 +69,7 @@ export function BuyCreditsTab({
   subscriptionCredits,
   packPrice,
   packCredits,
+  yearlySubscriptionPrice,
 }: BuyCreditsTabProps): JSX.Element {
   const { t } = useTranslation();
 
@@ -76,6 +78,9 @@ export function BuyCreditsTab({
   const [modalType, setModalType] = useState<"subscription" | "credits">(
     "subscription",
   );
+  const [billingInterval, setBillingInterval] = useState<
+    typeof BillingInterval.MONTHLY | typeof BillingInterval.YEARLY
+  >(BillingInterval.MONTHLY);
 
   // Initialize hooks
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -88,6 +93,15 @@ export function BuyCreditsTab({
   };
 
   const handleBuyCredits = (): void => {
+    // Check if quantity is sufficient for crypto (minimum 4 packs)
+    if (creditPurchaseEndpoint.create) {
+      const quantity =
+        creditPurchaseEndpoint.create.form.getValues("quantity") || 1;
+      // Ensure minimum quantity is met
+      if (quantity < 1) {
+        creditPurchaseEndpoint.create.form.setValue("quantity", 1);
+      }
+    }
     setModalType("credits");
     setIsProviderModalOpen(true);
   };
@@ -104,7 +118,7 @@ export function BuyCreditsTab({
 
       subscriptionCheckoutEndpoint.create.form.reset({
         planId: SubscriptionPlan.SUBSCRIPTION,
-        billingInterval: BillingInterval.MONTHLY,
+        billingInterval: billingInterval,
         provider: provider,
       });
 
@@ -118,6 +132,28 @@ export function BuyCreditsTab({
       void creditPurchaseEndpoint.create.onSubmit();
     }
   };
+
+  // Check if crypto payments are disabled
+  const isCryptoDisabled =
+    modalType === "subscription" && billingInterval === BillingInterval.MONTHLY;
+
+  // Check if crypto is disabled for credit packs (below minimum)
+  const creditQuantity =
+    creditPurchaseEndpoint.create?.form.watch("quantity") || 1;
+  const isCryptoDisabledForCredits =
+    modalType === "credits" && creditQuantity < 5;
+
+  // Get current subscription price based on billing interval
+  const currentSubscriptionPrice =
+    billingInterval === BillingInterval.YEARLY
+      ? yearlySubscriptionPrice
+      : subscriptionPrice;
+
+  // Calculate monthly price for yearly subscription
+  const monthlyEquivalent =
+    billingInterval === BillingInterval.YEARLY
+      ? yearlySubscriptionPrice / 12
+      : subscriptionPrice;
 
   return (
     <>
@@ -156,6 +192,7 @@ export function BuyCreditsTab({
               variant="outline"
               className="h-auto p-4 justify-start"
               onClick={() => handleProviderSelect(PaymentProvider.NOWPAYMENTS)}
+              disabled={isCryptoDisabled || isCryptoDisabledForCredits}
             >
               <Bitcoin className="h-6 w-6 text-orange-500 mr-3" />
               <Div className="text-left">
@@ -169,6 +206,34 @@ export function BuyCreditsTab({
                 </Div>
               </Div>
             </Button>
+            {isCryptoDisabled && (
+              <Div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <Div className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
+                  <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                  <Span>
+                    {t(
+                      "app.subscription.subscription.buy.provider.cryptoMonthlyDisabled",
+                    )}
+                  </Span>
+                </Div>
+              </Div>
+            )}
+            {isCryptoDisabledForCredits && (
+              <Div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <Div className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
+                  <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                  <Span>
+                    {t(
+                      "app.subscription.subscription.buy.provider.cryptoMinimumPacks",
+                      {
+                        minPacks: 5,
+                        minValue: formatPrice(packPrice * 5, locale),
+                      },
+                    )}
+                  </Span>
+                </Div>
+              </Div>
+            )}
           </Div>
         </DialogContent>
       </Dialog>
@@ -187,20 +252,66 @@ export function BuyCreditsTab({
             </CardTitle>
             <CardDescription>
               {t("app.subscription.subscription.buy.subscription.description", {
-                subPrice: formatPrice(subscriptionPrice, locale),
+                subPrice: formatPrice(currentSubscriptionPrice, locale),
                 subCredits: subscriptionCredits,
                 modelCount: TOTAL_MODEL_COUNT,
               })}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-6">
-            <Div className="flex items-baseline gap-1">
-              <Div className="text-4xl font-bold">
-                {formatPrice(subscriptionPrice, locale)}
+            {/* Billing Interval Toggle */}
+            <Div className="flex items-center justify-center gap-2 p-1 bg-muted rounded-lg">
+              <Button
+                variant={
+                  billingInterval === BillingInterval.MONTHLY
+                    ? "default"
+                    : "ghost"
+                }
+                size="sm"
+                onClick={() => setBillingInterval(BillingInterval.MONTHLY)}
+                className="flex-1"
+              >
+                {t("app.api.subscription.billing.monthly")}
+              </Button>
+              <Button
+                variant={
+                  billingInterval === BillingInterval.YEARLY
+                    ? "default"
+                    : "ghost"
+                }
+                size="sm"
+                onClick={() => setBillingInterval(BillingInterval.YEARLY)}
+                className="flex-1"
+              >
+                {t("app.api.subscription.billing.yearly")}
+              </Button>
+            </Div>
+
+            <Div className="flex flex-col gap-2">
+              <Div className="flex items-baseline gap-1">
+                <Div className="text-4xl font-bold">
+                  {formatPrice(currentSubscriptionPrice, locale)}
+                </Div>
+                <Div className="text-sm text-muted-foreground">
+                  {billingInterval === BillingInterval.YEARLY
+                    ? t(
+                        "app.subscription.subscription.buy.subscription.perYear",
+                      )
+                    : t(
+                        "app.subscription.subscription.buy.subscription.perMonth",
+                      )}
+                </Div>
               </Div>
-              <Div className="text-sm text-muted-foreground">
-                {t("app.subscription.subscription.buy.subscription.perMonth")}
-              </Div>
+              {billingInterval === BillingInterval.YEARLY && (
+                <Div className="text-sm text-green-600 dark:text-green-400">
+                  {t(
+                    "app.subscription.subscription.buy.subscription.yearlyEquivalent",
+                    {
+                      monthlyPrice: formatPrice(monthlyEquivalent, locale),
+                    },
+                  )}
+                </Div>
+              )}
             </Div>
 
             <Div className="flex flex-col gap-3 text-sm">

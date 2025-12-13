@@ -24,9 +24,9 @@ import {
   UserRoleOptions,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import {
-  CountriesArr,
+  Countries,
   LanguagesOptions,
-  LanguagesArr,
+  Languages,
   CountriesOptions,
 } from "@/i18n/core/config";
 
@@ -40,6 +40,7 @@ const { POST } = createEndpoint({
 
   title: "app.api.users.create.post.title" as const,
   description: "app.api.users.create.post.description" as const,
+  icon: "user-plus",
   category: "app.api.users.category" as const,
   tags: [
     "app.api.users.tags.create" as const,
@@ -137,7 +138,7 @@ const { POST } = createEndpoint({
               options: CountriesOptions,
               columns: 6,
             },
-            z.enum(CountriesArr),
+            z.enum(Countries),
           ),
 
           language: requestDataField(
@@ -149,7 +150,7 @@ const { POST } = createEndpoint({
               options: LanguagesOptions,
               columns: 6,
             },
-            z.enum(LanguagesArr),
+            z.enum(Languages),
           ),
         },
       ),

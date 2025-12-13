@@ -222,11 +222,8 @@ function ContextMenuItem({
   style,
   inset,
   children,
-  onSelect: _onSelect, // Web-only: native handles internally via onPress
   disabled,
   asChild,
-  onClick: _onClick, // Filter out web-only props
-  key: _key, // Filter out web-only props
 }: ContextMenuItemProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
@@ -385,16 +382,13 @@ ContextMenuSeparator.displayName = ContextMenuPrimitive.Separator.displayName;
 
 function ContextMenuShortcut({
   className,
-  style: _style,
   children,
   ...props
 }: ContextMenuShortcutProps): React.JSX.Element {
-  // Note: style prop is not passed to sub-component as it expects CSSProperties
-  // Native uses className for styling via NativeWind
   return (
     <Span
       className={cn(
-        "ml-auto text-xs text-sm tracking-widest text-muted-foreground",
+        "ml-auto text-xs tracking-widest text-muted-foreground",
         className,
       )}
       {...props}

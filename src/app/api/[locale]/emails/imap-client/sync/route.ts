@@ -15,7 +15,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger, locale }) =>
-      imapSyncRepository.startSync(data, user, locale, logger),
+    handler: ({ data, user, logger }) =>
+      imapSyncRepository.startSync(data, user, logger),
   },
 });

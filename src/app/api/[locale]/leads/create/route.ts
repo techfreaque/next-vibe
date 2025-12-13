@@ -23,8 +23,8 @@ export const { POST, tools } = endpointsHandler({
         ignoreErrors: true, // Don't fail lead creation if admin notification fails
       },
     ],
-    handler: async ({ data, user, locale, logger }) => {
-      return await leadsRepository.createLead(data, user, locale, logger);
+    handler: async ({ data, logger }) => {
+      return await leadsRepository.createLead(data, logger);
     },
   },
 });

@@ -31,7 +31,6 @@ export default async function AdminLayout({
   const userResponse = await userByIdRepository.getUserById(
     { id: minimalUser.id },
     minimalUser,
-    locale,
     logger,
   );
 

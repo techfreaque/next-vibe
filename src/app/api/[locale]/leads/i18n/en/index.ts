@@ -77,6 +77,10 @@ export const translations = {
       error: "Error getting all linked leads",
     },
   },
+  errors: {
+    cannotLinkLeadToItself: "Cannot link lead to itself",
+    linkFailed: "Failed to link leads",
+  },
   batch: batchTranslations,
   campaigns: campaignsTranslations,
   create: createTranslations,

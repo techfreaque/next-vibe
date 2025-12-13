@@ -18,7 +18,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { SortOrder, UserSortField, UserStatusFilter } from "../enum";
 import type { UserListRequestOutput } from "./definition";
@@ -27,15 +26,10 @@ export interface UserListRepository {
   listUsers(
     data: UserListRequestOutput,
     user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
       response: {
-        totalCount: number;
-        pageCount: number;
-        page: number;
-        limit: number;
         users: Array<{
           id: string;
           email: string;
@@ -43,9 +37,15 @@ export interface UserListRepository {
           publicName: string;
           isActive: boolean;
           emailVerified: boolean;
-          createdAt: string;
-          updatedAt: string;
+          createdAt: Date;
+          updatedAt: Date;
         }>;
+      };
+      paginationInfo: {
+        totalCount: number;
+        pageCount: number;
+        page: number;
+        limit: number;
       };
     }>
   >;
@@ -114,15 +114,10 @@ export class UserListRepositoryImpl implements UserListRepository {
   async listUsers(
     data: UserListRequestOutput,
     user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
       response: {
-        totalCount: number;
-        pageCount: number;
-        page: number;
-        limit: number;
         users: Array<{
           id: string;
           email: string;
@@ -130,34 +125,43 @@ export class UserListRepositoryImpl implements UserListRepository {
           publicName: string;
           isActive: boolean;
           emailVerified: boolean;
-          createdAt: string;
-          updatedAt: string;
+          createdAt: Date;
+          updatedAt: Date;
         }>;
+      };
+      paginationInfo: {
+        totalCount: number;
+        pageCount: number;
+        page: number;
+        limit: number;
       };
     }>
   > {
     try {
-      logger.debug("Listing users", { query: data, requestingUser: user.id });
+      logger.debug("Listing users", {
+        query: data,
+        requestingUser: user.id,
+      });
 
-      // Type assertion to fix inference issues
+      // Type assertion to match new definition structure
       const requestData = data as {
-        searchAndPagination?: {
-          limit?: number;
-          page?: number;
+        searchFilters?: {
           search?: string;
-        };
-        filters?: {
           status?: string[];
           role?: string[];
         };
-        sorting?: {
+        sortingOptions?: {
           sortBy?: string;
           sortOrder?: string;
         };
+        paginationInfo?: {
+          page?: number;
+          limit?: number;
+        };
       };
 
-      const limit = requestData.searchAndPagination?.limit || 20;
-      const page = requestData.searchAndPagination?.page || 1;
+      const limit = requestData.paginationInfo?.limit || 20;
+      const page = requestData.paginationInfo?.page || 1;
       const offset = (page - 1) * limit;
 
       // Build conditions
@@ -165,7 +169,7 @@ export class UserListRepositoryImpl implements UserListRepository {
 
       // Status filter
       const statusCondition = this.convertStatusFilter(
-        requestData.filters?.status?.[0],
+        requestData.searchFilters?.status?.[0],
       );
       if (statusCondition) {
         conditions.push(statusCondition);
@@ -178,17 +182,11 @@ export class UserListRepositoryImpl implements UserListRepository {
       }
 
       // Search filter
-      if (requestData.searchAndPagination?.search) {
+      if (requestData.searchFilters?.search) {
         const searchCondition = or(
-          ilike(users.email, `%${requestData.searchAndPagination.search}%`),
-          ilike(
-            users.privateName,
-            `%${requestData.searchAndPagination.search}%`,
-          ),
-          ilike(
-            users.publicName,
-            `%${requestData.searchAndPagination.search}%`,
-          ),
+          ilike(users.email, `%${requestData.searchFilters.search}%`),
+          ilike(users.privateName, `%${requestData.searchFilters.search}%`),
+          ilike(users.publicName, `%${requestData.searchFilters.search}%`),
         );
         if (searchCondition) {
           conditions.push(searchCondition);
@@ -200,8 +198,9 @@ export class UserListRepositoryImpl implements UserListRepository {
         conditions.length > 0 ? and(...conditions) : undefined;
 
       // Get sort configuration
-      const sortField = requestData.sorting?.sortBy || UserSortField.CREATED_AT;
-      const sortOrder = requestData.sorting?.sortOrder || SortOrder.DESC;
+      const sortField =
+        requestData.sortingOptions?.sortBy || UserSortField.CREATED_AT;
+      const sortOrder = requestData.sortingOptions?.sortOrder || SortOrder.DESC;
       const sortColumn = this.getSortColumn(sortField);
 
       // Execute queries
@@ -228,26 +227,28 @@ export class UserListRepositoryImpl implements UserListRepository {
 
       return success({
         response: {
+          users: usersList.map((u) => ({
+            id: u.id,
+            email: u.email,
+            privateName: u.privateName,
+            publicName: u.publicName,
+            isActive: u.isActive,
+            emailVerified: u.emailVerified,
+            createdAt: u.createdAt,
+            updatedAt: u.updatedAt,
+          })),
+        },
+        paginationInfo: {
           totalCount: total,
           pageCount: totalPages,
           page,
           limit,
-          users: usersList.map((user) => ({
-            id: user.id,
-            email: user.email,
-            privateName: user.privateName,
-            publicName: user.publicName,
-            isActive: user.isActive,
-            emailVerified: user.emailVerified,
-            createdAt: user.createdAt.toISOString(),
-            updatedAt: user.updatedAt.toISOString(),
-          })),
         },
       });
     } catch (error) {
       logger.error("Error listing users", parseError(error));
       return fail({
-        message: "app.api.users.list.post.errors.server.title",
+        message: "app.api.users.list.get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -224,9 +224,36 @@ export const leadEngagementsRelations = relations(
 );
 
 /**
+ * Lead-to-Lead Links Table
+ * Tracks direct connections between leads (e.g., from track page, referrals)
+ * Used for credit pool sharing before user signup
+ */
+export const leadLeadLinks = pgTable(
+  "lead_lead_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    leadId1: uuid("lead_id_1")
+      .notNull()
+      .references(() => leads.id, { onDelete: "cascade" }),
+    leadId2: uuid("lead_id_2")
+      .notNull()
+      .references(() => leads.id, { onDelete: "cascade" }),
+    linkReason: text("link_reason")
+      .$type<"track_page" | "referral" | "manual" | "test">()
+      .notNull(),
+    linkedAt: timestamp("linked_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    unique("uq_lead_lead_link").on(table.leadId1, table.leadId2),
+    index("idx_lead_lead_links_lead1").on(table.leadId1),
+    index("idx_lead_lead_links_lead2").on(table.leadId2),
+  ],
+);
+
+/**
  * User Lead Links Table
- * Simplified: tracks user-to-lead relationships
- * With proper UNIQUE constraint to prevent duplicates
+ * Tracks user-to-lead relationships
  */
 export const userLeadLinks = pgTable(
   "user_lead_links",
@@ -238,18 +265,14 @@ export const userLeadLinks = pgTable(
     leadId: uuid("lead_id")
       .notNull()
       .references(() => leads.id, { onDelete: "cascade" }),
-    linkReason: text("link_reason").notNull(), // 'signup', 'merge', 'manual', etc.
-    metadata: jsonb("metadata")
-      .$type<Record<string, string | number | boolean | null>>()
-      .notNull()
-      .default({}),
+    linkReason: text("link_reason")
+      .$type<"signup" | "login" | "merge" | "manual">()
+      .notNull(),
     linkedAt: timestamp("linked_at").defaultNow().notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    // Prevent duplicate user-lead links
     unique("uq_user_lead_link").on(table.userId, table.leadId),
-    // Fast lookups
     index("idx_user_lead_links_user").on(table.userId),
     index("idx_user_lead_links_lead").on(table.leadId),
   ],
@@ -258,6 +281,17 @@ export const userLeadLinks = pgTable(
 /**
  * Relations
  */
+export const leadLeadLinksRelations = relations(leadLeadLinks, ({ one }) => ({
+  lead1: one(leads, {
+    fields: [leadLeadLinks.leadId1],
+    references: [leads.id],
+  }),
+  lead2: one(leads, {
+    fields: [leadLeadLinks.leadId2],
+    references: [leads.id],
+  }),
+}));
+
 export const userLeadLinksRelations = relations(userLeadLinks, ({ one }) => ({
   user: one(users, {
     fields: [userLeadLinks.userId],
@@ -278,6 +312,8 @@ export const selectEmailCampaignSchema = createSelectSchema(emailCampaigns);
 export const insertEmailCampaignSchema = createInsertSchema(emailCampaigns);
 export const selectLeadEngagementSchema = createSelectSchema(leadEngagements);
 export const insertLeadEngagementSchema = createInsertSchema(leadEngagements);
+export const selectLeadLeadLinkSchema = createSelectSchema(leadLeadLinks);
+export const insertLeadLeadLinkSchema = createInsertSchema(leadLeadLinks);
 export const selectUserLeadLinkSchema = createSelectSchema(userLeadLinks);
 export const insertUserLeadLinkSchema = createInsertSchema(userLeadLinks);
 
@@ -290,5 +326,7 @@ export type EmailCampaign = z.infer<typeof selectEmailCampaignSchema>;
 export type NewEmailCampaign = z.infer<typeof insertEmailCampaignSchema>;
 export type LeadEngagement = z.infer<typeof selectLeadEngagementSchema>;
 export type NewLeadEngagement = z.infer<typeof insertLeadEngagementSchema>;
+export type LeadLeadLink = z.infer<typeof selectLeadLeadLinkSchema>;
+export type NewLeadLeadLink = z.infer<typeof insertLeadLeadLinkSchema>;
 export type UserLeadLink = z.infer<typeof selectUserLeadLinkSchema>;
 export type NewUserLeadLink = z.infer<typeof insertUserLeadLinkSchema>;

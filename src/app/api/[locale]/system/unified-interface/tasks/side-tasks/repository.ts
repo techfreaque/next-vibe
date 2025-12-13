@@ -15,8 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { sideTaskExecutions, sideTaskHealthChecks, sideTasks } from "./db";
 import type {
@@ -76,11 +74,9 @@ export interface ISideTasksRepository {
   ): ReturnType<SideTasksRepository["updateExecution"]>;
   getExecutionsByTaskId(
     taskId: string,
-    logger: EndpointLogger,
     limit?: number,
   ): ReturnType<SideTasksRepository["getExecutionsByTaskId"]>;
   getRecentExecutions(
-    logger: EndpointLogger,
     limit?: number,
   ): ReturnType<SideTasksRepository["getRecentExecutions"]>;
 
@@ -93,7 +89,6 @@ export interface ISideTasksRepository {
   ): ReturnType<SideTasksRepository["getLatestHealthCheck"]>;
   getHealthCheckHistory(
     taskId: string,
-    logger: EndpointLogger,
     limit?: number,
   ): ReturnType<SideTasksRepository["getHealthCheckHistory"]>;
 
@@ -112,8 +107,6 @@ export interface ISideTasksRepository {
 
   handleAction(
     data: ActionRequestData,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ActionResponseData>>;
 }
@@ -309,7 +302,6 @@ export class SideTasksRepository implements ISideTasksRepository {
 
   async getExecutionsByTaskId(
     taskId: string,
-    logger: EndpointLogger,
     limit = 50,
   ) {
     try {
@@ -332,7 +324,7 @@ export class SideTasksRepository implements ISideTasksRepository {
     }
   }
 
-  async getRecentExecutions(logger: EndpointLogger, limit = 100) {
+  async getRecentExecutions( limit = 100) {
     try {
       const executions = await db
         .select()
@@ -395,7 +387,6 @@ export class SideTasksRepository implements ISideTasksRepository {
 
   async getHealthCheckHistory(
     taskId: string,
-    logger: EndpointLogger,
     limit = 50,
   ) {
     try {
@@ -489,16 +480,14 @@ export class SideTasksRepository implements ISideTasksRepository {
 
   async handleAction(
     data: ActionRequestData,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
-    _logger: EndpointLogger,
+    logger: EndpointLogger,
   ): Promise<ResponseType<ActionResponseData>> {
     try {
       const { action } = data;
 
       switch (action) {
         case "list": {
-          const tasksResult = await this.getAllTasks(_logger);
+          const tasksResult = await this.getAllTasks(logger);
           if (!tasksResult.success) {
             return tasksResult;
           }

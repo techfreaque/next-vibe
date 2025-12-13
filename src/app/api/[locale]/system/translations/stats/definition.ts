@@ -44,6 +44,7 @@ const { GET } = createEndpoint({
     "app.api.system.translations.tags.analytics",
     "app.api.system.translations.tags.i18n",
   ],
+  icon: "book",
 
   // CLI configuration
   aliases: ["translations:stats", "ts"],

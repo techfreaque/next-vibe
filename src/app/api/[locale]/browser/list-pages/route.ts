@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: listPagesEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, logger }) => {
       // Explicitly void unused data to satisfy linter
       void data;
       return executeMCPTool(
@@ -21,9 +21,7 @@ export const { POST, tools } = endpointsHandler({
           toolName: "list-pages",
           args: filterUndefinedArgs({}),
         },
-        user,
         logger,
-        locale,
       ) as Promise<ResponseType<ListPagesResponseOutput>>;
     },
   },

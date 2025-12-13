@@ -74,6 +74,7 @@ export function Toggle({
 }: ToggleRootProps): React.JSX.Element {
   const isPressed = pressed ?? false;
   const handlePressedChange =
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Intentional no-op fallback function
     onPressedChange ?? ((_pressed: boolean): void => undefined);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 

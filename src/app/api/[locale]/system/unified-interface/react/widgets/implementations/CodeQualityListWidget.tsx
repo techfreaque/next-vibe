@@ -22,19 +22,18 @@ import {
   countCodeQualityBySeverity,
   type CodeQualityItem,
 } from "../../../shared/widgets/logic/code-quality-list";
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
+import type { WidgetType } from "../../../shared/types/enums";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { getSeverityVariant } from "../../../shared/widgets/utils/widget-helpers";
 
 /**
- * Code Quality List Widget Component
- * Displays code quality issues with grouping by file/severity/rule
+ * Displays code quality issues with grouping by file/severity/rule.
  */
 export function CodeQualityListWidget({
   value,
-  field: _field,
   context,
   className,
-}: WidgetComponentProps): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.CODE_QUALITY_LIST>): JSX.Element {
   const { t } = simpleT(context.locale);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 

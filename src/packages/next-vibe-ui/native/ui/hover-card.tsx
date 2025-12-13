@@ -54,16 +54,18 @@ function HoverCardContent({
   className,
   style,
   children,
-  disablePositioningStyle,
   forceMount,
   side,
   alignOffset,
   avoidCollisions,
-  collisionBoundary: _collisionBoundary, // Web-only
-  collisionPadding: _collisionPadding, // Web-only
-  arrowPadding: _arrowPadding, // Web-only
-  sticky: _sticky, // Web-only
-  hideWhenDetached: _hideWhenDetached, // Web-only
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  collisionPadding, // Intentionally extracted - Web-only, not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  arrowPadding, // Intentionally extracted - Web-only, not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  sticky, // Intentionally extracted - Web-only, not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  hideWhenDetached, // Intentionally extracted - Web-only, not used in React Native
   onEscapeKeyDown, // Web-only but accepted by RN primitive
   onPointerDownOutside, // Web-only but accepted by RN primitive
 }: HoverCardContentProps): React.JSX.Element {
@@ -89,7 +91,6 @@ function HoverCardContent({
               asChild
               align={align}
               sideOffset={sideOffset}
-              disablePositioningStyle={disablePositioningStyle}
               forceMount={forceMount}
               side={nativeSide}
               alignOffset={alignOffset}

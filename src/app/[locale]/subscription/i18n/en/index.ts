@@ -102,6 +102,10 @@ export const translations = {
         nowpayments: {
           description: "Cryptocurrency",
         },
+        cryptoMonthlyDisabled:
+          "Cryptocurrency payments are only available for yearly subscriptions due to minimum transaction value requirements (minimum $20).",
+        cryptoMinimumPacks:
+          "Cryptocurrency payments require a minimum of {{minPacks}} credit packs ({{minValue}}) due to minimum transaction value requirements.",
       },
       subscription: {
         badge: "Best Value",
@@ -109,6 +113,8 @@ export const translations = {
         description:
           "{{subPrice}}/month - {{subCredits}} credits per month with all {{modelCount}} AI models",
         perMonth: "/month",
+        perYear: "/year",
+        yearlyEquivalent: "Only {{monthlyPrice}}/month when billed annually",
         features: {
           credits: "{{count}} credits per month",
           expiry: "Access all {{modelCount}} AI models",

@@ -4,55 +4,114 @@
  *
  * POLYFILL PATTERN: This file makes folder operations work on native
  * by calling HTTP endpoints instead of direct database access using typesafe endpoint definitions.
- *
- * Server code can call getFolder() and it will:
- * - On Web/Server: Query the database directly
- * - On React Native: Make HTTP call via nativeEndpoint() with full type safety
- *
- * This allows the SAME code to work on both platforms!
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  fail,
+  ErrorResponseTypes,
+  type ResponseType,
+} from "next-vibe/shared/types/response.schema";
 
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import definitions from "./definition";
-import type { FolderGetResponseOutput } from "./definition";
+import definitions, {
+  type FolderDeleteResponseOutput,
+  type FolderGetResponseOutput,
+  type FolderUpdateRequestOutput,
+  type FolderUpdateResponseOutput,
+} from "./definition";
 
 const getFolderEndpoint = definitions.GET;
 
 /**
- * Get a single folder by ID (native implementation)
+ * Interface for folder repository operations (native version)
  */
-export async function getFolder(
-  user: JwtPayloadType,
-  data: { id: string },
-  logger: EndpointLogger,
-): Promise<ResponseType<FolderGetResponseOutput>> {
-  // Use typesafe nativeEndpoint() with endpoint definition
-  // This provides full type inference from the endpoint's schema
-  const response = await nativeEndpoint(
-    getFolderEndpoint,
-    { urlPathParams: { id: data.id } },
-    logger,
-    "en-GLOBAL",
-  );
+interface IFolderNativeRepository {
+  getFolder(
+    data: { id: string },
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<FolderGetResponseOutput>>;
 
-  if (response.success) {
+  updateFolder(
+    data: FolderUpdateRequestOutput & { id: string },
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<FolderUpdateResponseOutput>>;
+
+  deleteFolder(
+    data: { id: string },
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<FolderDeleteResponseOutput>>;
+}
+
+/**
+ * Native folder repository implementation
+ * Uses HTTP endpoints for React Native platform
+ */
+export class FolderNativeRepository implements IFolderNativeRepository {
+  async getFolder(
+    data: { id: string },
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<FolderGetResponseOutput>> {
+    const response = await nativeEndpoint(
+      getFolderEndpoint,
+      { urlPathParams: { id: data.id } },
+      logger,
+      locale,
+    );
+
+    if (response.success) {
+      return {
+        success: true,
+        data: response.data,
+        message: response.message,
+      };
+    }
+
     return {
-      success: true,
-      data: response.data,
+      success: false,
+      errorType: response.errorType,
       message: response.message,
+      messageParams: response.messageParams,
     };
   }
 
-  // Error response - preserve all error information
-  return {
-    success: false,
-    errorType: response.errorType,
-    message: response.message,
-    messageParams: response.messageParams,
-  };
+  async updateFolder(
+    data: FolderUpdateRequestOutput & { id: string },
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<FolderUpdateResponseOutput>> {
+    logger.error("updateFolder not implemented on native", {
+      folderId: data.id,
+      locale,
+    });
+    return fail({
+      message: "app.api.agent.chat.folders.id.patch.errors.server.title",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { reason: "Not implemented for React Native" },
+    });
+  }
+
+  async deleteFolder(
+    data: { id: string },
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<FolderDeleteResponseOutput>> {
+    logger.error("deleteFolder not implemented on native", {
+      folderId: data.id,
+      locale,
+    });
+    return fail({
+      message: "app.api.agent.chat.folders.id.delete.errors.server.title",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: { reason: "Not implemented for React Native" },
+    });
+  }
 }
+
+export const folderNativeRepository = new FolderNativeRepository();

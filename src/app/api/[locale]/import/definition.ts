@@ -21,7 +21,12 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { CountriesOptions, LanguagesOptions } from "@/i18n/core/config";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 import {
   CsvImportJobStatus,
@@ -41,6 +46,7 @@ const { POST: ImportCsvPost } = createEndpoint({
 
   title: "app.api.import.csv.post.title",
   description: "app.api.import.csv.post.description",
+  icon: "upload" as const,
   category: "app.api.import.category",
   tags: [
     "app.api.import.tags.csv",
@@ -178,7 +184,7 @@ const { POST: ImportCsvPost } = createEndpoint({
               placeholder: "app.api.import.csv.post.defaultCountry.placeholder",
               options: CountriesOptions,
             },
-            z.string().default("GLOBAL"),
+            z.enum(Countries).default(Countries.GLOBAL),
           ),
 
           defaultLanguage: requestDataField(
@@ -192,7 +198,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                 "app.api.import.csv.post.defaultLanguage.placeholder",
               options: LanguagesOptions,
             },
-            z.string().default("en"),
+            z.enum(Languages).default(Languages.EN),
           ),
         },
       ),
@@ -510,6 +516,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
 
   title: "app.api.import.jobs.get.title",
   description: "app.api.import.jobs.get.description",
+  icon: "file-text" as const,
   category: "app.api.import.category",
   tags: [
     "app.api.import.tags.jobs",

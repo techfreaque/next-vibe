@@ -54,11 +54,8 @@ Breadcrumb.displayName = "Breadcrumb";
 export function BreadcrumbList({
   className,
   style,
-  children,
-  id: _id,
-  role: _role,
   "aria-label": ariaLabel,
-  "aria-labelledby": _ariaLabelledby,
+  children,
 }: BreadcrumbListProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
@@ -83,11 +80,8 @@ BreadcrumbList.displayName = "BreadcrumbList";
 export function BreadcrumbItem({
   className,
   style,
-  children,
-  id: _id,
-  role: _role,
   "aria-label": ariaLabel,
-  "aria-current": _ariaCurrent,
+  children,
 }: BreadcrumbItemProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
@@ -110,18 +104,9 @@ export function BreadcrumbLink({
   asChild,
   className,
   style,
+  "aria-label": ariaLabel,
   children,
   onClick,
-  href: _href,
-  target: _target,
-  rel: _rel,
-  download: _download,
-  hrefLang: _hrefLang,
-  ping: _ping,
-  referrerPolicy: _referrerPolicy,
-  type: _type,
-  "aria-label": ariaLabel,
-  "aria-current": _ariaCurrent,
 }: BreadcrumbLinkProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
@@ -184,11 +169,8 @@ BreadcrumbLink.displayName = "BreadcrumbLink";
 export function BreadcrumbPage({
   className,
   style,
-  children,
-  id: _id,
-  role: _role,
   "aria-label": ariaLabel,
-  "aria-current": _ariaCurrent = "page",
+  children,
 }: BreadcrumbPageProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
@@ -211,10 +193,7 @@ export function BreadcrumbSeparator({
   children,
   className,
   style,
-  id: _id,
-  role: _role = "presentation",
   "aria-label": ariaLabel,
-  "aria-hidden": _ariaHidden = "true",
 }: BreadcrumbSeparatorProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
@@ -236,10 +215,7 @@ BreadcrumbSeparator.displayName = "BreadcrumbSeparator";
 export function BreadcrumbEllipsis({
   className,
   style,
-  id: _id,
-  role: _role = "presentation",
   "aria-label": ariaLabel,
-  "aria-hidden": _ariaHidden = "true",
 }: BreadcrumbEllipsisProps): React.JSX.Element {
   const { t } = useTranslation();
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;

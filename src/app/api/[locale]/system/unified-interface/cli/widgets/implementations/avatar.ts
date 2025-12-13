@@ -4,19 +4,16 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import { extractAvatarData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/avatar";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps } from "../core/types";
 
-export class AvatarWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.AVATAR;
-  }
+export class AvatarWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.AVATAR> {
+  readonly widgetType = WidgetType.AVATAR;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { field, value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.AVATAR>): string {
+    const { field, value, context } = props;
     const indent = this.createIndent(context.depth, context);
     const label = this.formatLabel(field, context);
 

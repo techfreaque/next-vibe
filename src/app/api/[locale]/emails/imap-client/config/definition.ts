@@ -33,6 +33,7 @@ const { GET } = createEndpoint({
 
   title: "app.api.emails.imapClient.config.title" as const,
   description: "app.api.emails.imapClient.config.description" as const,
+  icon: "settings",
   tags: ["app.api.emails.imapClient.tags.config" as const],
 
   fields: objectField(
@@ -430,6 +431,7 @@ const { POST } = createEndpoint({
 
   title: "app.api.emails.imapClient.config.update.title" as const,
   description: "app.api.emails.imapClient.config.update.description" as const,
+  icon: "settings",
   tags: ["app.api.emails.imapClient.tags.config" as const],
 
   fields: objectField(

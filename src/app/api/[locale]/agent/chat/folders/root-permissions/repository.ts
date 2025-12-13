@@ -10,6 +10,7 @@ import { success } from "next-vibe/shared/types/response.schema";
 
 import {
   DEFAULT_FOLDER_CONFIGS,
+  isDefaultFolderId,
   isIncognitoFolder,
 } from "@/app/api/[locale]/agent/chat/config";
 import {
@@ -18,12 +19,12 @@ import {
 } from "@/app/api/[locale]/agent/chat/permissions/permissions";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   RootPermissionsGetRequestOutput,
   RootPermissionsGetResponseOutput,
 } from "./definition";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Root Folder Permissions Repository Interface
@@ -51,23 +52,23 @@ export class RootFolderPermissionsRepositoryImpl implements RootFolderPermission
   async getRootFolderPermissions(
     data: RootPermissionsGetRequestOutput,
     user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<RootPermissionsGetResponseOutput>> {
     const { rootFolderId } = data;
 
-    // Get the root folder config
-    const rootConfig = DEFAULT_FOLDER_CONFIGS.find(
-      (config) => config.id === rootFolderId,
-    );
-
-    if (!rootConfig) {
-      logger.error("Root folder config not found", { rootFolderId });
+    // Validate root folder ID
+    if (!isDefaultFolderId(rootFolderId)) {
+      logger.error("Invalid root folder ID", { rootFolderId });
       return success({
         canCreateThread: false,
         canCreateFolder: false,
       });
     }
+
+    // Get the root folder config (direct access now that we validated it's a default folder)
+    const rootConfig = DEFAULT_FOLDER_CONFIGS[rootFolderId];
 
     // Special handling for incognito folder
     // Incognito is localStorage-only and should allow everyone to create threads/folders locally

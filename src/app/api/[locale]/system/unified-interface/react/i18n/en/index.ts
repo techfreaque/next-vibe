@@ -20,6 +20,8 @@ export const translations = {
       noData: "No data available",
       showMore: "Show {{count}} more",
       showLess: "Show less",
+      viewList: "List View",
+      viewGrid: "Grid View",
     },
     linkList: {
       noResults: "No results found",

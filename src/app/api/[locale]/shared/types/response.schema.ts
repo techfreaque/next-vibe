@@ -204,6 +204,7 @@ export type ErrorTypes =
   | "PERMISSION_ERROR"
   | "PAYMENT_ERROR"
   | "PARTIAL_FAILURE"
+  | "PAYMENT_REQUIRED"
   | "CONFLICT";
 
 export type ErrorResponseTypesElements = {
@@ -214,6 +215,10 @@ export type ErrorResponseTypesElements = {
 };
 
 export const ErrorResponseTypes: ErrorResponseTypesElements = {
+  PAYMENT_REQUIRED: {
+    errorKey: "app.api.shared.errorTypes.payment_required",
+    errorCode: 402,
+  },
   EXTERNAL_SERVICE_ERROR: {
     errorKey: "app.api.shared.errorTypes.external_service_error",
     errorCode: 500,

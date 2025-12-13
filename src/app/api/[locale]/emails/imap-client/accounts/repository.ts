@@ -19,7 +19,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import { withTransaction } from "@/app/api/[locale]/system/db/utils/repository-helpers";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ImapAccount, NewImapAccount } from "../db";
 import { imapAccounts } from "../db";
@@ -64,42 +63,36 @@ export interface ImapAccountsRepository {
   createAccount(
     data: ImapAccountCreateRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapAccountCreateResponseOutput>>;
 
   listAccounts(
     data: ImapAccountListRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapAccountListResponseOutput>>;
 
   getAccountById(
     data: { id: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapAccountGetResponseOutput>>;
 
   updateAccount(
     data: ImapAccountUpdateRequestOutput & { id: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapAccountPutResponseOutput>>;
 
   deleteAccount(
     data: { id: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean; message: string }>>;
 
   testAccountConnection(
     data: { id: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapAccountTestResponseOutput>>;
 }
@@ -259,7 +252,6 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
   async createAccount(
     data: ImapAccountCreateRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapAccountCreateResponseOutput>> {
     try {
@@ -354,7 +346,6 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
   async listAccounts(
     data: ImapAccountListRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapAccountListResponseOutput>> {
     try {
@@ -466,7 +457,6 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
   async getAccountById(
     data: { id: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapAccountGetResponseOutput>> {
     try {
@@ -509,7 +499,6 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
   async updateAccount(
     data: ImapAccountUpdateRequestOutput & { id: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapAccountPutResponseOutput>> {
     try {
@@ -604,7 +593,6 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
   async deleteAccount(
     data: { id: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean; message: string }>> {
     try {
@@ -656,7 +644,6 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
   async testAccountConnection(
     data: { id: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapAccountTestResponseOutput>> {
     try {

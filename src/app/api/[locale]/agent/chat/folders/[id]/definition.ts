@@ -36,6 +36,7 @@ const { GET } = createEndpoint({
   description: "app.api.agent.chat.folders.id.get.description" as const,
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.folders" as const],
+  icon: "folder-open" as const,
 
   fields: objectField(
     {
@@ -344,6 +345,7 @@ const { PATCH } = createEndpoint({
   description: "app.api.agent.chat.folders.id.patch.description" as const,
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.folders" as const],
+  icon: "folder-pen" as const,
 
   fields: objectField(
     {
@@ -824,6 +826,7 @@ const { DELETE } = createEndpoint({
   description: "app.api.agent.chat.folders.id.delete.description" as const,
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.folders" as const],
+  icon: "folder-x" as const,
 
   fields: objectField(
     {

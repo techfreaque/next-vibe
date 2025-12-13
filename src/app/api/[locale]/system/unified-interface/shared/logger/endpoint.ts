@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { enableDebugLogger, mcpSilentMode } from "@/config/debug";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -92,7 +92,7 @@ export function createEndpointLogger(
   };
   const { t } = simpleT(locale);
 
-  const formatMessage = (level: string, message: string): string => {
+  const formatMessage = (message: string): string => {
     return `[${getElapsedTime()}] ${t(message as TranslationKey)}`;
   };
 
@@ -102,11 +102,11 @@ export function createEndpointLogger(
         // In MCP mode, dynamically import and log to file instead of console
         const metadataObj = metadata.length > 0 ? { metadata } : undefined;
         void writeToFile(
-          `[INFO] ${formatMessage("INFO", message)}`,
+          `[INFO] ${formatMessage(message)}`,
           metadataObj,
         );
       } else {
-        console.log(formatMessage("INFO", message), ...metadata);
+        console.log(formatMessage(message), ...metadata);
       }
     },
 
@@ -123,12 +123,12 @@ export function createEndpointLogger(
           ...(metadata.length > 0 && { metadata }),
         };
         void writeToFile(
-          `[ERROR] ${formatMessage("ERROR", message)}`,
+          `[ERROR] ${formatMessage(message)}`,
           metadataObj,
         );
       } else {
         const typedError = error ? parseError(error) : undefined;
-        console.error(formatMessage("ERROR", message), typedError, ...metadata);
+        console.error(formatMessage(message), typedError, ...metadata);
       }
     },
 
@@ -152,11 +152,11 @@ export function createEndpointLogger(
           // In MCP mode, dynamically import and log to file instead of console
           const metadataObj = metadata.length > 0 ? { metadata } : undefined;
           void writeToFile(
-            `[DEBUG] ${formatMessage("DEBUG", message)}`,
+            `[DEBUG] ${formatMessage(message)}`,
             metadataObj,
           );
         } else {
-          console.log(formatMessage("DEBUG", message), ...metadata);
+          console.log(formatMessage(message), ...metadata);
         }
       }
     },
@@ -165,11 +165,11 @@ export function createEndpointLogger(
         // In MCP mode, dynamically import and log to file instead of console
         const metadataObj = metadata.length > 0 ? { metadata } : undefined;
         void writeToFile(
-          `[WARN] ${formatMessage("WARN", message)}`,
+          `[WARN] ${formatMessage(message)}`,
           metadataObj,
         );
       } else {
-        console.warn(formatMessage("WARN", message), ...metadata);
+        console.warn(formatMessage(message), ...metadata);
       }
     },
     isDebugEnabled: debugEnabled || enableDebugLogger,

@@ -1,6 +1,6 @@
 import React from "react";
 import type { ScrollView as RNScrollView } from "react-native";
-import { ScrollView, View, Pressable, Text } from "react-native";
+import { ScrollView, View, Pressable, Text as RNText } from "react-native";
 import { styled } from "nativewind";
 
 import type {
@@ -20,6 +20,12 @@ const StyledScrollView = styled(ScrollView, { className: "style" });
 
 // Type-safe View with className support (NativeWind)
 const StyledView = styled(View, { className: "style" });
+
+// Type-safe Pressable with className support (NativeWind)
+const StyledPressable = styled(Pressable, { className: "style" });
+
+// Type-safe Text with className support (NativeWind)
+const StyledText = styled(RNText, { className: "style" });
 
 interface CarouselContextProps {
   scrollViewRef: React.RefObject<RNScrollView | null>;
@@ -45,13 +51,15 @@ function Carousel({
   className,
   children,
   orientation = "horizontal",
-  opts: _opts,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  opts, // Intentionally extracted - not used in React Native
   setApi,
-  plugins: _plugins,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  plugins, // Intentionally extracted - not used in React Native
 }: CarouselProps): React.JSX.Element {
   const scrollViewRef = React.useRef<RNScrollView>(null);
-  const [canScrollPrev, _setCanScrollPrev] = React.useState(false);
-  const [canScrollNext, _setCanScrollNext] = React.useState(true);
+  const [canScrollPrev] = React.useState(false);
+  const [canScrollNext] = React.useState(true);
 
   // Expose setApi if provided
   React.useEffect(() => {
@@ -138,61 +146,55 @@ export { Carousel, CarouselItem, CarouselContent };
 
 function CarouselPrevious({
   className,
-  variant = "outline",
-  size = "icon",
-  ...restProps
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  variant = "outline", // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  size = "icon", // Intentionally extracted - not used in React Native
 }: CarouselButtonProps): React.JSX.Element {
   const { scrollPrev, canScrollPrev } = useCarousel();
   const { t } = useTranslation();
 
-  // Accept props for API compatibility but don't use them in native
-  void variant;
-  void size;
-  void restProps;
-
   return (
-    <Pressable
+    <StyledPressable
       onPress={scrollPrev}
       disabled={!canScrollPrev}
       className={cn("absolute", className)}
+      accessibilityRole="button"
       accessibilityLabel={t(
         "packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide",
       )}
     >
-      <Text>
+      <StyledText>
         {t("packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide")}
-      </Text>
-    </Pressable>
+      </StyledText>
+    </StyledPressable>
   );
 }
 
 function CarouselNext({
   className,
-  variant = "outline",
-  size = "icon",
-  ...restProps
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  variant = "outline", // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  size = "icon", // Intentionally extracted - not used in React Native
 }: CarouselButtonProps): React.JSX.Element {
   const { scrollNext, canScrollNext } = useCarousel();
   const { t } = useTranslation();
 
-  // Accept props for API compatibility but don't use them in native
-  void variant;
-  void size;
-  void restProps;
-
   return (
-    <Pressable
+    <StyledPressable
       onPress={scrollNext}
       disabled={!canScrollNext}
       className={cn("absolute", className)}
+      accessibilityRole="button"
       accessibilityLabel={t(
         "packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide",
       )}
     >
-      <Text>
+      <StyledText>
         {t("packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide")}
-      </Text>
-    </Pressable>
+      </StyledText>
+    </StyledPressable>
   );
 }
 

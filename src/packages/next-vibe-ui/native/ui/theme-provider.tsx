@@ -14,15 +14,15 @@ const StyledView = styled(View, { className: "style" });
 
 export function ThemeProvider({
   children,
-  defaultTheme: _defaultTheme = "system",
-  storageKey: _storageKey = "theme",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  defaultTheme = "system", // Intentionally extracted - not used in React Native, uses system color scheme
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  storageKey = "theme", // Intentionally extracted - not used in React Native, uses system color scheme
   className,
   style,
 }: ThemeProviderProps): React.JSX.Element {
   const colorScheme = useColorScheme();
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
-  // Note: defaultTheme and storageKey are ignored on native
-  // as React Native uses system color scheme
   return (
     <StyledView
       {...applyStyleType({

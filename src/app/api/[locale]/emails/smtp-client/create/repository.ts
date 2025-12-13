@@ -16,7 +16,6 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { smtpAccounts } from "../db";
 // SmtpAccountResponseType doesn't exist - we'll create the response directly
@@ -32,7 +31,6 @@ interface SmtpAccountCreateRepository {
   createSmtpAccount(
     data: SmtpAccountCreateRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpAccountCreateResponseOutput>>;
 }
@@ -48,7 +46,6 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
   async createSmtpAccount(
     data: SmtpAccountCreateRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpAccountCreateResponseOutput>> {
     try {
@@ -71,6 +68,11 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
           username: data.authentication.username,
           password: data.authentication.password,
           fromEmail: data.emailConfig.fromEmail,
+          campaignTypes: data.emailConfig.campaignTypes,
+          emailJourneyVariants: data.emailConfig.emailJourneyVariants,
+          emailCampaignStages: data.emailConfig.emailCampaignStages,
+          countries: data.emailConfig.countries,
+          languages: data.emailConfig.languages,
         })
         .returning();
 
@@ -100,6 +102,11 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
             username: newAccount.username,
             fromEmail: newAccount.fromEmail,
             healthCheckStatus: newAccount.healthCheckStatus,
+            campaignTypes: newAccount.campaignTypes || undefined,
+            emailJourneyVariants: newAccount.emailJourneyVariants || undefined,
+            emailCampaignStages: newAccount.emailCampaignStages || undefined,
+            countries: newAccount.countries || undefined,
+            languages: newAccount.languages || undefined,
           },
           performanceMetrics: {
             priority: newAccount.priority || undefined,

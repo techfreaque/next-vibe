@@ -57,14 +57,12 @@ export interface SmtpRepository {
   getTotalSendingCapacity(
     data: SmtpCapacityRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpCapacityResponseOutput>>;
 
   testConnection(
     data: { accountId: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean; message: string }>>;
 }
@@ -93,6 +91,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
         to: data.to,
         subject: data.subject,
         userId: user.id,
+        locale,
       });
 
       // Get the primary account first
@@ -196,11 +195,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
   async getTotalSendingCapacity(
     data: SmtpCapacityRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpCapacityResponseOutput>> {
     try {
-      logger.info("Getting total sending capacity", { userId: user.id });
+      logger.info("Getting total sending capacity", { userId: user.id, data });
 
       // Get all active SMTP accounts
       const accounts = await db
@@ -254,7 +252,6 @@ class SmtpRepositoryImpl implements SmtpRepository {
   async testConnection(
     data: { accountId: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean; message: string }>> {
     try {

@@ -41,7 +41,6 @@ export default async function UserEditPage({
   const userResponse = await userByIdRepository.getUserById(
     { id },
     user,
-    locale,
     logger,
   );
 

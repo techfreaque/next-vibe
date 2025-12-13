@@ -18,8 +18,6 @@ export const { POST, tools } = endpointsHandler({
     email: undefined,
     handler: async ({
       data,
-      user,
-      locale,
       logger,
     }): Promise<ResponseType<HandleDialogResponseOutput>> => {
       return executeMCPTool(
@@ -30,9 +28,7 @@ export const { POST, tools } = endpointsHandler({
             promptText: data.promptText,
           }),
         },
-        user,
         logger,
-        locale,
       );
     },
   },

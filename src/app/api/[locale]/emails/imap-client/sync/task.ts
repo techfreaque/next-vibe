@@ -28,10 +28,7 @@ import type {
   Task,
   TaskExecutionContext,
 } from "@/app/api/[locale]/system/unified-interface/tasks/types/repository";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPrivatePayloadType } from "../../../user/auth/types";
-import { UserPermissionRole } from "../../../user/user-roles/enum";
 import { imapSyncTaskRepository } from "../sync-task/repository";
 
 /**
@@ -86,19 +83,9 @@ async function executeImapSync(
   logger.info("tasks.imap_sync.start", { config });
 
   try {
-    // System user context for CRON execution
-    const systemUser: JwtPrivatePayloadType = {
-      id: "system",
-      leadId: "system",
-      isPublic: false,
-      roles: [UserPermissionRole.ADMIN],
-    };
-
     // Use the repository to execute the IMAP sync task
     const syncResult = await imapSyncTaskRepository.executeImapSync(
       { config },
-      systemUser,
-      "en-US" as CountryLanguage,
       logger,
     );
 
@@ -134,15 +121,10 @@ async function executeImapSync(
  */
 function validateImapSync(
   logger: EndpointLogger,
-  locale: CountryLanguage,
-  cronUser: JwtPrivatePayloadType,
 ): ResponseType<boolean> {
   try {
     // Use the repository to validate the IMAP sync task
     const validationResult = imapSyncTaskRepository.validateImapSync(
-      {},
-      cronUser,
-      locale,
       logger,
     );
 

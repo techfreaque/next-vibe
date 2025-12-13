@@ -112,30 +112,38 @@ function InputInner<
     onChangeText,
     onBlur,
     onFocus,
-    onClick: _onClick,
-    onKeyPress: _onKeyPress,
-    onKeyDown: _onKeyDown,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+    onKeyPress, // Intentionally extracted - not used in React Native
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+    onKeyDown, // Intentionally extracted - not used in React Native
     disabled,
     editable,
     value,
     defaultValue,
     placeholder,
     readOnly,
-    required: _required,
-    autoComplete: _autoComplete,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+    required, // Intentionally extracted - not used in React Native
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+    autoComplete, // Intentionally extracted - not used in React Native
     autoCorrect,
-    spellCheck: _spellCheck,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+    spellCheck, // Intentionally extracted - not used in React Native
     autoCapitalize,
     secureTextEntry,
     keyboardType,
     name,
     id,
     "aria-label": ariaLabel,
-    min: _min,
-    max: _max,
-    step: _step,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+    min, // Intentionally extracted - not used in React Native
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+    max, // Intentionally extracted - not used in React Native
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+    step, // Intentionally extracted - not used in React Native
     maxLength,
-    accept: _accept,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+    accept, // Intentionally extracted - not used in React Native
   }: Omit<InputProps<T>, "ref">,
   ref: React.ForwardedRef<InputRefObject>,
 ): JSX.Element {
@@ -198,7 +206,6 @@ function InputInner<
           target: {
             value: typedValue,
             name,
-            id,
             files: null,
           },
           currentTarget: createInputGenericTarget<T>(typedValue),
@@ -219,7 +226,7 @@ function InputInner<
         onChange(changeEvent);
       }
     },
-    [onChange, onChangeText, name, id, type],
+    [onChange, onChangeText, name, type],
   );
 
   const handleBlur = React.useCallback((): void => {

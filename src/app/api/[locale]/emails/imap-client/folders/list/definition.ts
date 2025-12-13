@@ -42,6 +42,7 @@ const { GET } = createEndpoint({
   title: "app.api.emails.imapClient.folders.list.title",
   description: "app.api.emails.imapClient.folders.list.description",
   category: "app.api.emails.category",
+  icon: "folder",
   tags: ["app.api.emails.imapClient.folders.list.tag"],
 
   allowedRoles: [UserRole.ADMIN],

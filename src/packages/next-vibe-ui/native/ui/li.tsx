@@ -18,11 +18,9 @@ function Li({
   onMouseEnter,
   onMouseLeave,
   value,
-  id: _id,
   role,
   "aria-label": ariaLabel,
-  "aria-labelledby": _ariaLabelledby,
-  "aria-describedby": _ariaDescribedby,
+  id,
 }: LiProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
@@ -93,6 +91,7 @@ function Li({
         accessibilityRole={accessibilityRole}
         accessibilityLabel={ariaLabel}
         accessibilityValue={value !== undefined ? { text: String(value) } : undefined}
+        nativeID={id}
       >
         {children}
       </StyledPressable>
@@ -105,6 +104,7 @@ function Li({
       accessibilityRole={accessibilityRole}
       accessibilityLabel={ariaLabel}
       accessibilityValue={value !== undefined ? { text: String(value) } : undefined}
+      nativeID={id}
     >
       {children}
     </StyledView>

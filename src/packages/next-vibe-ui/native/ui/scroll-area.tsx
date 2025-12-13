@@ -70,10 +70,9 @@ ScrollArea.displayName = "ScrollArea";
  * The function signature matches web exactly to ensure type safety.
  */
 export function ScrollBar({
-  className: _className,
-  style: _style,
-  orientation: _orientation = "vertical",
+  className,
 }: ScrollAreaBarProps): React.JSX.Element {
+  void className;
   // React Native handles scrollbars natively - no custom rendering needed
   // Return empty fragment to maintain component contract
   return <></>;

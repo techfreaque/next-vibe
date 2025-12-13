@@ -1,3 +1,5 @@
+/* eslint-disable oxlint-plugin-jsx-capitalization/jsx-capitalization */
+
 import "./globals.css";
 
 import { Analytics } from "@vercel/analytics/next";

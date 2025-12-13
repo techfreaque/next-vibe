@@ -16,8 +16,10 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
+  objectOptionalField,
   requestDataField,
   responseField,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -27,9 +29,18 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { Countries, Languages } from "@/i18n/core/config";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 import {
+  PaymentMethodFilter,
+  PaymentMethodFilterOptions,
+  SubscriptionStatusFilter,
+  SubscriptionStatusFilterOptions,
   UserRoleFilter,
   UserRoleFilterOptions,
   UserStatusFilter,
@@ -41,6 +52,7 @@ const { GET } = createEndpoint({
   path: ["users", "stats"],
   title: "app.api.users.stats.title" as const,
   description: "app.api.users.stats.description" as const,
+  icon: "bar-chart-3",
   category: "app.api.users.stats.category" as const,
   tags: ["app.api.users.stats.tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
@@ -51,116 +63,234 @@ const { GET } = createEndpoint({
       title: "app.api.users.stats.container.title" as const,
       description: "app.api.users.stats.container.description" as const,
       layoutType: LayoutType.STACKED,
+      submitButton: {
+        text: "app.api.users.stats.actions.refresh" as const,
+        loadingText: "app.api.users.stats.actions.refreshing" as const,
+        position: "header",
+        icon: "refresh-cw",
+        variant: "ghost",
+        size: "sm",
+      },
     },
     { request: "data", response: true },
     {
-      status: requestDataField(
+      // === FORM ALERT (shows validation and API errors) ===
+      formAlert: widgetField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.users.stats.fields.status.label" as const,
-          description: "app.api.users.stats.fields.status.description" as const,
-          options: UserStatusFilterOptions,
-          columns: 3,
+          type: WidgetType.FORM_ALERT,
+          order: 3.5,
         },
-        z.enum(UserStatusFilter).default(UserStatusFilter.ALL),
-      ),
-      role: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.users.stats.fields.role.label" as const,
-          description: "app.api.users.stats.fields.role.description" as const,
-          options: UserRoleFilterOptions,
-          columns: 3,
-        },
-        z.enum(UserRoleFilter).default(UserRoleFilter.ALL),
-      ),
-      country: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.users.stats.fields.country.label" as const,
-          description:
-            "app.api.users.stats.fields.country.description" as const,
-          placeholder:
-            "app.api.users.stats.fields.country.placeholder" as const,
-          columns: 3,
-        },
-        z.enum(Countries).optional(),
-      ),
-      language: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.users.stats.fields.language.label" as const,
-          description:
-            "app.api.users.stats.fields.language.description" as const,
-          placeholder:
-            "app.api.users.stats.fields.language.placeholder" as const,
-          columns: 3,
-        },
-        z.enum(Languages).optional(),
-      ),
-      search: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.users.stats.fields.search.label" as const,
-          description: "app.api.users.stats.fields.search.description" as const,
-          placeholder: "app.api.users.stats.fields.search.placeholder" as const,
-          columns: 12,
-        },
-        z.string().optional(),
+        { request: "data" },
       ),
 
-      // === STATS FILTERING OPTIONS ===
-      timePeriod: requestDataField(
+      // === BASIC FILTERS ===
+      basicFilters: objectOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.users.stats.fields.timePeriod.label" as const,
-          description:
-            "app.api.users.stats.fields.timePeriod.description" as const,
-          options: TimePeriodOptions,
+          type: WidgetType.CONTAINER,
+          title: "app.api.users.stats.basicFilters.title" as const,
+          description: "app.api.users.stats.basicFilters.description" as const,
+          layoutType: LayoutType.GRID,
           columns: 3,
+          order: 1,
+          showFormAlert: false,
+          showSubmitButton: false,
         },
-        z.nativeEnum(TimePeriod).default(TimePeriod.DAY),
+        { request: "data" },
+        {
+          search: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "app.api.users.stats.fields.search.label" as const,
+              description:
+                "app.api.users.stats.fields.search.description" as const,
+              placeholder:
+                "app.api.users.stats.fields.search.placeholder" as const,
+              columns: 12,
+            },
+            z.string().optional(),
+          ),
+          status: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label: "app.api.users.stats.fields.status.label" as const,
+              description:
+                "app.api.users.stats.fields.status.description" as const,
+              options: UserStatusFilterOptions,
+              columns: 6,
+            },
+            z.enum(UserStatusFilter).default(UserStatusFilter.ALL),
+          ),
+          role: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label: "app.api.users.stats.fields.role.label" as const,
+              description:
+                "app.api.users.stats.fields.role.description" as const,
+              options: UserRoleFilterOptions,
+              columns: 6,
+            },
+            z.enum(UserRoleFilter).default(UserRoleFilter.ALL),
+          ),
+        },
       ),
-      dateRangePreset: requestDataField(
+
+      // === SUBSCRIPTION FILTERS ===
+      subscriptionFilters: objectOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.users.stats.fields.dateRangePreset.label" as const,
+          type: WidgetType.CONTAINER,
+          title: "app.api.users.stats.subscriptionFilters.title" as const,
           description:
-            "app.api.users.stats.fields.dateRangePreset.description" as const,
-          options: DateRangePresetOptions,
-          columns: 3,
+            "app.api.users.stats.subscriptionFilters.description" as const,
+          layoutType: LayoutType.GRID_2_COLUMNS,
+          order: 1.5,
+          showFormAlert: false,
+          showSubmitButton: false,
         },
-        z.nativeEnum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
+        { request: "data" },
+        {
+          subscriptionStatus: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label:
+                "app.api.users.stats.fields.subscriptionStatus.label" as const,
+              description:
+                "app.api.users.stats.fields.subscriptionStatus.description" as const,
+              options: SubscriptionStatusFilterOptions,
+              columns: 6,
+            },
+            z
+              .enum(SubscriptionStatusFilter)
+              .default(SubscriptionStatusFilter.ALL),
+          ),
+          paymentMethod: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label: "app.api.users.stats.fields.paymentMethod.label" as const,
+              description:
+                "app.api.users.stats.fields.paymentMethod.description" as const,
+              options: PaymentMethodFilterOptions,
+              columns: 6,
+            },
+            z.enum(PaymentMethodFilter).default(PaymentMethodFilter.ALL),
+          ),
+        },
       ),
-      chartType: requestDataField(
+
+      // === LOCATION FILTERS ===
+      locationFilters: objectOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.users.stats.fields.chartType.label" as const,
+          type: WidgetType.CONTAINER,
+          title: "app.api.users.stats.locationFilters.title" as const,
           description:
-            "app.api.users.stats.fields.chartType.description" as const,
-          options: ChartTypeOptions,
-          columns: 3,
+            "app.api.users.stats.locationFilters.description" as const,
+          layoutType: LayoutType.GRID_2_COLUMNS,
+          order: 2,
+          showFormAlert: false,
+          showSubmitButton: false,
         },
-        z.nativeEnum(ChartType).default(ChartType.LINE),
+        { request: "data" },
+        {
+          country: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label: "app.api.users.stats.fields.country.label" as const,
+              description:
+                "app.api.users.stats.fields.country.description" as const,
+              placeholder:
+                "app.api.users.stats.fields.country.placeholder" as const,
+              options: CountriesOptions,
+              columns: 6,
+            },
+            z.enum(Countries).optional(),
+          ),
+          language: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label: "app.api.users.stats.fields.language.label" as const,
+              description:
+                "app.api.users.stats.fields.language.description" as const,
+              placeholder:
+                "app.api.users.stats.fields.language.placeholder" as const,
+              options: LanguagesOptions,
+              columns: 6,
+            },
+            z.enum(Languages).optional(),
+          ),
+        },
       ),
-      includeComparison: requestDataField(
+
+      // === TIME PERIOD OPTIONS ===
+      timePeriodOptions: objectOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.users.stats.fields.includeComparison.label" as const,
+          type: WidgetType.CONTAINER,
+          title: "app.api.users.stats.timePeriodOptions.title" as const,
           description:
-            "app.api.users.stats.fields.includeComparison.description" as const,
-          columns: 3,
+            "app.api.users.stats.timePeriodOptions.description" as const,
+          layoutType: LayoutType.GRID,
+          columns: 4,
+          order: 3,
+          showFormAlert: false,
+          showSubmitButton: false,
         },
-        z.coerce.boolean().default(false),
+        { request: "data" },
+        {
+          timePeriod: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label: "app.api.users.stats.fields.timePeriod.label" as const,
+              description:
+                "app.api.users.stats.fields.timePeriod.description" as const,
+              options: TimePeriodOptions,
+              columns: 3,
+            },
+            z.enum(TimePeriod).default(TimePeriod.DAY),
+          ),
+          dateRangePreset: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label:
+                "app.api.users.stats.fields.dateRangePreset.label" as const,
+              description:
+                "app.api.users.stats.fields.dateRangePreset.description" as const,
+              options: DateRangePresetOptions,
+              columns: 3,
+            },
+            z.enum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
+          ),
+          chartType: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label: "app.api.users.stats.fields.chartType.label" as const,
+              description:
+                "app.api.users.stats.fields.chartType.description" as const,
+              options: ChartTypeOptions,
+              columns: 3,
+            },
+            z.enum(ChartType).default(ChartType.LINE),
+          ),
+          includeComparison: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label:
+                "app.api.users.stats.fields.includeComparison.label" as const,
+              description:
+                "app.api.users.stats.fields.includeComparison.description" as const,
+              columns: 3,
+            },
+            z.coerce.boolean().default(false),
+          ),
+        },
       ),
 
       // === OVERVIEW STATISTICS ===
@@ -172,38 +302,53 @@ const { GET } = createEndpoint({
             "app.api.users.stats.response.overviewStats.description" as const,
           layoutType: LayoutType.GRID,
           columns: 4,
+          order: 4,
+          showFormAlert: false,
+          showSubmitButton: false,
         },
         { response: true },
         {
           totalUsers: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.overviewStats.totalUsers.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.overviewStats.totalUsers.label" as const,
+              icon: "users",
+              variant: "default",
+              format: "compact",
             },
             z.number().describe("Total number of users in system"),
           ),
           activeUsers: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.overviewStats.activeUsers.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.overviewStats.activeUsers.label" as const,
+              icon: "check",
+              variant: "success",
+              format: "compact",
             },
             z.number().describe("Number of active users"),
           ),
           inactiveUsers: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.overviewStats.inactiveUsers.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.overviewStats.inactiveUsers.label" as const,
+              icon: "error",
+              variant: "muted",
+              format: "compact",
             },
             z.number().describe("Number of inactive users"),
           ),
           newUsers: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.overviewStats.newUsers.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.overviewStats.newUsers.label" as const,
+              icon: "growth",
+              variant: "info",
+              format: "compact",
             },
             z.number().describe("New users this period"),
           ),
@@ -219,95 +364,190 @@ const { GET } = createEndpoint({
             "app.api.users.stats.response.emailStats.description" as const,
           layoutType: LayoutType.GRID,
           columns: 3,
+          order: 5,
+          showFormAlert: false,
+          showSubmitButton: false,
         },
         { response: true },
         {
           emailVerifiedUsers: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.emailStats.emailVerifiedUsers.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.emailStats.emailVerifiedUsers.label" as const,
+              icon: "verified",
+              variant: "success",
+              format: "compact",
             },
             z.number().describe("Users with verified emails"),
           ),
           emailUnverifiedUsers: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.emailStats.emailUnverifiedUsers.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.emailStats.emailUnverifiedUsers.label" as const,
+              icon: "unverified",
+              variant: "warning",
+              format: "compact",
             },
             z.number().describe("Users with unverified emails"),
           ),
           verificationRate: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.emailStats.verificationRate.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.emailStats.verificationRate.label" as const,
+              icon: "rate",
+              variant: "info",
+              format: "percentage",
             },
             z.number().describe("Email verification percentage (0-1)"),
           ),
         },
       ),
 
-      // === INTEGRATION STATISTICS ===
-      integrationStats: objectField(
+      // === SUBSCRIPTION STATISTICS ===
+      subscriptionStats: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.users.stats.response.integrationStats.title" as const,
+          title: "app.api.users.stats.response.subscriptionStats.title" as const,
           description:
-            "app.api.users.stats.response.integrationStats.description" as const,
+            "app.api.users.stats.response.subscriptionStats.description" as const,
           layoutType: LayoutType.GRID,
-          columns: 3,
+          columns: 4,
+          order: 6,
+          showFormAlert: false,
+          showSubmitButton: false,
         },
         { response: true },
         {
-          usersWithStripeId: responseField(
+          activeSubscriptions: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.integrationStats.usersWithStripeId.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label" as const,
+              icon: "check",
+              variant: "success",
+              format: "compact",
             },
-            z.number().describe("Users with Stripe integration"),
+            z.number().describe("Users with active subscriptions"),
           ),
-          usersWithoutStripeId: responseField(
+          canceledSubscriptions: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.integrationStats.usersWithoutStripeId.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label" as const,
+              icon: "x",
+              variant: "warning",
+              format: "compact",
             },
-            z.number().describe("Users without Stripe integration"),
+            z.number().describe("Users with canceled subscriptions"),
           ),
-          stripeIntegrationRate: responseField(
+          expiredSubscriptions: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.integrationStats.stripeIntegrationRate.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label" as const,
+              icon: "clock",
+              variant: "muted",
+              format: "compact",
             },
-            z.number().describe("Stripe integration percentage (0-1)"),
+            z.number().describe("Users with expired subscriptions"),
           ),
-          usersWithLeadId: responseField(
+          noSubscription: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.integrationStats.usersWithLeadId.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.subscriptionStats.noSubscription.label" as const,
+              icon: "users",
+              variant: "muted",
+              format: "compact",
             },
-            z.number().describe("Users linked to leads"),
+            z.number().describe("Users without any subscription"),
           ),
-          usersWithoutLeadId: responseField(
+          subscriptionChart: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.integrationStats.usersWithoutLeadId.content" as const,
+              type: WidgetType.CHART,
+              chartType: "pie",
+              label:
+                "app.api.users.stats.response.subscriptionStats.subscriptionChart.label" as const,
+              description:
+                "app.api.users.stats.response.subscriptionStats.subscriptionChart.description" as const,
+              height: 280,
+              showLegend: true,
+              columns: 12,
             },
-            z.number().describe("Users not linked to leads"),
+            z
+              .array(
+                z.object({
+                  x: z.string(),
+                  y: z.number(),
+                  label: z.string().optional(),
+                }),
+              )
+              .describe("Subscription distribution chart data"),
           ),
-          leadAssociationRate: responseField(
+        },
+      ),
+
+      // === PAYMENT STATISTICS ===
+      paymentStats: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title: "app.api.users.stats.response.paymentStats.title" as const,
+          description:
+            "app.api.users.stats.response.paymentStats.description" as const,
+          layoutType: LayoutType.GRID,
+          columns: 4,
+          order: 6.5,
+          showFormAlert: false,
+          showSubmitButton: false,
+        },
+        { response: true },
+        {
+          totalRevenue: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.integrationStats.leadAssociationRate.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.paymentStats.totalRevenue.label" as const,
+              icon: "currency",
+              variant: "success",
+              format: "currency",
             },
-            z.number().describe("Lead association percentage (0-1)"),
+            z.number().describe("Total revenue in cents"),
+          ),
+          transactionCount: responseField(
+            {
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.paymentStats.transactionCount.label" as const,
+              icon: "receipt",
+              variant: "info",
+              format: "compact",
+            },
+            z.number().describe("Total number of transactions"),
+          ),
+          averageOrderValue: responseField(
+            {
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.paymentStats.averageOrderValue.label" as const,
+              icon: "trending-up",
+              variant: "info",
+              format: "currency",
+            },
+            z.number().describe("Average order value in cents"),
+          ),
+          refundRate: responseField(
+            {
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.paymentStats.refundRate.label" as const,
+              icon: "refresh-cw",
+              variant: "warning",
+              format: "percentage",
+            },
+            z.number().describe("Refund rate (0-1)"),
           ),
         },
       ),
@@ -321,48 +561,88 @@ const { GET } = createEndpoint({
             "app.api.users.stats.response.roleStats.description" as const,
           layoutType: LayoutType.GRID,
           columns: 3,
+          order: 7,
+          showFormAlert: false,
+          showSubmitButton: false,
         },
         { response: true },
         {
           publicUsers: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.roleStats.publicUsers.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.roleStats.publicUsers.label" as const,
+              icon: "users",
+              variant: "muted",
+              size: "sm",
             },
             z.number().describe("Users with public role"),
           ),
           customerUsers: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.roleStats.customerUsers.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.roleStats.customerUsers.label" as const,
+              icon: "users",
+              variant: "success",
+              size: "sm",
             },
             z.number().describe("Users with customer role"),
           ),
           partnerAdminUsers: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.roleStats.partnerAdminUsers.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.roleStats.partnerAdminUsers.label" as const,
+              icon: "users",
+              variant: "info",
+              size: "sm",
             },
             z.number().describe("Users with partner admin role"),
           ),
           partnerEmployeeUsers: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.roleStats.partnerEmployeeUsers.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.roleStats.partnerEmployeeUsers.label" as const,
+              icon: "users",
+              variant: "info",
+              size: "sm",
             },
             z.number().describe("Users with partner employee role"),
           ),
           adminUsers: responseField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.users.stats.response.roleStats.adminUsers.content" as const,
+              type: WidgetType.STAT,
+              label:
+                "app.api.users.stats.response.roleStats.adminUsers.label" as const,
+              icon: "star",
+              variant: "warning",
+              size: "sm",
             },
             z.number().describe("Users with admin role"),
+          ),
+          roleChart: responseField(
+            {
+              type: WidgetType.CHART,
+              chartType: "pie",
+              label:
+                "app.api.users.stats.response.roleStats.roleChart.label" as const,
+              description:
+                "app.api.users.stats.response.roleStats.roleChart.description" as const,
+              height: 280,
+              showLegend: true,
+              columns: 12,
+            },
+            z
+              .array(
+                z.object({
+                  x: z.string(),
+                  y: z.number(),
+                  label: z.string().optional(),
+                }),
+              )
+              .describe("Role distribution chart data"),
           ),
         },
       ),
@@ -375,6 +655,9 @@ const { GET } = createEndpoint({
             "app.api.users.stats.response.growthMetrics.description" as const,
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID_2_COLUMNS,
+          order: 8,
+          showFormAlert: false,
+          showSubmitButton: false,
         },
         { response: true },
         {
@@ -384,39 +667,54 @@ const { GET } = createEndpoint({
               title: "app.api.users.stats.response.timeStats.title" as const,
               description:
                 "app.api.users.stats.response.timeStats.description" as const,
-              layoutType: LayoutType.VERTICAL,
+              layoutType: LayoutType.GRID,
+              columns: 4,
+              showFormAlert: false,
+              showSubmitButton: false,
             },
             { response: true },
             {
               usersCreatedToday: responseField(
                 {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.stats.response.timeStats.usersCreatedToday.content" as const,
+                  type: WidgetType.STAT,
+                  label:
+                    "app.api.users.stats.response.timeStats.usersCreatedToday.label" as const,
+                  icon: "time",
+                  variant: "info",
+                  size: "sm",
                 },
                 z.number().describe("Users created today"),
               ),
               usersCreatedThisWeek: responseField(
                 {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.stats.response.timeStats.usersCreatedThisWeek.content" as const,
+                  type: WidgetType.STAT,
+                  label:
+                    "app.api.users.stats.response.timeStats.usersCreatedThisWeek.label" as const,
+                  icon: "time",
+                  variant: "info",
+                  size: "sm",
                 },
                 z.number().describe("Users created this week"),
               ),
               usersCreatedThisMonth: responseField(
                 {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.stats.response.timeStats.usersCreatedThisMonth.content" as const,
+                  type: WidgetType.STAT,
+                  label:
+                    "app.api.users.stats.response.timeStats.usersCreatedThisMonth.label" as const,
+                  icon: "time",
+                  variant: "success",
+                  size: "sm",
                 },
                 z.number().describe("Users created this month"),
               ),
               usersCreatedLastMonth: responseField(
                 {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.stats.response.timeStats.usersCreatedLastMonth.content" as const,
+                  type: WidgetType.STAT,
+                  label:
+                    "app.api.users.stats.response.timeStats.usersCreatedLastMonth.label" as const,
+                  icon: "time",
+                  variant: "muted",
+                  size: "sm",
                 },
                 z.number().describe("Users created last month"),
               ),
@@ -429,35 +727,71 @@ const { GET } = createEndpoint({
                 "app.api.users.stats.response.performanceRates.title" as const,
               description:
                 "app.api.users.stats.response.performanceRates.description" as const,
-              layoutType: LayoutType.VERTICAL,
+              layoutType: LayoutType.GRID,
+              columns: 3,
+              showFormAlert: false,
+              showSubmitButton: false,
             },
             { response: true },
             {
               growthRate: responseField(
                 {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.stats.response.performanceRates.growthRate.content" as const,
+                  type: WidgetType.STAT,
+                  label:
+                    "app.api.users.stats.response.performanceRates.growthRate.label" as const,
+                  icon: "growth",
+                  variant: "success",
+                  format: "percentage",
                 },
                 z.number().describe("User growth rate percentage (0-1)"),
               ),
               leadToUserConversionRate: responseField(
                 {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.stats.response.performanceRates.leadToUserConversionRate.content" as const,
+                  type: WidgetType.STAT,
+                  label:
+                    "app.api.users.stats.response.performanceRates.leadToUserConversionRate.label" as const,
+                  icon: "conversion",
+                  variant: "info",
+                  format: "percentage",
                 },
                 z.number().describe("Lead to user conversion rate (0-1)"),
               ),
               retentionRate: responseField(
                 {
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.stats.response.performanceRates.retentionRate.content" as const,
+                  type: WidgetType.STAT,
+                  label:
+                    "app.api.users.stats.response.performanceRates.retentionRate.label" as const,
+                  icon: "retention",
+                  variant: "success",
+                  format: "percentage",
                 },
                 z.number().describe("User retention rate (0-1)"),
               ),
             },
+          ),
+          growthChart: responseField(
+            {
+              type: WidgetType.CHART,
+              chartType: "bar",
+              label:
+                "app.api.users.stats.response.growthMetrics.growthChart.label" as const,
+              description:
+                "app.api.users.stats.response.growthMetrics.growthChart.description" as const,
+              height: 280,
+              showLegend: false,
+              xAxisLabel: "Time Period",
+              yAxisLabel: "Users Created",
+              columns: 12,
+            },
+            z
+              .array(
+                z.object({
+                  x: z.string(),
+                  y: z.number(),
+                  label: z.string().optional(),
+                }),
+              )
+              .describe("User growth over time chart data"),
           ),
         },
       ),
@@ -470,14 +804,20 @@ const { GET } = createEndpoint({
             "app.api.users.stats.response.businessInsights.description" as const,
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.STACKED,
+          order: 9,
+          showFormAlert: false,
+          showSubmitButton: false,
         },
         { response: true },
         {
           generatedAt: responseField(
             {
               type: WidgetType.TEXT,
+              fieldType: FieldDataType.DATETIME,
+              label:
+                "app.api.users.stats.response.businessInsights.generatedAt.label" as const,
               content:
-                "app.api.users.stats.response.businessInsights.generatedAt.content" as const,
+                "app.api.users.stats.response.businessInsights.generatedAt.label" as const,
             },
             z
               .string()
@@ -485,211 +825,6 @@ const { GET } = createEndpoint({
               .describe("When these statistics were generated"),
           ),
         },
-      ),
-
-      // === BACKWARD COMPATIBILITY - Keep individual fields ===
-      totalUsers: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.users.stats.response.totalUsers.content" as const,
-        },
-        z.number(),
-      ),
-      activeUsers: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.users.stats.response.activeUsers.content" as const,
-        },
-        z.number(),
-      ),
-      inactiveUsers: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.inactiveUsers.content" as const,
-        },
-        z.number(),
-      ),
-      newUsers: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.users.stats.response.newUsers.content" as const,
-        },
-        z.number(),
-      ),
-
-      emailVerifiedUsers: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.emailVerifiedUsers.content" as const,
-        },
-        z.number(),
-      ),
-      emailUnverifiedUsers: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.emailUnverifiedUsers.content" as const,
-        },
-        z.number(),
-      ),
-      verificationRate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.verificationRate.content" as const,
-        },
-        z.number(),
-      ),
-      usersWithStripeId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.usersWithStripeId.content" as const,
-        },
-        z.number(),
-      ),
-      usersWithoutStripeId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.usersWithoutStripeId.content" as const,
-        },
-        z.number(),
-      ),
-      stripeIntegrationRate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.stripeIntegrationRate.content" as const,
-        },
-        z.number(),
-      ),
-      usersWithLeadId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.usersWithLeadId.content" as const,
-        },
-        z.number(),
-      ),
-      usersWithoutLeadId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.usersWithoutLeadId.content" as const,
-        },
-        z.number(),
-      ),
-      leadAssociationRate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.leadAssociationRate.content" as const,
-        },
-        z.number(),
-      ),
-      publicUsers: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.users.stats.response.publicUsers.content" as const,
-        },
-        z.number(),
-      ),
-      customerUsers: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.customerUsers.content" as const,
-        },
-        z.number(),
-      ),
-      partnerAdminUsers: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.partnerAdminUsers.content" as const,
-        },
-        z.number(),
-      ),
-      partnerEmployeeUsers: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.partnerEmployeeUsers.content" as const,
-        },
-        z.number(),
-      ),
-      adminUsers: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.users.stats.response.adminUsers.content" as const,
-        },
-        z.number(),
-      ),
-      usersCreatedToday: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.usersCreatedToday.content" as const,
-        },
-        z.number(),
-      ),
-      usersCreatedThisWeek: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.usersCreatedThisWeek.content" as const,
-        },
-        z.number(),
-      ),
-      usersCreatedThisMonth: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.usersCreatedThisMonth.content" as const,
-        },
-        z.number(),
-      ),
-      usersCreatedLastMonth: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.usersCreatedLastMonth.content" as const,
-        },
-        z.number(),
-      ),
-      growthRate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.users.stats.response.growthRate.content" as const,
-        },
-        z.number(),
-      ),
-      leadToUserConversionRate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.leadToUserConversionRate.content" as const,
-        },
-        z.number(),
-      ),
-      retentionRate: responseField(
-        {
-          type: WidgetType.TEXT,
-          content:
-            "app.api.users.stats.response.retentionRate.content" as const,
-        },
-        z.number(),
-      ),
-
-      generatedAt: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.users.stats.response.generatedAt.content" as const,
-        },
-        z.string().datetime(),
       ),
     },
   ),
@@ -740,44 +875,52 @@ const { GET } = createEndpoint({
   },
   examples: {
     requests: {
-      default: {
-        status: UserStatusFilter.ALL,
-        role: UserRoleFilter.ALL,
-        search: "john",
-        country: Countries.GLOBAL,
-        language: Languages.EN,
-      },
+      default: {},
     },
     responses: {
       default: {
-        totalUsers: 2450,
-        activeUsers: 2100,
-        inactiveUsers: 350,
-        newUsers: 125,
-        emailVerifiedUsers: 2200,
-        emailUnverifiedUsers: 250,
-        verificationRate: 0.898,
-        usersWithStripeId: 1800,
-        usersWithoutStripeId: 650,
-        stripeIntegrationRate: 0.735,
-        usersWithLeadId: 1950,
-        usersWithoutLeadId: 500,
-        leadAssociationRate: 0.796,
-        publicUsers: 1800,
-        customerUsers: 500,
-        partnerAdminUsers: 50,
-        partnerEmployeeUsers: 80,
-        adminUsers: 20,
-        usersCreatedToday: 12,
-        usersCreatedThisWeek: 85,
-        usersCreatedThisMonth: 320,
-        usersCreatedLastMonth: 280,
-        growthRate: 0.143,
-        leadToUserConversionRate: 0.204,
-        retentionRate: 0.857,
-        generatedAt: "2024-01-07T12:00:00.000Z",
-        businessInsights: {
-          generatedAt: "2024-01-07T12:00:00.000Z",
+        overviewStats: {
+          totalUsers: 2450,
+          activeUsers: 2100,
+          inactiveUsers: 350,
+          newUsers: 125,
+        },
+        emailStats: {
+          emailVerifiedUsers: 2200,
+          emailUnverifiedUsers: 250,
+          verificationRate: 0.898,
+        },
+        subscriptionStats: {
+          activeSubscriptions: 850,
+          canceledSubscriptions: 120,
+          expiredSubscriptions: 230,
+          noSubscription: 1250,
+          subscriptionChart: [
+            { x: "Active", y: 850, label: "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label" },
+            { x: "Canceled", y: 120, label: "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label" },
+            { x: "Expired", y: 230, label: "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label" },
+            { x: "None", y: 1250, label: "app.api.users.stats.response.subscriptionStats.noSubscription.label" },
+          ],
+        },
+        paymentStats: {
+          totalRevenue: 125000000,
+          transactionCount: 2450,
+          averageOrderValue: 5102,
+          refundRate: 0.023,
+        },
+        roleDistribution: {
+          publicUsers: 1800,
+          customerUsers: 500,
+          partnerAdminUsers: 50,
+          partnerEmployeeUsers: 80,
+          adminUsers: 20,
+          roleChart: [
+            { x: "Public", y: 1800, label: "Public" },
+            { x: "Customer", y: 500, label: "Customer" },
+            { x: "Partner Admin", y: 50, label: "Partner Admin" },
+            { x: "Partner Staff", y: 80, label: "Partner Staff" },
+            { x: "Admin", y: 20, label: "Admin" },
+          ],
         },
         growthMetrics: {
           timeSeriesData: {
@@ -791,32 +934,15 @@ const { GET } = createEndpoint({
             leadToUserConversionRate: 0.204,
             retentionRate: 0.857,
           },
+          growthChart: [
+            { x: "Last Month", y: 280, label: "Last Month" },
+            { x: "This Month", y: 320, label: "This Month" },
+            { x: "This Week", y: 85, label: "This Week" },
+            { x: "Today", y: 12, label: "Today" },
+          ],
         },
-        roleDistribution: {
-          publicUsers: 1800,
-          customerUsers: 500,
-          partnerAdminUsers: 50,
-          partnerEmployeeUsers: 80,
-          adminUsers: 20,
-        },
-        emailStats: {
-          emailVerifiedUsers: 2200,
-          emailUnverifiedUsers: 250,
-          verificationRate: 0.898,
-        },
-        integrationStats: {
-          usersWithStripeId: 1800,
-          usersWithoutStripeId: 650,
-          stripeIntegrationRate: 0.735,
-          usersWithLeadId: 1950,
-          usersWithoutLeadId: 500,
-          leadAssociationRate: 0.796,
-        },
-        overviewStats: {
-          totalUsers: 2450,
-          activeUsers: 2100,
-          inactiveUsers: 350,
-          newUsers: 125,
+        businessInsights: {
+          generatedAt: "2024-01-07T12:00:00.000Z",
         },
       },
     },
@@ -828,10 +954,6 @@ export type UserStatsRequestInput = typeof GET.types.RequestInput;
 export type UserStatsRequestOutput = typeof GET.types.RequestOutput;
 export type UserStatsResponseInput = typeof GET.types.ResponseInput;
 export type UserStatsResponseOutput = typeof GET.types.ResponseOutput;
-
-// Alias types for consistency with repository imports
-export type UsersStatsResponseType = UserStatsResponseOutput;
-export type UserStatsRequestType = UserStatsRequestOutput;
 
 /**
  * Export definitions

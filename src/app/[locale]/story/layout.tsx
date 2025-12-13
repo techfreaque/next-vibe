@@ -41,6 +41,7 @@ export default async function SiteLayoutServer({
     const subscriptionResponse = await subscriptionRepository.getSubscription(
       userResponse.data.id,
       logger,
+      locale,
     );
     hasSubscription =
       subscriptionResponse.success &&

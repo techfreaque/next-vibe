@@ -6,9 +6,9 @@
 
 import cronParser from "cron-parser";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 /**
@@ -426,8 +426,6 @@ export function formatCronScheduleShort(
     if (parts.length < 5) {
       return schedule;
     }
-
-    const [, , , ,] = parts;
 
     // Common patterns
     if (schedule === "0 0 * * *") {

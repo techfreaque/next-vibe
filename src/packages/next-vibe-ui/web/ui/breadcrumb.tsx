@@ -132,6 +132,7 @@ export function BreadcrumbLink({
   className,
   style,
   children,
+  onClick,
   href,
   target,
   rel,
@@ -140,7 +141,6 @@ export function BreadcrumbLink({
   ping,
   referrerPolicy,
   type,
-  onClick,
   "aria-label": ariaLabel,
   "aria-current": ariaCurrent,
 }: BreadcrumbLinkProps): React.JSX.Element {
@@ -210,9 +210,9 @@ export function BreadcrumbPage({
     role?: string;
     "aria-label"?: string;
   } = {
-    "aria-current": ariaCurrent,
     className: cn("font-normal text-foreground", className),
     style,
+    "aria-current": ariaCurrent,
   };
 
   if (id) {
@@ -242,10 +242,10 @@ export function BreadcrumbSeparator({
   children,
   className,
   style,
-  id,
   role = "presentation",
-  "aria-label": ariaLabel,
   "aria-hidden": ariaHidden = "true",
+  id,
+  "aria-label": ariaLabel,
 }: BreadcrumbSeparatorProps): React.JSX.Element {
   return (
     <li
@@ -272,10 +272,10 @@ export type BreadcrumbEllipsisProps = {
 export function BreadcrumbEllipsis({
   className,
   style,
-  id,
   role = "presentation",
-  "aria-label": ariaLabel,
   "aria-hidden": ariaHidden = "true",
+  id,
+  "aria-label": ariaLabel,
 }: BreadcrumbEllipsisProps): React.JSX.Element {
   const { t } = useTranslation();
 

@@ -23,6 +23,7 @@ interface AdminLeadsLayoutClientProps {
 }
 
 export enum CurrentPageType {
+  import = "import",
   stats = "stats",
   list = "list",
   emails = "emails",
@@ -39,6 +40,9 @@ export function AdminLeadsLayoutClient({
 
   // Determine current page from pathname
   const getCurrentPage = (): CurrentPageType => {
+    if (pathname.includes("/admin/leads/import")) {
+      return CurrentPageType.import;
+    }
     if (pathname.includes("/admin/leads/list")) {
       return CurrentPageType.list;
     }

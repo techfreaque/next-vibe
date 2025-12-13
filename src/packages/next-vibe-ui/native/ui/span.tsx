@@ -21,7 +21,7 @@ const StyledPressable = styled(Pressable, { className: "style" });
 export type SpanProps = SpanBaseProps & StyleType;
 
 // Create compatibility layer functions
-function createSpanRefObject(_text: RNText | null): SpanRefObject {
+function createSpanRefObject(): SpanRefObject {
   return {
     focus: (): void => {
       // No-op for React Native
@@ -112,30 +112,37 @@ export const Span = React.forwardRef<SpanRefObject, Omit<SpanProps, "ref">>(
       className,
       style,
       children,
-      role: _role,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+      role, // Intentionally extracted - not used in React Native
       ariaLabel,
-      id,
       title,
+      id,
       onClick,
       onMouseEnter,
       onMouseLeave,
       onTouchStart,
       onTouchEnd,
-      onDrop,
-      onDragOver,
-      onDragLeave,
-      suppressHydrationWarning: _suppressHydrationWarning,
-      dangerouslySetInnerHTML: _dangerouslySetInnerHTML,
-      tabIndex: _tabIndex,
-      onKeyDown,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+      onDrop, // Intentionally extracted - not used in React Native
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+      onDragOver, // Intentionally extracted - not used in React Native
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+      onDragLeave, // Intentionally extracted - not used in React Native
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+      suppressHydrationWarning, // Intentionally extracted - not used in React Native
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+      dangerouslySetInnerHTML, // Intentionally extracted - not used in React Native
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+      tabIndex, // Intentionally extracted - not used in React Native
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+      onKeyDown, // Intentionally extracted - not used in React Native
     },
     ref,
   ): JSX.Element => {
     const textRef = React.useRef<RNText>(null);
 
     React.useImperativeHandle(ref, (): SpanRefObject => {
-      const node = textRef.current;
-      return createSpanRefObject(node);
+      return createSpanRefObject();
     }, []);
 
     const handlePress = React.useCallback((): void => {
@@ -160,17 +167,7 @@ export const Span = React.forwardRef<SpanRefObject, Omit<SpanProps, "ref">>(
     }, [onMouseLeave]);
 
     // Use Pressable wrapper if any interaction handlers are present
-    if (
-      onClick ||
-      onMouseEnter ||
-      onMouseLeave ||
-      onTouchStart ||
-      onTouchEnd ||
-      onDrop ||
-      onDragOver ||
-      onDragLeave ||
-      onKeyDown
-    ) {
+    if (onClick || onMouseEnter || onMouseLeave || onTouchStart || onTouchEnd) {
       return (
         <StyledPressable
           onPress={handlePress}

@@ -11,7 +11,6 @@ import React from "react";
 import { Logo } from "@/app/[locale]/_components/logo";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -27,7 +26,6 @@ interface ThreadedMessageContentProps {
   messageGroup?: ReturnType<typeof groupMessagesBySequence>[0];
   depth: number;
   locale: CountryLanguage;
-  logger: EndpointLogger;
   collapseState?: ReturnType<typeof useCollapseState>;
   currentUserId?: string;
   onUserIdHover?: (
@@ -41,7 +39,6 @@ export function ThreadedMessageContent({
   messageGroup,
   depth,
   locale,
-  logger: _logger,
   collapseState,
   currentUserId,
   onUserIdHover,
@@ -150,7 +147,6 @@ export function ThreadedMessageContent({
                   toolCall={msg.metadata.toolCall}
                   locale={locale}
                   threadId={msg.threadId}
-                  hasContent={hasContentAfter}
                   messageId={msg.id}
                   collapseState={collapseState}
                 />

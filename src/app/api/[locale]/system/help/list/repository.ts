@@ -4,6 +4,7 @@
  * Uses shared help service for unified command discovery
  */
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
@@ -12,7 +13,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";

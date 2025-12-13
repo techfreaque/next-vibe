@@ -26,7 +26,6 @@ function Tabs({
   activationMode,
   className,
   style,
-  dir: _dir,
 }: TabsProps): React.JSX.Element {
   // Handle controlled/uncontrolled state with defaultValue
   const [internalValue, setInternalValue] = React.useState(defaultValue ?? "");

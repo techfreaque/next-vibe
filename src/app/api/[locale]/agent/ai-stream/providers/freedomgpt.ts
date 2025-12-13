@@ -33,7 +33,7 @@ export function createFreedomGPT(): {
   const apiKey = env.FREEDOMGPT_API_KEY;
 
   return {
-    chat: (_modelId: string) => {
+    chat: () => {
       // Use OpenAI's internal implementation with custom config
       // This gives us their message/tool/stream parsing logic for free
       // FreedomGPT uses "liberty" as the model name

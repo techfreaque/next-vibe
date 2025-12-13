@@ -35,7 +35,6 @@ export function PhoneField({
   disabled = false,
   className,
   style,
-  name: _name,
 }: PhoneFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();

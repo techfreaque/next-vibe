@@ -18,15 +18,13 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, logger }) => {
       return await imapFoldersRepository.syncFolders(
         {
           accountId: data.accountId,
           force: data.force ?? false,
           folderId: data.folderId,
         },
-        user,
-        locale,
         logger,
       );
     },

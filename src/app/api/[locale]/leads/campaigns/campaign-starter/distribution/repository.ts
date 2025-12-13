@@ -17,9 +17,8 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { getCronFrequencyMinutes } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { leads } from "../../../db";
 import type {
@@ -35,15 +34,11 @@ import type {
 export interface DistributionRepository {
   calculateDistribution(
     data: DistributionCalculationInputType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<DistributionCalculationOutputType>;
 
   calculateLocaleQuota(
     data: LocaleQuotaCalculationInputType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LocaleProcessingInfoOutputType>>;
 }
@@ -54,8 +49,6 @@ export interface DistributionRepository {
 export class DistributionRepositoryImpl implements DistributionRepository {
   calculateDistribution(
     data: DistributionCalculationInputType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<DistributionCalculationOutputType> {
     try {
@@ -102,8 +95,6 @@ export class DistributionRepositoryImpl implements DistributionRepository {
 
   async calculateLocaleQuota(
     data: LocaleQuotaCalculationInputType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LocaleProcessingInfoOutputType>> {
     try {

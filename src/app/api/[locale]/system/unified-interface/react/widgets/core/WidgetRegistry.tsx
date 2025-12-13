@@ -9,11 +9,13 @@ import type { FC } from "react";
 
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
+import { type WidgetComponentProps, type ReactWidgetProps } from "../../../shared/widgets/types";
+
 /**
- * Widget component type
+ * Widget component type - accepts either base props or narrowed props.
  */
-export type WidgetComponent = FC<WidgetComponentProps>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type WidgetComponent = FC<WidgetComponentProps> | FC<ReactWidgetProps<any>>;
 
 /**
  * Widget registry entry

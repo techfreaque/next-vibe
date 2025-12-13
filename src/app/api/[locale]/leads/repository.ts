@@ -22,7 +22,6 @@ import {
   convertLanguageFilter,
   type Countries,
   type CountryFilter,
-  type CountryLanguage,
   type LanguageFilter,
   type Languages,
 } from "@/i18n/core/config";
@@ -30,7 +29,6 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import { newsletterSubscriptions } from "../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../newsletter/enum";
-import type { JwtPayloadType } from "../user/auth/types";
 import {
   emailCampaigns,
   type Lead,
@@ -100,8 +98,6 @@ const INVALID_STATUS_TRANSITION_ERROR = "Invalid status transition";
 export interface LeadsRepository {
   createLead(
     data: LeadCreateRequestTypeOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
@@ -134,37 +130,27 @@ export interface LeadsRepository {
 
   getLeadById(
     id: string,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadDetailResponse>>;
 
   getLeadByTrackingId(
     leadId: string,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadResponseType>>;
 
   getLeadByEmail(
     email: string,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadResponseType>>;
 
   updateLead(
     id: string,
     data: Partial<LeadUpdateType>,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadDetailResponse>>;
 
   listLeads(
-    query: Partial<LeadListGetRequestTypeOutput>,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
+    query: LeadListGetRequestTypeOutput,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadListResponseType>>;
 
@@ -180,15 +166,11 @@ export interface LeadsRepository {
         website?: string;
       };
     },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadResponseType>>;
 
   unsubscribeLead(
     data: UnsubscribeType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{ success: boolean; message?: string; unsubscribedAt?: Date }>
@@ -203,8 +185,6 @@ export interface LeadsRepository {
       ipAddress?: string;
       userAgent?: string;
     },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadEngagementResponseOutput>>;
 
@@ -249,8 +229,6 @@ export interface LeadsRepository {
 
   exportLeads(
     query: ExportQueryType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
     t: TFunction,
   ): Promise<ResponseType<ExportResponseType>>;
@@ -279,8 +257,6 @@ export interface LeadsRepository {
       dryRun?: boolean;
       maxRecords?: number;
     },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
@@ -318,8 +294,6 @@ export interface LeadsRepository {
       dryRun?: boolean;
       maxRecords?: number;
     },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
@@ -381,8 +355,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
    */
   async createLead(
     data: LeadCreateRequestTypeOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
@@ -416,7 +388,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
       logger.debug("Creating new lead", {
         email: data.contactInfo?.email,
         businessName: data.contactInfo?.businessName,
-        userId: user?.id,
       });
 
       if (data.contactInfo?.email) {
@@ -457,8 +428,8 @@ class LeadsRepositoryImpl implements LeadsRepository {
           businessName,
           phone,
           website,
-          country: country as typeof leads.$inferInsert.country,
-          language: language as typeof leads.$inferInsert.language,
+          country,
+          language,
           source,
           notes,
           status: LeadStatus.PENDING, // Default status for general lead creation
@@ -514,10 +485,9 @@ class LeadsRepositoryImpl implements LeadsRepository {
    */
   async getLeadById(
     id: string,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadDetailResponse>> {
+    logger.debug("Getting lead by ID", { id });
     return await this.getLeadByIdInternal(id, logger);
   }
 
@@ -526,8 +496,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
    */
   async getLeadByTrackingId(
     leadId: string,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadResponseType>> {
     try {
@@ -561,8 +529,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
    */
   async getLeadByEmail(
     email: string,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadResponseType>> {
     try {
@@ -598,12 +564,13 @@ class LeadsRepositoryImpl implements LeadsRepository {
   async updateLead(
     id: string,
     data: Partial<LeadUpdateType>,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadDetailResponse>> {
     try {
-      logger.debug("Updating lead", { id, updates: Object.keys(data) });
+      logger.debug("Updating lead", {
+        id,
+        updates: Object.keys(data),
+      });
 
       // If status is being updated, validate the transition
       if (data.status) {
@@ -656,16 +623,14 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * List leads with filtering and pagination with business logic
    */
   async listLeads(
-    query: Partial<LeadListGetRequestTypeOutput>,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
+    query: LeadListGetRequestTypeOutput,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadListResponseType>> {
     try {
       // Extract values from nested structure with type safety
-      const page = query.searchPagination?.page ?? 1;
-      const limit = query.searchPagination?.limit ?? 20;
-      const search = query.searchPagination?.search;
+      const page = query.paginationInfo?.page ?? 1;
+      const limit = query.paginationInfo?.limit ?? 20;
+      const search = query.statusFilters?.search;
       const statusFilters = query.statusFilters?.status;
       const campaignStageFilters = query.statusFilters?.currentCampaignStage;
       const sourceFilters = query.statusFilters?.source;
@@ -684,7 +649,9 @@ class LeadsRepositoryImpl implements LeadsRepository {
       if (statusFilters && statusFilters.length > 0) {
         const mappedStatuses = statusFilters
           .map((filter) => mapStatusFilter(filter))
-          .filter((status) => status !== null);
+          .filter(
+            (status): status is typeof LeadStatusValues => status !== null,
+          );
         if (mappedStatuses.length > 0) {
           conditions.push(
             or(...mappedStatuses.map((status) => eq(leads.status, status)))!,
@@ -696,7 +663,9 @@ class LeadsRepositoryImpl implements LeadsRepository {
       if (campaignStageFilters && campaignStageFilters.length > 0) {
         const mappedStages = campaignStageFilters
           .map((filter) => mapCampaignStageFilter(filter))
-          .filter((stage) => stage !== null);
+          .filter(
+            (stage): stage is typeof EmailCampaignStageValues => stage !== null,
+          );
         if (mappedStages.length > 0) {
           conditions.push(
             or(
@@ -712,7 +681,9 @@ class LeadsRepositoryImpl implements LeadsRepository {
       if (sourceFilters && sourceFilters.length > 0) {
         const mappedSources = sourceFilters
           .map((filter) => mapSourceFilter(filter))
-          .filter((source) => source !== null);
+          .filter(
+            (source): source is typeof LeadSourceValues => source !== null,
+          );
         if (mappedSources.length > 0) {
           conditions.push(
             or(...mappedSources.map((source) => eq(leads.source, source)))!,
@@ -722,16 +693,26 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       // Handle country filters (array of countries)
       if (countryFilters && countryFilters.length > 0) {
+        const convertedCountries = countryFilters
+          .map((filter) => convertCountryFilter(filter))
+          .filter((country): country is Countries => country !== null);
         conditions.push(
-          or(...countryFilters.map((country) => eq(leads.country, country)))!,
+          or(
+            ...convertedCountries.map((country) => eq(leads.country, country)),
+          )!,
         );
       }
 
       // Handle language filters (array of languages)
       if (languageFilters && languageFilters.length > 0) {
+        const convertedLanguages = languageFilters
+          .map((filter) => convertLanguageFilter(filter))
+          .filter((language): language is Languages => language !== null);
         conditions.push(
           or(
-            ...languageFilters.map((language) => eq(leads.language, language)),
+            ...convertedLanguages.map((language) =>
+              eq(leads.language, language),
+            ),
           )!,
         );
       }
@@ -808,9 +789,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
       return success({
         response: {
           leads: leadsList.map((lead) => this.formatLeadResponse(lead)),
-          total,
+        },
+        paginationInfo: {
           page,
           limit,
+          total,
           totalPages,
         },
       });
@@ -838,8 +821,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
         website?: string;
       };
     },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadResponseType>> {
     return await this.convertLeadInternal(leadId, options, logger);
@@ -932,8 +913,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
    */
   async unsubscribeLead(
     data: UnsubscribeType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{ success: boolean; message?: string; unsubscribedAt?: Date }>
@@ -1373,14 +1352,12 @@ class LeadsRepositoryImpl implements LeadsRepository {
               .limit(1);
 
             if (!existingRelationship) {
-              // Create user-lead relationship record only if it doesn't exist
-              // Using onConflictDoNothing for race condition safety
               await tx
                 .insert(userLeadLinks)
                 .values({
                   userId: options.userId,
                   leadId: existingLead.id,
-                  linkReason: "lead_update",
+                  linkReason: "manual",
                 })
                 .onConflictDoNothing();
 
@@ -1567,8 +1544,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
       ipAddress?: string;
       userAgent?: string;
     },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     return await this.recordEngagementInternal(data, logger);
@@ -1579,8 +1554,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
    */
   async exportLeads(
     query: ExportQueryType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
     t: TFunction,
   ): Promise<ResponseType<ExportResponseType>> {
@@ -1810,8 +1783,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
       dryRun?: boolean;
       maxRecords?: number;
     },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
@@ -1973,21 +1944,20 @@ class LeadsRepositoryImpl implements LeadsRepository {
         );
       }
 
-      // Build the query
-      let query = db.select().from(leads);
-
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions)) as typeof query;
-      }
+      // Build the query - Drizzle maintains type through method chaining
+      const baseQuery = db.select().from(leads);
+      const queryWithConditions =
+        conditions.length > 0 ? baseQuery.where(and(...conditions)) : baseQuery;
 
       // Apply sorting
-      let orderClause;
       const sortByField = Array.isArray(sortBy)
         ? sortBy[0]
         : (sortBy ?? LeadSortField.CREATED_AT);
       const sortDirection = Array.isArray(sortOrder)
         ? sortOrder[0]
         : (sortOrder ?? SortOrder.DESC);
+
+      let orderClause;
       switch (sortByField) {
         case LeadSortField.EMAIL:
           orderClause =
@@ -2017,19 +1987,17 @@ class LeadsRepositoryImpl implements LeadsRepository {
               ? leads.createdAt
               : desc(leads.createdAt);
       }
-      query = query.orderBy(orderClause) as typeof query;
 
-      // Apply scope-based pagination or limit
-      if (scope === BatchOperationScope.CURRENT_PAGE) {
-        const offset = (page - 1) * pageSize;
-        query = query.limit(pageSize).offset(offset) as typeof query;
-      } else {
-        // Apply limit for safety on all pages
-        query = query.limit(maxRecords) as typeof query;
-      }
+      const queryWithOrdering = queryWithConditions.orderBy(orderClause);
+
+      // Apply scope-based pagination or limit - Drizzle maintains type through method chaining
+      const finalQuery =
+        scope === BatchOperationScope.CURRENT_PAGE
+          ? queryWithOrdering.limit(pageSize).offset((page - 1) * pageSize)
+          : queryWithOrdering.limit(maxRecords);
 
       // Get matching leads
-      const matchingLeads = await query;
+      const matchingLeads = await finalQuery;
 
       logger.debug("Found matching leads", { count: matchingLeads.length });
 
@@ -2160,8 +2128,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
       dryRun?: boolean;
       maxRecords?: number;
     },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
@@ -2347,13 +2313,14 @@ class LeadsRepositoryImpl implements LeadsRepository {
       });
 
       // Apply sorting
-      let orderClause;
       const sortByField = Array.isArray(sortBy)
         ? sortBy[0]
         : (sortBy ?? LeadSortField.CREATED_AT);
       const sortDirection = Array.isArray(sortOrder)
         ? sortOrder[0]
         : (sortOrder ?? SortOrder.DESC);
+
+      let orderClause;
       switch (sortByField) {
         case LeadSortField.EMAIL:
           orderClause =
@@ -2384,23 +2351,20 @@ class LeadsRepositoryImpl implements LeadsRepository {
               : desc(leads.createdAt);
       }
 
-      // Execute query to get matching leads
-      let query = db
+      // Build query with Drizzle's type-safe chaining
+      const baseQuery = db
         .select()
         .from(leads)
         .where(whereClause)
         .orderBy(orderClause);
 
-      // Apply scope-based pagination or limit
-      if (scope === BatchOperationScope.CURRENT_PAGE) {
-        const offset = (page - 1) * pageSize;
-        query = query.limit(pageSize).offset(offset) as typeof query;
-      } else {
-        // Apply limit for safety on all pages
-        query = query.limit(maxRecords) as typeof query;
-      }
+      // Apply scope-based pagination or limit - Drizzle maintains type through method chaining
+      const finalQuery =
+        scope === BatchOperationScope.CURRENT_PAGE
+          ? baseQuery.limit(pageSize).offset((page - 1) * pageSize)
+          : baseQuery.limit(maxRecords);
 
-      const matchingLeads = await query;
+      const matchingLeads = await finalQuery;
 
       logger.debug("Found matching leads for deletion", {
         count: matchingLeads.length,
@@ -2492,6 +2456,59 @@ class LeadsRepositoryImpl implements LeadsRepository {
       logger.error("Error in batch delete", parseError(error));
       return fail({
         message: "app.api.leads.leadsErrors.batch.update.error.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Link two leads together (for credit pool sharing)
+   * Creates a bidirectional link in the lead_lead_links table
+   */
+  async linkLeadToLead(
+    leadId1: string,
+    leadId2: string,
+    linkReason: "track_page" | "referral" | "manual" | "test",
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    try {
+      // Ensure leads are different
+      if (leadId1 === leadId2) {
+        return fail({
+          message: "app.api.leads.errors.cannotLinkLeadToItself",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      // Normalize order (always store smaller UUID first for consistency)
+      const [normalizedLead1, normalizedLead2] =
+        leadId1 < leadId2 ? [leadId1, leadId2] : [leadId2, leadId1];
+
+      await withTransaction(logger, async (tx) => {
+        // Import leadLeadLinks here to avoid circular dependency
+        const { leadLeadLinks } = await import("./db");
+
+        await tx
+          .insert(leadLeadLinks)
+          .values({
+            leadId1: normalizedLead1,
+            leadId2: normalizedLead2,
+            linkReason,
+          })
+          .onConflictDoNothing();
+      });
+
+      logger.info("Linked leads together", {
+        leadId1: normalizedLead1,
+        leadId2: normalizedLead2,
+        linkReason,
+      });
+
+      return success(undefined);
+    } catch (error) {
+      logger.error("Failed to link leads", parseError(error));
+      return fail({
+        message: "app.api.leads.errors.linkFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

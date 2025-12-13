@@ -6,14 +6,15 @@
 import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { formatTask, formatDuration } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import {
   CronTaskPriority,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { TaskRunner } from "../types/repository";
 
@@ -36,7 +37,7 @@ const pulseTaskRunner: TaskRunner = {
     cronUser: JwtPrivatePayloadType;
   }): Promise<void> {
     const { signal, logger } = props;
-    logger.info("Starting pulse task runner...");
+    logger.info(formatTask("Starting pulse task runner...", "💓"));
 
     const PULSE_INTERVAL = 60 * 1000; // 1 minute
     let pulseCount = 0;
@@ -50,15 +51,22 @@ const pulseTaskRunner: TaskRunner = {
         const { pulseHealthRepository } = await import("../pulse/repository");
 
         // Execute pulse with minimal configuration
-        const pulseResult = await pulseHealthRepository.executePulse({
-          dryRun: false,
-          force: false,
-        });
+        const pulseResult = await pulseHealthRepository.executePulse(
+          {
+            dryRun: false,
+            force: false,
+          },
+          logger,
+        );
 
         if (pulseResult.success) {
           const summary = pulseResult.data.summary;
+          const successCount = summary.tasksSucceeded.length;
+          const failureCount = summary.tasksFailed.length;
+          const duration = summary.totalExecutionTimeMs;
+
           logger.info(
-            `Pulse #${pulseCount} completed with ${summary.tasksSucceeded.length} successes and ${summary.tasksFailed.length} failures in ${summary.totalExecutionTimeMs}ms`,
+            formatTask(`Pulse #${pulseCount}: ${successCount} tasks succeeded, ${failureCount} tasks failed in ${formatDuration(duration)}`, "💓"),
           );
         } else {
           logger.error(

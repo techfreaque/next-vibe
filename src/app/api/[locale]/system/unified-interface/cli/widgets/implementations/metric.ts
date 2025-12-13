@@ -4,26 +4,22 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-
-import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { MetricConfig, WidgetRenderContext } from "../core/types";
-import type {
-  WidgetData,
-  WidgetInput,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { MetricCardWidgetConfig } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
 import {
   extractMetricCardData,
   formatMetricValue,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/metric-card";
 
-export class MetricWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.METRIC_CARD;
-  }
+import { BaseWidgetRenderer } from "../core/base-renderer";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { field, value } = input;
+export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.METRIC_CARD> {
+  readonly widgetType = WidgetType.METRIC_CARD;
+
+  render(props: CLIWidgetProps<typeof WidgetType.METRIC_CARD>): string {
+    const { field, value, context } = props;
     const config = this.getMetricConfig(field);
     const indent = this.createIndent(context.depth, context);
 
@@ -52,7 +48,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
 
   private renderMetricObject(
     value: { [key: string]: WidgetData },
-    config: MetricConfig,
+    config: Pick<MetricCardWidgetConfig, "icon" | "unit" | "precision" | "threshold" | "format">,
     context: WidgetRenderContext,
     indent: string,
   ): string {
@@ -144,7 +140,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
     return parts.join("\n");
   }
 
-  private getMetricConfig(field: UnifiedField): MetricConfig {
+  private getMetricConfig(field: UnifiedField): Pick<MetricCardWidgetConfig, "icon" | "unit" | "precision" | "threshold" | "format"> {
     if (field.ui.type !== WidgetType.METRIC_CARD) {
       return {
         format: "number",
@@ -176,7 +172,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
 
   private formatMetricValueLocal(
     value: WidgetData,
-    config: MetricConfig,
+    config: Pick<MetricCardWidgetConfig, "icon" | "unit" | "precision" | "threshold" | "format">,
     context: WidgetRenderContext,
   ): string {
     if (
@@ -230,7 +226,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer {
   }
 
   private getMetricIcon(
-    config: MetricConfig,
+    config: Pick<MetricCardWidgetConfig, "icon" | "threshold">,
     value: WidgetData,
     context: WidgetRenderContext,
   ): string {

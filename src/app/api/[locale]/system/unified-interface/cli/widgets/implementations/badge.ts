@@ -4,22 +4,19 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   extractBadgeData,
   getBadgeColor,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/badge";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps } from "../core/types";
 
-export class BadgeWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.BADGE;
-  }
+export class BadgeWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.BADGE> {
+  readonly widgetType = WidgetType.BADGE;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { field, value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.BADGE>): string {
+    const { field, value, context } = props;
     const indent = this.createIndent(context.depth, context);
     const label = this.formatLabel(field, context);
 

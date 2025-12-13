@@ -1,43 +1,41 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Lista użytkowników",
-  description: "Lista i wyszukiwanie użytkowników z filtrowaniem",
-  category: "Użytkownicy",
-  tag: "Lista",
-  container: {
+  get: {
     title: "Lista użytkowników",
     description: "Wyszukaj i filtruj użytkowników",
-  },
-  fields: {
-    limit: {
-      label: "Limit",
-      description: "Liczba użytkowników do zwrócenia",
-      placeholder: "Wprowadź limit...",
+    form: {
+      title: "Zarządzanie użytkownikami",
+      description: "Zarządzaj i filtruj użytkowników",
     },
-    page: {
-      label: "Strona",
-      description: "Numer strony dla paginacji",
-      placeholder: "Wprowadź numer strony...",
+    actions: {
+      refresh: "Odśwież",
+      refreshing: "Odświeżanie...",
     },
-    offset: {
-      label: "Przesunięcie",
-      description: "Liczba użytkowników do pominięcia",
+    // Search & Filters section
+    searchFilters: {
+      title: "Wyszukiwanie i filtry",
+      description: "Wyszukaj i filtruj użytkowników według kryteriów",
     },
     search: {
       label: "Wyszukaj",
       description: "Wyszukaj użytkowników po nazwie lub e-mailu",
-      placeholder: "Wprowadź wyszukiwany termin...",
+      placeholder: "Wyszukaj użytkowników...",
     },
     status: {
-      label: "Filtr statusu",
+      label: "Status",
       description: "Filtruj użytkowników według statusu",
       placeholder: "Wybierz status...",
     },
     role: {
-      label: "Filtr ról",
+      label: "Rola",
       description: "Filtruj użytkowników według roli",
       placeholder: "Wybierz rolę...",
+    },
+    // Sorting section
+    sortingOptions: {
+      title: "Sortowanie",
+      description: "Skonfiguruj sortowanie wyników",
     },
     sortBy: {
       label: "Sortuj według",
@@ -49,6 +47,82 @@ export const translations: typeof enTranslations = {
       description: "Kierunek sortowania",
       placeholder: "Wybierz kolejność sortowania...",
     },
+    // Response section
+    response: {
+      title: "Użytkownicy",
+      description: "Lista użytkowników spełniających kryteria",
+      users: {
+        id: "ID użytkownika",
+        email: "E-mail",
+        privateName: "Nazwa prywatna",
+        publicName: "Nazwa publiczna",
+        isActive: "Aktywny",
+        emailVerified: "Zweryfikowany",
+        createdAt: "Utworzono",
+        updatedAt: "Zaktualizowano",
+      },
+      totalCount: "Łączna liczba użytkowników",
+      pageCount: "Łączna liczba stron",
+    },
+    // Pagination section
+    page: {
+      label: "Strona",
+    },
+    limit: {
+      label: "Na stronę",
+    },
+    // Error messages
+    errors: {
+      unauthorized: {
+        title: "Brak autoryzacji",
+        description: "Musisz być zalogowany, aby przeglądać użytkowników",
+      },
+      validation: {
+        title: "Błąd walidacji",
+        description: "Podano nieprawidłowe parametry",
+      },
+      forbidden: {
+        title: "Dostęp zabroniony",
+        description: "Nie masz uprawnień do przeglądania użytkowników",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Nie można pobrać użytkowników",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieoczekiwany błąd",
+      },
+      conflict: {
+        title: "Błąd konfliktu",
+        description: "Nie można wyświetlić użytkowników z powodu konfliktów",
+      },
+      network: {
+        title: "Błąd sieci",
+        description: "Nie można połączyć się z serwerem",
+      },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Nie znaleziono użytkowników",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+    },
+    success: {
+      title: "Sukces",
+      description: "Użytkownicy zostali pomyślnie pobrani",
+    },
+  },
+  // Legacy keys for backward compatibility
+  title: "Lista użytkowników",
+  description: "Lista i wyszukiwanie użytkowników z filtrowaniem",
+  category: "Użytkownicy",
+  tag: "Lista",
+  container: {
+    title: "Lista użytkowników",
+    description: "Wyszukaj i filtruj użytkowników",
   },
   response: {
     summary: {
@@ -130,15 +204,15 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Tytuł",
-    description: "Opis endpointu",
+    title: "Lista",
+    description: "Endpoint listy",
     form: {
-      title: "Konfiguracja",
-      description: "Skonfiguruj parametry",
+      title: "Konfiguracja listy",
+      description: "Skonfiguruj parametry listy",
     },
     response: {
       title: "Odpowiedź",
-      description: "Dane odpowiedzi",
+      description: "Dane odpowiedzi listy",
     },
     errors: {
       unauthorized: {

@@ -110,7 +110,6 @@ export function createScopedTranslation<
             value,
             key,
             params as TParams,
-            "scoped",
           ) as TranslatedKeyType;
         },
       };

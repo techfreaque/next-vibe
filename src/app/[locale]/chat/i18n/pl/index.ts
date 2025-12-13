@@ -167,7 +167,7 @@ export const translations: typeof enTranslations = {
     breakdown: "Podział kredytów",
     navigation: {
       profile: "Profil",
-      subscription: "Subskrypcja",
+      subscription: "Subskrypcja i Kredyty",
       referral: "Program poleceń",
       about: "O nas",
       help: "Pomoc",
@@ -1006,8 +1006,8 @@ export const translations: typeof enTranslations = {
     result: "Wynik",
     error: "Błąd",
     executing: "Wykonywanie...",
-    creditsUsed: "{{count}} kredyt",
-    creditsUsed_other: "{{count}} kredytów",
+    creditsUsed_one: "{{cost}} kredyt",
+    creditsUsed_other: "{{cost}} kredytów",
     status: {
       error: "Błąd",
       executing: "Wykonywanie...",
@@ -1037,105 +1037,107 @@ export const translations: typeof enTranslations = {
     authDialog: {
       title: "Odblokuj prywatne i współdzielone foldery",
       description:
-        "Żeby uzyskać dostęp do prywatnych i współdzielonych folderów, musisz się zalogować lub zarejestrować. Twoje rozmowy będą synchronizowane między urządzeniami i bezpiecznie przechowywane.",
+        "Zarejestruj się lub zaloguj, aby uzyskać dostęp do prywatnych i współdzielonych folderów. Twoje czaty będą synchronizowane między urządzeniami.",
       continueTour: "Kontynuuj",
       signUp: "Zarejestruj się / Zaloguj",
     },
     welcome: {
       title: "Witaj w {{appName}}!",
       description:
-        "Twoja platforma do czatu z AI. Rozmawiaj z różnymi modelami AI, organizuj konwersacje i współpracuj z innymi.",
-      subtitle: "Przejdźmy szybko przez najważniejsze funkcje!",
+        "Uwolnij się od cenzury AI. Dostęp do GPT-5.1, Claude Sonnet i niecenzurowanych modeli trenowanych na WikiLeaks i nie-mainstreamowych danych. Rozmawiaj prywatnie, anonimowo lub publicznie. Twoja platforma, twoje zasady.",
+      subtitle: "Poznajmy, co nas wyróżnia:",
     },
     modelSelector: {
-      title: "Wybierz model AI",
+      title: "Wybierz swój model AI",
       description:
-        "Wybieraj z wielu modeli AI - każdy ma swoje mocne strony. Od asystentów do kodowania przez kreatywnych pisarzy, analityków po rozmówców bez cenzury. Przeglądaj według dostawcy lub funkcji, wyszukuj i dodawaj do ulubionych!",
-      tip: "💡 Wskazówka: Możesz zmieniać model w dowolnym momencie rozmowy. Różne tematy działają lepiej z różnymi modelami!",
+        "W przeciwieństwie do ChatGPT, nie jesteś zamknięty na jedną AI. Przełączaj między GPT-5.1, Claude Sonnet, DeepSeek i niecenzurowanymi modelami jak Gab Arya i UncensoredLM. Każdy model oferuje unikalne perspektywy i możliwości.",
+      tip: "Mainstream dla bezpieczeństwa, niecenzurowane dla prawdy. Mieszaj według potrzeb.",
     },
     personaSelector: {
-      title: "Personalizuj z pomocą person",
+      title: "Dostosuj zachowanie AI",
       description:
-        "Określ charakter AI za pomocą person! Wybieraj spośród gotowych jak Professional, Creative czy Technical - albo twórz własne z niestandardowymi instrukcjami i preferowanymi modelami. Przeglądaj, wyszukuj i dodawaj do ulubionych!",
-      tip: "💡 Wskazówka: Łącz dowolną personę z dowolnym modelem, aby stworzyć idealnego asystenta!",
+        "Persony kształtują sposób odpowiedzi AI. Używaj wbudowanych stylów lub twórz własne persony z własnymi instrukcjami i preferowanymi modelami.",
+      tip: "Połącz dowolną personę z dowolnym modelem dla idealnego asystenta.",
     },
     modelSelectorFavorites: {
-      title: "Dodaj ulubione modele",
+      title: "Oznacz ulubione",
       description:
-        "Twoje najczęściej używane modele pojawią się tutaj dla szybkiego dostępu! Kliknij gwiazdkę przy modelu, aby dodać go do ulubionych. Ulubione zawsze będą na początku listy.",
-      tip: "⭐ Pro tip: Oznacz 2-3 modele, z których korzystasz regularnie - przyspieszy to pracę!",
+        "Znalazłeś model, który kochasz? Oznacz go dla natychmiastowego dostępu. Mieszaj mainstreamowe i niecenzurowane modele według potrzeb.",
+    },
+    modelSelectorShowAll: {
+      title: "Przeglądaj pełną bibliotekę",
+      description:
+        "Eksploruj wszystkie dostępne modele z wyszukiwaniem i filtrami. Odkryj niecenzurowane alternatywy dla mainstreamowych AI.",
     },
     modelSelectorSearch: {
-      title: "Wyszukaj modele",
+      title: "Znajdź konkretne modele",
       description:
-        "Szukasz czegoś konkretnego? Po prostu zacznij pisać, aby filtrować dostępne modele według nazwy, dostawcy lub opisu. Idealne, gdy wiesz dokładnie, czego potrzebujesz!",
-      tip: '🔍 Spróbuj szukać po funkcjach jak "kodowanie", "kreatywny" lub "bez cenzury"!',
+        "Szukaj według nazwy, dostawcy lub możliwości. Spróbuj 'bez cenzury', 'kodowanie' lub 'kreatywny'.",
     },
     modelSelectorGroup: {
-      title: "Grupuj według dostawcy lub funkcji",
+      title: "Grupuj według dostawcy lub celu",
       description:
-        "Przełączaj między widokiem Dostawcy (pogrupowane według firm jak OpenAI, Anthropic) a widokiem Funkcji (pogrupowane według zastosowania jak Kodowanie, Kreatywność, Analityka). Wybierz widok, który Ci pasuje!",
-      tip: "💡 Widok Funkcji pomoże Ci odkryć nowe modele do konkretnych zadań!",
+        "Wyświetl modele pogrupowane według firmy (OpenAI, Anthropic) lub według przypadku użycia (Kodowanie, Bez cenzury, Kreatywność).",
     },
     personaSelectorFavorites: {
-      title: "Dodaj ulubione persony",
+      title: "Oznacz swoje persony",
+      description: "Zapisz swoje ulubione style rozmowy dla szybkiego dostępu.",
+    },
+    personaSelectorShowAll: {
+      title: "Przeglądaj wszystkie persony",
       description:
-        "Twoje ulubione style rozmowy pojawią się tutaj! Oznacz persony, z których korzystasz najczęściej. Czy to Professional do pracy czy Creative do burzy mózgów - zawsze pod ręką.",
-      tip: "⭐ Pro tip: Twórz własne persony dla powtarzających się zadań i dodawaj je do ulubionych!",
+        "Eksploruj pełną bibliotekę person. Twórz własne persony dostosowane do twojego przepływu pracy.",
     },
     personaSelectorSearch: {
-      title: "Znajdź idealną personę",
-      description:
-        "Przeszukuj wszystkie persony według nazwy, kategorii lub opisu. Szybko znajdź odpowiedni styl asystenta dla swojego zadania!",
-      tip: '🔍 Spróbuj szukać po tonie jak "przyjazny", "formalny" lub "zwięzły"!',
+      title: "Znajdź persony",
+      description: "Szukaj według nazwy, kategorii lub opisu.",
     },
     personaSelectorGroup: {
-      title: "Grupuj według źródła lub kategorii",
+      title: "Grupuj persony",
       description:
-        "Przełączaj między widokiem Źródła (Wbudowane vs. Własne) a widokiem Kategorii (Kreatywność, Techniczne, Professional itp.). Organizuj persony tak, jak Ci odpowiada!",
-      tip: "💡 Widok Kategorii pomoże Ci odkryć nowe style rozmowy dla różnych sytuacji!",
+        "Wyświetl według źródła (Wbudowane vs. Twoje własne) lub według kategorii (Kreatywność, Techniczne, Professional).",
     },
     rootFolders: {
-      title: "Organizuj czaty w folderach",
+      title: "4 sposoby na czat",
       description:
-        "Twoje czaty są podzielone na 4 specjalne foldery - każdy ma swoje funkcje:",
-      incognito: {
-        name: "Incognito",
-        suffix: "Nigdy nie przechowywane na serwerach",
-      },
-      public: {
-        name: "Publiczny",
-        suffix: "Forum społeczności - pytania, pomysły i współpraca",
-      },
+        "Wybierz swój poziom prywatności - od całkowicie anonimowego do współpracy:",
       private: {
         name: "Prywatny",
-        suffix: "Twoje osobiste, bezpieczne czaty (wymaga logowania)",
+        suffix: "Twoja osobista przestrzeń",
+      },
+      incognito: {
+        name: "Incognito",
+        suffix: "Prywatność zero-knowledge",
       },
       shared: {
         name: "Współdzielony",
-        suffix: "Udostępniaj konkretnym osobom (wymaga logowania)",
+        suffix: "Kontrolowana współpraca",
+      },
+      public: {
+        name: "Publiczny",
+        suffix: "Forum wolności słowa",
       },
     },
     incognitoFolder: {
       name: "Incognito",
       suffix: "Folder",
       description:
-        "Maksymalna prywatność - czaty przechowywane tylko na TYM urządzeniu, nigdy na naszych serwerach. Przeglądaj swobodnie, dyskutuj o wrażliwych tematach, eksperymentuj bez ograniczeń. Twoje dane należą do Ciebie!",
-      note: "✓ Nie potrzeba konta • ✓ Brak przechowywania na serwerze • ✓ 100% prywatnie",
+        "Maksymalna prywatność. Historia czatu przechowywana tylko na twoim urządzeniu, nigdy na naszych serwerach. Wiadomości przetwarzane przez AI, następnie natychmiast usuwane. Idealne dla wrażliwych tematów z niecenzurowanymi modelami.",
+      note: "Bez konta • Bez przechowywanej historii • Tylko lokalnie",
     },
     publicFolder: {
       name: "Publiczny",
       suffix: "Folder",
       description:
-        "Centrum społeczności! Zadawaj pytania, dziel się odkryciami, zbieraj opinie i współpracuj otwarcie. Wszystkie rozmowy tutaj są widoczne dla wszystkich - idealne do wspólnego budowania wiedzy i wymiany doświadczeń.",
-      note: "✓ Nie potrzeba konta • ✓ Widoczne dla wszystkich • ✓ Świetne dla różnych opinii",
+        "Otwarte forum AI chronione zasadami Pierwszej Poprawki. Rozmawiaj z AI i innymi użytkownikami publicznie. Dziel się wiedzą, debatuj nad pomysłami, uzyskuj różnorodne perspektywy.",
+      note: "Bez konta • Wolność słowa jako podstawa • Napędzane przez społeczność",
     },
     privateFolder: {
       name: "Prywatny",
       suffix: "Folder",
       description:
-        "Twoja osobista przestrzeń robocza z AI! Czaty synchronizują się na wszystkich urządzeniach, pozostają zorganizowane w podfolderach i są bezpiecznie przechowywane. Idealne dla bieżących projektów, osobistych badań i pracy.",
-      authPrompt: "🔓 Utwórz darmowe konto, aby odblokować:",
+        "Twoja osobista przestrzeń robocza AI. Synchronizowana na wszystkich urządzeniach, zorganizowana w podfolderach. Idealna dla bieżących projektów i badań.",
+      authPrompt: "Wymagane konto:",
       login: "Zaloguj się",
       signUp: "Zarejestruj się",
     },
@@ -1143,54 +1145,56 @@ export const translations: typeof enTranslations = {
       name: "Współdzielony",
       suffix: "Folder",
       description:
-        "Współpraca łatwa! Twórz rozmowy i udostępniaj je konkretnym osobom przez link. Kontroluj, kto co widzi dzięki szczegółowym uprawnieniom. Idealne dla zespołów, grup nauki lub zbierania opinii ekspertów!",
-      authPrompt: "🔓 Utwórz darmowe konto, aby odblokować:",
+        "Współpracuj z konkretnymi osobami. Udostępniaj rozmowy przez link, kontroluj kto może czytać lub pisać. Świetne dla zespołów i opinii ekspertów.",
+      authPrompt: "Wymagane konto:",
       login: "Zaloguj się",
       signUp: "Zarejestruj się",
     },
     newChatButton: {
       title: "Rozpocznij nową rozmowę",
       description:
-        "Kliknij tutaj w dowolnym momencie, aby rozpocząć nowy czat! Rozmowy automatycznie zapisują się w bieżącym folderze. Twórz ile chcesz - organizacja jest prosta!",
-      tip: "⚡ Szybka wskazówka: Naciśnij Ctrl+N (Cmd+N na Mac), aby natychmiast rozpocząć nowy czat!",
+        "Kliknij tutaj, aby rozpocząć świeży czat. Wszystkie rozmowy automatycznie zapisują się w bieżącym folderze.",
+      tip: "Każdy folder ma własną historię czatów.",
     },
     sidebarLogin: {
-      title: "Odblokuj więcej funkcji",
+      title: "Utwórz darmowe konto",
       description:
-        "Zarejestruj się za darmo, aby uzyskać dostęp do prywatnych i współdzielonych folderów, synchronizować czaty między urządzeniami, zapisywać ulubione modele i dostosowywać persony!",
-      tip: "💡 Foldery Incognito i Publiczny nie wymagają konta - korzystaj z nich zawsze!",
+        "Odblokuj foldery Prywatny i Współdzielony, synchronizuj na wszystkich urządzeniach, zapisuj ulubione modele i persony. Incognito i Publiczny pozostają dostępne bez konta.",
+      tip: "Pozostań anonimowy lub synchronizuj wszystko. Twój wybór.",
+    },
+    subscriptionButton: {
+      title: "Nieograniczony dostęp do AI",
+      description:
+        "Otrzymaj wszystko, co oferuje ChatGPT PLUS niecenzurowane modele, publiczne fora i prawdziwą prywatność. 800 miesięcznych kredytów za 30 PLN. Dostęp do wszystkich modeli, bez ograniczeń.",
+      tip: "Jedna subskrypcja. Wszystkie mainstreamowe i niecenzurowane modele. Bez granic.",
     },
     chatInput: {
-      title: "Dwa sposoby na czat",
-      description:
-        "Rozpocznij rozmowy po swojemu - pisz lub mów! Wybór należy do Ciebie:",
+      title: "Zacznij czatować",
+      description: "Pisz lub mów - oba działają płynnie:",
       typing: {
-        title: "Wpisz wiadomość",
-        description:
-          "Naciśnij Enter, aby wysłać, Shift+Enter dla nowej linii. Pełna kontrola z klawiatury!",
+        title: "Pisz wiadomości",
+        description: "Enter, aby wysłać, Shift+Enter dla nowej linii",
       },
       voice: {
-        title: "Mów do mikrofonu",
-        description:
-          "Kliknij przycisk mikrofonu i mów naturalnie. Twoje słowa zostaną natychmiast przepisane!",
+        title: "Wejście głosowe",
+        description: "Kliknij ikonę mikrofonu, aby mówić naturalnie",
       },
     },
     complete: {
-      title: "Gotowe do czatu! 🎊",
+      title: "Wszystko gotowe!",
       description:
-        "Wszystko gotowe! Eksploruj różne modele, wypróbuj różne persony i organizuj czaty po swojemu. AI jest gotowe, gdy Ty jesteś - po prostu zacznij pisać lub mówić!",
-      help: "💬 Utknąłeś? Po prostu zapytaj AI o pomoc - po to tu jest!",
+        "Masz teraz dostęp do mainstreamowych i niecenzurowanych modeli AI, prywatnych i publicznych trybów czatu oraz pełną kontrolę nad swoimi danymi. Zacznij eksplorować!",
+      help: "Pytania? Zapytaj dowolny model AI o pomoc.",
     },
     authUnlocked: {
       unlocked: "Folder odblokowany!",
       privateDescription:
-        "Witaj z powrotem! Twój prywatny folder jest teraz dostępny. Wszystkie czaty synchronizują się między urządzeniami i są zaszyfrowane.",
-      privateNote:
-        "Możesz tworzyć podfoldery, aby organizować czaty tak, jak chcesz!",
+        "Twój folder Prywatny jest teraz aktywny. Wszystkie czaty synchronizują się między urządzeniami i pozostają zorganizowane w podfolderach.",
+      privateNote: "Idealny dla bieżących projektów i osobistych badań.",
       sharedDescription:
-        "Teraz możesz tworzyć czaty do udostępniania! Wygeneruj link do wątku i udostępnij go konkretnym osobom lub zespołom.",
+        "Folder Współdzielony odblokowany! Twórz rozmowy i udostępniaj przez link z szczegółową kontrolą uprawnień.",
       sharedNote:
-        "Idealny do współpracy, zbierania opinii lub dzielenia się wiedzą!",
+        "Idealny dla współpracy zespołowej i uzyskiwania opinii ekspertów.",
     },
     buttons: {
       back: "Wstecz",

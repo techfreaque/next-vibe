@@ -49,6 +49,7 @@ const { GET } = createEndpoint({
   category: "app.api.leads.category",
   tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
   allowedRoles: [UserRole.ADMIN],
+  icon: "user",
 
   fields: objectField(
     {
@@ -493,6 +494,7 @@ const { PATCH } = createEndpoint({
   category: "app.api.leads.category",
   tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
   allowedRoles: [UserRole.ADMIN],
+  icon: "user",
 
   fields: objectField(
     {

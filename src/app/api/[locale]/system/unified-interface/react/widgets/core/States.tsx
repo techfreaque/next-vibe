@@ -90,7 +90,8 @@ export function WidgetSkeleton({
 }): JSX.Element {
   return (
     <Div className={cn("flex flex-col gap-2", className)}>
-      {Array.from({ length: lines }).map((_, i) => (
+      {/* eslint-disable-next-line @typescript-eslint/no-unused-vars -- Array.from callback requires first parameter */}
+      {Array.from({ length: lines }).map((unused, i) => (
         <Div key={i} style={{ width: `${100 - i * 10}%` }}>
           <Skeleton className="h-4 w-full" />
         </Div>

@@ -18,7 +18,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: ({ data, user, locale, logger }) =>
-      smtpAccountsListRepository.listSmtpAccounts(data, user, locale, logger),
+    handler: ({ data, user, logger }) =>
+      smtpAccountsListRepository.listSmtpAccounts(data, user, logger),
   },
 });

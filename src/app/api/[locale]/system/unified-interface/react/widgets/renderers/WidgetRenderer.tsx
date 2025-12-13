@@ -6,10 +6,15 @@ import type { UseFormReturn, FieldValues } from "react-hook-form";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import {
-  type WidgetRenderContext,
-  type WidgetData,
+import type {
+  WidgetRenderContext,
+  WidgetData,
+  ReactWidgetProps,
 } from "../../../shared/widgets/types";
+import { AlertWidget } from "../implementations/AlertWidget";
+import { BadgeWidget } from "../implementations/BadgeWidget";
+import { ChartWidget } from "../implementations/ChartWidget";
+import { FormAlertWidget } from "../implementations/FormAlertWidget";
 import { CodeOutputWidget } from "../implementations/CodeOutputWidget";
 import { CodeQualityListWidget } from "../implementations/CodeQualityListWidget";
 import { ContainerWidget } from "../implementations/ContainerWidget";
@@ -24,8 +29,11 @@ import { LinkListWidget } from "../implementations/LinkListWidget";
 import { LinkWidget } from "../implementations/LinkWidget";
 import { MarkdownWidget } from "../implementations/MarkdownWidget";
 import { MetricCardWidget } from "../implementations/MetricCardWidget";
+import { PasswordStrengthWidget } from "../implementations/PasswordStrengthWidget";
 import { SectionWidget } from "../implementations/SectionWidget";
+import { StatWidget } from "../implementations/StatWidget";
 import { StatsGridWidget } from "../implementations/StatsGridWidget";
+import { SubmitButtonWidget } from "../implementations/SubmitButtonWidget";
 import { TextWidget } from "../implementations/TextWidget";
 import { TitleWidget } from "../implementations/TitleWidget";
 import { WidgetErrorBoundary } from "../core/ErrorBoundary";
@@ -50,6 +58,10 @@ export interface WidgetRendererProps {
   style?: React.CSSProperties;
   /** Form instance (for form fields) */
   form?: UseFormReturn<FieldValues>;
+  /** Callback to trigger when submit button is clicked (e.g., refetch for GET, submit for POST) */
+  onSubmit?: () => void;
+  /** Whether the form is currently submitting/loading */
+  isSubmitting?: boolean;
 }
 
 /**
@@ -87,6 +99,8 @@ export function WidgetRenderer({
   className,
   style,
   form,
+  onSubmit,
+  isSubmitting,
 }: WidgetRendererProps): JSX.Element {
   const baseProps = {
     field,
@@ -96,6 +110,8 @@ export function WidgetRenderer({
     className,
     style,
     form,
+    onSubmit,
+    isSubmitting,
   };
 
   // Wrap widget in error boundary
@@ -111,86 +127,114 @@ export function WidgetRenderer({
  * Maps widget types to their corresponding widget components
  *
  * @param widgetType - Type of widget to render
- * @param baseProps - Base props (field, value, context, className, style, form)
+ * @param baseProps - Base props (field, value, context, className, style, form, onSubmit, isSubmitting)
  * @returns Rendered widget component
  */
 function renderWidget(
   widgetType: WidgetType,
   baseProps: {
     field: UnifiedField;
+    fieldName?: string;
     value: WidgetData;
     context: WidgetRenderContext;
     className?: string;
     style?: React.CSSProperties;
     form?: UseFormReturn<FieldValues>;
+    onSubmit?: () => void;
+    isSubmitting?: boolean;
   },
 ): JSX.Element {
   switch (widgetType) {
     // Text widgets
     case WidgetType.TEXT:
-      return <TextWidget {...baseProps} />;
+      return <TextWidget {...baseProps as ReactWidgetProps<typeof WidgetType.TEXT>} />;
+
+    case WidgetType.BADGE:
+      return <BadgeWidget {...baseProps as ReactWidgetProps<typeof WidgetType.BADGE>} />;
 
     case WidgetType.MARKDOWN:
-      return <MarkdownWidget {...baseProps} />;
+      return <MarkdownWidget {...baseProps as ReactWidgetProps<typeof WidgetType.MARKDOWN>} />;
 
     case WidgetType.MARKDOWN_EDITOR:
-      return <EditableTextWidget {...baseProps} />;
+      return <EditableTextWidget {...baseProps as ReactWidgetProps<typeof WidgetType.MARKDOWN_EDITOR>} />;
 
     case WidgetType.TITLE:
-      return <TitleWidget {...baseProps} />;
+      return <TitleWidget {...baseProps as ReactWidgetProps<typeof WidgetType.TITLE>} />;
 
     // Form field widget (renders as editable form input in both request and response modes)
     case WidgetType.FORM_FIELD:
-      return <FormFieldWidget {...baseProps} />;
+      return <FormFieldWidget {...baseProps as ReactWidgetProps<typeof WidgetType.FORM_FIELD>} />;
 
     // Link widgets
     case WidgetType.LINK:
-      return <LinkWidget {...baseProps} />;
+      return <LinkWidget {...baseProps as ReactWidgetProps<typeof WidgetType.LINK>} />;
 
     // Code widgets
     case WidgetType.CODE_OUTPUT:
-      return <CodeOutputWidget {...baseProps} />;
+      return <CodeOutputWidget {...baseProps as ReactWidgetProps<typeof WidgetType.CODE_OUTPUT>} />;
 
     case WidgetType.CODE_QUALITY_LIST:
-      return <CodeQualityListWidget {...baseProps} />;
+      return <CodeQualityListWidget {...baseProps as ReactWidgetProps<typeof WidgetType.CODE_QUALITY_LIST>} />;
 
     // Data display widgets
     case WidgetType.DATA_TABLE:
-      return <DataTableWidget {...baseProps} />;
+      return <DataTableWidget {...baseProps as ReactWidgetProps<typeof WidgetType.DATA_TABLE>} />;
 
     case WidgetType.DATA_CARDS:
-      return <DataCardsWidget {...baseProps} />;
+      return <DataCardsWidget {...baseProps as ReactWidgetProps<typeof WidgetType.DATA_CARDS>} />;
 
     case WidgetType.DATA_LIST:
-      return <DataListWidget {...baseProps} />;
+      return <DataListWidget {...baseProps as ReactWidgetProps<typeof WidgetType.DATA_LIST>} />;
 
     case WidgetType.GROUPED_LIST:
-      return <GroupedListWidget {...baseProps} />;
+      return <GroupedListWidget {...baseProps as ReactWidgetProps<typeof WidgetType.GROUPED_LIST>} />;
 
     // Metric widgets
     case WidgetType.METRIC_CARD:
-      return <MetricCardWidget {...baseProps} />;
+      return <MetricCardWidget {...baseProps as ReactWidgetProps<typeof WidgetType.METRIC_CARD>} />;
+
+    case WidgetType.STAT:
+      return <StatWidget {...baseProps as ReactWidgetProps<typeof WidgetType.STAT>} />;
 
     case WidgetType.STATS_GRID:
-      return <StatsGridWidget {...baseProps} />;
+      return <StatsGridWidget {...baseProps as ReactWidgetProps<typeof WidgetType.STATS_GRID>} />;
+
+    // Chart widgets
+    case WidgetType.CHART:
+      return <ChartWidget {...baseProps as ReactWidgetProps<typeof WidgetType.CHART>} />;
 
     // Layout widgets
     case WidgetType.CONTAINER:
-      return <ContainerWidget {...baseProps} />;
+      return <ContainerWidget {...baseProps as ReactWidgetProps<typeof WidgetType.CONTAINER>} />;
 
     case WidgetType.SECTION:
-      return <SectionWidget {...baseProps} />;
+      return <SectionWidget {...baseProps as ReactWidgetProps<typeof WidgetType.SECTION>} />;
 
     // Link display widgets
     case WidgetType.LINK_CARD:
-      return <LinkCardWidget {...baseProps} />;
+      return <LinkCardWidget {...baseProps as ReactWidgetProps<typeof WidgetType.LINK_CARD>} />;
 
     case WidgetType.LINK_LIST:
-      return <LinkListWidget {...baseProps} />;
+      return <LinkListWidget {...baseProps as ReactWidgetProps<typeof WidgetType.LINK_LIST>} />;
+
+    // Interactive widgets
+    case WidgetType.SUBMIT_BUTTON:
+      return <SubmitButtonWidget {...baseProps as ReactWidgetProps<typeof WidgetType.SUBMIT_BUTTON>} />;
+
+    // Status widgets
+    case WidgetType.ALERT:
+      return <AlertWidget {...baseProps as ReactWidgetProps<typeof WidgetType.ALERT>} />;
+
+    case WidgetType.FORM_ALERT:
+      return <FormAlertWidget {...baseProps as ReactWidgetProps<typeof WidgetType.FORM_ALERT>} />;
+
+    // Form feedback widgets
+    case WidgetType.PASSWORD_STRENGTH:
+      return <PasswordStrengthWidget {...baseProps as ReactWidgetProps<typeof WidgetType.PASSWORD_STRENGTH>} />;
 
     // Fallback to text widget
     default:
-      return <TextWidget {...baseProps} />;
+      return <TextWidget {...baseProps as ReactWidgetProps<typeof WidgetType.TEXT>} />;
   }
 }
 

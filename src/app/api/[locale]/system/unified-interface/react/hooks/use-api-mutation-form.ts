@@ -12,10 +12,11 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { isErrorResponseType } from "next-vibe/shared/utils/parse-error";
 import { storage } from "next-vibe-ui/lib/storage";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 
 import { useApiStore } from "./store";
 import type {
@@ -72,11 +73,46 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   // Extract store methods for error handling
   const setFormErrorStore = useApiStore((state) => state.setFormError);
   const clearFormErrorStore = useApiStore((state) => state.clearFormError);
+
   // Create base configuration with resolver
   type FormData = TEndpoint["types"]["RequestOutput"];
+
+  // Auto-generate default values from schema if not provided
+  // This ensures form fields start with empty strings instead of undefined
+  const schemaDefaultValues = useMemo(() => {
+    const extracted = extractSchemaDefaults<FormData>(
+      endpoint.requestSchema,
+      logger,
+      "",
+      true, // forFormInit: return empty values for primitives
+    );
+    const baseDefaults = (extracted ?? {}) as FormData;
+
+    // Pass through Zod's parse to validate and apply transformations
+    const parsed = endpoint.requestSchema.safeParse(baseDefaults);
+    if (parsed.success) {
+      return parsed.data as FormData;
+    }
+
+    // If validation fails, return the extracted defaults as-is
+    return baseDefaults;
+  }, [endpoint.requestSchema, logger]);
+
+  // Merge schema defaults with provided defaultValues (provided values take priority)
+  const mergedDefaultValues = useMemo(() => {
+    const provided = options.defaultValues as FormData | undefined;
+    if (provided && Object.keys(provided).length > 0) {
+      return { ...schemaDefaultValues, ...provided };
+    }
+    return schemaDefaultValues;
+  }, [schemaDefaultValues, options.defaultValues]);
+
   const formConfig = {
     ...options,
     resolver: zodResolver(endpoint.requestSchema),
+    mode: "onSubmit" as const,
+    reValidateMode: "onChange" as const,
+    defaultValues: mergedDefaultValues,
   };
 
   logger.debug("Form config for useForm", {
@@ -112,11 +148,8 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
       try {
         // Clear from storage
         await storage.removeItem(storageKey);
-        // Reset the form to default values if available, otherwise empty
-        const resetData =
-          (options.defaultValues as TEndpoint["types"]["RequestOutput"]) ||
-          ({} as TEndpoint["types"]["RequestOutput"]);
-        formMethods.reset(resetData);
+        // Reset the form to merged default values (schema + provided)
+        formMethods.reset(mergedDefaultValues);
       } catch (error) {
         logger.error(
           "Error clearing form data from storage:",
@@ -124,7 +157,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
         );
       }
     })();
-  }, [formMethods, storageKey, options.defaultValues, logger]);
+  }, [formMethods, storageKey, mergedDefaultValues, logger]);
 
   // Load saved form values on mount
   useEffect(() => {

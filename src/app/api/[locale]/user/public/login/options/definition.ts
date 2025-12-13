@@ -36,6 +36,7 @@ const { GET } = createEndpoint({
   path: ["user", "public", "login", "options"],
   title: "app.api.user.public.login.options.title",
   description: "app.api.user.public.login.options.description",
+  icon: "key",
   category: "app.api.user.category",
   tags: ["app.api.user.public.login.options.tag"],
   allowedRoles: [UserRole.PUBLIC] as const,

@@ -39,6 +39,7 @@ const { PATCH } = createEndpoint({
 
   title: "app.api.agent.chat.memories.id.patch.title" as const,
   description: "app.api.agent.chat.memories.id.patch.description" as const,
+  icon: "brain",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.memories" as const],
 
@@ -200,6 +201,7 @@ const { DELETE } = createEndpoint({
 
   title: "app.api.agent.chat.memories.id.delete.title" as const,
   description: "app.api.agent.chat.memories.id.delete.description" as const,
+  icon: "brain" as const,
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.memories" as const],
 

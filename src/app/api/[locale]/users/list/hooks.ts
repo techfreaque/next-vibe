@@ -27,18 +27,18 @@ export function useUsersListEndpoint(
       },
       filterOptions: {
         initialFilters: {
-          searchAndPagination: {
-            page: 1,
-            limit: 20,
+          searchFilters: {
             search: undefined,
-          },
-          filters: {
             status: undefined,
             role: undefined,
           },
-          sorting: {
+          sortingOptions: {
             sortBy: UserSortField.CREATED_AT,
             sortOrder: SortOrder.DESC,
+          },
+          paginationInfo: {
+            page: 1,
+            limit: 20,
           },
         },
       },

@@ -32,6 +32,7 @@ const { POST } = createEndpoint({
   title: "app.api.emails.imapClient.messages.sync.title",
   description: "app.api.emails.imapClient.messages.sync.description",
   category: "app.api.emails.category",
+  icon: "message-square",
   tags: ["app.api.emails.imapClient.tag"],
   allowedRoles: [UserRole.ADMIN],
 

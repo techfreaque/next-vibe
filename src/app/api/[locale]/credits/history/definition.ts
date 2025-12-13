@@ -36,6 +36,7 @@ const { GET } = createEndpoint({
   description: "app.api.agent.chat.credits.history.get.description",
   category: "app.api.agent.chat.category",
   tags: ["app.api.agent.chat.tags.credits", "app.api.agent.chat.tags.balance"],
+  icon: "wallet",
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   fields: objectField(

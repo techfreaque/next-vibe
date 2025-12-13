@@ -131,7 +131,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
       };
 
       // Send SMS notifications (fire and forget - don't fail user creation if SMS fails)
-      void sendWelcomeSms(responseData, user, locale, logger)
+      void sendWelcomeSms(responseData, logger)
         .then((result) => {
           if (result.success) {
             logger.debug("Welcome SMS sent successfully", {

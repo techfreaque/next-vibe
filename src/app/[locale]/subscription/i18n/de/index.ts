@@ -105,6 +105,10 @@ export const translations: typeof enTranslations = {
         nowpayments: {
           description: "Kryptowährung",
         },
+        cryptoMonthlyDisabled:
+          "Kryptowährungszahlungen sind nur für Jahresabonnements verfügbar, aufgrund von Mindesttransaktionswertanforderungen (mindestens 20€).",
+        cryptoMinimumPacks:
+          "Kryptowährungszahlungen erfordern mindestens {{minPacks}} Credit-Pakete ({{minValue}}) aufgrund von Mindesttransaktionswertanforderungen.",
       },
       subscription: {
         badge: "Für alle zugänglich",
@@ -112,6 +116,8 @@ export const translations: typeof enTranslations = {
         description:
           "{{subPrice}}/Monat - {{subCredits}} Credits pro Monat mit allen {{modelCount}} KI-Modellen",
         perMonth: "/Monat",
+        perYear: "/Jahr",
+        yearlyEquivalent: "Nur {{monthlyPrice}}/Monat bei jährlicher Abrechnung",
         features: {
           credits: "{{count}} Credits pro Monat",
           expiry: "Zugriff auf alle {{modelCount}} KI-Modelle",

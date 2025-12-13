@@ -109,45 +109,6 @@ const groupedStatsSchema = z.object({
   byConversionFunnel: z.array(groupedStatsItemSchema),
 });
 
-// Top performing campaign schema (unused - kept for reference)
-const _topPerformingCampaignSchema = z.object({
-  campaignId: z.string(),
-  campaignName: z.string(),
-  leadsGenerated: z.number(),
-  conversionRate: z.number(),
-  openRate: z.number(),
-  clickRate: z.number(),
-});
-
-// Top performing source schema (unused - kept for reference)
-const _topPerformingSourceSchema = z.object({
-  source: z.enum(LeadSource),
-  leadsGenerated: z.number(),
-  conversionRate: z.number(),
-  qualityScore: z.number(),
-});
-
-// Recent activity details schema
-const recentActivityDetailsSchema = z.object({
-  status: z.enum(LeadStatus),
-  source: z.string(),
-  country: z.string(),
-  emailsSent: z.number(),
-  emailsOpened: z.number(),
-  emailsClicked: z.number(),
-  daysSinceCreated: z.number(),
-  isConverted: z.boolean(),
-});
-
-// Recent activity item schema (unused - kept for reference)
-const _recentActivitySchema = z.object({
-  id: z.string(),
-  leadEmail: z.string(),
-  leadBusinessName: z.string(),
-  timestamp: z.string(),
-  type: z.enum(ActivityType),
-  details: recentActivityDetailsSchema,
-});
 
 // Data range schema
 const dataRangeSchema = z.object({
@@ -319,6 +280,7 @@ const { GET } = createEndpoint({
     "app.api.leads.stats.tags.analytics",
   ],
   allowedRoles: [UserRole.ADMIN],
+  icon: "bar-chart-3",
 
   fields: objectField(
     {

@@ -48,7 +48,6 @@ export function ChartContainer<TData extends ChartDataPoint = ChartDataPoint>({
   children,
   config,
   style,
-  ..._props
 }: ChartContainerProps<TData>): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (

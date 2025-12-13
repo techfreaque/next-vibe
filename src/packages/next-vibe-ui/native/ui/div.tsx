@@ -21,7 +21,8 @@ const StyledPressable = styled(Pressable, { className: "style" });
 export type DivProps = DivBaseProps & StyleType;
 
 // Create compatibility layer functions
-function createDivRefObject(_view: View | null): DivRefObject {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Accepted for API compatibility with web
+function createDivRefObject(view: View | null): DivRefObject {
   // React Native doesn't have DOM refs, return polyfill object for compatibility
   // The web version returns actual DOM Element refs
   return {
@@ -141,9 +142,9 @@ export const Div = React.forwardRef<DivRefObject, Omit<DivProps, "ref">>(
       className,
       style,
       children,
+      id,
       role,
       ariaLabel,
-      id,
       title,
       onClick,
       onMouseEnter,
@@ -153,9 +154,6 @@ export const Div = React.forwardRef<DivRefObject, Omit<DivProps, "ref">>(
       onDrop,
       onDragOver,
       onDragLeave,
-      suppressHydrationWarning: _suppressHydrationWarning,
-      dangerouslySetInnerHTML: _dangerouslySetInnerHTML,
-      tabIndex: _tabIndex,
       onKeyDown,
     },
     ref,

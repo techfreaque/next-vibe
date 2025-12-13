@@ -20,9 +20,6 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { JwtPayloadType } from "../auth/types";
 import { sessions } from "../private/session/db";
 import { passwordResets } from "../public/reset-password/db";
 import type {
@@ -37,8 +34,6 @@ import type {
 export interface SessionCleanupRepository {
   executeSessionCleanup(
     data: SessionCleanupRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SessionCleanupResponseOutput>>;
 }
@@ -49,8 +44,6 @@ export interface SessionCleanupRepository {
 export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
   async executeSessionCleanup(
     data: SessionCleanupRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SessionCleanupResponseOutput>> {
     const startTime = Date.now();
@@ -58,8 +51,6 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
     try {
       logger.debug("Starting session cleanup task", {
         config: data,
-        locale,
-        userId: user.isPublic ? null : user.id,
       });
 
       // Ensure database connection is available

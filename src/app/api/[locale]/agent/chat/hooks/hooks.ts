@@ -59,6 +59,7 @@ import {
   loadDraft,
   saveDraft as saveDraftToStorage,
 } from "./use-input-autosave";
+import { useSidebarCollapsed } from "./use-sidebar-collapsed";
 /**
  * Return type for useChat hook
  */
@@ -393,7 +394,7 @@ export function useChat(
     deductCredits: creditsHook.deductCredits,
   });
 
-  const navigationOps = useNavigation(locale, logger, threads, folders);
+  const navigationOps = useNavigation(locale, logger, threads);
 
   // Compute active thread messages
   const activeThreadMessages = useMemo(() => {
@@ -473,6 +474,9 @@ export function useChat(
 
   // UI State
   const uiState = useUIState();
+
+  // Sidebar collapsed state
+  const [sidebarCollapsed, setSidebarCollapsed] = useSidebarCollapsed();
 
   // Folder handlers
   const folderHandlers = useFolderHandlers(
@@ -564,7 +568,7 @@ export function useChat(
     temperature: settingsOps.settings.temperature,
     maxTokens: settingsOps.settings.maxTokens,
     ttsAutoplay: settingsOps.settings.ttsAutoplay,
-    sidebarCollapsed: settingsOps.settings.sidebarCollapsed,
+    sidebarCollapsed,
     viewMode: settingsOps.settings.viewMode,
     enabledToolIds: settingsOps.settings.enabledToolIds,
     setSelectedPersona: settingsOps.setSelectedPersona,
@@ -572,7 +576,7 @@ export function useChat(
     setTemperature: settingsOps.setTemperature,
     setMaxTokens: settingsOps.setMaxTokens,
     setTTSAutoplay: settingsOps.setTTSAutoplay,
-    setSidebarCollapsed: settingsOps.setSidebarCollapsed,
+    setSidebarCollapsed,
     setViewMode: settingsOps.setViewMode,
     setEnabledToolIds: settingsOps.setEnabledToolIds,
 

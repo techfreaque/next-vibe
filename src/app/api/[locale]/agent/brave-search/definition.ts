@@ -24,8 +24,22 @@ import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 
 /**
  * Freshness options for search results
+ * Values are API codes, mapped to readable display in options
  */
-const FRESHNESS_OPTIONS = ["pd", "pw", "pm", "py"] as const;
+const FRESHNESS_OPTIONS = [
+  "past_day",
+  "past_week",
+  "past_month",
+  "past_year",
+] as const;
+
+/** Map readable values to Brave API codes */
+export const FRESHNESS_API_MAP: Record<string, string> = {
+  past_day: "pd",
+  past_week: "pw",
+  past_month: "pm",
+  past_year: "py",
+};
 export const SEARCH_ALIAS = "search" as const;
 
 /**
@@ -50,18 +64,18 @@ const { GET } = createEndpoint({
     firstCliArgKey: "query",
   },
 
+  options: {
+    queryOptions: {
+      enabled: false, // Don't auto-fetch, wait for user to press search
+    },
+    formOptions: {
+      autoSubmit: false, // Don't auto-submit, wait for user to press search
+    },
+  },
+
   // Credit cost - use calculated price from centralized pricing
   credits: FEATURE_COSTS.BRAVE_SEARCH, // 0.65 credits per search
-
-  // AI Tool metadata
-  aiTool: {
-    instructions:
-      "You have access to a web search tool called 'search'. When the user asks about current events, recent information, or anything that requires up-to-date knowledge, you MUST use the search tool to find relevant information. To use the search tool, call it with a 'query' parameter containing the search keywords. After receiving search results, provide a comprehensive answer based on those results and cite your sources.",
-    displayName: "Web Search",
-    icon: "search",
-    color: "#4285F4", // Google blue
-    priority: 100, // High priority - search is fundamental
-  },
+  icon: "search",
 
   fields: objectField(
     {
@@ -101,7 +115,7 @@ const { GET } = createEndpoint({
             "app.api.agent.chat.tools.braveSearch.get.fields.maxResults.description" as const,
           columns: 4,
         },
-        z.number().min(1).max(10).optional().default(5),
+        z.coerce.number().min(1).max(10).optional().default(5),
       ),
 
       includeNews: requestDataField(
@@ -127,22 +141,22 @@ const { GET } = createEndpoint({
             "app.api.agent.chat.tools.braveSearch.get.fields.freshness.description" as const,
           options: [
             {
-              value: "pd",
+              value: "past_day",
               label:
                 "app.api.agent.chat.tools.braveSearch.get.fields.freshness.options.day" as const,
             },
             {
-              value: "pw",
+              value: "past_week",
               label:
                 "app.api.agent.chat.tools.braveSearch.get.fields.freshness.options.week" as const,
             },
             {
-              value: "pm",
+              value: "past_month",
               label:
                 "app.api.agent.chat.tools.braveSearch.get.fields.freshness.options.month" as const,
             },
             {
-              value: "py",
+              value: "past_year",
               label:
                 "app.api.agent.chat.tools.braveSearch.get.fields.freshness.options.year" as const,
             },
@@ -305,7 +319,7 @@ const { GET } = createEndpoint({
       recent: {
         query: "tech updates",
         maxResults: 5,
-        freshness: "pd",
+        freshness: "past_day",
       },
     },
     responses: {

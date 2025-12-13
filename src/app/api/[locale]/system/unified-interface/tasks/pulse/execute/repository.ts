@@ -5,6 +5,7 @@
 
 import "server-only";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -14,8 +15,6 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type {
@@ -32,7 +31,6 @@ export interface PulseExecuteRepository {
    */
   executePulse(
     data: PulseExecuteRequestOutput,
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<PulseExecuteResponseOutput>>;
@@ -47,14 +45,12 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
    */
   async executePulse(
     data: PulseExecuteRequestOutput,
-    _user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<PulseExecuteResponseOutput>> {
     const { t } = simpleT(locale);
     try {
       logger.debug("Executing pulse health check cycle", {
-        userId: _user.id,
         dryRun: data.dryRun,
         force: data.force,
         taskNames: data.taskNames,

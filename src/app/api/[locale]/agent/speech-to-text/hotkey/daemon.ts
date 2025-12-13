@@ -8,11 +8,7 @@
 import "server-only";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { Platform } from "./enum";
-import type { SttHotkeyPostRequestOutput } from "./definition";
 import { platformDetector } from "./utils/platform";
 
 /**
@@ -160,9 +156,6 @@ EOF
  * Listens for keyboard shortcuts and toggles STT recording
  */
 export async function startHotkeyDaemon(
-  requestData: SttHotkeyPostRequestOutput,
-  user: JwtPayloadType,
-  locale: CountryLanguage,
   logger: EndpointLogger,
   onToggle: () => Promise<void>,
 ): Promise<never> {

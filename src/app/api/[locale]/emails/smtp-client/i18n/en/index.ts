@@ -16,6 +16,10 @@ export const translations = {
   emailHandling: emailHandlingTranslations,
   sending: {
     errors: {
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required for SMTP sending operations",
+      },
       server: {
         title: "Server Error",
         description: "An error occurred on the SMTP server",

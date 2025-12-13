@@ -21,6 +21,7 @@ const { POST } = createEndpoint({
   title: "app.api.payment.providers.nowpayments.cli.post.title" as const,
   description:
     "app.api.payment.providers.nowpayments.cli.post.description" as const,
+  icon: "bitcoin" as const,
   category: "app.api.payment.providers.nowpayments.cli.post.category" as const,
   tags: [
     "app.api.payment.providers.nowpayments.cli.post.tags.nowpayments" as const,

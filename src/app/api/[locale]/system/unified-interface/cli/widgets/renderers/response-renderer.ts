@@ -5,12 +5,12 @@
 
 import chalk from "chalk";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -93,7 +93,7 @@ export class ModularCLIResponseRenderer {
 
     // If no fields provided, auto-detect fields from data
     if (fields.length === 0 && data && typeof data === "object") {
-      return this.renderAutoDetectedFields(data, context);
+      return this.renderAutoDetectedFields(data);
     }
 
     for (const [fieldName, field] of fields) {
@@ -111,10 +111,7 @@ export class ModularCLIResponseRenderer {
   /**
    * Auto-detect and render fields when no metadata is provided
    */
-  private renderAutoDetectedFields(
-    data: DataRecord,
-    _context: WidgetRenderContext,
-  ): string {
+  private renderAutoDetectedFields(data: DataRecord): string {
     const result: string[] = [];
 
     for (const [key, value] of Object.entries(data)) {
@@ -152,34 +149,6 @@ export class ModularCLIResponseRenderer {
     }
 
     return result.join("\n\n");
-  }
-
-  /**
-   * Check if an array looks like a list of issues/errors
-   */
-  private looksLikeIssuesList(arr: WidgetData[]): boolean {
-    if (arr.length === 0) {
-      return false;
-    }
-
-    const firstItem = arr[0];
-    if (typeof firstItem !== "object" || firstItem === null) {
-      return false;
-    }
-
-    // Check for common issue/error fields
-    const issueFields = [
-      "file",
-      "line",
-      "column",
-      "message",
-      "severity",
-      "code",
-      "rule",
-    ];
-    const hasIssueFields = issueFields.some((field) => field in firstItem);
-
-    return hasIssueFields;
   }
 
   /**

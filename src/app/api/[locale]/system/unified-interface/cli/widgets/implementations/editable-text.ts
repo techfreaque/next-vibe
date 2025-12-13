@@ -5,22 +5,19 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   extractEditableTextData,
   type ProcessedEditableText,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/editable-text";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class EditableTextWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.MARKDOWN_EDITOR;
-  }
+export class EditableTextWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.MARKDOWN_EDITOR> {
+  readonly widgetType = WidgetType.MARKDOWN_EDITOR;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { field, value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.MARKDOWN_EDITOR>): string {
+    const { field, value, context } = props;
     const t = context.t;
 
     // Extract data using shared logic
@@ -41,7 +38,7 @@ export class EditableTextWidgetRenderer extends BaseWidgetRenderer {
 
   private renderEditableText(
     data: ProcessedEditableText,
-    field: WidgetInput["field"],
+    field: CLIWidgetProps<typeof WidgetType.MARKDOWN_EDITOR>["field"],
     context: WidgetRenderContext,
   ): string {
     const { value, placeholder, multiline, maxLength, readonly } = data;

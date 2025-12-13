@@ -28,6 +28,7 @@ export const { GET } = createEndpoint({
   title: "app.api.referral.stats.get.title",
   description: "app.api.referral.stats.get.description",
   category: "app.api.referral.category",
+  icon: "trending-up" as const,
   tags: ["app.api.referral.tags.referral", "app.api.referral.tags.get"],
   allowedRoles: [
     UserRole.CUSTOMER,

@@ -1,4 +1,5 @@
 import type { UnifiedField } from "../../types/endpoint";
+import { WidgetType } from "../../types/enums";
 
 /**
  * Check if field is used for request (form input)
@@ -8,6 +9,19 @@ export function isRequestField(field: UnifiedField): boolean {
     return 'request' in field.usage && field.usage.request !== undefined;
   }
   return false;
+}
+
+/**
+ * Check if field is an actual form input field (FORM_FIELD widget with request usage)
+ * Used to determine if a container should show auto submit buttons
+ */
+export function isFormInputField(field: UnifiedField): boolean {
+  // Must be a FORM_FIELD widget type
+  if (field.ui?.type !== WidgetType.FORM_FIELD) {
+    return false;
+  }
+  // Must have request usage
+  return isRequestField(field);
 }
 
 /**

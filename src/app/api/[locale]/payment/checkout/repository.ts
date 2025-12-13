@@ -89,6 +89,7 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
       const existingSubscription = await subscriptionRepository.getSubscription(
         user.id,
         logger,
+        locale,
       );
 
       if (existingSubscription.success && existingSubscription.data) {

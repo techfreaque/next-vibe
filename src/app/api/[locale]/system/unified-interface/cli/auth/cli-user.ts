@@ -8,6 +8,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
@@ -15,7 +16,6 @@ import {
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Default CLI user configuration

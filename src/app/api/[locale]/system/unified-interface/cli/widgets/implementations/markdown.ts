@@ -5,22 +5,19 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   extractMarkdownData,
   type ProcessedMarkdown,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/markdown";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class MarkdownWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.MARKDOWN;
-  }
+export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.MARKDOWN> {
+  readonly widgetType = WidgetType.MARKDOWN;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.MARKDOWN>): string {
+    const { value, context } = props;
     const t = context.t;
 
     // Extract data using shared logic
@@ -65,21 +62,26 @@ export class MarkdownWidgetRenderer extends BaseWidgetRenderer {
     let result = content;
 
     // Convert headings (# Heading)
+    // oxlint-disable-next-line no-unused-vars
     result = result.replace(/^#{1,6}\s+(.+)$/gm, (match, heading) => {
       return this.styleText(heading, "bold", context);
     });
 
     // Convert bold (**text** or __text__)
+    // oxlint-disable-next-line no-unused-vars
     result = result.replace(/(\*\*|__)(.+?)\1/g, (match, marker, text) => {
       return this.styleText(text, "bold", context);
     });
 
     // Convert italic (*text* or _text_)
+    // oxlint-disable-next-line no-unused-vars
     result = result.replace(/(\*|_)(.+?)\1/g, (match, marker, text) => {
       return this.styleText(text, "dim", context);
     });
 
+    // oxlint-disable-next-line no-unused-vars
     // Convert inline code (`code`)
+    // oxlint-disable-next-line no-unused-vars
     result = result.replace(/`([^`]+)`/g, (match, code) => {
       return this.styleText(code, "blue", context);
     });
@@ -92,18 +94,20 @@ export class MarkdownWidgetRenderer extends BaseWidgetRenderer {
     });
 
     // Convert unordered lists (- item or * item)
-    result = result.replace(/^[*-]\s+(.+)$/gm, (_match, item) => {
+    // oxlint-disable-next-line no-unused-vars
+    result = result.replace(/^[*-]\s+(.+)$/gm, (match, item) => {
       const bullet = context.options.useEmojis ? "•" : "-";
       // eslint-disable-next-line i18next/no-literal-string
       return `${bullet} ${item}`;
     });
 
     // Convert ordered lists (1. item)
-    result = result.replace(/^\d+\.\s+(.+)$/gm, (match, _item) => {
+    result = result.replace(/^\d+\.\s+(.+)$/gm, (match) => {
       return match; // Keep numbered lists as-is
     });
 
     // Convert links [text](url)
+    // oxlint-disable-next-line no-unused-vars
     result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
       // For CLI, just show the text with URL in dim
       const styledText = this.styleText(text, "blue", context);

@@ -14,12 +14,11 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, user, logger, locale }) => {
+    handler: async ({ data, user, logger }) => {
       return await referralRepository.getReferralEarnings(
         user.id,
         data.limit ?? 50,
         data.offset ?? 0,
-        locale,
         logger,
       );
     },

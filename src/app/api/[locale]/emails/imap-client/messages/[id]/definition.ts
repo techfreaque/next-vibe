@@ -31,6 +31,7 @@ const { GET } = createEndpoint({
   title: "app.api.emails.imapClient.messages.id.get.title",
   description: "app.api.emails.imapClient.messages.id.get.description",
   category: "app.api.emails.category",
+  icon: "message-square",
   tags: ["app.api.emails.imapClient.messages.id.tag"],
 
   allowedRoles: [UserRole.ADMIN],
@@ -184,6 +185,7 @@ const { PATCH } = createEndpoint({
   title: "app.api.emails.imapClient.messages.id.patch.title",
   description: "app.api.emails.imapClient.messages.id.patch.description",
   category: "app.api.emails.category",
+  icon: "message-square",
   tags: ["app.api.emails.imapClient.messages.id.tag"],
 
   allowedRoles: [UserRole.ADMIN],

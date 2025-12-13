@@ -9,6 +9,26 @@ export const translations: typeof enTranslations = {
     title: "Benutzerstatistik-Dashboard",
     description: "Umfassende Benutzeranalysen und Statistiken anzeigen",
   },
+  actions: {
+    refresh: "Aktualisieren",
+    refreshing: "Aktualisiere...",
+  },
+  basicFilters: {
+    title: "Basis-Filter",
+    description: "Benutzer nach Status und Rolle filtern",
+  },
+  subscriptionFilters: {
+    title: "Abonnement-Filter",
+    description: "Nach Abonnement und Zahlung filtern",
+  },
+  locationFilters: {
+    title: "Standort-Filter",
+    description: "Nach Land und Sprache filtern",
+  },
+  timePeriodOptions: {
+    title: "Zeitraum-Optionen",
+    description: "Zeitraum und Diagramm-Einstellungen konfigurieren",
+  },
   sections: {
     filterOptions: {
       title: "Filter-Optionen",
@@ -55,35 +75,43 @@ export const translations: typeof enTranslations = {
       label: "Zeitraum",
       description: "Wählen Sie den Zeitraum für Statistiken",
     },
+    subscriptionStatus: {
+      label: "Abonnement-Status",
+      description: "Nach Abonnement-Status filtern",
+    },
+    paymentMethod: {
+      label: "Zahlungsmethode",
+      description: "Nach Zahlungsmethode filtern",
+    },
   },
   response: {
     overviewStats: {
       title: "Übersichts-Statistiken",
       description: "Allgemeine Benutzerstatistiken-Übersicht",
       totalUsers: {
-        content: "Benutzer insgesamt",
+        label: "Benutzer insgesamt",
       },
       activeUsers: {
-        content: "Aktive Benutzer",
+        label: "Aktive Benutzer",
       },
       inactiveUsers: {
-        content: "Inaktive Benutzer",
+        label: "Inaktive Benutzer",
       },
       newUsers: {
-        content: "Neue Benutzer",
+        label: "Neue Benutzer",
       },
     },
     emailStats: {
       title: "E-Mail-Statistiken",
       description: "Benutzer E-Mail-Verifizierungsstatistiken",
       emailVerifiedUsers: {
-        content: "E-Mail-verifizierte Benutzer",
+        label: "Verifizierte E-Mails",
       },
       emailUnverifiedUsers: {
-        content: "E-Mail-unbestätigte Benutzer",
+        label: "Unverifizierte E-Mails",
       },
       verificationRate: {
-        content: "E-Mail-Verifizierungsrate",
+        label: "Verifizierungsrate",
       },
     },
     profileStats: {
@@ -112,64 +140,82 @@ export const translations: typeof enTranslations = {
         },
       },
     },
-    integrationStats: {
-      title: "Integrations-Statistiken",
-      description: "Externe Service-Integrationsstatistiken",
-      usersWithStripeId: {
-        content: "Benutzer mit Stripe-ID",
+    subscriptionStats: {
+      title: "Abonnement-Statistiken",
+      description: "Benutzer-Abonnementverteilungsstatistiken",
+      activeSubscriptions: {
+        label: "Aktiv",
       },
-      usersWithoutStripeId: {
-        content: "Benutzer ohne Stripe-ID",
+      canceledSubscriptions: {
+        label: "Storniert",
       },
-      stripeIntegrationRate: {
-        content: "Stripe-Integrationsrate",
+      expiredSubscriptions: {
+        label: "Abgelaufen",
       },
-      usersWithLeadId: {
-        content: "Benutzer mit Lead-ID",
+      noSubscription: {
+        label: "Kein Abonnement",
       },
-      usersWithoutLeadId: {
-        content: "Benutzer ohne Lead-ID",
+      subscriptionChart: {
+        label: "Abonnementverteilung",
+        description: "Visuelle Aufschlüsselung der Abonnementstatus",
       },
-      leadAssociationRate: {
-        content: "Lead-Zuordnungsrate",
+    },
+    paymentStats: {
+      title: "Zahlungsstatistiken",
+      description: "Umsatz- und Transaktionsstatistiken",
+      totalRevenue: {
+        label: "Gesamtumsatz",
+      },
+      transactionCount: {
+        label: "Transaktionen",
+      },
+      averageOrderValue: {
+        label: "Durchschn. Bestellwert",
+      },
+      refundRate: {
+        label: "Erstattungsrate",
       },
     },
     roleStats: {
       title: "Rollen-Statistiken",
       description: "Benutzer-Rollenverteilungsstatistiken",
       publicUsers: {
-        content: "Öffentliche Benutzer",
+        label: "Öffentlich",
       },
       customerUsers: {
-        content: "Kunden-Benutzer",
+        label: "Kunden",
       },
       partnerAdminUsers: {
-        content: "Partner-Admin-Benutzer",
+        label: "Partner-Admins",
       },
       partnerEmployeeUsers: {
-        content: "Partner-Mitarbeiter-Benutzer",
+        label: "Partner-Personal",
       },
       adminUsers: {
-        content: "Admin-Benutzer",
+        label: "Admins",
+      },
+      roleChart: {
+        label: "Rollenverteilung",
+        description: "Visuelle Aufschlüsselung der Benutzer nach Rolle",
       },
     },
     timeStats: {
       title: "Zeitbasierte Statistiken",
       description: "Benutzererstellung und Wachstumsstatistiken über die Zeit",
       usersCreatedToday: {
-        content: "Heute erstellte Benutzer",
+        label: "Heute",
       },
       usersCreatedThisWeek: {
-        content: "Diese Woche erstellte Benutzer",
+        label: "Diese Woche",
       },
       usersCreatedThisMonth: {
-        content: "Diesen Monat erstellte Benutzer",
+        label: "Diesen Monat",
       },
       usersCreatedLastMonth: {
-        content: "Letzten Monat erstellte Benutzer",
+        label: "Letzten Monat",
       },
       growthRate: {
-        content: "Wachstumsrate",
+        label: "Wachstumsrate",
       },
     },
     companyStats: {
@@ -279,28 +325,32 @@ export const translations: typeof enTranslations = {
     growthMetrics: {
       title: "Wachstumsmetriken",
       description: "Benutzer-Wachstums- und Konversionsmetriken",
+      growthChart: {
+        label: "Benutzerwachstum über Zeit",
+        description: "Visuelle Darstellung der Benutzererstellungstrends",
+      },
     },
     performanceRates: {
       title: "Leistungsraten",
       description: "Benutzer-Leistungs- und Konversionsmetriken",
       growthRate: {
-        content: "Wachstumsrate",
+        label: "Wachstumsrate",
       },
       leadToUserConversionRate: {
-        content: "Lead-zu-Benutzer-Konversionsrate",
+        label: "Lead-Konversion",
       },
       retentionRate: {
-        content: "Benutzer-Retention-Rate",
+        label: "Bindungsrate",
       },
     },
     businessInsights: {
       title: "Geschäftseinblicke",
       description: "Business Intelligence und Analytik",
       uniqueCompanies: {
-        content: "Einzigartige Unternehmen",
+        label: "Einzigartige Unternehmen",
       },
       generatedAt: {
-        content: "Statistiken generiert am",
+        label: "Generiert am",
       },
     },
   },

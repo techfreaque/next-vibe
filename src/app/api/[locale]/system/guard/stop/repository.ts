@@ -12,8 +12,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type guardStopEndpoints from "./definition";
 
@@ -27,8 +25,6 @@ type GuardStopResponseType =
 export interface GuardStopRepository {
   stopGuard(
     data: GuardStopRequestType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<GuardStopResponseType>;
 }
@@ -39,8 +35,6 @@ export interface GuardStopRepository {
 export class GuardStopRepositoryImpl implements GuardStopRepository {
   stopGuard(
     data: GuardStopRequestType,
-    _user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<GuardStopResponseType> {
     try {

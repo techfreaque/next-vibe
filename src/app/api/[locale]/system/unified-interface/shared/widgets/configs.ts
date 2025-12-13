@@ -6,8 +6,10 @@
  */
 
 import type { Route } from "next";
+import type { z } from "zod";
 import type { TranslationKey } from "@/i18n/core/static-types";
-import type { FieldDataType, LayoutType, WidgetType, SpacingSize } from "../types/enums";
+import type { FieldDataType, LayoutType, WidgetType, SpacingSize, FieldUsage } from "../types/enums";
+import type { InferSchemaFromField, FieldUsageConfig, ObjectField } from "../types/endpoint";
 
 /**
  * Layout configuration for containers and widgets
@@ -533,18 +535,131 @@ export interface MetadataCardWidgetConfig extends BaseWidgetConfig {
 // LAYOUT WIDGETS
 // ============================================================================
 
-export interface ContainerWidgetConfig extends BaseWidgetConfig {
+/**
+ * Helper to infer request/response schemas from children
+ * Creates a minimal ObjectField-like structure for type inference
+ */
+// eslint-disable-next-line typescript-eslint/consistent-type-definitions
+type InferSchemasFromChildren<
+  TChildren,
+  TUsage extends FieldUsageConfig,
+> = {
+  request: z.output<
+    InferSchemaFromField<
+      ObjectField<TChildren, TUsage, ContainerWidgetConfig>,
+      FieldUsage.RequestData
+    >
+  >;
+  response: z.output<
+    InferSchemaFromField<
+      ObjectField<TChildren, TUsage, ContainerWidgetConfig>,
+      FieldUsage.Response
+    >
+  >;
+};
+
+/**
+ * Typed Container Widget Config with inferred request/response types
+ * TChildren should be the record of child fields passed to objectField
+ * TUsage should be the usage config passed to objectField
+ */
+export interface TypedContainerWidgetConfig<
+  TChildren = Record<string, never>,
+  TUsage extends FieldUsageConfig = FieldUsageConfig,
+> extends BaseWidgetConfig {
   type: WidgetType.CONTAINER;
   title?: TranslationKey;
   description?: TranslationKey;
   layoutType?: LayoutType;
   layout?: LayoutConfig;
   columns?: number;
+  /** Tailwind spacing value for gap between children (0, 1, 2, 3, 4, 6, 8) */
+  gap?: "0" | "1" | "2" | "3" | "4" | "6" | "8";
   optional?: boolean;
   icon?: string;
   border?: boolean;
   spacing?: "compact" | "normal" | "relaxed";
+  /** Render without Card wrapper for inline layouts */
+  noCard?: boolean;
+  /**
+   * Type-safe function to extract count from data for title display (e.g., "Leads (42)")
+   * Types are inferred from the field children and usage
+   *
+   * @param data - Object containing request and response data
+   * @param data.request - Request data (typed from requestSchema)
+   * @param data.response - Response data (typed from responseSchema)
+   * @returns The count to display in the title, or undefined to not show a count
+   *
+   * @example
+   * ```typescript
+   * getCount: (data) => data.response?.paginationInfo?.total
+   * ```
+   */
+  getCount?: (data: {
+    request?: InferSchemasFromChildren<TChildren, TUsage>["request"];
+    response?: InferSchemasFromChildren<TChildren, TUsage>["response"];
+  }) => number | undefined;
+  /**
+   * Submit/Refresh button configuration for the container
+   * Rendered in the header next to the title when position is "header"
+   *
+   * @example
+   * ```typescript
+   * submitButton: {
+   *   text: "app.common.actions.refresh",
+   *   loadingText: "app.common.actions.refreshing",
+   *   position: "header",
+   *   icon: "refresh-cw",
+   *   variant: "ghost",
+   *   size: "sm",
+   * }
+   * ```
+   */
+  submitButton?: {
+    /** Submit button text translation key */
+    text?: TranslationKey;
+    /** Submit button loading text translation key */
+    loadingText?: TranslationKey;
+    /** Submit button position - 'bottom' (default) or 'header' */
+    position?: "bottom" | "header";
+    /** Icon identifier (e.g., "refresh-cw", "save", "send") */
+    icon?: string;
+    /** Button variant */
+    variant?:
+      | "default"
+      | "primary"
+      | "secondary"
+      | "destructive"
+      | "ghost"
+      | "outline"
+      | "link";
+    /** Button size */
+    size?: "default" | "sm" | "lg" | "icon";
+  };
+  /**
+   * Show auto FormAlert at top of container when there are request fields
+   * Displays error/success messages from context.response
+   * Set to false to disable (e.g., for login/signup pages with custom alert position)
+   * @default true
+   */
+  showFormAlert?: boolean;
+  /**
+   * Show auto submit button at bottom of container when there are request fields
+   * Only shown when no explicit submitButton config is provided
+   * Set to false to disable (e.g., for login/signup pages with custom submit button)
+   * @default true
+   */
+  showSubmitButton?: boolean;
 }
+
+/**
+ * Container Widget Config - untyped version for backward compatibility
+ * When you don't have access to TChildren/TUsage, use this simpler version
+ */
+export type ContainerWidgetConfig = TypedContainerWidgetConfig<
+  Record<string, never>,
+  FieldUsageConfig
+>;
 
 export interface SectionWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.SECTION;
@@ -587,6 +702,9 @@ export interface TextWidgetConfig extends BaseWidgetConfig {
   multiline?: boolean;
   emphasis?: "bold" | "italic" | "underline";
   maxLength?: number;
+  format?: "link" | "plain";
+  href?: string;
+  textAlign?: "left" | "center" | "right";
 }
 
 export interface BadgeWidgetConfig extends BaseWidgetConfig {
@@ -777,6 +895,21 @@ export interface MetricCardWidgetConfig extends BaseWidgetConfig {
   };
 }
 
+/**
+ * Stat Widget Config - Simple stat display from field definition
+ * Takes a numeric value and displays with label from field.ui.label
+ */
+export interface StatWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.STAT;
+  label?: TranslationKey;
+  format?: "number" | "percentage" | "currency" | "compact";
+  icon?: string;
+  variant?: "default" | "success" | "warning" | "danger" | "info" | "muted";
+  trend?: "up" | "down" | "neutral";
+  trendValue?: number;
+  size?: "sm" | "md" | "lg";
+}
+
 export interface StatsGridWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.STATS_GRID;
   title?: TranslationKey;
@@ -789,7 +922,15 @@ export interface StatsGridWidgetConfig extends BaseWidgetConfig {
 export interface ChartWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.CHART;
   title?: TranslationKey;
-  chartType?: "line" | "bar" | "pie" | "area";
+  label?: TranslationKey;
+  description?: TranslationKey;
+  chartType?: "line" | "bar" | "pie" | "area" | "donut";
+  xAxisLabel?: string;
+  yAxisLabel?: string;
+  height?: number;
+  showLegend?: boolean;
+  showGrid?: boolean;
+  animate?: boolean;
 }
 
 export interface ProgressWidgetConfig extends BaseWidgetConfig {
@@ -828,6 +969,38 @@ export interface StatusIndicatorWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.STATUS_INDICATOR;
   status: "success" | "warning" | "error" | "info" | "pending";
   label?: TranslationKey;
+}
+
+export interface AlertWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.ALERT;
+  variant?: "default" | "destructive" | "success" | "warning";
+}
+
+export interface FormAlertWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.FORM_ALERT;
+}
+
+export interface SubmitButtonWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.SUBMIT_BUTTON;
+  text?: TranslationKey;
+  loadingText?: TranslationKey;
+  icon?: string;
+  variant?:
+    | "default"
+    | "primary"
+    | "secondary"
+    | "destructive"
+    | "ghost"
+    | "outline"
+    | "link";
+  size?: "default" | "sm" | "lg" | "icon";
+}
+
+// Password strength indicator
+export interface PasswordStrengthWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.PASSWORD_STRENGTH;
+  /** Field name to watch for password value (defaults to "password") */
+  watchField?: string;
 }
 
 // ============================================================================
@@ -889,6 +1062,7 @@ export type WidgetConfig =
   | PaginationInfoWidgetConfig
   | ActionListWidgetConfig
   // Stats widgets
+  | StatWidgetConfig
   | MetricCardWidgetConfig
   | StatsGridWidgetConfig
   | ChartWidgetConfig
@@ -898,6 +1072,10 @@ export type WidgetConfig =
   | ErrorWidgetConfig
   | EmptyStateWidgetConfig
   | StatusIndicatorWidgetConfig
+  | AlertWidgetConfig
+  | FormAlertWidgetConfig
+  | SubmitButtonWidgetConfig
+  | PasswordStrengthWidgetConfig
   // Custom widgets
   | CustomWidgetConfig;
 

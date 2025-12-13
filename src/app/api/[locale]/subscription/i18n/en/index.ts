@@ -152,6 +152,7 @@ export const translations = {
       description: "Subscription not found",
     },
     not_found: "Subscription not found",
+    not_found_description: "The requested subscription could not be found",
     server: {
       title: "Server Error",
       description: "Internal server error occurred",
@@ -169,6 +170,8 @@ export const translations = {
       description: "You have unsaved changes",
     },
     use_checkout_flow: "Please use the checkout flow to purchase subscriptions",
+    use_checkout_flow_description:
+      "Direct subscription creation is not allowed. Please use the checkout process.",
     conflict: {
       title: "Conflict",
       description: "Data conflict occurred",

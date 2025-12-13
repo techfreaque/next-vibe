@@ -61,6 +61,9 @@ export function generateTrackingLinkUrl(
   if (leadId) {
     url.searchParams.set("id", leadId);
   }
+  if (userId) {
+    url.searchParams.set("userId", userId);
+  }
   if (campaignId) {
     url.searchParams.set("campaignId", campaignId);
   }
@@ -139,7 +142,7 @@ export function generateEngagementTrackingApiUrl(
   },
 ): string {
   const apiUrl = new URL(
-    `/api/${locale}/v1/leads/tracking/engagement`,
+    `/api/${locale}/leads/tracking/engagement`,
     baseUrl,
   );
 

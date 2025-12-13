@@ -27,6 +27,7 @@ const { GET } = createEndpoint({
   path: ["system", "tasks", "types"],
   title: "app.api.system.unifiedInterface.tasks.types.get.title",
   description: "app.api.system.unifiedInterface.tasks.types.get.description",
+  icon: "list",
   category: "app.api.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN],
   aliases: ["tasks:types"],

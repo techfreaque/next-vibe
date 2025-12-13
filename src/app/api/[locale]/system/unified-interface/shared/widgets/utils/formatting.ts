@@ -6,6 +6,7 @@
  */
 
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { WidgetData } from "../types";
 
 /**
@@ -276,22 +277,22 @@ export class BaseDataFormatter {
    */
   private createReplacer(
     maxDepth: number,
-  ): (key: string, value: WidgetData) => WidgetData {
+  ): (propertyKey: string, propertyValue: WidgetData) => WidgetData {
     const seen = new WeakSet();
     let depth = 0;
 
     return function replacer(
       this: WidgetData,
-      key: string,
+      propertyKey: string,
       value: WidgetData,
     ): WidgetData {
       if (depth > maxDepth) {
-        return "[Max Depth Reached]";
+        return propertyKey ? `[Max Depth: ${propertyKey}]` : "[Max Depth Reached]";
       }
 
       if (typeof value === "object" && value !== null) {
         if (seen.has(value)) {
-          return "[Circular]";
+          return propertyKey ? `[Circular: ${propertyKey}]` : "[Circular]";
         }
         seen.add(value);
         depth++;

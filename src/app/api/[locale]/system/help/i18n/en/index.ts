@@ -37,6 +37,11 @@ export const translations = {
       title: "Success",
       description: "Interactive mode started successfully",
     },
+    grouping: {
+      category: "Category",
+      tags: "Tags",
+      path: "Path",
+    },
   },
   post: {
     title: "Show Help Information",

@@ -21,14 +21,10 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { smsServiceRepository } from "../../emails/sms-service/repository";
 import { CampaignType } from "../../emails/smtp-client/enum";
-import type {
-  UnsubscribePostRequestOutput,
-  UnsubscribePostResponseOutput,
-} from "./definition";
+import type { UnsubscribePostRequestOutput } from "./definition";
 
 // Use proper imported types
 type UnsubscribeRequestOutput = UnsubscribePostRequestOutput;
-type UnsubscribeResponseOutput = UnsubscribePostResponseOutput;
 
 /**
  * SMS Service Repository Interface for Newsletter Unsubscriptions
@@ -36,7 +32,6 @@ type UnsubscribeResponseOutput = UnsubscribePostResponseOutput;
 export interface NewsletterUnsubscribeSmsService {
   sendConfirmationSms(
     unsubscribeData: UnsubscribeRequestOutput,
-    responseData: UnsubscribeResponseOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -44,7 +39,6 @@ export interface NewsletterUnsubscribeSmsService {
 
   sendAdminNotificationSms(
     unsubscribeData: UnsubscribeRequestOutput,
-    responseData: UnsubscribeResponseOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -60,14 +54,14 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
    */
   async sendConfirmationSms(
     unsubscribeData: UnsubscribeRequestOutput,
-    responseData: UnsubscribeResponseOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
     try {
-      // Extract phone number from user profile if available
-      const userPhone = (user as { phone?: string } | null)?.phone;
+      // Phone number field not yet implemented in user schema
+      // TODO: Add phone field to user type when SMS feature is fully implemented
+      const userPhone: string | undefined = undefined;
 
       if (!userPhone) {
         logger.debug(
@@ -86,7 +80,6 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
       logger.debug("Sending unsubscribe confirmation SMS", {
         unsubscribeEmail: unsubscribeData.email,
         userPhone,
-        responseMessage: responseData.message,
       });
       const { t } = simpleT(locale);
       const message = t(
@@ -103,7 +96,6 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
           campaignType: CampaignType.NOTIFICATION,
         },
         user || { isPublic: true as const },
-        locale,
         logger,
       );
 
@@ -141,7 +133,6 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
    */
   async sendAdminNotificationSms(
     unsubscribeData: UnsubscribeRequestOutput,
-    responseData: UnsubscribeResponseOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -187,7 +178,6 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
           campaignType: CampaignType.NOTIFICATION,
         },
         user || { id: "system", isPublic: false as const },
-        locale,
         logger,
       );
 
@@ -229,14 +219,12 @@ export const newsletterUnsubscribeSmsService =
  */
 export const sendConfirmationSms = (
   unsubscribeData: UnsubscribeRequestOutput,
-  responseData: UnsubscribeResponseOutput,
   user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
   return newsletterUnsubscribeSmsService.sendConfirmationSms(
     unsubscribeData,
-    responseData,
     user,
     locale,
     logger,
@@ -248,14 +236,12 @@ export const sendConfirmationSms = (
  */
 export const sendAdminNotificationSms = (
   unsubscribeData: UnsubscribeRequestOutput,
-  responseData: UnsubscribeResponseOutput,
   user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
   return newsletterUnsubscribeSmsService.sendAdminNotificationSms(
     unsubscribeData,
-    responseData,
     user,
     locale,
     logger,

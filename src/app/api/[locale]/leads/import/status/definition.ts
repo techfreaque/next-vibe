@@ -43,6 +43,7 @@ const { GET } = createEndpoint({
     "app.api.leads.tags.list",
   ],
   allowedRoles: [UserRole.ADMIN] as const,
+  icon: "activity",
 
   fields: objectField(
     {

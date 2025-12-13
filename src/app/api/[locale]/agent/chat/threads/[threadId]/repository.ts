@@ -17,7 +17,6 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatFolders, chatThreads } from "../../db";
 import {
@@ -31,6 +30,7 @@ import type {
   ThreadPatchRequestOutput,
   ThreadPatchResponseOutput,
 } from "./definition";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Thread by ID Repository Interface
@@ -47,14 +47,12 @@ export interface ThreadByIdRepositoryInterface {
     data: ThreadPatchRequestOutput,
     threadId: string,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadPatchResponseOutput>>;
 
   deleteThread(
     threadId: string,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadDeleteResponseOutput>>;
 }
@@ -69,6 +67,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
   async getThreadById(
     threadId: string,
     user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars - locale is unused on server, but required on native
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadGetResponseOutput>> {
@@ -156,7 +155,6 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
     data: ThreadPatchRequestOutput,
     threadId: string,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadPatchResponseOutput>> {
     try {
@@ -296,7 +294,6 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
   async deleteThread(
     threadId: string,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadDeleteResponseOutput>> {
     try {

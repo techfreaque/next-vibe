@@ -78,9 +78,10 @@ export interface DefaultFolderConfig {
 /**
  * Default folder configurations
  * Defines all system folders with their metadata
+ * Keyed by folder ID for clean direct access
  */
-export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
-  {
+export const DEFAULT_FOLDER_CONFIGS = {
+  [DefaultFolderId.PRIVATE]: {
     id: DefaultFolderId.PRIVATE,
     translationKey: "app.chat.common.privateChats",
     icon: "lock",
@@ -94,7 +95,7 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     rolesModerate: [], // Owner only
     rolesAdmin: [], // Owner only
   },
-  {
+  [DefaultFolderId.INCOGNITO]: {
     id: DefaultFolderId.INCOGNITO,
     translationKey: "app.chat.common.incognitoChats",
     icon: "shield-plus",
@@ -108,7 +109,7 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     rolesModerate: [], // Local only
     rolesAdmin: [], // Local only
   },
-  {
+  [DefaultFolderId.SHARED]: {
     id: DefaultFolderId.SHARED,
     translationKey: "app.chat.common.sharedChats",
     icon: "users",
@@ -122,7 +123,7 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     rolesModerate: [], // Will be set via share links
     rolesAdmin: [], // Will be set via share links
   },
-  {
+  [DefaultFolderId.PUBLIC]: {
     id: DefaultFolderId.PUBLIC,
     translationKey: "app.chat.common.publicChats",
     icon: "1a",
@@ -136,7 +137,7 @@ export const DEFAULT_FOLDER_CONFIGS: readonly DefaultFolderConfig[] = [
     rolesModerate: [UserRole.PARTNER_ADMIN, UserRole.ADMIN], // Moderators and admins can moderate
     rolesAdmin: [UserRole.ADMIN], // Only admins can delete
   },
-] as const;
+} as const satisfies Record<DefaultFolderId, DefaultFolderConfig>;
 
 /**
  * Check if a folder ID is a default system folder
@@ -157,7 +158,10 @@ export function isDefaultFolderId(
 export function getDefaultFolderConfig(
   folderId: string,
 ): DefaultFolderConfig | undefined {
-  return DEFAULT_FOLDER_CONFIGS.find((config) => config.id === folderId);
+  if (!isDefaultFolderId(folderId)) {
+    return undefined;
+  }
+  return DEFAULT_FOLDER_CONFIGS[folderId];
 }
 
 /**

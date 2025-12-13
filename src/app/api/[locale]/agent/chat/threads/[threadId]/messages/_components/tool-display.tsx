@@ -19,8 +19,6 @@ interface ToolDisplayProps {
   locale: CountryLanguage;
   /** Thread ID */
   threadId: string;
-  /** Whether the message has content after tool calls (affects default open state) */
-  hasContent: boolean;
   /** Message ID for collapse state tracking */
   messageId: string;
   /** Collapse state management callbacks */
@@ -69,7 +67,6 @@ export function ToolDisplay({
   toolCall,
   locale,
   threadId,
-  hasContent: _hasContent = false,
   messageId,
   collapseState,
 }: ToolDisplayProps): JSX.Element | null {

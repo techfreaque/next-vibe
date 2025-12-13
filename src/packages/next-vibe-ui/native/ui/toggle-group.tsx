@@ -53,6 +53,7 @@ export function ToggleGroup({
   const toggleType = type ?? "single";
   const toggleValue = value ?? "";
   const handleValueChange = React.useMemo(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Intentional no-op fallback function
     () => onValueChange ?? ((_value: string | string[]): void => undefined),
     [onValueChange],
   );

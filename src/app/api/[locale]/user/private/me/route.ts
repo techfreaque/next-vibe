@@ -12,15 +12,15 @@ import { userProfileRepository } from "./repository";
 export const { GET, POST, DELETE, tools } = endpointsHandler({
   endpoint: meEndpoints,
   [Methods.GET]: {
-    handler: ({ user, locale, logger }) =>
+    handler: ({ user, logger, locale }) =>
       userProfileRepository.getProfile(user, locale, logger),
   },
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) =>
+    handler: ({ data, user, logger, locale }) =>
       userProfileRepository.updateProfile(data, user, locale, logger),
   },
   [Methods.DELETE]: {
-    handler: ({ data, user, locale, logger }) =>
-      userProfileRepository.deleteAccount(data, user, locale, logger),
+    handler: ({ data, logger, locale }) =>
+      userProfileRepository.deleteAccount(data, locale, logger),
   },
 });

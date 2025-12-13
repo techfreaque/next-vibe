@@ -29,6 +29,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.help.post.description",
   category: "app.api.system.help.category",
   tags: ["app.api.system.help.tag"],
+  icon: "help-circle",
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
   aliases: ["help", "h"],
   cli: {

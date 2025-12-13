@@ -18,14 +18,12 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { findFilesByName } from "@/app/api/[locale]/system/translations/reorganize/repository/scanner";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type {
-  GenerateRequestOutput,
-  GenerateResponseOutput,
-} from "./definition";
+import type { GenerateResponseOutput } from "./definition";
 
 interface GenerationResult {
   created: string[];
@@ -38,7 +36,6 @@ interface GenerationResult {
  */
 export interface GenerateExpoIndexesRepository {
   generate(
-    data: GenerateRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
   ): Promise<ResponseType<GenerateResponseOutput>>;
@@ -60,14 +57,10 @@ class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository
   }
 
   async generate(
-    data: GenerateRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
   ): Promise<ResponseType<GenerateResponseOutput>> {
     const { t } = simpleT(locale);
-
-    // Use data parameter to avoid unused variable warning
-    void data;
 
     // Validate user permissions
     if (!user?.id) {

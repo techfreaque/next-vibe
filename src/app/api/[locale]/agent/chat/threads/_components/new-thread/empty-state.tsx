@@ -80,7 +80,7 @@ export function ChatEmptyState({
         bg: "bg-sky-500/20",
         border: "border-sky-500/50",
         text: "text-sky-500",
-        "hover-bg": "hover:bg-sky-500/10",
+        "hover-bg": "hover:bg-sky-500/15",
       },
       purple: {
         bg: "bg-purple-500/20",
@@ -214,7 +214,7 @@ export function ChatEmptyState({
         <Div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pt-20 flex flex-col items-center">
           {/* Folder icon */}
           <Div
-            className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 ${getColorClasses("bg").replace("/20", "/10")}`}
+            className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 ${getColorClasses("bg")}`}
           >
             <Div className={`text-4xl ${getColorClasses("text")}`}>
               {React.createElement(

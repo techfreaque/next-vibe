@@ -34,6 +34,7 @@ import {
   FieldUsage,
   Methods,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
 
 /**
  * Configuration for a single method in a form endpoint
@@ -42,12 +43,12 @@ export interface FormMethodConfig {
   readonly title: TranslationKey;
   readonly description: TranslationKey;
   readonly tags: TranslationKey[];
+  readonly icon: IconValue;
   readonly aliases?: string[];
 }
 
 /**
  * Examples configuration for form endpoints
- * ✅ FIXED: Now uses method-specific type inference
  */
 export interface FormExamples<
   TFields extends UnifiedField<z.ZodTypeAny>,
@@ -695,6 +696,7 @@ export function createFormEndpoint<
     allowedRoles: config.allowedRoles,
     debug: config.debug,
     aliases: config.methods.GET.aliases,
+    icon: config.methods.GET.icon,
     fields: config.fields,
     errorTypes: config.errorTypes,
     successTypes: config.successTypes,
@@ -793,6 +795,7 @@ export function createFormEndpoint<
     description: config.methods.POST.description,
     category: config.category,
     tags: config.methods.POST.tags,
+    icon: config.methods.POST.icon,
     allowedRoles: config.allowedRoles,
     debug: config.debug,
     aliases: config.methods.POST.aliases,

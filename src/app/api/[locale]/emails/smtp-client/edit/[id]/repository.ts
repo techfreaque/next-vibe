@@ -16,11 +16,15 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { Countries, Languages } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../../user/auth/types";
 import { smtpAccounts } from "../../db";
 import type { CampaignType, SmtpSecurityType } from "../../enum";
+import type {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+} from "../../../../leads/enum";
 import type {
   SmtpAccountEditGETResponseOutput,
   SmtpAccountEditPUTResponseOutput,
@@ -40,6 +44,14 @@ interface SmtpAccountUpdateData {
   priority?: number;
   isDefault?: boolean;
   campaignTypes?: Array<(typeof CampaignType)[keyof typeof CampaignType]>;
+  emailJourneyVariants?: Array<
+    (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
+  >;
+  emailCampaignStages?: Array<
+    (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
+  >;
+  countries?: Countries[];
+  languages?: Languages[];
 }
 
 /**
@@ -49,14 +61,12 @@ export interface SmtpAccountEditRepository {
   getSmtpAccount(
     urlPathParams: { id: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpAccountEditGETResponseOutput>>;
 
   updateSmtpAccount(
     data: SmtpAccountUpdateData,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpAccountEditPUTResponseOutput>>;
 }
@@ -72,7 +82,6 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
   async getSmtpAccount(
     urlPathParams: { id: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpAccountEditGETResponseOutput>> {
     try {
@@ -113,6 +122,11 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
           lastUsedAt: account.lastUsedAt?.toISOString() || null,
           createdAt: account.createdAt.toISOString(),
           updatedAt: account.updatedAt.toISOString(),
+          campaignTypes: account.campaignTypes || undefined,
+          emailJourneyVariants: account.emailJourneyVariants || undefined,
+          emailCampaignStages: account.emailCampaignStages || undefined,
+          countries: account.countries || undefined,
+          languages: account.languages || undefined,
         },
       };
 
@@ -139,7 +153,6 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
   async updateSmtpAccount(
     data: SmtpAccountUpdateData,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpAccountEditPUTResponseOutput>> {
     try {
@@ -195,14 +208,27 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
       // Update the account - prepare update data excluding id field
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id: _id, ...updateFields } = data;
-      const updateData: Partial<typeof smtpAccounts.$inferInsert> = {
-        ...updateFields,
-        updatedAt: new Date(),
-      };
 
       const [updatedAccount] = await db
         .update(smtpAccounts)
-        .set(updateData)
+        .set({
+          updatedAt: new Date(),
+          name: updateFields.name,
+          description: updateFields.description,
+          host: updateFields.host,
+          port: updateFields.port,
+          securityType: updateFields.securityType,
+          username: updateFields.username,
+          password: updateFields.password,
+          fromEmail: updateFields.fromEmail,
+          priority: updateFields.priority,
+          isDefault: updateFields.isDefault,
+          campaignTypes: updateFields.campaignTypes,
+          emailJourneyVariants: updateFields.emailJourneyVariants,
+          emailCampaignStages: updateFields.emailCampaignStages,
+          countries: updateFields.countries,
+          languages: updateFields.languages,
+        })
         .where(eq(smtpAccounts.id, data.id))
         .returning();
 
@@ -235,6 +261,11 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
           lastUsedAt: updatedAccount.lastUsedAt?.toISOString() || null,
           createdAt: updatedAccount.createdAt.toISOString(),
           updatedAt: updatedAccount.updatedAt.toISOString(),
+          campaignTypes: updatedAccount.campaignTypes || undefined,
+          emailJourneyVariants: updatedAccount.emailJourneyVariants || undefined,
+          emailCampaignStages: updatedAccount.emailCampaignStages || undefined,
+          countries: updatedAccount.countries || undefined,
+          languages: updatedAccount.languages || undefined,
         },
       };
 

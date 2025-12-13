@@ -15,7 +15,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { Countries, Languages } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CampaignType } from "../smtp-client/enum";
 import { smtpRepository } from "../smtp-client/repository";
@@ -28,9 +28,6 @@ import type {
   EmailServiceSendPostResponseOutput,
 } from "./definition";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
-
-// Define the proper type for locale to match SMTP repository expectations
-type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
 
 /**
  * Email Service Repository Interface

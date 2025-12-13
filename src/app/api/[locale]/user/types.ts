@@ -45,7 +45,7 @@ export type MinimalUserType = JwtPayloadType;
  */
 export const standardUserSchema = z.object({
   id: z.uuid(),
-  leadId: leadId.nullable(),
+  leadId,
   isPublic: z.literal(false),
   email: z.email({ message: "validationErrors.user.profile.email_invalid" }),
   privateName: z.string(),

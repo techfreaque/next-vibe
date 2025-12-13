@@ -29,6 +29,7 @@ const { GET } = createEndpoint({
   title: "app.api.agent.chat.folders.id.permissions.get.title" as const,
   description:
     "app.api.agent.chat.folders.id.permissions.get.description" as const,
+  icon: "shield",
   category: "app.api.agent.chat.category" as const,
   tags: [
     "app.api.agent.chat.tags.folders" as const,
@@ -235,6 +236,7 @@ const { PATCH } = createEndpoint({
   title: "app.api.agent.chat.folders.id.permissions.patch.title" as const,
   description:
     "app.api.agent.chat.folders.id.permissions.patch.description" as const,
+  icon: "shield",
   category: "app.api.agent.chat.category" as const,
   tags: [
     "app.api.agent.chat.tags.folders" as const,

@@ -10,7 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "../alert";
 
 export interface FormAlertState {
   variant: "default" | "destructive" | "success" | "warning";
-  title: MessageResponseType;
+  title?: MessageResponseType;
   message: MessageResponseType;
 }
 

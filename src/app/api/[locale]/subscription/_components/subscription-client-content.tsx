@@ -43,6 +43,11 @@ export function SubscriptionClientContent({
   const products = productsRepository.getProducts(locale);
   const SUBSCRIPTION_PRICE = products[ProductIds.SUBSCRIPTION].price;
   const SUBSCRIPTION_CREDITS = products[ProductIds.SUBSCRIPTION].credits;
+  const YEARLY_SUBSCRIPTION_PRICE = productsRepository.getProduct(
+    ProductIds.SUBSCRIPTION,
+    locale,
+    "year",
+  ).price;
   const PACK_PRICE = products[ProductIds.CREDIT_PACK].price;
   const PACK_CREDITS = products[ProductIds.CREDIT_PACK].credits;
   const FREE_CREDITS = products[ProductIds.FREE_TIER].credits;
@@ -170,6 +175,7 @@ export function SubscriptionClientContent({
             initialSubscription={initialSubscription}
             subscriptionPrice={SUBSCRIPTION_PRICE}
             subscriptionCredits={SUBSCRIPTION_CREDITS}
+            yearlySubscriptionPrice={YEARLY_SUBSCRIPTION_PRICE}
             packPrice={PACK_PRICE}
             packCredits={PACK_CREDITS}
           />

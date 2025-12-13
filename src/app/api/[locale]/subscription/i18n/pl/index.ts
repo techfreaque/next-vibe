@@ -153,6 +153,7 @@ export const translations: typeof enTranslations = {
       description: "Subskrypcja nie została znaleziona",
     },
     not_found: "Subskrypcja nie została znaleziona",
+    not_found_description: "Żądana subskrypcja nie została znaleziona",
     server: {
       title: "Błąd serwera",
       description: "Wystąpił wewnętrzny błąd serwera",
@@ -174,6 +175,8 @@ export const translations: typeof enTranslations = {
       description: "Wystąpił konflikt danych",
     },
     use_checkout_flow: "Proszę użyć procesu płatności, aby kupić subskrypcję",
+    use_checkout_flow_description:
+      "Bezpośrednie tworzenie subskrypcji nie jest dozwolone. Proszę użyć procesu płatności.",
     sync_failed: "Nie udało się zsynchronizować subskrypcji z bazą danych",
     database_error: "Wystąpił błąd bazy danych",
     create_crashed: "Utworzenie subskrypcji nie powiodło się",

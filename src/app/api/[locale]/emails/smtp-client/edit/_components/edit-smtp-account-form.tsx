@@ -19,6 +19,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { useSmtpAccountById } from "@/app/api/[locale]/emails/smtp-client/edit/[id]/hooks";
+import { PUT as editDefinition } from "@/app/api/[locale]/emails/smtp-client/edit/[id]/definition";
 import { SmtpSecurityType } from "@/app/api/[locale]/emails/smtp-client/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -267,6 +268,58 @@ export function EditSmtpAccountForm({
                   showAllRequired: false,
                 }}
               />
+
+              <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <EndpointFormField
+                  name="updates.campaignTypes"
+                  endpointFields={editDefinition.fields}
+                  control={endpoint.create.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+
+                <EndpointFormField
+                  name="updates.emailJourneyVariants"
+                  endpointFields={editDefinition.fields}
+                  control={endpoint.create.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+
+                <EndpointFormField
+                  name="updates.emailCampaignStages"
+                  endpointFields={editDefinition.fields}
+                  control={endpoint.create.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+
+                <EndpointFormField
+                  name="updates.countries"
+                  endpointFields={editDefinition.fields}
+                  control={endpoint.create.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+
+                <EndpointFormField
+                  name="updates.languages"
+                  endpointFields={editDefinition.fields}
+                  control={endpoint.create.form.control}
+                  theme={{
+                    style: "none",
+                    showAllRequired: false,
+                  }}
+                />
+              </Div>
             </FormFieldGroup>
 
             {/* Advanced Settings */}

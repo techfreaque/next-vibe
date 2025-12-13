@@ -28,6 +28,7 @@ const { GET } = createEndpoint({
   path: ["newsletter", "status"],
   title: "app.api.newsletter.status.title" as const,
   description: "app.api.newsletter.status.description" as const,
+  icon: "newspaper",
   tags: [],
   category: "app.api.newsletter.status.category" as const,
   allowedRoles: [

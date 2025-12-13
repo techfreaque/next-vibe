@@ -280,7 +280,6 @@ export async function continueReleaseCommand(
 export function showReleaseStatusCommand(
   logger: EndpointLogger,
   rootDir: string,
-  _t: ReturnType<typeof simpleT>["t"],
 ): void {
   logger.info("📊 Release Status");
 

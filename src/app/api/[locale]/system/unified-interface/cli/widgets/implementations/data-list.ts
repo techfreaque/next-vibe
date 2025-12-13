@@ -4,8 +4,6 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   extractDataListData,
   type ProcessedDataList,
@@ -13,15 +11,13 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/data-list";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class DataListWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.DATA_LIST;
-  }
+export class DataListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_LIST> {
+  readonly widgetType = WidgetType.DATA_LIST;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { field, value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.DATA_LIST>): string {
+    const { value, context } = props;
 
     // Extract data using shared logic
     const data = extractDataListData(value);
@@ -32,18 +28,17 @@ export class DataListWidgetRenderer extends BaseWidgetRenderer {
     }
 
     // Render using extracted data
-    return this.renderDataList(data, field, context);
+    return this.renderDataList(data, context);
   }
 
   private renderDataList(
     data: ProcessedDataList,
-    field: UnifiedField,
     context: WidgetRenderContext,
   ): string {
     const result: string[] = [];
 
     for (const item of data.items) {
-      const rendered = this.renderListItem(item, field, context);
+      const rendered = this.renderListItem(item, context);
       if (rendered) {
         result.push(rendered);
       }
@@ -54,7 +49,6 @@ export class DataListWidgetRenderer extends BaseWidgetRenderer {
 
   private renderListItem(
     item: ListItem,
-    field: UnifiedField,
     context: WidgetRenderContext,
   ): string {
     // Special handling for command lists (command + description)

@@ -141,6 +141,7 @@ export type DivProps = {
   dangerouslySetInnerHTML?: { __html: string };
   tabIndex?: number;
   onKeyDown?: (e: DivKeyboardEvent) => void;
+  "data-tour"?: string;
 } & StyleType;
 
 export const Div = React.forwardRef<DivRefObject, DivProps>(
@@ -165,6 +166,7 @@ export const Div = React.forwardRef<DivRefObject, DivProps>(
       dangerouslySetInnerHTML,
       tabIndex,
       onKeyDown,
+      ...rest
     },
     ref,
   ): JSX.Element => {
@@ -189,6 +191,7 @@ export const Div = React.forwardRef<DivRefObject, DivProps>(
         dangerouslySetInnerHTML={dangerouslySetInnerHTML}
         tabIndex={tabIndex}
         onKeyDown={onKeyDown}
+        {...rest}
       >
         {children}
       </div>

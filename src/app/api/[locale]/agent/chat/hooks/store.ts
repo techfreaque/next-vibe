@@ -27,7 +27,6 @@ export interface ChatSettings {
   temperature: number;
   maxTokens: number;
   ttsAutoplay: boolean;
-  sidebarCollapsed: boolean;
   theme: "light" | "dark";
   viewMode: typeof ViewModeValue;
   enabledToolIds: string[];
@@ -87,7 +86,6 @@ const getDefaultSettings = (): ChatSettings => ({
   temperature: 0.7,
   maxTokens: 2000,
   ttsAutoplay: false,
-  sidebarCollapsed: false,
   theme: "dark",
   viewMode: ViewMode.LINEAR,
   enabledToolIds: [...DEFAULT_TOOL_IDS],

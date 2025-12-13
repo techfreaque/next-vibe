@@ -52,33 +52,33 @@ export function UsersListClient({
     ? apiResponse.data.response.users
     : [];
   const totalUsers = apiResponse?.success
-    ? apiResponse.data.response.totalCount
+    ? apiResponse.data.paginationInfo.totalCount
     : 0;
   const totalPages = apiResponse?.success
-    ? apiResponse.data.response.pageCount
+    ? apiResponse.data.paginationInfo.pageCount
     : 0;
   const queryLoading = usersEndpoint.read?.isLoading || false;
 
   // Get current form values for pagination display
   const currentPage =
-    usersEndpoint.read?.form.getValues("searchAndPagination.page") || 1;
+    usersEndpoint.read?.form.getValues("paginationInfo.page") || 1;
   const currentLimit =
-    usersEndpoint.read?.form.getValues("searchAndPagination.limit") || 20;
+    usersEndpoint.read?.form.getValues("paginationInfo.limit") || 20;
 
   const handleClearFilters = (): void => {
     usersEndpoint.read?.form.reset({
-      searchAndPagination: {
+      searchFilters: {
         search: undefined,
-        page: 1,
-        limit: 20,
-      },
-      filters: {
         status: [UserStatusFilter.ALL],
         role: [UserRoleFilter.ALL],
       },
-      sorting: {
+      sortingOptions: {
         sortBy: UserSortField.CREATED_AT,
         sortOrder: SortOrder.DESC,
+      },
+      paginationInfo: {
+        page: 1,
+        limit: 20,
       },
     });
   };
@@ -87,14 +87,14 @@ export function UsersListClient({
     <Card>
       <CardHeader>
         <Div className="flex items-center justify-between">
-          <CardTitle className="flex items-center flex flex-row gap-2">
+          <CardTitle className="items-center flex flex-row gap-2">
             <Span>{t("app.admin.users.list.title")}</Span>
             {queryLoading && (
               <RefreshCw className="h-4 w-4 animate-spin text-gray-500" />
             )}
           </CardTitle>
 
-          <Div className="flex items-center flex flex-row gap-2">
+          <Div className="items-center flex flex-row gap-2">
             {/* View Mode Toggle */}
             <Div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-md">
               <Button
@@ -139,7 +139,7 @@ export function UsersListClient({
       <CardContent>
         {/* Filter Form */}
         <Div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <Div className="flex items-center flex flex-row gap-2 mb-4">
+          <Div className="items-center flex flex-row gap-2 mb-4">
             <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
             <Span className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {t("app.admin.users.list.filters.title")}:
@@ -151,7 +151,7 @@ export function UsersListClient({
               <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {/* Search Field */}
                 <EndpointFormField
-                  name="searchAndPagination.search"
+                  name="searchFilters.search"
                   config={{
                     type: "text",
                     label: undefined,
@@ -166,7 +166,7 @@ export function UsersListClient({
 
                 {/* Status Filter */}
                 <EndpointFormField
-                  name="filters.status"
+                  name="searchFilters.status"
                   config={{
                     type: "select",
                     label: undefined,
@@ -203,7 +203,7 @@ export function UsersListClient({
 
                 {/* Role Filter */}
                 <EndpointFormField
-                  name="filters.role"
+                  name="searchFilters.role"
                   config={{
                     type: "select",
                     label: undefined,
@@ -244,7 +244,7 @@ export function UsersListClient({
 
                 {/* Sort By */}
                 <EndpointFormField
-                  name="sorting.sortBy"
+                  name="sortingOptions.sortBy"
                   config={{
                     type: "select",
                     label: undefined,
@@ -282,9 +282,9 @@ export function UsersListClient({
 
               {/* Sort Order and Actions */}
               <Div className="flex items-center justify-between">
-                <Div className="flex items-center flex flex-row gap-4">
+                <Div className="items-center flex flex-row gap-4">
                   <EndpointFormField
-                    name="sorting.sortOrder"
+                    name="sortingOptions.sortOrder"
                     config={{
                       type: "select",
                       label: undefined,
@@ -366,7 +366,7 @@ export function UsersListClient({
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 <Div className="flex items-center justify-between">
-                  <Div className="flex items-center flex flex-row gap-4">
+                  <Div className="items-center flex flex-row gap-4">
                     <Div>
                       <NextLink
                         href={`/${locale}/admin/users/${user.id}/edit`}

@@ -13,35 +13,33 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async (props) => {
+    handler: async ({ urlPathParams, user, locale, logger }) => {
       return await threadByIdRepository.getThreadById(
-        props.urlPathParams.threadId,
-        props.user,
-        props.locale,
-        props.logger,
+        urlPathParams.threadId,
+        user,
+        locale,
+        logger,
       );
     },
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: async (props) => {
+    handler: async ({ data, urlPathParams, user, logger }) => {
       return await threadByIdRepository.updateThread(
-        props.data,
-        props.urlPathParams.threadId,
-        props.user,
-        props.locale,
-        props.logger,
+        data,
+        urlPathParams.threadId,
+        user,
+        logger,
       );
     },
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: async (props) => {
+    handler: async ({ urlPathParams, user, logger }) => {
       return await threadByIdRepository.deleteThread(
-        props.urlPathParams.threadId,
-        props.user,
-        props.locale,
-        props.logger,
+        urlPathParams.threadId,
+        user,
+        logger,
       );
     },
   },

@@ -19,8 +19,8 @@ import { emailHandlingRepository } from "@/app/api/[locale]/emails/smtp-client/e
 import type { EmailHandleRequestOutput } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { handleSms } from "@/app/api/[locale]/sms/handle-sms";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { Platform } from "../../types/platform";
 import type { EndpointLogger } from "../../logger/endpoint";
 import { permissionsRegistry } from "../permissions/registry";
@@ -39,6 +39,7 @@ import {
   validateHandlerRequestData,
   validateResponseData,
 } from "./request-validator";
+import { creditRepository } from "@/app/api/[locale]/credits/repository";
 
 /**
  * Type helper to infer JWT payload type based on user roles
@@ -321,6 +322,52 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
 
     if (!validationResult.success) {
       return validationResult;
+    }
+
+    // 4. Check and deduct credits if endpoint has credit cost
+    if (endpoint.credits && endpoint.credits > 0) {
+      const hasSufficient = await creditRepository.hasSufficientCredits(
+        user.id
+          ? { userId: user.id, leadId: user.leadId }
+          : { leadId: user.leadId },
+        endpoint.credits,
+        logger,
+      );
+
+      if (!hasSufficient) {
+        logger.warn("Insufficient credits for endpoint", {
+          routePath: `${endpoint.path.join("/")}/${endpoint.method}`,
+          userId: user.isPublic ? "public" : user.id,
+          cost: endpoint.credits,
+        });
+        return {
+          success: false,
+          message: "app.api.credits.errors.insufficientCredits",
+          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+          messageParams: { cost: endpoint.credits },
+        };
+      }
+
+      const deductResult = await creditRepository.deductCreditsForFeature(
+        user,
+        endpoint.credits,
+        `${endpoint.path.join("/")}/${endpoint.method}`,
+        logger,
+      );
+
+      if (!deductResult.success) {
+        logger.error("Failed to deduct credits for endpoint", {
+          routePath: `${endpoint.path.join("/")}/${endpoint.method}`,
+          userId: user.isPublic ? "public" : user.id,
+          cost: endpoint.credits,
+        });
+        return {
+          success: false,
+          message: "app.api.credits.errors.deductionFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { cost: endpoint.credits },
+        };
+      }
     }
 
     const result = await handler({

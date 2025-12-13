@@ -25,7 +25,6 @@ export function NumberInput({
   disabled = false,
   className,
   style,
-  name: _name,
 }: NumberInputProps): React.JSX.Element {
   const currentValue = value ?? min;
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;

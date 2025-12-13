@@ -217,7 +217,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Get leadId from database (platform-agnostic)
    * Note: This method should not access cookies directly - platform handlers manage storage
    */
-  async getLeadIdFromDb(
+  private async getLeadIdFromDb(
     userId: string | undefined,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -239,7 +239,6 @@ class AuthRepositoryImpl implements AuthRepository {
     if (existingLeadId) {
       const isValid = await leadAuthRepository.validateLeadId(
         existingLeadId,
-        locale,
         logger,
       );
       if (isValid) {
@@ -488,7 +487,7 @@ class AuthRepositoryImpl implements AuthRepository {
         .values({
           userId,
           leadId: existingLead.id,
-          linkReason: "existing_lead_linked",
+          linkReason: "login",
         })
         .onConflictDoNothing();
 
@@ -513,7 +512,7 @@ class AuthRepositoryImpl implements AuthRepository {
       .values({
         userId,
         leadId: newLead.id,
-        linkReason: "user_creation",
+        linkReason: "signup",
       })
       .onConflictDoNothing();
 
@@ -987,7 +986,6 @@ class AuthRepositoryImpl implements AuthRepository {
         const sessionValid = await this.validateWebSession(
           token,
           verifyResult.data.id,
-          context.locale,
           logger,
         );
         if (!sessionValid) {
@@ -1043,7 +1041,6 @@ class AuthRepositoryImpl implements AuthRepository {
   private async validateWebSession(
     token: string,
     userId: string,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<boolean> {
     try {

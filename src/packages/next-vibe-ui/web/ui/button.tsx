@@ -94,6 +94,7 @@ export type ButtonProps = {
   tabIndex?: number;
   asChild?: boolean;
   key?: React.Key;
+  "data-tour"?: string;
 } & StyleType;
 
 export function Button({

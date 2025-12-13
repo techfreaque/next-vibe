@@ -17,7 +17,6 @@ import {
 import type { JSX } from "react";
 import React from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -28,10 +27,8 @@ import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 interface ThreadedMessageActionsProps {
   message: ChatMessage;
   locale: CountryLanguage;
-  logger: EndpointLogger;
   messageActions: ReturnType<typeof useMessageActions>;
   isTouch: boolean;
-  currentUserId?: string;
   // TTS props
   isTTSLoading: boolean;
   isPlaying: boolean;
@@ -59,10 +56,8 @@ interface ThreadedMessageActionsProps {
 export function ThreadedMessageActions({
   message,
   locale,
-  logger: _logger,
   messageActions,
   isTouch,
-  currentUserId: _currentUserId,
   isTTSLoading,
   isPlaying,
   playAudio,

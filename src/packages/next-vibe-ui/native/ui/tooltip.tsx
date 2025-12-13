@@ -20,9 +20,6 @@ const TEXT_CLASS_CONTENT = "text-sm text-base text-popover-foreground";
 
 export function TooltipProvider({
   children,
-  delayDuration: _delayDuration,
-  skipDelayDuration: _skipDelayDuration,
-  disableHoverableContent: _disableHoverableContent,
 }: TooltipProviderProps): React.JSX.Element {
   // React Native primitive doesn't support these props directly
   return <TooltipPrimitive.Root>{children}</TooltipPrimitive.Root>;
@@ -30,13 +27,14 @@ export function TooltipProvider({
 
 export function Tooltip({
   children,
-  open: _open,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  open, // Intentionally extracted - React Native primitives don't support controlled open state
   onOpenChange,
-  defaultOpen: _defaultOpen,
-  delayDuration: _delayDuration,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  defaultOpen, // Intentionally extracted - React Native primitives don't support controlled open state
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  delayDuration, // Intentionally extracted - not used in React Native
 }: TooltipRootProps): React.JSX.Element {
-  // Note: React Native primitives don't support controlled open state directly
-  // They're accepted in the interface for cross-platform compatibility but not used
   return (
     <TooltipPrimitive.Root onOpenChange={onOpenChange}>
       {children}
@@ -63,10 +61,14 @@ export function TooltipContent({
   align = "center",
   alignOffset = 0,
   children,
-  onEscapeKeyDown: _onEscapeKeyDown,
-  onPointerDownOutside: _onPointerDownOutside,
-  hidden: _hidden,
-  portalHost: _portalHost,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  onEscapeKeyDown, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  onPointerDownOutside, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  hidden, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  portalHost, // Intentionally extracted - not used in React Native
 }: TooltipContentProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (

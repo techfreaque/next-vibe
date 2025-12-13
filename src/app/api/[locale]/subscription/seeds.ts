@@ -1,5 +1,4 @@
 /**
-import type { CountryLanguage } from "@/i18n/core/config";
  * Subscription Seeds
  * Provides seed data for subscription-related tables
  */
@@ -199,6 +198,7 @@ export async function dev(
       const adminSubscription = await subscriptionRepository.getSubscription(
         adminUser.id,
         logger,
+        locale,
       );
 
       let adminSubscriptionData: SubscriptionGetResponseOutput | undefined =
@@ -335,6 +335,7 @@ export async function dev(
       const existingSubscription = await subscriptionRepository.getSubscription(
         lowCreditsUser.id,
         logger,
+        locale,
       );
 
       let subscription: SubscriptionGetResponseOutput | undefined = undefined;
@@ -505,6 +506,7 @@ export async function test(
           await subscriptionRepository.getSubscription(
             subscriptionData.userId,
             logger,
+            locale,
           );
 
         if (!existingSubscription.success || !existingSubscription.data) {
@@ -570,6 +572,7 @@ export async function prod(
       const adminSubscription = await subscriptionRepository.getSubscription(
         adminUser.id,
         logger,
+        locale,
       );
 
       if (!adminSubscription.success || !adminSubscription.data) {

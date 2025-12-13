@@ -21,12 +21,13 @@ import {
   fail,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
+
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { DbId } from "@/app/api/[locale]/system/db/types";
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { NewUser, User } from "./db";
+import type { NewUser } from "./db";
 import type { UserDetailLevel } from "./enum";
 import { GET as getUserMeEndpoint } from "./private/me/definition";
 // Import the interface for type compatibility
@@ -62,12 +63,11 @@ class UserRepositoryNativeImpl implements UserRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
-    logger.error(
-      "getUserById not implemented on native - not used in page.tsx",
-    );
-    void userId;
-    void detailLevel;
-    void locale;
+    logger.error("getUserById not implemented on native", {
+      userId,
+      detailLevel: String(detailLevel),
+      locale,
+    });
     return await Promise.resolve(
       this.createNotImplementedError<ExtendedUserType<T>>("getUserById"),
     );
@@ -81,12 +81,11 @@ class UserRepositoryNativeImpl implements UserRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
-    logger.error(
-      "getUserByEmail not implemented on native - not used in page.tsx",
-    );
-    void email;
-    void detailLevel;
-    void locale;
+    logger.error("getUserByEmail not implemented on native", {
+      email,
+      detailLevel: String(detailLevel),
+      locale,
+    });
     return await Promise.resolve(
       this.createNotImplementedError<ExtendedUserType<T>>("getUserByEmail"),
     );
@@ -100,6 +99,10 @@ class UserRepositoryNativeImpl implements UserRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserType<T>>> {
+    logger.debug("getUserByAuth on native", {
+      detailLevel: String(options.detailLevel),
+      locale,
+    });
     // Use typesafe nativeEndpoint() with endpoint definition
     // This provides full type inference from the endpoint's schema
     const response = await nativeEndpoint(
@@ -134,7 +137,7 @@ class UserRepositoryNativeImpl implements UserRepository {
     userId: DbId,
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
-    logger.error("exists not implemented on native - not used in page.tsx");
+    logger.error("exists not implemented on native", { userId });
     return await Promise.resolve(
       this.createNotImplementedError<boolean>("exists"),
     );
@@ -144,9 +147,7 @@ class UserRepositoryNativeImpl implements UserRepository {
     email: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
-    logger.error(
-      "emailExists not implemented on native - not used in page.tsx",
-    );
+    logger.error("emailExists not implemented on native", { email });
     return await Promise.resolve(
       this.createNotImplementedError<boolean>("emailExists"),
     );
@@ -157,21 +158,12 @@ class UserRepositoryNativeImpl implements UserRepository {
     excludeUserId: DbId,
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
-    logger.error(
-      "emailExistsByOtherUser not implemented on native - not used in page.tsx",
-    );
+    logger.error("emailExistsByOtherUser not implemented on native", {
+      email,
+      excludeUserId,
+    });
     return await Promise.resolve(
       this.createNotImplementedError<boolean>("emailExistsByOtherUser"),
-    );
-  }
-
-  async create(
-    data: NewUser,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<User>> {
-    logger.error("create not implemented on native - not used in page.tsx");
-    return await Promise.resolve(
-      this.createNotImplementedError<User>("create"),
     );
   }
 
@@ -179,9 +171,9 @@ class UserRepositoryNativeImpl implements UserRepository {
     data: NewUser,
     logger: EndpointLogger,
   ): Promise<ResponseType<StandardUserType>> {
-    logger.error(
-      "createWithHashedPassword not implemented on native - not used in page.tsx",
-    );
+    logger.error("createWithHashedPassword not implemented on native", {
+      email: data.email,
+    });
     return await Promise.resolve(
       this.createNotImplementedError<StandardUserType>(
         "createWithHashedPassword",
@@ -194,9 +186,11 @@ class UserRepositoryNativeImpl implements UserRepository {
     options: UserSearchOptions,
     logger: EndpointLogger,
   ): Promise<ResponseType<StandardUserType[]>> {
-    logger.error(
-      "searchUsers not implemented on native - not used in page.tsx",
-    );
+    logger.error("searchUsers not implemented on native", {
+      query,
+      limit: options.limit,
+      offset: options.offset,
+    });
     return await Promise.resolve(
       this.createNotImplementedError<StandardUserType[]>("searchUsers"),
     );
@@ -206,9 +200,10 @@ class UserRepositoryNativeImpl implements UserRepository {
     options: UserSearchOptions,
     logger: EndpointLogger,
   ): Promise<ResponseType<StandardUserType[]>> {
-    logger.error(
-      "getAllUsers not implemented on native - not used in page.tsx",
-    );
+    logger.error("getAllUsers not implemented on native", {
+      limit: options.limit,
+      offset: options.offset,
+    });
     return await Promise.resolve(
       this.createNotImplementedError<StandardUserType[]>("getAllUsers"),
     );
@@ -218,9 +213,7 @@ class UserRepositoryNativeImpl implements UserRepository {
     query: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<number>> {
-    logger.error(
-      "getUserSearchCount not implemented on native - not used in page.tsx",
-    );
+    logger.error("getUserSearchCount not implemented on native", { query });
     return await Promise.resolve(
       this.createNotImplementedError<number>("getUserSearchCount"),
     );
@@ -253,9 +246,12 @@ class UserRepositoryNativeImpl implements UserRepository {
       };
     }>
   > {
-    logger.warn(
-      "searchUsersWithPagination not implemented on native - not used in page.tsx",
-    );
+    logger.warn("searchUsersWithPagination not implemented on native", {
+      searchTerm,
+      limit: options.limit,
+      offset: options.offset,
+      roles: options.roles,
+    });
     return await Promise.resolve(
       this.createNotImplementedError<{
         users: Array<
@@ -282,9 +278,7 @@ class UserRepositoryNativeImpl implements UserRepository {
   async getActiveUserCount(
     logger: EndpointLogger,
   ): Promise<ResponseType<number>> {
-    logger.error(
-      "getActiveUserCount not implemented on native - not used in page.tsx",
-    );
+    logger.error("getActiveUserCount not implemented on native");
     return await Promise.resolve(
       this.createNotImplementedError<number>("getActiveUserCount"),
     );

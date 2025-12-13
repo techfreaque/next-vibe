@@ -15,7 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 
 import { CampaignType } from "../enum";
@@ -75,8 +74,6 @@ function mapLocaleToSelectionCriteria(locale: CountryLanguage): {
 export interface EmailSendingRepository {
   sendEmail(
     data: SendEmailRequestTypeOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SendEmailResponseTypeOutput>>;
 }
@@ -91,8 +88,6 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
    */
   async sendEmail(
     data: SendEmailRequestTypeOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SendEmailResponseTypeOutput>> {
     try {
@@ -155,8 +150,6 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
           leadId: data.params.leadId,
           campaignId: data.params.campaignId,
         },
-        user,
-        locale,
         logger,
       );
 

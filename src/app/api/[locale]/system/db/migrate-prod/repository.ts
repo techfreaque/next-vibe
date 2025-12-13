@@ -11,7 +11,6 @@ import {
 
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -33,7 +32,6 @@ type MigrateProdResponseType =
 export interface DatabaseMigrateProdRepository {
   runProductionMigrations(
     data: MigrateProdRequestType,
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateProdResponseType>>;
@@ -45,7 +43,6 @@ export interface DatabaseMigrateProdRepository {
 export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRepository {
   async runProductionMigrations(
     data: MigrateProdRequestType,
-    _user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateProdResponseType>> {

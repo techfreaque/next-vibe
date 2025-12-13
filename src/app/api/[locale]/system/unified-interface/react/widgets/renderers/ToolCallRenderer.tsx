@@ -79,7 +79,6 @@ interface ToolCallRendererProps {
 export function ToolCallRenderer({
   toolCall,
   locale,
-  context: _context,
   defaultOpen = false,
   threadId,
   messageId,
@@ -92,7 +91,6 @@ export function ToolCallRenderer({
   const [definition, setDefinition] = useState<CreateApiEndpointAny | null>(
     null,
   );
-  const [_isLoadingDef, setIsLoadingDef] = useState(true);
 
   // Create a form for managing the tool parameters when waiting for confirmation
   const confirmationForm = useForm<FieldValues>({
@@ -173,7 +171,6 @@ export function ToolCallRenderer({
           message: result.message,
         });
       }
-      setIsLoadingDef(false);
     };
     void loadDef();
   }, [toolCall.toolName, locale]);
@@ -236,10 +233,15 @@ export function ToolCallRenderer({
   const displayName = definition?.title
     ? t(definition.title)
     : toolCall.toolName;
-  const icon = definition?.aiTool?.icon;
+  const icon = definition?.icon;
   const credits = definition?.credits ?? toolCall.creditsUsed ?? 0;
   const creditsDisplay = credits
-    ? t("app.chat.toolCall.creditsUsed", { count: credits })
+    ? t(
+        credits === 1
+          ? "app.chat.toolCall.creditsUsed_one"
+          : "app.chat.toolCall.creditsUsed_other",
+        { cost: credits },
+      )
     : null;
 
   return (

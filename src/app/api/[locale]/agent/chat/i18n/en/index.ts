@@ -50,6 +50,19 @@ export const translations = {
       debug: "Debug",
     },
   },
+  components: {
+    sidebar: {
+      login: "Login",
+      logout: "Logout",
+      footer: {
+        account: "Account",
+        profile: "Profile",
+        balance: "Balance",
+        buy: "Buy",
+        freeCreditsLeft: "Free credits",
+      },
+    },
+  },
   common: {
     newChat: "New Chat",
     privateChats: "Private Chats",
@@ -127,7 +140,8 @@ export const translations = {
           },
           suggestedPrompts: {
             label: "Suggested Prompts (optional)",
-            description: "Add up to 4 example prompts to help users get started",
+            description:
+              "Add up to 4 example prompts to help users get started",
             placeholder: "Example prompt {{number}}",
           },
         },
@@ -244,6 +258,10 @@ export const translations = {
         "FreedomGPT Liberty - Uncensored AI model focused on free expression and creative content",
       gabAiArya:
         "Gab AI Arya - Uncensored conversational AI model with free expression and creative capabilities",
+      gemini3Pro:
+        "Google Gemini 3 Pro - Advanced multimodal AI model with large context window",
+      deepseekV32:
+        "DeepSeek V3.2 - High-performance reasoning model with advanced coding capabilities",
     },
   },
 };

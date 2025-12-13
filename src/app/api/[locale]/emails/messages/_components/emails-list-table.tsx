@@ -79,14 +79,17 @@ export function EmailsListTable({
   if (loading) {
     return (
       <Div className="flex flex-col gap-4">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Div key={i} className="flex items-center flex flex-row gap-4">
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-20" />
-          </Div>
-        ))}
+        {Array.from({ length: 5 }, (item, i) => {
+          void item;
+          return (
+            <Div key={i} className="items-center flex flex-row gap-4">
+              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-20" />
+            </Div>
+          );
+        })}
       </Div>
     );
   }

@@ -16,7 +16,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { contacts, type NewContact } from "./db";
 import type { ContactRequestOutput, ContactResponseOutput } from "./definition";
@@ -33,7 +32,6 @@ export class contactRepository {
   static async submitContactForm(
     data: ContactRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ContactResponseOutput>> {
     try {

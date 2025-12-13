@@ -129,7 +129,7 @@ export function DataDisplayPreview(): JSX.Element {
               </TableBody>
             </Table>
           </Div>
-          {/* 
+          {/*
           <Div className="space-y-2">
             <H3>Chart</H3>
             <Card>
@@ -155,19 +155,24 @@ export function DataDisplayPreview(): JSX.Element {
             <H3>Carousel</H3>
             <Carousel className="w-full max-w-xs mx-auto">
               <CarouselContent>
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <CarouselItem key={index}>
-                    <Div className="p-1">
-                      <Card>
-                        <CardContent className="flex aspect-square items-center justify-center p-6">
-                          <Span className="text-4xl font-semibold">
-                            {index + 1}
-                          </Span>
-                        </CardContent>
-                      </Card>
-                    </Div>
-                  </CarouselItem>
-                ))}
+                {
+                  // oxlint-disable-next-line no-unused-vars
+                  Array.from({ length: 5 }, (item, index) => {
+                    return (
+                      <CarouselItem key={index}>
+                        <Div className="p-1">
+                          <Card>
+                            <CardContent className="flex aspect-square items-center justify-center p-6">
+                              <Span className="text-4xl font-semibold">
+                                {index + 1}
+                              </Span>
+                            </CardContent>
+                          </Card>
+                        </Div>
+                      </CarouselItem>
+                    );
+                  })
+                }
               </CarouselContent>
               <CarouselPrevious />
               <CarouselNext />

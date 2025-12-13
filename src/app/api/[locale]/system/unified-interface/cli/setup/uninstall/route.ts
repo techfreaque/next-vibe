@@ -14,7 +14,7 @@ import { setupUninstallRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: uninstallEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) => {
+    handler: ({ data, user, logger, locale }) => {
       logger.info("Setup uninstall operation started", {
         verbose: data.verbose,
       });

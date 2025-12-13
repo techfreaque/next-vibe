@@ -3,10 +3,11 @@ import type { TFunction } from "@/i18n/core/static-types";
 import { Div } from "next-vibe-ui/ui/div";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
-import { Link } from "next-vibe-ui/ui/link";
 import { Ul } from "next-vibe-ui/ui/ul";
 import { Li } from "next-vibe-ui/ui/li";
 import { Strong } from "next-vibe-ui/ui/strong";
+import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
+import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 
 export interface TourStepConfig extends Step {
   requiresAuth?: boolean;
@@ -16,13 +17,16 @@ export interface TourStepConfig extends Step {
 // Data-tour attribute constants
 export const TOUR_DATA_ATTRS = {
   MODEL_SELECTOR: "model-selector",
+  MODEL_SELECTOR_FAVORITES: "model-selector-favorites",
+  MODEL_SELECTOR_SHOW_ALL: "model-selector-show-all",
   MODEL_SELECTOR_SEARCH: "model-selector-search",
   MODEL_SELECTOR_GROUP: "model-selector-group",
-  MODEL_SELECTOR_FAVORITES: "model-selector-favorites",
   PERSONA_SELECTOR: "persona-selector",
+  PERSONA_SELECTOR_FAVORITES: "persona-selector-favorites",
+  PERSONA_SELECTOR_SHOW_ALL: "persona-selector-show-all",
   PERSONA_SELECTOR_SEARCH: "persona-selector-search",
   PERSONA_SELECTOR_GROUP: "persona-selector-group",
-  PERSONA_SELECTOR_FAVORITES: "persona-selector-favorites",
+  SIDEBAR_TOGGLE: "sidebar-toggle",
   ROOT_FOLDERS: "root-folders",
   INCOGNITO_FOLDER: "incognito-folder",
   PUBLIC_FOLDER: "public-folder",
@@ -30,6 +34,7 @@ export const TOUR_DATA_ATTRS = {
   SHARED_FOLDER: "shared-folder",
   NEW_CHAT_BUTTON: "new-chat-button",
   SIDEBAR_LOGIN: "sidebar-login",
+  SUBSCRIPTION_BUTTON: "subscription-button",
   CHAT_INPUT: "chat-input",
   SPEECH_INPUT: "speech-input",
 } as const;
@@ -137,10 +142,17 @@ export const TOUR_TEXT_ALIGN = {
 
 export const getTourSteps = (
   t: TFunction,
-  locale: string,
   isAuthenticated = false,
 ): TourStepConfig[] => {
   const appName = t("config.appName");
+
+  // Get icon components from folder configs
+  const PrivateFolderIcon = getIconComponent(DEFAULT_FOLDER_CONFIGS.private.icon);
+  const IncognitoFolderIcon = getIconComponent(DEFAULT_FOLDER_CONFIGS.incognito.icon);
+  const SharedFolderIcon = getIconComponent(DEFAULT_FOLDER_CONFIGS.shared.icon);
+  const PublicFolderIcon = getIconComponent(DEFAULT_FOLDER_CONFIGS.public.icon);
+  const KeyboardIcon = getIconComponent("keyboard");
+  const MicIcon = getIconComponent("mic");
 
   return [
     {
@@ -188,12 +200,23 @@ export const getTourSteps = (
           <P className="text-sm">
             {t("app.chat.welcomeTour.modelSelectorFavorites.description")}
           </P>
-          <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.modelSelectorFavorites.tip")}
-          </P>
         </Div>
       ),
       placement: TOUR_PLACEMENTS.BOTTOM,
+    },
+    {
+      target: getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_SHOW_ALL),
+      content: (
+        <Div className="space-y-2">
+          <H3 className="text-lg font-semibold">
+            {t("app.chat.welcomeTour.modelSelectorShowAll.title")}
+          </H3>
+          <P className="text-sm">
+            {t("app.chat.welcomeTour.modelSelectorShowAll.description")}
+          </P>
+        </Div>
+      ),
+      placement: TOUR_PLACEMENTS.TOP,
     },
     {
       target: getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_SEARCH),
@@ -204,9 +227,6 @@ export const getTourSteps = (
           </H3>
           <P className="text-sm">
             {t("app.chat.welcomeTour.modelSelectorSearch.description")}
-          </P>
-          <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.modelSelectorSearch.tip")}
           </P>
         </Div>
       ),
@@ -221,9 +241,6 @@ export const getTourSteps = (
           </H3>
           <P className="text-sm">
             {t("app.chat.welcomeTour.modelSelectorGroup.description")}
-          </P>
-          <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.modelSelectorGroup.tip")}
           </P>
         </Div>
       ),
@@ -256,12 +273,23 @@ export const getTourSteps = (
           <P className="text-sm">
             {t("app.chat.welcomeTour.personaSelectorFavorites.description")}
           </P>
-          <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.personaSelectorFavorites.tip")}
-          </P>
         </Div>
       ),
       placement: TOUR_PLACEMENTS.BOTTOM,
+    },
+    {
+      target: getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_SHOW_ALL),
+      content: (
+        <Div className="space-y-2">
+          <H3 className="text-lg font-semibold">
+            {t("app.chat.welcomeTour.personaSelectorShowAll.title")}
+          </H3>
+          <P className="text-sm">
+            {t("app.chat.welcomeTour.personaSelectorShowAll.description")}
+          </P>
+        </Div>
+      ),
+      placement: TOUR_PLACEMENTS.TOP,
     },
     {
       target: getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_SEARCH),
@@ -272,9 +300,6 @@ export const getTourSteps = (
           </H3>
           <P className="text-sm">
             {t("app.chat.welcomeTour.personaSelectorSearch.description")}
-          </P>
-          <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.personaSelectorSearch.tip")}
           </P>
         </Div>
       ),
@@ -289,9 +314,6 @@ export const getTourSteps = (
           </H3>
           <P className="text-sm">
             {t("app.chat.welcomeTour.personaSelectorGroup.description")}
-          </P>
-          <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.personaSelectorGroup.tip")}
           </P>
         </Div>
       ),
@@ -309,22 +331,16 @@ export const getTourSteps = (
           </P>
           <Ul className="text-xs space-y-1 ml-4 list-disc">
             <Li>
-              <Strong className="text-purple-400">
-                {t("app.chat.welcomeTour.rootFolders.incognito.name")}
-              </Strong>{" "}
-              - {t("app.chat.welcomeTour.rootFolders.incognito.suffix")}
-            </Li>
-            <Li>
-              <Strong className="text-amber-400">
-                {t("app.chat.welcomeTour.rootFolders.public.name")}
-              </Strong>{" "}
-              - {t("app.chat.welcomeTour.rootFolders.public.suffix")}
-            </Li>
-            <Li>
               <Strong className="text-sky-400">
                 {t("app.chat.welcomeTour.rootFolders.private.name")}
               </Strong>{" "}
               - {t("app.chat.welcomeTour.rootFolders.private.suffix")}
+            </Li>
+            <Li>
+              <Strong className="text-purple-400">
+                {t("app.chat.welcomeTour.rootFolders.incognito.name")}
+              </Strong>{" "}
+              - {t("app.chat.welcomeTour.rootFolders.incognito.suffix")}
             </Li>
             <Li>
               <Strong className="text-teal-400">
@@ -332,20 +348,49 @@ export const getTourSteps = (
               </Strong>{" "}
               - {t("app.chat.welcomeTour.rootFolders.shared.suffix")}
             </Li>
+            <Li>
+              <Strong className="text-amber-400">
+                {t("app.chat.welcomeTour.rootFolders.public.name")}
+              </Strong>{" "}
+              - {t("app.chat.welcomeTour.rootFolders.public.suffix")}
+            </Li>
           </Ul>
         </Div>
       ),
       placement: TOUR_PLACEMENTS.RIGHT,
     },
+    // Private Folder - Only show if authenticated
+    ...(isAuthenticated
+      ? [
+          {
+            target: getTourSelector(TOUR_DATA_ATTRS.PRIVATE_FOLDER),
+            content: (
+              <Div className="space-y-3">
+                <H3 className="text-lg font-semibold flex items-center gap-2">
+                  <PrivateFolderIcon className="h-5 w-5" />
+                  <Span className="text-sky-400">
+                    {t("app.chat.welcomeTour.privateFolder.name")}
+                  </Span>
+                  {t("app.chat.welcomeTour.privateFolder.suffix")}
+                </H3>
+                <P className="text-sm">
+                  {t("app.chat.welcomeTour.privateFolder.description")}
+                </P>
+              </Div>
+            ),
+            placement: TOUR_PLACEMENTS.RIGHT,
+          },
+        ]
+      : []),
     {
       target: getTourSelector(TOUR_DATA_ATTRS.INCOGNITO_FOLDER),
       content: (
         <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            🛡️{" "}
+          <H3 className="text-lg font-semibold flex items-center gap-2">
+            <IncognitoFolderIcon className="h-5 w-5" />
             <Span className="text-purple-400">
               {t("app.chat.welcomeTour.incognitoFolder.name")}
-            </Span>{" "}
+            </Span>
             {t("app.chat.welcomeTour.incognitoFolder.suffix")}
           </H3>
           <P className="text-sm">
@@ -358,15 +403,38 @@ export const getTourSteps = (
       ),
       placement: TOUR_PLACEMENTS.RIGHT,
     },
+    // Shared Folder - Only show if authenticated
+    ...(isAuthenticated
+      ? [
+          {
+            target: getTourSelector(TOUR_DATA_ATTRS.SHARED_FOLDER),
+            content: (
+              <Div className="space-y-3">
+                <H3 className="text-lg font-semibold flex items-center gap-2">
+                  <SharedFolderIcon className="h-5 w-5" />
+                  <Span className="text-teal-400">
+                    {t("app.chat.welcomeTour.sharedFolder.name")}
+                  </Span>
+                  {t("app.chat.welcomeTour.sharedFolder.suffix")}
+                </H3>
+                <P className="text-sm">
+                  {t("app.chat.welcomeTour.sharedFolder.description")}
+                </P>
+              </Div>
+            ),
+            placement: TOUR_PLACEMENTS.RIGHT,
+          },
+        ]
+      : []),
     {
       target: getTourSelector(TOUR_DATA_ATTRS.PUBLIC_FOLDER),
       content: (
         <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            🌍{" "}
+          <H3 className="text-lg font-semibold flex items-center gap-2">
+            <PublicFolderIcon className="h-5 w-5" />
             <Span className="text-amber-400">
               {t("app.chat.welcomeTour.publicFolder.name")}
-            </Span>{" "}
+            </Span>
             {t("app.chat.welcomeTour.publicFolder.suffix")}
           </H3>
           <P className="text-sm">
@@ -375,84 +443,6 @@ export const getTourSteps = (
           <P className="text-xs text-muted-foreground">
             {t("app.chat.welcomeTour.publicFolder.note")}
           </P>
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.RIGHT,
-    },
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.PRIVATE_FOLDER),
-      content: (
-        <Div className="space-y-3">
-          <H3 className="text-lg font-semibold">
-            🔒{" "}
-            <Span className="text-sky-400">
-              {t("app.chat.welcomeTour.privateFolder.name")}
-            </Span>{" "}
-            {t("app.chat.welcomeTour.privateFolder.suffix")}
-          </H3>
-          <P className="text-sm">
-            {t("app.chat.welcomeTour.privateFolder.description")}
-          </P>
-          {!isAuthenticated && (
-            <Div className="space-y-2">
-              <P className="text-xs font-medium text-amber-400">
-                {t("app.chat.welcomeTour.privateFolder.authPrompt")}
-              </P>
-              <Div className="flex gap-2">
-                <Link
-                  href={getTourRoute(locale, TOUR_ROUTES.LOGIN)}
-                  className="flex-1 h-8 px-3 rounded-md text-center text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-center"
-                >
-                  {t("app.chat.welcomeTour.privateFolder.login")}
-                </Link>
-                <Link
-                  href={getTourRoute(locale, TOUR_ROUTES.SIGNUP)}
-                  className="flex-1 h-8 px-3 rounded-md text-center text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-center"
-                >
-                  {t("app.chat.welcomeTour.privateFolder.signUp")}
-                </Link>
-              </Div>
-            </Div>
-          )}
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.RIGHT,
-    },
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.SHARED_FOLDER),
-      content: (
-        <Div className="space-y-3">
-          <H3 className="text-lg font-semibold">
-            👥{" "}
-            <Span className="text-teal-400">
-              {t("app.chat.welcomeTour.sharedFolder.name")}
-            </Span>{" "}
-            {t("app.chat.welcomeTour.sharedFolder.suffix")}
-          </H3>
-          <P className="text-sm">
-            {t("app.chat.welcomeTour.sharedFolder.description")}
-          </P>
-          {!isAuthenticated && (
-            <Div className="space-y-2">
-              <P className="text-xs font-medium text-amber-400">
-                {t("app.chat.welcomeTour.sharedFolder.authPrompt")}
-              </P>
-              <Div className="flex gap-2">
-                <Link
-                  href={getTourRoute(locale, TOUR_ROUTES.LOGIN)}
-                  className="flex-1 h-8 px-3 rounded-md text-center text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-center"
-                >
-                  {t("app.chat.welcomeTour.sharedFolder.login")}
-                </Link>
-                <Link
-                  href={getTourRoute(locale, TOUR_ROUTES.SIGNUP)}
-                  className="flex-1 h-8 px-3 rounded-md text-center text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-center"
-                >
-                  {t("app.chat.welcomeTour.sharedFolder.signUp")}
-                </Link>
-              </Div>
-            </Div>
-          )}
         </Div>
       ),
       placement: TOUR_PLACEMENTS.RIGHT,
@@ -492,6 +482,23 @@ export const getTourSteps = (
       placement: TOUR_PLACEMENTS.RIGHT,
     },
     {
+      target: getTourSelector(TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON),
+      content: (
+        <Div className="space-y-2">
+          <H3 className="text-lg font-semibold">
+            {t("app.chat.welcomeTour.subscriptionButton.title")}
+          </H3>
+          <P className="text-sm">
+            {t("app.chat.welcomeTour.subscriptionButton.description")}
+          </P>
+          <P className="text-xs text-muted-foreground">
+            {t("app.chat.welcomeTour.subscriptionButton.tip")}
+          </P>
+        </Div>
+      ),
+      placement: TOUR_PLACEMENTS.RIGHT,
+    },
+    {
       target: getTourSelector(TOUR_DATA_ATTRS.CHAT_INPUT),
       content: (
         <Div className="space-y-3">
@@ -503,7 +510,7 @@ export const getTourSteps = (
           </P>
           <Div className="space-y-2">
             <Div className="flex items-start gap-2">
-              <Span className="text-lg">⌨️</Span>
+              <KeyboardIcon className="h-5 w-5 mt-0.5" />
               <Div>
                 <P className="text-sm font-medium">
                   {t("app.chat.welcomeTour.chatInput.typing.title")}
@@ -514,7 +521,7 @@ export const getTourSteps = (
               </Div>
             </Div>
             <Div className="flex items-start gap-2">
-              <Span className="text-lg">🎤</Span>
+              <MicIcon className="h-5 w-5 mt-0.5" />
               <Div>
                 <P className="text-sm font-medium">
                   {t("app.chat.welcomeTour.chatInput.voice.title")}

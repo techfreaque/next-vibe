@@ -68,6 +68,7 @@ const { POST } = createEndpoint({
     "app.api.system.db.migrate.taskManagement.tags.migration",
     "app.api.system.db.migrate.taskManagement.tags.tasks",
   ],
+  icon: "arrow-right",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["migrate-tasks", "db-migrate-tasks"],
   method: Methods.POST,

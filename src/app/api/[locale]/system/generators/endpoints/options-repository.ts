@@ -6,6 +6,7 @@
 
 import "server-only";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
@@ -15,7 +16,6 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 // CLI Options types

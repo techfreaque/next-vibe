@@ -10,8 +10,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { leadsRepository } from "../repository";
 import type {
@@ -25,9 +23,7 @@ import type {
 export interface LeadsListRepository {
   listLeads(
     data: LeadListGetRequestTypeOutput,
-    user: JwtPayloadType,
     logger: EndpointLogger,
-    locale: CountryLanguage,
   ): Promise<ResponseType<LeadListGetResponseTypeOutput>>;
 }
 
@@ -37,46 +33,32 @@ export interface LeadsListRepository {
 export class LeadsListRepositoryImpl implements LeadsListRepository {
   async listLeads(
     data: LeadListGetRequestTypeOutput,
-    user: JwtPayloadType,
     logger: EndpointLogger,
-    locale: CountryLanguage,
   ): Promise<ResponseType<LeadListGetResponseTypeOutput>> {
     logger.info("Listing leads with filters");
     logger.debug("Request data", data);
 
-    // Convert multi-select arrays to single values for the existing repository
-    const queryData = {
-      ...data,
-      status: data.statusFilters?.status?.[0],
-      currentCampaignStage: data.statusFilters?.currentCampaignStage?.[0],
-      country: data.locationFilters?.country?.[0],
-      language: data.locationFilters?.language?.[0],
-      source: data.statusFilters?.source?.[0],
-    };
-
-    const result = await leadsRepository.listLeads(
-      queryData,
-      user,
-      locale,
-      logger,
-    );
+    // Pass data directly - it matches the structure expected by leadsRepository
+    const result = await leadsRepository.listLeads(data, logger);
 
     if (result.success && result.data) {
       // Type-safe access to success response data
       const responseData = result.data.response;
+      const paginationData = result.data.paginationInfo;
       logger.vibe(`🎯 Successfully listed ${responseData.leads.length} leads`);
 
-      // The definition expects a response wrapper
-      // We'll create a properly typed response
+      // The definition expects response and paginationInfo separately
       return {
         success: true as const,
         data: {
           response: {
             leads: responseData.leads,
-            total: responseData.total,
-            page: responseData.page,
-            limit: responseData.limit,
-            totalPages: responseData.totalPages,
+          },
+          paginationInfo: {
+            page: paginationData.page,
+            limit: paginationData.limit,
+            total: paginationData.total,
+            totalPages: paginationData.totalPages,
           },
         },
       } satisfies ResponseType<LeadListGetResponseTypeOutput>;

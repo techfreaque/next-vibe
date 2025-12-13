@@ -8,7 +8,6 @@ import { cpus, freemem, totalmem } from "node:os";
 import { dirname, extname, join, relative, resolve } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import { success } from "../../../shared/types/response.schema";
@@ -113,7 +112,6 @@ interface WorkerResult {
 export interface LintRepositoryInterface {
   execute(
     data: LintRequestOutput,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ApiResponseType<LintResponseOutput>>;
 }
@@ -124,7 +122,6 @@ export interface LintRepositoryInterface {
 export class LintRepositoryImpl implements LintRepositoryInterface {
   async execute(
     data: LintRequestOutput,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ApiResponseType<LintResponseOutput>> {
     const startTime = Date.now();
@@ -178,7 +175,6 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       // Execute workers in parallel
       const workerResults = await this.executeWorkersInParallel(
         workerTasks,
-        locale,
         logger,
       );
 
@@ -503,14 +499,13 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
    */
   private async executeWorkersInParallel(
     tasks: WorkerTask[],
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<WorkerResult[]> {
     const results: WorkerResult[] = [];
 
     // Execute all workers in parallel
     const workerPromises = tasks.map((task) =>
-      this.executeWorker(task, locale, logger),
+      this.executeWorker(task, logger),
     );
 
     const workerResults = await Promise.allSettled(workerPromises);
@@ -549,7 +544,6 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
    */
   private async executeWorker(
     task: WorkerTask,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<WorkerResult> {
     const startTime = Date.now();

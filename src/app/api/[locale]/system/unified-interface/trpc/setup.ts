@@ -7,7 +7,6 @@ import { initTRPC } from "@trpc/server";
 import type { NextRequest } from "next/server";
 import { ZodError } from "zod";
 
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -17,10 +16,7 @@ import type { EndpointLogger } from "../shared/logger/endpoint";
 /**
  * tRPC Context - minimal context passed to all procedures
  */
-export interface TRPCContext<
-  TUrlParams,
-  _TUserRoleValue extends readonly UserRoleValue[],
-> {
+export interface TRPCContext<TUrlParams> {
   locale: CountryLanguage;
   t: TFunction;
   request: NextRequest;
@@ -36,7 +32,7 @@ export async function createTRPCContext<TUrlParams>(opts: {
   urlPathParams?: TUrlParams;
   logger: EndpointLogger;
   locale: CountryLanguage;
-}): Promise<TRPCContext<TUrlParams, readonly UserRoleValue[]>> {
+}): Promise<TRPCContext<TUrlParams>> {
   const { req, urlPathParams = {} as TUrlParams, logger, locale } = opts;
   const { t } = simpleT(locale);
 
@@ -53,7 +49,7 @@ export async function createTRPCContext<TUrlParams>(opts: {
  * Initialize tRPC
  */
 const t = initTRPC
-  .context<TRPCContext<Record<string, string>, readonly UserRoleValue[]>>()
+  .context<TRPCContext<Record<string, string>>>()
   .create({
     errorFormatter({ shape, error }) {
       return {

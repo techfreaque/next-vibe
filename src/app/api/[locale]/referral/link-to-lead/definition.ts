@@ -29,6 +29,7 @@ export const { POST } = createEndpoint({
   category: "app.api.referral.category",
   tags: ["app.api.referral.tags.referral", "app.api.referral.tags.create"],
   allowedRoles: [UserRole.PUBLIC] as const,
+  icon: "link",
 
   fields: objectField(
     {

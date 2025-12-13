@@ -13,6 +13,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { env } from "@/config/env";
 
 import type { BraveSearchGetResponseOutput } from "./definition";
+import { FRESHNESS_API_MAP } from "./definition";
 
 /**
  * Search error and success messages for AI tool responses
@@ -91,7 +92,7 @@ export interface SearchResponse {
 interface SearchConfig {
   maxResults?: number;
   includeNews?: boolean;
-  freshness?: "pd" | "pw" | "pm" | "py"; // day, week, month, year
+  freshness?: "past_day" | "past_week" | "past_month" | "past_year";
   safesearch?: "off" | "moderate" | "strict";
   bypassCache?: boolean;
 }
@@ -178,7 +179,9 @@ class BraveSearchService {
     });
 
     if (config.freshness) {
-      params.append("freshness", config.freshness);
+      // Map readable value to API code
+      const apiCode = FRESHNESS_API_MAP[config.freshness] ?? config.freshness;
+      params.append("freshness", apiCode);
     }
 
     const url = `https://api.search.brave.com/res/v1/web/search?${params}`;
@@ -395,9 +398,9 @@ function getBraveSearchService(): BraveSearchService {
 }
 
 /**
- * Freshness options for Brave Search
+ * Freshness options for Brave Search (readable values)
  */
-const FRESHNESS_OPTIONS = ["pd", "pw", "pm", "py"] as const;
+const FRESHNESS_OPTIONS = ["past_day", "past_week", "past_month", "past_year"] as const;
 
 /**
  * AI SDK Tool for Brave Search
@@ -430,7 +433,7 @@ Use this when:
       .describe("Include news results for current events (default: false)"),
     freshness: z.enum(FRESHNESS_OPTIONS).optional().describe(
       // eslint-disable-next-line i18next/no-literal-string
-      "Filter by freshness: pd (day), pw (week), pm (month), py (year)",
+      "Filter by freshness: past_day, past_week, past_month, past_year",
     ),
   }),
   execute: async ({
@@ -442,7 +445,7 @@ Use this when:
     query: string;
     maxResults?: number;
     includeNews?: boolean;
-    freshness?: "pd" | "pw" | "pm" | "py";
+    freshness?: "past_day" | "past_week" | "past_month" | "past_year";
   }) => {
     try {
       // Validate that query is provided
@@ -518,7 +521,7 @@ export interface IBraveSearchRepository {
     options: {
       maxResults?: number;
       includeNews?: boolean;
-      freshness?: "pd" | "pw" | "pm" | "py";
+      freshness?: "past_day" | "past_week" | "past_month" | "past_year";
     },
     logger: EndpointLogger,
   ): Promise<ResponseType<BraveSearchGetResponseOutput>>;
@@ -533,7 +536,7 @@ class BraveSearchRepository implements IBraveSearchRepository {
     options: {
       maxResults?: number;
       includeNews?: boolean;
-      freshness?: "pd" | "pw" | "pm" | "py";
+      freshness?: "past_day" | "past_week" | "past_month" | "past_year";
     },
     logger: EndpointLogger,
   ): Promise<ResponseType<BraveSearchGetResponseOutput>> {

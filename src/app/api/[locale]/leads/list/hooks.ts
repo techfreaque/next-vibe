@@ -28,13 +28,9 @@ export function useLeadsListEndpoint(
       },
       filterOptions: {
         initialFilters: {
-          searchPagination: {
+          paginationInfo: {
             page: 1,
             limit: 20,
-          },
-          statusFilters: {
-            status: undefined,
-            currentCampaignStage: undefined,
           },
           sortingOptions: {
             sortBy: LeadSortField.CREATED_AT,

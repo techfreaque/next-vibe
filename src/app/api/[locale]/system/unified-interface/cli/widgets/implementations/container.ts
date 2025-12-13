@@ -6,10 +6,7 @@
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type {
-  WidgetData,
-  WidgetInput,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   extractContainerData,
   getContainerConfig,
@@ -18,15 +15,13 @@ import {
 import { formatCamelCaseLabel } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class ContainerWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.CONTAINER;
-  }
+export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.CONTAINER> {
+  readonly widgetType = WidgetType.CONTAINER;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { field, value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.CONTAINER>): string {
+    const { field, value, context } = props;
 
     // Extract data using shared logic
     const data = extractContainerData(value);
@@ -100,10 +95,12 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
         const childField = field.children[key];
         const renderer = context.getRenderer(childField.ui.type);
         if (renderer) {
-          const rendered = renderer.render(
-            { field: childField, value, context },
+          const rendered = renderer.render({
+            widgetType: childField.ui.type,
+            field: childField,
+            value,
             context,
-          );
+          });
           if (rendered) {
             result.push(rendered);
           }
@@ -134,10 +131,12 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
             const childField = field.children[key];
             const renderer = context.getRenderer(childField.ui.type);
             if (renderer) {
-              return renderer.render(
-                { field: childField, value, context },
+              return renderer.render({
+                widgetType: childField.ui.type,
+                field: childField,
+                value,
                 context,
-              );
+              });
             }
           }
           return this.formatContainerValue(key, value, context);
@@ -163,7 +162,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
       typeof value === "number" ||
       typeof value === "boolean"
     ) {
-      const icon = this.getMetricIcon(key, value, context);
+      const icon = this.getMetricIcon(context);
       // Use shared formatting utility
       const label = formatCamelCaseLabel(key);
       const formattedValue =
@@ -184,8 +183,6 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer {
    * Get icon for metric based on configuration (RENDERING ONLY)
    */
   private getMetricIcon(
-    _key: string,
-    _value: string | number | boolean,
     context: WidgetRenderContext,
   ): string {
     if (!context.options.useEmojis) {

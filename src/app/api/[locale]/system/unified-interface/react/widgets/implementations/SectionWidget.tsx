@@ -22,16 +22,13 @@ import { useState } from "react";
 import { simpleT } from "@/i18n/core/shared";
 
 import { extractSectionData } from "../../../shared/widgets/logic/section";
-import {
-  type WidgetComponentProps,
-  type WidgetData,
-} from "../../../shared/widgets/types";
 import { WidgetType } from "../../../shared/types/enums";
+import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**
- * Type guard to check if an object is a UnifiedField
+ * Type guard to check if an object is a UnifiedField.
  */
 // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard: Must accept unknown to narrow any value to UnifiedField. This is the standard TypeScript pattern for type guards.
 function isUnifiedField(obj: unknown): obj is UnifiedField {
@@ -44,8 +41,7 @@ function isUnifiedField(obj: unknown): obj is UnifiedField {
 }
 
 /**
- * Section Widget Component
- * Displays titled content sections with optional collapsible behavior
+ * Displays titled content sections with optional collapsible behavior.
  */
 export function SectionWidget({
   value,
@@ -53,7 +49,7 @@ export function SectionWidget({
   context,
   className,
   form,
-}: WidgetComponentProps): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.SECTION>): JSX.Element {
   const { t } = simpleT(context.locale);
 
   // Extract data using shared logic

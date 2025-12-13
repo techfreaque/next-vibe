@@ -18,10 +18,12 @@ export function Image({
   alt,
   width,
   height,
-  fill: _fill,
-  fetchPriority: _fetchPriority,
-  priority: _priority,
-  className: _className,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  fetchPriority, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  priority, // Intentionally extracted - not used in React Native
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
+  className, // Intentionally extracted - not used in React Native
   style,
   onLoad,
   onError,

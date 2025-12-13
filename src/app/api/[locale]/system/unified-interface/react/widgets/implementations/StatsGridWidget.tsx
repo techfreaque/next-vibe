@@ -4,20 +4,20 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import { type WidgetComponentProps } from "../../../shared/widgets/types";
+import { WidgetType } from "../../../shared/types/enums";
+import type { ReactWidgetProps, NarrowedField } from "../../../shared/widgets/types";
 import { extractStatsGridData } from "../../../shared/widgets/logic/stats-grid";
 import { MetricCardWidget } from "./MetricCardWidget";
 
 /**
- * Stats Grid Widget Component
- * Displays a grid of metric cards
+ * Displays a grid of metric cards for statistical overviews.
  */
 export function StatsGridWidget({
   value,
-  field: _field,
+  field,
   context,
   className,
-}: WidgetComponentProps): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.STATS_GRID>): JSX.Element {
   // Extract data using shared logic
   const data = extractStatsGridData(value);
 
@@ -73,8 +73,9 @@ export function StatsGridWidget({
         return (
           <MetricCardWidget
             key={stat.label ?? index}
+            widgetType={WidgetType.METRIC_CARD}
             value={widgetData}
-            field={_field}
+            field={field as unknown as NarrowedField<typeof WidgetType.METRIC_CARD>}
             context={context}
           />
         );

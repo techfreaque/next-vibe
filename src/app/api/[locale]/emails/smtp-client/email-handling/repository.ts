@@ -104,8 +104,6 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                       templateData.smtpSelectionCriteria,
                   },
                 },
-                data.user,
-                data.locale,
                 logger,
               );
 
@@ -181,8 +179,6 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                       externalId: null,
                     },
                   },
-                  data.user,
-                  data.locale,
                   logger,
                 );
 

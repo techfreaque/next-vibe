@@ -279,6 +279,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       logger.debug("Getting payment information", {
         userId: user.id,
+        requestData: data,
       });
 
       // Get user's recent transactions
@@ -707,7 +708,6 @@ export class PaymentRepositoryImpl implements PaymentRepository {
             userId,
             amountTotal,
             currency,
-            "en-GLOBAL", // TODO: Get locale from metadata
             logger,
           );
         } else {

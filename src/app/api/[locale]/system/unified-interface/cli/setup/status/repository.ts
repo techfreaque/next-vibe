@@ -23,14 +23,13 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { JwtPayloadType } from "../../../../../user/auth/types";
-import type { StatusRequestOutput, StatusResponseOutput } from "./definition";
+import type { StatusResponseOutput } from "./definition";
 
 /**
  * Setup Status Repository Interface
  */
 export interface SetupStatusRepository {
   getStatus(
-    data: StatusRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
   ): Promise<ResponseType<StatusResponseOutput>>;
@@ -41,14 +40,10 @@ export interface SetupStatusRepository {
  */
 class SetupStatusRepositoryImpl implements SetupStatusRepository {
   async getStatus(
-    data: StatusRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
   ): Promise<ResponseType<StatusResponseOutput>> {
     const { t } = simpleT(locale);
-
-    // Use data parameter to avoid unused variable warning
-    void data;
 
     // Validate user permissions for CLI status check
     if (!user?.id) {

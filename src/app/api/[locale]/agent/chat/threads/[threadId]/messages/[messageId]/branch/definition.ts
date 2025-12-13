@@ -45,6 +45,7 @@ const { POST } = createEndpoint({
     "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.title" as const,
   description:
     "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.description" as const,
+  icon: "git-branch",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.messages" as const],
 

@@ -62,6 +62,7 @@ const { POST } = createEndpoint({
     "app.api.system.db.reset.taskManagement.tags.tasks",
     "app.api.system.db.reset.taskManagement.tags.management",
   ],
+  icon: "rotate-ccw",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

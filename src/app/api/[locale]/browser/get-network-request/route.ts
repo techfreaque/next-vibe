@@ -20,8 +20,6 @@ export const { POST, tools } = endpointsHandler({
     email: undefined,
     handler: async ({
       data,
-      user,
-      locale,
       logger,
     }): Promise<ResponseType<GetNetworkRequestResponseOutput>> => {
       return executeGetNetworkRequest(
@@ -31,9 +29,7 @@ export const { POST, tools } = endpointsHandler({
             reqid: data.reqid,
           }),
         },
-        user,
         logger,
-        locale,
       ) as Promise<ResponseType<GetNetworkRequestResponseOutput>>;
     },
   },

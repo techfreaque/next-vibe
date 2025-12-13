@@ -31,6 +31,7 @@ export const { GET } = createEndpoint({
   title: "app.api.referral.earnings.list.get.title",
   description: "app.api.referral.earnings.list.get.description",
   category: "app.api.referral.category",
+  icon: "dollar-sign" as const,
   tags: [
     "app.api.referral.tags.referral",
     "app.api.referral.tags.earnings",

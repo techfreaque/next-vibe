@@ -15,8 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   GuardStartRequestOutput,
@@ -278,7 +276,6 @@ function setupGuardJailEnvironment(
  * Setup VSCode integration
  */
 function setupVSCodeIntegration(
-  config: GuardJailConfig,
   projectPath: string,
   logger: EndpointLogger,
 ): { success: boolean; message: string } {
@@ -482,8 +479,6 @@ exec env -i \
 export interface GuardStartRepository {
   startGuard(
     data: GuardStartRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<GuardStartResponseOutput>>;
 }
@@ -494,8 +489,6 @@ export interface GuardStartRepository {
 export class GuardStartRepositoryImpl implements GuardStartRepository {
   async startGuard(
     data: GuardStartRequestOutput,
-    _user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<GuardStartResponseOutput>> {
     try {
@@ -585,7 +578,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     }
 
     // Setup VSCode integration
-    const vscodeResult = setupVSCodeIntegration(config, projectPath, logger);
+    const vscodeResult = setupVSCodeIntegration(projectPath, logger);
     if (!vscodeResult.success) {
       return fail({
         message: "app.api.system.guard.start.errors.internal.title",

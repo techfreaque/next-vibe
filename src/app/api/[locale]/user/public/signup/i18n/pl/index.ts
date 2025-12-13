@@ -6,6 +6,10 @@ export const translations: typeof enTranslations = {
   title: "Rejestracja Użytkownika",
   description: "Endpoint rejestracji użytkownika",
   tag: "Uwierzytelnianie",
+  actions: {
+    submit: "Utwórz konto",
+    submitting: "Tworzenie konta...",
+  },
   fields: {
     firstName: {
       label: "Imię",
@@ -24,24 +28,44 @@ export const translations: typeof enTranslations = {
       description: "Prywatna nazwa użytkownika",
       placeholder: "Wprowadź nazwę prywatną",
       help: "Wprowadź swoją prywatną nazwę do użytku wewnętrznego",
+      validation: {
+        required: "Nazwa prywatna jest wymagana",
+        minLength: "Nazwa musi mieć co najmniej 2 znaki",
+        maxLength: "Nazwa nie może być dłuższa niż 100 znaków",
+      },
     },
     publicName: {
       label: "Nazwa Publiczna",
       description: "Publiczna nazwa użytkownika",
       placeholder: "Wprowadź nazwę publiczną",
       help: "Wprowadź swoją publiczną nazwę, jak będzie wyświetlana innym",
+      validation: {
+        required: "Nazwa publiczna jest wymagana",
+        minLength: "Nazwa wyświetlana musi mieć co najmniej 2 znaki",
+        maxLength: "Nazwa wyświetlana nie może być dłuższa niż 100 znaków",
+      },
     },
     email: {
       label: "E-mail",
       description: "Adres e-mail użytkownika",
       placeholder: "Wprowadź adres e-mail",
       help: "To będzie Twój e-mail logowania i główny sposób kontaktu",
+      validation: {
+        required: "E-mail jest wymagany",
+        invalid: "Proszę wprowadzić prawidłowy adres e-mail",
+      },
     },
     password: {
       label: "Hasło",
       description: "Hasło użytkownika",
       placeholder: "Wprowadź hasło",
       help: "Hasło musi mieć co najmniej 8 znaków",
+      validation: {
+        required: "Hasło jest wymagane",
+        minLength: "Hasło musi mieć co najmniej 8 znaków",
+        complexity:
+          "Hasło musi zawierać wielką literę, małą literę i cyfrę",
+      },
     },
     confirmPassword: {
       label: "Potwierdź Hasło",
@@ -49,6 +73,8 @@ export const translations: typeof enTranslations = {
       placeholder: "Wprowadź hasło ponownie",
       help: "Wprowadź ponownie hasło, aby je potwierdzić",
       validation: {
+        required: "Proszę potwierdzić hasło",
+        minLength: "Hasło musi mieć co najmniej 8 znaków",
         mismatch: "Hasła nie są zgodne",
       },
     },
@@ -110,6 +136,13 @@ export const translations: typeof enTranslations = {
       help: "Jeśli masz kod polecający, wprowadź go tutaj",
     },
   },
+  form: {
+    title: "Utwórz swoje konto",
+    description: "Dołącz do społeczności dla nieocenzurowanych rozmów z AI",
+  },
+  footer: {
+    alreadyHaveAccount: "Masz już konto? Zaloguj się",
+  },
   groups: {
     personalInfo: {
       title: "Informacje Osobiste",
@@ -138,17 +171,45 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     title: "Błąd rejestracji",
+    validation: {
+      title: "Błąd Walidacji",
+      description: "Sprawdź wprowadzone dane i spróbuj ponownie",
+    },
+    unauthorized: {
+      title: "Brak Autoryzacji",
+      description: "Wymagana autoryzacja",
+    },
+    server: {
+      title: "Błąd Serwera",
+      description: "Wystąpił wewnętrzny błąd serwera",
+    },
+    unknown: {
+      title: "Nieznany Błąd",
+      description: "Wystąpił nieoczekiwany błąd",
+    },
     conflict: {
       title: "Konflikt Konta",
       description: "Konto już istnieje",
     },
-    internal: {
-      title: "Błąd Wewnętrzny",
-      description: "Wystąpił błąd wewnętrzny",
+    forbidden: {
+      title: "Dostęp Zabroniony",
+      description: "Odmowa dostępu",
     },
     network: {
       title: "Błąd Sieci",
       description: "Wystąpił błąd sieci",
+    },
+    notFound: {
+      title: "Nie Znaleziono",
+      description: "Zasób nie znaleziony",
+    },
+    unsaved: {
+      title: "Niezapisane Zmiany",
+      description: "Masz niezapisane zmiany",
+    },
+    internal: {
+      title: "Błąd Wewnętrzny",
+      description: "Wystąpił błąd wewnętrzny",
     },
   },
   emailCheck: {

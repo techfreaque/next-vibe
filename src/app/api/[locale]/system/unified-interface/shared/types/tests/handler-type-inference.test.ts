@@ -53,6 +53,7 @@ const testPublicOnlyEndpoint = createEndpoint({
   title: "test" as any,
   description: "test" as any,
   category: "test" as any,
+  icon: "test-tube",
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
@@ -79,6 +80,7 @@ const testAdminOnlyEndpoint = createEndpoint({
   title: "test" as any,
   description: "test" as any,
   category: "test" as any,
+  icon: "test-tube",
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
   fields: objectField(
@@ -105,6 +107,7 @@ const testMixedRolesEndpoint = createEndpoint({
   title: "test" as any,
   description: "test" as any,
   category: "test" as any,
+  icon: "test-tube",
   tags: [],
   allowedRoles: [UserRole.PUBLIC, UserRole.ADMIN] as const,
   fields: objectField(

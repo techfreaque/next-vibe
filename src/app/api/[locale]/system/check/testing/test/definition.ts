@@ -28,6 +28,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.check.testing.test.description",
   category: "app.api.system.check.testing.test.category",
   tags: ["app.api.system.check.testing.test.tag"],
+  icon: "test-tube",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

@@ -164,7 +164,7 @@ export const translations = {
     breakdown: "Credit Breakdown",
     navigation: {
       profile: "Profile",
-      subscription: "Subscription",
+      subscription: "Subscription & Credits",
       referral: "Referral Program",
       about: "About",
       help: "Help",
@@ -546,8 +546,8 @@ export const translations = {
     result: "Result",
     error: "Error",
     executing: "Executing...",
-    creditsUsed: "{{count}} credit",
-    creditsUsed_other: "{{count}} credits",
+    creditsUsed_one: "{{cost}} credit",
+    creditsUsed_other: "{{cost}} credits",
     status: {
       error: "Error",
       executing: "Executing...",
@@ -1026,105 +1026,108 @@ export const translations = {
     authDialog: {
       title: "Unlock Private & Shared Folders",
       description:
-        "To access your private and shared folders, you'll need to sign up or log in. Your chats will be synced across devices and kept secure.",
+        "Sign up or log in to access private and shared folders. Your chats will sync across devices.",
       continueTour: "Continue Tour",
       signUp: "Sign Up / Login",
     },
     welcome: {
       title: "Welcome to {{appName}}!",
       description:
-        "Your all-in-one AI chat platform. Connect with multiple AI models, organize conversations, and collaborate with others.",
-      subtitle: "Let's take a quick tour to get you started!",
+        "Break free from AI censorship. Access GPT-5.1, Claude Sonnet, and uncensored models trained on WikiLeaks and non-mainstream data. Chat privately, anonymously, or publicly. Your platform, your rules.",
+      subtitle: "Let's explore what makes us different:",
     },
     modelSelector: {
       title: "Choose Your AI Model",
       description:
-        "Select from diverse AI models - each with unique strengths. From coding assistants to creative writers, analytical thinkers to uncensored conversationalists. Click to browse models grouped by provider or utility, search to find specific ones, and star your favorites for quick access!",
-      tip: "💡 Tip: Switch models anytime mid-conversation. Different topics work better with different models!",
+        "Unlike ChatGPT, you're not locked into one AI. Switch between GPT-5.1, Claude Sonnet, DeepSeek, and uncensored models like Gab Arya and UncensoredLM. Each model offers unique perspectives and capabilities.",
+      tip: "Mainstream for safety, uncensored for truth. Mix and match based on your needs.",
     },
     modelSelectorFavorites: {
-      title: "Star Your Favorite Models",
+      title: "Star Your Favorites",
       description:
-        "Your most-used models appear here for instant access! Click the star on any model to add it to favorites. They'll always show first when you open the selector.",
-      tip: "⭐ Pro tip: Star 2-3 models you use regularly for the fastest workflow!",
+        "Build your personal AI toolkit. Star mainstream models for safe queries and uncensored models for unrestricted conversations. Quick access to what matters.",
+    },
+    modelSelectorShowAll: {
+      title: "Expand to See All Models",
+      description:
+        "Access the complete library. Compare mainstream vs uncensored, find specialized models for coding or creativity, discover what ChatGPT won't let you use.",
     },
     modelSelectorSearch: {
-      title: "Search Any Model",
+      title: "Search Models",
       description:
-        "Looking for something specific? Type to instantly filter through all available models by name, provider, or description. Perfect when you know exactly what you want!",
-      tip: '🔍 Try searching by capability like "coding", "creative", or "uncensored"!',
+        "Find exactly what you need. Search by name, provider, or capability. Try searching 'uncensored' to see models without content restrictions.",
     },
     modelSelectorGroup: {
-      title: "Browse by Provider or Utility",
+      title: "Organized by Provider & Category",
       description:
-        "Toggle between Provider mode (grouped by company like OpenAI, Anthropic) and Utility mode (grouped by purpose like Coding, Creative, Analytical). Choose the view that makes most sense to you!",
-      tip: "💡 Utility mode helps discover new models for specific tasks you hadn't considered!",
+        "Browse models grouped by company (OpenAI, Anthropic, Gab) or purpose (Uncensored, Coding, Creative). See what each provider offers.",
     },
     personaSelector: {
-      title: "Customize with Personas",
+      title: "Customize AI Personality",
       description:
-        "Shape how the AI responds with personas! Choose from built-in options like Professional, Creative, or Technical - or craft your own with custom instructions and preferred models. Browse by category, search, and star your favorites!",
-      tip: "💡 Tip: Combine any persona with any model for the perfect assistant!",
+        "Personas control how AI responds. Choose from built-in styles or create custom personas with specific instructions, tone, and preferred models. Make AI work your way.",
+      tip: "Pair any persona with any model. Professional tone with uncensored model? Done.",
     },
     personaSelectorFavorites: {
-      title: "Star Your Favorite Personas",
+      title: "Star Your Personas",
       description:
-        "Your go-to conversation styles appear here! Star the personas you use most often for quick access. Whether it's Professional for work or Creative for brainstorming, they're always ready.",
-      tip: "⭐ Pro tip: Create custom personas for recurring tasks and star them!",
+        "Quick access to your go-to conversation styles. Star the personas you use most.",
+    },
+    personaSelectorShowAll: {
+      title: "Expand to See All Personas",
+      description:
+        "Browse the complete persona library. Create unlimited custom personas for different tasks and workflows.",
     },
     personaSelectorSearch: {
-      title: "Find the Perfect Persona",
+      title: "Search Personas",
       description:
-        "Search through all personas by name, category, or description. Quickly find that specialized assistant style you need for your current task!",
-      tip: '🔍 Try searching by mood like "friendly", "formal", or "concise"!',
+        "Find the right style fast. Search by name, category, or description.",
     },
     personaSelectorGroup: {
-      title: "Browse by Source or Category",
+      title: "Organized by Source & Category",
       description:
-        "Toggle between Source mode (Built-in vs Custom) and Category mode (Creative, Technical, Professional, etc.). Organize personas the way that makes sense for your workflow!",
-      tip: "💡 Category mode helps discover new conversation styles for different scenarios!",
+        "View by source (Built-in, Your Custom, Community) or category (Creative, Technical, Professional). Find what fits your needs.",
     },
     rootFolders: {
-      title: "Organize with Root Folders",
-      description:
-        "Your chats are organized into 4 special folders, each with unique features:",
-      incognito: {
-        name: "Incognito",
-        suffix: "Never stored on servers",
-      },
-      public: {
-        name: "Public",
-        suffix: "Community forum for questions, ideas & collaboration",
-      },
+      title: "4 Privacy Modes",
+      description: "Control your data. Choose from anonymous to collaborative:",
       private: {
         name: "Private",
-        suffix: "Your personal, secure chats (requires login)",
+        suffix: "Synced workspace",
+      },
+      incognito: {
+        name: "Incognito",
+        suffix: "Zero-trace privacy",
       },
       shared: {
         name: "Shared",
-        suffix: "Share with specific people (requires login)",
+        suffix: "Team collaboration",
+      },
+      public: {
+        name: "Public",
+        suffix: "Open forum",
       },
     },
     incognitoFolder: {
       name: "Incognito",
       suffix: "Folder",
       description:
-        "Maximum privacy - chats stored only on THIS device, never on our servers. Browse freely, discuss sensitive topics, experiment without limits. Your data stays yours!",
-      note: "✓ No account required • ✓ No server storage • ✓ Complete privacy",
+        "True privacy. History stored only on your device. Messages sent for AI processing then immediately deleted from servers. Ask anything without leaving a trace.",
+      note: "No account • No server storage • Maximum privacy",
     },
     publicFolder: {
       name: "Public",
       suffix: "Folder",
       description:
-        "The community hub! Ask questions, share discoveries, get feedback, or collaborate openly. All conversations here are visible to everyone - perfect for building knowledge together and engaging with the community.",
-      note: "✓ No account required • ✓ Everyone can see • ✓ Great for getting diverse input",
+        "Open AI forum with First Amendment protection. Chat with AI and real people. Share uncensored knowledge, debate freely, get diverse perspectives from the community.",
+      note: "No account • Free speech • Community discussions",
     },
     privateFolder: {
       name: "Private",
       suffix: "Folder",
       description:
-        "Your personal AI workspace! Chats sync across all devices, stay organized with subfolders, and remain secure under your account. Perfect for ongoing projects, personal research, and work tasks.",
-      authPrompt: "🔓 Create a free account to unlock:",
+        "Your personal AI workspace. Synced across all devices, organized with subfolders. Build long-term projects, save research, access anywhere.",
+      authPrompt: "Requires account:",
       login: "Login",
       signUp: "Sign Up",
     },
@@ -1132,54 +1135,55 @@ export const translations = {
       name: "Shared",
       suffix: "Folder",
       description:
-        "Collaboration made easy! Create conversations and share them with specific people via link. Control who sees what with granular permissions. Perfect for teams, study groups, or getting expert feedback!",
-      authPrompt: "🔓 Create a free account to unlock:",
+        "Controlled collaboration. Share specific conversations via link with granular permissions. Perfect for team projects, getting expert feedback, or collaborative research.",
+      authPrompt: "Requires account:",
       login: "Login",
       signUp: "Sign Up",
     },
     newChatButton: {
-      title: "Start a New Conversation",
+      title: "Start New Conversation",
       description:
-        "Click here anytime to begin a fresh chat! Conversations automatically save to your current folder. Create as many as you need - organization is easy!",
-      tip: "⚡ Quick tip: Press Ctrl+N (Cmd+N on Mac) to start a new chat instantly!",
+        "Click here to begin a fresh chat. All conversations auto-save to your current folder for easy organization.",
+      tip: "Each folder keeps its own separate chat history.",
     },
     sidebarLogin: {
-      title: "Unlock More Features",
+      title: "Create Free Account",
       description:
-        "Sign up for free to access Private and Shared folders, sync chats across devices, save your favorite models, and customize personas!",
-      tip: "💡 No account needed for Incognito and Public folders - use those anytime!",
+        "Unlock Private and Shared folders, sync across all devices, save favorite models and personas. Incognito and Public stay available without account.",
+      tip: "Stay anonymous or sync everything. Your choice.",
+    },
+    subscriptionButton: {
+      title: "Unlimited AI Access",
+      description:
+        "Get everything ChatGPT offers PLUS uncensored models, public forums, and true privacy. 800 monthly credits for €8 (or $8/30 PLN). Access all models, no restrictions.",
+      tip: "One subscription. All mainstream and uncensored models. No boundaries.",
     },
     chatInput: {
-      title: "Two Ways to Chat",
-      description:
-        "Start conversations your way - type or talk! The choice is yours:",
+      title: "Start Chatting",
+      description: "Type or speak - both work seamlessly:",
       typing: {
-        title: "Type Your Message",
-        description:
-          "Press Enter to send, Shift+Enter for new lines. Full keyboard control!",
+        title: "Type Messages",
+        description: "Enter to send, Shift+Enter for new line",
       },
       voice: {
         title: "Voice Input",
-        description:
-          "Click the microphone button to speak naturally. Your words will be transcribed instantly!",
+        description: "Click mic icon to speak naturally",
       },
     },
     complete: {
-      title: "Ready to Chat! 🎊",
+      title: "You're Ready!",
       description:
-        "You're all set! Explore different models, try various personas, and organize chats your way. The AI is ready when you are - just start typing or speaking!",
-      help: "💬 Stuck? Just ask the AI for help - that's what it's here for!",
+        "You now have access to mainstream AND uncensored AI models, multiple privacy modes, and complete control over your data. Break free from AI censorship. Start chatting!",
+      help: "Need help? Ask any model - they're here to assist.",
     },
     authUnlocked: {
       unlocked: "Folder Unlocked!",
       privateDescription:
-        "Welcome back! Your private folder is now accessible. All your chats here sync across devices and are encrypted for security.",
-      privateNote:
-        "You can create subfolders to organize your chats however you like!",
+        "Your Private folder is now active. All chats sync across devices and stay organized in subfolders.",
+      privateNote: "Perfect for ongoing projects and personal research.",
       sharedDescription:
-        "Now you can create shareable chats! Generate a link to any thread and share it with specific people or teams.",
-      sharedNote:
-        "Perfect for collaboration, getting feedback, or sharing knowledge!",
+        "Shared folder unlocked! Create conversations and share via link with granular permission control.",
+      sharedNote: "Ideal for team collaboration and getting expert feedback.",
     },
     buttons: {
       back: "Back",

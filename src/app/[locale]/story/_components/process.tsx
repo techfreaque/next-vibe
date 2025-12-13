@@ -12,6 +12,7 @@ import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
+import { Section } from "next-vibe-ui/ui/section";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import type { FC } from "react";
@@ -87,12 +88,11 @@ const Process: FC<ProcessProps> = ({ locale }) => {
   ];
 
   return (
-    <section
+    <Section
       id="process"
       className="w-full py-24 bg-white bg-linear-to-b from-white to-gray-50 dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900"
-      ref={ref}
     >
-      <Div className="container px-4 md:px-6">
+      <Div ref={ref as never} className="container px-4 md:px-6">
         <Div className="text-center mb-16">
           <MotionDiv
             className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-600 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400 mb-4"
@@ -295,7 +295,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
           </Div>
         </MotionDiv>
       </Div>
-    </section>
+    </Section>
   );
 };
 

@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: performanceAnalyzeInsightEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, logger }) => {
       return executeMCPTool(
         {
           toolName: "performance-analyze-insight",
@@ -21,9 +21,7 @@ export const { POST, tools } = endpointsHandler({
             insightName: data.insightName,
           }),
         },
-        user,
         logger,
-        locale,
       );
     },
   },

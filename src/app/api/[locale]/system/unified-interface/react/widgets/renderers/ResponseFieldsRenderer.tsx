@@ -97,7 +97,6 @@ function renderResponseField(
   field: UnifiedField,
   result: ToolCallResult | null,
   context: WidgetRenderContext,
-  _locale: CountryLanguage,
 ): JSX.Element | null {
   // Handle null result
   if (!result) {
@@ -232,7 +231,7 @@ export function ResponseFieldsRenderer({
   return (
     <Div className="flex flex-col gap-3">
       {responseFields.map(({ key, field }) =>
-        renderResponseField(key, field, result, context, locale),
+        renderResponseField(key, field, result, context),
       )}
     </Div>
   );

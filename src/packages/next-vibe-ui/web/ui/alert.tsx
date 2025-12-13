@@ -1,7 +1,6 @@
 import { cva } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
-import type { StyleType } from "../utils/style-type";
 
 const alertVariants = cva(
   "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-3.5 [&>svg~*]:pl-7",
@@ -26,7 +25,7 @@ const alertVariants = cva(
 
 export type AlertVariant = "default" | "destructive" | "success" | "warning";
 
-export type AlertProps = {
+export interface AlertProps {
   variant?: AlertVariant;
   children?: React.ReactNode;
   icon?:
@@ -34,28 +33,26 @@ export type AlertProps = {
     | React.ComponentType<{ size?: number; color?: string }>;
   iconSize?: number;
   iconClassName?: string;
-} & StyleType;
+  className?: string;
+}
 
-export type AlertTitleProps = {
+export interface AlertTitleProps {
   children: React.ReactNode;
-} & StyleType;
+  className?: string;
+}
 
-export type AlertDescriptionProps = {
+export interface AlertDescriptionProps {
   children?: React.ReactNode;
-} & StyleType;
+  className?: string;
+}
 
 const Alert = ({
   className,
-  style,
   variant,
   icon: Icon,
   children,
 }: AlertProps): React.JSX.Element => (
-  <div
-    role="alert"
-    className={cn(alertVariants({ variant }), className)}
-    style={style}
-  >
+  <div role="alert" className={cn(alertVariants({ variant }), className)}>
     {Icon && <Icon />}
     {children}
   </div>
@@ -63,23 +60,18 @@ const Alert = ({
 
 const AlertTitle = ({
   className,
-  style,
   children,
 }: AlertTitleProps): React.JSX.Element => (
-  <h5
-    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
-    style={style}
-  >
+  <h5 className={cn("mb-1 font-medium leading-none tracking-tight", className)}>
     {children}
   </h5>
 );
 
 const AlertDescription = ({
   className,
-  style,
   children,
 }: AlertDescriptionProps): React.JSX.Element => (
-  <div className={cn("text-sm [&_p]:leading-relaxed", className)} style={style}>
+  <div className={cn("text-sm [&_p]:leading-relaxed", className)}>
     {children}
   </div>
 );

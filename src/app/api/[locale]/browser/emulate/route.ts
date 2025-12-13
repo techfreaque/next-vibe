@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: emulateEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, logger }) => {
       return executeEmulate(
         {
           toolName: "emulate",
@@ -21,9 +21,7 @@ export const { POST, tools } = endpointsHandler({
             networkConditions: data.networkConditions,
           }),
         },
-        user,
         logger,
-        locale,
       );
     },
   },

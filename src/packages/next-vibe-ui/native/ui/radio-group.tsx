@@ -1,6 +1,7 @@
 import * as RadioGroupPrimitive from "@rn-primitives/radio-group";
 import * as React from "react";
 import { View } from "react-native";
+import { styled } from "nativewind";
 
 import { cn } from "next-vibe/shared/utils/utils";
 import { Check } from "./icons/Check";
@@ -12,6 +13,7 @@ import type {
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 
+const StyledView = styled(View, { className: "style" });
 const StyledRadioGroupItem = RadioGroupPrimitive.Item;
 const StyledRadioGroupIndicator = RadioGroupPrimitive.Indicator;
 
@@ -22,14 +24,14 @@ function RadioGroup({
   onValueChange,
   disabled,
   style,
-
+  defaultValue,
   ...props
 }: RadioGroupRootProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <RadioGroupPrimitive.Root
       {...applyStyleType({ nativeStyle, className: cn("grid gap-2", className) })}
-      value={value ?? ""}
+      value={value ?? defaultValue ?? ""}
       onValueChange={onValueChange ?? (() => {})} // eslint-disable-line no-empty-function
       disabled={disabled}
       {...props}
@@ -45,9 +47,8 @@ function RadioGroupItem({
   children,
   value,
   disabled,
-  id,
   style,
-
+  id,
   ...props
 }: RadioGroupItemProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -63,13 +64,13 @@ function RadioGroupItem({
       })}
       value={value}
       disabled={disabled}
-      id={id}
+      nativeID={id}
       {...props}
     >
       <StyledRadioGroupIndicator>
-        <View className="flex flex-row items-center justify-center">
+        <StyledView className="flex flex-row items-center justify-center">
           <Check className="h-3.5 w-3.5 fill-primary" />
-        </View>
+        </StyledView>
       </StyledRadioGroupIndicator>
       {children}
     </StyledRadioGroupItem>

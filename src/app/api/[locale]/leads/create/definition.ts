@@ -18,7 +18,12 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { CountriesOptions, LanguagesOptions } from "@/i18n/core/config";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 import { UserRole } from "../../user/user-roles/enum";
 import { LeadSource, LeadSourceOptions, LeadStatus } from "../enum";
@@ -35,6 +40,7 @@ const { POST } = createEndpoint({
   category: "app.api.leads.category",
   tags: ["app.api.leads.tags.leads", "app.api.leads.tags.create"],
   allowedRoles: [UserRole.ADMIN],
+  icon: "user-plus",
 
   fields: objectField(
     {
@@ -131,7 +137,7 @@ const { POST } = createEndpoint({
               columns: 6,
               options: CountriesOptions,
             },
-            z.string(),
+            z.enum(Countries),
           ),
 
           language: requestDataField(
@@ -144,7 +150,7 @@ const { POST } = createEndpoint({
               columns: 6,
               options: LanguagesOptions,
             },
-            z.string(),
+            z.enum(Languages),
           ),
         },
       ),

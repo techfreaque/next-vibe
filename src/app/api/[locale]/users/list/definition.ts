@@ -9,8 +9,10 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   requestDataField,
+  requestResponseField,
   responseArrayField,
   responseField,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -41,93 +43,63 @@ const { GET } = createEndpoint({
   path: ["users", "list"],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  title: "app.api.users.list.title" as const,
-  description: "app.api.users.list.description" as const,
+  title: "app.api.users.list.get.title" as const,
+  description: "app.api.users.list.get.description" as const,
+  icon: "users",
   category: "app.api.users.category" as const,
   tags: ["app.api.users.list.tag" as const],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.users.list.container.title" as const,
-      description: "app.api.users.list.container.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
+      title: "app.api.users.list.get.form.title" as const,
+      description: "app.api.users.list.get.form.description" as const,
+      layoutType: LayoutType.STACKED,
+      getCount: (data) => data.response?.paginationInfo?.totalCount,
+      submitButton: {
+        text: "app.api.users.list.get.actions.refresh" as const,
+        loadingText: "app.api.users.list.get.actions.refreshing" as const,
+        position: "header",
+        icon: "refresh-cw",
+        variant: "ghost",
+        size: "sm",
+      },
     },
     { request: "data", response: true },
     {
-      // === PAGINATION & SEARCH ===
-      searchAndPagination: objectField(
+      // === SEARCH & FILTERS ===
+      searchFilters: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.users.list.container.title" as const,
-          description: "app.api.users.list.container.description" as const,
+          title: "app.api.users.list.get.searchFilters.title" as const,
+          description:
+            "app.api.users.list.get.searchFilters.description" as const,
           layoutType: LayoutType.GRID,
-          columns: 2,
+          columns: 3,
+          order: 1,
         },
         { request: "data" },
         {
-          page: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.users.list.fields.page.label" as const,
-              description:
-                "app.api.users.list.fields.page.description" as const,
-              placeholder:
-                "app.api.users.list.fields.page.placeholder" as const,
-              columns: 3,
-            },
-            z.number().min(1).optional().default(1),
-          ),
-          limit: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.NUMBER,
-              label: "app.api.users.list.fields.limit.label" as const,
-              description:
-                "app.api.users.list.fields.limit.description" as const,
-              placeholder:
-                "app.api.users.list.fields.limit.placeholder" as const,
-              columns: 3,
-            },
-            z.number().min(1).max(100).optional().default(20),
-          ),
-
           search: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "app.api.users.list.fields.search.label" as const,
+              label: "app.api.users.list.get.search.label" as const,
               description:
-                "app.api.users.list.fields.search.description" as const,
-              placeholder:
-                "app.api.users.list.fields.search.placeholder" as const,
+                "app.api.users.list.get.search.description" as const,
+              placeholder: "app.api.users.list.get.search.placeholder" as const,
               columns: 12,
             },
             z.string().optional(),
           ),
-        },
-      ),
-
-      // === FILTERS ===
-      filters: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.users.list.container.title" as const,
-          description: "app.api.users.list.container.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { request: "data" },
-        {
           status: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.users.list.fields.status.label" as const,
+              label: "app.api.users.list.get.status.label" as const,
               description:
-                "app.api.users.list.fields.status.description" as const,
+                "app.api.users.list.get.status.description" as const,
+              placeholder: "app.api.users.list.get.status.placeholder" as const,
               options: UserStatusFilterOptions,
               columns: 6,
             },
@@ -137,9 +109,9 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.users.list.fields.role.label" as const,
-              description:
-                "app.api.users.list.fields.role.description" as const,
+              label: "app.api.users.list.get.role.label" as const,
+              description: "app.api.users.list.get.role.description" as const,
+              placeholder: "app.api.users.list.get.role.placeholder" as const,
               options: UserRoleFilterOptions,
               columns: 6,
             },
@@ -148,14 +120,15 @@ const { GET } = createEndpoint({
         },
       ),
 
-      // === SORTING ===
-      sorting: objectField(
+      // === SORTING OPTIONS ===
+      sortingOptions: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.users.list.container.title" as const,
-          description: "app.api.users.list.container.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
+          title: "app.api.users.list.get.sortingOptions.title" as const,
+          description:
+            "app.api.users.list.get.sortingOptions.description" as const,
+          layoutType: LayoutType.GRID_2_COLUMNS,
+          order: 2,
         },
         { request: "data" },
         {
@@ -163,9 +136,10 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label: "app.api.users.list.fields.sortBy.label" as const,
+              label: "app.api.users.list.get.sortBy.label" as const,
               description:
-                "app.api.users.list.fields.sortBy.description" as const,
+                "app.api.users.list.get.sortBy.description" as const,
+              placeholder: "app.api.users.list.get.sortBy.placeholder" as const,
               options: UserSortFieldOptions,
               columns: 6,
             },
@@ -178,11 +152,11 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label: "app.api.users.list.fields.sortOrder.label" as const,
+              label: "app.api.users.list.get.sortOrder.label" as const,
               description:
-                "app.api.users.list.fields.sortOrder.description" as const,
+                "app.api.users.list.get.sortOrder.description" as const,
               placeholder:
-                "app.api.users.list.fields.sortOrder.placeholder" as const,
+                "app.api.users.list.get.sortOrder.placeholder" as const,
               options: SortOrderOptions,
               columns: 6,
             },
@@ -191,75 +165,45 @@ const { GET } = createEndpoint({
         },
       ),
 
+      // === FORM ALERT (shows validation and API errors) ===
+      formAlert: widgetField(
+        {
+          type: WidgetType.FORM_ALERT,
+          order: 2.5,
+        },
+        { request: "data" },
+      ),
+
       // === RESPONSE FIELDS ===
       response: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.users.list.response.summary.title" as const,
-          description:
-            "app.api.users.list.response.summary.description" as const,
-          layoutType: LayoutType.VERTICAL,
+          title: "app.api.users.list.get.response.title" as const,
+          description: "app.api.users.list.get.response.description" as const,
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          order: 3,
         },
         { response: true },
         {
-          totalCount: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.users.list.response.total.content" as const,
-            },
-            z.number(),
-          ),
-          pageCount: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.users.list.response.page.content" as const,
-            },
-            z.number(),
-          ),
-          page: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.users.list.response.page.content" as const,
-            },
-            z.number(),
-          ),
-          limit: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.users.list.response.limit.content" as const,
-            },
-            z.number(),
-          ),
           users: responseArrayField(
             {
-              type: WidgetType.DATA_CARDS,
-              cardTitle: "email",
-              cardSubtitle: "publicName",
-              cardContent: ["privateName"],
-              cardMetadata: ["isActive", "emailVerified"],
+              type: WidgetType.DATA_LIST,
+              columns: 12,
             },
             objectField(
               {
                 type: WidgetType.CONTAINER,
-                title: "app.api.users.list.response.user.title" as const,
-                description:
-                  "app.api.users.list.response.summary.description" as const,
                 layoutType: LayoutType.GRID,
-                columns: 3,
+                columns: 12,
               },
               { response: true },
               {
-                id: responseField(
-                  {
-                    type: WidgetType.TEXT,
-                    content: "app.api.users.list.response.user.id" as const,
-                  },
-                  z.string(),
-                ),
                 email: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.users.list.response.user.email" as const,
+                    content:
+                      "app.api.users.list.get.response.users.email" as const,
                   },
                   z.string(),
                 ),
@@ -267,7 +211,7 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     content:
-                      "app.api.users.list.response.user.privateName" as const,
+                      "app.api.users.list.get.response.users.privateName" as const,
                   },
                   z.string(),
                 ),
@@ -275,37 +219,47 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     content:
-                      "app.api.users.list.response.user.publicName" as const,
+                      "app.api.users.list.get.response.users.publicName" as const,
                   },
                   z.string(),
                 ),
                 isActive: responseField(
                   {
                     type: WidgetType.BADGE,
-                    text: "app.api.users.list.response.user.isActive" as const,
+                    text: "app.api.users.list.get.response.users.isActive" as const,
                   },
                   z.boolean(),
                 ),
                 emailVerified: responseField(
                   {
                     type: WidgetType.BADGE,
-                    text: "app.api.users.list.response.user.emailVerified" as const,
+                    text: "app.api.users.list.get.response.users.emailVerified" as const,
                   },
                   z.boolean(),
                 ),
                 createdAt: responseField(
                   {
                     type: WidgetType.TEXT,
+                    fieldType: FieldDataType.DATETIME,
                     content:
-                      "app.api.users.list.response.user.createdAt" as const,
+                      "app.api.users.list.get.response.users.createdAt" as const,
                   },
-                  z.string(),
+                  z.coerce.date(),
                 ),
                 updatedAt: responseField(
                   {
                     type: WidgetType.TEXT,
+                    fieldType: FieldDataType.DATETIME,
                     content:
-                      "app.api.users.list.response.user.updatedAt" as const,
+                      "app.api.users.list.get.response.users.updatedAt" as const,
+                  },
+                  z.coerce.date(),
+                ),
+                id: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.users.list.get.response.users.id" as const,
                   },
                   z.string(),
                 ),
@@ -314,80 +268,137 @@ const { GET } = createEndpoint({
           ),
         },
       ),
+
+      // === PAGINATION INFO (Editable controls + display in one row) ===
+      paginationInfo: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.HORIZONTAL,
+          noCard: true,
+          gap: "4",
+          order: 4,
+        },
+        { request: "data", response: true },
+        {
+          page: requestResponseField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.NUMBER,
+              label: "app.api.users.list.get.page.label" as const,
+              columns: 3,
+            },
+            z.coerce.number().optional().default(1),
+          ),
+          limit: requestResponseField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.NUMBER,
+              label: "app.api.users.list.get.limit.label" as const,
+              columns: 3,
+            },
+            z.coerce.number().optional().default(20),
+          ),
+          totalCount: responseField(
+            {
+              type: WidgetType.TEXT,
+              label: "app.api.users.list.get.response.totalCount" as const,
+              content: "app.api.users.list.get.response.totalCount" as const,
+              columns: 3,
+            },
+            z.number(),
+          ),
+          pageCount: responseField(
+            {
+              type: WidgetType.TEXT,
+              label: "app.api.users.list.get.response.pageCount" as const,
+              content: "app.api.users.list.get.response.pageCount" as const,
+              columns: 3,
+            },
+            z.number(),
+          ),
+        },
+      ),
     },
   ),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.users.list.errors.unauthorized.title" as const,
+      title: "app.api.users.list.get.errors.unauthorized.title" as const,
       description:
-        "app.api.users.list.errors.unauthorized.description" as const,
+        "app.api.users.list.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.users.list.errors.validation.title" as const,
-      description: "app.api.users.list.errors.validation.description" as const,
+      title: "app.api.users.list.get.errors.validation.title" as const,
+      description:
+        "app.api.users.list.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.users.list.errors.forbidden.title" as const,
-      description: "app.api.users.list.errors.forbidden.description" as const,
+      title: "app.api.users.list.get.errors.forbidden.title" as const,
+      description:
+        "app.api.users.list.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.users.list.errors.server.title" as const,
-      description: "app.api.users.list.errors.server.description" as const,
+      title: "app.api.users.list.get.errors.server.title" as const,
+      description:
+        "app.api.users.list.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.users.list.errors.unknown.title" as const,
-      description: "app.api.users.list.errors.unknown.description" as const,
+      title: "app.api.users.list.get.errors.unknown.title" as const,
+      description:
+        "app.api.users.list.get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.users.list.errors.conflict.title" as const,
-      description: "app.api.users.list.errors.conflict.description" as const,
+      title: "app.api.users.list.get.errors.conflict.title" as const,
+      description:
+        "app.api.users.list.get.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.users.list.errors.network.title" as const,
-      description: "app.api.users.list.errors.network.description" as const,
+      title: "app.api.users.list.get.errors.network.title" as const,
+      description:
+        "app.api.users.list.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.users.list.errors.notFound.title" as const,
-      description: "app.api.users.list.errors.notFound.description" as const,
+      title: "app.api.users.list.get.errors.notFound.title" as const,
+      description:
+        "app.api.users.list.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.users.list.errors.unsavedChanges.title" as const,
+      title: "app.api.users.list.get.errors.unsavedChanges.title" as const,
       description:
-        "app.api.users.list.errors.unsavedChanges.description" as const,
+        "app.api.users.list.get.errors.unsavedChanges.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.users.list.post.success.title" as const,
-    description: "app.api.users.list.post.success.description" as const,
+    title: "app.api.users.list.get.success.title" as const,
+    description: "app.api.users.list.get.success.description" as const,
   },
 
   examples: {
     requests: {
       default: {
-        searchAndPagination: {
-          page: 1,
-          limit: 20,
-        },
-        filters: {},
-        sorting: {
+        searchFilters: {},
+        sortingOptions: {
           sortBy: UserSortField.CREATED_AT,
           sortOrder: SortOrder.DESC,
         },
-      },
-      basicSearch: {
-        searchAndPagination: {
+        paginationInfo: {
           page: 1,
-          limit: 10,
-          search: "john",
+          limit: 20,
         },
-        filters: {
+      },
+      filtered: {
+        searchFilters: {
+          search: "john",
           status: [UserStatusFilter.ACTIVE],
         },
-        sorting: {
+        sortingOptions: {
           sortBy: UserSortField.EMAIL,
           sortOrder: SortOrder.ASC,
+        },
+        paginationInfo: {
+          page: 1,
+          limit: 10,
         },
       },
     },
@@ -395,15 +406,19 @@ const { GET } = createEndpoint({
       default: {
         response: {
           users: [],
+        },
+        paginationInfo: {
           totalCount: 0,
           pageCount: 0,
           page: 1,
           limit: 20,
         },
       },
-      basicSearch: {
+      filtered: {
         response: {
           users: [],
+        },
+        paginationInfo: {
           totalCount: 0,
           pageCount: 0,
           page: 1,

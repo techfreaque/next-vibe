@@ -29,6 +29,7 @@ interface BuyCreditsPageClientProps {
   packPrice: number;
   packCredits: number;
   freeCredits: number;
+  yearlySubscriptionPrice: number;
 }
 
 export function BuyCreditsPageClient({
@@ -41,6 +42,7 @@ export function BuyCreditsPageClient({
   packPrice,
   packCredits,
   freeCredits,
+  yearlySubscriptionPrice,
 }: BuyCreditsPageClientProps): JSX.Element {
   const { t } = simpleT(locale);
   const router = useRouter();
@@ -142,6 +144,7 @@ export function BuyCreditsPageClient({
         subscriptionCredits={subscriptionCredits}
         packPrice={packPrice}
         packCredits={packCredits}
+        yearlySubscriptionPrice={yearlySubscriptionPrice}
       />
     </Container>
   );

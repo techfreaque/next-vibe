@@ -18,7 +18,6 @@ import { cronStatsRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    email: undefined,
     handler: async (
       props: ApiHandlerProps<
         CronStatsGetRequestOutput,
@@ -29,7 +28,6 @@ export const { GET, tools } = endpointsHandler({
       return await cronStatsRepository.getStats(
         props.data,
         props.user,
-        props.locale,
         props.logger,
       );
     },

@@ -154,7 +154,6 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
               templateName: "app.api.emails.send.sms.emailNotificationTemplate",
             },
             user,
-            locale,
             logger,
           );
 

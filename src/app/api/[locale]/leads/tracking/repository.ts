@@ -113,15 +113,12 @@ export interface ILeadTrackingRepository {
     leadId: string,
     campaignId: string | undefined,
     clientInfo: ClientInfo,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<TrackingPixelResult>>;
 
   handleClickTracking(
     data: ClickTrackingRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ClickTrackingResult>>;
 
@@ -1078,8 +1075,6 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     leadId: string,
     campaignId: string | undefined,
     clientInfo: ClientInfo,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<TrackingPixelResult>> {
     try {
@@ -1135,7 +1130,6 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   async handleClickTracking(
     data: ClickTrackingRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ClickTrackingResult>> {
     try {
@@ -1161,7 +1155,6 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
             await leadAuthRepository.linkLeadToUser(
               trackingLeadId,
               user.id,
-              locale,
               logger,
             );
             leadsLinked = true;
@@ -1170,54 +1163,17 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
               userId: user.id,
               currentLeadId,
             });
-
-            // Redistribute free credits across user pool
-            const { creditRepository } =
-              await import("../../credits/repository");
-            const poolResult = await creditRepository.getUserPool(
-              user.id,
-              logger,
-            );
-            if (poolResult.success) {
-              await creditRepository.redistributeFreeCredits(
-                poolResult.data,
-                logger,
-              );
-            }
           } else {
-            // For anonymous users, create LEAD_ATTRIBUTION to link leads
-            await this.recordEngagement(
-              {
-                leadId: currentLeadId,
-                engagementType: EngagementTypes.LEAD_ATTRIBUTION,
-                metadata: {
-                  sourceLeadId: trackingLeadId,
-                  attributionType: "tracking_link",
-                  timestamp: new Date().toISOString(),
-                  url,
-                  campaignId: campaignId || "",
-                },
-              },
-              clientInfo,
-              logger,
-            );
-
-            // Redistribute free credits across lead pool
-            const { creditRepository } =
-              await import("../../credits/repository");
-            const poolResult = await creditRepository.getLeadPool(
+            // For anonymous users, create lead-to-lead link
+            await leadsRepository.linkLeadToLead(
+              trackingLeadId,
               currentLeadId,
+              "track_page",
               logger,
             );
-            if (poolResult.success) {
-              await creditRepository.redistributeFreeCredits(
-                poolResult.data,
-                logger,
-              );
-            }
 
             leadsLinked = true;
-            logger.debug("app.api.leads.tracking.click.leadAttribution", {
+            logger.debug("app.api.leads.tracking.click.leadLinked", {
               currentLeadId,
               trackingLeadId,
               campaignId: campaignId || "",
@@ -1357,6 +1313,9 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
     if (leadId) {
       url.searchParams.set("id", leadId);
+    }
+    if (userId) {
+      url.searchParams.set("userId", userId);
     }
     if (campaignId) {
       url.searchParams.set("campaignId", campaignId);

@@ -4,7 +4,6 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import {
   extractLinkCardData,
   type ProcessedLinkCard,
@@ -12,15 +11,13 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/link-card";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class LinkCardWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.LINK_CARD;
-  }
+export class LinkCardWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LINK_CARD> {
+  readonly widgetType = WidgetType.LINK_CARD;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.LINK_CARD>): string {
+    const { value, context } = props;
     const t = context.t;
 
     // Extract data using shared logic

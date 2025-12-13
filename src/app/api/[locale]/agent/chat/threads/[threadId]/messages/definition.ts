@@ -42,6 +42,7 @@ const { GET } = createEndpoint({
   title: "app.api.agent.chat.threads.threadId.messages.get.title" as const,
   description:
     "app.api.agent.chat.threads.threadId.messages.get.description" as const,
+  icon: "message-circle",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.messages" as const],
 
@@ -238,6 +239,7 @@ const { POST } = createEndpoint({
   title: "app.api.agent.chat.threads.threadId.messages.post.title" as const,
   description:
     "app.api.agent.chat.threads.threadId.messages.post.description" as const,
+  icon: "message-circle",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.messages" as const],
 

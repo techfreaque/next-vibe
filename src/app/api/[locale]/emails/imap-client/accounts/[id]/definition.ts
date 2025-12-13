@@ -37,6 +37,7 @@ const { GET } = createEndpoint({
   title: "app.api.emails.imapClient.accounts.id.get.title",
   description: "app.api.emails.imapClient.accounts.id.get.description",
   category: "app.api.emails.category",
+  icon: "inbox",
   tags: ["app.api.emails.imapClient.tags.accounts"],
   allowedRoles: [UserRole.ADMIN],
 
@@ -333,6 +334,7 @@ const { PUT } = createEndpoint({
   title: "app.api.emails.imapClient.accounts.id.post.title",
   description: "app.api.emails.imapClient.accounts.id.post.description",
   category: "app.api.emails.category",
+  icon: "inbox",
   tags: ["app.api.emails.imapClient.tags.accounts"],
   allowedRoles: [UserRole.ADMIN],
 
@@ -736,6 +738,7 @@ const { DELETE } = createEndpoint({
   title: "app.api.emails.imapClient.accounts.id.delete.title",
   description: "app.api.emails.imapClient.accounts.id.delete.description",
   category: "app.api.emails.category",
+  icon: "inbox",
   tags: ["app.api.emails.imapClient.tags.accounts"],
   allowedRoles: [UserRole.ADMIN],
 

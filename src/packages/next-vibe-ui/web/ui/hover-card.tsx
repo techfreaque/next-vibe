@@ -29,7 +29,6 @@ export type HoverCardContentProps = {
   children?: React.ReactNode;
   align?: "start" | "center" | "end";
   sideOffset?: number;
-  disablePositioningStyle?: boolean;
   asChild?: boolean;
   forceMount?: true;
   side?: "top" | "right" | "bottom" | "left";
@@ -88,7 +87,6 @@ export function HoverCardContent({
   align = "center",
   sideOffset = 4,
   children,
-  disablePositioningStyle: _disablePositioningStyle, // React Native-only prop
   asChild,
   forceMount,
   side,

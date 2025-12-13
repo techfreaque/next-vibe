@@ -48,6 +48,7 @@ export interface SubscriptionRepository {
   getSubscription(
     userId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SubscriptionGetResponseOutput>>;
 
   createSubscription(
@@ -79,6 +80,8 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
   async getSubscription(
     userId: string,
     logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars - locale is unused on server, but required on native
+    locale: CountryLanguage,
   ): Promise<ResponseType<SubscriptionGetResponseOutput>> {
     try {
       const results = await db
@@ -127,15 +130,23 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
   }
 
   async createSubscription(
-    _data: SubscriptionPostRequestOutput,
-    _userId: string,
-    _locale: CountryLanguage,
-    _logger: EndpointLogger,
+    data: SubscriptionPostRequestOutput,
+    userId: string,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionPostResponseOutput>> {
-    // This should be called from checkout flow after payment provider confirms
+    const { t } = simpleT(locale);
+    logger.debug("Subscription creation attempted via API (not supported)", {
+      userId,
+      plan: data.plan,
+      billingInterval: data.billingInterval,
+    });
     return fail({
       message: "app.api.subscription.errors.use_checkout_flow",
       errorType: ErrorResponseTypes.BAD_REQUEST,
+      messageParams: {
+        error: t("app.api.subscription.errors.use_checkout_flow_description"),
+      },
     });
   }
 
@@ -145,6 +156,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionPutResponseOutput>> {
+    const { t } = simpleT(locale);
     try {
       const currentSubscription = await db
         .select()
@@ -156,6 +168,9 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         return fail({
           message: "app.api.subscription.errors.not_found",
           errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: {
+            error: t("app.api.subscription.errors.not_found_description"),
+          },
         });
       }
 
@@ -180,6 +195,9 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         return fail({
           message: "app.api.subscription.errors.not_found",
           errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: {
+            error: t("app.api.subscription.errors.not_found_description"),
+          },
         });
       }
 

@@ -16,14 +16,12 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { imapAccounts } from "../db";
 import { ImapSyncStatus } from "../enum";
 import { imapSyncRepository as imapSyncServiceRepository } from "../sync-service/repository";
 import type {
-  ImapSyncGetRequestOutput,
   ImapSyncGetResponseOutput,
   ImapSyncPostRequestOutput,
   ImapSyncPostResponseOutput,
@@ -36,14 +34,11 @@ export interface ImapSyncRepository {
   startSync(
     data: ImapSyncPostRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapSyncPostResponseOutput>>;
 
   getSyncStatus(
-    data: ImapSyncGetRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<ImapSyncGetResponseOutput>;
 }
@@ -58,7 +53,6 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
   async startSync(
     data: ImapSyncPostRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapSyncPostResponseOutput>> {
     try {
@@ -133,8 +127,6 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
 
           const syncResult = await imapSyncServiceRepository.syncAccount(
             { account },
-            user,
-            locale,
             logger,
           );
 
@@ -231,9 +223,7 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
    * Note: Returns same format as POST to match type definition
    */
   getSyncStatus(
-    data: ImapSyncGetRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<ImapSyncGetResponseOutput> {
     try {

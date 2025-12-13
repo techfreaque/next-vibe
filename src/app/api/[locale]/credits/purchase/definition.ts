@@ -36,6 +36,7 @@ const { POST } = createEndpoint({
   description: "app.api.credits.purchase.post.description",
   category: "app.api.agent.chat.category",
   tags: ["app.api.agent.chat.tags.credits", "app.api.agent.chat.tags.balance"],
+  icon: "dollar-sign",
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   fields: objectField(

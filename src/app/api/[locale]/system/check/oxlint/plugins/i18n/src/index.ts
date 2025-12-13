@@ -74,7 +74,7 @@ const noLiteralStringRule = {
       words: {
         exclude: [
           ...(userOptions.words?.exclude || []),
-          "^[\\[\\]\\{\\}\\—\\<\\>\\•\\+\\%\\#\\@\\.\\:\\-\\_\\*\\;\\,\\/\\(\\)]+$",
+          "^[-\\[\\]\\{\\}—<>•+%#@.:_*;,/() ]+$",
           "^\\s+$",
           "^\\d+$",
           "^[^\\s]+\\.[^\\s]+$",
@@ -90,8 +90,8 @@ const noLiteralStringRule = {
           "^&[a-z]+;$",
           // SVG path data
           "^[MmLlHhVvCcSsQqTtAaZz0-9\\s,.-]+$",
-          // Technical symbols and emoji used as UI elements
-          "^[▶◀▲▼►◄▴▾►◄✅✕✔✓🔧]+$",
+          // Technical symbols used as UI elements (NOT emojis - those should use icon components)
+          "^[▶◀▲▼►◄▴▾►◄✅✕✔✓]+$",
           // CSS-like values with units
           "^[\\d\\s]+(?:px|em|rem|%|vh|vw|deg|rad)?(?:\\s+[\\d]+)*$",
           // url() notation
@@ -160,9 +160,9 @@ const noLiteralStringRule = {
       },
     };
 
-    // Convert string patterns to RegExp
+    // Convert string patterns to RegExp with Unicode support
     const wordExclusionPatterns = (options.words?.exclude || []).map(
-      (pattern: string) => new RegExp(pattern),
+      (pattern: string) => new RegExp(pattern, "u"),
     );
     const excludedAttributes = options["jsx-attributes"]?.exclude || [];
 

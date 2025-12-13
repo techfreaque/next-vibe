@@ -1,3 +1,4 @@
+/* eslint-disable oxlint-plugin-i18n/no-literal-string */
 import * as React from "react";
 import { View, Text } from "react-native";
 
@@ -13,7 +14,6 @@ import type { IframeProps } from "@/packages/next-vibe-ui/web/ui/iframe";
 export function Iframe({ src }: IframeProps): React.JSX.Element {
   return (
     <View>
-      {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
       <Text>
         Iframe not supported on native. If you need this feature, implement
         using WebView from react-native-webview.

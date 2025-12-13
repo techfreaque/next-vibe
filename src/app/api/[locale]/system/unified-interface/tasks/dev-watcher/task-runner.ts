@@ -15,6 +15,7 @@ import { CronTaskPriority, TaskCategory } from "../enum";
 import type { TaskRunner } from "../types/repository";
 import { Environment } from "../../../../shared/utils";
 import { env } from "@/config/env";
+import { formatDatabase } from "../../shared/logger/formatters";
 
 /**
  * Determine if a file change should trigger generator execution
@@ -315,7 +316,7 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
     logger: EndpointLogger;
     signal: AbortSignal;
   }): Promise<void> {
-    logger.info("Starting database health monitor...");
+    logger.debug("Starting database health monitor...");
 
     const HEALTH_CHECK_INTERVAL = 30000; // 30 seconds
     let checkCount = 0;
@@ -341,7 +342,8 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
 
         if (checkCount % 10 === 0) {
           // Log every 10th check (5 minutes)
-          logger.info(`Database health check #${checkCount} - OK`);
+          logger.info(formatDatabase(`Database health check #${checkCount} - OK`, "🗄️ "));
+
         }
       } catch (error) {
         consecutiveFailures++;

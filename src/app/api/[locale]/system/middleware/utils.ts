@@ -23,14 +23,6 @@ export function shouldSkipPath(path: string): boolean {
   );
 }
 
-/**
- * Check if a path is an API route
- * @param path The request path
- * @returns true if the path is an API route
- */
-export function isApiRoute(path: string): boolean {
-  return path.startsWith("/api/");
-}
 
 /**
  * Extract locale from path

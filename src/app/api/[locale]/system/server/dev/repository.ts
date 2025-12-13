@@ -6,6 +6,7 @@
 
 // CLI output messages don't need internationalization
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
 
@@ -15,9 +16,7 @@ import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/types/repository";
 import { unifiedTaskRunnerRepository } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/repository";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { databaseMigrationRepository } from "../../db/migrate/repository";
 import { dockerOperationsRepository } from "../../db/utils/docker-operations/repository";
@@ -54,7 +53,6 @@ const getDatabaseTimeoutMessage = (
 export interface DevRepositoryInterface {
   execute(
     data: RequestType,
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<never>;
@@ -82,7 +80,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       );
 
       // Kill child processes
-      for (const [_name, childProcess] of this.runningProcesses) {
+      for (const childProcess of this.runningProcesses.values()) {
         try {
           childProcess.kill("SIGTERM");
         } catch {
@@ -104,7 +102,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       );
 
       // Kill child processes
-      for (const [_name, childProcess] of this.runningProcesses) {
+      for (const childProcess of this.runningProcesses.values()) {
         try {
           childProcess.kill("SIGTERM");
         } catch {
@@ -251,7 +249,6 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
   async execute(
     data: RequestType,
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<never> {
@@ -262,7 +259,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     this.logStartupInfo(port, logger, data);
 
     // Setup database if not skipped
-    const dbSetupSuccess = await this.setupDatabase(data, user, locale, logger);
+    const dbSetupSuccess = await this.setupDatabase(data, locale, logger);
     if (!dbSetupSuccess) {
       // Database setup failed critically, start Next.js anyway
       return await this.startNextJsAndWait(port, logger);
@@ -295,7 +292,6 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
    */
   private async setupDatabase(
     data: RequestType,
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<boolean> {
@@ -317,7 +313,6 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       // Perform database operations based on reset flag
       const dbOperationSuccess = await this.performDatabaseOperations(
         data,
-        user,
         locale,
         logger,
       );
@@ -343,13 +338,12 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
    */
   private async performDatabaseOperations(
     data: RequestType,
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<boolean> {
     try {
       if (data.dbReset || data.r) {
-        await this.resetDatabase(user, locale, logger);
+        await this.resetDatabase(locale, logger);
       } else {
         await this.startDatabaseWithoutReset(locale, logger);
       }
@@ -357,7 +351,6 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       // Run migrations and seed
       await databaseMigrationRepository.runMigrations(
         { generate: true, redo: false, schema: "public", dryRun: false },
-        user,
         locale,
         logger,
       );
@@ -374,7 +367,6 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
    * Reset database with hard reset
    */
   private async resetDatabase(
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -389,7 +381,6 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         schema: "public",
         dryRun: false,
       },
-      user,
       locale,
       logger,
     );

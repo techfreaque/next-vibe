@@ -171,6 +171,7 @@ export abstract class BaseRecorder implements Recorder {
    * Handle stderr line - can be overridden by subclasses
    * @param _line - Stderr line to handle
    */
+  // eslint-disable-next-line no-unused-vars -- Parameter used in subclass overrides
   protected handleStderrLine(_line: string): void {
     // Subclasses can override to handle specific error patterns
   }

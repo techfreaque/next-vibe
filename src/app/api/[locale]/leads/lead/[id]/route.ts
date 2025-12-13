@@ -14,18 +14,13 @@ export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ urlPathParams, user, locale, logger }) => {
-      return await leadsRepository.getLeadById(
-        urlPathParams.id,
-        user,
-        locale,
-        logger,
-      );
+    handler: async ({ urlPathParams, logger }) => {
+      return await leadsRepository.getLeadById(urlPathParams.id, logger);
     },
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: async ({ urlPathParams, data, user, locale, logger }) => {
+    handler: async ({ urlPathParams, data, logger }) => {
       const leadId = urlPathParams.id;
       // Flatten nested update structure to match repository's flat LeadUpdateType
       const {
@@ -50,13 +45,7 @@ export const { GET, PATCH, tools } = endpointsHandler({
         subscriptionConfirmedAt: additionalDetails.subscriptionConfirmedAt,
         metadata: additionalDetails.metadata,
       };
-      return await leadsRepository.updateLead(
-        leadId,
-        updateData,
-        user,
-        locale,
-        logger,
-      );
+      return await leadsRepository.updateLead(leadId, updateData, logger);
     },
   },
 });

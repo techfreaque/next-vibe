@@ -3,6 +3,7 @@
  * Handles build the application operations
  */
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   success,
@@ -13,8 +14,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { databaseMigrationRepository } from "../../db/migrate/repository";
 import { generateAllRepository } from "../../generators/generate-all/repository";
@@ -67,7 +66,6 @@ const MESSAGES = {
 export interface BuildRepositoryInterface {
   execute(
     data: RequestType,
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<BuildResponseType>>;
@@ -79,7 +77,6 @@ export interface BuildRepositoryInterface {
 export class BuildRepositoryImpl implements BuildRepositoryInterface {
   async execute(
     data: RequestType,
-    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<BuildResponseType>> {
@@ -194,7 +191,6 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
                   redo: false,
                   schema: "public",
                 },
-                user,
                 locale,
                 logger,
               );

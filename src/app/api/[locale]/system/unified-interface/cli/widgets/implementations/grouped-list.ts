@@ -6,9 +6,7 @@
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
 /**
  * Configuration for grouped list rendering
@@ -64,14 +62,12 @@ interface TreeNode {
   children: Map<string, TreeNode>;
 }
 
-export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.GROUPED_LIST;
-  }
+export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.GROUPED_LIST> {
+  readonly widgetType = WidgetType.GROUPED_LIST;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
+  render(props: CLIWidgetProps<typeof WidgetType.GROUPED_LIST>): string {
+    const { value: data, context } = props;
     const t = context.t;
-    const { field, value: data } = input;
 
     if (!Array.isArray(data) || data.length === 0) {
       return context.renderEmptyState(
@@ -86,7 +82,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
       (item): item is GroupedListItem =>
         typeof item === "object" && item !== null && !Array.isArray(item),
     ) as GroupedListItem[];
-    const config = this.getGroupedListConfig(field);
+    const config = this.getGroupedListConfig();
 
     let output = "";
 
@@ -112,7 +108,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer {
     return output.trim();
   }
 
-  private getGroupedListConfig(_field: UnifiedField): GroupedListConfig {
+  private getGroupedListConfig(): GroupedListConfig {
     return {
       groupBy: "file",
       sortBy: "severity",

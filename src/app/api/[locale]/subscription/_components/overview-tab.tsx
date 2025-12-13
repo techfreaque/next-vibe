@@ -243,7 +243,7 @@ export function OverviewTab({
                     {t(
                       "app.subscription.subscription.overview.costs.features.costFormat",
                       {
-                        value: FEATURE_COSTS.BRAVE_SEARCH.toFixed(2),
+                        value: FEATURE_COSTS.BRAVE_SEARCH,
                         unit: t(
                           "app.subscription.subscription.overview.costs.features.creditsUnit",
                         ),

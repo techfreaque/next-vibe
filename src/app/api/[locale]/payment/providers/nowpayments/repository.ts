@@ -172,7 +172,8 @@ export class NOWPaymentsProvider implements PaymentProvider {
   async ensureCustomer(
     userId: string,
     email: string,
-    name: string | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Required by PaymentProvider interface
+    _name: string | null,
     logger: EndpointLogger,
   ): Promise<ResponseType<CustomerResult>> {
     try {
@@ -219,7 +220,8 @@ export class NOWPaymentsProvider implements PaymentProvider {
    */
   async createCheckoutSession(
     params: CheckoutSessionParams,
-    customerId: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Required by PaymentProvider interface
+    _customerId: string,
     logger: EndpointLogger,
     callbackToken: string,
   ): Promise<ResponseType<CheckoutSessionResult>> {

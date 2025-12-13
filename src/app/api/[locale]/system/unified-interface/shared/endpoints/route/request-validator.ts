@@ -9,8 +9,8 @@ import "server-only";
 import { parseError, validateData } from "next-vibe/shared/utils";
 import { z } from "zod";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import { CountryLanguageValues } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 import {
   type ResponseType,
   ErrorResponseTypes,

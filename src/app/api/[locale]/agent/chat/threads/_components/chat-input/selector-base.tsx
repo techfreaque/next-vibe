@@ -24,6 +24,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { useTouchDevice } from "@/hooks/use-touch-device";
+import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-state-context";
 import { OptionListItem } from "./option-list-item";
 import { OptionGridItem } from "./option-grid-item";
 
@@ -61,9 +62,19 @@ interface SelectorBaseProps<T = string> {
   className?: string;
   buttonClassName?: string;
   triggerSize?: "default" | "sm" | "lg" | "icon";
-  showTextAt?: "always" | "sm" | "md" | "lg" | "never";
+  showTextAt?:
+    | "always"
+    | "sm"
+    | "md"
+    | "lg"
+    | "@sm"
+    | "@md"
+    | "@lg"
+    | "@xl"
+    | "never";
   dataTour?: string;
   dataTourPrefix?: string; // For internal modal elements (e.g., "model-selector" -> "model-selector-search")
+  forceOpen?: boolean; // Force popover to stay open (for tour)
 }
 
 /**
@@ -97,10 +108,59 @@ export function SelectorBase<T extends string = string>({
   showTextAt = "sm",
   dataTour,
   dataTourPrefix,
+  forceOpen = false,
 }: SelectorBaseProps<T>): JSX.Element {
   const { t } = simpleT(locale);
-  const [open, setOpen] = useState(false);
-  const [showAll, setShowAll] = useState(false);
+
+  // Get tour state
+  const tourIsActive = useTourState((state) => state.isActive);
+  const tourModelSelectorOpen = useTourState(
+    (state) => state.modelSelectorOpen,
+  );
+  const tourPersonaSelectorOpen = useTourState(
+    (state) => state.personaSelectorOpen,
+  );
+  const tourModelSelectorShowAll = useTourState(
+    (state) => state.modelSelectorShowAll,
+  );
+  const tourPersonaSelectorShowAll = useTourState(
+    (state) => state.personaSelectorShowAll,
+  );
+  const setTourModelSelectorOpen = useTourState(
+    (state) => state.setModelSelectorOpen,
+  );
+  const setTourPersonaSelectorOpen = useTourState(
+    (state) => state.setPersonaSelectorOpen,
+  );
+  const setTourModelSelectorShowAll = useTourState(
+    (state) => state.setModelSelectorShowAll,
+  );
+  const setTourPersonaSelectorShowAll = useTourState(
+    (state) => state.setPersonaSelectorShowAll,
+  );
+
+  // Determine if this is model or persona selector based on dataTourPrefix
+  const isModelSelector = dataTourPrefix === "model-selector";
+  const isPersonaSelector = dataTourPrefix === "persona-selector";
+
+  // Use tour state if tour is active, otherwise use local state
+  const [localOpen, setLocalOpen] = useState(false);
+  const open = tourIsActive
+    ? isModelSelector
+      ? tourModelSelectorOpen
+      : isPersonaSelector
+        ? tourPersonaSelectorOpen
+        : localOpen
+    : localOpen;
+
+  const [localShowAll, setLocalShowAll] = useState(false);
+  const showAll = tourIsActive
+    ? isModelSelector
+      ? tourModelSelectorShowAll
+      : isPersonaSelector
+        ? tourPersonaSelectorShowAll
+        : localShowAll
+    : localShowAll;
   const [searchQuery, setSearchQuery] = useState("");
   const [groupMode, setGroupMode] = useState<GroupMode>("utility");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
@@ -215,10 +275,7 @@ export function SelectorBase<T extends string = string>({
                 option.utilityOrders &&
                 option.utilityOrders[utilityKey] !== undefined
               ) {
-                utilityOrderMap.set(
-                  groupKey,
-                  option.utilityOrders[utilityKey],
-                );
+                utilityOrderMap.set(groupKey, option.utilityOrders[utilityKey]);
               }
             }
             grouped[groupKey].options.push(option);
@@ -267,14 +324,65 @@ export function SelectorBase<T extends string = string>({
 
   const handleSelect = (id: T): void => {
     onChange(id);
-    setOpen(false);
+    // Close modal using the appropriate method
+    if (tourIsActive) {
+      if (isModelSelector) {
+        setTourModelSelectorOpen(false);
+      } else if (isPersonaSelector) {
+        setTourPersonaSelectorOpen(false);
+      }
+    } else {
+      setLocalOpen(false);
+    }
   };
 
   const handleOpenChange = (newOpen: boolean): void => {
-    setOpen(newOpen);
+    // If forceOpen is true, prevent closing
+    if (forceOpen && !newOpen) {
+      return;
+    }
+
+    // If tour is active and trying to close, prevent it
+    if (tourIsActive && !newOpen) {
+      return;
+    }
+
+    // If tour is active, update tour state instead of local state
+    if (tourIsActive) {
+      if (isModelSelector) {
+        setTourModelSelectorOpen(newOpen);
+      } else if (isPersonaSelector) {
+        setTourPersonaSelectorOpen(newOpen);
+      }
+    } else {
+      // Normal operation - update local state
+      setLocalOpen(newOpen);
+    }
+
     if (!newOpen) {
-      setShowAll(false);
+      // Reset show all state
+      if (tourIsActive) {
+        if (isModelSelector) {
+          setTourModelSelectorShowAll(false);
+        } else if (isPersonaSelector) {
+          setTourPersonaSelectorShowAll(false);
+        }
+      } else {
+        setLocalShowAll(false);
+      }
       setSearchQuery("");
+    }
+  };
+
+  const handleShowAllClick = (): void => {
+    if (tourIsActive) {
+      if (isModelSelector) {
+        setTourModelSelectorShowAll(!showAll);
+      } else if (isPersonaSelector) {
+        setTourPersonaSelectorShowAll(!showAll);
+      }
+    } else {
+      setLocalShowAll(!showAll);
     }
   };
 
@@ -297,7 +405,7 @@ export function SelectorBase<T extends string = string>({
               <Span className="flex items-center justify-center w-4 h-4 shrink-0">
                 {renderIcon(selectedOption.icon)}
               </Span>
-              {/* Text visibility based on showTextAt prop */}
+              {/* Text visibility based on showTextAt prop - screen breakpoints */}
               {showTextAt === "always" && (
                 <Span className="max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left wrap-break-word line-clamp-2">
                   {selectedOption.name}
@@ -315,6 +423,27 @@ export function SelectorBase<T extends string = string>({
               )}
               {showTextAt === "lg" && (
                 <Span className="hidden min-[680px]:inline max-w-[100px] min-[680px]:max-w-[120px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[220px] text-left wrap-break-word line-clamp-2">
+                  {selectedOption.name}
+                </Span>
+              )}
+              {/* Text visibility based on showTextAt prop - container query breakpoints */}
+              {showTextAt === "@sm" && (
+                <Span className="hidden @sm:inline max-w-[100px] @sm:max-w-[120px] @md:max-w-[140px] @lg:max-w-[180px] @xl:max-w-[220px] text-left wrap-break-word line-clamp-2">
+                  {selectedOption.name}
+                </Span>
+              )}
+              {showTextAt === "@md" && (
+                <Span className="hidden @md:inline max-w-[100px] @md:max-w-[120px] @lg:max-w-[140px] @xl:max-w-[180px] @2xl:max-w-[220px] text-left wrap-break-word line-clamp-2">
+                  {selectedOption.name}
+                </Span>
+              )}
+              {showTextAt === "@lg" && (
+                <Span className="hidden @lg:inline max-w-[100px] @lg:max-w-[120px] @xl:max-w-[140px] @2xl:max-w-[180px] text-left wrap-break-word line-clamp-2">
+                  {selectedOption.name}
+                </Span>
+              )}
+              {showTextAt === "@xl" && (
+                <Span className="hidden @xl:inline max-w-[100px] @xl:max-w-[120px] @2xl:max-w-[140px] text-left wrap-break-word line-clamp-2">
                   {selectedOption.name}
                 </Span>
               )}
@@ -350,7 +479,9 @@ export function SelectorBase<T extends string = string>({
                   })}
                   className="pl-9 h-10 sm:h-9 text-base sm:text-sm touch-manipulation"
                   autoComplete="off"
-                  data-tour={dataTourPrefix ? `${dataTourPrefix}-search` : undefined}
+                  data-tour={
+                    dataTourPrefix ? `${dataTourPrefix}-search` : undefined
+                  }
                 />
               </Div>
             </Div>
@@ -362,7 +493,9 @@ export function SelectorBase<T extends string = string>({
               {/* Group Mode Toggle */}
               <Div
                 className="flex gap-1 bg-muted rounded-md p-0.5"
-                data-tour={dataTourPrefix ? `${dataTourPrefix}-group` : undefined}
+                data-tour={
+                  dataTourPrefix ? `${dataTourPrefix}-group` : undefined
+                }
               >
                 <Button
                   type="button"
@@ -412,11 +545,13 @@ export function SelectorBase<T extends string = string>({
 
           {!showAll ? (
             /* Default List View - Favorites Always Visible */
-            <Div className="overflow-y-auto max-h-[400px] overscroll-contain">
-              <Div
-                className="p-1.5 sm:p-2"
-                data-tour={dataTourPrefix ? `${dataTourPrefix}-favorites` : undefined}
-              >
+            <Div
+              className="overflow-y-auto max-h-[400px] overscroll-contain"
+              data-tour={
+                dataTourPrefix ? `${dataTourPrefix}-favorites` : undefined
+              }
+            >
+              <Div className="p-1.5 sm:p-2">
                 {favoriteOptions.length > 0 ? (
                   favoriteOptions.map((option) => (
                     <OptionListItem
@@ -446,7 +581,11 @@ export function SelectorBase<T extends string = string>({
               <Div className="p-3 sm:p-4 flex flex-col gap-5 sm:gap-6">
                 {/* Favorites Section - Always First */}
                 {favoriteOptions.length > 0 && (
-                  <Div data-tour={dataTourPrefix ? `${dataTourPrefix}-favorites` : undefined}>
+                  <Div
+                    data-tour={
+                      dataTourPrefix ? `${dataTourPrefix}-favorites` : undefined
+                    }
+                  >
                     <Div className="text-xs font-semibold text-muted-foreground mb-2.5 sm:mb-3 px-1">
                       {t("app.chat.selectorBase.favorites")}
                     </Div>
@@ -512,8 +651,9 @@ export function SelectorBase<T extends string = string>({
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => setShowAll(!showAll)}
+              onClick={handleShowAllClick}
               className="flex-1 justify-start gap-2 h-10 sm:h-9 text-sm touch-manipulation"
+              data-tour={`${dataTourPrefix}-show-all`}
             >
               {showAll ? (
                 <>

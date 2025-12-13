@@ -18,7 +18,6 @@ import { type Email, emails } from "@/app/api/[locale]/emails/messages/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { imapAccounts } from "../db";
 import {
@@ -60,56 +59,41 @@ export interface ImapMessagesRepository {
   listMessages(
     data: ImapMessageQueryType,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessagesListGetResponseOutput>>;
 
   getMessageById(
     data: { id: string },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageResponseType>>;
 
   getMessageByIdFormatted(
     data: { id: string },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageByIdResponseOutput>>;
 
   updateMessage(
     data: { messageId: string; updates: Partial<ImapMessageResponseType> },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageResponseType>>;
 
   updateMessageFormatted(
     data: { messageId: string; updates: Partial<ImapMessageResponseType> },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageUpdateResponseOutput>>;
 
   syncMessages(
     data: ImapMessageSyncType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageSyncPostResponseOutput>>;
 
   updateMessageSyncStatus(
     data: { messageId: string; syncStatus: string },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean }>>;
 
   updateMessageReadStatus(
     data: { messageId: string; isRead: boolean },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean }>>;
 }
@@ -165,7 +149,6 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
   async listMessages(
     data: ImapMessageQueryType,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessagesListGetResponseOutput>> {
     try {
@@ -385,8 +368,6 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
    */
   async getMessageById(
     data: { id: string },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageResponseType>> {
     try {
@@ -422,8 +403,6 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
    */
   async updateMessage(
     data: { messageId: string; updates: Partial<ImapMessageResponseType> },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageResponseType>> {
     try {
@@ -496,11 +475,10 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
    */
   async getMessageByIdFormatted(
     data: { id: string },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageByIdResponseOutput>> {
-    const result = await this.getMessageById(data, user, locale, logger);
+    logger.debug("Getting message by ID", { id: data.id });
+    const result = await this.getMessageById(data, logger);
     if (!result.success) {
       return result;
     }
@@ -514,11 +492,9 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
    */
   async updateMessageFormatted(
     data: { messageId: string; updates: Partial<ImapMessageResponseType> },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageUpdateResponseOutput>> {
-    const result = await this.updateMessage(data, user, locale, logger);
+    const result = await this.updateMessage(data, logger);
     if (!result.success) {
       return result;
     }
@@ -532,8 +508,6 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
    */
   async syncMessages(
     data: ImapMessageSyncType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapMessageSyncPostResponseOutput>> {
     try {
@@ -541,7 +515,6 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         accountId: data.accountId,
         folderId: data.folderId,
         force: data.force,
-        userId: user.id,
       });
 
       // Implement actual message sync using the sync service
@@ -563,16 +536,9 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
           });
         }
 
-        // Note: syncRepository methods expect full CountryLanguage format
-        // but this repository uses Countries type - map accordingly
-        // eslint-disable-next-line i18next/no-literal-string
-        const fullLocale = `en-${locale}` as CountryLanguage;
-
         // Sync the specific account
         const syncResult = await imapSyncRepository.syncAccount(
           { account: account[0] },
-          user,
-          fullLocale,
           logger,
         );
 
@@ -606,15 +572,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         }
       } else {
         // Sync all accounts
-        // eslint-disable-next-line i18next/no-literal-string
-        const fullLocale = `en-${locale}` as CountryLanguage;
-
-        const syncResult = await imapSyncRepository.syncAllAccounts(
-          {},
-          user,
-          fullLocale,
-          logger,
-        );
+        const syncResult = await imapSyncRepository.syncAllAccounts(logger);
 
         if (syncResult.success) {
           const rawErrors = syncResult.data.result?.results?.errors ?? [];
@@ -660,8 +618,6 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
    */
   async updateMessageSyncStatus(
     data: { messageId: string; syncStatus: string },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean }>> {
     try {
@@ -722,8 +678,6 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
    */
   async updateMessageReadStatus(
     data: { messageId: string; isRead: boolean },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean }>> {
     try {

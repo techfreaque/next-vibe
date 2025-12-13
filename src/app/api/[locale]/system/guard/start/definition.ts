@@ -28,6 +28,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.guard.start.description",
   category: "app.api.system.guard.category",
   tags: ["app.api.system.guard.start.tag"],
+  icon: "lock",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

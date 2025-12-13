@@ -28,6 +28,7 @@ const { POST } = createEndpoint({
   description: "app.api.system.db.migrate.post.description",
   category: "app.api.system.db.category",
   tags: ["app.api.system.db.migrate.tag"],
+  icon: "arrow-right",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,

@@ -114,10 +114,11 @@ export async function executeCommand(
   // Handle timeout if specified
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const timeoutPromise = options?.timeout
-    ? new Promise<never>((_resolve, _reject) => {
+    ? // eslint-disable-next-line no-unused-vars -- Required by Promise constructor signature
+      new Promise<never>((_resolve, reject) => {
         timeoutId = setTimeout(() => {
           proc.kill();
-          _reject(new Error(`Command timeout after ${options.timeout}ms`));
+          reject(new Error(`Command timeout after ${options.timeout}ms`));
         }, options.timeout);
       })
     : null;
@@ -235,9 +236,8 @@ export async function ensureDirectory(dir: string): Promise<void> {
     await Bun.spawn(["mkdir", "-p", dir]).exited;
   } catch (error) {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Directory creation error
-    throw new Error(
-      `Failed to create directory ${dir}: ${String(error)}`,
-      { cause: error },
-    );
+    throw new Error(`Failed to create directory ${dir}: ${String(error)}`, {
+      cause: error,
+    });
   }
 }

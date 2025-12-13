@@ -4,19 +4,16 @@
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetInput } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import { extractAccordionData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/accordion";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
-import type { WidgetRenderContext } from "../core/types";
+import type { CLIWidgetProps } from "../core/types";
 
-export class AccordionWidgetRenderer extends BaseWidgetRenderer {
-  canRender(widgetType: WidgetType): boolean {
-    return widgetType === WidgetType.ACCORDION;
-  }
+export class AccordionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.ACCORDION> {
+  readonly widgetType = WidgetType.ACCORDION;
 
-  render(input: WidgetInput, context: WidgetRenderContext): string {
-    const { value } = input;
+  render(props: CLIWidgetProps<typeof WidgetType.ACCORDION>): string {
+    const { value, context } = props;
     const indent = this.createIndent(context.depth, context);
 
     // Extract data using shared logic
