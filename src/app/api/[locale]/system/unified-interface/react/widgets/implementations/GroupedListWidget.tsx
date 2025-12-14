@@ -8,12 +8,12 @@ import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import {
   extractGroupedListData,
   getDisplayItems,
   getRemainingItemsCount,
 } from "../../../shared/widgets/logic/grouped-list";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { formatDisplayValue } from "../../../shared/widgets/utils/formatting";
 
 /**

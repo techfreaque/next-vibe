@@ -7,7 +7,8 @@ import { ResizableContainer } from "next-vibe-ui/ui/resizable";
 import type { JSX, ReactNode } from "react";
 import React from "react";
 
-import { envClient } from "@/config/env-client";
+import { platform } from "@/config/env-client";
+
 import { ScrollArea } from "./scroll-area";
 
 const SIDEBAR_WIDTH = "w-65";
@@ -40,11 +41,11 @@ export function SidebarLayout({
   topBarRight,
 }: SidebarLayoutProps): JSX.Element {
   const [isMobile, setIsMobile] = React.useState(
-    envClient.platform.isReactNative,
+    platform.isReactNative,
   );
 
   React.useEffect(() => {
-    if (envClient.platform.isReactNative) {
+    if (platform.isReactNative) {
       setIsMobile(true);
       return;
     }

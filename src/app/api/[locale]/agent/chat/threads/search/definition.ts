@@ -85,7 +85,7 @@ const { GET } = createEndpoint({
                 "app.api.agent.chat.threads.search.get.page.description" as const,
               columns: 6,
             },
-            z.number().min(1).optional().default(1),
+            z.coerce.number().min(1).optional().default(1),
           ),
           limit: requestDataField(
             {
@@ -97,7 +97,7 @@ const { GET } = createEndpoint({
                 "app.api.agent.chat.threads.search.get.limit.description" as const,
               columns: 6,
             },
-            z.number().min(1).max(100).optional().default(20),
+            z.coerce.number().min(1).max(100).optional().default(20),
           ),
         },
       ),
@@ -187,7 +187,7 @@ const { GET } = createEndpoint({
                 description:
                   "app.api.agent.chat.threads.search.get.response.results.thread.rank.description" as const,
               },
-              z.number(),
+              z.coerce.number(),
             ),
             headline: responseField(
               {
@@ -241,7 +241,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.agent.chat.threads.search.get.response.totalResults.description" as const,
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

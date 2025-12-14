@@ -1,3 +1,7 @@
+import type { Metadata } from "next";
+import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   ArrowLeft,
   Award,
@@ -6,11 +10,7 @@ import {
   Heart,
   Lightbulb,
 } from "next-vibe-ui/ui/icons";
-import type { Metadata } from "next";
-import { Button } from "next-vibe-ui/ui/button";
 import { Image } from "next-vibe-ui/ui/image";
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";

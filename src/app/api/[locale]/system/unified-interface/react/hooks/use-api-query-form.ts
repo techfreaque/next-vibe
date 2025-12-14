@@ -1,11 +1,12 @@
 "use client";
+/* oxlint-disable oxlint-plugin-restricted/restricted-syntax -- Form query hook needs 'unknown' for dynamic form field handling. Foundational infrastructure for unified interface. */
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
@@ -13,15 +14,15 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type {
   ExtractOutput,
   InferSchemaFromField,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 
 import type { ApiStore, FormQueryParams } from "./store";
 import { useApiStore } from "./store";
@@ -34,6 +35,45 @@ import type {
   SubmitFormFunctionOptions,
 } from "./types";
 import { useApiQuery } from "./use-api-query";
+
+/**
+ * Deep merge saved data with defaults
+ * Uses default values for any undefined/null values in saved data
+ */
+function mergeWithDefaults<T>(saved: T, defaults: T): T {
+  if (defaults === null || defaults === undefined) {
+    return saved;
+  }
+  if (saved === null || saved === undefined) {
+    return defaults;
+  }
+  if (typeof defaults !== "object" || typeof saved !== "object") {
+    // For primitives, use saved if it has a value, otherwise use default
+    return saved ?? defaults;
+  }
+  if (Array.isArray(defaults)) {
+    // For arrays, use saved if it exists
+    return saved as T;
+  }
+
+  // For objects, recursively merge
+  const result = { ...defaults } as Record<string, unknown>;
+  for (const key of Object.keys(saved as Record<string, unknown>)) {
+    const savedValue = (saved as Record<string, unknown>)[key];
+    const defaultValue = (defaults as Record<string, unknown>)[key];
+
+    if (savedValue !== undefined && savedValue !== null && savedValue !== "") {
+      // Saved value exists and is not empty - use it (with recursive merge for objects)
+      if (typeof savedValue === "object" && !Array.isArray(savedValue) && savedValue !== null) {
+        result[key] = mergeWithDefaults(savedValue, defaultValue);
+      } else {
+        result[key] = savedValue;
+      }
+    }
+    // If savedValue is undefined/null/empty, we keep the default (already in result)
+  }
+  return result as T;
+}
 
 /**
  * Creates a form that automatically updates a query based on form values
@@ -102,7 +142,7 @@ export function useApiQueryForm<
   >
 > {
   if (!endpoint) {
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- React hook requires throwing for missing required endpoint parameter
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- React hook requires throwing for missing required endpoint parameter
     throw new Error("Endpoint is required");
   }
   const {
@@ -312,7 +352,7 @@ export function useApiQueryForm<
     })();
   }, [formMethods, storageKey, setQueryParams, restFormOptions.defaultValues]);
 
-  // Load saved form values on mount
+  // Load saved form values on mount - merge with schema defaults
   useEffect(() => {
     if (!persistForm || typeof window === "undefined") {
       return;
@@ -325,16 +365,18 @@ export function useApiQueryForm<
           const parsedData = JSON.parse(savedFormData) as ExtractOutput<
             InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
           >;
-          formMethods.reset(parsedData);
-          // Update query params with saved data
-          setQueryParams(parsedData);
+          // Merge saved data with schema defaults - defaults take precedence for undefined/null values
+          const mergedData = mergeWithDefaults(parsedData, mergedDefaultValues);
+          formMethods.reset(mergedData);
+          // Update query params with merged data
+          setQueryParams(mergedData);
         }
       } catch {
         // Handle error silently - we don't want to break the UI for storage errors
         // In a production app, this would use a proper error logging service
       }
     })();
-  }, [formMethods, storageKey, persistForm, setQueryParams]);
+  }, [formMethods, storageKey, persistForm, setQueryParams, mergedDefaultValues]);
 
   // Save form values when they change
   useEffect(() => {
@@ -608,7 +650,7 @@ export function useApiQueryForm<
         // This is safe because we're not depending on the previous value
         // and we're not in a concurrent environment where this would be an issue
         // This is a false positive for race conditions
-        // eslint-disable-next-line require-atomic-updates
+         
         lastSubmitTimeRef.current = Date.now();
 
         // Get form data
@@ -700,7 +742,7 @@ export function useApiQueryForm<
         // This is safe because we're not depending on the previous value
         // and we're not in a concurrent environment where this would be an issue
         // This is a false positive for race conditions
-        // eslint-disable-next-line require-atomic-updates
+         
         isSubmittingRef.current = false;
       }
     };

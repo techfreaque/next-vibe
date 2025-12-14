@@ -1,9 +1,9 @@
 import { translations as checkoutTranslations } from "../../checkout/i18n/de";
 import { translations as invoiceTranslations } from "../../invoice/i18n/de";
 import { translations as portalTranslations } from "../../portal/i18n/de";
-import { translations as refundTranslations } from "../../refund/i18n/de";
-import { translations as stripeProviderTranslations } from "../../providers/stripe/i18n/de";
 import { translations as nowpaymentsProviderTranslations } from "../../providers/nowpayments/i18n/de";
+import { translations as stripeProviderTranslations } from "../../providers/stripe/i18n/de";
+import { translations as refundTranslations } from "../../refund/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {

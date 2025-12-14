@@ -3,12 +3,11 @@
  * Main leads management interface showing statistics and overview
  */
 
-import type React from "react";
 import { Div } from "next-vibe-ui/ui/div";
-
-import type { CountryLanguage } from "@/i18n/core/config";
+import type React from "react";
 
 import { LeadsStatsClient } from "@/app/api/[locale]/leads/stats/_components/leads-stats-client";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface AdminLeadsPageProps {
   params: Promise<{

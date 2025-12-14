@@ -5,10 +5,11 @@
 
 "use client";
 
-import { Edit, Trash2, X } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { Edit, Trash2, X } from "next-vibe-ui/ui/icons";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Switch } from "next-vibe-ui/ui/switch";
 import {
@@ -19,12 +20,10 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { Div } from "next-vibe-ui/ui/div";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import React, { useState } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { CronTaskResponseType } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
 import {
   useCronTaskEndpoint,
@@ -32,6 +31,7 @@ import {
   useToggleCronTask,
 } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/hooks";
 import { formatCronSchedule } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";

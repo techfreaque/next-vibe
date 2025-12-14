@@ -1,8 +1,9 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
-import type { ReactNode, JSX } from "react";
+import type { JSX,ReactNode } from "react";
 import React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 export const buttonVariants = cva(

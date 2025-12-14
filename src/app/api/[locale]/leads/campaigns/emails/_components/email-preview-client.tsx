@@ -6,14 +6,14 @@
 "use client";
 
 import { render } from "@react-email/render";
-import { Mail, Send } from "next-vibe-ui/ui/icons";
 import { parseError } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui/div";
-import { H2, P } from "next-vibe-ui/ui/typography";
-import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "next-vibe-ui/ui/dialog";
+import { Div } from "next-vibe-ui/ui/div";
+import { Mail, Send } from "next-vibe-ui/ui/icons";
 import { Iframe } from "next-vibe-ui/ui/iframe";
+import { Span } from "next-vibe-ui/ui/span";
+import { H2, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import { useEffect, useState } from "react";
 

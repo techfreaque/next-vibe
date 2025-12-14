@@ -7,22 +7,22 @@
 
 import "server-only";
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   fail,
-  success,
   isStreamingResponse,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
 import { getRouteHandler } from "@/app/api/[locale]/system/generated/route-handlers";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { CliCompatiblePlatform } from "../../../cli/runtime/route-executor";
 import type { EndpointLogger } from "../../logger/endpoint";
-import type { Platform } from "../../types/platform";
 
 /**
  * Base execution context
@@ -31,7 +31,7 @@ export interface BaseExecutionContext<TData> {
   toolName: string;
   data: TData;
   user: JwtPayloadType;
-  platform: Platform;
+  platform: CliCompatiblePlatform;
   locale: CountryLanguage;
   logger: EndpointLogger;
   timestamp: number;
@@ -64,7 +64,7 @@ export interface IRouteExecutionExecutor {
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
-    platform: typeof Platform.CLI | typeof Platform.AI | typeof Platform.MCP;
+    platform: CliCompatiblePlatform;
   }): Promise<ResponseType<TResult>>;
 
   /**
@@ -155,7 +155,7 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
-    platform: typeof Platform.CLI | typeof Platform.AI | typeof Platform.MCP;
+    platform: CliCompatiblePlatform;
   }): Promise<ResponseType<TResult>> {
     try {
       const handlerResult = await getRouteHandler(params.toolName);
@@ -188,7 +188,7 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
       }
 
       if (result.success) {
-        return success(result.data);
+        return success(result.data, result.isErrorResponse ? { isErrorResponse: true } : undefined);
       }
 
       // Return the original error from the handler

@@ -3,39 +3,39 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
 import {
   ChevronDown,
   ChevronRight,
   CornerDownRight,
 } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store";
-import { processMessageGroupForTTS } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
-import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
-import { useTouchDevice } from "@/hooks/use-touch-device";
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
 import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
 import { getVoteStatus } from "@/app/[locale]/chat/lib/utils/message-votes";
 import { getDirectReplies } from "@/app/[locale]/chat/lib/utils/thread-builder";
+import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { processMessageGroupForTTS } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
+import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useTouchDevice } from "@/hooks/use-touch-device";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+import type { useCollapseState } from "../hooks/use-collapse-state";
+import { useMessageActions } from "../hooks/use-message-actions";
 import { MessageEditor } from "../message-editor";
+import type { groupMessagesBySequence } from "../message-grouping";
 import { ModelPersonaSelectorModal } from "../model-persona-selector-modal";
 import { UserProfileCard } from "../user-profile-card";
-import { useMessageActions } from "../hooks/use-message-actions";
-import type { useCollapseState } from "../hooks/use-collapse-state";
-import type { groupMessagesBySequence } from "../message-grouping";
 import { ThreadedMessageActions } from "./actions";
 import { ThreadedMessageContent } from "./content";
-import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 
 interface ThreadedMessageProps {
   message: ChatMessage;
@@ -116,8 +116,7 @@ export function ThreadedMessage({
     void processMessageGroupForTTS(allMessagesInGroup, locale, logger).then(
       setTtsText,
     );
-    // oxlint-disable-next-line exhaustive-deps
-  }, [allMessagesInGroup, locale]);
+  }, [allMessagesInGroup, locale, logger]);
 
   const {
     isLoading: isTTSLoading,

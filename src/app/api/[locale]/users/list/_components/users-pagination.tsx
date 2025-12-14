@@ -5,15 +5,14 @@
 
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
 } from "next-vibe-ui/ui/icons";
-import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
-import { Button } from "next-vibe-ui/ui/button";
 import {
   Select,
   SelectContent,
@@ -21,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe-ui/ui/select";
+import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 

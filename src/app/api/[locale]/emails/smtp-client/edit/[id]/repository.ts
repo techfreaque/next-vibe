@@ -8,9 +8,9 @@ import "server-only";
 import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -18,13 +18,13 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Countries, Languages } from "@/i18n/core/config";
 
-import type { JwtPayloadType } from "../../../../user/auth/types";
-import { smtpAccounts } from "../../db";
-import type { CampaignType, SmtpSecurityType } from "../../enum";
 import type {
   EmailCampaignStage,
   EmailJourneyVariant,
 } from "../../../../leads/enum";
+import type { JwtPayloadType } from "../../../../user/auth/types";
+import { smtpAccounts } from "../../db";
+import type { CampaignType, SmtpSecurityType } from "../../enum";
 import type {
   SmtpAccountEditGETResponseOutput,
   SmtpAccountEditPUTResponseOutput,

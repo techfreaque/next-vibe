@@ -3,7 +3,7 @@
  * Provides consistent, beautiful formatting for different types of log messages
  */
 
-import {  semantic, bold, dim, maybeColorize } from "./colors";
+import {  bold, dim, maybeColorize,semantic } from "./colors";
 
 /**
  * Format a startup message

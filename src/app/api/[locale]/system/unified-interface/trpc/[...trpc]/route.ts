@@ -10,8 +10,8 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
 import { z } from "zod";
 
-import { createTRPCContext } from "@/app/api/[locale]/system/unified-interface/trpc/setup";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createTRPCContext } from "@/app/api/[locale]/system/unified-interface/trpc/setup";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import { appRouter } from "./router";

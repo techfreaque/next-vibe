@@ -1,19 +1,20 @@
 {
   "name": "next-vibe",
   "version": "2.0.0",
-  "main": "./dist/bin/vibe-runtime.js",
+  "main": "./.dist/bin/vibe-runtime.js",
   "author": "Max Brandstätter",
   "description": "Full-stack TypeScript framework with unified CLI, React, and API interfaces",
   "license": "GPL-3.0-only",
   "type": "module",
   "packageManager": "bun@1.3.4",
   "files": [
-    "dist/**/*",
+    ".dist/**/*",
     "src/app/api/[locale]/**/*",
     "src/i18n/**/*",
     "src/config/**/*",
     "src/hooks/**/*",
-    "src/packages/**/*"
+    "src/packages/**/*",
+    "check.config.ts"
   ],
   "scripts": {
     "postinstall": "bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts setup --force || echo 'Vibe setup failed - run manually if needed'",
@@ -261,6 +262,8 @@
     "babel-preset-expo": "54.0.8",
     "baseline-browser-mapping": "2.9.7",
     "bun-types": "1.3.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
     "globals": "16.5.0",
     "jsdom": "27.3.0",
     "module-alias": "2.2.3",

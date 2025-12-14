@@ -6,7 +6,7 @@ const test: typeof webComponents = nativeComponents;
 void test;
 
 // icons
-import * as Icons from "./icons";
 import type * as webIcons from "../../web/ui/icons";
+import * as Icons from "./icons";
 const testIcons: typeof webIcons = Icons;
 void testIcons;

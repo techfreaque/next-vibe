@@ -1,5 +1,6 @@
-import type { translations as enTranslations } from "../en";
 import { translations as contactTranslations } from "@/app/api/[locale]/contact/i18n/de";
+
+import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   contact: contactTranslations,

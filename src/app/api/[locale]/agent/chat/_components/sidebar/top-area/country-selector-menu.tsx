@@ -6,8 +6,8 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "next-vibe-ui/ui/dropdown-menu";
-import { Span } from "next-vibe-ui/ui/span";
 import { Check, Globe } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import type { FC } from "react";
 import { useCallback } from "react";
 

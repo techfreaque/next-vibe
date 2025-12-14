@@ -15,8 +15,6 @@ import { H4 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
-
 import {
   getIconComponent,
   ICON_REGISTRY,
@@ -27,6 +25,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 interface IconSelectorProps {
   value: IconValue;

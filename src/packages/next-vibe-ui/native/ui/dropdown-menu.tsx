@@ -1,33 +1,33 @@
 import * as DropdownMenuPrimitive from "@rn-primitives/dropdown-menu";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { styled } from "nativewind";
 
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import type {
+  DropdownMenuCheckboxItemProps,
+  DropdownMenuContentProps,
+  DropdownMenuGroupProps,
+  DropdownMenuItemProps,
+  DropdownMenuLabelProps,
+  DropdownMenuPortalProps,
+  DropdownMenuRadioGroupProps,
+  DropdownMenuRadioItemProps,
+  DropdownMenuRootProps,
+  DropdownMenuSeparatorProps,
+  DropdownMenuShortcutProps,
+  DropdownMenuSubContentProps,
+  DropdownMenuSubProps,
+  DropdownMenuSubTriggerProps,
+  DropdownMenuTriggerProps,
+} from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
+
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Check } from "./icons/Check";
 import { ChevronRight } from "./icons/ChevronRight";
 import { Span } from "./span";
 import { TextClassContext } from "./text";
-
-import type {
-  DropdownMenuRootProps,
-  DropdownMenuTriggerProps,
-  DropdownMenuGroupProps,
-  DropdownMenuPortalProps,
-  DropdownMenuSubProps,
-  DropdownMenuRadioGroupProps,
-  DropdownMenuSubTriggerProps,
-  DropdownMenuSubContentProps,
-  DropdownMenuContentProps,
-  DropdownMenuItemProps,
-  DropdownMenuCheckboxItemProps,
-  DropdownMenuRadioItemProps,
-  DropdownMenuLabelProps,
-  DropdownMenuSeparatorProps,
-  DropdownMenuShortcutProps,
-} from "@/packages/next-vibe-ui/web/ui/dropdown-menu";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_ITEM =
@@ -98,7 +98,8 @@ function DropdownMenuRadioGroup({
   return (
     <DropdownMenuPrimitive.RadioGroup
       value={value ?? ""}
-      onValueChange={onValueChange ?? (() => {})} // eslint-disable-line no-empty-function
+      // eslint-disable-next-line no-empty-function -- Intentional no-op default handler
+      onValueChange={onValueChange ?? (() => {})}
       {...props}
     >
       {children}
@@ -276,7 +277,8 @@ function DropdownMenuCheckboxItem({
     <DropdownMenuPrimitive.CheckboxItem
       asChild
       checked={checked ?? false}
-      onCheckedChange={onCheckedChange ?? (() => {})} // eslint-disable-line no-empty-function
+      // eslint-disable-next-line no-empty-function -- Intentional no-op default handler
+      onCheckedChange={onCheckedChange ?? (() => {})}
       {...props}
     >
       <StyledPressable

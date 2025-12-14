@@ -4,11 +4,9 @@
  * Schedule Autocomplete Component
  * Custom autocomplete for cron schedules with human-readable labels
  */
-import { Check, ChevronDown, Search, X } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
-import { Input } from "next-vibe-ui/ui/input";
 import {
   Command,
   CommandEmpty,
@@ -17,13 +15,15 @@ import {
   CommandItem,
   CommandList,
 } from "next-vibe-ui/ui/command";
+import { Div } from "next-vibe-ui/ui/div";
+import { Check, ChevronDown, Search, X } from "next-vibe-ui/ui/icons";
+import { Input } from "next-vibe-ui/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";

@@ -3,6 +3,7 @@
 import * as SwitchPrimitives from "@radix-ui/react-switch";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 // Cross-platform types

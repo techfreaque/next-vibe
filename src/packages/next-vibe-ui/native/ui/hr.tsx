@@ -1,10 +1,11 @@
+import { styled } from "nativewind";
 import * as React from "react";
 import { View } from "react-native";
-import { styled } from "nativewind";
 
 import type { HrProps } from "@/packages/next-vibe-ui/web/ui/hr";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Type-safe View with className support (NativeWind)
 const StyledView = styled(View);

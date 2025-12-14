@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Div } from "next-vibe-ui/ui/div";
-import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import { ChevronLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
+import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import ContactForm from "@/app/api/[locale]/contact/_components/contact-form";
+import ContactInfo from "@/app/api/[locale]/contact/_components/contact-info";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import {
   ProductIds,
@@ -17,9 +19,6 @@ import { userRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
-
-import ContactForm from "@/app/api/[locale]/contact/_components/contact-form";
-import ContactInfo from "@/app/api/[locale]/contact/_components/contact-info";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;

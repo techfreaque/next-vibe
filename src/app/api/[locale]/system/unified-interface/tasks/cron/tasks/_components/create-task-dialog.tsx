@@ -5,10 +5,6 @@
 
 "use client";
 
-import { Plus, Save } from "next-vibe-ui/ui/icons";
-import { Form } from "next-vibe-ui/ui/form/form";
-import { Div } from "next-vibe-ui/ui/div";
-import { P } from "next-vibe-ui/ui/typography";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import {
@@ -19,8 +15,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
+import { Plus, Save } from "next-vibe-ui/ui/icons";
+import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -30,7 +31,6 @@ import { CronTaskPriority } from "@/app/api/[locale]/system/unified-interface/ta
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
-import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 
 interface CreateTaskDialogProps {
   open: boolean;

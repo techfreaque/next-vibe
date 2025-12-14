@@ -594,7 +594,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.user.private.me.update.response.changesSummary.totalChanges" as const,
                 },
-                z.number().describe("Number of fields updated"),
+                z.coerce.number().describe("Number of fields updated"),
               ),
               changedFields: responseField(
                 {

@@ -2,18 +2,12 @@ import "server-only";
 
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Platform } from "../../types/platform";
-
-/**
- * Platform types for authentication
- * @deprecated Use Platform enum from config instead
- */
-export type AuthPlatform = Platform;
 
 /**
  * Authentication context passed to platform handlers
@@ -24,24 +18,6 @@ export interface AuthContext {
   token?: string;
   jwtPayload?: JwtPayloadType;
   locale: CountryLanguage;
-}
-
-/**
- * Authentication result
- */
-export interface AuthResult<T extends JwtPayloadType = JwtPayloadType> {
-  success: boolean;
-  user: T;
-  error?: string;
-}
-
-/**
- * Lead identifier for tracking
- */
-export interface LeadIdentifier {
-  leadId: string;
-  userId?: string;
-  isPublic: boolean;
 }
 
 /**

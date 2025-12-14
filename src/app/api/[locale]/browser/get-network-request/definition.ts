@@ -93,7 +93,10 @@ const { POST } = createEndpoint({
               .object({
                 url: z.string().describe("Request URL"),
                 method: z.string().describe("HTTP method"),
-                status: z.number().optional().describe("Response status code"),
+                status: z.coerce
+                  .number()
+                  .optional()
+                  .describe("Response status code"),
                 type: z.string().optional().describe("Resource type"),
               })
               .optional()

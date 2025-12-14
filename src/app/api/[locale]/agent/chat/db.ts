@@ -42,17 +42,15 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import { leads } from "@/app/api/[locale]/leads/db";
+import type { MessageResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { users } from "@/app/api/[locale]/user/db";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { MessageResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 
 import type { DefaultFolderId } from "./config";
 import { ChatMessageRoleDB, ThreadStatusDB } from "./enum";
-
-import type { ModelId } from "./model-access/models";
 import type { IconKey } from "./model-access/icons";
-
-import { leads } from "@/app/api/[locale]/leads/db";
+import type { ModelId } from "./model-access/models";
 
 /**
  * Thread metadata structure

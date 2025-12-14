@@ -1,25 +1,25 @@
 import * as TablePrimitive from "@rn-primitives/table";
 import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
-import { View as RNView, Text as RNText, Pressable } from "react-native";
+import { Pressable,Text as RNText, View as RNView } from "react-native";
 
 // MUST import ALL props interfaces from web version (NO local type definitions)
 import type {
-  TableProps,
-  TableHeaderProps,
   TableBodyProps,
-  TableFooterProps,
-  TableRowProps,
-  TableHeadProps,
-  TableCellProps,
   TableCaptionProps,
+  TableCellProps,
+  TableFooterProps,
+  TableHeaderProps,
+  TableHeadProps,
+  TableProps,
+  TableRowProps,
 } from "@/packages/next-vibe-ui/web/ui/table";
 
-import { cn } from "next-vibe/shared/utils/utils";
-import { TextClassContext } from "./text";
-import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { TextClassContext } from "./text";
 
 const StyledTableRoot = styled(TablePrimitive.Root, { className: "style" });
 const StyledTableHeader = styled(TablePrimitive.Header, { className: "style" });

@@ -15,14 +15,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import type { JSX } from "react";
+import { useEffect } from "react";
 import type {
   DefaultValues,
   FieldValues,
   UseFormReturn,
 } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
 
+import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -33,9 +34,8 @@ import type {
   WidgetData,
   WidgetRenderContext,
 } from "../../../shared/widgets/types";
-import { WidgetRenderer } from "./WidgetRenderer";
 import { isResponseField } from "../../../shared/widgets/utils/field-helpers";
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import { WidgetRenderer } from "./WidgetRenderer";
 
 /**
  * Submit button configuration

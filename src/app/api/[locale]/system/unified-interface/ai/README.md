@@ -154,7 +154,7 @@ export const braveSearch = tool({
   description: "Search the internet for current information",
   parameters: z.object({
     query: z.string().min(1).max(400),
-    maxResults: z.number().optional(),
+    maxResults: z.coerce.number().optional(),
   }),
   execute: async ({ query, maxResults }) => {
     const service = getBraveSearchService();

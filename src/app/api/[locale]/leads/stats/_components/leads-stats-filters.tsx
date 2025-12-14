@@ -5,7 +5,6 @@
 
 "use client";
 
-import { RefreshCw } from "next-vibe-ui/ui/icons";
 import {
   ChartType,
   DateRangePreset,
@@ -16,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
+import { RefreshCw } from "next-vibe-ui/ui/icons";
 import type { JSX, ReactNode } from "react";
 import type { Control } from "react-hook-form";
 

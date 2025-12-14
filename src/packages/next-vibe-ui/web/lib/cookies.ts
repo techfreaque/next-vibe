@@ -3,9 +3,10 @@
  * Provides async interface for consistency with native AsyncStorage
  */
 
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import { Environment } from "next-vibe/shared/utils";
-import { envClient } from "@/config/env-client";
+
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
+import { envClient, platform } from "@/config/env-client";
 
 /**
  * Get a cookie value by name (async for platform consistency)
@@ -14,7 +15,7 @@ import { envClient } from "@/config/env-client";
  */
 export async function getCookie(name: string): Promise<string | null> {
   try {
-    if (envClient.platform.isServer || typeof document === "undefined") {
+    if (platform.isServer || typeof document === "undefined") {
       return null;
     }
 
@@ -40,7 +41,7 @@ export async function getCookie(name: string): Promise<string | null> {
  */
 export async function setCookie(name: string, value: string): Promise<void> {
   try {
-    if (envClient.platform.isServer || typeof document === "undefined") {
+    if (platform.isServer || typeof document === "undefined") {
       return;
     }
 
@@ -95,7 +96,7 @@ export async function setCookie(name: string, value: string): Promise<void> {
  */
 export async function deleteCookie(name: string): Promise<void> {
   try {
-    if (envClient.platform.isServer || typeof document === "undefined") {
+    if (platform.isServer || typeof document === "undefined") {
       return;
     }
 
@@ -141,7 +142,7 @@ export async function deleteCookie(name: string): Promise<void> {
  */
 export async function getAllCookies(): Promise<Record<string, string>> {
   try {
-    if (envClient.platform.isServer || typeof document === "undefined") {
+    if (platform.isServer || typeof document === "undefined") {
       return {};
     }
 

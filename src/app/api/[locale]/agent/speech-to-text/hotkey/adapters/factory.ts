@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { type PlatformType, Platform } from "../enum";
+import { Platform,type PlatformType } from "../enum";
 import type {
   Recorder,
   RecorderFactoryOptions,
@@ -13,13 +13,13 @@ import type {
   TyperFactoryOptions,
 } from "../types";
 import { platformDetector } from "../utils/platform";
-import { createMacRecorder } from "./recorder/mac";
 import { createLinuxWaylandRecorder } from "./recorder/linux-wayland";
 import { createLinuxX11Recorder } from "./recorder/linux-x11";
+import { createMacRecorder } from "./recorder/mac";
 import { createWindowsRecorder } from "./recorder/windows";
-import { createMacTyper } from "./typer/mac";
 import { createLinuxWaylandTyper } from "./typer/linux-wayland";
 import { createLinuxX11Typer } from "./typer/linux-x11";
+import { createMacTyper } from "./typer/mac";
 import { createWindowsTyper } from "./typer/windows";
 
 /**

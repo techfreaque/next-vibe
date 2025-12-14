@@ -5,8 +5,8 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import closePageEndpoints, { type ClosePageResponseOutput } from "./definition";
 import { executeClosePage, filterUndefinedArgs } from "../shared/repository";
+import closePageEndpoints, { type ClosePageResponseOutput } from "./definition";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: closePageEndpoints,

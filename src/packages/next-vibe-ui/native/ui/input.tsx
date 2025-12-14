@@ -1,19 +1,20 @@
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import type { JSX } from "react";
 import * as React from "react";
 import { TextInput } from "react-native";
-import { styled } from "nativewind";
 
-import { cn } from "next-vibe/shared/utils/utils";
 import type {
-  InputProps as InputBaseProps,
-  InputRefObject,
+  InferValueType,
   InputChangeEvent,
   InputFocusEvent,
   InputGenericTarget,
-  InferValueType,
+  InputProps as InputBaseProps,
+  InputRefObject,
 } from "@/packages/next-vibe-ui/web/ui/input";
 import type { StyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
 import { applyStyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
+
 import { convertCSSToTextStyle } from "../utils/style-converter";
 
 const StyledTextInput = styled(TextInput);

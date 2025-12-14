@@ -1,34 +1,34 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import { type DivMouseEvent, Div } from "next-vibe-ui/ui/div";
+import { Div,type DivMouseEvent } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
-import { type SpanMouseEvent, Span } from "next-vibe-ui/ui/span";
+import { Span,type SpanMouseEvent } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import {
   extractReferences,
   format4chanTimestamp,
   getIdColor,
 } from "@/app/[locale]/chat/lib/utils/formatting";
 import { formatPostNumber } from "@/app/[locale]/chat/lib/utils/post-numbers";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
+import type { useCollapseState } from "../hooks/use-collapse-state";
+import type { useMessageActions } from "../hooks/use-message-actions";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
 import { ModelPersonaSelectorModal } from "../model-persona-selector-modal";
 import { ToolDisplay } from "../tool-display";
-import type { useCollapseState } from "../hooks/use-collapse-state";
-import type { useMessageActions } from "../hooks/use-message-actions";
-import { countReplies, getDirectReplies, countPostsByUserId } from "./helpers";
+import { countPostsByUserId,countReplies, getDirectReplies } from "./helpers";
 
 export interface FlatMessageProps {
   message: ChatMessage;

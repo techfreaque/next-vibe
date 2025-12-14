@@ -3,17 +3,17 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
-import { H3, P } from "next-vibe-ui/ui/typography";
-import { Input } from "next-vibe-ui/ui/input";
 import { Check, Send, X } from "next-vibe-ui/ui/icons";
+import { Input } from "next-vibe-ui/ui/input";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
+import type { MeGetResponseOutput } from "@/app/api/[locale]/user/private/me/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import CountrySelector from "../../_components/country-selector";
-import type { MeGetResponseOutput } from "@/app/api/[locale]/user/private/me/definition";
 
 export function NewsletterSignupFooter({
   locale,

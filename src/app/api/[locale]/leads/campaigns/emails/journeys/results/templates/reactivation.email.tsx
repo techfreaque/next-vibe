@@ -10,7 +10,6 @@ import { SubscriptionPlan } from "@/app/api/[locale]/subscription/enum";
 import { formatCurrencyNoDecimals } from "@/i18n/core/localization-utils";
 import { getCountryFromLocale } from "@/i18n/core/translation-utils";
 
-import type { EmailRenderContext, EmailTemplateFunction } from "../../../types";
 import {
   CTAButton,
   EmailContent,
@@ -18,6 +17,7 @@ import {
   EmailHeader,
   EmailLayout,
 } from "../../../components.email";
+import type { EmailRenderContext, EmailTemplateFunction } from "../../../types";
 
 /**
  * Results Journey - Reactivation Email

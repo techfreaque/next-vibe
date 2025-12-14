@@ -8,19 +8,18 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getNewsletterSubscriptionStatus } from "@/app/api/[locale]/leads/enum";
 import { leadsRepository } from "@/app/api/[locale]/leads/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { newsletterSubscriptions } from "../db";

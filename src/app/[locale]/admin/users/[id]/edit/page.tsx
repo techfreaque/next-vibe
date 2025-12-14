@@ -10,11 +10,10 @@ import type React from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
+import { UserEditForm } from "@/app/api/[locale]/users/user/_components/user-edit-form";
 import { userByIdRepository } from "@/app/api/[locale]/users/user/[id]/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { UserEditForm } from "@/app/api/[locale]/users/user/_components/user-edit-form";
 
 interface UserEditPageProps {
   params: Promise<{

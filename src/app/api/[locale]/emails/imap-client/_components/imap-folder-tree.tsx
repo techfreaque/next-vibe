@@ -5,6 +5,10 @@
 
 "use client";
 
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   ChevronDown,
   ChevronRight,
@@ -12,11 +16,7 @@ import {
   FolderOpen,
   Mail,
 } from "next-vibe-ui/ui/icons";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { useRouter } from "next-vibe-ui/hooks/use-navigation";
-import { Button } from "next-vibe-ui/ui/button";
 import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
 import { H3 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";

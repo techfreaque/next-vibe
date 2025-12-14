@@ -1,22 +1,22 @@
 import * as PopoverPrimitive from "@rn-primitives/popover";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { styled } from "nativewind";
-
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
-import { TextClassContext } from "./text";
 
 import type {
+  PopoverAnchorProps,
+  PopoverCloseProps,
+  PopoverContentProps,
+  PopoverPortalProps,
   PopoverRootProps,
   PopoverTriggerProps,
-  PopoverAnchorProps,
-  PopoverPortalProps,
-  PopoverContentProps,
-  PopoverCloseProps,
 } from "@/packages/next-vibe-ui/web/ui/popover";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });
 

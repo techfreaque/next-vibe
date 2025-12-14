@@ -3,6 +3,7 @@
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 export type SliderRootProps = {

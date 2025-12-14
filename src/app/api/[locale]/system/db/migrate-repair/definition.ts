@@ -126,7 +126,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.system.db.migrateRepair.fields.trackedMigrations.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       migrationFiles: responseField(
@@ -135,7 +135,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.system.db.migrateRepair.fields.migrationFiles.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       repaired: responseField(
@@ -143,7 +143,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.migrateRepair.fields.repaired.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

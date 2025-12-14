@@ -5,8 +5,8 @@ import { storage } from "next-vibe-ui/lib/storage";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import {
   type IconKey,
   type IconValue,
@@ -18,18 +18,18 @@ import {
   type PersonaCategory,
   type PersonaCategoryId,
 } from "@/app/api/[locale]/agent/chat/personas/config";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
-import { simpleT } from "@/i18n/core/shared";
-
 import {
   SelectorBase,
   type SelectorOption,
 } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/selector-base";
 import { useFavorites } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/use-favorites";
-import { AddPersonaDialog } from "./add-persona-dialog";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
+
 import { AddCategoryDialog } from "./add-category-dialog";
+import { AddPersonaDialog } from "./add-persona-dialog";
 
 interface PersonaSelectorProps {
   value: string;

@@ -66,7 +66,7 @@ const { GET } = createEndpoint({
             "app.api.emails.imapClient.messages.list.get.page.description",
           columns: 3,
         },
-        z.number().int().positive().default(1),
+        z.coerce.number().int().positive().default(1),
       ),
 
       limit: requestDataField(
@@ -78,7 +78,7 @@ const { GET } = createEndpoint({
             "app.api.emails.imapClient.messages.list.get.limit.description",
           columns: 3,
         },
-        z.number().int().positive().max(100).default(20),
+        z.coerce.number().int().positive().max(100).default(20),
       ),
 
       accountId: requestDataField(
@@ -284,7 +284,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.messages.list.get.response.total",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       pageNumber: responseField(
@@ -292,7 +292,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.messages.list.get.response.page",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       pageLimit: responseField(
@@ -300,7 +300,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.messages.list.get.response.limit",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       totalPages: responseField(
@@ -309,7 +309,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.messages.list.get.response.totalPages",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

@@ -1,6 +1,4 @@
 "use client";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
 import {
   Accordion,
   AccordionContent,
@@ -55,18 +53,15 @@ export class WidgetErrorBoundary extends Component<
       errorInfo,
     });
 
-    // Call error callback if provided
+    // ErrorBoundary must log errors - this is client-side React code catching unexpected runtime errors
+    // console.error is the standard and appropriate way to log in React ErrorBoundaries
+    // eslint-disable-next-line no-console -- ErrorBoundary requires console.error for client-side error visibility
+    console.error("Widget rendering error:", error, errorInfo);
+
+    // Call error callback if provided for custom handling (error reporting services, etc.)
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
-
-    // Log error for debugging
-    // eslint-disable-next-line i18next/no-literal-string
-    const errorMsg = parseError(error).message;
-    // eslint-disable-next-line i18next/no-literal-string
-    const errorInfoStr = JSON.stringify(errorInfo);
-    // eslint-disable-next-line no-console, i18next/no-literal-string
-    console.error(`Widget Error: ${errorMsg}`, errorInfoStr);
   }
 
   render(): ReactNode {

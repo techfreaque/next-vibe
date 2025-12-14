@@ -1,7 +1,8 @@
 import * as AccordionPrimitive from "@rn-primitives/accordion";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Pressable } from "react-native";
-import { styled } from "nativewind";
 import Animated, {
   Extrapolation,
   FadeIn,
@@ -20,9 +21,9 @@ import type {
   AccordionProps,
   AccordionTriggerProps,
 } from "@/packages/next-vibe-ui/web/ui/accordion";
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { ChevronDown } from "./icons/ChevronDown";
 import { Text, TextClassContext } from "./text";
 
@@ -46,6 +47,23 @@ export function Accordion({
   collapsible = false,
 }: AccordionProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+
+  // Compute values for both modes
+  const singleValue = typeof value === "string" ? value : undefined;
+  const singleDefaultValue =
+    typeof defaultValue === "string" ? defaultValue : undefined;
+
+  // Hooks must be called unconditionally
+  const [, setValue] = React.useState(singleDefaultValue ?? "");
+  const handleValueChange = React.useCallback(
+    (newValue: string | undefined) => {
+      setValue(newValue ?? "");
+      if (newValue !== undefined && onValueChange) {
+        onValueChange(newValue);
+      }
+    },
+    [onValueChange],
+  );
 
   if (type === "multiple") {
     const multiValue = Array.isArray(value) ? value : undefined;
@@ -81,21 +99,6 @@ export function Accordion({
       </LayoutAnimationConfig>
     );
   }
-
-  const singleValue = typeof value === "string" ? value : undefined;
-  const singleDefaultValue =
-    typeof defaultValue === "string" ? defaultValue : undefined;
-
-  const [, setValue] = React.useState(singleDefaultValue ?? "");
-  const handleValueChange = React.useCallback(
-    (newValue: string | undefined) => {
-      setValue(newValue ?? "");
-      if (newValue !== undefined && onValueChange) {
-        onValueChange(newValue);
-      }
-    },
-    [onValueChange],
-  );
 
   return (
     <LayoutAnimationConfig skipEntering>

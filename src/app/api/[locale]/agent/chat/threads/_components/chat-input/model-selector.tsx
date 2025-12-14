@@ -3,7 +3,9 @@
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
+import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import type { ModelUtility } from "@/app/api/[locale]/agent/chat/model-access/model-utilities";
 import { MODEL_UTILITIES } from "@/app/api/[locale]/agent/chat/model-access/model-utilities";
 import {
   DEFAULT_FAVORITES,
@@ -11,11 +13,9 @@ import {
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/agent/chat/model-access/models";
-import type { ModelUtility } from "@/app/api/[locale]/agent/chat/model-access/model-utilities";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 
 import { SelectorBase, type SelectorOption } from "./selector-base";
 import { useFavorites } from "./use-favorites";

@@ -9,8 +9,8 @@ import type { JSX } from "react";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { extractTitleData } from "../../../shared/widgets/logic/title";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 
 /**
  * Renders H1-H6 headings with optional subtitle and alignment.

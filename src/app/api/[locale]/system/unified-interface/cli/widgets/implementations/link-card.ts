@@ -6,8 +6,8 @@
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   extractLinkCardData,
-  type ProcessedLinkCard,
   getDisplayUrl,
+  type ProcessedLinkCard,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/link-card";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";

@@ -4,18 +4,19 @@
  * Eliminates 5+ duplicate implementations across the codebase
  */
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   UserPermissionRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { cliEnv } from "../env";
 
 /**
  * Default CLI user configuration
@@ -27,7 +28,7 @@ const DEFAULT_CLI_USER_ID = "00000000-0000-0000-0000-000000000001";
  * Returns null if VIBE_CLI_USER_EMAIL is not set
  */
 export function getCliUserEmail(): string | null {
-  return env.VIBE_CLI_USER_EMAIL ?? null;
+  return cliEnv.VIBE_CLI_USER_EMAIL ?? null;
 }
 
 /**
@@ -278,8 +279,9 @@ export async function getCliUser(
       };
     }
 
-    // User not found in database - this is an ERROR
-    logger.error("[CLI AUTH] CLI user not found in database", {
+    // User not found in database - this is expected for CLI_AUTH_BYPASS routes
+    // Use debug level to avoid polluting output for routes that don't require auth
+    logger.debug("[CLI AUTH] CLI user not found in database", {
       email: cliUserEmail,
       authSuccess: authResult.success,
       authMessage: authResult.message,
@@ -294,10 +296,10 @@ export async function getCliUser(
       },
     };
   } catch (error) {
-    // Database error
-    logger.error("[CLI AUTH] Error getting CLI user from database", {
+    // Database error - use debug level as CLI_AUTH_BYPASS routes will still work
+    // This avoids polluting CLI output for routes that don't require auth
+    logger.debug("[CLI AUTH] Error getting CLI user from database", {
       error: parseError(error).message,
-      errorStack: error instanceof Error ? error.stack : undefined,
       email: cliUserEmail,
       locale,
     });

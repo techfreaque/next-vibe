@@ -1,12 +1,13 @@
 "use client";
 import type { Route } from "next";
 import type { RouteType } from "next/dist/lib/load-custom-routes";
-import { LOCALE_COOKIE_NAME } from "@/config/constants";
 import { usePathname, useRouter } from "next-vibe-ui/hooks";
-import { storage } from "next-vibe-ui/lib/storage";
 import { setCookie } from "next-vibe-ui/lib/cookies";
+import { storage } from "next-vibe-ui/lib/storage";
 import type { JSX, ReactNode } from "react";
 import React, { createContext, useContext, useEffect, useState } from "react";
+
+import { LOCALE_COOKIE_NAME } from "@/config/constants";
 
 import { languageConfig } from "..";
 import type { CountryInfo, CountryLanguage } from "./config";
@@ -233,7 +234,7 @@ export function useTranslation(): TranslationContextType {
   const context = useContext(TranslationContext);
 
   if (!context) {
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Critical initialization error: Context must exist for i18n to function
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Critical initialization error: Context must exist for i18n to function
     throw new Error("useTranslation must be used within a TranslationProvider");
   }
 

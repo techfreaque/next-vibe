@@ -7,9 +7,9 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import { getCliUser } from "@/app/api/[locale]/system/unified-interface/cli/auth/cli-user";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { Platform } from "../../shared/types/platform";
@@ -53,7 +53,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    * Handle incoming JSON-RPC request
    */
   async handleRequest(
-    // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Protocol message handling requires 'unknown' for flexible message types
+     
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol message handling requires 'unknown' for flexible message types
     request: JsonRpcRequest<unknown>,
   ): Promise<JsonRpcResponse> {
@@ -73,7 +73,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       }
 
       // Route to appropriate handler
-      // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Request parsing requires 'unknown' for untrusted input
+       
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Request parsing requires 'unknown' for untrusted input
       let result: unknown;
 
@@ -248,7 +248,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    */
   private success(
     id: string | number | null,
-    // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types
+     
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types
     result: unknown,
   ): JsonRpcResponse {
@@ -293,14 +293,14 @@ export async function createMCPProtocolHandler(
   const cliUserResult = await getCliUser(logger, locale);
 
   if (!cliUserResult.success) {
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for invalid CLI user state
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for invalid CLI user state
     throw new Error(`CLI user authentication failed: ${cliUserResult.message}`);
   }
 
   const cliUser = cliUserResult.data;
 
   if (!cliUser.isPublic && !cliUser.id) {
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for invalid CLI user state
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for invalid CLI user state
     throw new Error("CLI user ID is required");
   }
 

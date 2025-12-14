@@ -3,9 +3,8 @@
  * Handles loading messages for the active thread
  */
 
-import { useEffect, useRef } from "react";
-
 import { parseError } from "next-vibe/shared/utils";
+import { useEffect, useRef } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -105,6 +104,5 @@ export function useMessageLoader(
     };
 
     void loadMessages();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeThreadId, locale, logger, isDataLoaded]);
+  }, [activeThreadId, locale, logger, isDataLoaded, addMessage, threads]);
 }

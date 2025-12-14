@@ -7,9 +7,11 @@
 
 import type { Route } from "next";
 import type { z } from "zod";
+
 import type { TranslationKey } from "@/i18n/core/static-types";
-import type { FieldDataType, LayoutType, WidgetType, SpacingSize, FieldUsage } from "../types/enums";
-import type { InferSchemaFromField, FieldUsageConfig, ObjectField } from "../types/endpoint";
+
+import type { FieldUsageConfig, InferSchemaFromField, ObjectField } from "../types/endpoint";
+import type { FieldDataType, FieldUsage,LayoutType, SpacingSize, WidgetType } from "../types/enums";
 
 /**
  * Layout configuration for containers and widgets

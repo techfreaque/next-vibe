@@ -108,7 +108,7 @@ export const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.contact.response.success",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       isActive: responseField(
         {

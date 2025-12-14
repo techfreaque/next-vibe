@@ -1,9 +1,8 @@
+import type { DivRefObject } from "next-vibe-ui/ui/div";
 import { useEffect, useState } from "react";
 
-import type { DivRefObject } from "next-vibe-ui/ui/div";
-import { envClient } from "@/config/env-client";
-
 import { LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
+import { platform } from "@/config/env-client";
 
 /**
  * Hook to dynamically measure input container height using ResizeObserver.
@@ -20,7 +19,7 @@ export function useInputHeight(
   );
 
   useEffect(() => {
-    if (envClient.platform.isReactNative) {
+    if (platform.isReactNative) {
       // TODO: Handle dynamic input height on native
       return;
     }

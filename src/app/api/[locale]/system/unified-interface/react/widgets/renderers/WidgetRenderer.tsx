@@ -1,20 +1,20 @@
 "use client";
 
 import type { JSX } from "react";
-import type { UseFormReturn, FieldValues } from "react-hook-form";
+import type { FieldValues,UseFormReturn } from "react-hook-form";
 
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import type {
-  WidgetRenderContext,
-  WidgetData,
   ReactWidgetProps,
+  WidgetData,
+  WidgetRenderContext,
 } from "../../../shared/widgets/types";
+import { WidgetErrorBoundary } from "../core/ErrorBoundary";
 import { AlertWidget } from "../implementations/AlertWidget";
 import { BadgeWidget } from "../implementations/BadgeWidget";
 import { ChartWidget } from "../implementations/ChartWidget";
-import { FormAlertWidget } from "../implementations/FormAlertWidget";
 import { CodeOutputWidget } from "../implementations/CodeOutputWidget";
 import { CodeQualityListWidget } from "../implementations/CodeQualityListWidget";
 import { ContainerWidget } from "../implementations/ContainerWidget";
@@ -22,6 +22,7 @@ import { DataCardsWidget } from "../implementations/DataCardsWidget";
 import { DataListWidget } from "../implementations/DataListWidget";
 import { DataTableWidget } from "../implementations/DataTableWidget";
 import { EditableTextWidget } from "../implementations/EditableTextWidget";
+import { FormAlertWidget } from "../implementations/FormAlertWidget";
 import { FormFieldWidget } from "../implementations/FormFieldWidget";
 import { GroupedListWidget } from "../implementations/GroupedListWidget";
 import { LinkCardWidget } from "../implementations/LinkCardWidget";
@@ -31,12 +32,11 @@ import { MarkdownWidget } from "../implementations/MarkdownWidget";
 import { MetricCardWidget } from "../implementations/MetricCardWidget";
 import { PasswordStrengthWidget } from "../implementations/PasswordStrengthWidget";
 import { SectionWidget } from "../implementations/SectionWidget";
-import { StatWidget } from "../implementations/StatWidget";
 import { StatsGridWidget } from "../implementations/StatsGridWidget";
+import { StatWidget } from "../implementations/StatWidget";
 import { SubmitButtonWidget } from "../implementations/SubmitButtonWidget";
 import { TextWidget } from "../implementations/TextWidget";
 import { TitleWidget } from "../implementations/TitleWidget";
-import { WidgetErrorBoundary } from "../core/ErrorBoundary";
 
 /**
  * Widget Renderer Props

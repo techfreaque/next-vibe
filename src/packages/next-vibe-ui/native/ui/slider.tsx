@@ -3,6 +3,7 @@
  * Uses @rn-primitives/slider
  */
 import * as SliderPrimitive from "@rn-primitives/slider";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
 import type {
@@ -11,9 +12,9 @@ import type {
   SliderThumbProps,
   SliderTrackProps,
 } from "@/packages/next-vibe-ui/web/ui/slider";
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Re-export all types from web
 export type {

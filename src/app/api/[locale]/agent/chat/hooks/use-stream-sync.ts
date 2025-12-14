@@ -7,12 +7,12 @@ import { useEffect } from "react";
 
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { ChatMessageRole, ThreadStatus } from "../enum";
-import type { ChatMessage, ChatThread } from "../db";
 import type {
   StreamingMessage,
   StreamingThread,
 } from "../../ai-stream/hooks/store";
+import type { ChatMessage, ChatThread } from "../db";
+import { ChatMessageRole, ThreadStatus } from "../enum";
 
 /**
  * Dependencies for stream sync
@@ -101,8 +101,7 @@ export function useStreamSync(deps: StreamSyncDeps): void {
         }
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [streamingMessages, t]);
+  }, [streamingMessages, chatMessages, addMessage, updateMessage, t]);
 
   // Sync streaming threads to chat store
   useEffect(() => {
@@ -137,6 +136,5 @@ export function useStreamSync(deps: StreamSyncDeps): void {
         });
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [streamThreads]);
+  }, [streamThreads, chatThreads, addThread]);
 }

@@ -1,34 +1,35 @@
+import type { MotiProps } from "moti";
+import {
+  AnimatePresence as MotiAnimatePresence,
+  MotiImage,
+  MotiText,
+  MotiView,
+} from "moti";
+import { styled } from "nativewind";
 import * as React from "react";
-import { Pressable, Text as RNText } from "react-native";
 import type {
   ImageSourcePropType,
-  ViewStyle,
-  TextStyle,
   ImageStyle,
+  TextStyle,
+  ViewStyle,
 } from "react-native";
-import {
-  MotiView,
-  MotiText,
-  MotiImage,
-  AnimatePresence as MotiAnimatePresence,
-} from "moti";
-import type { MotiProps } from "moti";
-import { styled } from "nativewind";
+import { Pressable, Text as RNText } from "react-native";
 
-import {
-  convertCSSToViewStyle,
-  convertCSSToTextStyle,
-  convertCSSToImageStyle,
-} from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 import type {
   AnimatePresenceProps,
-  MotionTransition,
-  MotionDivProps,
-  MotionSpanProps,
   MotionButtonProps,
+  MotionDivProps,
   MotionImgProps,
+  MotionSpanProps,
+  MotionTransition,
 } from "@/packages/next-vibe-ui/web/ui/motion";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import {
+  convertCSSToImageStyle,
+  convertCSSToTextStyle,
+  convertCSSToViewStyle,
+} from "../utils/style-converter";
 
 // Create styled wrappers for Moti components
 const StyledMotiView = styled(MotiView, { className: "style" });
@@ -38,11 +39,11 @@ const StyledMotiImage = styled(MotiImage, { className: "style" });
 // Re-export all types from web (zero definitions in native)
 export type {
   AnimatePresenceProps,
-  MotionTransition,
-  MotionDivProps,
-  MotionSpanProps,
   MotionButtonProps,
+  MotionDivProps,
   MotionImgProps,
+  MotionSpanProps,
+  MotionTransition,
 };
 
 // AnimatePresence component for native

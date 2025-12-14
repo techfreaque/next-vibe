@@ -2,10 +2,10 @@ import "server-only";
 
 import { and, desc, eq, isNull, or } from "drizzle-orm";
 import {
-  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -13,12 +13,12 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
 import {
   canCreateFolder,
-  canViewFolder,
-  canManageFolder,
   canCreateThreadInFolder,
-  canHideFolder,
   canDeleteFolder,
+  canHideFolder,
+  canManageFolder,
   canManageFolderPermissions,
+  canViewFolder,
 } from "@/app/api/[locale]/agent/chat/permissions/permissions";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";

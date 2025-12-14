@@ -1,17 +1,17 @@
 "use client";
 
-import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Section } from "next-vibe-ui/ui/section";
 import { H2, P } from "next-vibe-ui/ui/typography";
 import type { FC } from "react";
 import { useInView } from "react-intersection-observer";
 
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
 
 interface CallToActionProps {
   locale: CountryLanguage;

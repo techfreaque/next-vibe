@@ -5,8 +5,8 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import fillEndpoints, { type FillResponseOutput } from "./definition";
 import { executeFill, filterUndefinedArgs } from "../shared/repository";
+import fillEndpoints, { type FillResponseOutput } from "./definition";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: fillEndpoints,

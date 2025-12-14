@@ -22,14 +22,14 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  UserRoleDB,
-  UserRole,
   UserPermissionRoleOptions,
+  UserRole,
+  UserRoleDB,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { iconSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
 import type { IconKey } from "../model-access/icons";
-import { iconSchema } from "../../../shared/types/common.schema";
 
 /**
  * Get Folders List Endpoint (GET)
@@ -215,7 +215,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.folders.get.response.folders.folder.sortOrder.content" as const,
               },
-              z.number(),
+              z.coerce.number(),
             ),
             rolesView: responseArrayOptionalField(
               {
@@ -653,7 +653,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.agent.chat.folders.post.response.folder.sortOrder.content" as const,
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               rolesView: responseArrayOptionalField(
                 {

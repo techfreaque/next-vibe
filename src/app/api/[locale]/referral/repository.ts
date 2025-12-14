@@ -8,9 +8,9 @@ import "server-only";
 import { desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -19,10 +19,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import type { CodesListGetResponseOutput } from "./codes/list/definition";
 import {
-  referralCodes,
   leadReferrals,
-  userReferrals,
+  referralCodes,
   referralEarnings,
+  userReferrals,
 } from "./db";
 import type {
   ReferralPostRequestOutput,

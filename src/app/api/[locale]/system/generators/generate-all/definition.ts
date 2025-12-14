@@ -172,9 +172,9 @@ const { POST } = createEndpoint({
             "app.api.system.generators.generateAll.post.fields.generationStats.title",
         },
         z.object({
-          totalGenerators: z.number(),
-          generatorsRun: z.number(),
-          generatorsSkipped: z.number(),
+          totalGenerators: z.coerce.number(),
+          generatorsRun: z.coerce.number(),
+          generatorsSkipped: z.coerce.number(),
           outputDirectory: z.string(),
           functionalGeneratorsCompleted: z.boolean(),
         }),

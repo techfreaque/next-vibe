@@ -5,7 +5,6 @@
 
 import React from "react";
 
-import type { EmailRenderContext, EmailTemplateFunction } from "../../../types";
 import {
   CTAButton,
   EmailContent,
@@ -13,6 +12,7 @@ import {
   EmailHeader,
   EmailLayout,
 } from "../../../components.email";
+import type { EmailRenderContext, EmailTemplateFunction } from "../../../types";
 
 /**
  * Results Journey - Follow-up 3 Email (Final Opportunity)

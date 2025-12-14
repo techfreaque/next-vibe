@@ -8,38 +8,39 @@ import "server-only";
 
 import type { NextRequest } from "next/server";
 import {
+  ErrorResponseTypes,
   isStreamingResponse,
   type ResponseType,
   type StreamingResponse,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type { z } from "zod";
 
+import { creditRepository } from "@/app/api/[locale]/credits/repository";
 import { emailHandlingRepository } from "@/app/api/[locale]/emails/smtp-client/email-handling/repository";
 import type { EmailHandleRequestOutput } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
+import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { handleSms } from "@/app/api/[locale]/sms/handle-sms";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import { simpleT } from "@/i18n/core/shared";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { Platform } from "../../types/platform";
-import type { EndpointLogger } from "../../logger/endpoint";
-import { permissionsRegistry } from "../permissions/registry";
-import type { CreateApiEndpointAny } from "../../types/endpoint";
+import type { SmsFunctionType } from "@/app/api/[locale]/sms/utils";
+import { authRepository } from "@/app/api/[locale]/user/auth/repository";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
 } from "@/app/api/[locale]/user/auth/types";
+import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import type { TFunction } from "@/i18n/core/static-types";
-import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
-import type { SmsFunctionType } from "@/app/api/[locale]/sms/utils";
-import { authRepository } from "@/app/api/[locale]/user/auth/repository";
+
+import type { EndpointLogger } from "../../logger/endpoint";
+import type { CreateApiEndpointAny } from "../../types/endpoint";
+import type { Platform } from "../../types/platform";
+import { permissionsRegistry } from "../permissions/registry";
 import {
   validateHandlerRequestData,
   validateResponseData,
 } from "./request-validator";
-import { creditRepository } from "@/app/api/[locale]/credits/repository";
 
 /**
  * Type helper to infer JWT payload type based on user roles
@@ -446,9 +447,11 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       });
     }
 
+    // Preserve isErrorResponse flag from handler result for CLI exit code handling
     return {
       success: true,
       data: responseValidation.data as T["types"]["ResponseOutput"],
+      ...(result.isErrorResponse && { isErrorResponse: true as const }),
     };
   };
 }

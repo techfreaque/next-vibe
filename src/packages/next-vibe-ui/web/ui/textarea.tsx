@@ -1,8 +1,8 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils";
 import React from "react";
-import type { StyleType } from "../utils/style-type";
 
+import type { StyleType } from "../utils/style-type";
 import type { InputGenericTarget } from "./input";
 
 export interface TextareaChangeEvent {

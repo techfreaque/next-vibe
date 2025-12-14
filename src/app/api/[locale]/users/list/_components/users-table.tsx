@@ -6,9 +6,9 @@
 "use client";
 
 import { Badge } from "next-vibe-ui/ui/badge";
-import { Link as NextLink } from "next-vibe-ui/ui/link";
-import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { Link as NextLink } from "next-vibe-ui/ui/link";
 import {
   Table,
   TableBody,

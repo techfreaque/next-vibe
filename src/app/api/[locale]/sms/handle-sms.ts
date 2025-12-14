@@ -7,17 +7,17 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import { smsEnv } from "./env";
 import { batchSendSms, sendSms } from "./send-sms";
 import type {
   ProviderBaseOptions,
@@ -54,7 +54,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
   const errors: ErrorResponseType[] = [];
   let processedCount = 0;
   const maxMessageLength =
-    options?.maxMessageLength || parseInt(env.SMS_MAX_LENGTH || "160", 10);
+    options?.maxMessageLength || parseInt(smsEnv.SMS_MAX_LENGTH || "160", 10);
 
   if (!sms?.afterHandlerSms || sms.afterHandlerSms.length === 0) {
     return { success: true, data: undefined };

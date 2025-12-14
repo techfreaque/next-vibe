@@ -53,6 +53,10 @@ export const translations = {
       label: "Skip Type Check",
       description: "Skip TypeScript type checking",
     },
+    createConfig: {
+      label: "Create Config",
+      description: "Create default lint.config.ts if missing",
+    },
     timeoutSeconds: {
       label: "Timeout (seconds)",
       description: "Maximum execution time",

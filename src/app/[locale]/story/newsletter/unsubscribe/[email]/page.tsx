@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import type { JSX } from "react";
 import { notFound } from "next-vibe-ui/lib/not-found";
-
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import type { JSX } from "react";
 
 import { UnsubscribePage } from "@/app/api/[locale]/newsletter/unsubscribe/_components/unsubscribe-page";
-import { userProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { authRepository } from "@/app/api/[locale]/user/auth/repository";
+import { userProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 interface PageProps {
   params: Promise<{

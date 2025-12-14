@@ -61,7 +61,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.config.response.port",
         },
-        z.number().int().min(1).max(65535),
+        z.coerce.number().int().min(1).max(65535),
       ),
 
       // Username field
@@ -123,7 +123,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.config.response.maxConnections",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       connectionTimeout: responseField(
@@ -132,7 +132,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.config.response.connectionTimeout",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       poolIdleTimeout: responseField(
@@ -140,7 +140,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.config.response.poolIdleTimeout",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       keepAlive: responseField(
@@ -165,7 +165,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.config.response.syncInterval",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       maxMessages: responseField(
@@ -173,7 +173,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.config.response.maxMessages",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       batchSize: responseField(
@@ -181,7 +181,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.config.response.batchSize",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       concurrentAccounts: responseField(
@@ -190,7 +190,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.config.response.concurrentAccounts",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       // Performance configuration fields
@@ -207,7 +207,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.config.response.cacheMaxSize",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       cacheTtl: responseField(
@@ -215,7 +215,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.config.response.cacheTtl",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       memoryThreshold: responseField(
@@ -223,7 +223,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.config.response.memoryThreshold",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       // Resilience configuration fields
@@ -232,7 +232,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.config.response.maxRetries",
         },
-        z.number().int().min(0),
+        z.coerce.number().int().min(0),
       ),
 
       retryDelay: responseField(
@@ -240,7 +240,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.config.response.retryDelay",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       circuitBreakerThreshold: responseField(
@@ -249,7 +249,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       circuitBreakerTimeout: responseField(
@@ -258,7 +258,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       // Monitoring configuration fields
@@ -268,7 +268,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.config.response.healthCheckInterval",
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       metricsEnabled: responseField(
@@ -471,7 +471,7 @@ const { POST } = createEndpoint({
             "app.api.emails.imapClient.accounts.create.port.placeholder",
           columns: 6,
         },
-        z.number().int().min(1).max(65535),
+        z.coerce.number().int().min(1).max(65535),
       ),
 
       // Username field
@@ -566,7 +566,7 @@ const { POST } = createEndpoint({
             "app.api.emails.imapClient.config.maxConnections.description",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       connectionTimeout: requestDataField(
@@ -578,7 +578,7 @@ const { POST } = createEndpoint({
             "app.api.emails.imapClient.config.connectionTimeout.description",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       poolIdleTimeout: requestDataField(
@@ -590,7 +590,7 @@ const { POST } = createEndpoint({
             "app.api.emails.imapClient.config.serverEnabled.description",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       keepAlive: requestDataField(
@@ -627,7 +627,7 @@ const { POST } = createEndpoint({
             "app.api.emails.imapClient.config.syncInterval.description",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       maxMessages: requestDataField(
@@ -638,7 +638,7 @@ const { POST } = createEndpoint({
           description: "app.api.emails.imapClient.sync.maxMessages.description",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       batchSize: requestDataField(
@@ -649,7 +649,7 @@ const { POST } = createEndpoint({
           description: "app.api.emails.imapClient.config.batchSize.description",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       concurrentAccounts: requestDataField(
@@ -660,7 +660,7 @@ const { POST } = createEndpoint({
           description: "app.api.emails.imapClient.sync.accountIds.description",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       // Performance configuration fields
@@ -684,7 +684,7 @@ const { POST } = createEndpoint({
           description: "app.api.emails.imapClient.config.batchSize.description",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       cacheTtl: requestDataField(
@@ -695,7 +695,7 @@ const { POST } = createEndpoint({
           description: "app.api.emails.imapClient.config.form.description",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       memoryThreshold: requestDataField(
@@ -706,7 +706,7 @@ const { POST } = createEndpoint({
           description: "app.api.emails.imapClient.config.form.description",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       // Resilience configuration fields
@@ -718,7 +718,7 @@ const { POST } = createEndpoint({
           description: "app.api.emails.imapClient.config.response.maxRetries",
           columns: 6,
         },
-        z.number().int().min(0),
+        z.coerce.number().int().min(0),
       ),
 
       retryDelay: requestDataField(
@@ -729,7 +729,7 @@ const { POST } = createEndpoint({
           description: "app.api.emails.imapClient.config.response.retryDelay",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       circuitBreakerThreshold: requestDataField(
@@ -742,7 +742,7 @@ const { POST } = createEndpoint({
             "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       circuitBreakerTimeout: requestDataField(
@@ -755,7 +755,7 @@ const { POST } = createEndpoint({
             "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       // Monitoring configuration fields
@@ -769,7 +769,7 @@ const { POST } = createEndpoint({
             "app.api.emails.imapClient.config.syncInterval.description",
           columns: 6,
         },
-        z.number().int().min(1),
+        z.coerce.number().int().min(1),
       ),
 
       metricsEnabled: requestDataField(

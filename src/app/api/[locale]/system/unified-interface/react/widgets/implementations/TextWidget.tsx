@@ -1,22 +1,22 @@
 "use client";
 
+import type { Route } from "next";
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
-import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { Label } from "next-vibe-ui/ui/label";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import type { Route } from "next";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { FieldDataType, type WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import {
   extractTextData,
   formatText,
 } from "../../../shared/widgets/logic/text";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { getTextFormatClassName } from "../../../shared/widgets/utils/widget-helpers";
 
 function formatDate(value: string | Date, locale: string): string {

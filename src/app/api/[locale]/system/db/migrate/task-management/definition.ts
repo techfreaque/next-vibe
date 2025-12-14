@@ -301,8 +301,8 @@ const { POST } = createEndpoint({
             success: z.boolean(),
             message: z.string().optional(),
             data: z.record(z.string(), z.unknown()).optional(),
-            migrationsChecked: z.number().optional(),
-            pendingMigrations: z.number().optional(),
+            migrationsChecked: z.coerce.number().optional(),
+            pendingMigrations: z.coerce.number().optional(),
           })
           .optional()
           .describe("Detailed migration task result"),

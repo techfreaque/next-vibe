@@ -106,7 +106,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.migrate.fields.migrationsRun.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       migrationsGenerated: responseField(
@@ -114,7 +114,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.migrate.fields.migrationsGenerated.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       output: responseField(
@@ -130,7 +130,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.migrate.fields.duration.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

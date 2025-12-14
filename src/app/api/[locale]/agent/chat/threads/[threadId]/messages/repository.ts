@@ -8,9 +8,9 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -20,8 +20,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
-  type ChatMessage,
   chatFolders,
+  type ChatMessage,
   chatMessages,
   chatThreads,
   type ToolCall,
@@ -299,7 +299,7 @@ export async function createTextMessage(params: {
   persona: string;
   sequenceId: string | null;
   logger: EndpointLogger;
-}): Promise<void> {
+}): Promise<ResponseType<void>> {
   try {
     await db.insert(chatMessages).values({
       id: params.messageId,
@@ -321,14 +321,18 @@ export async function createTextMessage(params: {
       sequenceId: params.sequenceId,
       userId: params.userId ?? "public",
     });
+
+    return success(undefined);
   } catch (error) {
     params.logger.error("Failed to insert chat message", parseError(error), {
       messageId: params.messageId,
       persona: params.persona,
       model: params.model,
     });
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Internal helper throws, caught by caller
-    throw error;
+    return fail({
+      message: "app.api.agent.chat.messages.errors.createFailed.title",
+      errorType: ErrorResponseTypes.DATABASE_ERROR,
+    });
   }
 }
 

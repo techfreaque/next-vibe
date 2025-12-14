@@ -2,6 +2,7 @@
 
 import { cn } from "next-vibe/shared/utils";
 import React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 export type TitleProps = {

@@ -1,23 +1,27 @@
 import { Environment } from "next-vibe/shared/utils";
 import { useMemo } from "react";
+import type { FieldValues } from "react-hook-form";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  Methods,
   ALL_METHODS,
+  Methods,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import { clearFormsAfterSuccessInDev } from "@/config/debug";
 import { envClient } from "@/config/env-client";
 
-/**
- * Form data priority and merging logic
- */
 import type {
   AutoPrefillConfig,
   FormDataPriority,
   FormDataSources,
 } from "./endpoint-types";
+import type {
+  ApiFormOptions,
+  ApiMutationOptions,
+  ApiQueryFormOptions,
+  ApiQueryOptions,
+} from "./types";
 
 /**
  * Utility to detect available HTTP methods from endpoints object
@@ -138,10 +142,10 @@ export function determineFormDataPriority<T>(
 }
 
 /**
- * Deep merge utility that merges two objects recursively
- * Hook options take priority over endpoint options
+ * Shallow merge utility that merges two option objects.
+ * Hook options take priority over endpoint options.
  */
-function deepMerge<T>(
+function mergeOptions<T extends FieldValues>(
   endpointOptions: T | undefined,
   hookOptions: T | undefined,
 ): T | undefined {
@@ -154,83 +158,52 @@ function deepMerge<T>(
   if (!hookOptions) {
     return endpointOptions;
   }
-
-  // If both are objects, merge them recursively
-  if (
-    typeof endpointOptions === "object" &&
-    typeof hookOptions === "object" &&
-    !Array.isArray(endpointOptions) &&
-    !Array.isArray(hookOptions)
-  ) {
-    const result = { ...endpointOptions } as T;
-    for (const key in hookOptions) {
-      if (Object.prototype.hasOwnProperty.call(hookOptions, key)) {
-        const endpointValue = (endpointOptions as Record<string, unknown>)[key];
-        const hookValue = (hookOptions as Record<string, unknown>)[key];
-
-        // Hook value takes priority, but merge nested objects
-        if (hookValue !== undefined) {
-          if (
-            typeof endpointValue === "object" &&
-            typeof hookValue === "object" &&
-            !Array.isArray(endpointValue) &&
-            !Array.isArray(hookValue)
-          ) {
-            (result as Record<string, unknown>)[key] = deepMerge(
-              endpointValue,
-              hookValue,
-            );
-          } else {
-            (result as Record<string, unknown>)[key] = hookValue;
-          }
-        }
-      }
-    }
-    return result;
-  }
-
-  // For non-objects, hook options take priority
-  return hookOptions;
+  // Hook options override endpoint options
+  return { ...endpointOptions, ...hookOptions };
 }
 
 /**
  * Merge endpoint read options with hook-provided read options
  * Hook options take priority over endpoint options
  */
-export function mergeReadOptions<TRequest, TUrlVariables>(
+export function mergeReadOptions<
+  TRequest extends FieldValues,
+  TResponse,
+  TUrlVariables,
+>(
   endpointOptions:
     | {
-        formOptions?: Record<string, unknown>;
-        queryOptions?: Record<string, unknown>;
+        formOptions?: ApiQueryFormOptions<TRequest>;
+        queryOptions?: ApiQueryOptions<TRequest, TResponse, TUrlVariables>;
         urlPathParams?: TUrlVariables;
         initialState?: Partial<TRequest>;
       }
     | undefined,
   hookOptions:
     | {
-        formOptions?: Record<string, unknown>;
-        queryOptions?: Record<string, unknown>;
+        formOptions?: ApiQueryFormOptions<TRequest>;
+        queryOptions?: ApiQueryOptions<TRequest, TResponse, TUrlVariables>;
         urlPathParams?: TUrlVariables;
         initialState?: Partial<TRequest>;
       }
     | undefined,
 ): {
-  formOptions?: Record<string, unknown>;
-  queryOptions?: Record<string, unknown>;
+  formOptions?: ApiQueryFormOptions<TRequest>;
+  queryOptions?: ApiQueryOptions<TRequest, TResponse, TUrlVariables>;
   urlPathParams?: TUrlVariables;
   initialState?: Partial<TRequest>;
 } {
   return {
-    formOptions: deepMerge(
+    formOptions: mergeOptions(
       endpointOptions?.formOptions,
       hookOptions?.formOptions,
     ),
-    queryOptions: deepMerge(
+    queryOptions: mergeOptions(
       endpointOptions?.queryOptions,
       hookOptions?.queryOptions,
     ),
     urlPathParams: hookOptions?.urlPathParams ?? endpointOptions?.urlPathParams,
-    initialState: deepMerge(
+    initialState: mergeOptions(
       endpointOptions?.initialState,
       hookOptions?.initialState,
     ),
@@ -241,11 +214,15 @@ export function mergeReadOptions<TRequest, TUrlVariables>(
  * Merge endpoint create options with hook-provided create options
  * Hook options take priority over endpoint options
  */
-export function mergeCreateOptions<TRequest, TUrlVariables>(
+export function mergeCreateOptions<
+  TRequest extends FieldValues,
+  TResponse,
+  TUrlVariables,
+>(
   endpointOptions:
     | {
-        formOptions?: Record<string, unknown>;
-        mutationOptions?: Record<string, unknown>;
+        formOptions?: ApiFormOptions<TRequest>;
+        mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
         urlPathParams?: TUrlVariables;
         autoPrefillData?: Partial<TRequest>;
         initialState?: Partial<TRequest>;
@@ -253,35 +230,35 @@ export function mergeCreateOptions<TRequest, TUrlVariables>(
     | undefined,
   hookOptions:
     | {
-        formOptions?: Record<string, unknown>;
-        mutationOptions?: Record<string, unknown>;
+        formOptions?: ApiFormOptions<TRequest>;
+        mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
         urlPathParams?: TUrlVariables;
         autoPrefillData?: Partial<TRequest>;
         initialState?: Partial<TRequest>;
       }
     | undefined,
 ): {
-  formOptions?: Record<string, unknown>;
-  mutationOptions?: Record<string, unknown>;
+  formOptions?: ApiFormOptions<TRequest>;
+  mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
   urlPathParams?: TUrlVariables;
   autoPrefillData?: Partial<TRequest>;
   initialState?: Partial<TRequest>;
 } {
   return {
-    formOptions: deepMerge(
+    formOptions: mergeOptions(
       endpointOptions?.formOptions,
       hookOptions?.formOptions,
     ),
-    mutationOptions: deepMerge(
+    mutationOptions: mergeOptions(
       endpointOptions?.mutationOptions,
       hookOptions?.mutationOptions,
     ),
     urlPathParams: hookOptions?.urlPathParams ?? endpointOptions?.urlPathParams,
-    autoPrefillData: deepMerge(
+    autoPrefillData: mergeOptions(
       endpointOptions?.autoPrefillData,
       hookOptions?.autoPrefillData,
     ),
-    initialState: deepMerge(
+    initialState: mergeOptions(
       endpointOptions?.initialState,
       hookOptions?.initialState,
     ),
@@ -292,25 +269,25 @@ export function mergeCreateOptions<TRequest, TUrlVariables>(
  * Merge endpoint delete options with hook-provided delete options
  * Hook options take priority over endpoint options
  */
-export function mergeDeleteOptions<TUrlVariables>(
+export function mergeDeleteOptions<TRequest, TResponse, TUrlVariables>(
   endpointOptions:
     | {
-        mutationOptions?: Record<string, unknown>;
+        mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
         urlPathParams?: TUrlVariables;
       }
     | undefined,
   hookOptions:
     | {
-        mutationOptions?: Record<string, unknown>;
+        mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
         urlPathParams?: TUrlVariables;
       }
     | undefined,
 ): {
-  mutationOptions?: Record<string, unknown>;
+  mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
   urlPathParams?: TUrlVariables;
 } {
   return {
-    mutationOptions: deepMerge(
+    mutationOptions: mergeOptions(
       endpointOptions?.mutationOptions,
       hookOptions?.mutationOptions,
     ),

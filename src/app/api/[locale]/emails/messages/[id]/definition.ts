@@ -178,7 +178,7 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content: "app.api.emails.messages.id.response.email.retryCount",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           error: responseField(
             {

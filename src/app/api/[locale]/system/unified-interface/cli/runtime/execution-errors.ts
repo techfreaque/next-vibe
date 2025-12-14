@@ -3,7 +3,7 @@
  */
 
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../shared/types/node.d.ts" />
+/// <reference path="../../types/node.d.ts" />
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 
@@ -415,7 +415,7 @@ export namespace ErrorHandler {
     try {
       return await fn();
     } catch (error) {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure code requires throwing for system-level errors and initialization failures
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure code requires throwing for system-level errors and initialization failures
       throw createError(error as UnknownError, context);
     }
   }

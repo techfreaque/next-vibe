@@ -1,13 +1,13 @@
 /// <reference types="node" />
 import {
-  fail,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
 
+import { smsEnv } from "../env";
 import type { SendSmsParams, SmsProvider, SmsResult } from "../utils";
 import { SmsProviders } from "../utils";
 
@@ -34,9 +34,9 @@ interface TwilioSuccessResponse {
  * Creates a Twilio SMS provider instance
  */
 export function getTwilioProvider(): SmsProvider {
-  const accountSid = env.TWILIO_ACCOUNT_SID;
-  const authToken = env.TWILIO_AUTH_TOKEN;
-  const region = env.TWILIO_REGION;
+  const accountSid = smsEnv.TWILIO_ACCOUNT_SID;
+  const authToken = smsEnv.TWILIO_AUTH_TOKEN;
+  const region = smsEnv.TWILIO_REGION;
 
   return {
     name: SmsProviders.TWILIO,
@@ -89,7 +89,7 @@ export function getTwilioProvider(): SmsProvider {
         }
 
         // From phone number fallback with nullish coalescing
-        const fromNumber = params.from ?? env.SMS_FROM_NUMBER;
+        const fromNumber = params.from ?? smsEnv.SMS_FROM_NUMBER;
         if (!fromNumber) {
           return fail({
             message: "app.api.sms.sms.error.invalid_phone_format",

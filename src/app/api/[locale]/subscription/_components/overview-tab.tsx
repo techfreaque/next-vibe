@@ -1,12 +1,4 @@
-import { MotionDiv } from "next-vibe-ui/ui/motion";
-import {
-  ArrowRight,
-  Calendar,
-  Coins,
-  Info,
-  Sparkles,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { Button } from "next-vibe-ui/ui/button";
 import {
   Card,
   CardContent,
@@ -15,23 +7,32 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { H4, P } from "next-vibe-ui/ui/typography";
+import {
+  ArrowRight,
+  Calendar,
+  Coins,
+  Info,
+  Sparkles,
+  Zap,
+} from "next-vibe-ui/ui/icons";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
-import { Button } from "next-vibe-ui/ui/button";
+import { H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { useTranslation } from "@/i18n/core/client";
+import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import {
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/agent/chat/model-access/models";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { formatPrice } from "./types";
 import {
-  TOTAL_MODEL_COUNT,
   FEATURE_COSTS,
+  TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/products/repository-client";
+import { useTranslation } from "@/i18n/core/client";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { formatPrice } from "./types";
 
 interface OverviewTabProps {
   locale: CountryLanguage;

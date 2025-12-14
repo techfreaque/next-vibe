@@ -8,25 +8,25 @@ import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type z from "zod";
 
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import { type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
 import { isEmptySchema } from "../../../../shared/utils/validation";
 import type { CreateApiEndpoint } from "../../shared/endpoints/definition/create";
-import type { EndpointLogger } from "../../shared/logger/endpoint";
-import { getCliUser } from "../auth/cli-user";
-import { Platform } from "../../shared/types/platform";
 import { definitionLoader } from "../../shared/endpoints/definition/loader";
 import type { BaseExecutionContext } from "../../shared/endpoints/route/executor";
 import { routeExecutionExecutor } from "../../shared/endpoints/route/executor";
+import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
+import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { UnifiedField } from "../../shared/types/endpoint";
 import type { Methods } from "../../shared/types/enums";
-import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
+import type { Platform } from "../../shared/types/platform";
+import { getCliUser } from "../auth/cli-user";
 import { modularCLIResponseRenderer } from "../widgets/renderers/response-renderer";
 import { schemaUIHandler } from "../widgets/renderers/schema-handler";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import type { CliObject } from "./parsing";
 
 // Input data interfaces
@@ -76,6 +76,13 @@ interface CliResponseData {
     | CliResponseData
     | CliResponseData[];
 }
+
+/** CLI-compatible platforms for type assertions */
+export type CliCompatiblePlatform =
+  | typeof Platform.CLI
+  | typeof Platform.CLI_PACKAGE
+  | typeof Platform.AI
+  | typeof Platform.MCP;
 
 /**
  * Route execution context
@@ -138,6 +145,12 @@ export interface RouteExecutionResult {
 
   /** Formatted output string ready for display */
   formattedOutput?: string;
+
+  /**
+   * Indicates that this is a logical error response (e.g., operation failed)
+   * even though success: true was returned. Used for CLI exit code handling.
+   */
+  isErrorResponse?: true;
 }
 
 /**
@@ -183,7 +196,7 @@ export class RouteDelegationHandler {
         >
       >({
         identifier: resolvedCommand,
-        platform: Platform.CLI,
+        platform: context.platform,
         user: cliUser,
         logger,
       });
@@ -232,15 +245,16 @@ export class RouteDelegationHandler {
       }
 
       // 6. Delegate to shared generic handler executor
-      const result = await routeExecutionExecutor.executeGenericHandler({
+      let result = await routeExecutionExecutor.executeGenericHandler({
         toolName: resolvedCommand,
         data: (inputData.data || {}) as Record<string, never>,
         urlPathParams: (inputData.urlPathParams || {}) as Record<string, never>,
         user: cliUser,
         locale,
         logger,
-        platform: Platform.CLI,
+        platform: context.platform,
       });
+
 
       // 7. Convert ResponseType to RouteExecutionResult
       const routeResult: RouteExecutionResult = {
@@ -256,6 +270,12 @@ export class RouteDelegationHandler {
           method: "",
           resolvedCommand,
         },
+        // Pass through isErrorResponse from API response for CLI exit code handling
+        // Note: isErrorResponse can be true even when result.success is true (e.g., vibe check found errors)
+        isErrorResponse:
+          "isErrorResponse" in result && result.isErrorResponse
+            ? true
+            : undefined,
       };
 
       // 8. Format result for CLI output

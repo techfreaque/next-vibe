@@ -3,6 +3,7 @@
 import * as AspectRatioPrimitive from "@radix-ui/react-aspect-ratio";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 export type AspectRatioRootProps = {

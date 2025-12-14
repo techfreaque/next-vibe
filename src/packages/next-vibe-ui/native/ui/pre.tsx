@@ -1,13 +1,14 @@
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import type { JSX } from "react";
 import * as React from "react";
-import { Text } from "react-native";
 import type { TextStyle } from "react-native";
-import { styled } from "nativewind";
+import { Text } from "react-native";
 
 import type { PreProps } from "@/packages/next-vibe-ui/web/ui/pre";
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToTextStyle } from "../utils/style-converter";
+
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToTextStyle } from "../utils/style-converter";
 
 const StyledText = styled(Text, { className: "style" });
 

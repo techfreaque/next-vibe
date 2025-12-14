@@ -56,6 +56,10 @@ export const translations: typeof enTranslations = {
       label: "Pomiń Sprawdzanie Typów",
       description: "Pomiń sprawdzanie typów TypeScript",
     },
+    createConfig: {
+      label: "Utwórz Konfigurację",
+      description: "Utwórz domyślny lint.config.ts jeśli brakuje",
+    },
     timeoutSeconds: {
       label: "Limit czasu (sekundy)",
       description: "Maksymalny czas wykonania",

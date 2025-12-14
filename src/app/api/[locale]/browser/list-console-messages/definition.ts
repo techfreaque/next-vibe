@@ -173,14 +173,14 @@ const { POST } = createEndpoint({
             messages: z
               .array(
                 z.object({
-                  msgid: z.number(),
+                  msgid: z.coerce.number(),
                   type: z.string(),
                   text: z.string(),
                   timestamp: z.string().optional(),
                 }),
               )
               .describe("List of console messages"),
-            totalCount: z.number().describe("Total number of messages"),
+            totalCount: z.coerce.number().describe("Total number of messages"),
           })
           .optional()
           .describe("Result of console messages listing"),

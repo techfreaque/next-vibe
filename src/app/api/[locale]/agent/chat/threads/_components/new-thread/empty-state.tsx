@@ -9,29 +9,28 @@ import {
   DialogTrigger,
 } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
-import { H1, H3, P } from "next-vibe-ui/ui/typography";
+import { ChevronDown, ChevronUp, MoreHorizontal } from "next-vibe-ui/ui/icons";
+import { Markdown } from "next-vibe-ui/ui/markdown";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Span } from "next-vibe-ui/ui/span";
-import { Markdown } from "next-vibe-ui/ui/markdown";
-import { ChevronDown, ChevronUp, MoreHorizontal } from "next-vibe-ui/ui/icons";
+import { H1, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useState } from "react";
-import { envClient } from "@/config/env-client";
 
+import { DOM_IDS, LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
+import { getDefaultFolderConfig } from "@/app/api/[locale]/agent/chat/config";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
+import {
+  DEFAULT_CATEGORIES,
+  DEFAULT_PERSONAS,
+  type Persona,
+} from "@/app/api/[locale]/agent/chat/personas/config";
+import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
-
-import { DOM_IDS, LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import {
-  DEFAULT_PERSONAS,
-  DEFAULT_CATEGORIES,
-  type Persona,
-} from "@/app/api/[locale]/agent/chat/personas/config";
-import { getDefaultFolderConfig } from "@/app/api/[locale]/agent/chat/config";
-import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
 
 interface ChatEmptyStateProps {
   locale: CountryLanguage;
@@ -204,7 +203,7 @@ export function ChatEmptyState({
     >
       <Div
         style={
-          envClient.platform.isReactNative
+          platform.isReactNative
             ? { paddingBottom: LAYOUT.MESSAGES_BOTTOM_PADDING }
             : {
                 paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,

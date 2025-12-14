@@ -438,7 +438,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.emails.messages.list.response.emails.item.retryCount",
                   },
-                  z.number().int(),
+                  z.coerce.number().int(),
                 ),
                 error: responseField(
                   {
@@ -524,21 +524,21 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content: "app.api.emails.messages.list.response.pagination.page",
             },
-            z.number().int().min(1),
+            z.coerce.number().int().min(1),
           ),
           limit: responseField(
             {
               type: WidgetType.TEXT,
               content: "app.api.emails.messages.list.response.pagination.limit",
             },
-            z.number().int().min(1),
+            z.coerce.number().int().min(1),
           ),
           total: responseField(
             {
               type: WidgetType.TEXT,
               content: "app.api.emails.messages.list.response.pagination.total",
             },
-            z.number().int().min(0),
+            z.coerce.number().int().min(0),
           ),
           totalPages: responseField(
             {
@@ -546,7 +546,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.messages.list.response.pagination.totalPages",
             },
-            z.number().int().min(0),
+            z.coerce.number().int().min(0),
           ),
         },
       ),

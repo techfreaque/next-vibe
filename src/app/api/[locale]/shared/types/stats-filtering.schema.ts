@@ -88,13 +88,13 @@ export type BaseStatsFilterType = z.infer<typeof baseStatsFilterSchema>;
  */
 export const historicalDataPointSchema = z.object({
   date: dateSchema,
-  value: z.number(),
+  value: z.coerce.number(),
   label: z.string().optional() as z.ZodType<TranslationKey | undefined>,
   labelParams: z
-    .record(z.string(), z.union([z.string(), z.number()]))
+    .record(z.string(), z.union([z.string(), z.coerce.number()]))
     .optional(),
   metadata: z
-    .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
+    .record(z.string(), z.union([z.string(), z.coerce.number(), z.boolean()]))
     .optional(),
 });
 
@@ -107,7 +107,7 @@ export type HistoricalDataPointType = z.infer<typeof historicalDataPointSchema>;
 export const historicalDataSeriesSchema = z.object({
   name: z.string() as z.ZodType<TranslationKey>,
   nameParams: z
-    .record(z.string(), z.union([z.string(), z.number()]))
+    .record(z.string(), z.union([z.string(), z.coerce.number()]))
     .optional(),
   data: z.array(historicalDataPointSchema),
   color: z.string().optional(),
@@ -138,35 +138,44 @@ export type ChartDataType = z.infer<typeof chartDataSchema>;
  */
 export const currentPeriodStatsSchema = z.object({
   // Core metrics
-  totalCount: z.number().describe("Total count for the current period"),
-  newCount: z.number().describe("New items in the current period"),
-  activeCount: z.number().describe("Active items in the current period"),
+  totalCount: z.coerce.number().describe("Total count for the current period"),
+  newCount: z.coerce.number().describe("New items in the current period"),
+  activeCount: z.coerce.number().describe("Active items in the current period"),
 
   // Engagement metrics (for emails/campaigns)
-  totalSent: z.number().optional().describe("Total emails sent"),
-  totalOpened: z.number().optional().describe("Total emails opened"),
-  totalClicked: z.number().optional().describe("Total emails clicked"),
-  totalBounced: z.number().optional().describe("Total emails bounced"),
-  totalUnsubscribed: z.number().optional().describe("Total unsubscribed"),
+  totalSent: z.coerce.number().optional().describe("Total emails sent"),
+  totalOpened: z.coerce.number().optional().describe("Total emails opened"),
+  totalClicked: z.coerce.number().optional().describe("Total emails clicked"),
+  totalBounced: z.coerce.number().optional().describe("Total emails bounced"),
+  totalUnsubscribed: z.coerce
+    .number()
+    .optional()
+    .describe("Total unsubscribed"),
 
   // Conversion metrics (for leads)
-  totalSignedUp: z.number().optional().describe("Total leads signed up"),
+  totalSignedUp: z.coerce.number().optional().describe("Total leads signed up"),
   totalConsultationBooked: z
     .number()
     .optional()
     .describe("Total consultations booked"),
-  totalConverted: z.number().optional().describe("Total converted leads"),
+  totalConverted: z.coerce
+    .number()
+    .optional()
+    .describe("Total converted leads"),
 
   // Rate calculations
-  openRate: z.number().optional().describe("Email open rate (0-1)"),
-  clickRate: z.number().optional().describe("Email click rate (0-1)"),
-  bounceRate: z.number().optional().describe("Email bounce rate (0-1)"),
+  openRate: z.coerce.number().optional().describe("Email open rate (0-1)"),
+  clickRate: z.coerce.number().optional().describe("Email click rate (0-1)"),
+  bounceRate: z.coerce.number().optional().describe("Email bounce rate (0-1)"),
   unsubscribeRate: z
     .number()
     .optional()
     .describe("Email unsubscribe rate (0-1)"),
-  conversionRate: z.number().optional().describe("Lead conversion rate (0-1)"),
-  signupRate: z.number().optional().describe("Lead signup rate (0-1)"),
+  conversionRate: z.coerce
+    .number()
+    .optional()
+    .describe("Lead conversion rate (0-1)"),
+  signupRate: z.coerce.number().optional().describe("Lead signup rate (0-1)"),
   consultationBookingRate: z
     .number()
     .optional()
@@ -175,32 +184,32 @@ export const currentPeriodStatsSchema = z.object({
   // Distribution data
   // Generic string keys - specific implementations should override with proper enum types
   byType: z
-    .record(z.string(), z.number())
+    .record(z.string(), z.coerce.number())
     .optional()
     .describe("Distribution by type"),
   byStatus: z
-    .record(z.string(), z.number())
+    .record(z.string(), z.coerce.number())
     .optional()
     .describe("Distribution by status"),
   bySource: z
-    .record(z.string(), z.number())
+    .record(z.string(), z.coerce.number())
     .optional()
     .describe("Distribution by source"),
   // Proper enum types for country and language
   byCountry: z
-    .record(z.custom<Countries>(), z.number())
+    .record(z.custom<Countries>(), z.coerce.number())
     .optional()
     .describe("Distribution by country"),
   byLanguage: z
-    .record(z.custom<Languages>(), z.number())
+    .record(z.custom<Languages>(), z.coerce.number())
     .optional()
     .describe("Distribution by language"),
 
   // Time-based metrics
-  todayCount: z.number().optional().describe("Count for today"),
-  thisWeekCount: z.number().optional().describe("Count for this week"),
-  thisMonthCount: z.number().optional().describe("Count for this month"),
-  lastMonthCount: z.number().optional().describe("Count for last month"),
+  todayCount: z.coerce.number().optional().describe("Count for today"),
+  thisWeekCount: z.coerce.number().optional().describe("Count for this week"),
+  thisMonthCount: z.coerce.number().optional().describe("Count for this month"),
+  lastMonthCount: z.coerce.number().optional().describe("Count for last month"),
 
   // Top performers
   topPerforming: z

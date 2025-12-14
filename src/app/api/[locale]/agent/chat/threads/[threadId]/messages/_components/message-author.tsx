@@ -1,10 +1,11 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
+import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import {
@@ -14,7 +15,6 @@ import {
 import { getPersonaById } from "@/app/api/[locale]/agent/chat/personas/config";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
 
 interface MessageAuthorProps {
   authorName: string | null;

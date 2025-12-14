@@ -4,9 +4,10 @@
  * Extracted from BaseAuthHandler to separate business logic from platform infrastructure
  */
 
-import type { JwtPayloadType, JwtPrivatePayloadType } from "./types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import type { JwtPayloadType, JwtPrivatePayloadType } from "./types";
 
 /**
  * Create public user payload
@@ -17,7 +18,7 @@ import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles
  */
 export function createPublicUser(leadId: string): JwtPayloadType {
   if (!leadId) {
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
     throw new Error("leadId from DB required for public user");
   }
   return {
@@ -41,11 +42,11 @@ export function createPrivateUser(
   roles: (typeof UserPermissionRoleValue)[],
 ): JwtPrivatePayloadType {
   if (!leadId) {
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
     throw new Error("leadId from DB required for private user");
   }
   if (!userId) {
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth infrastructure helper throws for invalid state
     throw new Error("userId required for private user");
   }
   return {

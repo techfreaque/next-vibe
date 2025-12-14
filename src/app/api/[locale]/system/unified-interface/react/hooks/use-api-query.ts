@@ -3,18 +3,18 @@
 import type { QueryKey } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-import { success } from "next-vibe/shared/types/response.schema";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
 import { useMemo } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import { executeQuery } from "./query-executor";
 import { buildQueryKey } from "./query-key-builder";
-import { useApiStore, deserializeQueryParams } from "./store";
+import { deserializeQueryParams, type FormQueryParams,useApiStore } from "./store";
 import type { ApiQueryReturn } from "./types";
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 
 /**
  * React Query hook for API queries with type-safe responses
@@ -119,10 +119,11 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
       const formId = store.getFormId(endpoint);
       const storedParams = store.getFormQueryParams(formId);
 
-      // Use stored params if available, otherwise fall back to the prop value
+      // Use stored params if available and non-empty, otherwise fall back to the prop value
       // Deserialize any JSON-stringified nested objects
-      const currentRequestData = storedParams
-        ? deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(storedParams)
+      const hasStoredParams = storedParams && Object.keys(storedParams).length > 0;
+      const currentRequestData = hasStoredParams
+        ? deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(storedParams as FormQueryParams)
         : requestData;
 
       logger.info("useApiQuery: Executing query", {

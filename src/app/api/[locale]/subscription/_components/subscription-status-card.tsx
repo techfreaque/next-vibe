@@ -1,10 +1,3 @@
-import { MotionDiv } from "next-vibe-ui/ui/motion";
-import {
-  CreditCard,
-  Bitcoin,
-  ExternalLink,
-  AlertCircle,
-} from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import {
@@ -15,13 +8,21 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import {
+  AlertCircle,
+  Bitcoin,
+  CreditCard,
+  ExternalLink,
+} from "next-vibe-ui/ui/icons";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 
+import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
+import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
+
 import { formatDate } from "./types";
-import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 
 interface SubscriptionStatusCardProps {
   locale: CountryLanguage;

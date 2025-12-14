@@ -5,23 +5,23 @@
 
 "use client";
 
-import { ArrowLeft, Save } from "next-vibe-ui/ui/icons";
-import { Link } from "next-vibe-ui/ui/link";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
-import { Form } from "next-vibe-ui/ui/form/form";
-import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import { Div } from "next-vibe-ui/ui/div";
+import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
+import { ArrowLeft, Save } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
 import React from "react";
 
+import createDefinition from "@/app/api/[locale]/emails/smtp-client/create/definition";
 import { useSmtpAccountCreateEndpoint } from "@/app/api/[locale]/emails/smtp-client/create/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import createDefinition from "@/app/api/[locale]/emails/smtp-client/create/definition";
 
 interface CreateSmtpAccountFormProps {
   locale: CountryLanguage;

@@ -11,21 +11,21 @@
  * ✅ Disabled and readOnly states
  */
 
+import { cva } from "class-variance-authority";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { TextInput, View } from "react-native";
-import { styled } from "nativewind";
-import { cva } from "class-variance-authority";
 
 // Import ALL types from web - ZERO definitions here
 import type {
-  TextareaProps,
   TextareaChangeEvent,
+  TextareaProps,
   TextareaRefObject,
 } from "@/packages/next-vibe-ui/web/ui/textarea";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 
-import { cn } from "next-vibe/shared/utils/utils";
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 const noop = (): void => {
   return undefined;
 };
@@ -112,7 +112,8 @@ const TextareaInner = (
 
       // Call web-compatible onChange handler if provided with proper event object
       if (onChange) {
-        /* eslint-disable no-empty-function -- Required for cross-platform event compatibility (React Native to Web adapter) */
+        // Mock event object for web API compatibility in React Native
+        // eslint-disable-next-line no-empty-function -- Mock event stubs required for web API interface
         const changeEvent: TextareaChangeEvent = {
           target: {
             value: text,
@@ -120,8 +121,8 @@ const TextareaInner = (
             id: idAttr,
           },
           currentTarget: {
-            addEventListener: () => {},
-            removeEventListener: () => {},
+            addEventListener: () => {/* no-op stub for web interface */},
+            removeEventListener: () => {/* no-op stub for web interface */},
             dispatchEvent: () => false,
             getBoundingClientRect: () => ({
               left: 0,
@@ -135,8 +136,8 @@ const TextareaInner = (
             }),
             value: text,
           },
-          preventDefault: () => {},
-          stopPropagation: () => {},
+          preventDefault: () => {/* no-op stub for web interface */},
+          stopPropagation: () => {/* no-op stub for web interface */},
           bubbles: true,
           cancelable: true,
           defaultPrevented: false,
@@ -145,7 +146,7 @@ const TextareaInner = (
           timeStamp: Date.now(),
           type: "change",
         };
-        /* eslint-enable no-empty-function */
+         
         onChange(changeEvent);
       }
     },

@@ -16,6 +16,7 @@ import React, { useEffect, useState } from "react";
 import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+
 import { IconSelector } from "./icon-selector";
 
 interface RenameFolderDialogProps {

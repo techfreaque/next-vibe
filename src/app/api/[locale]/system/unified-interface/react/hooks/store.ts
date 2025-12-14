@@ -10,16 +10,16 @@ import { create } from "zustand";
 
 import { generateStorageKey } from "@/app/api/[locale]/system/unified-interface/react/utils/storage-storage-client";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
-import { executeQuery } from "./query-executor";
-import type { ApiMutationOptions, ApiQueryOptions } from "./types";
-import { buildQueryKey } from "./query-key-builder";
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
+import { executeQuery } from "./query-executor";
+import { buildQueryKey } from "./query-key-builder";
+import type { ApiMutationOptions, ApiQueryOptions } from "./types";
 
 // Create a single QueryClient instance
 export const queryClient = new QueryClient({
@@ -447,7 +447,7 @@ export const apiClient = {
     } = {},
   ): Promise<ResponseType<TResponseOutput>> => {
     // Check if the endpoint expects undefined for request data
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
     const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
     const isUndefinedSchema =
       requestSchema.safeParse(undefined).success &&

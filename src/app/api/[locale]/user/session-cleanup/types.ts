@@ -11,9 +11,9 @@ import { z } from "zod";
  * Task Configuration Schema
  */
 export const sessionCleanupConfigSchema = z.object({
-  sessionRetentionDays: z.number().min(1).max(365).default(30),
-  tokenRetentionDays: z.number().min(1).max(365).default(7),
-  batchSize: z.number().min(1).max(1000).default(100),
+  sessionRetentionDays: z.coerce.number().min(1).max(365).default(30),
+  tokenRetentionDays: z.coerce.number().min(1).max(365).default(7),
+  batchSize: z.coerce.number().min(1).max(1000).default(100),
   dryRun: z.boolean().default(false),
 });
 
@@ -25,10 +25,10 @@ export type SessionCleanupConfigType = z.output<
  * Task Result Schema
  */
 export const sessionCleanupResultSchema = z.object({
-  sessionsDeleted: z.number().default(0),
-  tokensDeleted: z.number().default(0),
-  totalProcessed: z.number().default(0),
-  executionTimeMs: z.number().default(0),
+  sessionsDeleted: z.coerce.number().default(0),
+  tokensDeleted: z.coerce.number().default(0),
+  totalProcessed: z.coerce.number().default(0),
+  executionTimeMs: z.coerce.number().default(0),
   errors: z.array(z.string()).default([]),
 });
 

@@ -7,10 +7,9 @@ import { Div } from "next-vibe-ui/ui/div";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { CreateSmtpAccountForm } from "@/app/api/[locale]/emails/smtp-client/create/_components/create-smtp-account-form";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { CreateSmtpAccountForm } from "@/app/api/[locale]/emails/smtp-client/create/_components/create-smtp-account-form";
 
 export default async function CreateSmtpAccountPage({
   params,

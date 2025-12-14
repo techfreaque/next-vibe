@@ -5,6 +5,10 @@
 
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   Clock,
   Home,
@@ -14,14 +18,10 @@ import {
   Users,
   X,
 } from "next-vibe-ui/ui/icons";
-import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
-import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
-import { Main } from "next-vibe-ui/ui/main";
-import { H1 } from "next-vibe-ui/ui/typography";
 import { Link } from "next-vibe-ui/ui/link";
-import { usePathname } from "next-vibe-ui/hooks/use-pathname";
+import { Main } from "next-vibe-ui/ui/main";
+import { Span } from "next-vibe-ui/ui/span";
+import { H1 } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useState } from "react";

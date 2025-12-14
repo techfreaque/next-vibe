@@ -5,12 +5,12 @@
 
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
 import { Card } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { P } from "next-vibe-ui/ui/typography";
+import { Check,Copy } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
-import { Button } from "next-vibe-ui/ui/button";
-import { Copy, Check } from "next-vibe-ui/ui/icons";
+import { P } from "next-vibe-ui/ui/typography";
 import React from "react";
 
 import type { CountryLanguage, Currencies } from "@/i18n/core/config";
@@ -18,6 +18,7 @@ import { currencyByCountry } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import { formatCurrency } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
+
 import { useReferralCodesList } from "../hooks";
 
 interface ReferralCodesListProps {

@@ -16,6 +16,11 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  formatGenerator,
+  formatCount,
+  formatDuration,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
 import {
   extractModuleName,
@@ -84,7 +89,7 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
       const duration = Date.now() - startTime;
 
       logger.info(
-        `Generated seeds file with ${seedFiles.length} seeds in ${duration}ms`,
+        formatGenerator(`Generated seeds file with ${formatCount(seedFiles.length, "seed")} in ${formatDuration(duration)}`, "🌱"),
       );
 
       return success({

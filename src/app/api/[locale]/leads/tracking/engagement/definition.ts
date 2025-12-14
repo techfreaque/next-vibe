@@ -58,7 +58,7 @@ const engagementMetadataSchema = z
 
     // Custom tracking data
     customData: z
-      .record(z.string(), z.string().or(z.number()).or(z.boolean()))
+      .record(z.string(), z.string().or(z.coerce.number()).or(z.boolean()))
       .optional(),
   })
   .optional();
@@ -222,7 +222,7 @@ const { POST } = createEndpoint({
             "app.api.leads.tracking.engagement.post.response.metadata" as const,
         },
         z
-          .record(z.string(), z.string().or(z.number()).or(z.boolean()))
+          .record(z.string(), z.string().or(z.coerce.number()).or(z.boolean()))
           .optional(),
       ),
       timestamp: responseField(

@@ -5,11 +5,11 @@
 
 "use client";
 
-import { Eye, EyeOff } from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import { Eye, EyeOff } from "next-vibe-ui/ui/icons";
 import { Switch } from "next-vibe-ui/ui/switch";
 import type { JSX } from "react";
 

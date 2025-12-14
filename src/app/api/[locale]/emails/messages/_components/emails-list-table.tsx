@@ -5,9 +5,9 @@
 
 "use client";
 
-import { Eye, Mail, MousePointer } from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Div } from "next-vibe-ui/ui/div";
+import { Eye, Mail, MousePointer } from "next-vibe-ui/ui/icons";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
 import {

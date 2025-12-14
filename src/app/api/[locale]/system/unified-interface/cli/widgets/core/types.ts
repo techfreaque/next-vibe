@@ -10,13 +10,14 @@ import type {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { TFunction } from "@/i18n/core/static-types";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
+
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import type {
+  BaseWidgetProps,
   WidgetData,
   WidgetRenderContext as SharedWidgetRenderContext,
-  BaseWidgetProps,
 } from "../../../shared/widgets/types";
 
 /**

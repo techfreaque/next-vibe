@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 
+import type { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 
 type ChatContextType = ReturnType<typeof useChatContext>;
 

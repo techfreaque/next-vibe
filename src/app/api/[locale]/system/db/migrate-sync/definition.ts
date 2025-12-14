@@ -124,7 +124,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.system.db.migrateSync.fields.migrationsProcessed.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

@@ -5,15 +5,15 @@
 
 "use client";
 
-import { Plus, Users } from "next-vibe-ui/ui/icons";
-import { usePathname } from "next-vibe-ui/hooks/use-pathname";
-import { Link } from "next-vibe-ui/ui/link";
 import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui/div";
-import { P } from "next-vibe-ui/ui/typography";
-import { Span } from "next-vibe-ui/ui/span";
-import { Nav } from "next-vibe-ui/ui/nav";
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { Plus, Users } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
+import { Nav } from "next-vibe-ui/ui/nav";
+import { Span } from "next-vibe-ui/ui/span";
+import { P } from "next-vibe-ui/ui/typography";
 import { H2 } from "next-vibe-ui/ui/typography";
 import type { ComponentType, JSX, ReactNode } from "react";
 

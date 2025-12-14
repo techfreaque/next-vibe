@@ -19,47 +19,46 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TextareaKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/textarea";
+import { type TextareaRefObject } from "@/packages/next-vibe-ui/web/ui/textarea";
 
-import { useAIStream } from "../../ai-stream/hooks/use-ai-stream";
+import { type CreditsGetResponseOutput } from "../../../credits/definition";
+import { useCredits } from "../../../credits/hooks";
 import { useAIStreamStore } from "../../ai-stream/hooks/store";
+import { useAIStream } from "../../ai-stream/hooks/use-ai-stream";
 import type { DefaultFolderId } from "../config";
+import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { NEW_MESSAGE_ID } from "../enum";
-import type { ModelId } from "../model-access/models";
+import type { FolderUpdate } from "../folders/hooks/use-operations";
+import { useFolderOperations } from "../folders/hooks/use-operations";
 import type { IconValue } from "../model-access/icons";
+import type { ModelId } from "../model-access/models";
 import type { PersonaListResponseOutput } from "../personas/definition";
 import { usePersonasList } from "../personas/hooks";
-import type { ChatFolder, ChatMessage, ChatThread } from "../db";
-import { useChatStore, type ChatSettings } from "./store";
-
-import { useDataLoader } from "./use-data-loader";
-import { useMessageLoader } from "./use-message-loader";
-import { useSettings } from "./use-settings";
-import { useStreamSync } from "./use-stream-sync";
-import { useFolderOperations } from "../folders/hooks/use-operations";
-import type { FolderUpdate } from "../folders/hooks/use-operations";
-import { useThreadOperations } from "../threads/hooks/use-operations";
-import type { ThreadUpdate } from "../threads/hooks/use-operations";
 import { useMessageOperations } from "../threads/[threadId]/messages/hooks/use-operations";
-import { useNavigation } from "./use-navigation";
-import { useCredits } from "../../../credits/hooks";
-import { type CreditsGetResponseOutput } from "../../../credits/definition";
-import { type TextareaRefObject } from "@/packages/next-vibe-ui/web/ui/textarea";
+import type { ThreadUpdate } from "../threads/hooks/use-operations";
+import { useThreadOperations } from "../threads/hooks/use-operations";
+import { type ChatSettings,useChatStore } from "./store";
 import { useBranchManagement } from "./use-branch-management";
-import { useMessageActions } from "./use-message-actions";
-import { useMessageActions as useMessageEditorActions } from "./use-message-editor-actions";
-import { useThreadNavigation } from "./use-thread-navigation";
-import { useCollapseState } from "./use-collapse-state";
 import type { UseCollapseStateReturn } from "./use-collapse-state";
-import { useInputHandlers } from "./use-input-handlers";
-import type { TextareaKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/textarea";
-import { useUIState } from "./use-ui-state";
+import { useCollapseState } from "./use-collapse-state";
+import { useDataLoader } from "./use-data-loader";
 import { useFolderHandlers } from "./use-folder-handlers";
 import {
   getDraftKey,
   loadDraft,
   saveDraft as saveDraftToStorage,
 } from "./use-input-autosave";
+import { useInputHandlers } from "./use-input-handlers";
+import { useMessageActions } from "./use-message-actions";
+import { useMessageActions as useMessageEditorActions } from "./use-message-editor-actions";
+import { useMessageLoader } from "./use-message-loader";
+import { useNavigation } from "./use-navigation";
+import { useSettings } from "./use-settings";
 import { useSidebarCollapsed } from "./use-sidebar-collapsed";
+import { useStreamSync } from "./use-stream-sync";
+import { useThreadNavigation } from "./use-thread-navigation";
+import { useUIState } from "./use-ui-state";
 /**
  * Return type for useChat hook
  */
@@ -278,7 +277,8 @@ export function useChat(
   const { t } = simpleT(locale);
 
   // Get credits hook with deduct/refetch methods
-  const creditsHook = useCredits(logger, initialCredits);
+  // initialCredits is required in useChat, so creditsHook is guaranteed to be non-null
+  const creditsHook = useCredits(logger, initialCredits)!;
 
   // Get AI stream hook
   const aiStream = useAIStream(locale, logger, t);
@@ -316,8 +316,7 @@ export function useChat(
       });
     };
     void loadDraftForContext();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [draftKey]);
+  }, [draftKey, logger]);
 
   // Wrapper function to save input and draft together
   const setInputAndSaveDraft = useCallback(

@@ -1,9 +1,10 @@
 import { Link as ExpoLink } from "expo-router";
-import { Text as RNText, View } from "react-native";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
+import { Children, isValidElement, type JSX,type ReactNode } from "react";
+import { Text as RNText, View } from "react-native";
+
 import type { LinkProps } from "@/packages/next-vibe-ui/web/ui/link";
-import { type ReactNode, Children, isValidElement, type JSX } from "react";
 
 const StyledText = styled(RNText, {
   className: "style",

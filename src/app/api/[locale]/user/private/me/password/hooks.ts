@@ -3,8 +3,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 
-import passwordEndpoints from "./definition";
 import { useApiForm } from "../../../../system/unified-interface/react/hooks/use-api-mutation-form";
+import passwordEndpoints from "./definition";
 
 /**
  * Hook for updating user password

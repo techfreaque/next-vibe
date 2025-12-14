@@ -7,11 +7,11 @@ import "server-only";
 
 import type { Countries, Languages } from "@/i18n/core/config";
 
-import type { CampaignTypeValue } from "../enum";
 import {
   type EmailCampaignStageValues,
   type EmailJourneyVariantValues,
 } from "../../../leads/enum";
+import type { CampaignTypeValue } from "../enum";
 
 /**
  * SMTP Selection Criteria

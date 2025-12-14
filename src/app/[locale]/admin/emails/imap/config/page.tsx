@@ -7,10 +7,9 @@ import { Div } from "next-vibe-ui/ui/div";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { ImapConfigurationManagement } from "@/app/api/[locale]/emails/imap-client/_components/imap-configuration-management";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { ImapConfigurationManagement } from "@/app/api/[locale]/emails/imap-client/_components/imap-configuration-management";
 
 interface ImapConfigPageProps {
   params: Promise<{

@@ -1,13 +1,14 @@
 "use client";
+/* oxlint-disable oxlint-plugin-restricted/restricted-syntax -- Core endpoint hook needs 'unknown' for dynamic endpoint type handling. Foundational infrastructure for unified interface. */
 
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { useMemo } from "react";
 import type { z } from "zod";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type {
@@ -16,11 +17,11 @@ import type {
   UseEndpointOptions,
 } from "./endpoint-types";
 import {
-  useAvailableMethods,
-  usePrimaryMutationMethod,
-  mergeReadOptions,
   mergeCreateOptions,
   mergeDeleteOptions,
+  mergeReadOptions,
+  useAvailableMethods,
+  usePrimaryMutationMethod,
 } from "./endpoint-utils";
 import { useEndpointCreate } from "./use-endpoint-create";
 import { useEndpointDelete } from "./use-endpoint-delete";
@@ -190,22 +191,21 @@ export function useEndpoint<
     return createFormOptions.defaultValues;
   }, [autoPrefillData, createFormOptions.defaultValues]);
 
-  const createOperation = primaryEndpoint
-    ? useEndpointCreate<PrimaryEndpoint>(
-        primaryEndpoint as PrimaryEndpoint | null,
-        logger,
-        {
-          formOptions: createFormOptions,
-          mutationOptions: mergedCreateOptions.mutationOptions,
-          urlPathParams: createUrlPathParams,
-          autoPrefillData:
-            autoPrefillData ??
-            mergedCreateOptions.autoPrefillData ??
-            options.create?.autoPrefillData,
-          initialState: mergedCreateOptions.initialState,
-        } as Parameters<typeof useEndpointCreate<PrimaryEndpoint>>[2],
-      )
-    : null;
+  // Always call the hook unconditionally - it handles null endpoints internally
+  const createOperation = useEndpointCreate<PrimaryEndpoint>(
+    primaryEndpoint as PrimaryEndpoint | null,
+    logger,
+    {
+      formOptions: createFormOptions,
+      mutationOptions: mergedCreateOptions.mutationOptions,
+      urlPathParams: createUrlPathParams,
+      autoPrefillData:
+        autoPrefillData ??
+        mergedCreateOptions.autoPrefillData ??
+        options.create?.autoPrefillData,
+      initialState: mergedCreateOptions.initialState,
+    } as Parameters<typeof useEndpointCreate<PrimaryEndpoint>>[2],
+  );
 
   // Merge endpoint delete options with hook options (hook options take priority)
   const mergedDeleteOptions = useMemo(() => {

@@ -9,6 +9,9 @@ import type { z } from "zod";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import { type UserRoleValue } from "../../../../user/user-roles/enum";
+import type { CreateApiEndpoint } from "../endpoints/definition/create";
+import type { WidgetConfig } from "../widgets/configs";
 import type {
   ActionTiming,
   ActionType,
@@ -19,9 +22,6 @@ import type {
   Methods,
 } from "./enums";
 import type { FieldUsage } from "./enums";
-import type { WidgetConfig } from "../widgets/configs";
-import type { CreateApiEndpoint } from "../endpoints/definition/create";
-import { type UserRoleValue } from "../../../../user/user-roles/enum";
 
 // ============================================================================
 // ENDPOINT REGISTRY TYPES

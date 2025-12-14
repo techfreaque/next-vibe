@@ -7,9 +7,9 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 

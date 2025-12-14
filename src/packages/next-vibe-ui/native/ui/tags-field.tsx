@@ -2,22 +2,22 @@
  * TagsField Component for React Native
  * Production-ready multi-select tags input with suggestions and custom values
  */
+import { cn } from "next-vibe/shared/utils/utils";
 import React, { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { Plus, X } from "./icons";
 
+import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 // Import cross-platform types from web (source of truth)
 import type {
   TagOption,
   TagsFieldProps,
 } from "@/packages/next-vibe-ui/web/ui/tags-field";
-import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 
 import { useTranslation } from "../../../../i18n/core/client";
-import { cn } from "next-vibe/shared/utils/utils";
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Badge } from "./badge";
+import { Plus, X } from "./icons";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";

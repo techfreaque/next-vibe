@@ -1,16 +1,6 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import type { JSX } from "react";
-
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "next-vibe-ui/ui/table";
+import { Card, CardContent } from "next-vibe-ui/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -18,27 +8,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "next-vibe-ui/ui/carousel";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-// import {
-//   ChartContainer,
-//   Chart,
-//   Bar,
-//   Axis,
-// } from "next-vibe-ui/ui/chart";
-import {
-  H1,
-  H2,
-  H3,
-  H4,
-  P,
-  BlockQuote,
-  Lead,
-  Large,
-  Small,
-  Muted,
-} from "next-vibe-ui/ui/typography";
-import { Span } from "next-vibe-ui/ui/span";
-import { Title } from "next-vibe-ui/ui/title";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   Pagination,
   PaginationContent,
@@ -48,8 +18,37 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "next-vibe-ui/ui/pagination";
-import { Div } from "next-vibe-ui/ui/div";
 import { Section } from "next-vibe-ui/ui/section";
+import { Span } from "next-vibe-ui/ui/span";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe-ui/ui/table";
+import { Title } from "next-vibe-ui/ui/title";
+// import {
+//   ChartContainer,
+//   Chart,
+//   Bar,
+//   Axis,
+// } from "next-vibe-ui/ui/chart";
+import {
+  BlockQuote,
+  H1,
+  H2,
+  H3,
+  H4,
+  Large,
+  Lead,
+  Muted,
+  P,
+  Small,
+} from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
 
 // const chartData = [
 //   { month: "January", desktop: 186 },

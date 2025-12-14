@@ -9,19 +9,19 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import type { ChatMessage, ChatThread } from "@/app/api/[locale]/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTouchDevice } from "@/hooks/use-touch-device";
-import { groupMessagesBySequence } from "../message-grouping";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import { useCollapseState } from "../hooks/use-collapse-state";
 import { useMessageActions } from "../hooks/use-message-actions";
+import { groupMessagesBySequence } from "../message-grouping";
+import { FlatMessage } from "./flat-message";
 import { MessagePreview } from "./preview";
 import { UserIdHoverCard } from "./user-id-hover-card";
-import { FlatMessage } from "./flat-message";
-import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 
 interface FlatMessageViewProps {
   thread: ChatThread;

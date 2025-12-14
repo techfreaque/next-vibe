@@ -1,4 +1,5 @@
 import type { JSX, ReactNode } from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 export type PreProps = {

@@ -38,7 +38,7 @@ export class StudioRepositoryImpl implements StudioRepositoryInterface {
     const startTime = Date.now();
 
     try {
-      const port = data.port ? parseInt(data.port, 10) : 5555;
+      const port = data.port ? data.port : 5555;
       const url = `https://local.drizzle.studio/?port=${port}`;
 
       logger.info(`Starting Drizzle Studio on port ${port}...`);

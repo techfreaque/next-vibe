@@ -8,13 +8,12 @@ import type { JSX } from "react";
 import React from "react";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { ChatSidebar } from "@/app/api/[locale]/agent/chat/threads/_components/sidebar";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { envClient } from "@/config/env-client";
-import { ChatSidebar } from "@/app/api/[locale]/agent/chat/threads/_components/sidebar";
 
 const SIDEBAR_WIDTH = "w-65";
 const SIDEBAR_MIN_WIDTH_PX = 235; // Minimum 235px
@@ -39,7 +38,7 @@ export function SidebarWrapper({
   const [isMobile, setIsMobile] = React.useState(false);
 
   React.useEffect(() => {
-    if (envClient.platform.isReactNative) {
+    if (platform.isReactNative) {
       setIsMobile(true);
       return;
     }

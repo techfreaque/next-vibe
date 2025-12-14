@@ -1,5 +1,5 @@
-import type { translations as enTranslations } from "../en";
 import { translations as purchaseTranslations } from "../../purchase/i18n/de";
+import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   purchase: purchaseTranslations,

@@ -19,6 +19,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
 import { HotkeyAction, HotkeyActionOptions } from "./enum";
 
 /**
@@ -175,7 +176,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.agent.speechToText.hotkey.post.response.recordingDuration" as const,
             },
-            z.number().optional(),
+            z.coerce.number().optional(),
           ),
         },
       ),

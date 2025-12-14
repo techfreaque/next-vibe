@@ -4,8 +4,8 @@
  * Uses zustand with async storage
  */
 
-import { useEffect, useRef, useState } from "react";
 import { storage } from "next-vibe-ui/lib/storage";
+import { useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "sidebar-collapsed";
 const MOBILE_BREAKPOINT = 930; // px

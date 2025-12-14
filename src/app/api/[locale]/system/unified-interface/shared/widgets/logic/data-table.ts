@@ -6,9 +6,9 @@
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { WidgetData } from "../types";
 import type { UnifiedField } from "../../types/endpoint";
 import { FieldDataType, WidgetType } from "../../types/enums";
+import type { WidgetData } from "../types";
 
 /**
  * Table row type

@@ -8,6 +8,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
+import { CronTaskEditClient } from "@/app/api/[locale]/system/unified-interface/tasks/cron/task/_components/cron-task-edit-client";
 import type { IndividualCronTaskType } from "@/app/api/[locale]/system/unified-interface/tasks/cron/task/[id]/definition";
 import {
   CronTaskPriority,
@@ -17,8 +18,6 @@ import {
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { CronTaskEditClient } from "@/app/api/[locale]/system/unified-interface/tasks/cron/task/_components/cron-task-edit-client";
 
 interface CronTaskEditPageProps {
   params: Promise<{

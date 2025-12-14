@@ -5,17 +5,18 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { browserRepository } from "../repository";
 import type {
   BrowserRequestOutput,
   BrowserResponseOutput,
 } from "../definition";
 import type { BrowserTool } from "../enum";
+import { browserRepository } from "../repository";
 
 /**
  * Explicit type for MCP argument values - no any or unknown

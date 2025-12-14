@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
 import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
+import React, { useEffect, useState } from "react";
+import { Appearance,useColorScheme, View } from "react-native";
 
 import type {
   ThemeProviderProps,
   UseThemeToggleReturn,
 } from "@/packages/next-vibe-ui/web/ui/theme-provider";
-import { View, useColorScheme, Appearance } from "react-native";
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledView = styled(View, { className: "style" });
 

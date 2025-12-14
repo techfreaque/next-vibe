@@ -1,8 +1,9 @@
 import type { ExplicitObjectType } from "next-vibe/shared/types/utils";
 
+import type { translationsKeyTypesafety } from "@/config/debug";
+
 import type { TranslationSchema } from "./config";
 import type { TranslatedKeyType } from "./scoped-translation";
-import type { translationsKeyTypesafety } from "@/config/debug";
 
 export interface TranslationElement {
   [key: string]: string | number | string[] | TranslationElement;

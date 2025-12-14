@@ -5,15 +5,15 @@
  * Form for editing cron task details
  */
 
-import { Form } from "next-vibe-ui/ui/form/form";
-import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
-import { Div } from "next-vibe-ui/ui/div";
-import { Label } from "next-vibe-ui/ui/label";
-import { P } from "next-vibe-ui/ui/typography";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
+import { Label } from "next-vibe-ui/ui/label";
+import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";

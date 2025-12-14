@@ -62,7 +62,7 @@ export {
 } from "./breadcrumb";
 
 // button
-export { Button, buttonVariants, buttonTextVariants } from "./button";
+export { Button, buttonTextVariants,buttonVariants } from "./button";
 
 // calendar
 export { Calendar } from "./calendar";
@@ -88,19 +88,19 @@ export {
 
 // chart
 export {
+  Area,
+  Axis,
+  Bar,
+  Chart,
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
-  useChart,
-  Chart,
+  ChartTooltip,
+  ChartTooltipContent,
   Line,
-  Bar,
-  Area,
   Pie,
-  Axis,
   Theme,
+  useChart,
 } from "./chart";
 
 // checkbox
@@ -451,7 +451,7 @@ export { Textarea, textareaVariants } from "./textarea";
 export { ThemeProvider } from "./theme-provider";
 
 // title
-export { Title, sizeClasses } from "./title";
+export { sizeClasses,Title } from "./title";
 
 // toast
 export {
@@ -468,7 +468,7 @@ export {
 export { Toaster } from "./toaster";
 
 // toggle
-export { Toggle, toggleVariants, toggleTextVariants } from "./toggle";
+export { Toggle, toggleTextVariants,toggleVariants } from "./toggle";
 
 // toggle-group
 export { ToggleGroup, ToggleGroupItem } from "./toggle-group";

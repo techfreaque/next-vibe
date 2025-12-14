@@ -1,7 +1,7 @@
 import type { QueryKey } from "@tanstack/react-query";
 import { storage } from "next-vibe-ui/lib/storage";
 
-import { envClient } from "@/config/env-client";
+import { platform } from "@/config/env-client";
 
 /**
  * Initialize storage (no-op for compatibility)
@@ -43,7 +43,7 @@ interface StoredItem<T> {
  */
 export async function getStorageItem<T>(key: string): Promise<T | null> {
   try {
-    if (envClient.platform.isServer) {
+    if (platform.isServer) {
       return null;
     }
 
@@ -87,7 +87,7 @@ export async function getStorageItem<T>(key: string): Promise<T | null> {
  */
 export async function setStorageItem<T>(key: string, value: T): Promise<void> {
   try {
-    if (envClient.platform.isServer) {
+    if (platform.isServer) {
       return;
     }
 
@@ -111,7 +111,7 @@ export async function setStorageItem<T>(key: string, value: T): Promise<void> {
  */
 export async function removeStorageItem(key: string): Promise<void> {
   try {
-    if (envClient.platform.isServer) {
+    if (platform.isServer) {
       return;
     }
 
@@ -128,7 +128,7 @@ export async function removeStorageItem(key: string): Promise<void> {
 // eslint-disable-next-line @typescript-eslint/require-await
 export async function clearStorageItems(): Promise<void> {
   try {
-    if (envClient.platform.isServer) {
+    if (platform.isServer) {
       return;
     }
 

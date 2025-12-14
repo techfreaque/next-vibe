@@ -8,8 +8,8 @@ import { useCallback } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { ChatFolder } from "./store";
 import type { FolderUpdate } from "../folders/hooks/use-operations";
+import type { ChatFolder } from "./store";
 
 interface FolderHandlersDeps {
   folders: Record<string, ChatFolder>;

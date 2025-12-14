@@ -224,56 +224,56 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.totalEmails",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       sentEmails: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.sentEmails",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       deliveredEmails: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.deliveredEmails",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       openedEmails: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.openedEmails",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       clickedEmails: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.clickedEmails",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       bouncedEmails: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.bouncedEmails",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       failedEmails: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.failedEmails",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       draftEmails: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.draftEmails",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Engagement rates
@@ -282,35 +282,35 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.deliveryRate",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       openRate: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.openRate",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       clickRate: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.clickRate",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       bounceRate: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.bounceRate",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       failureRate: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.failureRate",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Provider/template/status/type metrics
@@ -320,7 +320,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.messages.stats.get.response.emailsByProvider",
         },
-        z.record(z.string(), z.number()),
+        z.record(z.string(), z.coerce.number()),
       ),
       emailsByTemplate: responseField(
         {
@@ -328,21 +328,21 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.messages.stats.get.response.emailsByTemplate",
         },
-        z.record(z.string(), z.number()),
+        z.record(z.string(), z.coerce.number()),
       ),
       emailsByStatus: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.emailsByStatus",
         },
-        z.record(z.string(), z.number()),
+        z.record(z.string(), z.coerce.number()),
       ),
       emailsByType: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.emailsByType",
         },
-        z.record(z.string(), z.number()),
+        z.record(z.string(), z.coerce.number()),
       ),
 
       // User association metrics
@@ -352,7 +352,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.messages.stats.get.response.emailsWithUserId",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       emailsWithoutUserId: responseField(
         {
@@ -360,7 +360,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.messages.stats.get.response.emailsWithoutUserId",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       emailsWithLeadId: responseField(
         {
@@ -368,7 +368,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.messages.stats.get.response.emailsWithLeadId",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       emailsWithoutLeadId: responseField(
         {
@@ -376,7 +376,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.messages.stats.get.response.emailsWithoutLeadId",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Error metrics
@@ -386,7 +386,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.messages.stats.get.response.emailsWithErrors",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       emailsWithoutErrors: responseField(
         {
@@ -394,7 +394,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.messages.stats.get.response.emailsWithoutErrors",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       averageRetryCount: responseField(
         {
@@ -402,14 +402,14 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.messages.stats.get.response.averageRetryCount",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       maxRetryCount: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.messages.stats.get.response.maxRetryCount",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Performance metrics
@@ -419,7 +419,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.messages.stats.get.response.averageProcessingTime",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       averageDeliveryTime: responseField(
         {
@@ -427,7 +427,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.messages.stats.get.response.averageDeliveryTime",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Historical data - complex nested structure

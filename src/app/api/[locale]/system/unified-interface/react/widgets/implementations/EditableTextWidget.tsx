@@ -1,19 +1,19 @@
 "use client";
 
-import { Check, Edit2, X } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { Check, Edit2, X } from "next-vibe-ui/ui/icons";
 import { Input } from "next-vibe-ui/ui/input";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { extractEditableTextData } from "../../../shared/widgets/logic/editable-text";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { useWidgetActions } from "../renderers/ToolActionHandler";
 
 /**
@@ -27,14 +27,20 @@ export function EditableTextWidget({
 }: ReactWidgetProps<typeof WidgetType.MARKDOWN_EDITOR>): JSX.Element {
   const extractedData = extractEditableTextData(data);
 
-  if (!extractedData) {
-    return <Span className={cn("text-foreground", className)}>—</Span>;
-  }
+  const { value, placeholder, readonly } = extractedData ?? {
+    value: "",
+    placeholder: undefined,
+    readonly: true,
+  };
 
-  const { value, placeholder, readonly } = extractedData;
+  // Hooks must be called before any early returns
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
   const { handleAction, isProcessing } = useWidgetActions(onAction);
+
+  if (!extractedData) {
+    return <Span className={cn("text-foreground", className)}>—</Span>;
+  }
 
   const handleEdit = (): void => {
     setEditValue(value);

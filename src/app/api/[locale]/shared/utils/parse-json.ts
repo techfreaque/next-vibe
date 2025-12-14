@@ -1,8 +1,8 @@
 import { parse } from "jsonc-parser";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 
 /**

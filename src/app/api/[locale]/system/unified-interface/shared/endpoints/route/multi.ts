@@ -6,17 +6,18 @@ import "server-only";
  */
 import type { NextRequest, NextResponse } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+
+import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { Methods } from "../../types/enums";
-import type { CreateApiEndpointAny } from "../../types/endpoint";
-import { endpointHandler } from "./single";
-import type {
-  MethodHandlerConfig,
-  GenericHandlerReturnType as GenericHandlerReturnTypeImport,
-} from "./handler";
 import type { NextHandlerReturnType } from "../../../next-api/handler";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CreateApiEndpointAny } from "../../types/endpoint";
+import { Methods } from "../../types/enums";
+import type {
+  GenericHandlerReturnType as GenericHandlerReturnTypeImport,
+  MethodHandlerConfig,
+} from "./handler";
+import { endpointHandler } from "./single";
 
 /**
  * Base constraint for endpoint definitions

@@ -4,7 +4,7 @@ import { z } from "zod";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { ResponseType } from "../types/response.schema";
-import { fail, ErrorResponseTypes } from "../types/response.schema";
+import { ErrorResponseTypes,fail } from "../types/response.schema";
 import { parseError } from "./parse-error";
 
 /**

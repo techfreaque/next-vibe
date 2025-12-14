@@ -9,7 +9,7 @@ import type { FC } from "react";
 
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { type WidgetComponentProps, type ReactWidgetProps } from "../../../shared/widgets/types";
+import { type ReactWidgetProps,type WidgetComponentProps } from "../../../shared/widgets/types";
 
 /**
  * Widget component type - accepts either base props or narrowed props.

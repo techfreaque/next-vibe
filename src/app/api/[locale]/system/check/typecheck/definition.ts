@@ -119,14 +119,14 @@ const { POST } = createEndpoint({
                 type: WidgetType.TEXT,
                 content: "app.api.system.check.typecheck.response.issue.line",
               },
-              z.number().optional(),
+              z.coerce.number().optional(),
             ),
             column: responseField(
               {
                 type: WidgetType.TEXT,
                 content: "app.api.system.check.typecheck.response.issue.column",
               },
-              z.number().optional(),
+              z.coerce.number().optional(),
             ),
             code: responseField(
               {

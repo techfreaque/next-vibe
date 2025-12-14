@@ -18,9 +18,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   UserPermissionRoleOptions,
-  UserRoleDB,
   UserRole,
+  UserRoleDB,
 } from "@/app/api/[locale]/user/user-roles/enum";
+
 import { iconSchema } from "../../../../shared/types/common.schema";
 
 /**
@@ -144,7 +145,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.agent.chat.folders.id.get.response.folder.sortOrder.content" as const,
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               rolesView: responseArrayOptionalField(
                 {
@@ -450,7 +451,7 @@ const { PATCH } = createEndpoint({
                 "app.api.agent.chat.folders.id.patch.sortOrder.description" as const,
               columns: 6,
             },
-            z.number().optional(),
+            z.coerce.number().optional(),
           ),
           rolesView: requestDataField(
             {
@@ -617,7 +618,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.agent.chat.folders.id.patch.response.folder.sortOrder.content" as const,
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               rolesView: responseArrayOptionalField(
                 {

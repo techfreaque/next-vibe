@@ -25,12 +25,10 @@ export function objectEntries<K extends string | number | symbol, V>(
  * @param obj - The partial object to get entries from
  * @returns Array of [key, value] tuples with preserved types, filtered for defined values
  */
-// eslint-disable-next-line no-redeclare
 export function objectEntries<K extends string | number | symbol, V>(
   obj: Partial<Record<K, V>>,
 ): Array<[K, V]>;
 
-// eslint-disable-next-line no-redeclare
 export function objectEntries<K extends string | number | symbol, V>(
   obj: Record<K, V> | Partial<Record<K, V>>,
 ): Array<[K, V]> {

@@ -1,12 +1,12 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
 
+import { smsEnv } from "../env";
 import type {
   SendSmsParams,
   SmsProvider,
@@ -53,7 +53,7 @@ interface MessageBirdSuccessResponse {
  * Creates a MessageBird provider for SMS sending
  */
 export function getMessageBirdProvider(): SmsProvider {
-  const accessKey = env.MESSAGEBIRD_ACCESS_KEY;
+  const accessKey = smsEnv.MESSAGEBIRD_ACCESS_KEY;
 
   // Cache API URL
   const apiUrl = "https://rest.messagebird.com/messages";
@@ -93,7 +93,7 @@ export function getMessageBirdProvider(): SmsProvider {
         }
 
         // From phone number fallback with nullish coalescing
-        const originator = params.from ?? env.SMS_FROM_NUMBER;
+        const originator = params.from ?? smsEnv.SMS_FROM_NUMBER;
         if (!originator) {
           return fail({
             message: "app.api.sms.sms.error.invalid_phone_format",

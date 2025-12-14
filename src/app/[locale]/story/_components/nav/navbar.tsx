@@ -9,9 +9,9 @@ import {
 } from "next-vibe-ui/ui/dropdown-menu";
 import { ChevronDown } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
-import { P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
 import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { StandardUserType } from "@/app/api/[locale]/user/types";
@@ -19,12 +19,12 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import CountrySelector from "../../../_components/country-selector";
-import { AuthButtons, MobileAuthButtons } from "./auth-buttons";
 import { Logo } from "../../../_components/logo";
+import { ThemeToggle } from "../../../_components/theme-toggle";
+import { AuthButtons, MobileAuthButtons } from "./auth-buttons";
 import { MobileMenuClient } from "./mobile-menu-client";
 import type { NavItemType } from "./nav-constants";
 import { NavSingleItem } from "./nav-single-item";
-import { ThemeToggle } from "../../../_components/theme-toggle";
 import { UserMenu } from "./user-menu";
 
 interface NavbarProps {

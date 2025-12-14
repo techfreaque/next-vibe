@@ -247,7 +247,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.emails.imapClient.folders.list.response.folder.messageCount",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             unseenCount: responseField(
               {
@@ -255,7 +255,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.emails.imapClient.folders.list.response.folder.unseenCount",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             syncStatus: responseField(
               {
@@ -294,7 +294,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.imapClient.folders.list.response.pagination.page",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           limit: responseField(
             {
@@ -302,7 +302,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.imapClient.folders.list.response.pagination.limit",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           total: responseField(
             {
@@ -310,7 +310,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.imapClient.folders.list.response.pagination.total",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           totalPages: responseField(
             {
@@ -318,7 +318,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.imapClient.folders.list.response.pagination.totalPages",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
         },
       ),

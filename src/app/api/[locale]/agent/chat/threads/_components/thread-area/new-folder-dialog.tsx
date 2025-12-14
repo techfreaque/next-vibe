@@ -13,13 +13,13 @@ import { Label } from "next-vibe-ui/ui/label";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
 import type {
   IconKey,
   IconValue,
 } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { FolderIconSelector } from "./folder-icon-selector";
 

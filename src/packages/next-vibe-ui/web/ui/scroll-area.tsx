@@ -3,6 +3,7 @@
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 // Cross-platform props interfaces

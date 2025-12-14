@@ -1,13 +1,12 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import type { JSX } from "react";
-
 import { Button } from "next-vibe-ui/ui/button";
-import { Toggle } from "next-vibe-ui/ui/toggle";
-import { ToggleGroup, ToggleGroupItem } from "next-vibe-ui/ui/toggle-group";
 import { Div } from "next-vibe-ui/ui/div";
 import { Section } from "next-vibe-ui/ui/section";
+import { Toggle } from "next-vibe-ui/ui/toggle";
+import { ToggleGroup, ToggleGroupItem } from "next-vibe-ui/ui/toggle-group";
 import { H2, H3 } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
 
 export function ButtonsPreview(): JSX.Element {
   return (

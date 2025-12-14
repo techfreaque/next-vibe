@@ -1,11 +1,11 @@
-/* eslint-disable no-console */
+ 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { simpleT } from "@/i18n/core/shared";
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { enableDebugLogger, mcpSilentMode } from "@/config/debug";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
+
 import type { ErrorResponseType } from "../../../../shared/types/response.schema";
 
 /**
@@ -106,6 +106,7 @@ export function createEndpointLogger(
           metadataObj,
         );
       } else {
+        // oxlint-disable-next-line no-console
         console.log(formatMessage(message), ...metadata);
       }
     },
@@ -128,6 +129,7 @@ export function createEndpointLogger(
         );
       } else {
         const typedError = error ? parseError(error) : undefined;
+        // oxlint-disable-next-line no-console
         console.error(formatMessage(message), typedError, ...metadata);
       }
     },
@@ -142,6 +144,7 @@ export function createEndpointLogger(
         );
       } else {
         // Special vibe formatting - messages are plain strings
+        // oxlint-disable-next-line no-console
         console.log(`[${getElapsedTime()}] ${message}`, ...metadata);
       }
     },
@@ -156,6 +159,7 @@ export function createEndpointLogger(
             metadataObj,
           );
         } else {
+          // oxlint-disable-next-line no-console
           console.log(formatMessage(message), ...metadata);
         }
       }
@@ -169,6 +173,7 @@ export function createEndpointLogger(
           metadataObj,
         );
       } else {
+        // oxlint-disable-next-line no-console
         console.warn(formatMessage(message), ...metadata);
       }
     },

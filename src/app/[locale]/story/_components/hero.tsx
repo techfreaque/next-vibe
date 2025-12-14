@@ -1,16 +1,16 @@
 "use client";
 
-import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { MessageSquare, Users } from "next-vibe-ui/ui/icons";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { MessageSquare, Users } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
 
 interface HeroProps {
   locale: CountryLanguage;

@@ -66,7 +66,7 @@ const { POST } = createEndpoint({
             pages: z
               .array(
                 z.object({
-                  idx: z.number().describe("Page index"),
+                  idx: z.coerce.number().describe("Page index"),
                   title: z.string().describe("Page title"),
                   url: z.string().describe("Page URL"),
                   active: z
@@ -75,7 +75,9 @@ const { POST } = createEndpoint({
                 }),
               )
               .describe("List of open pages"),
-            totalCount: z.number().describe("Total number of open pages"),
+            totalCount: z.coerce
+              .number()
+              .describe("Total number of open pages"),
           })
           .optional()
           .describe("Result of pages listing"),

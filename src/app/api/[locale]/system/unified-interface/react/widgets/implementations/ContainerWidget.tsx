@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Button } from "next-vibe-ui/ui/button";
 import {
   Card,
   CardContent,
@@ -8,32 +9,31 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe-ui/ui/card";
-import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { P, H1 } from "next-vibe-ui/ui/typography";
 import {
   FormAlert,
   type FormAlertState,
 } from "next-vibe-ui/ui/form/form-alert";
+import { H1,P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { simpleT } from "@/i18n/core/shared";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { UnifiedField } from "../../../shared/types/endpoint";
 import { WidgetType, type WidgetType as WidgetTypeEnum } from "../../../shared/types/enums";
 import type {
   ReactWidgetProps,
   WidgetData,
 } from "../../../shared/widgets/types";
-import { WidgetRenderer } from "../renderers/WidgetRenderer";
+import { isFormInputField,isResponseField } from "../../../shared/widgets/utils/field-helpers";
 import {
-  type LayoutConfig,
   getLayoutClassName,
+  type LayoutConfig,
 } from "../../../shared/widgets/utils/widget-helpers";
-import type { UnifiedField } from "../../../shared/types/endpoint";
-import { isResponseField, isFormInputField } from "../../../shared/widgets/utils/field-helpers";
+import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**
  * Displays container layouts with nested fields.
@@ -72,28 +72,38 @@ export function ContainerWidget({
   const layoutTypeStr = String(layoutTypeRaw);
 
   let layoutType: "grid" | "flex" | "stack" = "stack";
-  let finalColumns: number | undefined = columns;
+  // conceptualColumns is how many logical columns the definition wants (e.g., 4 = 4 items per row)
+  let conceptualColumns = 1;
 
   if (layoutTypeStr === "grid" || layoutTypeStr.startsWith("grid_")) {
     layoutType = "grid";
-    finalColumns = 12;
-    if (layoutTypeStr === "grid_2_columns") {
-      finalColumns = 2;
+    // Use the columns prop if specified, otherwise use layout type presets or default to 12
+    if (columns && columns > 0) {
+      conceptualColumns = columns;
+    } else if (layoutTypeStr === "grid_2_columns") {
+      conceptualColumns = 2;
     } else if (layoutTypeStr === "grid_3_columns") {
-      finalColumns = 3;
+      conceptualColumns = 3;
     } else if (layoutTypeStr === "grid_4_columns") {
-      finalColumns = 4;
+      conceptualColumns = 4;
+    } else {
+      conceptualColumns = 12;
     }
   } else if (layoutTypeStr === "flex" || layoutTypeStr === "horizontal") {
     layoutType = "flex";
   }
 
+  // Always use 12-column grid for maximum flexibility with child column spans
   const layoutConfig: LayoutConfig = {
     type: layoutType,
-    columns: finalColumns,
+    columns: layoutType === "grid" ? 12 : undefined,
     gap: String(gap),
   };
   const layoutClass = getLayoutClassName(layoutConfig);
+
+  // Calculate default column span for children based on conceptual columns
+  // E.g., if parent wants 4 columns, each child by default takes 12/4 = 3 grid columns
+  const defaultChildSpan = layoutType === "grid" ? Math.floor(12 / conceptualColumns) : undefined;
 
   let title = titleKey ? t(titleKey) : undefined;
   const description = descriptionKey ? t(descriptionKey) : undefined;
@@ -101,12 +111,12 @@ export function ContainerWidget({
   if (getCount && value && typeof value === "object" && !Array.isArray(value)) {
     // getCount's type is generic and depends on field children, cast to runtime type
     const getCountFn = getCount as (data: {
-      request?: Record<string, unknown>;
-      response?: Record<string, unknown>;
+      request?: { [key: string]: WidgetData };
+      response?: { [key: string]: WidgetData };
     }) => number | undefined;
     const count = getCountFn({
-      request: value as Record<string, unknown>,
-      response: value as Record<string, unknown>,
+      request: value as { [key: string]: WidgetData },
+      response: value as { [key: string]: WidgetData },
     });
     if (count !== undefined && title) {
       title = `${title} (${count})`;
@@ -302,8 +312,18 @@ export function ContainerWidget({
               : childName;
 
             // Extract column span from child field if in grid layout
-            const childUi = childField.ui as { columns?: number } | undefined;
-            const childColumns = childUi?.columns;
+            // IMPORTANT: For CONTAINER widgets, `columns` means internal grid columns, NOT span
+            // For other widgets (STAT, CHART, FORM_FIELD, etc.), `columns` means span in parent grid
+            const childUi = childField.ui as { columns?: number; type?: string } | undefined;
+            const isChildContainer = childUi?.type === WidgetType.CONTAINER;
+            const childColumns = isChildContainer ? undefined : childUi?.columns;
+
+            // Calculate effective column span:
+            // - For containers: always use default span (their `columns` is for internal grid)
+            // - For other widgets: use explicit columns if set, otherwise default span
+            const effectiveSpan = layoutType === "grid"
+              ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12)
+              : undefined;
 
             // Map column numbers to Tailwind classes (JIT-safe)
             const colSpanMap: Record<number, string> = {
@@ -322,8 +342,8 @@ export function ContainerWidget({
             };
 
             const colSpanClass =
-              layoutType === "grid" && childColumns
-                ? colSpanMap[childColumns]
+              layoutType === "grid" && effectiveSpan
+                ? colSpanMap[effectiveSpan]
                 : undefined;
 
             return (
@@ -452,8 +472,18 @@ export function ContainerWidget({
               : childName;
 
             // Extract column span from child field if in grid layout
-            const childUi = childField.ui as { columns?: number } | undefined;
-            const childColumns = childUi?.columns;
+            // IMPORTANT: For CONTAINER widgets, `columns` means internal grid columns, NOT span
+            // For other widgets (STAT, CHART, FORM_FIELD, etc.), `columns` means span in parent grid
+            const childUi = childField.ui as { columns?: number; type?: string } | undefined;
+            const isChildContainer = childUi?.type === WidgetType.CONTAINER;
+            const childColumns = isChildContainer ? undefined : childUi?.columns;
+
+            // Calculate effective column span:
+            // - For containers: always use default span (their `columns` is for internal grid)
+            // - For other widgets: use explicit columns if set, otherwise default span
+            const effectiveSpan = layoutType === "grid"
+              ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12)
+              : undefined;
 
             // Map column numbers to Tailwind classes (JIT-safe)
             const colSpanMap: Record<number, string> = {
@@ -472,8 +502,8 @@ export function ContainerWidget({
             };
 
             const colSpanClass =
-              layoutType === "grid" && childColumns
-                ? colSpanMap[childColumns]
+              layoutType === "grid" && effectiveSpan
+                ? colSpanMap[effectiveSpan]
                 : undefined;
 
             return (

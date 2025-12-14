@@ -6,58 +6,57 @@
 import "server-only";
 
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { streamText, type JSONValue, stepCountIs } from "ai";
+import { type JSONValue, stepCountIs,streamText } from "ai";
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import {
   createStreamingResponse,
   ErrorResponseTypes,
+  type MessageResponseType,
   type ResponseType,
   type StreamingResponse,
-  type MessageResponseType,
 } from "next-vibe/shared/types/response.schema";
 
+import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { creditRepository } from "@/app/api/[locale]/credits/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import { getFullPath } from "@/app/api/[locale]/system/generated/endpoint";
-import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
+import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { setupAiStream } from "./stream-setup";
-
+import { parseError } from "../../../shared/utils";
+import type { DefaultFolderId } from "../../chat/config";
 import {
   chatMessages,
   type ToolCall,
   type ToolCallResult,
 } from "../../chat/db";
-import type { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
 import {
+  ApiProvider,
   getModelById,
   type ModelId,
-  ApiProvider,
 } from "../../chat/model-access/models";
-import { generateThreadTitle } from "../../chat/threads/repository";
 import {
   createErrorMessage,
   createTextMessage,
-  updateMessageContent,
   createToolMessage,
+  updateMessageContent,
 } from "../../chat/threads/[threadId]/messages/repository";
+import { generateThreadTitle } from "../../chat/threads/repository";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
 } from "../definition";
 import { createStreamEvent, formatSSEEvent } from "../events";
-import { createUncensoredAI } from "../providers/uncensored-ai";
 import { createFreedomGPT } from "../providers/freedomgpt";
 import { createGabAI } from "../providers/gab-ai";
-import { parseError } from "../../../shared/utils";
+import { createUncensoredAI } from "../providers/uncensored-ai";
+import { setupAiStream } from "./stream-setup";
 
 /**
  * Maximum duration for streaming responses (in seconds)
@@ -771,7 +770,7 @@ class AiStreamRepository implements IAiStreamRepository {
     switch (modelOption.apiProvider) {
       case ApiProvider.UNCENSORED_AI:
         return createUncensoredAI({
-          apiKey: env.UNCENSORED_AI_API_KEY,
+          apiKey: agentEnv.UNCENSORED_AI_API_KEY,
         });
 
       case ApiProvider.FREEDOMGPT:
@@ -783,7 +782,7 @@ class AiStreamRepository implements IAiStreamRepository {
       case ApiProvider.OPENROUTER:
       default:
         return createOpenRouter({
-          apiKey: env.OPENROUTER_API_KEY,
+          apiKey: agentEnv.OPENROUTER_API_KEY,
         });
     }
   }
@@ -1088,7 +1087,7 @@ class AiStreamRepository implements IAiStreamRepository {
     // Save ASSISTANT message to database if not incognito
     // Public users (userId undefined) are allowed - helper converts to null
     if (!isIncognito) {
-      await createTextMessage({
+      const result = await createTextMessage({
         messageId,
         threadId,
         content: initialContent,
@@ -1100,6 +1099,12 @@ class AiStreamRepository implements IAiStreamRepository {
         sequenceId,
         logger,
       });
+      if (!result.success) {
+        logger.warn("Failed to persist ASSISTANT message - continuing stream", {
+          messageId,
+          error: result.message,
+        });
+      }
     }
 
     logger.debug("ASSISTANT message created", {

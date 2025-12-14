@@ -1,20 +1,20 @@
 "use client";
 
-import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { cn } from "next-vibe/shared/utils";
-import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown, ChevronUp, Menu, X } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
+import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { NavItemType } from "./nav-constants";
 import { ThemeToggleMobile } from "../../../_components/theme-toggle";
+import type { NavItemType } from "./nav-constants";
 
 interface MobileMenuClientProps {
   locale: CountryLanguage;

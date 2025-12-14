@@ -334,7 +334,7 @@ const { POST } = createEndpoint({
                   "app.api.system.db.reset.fields.operations.count.title",
                 fieldType: FieldDataType.NUMBER,
               },
-              z.number(),
+              z.coerce.number(),
             ),
           },
         ),
@@ -345,7 +345,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.reset.fields.tablesAffected.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       migrationsRun: responseField(
@@ -353,7 +353,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.reset.fields.migrationsRun.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       seedsRun: responseField(
@@ -361,7 +361,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.reset.fields.seedsRun.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       isDryRun: responseField(
@@ -385,7 +385,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.reset.fields.duration.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

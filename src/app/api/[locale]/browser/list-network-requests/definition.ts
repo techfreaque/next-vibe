@@ -172,15 +172,15 @@ const { POST } = createEndpoint({
             requests: z
               .array(
                 z.object({
-                  reqid: z.number(),
+                  reqid: z.coerce.number(),
                   url: z.string(),
                   method: z.string(),
-                  status: z.number().optional(),
+                  status: z.coerce.number().optional(),
                   type: z.string(),
                 }),
               )
               .describe("List of network requests"),
-            totalCount: z.number().describe("Total number of requests"),
+            totalCount: z.coerce.number().describe("Total number of requests"),
           })
           .optional()
           .describe("Result of network requests listing"),

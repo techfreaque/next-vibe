@@ -3,18 +3,18 @@
  * Handles DATA_TABLE widget type with column definitions and formatting
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import {
   extractDataTableData,
   formatCellValue,
   type TableRow,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/data-table";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
@@ -245,7 +245,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
 
     // Render rows
     const rows = typedData.map((row) =>
-      this.renderTableRow(row, config, columnWidths),
+      this.renderTableRow(row, config, columnWidths, context),
     );
 
     const result = [header, separator, ...rows];
@@ -258,6 +258,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     config: TableRenderConfig,
     context: WidgetRenderContext,
   ): number[] {
+    const t = context.t;
     const maxWidth =
       context.options.maxWidth - context.depth * context.options.indentSize;
     const availableWidth = maxWidth - (config.columns.length - 1) * 3; // Account for separators
@@ -268,8 +269,9 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
         return Math.floor(availableWidth * percentage);
       }
 
-      // Auto-calculate based on content
-      const headerWidth = col.label.length;
+      // Auto-calculate based on content - always translate labels
+      const translatedLabel = t(col.label);
+      const headerWidth = translatedLabel.length;
       const maxContentWidth = Math.max(
         ...data.slice(0, 10).map((row) => {
           const value = row[col.key];
@@ -289,9 +291,11 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     columnWidths: number[],
     context: WidgetRenderContext,
   ): string {
+    const t = context.t;
     const cells = config.columns.map((col, index) => {
-      // Column labels are literal strings, not translation keys
-      const styledLabel = this.styleText(col.label, "bold", context);
+      // Always translate column labels
+      const translatedLabel = t(col.label);
+      const styledLabel = this.styleText(translatedLabel, "bold", context);
       return this.padText(styledLabel, columnWidths[index], col.align);
     });
 
@@ -312,12 +316,16 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     row: TableRow,
     config: TableRenderConfig,
     columnWidths: number[],
+    context: WidgetRenderContext,
   ): string {
+    const t = context.t;
     const cells = config.columns.map((col, index) => {
       const value = row[col.key];
+      // Translate string values (handles translation keys in data)
+      const translatedValue = typeof value === "string" ? t(value) : value;
       const formatted = col.formatter
-        ? col.formatter(value)
-        : formatCellValue(value);
+        ? col.formatter(translatedValue)
+        : formatCellValue(translatedValue);
       const truncated = this.formatter.formatText(formatted, {
         maxLength: columnWidths[index],
       });

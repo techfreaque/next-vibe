@@ -6,22 +6,22 @@
 
 import "server-only";
 
-import { jsonSchema, tool, type JSONSchema7 } from "ai";
-import { z } from "zod";
+import { jsonSchema, type JSONSchema7,tool } from "ai";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import { z } from "zod";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { Platform } from "../shared/types/platform";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
 import { routeExecutionExecutor } from "../shared/endpoints/route/executor";
-
-import { simpleT } from "@/i18n/core/shared";
-import { endpointToToolName } from "../shared/utils/path";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint";
+import { Platform } from "../shared/types/platform";
+import { endpointToToolName } from "../shared/utils/path";
 
 /**
  * CoreTool type from AI SDK
@@ -95,7 +95,7 @@ function createToolFromEndpoint(
 
       if (!result.success) {
         // Throw error for AI SDK
-        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
         throw new Error(result.message ?? "errors.toolExecutionFailed");
       }
 

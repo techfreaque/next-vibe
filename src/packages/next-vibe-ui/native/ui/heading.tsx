@@ -1,9 +1,7 @@
-import { Text } from "react-native";
-import type { TextStyle } from "react-native";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToTextStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
+import type { TextStyle } from "react-native";
+import { Text } from "react-native";
 
 import type {
   H1Props,
@@ -11,6 +9,8 @@ import type {
   H3Props,
   H4Props,
 } from "../../web/ui/typography";
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToTextStyle } from "../utils/style-converter";
 
 const StyledText = styled(Text, { className: "style" });
 

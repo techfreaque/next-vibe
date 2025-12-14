@@ -6,15 +6,15 @@
 import "server-only";
 
 import {
+  createNextHandler,
+  type NextHandlerReturnType,
+} from "../../../next-api/handler";
+import type { CreateApiEndpointAny } from "../../types/endpoint";
+import {
   type ApiHandlerOptions,
   createGenericHandler,
   type GenericHandlerReturnType,
 } from "./handler";
-import {
-  type NextHandlerReturnType,
-  createNextHandler,
-} from "../../../next-api/handler";
-import type { CreateApiEndpointAny } from "../../types/endpoint";
 
 /**
  * API handler return type that supports both Next.js and tRPC

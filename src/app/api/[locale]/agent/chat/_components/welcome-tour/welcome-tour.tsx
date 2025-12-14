@@ -1,30 +1,33 @@
 "use client";
+/* eslint-disable react-compiler/react-compiler -- Complex mount-only effect requires intentional dependency exclusion */
 
-import React, { useCallback, useEffect, useState } from "react";
-import Joyride, { STATUS, EVENTS, ACTIONS } from "react-joyride";
-import type { CallBackProps } from "react-joyride";
 import { useRouter } from "next-vibe-ui/hooks";
-import type { TourStepConfig } from "./tour-config";
-import {
-  getTourSteps,
-  getTourSelector,
-  getNewChatUrl,
-  getJoyrideLabels,
-  TOUR_STORAGE_KEY,
-  TOUR_SKIPPED_KEY,
-  TOUR_AUTH_PENDING_KEY,
-  TOUR_LAST_STEP_KEY,
-  TOUR_IN_PROGRESS_KEY,
-  TOUR_DATA_ATTRS,
-  TOUR_COLORS,
-  TOUR_SPACING,
-  TOUR_TEXT_ALIGN,
-} from "./tour-config";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import React, { useCallback, useEffect, useState } from "react";
+import type { CallBackProps } from "react-joyride";
+import Joyride, { ACTIONS,EVENTS, STATUS } from "react-joyride";
+
 import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+
+import type { TourStepConfig } from "./tour-config";
+import {
+  getJoyrideLabels,
+  getNewChatUrl,
+  getTourSelector,
+  getTourSteps,
+  TOUR_AUTH_PENDING_KEY,
+  TOUR_COLORS,
+  TOUR_DATA_ATTRS,
+  TOUR_IN_PROGRESS_KEY,
+  TOUR_LAST_STEP_KEY,
+  TOUR_SKIPPED_KEY,
+  TOUR_SPACING,
+  TOUR_STORAGE_KEY,
+  TOUR_TEXT_ALIGN,
+} from "./tour-config";
 import { useTourState } from "./tour-state-context";
 
 interface WelcomeTourProps {
@@ -104,7 +107,9 @@ export function WelcomeTour({
   // Get tour steps with translations
   const tourSteps = getTourSteps(t, isAuthenticated);
 
-  // Initialize tour on mount
+  // Initialize tour on mount - uses empty deps intentionally as this should only run once
+  // The callbacks used inside (isSidebarTarget, ensureSidebarOpen, etc.) are stable and defined below
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     // Check if tour was already completed or skipped
     const tourCompleted = localStorage.getItem(TOUR_STORAGE_KEY);
@@ -176,8 +181,8 @@ export function WelcomeTour({
       // Small delay to ensure DOM is ready
       setTimeout(() => setRun(true), 500);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run on mount - autoStart is intentionally not a dependency
+  }, []);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   // Helper to check if a target is a sidebar element
   const isSidebarTarget = useCallback((target: string): boolean => {

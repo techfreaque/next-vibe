@@ -141,7 +141,7 @@ const { PATCH } = createEndpoint({
           description:
             "app.api.leads.batch.patch.maxRecords.description" as const,
         },
-        z.number().min(1).max(10000).optional().default(1000),
+        z.coerce.number().min(1).max(10000).optional().default(1000),
       ),
       // Update data
       updates: objectField(
@@ -223,7 +223,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.leads.batch.patch.response.totalMatched" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           totalProcessed: responseField(
             {
@@ -231,7 +231,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.leads.batch.patch.response.totalProcessed" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           totalUpdated: responseField(
             {
@@ -239,7 +239,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.leads.batch.patch.response.totalUpdated" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           preview: responseArrayOptionalField(
             {
@@ -498,7 +498,7 @@ const { DELETE } = createEndpoint({
           description:
             "app.api.leads.batch.delete.maxRecords.description" as const,
         },
-        z.number().min(1).max(10000).optional().default(1000),
+        z.coerce.number().min(1).max(10000).optional().default(1000),
       ),
       // Response fields
       response: objectField(
@@ -524,7 +524,7 @@ const { DELETE } = createEndpoint({
               content:
                 "app.api.leads.batch.delete.response.totalMatched" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           totalProcessed: responseField(
             {
@@ -532,7 +532,7 @@ const { DELETE } = createEndpoint({
               content:
                 "app.api.leads.batch.delete.response.totalProcessed" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           totalDeleted: responseField(
             {
@@ -540,7 +540,7 @@ const { DELETE } = createEndpoint({
               content:
                 "app.api.leads.batch.delete.response.totalDeleted" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           preview: responseArrayOptionalField(
             {

@@ -3,8 +3,8 @@
  * Handles all chat settings (model, persona, theme, etc.)
  */
 
-import { useCallback, useEffect } from "react";
 import { useTheme } from "next-themes";
+import { useCallback, useEffect } from "react";
 
 import type { ModelId } from "../model-access/models";
 import type { ChatSettings } from "./store";
@@ -40,8 +40,7 @@ export function useSettings(deps: {
   // Hydrate settings from localStorage after mount
   useEffect(() => {
     void chatStore.hydrateSettings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [chatStore]);
 
   const setSelectedPersona = useCallback(
     (persona: string) => {

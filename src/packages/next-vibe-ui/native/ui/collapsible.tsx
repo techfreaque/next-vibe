@@ -1,4 +1,5 @@
 import * as CollapsiblePrimitive from "@rn-primitives/collapsible";
+import { styled } from "nativewind";
 import * as React from "react";
 import Animated, {
   FadeIn,
@@ -6,15 +7,14 @@ import Animated, {
   LayoutAnimationConfig,
   LinearTransition,
 } from "react-native-reanimated";
-import { styled } from "nativewind";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 import type {
+  CollapsibleContentProps,
   CollapsibleProps,
   CollapsibleTriggerProps,
-  CollapsibleContentProps,
 } from "../../web/ui/collapsible";
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledAnimatedView = styled(Animated.View, { className: "style" });
 

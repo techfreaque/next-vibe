@@ -1,15 +1,14 @@
 "use client";
 
-import { ArrowLeftIcon, ArrowRightIcon } from "next-vibe-ui/ui/icons";
 import useEmblaCarousel from "embla-carousel-react";
 import { cn } from "next-vibe/shared/utils/utils";
+import { ArrowLeftIcon, ArrowRightIcon } from "next-vibe-ui/ui/icons";
 import * as React from "react";
-import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 
+import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
-
 import type { DivKeyboardEvent } from "./div";
 
 // Cross-platform types for Embla Carousel
@@ -56,7 +55,8 @@ function useCarousel(): CarouselContextProps {
   const context = React.useContext(CarouselContext);
 
   if (!context) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useCarousel must be used within a <Carousel />");
   }
 

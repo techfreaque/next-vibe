@@ -123,7 +123,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.emails.imapClient.messages.sync.response.results.messagesProcessed",
             },
-            z.number(),
+            z.coerce.number(),
           ),
           messagesAdded: responseField(
             {
@@ -131,7 +131,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.emails.imapClient.messages.sync.response.results.messagesAdded",
             },
-            z.number(),
+            z.coerce.number(),
           ),
           messagesUpdated: responseField(
             {
@@ -139,7 +139,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.emails.imapClient.messages.sync.response.results.messagesUpdated",
             },
-            z.number(),
+            z.coerce.number(),
           ),
           messagesDeleted: responseField(
             {
@@ -147,7 +147,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.emails.imapClient.messages.sync.response.results.messagesDeleted",
             },
-            z.number(),
+            z.coerce.number(),
           ),
           duration: responseField(
             {
@@ -155,7 +155,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.emails.imapClient.messages.sync.response.results.duration",
             },
-            z.number(),
+            z.coerce.number(),
           ),
         },
       ),

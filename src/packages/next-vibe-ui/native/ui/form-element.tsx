@@ -4,10 +4,10 @@
  * Uses exact same interface as web version
  */
 
+import { styled } from "nativewind";
 import type { ForwardedRef } from "react";
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import { View } from "react-native";
-import { styled } from "nativewind";
 
 // Import all types from web version (web is source of truth)
 import type {

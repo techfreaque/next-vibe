@@ -5,15 +5,15 @@
 
 "use client";
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useCallback, useMemo } from "react";
 
 import { handleCheckoutRedirect } from "@/app/api/[locale]/payment/utils/redirect";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
@@ -50,22 +50,27 @@ export interface UseCreditsReturn extends EndpointReturn<typeof definitions> {
  * Optimized with 10-second cache to reduce excessive API calls
  *
  * @param logger - Endpoint logger for tracking requests
- * @param initialData - Optional initial credit data from server (disables initial fetch when provided)
+ * @param initialData - Initial credit data from server, or null if not available (hook disabled when null)
  */
 export function useCredits(
   logger: EndpointLogger,
-  // this has to be provided from server side
-  initialData: CreditsGetResponseOutput,
-): UseCreditsReturn {
+  // Pass null when credits should not be fetched (e.g., unauthenticated users)
+  initialData: CreditsGetResponseOutput | null,
+): UseCreditsReturn | null {
+  // Determine if hook is enabled
+  const isEnabled = initialData !== null;
+
   const endpoint = useEndpoint(
     definitions,
     {
       read: {
         // Pass initial data - this will populate the cache properly
+        // When initialData is null, the hook is effectively disabled
         initialData: initialData ?? undefined,
         queryOptions: {
-          refetchOnWindowFocus: true,
+          refetchOnWindowFocus: isEnabled,
           staleTime: 10 * 1000, // 10 seconds cache to prevent excessive refetching
+          enabled: isEnabled,
         },
       },
     },
@@ -134,8 +139,7 @@ export function useCredits(
         };
       });
     },
-    // oxlint-disable-next-line exhaustive-deps
-    [], // apiClient and definitions.GET are stable references
+    [logger],
   );
 
   /**
@@ -149,7 +153,7 @@ export function useCredits(
     await endpoint.read.refetch();
   }, [endpoint.read, logger]);
 
-  return useMemo(
+  const result = useMemo(
     () => ({
       ...endpoint,
       deductCredits,
@@ -157,6 +161,13 @@ export function useCredits(
     }),
     [endpoint, deductCredits, refetchCredits],
   );
+
+  // Return null when disabled (no initial data provided) - after all hooks are called
+  if (!isEnabled) {
+    return null;
+  }
+
+  return result;
 }
 
 /**

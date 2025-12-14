@@ -229,7 +229,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.user.search.response.searchInfo.totalResults" as const,
                 },
-                z.number().describe("Total number of results found"),
+                z.coerce.number().describe("Total number of results found"),
               ),
             },
           ),
@@ -403,7 +403,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.user.search.response.pagination.currentPage" as const,
                 },
-                z.number().describe("Current page number (1-based)"),
+                z.coerce.number().describe("Current page number (1-based)"),
               ),
               totalPages: responseField(
                 {
@@ -411,7 +411,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.user.search.response.pagination.totalPages" as const,
                 },
-                z.number().describe("Total number of pages"),
+                z.coerce.number().describe("Total number of pages"),
               ),
               itemsPerPage: responseField(
                 {
@@ -419,7 +419,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.user.search.response.pagination.itemsPerPage" as const,
                 },
-                z.number().describe("Number of items per page"),
+                z.coerce.number().describe("Number of items per page"),
               ),
               totalItems: responseField(
                 {
@@ -427,7 +427,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.user.search.response.pagination.totalItems" as const,
                 },
-                z.number().describe("Total number of items"),
+                z.coerce.number().describe("Total number of items"),
               ),
               hasMore: responseField(
                 {

@@ -10,11 +10,10 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-
 import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 interface UserProfileCardProps {
   userId: string;

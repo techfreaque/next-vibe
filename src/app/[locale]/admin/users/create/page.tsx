@@ -9,10 +9,9 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
+import { UserCreateForm } from "@/app/api/[locale]/users/create/_components/user-create-form";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { UserCreateForm } from "@/app/api/[locale]/users/create/_components/user-create-form";
 
 interface UserCreatePageProps {
   params: Promise<{

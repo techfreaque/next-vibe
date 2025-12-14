@@ -2,9 +2,9 @@ import {
   Code,
   FileText,
   Image,
+  Lightbulb,
   MessageSquare,
   Sparkles,
-  Lightbulb,
   Zap,
 } from "next-vibe-ui/ui/icons";
 

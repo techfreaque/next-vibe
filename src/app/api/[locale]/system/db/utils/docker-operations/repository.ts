@@ -34,7 +34,7 @@ const DOCKER_CMD_FLAG_DETACH = "-d";
  */
 const HIDDEN_DOCKER_LOG_PATTERNS = [
   // Match raw Docker output: Container dev-postgres {action}
-  /^\s*Container\s+dev-postgres\s+(Stopping|Stopped|Removing|Removed|Creating|Created|Starting|Started)\s*$/,
+  /^\s*Container\s+dev-postgres\s+(Stopping|Stopped|Removing|Removed|Creating|Created|Starting|Started|Running)\s*$/,
   // Match raw Docker output: Network {any}_default {action}
   /^\s*Network\s+[a-zA-Z0-9_-]+_default\s+(Removing|Removed|Creating|Created)\s*$/,
   // Match raw Docker output: Volume {any} {action}
@@ -198,7 +198,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         logger,
       });
 
-      logger.info("🗄️  Docker Compose up completed:", result.success);
+      logger.debug("Docker Compose up completed", { success: result.success });
 
       return success(result.success);
     } catch (error) {

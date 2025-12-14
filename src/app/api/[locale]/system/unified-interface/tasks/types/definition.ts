@@ -166,7 +166,7 @@ const { GET } = createEndpoint({
             "app.api.system.unifiedInterface.tasks.types.get.response.metadata.title",
         },
         z.object({
-          totalTypes: z.number(),
+          totalTypes: z.coerce.number(),
           categories: z.array(z.string()),
           timestamp: z.string(),
         }),

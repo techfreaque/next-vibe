@@ -3,15 +3,15 @@
  * Upload CSV files and monitor import job status
  */
 
-import type { JSX } from "react";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
 
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { LeadsImportClient } from "./_components/leads-import-client";
-import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 
 export default async function LeadsImportPage({
   params,

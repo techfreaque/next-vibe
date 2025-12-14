@@ -4,29 +4,29 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Input } from "next-vibe-ui/ui/input";
 import { Popover } from "next-vibe-ui/ui/popover";
 import { PopoverContent } from "next-vibe-ui/ui/popover";
 import { PopoverTrigger } from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Search } from "next-vibe-ui/ui/icons/Search";
 import type { JSX, ReactNode } from "react";
 import React, { useMemo, useState } from "react";
 
+import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-state-context";
 import {
   getIconComponent,
   type IconValue,
 } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { useTouchDevice } from "@/hooks/use-touch-device";
-import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-state-context";
-import { OptionListItem } from "./option-list-item";
 import { OptionGridItem } from "./option-grid-item";
+import { OptionListItem } from "./option-list-item";
 
 export interface SelectorOption<T = string> {
   id: T;

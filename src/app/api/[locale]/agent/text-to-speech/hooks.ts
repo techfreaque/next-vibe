@@ -5,9 +5,8 @@
 
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";

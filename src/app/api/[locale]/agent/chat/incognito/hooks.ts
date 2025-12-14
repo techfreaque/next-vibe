@@ -13,17 +13,17 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { DefaultFolderId } from "../config";
 import { CHAT_CONSTANTS } from "../config";
+import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { ChatMessageRole, ThreadStatus } from "../enum";
 import type { ModelId } from "../model-access/models";
-import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import {
   createIncognitoMessage,
   createIncognitoThread,
   deleteMessage,
   deleteThread,
   getMessagesForThread,
-  loadIncognitoState,
   type IncognitoState,
+  loadIncognitoState,
   setActiveThread as setActiveThreadStorage,
   setCurrentFolder as setCurrentFolderStorage,
   updateIncognitoMessage,

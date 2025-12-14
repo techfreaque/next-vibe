@@ -5,19 +5,21 @@
 
 import "server-only";
 
-import { spawn } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
+import { spawn } from "node:child_process";
+
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import { getChromeMCPConfig } from "./config";
 import type { BrowserRequestOutput, BrowserResponseOutput } from "./definition";
 import { BrowserTool, BrowserToolStatus } from "./enum";
-import { getChromeMCPConfig } from "./config";
 
 /**
  * Map translation keys to MCP tool names

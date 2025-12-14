@@ -18,14 +18,14 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { DbId } from "@/app/api/[locale]/system/db/types";
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NewUser } from "./db";
 import type { UserDetailLevel } from "./enum";

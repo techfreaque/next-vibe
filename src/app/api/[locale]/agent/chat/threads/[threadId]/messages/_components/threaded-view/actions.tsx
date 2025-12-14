@@ -3,7 +3,6 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
 import {
   ArrowBigDown,
   ArrowBigUp,
@@ -14,15 +13,16 @@ import {
   Volume2,
   X,
 } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React from "react";
 
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { useMessageActions } from "../hooks/use-message-actions";
-import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 
 interface ThreadedMessageActionsProps {
   message: ChatMessage;

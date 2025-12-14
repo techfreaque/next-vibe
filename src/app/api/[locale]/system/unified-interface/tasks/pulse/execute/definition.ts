@@ -124,7 +124,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.tasksExecuted",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       results: responseArrayField(
         {
@@ -166,7 +166,7 @@ const { POST } = createEndpoint({
                 content:
                   "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.duration",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             message: responseField(
               {

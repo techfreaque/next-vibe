@@ -14,13 +14,7 @@
 
 import type { z } from "zod";
 
-import {
-  UserRole,
-  type UserRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
 import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import type { TranslationKey } from "@/i18n/core/static-types";
-
 import { generateSchemaForUsage as generateSchemaFromUtils } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type {
   ExamplesList,
@@ -30,11 +24,16 @@ import type {
   LifecycleActions,
   UnifiedField,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type {
   EndpointErrorTypes,
   Methods,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import {
+  UserRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/user/user-roles/enum";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 // Extract schema type directly from field, bypassing complex field structure
 type ExtractSchemaType<F> = F extends { schema: z.ZodType<infer T> }

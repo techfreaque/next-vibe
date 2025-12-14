@@ -1,21 +1,20 @@
-import { AlertCircle } from "next-vibe-ui/ui/icons";
 import type { Metadata } from "next";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import { Div } from "next-vibe-ui/ui/div";
+import { AlertCircle } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import { Suspense } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import ResetPasswordConfirmForm from "@/app/api/[locale]/user/public/reset-password/confirm/_components/reset-password-confirm-form";
 import { passwordRepository } from "@/app/api/[locale]/user/public/reset-password/repository";
 import { userRepository } from "@/app/api/[locale]/user/repository";
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
-
-import ResetPasswordConfirmForm from "@/app/api/[locale]/user/public/reset-password/confirm/_components/reset-password-confirm-form";
-import { envClient } from "@/config/env-client";
 
 /**
  * Generate metadata for the Reset Password Confirm page with translations

@@ -1006,7 +1006,7 @@ export function useAIStream(
         }
         store.stopStream();
       } finally {
-        // eslint-disable-next-line require-atomic-updates
+         
         abortControllerRef.current = null;
       }
     },

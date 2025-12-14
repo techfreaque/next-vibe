@@ -5,21 +5,21 @@
 
 "use client";
 
-import { ArrowLeft, Save } from "next-vibe-ui/ui/icons";
-import { Link } from "next-vibe-ui/ui/link";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
-import { Form } from "next-vibe-ui/ui/form/form";
-import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
 import { Div } from "next-vibe-ui/ui/div";
+import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
+import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
+import { ArrowLeft, Save } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
 import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
-import { useSmtpAccountById } from "@/app/api/[locale]/emails/smtp-client/edit/[id]/hooks";
 import { PUT as editDefinition } from "@/app/api/[locale]/emails/smtp-client/edit/[id]/definition";
+import { useSmtpAccountById } from "@/app/api/[locale]/emails/smtp-client/edit/[id]/hooks";
 import { SmtpSecurityType } from "@/app/api/[locale]/emails/smtp-client/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";

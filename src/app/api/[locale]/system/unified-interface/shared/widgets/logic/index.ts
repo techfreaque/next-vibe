@@ -9,12 +9,12 @@ export * from "./avatar";
 export * from "./badge";
 export * from "./code-output";
 export {
+  type CodeQualityItem,
+  countCodeQualityBySeverity,
   extractCodeQualityListData,
   groupCodeQualityItems,
-  sortBySeverity,
-  countCodeQualityBySeverity,
-  type CodeQualityItem,
   type ProcessedCodeQualityList,
+  sortBySeverity,
 } from "./code-quality-list";
 export * from "./container";
 export * from "./data-card";

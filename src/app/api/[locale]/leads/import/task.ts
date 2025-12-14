@@ -9,9 +9,9 @@ import "server-only";
 import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
@@ -37,8 +37,8 @@ import { CsvImportJobStatus } from "./enum";
  * Task Configuration Schema
  */
 export const taskConfigSchema = z.object({
-  maxJobsPerRun: z.number().min(1).max(10).default(5),
-  maxRetriesPerJob: z.number().min(1).max(5).default(3),
+  maxJobsPerRun: z.coerce.number().min(1).max(10).default(5),
+  maxRetriesPerJob: z.coerce.number().min(1).max(5).default(3),
   dryRun: z.boolean().default(false),
 });
 
@@ -48,10 +48,10 @@ export type TaskConfigType = z.output<typeof taskConfigSchema>;
  * Task Result Schema
  */
 export const taskResultSchema = z.object({
-  jobsProcessed: z.number(),
-  totalRowsProcessed: z.number(),
-  successfulImports: z.number(),
-  failedImports: z.number(),
+  jobsProcessed: z.coerce.number(),
+  totalRowsProcessed: z.coerce.number(),
+  successfulImports: z.coerce.number(),
+  failedImports: z.coerce.number(),
   errors: z.array(
     z.object({
       jobId: z.string(),
@@ -60,11 +60,11 @@ export const taskResultSchema = z.object({
     }),
   ),
   summary: z.object({
-    totalJobs: z.number(),
-    pendingJobs: z.number(),
-    processingJobs: z.number(),
-    completedJobs: z.number(),
-    failedJobs: z.number(),
+    totalJobs: z.coerce.number(),
+    pendingJobs: z.coerce.number(),
+    processingJobs: z.coerce.number(),
+    completedJobs: z.coerce.number(),
+    failedJobs: z.coerce.number(),
   }),
 });
 

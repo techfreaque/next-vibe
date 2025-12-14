@@ -135,7 +135,10 @@ const { POST } = createEndpoint({
         },
         z
           .object({
-            timeout: z.number().optional().describe("Timeout in milliseconds"),
+            timeout: z.coerce
+              .number()
+              .optional()
+              .describe("Timeout in milliseconds"),
             hideStandardLogs: z
               .boolean()
               .optional()

@@ -89,7 +89,7 @@ const { POST } = createEndpoint({
           placeholder: "app.api.emails.imapClient.sync.maxMessages.placeholder",
           columns: 4,
         },
-        z.number().min(1).max(10000).default(1000),
+        z.coerce.number().min(1).max(10000).default(1000),
       ),
 
       // === RESPONSE FIELDS ===
@@ -100,7 +100,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.emails.imapClient.sync.post.response.result.accountsProcessed",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       foldersProcessed: responseField(
         {
@@ -108,7 +108,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.emails.imapClient.sync.post.response.result.foldersProcessed",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       messagesProcessed: responseField(
         {
@@ -116,7 +116,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.emails.imapClient.sync.post.response.result.messagesProcessed",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       messagesAdded: responseField(
         {
@@ -124,7 +124,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.emails.imapClient.sync.post.response.result.messagesAdded",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       messagesUpdated: responseField(
         {
@@ -132,7 +132,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.emails.imapClient.sync.post.response.result.messagesUpdated",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       messagesDeleted: responseField(
         {
@@ -140,7 +140,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.emails.imapClient.sync.post.response.result.messagesDeleted",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       duration: responseField(
         {
@@ -148,7 +148,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.emails.imapClient.sync.post.response.result.duration",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       errors: responseArrayField(

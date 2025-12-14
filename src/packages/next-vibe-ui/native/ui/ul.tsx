@@ -1,11 +1,12 @@
+import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
-import { View, Pressable, type AccessibilityRole } from "react-native";
-import { styled } from "nativewind";
+import { type AccessibilityRole,Pressable, View } from "react-native";
 
-import type { UlProps, UlMouseEvent } from "@/packages/next-vibe-ui/web/ui/ul";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import type { UlMouseEvent,UlProps } from "@/packages/next-vibe-ui/web/ui/ul";
+
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledPressable = styled(Pressable, { className: "style" });
 const StyledView = styled(View, { className: "style" });

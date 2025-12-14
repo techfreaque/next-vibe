@@ -9,12 +9,12 @@ import {
   isStreamingResponse,
 } from "next-vibe/shared/types/response.schema";
 
-import { publicProcedure } from "./setup";
-import { Platform } from "../shared/types/platform";
 import type {
-  ToolsObject,
   EndpointDefinitionsConstraint,
+  ToolsObject,
 } from "../shared/endpoints/route/multi";
+import { Platform } from "../shared/types/platform";
+import { publicProcedure } from "./setup";
 
 /**
  * Wraps tools object (route exports with genericHandlers) into tRPC procedures

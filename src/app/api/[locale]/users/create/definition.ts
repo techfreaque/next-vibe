@@ -25,9 +25,9 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   Countries,
-  LanguagesOptions,
-  Languages,
   CountriesOptions,
+  Languages,
+  LanguagesOptions,
 } from "@/i18n/core/config";
 
 /**

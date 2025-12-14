@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
             result: z
               .union([
                 z.string(),
-                z.number(),
+                z.coerce.number(),
                 z.boolean(),
                 z.record(z.string(), z.unknown()),
                 z.array(z.unknown()),

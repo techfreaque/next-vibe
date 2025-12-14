@@ -5,9 +5,8 @@
 
 import type { JSX, ReactNode } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { EmailsAdminLayoutClient } from "@/app/api/[locale]/emails/_components/emails-admin-layout-client";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface EmailsAdminLayoutProps {
   children: ReactNode;

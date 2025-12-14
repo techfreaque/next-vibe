@@ -1,16 +1,15 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import type { JSX } from "react";
-
-import { ResizableContainer } from "next-vibe-ui/ui/resizable";
-import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { AspectRatio } from "next-vibe-ui/ui/aspect-ratio";
+import { Div } from "next-vibe-ui/ui/div";
+import { Label } from "next-vibe-ui/ui/label";
 import { NumberInput } from "next-vibe-ui/ui/number-input";
 import { PhoneField } from "next-vibe-ui/ui/phone-field";
-import { Div } from "next-vibe-ui/ui/div";
+import { ResizableContainer } from "next-vibe-ui/ui/resizable";
+import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Section } from "next-vibe-ui/ui/section";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
-import { Label } from "next-vibe-ui/ui/label";
+import type { JSX } from "react";
 import { useState } from "react";
 
 export function AdvancedPreview(): JSX.Element {

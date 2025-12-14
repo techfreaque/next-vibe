@@ -1,5 +1,5 @@
 import type { JSX } from "react";
-import { Svg, Path } from "react-native-svg";
+import { Path,Svg } from "react-native-svg";
 
 /**
  * FreedomGPT Logo for React Native

@@ -1,12 +1,13 @@
 "use client";
 
-import { Badge, type BadgeVariant } from "next-vibe-ui/ui/badge";
 import { cn } from "next-vibe/shared/utils";
+import { Badge, type BadgeVariant } from "next-vibe-ui/ui/badge";
 import type { JSX } from "react";
+
+import { simpleT } from "@/i18n/core/shared";
 
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
-import { simpleT } from "@/i18n/core/shared";
 
 type SemanticVariant = "default" | "success" | "warning" | "error" | "info";
 

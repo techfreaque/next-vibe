@@ -61,7 +61,7 @@ const { POST } = createEndpoint({
             "app.api.browser.resize-page.form.fields.width.placeholder",
           columns: 6,
         },
-        z.number().describe("Page width"),
+        z.coerce.number().describe("Page width"),
       ),
       height: requestDataField(
         {
@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
             "app.api.browser.resize-page.form.fields.height.placeholder",
           columns: 6,
         },
-        z.number().describe("Page height"),
+        z.coerce.number().describe("Page height"),
       ),
 
       // Response fields
@@ -93,8 +93,8 @@ const { POST } = createEndpoint({
         z
           .object({
             resized: z.boolean().describe("Whether the page was resized"),
-            width: z.number().describe("New page width"),
-            height: z.number().describe("New page height"),
+            width: z.coerce.number().describe("New page width"),
+            height: z.coerce.number().describe("New page height"),
           })
           .optional()
           .describe("Result of page resize operation"),

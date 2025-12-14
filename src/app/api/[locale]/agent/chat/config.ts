@@ -3,20 +3,20 @@
  * Central configuration for chat system including default folders, constants, and system settings
  */
 
-import type { TranslationKey } from "@/i18n/core/static-types";
 import {
   type UserPermissionRoleValue,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { IconValue } from "./model-access/icons";
 import { aliasToPathMap } from "../../system/generated/endpoint";
 import { SEARCH_ALIAS } from "../brave-search/definition";
-import { MEMORY_ADD_ALIAS, MEMORY_LIST_ALIAS } from "./memories/definition";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
 } from "./memories/[id]/definition";
+import { MEMORY_ADD_ALIAS, MEMORY_LIST_ALIAS } from "./memories/definition";
+import type { IconValue } from "./model-access/icons";
 
 /**
  * Default folder IDs

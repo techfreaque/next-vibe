@@ -217,7 +217,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.emails.imapClient.accounts.list.response.accounts.item.port",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             secure: responseField(
               {
@@ -247,7 +247,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.emails.imapClient.accounts.list.response.accounts.item.connectionTimeout",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             keepAlive: responseField(
               {
@@ -269,7 +269,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.emails.imapClient.accounts.list.response.accounts.item.syncInterval",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             maxMessages: responseField(
               {
@@ -277,7 +277,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.emails.imapClient.accounts.list.response.accounts.item.maxMessages",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             syncFolders: responseField(
               {

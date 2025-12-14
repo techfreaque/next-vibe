@@ -159,7 +159,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.system.translations.restoreBackup.post.response.backupInfo.filesRestored",
             },
-            z.number(),
+            z.coerce.number(),
           ),
           newBackupCreated: responseField(
             {

@@ -8,6 +8,13 @@
 import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schema";
 import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import {
+  Area,
+  Axis,
+  Bar,
+  Chart,
+  Line,
+} from "next-vibe-ui/ui/chart";
 import { Div } from "next-vibe-ui/ui/div";
 import {
   BarChart3Icon,
@@ -17,13 +24,6 @@ import {
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import {
-  Chart,
-  Line,
-  Bar,
-  Area,
-  Axis,
-} from "next-vibe-ui/ui/chart";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

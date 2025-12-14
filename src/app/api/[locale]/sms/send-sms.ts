@@ -2,15 +2,15 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
 
+import { smsEnv } from "./env";
 import { getAwsSnsProvider } from "./providers/aws-sns";
 import { getHttpProvider } from "./providers/http";
 import { getMessageBirdProvider } from "./providers/messagebird";
@@ -28,7 +28,7 @@ const providerCache: Record<string, SmsProvider> = {};
  * Uses a cache to avoid recreating providers
  */
 export function getSmsProvider(providerName?: SmsProviders): SmsProvider {
-  const name = providerName ?? env.SMS_PROVIDER ?? SmsProviders.TWILIO;
+  const name = providerName ?? smsEnv.SMS_PROVIDER ?? SmsProviders.TWILIO;
 
   // Return cached provider if available
   if (providerCache[name]) {
@@ -93,9 +93,9 @@ export async function sendSms(
   logger: EndpointLogger,
 ): Promise<ResponseType<SmsResult>> {
   const maxAttempts =
-    params.retry?.attempts || parseInt(env.SMS_MAX_RETRY_ATTEMPTS || "3", 10);
+    params.retry?.attempts || parseInt(smsEnv.SMS_MAX_RETRY_ATTEMPTS || "3", 10);
   const delayMs =
-    params.retry?.delayMs || parseInt(env.SMS_RETRY_DELAY_MS || "1000", 10);
+    params.retry?.delayMs || parseInt(smsEnv.SMS_RETRY_DELAY_MS || "1000", 10);
 
   // Validate phone number
   const validation = validatePhoneNumber(params.to, logger);
@@ -124,7 +124,7 @@ export async function sendSms(
     const smsParams: SendSmsParams = {
       ...params,
 
-      from: params.from || env.SMS_FROM_NUMBER,
+      from: params.from || smsEnv.SMS_FROM_NUMBER,
     };
 
     let lastError: Error | undefined;

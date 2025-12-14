@@ -113,7 +113,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.server.health.get.response.uptime.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       environment: objectField(
@@ -189,7 +189,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.system.server.health.get.response.database.responseTime.title",
             },
-            z.number().optional(),
+            z.coerce.number().optional(),
           ),
           error: responseField(
             {
@@ -227,7 +227,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.system.server.health.get.response.tasks.activeTasks.title",
             },
-            z.number(),
+            z.coerce.number(),
           ),
           totalTasks: responseField(
             {
@@ -235,7 +235,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.system.server.health.get.response.tasks.totalTasks.title",
             },
-            z.number(),
+            z.coerce.number(),
           ),
           errors: responseField(
             {
@@ -243,7 +243,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.system.server.health.get.response.tasks.errors.title",
             },
-            z.number(),
+            z.coerce.number(),
           ),
           lastError: responseField(
             {
@@ -285,7 +285,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.system.server.health.get.response.system.memory.used.title",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               total: responseField(
                 {
@@ -293,7 +293,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.system.server.health.get.response.system.memory.total.title",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               percentage: responseField(
                 {
@@ -301,7 +301,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.system.server.health.get.response.system.memory.percentage.title",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
             },
           ),
@@ -323,7 +323,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.system.server.health.get.response.system.cpu.usage.title",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               loadAverage: responseField(
                 {
@@ -331,7 +331,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.system.server.health.get.response.system.cpu.loadAverage.title",
                 },
-                z.array(z.number()),
+                z.array(z.coerce.number()),
               ),
             },
           ),
@@ -353,7 +353,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.system.server.health.get.response.system.disk.available.title",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               total: responseField(
                 {
@@ -361,7 +361,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.system.server.health.get.response.system.disk.total.title",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               percentage: responseField(
                 {
@@ -369,7 +369,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.system.server.health.get.response.system.disk.percentage.title",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
             },
           ),
@@ -423,7 +423,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.system.server.health.get.response.checks.item.duration.title",
               },
-              z.number().optional(),
+              z.coerce.number().optional(),
             ),
           },
         ),

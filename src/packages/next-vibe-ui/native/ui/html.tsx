@@ -1,4 +1,5 @@
 import type React from "react";
+
 // Import all public types from web version (web is source of truth)
 import type { HtmlProps } from "../../web/ui/html";
 

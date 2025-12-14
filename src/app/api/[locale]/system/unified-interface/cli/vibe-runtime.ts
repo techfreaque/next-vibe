@@ -6,18 +6,18 @@
  */
 
 import { Command } from "commander";
-
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { enableDebug, enableMcpSilentMode } from "@/config/debug";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
 import { createEndpointLogger } from "../shared/logger/endpoint";
+import { type EnvironmentResult,loadEnvironment } from "./runtime/environment";
 import {
   ErrorHandler,
   setupGlobalErrorHandlers,
 } from "./runtime/execution-errors";
-import { enableDebug, enableMcpSilentMode } from "@/config/debug";
-import { loadEnvironment } from "./runtime/environment";
 import {
   parseCliArguments,
   parseCliArgumentsSimple,
@@ -25,6 +25,18 @@ import {
 } from "./runtime/parsing";
 
 export const binaryStartTime = Date.now();
+
+// Load environment first and capture platform
+const environmentResult: EnvironmentResult = loadEnvironment();
+
+/** The detected CLI platform (CLI for local dev, CLI_PACKAGE for npm package) */
+export const cliPlatform = environmentResult.platform;
+
+/** Whether running from npm package */
+export const isCliPackage: boolean = environmentResult.isPackage;
+
+/** Project root path if detected */
+export const projectRoot: string | null = environmentResult.projectRoot;
 
 /**
  * CLI Options interface for type safety
@@ -53,15 +65,12 @@ const CLI_CONSTANTS = {
   QUOTED_COLON_PATTERN: '"":' as const,
 } as const;
 
-// Load environment first
-loadEnvironment();
-
-import { env } from "@/config/env";
+import { cliEnv } from "./env";
 import { cliEntryPoint } from "./runtime/entry-point";
 
 const program = new Command();
 
-const { t: earlyT } = simpleT(env.VIBE_CLI_LOCALE);
+const { t: earlyT } = simpleT(cliEnv.VIBE_CLI_LOCALE);
 
 program
   .name(CLI_CONSTANTS.CLI_NAME)
@@ -96,7 +105,7 @@ program
     // eslint-disable-next-line i18next/no-literal-string
     "-l, --locale <locale>",
     earlyT("app.api.system.unifiedInterface.cli.vibe.help.locale"),
-    env.VIBE_CLI_LOCALE,
+    cliEnv.VIBE_CLI_LOCALE,
   )
   .option(
     // eslint-disable-next-line i18next/no-literal-string
@@ -179,6 +188,7 @@ program
             {
               user: undefined, // Let route executor handle authentication via getCliUser()
               locale: options.locale,
+              platform: cliPlatform,
               output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
                 | "table"
                 | "pretty"
@@ -234,6 +244,7 @@ program
             },
             user: undefined, // Let route executor handle authentication via getCliUser()
             locale: options.locale,
+            platform: cliPlatform,
             output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
               | "table"
               | "pretty"

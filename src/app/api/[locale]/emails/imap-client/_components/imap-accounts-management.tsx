@@ -6,7 +6,6 @@
 
 "use client";
 
-import { Plus } from "next-vibe-ui/ui/icons";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import {
@@ -16,6 +15,7 @@ import {
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
+import { Plus } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import { useState } from "react";
 

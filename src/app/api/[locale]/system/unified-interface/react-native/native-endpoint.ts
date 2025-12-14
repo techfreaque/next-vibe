@@ -24,8 +24,9 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { envClient } from "@/config/env-client";
-import { type CreateApiEndpointAny } from "../shared/types/endpoint";
 import { type CountryLanguage } from "@/i18n/core/config";
+
+import { type CreateApiEndpointAny } from "../shared/types/endpoint";
 
 /**
  * Type helpers to extract input/output types from endpoint definitions
@@ -282,7 +283,7 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
         });
       }
 
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure code requires throwing for system-level errors and initialization failures
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure code requires throwing for system-level errors and initialization failures
       throw parseError;
     }
 

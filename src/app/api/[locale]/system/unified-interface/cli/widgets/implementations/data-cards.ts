@@ -3,8 +3,8 @@
  * Handles DATA_CARDS widget type with configurable templates for different display formats
  */
 
-import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";

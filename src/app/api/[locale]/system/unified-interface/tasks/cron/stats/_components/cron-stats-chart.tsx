@@ -6,9 +6,9 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Area, Axis,Bar, Chart, Line, Pie } from "next-vibe-ui/ui/chart";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import { Chart, Line, Bar, Area, Pie, Axis } from "next-vibe-ui/ui/chart";
 
 import type { CronStatsResponseType } from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/definition";
 

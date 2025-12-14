@@ -6,17 +6,18 @@
 import { relations } from "drizzle-orm";
 import {
   index,
+  integer,
   jsonb,
   pgTable,
   text,
   timestamp,
   unique,
   uuid,
-  integer,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import { EmailStatus, EmailStatusDB } from "../emails/messages/enum";
 import { users } from "../user/db";
 import {
   EmailCampaignStage,
@@ -29,7 +30,6 @@ import {
   LeadStatus,
   LeadStatusDB,
 } from "./enum";
-import { EmailStatus, EmailStatusDB } from "../emails/messages/enum";
 
 /**
  * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys

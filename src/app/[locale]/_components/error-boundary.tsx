@@ -17,10 +17,10 @@ import { H3, P } from "next-vibe-ui/ui/typography";
 import type { ErrorInfo, JSX, ReactNode } from "react";
 import { Component } from "react";
 
+import { Environment } from "@/app/api/[locale]/shared/utils";
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { envClient } from "@/config/env-client";
-import { Environment } from "@/app/api/[locale]/shared/utils";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -172,9 +172,9 @@ export class ErrorBoundary extends Component<
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // Log error details for debugging
-    // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console -- Intentional error logging in error boundary
     console.error("ErrorBoundary caught an error:", error);
-    // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console -- Intentional error logging in error boundary
     console.error("Component stack:", errorInfo.componentStack);
 
     // Update state with error info
@@ -187,7 +187,7 @@ export class ErrorBoundary extends Component<
       this.props.onError(error, errorInfo);
     }
     if (envClient.NODE_ENV !== Environment.PRODUCTION) {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
       throw error;
     }
   }

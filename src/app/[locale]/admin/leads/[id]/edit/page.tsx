@@ -8,13 +8,12 @@ import { Div } from "next-vibe-ui/ui/div";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
+import { LeadEditForm } from "@/app/api/[locale]/leads/_components/lead-edit-form";
 import { leadsRepository } from "@/app/api/[locale]/leads/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { LeadEditForm } from "@/app/api/[locale]/leads/_components/lead-edit-form";
 
 interface LeadEditPageProps {
   params: Promise<{

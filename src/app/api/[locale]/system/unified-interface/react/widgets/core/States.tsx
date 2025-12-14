@@ -1,10 +1,10 @@
 "use client";
 
-import { Loader2 } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Div } from "next-vibe-ui/ui/div";
+import { Loader2 } from "next-vibe-ui/ui/icons";
+import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 

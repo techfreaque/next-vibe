@@ -4,8 +4,8 @@
  * Uses localStorage with async storage for persistence
  */
 
-import { useEffect, useState } from "react";
 import { storage } from "next-vibe-ui/lib/storage";
+import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "chat-bottom-sheet-expanded";
 

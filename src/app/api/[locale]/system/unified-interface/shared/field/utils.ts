@@ -7,6 +7,7 @@
 
 import { z } from "zod";
 
+import type { EndpointLogger } from "../logger/endpoint";
 import type {
   ArrayField,
   ArrayOptionalField,
@@ -20,8 +21,7 @@ import type {
 } from "../types/endpoint";
 import type { CacheStrategy } from "../types/enums";
 import { FieldUsage } from "../types/enums";
-import type { WidgetConfig, TypedContainerWidgetConfig } from "../widgets/configs";
-import type { EndpointLogger } from "../logger/endpoint";
+import type { TypedContainerWidgetConfig,WidgetConfig } from "../widgets/configs";
 
 // ============================================================================
 // TYPE GUARDS

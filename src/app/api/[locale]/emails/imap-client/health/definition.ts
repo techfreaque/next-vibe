@@ -56,7 +56,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.health.health.get.response.data.accountsHealthy",
         },
-        z.number().int(),
+        z.coerce.number().int(),
       ),
       accountsTotal: responseField(
         {
@@ -64,7 +64,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.health.health.get.response.data.accountsTotal",
         },
-        z.number().int(),
+        z.coerce.number().int(),
       ),
       connectionsActive: responseField(
         {
@@ -72,7 +72,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.health.health.get.response.data.connectionsActive",
         },
-        z.number().int(),
+        z.coerce.number().int(),
       ),
       connectionErrors: responseField(
         {
@@ -80,7 +80,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.health.health.get.response.data.connectionErrors",
         },
-        z.number().int(),
+        z.coerce.number().int(),
       ),
       lastSyncAt: responseField(
         {
@@ -115,7 +115,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.imapClient.health.health.get.response.data.syncStats.totalSyncs",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           lastSyncTime: responseField(
             {
@@ -148,7 +148,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.health.health.get.response.data.syncedAccounts",
         },
-        z.number().int(),
+        z.coerce.number().int(),
       ),
       totalAccounts: responseField(
         {
@@ -156,7 +156,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.health.health.get.response.data.totalAccounts",
         },
-        z.number().int(),
+        z.coerce.number().int(),
       ),
       activeConnections: responseField(
         {
@@ -164,7 +164,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.health.health.get.response.data.activeConnections",
         },
-        z.number().int(),
+        z.coerce.number().int(),
       ),
       avgResponseTime: responseField(
         {
@@ -172,7 +172,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.emails.imapClient.health.health.get.response.data.performanceMetrics.avgResponseTime",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

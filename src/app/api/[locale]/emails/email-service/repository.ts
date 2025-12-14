@@ -7,15 +7,16 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { CampaignType } from "../smtp-client/enum";
 import { smtpRepository } from "../smtp-client/repository";
@@ -27,7 +28,6 @@ import type {
   EmailServiceSendPostRequestOutput,
   EmailServiceSendPostResponseOutput,
 } from "./definition";
-import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 /**
  * Email Service Repository Interface

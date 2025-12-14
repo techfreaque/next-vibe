@@ -5,27 +5,27 @@
 
 import "server-only";
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { simpleT } from "@/i18n/core/shared";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+import type { TParams,TranslationKey } from "@/i18n/core/static-types";
 
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
-import { Platform } from "../shared/types/platform";
 import { routeExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint";
+import type { Methods } from "../shared/types/enums";
+import { Platform } from "../shared/types/platform";
 import type {
   MCPExecutionContext,
   MCPToolCallResult,
   MCPToolMetadata,
 } from "./types";
 import { MCPErrorCode } from "./types";
-import type { TranslationKey, TParams } from "@/i18n/core/static-types";
-import type { Methods } from "../shared/types/enums";
 
 /**
  * MCP Registry Interface
@@ -245,7 +245,7 @@ export class MCPRegistry implements IMCPRegistry {
   }: {
     error: string;
     code: MCPErrorCode;
-    // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Tool registration requires 'unknown' for flexible tool definitions
+     
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Tool registration requires 'unknown' for flexible tool definitions
     details?: { [key: string]: unknown };
   }): MCPToolCallResult {

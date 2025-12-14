@@ -172,7 +172,7 @@ const { POST } = createEndpoint({
                 content: "app.api.system.guard.stop.fields.pid.title",
                 fieldType: FieldDataType.NUMBER,
               },
-              z.number().optional(),
+              z.coerce.number().optional(),
             ),
             forceStopped: responseField(
               {
@@ -191,7 +191,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.guard.stop.fields.totalStopped.title",
         },
-        z.number().optional(),
+        z.coerce.number().optional(),
       ),
     },
   ),

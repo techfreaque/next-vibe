@@ -21,9 +21,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { iconSchema } from "../../../shared/types/common.schema";
 import { ModelId, ModelIdOptions } from "../model-access/models";
 import { CategoryOptions } from "./config";
-import { iconSchema } from "../../../shared/types/common.schema";
 
 /**
  * Get Personas List Endpoint (GET)

@@ -1,16 +1,16 @@
 import * as CheckboxPrimitive from "@rn-primitives/checkbox";
 import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
-import { cn } from "next-vibe/shared/utils/utils";
-import { Check } from "./icons/Check";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
-
 import type {
-  CheckboxRootProps,
   CheckboxIndicatorProps,
+  CheckboxRootProps,
 } from "@/packages/next-vibe-ui/web/ui/checkbox";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { Check } from "./icons/Check";
 
 const StyledCheckboxRoot = styled(CheckboxPrimitive.Root, {
   className: "style",

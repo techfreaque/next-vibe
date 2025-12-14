@@ -9,6 +9,7 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { createMCPProtocolHandler } from "./protocol-handler";
 import { StdioTransport } from "./stdio-transport";
@@ -32,7 +33,7 @@ export class MCPServer {
     const isMCPServerEnabled = process.env.VIBE_MCP_DISABLED !== "true";
     if (!isMCPServerEnabled) {
       logger.error("[MCP Server] MCP server is disabled");
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for disabled server
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for disabled server
       throw new Error("MCP server is disabled");
     }
 
@@ -79,7 +80,7 @@ export class MCPServer {
       logger.error("[MCP Server] Failed to start", {
         error: parseError(error).message,
       });
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Re-throw MCP server startup errors for caller to handle
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Re-throw MCP server startup errors for caller to handle
       throw error;
     }
   }

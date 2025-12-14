@@ -3,8 +3,8 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
 import { ChevronLeft, ChevronRight, GitBranch } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React from "react";
 

@@ -15,11 +15,10 @@ import type { JSX } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
 
-import { Alert, AlertDescription, AlertTitle } from "../alert";
-import { convertCSSToViewStyle } from "../../utils/style-converter";
-
 // Import all public types from web version (web is source of truth)
 import type { FormAlertProps } from "../../../web/ui/form/form-alert";
+import { convertCSSToViewStyle } from "../../utils/style-converter";
+import { Alert, AlertDescription, AlertTitle } from "../alert";
 
 /**
  * Central alert component for forms with consistent styling and icons

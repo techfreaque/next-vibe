@@ -3,8 +3,9 @@
  * Provides full type inference from definition.POST.fields to form components
  */
 
-import type { FieldConfig } from "./field-config-types";
 import { type Countries } from "@/i18n/core/config";
+
+import type { FieldConfig } from "./field-config-types";
 
 /**
  * Type for endpoint field structure from unified interface

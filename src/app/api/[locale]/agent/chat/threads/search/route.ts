@@ -5,9 +5,9 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
+import type { ApiHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { ApiHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 
 import type {
   ThreadSearchGetRequestOutput,

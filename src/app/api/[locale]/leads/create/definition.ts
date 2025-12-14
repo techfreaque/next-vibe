@@ -309,7 +309,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.leads.create.post.response.trackingInfo.emailsSent",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               currentCampaignStage: responseField(
                 {

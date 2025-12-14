@@ -7,19 +7,20 @@ import "server-only";
 
 import { lt, sql } from "drizzle-orm";
 import {
-  AUTH_TOKEN_COOKIE_MAX_AGE_DAYS,
-  RESET_TOKEN_EXPIRY,
-} from "@/config/constants";
-import {
-  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  AUTH_TOKEN_COOKIE_MAX_AGE_DAYS,
+  RESET_TOKEN_EXPIRY,
+} from "@/config/constants";
+
 import { sessions } from "../private/session/db";
 import { passwordResets } from "../public/reset-password/db";
 import type {

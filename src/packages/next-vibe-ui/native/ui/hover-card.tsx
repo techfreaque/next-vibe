@@ -1,20 +1,20 @@
 import * as HoverCardPrimitive from "@rn-primitives/hover-card";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { styled } from "nativewind";
-
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
-import { TextClassContext } from "./text";
 
 import type {
+  HoverCardContentProps,
+  HoverCardPortalProps,
   HoverCardRootProps,
   HoverCardTriggerProps,
-  HoverCardPortalProps,
-  HoverCardContentProps,
 } from "@/packages/next-vibe-ui/web/ui/hover-card";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });
 

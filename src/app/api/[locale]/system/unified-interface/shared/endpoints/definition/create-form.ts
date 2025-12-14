@@ -10,13 +10,7 @@
 
 import { z } from "zod";
 
-import {
-  UserRole,
-  type UserRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
-
-import { type CreateApiEndpoint } from "./create";
+import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type {
   ExamplesList,
   ExtractInput,
@@ -34,7 +28,13 @@ import {
   FieldUsage,
   Methods,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import {
+  UserRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/user/user-roles/enum";
+import type { TranslationKey } from "@/i18n/core/static-types";
+
+import { type CreateApiEndpoint } from "./create";
 
 /**
  * Configuration for a single method in a form endpoint

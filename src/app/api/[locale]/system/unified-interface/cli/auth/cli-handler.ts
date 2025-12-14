@@ -2,6 +2,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 
+import type { EndpointLogger } from "../../shared/logger/endpoint";
 import {
   type AuthContext,
   BaseAuthHandler,
@@ -12,7 +13,6 @@ import {
   readSessionFile,
   writeSessionFile,
 } from "./session-file";
-import type { EndpointLogger } from "../../shared/logger/endpoint";
 
 /**
  * CLI/MCP Authentication Handler

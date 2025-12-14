@@ -4,9 +4,8 @@
  * Located in threads/ folder as per architectural standards
  */
 
-import { useCallback } from "react";
-
 import { parseError } from "next-vibe/shared/utils";
+import { useCallback } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -133,8 +132,8 @@ export function useThreadOperations(
 
         // Delete from streaming store
         if (streamStore.threads[threadId]) {
-          // eslint-disable-next-line no-unused-vars -- Destructuring pattern to omit property
-          const { [threadId]: _deleted, ...remainingThreads } =
+          // eslint-disable-next-line no-unused-vars -- Rest destructuring to exclude key
+          const { [threadId]: excluded, ...remainingThreads } =
             streamStore.threads;
           streamStore.reset();
           Object.values(remainingThreads).forEach((thread) => {

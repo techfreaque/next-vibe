@@ -6,6 +6,14 @@
 
 "use client";
 
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import {
   ArrowLeft,
   Calendar,
@@ -16,16 +24,8 @@ import {
   Star,
   User,
 } from "next-vibe-ui/ui/icons";
-import { Div } from "next-vibe-ui/ui/div";
-import { useRouter } from "next-vibe-ui/hooks/use-navigation";
-import { Form } from "next-vibe-ui/ui/form/form";
-import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
-import { Span } from "next-vibe-ui/ui/span";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Separator } from "next-vibe-ui/ui/separator";
+import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useState } from "react";

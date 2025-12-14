@@ -20,6 +20,10 @@ import {
   LanguageFilter,
 } from "@/i18n/core/config";
 
+import type {
+  EndpointReturn,
+  FormAlertState,
+} from "../../system/unified-interface/react/hooks/endpoint-types";
 import {
   EmailCampaignStageFilter,
   LeadSortField,
@@ -29,10 +33,6 @@ import {
 } from "../enum";
 import type { LeadsStatsResponseOutput } from "./definition";
 import definitions from "./definition";
-import type {
-  EndpointReturn,
-  FormAlertState,
-} from "../../system/unified-interface/react/hooks/endpoint-types";
 
 /**
  * Basic endpoint hook for leads statistics

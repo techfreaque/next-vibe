@@ -2,31 +2,32 @@
  * ScrollArea Component for React Native
  * Cross-platform wrapper around ScrollView with full web API compatibility
  */
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { ScrollView } from "react-native";
-import { styled } from "nativewind";
 
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 import type {
+  ScrollAreaBarProps,
+  ScrollAreaCornerProps,
   ScrollAreaProps,
   ScrollAreaRootProps,
-  ScrollAreaViewportProps,
-  ScrollAreaBarProps,
   ScrollAreaThumbProps,
-  ScrollAreaCornerProps,
+  ScrollAreaViewportProps,
   ScrollBarProps,
 } from "@/packages/next-vibe-ui/web/ui/scroll-area";
 
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+
 // Re-export all types from web for cross-platform compatibility
 export type {
+  ScrollAreaBarProps,
+  ScrollAreaCornerProps,
   ScrollAreaProps,
   ScrollAreaRootProps,
-  ScrollAreaViewportProps,
-  ScrollAreaBarProps,
   ScrollAreaThumbProps,
-  ScrollAreaCornerProps,
+  ScrollAreaViewportProps,
   ScrollBarProps,
 };
 

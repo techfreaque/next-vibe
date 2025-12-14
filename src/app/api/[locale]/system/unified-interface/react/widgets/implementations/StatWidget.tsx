@@ -1,26 +1,26 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Span } from "next-vibe-ui/ui/span";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import {
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  Users,
-  Mail,
-  CreditCard,
-  BarChart3,
   Activity,
+  BarChart3,
   CheckCircle,
-  XCircle,
   Clock,
+  CreditCard,
+  Mail,
+  Minus,
   Star,
+  TrendingDown,
+  TrendingUp,
+  Users,
+  XCircle,
 } from "next-vibe-ui/ui/icons";
-import type { JSX, ComponentType } from "react";
+import { Span } from "next-vibe-ui/ui/span";
+import type { ComponentType,JSX } from "react";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";

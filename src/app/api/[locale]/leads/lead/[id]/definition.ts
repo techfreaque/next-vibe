@@ -219,7 +219,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.leads.lead.id.get.response.emailsSent.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               lastEmailSentAt: responseField(
                 {
@@ -250,7 +250,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.leads.lead.id.get.response.emailsOpened.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               emailsClicked: responseField(
                 {
@@ -258,7 +258,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.leads.lead.id.get.response.emailsClicked.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               lastEngagementAt: responseField(
                 {
@@ -735,7 +735,10 @@ const { PATCH } = createEndpoint({
                   columns: 12,
                 },
                 z
-                  .record(z.string(), z.string().or(z.number()).or(z.boolean()))
+                  .record(
+                    z.string(),
+                    z.string().or(z.coerce.number()).or(z.boolean()),
+                  )
                   .optional(),
               ),
               convertedUserId: requestDataField(
@@ -932,7 +935,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.leads.lead.id.patch.response.emailsSent.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               lastEmailSentAt: responseField(
                 {
@@ -962,7 +965,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.leads.lead.id.patch.response.emailsOpened.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               emailsClicked: responseField(
                 {
@@ -970,7 +973,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.leads.lead.id.patch.response.emailsClicked.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               lastEngagementAt: responseField(
                 {

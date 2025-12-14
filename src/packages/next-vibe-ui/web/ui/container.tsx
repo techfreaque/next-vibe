@@ -5,6 +5,7 @@
 
 import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 // Cross-platform props interface

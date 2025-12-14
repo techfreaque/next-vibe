@@ -3,13 +3,13 @@
  * Creates module-specific translation functions that work only within a defined scope
  */
 
-import { type CountryLanguage, type Languages, defaultLocale } from "./config";
+import { type CountryLanguage, defaultLocale,type Languages } from "./config";
+import { getLanguageFromLocale } from "./language-utils";
 import {
   navigateTranslationObject,
   processTranslationValue,
 } from "./shared-translation-utils";
 import type { TParams } from "./static-types";
-import { getLanguageFromLocale } from "./language-utils";
 import type { DotNotation } from "./static-types";
 
 /**

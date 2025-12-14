@@ -151,7 +151,7 @@ const { GET } = createEndpoint({
             "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.limit.description",
           columns: 3,
         },
-        z.number().optional().default(100),
+        z.coerce.number().optional().default(100),
       ),
 
       // Additional filter fields
@@ -229,7 +229,7 @@ const { GET } = createEndpoint({
             "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.minDuration.title",
           columns: 3,
         },
-        z.number().optional(),
+        z.coerce.number().optional(),
       ),
 
       maxDuration: requestDataField(
@@ -240,7 +240,7 @@ const { GET } = createEndpoint({
             "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.maxDuration.title",
           columns: 3,
         },
-        z.number().optional(),
+        z.coerce.number().optional(),
       ),
 
       includeDisabled: requestDataField(
@@ -316,49 +316,49 @@ const { GET } = createEndpoint({
         },
         z.object({
           // Basic stats fields
-          totalTasks: z.number(),
-          executedTasks: z.number(),
-          successfulTasks: z.number(),
-          failedTasks: z.number(),
-          averageExecutionTime: z.number(),
+          totalTasks: z.coerce.number(),
+          executedTasks: z.coerce.number(),
+          successfulTasks: z.coerce.number(),
+          failedTasks: z.coerce.number(),
+          averageExecutionTime: z.coerce.number(),
 
           // Extended stats fields for comprehensive dashboard
-          totalExecutions: z.number().optional(),
-          executionsLast24h: z.number().optional(),
-          successRate: z.number().optional(),
-          successfulExecutions: z.number().optional(),
-          activeTasks: z.number().optional(),
-          systemLoad: z.number().optional(),
-          queueSize: z.number().optional(),
-          failedExecutions: z.number().optional(),
-          failureRate: z.number().optional(),
-          avgExecutionTime: z.number().optional(),
-          medianExecutionTime: z.number().optional(),
-          minExecutionTime: z.number().optional(),
-          maxExecutionTime: z.number().optional(),
-          healthyTasks: z.number().optional(),
-          degradedTasks: z.number().optional(),
-          pendingExecutions: z.number().optional(),
-          runningExecutions: z.number().optional(),
+          totalExecutions: z.coerce.number().optional(),
+          executionsLast24h: z.coerce.number().optional(),
+          successRate: z.coerce.number().optional(),
+          successfulExecutions: z.coerce.number().optional(),
+          activeTasks: z.coerce.number().optional(),
+          systemLoad: z.coerce.number().optional(),
+          queueSize: z.coerce.number().optional(),
+          failedExecutions: z.coerce.number().optional(),
+          failureRate: z.coerce.number().optional(),
+          avgExecutionTime: z.coerce.number().optional(),
+          medianExecutionTime: z.coerce.number().optional(),
+          minExecutionTime: z.coerce.number().optional(),
+          maxExecutionTime: z.coerce.number().optional(),
+          healthyTasks: z.coerce.number().optional(),
+          degradedTasks: z.coerce.number().optional(),
+          pendingExecutions: z.coerce.number().optional(),
+          runningExecutions: z.coerce.number().optional(),
 
           // Distribution fields
           tasksByPriority: z
-            .record(z.nativeEnum(CronTaskPriority), z.number())
+            .record(z.nativeEnum(CronTaskPriority), z.coerce.number())
             .optional(),
           tasksByStatus: z
-            .record(z.nativeEnum(CronTaskStatus), z.number())
+            .record(z.nativeEnum(CronTaskStatus), z.coerce.number())
             .optional(),
-          executionsByHour: z.record(z.string(), z.number()).optional(),
-          executionsByDay: z.record(z.number(), z.number()).optional(),
+          executionsByHour: z.record(z.string(), z.coerce.number()).optional(),
+          executionsByDay: z.record(z.string(), z.coerce.number()).optional(),
 
           // Top tasks and problem tasks
           topPerformingTasks: z
             .array(
               z.object({
                 taskName: z.string(),
-                executions: z.number(),
-                successRate: z.number(),
-                avgDuration: z.number(),
+                executions: z.coerce.number(),
+                successRate: z.coerce.number(),
+                avgDuration: z.coerce.number(),
               }),
             )
             .optional(),
@@ -367,10 +367,10 @@ const { GET } = createEndpoint({
             .array(
               z.object({
                 taskName: z.string(),
-                failures: z.number(),
-                executions: z.number(),
+                failures: z.coerce.number(),
+                executions: z.coerce.number(),
                 lastError: z.string().optional(),
-                failureRate: z.number(),
+                failureRate: z.coerce.number(),
                 lastFailure: z.string().optional(),
               }),
             )
@@ -383,11 +383,11 @@ const { GET } = createEndpoint({
                 .array(
                   z.object({
                     taskName: z.string(),
-                    executions: z.number(),
-                    successes: z.number(),
-                    failures: z.number(),
-                    successRate: z.number(),
-                    avgDuration: z.number(),
+                    executions: z.coerce.number(),
+                    successes: z.coerce.number(),
+                    failures: z.coerce.number(),
+                    successRate: z.coerce.number(),
+                    avgDuration: z.coerce.number(),
                   }),
                 )
                 .optional(),
@@ -395,10 +395,10 @@ const { GET } = createEndpoint({
                 .array(
                   z.object({
                     priority: z.string(),
-                    taskCount: z.number(),
-                    executions: z.number(),
-                    successRate: z.number(),
-                    avgDuration: z.number(),
+                    taskCount: z.coerce.number(),
+                    executions: z.coerce.number(),
+                    successRate: z.coerce.number(),
+                    avgDuration: z.coerce.number(),
                   }),
                 )
                 .optional(),
@@ -406,8 +406,8 @@ const { GET } = createEndpoint({
                 .array(
                   z.object({
                     healthStatus: z.string(),
-                    taskCount: z.number(),
-                    percentage: z.number(),
+                    taskCount: z.coerce.number(),
+                    percentage: z.coerce.number(),
                   }),
                 )
                 .optional(),
@@ -415,9 +415,9 @@ const { GET } = createEndpoint({
                 .array(
                   z.object({
                     timeRange: z.string(),
-                    count: z.number(),
-                    percentage: z.number(),
-                    avgDuration: z.number(),
+                    count: z.coerce.number(),
+                    percentage: z.coerce.number(),
+                    avgDuration: z.coerce.number(),
                   }),
                 )
                 .optional(),
@@ -433,7 +433,7 @@ const { GET } = createEndpoint({
                 status: z.string(),
                 timestamp: z.string(),
                 type: z.string(),
-                duration: z.number().optional(),
+                duration: z.coerce.number().optional(),
               }),
             )
             .optional(),
@@ -442,11 +442,11 @@ const { GET } = createEndpoint({
             .array(
               z.object({
                 date: z.string(),
-                executions: z.number(),
-                successes: z.number(),
-                failures: z.number(),
-                avgDuration: z.number(),
-                uniqueTasks: z.number(),
+                executions: z.coerce.number(),
+                successes: z.coerce.number(),
+                failures: z.coerce.number(),
+                avgDuration: z.coerce.number(),
+                uniqueTasks: z.coerce.number(),
               }),
             )
             .optional(),
@@ -458,10 +458,10 @@ const { GET } = createEndpoint({
               z.object({
                 priority: z.string(),
                 healthStatus: z.string(),
-                successfulExecutions: z.number(),
-                totalExecutions: z.number(),
-                successRate: z.number(),
-                avgDuration: z.number(),
+                successfulExecutions: z.coerce.number(),
+                totalExecutions: z.coerce.number(),
+                successRate: z.coerce.number(),
+                avgDuration: z.coerce.number(),
                 isEnabled: z.boolean(),
               }),
             )
@@ -471,7 +471,7 @@ const { GET } = createEndpoint({
           historicalData: z
             .record(
               z.string(),
-              z.array(z.object({ date: z.string(), value: z.number() })),
+              z.array(z.object({ date: z.string(), value: z.coerce.number() })),
             )
             .optional(),
         }),

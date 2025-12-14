@@ -1,9 +1,10 @@
 import {
+  AnimatePresence as FMAnimatePresence,
   motion as fmMotion,
   type Transition,
-  AnimatePresence as FMAnimatePresence,
 } from "framer-motion";
 import type { JSX } from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 // AnimatePresence interface

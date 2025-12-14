@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable i18next/no-literal-string */
 /**
  * CLI Entry Point System
@@ -8,23 +7,20 @@
 
 import { parseError } from "next-vibe/shared/utils";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
-import { Platform } from "../../shared/types/platform";
+import type { EndpointLogger } from "../../shared/logger/endpoint";
+import type { CliObject } from "./parsing";
 import type {
+  CliCompatiblePlatform,
   CliRequestData,
   RouteExecutionContext,
   RouteExecutionResult,
 } from "./route-executor";
 import { routeDelegationHandler } from "./route-executor";
-import type { CliObject } from "./parsing";
-
-// Import InputData type from route-executor
-type InputData = CliRequestData;
 
 interface CliExecutionOptions {
   data?: CliRequestData;
@@ -35,6 +31,8 @@ interface CliExecutionOptions {
   };
   user?: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
   locale: CountryLanguage;
+  /** Platform identifier (CLI or CLI_PACKAGE) */
+  platform: CliCompatiblePlatform;
   dryRun?: boolean;
   interactive?: boolean;
   verbose?: boolean;
@@ -76,7 +74,7 @@ class CliEntryPoint {
       }
     }
 
-    const dataForContext: InputData = options.data || {};
+    const dataForContext: CliRequestData = options.data || {};
 
     const context: RouteExecutionContext = {
       toolName: resolvedCommand,
@@ -86,7 +84,7 @@ class CliEntryPoint {
       user: cliUser,
       locale: options.locale,
       logger: logger,
-      platform: Platform.CLI,
+      platform: options.platform,
       timestamp: Date.now(),
       options: {
         dryRun: options.dryRun,

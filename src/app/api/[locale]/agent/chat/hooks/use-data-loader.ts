@@ -3,18 +3,17 @@
  * Handles initial loading of threads, folders, and messages from server and localStorage
  */
 
-import { useEffect, useRef } from "react";
-
 import { parseError } from "next-vibe/shared/utils";
+import { useEffect, useRef } from "react";
 
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import type { FolderListResponseOutput } from "../folders/definition";
 import { GET as foldersGetEndpoint } from "../folders/definition";
-import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import {
   GET as threadsGetEndpoint,
   type ThreadListResponseOutput,
@@ -292,6 +291,5 @@ export function useDataLoader(
     };
 
     void loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locale, user]);
+  }, [locale, user, logger, addThread, addMessage, addFolder, setDataLoaded]);
 }

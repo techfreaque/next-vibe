@@ -4,9 +4,9 @@
  * Used by both React and CLI implementations
  */
 
-import type { WidgetData } from "../types";
 import type { UnifiedField } from "../../types/endpoint";
 import { WidgetType } from "../../types/enums";
+import type { WidgetData } from "../types";
 
 /**
  * Code output item interface (for linter/code quality output)

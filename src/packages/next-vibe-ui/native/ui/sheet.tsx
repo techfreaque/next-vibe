@@ -1,5 +1,7 @@
 import * as DialogPrimitive from "@rn-primitives/dialog";
 import { cva } from "class-variance-authority";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import Animated, {
@@ -12,26 +14,24 @@ import Animated, {
   SlideOutRight,
   SlideOutUp,
 } from "react-native-reanimated";
-import { styled } from "nativewind";
 
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { X } from "./icons/X";
 
 const StyledView = styled(View, { className: "style" });
 
 import type {
-  SheetRootProps,
-  SheetTriggerProps,
   SheetCloseProps,
-  SheetPortalProps,
-  SheetOverlayProps,
-  SheetHeaderProps,
-  SheetFooterProps,
-  SheetTitleProps,
-  SheetDescriptionProps,
   SheetContentProps,
+  SheetDescriptionProps,
+  SheetFooterProps,
+  SheetHeaderProps,
+  SheetOverlayProps,
+  SheetPortalProps,
+  SheetRootProps,
+  SheetTitleProps,
+  SheetTriggerProps,
 } from "@/packages/next-vibe-ui/web/ui/sheet";
 
 const sheetVariants = cva("fixed z-50 gap-4 bg-background p-6 shadow-lg", {

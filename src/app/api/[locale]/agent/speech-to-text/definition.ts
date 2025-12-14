@@ -144,7 +144,7 @@ const { POST } = createEndpoint({
               type: WidgetType.TEXT,
               content: "app.api.agent.speechToText.post.response.confidence",
             },
-            z.number().optional(),
+            z.coerce.number().optional(),
           ),
         },
       ),

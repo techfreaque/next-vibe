@@ -14,10 +14,10 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-import { users } from "../user/db";
 import { leads } from "../leads/db";
 import { paymentTransactions } from "../payment/db";
-import { ReferralEarningStatusDB, ReferralEarningStatus } from "./enum";
+import { users } from "../user/db";
+import { ReferralEarningStatus,ReferralEarningStatusDB } from "./enum";
 
 /**
  * Referral Codes Table

@@ -12,7 +12,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "next-vibe-ui/ui/dropdown-menu";
-import { Span } from "next-vibe-ui/ui/span";
 import {
   MessageSquarePlus,
   PanelLeft,
@@ -20,17 +19,18 @@ import {
   Volume2,
   VolumeX,
 } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
+import { ThemeToggleDropdown } from "@/app/[locale]/_components/theme-toggle";
+import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { LocaleSelectorContent } from "./locale-selector-content";
-import { ThemeToggleDropdown } from "@/app/[locale]/_components/theme-toggle";
 
 interface TopBarProps {
   currentCountry: { flag: string; name: string };

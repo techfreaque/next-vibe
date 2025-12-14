@@ -13,8 +13,8 @@ import {
 } from "next-vibe-ui/ui/dropdown-menu";
 import { HelpCircle, LogOut, User } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
-import { P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";

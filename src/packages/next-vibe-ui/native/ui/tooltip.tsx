@@ -1,18 +1,18 @@
 import * as TooltipPrimitive from "@rn-primitives/tooltip";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
-import { TextClassContext } from "./text";
 import type {
   TooltipContentProps,
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,
 } from "../../web/ui/tooltip";
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { TextClassContext } from "./text";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_CONTENT = "text-sm text-base text-popover-foreground";

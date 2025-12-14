@@ -16,15 +16,15 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-
 import { storage } from "next-vibe-ui/lib/storage";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { envClient } from "@/config/env-client";
+import { platform } from "@/config/env-client";
 
 // Storage key for auth token
 const AUTH_TOKEN_STORAGE_KEY = "auth_token";
@@ -82,7 +82,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
-      if (envClient.platform.isServer) {
+      if (platform.isServer) {
         logger.error("setAuthToken cannot be called on the server");
         return fail({
           message: "app.api.user.auth.authClient.errors.token_save_failed",
@@ -93,7 +93,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       // Use platform-agnostic storage (localStorage for web, AsyncStorage for React Native)
       await storage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
       logger.debug("Auth token stored successfully", {
-        platform: envClient.platform.isReactNative ? "React Native" : "Web",
+        platform: platform.isReactNative ? "React Native" : "Web",
       });
 
       return success(undefined);
@@ -116,7 +116,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<string | undefined>> {
     try {
-      if (envClient.platform.isServer) {
+      if (platform.isServer) {
         logger.error("getAuthToken cannot be called on the server");
         return fail({
           message: "app.api.user.auth.authClient.errors.token_get_failed",
@@ -128,7 +128,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       const token = await storage.getItem(AUTH_TOKEN_STORAGE_KEY);
       logger.debug("Auth token retrieved", {
         hasToken: !!token,
-        platform: envClient.platform.isReactNative ? "React Native" : "Web",
+        platform: platform.isReactNative ? "React Native" : "Web",
       });
 
       return success(token || undefined);
@@ -149,7 +149,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
    */
   async removeAuthToken(logger: EndpointLogger): Promise<ResponseType<void>> {
     try {
-      if (envClient.platform.isServer) {
+      if (platform.isServer) {
         logger.error("removeAuthToken cannot be called on the server");
         return fail({
           message: "app.api.user.auth.authClient.errors.token_remove_failed",
@@ -160,7 +160,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       // Use platform-agnostic storage (localStorage for web, AsyncStorage for React Native)
       await storage.removeItem(AUTH_TOKEN_STORAGE_KEY);
       logger.debug("Auth token removed successfully", {
-        platform: envClient.platform.isReactNative ? "React Native" : "Web",
+        platform: platform.isReactNative ? "React Native" : "Web",
       });
 
       return success(undefined);

@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import { Button } from "next-vibe-ui/ui/button";
-import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
-import { envClient } from "@/config/env-client";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;

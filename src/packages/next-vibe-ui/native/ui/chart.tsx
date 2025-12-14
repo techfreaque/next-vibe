@@ -2,31 +2,32 @@
 
 import { cn } from "next-vibe/shared/utils";
 import * as React from "react";
-import { View, Text } from "react-native";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
+import { Text,View } from "react-native";
 
 import type {
+  AreaProps,
+  AxisProps,
+  BarProps,
   ChartBaseProps,
   ChartConfig,
   ChartContainerBaseProps,
   ChartContainerProps,
-  ChartStyleProps,
-  ChartDataPoint,
-  PayloadItem,
-  ThemeKeys,
-  ChartTooltipContentProps,
-  ChartLegendContentProps,
   ChartContextProps,
-  ChartTooltipProps,
+  ChartDataPoint,
+  ChartLegendContentProps,
   ChartLegendProps,
   ChartProps,
+  ChartStyleProps,
+  ChartTooltipContentProps,
+  ChartTooltipProps,
   LineProps,
-  BarProps,
-  AreaProps,
+  PayloadItem,
   PieProps,
-  AxisProps,
+  ThemeKeys,
 } from "@/packages/next-vibe-ui/web/ui/chart";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const ChartContext = React.createContext<ChartContextProps | null>(null);
 
@@ -36,7 +37,8 @@ export function useChart<
   const context = React.useContext(ChartContext);
 
   if (!context) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useChart must be used within a <ChartContainer />");
   }
 
@@ -193,7 +195,7 @@ type VictoryPropsType = Record<
   | string
   | number
   | boolean
-  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Chart library type definition requires generic object type for flexible configuration
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Chart library type definition requires generic object type for flexible configuration
   | object
   | React.ReactNode
   | React.ReactElement
@@ -235,7 +237,7 @@ function getVictoryComponents(): VictoryComponentsInterface | null {
     return VictoryComponents;
   } catch (error) {
     skiaInitError = error as Error;
-    // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console -- Intentional error logging for module load failure
     console.error("Failed to load victory-native:", error);
     return null;
   }
@@ -567,23 +569,23 @@ export const Theme = {
 } as const;
 
 export type {
+  AreaProps,
+  AxisProps,
+  BarProps,
   ChartBaseProps,
   ChartConfig,
   ChartContainerBaseProps,
   ChartContainerProps,
-  ChartStyleProps,
-  ChartDataPoint,
-  PayloadItem,
-  ThemeKeys,
-  ChartTooltipContentProps,
-  ChartLegendContentProps,
   ChartContextProps,
-  ChartTooltipProps,
+  ChartDataPoint,
+  ChartLegendContentProps,
   ChartLegendProps,
   ChartProps,
+  ChartStyleProps,
+  ChartTooltipContentProps,
+  ChartTooltipProps,
   LineProps,
-  BarProps,
-  AreaProps,
+  PayloadItem,
   PieProps,
-  AxisProps,
+  ThemeKeys,
 } from "@/packages/next-vibe-ui/web/ui/chart";

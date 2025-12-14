@@ -189,7 +189,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.messages.messageId.get.response.message.depth.content" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           authorId: responseField(
             {
@@ -221,7 +221,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.messages.messageId.get.response.message.tokens.content" as const,
             },
-            z.number().nullable(),
+            z.coerce.number().nullable(),
           ),
           createdAt: responseField(
             {

@@ -6,17 +6,17 @@
  */
 
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
+import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useCallback } from "react";
 
+import definitions from "@/app/api/[locale]/credits/definition";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 
-import logoutEndpoints from "./definition";
 import { useApiMutation } from "../../../system/unified-interface/react/hooks/use-api-mutation";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
-import definitions from "@/app/api/[locale]/credits/definition";
 import { authClientRepository } from "../../auth/repository-client";
+import logoutEndpoints from "./definition";
 
 /****************************
  * MUTATION HOOKS

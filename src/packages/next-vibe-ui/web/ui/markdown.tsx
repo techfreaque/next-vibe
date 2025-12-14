@@ -10,9 +10,10 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
-import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
+
+import type { StyleType } from "../utils/style-type";
 
 // Constants for non-translatable values
 const DECORATIVE_QUOTE = String.fromCharCode(0x201c); // Left double quotation mark
@@ -128,7 +129,7 @@ export function Markdown({
       // Content arrived - auto-collapse all thinking sections
       setExpandedThinking(new Set());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- allThinkingSections.length is intentionally used to avoid re-rendering on array reference changes
+     
   }, [hasContent, userToggledThinking, allThinkingSections.length]);
 
   const toggleThinking = (index: number): void => {

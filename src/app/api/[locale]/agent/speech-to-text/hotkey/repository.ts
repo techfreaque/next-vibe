@@ -15,22 +15,21 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { speechToTextRepository } from "@/app/api/[locale]/agent/speech-to-text/repository";
 import { STT_COST_PER_SECOND } from "@/app/api/[locale]/products/repository-client";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { creditRepository } from "../../../credits/repository";
 import { createAdapters } from "./adapters/factory";
 import type {
   SttHotkeyPostRequestOutput,
   SttHotkeyPostResponseOutput,
 } from "./definition";
 import { HotkeyAction, RecordingStatus } from "./enum";
-import { type SpeechHotkeySession, createSession } from "./session";
+import { createSession,type SpeechHotkeySession } from "./session";
 import { checkPlatformDependencies, platformDetector } from "./utils/platform";
-import { creditRepository } from "../../../credits/repository";
 
 /**
  * Session store (in-memory for now, could be Redis in production)

@@ -1,17 +1,17 @@
 import * as TabsPrimitive from "@rn-primitives/tabs";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
-import { TextClassContext } from "./text";
-
 import type {
-  TabsProps,
-  TabsListProps,
-  TabsTriggerProps,
   TabsContentProps,
+  TabsListProps,
+  TabsProps,
+  TabsTriggerProps,
 } from "@/packages/next-vibe-ui/web/ui/tabs";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { TextClassContext } from "./text";
 
 const StyledTabsList = TabsPrimitive.List;
 const StyledTabsTrigger = TabsPrimitive.Trigger;

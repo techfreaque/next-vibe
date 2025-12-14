@@ -9,13 +9,13 @@ import {
 } from "next-vibe-ui/ui/dropdown-menu";
 import { AlertCircle, Bell, CheckCircle, Info } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
-import { P } from "next-vibe-ui/ui/typography";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

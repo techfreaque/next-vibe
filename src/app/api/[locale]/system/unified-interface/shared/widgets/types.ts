@@ -1,12 +1,13 @@
 import type React from "react";
-import type { UseFormReturn, FieldValues } from "react-hook-form";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { FieldValues,UseFormReturn } from "react-hook-form";
 
+import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { Platform } from "../types/platform";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { UnifiedField } from "../types/endpoint";
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { Platform } from "../types/platform";
 import type { ExtractWidgetConfig } from "./configs";
 
 export type WidgetData =
@@ -68,7 +69,8 @@ export interface WidgetRenderContext {
     | typeof Platform.TRPC
     | typeof Platform.NEXT_PAGE
     | typeof Platform.NEXT_API
-    | typeof Platform.CLI;
+    | typeof Platform.CLI
+    | typeof Platform.CLI_PACKAGE;
   theme?: "light" | "dark" | "system";
   endpointFields?: Record<string, WidgetData>; // Original endpoint fields for nested path lookup
   disabled?: boolean; // Disable all form inputs
@@ -138,6 +140,17 @@ export interface ReactWidgetProps<
   form?: UseFormReturn<TFieldValues>;
   onSubmit?: () => void;
   isSubmitting?: boolean;
+}
+
+/**
+ * Value-only React widget props for widgets that don't need field definition.
+ * Use this for leaf widgets that only consume value/context (e.g., MetricCardWidget).
+ */
+export interface ValueOnlyReactWidgetProps<T extends WidgetType> {
+  widgetType: T;
+  value: WidgetData;
+  context: WidgetRenderContext;
+  className?: string;
 }
 
 /**

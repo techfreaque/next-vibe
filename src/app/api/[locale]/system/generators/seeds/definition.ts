@@ -26,8 +26,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 export const seedsGenerationResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
-  seedsFound: z.number(),
-  duration: z.number(),
+  seedsFound: z.coerce.number(),
+  duration: z.coerce.number(),
   outputDir: z.string().optional(),
   includeTestData: z.boolean().optional(),
   includeProdData: z.boolean().optional(),
@@ -130,14 +130,14 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.seed.post.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       duration: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.system.db.seed.post.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       outputPath: responseField(
         {

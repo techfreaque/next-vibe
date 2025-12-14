@@ -3,16 +3,15 @@
  * Server component for leads statistics and analytics
  */
 
-import { BarChart3 } from "next-vibe-ui/ui/icons";
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import { BarChart3 } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
+import { LeadsStatsClient } from "@/app/api/[locale]/leads/stats/_components/leads-stats-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { LeadsStatsClient } from "@/app/api/[locale]/leads/stats/_components/leads-stats-client";
 
 interface LeadsStatsPageProps {
   params: Promise<{

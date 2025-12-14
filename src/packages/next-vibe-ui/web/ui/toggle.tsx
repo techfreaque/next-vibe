@@ -4,6 +4,7 @@ import * as TogglePrimitive from "@radix-ui/react-toggle";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 const toggleVariants = cva(
@@ -82,4 +83,4 @@ export function Toggle({
   );
 }
 
-export { toggleVariants, toggleTextVariants };
+export { toggleTextVariants,toggleVariants };

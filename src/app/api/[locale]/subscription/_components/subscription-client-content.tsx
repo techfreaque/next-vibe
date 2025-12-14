@@ -1,10 +1,12 @@
 "use client";
 
-import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { History, TrendingUp } from "next-vibe-ui/ui/icons";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { useRouter, useSearchParams } from "next-vibe-ui/hooks/use-navigation";
+import { Container } from "next-vibe-ui/ui/container";
+import { History, TrendingUp } from "next-vibe-ui/ui/icons";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { H1, P } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
 import {
@@ -12,8 +14,6 @@ import {
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
 import { useTranslation } from "@/i18n/core/client";
-import { Container } from "next-vibe-ui/ui/container";
-import type { JSX } from "react";
 
 import { BuyCreditsTab } from "./buy-credits-tab";
 import { CreditBalanceCard } from "./credit-balance-card";

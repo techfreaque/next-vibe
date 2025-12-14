@@ -21,17 +21,26 @@ import type {
 } from "react-hook-form";
 import type { z } from "zod";
 
+import type { EndpointFieldStructure } from "@/app/api/[locale]/system/unified-interface/shared/field-config/endpoint-field-types";
+import type {
+  FieldConfig,
+  FieldStyleClassName,
+  FieldValidationState,
+  RequiredFieldTheme,
+} from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
+import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
 import { useTranslation } from "@/i18n/core/client";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
-import { MultiSelect } from "../multi-select";
 
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
 import { Button } from "../button";
 import { Calendar as CalendarComponent } from "../calendar";
 import { Checkbox } from "../checkbox";
+import { Info } from "../icons/Info";
 import { Input } from "../input";
 import { Label } from "../label";
+import { MultiSelect } from "../multi-select";
 import { NumberInput } from "../number-input";
 import { PhoneField } from "../phone-field";
 import { Popover, PopoverContent, PopoverTrigger } from "../popover";
@@ -52,15 +61,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../tooltip";
-import { Info } from "../icons/Info";
-import type {
-  FieldConfig,
-  FieldStyleClassName,
-  FieldValidationState,
-  RequiredFieldTheme,
-} from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
-import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
-import type { EndpointFieldStructure } from "@/app/api/[locale]/system/unified-interface/shared/field-config/endpoint-field-types";
 import {
   FormControl,
   FormField,
@@ -528,7 +528,8 @@ function renderFieldInput<
 
     case "phone": {
       if (config.type !== "phone") {
-        // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for invalid config
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard for developer mistakes at runtime
+        // eslint-disable-next-line i18next/no-literal-string -- Error handling for invalid config
         throw new Error("Invalid config type for phone field");
       }
       // Extract placeholder to avoid complex union type error
@@ -640,7 +641,8 @@ export function EndpointFormField<
     (endpointFields ? getFieldConfig(endpointFields, name) : null);
 
   if (!config) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for missing config
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Developer mistake - missing required prop
+    // eslint-disable-next-line i18next/no-literal-string -- Error handling for missing config
     throw new Error(
       `EndpointFormField: No config provided for field "${name}". ` +
         `Either provide a config prop or pass endpointFields for auto-inference.`,

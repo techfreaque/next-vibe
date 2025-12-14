@@ -4,19 +4,18 @@
  * Located in threads/[threadId]/messages/ folder as per architectural standards
  */
 
-import { useCallback } from "react";
-
 import { parseError } from "next-vibe/shared/utils";
+import { useCallback } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { UseAIStreamReturn } from "../../../../../ai-stream/hooks/use-ai-stream";
 import { DefaultFolderId } from "../../../../config";
+import { createCreditUpdateCallback } from "../../../../credit-updater";
+import type { ChatMessage } from "../../../../db";
 import { ChatMessageRole, NEW_MESSAGE_ID } from "../../../../enum";
 import type { ModelId } from "../../../../model-access/models";
-import type { ChatMessage } from "../../../../db";
-import type { UseAIStreamReturn } from "../../../../../ai-stream/hooks/use-ai-stream";
-import { createCreditUpdateCallback } from "../../../../credit-updater";
 
 // TODO: Get from tool config
 const REQUIRE_TOOL_CONFIRMATION = false;
@@ -624,8 +623,8 @@ export function useMessageOperations(
         chatStore.deleteMessage(messageId);
 
         if (streamStore.streamingMessages[messageId]) {
-          // eslint-disable-next-line no-unused-vars -- Destructuring pattern to omit property
-          const { [messageId]: _deleted, ...remainingMessages } =
+          // eslint-disable-next-line no-unused-vars -- Rest destructuring to exclude key
+          const { [messageId]: excluded, ...remainingMessages } =
             streamStore.streamingMessages;
           streamStore.reset();
           Object.values(remainingMessages).forEach((msg) => {
@@ -703,8 +702,8 @@ export function useMessageOperations(
         chatStore.deleteMessage(messageId);
 
         if (streamStore.streamingMessages[messageId]) {
-          // eslint-disable-next-line no-unused-vars -- Destructuring pattern to omit property
-          const { [messageId]: _deleted, ...remainingMessages } =
+          // eslint-disable-next-line no-unused-vars -- Rest destructuring to exclude key
+          const { [messageId]: excluded, ...remainingMessages } =
             streamStore.streamingMessages;
           streamStore.reset();
           Object.values(remainingMessages).forEach((msg) => {

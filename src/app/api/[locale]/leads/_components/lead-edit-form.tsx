@@ -5,17 +5,17 @@
 
 "use client";
 
-import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
-import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
-import { useLeadByIdEndpoint } from "@/app/api/[locale]/leads/lead/[id]/hooks";
 import leadEndpoints from "@/app/api/[locale]/leads/lead/[id]/definition";
+import { useLeadByIdEndpoint } from "@/app/api/[locale]/leads/lead/[id]/hooks";
 import type { LeadDetailResponse } from "@/app/api/[locale]/leads/types";
+import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";

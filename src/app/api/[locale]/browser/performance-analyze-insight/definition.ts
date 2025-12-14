@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
             insight: z
               .object({
                 name: z.string(),
-                value: z.number(),
+                value: z.coerce.number(),
                 details: z.string(),
               })
               .describe("The analyzed insight details"),

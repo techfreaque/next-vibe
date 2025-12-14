@@ -19,14 +19,14 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-
 import {
   CronTaskPriority,
   CronTaskPriorityDB,
   CronTaskStatus,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
 import {
   CronTaskPriorityOptions,
   CronTaskStatusDB,
@@ -87,11 +87,11 @@ const { GET } = createEndpoint({
           priority: z.enum(CronTaskPriorityDB),
           status: z.enum(CronTaskStatusDB),
           category: z.enum(TaskCategoryDB),
-          timeout: z.number().optional(),
-          retries: z.number().optional(),
+          timeout: z.coerce.number().optional(),
+          retries: z.coerce.number().optional(),
           lastRun: z.string().optional(),
           nextRun: z.string().optional(),
-          version: z.number(),
+          version: z.coerce.number(),
           createdAt: z.string(),
           updatedAt: z.string(),
         }),
@@ -315,7 +315,7 @@ const { PUT } = createEndpoint({
             "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.placeholder",
           columns: 6,
         },
-        z.number().optional(),
+        z.coerce.number().optional(),
       ),
 
       retries: requestDataField(
@@ -330,7 +330,7 @@ const { PUT } = createEndpoint({
             "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.placeholder",
           columns: 6,
         },
-        z.number().optional(),
+        z.coerce.number().optional(),
       ),
 
       // Response fields
@@ -349,11 +349,11 @@ const { PUT } = createEndpoint({
           priority: z.enum(CronTaskPriorityDB),
           status: z.enum(CronTaskStatusDB),
           category: z.enum(TaskCategoryDB),
-          timeout: z.number().optional(),
-          retries: z.number().optional(),
+          timeout: z.coerce.number().optional(),
+          retries: z.coerce.number().optional(),
           lastRun: z.string().optional(),
           nextRun: z.string().optional(),
-          version: z.number(),
+          version: z.coerce.number(),
           createdAt: z.string(),
           updatedAt: z.string(),
         }),

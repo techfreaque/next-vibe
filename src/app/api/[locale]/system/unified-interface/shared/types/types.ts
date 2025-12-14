@@ -7,13 +7,13 @@
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { LayoutConfig,WidgetConfig } from "../widgets/configs";
 import type {
   FieldActions,
   InteractiveActions,
   LifecycleActions,
 } from "./endpoint";
 import type { FieldDataType, InterfaceContext } from "./enums";
-import type { WidgetConfig, LayoutConfig } from "../widgets/configs";
 
 // ============================================================================
 // UI CONFIGURATION SYSTEM

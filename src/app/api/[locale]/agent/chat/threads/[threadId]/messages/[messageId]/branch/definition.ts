@@ -234,7 +234,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.depth.content" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           authorId: responseField(
             {
@@ -266,7 +266,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.tokens.content" as const,
             },
-            z.number().nullable(),
+            z.coerce.number().nullable(),
           ),
           createdAt: responseField(
             {

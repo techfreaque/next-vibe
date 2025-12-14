@@ -12,14 +12,14 @@ import type { CountryLanguage } from "@/i18n/core/config";
  */
 export const campaignStarterConfigSchema = z.object({
   dryRun: z.boolean(),
-  minAgeHours: z.number().min(0).max(168), // 0-7 days
-  enabledDays: z.array(z.number().min(1).max(7)), // 1=Monday, 7=Sunday
+  minAgeHours: z.coerce.number().min(0).max(168), // 0-7 days
+  enabledDays: z.array(z.coerce.number().min(1).max(7)), // 1=Monday, 7=Sunday
   enabledHours: z.object({
-    start: z.number().min(0).max(23),
-    end: z.number().min(0).max(23),
+    start: z.coerce.number().min(0).max(23),
+    end: z.coerce.number().min(0).max(23),
   }),
   // Weekly quotas per locale (leads per week)
-  leadsPerWeek: z.record(z.string(), z.number().min(0)),
+  leadsPerWeek: z.record(z.string(), z.coerce.number().min(0)),
 });
 
 export type CampaignStarterConfigType = z.infer<
@@ -30,10 +30,10 @@ export type CampaignStarterConfigType = z.infer<
  * Campaign Starter Result Schema
  */
 export const campaignStarterResultSchema = z.object({
-  leadsProcessed: z.number(),
-  leadsStarted: z.number(),
-  leadsSkipped: z.number(),
-  executionTimeMs: z.number(),
+  leadsProcessed: z.coerce.number(),
+  leadsStarted: z.coerce.number(),
+  leadsSkipped: z.coerce.number(),
+  executionTimeMs: z.coerce.number(),
   errors: z.array(
     z.object({
       leadId: z.string(),

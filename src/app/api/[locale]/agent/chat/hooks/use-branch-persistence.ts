@@ -4,11 +4,12 @@
  * Only persists user-initiated changes, not automatic switches
  */
 
-import { useCallback, useRef } from "react";
-import type { ChatMessage } from "../db";
-import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
-import { parseError } from "../../../shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
+import { useCallback, useRef } from "react";
+
+import { parseError } from "../../../shared/utils";
+import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
+import type { ChatMessage } from "../db";
 
 const STORAGE_KEY_PREFIX = "chat_branch_state_";
 const STORAGE_VERSION = 1;

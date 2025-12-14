@@ -3,15 +3,13 @@
  * Page for managing SMTP accounts without navigation (handled by layout)
  */
 
-import type { JSX } from "react";
-
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
-
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import type { JSX } from "react";
 
 import { SmtpAccountsClient } from "@/app/api/[locale]/emails/smtp-client/list/_components/smtp-accounts-client";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 export default async function SmtpAccountsPage({
   params,

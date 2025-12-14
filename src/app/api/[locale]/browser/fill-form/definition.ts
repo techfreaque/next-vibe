@@ -89,7 +89,9 @@ const { POST } = createEndpoint({
             filled: z
               .boolean()
               .describe("Whether all form elements were filled"),
-            filledCount: z.number().describe("Number of elements filled"),
+            filledCount: z.coerce
+              .number()
+              .describe("Number of elements filled"),
             elements: z
               .array(
                 z.object({

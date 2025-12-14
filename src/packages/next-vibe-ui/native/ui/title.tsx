@@ -2,13 +2,13 @@
  * Title Component for React Native
  * Provides semantic heading levels with responsive sizing
  */
-import { Text as RNText } from "react-native";
-import type { TextStyle } from "react-native";
-
 import { cn } from "next-vibe/shared/utils/utils";
+import type { TextStyle } from "react-native";
+import { Text as RNText } from "react-native";
+
 import type { TitleProps } from "../../web/ui/title";
-import { convertCSSToTextStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToTextStyle } from "../utils/style-converter";
 
 // Re-export types from web
 export type { TitleProps };

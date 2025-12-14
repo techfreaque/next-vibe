@@ -115,7 +115,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.imapClient.accounts.id.get.response.account.port",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           secure: responseField(
             {
@@ -145,7 +145,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.imapClient.accounts.id.get.response.account.connectionTimeout",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           keepAlive: responseField(
             {
@@ -167,7 +167,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.imapClient.accounts.id.get.response.account.syncInterval",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           maxMessages: responseField(
             {
@@ -175,7 +175,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.imapClient.accounts.id.get.response.account.maxMessages",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           syncFolders: responseField(
             {
@@ -403,7 +403,7 @@ const { PUT } = createEndpoint({
           description:
             "app.api.emails.imapClient.accounts.id.post.form.port.description",
         },
-        z.number().int().min(1).max(65535),
+        z.coerce.number().int().min(1).max(65535),
       ),
 
       secure: requestDataField(
@@ -478,7 +478,7 @@ const { PUT } = createEndpoint({
           description:
             "app.api.emails.imapClient.accounts.id.post.form.connectionTimeout.description",
         },
-        z.number().min(1000).optional(),
+        z.coerce.number().min(1000).optional(),
       ),
 
       keepAlive: requestDataField(
@@ -502,7 +502,7 @@ const { PUT } = createEndpoint({
           description:
             "app.api.emails.imapClient.accounts.id.post.form.syncInterval.description",
         },
-        z.number().min(10).optional(),
+        z.coerce.number().min(10).optional(),
       ),
 
       maxMessages: requestDataField(
@@ -514,7 +514,7 @@ const { PUT } = createEndpoint({
           description:
             "app.api.emails.imapClient.accounts.id.post.form.maxMessages.description",
         },
-        z.number().min(1).optional(),
+        z.coerce.number().min(1).optional(),
       ),
 
       syncFolders: requestDataField(
@@ -579,7 +579,7 @@ const { PUT } = createEndpoint({
               content:
                 "app.api.emails.imapClient.accounts.id.post.response.account.port",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           secure: responseField(
             {

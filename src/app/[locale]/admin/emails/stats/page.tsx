@@ -9,10 +9,9 @@ import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
+import { EmailsStatsClient } from "@/app/api/[locale]/emails/messages/stats/_components/emails-stats-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { EmailsStatsClient } from "@/app/api/[locale]/emails/messages/stats/_components/emails-stats-client";
 
 interface EmailsStatsPageProps {
   params: Promise<{

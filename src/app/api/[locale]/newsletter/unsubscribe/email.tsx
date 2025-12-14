@@ -5,9 +5,9 @@
 
 import { Button, Hr, Section } from "@react-email/components";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
 import React from "react";
@@ -18,12 +18,12 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import { EmailTemplate } from "../../emails/smtp-client/components/template.email";
+import { createTrackingContext } from "../../emails/smtp-client/components/tracking_context.email";
 import type {
   UnsubscribePostRequestOutput as NewsletterUnsubscribeType,
   UnsubscribePostResponseOutput as NewsletterUnsubscribeResponseType,
 } from "./definition";
-import { EmailTemplate } from "../../emails/smtp-client/components/template.email";
-import { createTrackingContext } from "../../emails/smtp-client/components/tracking_context.email";
 
 /**
  * Unsubscribe Confirmation Email Template Component

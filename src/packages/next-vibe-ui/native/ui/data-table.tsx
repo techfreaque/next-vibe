@@ -1,5 +1,5 @@
-import { FlashList } from "@shopify/flash-list";
 import type { FlashListProps, ListRenderItemInfo } from "@shopify/flash-list";
+import { FlashList } from "@shopify/flash-list";
 import type { Row, SortingState } from "@tanstack/react-table";
 import {
   flexRender,
@@ -7,6 +7,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import type { JSX } from "react";
 import * as React from "react";
 import {
@@ -17,9 +19,10 @@ import {
   Text as RNText,
 } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
-import { styled } from "nativewind";
 
-import { cn } from "next-vibe/shared/utils/utils";
+// Import ALL types from web version (web is source of truth)
+import type { DataTableProps } from "@/packages/next-vibe-ui/web/ui/data-table";
+
 import {
   Table,
   TableBody,
@@ -28,9 +31,6 @@ import {
   TableHeader,
   TableRow,
 } from "./table";
-
-// Import ALL types from web version (web is source of truth)
-import type { DataTableProps } from "@/packages/next-vibe-ui/web/ui/data-table";
 
 // Re-export types for consistency
 export type { DataTableProps };

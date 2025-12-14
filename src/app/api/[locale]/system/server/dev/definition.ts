@@ -104,7 +104,7 @@ const { POST } = createEndpoint({
           label: "app.api.system.server.dev.post.fields.port.title",
           description: "app.api.system.server.dev.post.fields.port.description",
         },
-        z.union([z.number(), z.string()]).default(3000),
+        z.union([z.coerce.number(), z.string()]).default(3000),
       ),
 
       skipGeneratorWatcher: requestDataField(
@@ -128,7 +128,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.system.server.dev.post.fields.generatorWatcherInterval.description",
         },
-        z.number().default(5000),
+        z.coerce.number().default(5000),
       ),
 
       skipTaskRunner: requestDataField(
@@ -138,6 +138,40 @@ const { POST } = createEndpoint({
           label: "app.api.system.server.dev.post.fields.skipTaskRunner.title",
           description:
             "app.api.system.server.dev.post.fields.skipTaskRunner.description",
+        },
+        z.boolean().default(false),
+      ),
+
+      skipMigrations: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.server.dev.post.fields.skipMigrations.title",
+          description:
+            "app.api.system.server.dev.post.fields.skipMigrations.description",
+        },
+        z.boolean().default(false),
+      ),
+
+      skipMigrationGeneration: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label:
+            "app.api.system.server.dev.post.fields.skipMigrationGeneration.title",
+          description:
+            "app.api.system.server.dev.post.fields.skipMigrationGeneration.description",
+        },
+        z.boolean().default(false),
+      ),
+
+      skipSeeding: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.server.dev.post.fields.skipSeeding.title",
+          description:
+            "app.api.system.server.dev.post.fields.skipSeeding.description",
         },
         z.boolean().default(false),
       ),
@@ -212,6 +246,9 @@ const { POST } = createEndpoint({
         skipGeneratorWatcher: false,
         generatorWatcherInterval: 5000,
         skipTaskRunner: false,
+        skipMigrations: false,
+        skipMigrationGeneration: false,
+        skipSeeding: false,
       },
       quickStart: {
         skipDbSetup: true,
@@ -222,6 +259,9 @@ const { POST } = createEndpoint({
         skipGeneratorWatcher: true,
         generatorWatcherInterval: 5000,
         skipTaskRunner: false,
+        skipMigrations: false,
+        skipMigrationGeneration: false,
+        skipSeeding: false,
       },
     },
     responses: {

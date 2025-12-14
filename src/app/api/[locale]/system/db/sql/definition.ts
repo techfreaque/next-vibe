@@ -84,7 +84,7 @@ const { POST } = createEndpoint({
           description: "app.api.system.db.sql.fields.limit.description",
           columns: 4,
         },
-        z.number().optional().default(100),
+        z.coerce.number().optional().default(100),
       ),
 
       // === RESPONSE FIELDS ===
@@ -117,7 +117,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.sql.fields.rowCount.title",
         },
-        z.number().optional(),
+        z.coerce.number().optional(),
       ),
 
       queryType: responseField(

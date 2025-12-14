@@ -5,9 +5,9 @@
 
 import "server-only";
 
+import type { TyperBackendType } from "../../enum";
 import type { Typer } from "../../types";
 import { TyperError } from "../../types";
-import type { TyperBackendType } from "../../enum";
 
 /**
  * Abstract base typer class

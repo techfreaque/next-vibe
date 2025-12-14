@@ -1,27 +1,27 @@
 import * as SelectPrimitive from "@rn-primitives/select";
-import * as React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import type { ViewStyle } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { styled } from "nativewind";
-
 import { cn } from "next-vibe/shared/utils/utils";
-import { Check, ChevronDown, ChevronUp } from "./icons";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
+import * as React from "react";
+import type { ViewStyle } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 // Import ALL types from web (source of truth) - ZERO definitions in native
 import type {
-  SelectRootProps,
-  SelectGroupProps,
-  SelectValueProps,
-  SelectTriggerProps,
   SelectContentProps,
+  SelectGroupProps,
   SelectItemProps,
   SelectLabelProps,
-  SelectSeparatorProps,
   SelectOption,
+  SelectRootProps,
+  SelectSeparatorProps,
+  SelectTriggerProps,
+  SelectValueProps,
 } from "@/packages/next-vibe-ui/web/ui/select";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { Check, ChevronDown, ChevronUp } from "./icons";
 
 const StyledAnimatedView = styled(Animated.View, { className: "style" });
 const StyledView = styled(View, { className: "style" });
@@ -337,15 +337,15 @@ SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
 // Export all types (re-exported from web - source of truth)
 export type {
-  SelectRootProps,
-  SelectGroupProps,
-  SelectValueProps,
-  SelectTriggerProps,
   SelectContentProps,
+  SelectGroupProps,
   SelectItemProps,
   SelectLabelProps,
-  SelectSeparatorProps,
   SelectOption,
+  SelectRootProps,
+  SelectSeparatorProps,
+  SelectTriggerProps,
+  SelectValueProps,
 };
 
 // Export primitive Option type for internal use

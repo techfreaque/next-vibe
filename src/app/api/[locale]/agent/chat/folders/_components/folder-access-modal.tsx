@@ -10,9 +10,9 @@ import {
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
-import type { JSX } from "react";
 import { Link } from "next-vibe-ui/ui/link";
 import { P } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
 import React from "react";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";

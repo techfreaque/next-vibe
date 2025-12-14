@@ -3,14 +3,13 @@
  * Server-side page for email list management
  */
 
-import { Div } from "next-vibe-ui/ui/div";
 import type { Metadata } from "next";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
+import { EmailsListClient } from "@/app/api/[locale]/emails/messages/_components/emails-list-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { EmailsListClient } from "@/app/api/[locale]/emails/messages/_components/emails-list-client";
 
 interface EmailsListPageProps {
   params: Promise<{

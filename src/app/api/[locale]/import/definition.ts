@@ -159,7 +159,7 @@ const { POST: ImportCsvPost } = createEndpoint({
               description: "app.api.import.csv.post.batchSize.description",
               placeholder: "app.api.import.csv.post.batchSize.placeholder",
             },
-            z.number().min(10).max(1000).default(100),
+            z.coerce.number().min(10).max(1000).default(100),
           ),
         },
       ),
@@ -236,7 +236,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                   type: WidgetType.TEXT,
                   content: "app.api.import.csv.post.response.totalRows.label",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               isChunkedProcessing: responseField(
                 {
@@ -274,7 +274,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                   content:
                     "app.api.import.csv.post.response.successfulImports.label",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               failedImports: responseField(
                 {
@@ -282,7 +282,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                   content:
                     "app.api.import.csv.post.response.failedImports.label",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               duplicateEmails: responseField(
                 {
@@ -290,7 +290,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                   content:
                     "app.api.import.csv.post.response.duplicateEmails.label",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               processingTimeMs: responseField(
                 {
@@ -298,7 +298,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                   content:
                     "app.api.import.csv.post.response.processingTimeMs.label",
                 },
-                z.number().optional(),
+                z.coerce.number().optional(),
               ),
             },
           ),
@@ -320,7 +320,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                   type: WidgetType.TEXT,
                   content: "app.api.import.csv.post.response.newRecords.label",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               updatedRecords: responseField(
                 {
@@ -328,7 +328,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                   content:
                     "app.api.import.csv.post.response.updatedRecords.label",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               skippedDuplicates: responseField(
                 {
@@ -336,7 +336,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                   content:
                     "app.api.import.csv.post.response.skippedDuplicates.label",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
             },
           ),
@@ -361,7 +361,7 @@ const { POST: ImportCsvPost } = createEndpoint({
                     content:
                       "app.api.import.csv.post.response.errors.row.label",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 email: responseField(
                   {
@@ -555,7 +555,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
           description: "app.api.import.jobs.get.limit.description",
           placeholder: "app.api.import.jobs.get.limit.placeholder",
         },
-        z.number().min(1).max(100).default(20),
+        z.coerce.number().min(1).max(100).default(20),
       ),
 
       offset: requestDataField(
@@ -566,7 +566,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
           description: "app.api.import.jobs.get.offset.description",
           placeholder: "app.api.import.jobs.get.offset.placeholder",
         },
-        z.number().min(0).default(0),
+        z.coerce.number().min(0).default(0),
       ),
 
       // === RESPONSE DATA ===
@@ -628,7 +628,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
                     content:
                       "app.api.import.jobs.get.response.job.progress.totalRows.label",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 processedRows: responseField(
                   {
@@ -636,7 +636,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
                     content:
                       "app.api.import.jobs.get.response.job.progress.processedRows.label",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 currentBatchStart: responseField(
                   {
@@ -644,7 +644,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
                     content:
                       "app.api.import.jobs.get.response.job.progress.currentBatchStart.label",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 batchSize: responseField(
                   {
@@ -652,7 +652,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
                     content:
                       "app.api.import.jobs.get.response.job.progress.batchSize.label",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 percentComplete: responseField(
                   {
@@ -660,7 +660,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
                     content:
                       "app.api.import.jobs.get.response.job.progress.percentComplete.label",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
               },
             ),
@@ -681,7 +681,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
                     content:
                       "app.api.import.jobs.get.response.job.results.successfulImports.label",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 failedImports: responseField(
                   {
@@ -689,7 +689,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
                     content:
                       "app.api.import.jobs.get.response.job.results.failedImports.label",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 duplicateEmails: responseField(
                   {
@@ -697,7 +697,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
                     content:
                       "app.api.import.jobs.get.response.job.results.duplicateEmails.label",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
               },
             ),
@@ -770,7 +770,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
                     content:
                       "app.api.import.jobs.get.response.job.errorInfo.retryCount.label",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 maxRetries: responseField(
                   {
@@ -778,7 +778,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
                     content:
                       "app.api.import.jobs.get.response.job.errorInfo.maxRetries.label",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
               },
             ),

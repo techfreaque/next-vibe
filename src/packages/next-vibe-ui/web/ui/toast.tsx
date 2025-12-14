@@ -5,6 +5,7 @@ import { cva } from "class-variance-authority";
 import { X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 export interface ToastProviderProps {

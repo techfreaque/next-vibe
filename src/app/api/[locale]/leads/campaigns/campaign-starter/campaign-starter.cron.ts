@@ -8,9 +8,9 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";

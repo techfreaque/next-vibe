@@ -23,13 +23,13 @@ export interface CountryInfo {
 }
 
 // Enum-like objects to replace the enums
-// eslint-disable-next-line no-redeclare
+ 
 export const Countries = languageConfig.countries;
 export const CountriesArr = languageConfig.countriesArr;
-// eslint-disable-next-line no-redeclare
+ 
 export const Currencies = languageConfig.currencies;
 export const CurrenciesArr = languageConfig.currenciesArr;
-// eslint-disable-next-line no-redeclare
+ 
 export const Languages = languageConfig.languages;
 export const LanguagesArr = languageConfig.languagesArr;
 

@@ -2,27 +2,28 @@
 // The code is licensed under the MIT License.
 // https://github.com/shadcn-ui/ui
 
-import * as React from "react";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import type { JSX } from "react";
+import * as React from "react";
 import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
+import { Pressable, View } from "react-native";
+import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 
 // Import ALL form types from web - ZERO definitions here
 import type {
+  FormComboboxProps,
+  FormDatePickerProps,
+  FormDescriptionProps,
   FormFieldContextValue,
   FormItemContextValue,
-  UseFormFieldReturn,
-  FormDescriptionProps,
-  FormMessageProps,
-  FormDatePickerProps,
-  FormComboboxProps,
   FormItemProps,
+  FormMessageProps,
+  UseFormFieldReturn,
 } from "@/packages/next-vibe-ui/web/ui/form/form";
-import { Pressable, View } from "react-native";
-import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
-import { styled } from "nativewind";
 
-import { cn } from "next-vibe/shared/utils/utils";
+import type { LabelRootProps } from "../../web/ui/label";
 import {
   BottomSheet,
   BottomSheetContent,
@@ -36,7 +37,6 @@ import { Calendar as CalendarIcon } from "./icons/Calendar";
 import { X } from "./icons/X";
 import { Input } from "./input";
 import { Label } from "./label";
-import type { LabelRootProps } from "../../web/ui/label";
 import { RadioGroup } from "./radio-group";
 import {
   type Option,
@@ -46,10 +46,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./select";
-import { Switch } from "./switch";
-
-import { Textarea } from "./textarea";
 import { Span } from "./span";
+import { Switch } from "./switch";
+import { Textarea } from "./textarea";
 
 // Styled components for NativeWind support
 const StyledView = styled(View, { className: "style" });

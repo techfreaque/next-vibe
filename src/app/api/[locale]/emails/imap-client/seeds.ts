@@ -9,24 +9,24 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
 
 import { imapAccounts, type NewImapAccount } from "./db";
 import { ImapAuthMethod, ImapSpecialUseType, ImapSyncStatus } from "./enum";
+import { imapClientEnv } from "./env";
 
 /**
  * Get environment variables for IMAP seeding
  */
 function getImapSeedConfig(): NewImapAccount {
   // Required account-specific environment variables
-  const name = env.IMAP_SEED_ACCOUNT_NAME || "Development IMAP Account";
-  const email = env.IMAP_SEED_EMAIL || "test@example.com";
-  const host = env.IMAP_SEED_HOST || "app.api.emails.imapClient.imap.gmail.com";
-  const username = env.IMAP_SEED_USERNAME || "";
-  const password = env.IMAP_SEED_PASSWORD || "";
-  const port = env.IMAP_SEED_PORT || 993;
+  const name = imapClientEnv.IMAP_SEED_ACCOUNT_NAME || "Development IMAP Account";
+  const email = imapClientEnv.IMAP_SEED_EMAIL || "test@example.com";
+  const host = imapClientEnv.IMAP_SEED_HOST || "app.api.emails.imapClient.imap.gmail.com";
+  const username = imapClientEnv.IMAP_SEED_USERNAME || "";
+  const password = imapClientEnv.IMAP_SEED_PASSWORD || "";
+  const port = imapClientEnv.IMAP_SEED_PORT || 993;
   const secure =
-    env.IMAP_SEED_SECURE !== undefined ? env.IMAP_SEED_SECURE : true;
+    imapClientEnv.IMAP_SEED_SECURE !== undefined ? imapClientEnv.IMAP_SEED_SECURE : true;
 
   // Hardcoded settings for consistency
   const authMethod = ImapAuthMethod.PLAIN;
@@ -69,7 +69,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   logger.debug("🌱 Seeding development IMAP accounts...");
 
   // Check if environment variables are configured
-  const email = env.IMAP_SEED_EMAIL;
+  const email = imapClientEnv.IMAP_SEED_EMAIL;
   if (!email || email === "your-email@example.com") {
     logger.debug(
       "⚠️  IMAP seed environment variables not configured, skipping seeding",

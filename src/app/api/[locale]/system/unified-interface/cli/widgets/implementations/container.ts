@@ -4,14 +4,14 @@
  * All business logic imported from shared
  */
 
-import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
+  type ContainerConfig,
   extractContainerData,
   getContainerConfig,
-  type ContainerConfig,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/container";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import { formatCamelCaseLabel } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";

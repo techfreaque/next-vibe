@@ -6,8 +6,8 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import definitions from "./definition";
 import * as repository from "../repository";
+import definitions from "./definition";
 
 export const { PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,

@@ -5,10 +5,10 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { executeSelectPage, filterUndefinedArgs } from "../shared/repository";
 import selectPageEndpoints, {
   type SelectPageResponseOutput,
 } from "./definition";
-import { executeSelectPage, filterUndefinedArgs } from "../shared/repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: selectPageEndpoints,

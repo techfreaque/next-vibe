@@ -5,17 +5,16 @@
  * These are not available in standard @types/node and must be augmented locally
  */
 
-/* eslint-disable no-console */
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../../types/node.d.ts" />
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { binaryStartTime } from "../vibe-runtime";
 import type { RouteExecutionResult } from "./route-executor";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 /**
  * Safe handle types that should not be forcefully closed
@@ -339,15 +338,14 @@ function formatExecutionSummary(
   const overheadSeconds = (overhead / 1000).toFixed(2);
   const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
 
-  return (
-    // eslint-disable-next-line prefer-template
-    "\n" +
-    t("app.api.system.unifiedInterface.cli.vibe.utils.debug.executionSummary", {
+  return `\n${t(
+    "app.api.system.unifiedInterface.cli.vibe.utils.debug.executionSummary",
+    {
       executionSeconds,
       overheadSeconds,
       totalSeconds,
-    })
-  );
+    },
+  )}`;
 }
 
 /**
@@ -535,7 +533,12 @@ export class CliResourceManager {
 
   exit(result: RouteExecutionResult): void {
     // Exit with error code if the result indicates failure
-    if (!result.success || result.cause || result.error) {
+    if (
+      !result.success ||
+      result.cause ||
+      result.error ||
+      result.isErrorResponse
+    ) {
       process.exit(1);
     } else {
       process.exit(0);

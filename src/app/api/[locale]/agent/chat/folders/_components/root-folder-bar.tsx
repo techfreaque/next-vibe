@@ -1,11 +1,10 @@
 "use client";
-import { TOUR_DATA_ATTRS, getFolderTourAttr } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
-
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import React, { useCallback, useState } from "react";
 
+import { getFolderTourAttr,TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import {
   DEFAULT_FOLDER_CONFIGS,
   DefaultFolderId,

@@ -208,7 +208,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.guard.destroy.fields.totalDestroyed.title",
         },
-        z.number().optional(),
+        z.coerce.number().optional(),
       ),
     },
   ),

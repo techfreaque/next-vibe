@@ -1,17 +1,16 @@
-import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import type { Metadata } from "next";
 import { redirect } from "next-vibe-ui/lib/redirect";
+import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import ResetPasswordForm from "@/app/api/[locale]/user/public/reset-password/request/_components/reset-password-form";
 import { userRepository } from "@/app/api/[locale]/user/repository";
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
-
-import ResetPasswordForm from "@/app/api/[locale]/user/public/reset-password/request/_components/reset-password-form";
-import { envClient } from "@/config/env-client";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;

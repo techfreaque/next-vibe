@@ -7,13 +7,13 @@
  * Body component already provides SafeAreaView wrapper
  */
 
+import { PortalHost } from "@rn-primitives/portal";
 import { Slot, useLocalSearchParams } from "expo-router";
 import type { JSX } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import { RootProviders } from "@/app/[locale]/layout-shared";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { Body } from "@/packages/next-vibe-ui/native/ui/body";
-import { PortalHost } from "@rn-primitives/portal";
 
 export default function RootLayoutNative(): JSX.Element {
   const { locale } = useLocalSearchParams<{ locale: CountryLanguage }>();

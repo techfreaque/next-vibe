@@ -3,6 +3,7 @@
 import * as ProgressPrimitive from "@radix-ui/react-progress";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 export type ProgressRootProps = {

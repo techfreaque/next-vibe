@@ -26,14 +26,14 @@ import type { JSX } from "react";
 
 import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import type {
-  WidgetRenderContext,
-  WidgetData,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
-import type {
-  UnifiedField,
   CreateApiEndpointAny,
+  UnifiedField,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type {
+  WidgetData,
+  WidgetRenderContext,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

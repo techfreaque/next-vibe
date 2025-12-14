@@ -128,7 +128,7 @@ const testResponseEndpoint = createEndpoint({
       ),
       count: responseField(
         { type: WidgetType.TEXT, content: "test" as TranslationKey },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

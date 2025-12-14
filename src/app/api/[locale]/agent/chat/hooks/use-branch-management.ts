@@ -10,9 +10,10 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+
+import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
 import type { ChatMessage } from "../db";
 import { useBranchPersistence } from "./use-branch-persistence";
-import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
 
 interface UseBranchManagementProps {
   activeThreadMessages: ChatMessage[];

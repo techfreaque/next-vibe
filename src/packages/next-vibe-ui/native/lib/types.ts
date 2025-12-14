@@ -8,12 +8,12 @@
 
 import type { ComponentPropsWithoutRef } from "react";
 import type {
-  View,
-  Text,
-  Pressable,
   Image,
+  Pressable,
   ScrollView,
+  Text,
   TextInput,
+  View,
 } from "react-native";
 
 export type ViewPropsWithClassName = ComponentPropsWithoutRef<typeof View> & {
@@ -56,9 +56,9 @@ export type WithClassName<T> = T & { className?: string };
  * These extend the @rn-primitives slottable types to include className
  */
 import type {
+  SlottablePressableProps as RNPSlottablePressableProps,
   SlottableTextProps as RNPSlottableTextProps,
   SlottableViewProps as RNPSlottableViewProps,
-  SlottablePressableProps as RNPSlottablePressableProps,
 } from "@rn-primitives/types";
 
 export type SlottableTextPropsWithClassName = RNPSlottableTextProps & {

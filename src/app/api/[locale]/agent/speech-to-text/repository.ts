@@ -7,21 +7,21 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { agentEnv } from "@/app/api/[locale]/agent/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { env } from "@/config/env";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
-import type { JwtPayloadType } from "../../user/auth/types";
-import { STT_COST_PER_SECOND } from "../../products/repository-client";
-import type { SpeechToTextPostResponseOutput } from "./definition";
 import { creditRepository } from "../../credits/repository";
+import { STT_COST_PER_SECOND } from "../../products/repository-client";
+import type { JwtPayloadType } from "../../user/auth/types";
+import type { SpeechToTextPostResponseOutput } from "./definition";
 
 /**
  * Server-side provider configuration
@@ -110,7 +110,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
           method: "POST",
           headers: {
             // eslint-disable-next-line i18next/no-literal-string
-            Authorization: `Bearer ${env.EDEN_AI_API_KEY}`,
+            Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
           },
           body: formData,
         },
@@ -257,7 +257,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
           {
             headers: {
               // eslint-disable-next-line i18next/no-literal-string
-              Authorization: `Bearer ${env.EDEN_AI_API_KEY}`,
+              Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
             },
           },
         );

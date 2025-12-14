@@ -84,7 +84,7 @@ const { POST } = createEndpoint({
         z
           .object({
             selected: z.boolean().describe("Whether the page was selected"),
-            pageIdx: z.number().describe("Index of the selected page"),
+            pageIdx: z.coerce.number().describe("Index of the selected page"),
             title: z.string().optional().describe("Title of the selected page"),
             url: z.string().optional().describe("URL of the selected page"),
           })

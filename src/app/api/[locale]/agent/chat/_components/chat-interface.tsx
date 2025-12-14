@@ -1,4 +1,4 @@
-/* eslint-disable react-compiler/react-compiler */
+ 
 "use client";
 
 import { AlertDialog } from "next-vibe-ui/ui/alert-dialog";
@@ -13,17 +13,17 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import React, { useEffect, useMemo, useState } from "react";
 
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { platform } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
-import { envClient } from "@/config/env-client";
 
 import { ChatArea } from "./chat-area/chat-area";
 import { SidebarWrapper } from "./sidebar/sidebar-wrapper";
 import { TopBar } from "./sidebar/top-area/top-bar";
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { WelcomeTour } from "./welcome-tour/welcome-tour";
 
 interface ChatInterfaceProps {
@@ -79,7 +79,7 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
     <>
       <Div
         className={
-          envClient.platform.isReactNative
+          platform.isReactNative
             ? "flex flex-1 overflow-hidden bg-background"
             : "flex h-dvh overflow-hidden bg-background"
         }

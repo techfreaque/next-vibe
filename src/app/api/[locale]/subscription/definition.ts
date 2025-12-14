@@ -20,6 +20,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
 import { UserRole } from "../user/user-roles/enum";
 import {
   BillingInterval,
@@ -28,7 +29,6 @@ import {
   SubscriptionPlanOptions,
   SubscriptionStatus,
 } from "./enum";
-import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
 
 /**
  * GET endpoint for retrieving subscription

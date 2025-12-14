@@ -4,25 +4,25 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
+import { Send, Square } from "next-vibe-ui/ui/icons";
 import { Kbd } from "next-vibe-ui/ui/kbd";
 import { Textarea } from "next-vibe-ui/ui/textarea";
-import { Send, Square } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React from "react";
 
+import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatPermissions } from "@/app/api/[locale]/agent/chat/hooks/use-chat-permissions";
 import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { PersonaSelector } from "@/app/api/[locale]/agent/chat/personas/_components/persona-selector";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { ModelSelector } from "./model-selector";
-import { PersonaSelector } from "@/app/api/[locale]/agent/chat/personas/_components/persona-selector";
 import { SearchToggle } from "./search-toggle";
 import { SpeechInputButton } from "./speech-input-button";
 import { ToolsButton } from "./tools-button";
-import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 
 interface ChatInputV2Props {
   locale: CountryLanguage;

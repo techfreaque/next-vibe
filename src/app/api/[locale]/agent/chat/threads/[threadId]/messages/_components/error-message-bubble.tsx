@@ -4,9 +4,8 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import { useTranslation } from "@/i18n/core/client";
-
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 interface ErrorMessageBubbleProps {

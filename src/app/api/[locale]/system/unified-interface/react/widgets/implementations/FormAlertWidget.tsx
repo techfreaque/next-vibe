@@ -1,11 +1,13 @@
 "use client";
 
-import type { JSX } from "react";
 import {
   FormAlert,
   type FormAlertState,
 } from "next-vibe-ui/ui/form/form-alert";
+import type { JSX } from "react";
+
 import type { TranslationKey } from "@/i18n/core/static-types";
+
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
 

@@ -130,14 +130,14 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.dev.typecheck.success.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       generatorsSkipped: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.system.dev.typecheck.success.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       output: responseField(
         {

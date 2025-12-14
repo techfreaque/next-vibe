@@ -1,4 +1,5 @@
 import { translations as requestTranslations } from "@/app/api/[locale]/user/public/reset-password/request/i18n/en";
+
 import { translations as tokenTranslations } from "../../[token]/i18n/en";
 
 export const translations = {

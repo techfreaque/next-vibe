@@ -11,23 +11,24 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import {
-  wrapSuccessResponse,
-  wrapErrorResponse,
-} from "@/app/api/[locale]/system/unified-interface/next-api/response";
 import {
   parseRequestBody,
   parseSearchParams,
 } from "@/app/api/[locale]/system/unified-interface/next-api/request-parser";
-import { createEndpointLogger } from "../shared/logger/endpoint";
-import { Platform } from "../shared/types/platform";
-import { Methods } from "../shared/types/enums";
-import type { CreateApiEndpointAny } from "../shared/types/endpoint";
+import {
+  wrapErrorResponse,
+  wrapSuccessResponse,
+} from "@/app/api/[locale]/system/unified-interface/next-api/response";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import {
   type ApiHandlerOptions,
   createGenericHandler,
 } from "../shared/endpoints/route/handler";
+import { createEndpointLogger } from "../shared/logger/endpoint";
+import type { CreateApiEndpointAny } from "../shared/types/endpoint";
+import { Methods } from "../shared/types/enums";
+import { Platform } from "../shared/types/platform";
 
 /**
  * API handler return type

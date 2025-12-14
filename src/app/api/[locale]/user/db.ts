@@ -8,8 +8,9 @@ import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import { UserRoleDB } from "./user-roles/enum";
 import { type CountryLanguage } from "@/i18n/core/config";
+
+import { UserRoleDB } from "./user-roles/enum";
 
 /**
  * Users table schema

@@ -5,13 +5,13 @@
 
 "use client";
 
-import { Eye, Mail, MailOpen, Paperclip, Star } from "next-vibe-ui/ui/icons";
-import { Span } from "next-vibe-ui/ui/span";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
-import { Div } from "next-vibe-ui/ui/div";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
+import { Div } from "next-vibe-ui/ui/div";
+import { Eye, Mail, MailOpen, Paperclip, Star } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import {
   Table,
   TableBody,

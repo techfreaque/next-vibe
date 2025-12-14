@@ -161,7 +161,7 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
           content:
             "app.api.system.unifiedInterface.tasks.cronSystem.status.common.active",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       totalTasks: responseField(
@@ -170,7 +170,7 @@ const { GET: cronStatusGetEndpoint } = createEndpoint({
           content:
             "app.api.system.unifiedInterface.tasks.cronSystem.status.common.total",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       uptime: responseField(

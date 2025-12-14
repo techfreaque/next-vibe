@@ -101,7 +101,7 @@ const { POST } = createEndpoint({
               content: "app.api.system.guard.start.fields.totalStarted.title",
               fieldType: FieldDataType.NUMBER,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           status: responseField(
             {

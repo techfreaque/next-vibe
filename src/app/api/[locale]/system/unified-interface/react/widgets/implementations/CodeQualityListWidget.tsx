@@ -16,13 +16,13 @@ import { useState } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
+import type { WidgetType } from "../../../shared/types/enums";
 import {
+  type CodeQualityItem,
+  countCodeQualityBySeverity,
   extractCodeQualityListData,
   groupCodeQualityItems,
-  countCodeQualityBySeverity,
-  type CodeQualityItem,
 } from "../../../shared/widgets/logic/code-quality-list";
-import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { getSeverityVariant } from "../../../shared/widgets/utils/widget-helpers";
 

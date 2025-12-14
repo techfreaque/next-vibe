@@ -1,19 +1,20 @@
-import * as React from "react";
-import { View, Text as RNText } from "react-native";
 import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
-import { TextClassContext } from "./text";
-import { convertCSSToViewStyle, convertCSSToTextStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
+import * as React from "react";
+import { Text as RNText,View } from "react-native";
 
 import type {
-  CardProps,
-  CardHeaderProps,
-  CardTitleProps,
-  CardDescriptionProps,
   CardContentProps,
+  CardDescriptionProps,
   CardFooterProps,
+  CardHeaderProps,
+  CardProps,
+  CardTitleProps,
 } from "@/packages/next-vibe-ui/web/ui/card";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToTextStyle,convertCSSToViewStyle } from "../utils/style-converter";
+import { TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });
 const StyledText = styled(RNText, { className: "style" });

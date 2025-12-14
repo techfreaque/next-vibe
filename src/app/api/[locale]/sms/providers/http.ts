@@ -1,14 +1,14 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
 
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
 
+import { smsEnv } from "../env";
 import {
   phoneNumberSchema,
   type SendSmsParams,
@@ -34,22 +34,22 @@ interface HttpResponseData {
  */
 export function getHttpProvider(): SmsProvider {
   // Cache the API URL to avoid repeated environment lookups
-  const apiUrl = env.SMS_HTTP_API_URL;
-  const apiKey = env.SMS_HTTP_API_KEY;
-  const apiMethod = env.SMS_HTTP_API_METHOD ?? "POST";
+  const apiUrl = smsEnv.SMS_HTTP_API_URL;
+  const apiKey = smsEnv.SMS_HTTP_API_KEY;
+  const apiMethod = smsEnv.SMS_HTTP_API_METHOD ?? "POST";
 
   // Field mappings (configurable)
-  const toField = env.SMS_HTTP_TO_FIELD ?? "to";
-  const messageField = env.SMS_HTTP_MESSAGE_FIELD ?? "message";
-  const fromField = env.SMS_HTTP_FROM_FIELD ?? "from";
-  const messageIdField = env.SMS_HTTP_RESPONSE_ID_FIELD ?? "id";
+  const toField = smsEnv.SMS_HTTP_TO_FIELD ?? "to";
+  const messageField = smsEnv.SMS_HTTP_MESSAGE_FIELD ?? "message";
+  const fromField = smsEnv.SMS_HTTP_FROM_FIELD ?? "from";
+  const messageIdField = smsEnv.SMS_HTTP_RESPONSE_ID_FIELD ?? "id";
 
   // Cache additional configuration settings
   const additionalHeaders: Record<string, string> = {};
   try {
-    if (env.SMS_HTTP_CUSTOM_HEADERS) {
+    if (smsEnv.SMS_HTTP_CUSTOM_HEADERS) {
       // Parse custom headers safely
-      const parsed = JSON.parse(env.SMS_HTTP_CUSTOM_HEADERS) as Record<
+      const parsed = JSON.parse(smsEnv.SMS_HTTP_CUSTOM_HEADERS) as Record<
         string,
         string | number | boolean
       >;
@@ -79,8 +79,8 @@ export function getHttpProvider(): SmsProvider {
       // Otherwise use the standard E.164 validation
       let pattern: RegExp;
       try {
-        if (env.SMS_HTTP_PHONE_REGEX) {
-          pattern = new RegExp(env.SMS_HTTP_PHONE_REGEX);
+        if (smsEnv.SMS_HTTP_PHONE_REGEX) {
+          pattern = new RegExp(smsEnv.SMS_HTTP_PHONE_REGEX);
           const customSchema = z
             .string()
             .refine((value) => pattern.test(value), {
@@ -146,7 +146,7 @@ export function getHttpProvider(): SmsProvider {
         }
 
         // Default to JSON content type
-        const contentType = env.SMS_HTTP_CONTENT_TYPE ?? "application/json";
+        const contentType = smsEnv.SMS_HTTP_CONTENT_TYPE ?? "application/json";
 
         // Prepare headers
         const headers: Record<string, string> = {
@@ -156,7 +156,7 @@ export function getHttpProvider(): SmsProvider {
 
         // Add authorization header if API key is provided
         if (apiKey) {
-          const authScheme = env.SMS_HTTP_AUTH_SCHEME;
+          const authScheme = smsEnv.SMS_HTTP_AUTH_SCHEME;
           // eslint-disable-next-line i18next/no-literal-string
           const bearerDefault = "Bearer";
           const scheme = authScheme ?? bearerDefault;

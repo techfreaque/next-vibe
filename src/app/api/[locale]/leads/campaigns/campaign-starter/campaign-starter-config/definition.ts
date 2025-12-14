@@ -82,7 +82,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.minAgeHours" as const,
             },
-            z.number().min(0).max(168),
+            z.coerce.number().min(0).max(168),
           ),
           enabledDays: responseField(
             {
@@ -90,7 +90,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledDays" as const,
             },
-            z.array(z.number().min(1).max(7)),
+            z.array(z.coerce.number().min(1).max(7)),
           ),
           enabledHours: objectField(
             {
@@ -109,7 +109,7 @@ const { GET } = createEndpoint({
                     "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
                   fieldType: FieldDataType.NUMBER,
                 },
-                z.number().min(0).max(23),
+                z.coerce.number().min(0).max(23),
               ),
               end: responseField(
                 {
@@ -118,7 +118,7 @@ const { GET } = createEndpoint({
                     "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
                   fieldType: FieldDataType.NUMBER,
                 },
-                z.number().min(0).max(23),
+                z.coerce.number().min(0).max(23),
               ),
             },
           ),
@@ -128,7 +128,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.leadsPerWeek" as const,
             },
-            z.record(z.string(), z.number().min(1)),
+            z.record(z.string(), z.coerce.number().min(1)),
           ),
           // Cron settings
           schedule: responseField(
@@ -161,7 +161,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.timeout" as const,
             },
-            z.number().min(1000).max(3600000).default(300000),
+            z.coerce.number().min(1000).max(3600000).default(300000),
           ),
           retries: responseField(
             {
@@ -169,7 +169,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retries" as const,
             },
-            z.number().min(0).max(10).default(3),
+            z.coerce.number().min(0).max(10).default(3),
           ),
           retryDelay: responseField(
             {
@@ -177,7 +177,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retryDelay" as const,
             },
-            z.number().min(1000).max(300000).default(30000),
+            z.coerce.number().min(1000).max(300000).default(30000),
           ),
         },
       ),
@@ -326,7 +326,7 @@ const { PUT } = createEndpoint({
           description:
             "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.minAgeHours.description" as const,
         },
-        z.number().min(0).max(168),
+        z.coerce.number().min(0).max(168),
       ),
       enabledDays: requestDataField(
         {
@@ -374,7 +374,7 @@ const { PUT } = createEndpoint({
             },
           ],
         },
-        z.array(z.number().min(1).max(7)),
+        z.array(z.coerce.number().min(1).max(7)),
       ),
       enabledHours: objectField(
         {
@@ -397,7 +397,7 @@ const { PUT } = createEndpoint({
               description:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.start.description" as const,
             },
-            z.number().min(0).max(23),
+            z.coerce.number().min(0).max(23),
           ),
           end: requestDataField(
             {
@@ -408,7 +408,7 @@ const { PUT } = createEndpoint({
               description:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.end.description" as const,
             },
-            z.number().min(0).max(23),
+            z.coerce.number().min(0).max(23),
           ),
         },
       ),
@@ -455,7 +455,7 @@ const { PUT } = createEndpoint({
           description:
             "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.timeout.description" as const,
         },
-        z.number().min(1000).max(3600000).default(300000),
+        z.coerce.number().min(1000).max(3600000).default(300000),
       ),
       retries: requestDataField(
         {
@@ -466,7 +466,7 @@ const { PUT } = createEndpoint({
           description:
             "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retries.description" as const,
         },
-        z.number().min(0).max(10).default(3),
+        z.coerce.number().min(0).max(10).default(3),
       ),
       retryDelay: requestDataField(
         {
@@ -477,7 +477,7 @@ const { PUT } = createEndpoint({
           description:
             "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retryDelay.description" as const,
         },
-        z.number().min(1000).max(300000).default(30000),
+        z.coerce.number().min(1000).max(300000).default(30000),
       ),
       leadsPerWeek: requestDataField(
         {
@@ -488,7 +488,7 @@ const { PUT } = createEndpoint({
           description:
             "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.leadsPerWeek.description" as const,
         },
-        z.record(z.string(), z.number().min(1)),
+        z.record(z.string(), z.coerce.number().min(1)),
       ),
       // Response fields (same structure as GET)
       response: objectField(
@@ -516,7 +516,7 @@ const { PUT } = createEndpoint({
               content:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.minAgeHours" as const,
             },
-            z.number().min(0).max(168),
+            z.coerce.number().min(0).max(168),
           ),
           enabledDays: responseField(
             {
@@ -524,7 +524,7 @@ const { PUT } = createEndpoint({
               content:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledDays" as const,
             },
-            z.array(z.number().min(1).max(7)),
+            z.array(z.coerce.number().min(1).max(7)),
           ),
           enabledHours: objectField(
             {
@@ -543,7 +543,7 @@ const { PUT } = createEndpoint({
                     "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
                   fieldType: FieldDataType.NUMBER,
                 },
-                z.number().min(0).max(23),
+                z.coerce.number().min(0).max(23),
               ),
               end: responseField(
                 {
@@ -552,7 +552,7 @@ const { PUT } = createEndpoint({
                     "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
                   fieldType: FieldDataType.NUMBER,
                 },
-                z.number().min(0).max(23),
+                z.coerce.number().min(0).max(23),
               ),
             },
           ),
@@ -562,7 +562,7 @@ const { PUT } = createEndpoint({
               content:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.leadsPerWeek" as const,
             },
-            z.record(z.string(), z.number().min(1)),
+            z.record(z.string(), z.coerce.number().min(1)),
           ),
           schedule: responseField(
             {
@@ -594,7 +594,7 @@ const { PUT } = createEndpoint({
               content:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.timeout" as const,
             },
-            z.number().min(1000).max(3600000).default(300000),
+            z.coerce.number().min(1000).max(3600000).default(300000),
           ),
           retries: responseField(
             {
@@ -602,7 +602,7 @@ const { PUT } = createEndpoint({
               content:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retries" as const,
             },
-            z.number().min(0).max(10).default(3),
+            z.coerce.number().min(0).max(10).default(3),
           ),
           retryDelay: responseField(
             {
@@ -610,7 +610,7 @@ const { PUT } = createEndpoint({
               content:
                 "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retryDelay" as const,
             },
-            z.number().min(1000).max(300000).default(30000),
+            z.coerce.number().min(1000).max(300000).default(30000),
           ),
         },
       ),

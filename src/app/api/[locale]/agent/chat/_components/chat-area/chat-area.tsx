@@ -1,26 +1,25 @@
 "use client";
 
-import { type DivRefObject, Div } from "next-vibe-ui/ui/div";
-import { KeyboardAvoidingView } from "next-vibe-ui/ui/keyboard-avoiding-view";
 import { useSafeAreaInsets } from "next-vibe-ui/hooks/use-safe-area-insets";
+import { Div,type DivRefObject } from "next-vibe-ui/ui/div";
+import { KeyboardAvoidingView } from "next-vibe-ui/ui/keyboard-avoiding-view";
 import type { JSX } from "react";
 import React, { useRef } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { envClient } from "@/config/env-client";
-
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
+import { NEW_MESSAGE_ID, ViewMode } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useInputHeight } from "@/app/api/[locale]/agent/chat/hooks/use-input-height";
-import { NEW_MESSAGE_ID, ViewMode } from "@/app/api/[locale]/agent/chat/enum";
 import { AIToolsModal } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/ai-tools-modal";
-import { ChatMessages } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/_components/messages";
+import { ChatInputContainer } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/input-container";
+import { ChatEmptyState } from "@/app/api/[locale]/agent/chat/threads/_components/new-thread/empty-state";
 import { PublicFeed } from "@/app/api/[locale]/agent/chat/threads/_components/public-feed/public-feed";
 import { ChatBranding } from "@/app/api/[locale]/agent/chat/threads/[threadId]/_components/branding";
-import { ChatEmptyState } from "@/app/api/[locale]/agent/chat/threads/_components/new-thread/empty-state";
-import { ChatInputContainer } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/input-container";
 import { ChatToolbar } from "@/app/api/[locale]/agent/chat/threads/[threadId]/_components/toolbar";
-import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
+import { ChatMessages } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/_components/messages";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { platform } from "@/config/env-client";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ChatAreaProps {
   locale: CountryLanguage;
@@ -64,14 +63,12 @@ export function ChatArea({
     >
       <Div
         style={
-          envClient.platform.isReactNative
-            ? { paddingTop: insets.top + 60 }
-            : undefined
+          platform.isReactNative ? { paddingTop: insets.top + 60 } : undefined
         }
       >
         <Div
           className={
-            envClient.platform.isReactNative
+            platform.isReactNative
               ? "flex-1 flex flex-col min-w-0 relative w-full"
               : "w-full h-screen max-h-screen"
           }

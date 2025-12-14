@@ -1,13 +1,14 @@
-import type { Step } from "react-joyride";
-import type { TFunction } from "@/i18n/core/static-types";
 import { Div } from "next-vibe-ui/ui/div";
-import { H2, H3, P } from "next-vibe-ui/ui/typography";
-import { Span } from "next-vibe-ui/ui/span";
-import { Ul } from "next-vibe-ui/ui/ul";
 import { Li } from "next-vibe-ui/ui/li";
+import { Span } from "next-vibe-ui/ui/span";
 import { Strong } from "next-vibe-ui/ui/strong";
+import { H2, H3, P } from "next-vibe-ui/ui/typography";
+import { Ul } from "next-vibe-ui/ui/ul";
+import type { Step } from "react-joyride";
+
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import type { TFunction } from "@/i18n/core/static-types";
 
 export interface TourStepConfig extends Step {
   requiresAuth?: boolean;

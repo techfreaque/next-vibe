@@ -16,6 +16,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
 import { UserRole } from "../../user/user-roles/enum";
 
 /**

@@ -4,9 +4,9 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Star } from "next-vibe-ui/ui/icons/Star";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX, ReactNode } from "react";
 import React from "react";
 

@@ -64,14 +64,14 @@ export const { enum: ChartType, options: ChartTypeOptions } = createEnumOptions(
  */
 export const historicalDataPointSchema = z.object({
   date: dateSchema,
-  value: z.number(),
+  value: z.coerce.number(),
   label: z.string().optional() as z.ZodType<TranslationKey | undefined>,
   metadata: z
     .record(
       z.string(),
       z.union([
         z.string() as z.ZodType<TranslationKey>,
-        z.number(),
+        z.coerce.number(),
         z.boolean(),
       ]),
     )
@@ -79,3 +79,124 @@ export const historicalDataPointSchema = z.object({
 });
 
 export type HistoricalDataPointType = z.infer<typeof historicalDataPointSchema>;
+
+/**
+ * Calculate date range from preset
+ */
+export function getDateRangeFromPreset(
+  preset: (typeof DateRangePreset)[keyof typeof DateRangePreset],
+): {
+  from: Date;
+  to: Date;
+} {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  switch (preset) {
+    case DateRangePreset.TODAY:
+      return {
+        from: today,
+        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1),
+      };
+    case DateRangePreset.YESTERDAY: {
+      const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+      return {
+        from: yesterday,
+        to: new Date(yesterday.getTime() + 24 * 60 * 60 * 1000 - 1),
+      };
+    }
+    case DateRangePreset.LAST_7_DAYS:
+      return {
+        from: new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000),
+        to: now,
+      };
+    case DateRangePreset.LAST_30_DAYS:
+      return {
+        from: new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000),
+        to: now,
+      };
+    case DateRangePreset.LAST_90_DAYS:
+      return {
+        from: new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000),
+        to: now,
+      };
+    case DateRangePreset.THIS_WEEK: {
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay());
+      return { from: startOfWeek, to: now };
+    }
+    case DateRangePreset.LAST_WEEK: {
+      const lastWeekStart = new Date(today);
+      lastWeekStart.setDate(today.getDate() - today.getDay() - 7);
+      const lastWeekEnd = new Date(lastWeekStart);
+      lastWeekEnd.setDate(lastWeekStart.getDate() + 6);
+      lastWeekEnd.setHours(23, 59, 59, 999);
+      return { from: lastWeekStart, to: lastWeekEnd };
+    }
+    case DateRangePreset.THIS_MONTH:
+      return {
+        from: new Date(today.getFullYear(), today.getMonth(), 1),
+        to: now,
+      };
+    case DateRangePreset.LAST_MONTH: {
+      const lastMonthStart = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        1,
+      );
+      const lastMonthEnd = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        0,
+        23,
+        59,
+        59,
+        999,
+      );
+      return { from: lastMonthStart, to: lastMonthEnd };
+    }
+    case DateRangePreset.THIS_QUARTER: {
+      const quarterStart = new Date(
+        today.getFullYear(),
+        Math.floor(today.getMonth() / 3) * 3,
+        1,
+      );
+      return { from: quarterStart, to: now };
+    }
+    case DateRangePreset.LAST_QUARTER: {
+      const lastQuarterMonth = Math.floor(today.getMonth() / 3) * 3 - 3;
+      const lastQuarterStart = new Date(
+        today.getFullYear(),
+        lastQuarterMonth,
+        1,
+      );
+      if (lastQuarterMonth < 0) {
+        lastQuarterStart.setFullYear(today.getFullYear() - 1);
+        lastQuarterStart.setMonth(9);
+      }
+      const lastQuarterEnd = new Date(
+        lastQuarterStart.getFullYear(),
+        lastQuarterStart.getMonth() + 3,
+        0,
+        23,
+        59,
+        59,
+        999,
+      );
+      return { from: lastQuarterStart, to: lastQuarterEnd };
+    }
+    case DateRangePreset.THIS_YEAR:
+      return { from: new Date(today.getFullYear(), 0, 1), to: now };
+    case DateRangePreset.LAST_YEAR:
+      return {
+        from: new Date(today.getFullYear() - 1, 0, 1),
+        to: new Date(today.getFullYear() - 1, 11, 31, 23, 59, 59, 999),
+      };
+    case DateRangePreset.CUSTOM:
+    default:
+      return {
+        from: new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000),
+        to: now,
+      };
+  }
+}

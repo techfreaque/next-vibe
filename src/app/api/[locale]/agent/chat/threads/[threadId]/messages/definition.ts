@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -21,7 +22,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 
 import { selectChatMessageSchema } from "../../../db";
 import { ChatMessageRole } from "../../../enum";

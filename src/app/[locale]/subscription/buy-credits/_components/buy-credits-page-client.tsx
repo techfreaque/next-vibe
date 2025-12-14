@@ -1,23 +1,22 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next-vibe-ui/hooks/use-navigation";
+import { Container } from "next-vibe-ui/ui/container";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { H1, P } from "next-vibe-ui/ui/typography";
-import { Container } from "next-vibe-ui/ui/container";
-import { useRouter, useSearchParams } from "next-vibe-ui/hooks/use-navigation";
-import { useEffect, useState } from "react";
 import type { JSX } from "react";
+import { useEffect, useState } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import type { CreditBalance } from "@/app/api/[locale]/credits/repository";
-import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
-
+import { BuyCreditsTab } from "@/app/api/[locale]/subscription/_components/buy-credits-tab";
 import { CreditBalanceCard } from "@/app/api/[locale]/subscription/_components/credit-balance-card";
+import { PaymentStatusAlert } from "@/app/api/[locale]/subscription/_components/payment-status-alert";
 import { SubscriptionHeader } from "@/app/api/[locale]/subscription/_components/subscription-header";
 import { SubscriptionStatusCard } from "@/app/api/[locale]/subscription/_components/subscription-status-card";
-import { BuyCreditsTab } from "@/app/api/[locale]/subscription/_components/buy-credits-tab";
-import { PaymentStatusAlert } from "@/app/api/[locale]/subscription/_components/payment-status-alert";
 import { SubscriptionTabsNav } from "@/app/api/[locale]/subscription/_components/subscription-tabs-nav";
+import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 interface BuyCreditsPageClientProps {
   locale: CountryLanguage;

@@ -5,6 +5,10 @@
 
 import { z } from "zod";
 
+import {
+  EmailCampaignStageDB,
+  EmailJourneyVariantDB,
+} from "@/app/api/[locale]/leads/enum";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -19,10 +23,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import {
-  EmailCampaignStageDB,
-  EmailJourneyVariantDB,
-} from "@/app/api/[locale]/leads/enum";
 
 import { CampaignType, CampaignTypeOptions } from "../smtp-client/enum";
 

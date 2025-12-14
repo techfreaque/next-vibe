@@ -4,13 +4,12 @@
  */
 
 import type { Metadata } from "next";
-import type { JSX } from "react";
 import { Div } from "next-vibe-ui/ui/div";
-
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import type { JSX } from "react";
 
 import { CronTasksClient } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/_components/cron-tasks-client";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 interface CronTasksPageProps {
   params: Promise<{

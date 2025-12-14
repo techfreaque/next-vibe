@@ -1,8 +1,0 @@
-.github
-.vscode
-node_modules/
-.gitignore
-eslint.config.mjs
-tsconfig.build.json
-tsconfig.json
-bun.lock

@@ -4,15 +4,17 @@
  */
 
 import React from "react";
+
+import { HumanCTAButton } from "@/app/api/[locale]/emails/smtp-client/components/human_cta_button.email";
+import { HumanEmailLayout } from "@/app/api/[locale]/emails/smtp-client/components/human_email_layout.email";
+import { HumanText } from "@/app/api/[locale]/emails/smtp-client/components/human_text.email";
+
 import { EmailCampaignStage } from "../../../enum";
 import type {
   EmailRenderContext,
   EmailTemplateFunction,
   JourneyTemplateMap,
 } from "../types";
-import { HumanEmailLayout } from "@/app/api/[locale]/emails/smtp-client/components/human_email_layout.email";
-import { HumanText } from "@/app/api/[locale]/emails/smtp-client/components/human_text.email";
-import { HumanCTAButton } from "@/app/api/[locale]/emails/smtp-client/components/human_cta_button.email";
 
 /**
  * Personal Journey - Initial Contact Email

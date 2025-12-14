@@ -5,6 +5,10 @@
 
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
+import { Card, CardContent } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   BarChart3,
   Mail,
@@ -12,13 +16,9 @@ import {
   Settings,
   Users,
 } from "next-vibe-ui/ui/icons";
-import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Link } from "next-vibe-ui/ui/link";
-import { cn } from "next-vibe/shared/utils";
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Span } from "next-vibe-ui/ui/span";
 import { Nav } from "next-vibe-ui/ui/nav";
-import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
 import { H2 } from "next-vibe-ui/ui/typography";
 import { P } from "next-vibe-ui/ui/typography";
 import type { ComponentType, JSX, ReactNode } from "react";

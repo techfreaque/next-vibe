@@ -98,7 +98,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.memories.get.response.memories.memory.sequenceNumber.content" as const,
               },
-              z.number(),
+              z.coerce.number(),
             ),
             priority: responseField(
               {
@@ -106,7 +106,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.memories.get.response.memories.memory.priority.content" as const,
               },
-              z.number(),
+              z.coerce.number(),
             ),
             createdAt: responseField(
               {
@@ -263,7 +263,7 @@ const { POST } = createEndpoint({
             "app.api.agent.chat.memories.post.priority.description" as const,
           columns: 6,
         },
-        z.number().min(0).max(100).optional(),
+        z.coerce.number().min(0).max(100).optional(),
       ),
 
       // === RESPONSE ===

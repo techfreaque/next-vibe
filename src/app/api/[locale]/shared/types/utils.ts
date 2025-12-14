@@ -2,7 +2,7 @@
  * Utility types for cleaning and prettifying complex types
  */
 
-// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic utility type for type system operations
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for type system operations
 export type ExplicitObjectType = object;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -12,7 +12,7 @@ export type ExplicitAnyType = any;
  * Makes all properties in T optional recursively
  */
 export type DeepPartial<T> = {
-  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
 
@@ -20,7 +20,7 @@ export type DeepPartial<T> = {
  * Makes all properties in T required recursively
  */
 export type DeepRequired<T> = {
-  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
   [P in keyof T]-?: T[P] extends object ? DeepRequired<T[P]> : T[P];
 };
 
@@ -88,10 +88,10 @@ export type PickByType<T, U> = {
 /**
  * Flattens nested object types into a single level
  */
-// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
 export type Flatten<T> = T extends object
   ? {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
       [K in keyof T]: T[K] extends object ? Flatten<T[K]> : T[K];
     }
   : T;
@@ -142,7 +142,7 @@ export type NonFunctionProperties<T> = Pick<T, NonFunctionKeys<T>>;
  * Creates a deeply readonly version of a type
  */
 export type DeepReadonly<T> = {
-  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
   readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];
 };
 
@@ -164,11 +164,11 @@ export type If<C extends boolean, T, F> = C extends true ? T : F;
 /**
  * Creates a type that represents all possible paths through an object
  */
-// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
 export type Paths<T> = T extends object
   ? {
       [K in keyof T]: K extends string
-        ? // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
+        ? // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for recursive type operations
           T[K] extends object
           ? K | `${K}.${Paths<T[K]>}`
           : K

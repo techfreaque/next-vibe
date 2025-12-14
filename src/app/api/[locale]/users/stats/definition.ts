@@ -317,7 +317,7 @@ const { GET } = createEndpoint({
               variant: "default",
               format: "compact",
             },
-            z.number().describe("Total number of users in system"),
+            z.coerce.number().describe("Total number of users in system"),
           ),
           activeUsers: responseField(
             {
@@ -328,7 +328,7 @@ const { GET } = createEndpoint({
               variant: "success",
               format: "compact",
             },
-            z.number().describe("Number of active users"),
+            z.coerce.number().describe("Number of active users"),
           ),
           inactiveUsers: responseField(
             {
@@ -339,7 +339,7 @@ const { GET } = createEndpoint({
               variant: "muted",
               format: "compact",
             },
-            z.number().describe("Number of inactive users"),
+            z.coerce.number().describe("Number of inactive users"),
           ),
           newUsers: responseField(
             {
@@ -350,7 +350,7 @@ const { GET } = createEndpoint({
               variant: "info",
               format: "compact",
             },
-            z.number().describe("New users this period"),
+            z.coerce.number().describe("New users this period"),
           ),
         },
       ),
@@ -379,7 +379,7 @@ const { GET } = createEndpoint({
               variant: "success",
               format: "compact",
             },
-            z.number().describe("Users with verified emails"),
+            z.coerce.number().describe("Users with verified emails"),
           ),
           emailUnverifiedUsers: responseField(
             {
@@ -390,7 +390,7 @@ const { GET } = createEndpoint({
               variant: "warning",
               format: "compact",
             },
-            z.number().describe("Users with unverified emails"),
+            z.coerce.number().describe("Users with unverified emails"),
           ),
           verificationRate: responseField(
             {
@@ -401,7 +401,7 @@ const { GET } = createEndpoint({
               variant: "info",
               format: "percentage",
             },
-            z.number().describe("Email verification percentage (0-1)"),
+            z.coerce.number().describe("Email verification percentage (0-1)"),
           ),
         },
       ),
@@ -410,7 +410,8 @@ const { GET } = createEndpoint({
       subscriptionStats: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.users.stats.response.subscriptionStats.title" as const,
+          title:
+            "app.api.users.stats.response.subscriptionStats.title" as const,
           description:
             "app.api.users.stats.response.subscriptionStats.description" as const,
           layoutType: LayoutType.GRID,
@@ -430,7 +431,7 @@ const { GET } = createEndpoint({
               variant: "success",
               format: "compact",
             },
-            z.number().describe("Users with active subscriptions"),
+            z.coerce.number().describe("Users with active subscriptions"),
           ),
           canceledSubscriptions: responseField(
             {
@@ -441,7 +442,7 @@ const { GET } = createEndpoint({
               variant: "warning",
               format: "compact",
             },
-            z.number().describe("Users with canceled subscriptions"),
+            z.coerce.number().describe("Users with canceled subscriptions"),
           ),
           expiredSubscriptions: responseField(
             {
@@ -452,7 +453,7 @@ const { GET } = createEndpoint({
               variant: "muted",
               format: "compact",
             },
-            z.number().describe("Users with expired subscriptions"),
+            z.coerce.number().describe("Users with expired subscriptions"),
           ),
           noSubscription: responseField(
             {
@@ -463,7 +464,7 @@ const { GET } = createEndpoint({
               variant: "muted",
               format: "compact",
             },
-            z.number().describe("Users without any subscription"),
+            z.coerce.number().describe("Users without any subscription"),
           ),
           subscriptionChart: responseField(
             {
@@ -481,7 +482,7 @@ const { GET } = createEndpoint({
               .array(
                 z.object({
                   x: z.string(),
-                  y: z.number(),
+                  y: z.coerce.number(),
                   label: z.string().optional(),
                 }),
               )
@@ -514,7 +515,7 @@ const { GET } = createEndpoint({
               variant: "success",
               format: "currency",
             },
-            z.number().describe("Total revenue in cents"),
+            z.coerce.number().describe("Total revenue in cents"),
           ),
           transactionCount: responseField(
             {
@@ -525,7 +526,7 @@ const { GET } = createEndpoint({
               variant: "info",
               format: "compact",
             },
-            z.number().describe("Total number of transactions"),
+            z.coerce.number().describe("Total number of transactions"),
           ),
           averageOrderValue: responseField(
             {
@@ -536,7 +537,7 @@ const { GET } = createEndpoint({
               variant: "info",
               format: "currency",
             },
-            z.number().describe("Average order value in cents"),
+            z.coerce.number().describe("Average order value in cents"),
           ),
           refundRate: responseField(
             {
@@ -547,7 +548,7 @@ const { GET } = createEndpoint({
               variant: "warning",
               format: "percentage",
             },
-            z.number().describe("Refund rate (0-1)"),
+            z.coerce.number().describe("Refund rate (0-1)"),
           ),
         },
       ),
@@ -576,7 +577,7 @@ const { GET } = createEndpoint({
               variant: "muted",
               size: "sm",
             },
-            z.number().describe("Users with public role"),
+            z.coerce.number().describe("Users with public role"),
           ),
           customerUsers: responseField(
             {
@@ -587,7 +588,7 @@ const { GET } = createEndpoint({
               variant: "success",
               size: "sm",
             },
-            z.number().describe("Users with customer role"),
+            z.coerce.number().describe("Users with customer role"),
           ),
           partnerAdminUsers: responseField(
             {
@@ -598,7 +599,7 @@ const { GET } = createEndpoint({
               variant: "info",
               size: "sm",
             },
-            z.number().describe("Users with partner admin role"),
+            z.coerce.number().describe("Users with partner admin role"),
           ),
           partnerEmployeeUsers: responseField(
             {
@@ -609,7 +610,7 @@ const { GET } = createEndpoint({
               variant: "info",
               size: "sm",
             },
-            z.number().describe("Users with partner employee role"),
+            z.coerce.number().describe("Users with partner employee role"),
           ),
           adminUsers: responseField(
             {
@@ -620,7 +621,7 @@ const { GET } = createEndpoint({
               variant: "warning",
               size: "sm",
             },
-            z.number().describe("Users with admin role"),
+            z.coerce.number().describe("Users with admin role"),
           ),
           roleChart: responseField(
             {
@@ -638,7 +639,7 @@ const { GET } = createEndpoint({
               .array(
                 z.object({
                   x: z.string(),
-                  y: z.number(),
+                  y: z.coerce.number(),
                   label: z.string().optional(),
                 }),
               )
@@ -683,7 +684,7 @@ const { GET } = createEndpoint({
                   variant: "info",
                   size: "sm",
                 },
-                z.number().describe("Users created today"),
+                z.coerce.number().describe("Users created today"),
               ),
               usersCreatedThisWeek: responseField(
                 {
@@ -694,7 +695,7 @@ const { GET } = createEndpoint({
                   variant: "info",
                   size: "sm",
                 },
-                z.number().describe("Users created this week"),
+                z.coerce.number().describe("Users created this week"),
               ),
               usersCreatedThisMonth: responseField(
                 {
@@ -705,7 +706,7 @@ const { GET } = createEndpoint({
                   variant: "success",
                   size: "sm",
                 },
-                z.number().describe("Users created this month"),
+                z.coerce.number().describe("Users created this month"),
               ),
               usersCreatedLastMonth: responseField(
                 {
@@ -716,7 +717,7 @@ const { GET } = createEndpoint({
                   variant: "muted",
                   size: "sm",
                 },
-                z.number().describe("Users created last month"),
+                z.coerce.number().describe("Users created last month"),
               ),
             },
           ),
@@ -743,7 +744,7 @@ const { GET } = createEndpoint({
                   variant: "success",
                   format: "percentage",
                 },
-                z.number().describe("User growth rate percentage (0-1)"),
+                z.coerce.number().describe("User growth rate percentage (0-1)"),
               ),
               leadToUserConversionRate: responseField(
                 {
@@ -754,7 +755,9 @@ const { GET } = createEndpoint({
                   variant: "info",
                   format: "percentage",
                 },
-                z.number().describe("Lead to user conversion rate (0-1)"),
+                z.coerce
+                  .number()
+                  .describe("Lead to user conversion rate (0-1)"),
               ),
               retentionRate: responseField(
                 {
@@ -765,7 +768,7 @@ const { GET } = createEndpoint({
                   variant: "success",
                   format: "percentage",
                 },
-                z.number().describe("User retention rate (0-1)"),
+                z.coerce.number().describe("User retention rate (0-1)"),
               ),
             },
           ),
@@ -787,7 +790,7 @@ const { GET } = createEndpoint({
               .array(
                 z.object({
                   x: z.string(),
-                  y: z.number(),
+                  y: z.coerce.number(),
                   label: z.string().optional(),
                 }),
               )
@@ -896,10 +899,30 @@ const { GET } = createEndpoint({
           expiredSubscriptions: 230,
           noSubscription: 1250,
           subscriptionChart: [
-            { x: "Active", y: 850, label: "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label" },
-            { x: "Canceled", y: 120, label: "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label" },
-            { x: "Expired", y: 230, label: "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label" },
-            { x: "None", y: 1250, label: "app.api.users.stats.response.subscriptionStats.noSubscription.label" },
+            {
+              x: "Active",
+              y: 850,
+              label:
+                "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
+            },
+            {
+              x: "Canceled",
+              y: 120,
+              label:
+                "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
+            },
+            {
+              x: "Expired",
+              y: 230,
+              label:
+                "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
+            },
+            {
+              x: "None",
+              y: 1250,
+              label:
+                "app.api.users.stats.response.subscriptionStats.noSubscription.label",
+            },
           ],
         },
         paymentStats: {

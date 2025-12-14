@@ -5,9 +5,8 @@
 
 import type { JSX, ReactNode } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { SmtpAdminLayoutClient } from "@/app/api/[locale]/emails/smtp-client/_components/smtp-admin-layout-client";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface SmtpAdminLayoutProps {
   children: ReactNode;

@@ -70,6 +70,7 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
                     verbose: logger.isDebugEnabled,
                     fix: data.fix || false,
                     timeout: data.timeout,
+                    createConfig: data.createConfig || false,
                   },
                   logger,
                 )

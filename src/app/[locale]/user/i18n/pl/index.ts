@@ -1,7 +1,7 @@
 import { translations as componentsTranslations } from "../../_components/i18n/pl";
 import { translations as otherTranslations } from "../../(other)/i18n/pl";
-import { translations as signupTranslations } from "../../signup/i18n/pl";
 import { translations as referralTranslations } from "../../referral/i18n/pl";
+import { translations as signupTranslations } from "../../signup/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {

@@ -1,10 +1,8 @@
 import type { JSX } from "react";
-
 /**
  * Gab AI Logo for React Native
  */
-
-import { Svg, Path } from "react-native-svg";
+import { Path,Svg } from "react-native-svg";
 
 export function GabAILogo({
   width = 48,

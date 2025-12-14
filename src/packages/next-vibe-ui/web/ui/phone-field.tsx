@@ -9,10 +9,10 @@ import { ChevronDown, Phone } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
-import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 
+import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
 import {
   Command,

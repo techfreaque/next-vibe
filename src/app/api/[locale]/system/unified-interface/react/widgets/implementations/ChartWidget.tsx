@@ -2,22 +2,19 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import {
-  Chart,
-  Line,
-  Bar,
-  Area,
-  Pie,
-  Axis,
-} from "next-vibe-ui/ui/chart";
+import { Area, Axis, Bar, Chart, Line, Pie } from "next-vibe-ui/ui/chart";
+import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps } from "../../../shared/widgets/types";
+import type {
+  ReactWidgetProps,
+  WidgetData,
+} from "../../../shared/widgets/types";
 
 // Color palette for charts
 const CHART_COLORS = [
@@ -46,11 +43,56 @@ interface ChartSeries {
   color?: string;
 }
 
+// Check if value looks like a ChartDataPoint
+function looksLikeChartDataPoint(item: WidgetData): boolean {
+  return (
+    typeof item === "object" &&
+    item !== null &&
+    !Array.isArray(item) &&
+    "x" in item &&
+    "y" in item &&
+    typeof (item as { y: WidgetData }).y === "number"
+  );
+}
+
+// Check if value looks like a ChartSeries
+function looksLikeChartSeries(item: WidgetData): boolean {
+  return (
+    typeof item === "object" &&
+    item !== null &&
+    !Array.isArray(item) &&
+    "name" in item &&
+    "data" in item &&
+    typeof (item as { name: WidgetData }).name === "string" &&
+    Array.isArray((item as { data: WidgetData }).data)
+  );
+}
+
+// Convert validated WidgetData to ChartDataPoint
+function toChartDataPoint(item: WidgetData): ChartDataPoint {
+  const obj = item as { x: WidgetData; y: number; label?: WidgetData };
+  return {
+    x: String(obj.x),
+    y: obj.y,
+    label: obj.label !== undefined ? String(obj.label) : undefined,
+  };
+}
+
+// Convert validated WidgetData to ChartSeries
+function toChartSeries(item: WidgetData): ChartSeries {
+  const obj = item as { name: string; data: WidgetData[]; color?: string };
+  return {
+    name: obj.name,
+    data: obj.data.filter(looksLikeChartDataPoint).map(toChartDataPoint),
+    color: obj.color,
+  };
+}
+
 /**
  * Extract chart data from various value formats
  * Supports: array of points, object with series, raw numbers
  */
-function extractChartData(value: unknown): {
+function extractChartData(value: WidgetData): {
   type: "single" | "series" | "pie";
   data: ChartSeries[];
 } | null {
@@ -65,31 +107,40 @@ function extractChartData(value: unknown): {
     }
 
     // Check if it's array of series: [{name: "Series1", data: [...]}, ...]
-    if (value[0] && typeof value[0] === "object" && "name" in value[0] && "data" in value[0]) {
+    if (value[0] && looksLikeChartSeries(value[0])) {
+      // Filter and convert to ChartSeries
+      const validSeries = value.filter(looksLikeChartSeries).map(toChartSeries);
       return {
         type: "series",
-        data: value as ChartSeries[],
+        data: validSeries,
       };
     }
 
-    // Single series of points
-    return {
-      type: "single",
-      data: [{ name: "Value", data: value as ChartDataPoint[] }],
-    };
+    // Single series of points - filter and convert to ChartDataPoint
+    const validPoints = value.filter(looksLikeChartDataPoint).map(toChartDataPoint);
+    if (validPoints.length > 0) {
+      return {
+        type: "single",
+        data: [{ name: "Value", data: validPoints }],
+      };
+    }
   }
 
   // Object with named series: {series1: [...], series2: [...]}
-  if (typeof value === "object" && value !== null) {
-    const obj = value as Record<string, unknown>;
+  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    const obj = value as { [key: string]: WidgetData };
     const series: ChartSeries[] = [];
 
     for (const [key, val] of Object.entries(obj)) {
       if (Array.isArray(val)) {
-        series.push({
-          name: key,
-          data: val as ChartDataPoint[],
-        });
+        // Filter and convert to ChartDataPoint
+        const validPoints = val.filter(looksLikeChartDataPoint).map(toChartDataPoint);
+        if (validPoints.length > 0) {
+          series.push({
+            name: key,
+            data: validPoints,
+          });
+        }
       }
     }
 
@@ -134,7 +185,9 @@ export function ChartWidget({
   } = field.ui;
 
   const title = labelKey ? t(labelKey as TranslationKey) : undefined;
-  const description = descriptionKey ? t(descriptionKey as TranslationKey) : undefined;
+  const description = descriptionKey
+    ? t(descriptionKey as TranslationKey)
+    : undefined;
 
   // Extract chart data
   const chartData = extractChartData(value);
@@ -149,9 +202,21 @@ export function ChartWidget({
           </CardHeader>
         )}
         <CardContent className="flex items-center justify-center">
-          <div style={{ height }} className="flex items-center justify-center w-full">
-            <Span className="text-muted-foreground">No chart data available</Span>
-          </div>
+          <Div
+            style={{
+              height,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <Span className="text-muted-foreground">
+              {t(
+                "app.api.system.unifiedInterface.widgets.chart.noDataAvailable",
+              )}
+            </Span>
+          </Div>
         </CardContent>
       </Card>
     );
@@ -164,23 +229,36 @@ export function ChartWidget({
     if (isPie) {
       // Pie/Donut chart
       const firstSeries = chartData.data[0];
-      const pieData = firstSeries?.data
-        .filter((d: ChartDataPoint) => d.y > 0) // Filter out zero values for pie chart
-        .map((d: ChartDataPoint) => {
-          // Translate labels - t() returns original string if key not found
-          const rawLabel = String(d.label ?? d.x ?? "Unknown");
-          return {
-            x: t(rawLabel as TranslationKey),
-            y: d.y,
-          };
-        }) ?? [];
+      const pieData =
+        firstSeries?.data
+          .filter((d: ChartDataPoint) => d.y > 0) // Filter out zero values for pie chart
+          .map((d: ChartDataPoint) => {
+            // Translate labels - t() returns original string if key not found
+            const rawLabel = String(d.label ?? d.x ?? "Unknown");
+            return {
+              x: t(rawLabel as TranslationKey),
+              y: d.y,
+            };
+          }) ?? [];
 
       // If all values are zero, show empty state
       if (pieData.length === 0) {
         return (
-          <div style={{ height }} className="flex items-center justify-center w-full">
-            <Span className="text-muted-foreground">No data to display</Span>
-          </div>
+          <Div
+            style={{
+              height,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <Span className="text-muted-foreground">
+              {t(
+                "app.api.system.unifiedInterface.widgets.chart.noDataToDisplay",
+              )}
+            </Span>
+          </Div>
         );
       }
 
@@ -202,8 +280,8 @@ export function ChartWidget({
 
     // Line/Bar/Area charts
     // Collect all unique x values for categorical axis (with translation)
-    const allXValues = chartData.data.flatMap(series =>
-      series.data.map(d => t(String(d.label ?? d.x ?? "") as TranslationKey))
+    const allXValues = chartData.data.flatMap((series) =>
+      series.data.map((d) => t(String(d.label ?? d.x ?? "") as TranslationKey)),
     );
     const uniqueXValues = [...new Set(allXValues)];
 
@@ -228,7 +306,12 @@ export function ChartWidget({
           tickFormat={(t: string | number) => String(t)}
           style={{
             axisLabel: { padding: 30, fontSize: 12, fill: "currentColor" },
-            tickLabels: { fontSize: 10, fill: "currentColor", angle: -45, textAnchor: "end" },
+            tickLabels: {
+              fontSize: 10,
+              fill: "currentColor",
+              angle: -45,
+              textAnchor: "end",
+            },
             grid: { stroke: "transparent" },
           }}
         />
@@ -256,7 +339,9 @@ export function ChartWidget({
                 <Area
                   key={series.name}
                   data={data}
-                  style={{ data: { fill: color, fillOpacity: 0.3, stroke: color } }}
+                  style={{
+                    data: { fill: color, fillOpacity: 0.3, stroke: color },
+                  }}
                   interpolation="natural"
                   animate={animate}
                 />
@@ -282,30 +367,37 @@ export function ChartWidget({
     <Card className={cn("h-full", className)}>
       {(title || description) && (
         <CardHeader className="pb-2">
-          {title && <CardTitle className="text-sm font-medium">{title}</CardTitle>}
+          {title && (
+            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+          )}
           {description && (
             <Span className="text-xs text-muted-foreground">{description}</Span>
           )}
         </CardHeader>
       )}
       <CardContent className="pt-0">
-        <div style={{ height, width: "100%" }}>
-          {renderChart()}
-        </div>
+        <Div style={{ height, width: "100%" }}>{renderChart()}</Div>
 
         {/* Legend */}
         {showLegend && chartData.data.length > 1 && (
-          <div className="flex flex-wrap justify-center gap-4 mt-4">
+          <Div className="flex flex-wrap justify-center gap-4 mt-4">
             {chartData.data.map((series, i) => (
-              <div key={series.name} className="flex items-center gap-2">
-                <div
-                  className="h-3 w-3 rounded-full"
-                  style={{ backgroundColor: series.color || CHART_COLORS[i % CHART_COLORS.length] }}
+              <Div key={series.name} className="flex items-center gap-2">
+                <Div
+                  style={{
+                    backgroundColor:
+                      series.color || CHART_COLORS[i % CHART_COLORS.length],
+                    height: 12,
+                    width: 12,
+                    borderRadius: 9999,
+                  }}
                 />
-                <Span className="text-xs text-muted-foreground">{series.name}</Span>
-              </div>
+                <Span className="text-xs text-muted-foreground">
+                  {series.name}
+                </Span>
+              </Div>
             ))}
-          </div>
+          </Div>
         )}
       </CardContent>
     </Card>

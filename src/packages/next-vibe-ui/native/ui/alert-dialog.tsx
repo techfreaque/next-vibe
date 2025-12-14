@@ -1,28 +1,28 @@
 import * as AlertDialogPrimitive from "@rn-primitives/alert-dialog";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
 import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
-import { buttonTextVariants, buttonVariants } from "./button";
-import { TextClassContext } from "./text";
-
 import type {
-  AlertDialogRootProps,
-  AlertDialogTriggerProps,
-  AlertDialogPortalProps,
-  AlertDialogOverlayProps,
-  AlertDialogContentProps,
-  AlertDialogHeaderProps,
-  AlertDialogFooterProps,
-  AlertDialogTitleProps,
-  AlertDialogDescriptionProps,
   AlertDialogActionProps,
   AlertDialogCancelProps,
+  AlertDialogContentProps,
+  AlertDialogDescriptionProps,
+  AlertDialogFooterProps,
+  AlertDialogHeaderProps,
+  AlertDialogOverlayProps,
+  AlertDialogPortalProps,
+  AlertDialogRootProps,
+  AlertDialogTitleProps,
+  AlertDialogTriggerProps,
 } from "@/packages/next-vibe-ui/web/ui/alert-dialog";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { buttonTextVariants, buttonVariants } from "./button";
+import { TextClassContext } from "./text";
 
 function AlertDialog({
   children,

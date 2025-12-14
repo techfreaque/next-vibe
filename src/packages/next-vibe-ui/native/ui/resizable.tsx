@@ -3,18 +3,18 @@
  * Simple fixed-width container (React Native doesn't support mouse drag-to-resize)
  */
 import { GripVertical } from "lucide-react-native";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import React from "react";
 import { View } from "react-native";
 
-import { cn } from "next-vibe/shared/utils/utils";
 import type {
   ResizableContainerProps,
   ResizableHandleProps,
 } from "@/packages/next-vibe-ui/web/ui/resizable";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 
-import { styled } from "nativewind";
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Type-safe View with className support (NativeWind)
 const StyledView = styled(View, { className: "style" });

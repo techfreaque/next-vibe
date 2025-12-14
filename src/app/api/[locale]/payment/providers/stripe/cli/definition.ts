@@ -18,7 +18,6 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 /**
@@ -104,7 +103,7 @@ const { POST } = createEndpoint({
           placeholder: "app.api.stripe.form.fields.port.placeholder" as const,
           columns: 6,
         },
-        z.number().optional(),
+        z.coerce.number().optional(),
       ),
 
       events: requestDataField(

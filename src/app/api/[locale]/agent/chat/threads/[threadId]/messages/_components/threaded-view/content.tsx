@@ -4,22 +4,22 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
-import { type SpanMouseEvent, Span } from "next-vibe-ui/ui/span";
+import { Span,type SpanMouseEvent } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { getPersonaName } from "@/app/api/[locale]/agent/chat/personas/config";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { getPersonaName } from "@/app/api/[locale]/agent/chat/personas/config";
-import { ToolDisplay } from "../tool-display";
 import { ErrorMessageBubble } from "../error-message-bubble";
 import type { useCollapseState } from "../hooks/use-collapse-state";
 import type { groupMessagesBySequence } from "../message-grouping";
+import { ToolDisplay } from "../tool-display";
 
 interface ThreadedMessageContentProps {
   message: ChatMessage;

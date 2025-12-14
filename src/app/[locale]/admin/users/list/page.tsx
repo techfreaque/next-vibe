@@ -3,14 +3,13 @@
  * Uses form-based filtering pattern similar to leads list
  */
 
-import type { JSX } from "react";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
-
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import type { JSX } from "react";
 
 import { UsersListClient } from "@/app/api/[locale]/users/list/_components/users-list-client";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 export default async function UsersListPage({
   params,

@@ -6,21 +6,21 @@
 import "server-only";
 
 import {
-  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { agentEnv } from "@/app/api/[locale]/agent/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { env } from "@/config/env";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
-import type { JwtPayloadType } from "../../user/auth/types";
 import { creditRepository } from "../../credits/repository";
 import { TTS_COST_PER_CHARACTER } from "../../products/repository-client";
+import type { JwtPayloadType } from "../../user/auth/types";
 import type { TextToSpeechPostRequestOutput } from "./definition";
 
 /**
@@ -99,7 +99,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
     });
 
     // Check API key
-    if (!env.EDEN_AI_API_KEY) {
+    if (!agentEnv.EDEN_AI_API_KEY) {
       logger.error("Eden AI API key not configured");
       return fail({
         message: "app.api.agent.textToSpeech.post.errors.apiKeyMissing",
@@ -157,7 +157,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
           method: "POST",
           headers: {
             // eslint-disable-next-line i18next/no-literal-string
-            Authorization: `Bearer ${env.EDEN_AI_API_KEY}`,
+            Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

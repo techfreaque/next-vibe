@@ -1,7 +1,7 @@
 import * as LabelPrimitive from "@rn-primitives/label";
+import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
-import { styled } from "nativewind";
 
 import type { LabelRootProps } from "../../web/ui/label";
 

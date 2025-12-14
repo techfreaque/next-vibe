@@ -5,11 +5,11 @@
 
 "use client";
 
-import { BarChart3, Database, List, Settings } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
-import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { BarChart3, Database, List, Settings } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

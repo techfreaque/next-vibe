@@ -7,17 +7,17 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  objectField,
+  requestDataField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import {
-  objectField,
-  requestDataField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 const { POST } = createEndpoint({
@@ -183,7 +183,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.server.build.post.fields.duration.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       errors: responseField(

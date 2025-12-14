@@ -62,7 +62,7 @@ export const { GET } = createEndpoint({
           label: "app.api.browser.tags.browserAutomation",
           description: "app.api.browser.tags.browserAutomation",
         },
-        z.number().positive().optional(),
+        z.coerce.number().positive().optional(),
       ),
       offset: requestDataField(
         {
@@ -71,7 +71,7 @@ export const { GET } = createEndpoint({
           label: "app.api.browser.tags.browserAutomation",
           description: "app.api.browser.tags.browserAutomation",
         },
-        z.number().min(0).optional(),
+        z.coerce.number().min(0).optional(),
       ),
 
       // Response fields
@@ -82,8 +82,8 @@ export const { GET } = createEndpoint({
           earnerUserId: z.string(),
           sourceUserId: z.string(),
           transactionId: z.string(),
-          level: z.number(),
-          amountCents: z.number(),
+          level: z.coerce.number(),
+          amountCents: z.coerce.number(),
           currency: z.string(),
           status: z.string(),
           createdAt: z.string(),
@@ -94,7 +94,7 @@ export const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.browser.tags.browserAutomation",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

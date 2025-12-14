@@ -120,7 +120,7 @@ export const imapMessageResponseSchema = objectField(
         type: WidgetType.TEXT,
         content: "app.api.emails.imapClient.messages.tag",
       },
-      z.number().optional(),
+      z.coerce.number().optional(),
     ),
     imapMessageId: responseField(
       {
@@ -134,7 +134,7 @@ export const imapMessageResponseSchema = objectField(
         type: WidgetType.TEXT,
         content: "app.api.emails.imapClient.messages.tag",
       },
-      z.number().optional(),
+      z.coerce.number().optional(),
     ),
     imapFolderId: responseField(
       {
@@ -211,14 +211,14 @@ export const imapMessageResponseSchema = objectField(
         type: WidgetType.TEXT,
         content: "app.api.emails.imapClient.messages.tag",
       },
-      z.number().optional(),
+      z.coerce.number().optional(),
     ),
     attachmentCount: responseField(
       {
         type: WidgetType.TEXT,
         content: "app.api.emails.imapClient.messages.tag",
       },
-      z.number().optional(),
+      z.coerce.number().optional(),
     ),
     lastSyncAt: responseField(
       {

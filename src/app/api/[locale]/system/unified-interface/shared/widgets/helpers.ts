@@ -13,14 +13,13 @@ import type {
   InterfaceContext,
   SpacingSize,
 } from "../types/enums";
-
 import type {
-  WidgetConfig,
-  FormFieldWidgetConfig,
-  DataTableWidgetConfig,
-  MetricCardWidgetConfig,
   ChartWidgetConfig,
   ContainerWidgetConfig,
+  DataTableWidgetConfig,
+  FormFieldWidgetConfig,
+  MetricCardWidgetConfig,
+  WidgetConfig,
 } from "./configs";
 
 /**

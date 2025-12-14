@@ -10,6 +10,8 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { env } from "@/config/env";
 
+import { serverSystemEnv } from "./env";
+
 /**
  * Supported server environments
  */
@@ -81,11 +83,11 @@ export function detectEnvironment(): ServerEnvironmentType {
  */
 export function isServerlessEnvironment(): boolean {
   return !!(
-    env.VERCEL ||
-    env.AWS_LAMBDA_FUNCTION_NAME ||
-    env.NETLIFY ||
-    env.CLOUDFLARE_WORKERS ||
-    env.RAILWAY_ENVIRONMENT
+    serverSystemEnv.VERCEL ||
+    serverSystemEnv.AWS_LAMBDA_FUNCTION_NAME ||
+    serverSystemEnv.NETLIFY ||
+    serverSystemEnv.CLOUDFLARE_WORKERS ||
+    serverSystemEnv.RAILWAY_ENVIRONMENT
   );
 }
 
@@ -160,42 +162,42 @@ export function getEnvironmentConfig(
  * Get platform information
  */
 export function getPlatformInfo(): PlatformInfo {
-  if (env.VERCEL) {
+  if (serverSystemEnv.VERCEL) {
     const result: PlatformInfo = {
       name: "Vercel",
       type: "serverless",
     };
-    if (env.VERCEL_REGION) {
-      result.region = env.VERCEL_REGION;
+    if (serverSystemEnv.VERCEL_REGION) {
+      result.region = serverSystemEnv.VERCEL_REGION;
     }
-    if (env.VERCEL_URL) {
-      result.url = env.VERCEL_URL;
+    if (serverSystemEnv.VERCEL_URL) {
+      result.url = serverSystemEnv.VERCEL_URL;
     }
     return result;
   }
 
-  if (env.AWS_LAMBDA_FUNCTION_NAME) {
+  if (serverSystemEnv.AWS_LAMBDA_FUNCTION_NAME) {
     return {
       name: "AWS Lambda",
       type: "serverless",
-      region: env.AWS_REGION,
-      functionName: env.AWS_LAMBDA_FUNCTION_NAME,
+      region: serverSystemEnv.AWS_REGION,
+      functionName: serverSystemEnv.AWS_LAMBDA_FUNCTION_NAME,
     };
   }
 
-  if (env.NETLIFY) {
+  if (serverSystemEnv.NETLIFY) {
     return {
       name: "Netlify",
       type: "serverless",
-      site: env.NETLIFY_SITE_NAME,
+      site: serverSystemEnv.NETLIFY_SITE_NAME,
     };
   }
 
-  if (env.RAILWAY_ENVIRONMENT) {
+  if (serverSystemEnv.RAILWAY_ENVIRONMENT) {
     return {
       name: "Railway",
       type: "container",
-      environment: env.RAILWAY_ENVIRONMENT,
+      environment: serverSystemEnv.RAILWAY_ENVIRONMENT,
     };
   }
 
@@ -220,7 +222,7 @@ export function getCurrentEnvironmentInfo(): CurrentEnvironmentInfo {
     isServerless: environment === "serverless",
     isDevelopment: environment === "development",
     isProduction: environment === "production",
-    nodeEnv: env.NODE_ENV || "development",
+    nodeEnv: env.NODE_ENV,
     platform,
   };
 }

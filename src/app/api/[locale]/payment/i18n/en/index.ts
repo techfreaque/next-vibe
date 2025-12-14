@@ -1,9 +1,9 @@
 import { translations as checkoutTranslations } from "../../checkout/i18n/en";
 import { translations as invoiceTranslations } from "../../invoice/i18n/en";
 import { translations as portalTranslations } from "../../portal/i18n/en";
-import { translations as refundTranslations } from "../../refund/i18n/en";
-import { translations as stripeProviderTranslations } from "../../providers/stripe/i18n/en";
 import { translations as nowpaymentsProviderTranslations } from "../../providers/nowpayments/i18n/en";
+import { translations as stripeProviderTranslations } from "../../providers/stripe/i18n/en";
+import { translations as refundTranslations } from "../../refund/i18n/en";
 
 export const translations = {
   // Import sub-domain translations

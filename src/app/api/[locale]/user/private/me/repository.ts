@@ -8,10 +8,10 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
-  fail,
-  success,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -20,7 +20,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { JwtPrivatePayloadType, JwtPayloadType } from "../../auth/types";
+import type { JwtPayloadType,JwtPrivatePayloadType } from "../../auth/types";
 import { users } from "../../db";
 import { UserDetailLevel } from "../../enum";
 import { userRepository } from "../../repository";

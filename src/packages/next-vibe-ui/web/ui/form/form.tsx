@@ -145,12 +145,14 @@ export const useFormField = (): UseFormFieldReturn => {
   const { getFieldState, formState } = useFormContext();
 
   if (!fieldContext) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useFormField should be used within <FormField>");
   }
 
   if (!itemContext) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useFormField should be used within <FormItem>");
   }
 

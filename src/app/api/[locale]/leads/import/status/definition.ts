@@ -161,7 +161,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.leads.import.status.get.response.items.title",
                   },
-                  z.number().nullable(),
+                  z.coerce.number().nullable(),
                 ),
                 processedRows: responseField(
                   {
@@ -169,7 +169,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.leads.import.status.get.response.items.title",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 successfulImports: responseField(
                   {
@@ -177,7 +177,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.leads.import.status.get.response.items.title",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 failedImports: responseField(
                   {
@@ -185,7 +185,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.leads.import.status.get.response.items.title",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 duplicateEmails: responseField(
                   {
@@ -193,7 +193,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.leads.import.status.get.response.items.title",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
 
                 // Batch Processing
@@ -203,7 +203,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.leads.import.status.get.response.items.title",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 batchSize: responseField(
                   {
@@ -211,7 +211,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.leads.import.status.get.response.items.title",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
 
                 // Error Handling
@@ -229,7 +229,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.leads.import.status.get.response.items.title",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 maxRetries: responseField(
                   {
@@ -237,7 +237,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.leads.import.status.get.response.items.title",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
 
                 // Timestamps

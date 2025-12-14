@@ -7,20 +7,19 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { TIMING } from "@/app/[locale]/chat/lib/config/constants";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import {
+  clearDraft,
+  loadDraft,
+  saveDraft,
+} from "@/app/api/[locale]/agent/chat/hooks/use-input-autosave";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { DivRefObject } from "@/packages/next-vibe-ui/web/ui/div";
 import type {
   TextareaKeyboardEvent,
   TextareaRefObject,
 } from "@/packages/next-vibe-ui/web/ui/textarea";
-import type { DivRefObject } from "@/packages/next-vibe-ui/web/ui/div";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { TIMING } from "@/app/[locale]/chat/lib/config/constants";
-import {
-  loadDraft,
-  saveDraft,
-  clearDraft,
-} from "@/app/api/[locale]/agent/chat/hooks/use-input-autosave";
 
 export type EditorActionType = "branch" | null;
 
@@ -66,6 +65,10 @@ export function useMessageEditor({
   // Generate unique draft key for this message editor
   const draftKey = `message-editor-draft:${message.id}`;
 
+  // Capture message content in ref to avoid re-running effect when content changes
+  const messageContentRef = useRef(message.content);
+  messageContentRef.current = message.content;
+
   // Load draft on mount or when message ID changes
   // Don't re-run when message.content changes to avoid overriding user input
   useEffect(() => {
@@ -75,11 +78,10 @@ export function useMessageEditor({
       if (draft) {
         setContent(draft);
       } else {
-        setContent(message.content);
+        setContent(messageContentRef.current);
       }
     };
     void loadDraftForMessage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draftKey, message.id, logger]);
 
   // Wrapper function to save content and draft together

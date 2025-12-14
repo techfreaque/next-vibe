@@ -13,10 +13,10 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
+import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
 
 interface MoveFolderDialogProps {
   open: boolean;

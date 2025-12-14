@@ -5,14 +5,14 @@
 
 "use client";
 
-import { History, List, TrendingUp } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils/utils";
-import { Link } from "next-vibe-ui/ui/link";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
+import { History, List, TrendingUp } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 

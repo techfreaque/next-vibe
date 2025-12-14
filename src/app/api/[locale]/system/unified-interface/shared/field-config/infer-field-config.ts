@@ -6,12 +6,11 @@
  */
 
 import { FieldDataType, WidgetType } from "../types/enums";
-
-import type { FieldConfig } from "./field-config-types";
 import {
   type EndpointFieldStructure,
   getFieldStructureByPath,
 } from "./endpoint-field-types";
+import type { FieldConfig } from "./field-config-types";
 
 /**
  * Extract FieldConfig from a UnifiedField's WidgetConfig

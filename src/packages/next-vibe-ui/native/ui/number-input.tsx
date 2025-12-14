@@ -1,12 +1,12 @@
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { View } from "react-native";
-import { styled } from "nativewind";
 
 import type { NumberInputProps } from "@/packages/next-vibe-ui/web/ui/number-input";
 
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Button } from "./button";
 import { Minus, Plus } from "./icons";
 import { Input } from "./input";

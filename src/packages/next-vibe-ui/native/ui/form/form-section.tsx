@@ -14,9 +14,8 @@ import type {
   FormFieldGroupProps,
   FormSectionProps,
 } from "../../../web/ui/form/form-section";
-
-import { Span } from "../span";
 import { Div } from "../div";
+import { Span } from "../span";
 import { H2, H3, P } from "../typography";
 
 // StyledView is kept for potential future use with dynamic styles

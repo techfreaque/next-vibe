@@ -5,14 +5,14 @@
 
 "use client";
 
-import { BarChart3, Database, List, Settings } from "next-vibe-ui/ui/icons";
-import { usePathname } from "next-vibe-ui/hooks/use-pathname";
-import { Link } from "next-vibe-ui/ui/link";
 import { cn } from "next-vibe/shared/utils";
+import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Span } from "next-vibe-ui/ui/span";
 import { Div } from "next-vibe-ui/ui/div";
+import { BarChart3, Database, List, Settings } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type { ComponentType, JSX, ReactNode } from "react";
 

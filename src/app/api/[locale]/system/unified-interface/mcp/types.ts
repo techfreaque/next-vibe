@@ -5,10 +5,10 @@
 
 import type { z } from "zod";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { BaseExecutionContext } from "../shared/endpoints/route/executor";
@@ -24,7 +24,7 @@ export type JsonRpcVersion = "2.0";
 /**
  * JSON-RPC Request (generic version)
  */
-// eslint-disable-next-line no-restricted-syntax -- Infrastructure: MCP tool parameters require 'unknown' for flexible schema definitions
+ 
 // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: MCP tool parameters require 'unknown' for flexible schema definitions
 export interface JsonRpcRequest<TParams = unknown> {
   jsonrpc: JsonRpcVersion;
@@ -36,7 +36,7 @@ export interface JsonRpcRequest<TParams = unknown> {
 /**
  * JSON-RPC Response (generic version)
  */
-// eslint-disable-next-line no-restricted-syntax -- Infrastructure: Tool result type requires 'unknown' for flexible return values
+ 
 // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Tool result type requires 'unknown' for flexible return values
 export interface JsonRpcResponse<TResult = unknown> {
   jsonrpc: JsonRpcVersion;
@@ -237,7 +237,7 @@ export interface IMCPTransport {
  * MCP Protocol Handler Interface
  */
 export interface IMCPProtocolHandler {
-  // eslint-disable-next-line no-restricted-syntax -- Infrastructure: Protocol extension requires 'unknown' for flexible message payloads
+   
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol extension requires 'unknown' for flexible message payloads
   handleRequest(request: JsonRpcRequest<unknown>): Promise<JsonRpcResponse>;
   handleInitialize(params: MCPInitializeParams): Promise<MCPInitializeResult>;

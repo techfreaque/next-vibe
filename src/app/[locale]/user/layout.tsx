@@ -3,9 +3,9 @@ import { Div } from "next-vibe-ui/ui/div";
 import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type { JSX, ReactNode } from "react";
 
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { envClient } from "@/config/env-client";
 
 /**
  * Generate metadata for the user pages with translations

@@ -99,7 +99,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.credits.history.get.transaction.amount.content",
               },
-              z.number().int(),
+              z.coerce.number().int(),
             ),
 
             balanceAfter: responseField(
@@ -108,7 +108,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.credits.history.get.transaction.balanceAfter.content",
               },
-              z.number().int(),
+              z.coerce.number().int(),
             ),
 
             type: responseField(
@@ -155,7 +155,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.agent.chat.credits.history.get.totalCount.content",
         },
-        z.number().int(),
+        z.coerce.number().int(),
       ),
     },
   ),

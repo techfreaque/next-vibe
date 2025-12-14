@@ -1,18 +1,19 @@
 "use client";
 
+import { styled } from "nativewind";
 import type { JSX } from "react";
 import * as React from "react";
-import { View, Text as RNText, Pressable } from "react-native";
-import { styled } from "nativewind";
+import { Pressable,Text as RNText, View } from "react-native";
 
 import type {
+  DivGenericTarget,
+  DivMouseEvent,
   DivProps as DivBaseProps,
   DivRefObject,
-  DivMouseEvent,
-  DivGenericTarget,
 } from "@/packages/next-vibe-ui/web/ui/div";
 import type { StyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
 import { applyStyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
+
 import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledView = styled(View);

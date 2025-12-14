@@ -1,30 +1,31 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
-import { Link } from "next-vibe-ui/ui/link";
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "next-vibe-ui/ui/collapsible";
-import { Coins } from "next-vibe-ui/ui/icons/Coins";
+import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { Handshake } from "next-vibe-ui/ui/icons/Handshake";
 import { HelpCircle } from "next-vibe-ui/ui/icons/HelpCircle";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { ShoppingCart } from "next-vibe-ui/ui/icons/ShoppingCart";
 import { User } from "next-vibe-ui/ui/icons/User";
+import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { useBottomSheetExpanded } from "../../../hooks/use-bottom-sheet-expanded";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
 import { TOUR_DATA_ATTRS } from "../../../_components/welcome-tour/tour-config";
+import { useBottomSheetExpanded } from "../../../hooks/use-bottom-sheet-expanded";
 import { UserMenu } from "./user-menu";
 
 interface SidebarFooterProps {

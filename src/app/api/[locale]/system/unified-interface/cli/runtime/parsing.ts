@@ -23,7 +23,16 @@ type CliValue = string | number | boolean | CliObject;
 export type ParsedCliData = Record<string, CliValue | null>;
 
 /**
+ * Convert kebab-case to camelCase
+ * Example: "force-update" -> "forceUpdate"
+ */
+function kebabToCamelCase(str: string): string {
+  return str.replace(/-([a-z])/g, (match) => match[1].toUpperCase());
+}
+
+/**
  * Set a nested value in an object using dot notation
+ * Converts kebab-case keys to camelCase for API compatibility
  * Example: setNestedValue(obj, "user.name", "John") -> { user: { name: "John" } }
  */
 function setNestedValue(
@@ -31,11 +40,12 @@ function setNestedValue(
   path: string,
   value: string | number | boolean,
 ): void {
-  const keys = path.split(".");
+  // Convert kebab-case path segments to camelCase for API compatibility
+  const keys = path.split(".").map(kebabToCamelCase);
 
   if (keys.length === 1) {
     // Simple key, no nesting
-    obj[path] = value;
+    obj[keys[0]] = value;
     return;
   }
 

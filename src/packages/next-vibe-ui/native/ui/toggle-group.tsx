@@ -1,23 +1,23 @@
 import * as ToggleGroupPrimitive from "@rn-primitives/toggle-group";
 import type { LucideIcon } from "lucide-react-native";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { View } from "react-native";
-import { styled } from "nativewind";
 
-import { cn } from "next-vibe/shared/utils/utils";
-import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { TextClassContext } from "./text";
-import {
-  toggleTextVariants,
-  toggleVariants,
-  type ToggleSize,
-  type ToggleVariant,
-} from "./toggle";
 import type {
   ToggleGroupItemProps,
   ToggleGroupRootProps,
 } from "../../web/ui/toggle-group";
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { TextClassContext } from "./text";
+import {
+  type ToggleSize,
+  toggleTextVariants,
+  type ToggleVariant,
+  toggleVariants,
+} from "./toggle";
 
 // The styled() function has type inference issues with this primitive
 const StyledToggleGroupRoot = ToggleGroupPrimitive.Root;
@@ -131,7 +131,7 @@ function useToggleGroupContext(): {
 } {
   const context = React.useContext(ToggleGroupContext);
   if (context === null) {
-    // eslint-disable-next-line no-restricted-syntax -- Error handling for context
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
     throw new Error(
       "ToggleGroup compound components cannot be rendered outside the ToggleGroup component", // eslint-disable-line i18next/no-literal-string -- Error message
     );

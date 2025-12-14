@@ -1,17 +1,18 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { AudioWaveform } from "next-vibe-ui/ui/audio-waveform";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { P } from "next-vibe-ui/ui/typography";
-import { Span } from "next-vibe-ui/ui/span";
 import { Loader2, Mic, MicOff, X } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useEffect } from "react";
 
@@ -21,7 +22,6 @@ import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { AudioWaveform } from "next-vibe-ui/ui/audio-waveform";
 
 interface SpeechInputButtonProps {
   /** Optional custom transcript handler. If not provided, appends to main chat input from context */

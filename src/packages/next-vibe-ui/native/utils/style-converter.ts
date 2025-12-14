@@ -3,7 +3,7 @@
  * This ensures consistent style conversion across all native components
  */
 
-import type { ViewStyle, TextStyle, ImageStyle } from "react-native";
+import type { ImageStyle,TextStyle, ViewStyle } from "react-native";
 
 /**
  * Convert React.CSSProperties to React Native ViewStyle

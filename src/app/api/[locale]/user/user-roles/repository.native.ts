@@ -12,15 +12,15 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 
 import type { DbId } from "@/app/api/[locale]/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { NewUserRole, UserRole } from "../db";
-import type { UserRole as UserRoleEnum, UserPermissionRoleValue } from "./enum";
+import type { UserPermissionRoleValue,UserRole as UserRoleEnum } from "./enum";
 // Import interface for type compatibility
 import type { UserRolesRepository } from "./repository";
 

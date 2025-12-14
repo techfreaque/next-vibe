@@ -1,6 +1,6 @@
 "use client";
 
-import { MotionDiv } from "next-vibe-ui/ui/motion";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   BarChart3,
   CheckCircle2,
@@ -10,9 +10,9 @@ import {
 } from "next-vibe-ui/ui/icons";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
-import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Section } from "next-vibe-ui/ui/section";
+import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import type { FC } from "react";

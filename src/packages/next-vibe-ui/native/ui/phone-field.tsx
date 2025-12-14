@@ -2,24 +2,24 @@
  * PhoneField Component for React Native
  * Production-ready international phone input with country code selection
  */
+import { cn } from "next-vibe/shared/utils/utils";
 import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { ChevronDown, Phone } from "./icons";
 
 import { useTranslation } from "@/i18n/core/client";
-import { cn } from "next-vibe/shared/utils/utils";
+// Import all types and constants from web (web is source of truth)
+import type {
+  CountryData,
+  PhoneFieldProps,
+} from "@/packages/next-vibe-ui/web/ui/phone-field";
+import { COUNTRIES } from "@/packages/next-vibe-ui/web/ui/phone-field";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { ChevronDown, Phone } from "./icons";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
-
-// Import all types and constants from web (web is source of truth)
-import type {
-  PhoneFieldProps,
-  CountryData,
-} from "@/packages/next-vibe-ui/web/ui/phone-field";
-import { COUNTRIES } from "@/packages/next-vibe-ui/web/ui/phone-field";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 
 // Re-export COUNTRIES and types for use in other modules
 export { COUNTRIES };

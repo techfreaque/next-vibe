@@ -2,9 +2,9 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Check } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
-import { Check } from "next-vibe-ui/ui/icons";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 

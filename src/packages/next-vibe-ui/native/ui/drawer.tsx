@@ -2,35 +2,35 @@
  * Drawer Component for React Native
  * Bottom sheet drawer implementation using Modal
  */
+import { cn } from "next-vibe/shared/utils/utils";
 import React, { createContext, useContext, useState } from "react";
 import { Modal, Pressable, Text as RNText, View } from "react-native";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
-
 // Import ALL types from web - ZERO definitions here
 import type {
-  DrawerRootProps,
-  DrawerTriggerProps,
-  DrawerTriggerRefObject,
   DrawerCloseProps,
   DrawerCloseRefObject,
   DrawerContentProps,
-  DrawerHeaderProps,
-  DrawerFooterProps,
-  DrawerTitleProps,
-  DrawerDescriptionProps,
   DrawerContextValue,
+  DrawerDescriptionProps,
+  DrawerFooterProps,
+  DrawerHeaderProps,
+  DrawerRootProps,
+  DrawerTitleProps,
+  DrawerTriggerProps,
+  DrawerTriggerRefObject,
 } from "@/packages/next-vibe-ui/web/ui/drawer";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const DrawerContext = createContext<DrawerContextValue | undefined>(undefined);
 
 function useDrawer(): DrawerContextValue {
   const context = useContext(DrawerContext);
   if (!context) {
-    // eslint-disable-next-line no-restricted-syntax -- Error handling for context
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
     throw new Error("Drawer components must be used within Drawer"); // eslint-disable-line i18next/no-literal-string -- Error message
   }
   return context;

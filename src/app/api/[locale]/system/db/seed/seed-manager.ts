@@ -5,6 +5,7 @@ import {
   getSeedModule,
 } from "@/app/api/[locale]/system/generated/seeds";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { formatDatabase, formatDuration } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 export type SeedFn = (
@@ -86,6 +87,8 @@ export async function runSeeds(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
+  const startTime = Date.now();
+
   // First load seed modules from generated index
   logger.debug("🔍 Loading seed modules...");
   await loadSeedModules(logger);
@@ -93,7 +96,7 @@ export async function runSeeds(
   logger.debug(
     `📦 Seed registry has ${Object.keys(seedRegistry).length} modules`,
   );
-  logger.info(`🌱 Running ${environment} seeds...`);
+  logger.debug(`🌱 Running ${environment} seeds`);
 
   // Sort modules by priority (higher priority runs first)
   const sortedModules = Object.entries(seedRegistry).toSorted(
@@ -124,7 +127,8 @@ export async function runSeeds(
     }
   }
 
-  logger.info(`✅ ${environment} seeds completed successfully!`);
+  const duration = Date.now() - startTime;
+  logger.info(formatDatabase(`${environment} seeds completed successfully in ${formatDuration(duration)}`, "🌱"));
 }
 
 /**

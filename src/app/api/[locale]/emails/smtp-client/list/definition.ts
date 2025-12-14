@@ -209,7 +209,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.emails.smtpClient.list.response.account.priority",
               },
-              z.number().int(),
+              z.coerce.number().int(),
             ),
             totalEmailsSent: responseField(
               {
@@ -217,7 +217,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.emails.smtpClient.list.response.account.totalEmailsSent",
               },
-              z.number().int(),
+              z.coerce.number().int(),
             ),
             lastUsedAt: responseField(
               {
@@ -256,7 +256,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.smtpClient.list.response.pagination.page",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           limit: responseField(
             {
@@ -264,7 +264,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.smtpClient.list.response.pagination.limit",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           total: responseField(
             {
@@ -272,7 +272,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.smtpClient.list.response.pagination.total",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
           totalPages: responseField(
             {
@@ -280,7 +280,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.emails.smtpClient.list.response.pagination.totalPages",
             },
-            z.number().int(),
+            z.coerce.number().int(),
           ),
         },
       ),

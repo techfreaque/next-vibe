@@ -78,7 +78,7 @@ const { POST } = createEndpoint({
           placeholder: "app.api.payment.invoice.amount.placeholder" as const,
           columns: 12,
         },
-        z.number().min(0.01),
+        z.coerce.number().min(0.01),
       ),
 
       currency: requestDataField(
@@ -211,7 +211,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.payment.invoice.post.response.invoice.amount" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           currency: responseField(
             {

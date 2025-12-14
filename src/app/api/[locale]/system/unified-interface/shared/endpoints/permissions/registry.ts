@@ -8,23 +8,23 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 
-import {
-  UserRole,
-  PlatformMarker,
-  UserPermissionRole,
-  type UserRoleValue,
-  type UserPermissionRoleValue,
-  type PlatformMarkerValue,
-  filterUserPermissionRoles,
-  filterPlatformMarkers,
-} from "@/app/api/[locale]/user/user-roles/enum";
-
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { Platform } from "../../types/platform";
-import type { EndpointLogger } from "../../logger/endpoint";
-import type { InferJwtPayloadTypeFromRoles } from "../route/handler";
+import {
+  filterPlatformMarkers,
+  filterUserPermissionRoles,
+  PlatformMarker,
+  type PlatformMarkerValue,
+  UserPermissionRole,
+  type UserPermissionRoleValue,
+  UserRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
+
+import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint";
+import { Platform } from "../../types/platform";
+import type { InferJwtPayloadTypeFromRoles } from "../route/handler";
 
 /**
  * Platform access check result
@@ -131,6 +131,25 @@ class PermissionsRegistry implements IPermissionsRegistry {
             allowed: false,
             reason: `Endpoint is not accessible via ${platformStr.toUpperCase()} platform`,
             blockedByRole: PlatformMarker.CLI_OFF,
+          };
+        }
+        break;
+
+      case "cli-package":
+        // CLI_PACKAGE can only access endpoints with CLI_AUTH_BYPASS marker
+        // This restricts npm package users to unauthenticated endpoints only
+        if (platformMarkers.includes(PlatformMarker.CLI_OFF)) {
+          return {
+            allowed: false,
+            reason: "Endpoint is not accessible via CLI_PACKAGE platform",
+            blockedByRole: PlatformMarker.CLI_OFF,
+          };
+        }
+        if (!platformMarkers.includes(PlatformMarker.CLI_AUTH_BYPASS)) {
+          return {
+            allowed: false,
+            reason: "Endpoint requires authentication which is not available in CLI_PACKAGE mode",
+            blockedByRole: PlatformMarker.CLI_AUTH_BYPASS,
           };
         }
         break;
@@ -575,6 +594,11 @@ class PermissionsRegistry implements IPermissionsRegistry {
 
     if (!endpoint.allowedRoles.includes(UserRole.CLI_OFF)) {
       platforms.push(Platform.CLI);
+      // CLI_PACKAGE only available for endpoints with CLI_AUTH_BYPASS
+      // (unauthenticated endpoints that don't require local auth)
+      if (endpoint.allowedRoles.includes(PlatformMarker.CLI_AUTH_BYPASS)) {
+        platforms.push(Platform.CLI_PACKAGE);
+      }
     }
     if (!endpoint.allowedRoles.includes(UserRole.AI_TOOL_OFF)) {
       platforms.push(Platform.AI);

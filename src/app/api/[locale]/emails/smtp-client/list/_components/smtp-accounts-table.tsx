@@ -5,16 +5,18 @@
 
 "use client";
 
-import { Edit, MoreHorizontal, Trash2 } from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
-import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "next-vibe-ui/ui/dropdown-menu";
+import { Edit, MoreHorizontal, Trash2 } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
 import {
   Table,
   TableBody,
@@ -23,8 +25,6 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 

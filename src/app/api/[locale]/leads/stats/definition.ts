@@ -49,7 +49,7 @@ import {
 // Historical data point schema
 const historicalDataPointSchema = z.object({
   date: z.string(),
-  value: z.number(),
+  value: z.coerce.number(),
 });
 
 // Chart data schema for a single metric
@@ -92,8 +92,8 @@ const historicalDataSchema = z.object({
 // Grouped stats item schema
 const groupedStatsItemSchema = z.object({
   label: z.string(),
-  value: z.number(),
-  percentage: z.number(),
+  value: z.coerce.number(),
+  percentage: z.coerce.number(),
   color: z.string(),
 });
 
@@ -108,7 +108,6 @@ const groupedStatsSchema = z.object({
   byEngagementLevel: z.array(groupedStatsItemSchema),
   byConversionFunnel: z.array(groupedStatsItemSchema),
 });
-
 
 // Data range schema
 const dataRangeSchema = z.object({
@@ -714,7 +713,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.totalLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       newLeads: responseField(
@@ -722,7 +721,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.newLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       activeLeads: responseField(
@@ -730,7 +729,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.activeLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       conversionRate: responseField(
@@ -738,7 +737,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.conversionRate",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       averageOpenRate: responseField(
@@ -746,7 +745,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.averageOpenRate",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       averageClickRate: responseField(
@@ -754,7 +753,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.averageClickRate",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Additional lead metrics
@@ -763,7 +762,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.campaignRunningLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       websiteUserLeads: responseField(
@@ -771,7 +770,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.websiteUserLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       newsletterSubscriberLeads: responseField(
@@ -779,7 +778,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.newsletterSubscriberLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       convertedLeads: responseField(
@@ -787,7 +786,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.convertedLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       signedUpLeads: responseField(
@@ -795,7 +794,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.signedUpLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       consultationBookedLeads: responseField(
@@ -803,7 +802,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.consultationBookedLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       subscriptionConfirmedLeads: responseField(
@@ -811,7 +810,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.subscriptionConfirmedLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       unsubscribedLeads: responseField(
@@ -819,7 +818,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.unsubscribedLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       bouncedLeads: responseField(
@@ -827,7 +826,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.bouncedLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       invalidLeads: responseField(
@@ -835,7 +834,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.invalidLeads",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Email campaign metrics
@@ -844,7 +843,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.totalEmailsSent",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       totalEmailsOpened: responseField(
@@ -852,7 +851,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.totalEmailsOpened",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       totalEmailsClicked: responseField(
@@ -860,7 +859,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.totalEmailsClicked",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       averageEmailsPerLead: responseField(
@@ -868,7 +867,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.averageEmailsPerLead",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Engagement metrics
@@ -877,7 +876,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsWithEmailEngagement",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       leadsWithoutEmailEngagement: responseField(
@@ -885,7 +884,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsWithoutEmailEngagement",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       averageEmailEngagementScore: responseField(
@@ -893,7 +892,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.averageEmailEngagementScore",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       totalEmailEngagements: responseField(
@@ -901,7 +900,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.totalEmailEngagements",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Conversion metrics
@@ -910,7 +909,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.signupRate",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       consultationBookingRate: responseField(
@@ -918,7 +917,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.consultationBookingRate",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       subscriptionConfirmationRate: responseField(
@@ -926,7 +925,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.subscriptionConfirmationRate",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Data completeness
@@ -935,7 +934,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.dataCompletenessRate",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Performance metrics
@@ -944,7 +943,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadVelocity",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Time-based metrics
@@ -953,7 +952,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsCreatedToday",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       leadsCreatedThisWeek: responseField(
@@ -961,7 +960,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsCreatedThisWeek",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       leadsCreatedThisMonth: responseField(
@@ -969,7 +968,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsCreatedThisMonth",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       leadsUpdatedToday: responseField(
@@ -977,7 +976,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsUpdatedToday",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       leadsUpdatedThisWeek: responseField(
@@ -985,7 +984,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsUpdatedThisWeek",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       leadsUpdatedThisMonth: responseField(
@@ -993,7 +992,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsUpdatedThisMonth",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Distribution metrics
@@ -1002,7 +1001,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsByCampaignStage",
         },
-        z.record(z.string(), z.number()),
+        z.record(z.string(), z.coerce.number()),
       ),
 
       leadsInActiveCampaigns: responseField(
@@ -1010,7 +1009,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsInActiveCampaigns",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       leadsNotInCampaigns: responseField(
@@ -1018,7 +1017,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsNotInCampaigns",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       leadsByJourneyVariant: responseField(
@@ -1026,7 +1025,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsByJourneyVariant",
         },
-        z.record(z.string(), z.number()),
+        z.record(z.string(), z.coerce.number()),
       ),
 
       leadsByCountry: responseField(
@@ -1034,7 +1033,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsByCountry",
         },
-        z.record(z.string(), z.number()),
+        z.record(z.string(), z.coerce.number()),
       ),
 
       leadsByLanguage: responseField(
@@ -1042,7 +1041,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsByLanguage",
         },
-        z.record(z.string(), z.number()),
+        z.record(z.string(), z.coerce.number()),
       ),
 
       leadsBySource: responseField(
@@ -1050,7 +1049,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsBySource",
         },
-        z.record(z.string(), z.number()),
+        z.record(z.string(), z.coerce.number()),
       ),
 
       leadsByStatus: responseField(
@@ -1058,7 +1057,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsByStatus",
         },
-        z.record(z.string(), z.number()),
+        z.record(z.string(), z.coerce.number()),
       ),
 
       // Business information completeness
@@ -1067,7 +1066,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsWithBusinessName",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       leadsWithContactName: responseField(
@@ -1075,7 +1074,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsWithContactName",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       leadsWithPhone: responseField(
@@ -1083,7 +1082,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsWithPhone",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       leadsWithWebsite: responseField(
@@ -1091,7 +1090,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsWithWebsite",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       leadsWithNotes: responseField(
@@ -1099,7 +1098,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.leadsWithNotes",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Historical data with proper Zod schema
@@ -1126,7 +1125,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.averageTimeToConversion",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       averageTimeToSignup: responseField(
@@ -1134,7 +1133,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.averageTimeToSignup",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       averageTimeToConsultation: responseField(
@@ -1142,7 +1141,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.stats.response.averageTimeToConsultation",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Top performers with proper Zod schemas
@@ -1179,28 +1178,28 @@ const { GET } = createEndpoint({
                 type: WidgetType.TEXT,
                 content: "app.api.leads.stats.response.topPerformingCampaigns",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             conversionRate: responseField(
               {
                 type: WidgetType.TEXT,
                 content: "app.api.leads.stats.response.conversionRate",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             openRate: responseField(
               {
                 type: WidgetType.TEXT,
                 content: "app.api.leads.stats.response.averageOpenRate",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             clickRate: responseField(
               {
                 type: WidgetType.TEXT,
                 content: "app.api.leads.stats.response.averageClickRate",
               },
-              z.number(),
+              z.coerce.number(),
             ),
           },
         ),
@@ -1232,21 +1231,21 @@ const { GET } = createEndpoint({
                 type: WidgetType.TEXT,
                 content: "app.api.leads.stats.response.topPerformingSources",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             conversionRate: responseField(
               {
                 type: WidgetType.TEXT,
                 content: "app.api.leads.stats.response.conversionRate",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             qualityScore: responseField(
               {
                 type: WidgetType.TEXT,
                 content: "app.api.leads.stats.response.topPerformingSources",
               },
-              z.number(),
+              z.coerce.number(),
             ),
           },
         ),
@@ -1337,28 +1336,28 @@ const { GET } = createEndpoint({
                     type: WidgetType.TEXT,
                     content: "app.api.leads.stats.response.totalEmailsSent",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 emailsOpened: responseField(
                   {
                     type: WidgetType.TEXT,
                     content: "app.api.leads.stats.response.totalEmailsOpened",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 emailsClicked: responseField(
                   {
                     type: WidgetType.TEXT,
                     content: "app.api.leads.stats.response.totalEmailsClicked",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 daysSinceCreated: responseField(
                   {
                     type: WidgetType.TEXT,
                     content: "app.api.leads.stats.response.recentActivity",
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 isConverted: responseField(
                   {

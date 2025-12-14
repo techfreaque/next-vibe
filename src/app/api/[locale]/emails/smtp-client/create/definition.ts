@@ -18,7 +18,6 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-
 import {
   CountriesOptions,
   Languages,
@@ -136,7 +135,7 @@ const { POST } = createEndpoint({
               placeholder: "app.api.emails.smtpClient.create.port.placeholder",
               columns: 6,
             },
-            z.number().min(1).max(65535),
+            z.coerce.number().min(1).max(65535),
           ),
 
           securityType: requestDataField(
@@ -387,7 +386,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.emails.smtpClient.create.response.account.port",
                 },
-                z.number().int(),
+                z.coerce.number().int(),
               ),
               securityType: responseField(
                 {
@@ -480,7 +479,7 @@ const { POST } = createEndpoint({
                   type: WidgetType.BADGE,
                   text: "app.api.emails.smtpClient.create.response.account.priority",
                 },
-                z.number().int().optional(),
+                z.coerce.number().int().optional(),
               ),
               totalEmailsSent: responseField(
                 {
@@ -488,7 +487,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.emails.smtpClient.create.response.account.totalEmailsSent",
                 },
-                z.number().int(),
+                z.coerce.number().int(),
               ),
               createdAt: responseField(
                 {

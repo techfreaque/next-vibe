@@ -6,16 +6,16 @@
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
+  type CodeQualityItem,
+  countCodeQualityBySeverity,
   extractCodeQualityListData,
   groupCodeQualityItems,
-  countCodeQualityBySeverity,
-  sortBySeverity,
-  type CodeQualityItem,
   type ProcessedCodeQualityList,
+  sortBySeverity,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/code-quality-list";
 import {
-  formatLocation,
   formatFilePath,
+  formatLocation,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";

@@ -57,7 +57,7 @@ const { POST } = createEndpoint({
           description: "app.api.system.db.studio.fields.port.description",
           columns: 6,
         },
-        z.string().optional().default("5555"),
+        z.coerce.number().optional().default(5555),
       ),
 
       openBrowser: requestDataField(
@@ -94,7 +94,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.studio.fields.portUsed.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       output: responseField(
@@ -110,7 +110,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.studio.fields.duration.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

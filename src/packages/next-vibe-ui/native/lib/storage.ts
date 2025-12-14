@@ -13,7 +13,7 @@ const logStorageError = (operation: string, error: unknown): void => {
     (globalThis as { __DEV__?: boolean }).__DEV__
   ) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    // eslint-disable-next-line no-console, i18next/no-literal-string
+    // eslint-disable-next-line i18next/no-literal-string, no-console -- Intentional dev-mode error logging
     console.error(`[Storage] Error ${operation}:`, errorMsg);
   }
 };

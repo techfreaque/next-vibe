@@ -3,11 +3,11 @@
 
 import { Environment } from "next-vibe/shared/utils";
 import { useParams } from "next-vibe-ui/hooks/use-navigation";
-import { Div } from "next-vibe-ui/ui/div";
-import { H2, P } from "next-vibe-ui/ui/typography";
-import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
+import { H2, P } from "next-vibe-ui/ui/typography";
 import type { ReactElement } from "react";
 
 import { envClient } from "@/config/env-client";
@@ -27,7 +27,7 @@ export default function ErrorPage({
     envClient.NODE_ENV !== Environment.PRODUCTION ||
     envClient.NEXT_PUBLIC_DEBUG_PRODUCTION
   ) {
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     throw error;
   }
 

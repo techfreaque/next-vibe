@@ -7,11 +7,12 @@
 import { dateSchema } from "next-vibe/shared/types/common.schema";
 import { z } from "zod";
 
-import { WebSocketErrorCode } from "./enum";
 import {
   UserPermissionRole,
   UserRoleDB,
 } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { WebSocketErrorCode } from "./enum";
 
 /**
  * JWT Payload Schema

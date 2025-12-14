@@ -8,12 +8,12 @@ import { Code } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import {
   extractCodeOutputData,
-  splitCodeIntoLines,
   isLineHighlighted,
+  splitCodeIntoLines,
 } from "../../../shared/widgets/logic/code-output";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 
 /**
  * Displays code with syntax highlighting and optional line numbers.

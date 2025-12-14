@@ -7,18 +7,18 @@ import "server-only";
 
 import { eq, lt, or } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { AUTH_TOKEN_COOKIE_NAME } from "@/config/constants";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { DbId } from "@/app/api/[locale]/system/db/types";
 import { createDefaultCliUser } from "@/app/api/[locale]/system/unified-interface/cli/auth/cli-user";
+import { AUTH_TOKEN_COOKIE_NAME } from "@/config/constants";
 
 import type { NewSession, Session } from "./db";
 import { sessions } from "./db";

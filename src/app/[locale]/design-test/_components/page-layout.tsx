@@ -1,37 +1,39 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
-import { useState } from "react";
-import { ButtonsPreview } from "./buttons";
-import { FormsPreview } from "./forms";
-import { FeedbackPreview } from "./feedback";
-import { LayoutsPreview } from "./layouts";
-import { NavigationPreview } from "./navigation";
-import { OverlaysPreview } from "./overlays";
-import { DataDisplayPreview } from "./data-display";
-import { AdvancedPreview } from "./advanced";
-import { SpecialPreview } from "./special";
-import { Separator } from "next-vibe-ui/ui/separator";
-import { Toaster } from "next-vibe-ui/ui/sonner";
+import { Button } from "next-vibe-ui/ui/button";
 import { Container } from "next-vibe-ui/ui/container";
 import { Div } from "next-vibe-ui/ui/div";
-import { H1, H4, Large, P } from "next-vibe-ui/ui/typography";
-import { SidebarLayout } from "next-vibe-ui/ui/sidebar";
-import { Button } from "next-vibe-ui/ui/button";
-import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import {
-  Menu,
-  Palette,
-  Layout,
-  Navigation,
   Box,
   Database,
   Layers,
+  Layout,
+  Menu,
+  Navigation,
+  Palette,
   Sparkles,
 } from "next-vibe-ui/ui/icons";
+import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
+import { Separator } from "next-vibe-ui/ui/separator";
+import { SidebarLayout } from "next-vibe-ui/ui/sidebar";
+import { Toaster } from "next-vibe-ui/ui/sonner";
+import { H1, H4, Large, P } from "next-vibe-ui/ui/typography";
+import { useState } from "react";
+
+import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import { ThemeToggle } from "../../_components/theme-toggle";
-import { envClient } from "@/config/env-client";
+import { AdvancedPreview } from "./advanced";
+import { ButtonsPreview } from "./buttons";
+import { DataDisplayPreview } from "./data-display";
+import { FeedbackPreview } from "./feedback";
+import { FormsPreview } from "./forms";
+import { LayoutsPreview } from "./layouts";
+import { NavigationPreview } from "./navigation";
+import { OverlaysPreview } from "./overlays";
+import { SpecialPreview } from "./special";
 
 export function DesignTestPageLayout({
   locale,
@@ -44,7 +46,7 @@ export function DesignTestPageLayout({
     <>
       <SidebarLayout
         className={
-          envClient.platform.isReactNative
+          platform.isReactNative
             ? "flex flex-1 overflow-hidden bg-background"
             : "flex h-dvh overflow-hidden bg-background"
         }
@@ -80,7 +82,7 @@ export function DesignTestPageLayout({
                     className="w-full justify-start"
                     size="sm"
                     onClick={() => {
-                      if (!envClient.platform.isReactNative) {
+                      if (!platform.isReactNative) {
                         document
                           .getElementById("buttons")
                           ?.scrollIntoView({ behavior: "smooth" });
@@ -95,7 +97,7 @@ export function DesignTestPageLayout({
                     className="w-full justify-start"
                     size="sm"
                     onClick={() => {
-                      if (!envClient.platform.isReactNative) {
+                      if (!platform.isReactNative) {
                         document
                           .getElementById("forms")
                           ?.scrollIntoView({ behavior: "smooth" });
@@ -110,7 +112,7 @@ export function DesignTestPageLayout({
                     className="w-full justify-start"
                     size="sm"
                     onClick={() => {
-                      if (!envClient.platform.isReactNative) {
+                      if (!platform.isReactNative) {
                         document
                           .getElementById("feedback")
                           ?.scrollIntoView({ behavior: "smooth" });
@@ -125,7 +127,7 @@ export function DesignTestPageLayout({
                     className="w-full justify-start"
                     size="sm"
                     onClick={() => {
-                      if (!envClient.platform.isReactNative) {
+                      if (!platform.isReactNative) {
                         document
                           .getElementById("layouts")
                           ?.scrollIntoView({ behavior: "smooth" });
@@ -140,7 +142,7 @@ export function DesignTestPageLayout({
                     className="w-full justify-start"
                     size="sm"
                     onClick={() => {
-                      if (!envClient.platform.isReactNative) {
+                      if (!platform.isReactNative) {
                         document
                           .getElementById("navigation")
                           ?.scrollIntoView({ behavior: "smooth" });
@@ -155,7 +157,7 @@ export function DesignTestPageLayout({
                     className="w-full justify-start"
                     size="sm"
                     onClick={() => {
-                      if (!envClient.platform.isReactNative) {
+                      if (!platform.isReactNative) {
                         document
                           .getElementById("overlays")
                           ?.scrollIntoView({ behavior: "smooth" });
@@ -170,7 +172,7 @@ export function DesignTestPageLayout({
                     className="w-full justify-start"
                     size="sm"
                     onClick={() => {
-                      if (!envClient.platform.isReactNative) {
+                      if (!platform.isReactNative) {
                         document
                           .getElementById("data-display")
                           ?.scrollIntoView({ behavior: "smooth" });
@@ -185,7 +187,7 @@ export function DesignTestPageLayout({
                     className="w-full justify-start"
                     size="sm"
                     onClick={() => {
-                      if (!envClient.platform.isReactNative) {
+                      if (!platform.isReactNative) {
                         document
                           .getElementById("advanced")
                           ?.scrollIntoView({ behavior: "smooth" });
@@ -200,7 +202,7 @@ export function DesignTestPageLayout({
                     className="w-full justify-start"
                     size="sm"
                     onClick={() => {
-                      if (!envClient.platform.isReactNative) {
+                      if (!platform.isReactNative) {
                         document
                           .getElementById("special")
                           ?.scrollIntoView({ behavior: "smooth" });

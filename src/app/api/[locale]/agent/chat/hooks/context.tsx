@@ -17,6 +17,7 @@ import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/defini
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { DefaultFolderId } from "../config";
 
 /**

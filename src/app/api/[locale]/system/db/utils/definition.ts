@@ -174,7 +174,7 @@ const { GET } = createEndpoint({
               content: "app.api.system.db.utils.details.uptime",
               fieldType: FieldDataType.NUMBER,
             },
-            z.number().optional(),
+            z.coerce.number().optional(),
           ),
           activeConnections: responseField(
             {
@@ -182,7 +182,7 @@ const { GET } = createEndpoint({
               content: "app.api.system.db.utils.details.activeConnections",
               fieldType: FieldDataType.NUMBER,
             },
-            z.number().optional(),
+            z.coerce.number().optional(),
           ),
           maxConnections: responseField(
             {
@@ -190,7 +190,7 @@ const { GET } = createEndpoint({
               content: "app.api.system.db.utils.details.maxConnections",
               fieldType: FieldDataType.NUMBER,
             },
-            z.number().optional(),
+            z.coerce.number().optional(),
           ),
         },
       ),

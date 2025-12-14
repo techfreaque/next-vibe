@@ -189,9 +189,9 @@ export const { POST } = createEndpoint({
               )
               .optional(),
             report: z.string().optional(),
-            totalFiles: z.number().optional(),
-            validFiles: z.number().optional(),
-            filesWithIssues: z.number().optional(),
+            totalFiles: z.coerce.number().optional(),
+            validFiles: z.coerce.number().optional(),
+            filesWithIssues: z.coerce.number().optional(),
           })
           .describe("Detailed TRPC validation result"),
       ),

@@ -3,22 +3,21 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Send, X } from "next-vibe-ui/ui/icons";
+import { Textarea } from "next-vibe-ui/ui/textarea";
 import { H3 } from "next-vibe-ui/ui/typography";
 import { P } from "next-vibe-ui/ui/typography";
-import { Textarea } from "next-vibe-ui/ui/textarea";
-import { Send, X } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { PersonaSelector } from "@/app/api/[locale]/agent/chat/personas/_components/persona-selector";
+import { ModelSelector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/model-selector";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
-
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
-import { ModelSelector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/model-selector";
-import { PersonaSelector } from "@/app/api/[locale]/agent/chat/personas/_components/persona-selector";
 
 interface ModelPersonaSelectorModalProps {
   titleKey: TranslationKey;

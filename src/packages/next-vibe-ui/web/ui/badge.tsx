@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
 import type * as React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 const badgeVariants = cva(

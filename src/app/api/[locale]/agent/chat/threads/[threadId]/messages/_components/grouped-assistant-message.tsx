@@ -5,6 +5,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import React, { type JSX } from "react";
 
+import { chatProse } from "@/app/[locale]/chat/lib/design-tokens";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
 import {
@@ -15,7 +16,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { chatProse } from "@/app/[locale]/chat/lib/design-tokens";
 import { AssistantMessageActions } from "./assistant-message-actions";
 import { MessageAuthorInfo } from "./message-author";
 import type { MessageGroup } from "./message-grouping";
@@ -119,8 +119,7 @@ export function GroupedAssistantMessage({
     void processMessageGroupForCopy(allMessages, locale, false, logger).then(
       setContentText,
     );
-    // oxlint-disable-next-line exhaustive-deps
-  }, [allMessages, locale]);
+  }, [allMessages, locale, logger]);
 
   return (
     <Div className="flex items-start gap-3">

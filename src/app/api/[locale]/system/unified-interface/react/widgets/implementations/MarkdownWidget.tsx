@@ -8,8 +8,8 @@ import type { JSX } from "react";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { extractMarkdownData } from "../../../shared/widgets/logic/markdown";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 
 /**
  * Renders markdown content with optional sanitization.

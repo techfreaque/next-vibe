@@ -4,9 +4,10 @@
  */
 
 import type { QueryKey } from "@tanstack/react-query";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { parseError } from "next-vibe/shared/utils/parse-error";
+
 import { type Methods } from "../../../shared/enums";
 
 type SerializableValue =

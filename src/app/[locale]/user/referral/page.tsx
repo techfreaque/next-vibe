@@ -4,20 +4,19 @@
  */
 
 import type { Metadata } from "next";
-import { Div } from "next-vibe-ui/ui/div";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { H1, H2, P } from "next-vibe-ui/ui/typography";
-import { Link } from "next-vibe-ui/ui/link";
+import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
+import { H1, H2, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
-
-import { requireUser } from "@/app/api/[locale]/user/auth/utils";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { ReferralCodeForm } from "@/app/api/[locale]/referral/_components/referral-code-form";
 import { ReferralCodesList } from "@/app/api/[locale]/referral/_components/referral-codes-list";
 import { ReferralStats } from "@/app/api/[locale]/referral/_components/referral-stats";
+import { requireUser } from "@/app/api/[locale]/user/auth/utils";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 interface ReferralPageProps {
   params: Promise<{

@@ -1,12 +1,13 @@
 "use client";
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Cross2Icon } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils/utils";
+import { Cross2Icon } from "next-vibe-ui/ui/icons";
 import * as React from "react";
-import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
+
+import type { StyleType } from "../utils/style-type";
 
 // Cross-platform type exports
 export interface DialogRootProps {

@@ -18,15 +18,15 @@ import { useState } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
+import type { UnifiedField } from "../../../shared/types/endpoint";
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import {
   extractDataListData,
   getListDisplayItems,
   getRemainingListItemsCount,
   type ListItem,
 } from "../../../shared/widgets/logic/data-list";
-import type { UnifiedField } from "../../../shared/types/endpoint";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**

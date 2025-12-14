@@ -5,9 +5,11 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
+import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
 import {
   Table,
   TableBody,
@@ -16,8 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { useImapFoldersList } from "@/app/api/[locale]/emails/imap-client/folders/list/hooks";

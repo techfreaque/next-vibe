@@ -6,9 +6,10 @@
 
 "use client";
 
-import { Badge } from "next-vibe-ui/ui/badge";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
+import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
 import {
   Table,
@@ -18,18 +19,18 @@ import {
   TableHeader,
   TableRow,
 } from "next-vibe-ui/ui/table";
-import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { type ImapSyncStatusValue, ImapSyncStatus } from "../enum";
+
 import imapAccountsListDefinitions, {
   type ImapAccountsListResponseOutput,
 } from "../accounts/list/definition";
 import imapAccountTestDefinition from "../accounts/test/definition";
+import { ImapSyncStatus,type ImapSyncStatusValue } from "../enum";
 
 interface ImapAccountsListProps {
   locale: CountryLanguage;

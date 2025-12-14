@@ -3,18 +3,18 @@
  * Server-rendered email preview page
  */
 
+import { notFound } from "next-vibe-ui/lib/not-found";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
-import { notFound } from "next-vibe-ui/lib/not-found";
-import { Div } from "next-vibe-ui/ui/div";
-import { H1, P } from "next-vibe-ui/ui/typography";
 import { Span } from "next-vibe-ui/ui/span";
-import { Button } from "next-vibe-ui/ui/button";
+import { H1, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
-import { EmailPreviewClient } from "@/app/api/[locale]/leads/campaigns/emails/_components/email-preview-client";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
+import { EmailPreviewClient } from "@/app/api/[locale]/leads/campaigns/emails/_components/email-preview-client";
 import type {
   EmailCampaignStageValues,
   EmailJourneyVariantValues,

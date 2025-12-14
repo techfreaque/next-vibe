@@ -4,9 +4,10 @@
  * This file contains default/built-in personas that are read-only
  */
 
-import { ModelId } from "../model-access/models";
-import type { IconKey } from "../model-access/icons";
 import type { TranslationKey } from "@/i18n/core/static-types";
+
+import type { IconKey } from "../model-access/icons";
+import { ModelId } from "../model-access/models";
 
 /**
  * Persona source types

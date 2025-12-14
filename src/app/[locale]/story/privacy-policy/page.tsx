@@ -1,21 +1,20 @@
-import { Lock, Shield } from "next-vibe-ui/ui/icons";
 import type { Metadata, ResolvingMetadata } from "next";
+import { Div } from "next-vibe-ui/ui/div";
+import { Lock, Shield } from "next-vibe-ui/ui/icons";
+import { Li } from "next-vibe-ui/ui/li";
+import { Span } from "next-vibe-ui/ui/span";
+import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
+import { Ul } from "next-vibe-ui/ui/ul";
 import type { JSX } from "react";
 
-import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
-import { Li } from "next-vibe-ui/ui/li";
-import { Ul } from "next-vibe-ui/ui/ul";
-import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
-
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
 import { PrivacyPolicyClientInteraction } from "./_components/privacy-policy-client-content";
 import { SupportButton } from "./_components/support-button";
-import { envClient } from "@/config/env-client";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;

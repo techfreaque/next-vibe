@@ -9,15 +9,14 @@ import {
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
-import { Input } from "next-vibe-ui/ui/input";
 import { MessageSquarePlus, Search } from "next-vibe-ui/ui/icons";
+import { Input } from "next-vibe-ui/ui/input";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import type { ChatThread } from "@/app/api/[locale]/agent/chat/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import type { ChatThread } from "@/app/api/[locale]/agent/chat/db";
 
 interface SearchModalProps {
   open: boolean;

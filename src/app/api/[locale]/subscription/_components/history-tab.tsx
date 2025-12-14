@@ -1,5 +1,4 @@
-import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { History } from "next-vibe-ui/ui/icons";
+import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import {
@@ -10,15 +9,17 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { P } from "next-vibe-ui/ui/typography";
+import { History } from "next-vibe-ui/ui/icons";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
-import { cn } from "next-vibe/shared/utils";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import type { CreditTransactionOutput } from "@/app/api/[locale]/credits/repository";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import { formatDate, getTransactionTypeKey } from "./types";
-import type { CreditTransactionOutput } from "@/app/api/[locale]/credits/repository";
 
 interface HistoryTabProps {
   locale: CountryLanguage;

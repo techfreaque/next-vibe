@@ -16,6 +16,11 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  formatGenerator,
+  formatCount,
+  formatDuration,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import {
   extractNestedPath,
@@ -82,7 +87,7 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
       const duration = Date.now() - startTime;
 
       logger.info(
-        `Generated endpoints index with ${definitionFiles.length} endpoints in ${duration}ms`,
+        formatGenerator(`Generated endpoints index with ${formatCount(definitionFiles.length, "endpoint")} in ${formatDuration(duration)}`, "📋"),
       );
 
       return success({

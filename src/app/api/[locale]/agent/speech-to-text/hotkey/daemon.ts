@@ -8,6 +8,7 @@
 import "server-only";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
 import { Platform } from "./enum";
 import { platformDetector } from "./utils/platform";
 

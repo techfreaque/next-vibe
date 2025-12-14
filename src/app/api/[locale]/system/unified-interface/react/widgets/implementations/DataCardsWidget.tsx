@@ -6,14 +6,14 @@ import type { JSX } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
+import type { UnifiedField } from "../../../shared/types/endpoint";
 import type { WidgetType } from "../../../shared/types/enums";
+import { extractDataCardsData } from "../../../shared/widgets/logic/data-cards";
 import type {
   ReactWidgetProps,
   WidgetData,
 } from "../../../shared/widgets/types";
-import { extractDataCardsData } from "../../../shared/widgets/logic/data-cards";
 import { getGridClassName } from "../../../shared/widgets/utils/widget-helpers";
-import type { UnifiedField } from "../../../shared/types/endpoint";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**

@@ -6,10 +6,11 @@
 "use client";
 
 import type { JSX, ReactNode } from "react";
-import type { StyleType } from "../../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
+
+import type { StyleType } from "../../utils/style-type";
 
 
 /**

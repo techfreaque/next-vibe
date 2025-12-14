@@ -1,9 +1,17 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import type { JSX } from "react";
-
+import { Calendar } from "next-vibe-ui/ui/calendar";
+import { Checkbox } from "next-vibe-ui/ui/checkbox";
+import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
-import { Textarea } from "next-vibe-ui/ui/textarea";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "next-vibe-ui/ui/input-otp";
+import { Label } from "next-vibe-ui/ui/label";
+import { RadioGroup, RadioGroupItem } from "next-vibe-ui/ui/radio-group";
+import { Section } from "next-vibe-ui/ui/section";
 import {
   Select,
   SelectContent,
@@ -11,21 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe-ui/ui/select";
-import { Checkbox } from "next-vibe-ui/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "next-vibe-ui/ui/radio-group";
-import { Switch } from "next-vibe-ui/ui/switch";
 import { Slider } from "next-vibe-ui/ui/slider";
-import { Label } from "next-vibe-ui/ui/label";
-import { Calendar } from "next-vibe-ui/ui/calendar";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "next-vibe-ui/ui/input-otp";
+import { Switch } from "next-vibe-ui/ui/switch";
 import { TagsField } from "next-vibe-ui/ui/tags-field";
-import { Div } from "next-vibe-ui/ui/div";
-import { Section } from "next-vibe-ui/ui/section";
+import { Textarea } from "next-vibe-ui/ui/textarea";
 import { H2 } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
 import { useState } from "react";
 
 export function FormsPreview(): JSX.Element {

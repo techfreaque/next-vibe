@@ -2,9 +2,9 @@
  * Payment Provider Registry
  */
 
-import type { PaymentProvider } from "./types";
 import { NOWPaymentsProvider } from "./nowpayments/repository";
 import { StripeProvider } from "./stripe/repository";
+import type { PaymentProvider } from "./types";
 
 export * from "./types";
 

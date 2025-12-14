@@ -397,7 +397,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.get.response.totalCount.content" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           pageCount: responseField(
             {
@@ -405,7 +405,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.get.response.pageCount.content" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           page: responseField(
             {
@@ -413,7 +413,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.get.response.page.content" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           limit: responseField(
             {
@@ -421,7 +421,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.get.response.limit.content" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
         },
       ),

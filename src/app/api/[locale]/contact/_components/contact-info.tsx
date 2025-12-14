@@ -1,16 +1,16 @@
 "use client";
 
-import { Globe, Mail, MessageCircle, Twitter } from "next-vibe-ui/ui/icons";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Globe, Mail, MessageCircle, Twitter } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
 import { openUrl } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Button } from "next-vibe-ui/ui/button";
-import { envClient } from "@/config/env-client";
 
 interface ContactInfoProps {
   locale: CountryLanguage;

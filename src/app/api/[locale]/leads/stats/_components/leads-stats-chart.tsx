@@ -7,26 +7,26 @@
 
 import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schema";
 import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
-import { H4, P } from "next-vibe-ui/ui/typography";
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { Skeleton } from "next-vibe-ui/ui/skeleton";
-import type { JSX } from "react";
-import React, { useEffect, useState } from "react";
 import {
-  Chart,
-  Line,
-  Bar,
   Area,
   Axis,
+  Bar,
+  Chart,
+  Line,
 } from "next-vibe-ui/ui/chart";
+import { Div } from "next-vibe-ui/ui/div";
+import { Skeleton } from "next-vibe-ui/ui/skeleton";
+import { Span } from "next-vibe-ui/ui/span";
+import { H4, P } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
-  type LeadSourceValues,
   LeadSource,
   LeadSourceOptions,
+  type LeadSourceValues,
 } from "@/app/api/[locale]/leads/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -113,6 +113,30 @@ export function LeadsStatsChart({
       setVisibleSources(initial);
     }
   }, [data?.sourceData]);
+
+  // Format Y-axis values - must be before any early returns per React hooks rules
+  const formatYAxis = React.useCallback((value: number | string): string => {
+    const val = typeof value === "string" ? Number.parseFloat(value) : value;
+    if (val >= 1000000) {
+      return `${(val / 1000000).toFixed(1)}M`;
+    }
+    if (val >= 1000) {
+      return `${(val / 1000).toFixed(1)}K`;
+    }
+    if (val >= 1) {
+      return Math.round(val).toString();
+    }
+    if (val === 0.000001) {
+      return "0";
+    }
+    if (val >= 0.1) {
+      return val.toFixed(1);
+    }
+    if (val >= 0.01) {
+      return val.toFixed(2);
+    }
+    return val.toFixed(3);
+  }, []);
 
   const toggleSeries = (name: string): void => {
     setVisibleSeries((prev) => ({
@@ -313,29 +337,6 @@ export function LeadsStatsChart({
       width: 600,
       padding: { top: 5, right: 30, left: 50, bottom: 40 },
     };
-
-    const formatYAxis = React.useCallback((value: number | string): string => {
-      const val = typeof value === "string" ? Number.parseFloat(value) : value;
-      if (val >= 1000000) {
-        return `${(val / 1000000).toFixed(1)}M`;
-      }
-      if (val >= 1000) {
-        return `${(val / 1000).toFixed(1)}K`;
-      }
-      if (val >= 1) {
-        return Math.round(val).toString();
-      }
-      if (val === 0.000001) {
-        return "0";
-      }
-      if (val >= 0.1) {
-        return val.toFixed(1);
-      }
-      if (val >= 0.01) {
-        return val.toFixed(2);
-      }
-      return val.toFixed(3);
-    }, []);
 
     const chartComponents = activeSeries.map((series, index) => {
       const color =

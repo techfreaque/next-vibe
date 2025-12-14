@@ -9,8 +9,8 @@ import { tool } from "ai";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
 
+import { agentEnv } from "@/app/api/[locale]/agent/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
 
 import type { BraveSearchGetResponseOutput } from "./definition";
 import { FRESHNESS_API_MAP } from "./definition";
@@ -197,7 +197,7 @@ class BraveSearchService {
         headers: {
           Accept: "application/json",
           "Accept-Encoding": "gzip",
-          "X-Subscription-Token": env.BRAVE_SEARCH_API_KEY,
+          "X-Subscription-Token": agentEnv.BRAVE_SEARCH_API_KEY,
         },
         signal: controller.signal,
       });

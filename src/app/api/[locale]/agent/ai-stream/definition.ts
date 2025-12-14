@@ -20,15 +20,15 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { dateSchema } from "../../shared/types/common.schema";
 import { DefaultFolderId } from "../chat/config";
-import { ModelId, ModelIdOptions } from "../chat/model-access/models";
+import { selectChatMessageSchema } from "../chat/db";
 import {
-  ChatMessageRoleOptions,
   ChatMessageRole,
+  ChatMessageRoleOptions,
   NEW_MESSAGE_ID,
 } from "../chat/enum";
-import { selectChatMessageSchema } from "../chat/db";
-import { dateSchema } from "../../shared/types/common.schema";
+import { ModelId, ModelIdOptions } from "../chat/model-access/models";
 
 /**
  * AI Stream Endpoint (POST)
@@ -272,7 +272,7 @@ const { POST } = createEndpoint({
             updatedArgs: z
               .record(
                 z.string(),
-                z.union([z.string(), z.number(), z.boolean(), z.null()]),
+                z.union([z.string(), z.coerce.number(), z.boolean(), z.null()]),
               )
               .optional(),
           })

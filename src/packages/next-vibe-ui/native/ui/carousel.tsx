@@ -1,19 +1,20 @@
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import React from "react";
 import type { ScrollView as RNScrollView } from "react-native";
-import { ScrollView, View, Pressable, Text as RNText } from "react-native";
-import { styled } from "nativewind";
+import { Pressable, ScrollView, Text as RNText,View } from "react-native";
 
-import type {
-  CarouselProps,
-  CarouselApi,
-  CarouselItemProps,
-  CarouselContentProps,
-  CarouselButtonProps,
-} from "@/packages/next-vibe-ui/web/ui/carousel";
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 import { useTranslation } from "@/i18n/core/client";
+import type {
+  CarouselApi,
+  CarouselButtonProps,
+  CarouselContentProps,
+  CarouselItemProps,
+  CarouselProps,
+} from "@/packages/next-vibe-ui/web/ui/carousel";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Type-safe ScrollView with className support (NativeWind)
 const StyledScrollView = styled(ScrollView, { className: "style" });
@@ -41,7 +42,8 @@ const CarouselContext = React.createContext<CarouselContextProps | null>(null);
 function useCarousel(): CarouselContextProps {
   const context = React.useContext(CarouselContext);
   if (!context) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useCarousel must be used within a <Carousel />");
   }
   return context;
@@ -142,7 +144,7 @@ function CarouselContent(props: CarouselContentProps): React.JSX.Element {
 
 CarouselContent.displayName = "CarouselContent";
 
-export { Carousel, CarouselItem, CarouselContent };
+export { Carousel, CarouselContent,CarouselItem };
 
 function CarouselPrevious({
   className,
@@ -198,4 +200,4 @@ function CarouselNext({
   );
 }
 
-export { CarouselPrevious, CarouselNext };
+export { CarouselNext,CarouselPrevious };

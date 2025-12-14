@@ -3,15 +3,14 @@
  * Displays and manages A/B testing configuration for email campaigns
  */
 
-import type { JSX } from "react";
-import * as React from "react";
-
-import { BarChart3, Settings, TestTube, Users } from "next-vibe-ui/ui/icons";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { H2, H3, H4, P } from "next-vibe-ui/ui/typography";
+import { BarChart3, Settings, TestTube, Users } from "next-vibe-ui/ui/icons";
 import { Progress } from "next-vibe-ui/ui/progress";
+import { H2, H3, H4, P } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
+import * as React from "react";
 
 import { getABTestSummary } from "@/app/api/[locale]/leads/campaigns/emails/services/ab-testing";
 import type { CountryLanguage } from "@/i18n/core/config";

@@ -7,20 +7,20 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { smsServiceRepository } from "../../emails/sms-service/repository";
 import { CampaignType } from "../../emails/smtp-client/enum";
+import { smsEnv } from "../../sms/env";
 import type { UnsubscribePostRequestOutput } from "./definition";
 
 // Use proper imported types
@@ -139,7 +139,7 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
     try {
       // Get admin phone number from environment or config
-      const adminPhone = env.ADMIN_NOTIFICATION_PHONE;
+      const adminPhone = smsEnv.ADMIN_NOTIFICATION_PHONE;
 
       if (!adminPhone) {
         logger.debug(

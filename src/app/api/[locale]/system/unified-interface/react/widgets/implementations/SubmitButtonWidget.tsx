@@ -1,13 +1,15 @@
 "use client";
 
-import type { JSX } from "react";
 import { Button } from "next-vibe-ui/ui/button";
-import type { TranslationKey } from "@/i18n/core/static-types";
-import { simpleT } from "@/i18n/core/shared";
+import type { JSX } from "react";
+
 import {
   getIconComponent,
   type IconValue,
 } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
+
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
 

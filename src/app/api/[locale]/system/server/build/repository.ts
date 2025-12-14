@@ -3,17 +3,17 @@
  * Handles build the application operations
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { databaseMigrationRepository } from "../../db/migrate/repository";
 import { generateAllRepository } from "../../generators/generate-all/repository";
@@ -88,10 +88,31 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
       output.push(MESSAGES.BUILD_START);
 
       if (data.package) {
-        // Build package (if needed)
+        // Build package using the builder with build.config.ts
         output.push(MESSAGES.PACKAGE_BUILD_START);
-        // Package building logic would go here
-        output.push(MESSAGES.PACKAGE_BUILD_SUCCESS);
+        const { builderRepository } = await import("../../builder/repository");
+        const builderResult = await builderRepository.execute(
+          {
+            configPath: "build.config.ts",
+          },
+          locale,
+          logger,
+        );
+        if (builderResult.success && builderResult.data) {
+          output.push(builderResult.data.output);
+          output.push(MESSAGES.PACKAGE_BUILD_SUCCESS);
+        } else {
+          errors.push(MESSAGES.PACKAGE_BUILD_FAILED);
+          if (!data.force) {
+            const response: BuildResponseType = {
+              success: false,
+              output: output.join("\n"),
+              duration: Date.now() - startTime,
+              errors,
+            };
+            return success(response);
+          }
+        }
       }
 
       // Generate API endpoints

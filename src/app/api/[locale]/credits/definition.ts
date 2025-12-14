@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.agent.chat.credits.get.total.content",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Expiring credits (from subscription)
@@ -56,7 +56,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.agent.chat.credits.get.expiring.content",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Permanent credits (from packs)
@@ -65,7 +65,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.agent.chat.credits.get.permanent.content",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Free tier credits
@@ -74,7 +74,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.agent.chat.credits.get.free.content",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       // Expiration date for expiring credits

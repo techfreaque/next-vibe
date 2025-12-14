@@ -125,7 +125,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.check.testing.test.response.duration",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

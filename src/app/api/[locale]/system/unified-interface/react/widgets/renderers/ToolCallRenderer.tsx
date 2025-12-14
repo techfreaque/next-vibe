@@ -25,24 +25,25 @@ import {
   CollapsibleTrigger,
 } from "next-vibe-ui/ui/collapsible";
 import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
 import { ChevronDown, ChevronRight, Loader2 } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import { useState, useEffect } from "react";
+import { useEffect,useState } from "react";
 import type { FieldValues } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import type { WidgetRenderContext } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { WidgetRenderContext } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
 import { EndpointRenderer } from "./EndpointRenderer";
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 
 interface ToolCallRendererProps {
   toolCall: ToolCall;

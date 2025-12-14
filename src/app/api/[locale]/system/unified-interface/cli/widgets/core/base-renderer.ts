@@ -5,12 +5,12 @@
 
 import chalk from "chalk";
 
-import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
+import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type {
   WidgetData,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {

@@ -6,16 +6,17 @@
 import "server-only";
 
 import type { FSWatcher } from "node:fs";
+
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { env } from "@/config/env";
 
+import { Environment } from "../../../../shared/utils";
 import { generateAllRepository } from "../../../generators/generate-all/repository";
+import { formatDatabase } from "../../shared/logger/formatters";
 import { CronTaskPriority, TaskCategory } from "../enum";
 import type { TaskRunner } from "../types/repository";
-import { Environment } from "../../../../shared/utils";
-import { env } from "@/config/env";
-import { formatDatabase } from "../../shared/logger/formatters";
 
 /**
  * Determine if a file change should trigger generator execution

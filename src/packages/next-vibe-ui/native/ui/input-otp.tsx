@@ -3,13 +3,10 @@
  * Simple OTP input implementation using TextInput
  */
 import { Minus } from "lucide-react-native";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import React, { createContext, useContext, useState } from "react";
 import { Text as RNText, TextInput, View } from "react-native";
-import { styled } from "nativewind";
-
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 
 // Import all public types from web version (web is source of truth)
 import type {
@@ -19,6 +16,8 @@ import type {
   InputOTPSlotProps,
   OTPContextValue,
 } from "../../web/ui/input-otp";
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledView = styled(View, { className: "style" });
 const StyledTextInput = styled(TextInput, { className: "style" });
@@ -32,7 +31,7 @@ const OTPContext = createContext<InternalOTPContextValue>(undefined);
 function useOTP(): OTPContextValue {
   const context = useContext(OTPContext);
   if (!context) {
-    // eslint-disable-next-line no-restricted-syntax -- Error handling for context
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
     throw new Error("OTP components must be used within InputOTP"); // eslint-disable-line i18next/no-literal-string -- Error message
   }
   return context;

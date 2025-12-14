@@ -7,9 +7,9 @@ import type { SQL } from "drizzle-orm";
 import { and, count, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -29,6 +29,7 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import { newsletterSubscriptions } from "../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../newsletter/enum";
+import type { LeadCreateRequestTypeOutput } from "./create/definition";
 import {
   emailCampaigns,
   type Lead,
@@ -64,6 +65,7 @@ import {
   SortOrder,
 } from "./enum";
 import type { ExportQueryType, ExportResponseType } from "./export/definition";
+import type { LeadListGetRequestTypeOutput } from "./list/definition";
 import type { LeadEngagementResponseOutput } from "./tracking/engagement/definition";
 import type {
   LeadDetailResponse,
@@ -73,8 +75,6 @@ import type {
   LeadWithEmailType,
   UnsubscribeType,
 } from "./types";
-import type { LeadCreateRequestTypeOutput } from "./create/definition";
-import type { LeadListGetRequestTypeOutput } from "./list/definition";
 
 // Type aliases for enum values
 type LeadSortFieldType = typeof LeadSortFieldValues;

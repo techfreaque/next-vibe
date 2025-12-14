@@ -23,6 +23,7 @@ src/app/api/[locale]/system/check/oxlint/types.d.ts.map
 code-server
 .vibe-guard-instance/
 .vibe-debug/
+.build-cache.json
 
 # react native
 .expo

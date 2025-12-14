@@ -5,8 +5,8 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps, NarrowedField } from "../../../shared/widgets/types";
 import { extractStatsGridData } from "../../../shared/widgets/logic/stats-grid";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { MetricCardWidget } from "./MetricCardWidget";
 
 /**
@@ -14,7 +14,6 @@ import { MetricCardWidget } from "./MetricCardWidget";
  */
 export function StatsGridWidget({
   value,
-  field,
   context,
   className,
 }: ReactWidgetProps<typeof WidgetType.STATS_GRID>): JSX.Element {
@@ -75,7 +74,6 @@ export function StatsGridWidget({
             key={stat.label ?? index}
             widgetType={WidgetType.METRIC_CARD}
             value={widgetData}
-            field={field as unknown as NarrowedField<typeof WidgetType.METRIC_CARD>}
             context={context}
           />
         );

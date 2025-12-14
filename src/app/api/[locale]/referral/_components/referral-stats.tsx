@@ -15,6 +15,7 @@ import { currencyByCountry } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import { formatCurrency } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
+
 import { useReferralStats } from "../hooks";
 
 interface ReferralStatsProps {

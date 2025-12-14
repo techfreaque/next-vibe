@@ -8,9 +8,9 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/app/api/[locale]/system/db";
 import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { translations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
-import { translations } from "@/config/i18n/en";
 
 import { leads, userLeadLinks } from "../leads/db";
 import { LeadSource, LeadStatus } from "../leads/enum";

@@ -1,7 +1,8 @@
 import type { JSX } from "react";
 import * as React from "react";
-import { Animated, StyleSheet, View } from "react-native";
 import type { ViewStyle } from "react-native";
+import { Animated, StyleSheet, View } from "react-native";
+
 import type { AudioWaveformProps as WebAudioWaveformProps } from "@/packages/next-vibe-ui/web/ui/audio-waveform";
 import { applyStyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
 

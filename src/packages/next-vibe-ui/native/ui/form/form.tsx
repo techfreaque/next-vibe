@@ -1,12 +1,12 @@
 "use client";
 
 import { Slot } from "@radix-ui/react-slot";
+import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import type { FieldPath, FieldValues } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
 import { View } from "react-native";
-import { styled } from "nativewind";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -14,20 +14,18 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 // ============================================================================
 // IMPORT ALL TYPES FROM WEB - DO NOT REDEFINE ANY TYPES
 // ============================================================================
-
 import type {
-  FormProps,
-  FormFieldProps,
-  FormItemProps,
-  FormLabelProps,
   FormControlProps,
   FormDescriptionProps,
-  FormMessageProps,
   FormFieldContextValue,
+  FormFieldProps,
   FormItemContextValue,
+  FormItemProps,
+  FormLabelProps,
+  FormMessageProps,
+  FormProps,
   UseFormFieldReturn,
 } from "../../../web/ui/form/form";
-
 import { Label } from "../label";
 import { P } from "../typography";
 
@@ -104,12 +102,14 @@ const useFormField = (): UseFormFieldReturn => {
   const { getFieldState, formState } = useFormContext();
 
   if (!fieldContext) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useFormField should be used within <FormField>");
   }
 
   if (!itemContext) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useFormField should be used within <FormItem>");
   }
 

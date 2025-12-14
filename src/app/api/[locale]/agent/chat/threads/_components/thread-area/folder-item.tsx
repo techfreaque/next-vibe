@@ -16,7 +16,6 @@ import { DropdownMenu } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuContent } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuItem } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuTrigger } from "next-vibe-ui/ui/dropdown-menu";
-import { Span } from "next-vibe-ui/ui/span";
 import { ArrowDown } from "next-vibe-ui/ui/icons/ArrowDown";
 import { ArrowUp } from "next-vibe-ui/ui/icons/ArrowUp";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
@@ -28,20 +27,10 @@ import { MessageSquarePlus } from "next-vibe-ui/ui/icons/MessageSquarePlus";
 import { MoreVertical } from "next-vibe-ui/ui/icons/MoreVertical";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
-import type { DivMouseEvent } from "@/packages/next-vibe-ui/web/ui/div";
-
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import {
-  getIconComponent,
-  type IconValue,
-} from "@/app/api/[locale]/agent/chat/model-access/icons";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-
-import { useTouchDevice } from "@/hooks/use-touch-device";
 import {
   getFolderColor,
   getFolderDisplayName,
@@ -52,17 +41,27 @@ import {
   buildFolderUrl,
   getRootFolderId,
 } from "@/app/[locale]/chat/lib/utils/navigation";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
+import {
+  getIconComponent,
+  type IconValue,
+} from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useTouchDevice } from "@/hooks/use-touch-device";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+import type { DivMouseEvent } from "@/packages/next-vibe-ui/web/ui/div";
+
+import {
+  getFolderColorClasses,
+  groupThreadsByTime,
+  shouldFolderBeExpanded,
+} from "./folder-list-helpers";
 import { FolderPermissionsDialog } from "./folder-permissions-dialog";
 import { MoveFolderDialog } from "./move-folder-dialog";
 import { RenameFolderDialog } from "./rename-folder-dialog";
 import { ThreadList } from "./thread-list";
-import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
-import {
-  shouldFolderBeExpanded,
-  groupThreadsByTime,
-  getFolderColorClasses,
-} from "./folder-list-helpers";
 
 interface FolderItemProps {
   folder: ChatFolder;

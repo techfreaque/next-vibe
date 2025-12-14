@@ -32,19 +32,19 @@ import {
 import { UserRole } from "../../user/user-roles/enum";
 import {
   EmailCampaignStage,
-  EmailCampaignStageOptions,
   EmailCampaignStageFilter,
   EmailCampaignStageFilterOptions,
+  EmailCampaignStageOptions,
   LeadSortField,
   LeadSortFieldOptions,
   LeadSource,
-  LeadSourceOptions,
   LeadSourceFilter,
   LeadSourceFilterOptions,
+  LeadSourceOptions,
   LeadStatus,
-  LeadStatusOptions,
   LeadStatusFilter,
   LeadStatusFilterOptions,
+  LeadStatusOptions,
   SortOrder,
   SortOrderOptions,
 } from "../enum";
@@ -418,7 +418,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.leads.list.get.response.leads.emailsSent" as const,
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 lastEmailSentAt: responseField(
                   {
@@ -444,7 +444,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.leads.list.get.response.leads.emailsOpened" as const,
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 emailsClicked: responseField(
                   {
@@ -452,7 +452,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.leads.list.get.response.leads.emailsClicked" as const,
                   },
-                  z.number(),
+                  z.coerce.number(),
                 ),
                 lastEngagementAt: responseField(
                   {
@@ -530,7 +530,7 @@ const { GET } = createEndpoint({
               content: "app.api.leads.list.get.response.total" as const,
               columns: 3,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           totalPages: responseField(
             {
@@ -539,7 +539,7 @@ const { GET } = createEndpoint({
               content: "app.api.leads.list.get.response.totalPages" as const,
               columns: 3,
             },
-            z.number(),
+            z.coerce.number(),
           ),
         },
       ),

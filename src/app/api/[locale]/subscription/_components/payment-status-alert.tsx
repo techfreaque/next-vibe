@@ -1,7 +1,7 @@
-import { MotionDiv } from "next-vibe-ui/ui/motion";
-import { AlertCircle, CheckCircle, X } from "next-vibe-ui/ui/icons";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import { Button } from "next-vibe-ui/ui/button";
+import { AlertCircle, CheckCircle, X } from "next-vibe-ui/ui/icons";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 
 import { useTranslation } from "@/i18n/core/client";

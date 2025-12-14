@@ -3,6 +3,7 @@
 import type { ThemeProviderProps as NextThemesProviderProps } from "next-themes";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import React, { type JSX, useEffect, useState } from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 export type ThemeProviderProps = {

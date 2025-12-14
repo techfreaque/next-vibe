@@ -3,9 +3,8 @@
  * Shared types and utilities for email tracking
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { envClient } from "@/config/env-client";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Tracking context for email components

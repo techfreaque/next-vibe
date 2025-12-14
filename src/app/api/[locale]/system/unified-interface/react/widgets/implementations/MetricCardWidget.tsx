@@ -1,18 +1,18 @@
 "use client";
 
-import { TrendingDown, TrendingUp } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
 import { Card } from "next-vibe-ui/ui/card";
 import { CardContent } from "next-vibe-ui/ui/card";
 import { CardHeader } from "next-vibe-ui/ui/card";
 import { CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { TrendingDown, TrendingUp } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { extractMetricCardData } from "../../../shared/widgets/logic/metric-card";
+import type { ValueOnlyReactWidgetProps } from "../../../shared/widgets/types";
 import {
   extractMetricUnit,
   getTrendColorClassName,
@@ -25,7 +25,7 @@ export function MetricCardWidget({
   value,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.METRIC_CARD>): JSX.Element {
+}: ValueOnlyReactWidgetProps<typeof WidgetType.METRIC_CARD>): JSX.Element {
   const data = extractMetricCardData(value);
 
   if (!data) {

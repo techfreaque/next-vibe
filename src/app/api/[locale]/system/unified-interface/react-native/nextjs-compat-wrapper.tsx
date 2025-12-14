@@ -27,17 +27,17 @@
  */
 
 import { Slot, useLocalSearchParams } from "expo-router";
+import { parseError } from "next-vibe/shared/utils/parse-error";
+import { Span } from "next-vibe-ui/ui/span";
 import type React from "react";
 import type { JSX, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
-import { Span } from "next-vibe-ui/ui/span";
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { envClient } from "@/config/env-client";
 
 /**
  * Next.js 15 async component props format
@@ -111,6 +111,10 @@ export function createPageWrapperWithImport(
       [params.locale],
     );
     const { t } = useMemo(() => simpleT(params.locale), [params.locale]);
+
+    // Serialize params for stable dependency comparison
+    const paramsKey = useMemo(() => JSON.stringify(params), [params]);
+
     useEffect(() => {
       let cancelled = false;
 
@@ -166,8 +170,8 @@ export function createPageWrapperWithImport(
       return (): void => {
         cancelled = true;
       };
-      // oxlint-disable-next-line exhaustive-deps
-    }, [logger, JSON.stringify(params), t]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- params used via paramsKey for stable comparison
+    }, [logger, paramsKey, t]);
 
     // Error state
     if (error) {

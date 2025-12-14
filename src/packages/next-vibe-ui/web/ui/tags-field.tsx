@@ -9,11 +9,11 @@ import { Plus, X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useRef, useState } from "react";
-import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { StyleType } from "../utils/style-type";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import { Input, type InputKeyboardEvent } from "./input";

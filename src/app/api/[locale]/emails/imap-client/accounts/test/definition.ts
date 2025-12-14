@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.emails.imapClient.accounts.test.response.details.port",
             },
-            z.number().optional(),
+            z.coerce.number().optional(),
           ),
           secure: responseField(
             {
@@ -135,7 +135,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.emails.imapClient.accounts.test.response.details.responseTime",
             },
-            z.number().optional(),
+            z.coerce.number().optional(),
           ),
           serverCapabilities: responseField(
             {

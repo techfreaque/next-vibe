@@ -6,8 +6,8 @@
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   extractDataListData,
-  type ProcessedDataList,
   type ListItem,
+  type ProcessedDataList,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/data-list";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";

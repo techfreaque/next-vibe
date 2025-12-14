@@ -10,6 +10,7 @@ import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Countries, Languages } from "@/i18n/core/config";
 
+import { EmailStatus } from "../emails/messages/enum";
 import {
   emailCampaigns,
   leadEngagements,
@@ -25,7 +26,6 @@ import {
   LeadSource,
   LeadStatus,
 } from "./enum";
-import { EmailStatus } from "../emails/messages/enum";
 
 /**
  * Number of random leads to generate

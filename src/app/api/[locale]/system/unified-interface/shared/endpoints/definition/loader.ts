@@ -1,14 +1,15 @@
 import {
-  fail,
-  success,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { EndpointLogger } from "../../logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+
+import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint";
 import type { Platform } from "../../types/platform";
 import { permissionsRegistry } from "../permissions/registry";

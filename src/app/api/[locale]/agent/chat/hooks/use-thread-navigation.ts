@@ -12,6 +12,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { ChatFolder } from "./store";
 
 interface UseThreadNavigationProps {

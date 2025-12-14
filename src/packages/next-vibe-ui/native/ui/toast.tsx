@@ -1,10 +1,10 @@
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Pressable, View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
-import { styled } from "nativewind";
 
 import { useTranslation } from "@/i18n/core/client";
-
 import type {
   ToastActionProps,
   ToastCloseProps,
@@ -15,10 +15,9 @@ import type {
   ToastViewportProps,
 } from "@/packages/next-vibe-ui/web/ui/toast";
 import { toastVariants } from "@/packages/next-vibe-ui/web/ui/toast";
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Span } from "./span";
 
 // Re-export types for cross-platform compatibility

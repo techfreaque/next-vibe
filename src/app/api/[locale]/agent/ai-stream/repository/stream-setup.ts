@@ -6,26 +6,36 @@
 import "server-only";
 
 import type { CoreMessage } from "ai";
-import type { z } from "zod";
-
+import { eq } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
-  type ResponseType,
   type MessageResponseType,
+  type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+import type { z } from "zod";
 
 import { creditValidator } from "@/app/api/[locale]/credits/validator";
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
+import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { getUserPublicName } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import { db } from "../../../system/db";
+import type { DefaultFolderId } from "../../chat/config";
+import {
+  type ChatMessage,
+  chatMessages,
+  type ToolCall,
+  type ToolCallResult,
+} from "../../chat/db";
+import { selectChatMessageSchema } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
 import { getModelCost } from "../../chat/model-access/costs";
-import { ensureThread } from "../../chat/threads/repository";
 import {
   calculateMessageDepth,
   createUserMessage,
@@ -33,22 +43,11 @@ import {
   handleEditOperation,
   handleRetryOperation,
 } from "../../chat/threads/[threadId]/messages/repository";
+import { ensureThread } from "../../chat/threads/repository";
 import type { AiStreamPostRequestOutput } from "../definition";
-import { buildSystemPrompt } from "../system-prompt-builder";
-import { CONTINUE_CONVERSATION_PROMPT } from "../system-prompt";
-import {
-  chatMessages,
-  type ChatMessage,
-  type ToolCall,
-  type ToolCallResult,
-} from "../../chat/db";
-import { selectChatMessageSchema } from "../../chat/db";
-import { eq } from "drizzle-orm";
-import { db } from "../../../system/db";
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
-import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
-import type { DefaultFolderId } from "../../chat/config";
 import { createMetadataSystemMessage } from "../message-metadata-generator";
+import { CONTINUE_CONVERSATION_PROMPT } from "../system-prompt";
+import { buildSystemPrompt } from "../system-prompt-builder";
 
 export interface StreamSetupResult {
   userId: string | undefined;

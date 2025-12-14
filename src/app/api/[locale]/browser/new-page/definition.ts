@@ -98,7 +98,7 @@ const { POST } = createEndpoint({
         z
           .object({
             created: z.boolean().describe("Whether the new page was created"),
-            pageIdx: z.number().describe("Index of the new page"),
+            pageIdx: z.coerce.number().describe("Index of the new page"),
             url: z.string().describe("URL of the new page"),
           })
           .optional()

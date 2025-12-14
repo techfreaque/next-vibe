@@ -6,12 +6,12 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Bug, Hash, List, Network } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
+import {
+  ViewMode,
+  type ViewModeValue,
+} from "@/app/api/[locale]/agent/chat/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import {
-  type ViewModeValue,
-  ViewMode,
-} from "@/app/api/[locale]/agent/chat/enum";
 
 interface ViewModeToggleProps {
   mode: typeof ViewModeValue;

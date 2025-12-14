@@ -5,8 +5,8 @@
 
 import type { JSX } from "react";
 
-import type { TFunction } from "@/i18n/core/static-types";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TFunction } from "@/i18n/core/static-types";
 
 import type { TrackingContext } from "../../../emails/smtp-client/components/tracking_context.email";
 import type {

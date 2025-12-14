@@ -5,8 +5,8 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import waitForEndpoints from "./definition";
 import { executeWaitFor, filterUndefinedArgs } from "../shared/repository";
+import waitForEndpoints from "./definition";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: waitForEndpoints,

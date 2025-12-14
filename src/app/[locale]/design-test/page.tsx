@@ -1,5 +1,7 @@
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { JSX } from "react";
+
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import { DesignTestPageLayout } from "./_components/page-layout";
 
 interface DesignTestPageProps {

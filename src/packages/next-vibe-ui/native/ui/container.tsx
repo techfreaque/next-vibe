@@ -2,15 +2,15 @@
  * Container Component for React Native
  * Provides consistent max-width and padding for app pages
  */
-import { View } from "react-native";
 import { styled } from "nativewind";
-
 import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
+import { View } from "react-native";
 
 // Import ALL types from web - ZERO definitions here
 import type { ContainerProps } from "@/packages/next-vibe-ui/web/ui/container";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Type-safe View with className support (NativeWind)
 const StyledView = styled(View);

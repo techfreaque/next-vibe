@@ -3,14 +3,14 @@
  * Preview and manage email templates
  */
 
-import { Div } from "next-vibe-ui/ui/div";
-import { Link } from "next-vibe-ui/ui/link";
-import { H3, P } from "next-vibe-ui/ui/typography";
-import { Span } from "next-vibe-ui/ui/span";
-import { Strong } from "next-vibe-ui/ui/strong";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
+import { Strong } from "next-vibe-ui/ui/strong";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";

@@ -1,6 +1,4 @@
 import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
-import { H3, P } from "next-vibe-ui/ui/typography";
 import {
   Bot,
   Briefcase,
@@ -14,11 +12,13 @@ import {
 } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
+import { Span } from "next-vibe-ui/ui/span";
+import { H3, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
 
 import { Logo } from "../../_components/logo";
 

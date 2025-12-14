@@ -103,7 +103,7 @@ const { POST } = createEndpoint({
           label:
             "app.api.system.db.ping.fields.connectionInfo.totalConnections.content",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       idleConnections: responseField(
@@ -114,7 +114,7 @@ const { POST } = createEndpoint({
           label:
             "app.api.system.db.ping.fields.connectionInfo.idleConnections.content",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       waitingClients: responseField(
@@ -125,7 +125,7 @@ const { POST } = createEndpoint({
           label:
             "app.api.system.db.ping.fields.connectionInfo.waitingClients.content",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

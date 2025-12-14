@@ -131,7 +131,7 @@ const { GET } = createEndpoint({
           description:
             "app.api.agent.chat.threads.threadId.messages.path.get.branchIndices.description" as const,
         },
-        z.record(z.string(), z.number()).optional(),
+        z.record(z.string(), z.coerce.number()).optional(),
       ),
 
       // === RESPONSE ===
@@ -195,7 +195,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.threads.threadId.messages.path.get.response.messages.message.depth.content" as const,
               },
-              z.number(),
+              z.coerce.number(),
             ),
             authorId: responseField(
               {
@@ -227,7 +227,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.threads.threadId.messages.path.get.response.messages.message.tokens.content" as const,
               },
-              z.number().nullable(),
+              z.coerce.number().nullable(),
             ),
             createdAt: responseField(
               {

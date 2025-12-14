@@ -1,33 +1,33 @@
 import * as ContextMenuPrimitive from "@rn-primitives/context-menu";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { styled } from "nativewind";
 
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import type {
+  ContextMenuCheckboxItemProps,
+  ContextMenuContentProps,
+  ContextMenuGroupProps,
+  ContextMenuItemProps,
+  ContextMenuLabelProps,
+  ContextMenuPortalProps,
+  ContextMenuRadioGroupProps,
+  ContextMenuRadioItemProps,
+  ContextMenuRootProps,
+  ContextMenuSeparatorProps,
+  ContextMenuShortcutProps,
+  ContextMenuSubContentProps,
+  ContextMenuSubProps,
+  ContextMenuSubTriggerProps,
+  ContextMenuTriggerProps,
+} from "@/packages/next-vibe-ui/web/ui/context-menu";
+
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Check } from "./icons/Check";
 import { ChevronRight } from "./icons/ChevronRight";
 import { Span } from "./span";
 import { TextClassContext } from "./text";
-
-import type {
-  ContextMenuRootProps,
-  ContextMenuTriggerProps,
-  ContextMenuGroupProps,
-  ContextMenuPortalProps,
-  ContextMenuSubProps,
-  ContextMenuRadioGroupProps,
-  ContextMenuSubTriggerProps,
-  ContextMenuSubContentProps,
-  ContextMenuContentProps,
-  ContextMenuItemProps,
-  ContextMenuCheckboxItemProps,
-  ContextMenuRadioItemProps,
-  ContextMenuLabelProps,
-  ContextMenuSeparatorProps,
-  ContextMenuShortcutProps,
-} from "@/packages/next-vibe-ui/web/ui/context-menu";
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_ITEM =
@@ -104,7 +104,8 @@ function ContextMenuRadioGroup({
   return (
     <ContextMenuPrimitive.RadioGroup
       value={value ?? ""}
-      onValueChange={onValueChange ?? (() => {})} // eslint-disable-line no-empty-function
+      // eslint-disable-next-line no-empty-function -- Intentional no-op default handler
+      onValueChange={onValueChange ?? (() => {})}
       {...props}
     >
       {children}
@@ -272,7 +273,8 @@ function ContextMenuCheckboxItem({
     <ContextMenuPrimitive.CheckboxItem
       asChild
       checked={checked ?? false}
-      onCheckedChange={onCheckedChange ?? (() => {})} // eslint-disable-line no-empty-function
+      // eslint-disable-next-line no-empty-function -- Intentional no-op default handler
+      onCheckedChange={onCheckedChange ?? (() => {})}
       {...props}
     >
       <StyledPressable

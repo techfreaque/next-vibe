@@ -3,14 +3,14 @@
  * Handles METRIC_CARD widget type for displaying key metrics and statistics
  */
 
-import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { MetricCardWidgetConfig } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
 import {
   extractMetricCardData,
   formatMetricValue,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/metric-card";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";

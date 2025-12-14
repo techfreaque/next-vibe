@@ -3,9 +3,8 @@
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { Logo } from "@/app/[locale]/_components/logo";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ChatBrandingProps {
   locale: CountryLanguage;

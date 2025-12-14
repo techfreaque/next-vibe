@@ -215,7 +215,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.export.get.response.totalRecords",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       exportedAt: responseField(

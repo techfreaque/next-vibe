@@ -16,7 +16,7 @@ module.exports.transform = async (props) => {
     src.includes('import "server-only"') ||
     src.includes("import 'server-only'")
   ) {
-    // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console -- Intentional logging for Metro build debugging
     console.error(
       `[Metro] Skipping server-only file: ${filename.replace(process.cwd(), "")}`,
     );

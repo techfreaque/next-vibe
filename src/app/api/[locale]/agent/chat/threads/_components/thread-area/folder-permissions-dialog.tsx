@@ -8,16 +8,16 @@ import {
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
+import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
-import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import type { JSX } from "react";
 import React, { useEffect } from "react";
 
 import { useFolderPermissions } from "@/app/api/[locale]/agent/chat/folders/[id]/permissions/hooks";
-import { UserRoleOptions } from "@/app/api/[locale]/user/user-roles/enum";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { UserRoleOptions } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -53,8 +53,7 @@ export function FolderPermissionsDialog({
     if (open && folderId) {
       void endpoint.read.refetch();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, folderId]);
+  }, [open, folderId, endpoint.read]);
 
   const handleSave = async (): Promise<void> => {
     await endpoint.create.onSubmit();

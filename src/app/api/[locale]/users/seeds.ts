@@ -10,12 +10,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import type { JwtPrivatePayloadType } from "../user/auth/types";
 import { UserDetailLevel } from "../user/enum";
 import { userRepository } from "../user/repository";
 import { UserPermissionRole, UserRole } from "../user/user-roles/enum";
 import type { UserCreateRequestOutput } from "./create/definition";
 import { userCreateRepository } from "./create/repository";
-import type { JwtPrivatePayloadType } from "../user/auth/types";
 
 /**
  * Dummy translation function for seeds

@@ -158,7 +158,7 @@ const { POST } = createEndpoint({
               type: WidgetType.TEXT,
               content: "app.api.emails.smsService.send.response.result.cost",
             },
-            z.number().optional(),
+            z.coerce.number().optional(),
           ),
         },
       ),

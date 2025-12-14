@@ -1,13 +1,14 @@
 "use client";
 
 import * as MenubarPrimitive from "@radix-ui/react-menubar";
+import { cn } from "next-vibe/shared/utils/utils";
 import {
   CheckIcon,
   ChevronRightIcon,
   DotFilledIcon,
 } from "next-vibe-ui/ui/icons";
-import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 // Cross-platform types

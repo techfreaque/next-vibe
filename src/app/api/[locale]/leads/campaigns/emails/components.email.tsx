@@ -12,11 +12,11 @@ import {
   Preview,
   Section,
 } from "@react-email/components";
-import type * as icons from "next-vibe-ui/ui/icons";
 import {
   createDataUrl,
   createTransparentPixelDataUrl,
 } from "next-vibe/shared/utils";
+import type * as icons from "next-vibe-ui/ui/icons";
 import type React from "react";
 import type { JSX, ReactNode } from "react";
 

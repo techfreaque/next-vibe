@@ -1,10 +1,9 @@
 import { useTheme } from "@react-navigation/native";
 import { cva } from "class-variance-authority";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { View } from "react-native";
-import { styled } from "nativewind";
-
-import { cn } from "next-vibe/shared/utils/utils";
 
 import type {
   AlertDescriptionProps,
@@ -12,6 +11,7 @@ import type {
   AlertTitleProps,
   AlertVariant,
 } from "@/packages/next-vibe-ui/web/ui/alert";
+
 import { Span } from "./span";
 
 // Re-export types for consistency

@@ -4,9 +4,10 @@
 
 "use client";
 
-import { AlertCircle, Calendar } from "next-vibe-ui/ui/icons";
+import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils";
 import { safeGetRequiredFields } from "next-vibe/shared/utils/zod-required-fields";
+import { AlertCircle, Calendar } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import type {
   ControllerRenderProps,
@@ -14,9 +15,7 @@ import type {
   FieldValues,
   Path,
 } from "react-hook-form";
-
-import { useTranslation } from "@/i18n/core/client";
-import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import { View } from "react-native";
 
 import type {
   FieldConfig,
@@ -25,17 +24,20 @@ import type {
   RequiredFieldTheme,
 } from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
 import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
+import { useTranslation } from "@/i18n/core/client";
+import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+
 import type {
   EndpointFormFieldProps,
   EndpointFormFieldsProps,
   FormFieldError,
 } from "../../../web/ui/form/endpoint-form-field";
-
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
 import { Button } from "../button";
 import { Calendar as CalendarComponent } from "../calendar";
 import { Checkbox } from "../checkbox";
+import { Div } from "../div";
 import { Input } from "../input";
 import { Label } from "../label";
 import { PhoneField } from "../phone-field";
@@ -58,21 +60,18 @@ import {
   FormLabel,
   FormMessage,
 } from "./form";
-import { View } from "react-native";
-import { styled } from "nativewind";
-import { Div } from "../div";
 
 // Styled View for proper NativeWind support
 const StyledView = styled(View, { className: "style" });
-import { Span } from "../span";
 import { convertCSSToViewStyle } from "../../utils/style-converter";
+import { Info } from "../icons/Info";
+import { Span } from "../span";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "../tooltip";
-import { Info } from "../icons/Info";
 
 // Default theme for required fields
 const DEFAULT_THEME: RequiredFieldTheme = {
@@ -580,7 +579,8 @@ function renderFieldInput<
 
     case "phone": {
       if (config.type !== "phone") {
-        // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for invalid config
+        // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard for developer mistakes at runtime
+        // eslint-disable-next-line i18next/no-literal-string -- Error handling for invalid config
         throw new Error("Invalid config type for phone field");
       }
       // Extract placeholder to avoid complex union type error
@@ -702,7 +702,8 @@ export function EndpointFormField<
     (endpointFields ? getFieldConfig(endpointFields, name) : null);
 
   if (!config) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for missing config
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Developer mistake - missing required prop
+    // eslint-disable-next-line i18next/no-literal-string -- Error handling for missing config
     throw new Error(
       `EndpointFormField: No config provided for field "${name}". ` +
         `Either provide a config prop or pass endpointFields for auto-inference.`,

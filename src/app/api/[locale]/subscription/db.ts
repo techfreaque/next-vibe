@@ -8,6 +8,7 @@ import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
 import { users } from "../user/db";
 import {
   BillingInterval,
@@ -17,7 +18,6 @@ import {
   SubscriptionStatus,
   SubscriptionStatusDB,
 } from "./enum";
-import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
 
 /**
  * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys

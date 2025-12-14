@@ -7,26 +7,28 @@
 import "server-only";
 
 import { createHmac } from "node:crypto";
+
 import { eq } from "drizzle-orm";
 import {
-  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import {
+  type Product,
+  productsRepository,
+} from "@/app/api/[locale]/products/repository-client";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
-import {
-  productsRepository,
-  type Product,
-} from "@/app/api/[locale]/products/repository-client";
 
 import { users } from "../../../user/db";
 import { paymentInvoices } from "../../db";
 import { InvoiceStatus } from "../../enum";
+import { paymentEnv } from "../../env";
 import type {
   CheckoutSessionParams,
   CheckoutSessionResult,
@@ -150,9 +152,9 @@ export class NOWPaymentsProvider implements PaymentProvider {
   private apiUrl: string;
 
   constructor() {
-    this.apiKey = env.NOWPAYMENTS_API_KEY;
-    this.ipnSecret = env.NOWPAYMENTS_IPN_SECRET;
-    this.apiUrl = env.NOWPAYMENTS_API_URL;
+    this.apiKey = paymentEnv.NOWPAYMENTS_API_KEY;
+    this.ipnSecret = paymentEnv.NOWPAYMENTS_IPN_SECRET;
+    this.apiUrl = paymentEnv.NOWPAYMENTS_API_URL;
   }
 
   /**

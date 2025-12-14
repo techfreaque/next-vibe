@@ -24,6 +24,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
 import { UserRole } from "../../../user/user-roles/enum";
 
 /**
@@ -171,7 +172,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.system.translations.reorganize.post.messages.foundKeys",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               usedKeys: responseField(
                 {
@@ -179,7 +180,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.system.translations.reorganize.post.messages.foundKeys",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               unusedKeys: responseField(
                 {
@@ -187,7 +188,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.system.translations.reorganize.post.messages.foundKeys",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               keysRemoved: responseField(
                 {
@@ -195,7 +196,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.system.translations.reorganize.post.messages.removingKeys",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               filesUpdated: responseField(
                 {
@@ -203,7 +204,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.system.translations.reorganize.post.messages.regeneratedStructure",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               filesCreated: responseField(
                 {
@@ -211,7 +212,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.system.translations.reorganize.post.messages.regeneratedStructure",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               backupCreated: responseField(
                 {
@@ -239,7 +240,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.system.translations.reorganize.post.fields.duration.title",
             },
-            z.number(),
+            z.coerce.number(),
           ),
 
           backupPath: responseField(

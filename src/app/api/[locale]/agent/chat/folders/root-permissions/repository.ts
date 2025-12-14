@@ -19,12 +19,12 @@ import {
 } from "@/app/api/[locale]/agent/chat/permissions/permissions";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   RootPermissionsGetRequestOutput,
   RootPermissionsGetResponseOutput,
 } from "./definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Root Folder Permissions Repository Interface

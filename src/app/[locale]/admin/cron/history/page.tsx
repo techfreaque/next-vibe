@@ -4,13 +4,12 @@
  */
 
 import type { Metadata } from "next";
-import type React from "react";
 import { Div } from "next-vibe-ui/ui/div";
-
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import type React from "react";
 
 import { CronHistoryClient } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/_components/cron-history-client";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 interface CronHistoryPageProps {
   params: Promise<{

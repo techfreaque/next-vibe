@@ -6,12 +6,12 @@
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
+  buildTableData,
+  type CodeOutputConfig,
+  type CodeOutputItem,
+  countCodeOutputBySeverity,
   getCodeOutputConfig,
   groupCodeOutputData,
-  countCodeOutputBySeverity,
-  buildTableData,
-  type CodeOutputItem,
-  type CodeOutputConfig,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/code-output";
 import {
   formatLocation,
@@ -37,6 +37,14 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
     const { field, value, context } = props;
     // Use shared logic to extract config
     const config = getCodeOutputConfig(field);
+
+    // Handle plain string output (e.g., build logs, command output)
+    if (typeof value === "string") {
+      if (value.trim() === "") {
+        return this.renderEmptyState(context);
+      }
+      return value;
+    }
 
     if (!Array.isArray(value) || value.length === 0) {
       return this.renderEmptyState(context);

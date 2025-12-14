@@ -1,11 +1,11 @@
 "use client";
 
-import { History, ShoppingCart, TrendingUp } from "next-vibe-ui/ui/icons";
-import { usePathname } from "next-vibe-ui/hooks/use-navigation";
 import Link from "next/link";
-import type { JSX } from "react";
 import { cn } from "next-vibe/shared/utils/utils";
+import { usePathname } from "next-vibe-ui/hooks/use-navigation";
 import { Div } from "next-vibe-ui/ui/div";
+import { History, ShoppingCart, TrendingUp } from "next-vibe-ui/ui/icons";
+import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

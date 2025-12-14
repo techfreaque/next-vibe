@@ -1,8 +1,5 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import { useState } from "react";
-import type { JSX } from "react";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,14 +8,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "next-vibe-ui/ui/breadcrumb";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "next-vibe-ui/ui/navigation-menu";
+import { Div } from "next-vibe-ui/ui/div";
+import { Link } from "next-vibe-ui/ui/link";
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -34,10 +25,18 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from "next-vibe-ui/ui/menubar";
-import { Link } from "next-vibe-ui/ui/link";
-import { Div } from "next-vibe-ui/ui/div";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "next-vibe-ui/ui/navigation-menu";
 import { Section } from "next-vibe-ui/ui/section";
 import { H2, H3, Small } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
+import { useState } from "react";
 
 export function NavigationPreview(): JSX.Element {
   const [showBookmarks, setShowBookmarks] = useState(false);

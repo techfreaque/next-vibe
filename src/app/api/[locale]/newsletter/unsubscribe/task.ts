@@ -10,9 +10,9 @@ import "server-only";
 import { and, eq, ne } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
@@ -40,7 +40,7 @@ import { NewsletterSubscriptionStatus } from "../enum";
  * Task Configuration Schema
  */
 export const taskConfigSchema = z.object({
-  batchSize: z.number().min(1).max(1000).default(500),
+  batchSize: z.coerce.number().min(1).max(1000).default(500),
   dryRun: z.boolean().default(false),
 });
 
@@ -50,10 +50,10 @@ export type TaskConfigType = z.output<typeof taskConfigSchema>;
  * Task Result Schema
  */
 export const taskResultSchema = z.object({
-  leadsProcessed: z.number(),
-  leadsUpdated: z.number(),
+  leadsProcessed: z.coerce.number(),
+  leadsUpdated: z.coerce.number(),
   errors: z.array(z.string()),
-  executionTimeMs: z.number(),
+  executionTimeMs: z.coerce.number(),
 });
 
 export type TaskResultType = z.output<typeof taskResultSchema>;

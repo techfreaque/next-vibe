@@ -89,6 +89,18 @@ const { POST } = createEndpoint({
         z.boolean().optional().default(false),
       ),
 
+      createConfig: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.check.vibeCheck.fields.createConfig.label",
+          description:
+            "app.api.system.check.vibeCheck.fields.createConfig.description",
+          columns: 3,
+        },
+        z.boolean().optional().default(false),
+      ),
+
       timeout: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -98,7 +110,7 @@ const { POST } = createEndpoint({
             "app.api.system.check.vibeCheck.fields.timeoutSeconds.description",
           columns: 4,
         },
-        z.number().min(1).max(3600).default(3600),
+        z.coerce.number().min(1).max(3600).default(3600),
       ),
 
       paths: requestDataField(
@@ -181,14 +193,14 @@ const { POST } = createEndpoint({
                 type: WidgetType.TEXT,
                 content: "app.api.system.check.vibeCheck.response.issues.title",
               },
-              z.number().optional(),
+              z.coerce.number().optional(),
             ),
             column: responseField(
               {
                 type: WidgetType.TEXT,
                 content: "app.api.system.check.vibeCheck.response.issues.title",
               },
-              z.number().optional(),
+              z.coerce.number().optional(),
             ),
             rule: responseField(
               {

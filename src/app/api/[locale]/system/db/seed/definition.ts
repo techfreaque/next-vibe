@@ -93,7 +93,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.seed.fields.seedsExecuted.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       collections: responseArrayField(
@@ -131,7 +131,7 @@ const { POST } = createEndpoint({
                   "app.api.system.db.seed.fields.collections.recordsCreated.title",
                 fieldType: FieldDataType.NUMBER,
               },
-              z.number(),
+              z.coerce.number(),
             ),
           },
         ),
@@ -142,7 +142,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.seed.fields.totalRecords.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       duration: responseField(
@@ -150,7 +150,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.db.seed.fields.duration.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

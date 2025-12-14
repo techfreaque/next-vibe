@@ -6,6 +6,13 @@
 "use client";
 
 import {
+  objectEntries,
+  objectEntriesNumericEnum,
+} from "next-vibe/shared/utils";
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import {
   Activity,
   AlertTriangle,
   BarChart3,
@@ -19,16 +26,9 @@ import {
   Users,
   Zap,
 } from "next-vibe-ui/ui/icons";
-import {
-  objectEntries,
-  objectEntriesNumericEnum,
-} from "next-vibe/shared/utils";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 

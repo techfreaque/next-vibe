@@ -128,7 +128,7 @@ const { POST } = createEndpoint({
                 "app.api.emails.imapClient.accounts.create.port.placeholder",
               columns: 12,
             },
-            z.number().min(1).max(65535),
+            z.coerce.number().min(1).max(65535),
           ),
 
           secure: requestDataField(
@@ -238,7 +238,7 @@ const { POST } = createEndpoint({
                 "app.api.emails.imapClient.accounts.create.syncInterval.placeholder",
               columns: 12,
             },
-            z.number().min(10).default(60).optional(),
+            z.coerce.number().min(10).default(60).optional(),
           ),
 
           maxMessages: requestDataField(
@@ -253,7 +253,7 @@ const { POST } = createEndpoint({
                 "app.api.emails.imapClient.accounts.create.maxMessages.placeholder",
               columns: 12,
             },
-            z.number().min(1).default(1000).optional(),
+            z.coerce.number().min(1).default(1000).optional(),
           ),
 
           syncFolders: requestDataField(
@@ -296,7 +296,7 @@ const { POST } = createEndpoint({
                 "app.api.emails.imapClient.accounts.create.connectionTimeout.placeholder",
               columns: 12,
             },
-            z.number().min(1000).default(30000).optional(),
+            z.coerce.number().min(1000).default(30000).optional(),
           ),
 
           keepAlive: requestDataField(
@@ -399,7 +399,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.emails.imapClient.accounts.create.response.port.title",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               secure: responseField(
                 {
@@ -429,7 +429,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.emails.imapClient.accounts.create.response.connectionTimeout.title",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
             },
           ),
@@ -467,7 +467,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.emails.imapClient.accounts.create.response.syncInterval.title",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               maxMessages: responseField(
                 {
@@ -475,7 +475,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.emails.imapClient.accounts.create.response.maxMessages.title",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               syncFolders: responseField(
                 {

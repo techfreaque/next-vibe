@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { Form } from "next-vibe-ui/ui/form/form";
 import {
   Check,
   Mail,
@@ -9,11 +12,8 @@ import {
   X,
   Zap,
 } from "next-vibe-ui/ui/icons";
-import { Form } from "next-vibe-ui/ui/form/form";
-import { Link } from "next-vibe-ui/ui/link";
-import { Button } from "next-vibe-ui/ui/button";
 import { Input } from "next-vibe-ui/ui/input";
-import { Div } from "next-vibe-ui/ui/div";
+import { Link } from "next-vibe-ui/ui/link";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useRef } from "react";
@@ -21,6 +21,7 @@ import { useEffect, useRef } from "react";
 import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+
 import type { MeGetResponseOutput } from "../../../user/private/me/definition";
 
 interface NewsletterPageProps {

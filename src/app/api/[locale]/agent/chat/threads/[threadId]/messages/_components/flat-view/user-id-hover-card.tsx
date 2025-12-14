@@ -10,15 +10,15 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import {
   format4chanTimestamp,
   getIdColor,
   getShortId,
 } from "@/app/[locale]/chat/lib/utils/formatting";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+
 import { getPostsByUserId } from "./helpers";
 
 interface UserIdHoverCardProps {

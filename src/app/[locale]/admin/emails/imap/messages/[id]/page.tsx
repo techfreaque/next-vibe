@@ -3,18 +3,17 @@
  * Page for viewing individual IMAP message details
  */
 
-import { Div } from "next-vibe-ui/ui/div";
 import { notFound } from "next-vibe-ui/lib/not-found";
+import { Div } from "next-vibe-ui/ui/div";
 import { H1 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { ImapMessageDetail } from "@/app/api/[locale]/emails/imap-client/_components/imap-message-detail";
 import { imapMessagesRepository } from "@/app/api/[locale]/emails/imap-client/messages/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { ImapMessageDetail } from "@/app/api/[locale]/emails/imap-client/_components/imap-message-detail";
 
 interface ImapMessageDetailPageProps {
   params: Promise<{

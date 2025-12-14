@@ -4,10 +4,10 @@
  */
 
 // BottomSheetView is just a View wrapper
+import { styled } from "nativewind";
 import type { ReactNode } from "react";
 import React from "react";
 import { View } from "react-native";
-import { styled } from "nativewind";
 
 export {
   Sheet as BottomSheet,

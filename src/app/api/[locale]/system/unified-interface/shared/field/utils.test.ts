@@ -5,7 +5,7 @@
  * for form initialization in the unified interface system.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
 import { z } from "zod";
 
 import { extractSchemaDefaults } from "./utils";
@@ -19,7 +19,7 @@ describe("extractSchemaDefaults", () => {
     });
 
     it("extracts default value from a number field with default", () => {
-      const schema = z.number().default(42);
+      const schema = z.coerce.number().default(42);
       const result = extractSchemaDefaults(schema);
       expect(result).toBe(42);
     });
@@ -51,7 +51,7 @@ describe("extractSchemaDefaults", () => {
     it("returns empty object for object with no defaults", () => {
       const schema = z.object({
         name: z.string(),
-        age: z.number(),
+        age: z.coerce.number(),
       });
       const result = extractSchemaDefaults(schema);
       expect(result).toEqual({});
@@ -60,7 +60,7 @@ describe("extractSchemaDefaults", () => {
     it("extracts defaults from object with some fields having defaults", () => {
       const schema = z.object({
         name: z.string(),
-        age: z.number().default(18),
+        age: z.coerce.number().default(18),
         active: z.boolean().default(true),
       });
       const result = extractSchemaDefaults(schema);
@@ -98,8 +98,8 @@ describe("extractSchemaDefaults", () => {
           sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
         }),
         paginationInfo: z.object({
-          page: z.number().optional().default(1),
-          limit: z.number().optional().default(20),
+          page: z.coerce.number().optional().default(1),
+          limit: z.coerce.number().optional().default(20),
         }),
       });
       const result = extractSchemaDefaults(schema);
@@ -161,7 +161,7 @@ describe("extractSchemaDefaults", () => {
 
     it("extracts defaults through nullable wrapper in object", () => {
       const schema = z.object({
-        maybeValue: z.number().nullable().default(100),
+        maybeValue: z.coerce.number().nullable().default(100),
       });
       const result = extractSchemaDefaults(schema);
       expect(result).toEqual({
@@ -201,7 +201,10 @@ describe("extractSchemaDefaults", () => {
           .nullable()
           .optional(),
         sortingOptions: z.object({
-          sortBy: z.nativeEnum(LeadSortField).optional().default(LeadSortField.CREATED_AT),
+          sortBy: z
+            .nativeEnum(LeadSortField)
+            .optional()
+            .default(LeadSortField.CREATED_AT),
           sortOrder: z.enum(SortOrder).optional().default("desc"),
         }),
         paginationInfo: z.object({
@@ -232,7 +235,7 @@ describe("extractSchemaDefaults", () => {
         optionalWithDefault: z.string().optional().default("optional default"),
         nested: z.object({
           deep: z.object({
-            value: z.number().default(999),
+            value: z.coerce.number().default(999),
           }),
         }),
       });
@@ -259,15 +262,21 @@ describe("extractSchemaDefaults", () => {
 
     it("handles primitive schemas without defaults", () => {
       expect(extractSchemaDefaults(z.string())).toBeUndefined();
-      expect(extractSchemaDefaults(z.number())).toBeUndefined();
+      expect(extractSchemaDefaults(z.coerce.number())).toBeUndefined();
       expect(extractSchemaDefaults(z.boolean())).toBeUndefined();
     });
 
     it("returns empty values for primitives when forFormInit is true", () => {
       expect(extractSchemaDefaults(z.string(), undefined, "", true)).toBe("");
-      expect(extractSchemaDefaults(z.number(), undefined, "", true)).toBe(0);
-      expect(extractSchemaDefaults(z.boolean(), undefined, "", true)).toBe(false);
-      expect(extractSchemaDefaults(z.array(z.string()), undefined, "", true)).toEqual([]);
+      expect(
+        extractSchemaDefaults(z.coerce.number(), undefined, "", true),
+      ).toBe(0);
+      expect(extractSchemaDefaults(z.boolean(), undefined, "", true)).toBe(
+        false,
+      );
+      expect(
+        extractSchemaDefaults(z.array(z.string()), undefined, "", true),
+      ).toEqual([]);
     });
 
     it("returns empty values for transformed string when forFormInit is true", () => {
@@ -277,7 +286,10 @@ describe("extractSchemaDefaults", () => {
 
     it("handles nested objects with forFormInit", () => {
       const schema = z.object({
-        email: z.string().email().transform((x) => x.toLowerCase()),
+        email: z
+          .string()
+          .email()
+          .transform((x) => x.toLowerCase()),
         password: z.string().min(1),
         rememberMe: z.boolean().optional().default(false),
       });
@@ -299,7 +311,7 @@ describe("extractSchemaDefaults", () => {
       const schema = z
         .object({
           a: z.string().default("inner-a"),
-          b: z.number().default(10),
+          b: z.coerce.number().default(10),
         })
         .default({ a: "outer-a", b: 20 });
 

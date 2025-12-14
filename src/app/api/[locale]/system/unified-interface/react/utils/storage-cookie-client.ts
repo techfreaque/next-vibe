@@ -4,10 +4,10 @@
  * specifically for authentication tokens and session data.
  */
 
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import { Environment } from "next-vibe/shared/utils";
 
-import { envClient } from "@/config/env-client";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
+import { envClient, platform } from "@/config/env-client";
 
 /**
  * Get a cookie value by name (client-side only)
@@ -16,8 +16,8 @@ import { envClient } from "@/config/env-client";
  */
 export function getCookie(name: string): string | null {
   try {
-    if (envClient.platform.isServer || typeof document === "undefined") {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Client-side cookie helper throws for server-side usage
+    if (platform.isServer || typeof document === "undefined") {
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Client-side cookie helper throws for server-side usage
       throw new Error("getCookie cannot be called on the server");
     }
 
@@ -45,8 +45,8 @@ export function getCookie(name: string): string | null {
  */
 export function setCookie(name: string, value: string): void {
   try {
-    if (envClient.platform.isServer || typeof document === "undefined") {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Client-side cookie helper throws for server-side usage
+    if (platform.isServer || typeof document === "undefined") {
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Client-side cookie helper throws for server-side usage
       throw new Error("setCookie cannot be called on the server");
     }
 
@@ -104,8 +104,8 @@ export function setCookie(name: string, value: string): void {
  */
 export function deleteCookie(name: string): void {
   try {
-    if (envClient.platform.isServer || typeof document === "undefined") {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Client-side cookie helper throws for server-side usage
+    if (platform.isServer || typeof document === "undefined") {
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Client-side cookie helper throws for server-side usage
       throw new Error("deleteCookie cannot be called on the server");
     }
 
@@ -156,8 +156,8 @@ export function deleteCookie(name: string): void {
  */
 export function getAllCookies(): Record<string, string> {
   try {
-    if (envClient.platform.isServer || typeof document === "undefined") {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Client-side cookie helper throws for server-side usage
+    if (platform.isServer || typeof document === "undefined") {
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Client-side cookie helper throws for server-side usage
       throw new Error("getAllCookies cannot be called on the server");
     }
 

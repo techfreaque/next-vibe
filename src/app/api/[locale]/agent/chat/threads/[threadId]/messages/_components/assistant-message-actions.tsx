@@ -6,6 +6,7 @@ import { Bot, Square, Trash2, Volume2, X } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import {
   prepareTextForTTS,
   stripThinkTags,
@@ -13,11 +14,10 @@ import {
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useTouchDevice } from "@/hooks/use-touch-device";
 import { CopyButton } from "./copy-button";
 import { MessageActionButton } from "./message-action-button";
 

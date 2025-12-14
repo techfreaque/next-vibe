@@ -5,12 +5,12 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import { smsEnv } from "./env";
 // Import and re-export enum from separate file to avoid circular dependency
 import { SmsProviders } from "./utils-enum";
 
@@ -228,8 +228,8 @@ export function validateE164PhoneNumber(
   // Special case for HTTP provider with custom regex
   if (providerName === SmsProviders.HTTP) {
     try {
-      if (env.SMS_HTTP_PHONE_REGEX) {
-        const pattern = new RegExp(env.SMS_HTTP_PHONE_REGEX);
+      if (smsEnv.SMS_HTTP_PHONE_REGEX) {
+        const pattern = new RegExp(smsEnv.SMS_HTTP_PHONE_REGEX);
         if (!pattern.test(phoneNumber)) {
           return {
             valid: false,

@@ -114,7 +114,7 @@ export async function executeCommand(
   // Handle timeout if specified
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const timeoutPromise = options?.timeout
-    ? // eslint-disable-next-line no-unused-vars -- Required by Promise constructor signature
+    ? // eslint-disable-next-line no-unused-vars -- Timeout promise only rejects, never resolves
       new Promise<never>((_resolve, reject) => {
         timeoutId = setTimeout(() => {
           proc.kill();

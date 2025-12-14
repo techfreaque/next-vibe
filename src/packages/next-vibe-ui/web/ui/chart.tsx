@@ -1,21 +1,22 @@
 "use client";
 
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { cn } from "next-vibe/shared/utils";
 import type { ReactNode } from "react";
 import * as React from "react";
-import type { StyleType } from "../utils/style-type";
 import {
-  VictoryChart as VictoryChartBase,
-  VictoryLine as VictoryLineBase,
-  VictoryBar as VictoryBarBase,
   VictoryArea as VictoryAreaBase,
-  VictoryPie as VictoryPieBase,
-  VictoryTooltip as VictoryTooltipBase,
-  VictoryLegend as VictoryLegendBase,
   VictoryAxis as VictoryAxisBase,
+  VictoryBar as VictoryBarBase,
+  VictoryChart as VictoryChartBase,
+  VictoryLegend as VictoryLegendBase,
+  VictoryLine as VictoryLineBase,
+  VictoryPie as VictoryPieBase,
   VictoryTheme as VictoryThemeBase,
+  VictoryTooltip as VictoryTooltipBase,
 } from "victory";
-import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+
+import type { StyleType } from "../utils/style-type";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: ".light", dark: ".dark" } as const;
@@ -101,7 +102,8 @@ export function useChart<
   const context = React.useContext(ChartContext);
 
   if (!context) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useChart must be used within a <ChartContainer />");
   }
 

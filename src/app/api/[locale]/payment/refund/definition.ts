@@ -80,7 +80,7 @@ const { POST } = createEndpoint({
             "app.api.payment.refund.form.fields.amount.placeholder" as const,
           columns: 12,
         },
-        z.number().positive().optional(),
+        z.coerce.number().positive().optional(),
       ),
 
       reason: requestDataField(
@@ -177,7 +177,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.payment.refund.post.response.refund.amount" as const,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           currency: responseField(
             {

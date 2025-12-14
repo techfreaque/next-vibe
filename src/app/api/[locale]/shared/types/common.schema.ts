@@ -5,7 +5,7 @@ import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
 // Common reusable schemas
 
 export const dateSchema = z
-  .union([z.string(), z.date(), z.number()])
+  .union([z.string(), z.date(), z.coerce.number()])
   .transform((val): string | Date | number => {
     if (val instanceof Date) {
       return val;

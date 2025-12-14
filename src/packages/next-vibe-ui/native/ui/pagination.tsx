@@ -1,19 +1,19 @@
 "use client";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   DotsHorizontalIcon,
 } from "next-vibe-ui/ui/icons";
-import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
-import { styled } from "nativewind";
 
 import { useTranslation } from "@/i18n/core/client";
 
-import { buttonVariants } from "./button";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
+import { buttonVariants } from "./button";
 
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styled(Pressable, { className: "style" });

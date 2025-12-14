@@ -95,7 +95,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.emails.imapClient.folders.sync.response.foldersProcessed",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       foldersAdded: responseField(
@@ -104,7 +104,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.emails.imapClient.folders.sync.response.foldersAdded",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       foldersUpdated: responseField(
@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.emails.imapClient.folders.sync.response.foldersUpdated",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       foldersDeleted: responseField(
@@ -122,7 +122,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.emails.imapClient.folders.sync.response.foldersDeleted",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       duration: responseField(
@@ -130,7 +130,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.imapClient.folders.sync.response.duration",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       success: responseField(

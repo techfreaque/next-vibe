@@ -1,14 +1,14 @@
 "use client";
 
-import { ExternalLink } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
-import { Span } from "next-vibe-ui/ui/span";
+import { ExternalLink } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { extractLinkData } from "../../../shared/widgets/logic/link";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { isExternalUrl } from "../../../shared/widgets/utils/widget-helpers";
 
 /**

@@ -52,28 +52,28 @@ export const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.browser.tags.browserAutomation",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       totalEarningsCents: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.browser.tags.browserAutomation",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       pendingEarningsCents: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.browser.tags.browserAutomation",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       confirmedEarningsCents: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.browser.tags.browserAutomation",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       currency: responseField(
         {

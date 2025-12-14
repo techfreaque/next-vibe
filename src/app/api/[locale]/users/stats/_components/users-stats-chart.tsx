@@ -7,21 +7,21 @@
 
 import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schema";
 import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
-import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import {
+  Area,
+  Axis,
+  Bar,
+  Chart,
+  Line,
+} from "next-vibe-ui/ui/chart";
+import { Div } from "next-vibe-ui/ui/div";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
+import { Span } from "next-vibe-ui/ui/span";
 import { H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
-import {
-  Chart,
-  Line,
-  Bar,
-  Area,
-  Axis,
-} from "next-vibe-ui/ui/chart";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

@@ -13,7 +13,6 @@ import { AlertDialogTitle } from "next-vibe-ui/ui/alert-dialog";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { DropdownMenu } from "next-vibe-ui/ui/dropdown-menu";
-import { Input } from "next-vibe-ui/ui/input";
 import { DropdownMenuContent } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuItem } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuSeparator } from "next-vibe-ui/ui/dropdown-menu";
@@ -21,12 +20,6 @@ import { DropdownMenuSub } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuSubContent } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuSubTrigger } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuTrigger } from "next-vibe-ui/ui/dropdown-menu";
-import { P } from "next-vibe-ui/ui/typography";
-import { Span } from "next-vibe-ui/ui/span";
-import { Tooltip } from "next-vibe-ui/ui/tooltip";
-import { TooltipContent } from "next-vibe-ui/ui/tooltip";
-import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
-import { TooltipTrigger } from "next-vibe-ui/ui/tooltip";
 import { Archive } from "next-vibe-ui/ui/icons/Archive";
 import { ArchiveRestore } from "next-vibe-ui/ui/icons/ArchiveRestore";
 import { Edit2 } from "next-vibe-ui/ui/icons/Edit2";
@@ -36,25 +29,31 @@ import { Pin } from "next-vibe-ui/ui/icons/Pin";
 import { PinOff } from "next-vibe-ui/ui/icons/PinOff";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { Input } from "next-vibe-ui/ui/input";
+import { Span } from "next-vibe-ui/ui/span";
+import { Tooltip } from "next-vibe-ui/ui/tooltip";
+import { TooltipContent } from "next-vibe-ui/ui/tooltip";
+import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
+import { TooltipTrigger } from "next-vibe-ui/ui/tooltip";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import type { DivMouseEvent } from "@/packages/next-vibe-ui/web/ui/div";
-import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
-
-import type { UseChatReturn } from "@/app/api/[locale]/agent/chat/hooks/hooks";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-
-import { ThreadPermissionsDialog } from "./thread-permissions-dialog";
-import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useTouchDevice } from "@/hooks/use-touch-device";
 import {
   chatColors,
   chatTransitions,
 } from "@/app/[locale]/chat/lib/design-tokens";
+import type { UseChatReturn } from "@/app/api/[locale]/agent/chat/hooks/hooks";
 import type { ChatThread } from "@/app/api/[locale]/agent/chat/hooks/store";
+import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useTouchDevice } from "@/hooks/use-touch-device";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
+import type { DivMouseEvent } from "@/packages/next-vibe-ui/web/ui/div";
+import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
+
+import { ThreadPermissionsDialog } from "./thread-permissions-dialog";
 
 export interface ThreadItemProps {
   thread: ChatThread;

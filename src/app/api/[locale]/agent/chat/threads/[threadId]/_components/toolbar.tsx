@@ -3,10 +3,9 @@
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ViewModeToggle } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/_components/view-mode-toggle";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ChatToolbarProps {
   locale: CountryLanguage;

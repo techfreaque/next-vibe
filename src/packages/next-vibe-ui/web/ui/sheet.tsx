@@ -1,13 +1,14 @@
 "use client";
 
 import * as SheetPrimitive from "@radix-ui/react-dialog";
-import { Cross2Icon } from "next-vibe-ui/ui/icons";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "next-vibe/shared/utils/utils";
+import { Cross2Icon } from "next-vibe-ui/ui/icons";
 import * as React from "react";
-import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
+
+import type { StyleType } from "../utils/style-type";
 
 // Cross-platform types
 export interface SheetRootProps {

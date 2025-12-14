@@ -85,8 +85,7 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.users.list.get.search.label" as const,
-              description:
-                "app.api.users.list.get.search.description" as const,
+              description: "app.api.users.list.get.search.description" as const,
               placeholder: "app.api.users.list.get.search.placeholder" as const,
               columns: 12,
             },
@@ -97,8 +96,7 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
               label: "app.api.users.list.get.status.label" as const,
-              description:
-                "app.api.users.list.get.status.description" as const,
+              description: "app.api.users.list.get.status.description" as const,
               placeholder: "app.api.users.list.get.status.placeholder" as const,
               options: UserStatusFilterOptions,
               columns: 6,
@@ -137,8 +135,7 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.users.list.get.sortBy.label" as const,
-              description:
-                "app.api.users.list.get.sortBy.description" as const,
+              description: "app.api.users.list.get.sortBy.description" as const,
               placeholder: "app.api.users.list.get.sortBy.placeholder" as const,
               options: UserSortFieldOptions,
               columns: 6,
@@ -305,7 +302,7 @@ const { GET } = createEndpoint({
               content: "app.api.users.list.get.response.totalCount" as const,
               columns: 3,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           pageCount: responseField(
             {
@@ -314,7 +311,7 @@ const { GET } = createEndpoint({
               content: "app.api.users.list.get.response.pageCount" as const,
               columns: 3,
             },
-            z.number(),
+            z.coerce.number(),
           ),
         },
       ),
@@ -339,13 +336,11 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.users.list.get.errors.server.title" as const,
-      description:
-        "app.api.users.list.get.errors.server.description" as const,
+      description: "app.api.users.list.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.users.list.get.errors.unknown.title" as const,
-      description:
-        "app.api.users.list.get.errors.unknown.description" as const,
+      description: "app.api.users.list.get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.users.list.get.errors.conflict.title" as const,
@@ -354,8 +349,7 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.users.list.get.errors.network.title" as const,
-      description:
-        "app.api.users.list.get.errors.network.description" as const,
+      description: "app.api.users.list.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.users.list.get.errors.notFound.title" as const,

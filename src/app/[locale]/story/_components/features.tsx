@@ -1,6 +1,13 @@
 "use client";
 
-import { MotionDiv } from "next-vibe-ui/ui/motion";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   BarChart3,
   Brush,
@@ -11,14 +18,7 @@ import {
   Users,
   Zap,
 } from "next-vibe-ui/ui/icons";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
+import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type React from "react";
 import type { JSX } from "react";
 import { useInView } from "react-intersection-observer";

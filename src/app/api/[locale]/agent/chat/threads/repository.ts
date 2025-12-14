@@ -18,10 +18,10 @@ import {
   or,
 } from "drizzle-orm";
 import {
-  success,
   ErrorResponseTypes,
   fail,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -31,19 +31,19 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { chatFolders, chatThreads, type ChatFolder } from "../db";
+import { DefaultFolderId } from "../config";
+import { type ChatFolder,chatFolders, chatThreads } from "../db";
+import { ThreadStatus } from "../enum";
 import {
   canCreateThreadInFolder,
-  canViewThread,
-  canEditThread,
-  canPostInThread,
-  canHideThread,
   canDeleteThread,
+  canEditThread,
+  canHideThread,
   canManageThreadPermissions,
+  canPostInThread,
+  canViewThread,
 } from "../permissions/permissions";
-import { ThreadStatus } from "../enum";
 import { validateNotIncognito } from "../validation";
-import { DefaultFolderId } from "../config";
 import type {
   ThreadCreateRequestOutput,
   ThreadCreateResponseOutput,

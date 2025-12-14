@@ -7,8 +7,9 @@
 import "server-only";
 
 import type { NextRequest } from "next/server";
-import type { EndpointLogger } from "../shared/logger/endpoint";
+
 import { parseError } from "../../../shared/utils";
+import type { EndpointLogger } from "../shared/logger/endpoint";
 
 /**
  * Parsed JSON value type - recursive type for any JSON-compatible structure
@@ -112,7 +113,7 @@ export function parseSearchParams(searchParams: URLSearchParams): ParsedObject {
  * Example: fileUpload.file => { fileUpload: { file: File } }
  */
 function parseFormData(
-  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility between Next.js and web standards
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility between Next.js and web standards
   formData: any,
 ): Record<
   string,

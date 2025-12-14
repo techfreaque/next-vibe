@@ -10,14 +10,14 @@ import type {
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { emailEnv } from "@/app/api/[locale]/emails/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
 
 import { EmailProvider, EmailStatus, EmailType } from "../../messages/enum";
 import { emailMetadataRepository } from "../email-metadata/repository";
@@ -154,7 +154,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                       recipientName: data.t(
                         "app.api.emails.smtpClient.emailHandling.email.errors.unknown_recipient",
                       ),
-                      senderEmail: env.EMAIL_FROM_EMAIL,
+                      senderEmail: emailEnv.EMAIL_FROM_EMAIL,
                       senderName: data.t("config.appName"),
                       type: EmailType.SYSTEM,
                       templateName: null,

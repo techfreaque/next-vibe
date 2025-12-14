@@ -30,8 +30,8 @@ import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
-  UserRole,
   type UserPermissionRoleValue,
+  UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import { userRolesRepository } from "@/app/api/[locale]/user/user-roles/repository";
 

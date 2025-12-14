@@ -2,15 +2,14 @@ import { Button, Link, Section, Text as Span } from "@react-email/components";
 import type React from "react";
 import type { JSX } from "react";
 
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { env } from "@/config/env";
 import { contactClientRepository } from "../contact/repository-client";
-
-import { SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { EmailTemplate } from "../emails/smtp-client/components/template.email";
 import { createTrackingContext } from "../emails/smtp-client/components/tracking_context.email";
+import { SubscriptionPlan, SubscriptionStatus } from "./enum";
 
 /**
  * Email function type for subscription success notifications

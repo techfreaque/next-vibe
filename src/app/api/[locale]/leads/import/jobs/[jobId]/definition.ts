@@ -82,7 +82,7 @@ const { PATCH } = createEndpoint({
                 "app.api.leads.import.jobs.jobId.patch.batchSize.placeholder",
               columns: 6,
             },
-            z.number().min(10).max(1000).optional(),
+            z.coerce.number().min(10).max(1000).optional(),
           ),
           maxRetries: requestDataField(
             {
@@ -95,7 +95,7 @@ const { PATCH } = createEndpoint({
                 "app.api.leads.import.jobs.jobId.patch.maxRetries.placeholder",
               columns: 6,
             },
-            z.number().min(0).max(10).optional(),
+            z.coerce.number().min(0).max(10).optional(),
           ),
         },
       ),
@@ -167,7 +167,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.leads.import.jobs.jobId.patch.response.totalRows.content",
                 },
-                z.number().nullable(),
+                z.coerce.number().nullable(),
               ),
               processedRows: responseField(
                 {
@@ -175,7 +175,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.leads.import.jobs.jobId.patch.response.processedRows.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               successfulImports: responseField(
                 {
@@ -183,7 +183,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.leads.import.jobs.jobId.patch.response.successfulImports.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               failedImports: responseField(
                 {
@@ -191,7 +191,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.leads.import.jobs.jobId.patch.response.failedImports.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               duplicateEmails: responseField(
                 {
@@ -199,7 +199,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.leads.import.jobs.jobId.patch.response.duplicateEmails.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
             },
           ),
@@ -222,7 +222,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.leads.import.jobs.jobId.patch.response.currentBatchStart.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               batchSize: responseField(
                 {
@@ -230,7 +230,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.leads.import.jobs.jobId.patch.response.batchSize.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               retryCount: responseField(
                 {
@@ -238,7 +238,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.leads.import.jobs.jobId.patch.response.retryCount.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               maxRetries: responseField(
                 {
@@ -246,7 +246,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.leads.import.jobs.jobId.patch.response.maxRetries.content",
                 },
-                z.number(),
+                z.coerce.number(),
               ),
               error: responseField(
                 {

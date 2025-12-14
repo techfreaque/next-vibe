@@ -16,6 +16,11 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  formatGenerator,
+  formatCount,
+  formatDuration,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { PATH_SEPARATOR } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import {
@@ -85,7 +90,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       const duration = Date.now() - startTime;
 
       logger.info(
-        `Generated route handlers file with ${routeFiles.length} routes in ${duration}ms`,
+        formatGenerator(`Generated route handlers file with ${formatCount(routeFiles.length, "route")} in ${formatDuration(duration)}`, "🔗"),
       );
 
       return success({

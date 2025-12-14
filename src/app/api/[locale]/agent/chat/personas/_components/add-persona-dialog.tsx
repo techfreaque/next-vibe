@@ -10,7 +10,6 @@ import {
 import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
-import { P } from "next-vibe-ui/ui/typography";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import {
   Select,
@@ -21,6 +20,7 @@ import {
 } from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React from "react";
 

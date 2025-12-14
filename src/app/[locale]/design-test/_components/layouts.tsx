@@ -1,7 +1,12 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import type { JSX } from "react";
-
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "next-vibe-ui/ui/accordion";
+import { Button } from "next-vibe-ui/ui/button";
 import {
   Card,
   CardContent,
@@ -10,23 +15,17 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe-ui/ui/card";
-import { Separator } from "next-vibe-ui/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "next-vibe-ui/ui/accordion";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "next-vibe-ui/ui/collapsible";
-import { Section } from "next-vibe-ui/ui/section";
 import { Div } from "next-vibe-ui/ui/div";
-import { Button } from "next-vibe-ui/ui/button";
+import { Section } from "next-vibe-ui/ui/section";
+import { Separator } from "next-vibe-ui/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
 
 export function LayoutsPreview(): JSX.Element {
   return (

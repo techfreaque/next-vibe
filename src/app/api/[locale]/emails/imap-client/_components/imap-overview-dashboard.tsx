@@ -5,6 +5,10 @@
 
 "use client";
 
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   AlertCircle,
   AlertTriangle,
@@ -14,10 +18,6 @@ import {
   WifiOff,
 } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import {
   Table,
   TableBody,

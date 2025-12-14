@@ -1,9 +1,11 @@
 "use client";
 
-import type { JSX } from "react";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { JSX } from "react";
+
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
+
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
 

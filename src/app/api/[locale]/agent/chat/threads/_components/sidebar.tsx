@@ -1,25 +1,32 @@
 "use client";
-import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
-
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { type InputRefObject, Input } from "next-vibe-ui/ui/input";
-import { P } from "next-vibe-ui/ui/typography";
+import { FolderPlus } from "next-vibe-ui/ui/icons/FolderPlus";
+import { MessageSquarePlus } from "next-vibe-ui/ui/icons/MessageSquarePlus";
+import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Input,type InputRefObject } from "next-vibe-ui/ui/input";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Tooltip } from "next-vibe-ui/ui/tooltip";
 import { TooltipContent } from "next-vibe-ui/ui/tooltip";
 import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
 import { TooltipTrigger } from "next-vibe-ui/ui/tooltip";
-import { FolderPlus } from "next-vibe-ui/ui/icons/FolderPlus";
-import { MessageSquarePlus } from "next-vibe-ui/ui/icons/MessageSquarePlus";
-import { Search } from "next-vibe-ui/ui/icons/Search";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import {
+  buildFolderUrl,
+  getNewChatTranslationKey,
+  getNewFolderTranslationKey,
+  getRootFolderId,
+} from "@/app/[locale]/chat/lib/utils/navigation";
+import { SidebarFooter } from "@/app/api/[locale]/agent/chat/_components/sidebar/footer/sidebar-footer";
+import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
+import { RootFolderBar } from "@/app/api/[locale]/agent/chat/folders/_components/root-folder-bar";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -27,17 +34,10 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { type TFunction } from "@/i18n/core/static-types";
-import {
-  buildFolderUrl,
-  getNewChatTranslationKey,
-  getNewFolderTranslationKey,
-  getRootFolderId,
-} from "@/app/[locale]/chat/lib/utils/navigation";
-import { ThreadList } from "./thread-area/thread-list";
+
 import { FolderList } from "./thread-area/folder-list";
-import { RootFolderBar } from "@/app/api/[locale]/agent/chat/folders/_components/root-folder-bar";
-import { SidebarFooter } from "@/app/api/[locale]/agent/chat/_components/sidebar/footer/sidebar-footer";
 import { NewFolderDialog } from "./thread-area/new-folder-dialog";
+import { ThreadList } from "./thread-area/thread-list";
 
 interface ChatSidebarProps {
   locale: CountryLanguage;
@@ -90,8 +90,8 @@ export function ChatSidebar({
   } = useChatContext();
 
   // Fetch credits with server-side initial data (disables initial fetch)
-  // Only use credits hook if we have initial data from server
-  const endpoint = initialCredits ? useCredits(logger, initialCredits) : null;
+  // Hook handles null case internally - called unconditionally per React rules
+  const endpoint = useCredits(logger, initialCredits ?? null);
   const readState = endpoint?.read;
   const credits = readState?.response?.success
     ? readState.response.data

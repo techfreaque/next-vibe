@@ -6,7 +6,6 @@
 
 // CLI output messages don't need internationalization
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
 
@@ -14,16 +13,30 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  formatActionCommand,
+  formatCommand,
+  formatConfig,
+  formatDatabase,
+  formatDuration,
+  formatError,
+  formatHint,
+  formatSkip,
+  formatStartup,
+  formatTask,
+  formatWarning,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/types/repository";
 import { unifiedTaskRunnerRepository } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/repository";
+import { useTurbopack } from "@/config/constants";
 import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { databaseMigrationRepository } from "../../db/migrate/repository";
 import { dockerOperationsRepository } from "../../db/utils/docker-operations/repository";
 import { dbUtilsRepository } from "../../db/utils/repository";
-import type endpoints from "./definition";
-import { useTurbopack } from "@/config/constants";
 import { DEV_WATCHER_TASK_NAME } from "../../unified-interface/tasks/dev-watcher/task-runner";
+import type endpoints from "./definition";
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 
@@ -33,6 +46,20 @@ const DATABASE_TEST_QUERY = "SELECT 1";
 const DOCKER_VOLUME_RM_COMMAND = `docker volume rm ${DOCKER_VOLUME_NAME} 2>/dev/null || true`;
 const DATABASE_TIMEOUT_PREFIX = "Database connection timeout after";
 const DATABASE_TIMEOUT_SUFFIX = "attempts";
+
+// Funny shutdown messages - randomly picked when server stops
+const SHUTDOWN_MESSAGES = [
+  "👋 Peace out! The vibes have left the building",
+  "🌙 Server has left the chat",
+  "🌙 Going dark... catch you on the flip side",
+  "🎬 And... scene! That's a wrap folks",
+  "🚪 Server has stopped responding (just kidding, it's fine)",
+  "☕ Taking a coffee break... indefinitely",
+  "🎮 Game over! Insert coin to continue",
+  "🛌 Server is going to bed. Sweet dreams!",
+  "🎪 The circus has left town",
+  "🦖 Server went extinct (but it'll be back)",
+];
 
 /**
  * Returns database connection timeout error message
@@ -151,7 +178,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         error: upResult.message || "Unknown error",
       });
       // Continue execution - don't throw, let the process continue
-      logger.vibe("❌ Database startup failed, continuing without database");
+      logger.vibe(
+        formatError("Database startup failed, continuing without database"),
+      );
     }
     // 4. Wait for database to be ready
     await this.waitForDatabaseConnection(logger);
@@ -234,7 +263,6 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           logger.error(
             "❌ Database connection timeout - this will cause errors",
           );
-          // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Dev tooling requires throwing errors to halt execution
           throw new Error(getDatabaseTimeoutMessage(maxAttempts, delayMs));
         }
 
@@ -266,7 +294,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     }
 
     // Start task runner if not skipped
-    await this.startTaskRunnerIfEnabled(data, locale, logger);
+    void this.startTaskRunnerIfEnabled(data, locale, logger);
 
     // Start Next.js and keep process alive
     return await this.startNextJsAndWait(port, logger);
@@ -280,10 +308,50 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     logger: EndpointLogger,
     data: RequestType,
   ): void {
-    logger.vibe("🚀 Starting development server");
-    logger.vibe(
-      `📍 Port: ${port} | Debug: ${logger.isDebugEnabled ? "ON" : "OFF (use --verbose to debug)"} | Tasks: ${data.skipTaskRunner ? "DISABLED" : "ENABLED"}`,
+    logger.vibe(formatStartup("Starting Development Server", "⚡"));
+    log("");
+    log(`  ${formatConfig("Port", port)}  ${formatHint("(--port=N)")}`);
+    log(
+      `  ${formatConfig("Debug", logger.isDebugEnabled ? "ON" : "OFF")}  ${formatHint(logger.isDebugEnabled ? "(remove -v or --verbose to disable)" : "(-v or --verbose to enable)")}`,
     );
+    log("");
+
+    if (data.skipDbSetup) {
+      log(
+        `  ${formatConfig("Database", "DISABLED")} ${formatHint("(remove --skip-db-setup to enable)")}`,
+      );
+    } else {
+      log(
+        `  ${formatConfig("Database", "ENABLED")} ${formatHint("(--skip-db-setup to disable)")}`,
+      );
+      log(
+        `    ${formatConfig("Reset", data.dbReset || data.r ? "YES" : "NO")} ${formatHint(data.dbReset || data.r ? "(remove -r to skip)" : "(-r to reset)")}`,
+      );
+      log(
+        `    ${formatConfig("Migrations", data.skipMigrations ? "NO" : "YES")} ${formatHint(data.skipMigrations ? "(remove --skip-migrations)" : "(--skip-migrations)")}`,
+      );
+      if (!data.skipMigrations) {
+        log(
+          `    ${formatConfig("Generation", data.skipMigrationGeneration ? "NO" : "YES")} ${formatHint(data.skipMigrationGeneration ? "(remove --skip-migration-generation)" : "(--skip-migration-generation)")}`,
+        );
+      }
+      log(
+        `    ${formatConfig("Seeding", data.skipSeeding ? "NO" : "YES")} ${formatHint(data.skipSeeding ? "(remove --skip-seeding to enable)" : "(--skip-seeding to disable)")}`,
+      );
+    }
+
+    log("");
+    log(
+      `  ${formatConfig("Background Tasks", data.skipTaskRunner ? "DISABLED" : "ENABLED")} ${formatHint(data.skipTaskRunner ? "(remove --skip-task-runner)" : "(--skip-task-runner)")}`,
+    );
+    log(
+      `  ${formatConfig("Code Generators", data.skipGeneratorWatcher ? "DISABLED" : "ENABLED")} ${formatHint(data.skipGeneratorWatcher ? "(remove --skip-generator-watcher)" : "(--skip-generator-watcher)")}`,
+    );
+    log("");
+    log(
+      `  ${formatHint("💡 Edit src/app/api/[locale]/system/server/dev/definition.ts to change defaults")}`,
+    );
+    log("");
   }
 
   /**
@@ -296,7 +364,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<boolean> {
     if (data.skipDbSetup) {
-      logger.vibe("⏭️ Database setup skipped");
+      logger.vibe(formatSkip("Database setup skipped"));
       return true;
     }
 
@@ -305,8 +373,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         await dbUtilsRepository.isDockerAvailable(logger);
 
       if (!dockerCheckResult.success || !dockerCheckResult.data) {
-        logger.vibe("⚠️ Docker unavailable (continuing anyway)");
-        logger.vibe("🔧 Install Docker to enable database functionality");
+        logger.vibe(formatWarning("Docker unavailable (continuing anyway)"));
+        logger.vibe(
+          `� ${formatCommand("Install Docker")} to enable database functionality`,
+        );
         return true;
       }
 
@@ -321,11 +391,11 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         return false; // Critical failure, start Next.js immediately
       }
 
-      logger.vibe("✅ Database ready");
+      logger.info(formatDatabase("Database ready", "🗄️ "));
       return true;
     } catch (error) {
       const parsedError = parseError(error);
-      logger.vibe("❌ Database setup failed (continuing anyway)");
+      logger.vibe(formatError("Database setup failed (continuing anyway)"));
       logger.error("Database setup error details", parsedError);
       logger.vibe(`💡 Error: ${parsedError.message}`);
       return true;
@@ -348,14 +418,29 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         await this.startDatabaseWithoutReset(locale, logger);
       }
 
-      // Run migrations and seed
-      await databaseMigrationRepository.runMigrations(
-        { generate: true, redo: false, schema: "public", dryRun: false },
-        locale,
-        logger,
-      );
+      // Run migrations if not skipped
+      if (!data.skipMigrations) {
+        await databaseMigrationRepository.runMigrations(
+          {
+            generate: !data.skipMigrationGeneration,
+            redo: false,
+            schema: "public",
+            dryRun: false,
+          },
+          locale,
+          logger,
+        );
+      } else {
+        logger.vibe(formatSkip("Migrations skipped"));
+      }
 
-      await seedDatabase("dev", logger, locale);
+      // Seed database if not skipped
+      if (!data.skipSeeding) {
+        await seedDatabase("dev", logger, locale);
+      } else {
+        logger.vibe(formatSkip("Database seeding skipped"));
+      }
+
       return true;
     } catch (error) {
       this.logDatabaseError(error, logger);
@@ -370,9 +455,11 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<void> {
-    logger.vibe("🔄 Resetting database...");
+    logger.debug(
+      `🔄 ${formatActionCommand("Resetting database using:", "docker compose down && docker volume rm")}`,
+    );
     await this.performHardDatabaseReset(logger, locale);
-    logger.vibe("✅ Database reset completed");
+    logger.info("   ✓ Reset completed");
 
     await databaseMigrationRepository.runMigrations(
       {
@@ -393,6 +480,11 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<void> {
+    const startTime = Date.now();
+    logger.debug(
+      `🐘 ${formatActionCommand("Starting PostgreSQL using:", "docker compose -f docker-compose-dev.yml up -d")}`,
+    );
+
     const dbStartResult = await dockerOperationsRepository.dockerComposeUp(
       logger,
       locale,
@@ -401,22 +493,23 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     );
 
     if (!dbStartResult.success) {
-      logger.vibe("❌ Failed to start database");
-      if (dbStartResult.message) {
-        logger.error("Database startup error details", {
-          error: dbStartResult.message,
-        });
-        logger.vibe(`💡 Error: ${dbStartResult.message}`);
-      }
+      logger.error("Failed to start database", {
+        error: dbStartResult.message,
+      });
+      logger.vibe(formatError("Database startup failed"));
       logger.vibe(
-        "🔧 Try running: docker compose -f docker-compose-dev.yml up -d",
+        `   Try: ${formatCommand("docker compose -f docker-compose-dev.yml up -d")}`,
       );
-      logger.vibe("🔧 Or check if Docker is running: docker --version");
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Required for error handling flow
       throw new Error("Failed to start database");
     }
 
-    logger.vibe("✅ Database started");
+    const duration = Date.now() - startTime;
+    logger.info(
+      formatDatabase(
+        `${formatActionCommand("Started PostgreSQL using:", "docker compose -f docker-compose-dev.yml up -d")} in ${formatDuration(duration)}`,
+        "🐘",
+      ),
+    );
   }
 
   /**
@@ -425,10 +518,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Error handling: Database errors can be any type (Drizzle errors, connection errors, etc), so unknown is correct before narrowing.
   private logDatabaseError(error: unknown, logger: EndpointLogger): void {
     const parsedError = parseError(error);
-    logger.vibe("❌ Database operation failed");
+    logger.vibe(formatError("Database operation failed"));
     logger.error("Database error details", parsedError);
     logger.vibe(`💡 Error: ${parsedError.message}`);
-    logger.vibe("🔧 Try running: vibe dev -r");
+    logger.vibe(`� Try running: ${formatCommand("vibe dev -r")}`);
   }
 
   /**
@@ -440,16 +533,19 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<void> {
     if (data.skipTaskRunner) {
-      logger.vibe("⏭️ Task runner disabled");
+      logger.vibe(formatSkip("Task runner disabled"));
       return;
     }
 
     try {
+      logger.info(formatTask("Starting task runner"));
       await this.startUnifiedTaskRunner(locale, logger, data);
-      logger.vibe("✅ Task runner started in background");
+      logger.info(formatTask("Task runner started"));
     } catch (error) {
       const parsedError = parseError(error);
-      logger.vibe("⚠️ Task runner startup failed (continuing anyway)");
+      logger.vibe(
+        formatWarning("Task runner startup failed (continuing anyway)"),
+      );
       logger.error("Task runner startup error details", parsedError);
       if (logger.isDebugEnabled) {
         logger.vibe(`💡 Error: ${parsedError.message}`);
@@ -464,7 +560,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     port: number,
     logger: EndpointLogger,
   ): Promise<never> {
-    logger.vibe(`🌐 Starting Next.js on http://localhost:${port}`);
+    logger.info(`🌐 Starting Next.js on port ${port}...`);
 
     const nextProcess = this.startNextJsProcess(port);
 
@@ -488,8 +584,13 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         // Wait briefly for stdio streams to finish (child might have buffered output)
         // This prevents terminal pollution from warnings like browserslist age warnings
         setTimeout(() => {
+          // Pick a random shutdown message
+          const randomMessage =
+            SHUTDOWN_MESSAGES[
+              Math.floor(Math.random() * SHUTDOWN_MESSAGES.length)
+            ];
           // eslint-disable-next-line i18next/no-literal-string
-          process.stdout.write("\n🛑 vibes have stopped\n");
+          process.stdout.write(`\n${randomMessage}\n`);
           // Exit with the same code as Next.js
           process.exit(code ?? 0);
         }, 100);
@@ -626,3 +727,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
  * Default repository instance
  */
 export const devRepository = new DevRepositoryImpl();
+
+// Use console.log directly to avoid timestamps for the config section
+// oxlint-disable-next-line no-console
+const log = (msg: string): void => console.log(msg);

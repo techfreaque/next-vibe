@@ -7,26 +7,26 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import Stripe from "stripe";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
 import type { Countries, CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import {
-  productsRepository,
   type ProductIds,
+  productsRepository,
   TOTAL_MODEL_COUNT,
 } from "../../../products/repository-client";
+import { paymentEnv } from "../../env";
 import type { PaymentInterval } from "../types";
 
-const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
   apiVersion: "2025-11-17.clover",
 });
 

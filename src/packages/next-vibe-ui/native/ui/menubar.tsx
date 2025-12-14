@@ -1,35 +1,35 @@
 import * as MenubarPrimitive from "@rn-primitives/menubar";
-import * as React from "react";
-import { View } from "react-native";
-
 import { cn } from "next-vibe/shared/utils/utils";
 import {
   CheckIcon,
   ChevronRightIcon,
   DotFilledIcon,
 } from "next-vibe-ui/ui/icons";
-import { Span } from "./span";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
+import * as React from "react";
+import { View } from "react-native";
 
 import type {
-  MenubarRootProps,
-  MenubarMenuProps,
-  MenubarTriggerProps,
-  MenubarGroupProps,
-  MenubarPortalProps,
-  MenubarSubProps,
-  MenubarRadioGroupProps,
-  MenubarSubTriggerProps,
-  MenubarSubContentProps,
-  MenubarContentProps,
-  MenubarItemProps,
   MenubarCheckboxItemProps,
-  MenubarRadioItemProps,
+  MenubarContentProps,
+  MenubarGroupProps,
+  MenubarItemProps,
   MenubarLabelProps,
+  MenubarMenuProps,
+  MenubarPortalProps,
+  MenubarRadioGroupProps,
+  MenubarRadioItemProps,
+  MenubarRootProps,
   MenubarSeparatorProps,
   MenubarShortcutProps,
+  MenubarSubContentProps,
+  MenubarSubProps,
+  MenubarSubTriggerProps,
+  MenubarTriggerProps,
 } from "@/packages/next-vibe-ui/web/ui/menubar";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
+import { Span } from "./span";
 
 // The styled() function from nativewind has overly complex type inference for these components
 const StyledMenubarTrigger = MenubarPrimitive.Trigger;

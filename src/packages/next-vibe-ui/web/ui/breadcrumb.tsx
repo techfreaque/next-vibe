@@ -1,10 +1,11 @@
-import { ChevronRightIcon, DotsHorizontalIcon } from "next-vibe-ui/ui/icons";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "next-vibe/shared/utils/utils";
+import { ChevronRightIcon, DotsHorizontalIcon } from "next-vibe-ui/ui/icons";
 import * as React from "react";
-import type { StyleType } from "../utils/style-type";
 
 import { useTranslation } from "@/i18n/core/client";
+
+import type { StyleType } from "../utils/style-type";
 
 // Breadcrumb
 export type BreadcrumbProps = {

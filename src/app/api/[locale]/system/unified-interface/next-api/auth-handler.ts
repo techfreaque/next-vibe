@@ -1,26 +1,26 @@
 import "server-only";
 
 import { cookies } from "next/headers";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
+import { Environment, parseError } from "next-vibe/shared/utils";
+
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
   AUTH_TOKEN_COOKIE_NAME,
   LEAD_ID_COOKIE_NAME,
 } from "@/config/constants";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  success,
-  fail,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
-import { Environment, parseError } from "next-vibe/shared/utils";
-
 import { env } from "@/config/env";
 
+import type { EndpointLogger } from "../shared/logger/endpoint";
 import {
   type AuthContext,
   BaseAuthHandler,
 } from "../shared/server-only/auth/base-auth-handler";
-import type { EndpointLogger } from "../shared/logger/endpoint";
 
 /**
  * Web Authentication Handler

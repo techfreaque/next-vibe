@@ -11,9 +11,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import type {
+  ErrorResponseType,
   ResponseType,
   SuccessResponseType,
-  ErrorResponseType,
 } from "next-vibe/shared/types/response.schema";
 
 import type imapAccountsListDefinition from "@/app/api/[locale]/emails/imap-client/accounts/list/definition";

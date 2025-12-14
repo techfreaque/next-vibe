@@ -17,14 +17,14 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import { GET as getRootPermissionsEndpoint } from "./definition";
-import type { RootFolderPermissionsRepositoryInterface } from "./repository";
 import type {
   RootPermissionsGetRequestOutput,
   RootPermissionsGetResponseOutput,
 } from "./definition";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { GET as getRootPermissionsEndpoint } from "./definition";
+import type { RootFolderPermissionsRepositoryInterface } from "./repository";
 
 /**
  * Native Root Folder Permissions Repository Implementation
@@ -33,7 +33,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 class RootFolderPermissionsRepositoryNativeImpl implements RootFolderPermissionsRepositoryInterface {
   async getRootFolderPermissions(
     data: RootPermissionsGetRequestOutput,
-    // eslint-disable-next-line no-unused-vars -- Required by interface (user auth handled by nativeEndpoint)
+    // eslint-disable-next-line no-unused-vars -- Required by interface, native impl uses HTTP client instead
     _user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,

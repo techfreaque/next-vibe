@@ -5,8 +5,8 @@
 
 import type { JSX } from "react";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import { LeadsListClient } from "@/app/api/[locale]/leads/list/_components/leads-list-client";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 export default async function LeadsListPage({
   params,

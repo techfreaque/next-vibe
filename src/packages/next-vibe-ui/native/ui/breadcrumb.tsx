@@ -4,14 +4,12 @@
  */
 import * as Slot from "@rn-primitives/slot";
 import { ChevronRight } from "lucide-react-native";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
-import { styled } from "nativewind";
 
 import { useTranslation } from "@/i18n/core/client";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
-
 import type {
   BreadcrumbEllipsisProps,
   BreadcrumbItemProps,
@@ -21,7 +19,9 @@ import type {
   BreadcrumbProps,
   BreadcrumbSeparatorProps,
 } from "@/packages/next-vibe-ui/web/ui/breadcrumb";
-import { cn } from "next-vibe/shared/utils/utils";
+
+import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styled(Pressable, { className: "style" });

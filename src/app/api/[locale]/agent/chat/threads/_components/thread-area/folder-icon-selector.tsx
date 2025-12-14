@@ -4,12 +4,6 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
-import { Span } from "next-vibe-ui/ui/span";
-import {
   Activity,
   Atom,
   Book,
@@ -58,15 +52,6 @@ import {
   Scale,
   Shield,
   ShieldPlus,
-  Sparkles,
-  Star,
-  Terminal,
-  TestTube,
-  TrendingUp,
-  Trophy,
-  Users,
-  Utensils,
-  Zap,
   SiAndroid,
   SiApple,
   SiDiscord,
@@ -85,7 +70,22 @@ import {
   SiReddit,
   SiRust,
   SiTypescript,
+  Sparkles,
+  Star,
+  Terminal,
+  TestTube,
+  TrendingUp,
+  Trophy,
+  Users,
+  Utensils,
+  Zap,
 } from "next-vibe-ui/ui/icons";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "next-vibe-ui/ui/popover";
+import { Span } from "next-vibe-ui/ui/span";
 import type { ComponentType, JSX } from "react";
 import React from "react";
 

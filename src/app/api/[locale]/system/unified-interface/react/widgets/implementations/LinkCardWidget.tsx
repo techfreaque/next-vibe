@@ -1,20 +1,21 @@
 "use client";
 
-import { ExternalLink } from "next-vibe-ui/ui/icons";
 import { cn } from "next-vibe/shared/utils";
-import { Image } from "next-vibe-ui/ui/image";
-import { Div } from "next-vibe-ui/ui/div";
-import { Span } from "next-vibe-ui/ui/span";
 import { Card } from "next-vibe-ui/ui/card";
 import { CardContent } from "next-vibe-ui/ui/card";
 import { CardDescription } from "next-vibe-ui/ui/card";
 import { CardHeader } from "next-vibe-ui/ui/card";
 import { CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { ExternalLink } from "next-vibe-ui/ui/icons";
+import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
+
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { extractLinkCardData } from "../../../shared/widgets/logic/link-card";
+import type { ValueOnlyReactWidgetProps } from "../../../shared/widgets/types";
 import { isExternalUrl } from "../../../shared/widgets/utils/widget-helpers";
 
 /**
@@ -24,7 +25,7 @@ export function LinkCardWidget({
   value,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.LINK_CARD>): JSX.Element {
+}: ValueOnlyReactWidgetProps<typeof WidgetType.LINK_CARD>): JSX.Element {
   // Extract data using shared logic
   const data = extractLinkCardData(value);
 

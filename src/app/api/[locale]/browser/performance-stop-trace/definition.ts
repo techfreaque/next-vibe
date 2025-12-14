@@ -66,10 +66,10 @@ const { POST } = createEndpoint({
             stopped: z.boolean().describe("Whether the trace was stopped"),
             metrics: z
               .object({
-                lcp: z.number().optional(),
-                fcp: z.number().optional(),
-                cls: z.number().optional(),
-                tti: z.number().optional(),
+                lcp: z.coerce.number().optional(),
+                fcp: z.coerce.number().optional(),
+                cls: z.coerce.number().optional(),
+                tti: z.coerce.number().optional(),
               })
               .optional()
               .describe("Performance metrics from the trace"),

@@ -97,7 +97,7 @@ const { PATCH } = createEndpoint({
             "app.api.agent.chat.memories.id.patch.priority.description" as const,
           columns: 6,
         },
-        z.number().min(0).max(100).optional(),
+        z.coerce.number().min(0).max(100).optional(),
       ),
 
       // === RESPONSE ===
@@ -120,7 +120,8 @@ const { PATCH } = createEndpoint({
         "app.api.agent.chat.memories.id.patch.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.memories.id.patch.errors.network.title" as const,
+      title:
+        "app.api.agent.chat.memories.id.patch.errors.network.title" as const,
       description:
         "app.api.agent.chat.memories.id.patch.errors.network.description" as const,
     },
@@ -137,17 +138,20 @@ const { PATCH } = createEndpoint({
         "app.api.agent.chat.memories.id.patch.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.memories.id.patch.errors.notFound.title" as const,
+      title:
+        "app.api.agent.chat.memories.id.patch.errors.notFound.title" as const,
       description:
         "app.api.agent.chat.memories.id.patch.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.memories.id.patch.errors.server.title" as const,
+      title:
+        "app.api.agent.chat.memories.id.patch.errors.server.title" as const,
       description:
         "app.api.agent.chat.memories.id.patch.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.memories.id.patch.errors.unknown.title" as const,
+      title:
+        "app.api.agent.chat.memories.id.patch.errors.unknown.title" as const,
       description:
         "app.api.agent.chat.memories.id.patch.errors.unknown.description" as const,
     },
@@ -158,7 +162,8 @@ const { PATCH } = createEndpoint({
         "app.api.agent.chat.memories.id.patch.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.memories.id.patch.errors.conflict.title" as const,
+      title:
+        "app.api.agent.chat.memories.id.patch.errors.conflict.title" as const,
       description:
         "app.api.agent.chat.memories.id.patch.errors.conflict.description" as const,
     },
@@ -247,7 +252,8 @@ const { DELETE } = createEndpoint({
         "app.api.agent.chat.memories.id.delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.memories.id.delete.errors.network.title" as const,
+      title:
+        "app.api.agent.chat.memories.id.delete.errors.network.title" as const,
       description:
         "app.api.agent.chat.memories.id.delete.errors.network.description" as const,
     },
@@ -270,12 +276,14 @@ const { DELETE } = createEndpoint({
         "app.api.agent.chat.memories.id.delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.memories.id.delete.errors.server.title" as const,
+      title:
+        "app.api.agent.chat.memories.id.delete.errors.server.title" as const,
       description:
         "app.api.agent.chat.memories.id.delete.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.memories.id.delete.errors.unknown.title" as const,
+      title:
+        "app.api.agent.chat.memories.id.delete.errors.unknown.title" as const,
       description:
         "app.api.agent.chat.memories.id.delete.errors.unknown.description" as const,
     },
@@ -325,5 +333,5 @@ export type MemoryDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type MemoryDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 
 const definitions = { PATCH, DELETE };
-export { PATCH, DELETE };
+export { DELETE,PATCH };
 export default definitions;

@@ -175,7 +175,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.response.upvotes.content" as const,
         },
-        z.number(),
+        z.coerce.number(),
       ),
       downvotes: responseField(
         {
@@ -183,7 +183,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.response.downvotes.content" as const,
         },
-        z.number(),
+        z.coerce.number(),
       ),
       userVote: responseField(
         {

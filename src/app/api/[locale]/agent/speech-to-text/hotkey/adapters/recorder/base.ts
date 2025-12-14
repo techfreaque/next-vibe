@@ -9,9 +9,9 @@ import "server-only";
 
 import type { Subprocess } from "bun";
 
+import type { RecorderBackendType } from "../../enum";
 import type { Recorder } from "../../types";
 import { RecorderError } from "../../types";
-import type { RecorderBackendType } from "../../enum";
 
 /**
  * Abstract base recorder class
@@ -171,7 +171,7 @@ export abstract class BaseRecorder implements Recorder {
    * Handle stderr line - can be overridden by subclasses
    * @param _line - Stderr line to handle
    */
-  // eslint-disable-next-line no-unused-vars -- Parameter used in subclass overrides
+  // eslint-disable-next-line no-unused-vars -- Parameter provided for subclass override
   protected handleStderrLine(_line: string): void {
     // Subclasses can override to handle specific error patterns
   }

@@ -1,8 +1,8 @@
 // Native implementation with optional scrolling
 // Note: SafeAreaView is already provided by Body component at root level
+import { styled } from "nativewind";
 import React from "react";
 import { Platform, ScrollView, View } from "react-native";
-import { styled } from "nativewind";
 
 // Import types from web
 import type { PageLayoutProps } from "@/packages/next-vibe-ui/web/ui/page-layout";

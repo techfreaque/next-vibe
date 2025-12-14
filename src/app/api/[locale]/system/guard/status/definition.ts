@@ -207,7 +207,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.guard.status.post.fields.totalGuards.title",
         },
-        z.number().optional(),
+        z.coerce.number().optional(),
       ),
 
       activeGuards: responseField(
@@ -215,7 +215,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.system.guard.status.post.fields.activeGuards.title",
         },
-        z.number().optional(),
+        z.coerce.number().optional(),
       ),
     },
   ),

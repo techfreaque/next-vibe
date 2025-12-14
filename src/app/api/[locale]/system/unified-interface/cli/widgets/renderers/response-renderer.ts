@@ -5,25 +5,25 @@
 
 import chalk from "chalk";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
+import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 
+import type { WidgetData } from "../../../shared/widgets/types";
+import type { WidgetRegistry } from "../core/registry";
+import { defaultWidgetRegistry } from "../core/registry";
 import type {
   CLIRenderingOptions,
   DataFormatter,
   WidgetRenderContext,
 } from "../core/types";
-import type { WidgetRegistry } from "../core/registry";
-import { defaultWidgetRegistry } from "../core/registry";
-import type { WidgetData } from "../../../shared/widgets/types";
 
 /**
  * Data record type for response rendering

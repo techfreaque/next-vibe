@@ -277,7 +277,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.version",
               },
-              z.number(),
+              z.coerce.number(),
             ),
             createdAt: responseField(
               {
@@ -304,7 +304,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.totalTasks",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),
@@ -500,7 +500,7 @@ const { POST } = createEndpoint({
             "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.timeout.description",
           columns: 4,
         },
-        z.number().default(300000),
+        z.coerce.number().default(300000),
       ),
       retries: requestDataField(
         {
@@ -512,7 +512,7 @@ const { POST } = createEndpoint({
             "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.retries.description",
           columns: 4,
         },
-        z.number().default(3),
+        z.coerce.number().default(3),
       ),
       retryDelay: requestDataField(
         {
@@ -524,7 +524,7 @@ const { POST } = createEndpoint({
             "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.retryDelay.description",
           columns: 4,
         },
-        z.number().default(5000),
+        z.coerce.number().default(5000),
       ),
 
       // Response - return the created task
@@ -543,10 +543,10 @@ const { POST } = createEndpoint({
           priority: z.enum(CronTaskPriorityDB),
           status: z.enum(CronTaskStatusDB),
           category: z.enum(TaskCategoryDB),
-          timeout: z.number(),
-          retries: z.number(),
-          retryDelay: z.number(),
-          version: z.number(),
+          timeout: z.coerce.number(),
+          retries: z.coerce.number(),
+          retryDelay: z.coerce.number(),
+          version: z.coerce.number(),
           createdAt: z.string(),
           updatedAt: z.string(),
         }),

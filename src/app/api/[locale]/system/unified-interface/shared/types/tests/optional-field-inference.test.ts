@@ -16,6 +16,7 @@ import { z } from "zod";
 
 import {
   arrayOptionalField,
+  type InferFieldType,
   objectField,
   objectOptionalField,
   requestDataArrayField,
@@ -24,11 +25,10 @@ import {
   responseArrayField,
   responseArrayOptionalField,
   responseField,
-  type InferFieldType,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
-  type FieldUsage,
   FieldDataType,
+  type FieldUsage,
   LayoutType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";

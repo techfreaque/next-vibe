@@ -1,13 +1,14 @@
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
+import type { ViewStyle } from "react-native";
 import {
   KeyboardAvoidingView as RNKeyboardAvoidingView,
   Platform,
 } from "react-native";
-import type { ViewStyle } from "react-native";
-import { styled } from "nativewind";
 
-import { cn } from "next-vibe/shared/utils/utils";
 import type { KeyboardAvoidingViewProps } from "@/packages/next-vibe-ui/web/ui/keyboard-avoiding-view";
+
 import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledKeyboardAvoidingView = styled(RNKeyboardAvoidingView, {

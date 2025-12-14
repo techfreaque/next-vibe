@@ -5,16 +5,16 @@
 
 "use client";
 
-import { ArrowLeft, Save } from "next-vibe-ui/ui/icons";
-import { Form } from "next-vibe-ui/ui/form/form";
 import { useRouter } from "next-vibe-ui/hooks/use-navigation";
-import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
-import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import { Form } from "next-vibe-ui/ui/form/form";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { FormFieldGroup } from "next-vibe-ui/ui/form/form-section";
+import { ArrowLeft, Save } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";

@@ -19,6 +19,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
 import {
   PaymentProvider,
   PaymentProviderDB,
@@ -60,7 +61,7 @@ const { POST } = createEndpoint({
           description: "app.api.credits.purchase.post.quantity.description",
           placeholder: "app.api.credits.purchase.post.quantity.placeholder",
         },
-        z.number().int().min(1).max(10),
+        z.coerce.number().int().min(1).max(10),
       ),
 
       provider: requestDataField(
@@ -97,7 +98,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.credits.purchase.post.totalAmount.content",
         },
-        z.number().int(),
+        z.coerce.number().int(),
       ),
 
       totalCredits: responseField(
@@ -105,7 +106,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.credits.purchase.post.totalCredits.content",
         },
-        z.number().int(),
+        z.coerce.number().int(),
       ),
     },
   ),

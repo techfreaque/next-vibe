@@ -4,16 +4,16 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
 import {
   chatColors,
   chatShadows,
   chatTransitions,
 } from "@/app/[locale]/chat/lib/design-tokens";
+import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import { MessageAuthorInfo } from "./message-author";
 import { UserMessageActions } from "./user-message-actions";
 

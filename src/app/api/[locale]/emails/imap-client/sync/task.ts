@@ -8,9 +8,9 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
@@ -35,7 +35,7 @@ import { imapSyncTaskRepository } from "../sync-task/repository";
  * Task Configuration Schema
  */
 export const taskConfigSchema = z.object({
-  maxAccountsPerRun: z.number().min(1).max(50).default(10),
+  maxAccountsPerRun: z.coerce.number().min(1).max(50).default(10),
   enableFolderSync: z.boolean().default(true),
   enableMessageSync: z.boolean().default(true),
   dryRun: z.boolean().default(false),
@@ -47,11 +47,11 @@ export type TaskConfigType = z.output<typeof taskConfigSchema>;
  * Task Result Schema
  */
 export const taskResultSchema = z.object({
-  accountsProcessed: z.number().default(0),
-  accountsSuccessful: z.number().default(0),
-  accountsFailed: z.number().default(0),
-  foldersProcessed: z.number().optional(),
-  messagesProcessed: z.number().optional(),
+  accountsProcessed: z.coerce.number().default(0),
+  accountsSuccessful: z.coerce.number().default(0),
+  accountsFailed: z.coerce.number().default(0),
+  foldersProcessed: z.coerce.number().optional(),
+  messagesProcessed: z.coerce.number().optional(),
   errors: z
     .array(
       z.object({
@@ -62,10 +62,10 @@ export const taskResultSchema = z.object({
     )
     .default([]),
   summary: z.object({
-    totalAccounts: z.number().default(0),
-    activeAccounts: z.number().default(0),
-    syncedAccounts: z.number().default(0),
-    failedAccounts: z.number().default(0),
+    totalAccounts: z.coerce.number().default(0),
+    activeAccounts: z.coerce.number().default(0),
+    syncedAccounts: z.coerce.number().default(0),
+    failedAccounts: z.coerce.number().default(0),
   }),
 });
 
@@ -119,14 +119,10 @@ async function executeImapSync(
 /**
  * Validate function for the task
  */
-function validateImapSync(
-  logger: EndpointLogger,
-): ResponseType<boolean> {
+function validateImapSync(logger: EndpointLogger): ResponseType<boolean> {
   try {
     // Use the repository to validate the IMAP sync task
-    const validationResult = imapSyncTaskRepository.validateImapSync(
-      logger,
-    );
+    const validationResult = imapSyncTaskRepository.validateImapSync(logger);
 
     if (validationResult.success && validationResult.data) {
       return success(validationResult.data.isValid);

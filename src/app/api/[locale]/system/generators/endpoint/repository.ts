@@ -16,6 +16,11 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  formatGenerator,
+  formatCount,
+  formatDuration,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import {
   findFilesRecursively,
@@ -81,7 +86,7 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       const duration = Date.now() - startTime;
 
       logger.info(
-        `Generated endpoint file with ${definitionFiles.length} endpoints in ${duration}ms`,
+        formatGenerator(`Generated endpoint file with ${formatCount(definitionFiles.length, "endpoint")} in ${formatDuration(duration)}`, "📄"),
       );
 
       return success({

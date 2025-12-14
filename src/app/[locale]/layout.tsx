@@ -10,13 +10,13 @@ import { Html } from "next-vibe-ui/ui/html";
 import type { JSX, ReactNode } from "react";
 
 import { env } from "@/config/env";
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
+import { Body } from "@/packages/next-vibe-ui/web/ui/body";
 
 import { RootProviders } from "./layout-shared";
-import { Body } from "@/packages/next-vibe-ui/web/ui/body";
-import { envClient } from "@/config/env-client";
 
 const inter = Inter({
   subsets: ["latin"],

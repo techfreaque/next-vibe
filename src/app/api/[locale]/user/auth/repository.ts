@@ -7,22 +7,23 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
-import { redirect } from "next-vibe-ui/lib/redirect";
 import type { NextRequest } from "next/server";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+  throwErrorResponse,
+} from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
+import { redirect } from "next-vibe-ui/lib/redirect";
+
+import { cliEnv } from "@/app/api/[locale]/system/unified-interface/cli/env";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
   AUTH_TOKEN_COOKIE_NAME,
 } from "@/config/constants";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  success,
-  ErrorResponseTypes,
-  fail,
-  throwErrorResponse,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
-
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
@@ -33,7 +34,7 @@ import { LeadSource, LeadStatus } from "../../leads/enum";
 import { db } from "../../system/db";
 import { type AuthContext } from "../../system/unified-interface/shared/server-only/auth/base-auth-handler";
 import { getPlatformAuthHandler } from "../../system/unified-interface/shared/server-only/auth/factory";
-import { Platform } from "../../system/unified-interface/shared/types/platform";
+import { isCliPlatform,Platform } from "../../system/unified-interface/shared/types/platform";
 import { users } from "../db";
 import { UserDetailLevel } from "../enum";
 import { sessionRepository } from "../private/session/repository";
@@ -41,9 +42,9 @@ import { userRepository } from "../repository";
 import type { CompleteUserType } from "../types";
 import type { UserRoleValue } from "../user-roles/enum";
 import {
-  UserRole,
-  UserPermissionRole,
   filterUserPermissionRoles,
+  UserPermissionRole,
+  UserRole,
 } from "../user-roles/enum";
 import { userRolesRepository } from "../user-roles/repository";
 import type {
@@ -943,9 +944,9 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (!token) {
         logger.debug("No auth token found");
-        if (context.platform === Platform.CLI) {
-          // Try CLI email auth if no token
-          const cliEmail = env.VIBE_CLI_USER_EMAIL;
+        if (isCliPlatform(context.platform)) {
+          // Try CLI email auth if no token (works for both CLI and CLI_PACKAGE)
+          const cliEmail = cliEnv.VIBE_CLI_USER_EMAIL;
           if (cliEmail) {
             logger.debug("Attempting CLI email authentication");
             return await this.authenticateUserByEmail(

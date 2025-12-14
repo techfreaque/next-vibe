@@ -8,9 +8,9 @@
 import { Minus, Plus } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
-import { useEffect } from "react";
-import type { StyleType } from "../utils/style-type";
+import { useEffect, useRef } from "react";
 
+import type { StyleType } from "../utils/style-type";
 import { Button } from "./button";
 import { Div } from "./div";
 import { Input, type InputChangeEvent } from "./input";
@@ -40,10 +40,13 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
   } = props;
 
   // Call onChange with initial value on mount to register the field
+  const hasRegistered = useRef(false);
   useEffect(() => {
-    onChange?.(value);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only on mount
+    if (!hasRegistered.current) {
+      hasRegistered.current = true;
+      onChange?.(value);
+    }
+  }, [onChange, value]);
 
   const handleDecrement = (): void => {
     const newValue =

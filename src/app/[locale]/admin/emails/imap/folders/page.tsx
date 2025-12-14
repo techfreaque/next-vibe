@@ -7,11 +7,10 @@ import { Div } from "next-vibe-ui/ui/div";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { ImapFoldersManagement } from "@/app/api/[locale]/emails/imap-client/_components/imap-folders-management";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { ImapFoldersManagement } from "@/app/api/[locale]/emails/imap-client/_components/imap-folders-management";
 
 interface ImapFoldersPageProps {
   params: Promise<{

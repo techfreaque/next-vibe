@@ -59,91 +59,92 @@ import { tools as route46Tools } from '../../../generators/generate-all/route';
 import { tools as route47Tools } from '../../../generators/endpoint/route';
 import { tools as route48Tools } from '../../../generators/route-handlers/route';
 import { tools as route49Tools } from '../../../generators/endpoints/route';
-import { tools as route50Tools } from '../../../generators/endpoints-index/route';
-import { tools as route51Tools } from '../../../generators/task-index/route';
-import { tools as route52Tools } from '../../../generators/seeds/route';
-import { tools as route53Tools } from '../../../generators/generate-trpc-router/validation/route';
-import { tools as route54Tools } from '../../../../manifest/route';
-import { tools as route55Tools } from '../../../../leads/lead/[id]/route';
-import { tools as route56Tools } from '../../../../leads/tracking/engagement/route';
-import { tools as route57Tools } from '../../../../leads/search/route';
-import { tools as route58Tools } from '../../../../leads/campaigns/campaign-starter/campaign-starter-config/route';
-import { tools as route59Tools } from '../../../../leads/campaigns/emails/test-mail/route';
-import { tools as route60Tools } from '../../../../leads/list/route';
-import { tools as route61Tools } from '../../../../leads/import/route';
-import { tools as route62Tools } from '../../../../leads/export/route';
-import { tools as route63Tools } from '../../../../leads/stats/route';
-import { tools as route64Tools } from '../../../../leads/create/route';
-import { tools as route65Tools } from '../../../../leads/batch/route';
-import { tools as route66Tools } from '../../../../referral/earnings/list/route';
-import { tools as route67Tools } from '../../../../referral/link-to-lead/route';
-import { tools as route68Tools } from '../../../../referral/codes/list/route';
-import { tools as route69Tools } from '../../../../referral/stats/route';
-import { tools as route70Tools } from '../../../../users/user/[id]/route';
-import { tools as route71Tools } from '../../../../users/list/route';
-import { tools as route72Tools } from '../../../../users/stats/route';
-import { tools as route73Tools } from '../../../../users/create/route';
-import { tools as route74Tools } from '../../../../user/private/logout/route';
-import { tools as route75Tools } from '../../../../user/private/me/route';
-import { tools as route76Tools } from '../../../../user/public/login/options/route';
-import { tools as route77Tools } from '../../../../user/public/signup/route';
-import { tools as route78Tools } from '../../../../user/public/reset-password/validate/route';
-import { tools as route79Tools } from '../../../../user/public/reset-password/request/route';
-import { tools as route80Tools } from '../../../../user/public/reset-password/confirm/route';
-import { tools as route81Tools } from '../../../../user/search/route';
-import { tools as route82Tools } from '../../../../user/auth/check/route';
-import { tools as route83Tools } from '../../../../subscription/route';
-import { tools as route84Tools } from '../../../../payment/portal/route';
-import { tools as route85Tools } from '../../../../payment/invoice/route';
-import { tools as route86Tools } from '../../../../payment/providers/stripe/cli/route';
-import { tools as route87Tools } from '../../../../payment/providers/nowpayments/cli/route';
-import { tools as route88Tools } from '../../../../payment/checkout/route';
-import { tools as route89Tools } from '../../../../payment/refund/route';
-import { tools as route90Tools } from '../../../../credits/history/route';
-import { tools as route91Tools } from '../../../../credits/purchase/route';
-import { tools as route92Tools } from '../../../../contact/route';
-import { tools as route93Tools } from '../../../../emails/smtp-client/list/route';
-import { tools as route94Tools } from '../../../../emails/smtp-client/edit/[id]/route';
-import { tools as route95Tools } from '../../../../emails/smtp-client/create/route';
-import { tools as route96Tools } from '../../../../emails/send/route';
-import { tools as route97Tools } from '../../../../emails/messages/[id]/route';
-import { tools as route98Tools } from '../../../../emails/imap-client/messages/[id]/route';
-import { tools as route99Tools } from '../../../../emails/imap-client/folders/list/route';
-import { tools as route100Tools } from '../../../../emails/imap-client/folders/sync/route';
-import { tools as route101Tools } from '../../../../emails/imap-client/config/route';
-import { tools as route102Tools } from '../../../../emails/imap-client/health/route';
-import { tools as route103Tools } from '../../../../emails/imap-client/sync/route';
-import { tools as route104Tools } from '../../../../emails/imap-client/accounts/[id]/route';
-import { tools as route105Tools } from '../../../../import/route';
-import { tools as route106Tools } from '../../../../newsletter/unsubscribe/route';
-import { tools as route107Tools } from '../../../../newsletter/subscribe/route';
-import { tools as route108Tools } from '../../../../newsletter/status/route';
-import { tools as route109Tools } from '../../../../browser/performance-analyze-insight/route';
-import { tools as route110Tools } from '../../../../browser/get-console-message/route';
-import { tools as route111Tools } from '../../../../browser/new-page/route';
-import { tools as route112Tools } from '../../../../browser/take-snapshot/route';
-import { tools as route113Tools } from '../../../../browser/drag/route';
-import { tools as route114Tools } from '../../../../browser/get-network-request/route';
-import { tools as route115Tools } from '../../../../browser/list-pages/route';
-import { tools as route116Tools } from '../../../../browser/close-page/route';
-import { tools as route117Tools } from '../../../../browser/resize-page/route';
-import { tools as route118Tools } from '../../../../browser/fill/route';
-import { tools as route119Tools } from '../../../../browser/hover/route';
-import { tools as route120Tools } from '../../../../browser/upload-file/route';
-import { tools as route121Tools } from '../../../../browser/handle-dialog/route';
-import { tools as route122Tools } from '../../../../browser/select-page/route';
-import { tools as route123Tools } from '../../../../browser/navigate-page/route';
-import { tools as route124Tools } from '../../../../browser/press-key/route';
-import { tools as route125Tools } from '../../../../browser/fill-form/route';
-import { tools as route126Tools } from '../../../../browser/performance-stop-trace/route';
-import { tools as route127Tools } from '../../../../browser/performance-start-trace/route';
-import { tools as route128Tools } from '../../../../browser/emulate/route';
-import { tools as route129Tools } from '../../../../browser/take-screenshot/route';
-import { tools as route130Tools } from '../../../../browser/list-network-requests/route';
-import { tools as route131Tools } from '../../../../browser/evaluate-script/route';
-import { tools as route132Tools } from '../../../../browser/list-console-messages/route';
-import { tools as route133Tools } from '../../../../browser/wait-for/route';
-import { tools as route134Tools } from '../../../../browser/click/route';
+import { tools as route50Tools } from '../../../generators/env/route';
+import { tools as route51Tools } from '../../../generators/endpoints-index/route';
+import { tools as route52Tools } from '../../../generators/task-index/route';
+import { tools as route53Tools } from '../../../generators/seeds/route';
+import { tools as route54Tools } from '../../../generators/generate-trpc-router/validation/route';
+import { tools as route55Tools } from '../../../../manifest/route';
+import { tools as route56Tools } from '../../../../leads/lead/[id]/route';
+import { tools as route57Tools } from '../../../../leads/tracking/engagement/route';
+import { tools as route58Tools } from '../../../../leads/search/route';
+import { tools as route59Tools } from '../../../../leads/campaigns/campaign-starter/campaign-starter-config/route';
+import { tools as route60Tools } from '../../../../leads/campaigns/emails/test-mail/route';
+import { tools as route61Tools } from '../../../../leads/list/route';
+import { tools as route62Tools } from '../../../../leads/import/route';
+import { tools as route63Tools } from '../../../../leads/export/route';
+import { tools as route64Tools } from '../../../../leads/stats/route';
+import { tools as route65Tools } from '../../../../leads/create/route';
+import { tools as route66Tools } from '../../../../leads/batch/route';
+import { tools as route67Tools } from '../../../../referral/earnings/list/route';
+import { tools as route68Tools } from '../../../../referral/link-to-lead/route';
+import { tools as route69Tools } from '../../../../referral/codes/list/route';
+import { tools as route70Tools } from '../../../../referral/stats/route';
+import { tools as route71Tools } from '../../../../users/user/[id]/route';
+import { tools as route72Tools } from '../../../../users/list/route';
+import { tools as route73Tools } from '../../../../users/stats/route';
+import { tools as route74Tools } from '../../../../users/create/route';
+import { tools as route75Tools } from '../../../../user/private/logout/route';
+import { tools as route76Tools } from '../../../../user/private/me/route';
+import { tools as route77Tools } from '../../../../user/public/login/options/route';
+import { tools as route78Tools } from '../../../../user/public/signup/route';
+import { tools as route79Tools } from '../../../../user/public/reset-password/validate/route';
+import { tools as route80Tools } from '../../../../user/public/reset-password/request/route';
+import { tools as route81Tools } from '../../../../user/public/reset-password/confirm/route';
+import { tools as route82Tools } from '../../../../user/search/route';
+import { tools as route83Tools } from '../../../../user/auth/check/route';
+import { tools as route84Tools } from '../../../../subscription/route';
+import { tools as route85Tools } from '../../../../payment/portal/route';
+import { tools as route86Tools } from '../../../../payment/invoice/route';
+import { tools as route87Tools } from '../../../../payment/providers/stripe/cli/route';
+import { tools as route88Tools } from '../../../../payment/providers/nowpayments/cli/route';
+import { tools as route89Tools } from '../../../../payment/checkout/route';
+import { tools as route90Tools } from '../../../../payment/refund/route';
+import { tools as route91Tools } from '../../../../credits/history/route';
+import { tools as route92Tools } from '../../../../credits/purchase/route';
+import { tools as route93Tools } from '../../../../contact/route';
+import { tools as route94Tools } from '../../../../emails/smtp-client/list/route';
+import { tools as route95Tools } from '../../../../emails/smtp-client/edit/[id]/route';
+import { tools as route96Tools } from '../../../../emails/smtp-client/create/route';
+import { tools as route97Tools } from '../../../../emails/send/route';
+import { tools as route98Tools } from '../../../../emails/messages/[id]/route';
+import { tools as route99Tools } from '../../../../emails/imap-client/messages/[id]/route';
+import { tools as route100Tools } from '../../../../emails/imap-client/folders/list/route';
+import { tools as route101Tools } from '../../../../emails/imap-client/folders/sync/route';
+import { tools as route102Tools } from '../../../../emails/imap-client/config/route';
+import { tools as route103Tools } from '../../../../emails/imap-client/health/route';
+import { tools as route104Tools } from '../../../../emails/imap-client/sync/route';
+import { tools as route105Tools } from '../../../../emails/imap-client/accounts/[id]/route';
+import { tools as route106Tools } from '../../../../import/route';
+import { tools as route107Tools } from '../../../../newsletter/unsubscribe/route';
+import { tools as route108Tools } from '../../../../newsletter/subscribe/route';
+import { tools as route109Tools } from '../../../../newsletter/status/route';
+import { tools as route110Tools } from '../../../../browser/performance-analyze-insight/route';
+import { tools as route111Tools } from '../../../../browser/get-console-message/route';
+import { tools as route112Tools } from '../../../../browser/new-page/route';
+import { tools as route113Tools } from '../../../../browser/take-snapshot/route';
+import { tools as route114Tools } from '../../../../browser/drag/route';
+import { tools as route115Tools } from '../../../../browser/get-network-request/route';
+import { tools as route116Tools } from '../../../../browser/list-pages/route';
+import { tools as route117Tools } from '../../../../browser/close-page/route';
+import { tools as route118Tools } from '../../../../browser/resize-page/route';
+import { tools as route119Tools } from '../../../../browser/fill/route';
+import { tools as route120Tools } from '../../../../browser/hover/route';
+import { tools as route121Tools } from '../../../../browser/upload-file/route';
+import { tools as route122Tools } from '../../../../browser/handle-dialog/route';
+import { tools as route123Tools } from '../../../../browser/select-page/route';
+import { tools as route124Tools } from '../../../../browser/navigate-page/route';
+import { tools as route125Tools } from '../../../../browser/press-key/route';
+import { tools as route126Tools } from '../../../../browser/fill-form/route';
+import { tools as route127Tools } from '../../../../browser/performance-stop-trace/route';
+import { tools as route128Tools } from '../../../../browser/performance-start-trace/route';
+import { tools as route129Tools } from '../../../../browser/emulate/route';
+import { tools as route130Tools } from '../../../../browser/take-screenshot/route';
+import { tools as route131Tools } from '../../../../browser/list-network-requests/route';
+import { tools as route132Tools } from '../../../../browser/evaluate-script/route';
+import { tools as route133Tools } from '../../../../browser/list-console-messages/route';
+import { tools as route134Tools } from '../../../../browser/wait-for/route';
+import { tools as route135Tools } from '../../../../browser/click/route';
 
 const route0 = wrapToolsForTRPC(route0Tools);
 const route1 = wrapToolsForTRPC(route1Tools);
@@ -280,6 +281,7 @@ const route131 = wrapToolsForTRPC(route131Tools);
 const route132 = wrapToolsForTRPC(route132Tools);
 const route133 = wrapToolsForTRPC(route133Tools);
 const route134 = wrapToolsForTRPC(route134Tools);
+const route135 = wrapToolsForTRPC(route135Tools);
 
 export const appRouter = router({
   agent: router({
@@ -360,146 +362,147 @@ export const appRouter = router({
       endpoint: router({ ...route47 }),
       "route-handlers": router({ ...route48 }),
       endpoints: router({ ...route49 }),
-      "endpoints-index": router({ ...route50 }),
-      "task-index": router({ ...route51 }),
-      seeds: router({ ...route52 }),
+      env: router({ ...route50 }),
+      "endpoints-index": router({ ...route51 }),
+      "task-index": router({ ...route52 }),
+      seeds: router({ ...route53 }),
       "generate-trpc-router": router({
-        validation: router({ ...route53 }),
+        validation: router({ ...route54 }),
       }),
     }),
   }),
-  manifest: router({ ...route54 }),
+  manifest: router({ ...route55 }),
   leads: router({
-    lead: router({ ...route55 }),
+    lead: router({ ...route56 }),
     tracking: router({
-      engagement: router({ ...route56 }),
+      engagement: router({ ...route57 }),
     }),
-    search: router({ ...route57 }),
+    search: router({ ...route58 }),
     campaigns: router({
       "campaign-starter": router({
-        "campaign-starter-config": router({ ...route58 }),
+        "campaign-starter-config": router({ ...route59 }),
       }),
       emails: router({
-        "test-mail": router({ ...route59 }),
+        "test-mail": router({ ...route60 }),
       }),
     }),
-    list: router({ ...route60 }),
-    import: router({ ...route61 }),
-    export: router({ ...route62 }),
-    stats: router({ ...route63 }),
-    create: router({ ...route64 }),
-    batch: router({ ...route65 }),
+    list: router({ ...route61 }),
+    import: router({ ...route62 }),
+    export: router({ ...route63 }),
+    stats: router({ ...route64 }),
+    create: router({ ...route65 }),
+    batch: router({ ...route66 }),
   }),
   referral: router({
     earnings: router({
-      list: router({ ...route66 }),
+      list: router({ ...route67 }),
     }),
-    "link-to-lead": router({ ...route67 }),
+    "link-to-lead": router({ ...route68 }),
     codes: router({
-      list: router({ ...route68 }),
+      list: router({ ...route69 }),
     }),
-    stats: router({ ...route69 }),
+    stats: router({ ...route70 }),
   }),
   users: router({
-    user: router({ ...route70 }),
-    list: router({ ...route71 }),
-    stats: router({ ...route72 }),
-    create: router({ ...route73 }),
+    user: router({ ...route71 }),
+    list: router({ ...route72 }),
+    stats: router({ ...route73 }),
+    create: router({ ...route74 }),
   }),
   user: router({
     private: router({
-      logout: router({ ...route74 }),
-      me: router({ ...route75 }),
+      logout: router({ ...route75 }),
+      me: router({ ...route76 }),
     }),
     public: router({
       login: router({
-        options: router({ ...route76 }),
+        options: router({ ...route77 }),
       }),
-      signup: router({ ...route77 }),
+      signup: router({ ...route78 }),
       "reset-password": router({
-        validate: router({ ...route78 }),
-        request: router({ ...route79 }),
-        confirm: router({ ...route80 }),
+        validate: router({ ...route79 }),
+        request: router({ ...route80 }),
+        confirm: router({ ...route81 }),
       }),
     }),
-    search: router({ ...route81 }),
+    search: router({ ...route82 }),
     auth: router({
-      check: router({ ...route82 }),
+      check: router({ ...route83 }),
     }),
   }),
-  subscription: router({ ...route83 }),
+  subscription: router({ ...route84 }),
   payment: router({
-    portal: router({ ...route84 }),
-    invoice: router({ ...route85 }),
+    portal: router({ ...route85 }),
+    invoice: router({ ...route86 }),
     providers: router({
       stripe: router({
-        cli: router({ ...route86 }),
-      }),
-      nowpayments: router({
         cli: router({ ...route87 }),
       }),
+      nowpayments: router({
+        cli: router({ ...route88 }),
+      }),
     }),
-    checkout: router({ ...route88 }),
-    refund: router({ ...route89 }),
+    checkout: router({ ...route89 }),
+    refund: router({ ...route90 }),
   }),
   credits: router({
-    history: router({ ...route90 }),
-    purchase: router({ ...route91 }),
+    history: router({ ...route91 }),
+    purchase: router({ ...route92 }),
   }),
-  contact: router({ ...route92 }),
+  contact: router({ ...route93 }),
   emails: router({
     "smtp-client": router({
-      list: router({ ...route93 }),
-      edit: router({ ...route94 }),
-      create: router({ ...route95 }),
+      list: router({ ...route94 }),
+      edit: router({ ...route95 }),
+      create: router({ ...route96 }),
     }),
-    send: router({ ...route96 }),
-    messages: router({ ...route97 }),
+    send: router({ ...route97 }),
+    messages: router({ ...route98 }),
     "imap-client": router({
-      messages: router({ ...route98 }),
+      messages: router({ ...route99 }),
       folders: router({
-        list: router({ ...route99 }),
-        sync: router({ ...route100 }),
+        list: router({ ...route100 }),
+        sync: router({ ...route101 }),
       }),
-      config: router({ ...route101 }),
-      health: router({ ...route102 }),
-      sync: router({ ...route103 }),
-      accounts: router({ ...route104 }),
+      config: router({ ...route102 }),
+      health: router({ ...route103 }),
+      sync: router({ ...route104 }),
+      accounts: router({ ...route105 }),
     }),
   }),
-  import: router({ ...route105 }),
+  import: router({ ...route106 }),
   newsletter: router({
-    unsubscribe: router({ ...route106 }),
-    subscribe: router({ ...route107 }),
-    status: router({ ...route108 }),
+    unsubscribe: router({ ...route107 }),
+    subscribe: router({ ...route108 }),
+    status: router({ ...route109 }),
   }),
   browser: router({
-    "performance-analyze-insight": router({ ...route109 }),
-    "get-console-message": router({ ...route110 }),
-    "new-page": router({ ...route111 }),
-    "take-snapshot": router({ ...route112 }),
-    drag: router({ ...route113 }),
-    "get-network-request": router({ ...route114 }),
-    "list-pages": router({ ...route115 }),
-    "close-page": router({ ...route116 }),
-    "resize-page": router({ ...route117 }),
-    fill: router({ ...route118 }),
-    hover: router({ ...route119 }),
-    "upload-file": router({ ...route120 }),
-    "handle-dialog": router({ ...route121 }),
-    "select-page": router({ ...route122 }),
-    "navigate-page": router({ ...route123 }),
-    "press-key": router({ ...route124 }),
-    "fill-form": router({ ...route125 }),
-    "performance-stop-trace": router({ ...route126 }),
-    "performance-start-trace": router({ ...route127 }),
-    emulate: router({ ...route128 }),
-    "take-screenshot": router({ ...route129 }),
-    "list-network-requests": router({ ...route130 }),
-    "evaluate-script": router({ ...route131 }),
-    "list-console-messages": router({ ...route132 }),
-    "wait-for": router({ ...route133 }),
-    click: router({ ...route134 }),
+    "performance-analyze-insight": router({ ...route110 }),
+    "get-console-message": router({ ...route111 }),
+    "new-page": router({ ...route112 }),
+    "take-snapshot": router({ ...route113 }),
+    drag: router({ ...route114 }),
+    "get-network-request": router({ ...route115 }),
+    "list-pages": router({ ...route116 }),
+    "close-page": router({ ...route117 }),
+    "resize-page": router({ ...route118 }),
+    fill: router({ ...route119 }),
+    hover: router({ ...route120 }),
+    "upload-file": router({ ...route121 }),
+    "handle-dialog": router({ ...route122 }),
+    "select-page": router({ ...route123 }),
+    "navigate-page": router({ ...route124 }),
+    "press-key": router({ ...route125 }),
+    "fill-form": router({ ...route126 }),
+    "performance-stop-trace": router({ ...route127 }),
+    "performance-start-trace": router({ ...route128 }),
+    emulate: router({ ...route129 }),
+    "take-screenshot": router({ ...route130 }),
+    "list-network-requests": router({ ...route131 }),
+    "evaluate-script": router({ ...route132 }),
+    "list-console-messages": router({ ...route133 }),
+    "wait-for": router({ ...route134 }),
+    click: router({ ...route135 }),
   }),
 });
 

@@ -220,7 +220,7 @@ const { POST } = createEndpoint({
           helpText: "app.api.leads.import.post.batchSize.helpText" as const,
           columns: 6,
         },
-        z.number().min(10).max(1000).default(2000),
+        z.coerce.number().min(10).max(1000).default(2000),
       ),
 
       // === RESPONSE FIELDS ===
@@ -236,7 +236,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.import.post.response.totalRows" as const,
         },
-        z.number(),
+        z.coerce.number(),
       ),
       successfulImports: responseField(
         {
@@ -244,14 +244,14 @@ const { POST } = createEndpoint({
           content:
             "app.api.leads.import.post.response.successfulImports" as const,
         },
-        z.number(),
+        z.coerce.number(),
       ),
       failedImports: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.leads.import.post.response.failedImports" as const,
         },
-        z.number(),
+        z.coerce.number(),
       ),
       duplicateEmails: responseField(
         {
@@ -259,7 +259,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.leads.import.post.response.duplicateEmails" as const,
         },
-        z.number(),
+        z.coerce.number(),
       ),
       errors: responseArrayField(
         {
@@ -280,7 +280,7 @@ const { POST } = createEndpoint({
                 content: "app.api.leads.import.post.response.errors" as const,
                 fieldType: FieldDataType.NUMBER,
               },
-              z.number(),
+              z.coerce.number(),
             ),
             email: responseField(
               {
@@ -316,7 +316,7 @@ const { POST } = createEndpoint({
               content: "app.api.leads.import.post.response.summary" as const,
               fieldType: FieldDataType.NUMBER,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           updatedLeads: responseField(
             {
@@ -324,7 +324,7 @@ const { POST } = createEndpoint({
               content: "app.api.leads.import.post.response.summary" as const,
               fieldType: FieldDataType.NUMBER,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           skippedDuplicates: responseField(
             {
@@ -332,7 +332,7 @@ const { POST } = createEndpoint({
               content: "app.api.leads.import.post.response.summary" as const,
               fieldType: FieldDataType.NUMBER,
             },
-            z.number(),
+            z.coerce.number(),
           ),
         },
       ),

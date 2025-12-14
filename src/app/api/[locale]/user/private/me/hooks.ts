@@ -9,12 +9,22 @@ import type {
   ErrorResponseType,
   ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import { useEffect } from "react";
+import { useToast } from "next-vibe-ui/hooks/use-toast";
+import { useEffect, useRef } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useTranslation } from "@/i18n/core/client";
 
+import {
+  createCustomStateKey,
+  useCustomState,
+} from "../../../system/unified-interface/react/hooks/store";
+import {
+  type EnhancedMutationResult,
+  useApiMutation,
+} from "../../../system/unified-interface/react/hooks/use-api-mutation";
+import { useApiQuery } from "../../../system/unified-interface/react/hooks/use-api-query";
+import type { JwtPayloadType } from "../../auth/types";
 import meEndpoints, {
   type MeDeleteRequestOutput,
   type MeDeleteResponseOutput,
@@ -22,16 +32,6 @@ import meEndpoints, {
   type MePostRequestOutput,
   type MePostResponseOutput,
 } from "./definition";
-import {
-  createCustomStateKey,
-  useCustomState,
-} from "../../../system/unified-interface/react/hooks/store";
-import { useApiQuery } from "../../../system/unified-interface/react/hooks/use-api-query";
-import {
-  type EnhancedMutationResult,
-  useApiMutation,
-} from "../../../system/unified-interface/react/hooks/use-api-mutation";
-import type { JwtPayloadType } from "../../auth/types";
 
 /****************************
  * STATE KEYS
@@ -93,13 +93,14 @@ export function useUser(
   const authUser = userResponse;
 
   // Enable query immediately - server will return 401 if not authenticated
+  const hasEnabledQuery = useRef(false);
   useEffect(() => {
-    if (!user.isPublic) {
+    if (!user.isPublic && !hasEnabledQuery.current) {
+      hasEnabledQuery.current = true;
       logger.debug("Enabling /me query - server will handle auth");
       setQueryEnabled(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user.isPublic]);
+  }, [user.isPublic, logger, setQueryEnabled]);
 
   return {
     user: authUser,

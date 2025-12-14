@@ -10,9 +10,9 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { Methods as MethodsEnum } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { EndpointErrorTypes } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
@@ -81,7 +81,7 @@ export async function executeMutation<
   let requestData = initialRequestData;
 
   // Validate request data against schema
-  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
   const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
   const isUndefinedSchema =
     requestSchema.safeParse(undefined).success &&

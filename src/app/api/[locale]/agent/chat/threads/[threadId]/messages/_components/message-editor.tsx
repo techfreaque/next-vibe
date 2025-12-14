@@ -4,22 +4,22 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
+import { GitBranch, X } from "next-vibe-ui/ui/icons";
 import { Kbd } from "next-vibe-ui/ui/kbd";
 import { Textarea } from "next-vibe-ui/ui/textarea";
-import { GitBranch, X } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import React from "react";
 
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { PersonaSelector } from "@/app/api/[locale]/agent/chat/personas/_components/persona-selector";
+import { ModelSelector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/model-selector";
+import { SpeechInputButton } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/speech-input-button";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { ModelSelector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/model-selector";
-import { SpeechInputButton } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/speech-input-button";
-import { PersonaSelector } from "@/app/api/[locale]/agent/chat/personas/_components/persona-selector";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
 import { useMessageEditor } from "./hooks/use-message-editor";
 
 interface MessageEditorProps {

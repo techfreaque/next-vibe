@@ -4,15 +4,15 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { ThreadList } from "./thread-list";
 import { FolderItem } from "./folder-item";
 import { groupThreadsByTime } from "./folder-list-helpers";
+import { ThreadList } from "./thread-list";
 
 interface FolderListProps {
   activeRootFolderId: DefaultFolderId;

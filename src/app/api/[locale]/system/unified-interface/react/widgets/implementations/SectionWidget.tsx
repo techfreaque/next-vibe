@@ -2,7 +2,6 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import { ChevronDown } from "next-vibe-ui/ui/icons";
 import {
   Card,
   CardContent,
@@ -16,15 +15,16 @@ import {
   CollapsibleTrigger,
 } from "next-vibe-ui/ui/collapsible";
 import { Div } from "next-vibe-ui/ui/div";
+import { ChevronDown } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import { extractSectionData } from "../../../shared/widgets/logic/section";
-import { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
 import type { UnifiedField } from "../../../shared/types/endpoint";
+import { WidgetType } from "../../../shared/types/enums";
+import { extractSectionData } from "../../../shared/widgets/logic/section";
+import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**
@@ -55,6 +55,18 @@ export function SectionWidget({
   // Extract data using shared logic
   const data = extractSectionData(value);
 
+  // Extract values with defaults for hooks (hooks must be called unconditionally)
+  const { title, content, description, collapsible, defaultExpanded } = data ?? {
+    title: "",
+    content: null,
+    description: undefined,
+    collapsible: false,
+    defaultExpanded: true,
+  };
+
+  // State for collapsible sections - must be called before any early returns
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded ?? true);
+
   // Handle null case
   if (!data) {
     return (
@@ -67,11 +79,6 @@ export function SectionWidget({
       </Card>
     );
   }
-
-  const { title, content, description, collapsible, defaultExpanded } = data;
-
-  // State for collapsible sections
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded ?? true);
 
   // Render content - can be a widget config or raw data
   const renderContent = (): JSX.Element => {

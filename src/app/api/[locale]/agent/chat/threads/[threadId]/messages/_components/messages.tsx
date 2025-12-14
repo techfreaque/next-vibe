@@ -2,7 +2,6 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import type { DivRefObject } from "@/packages/next-vibe-ui/web/ui/div";
 import type { JSX } from "react";
 import React, {
   useCallback,
@@ -12,30 +11,31 @@ import React, {
   useState,
 } from "react";
 
-import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store";
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { envClient } from "@/config/env-client";
-
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import {
   DOM_IDS,
   LAYOUT,
   QUOTE_CHARACTER,
 } from "@/app/[locale]/chat/lib/config/constants";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import {
   buildMessagePath,
   getDirectReplies,
   getRootMessages,
 } from "@/app/[locale]/chat/lib/utils/thread-builder";
+import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { platform } from "@/config/env-client";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { DivRefObject } from "@/packages/next-vibe-ui/web/ui/div";
+
+import { ViewMode } from "../../../../enum";
 import { FlatMessageView } from "./flat-view/view";
 import { LinearMessageView } from "./linear-view/view";
 import { LoadingIndicator } from "./loading-indicator";
 import { groupMessagesBySequence } from "./message-grouping";
 import { ThreadedMessage } from "./threaded-view/view";
-import { ViewMode } from "../../../../enum";
-import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 
 interface ChatMessagesProps {
   inputHeight?: number;
@@ -350,7 +350,7 @@ export function ChatMessages({
       <Div
         id={DOM_IDS.MESSAGES_CONTENT}
         style={
-          envClient.platform.isReactNative
+          platform.isReactNative
             ? { paddingBottom: LAYOUT.MESSAGES_BOTTOM_PADDING }
             : {
                 paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,

@@ -3,14 +3,13 @@
  * Interface for managing campaign starter configuration
  */
 
-import type React from "react";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
-
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import type React from "react";
 
 import { CampaignStarterForm } from "@/app/api/[locale]/leads/campaigns/campaign-starter/_components/campaign-starter-form";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 interface AdminCampaignStarterPageProps {
   params: Promise<{

@@ -10,8 +10,8 @@ import {
 import { cn } from "next-vibe/shared/utils/utils";
 import type { ReactElement } from "react";
 import * as React from "react";
-import type { StyleType } from "../utils/style-type";
 
+import type { StyleType } from "../utils/style-type";
 import {
   Table,
   TableBody,

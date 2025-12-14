@@ -8,9 +8,9 @@ import "server-only";
 import { and, eq, inArray } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -23,8 +23,8 @@ import type { NewUserRole, UserRole } from "../db";
 import { insertUserRoleSchema, userRoles } from "../db";
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- UserRoleDB is used in typeof expressions
 import {
-  type UserRole as UserRoleEnum,
   type UserPermissionRoleValue,
+  type UserRole as UserRoleEnum,
   UserRoleDB,
 } from "./enum";
 

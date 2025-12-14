@@ -6,25 +6,32 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Code,Copy, FileText } from "next-vibe-ui/ui/icons";
+import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useCallback, useMemo } from "react";
+import { useState } from "react";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { ChatMessageRole, ViewMode } from "@/app/api/[locale]/agent/chat/enum";
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
+import { Logo } from "@/app/[locale]/_components/logo";
 import {
   chatAnimations,
   chatProse,
   chatShadows,
   chatTransitions,
 } from "@/app/[locale]/chat/lib/design-tokens";
+import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/message-metadata-generator";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { ChatMessageRole, ViewMode } from "@/app/api/[locale]/agent/chat/enum";
+import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { useSystemPrompt } from "@/app/api/[locale]/agent/chat/hooks/use-system-prompt";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { Markdown } from "next-vibe-ui/ui/markdown";
+
 import { BranchNavigator } from "../branch-navigator";
 import { ErrorMessageBubble } from "../error-message-bubble";
 import { GroupedAssistantMessage } from "../grouped-assistant-message";
@@ -33,13 +40,6 @@ import { MessageEditor } from "../message-editor";
 import { groupMessagesBySequence } from "../message-grouping";
 import { ModelPersonaSelectorModal } from "../model-persona-selector-modal";
 import { UserMessageBubble } from "../user-message-bubble";
-import { useSystemPrompt } from "@/app/api/[locale]/agent/chat/hooks/use-system-prompt";
-import { Button } from "next-vibe-ui/ui/button";
-import { Copy, FileText, Code } from "next-vibe-ui/ui/icons";
-import { useState } from "react";
-import { Logo } from "@/app/[locale]/_components/logo";
-import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/message-metadata-generator";
-import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 
 interface LinearMessageViewProps {
   messages: ChatMessage[];

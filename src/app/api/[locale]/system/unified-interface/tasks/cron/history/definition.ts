@@ -169,7 +169,7 @@ export const { GET } = createEndpoint({
             priority: z.enum(CronTaskPriorityDB),
             startedAt: z.string(),
             completedAt: z.string().nullable(),
-            durationMs: z.number().nullable(),
+            durationMs: z.coerce.number().nullable(),
             error: z
               .object({
                 message: z.string(),
@@ -188,7 +188,7 @@ export const { GET } = createEndpoint({
           content:
             "app.api.system.unifiedInterface.tasks.cronSystem.history.get.response.totalCount.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
       hasMore: responseField(
         {
@@ -205,11 +205,11 @@ export const { GET } = createEndpoint({
             "app.api.system.unifiedInterface.tasks.cronSystem.history.get.response.summary.title",
         },
         z.object({
-          totalExecutions: z.number(),
-          successfulExecutions: z.number(),
-          failedExecutions: z.number(),
-          averageDuration: z.number().nullable(),
-          successRate: z.number(),
+          totalExecutions: z.coerce.number(),
+          successfulExecutions: z.coerce.number(),
+          failedExecutions: z.coerce.number(),
+          averageDuration: z.coerce.number().nullable(),
+          successRate: z.coerce.number(),
         }),
       ),
     },

@@ -9,23 +9,23 @@ import {
   DialogTrigger,
 } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
-import { H1, H3 } from "next-vibe-ui/ui/typography";
-import { P } from "next-vibe-ui/ui/typography";
-import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
-import { Span } from "next-vibe-ui/ui/span";
 import { ChevronDown, ChevronUp, MoreHorizontal } from "next-vibe-ui/ui/icons";
 import { Markdown } from "next-vibe-ui/ui/markdown";
+import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
+import { Span } from "next-vibe-ui/ui/span";
+import { H1, H3 } from "next-vibe-ui/ui/typography";
+import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
 import {
-  DEFAULT_PERSONAS,
   DEFAULT_CATEGORIES,
+  DEFAULT_PERSONAS,
   type Persona,
 } from "@/app/api/[locale]/agent/chat/personas/config";
-import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";

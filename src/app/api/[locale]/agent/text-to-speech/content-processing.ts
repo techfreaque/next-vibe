@@ -8,10 +8,11 @@ import type {
   ToolCallResult,
 } from "@/app/api/[locale]/agent/chat/db";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
 import { parseError } from "../../shared/utils";
 
 /**
@@ -146,7 +147,7 @@ export async function extractToolCallText(
       return title;
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
+     
     logger.warn(
       "[TTS Content] Failed to load tool definition",
       parseError(error),

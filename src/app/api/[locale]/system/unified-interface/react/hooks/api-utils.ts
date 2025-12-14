@@ -9,6 +9,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { authClientRepository } from "@/app/api/[locale]/user/auth/repository-client";
+
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 
 /**

@@ -1,15 +1,15 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "next-vibe-ui/ui/dropdown-menu";
 import { Check } from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { FC } from "react";
 import { useCallback, useState } from "react";

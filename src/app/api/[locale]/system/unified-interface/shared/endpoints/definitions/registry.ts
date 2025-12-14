@@ -1,15 +1,15 @@
 import { endpoints } from "@/app/api/[locale]/system/generated/endpoints";
-import type { EndpointLogger } from "../../logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import { simpleT } from "@/i18n/core/shared";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
+import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint";
 import { Methods } from "../../types/enums";
 import type { Platform } from "../../types/platform";
-import { permissionsRegistry } from "../permissions/registry";
 import { endpointToToolName } from "../../utils/path";
+import { permissionsRegistry } from "../permissions/registry";
 
 type EndpointNode =
   | {

@@ -5,6 +5,8 @@
 
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   BarChart3,
   List,
@@ -13,11 +15,9 @@ import {
   TestTube,
   Upload,
 } from "next-vibe-ui/ui/icons";
-import { cn } from "next-vibe/shared/utils";
 import { Link } from "next-vibe-ui/ui/link";
-import { Span } from "next-vibe-ui/ui/span";
 import { Nav } from "next-vibe-ui/ui/nav";
-import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

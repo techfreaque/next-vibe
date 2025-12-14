@@ -3,6 +3,7 @@
 import { cn } from "next-vibe/shared/utils/utils";
 import type { JSX } from "react";
 import * as React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 export type AudioWaveformProps = {

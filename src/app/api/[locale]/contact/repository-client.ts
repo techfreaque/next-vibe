@@ -3,9 +3,10 @@
  * Handles data access and business logic for contact form submissions
  */
 
-import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/translation-utils";
+
+import { contactClientEnv } from "./env-client";
 
 /**
  * Contact Repository Implementation
@@ -20,13 +21,13 @@ export class contactClientRepository {
     const language = getLanguageFromLocale(locale);
     switch (language) {
       case "de":
-        return envClient.NEXT_PUBLIC_SUPPORT_EMAIL_DE;
+        return contactClientEnv.NEXT_PUBLIC_SUPPORT_EMAIL_DE;
       case "pl":
-        return envClient.NEXT_PUBLIC_SUPPORT_EMAIL_PL;
+        return contactClientEnv.NEXT_PUBLIC_SUPPORT_EMAIL_PL;
       case "en":
-        return envClient.NEXT_PUBLIC_SUPPORT_EMAIL_GLOBAL;
+        return contactClientEnv.NEXT_PUBLIC_SUPPORT_EMAIL_GLOBAL;
       default:
-        return envClient.NEXT_PUBLIC_SUPPORT_EMAIL_GLOBAL;
+        return contactClientEnv.NEXT_PUBLIC_SUPPORT_EMAIL_GLOBAL;
     }
   }
 }

@@ -5,6 +5,10 @@
 
 "use client";
 
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
+import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import {
   AlertTriangle,
   BarChart3,
@@ -20,14 +24,10 @@ import {
   UserCheck,
   UserX,
 } from "next-vibe-ui/ui/icons";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Progress } from "next-vibe-ui/ui/progress";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { P } from "next-vibe-ui/ui/typography";
 import { type JSX, useMemo } from "react";
 

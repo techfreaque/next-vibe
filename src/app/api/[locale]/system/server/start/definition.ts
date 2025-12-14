@@ -82,7 +82,7 @@ const { POST } = createEndpoint({
             "app.api.system.server.start.post.fields.port.description",
           columns: 12,
         },
-        z.union([z.number(), z.string()]).optional(),
+        z.union([z.coerce.number(), z.string()]).optional(),
       ),
 
       skipTaskRunner: requestDataField(

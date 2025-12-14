@@ -58,40 +58,31 @@ export function throwErrorResponse(
   messageParams?: TParams,
 ): never {
   const errorResponse = fail({ message, errorType, messageParams });
-  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Core utility function that intentionally throws for error propagation
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Core utility function that intentionally throws for error propagation
   throw new ErrorResponseError(errorResponse);
 }
 
 /**
  * Create a standardized success response
  * @param data - The response data
+ * @param options - Optional settings for the response
  * @returns A standardized success response
  */
-export function success<TResponse>(data: TResponse): ResponseType<TResponse> {
+export function success<TResponse>(
+  data: TResponse,
+  options?: { isErrorResponse?: true },
+): ResponseType<TResponse> {
   return {
     success: true,
     data,
-  };
-}
-
-export function createSuccessMessageResponse(
-  message: TranslationKey,
-  messageParams?: TParams,
-): ResponseType<MessageResponseType> {
-  return {
-    success: true,
-    data: {
-      message,
-      messageParams,
-    },
+    ...(options?.isErrorResponse && { isErrorResponse: true }),
   };
 }
 
 export const messageResponseSchema = z.object({
-  // TODO TranslationKey validation here
   message: z.string() as z.ZodType<TranslationKey>,
   messageParams: z
-    .record(z.string(), z.union([z.string(), z.number()]))
+    .record(z.string(), z.union([z.string(), z.coerce.number()]))
     .optional(),
 });
 
@@ -99,11 +90,11 @@ export const errorResponseSchema = z.object({
   success: z.literal(false),
   message: z.string() as z.ZodType<TranslationKey>,
   messageParams: z
-    .record(z.string(), z.union([z.string(), z.number()]))
+    .record(z.string(), z.union([z.string(), z.coerce.number()]))
     .optional(),
   errorType: z.object({
     errorKey: z.string(),
-    errorCode: z.number(),
+    errorCode: z.coerce.number(),
   }),
 });
 
@@ -137,16 +128,14 @@ export function createStreamingResponse(response: Response): StreamingResponse {
 /**
  * Type guard to check if a response is a streaming response
  */
-// eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Generic type parameter for type guard utility
-export function isStreamingResponse<T = unknown>(
+export function isStreamingResponse<T>(
   value: ResponseType<T> | StreamingResponse,
 ): value is StreamingResponse {
   return (
     typeof value === "object" &&
     value !== null &&
     "__isStreamingResponse" in value &&
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Type assertion needed for runtime type checking
-    (value as unknown as Record<string, boolean>).__isStreamingResponse === true
+    value.__isStreamingResponse === true
   );
 }
 
@@ -163,6 +152,7 @@ export interface ErrorResponseType {
 export interface SuccessResponseType<TResponseData> {
   success: true;
   data: TResponseData;
+  isErrorResponse?: true;
   message?: never;
   messageParams?: never;
   errorType?: never;

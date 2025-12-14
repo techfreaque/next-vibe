@@ -2,28 +2,28 @@ import type { Metadata } from "next";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import { subscriptionRepository } from "@/app/api/[locale]/subscription/repository";
-import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { userRepository } from "@/app/api/[locale]/user/repository";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { metadataGenerator } from "@/i18n/core/metadata";
 import { threadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
 import {
   ProductIds,
   productsRepository,
   TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/products/repository-client";
+import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
+import { subscriptionRepository } from "@/app/api/[locale]/subscription/repository";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { envClient } from "@/config/env-client";
 import { languageConfig } from "@/i18n";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
+import { metadataGenerator } from "@/i18n/core/metadata";
 
 import CallToAction from "./_components/call-to-action";
 import Features from "./_components/features";
 import Hero from "./_components/hero";
 import { StoryPricingSection } from "./_components/story-pricing-section";
-import { envClient } from "@/config/env-client";
 
 interface HomePageProps {
   params: Promise<{ locale: CountryLanguage }>;

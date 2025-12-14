@@ -12,7 +12,6 @@ import {
   Preview,
   Section,
 } from "@react-email/components";
-
 import type { JSX, ReactNode } from "react";
 
 import { envClient } from "@/config/env-client";

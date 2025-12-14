@@ -1,23 +1,23 @@
-import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import type { Metadata } from "next";
-import { Button } from "next-vibe-ui/ui/button";
 import { notFound } from "next-vibe-ui/lib/not-found";
+import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import { Li } from "next-vibe-ui/ui/li";
 import { Link } from "next-vibe-ui/ui/link";
-import { Span } from "next-vibe-ui/ui/span";
-import { Ul } from "next-vibe-ui/ui/ul";
-import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
-import { Separator } from "next-vibe-ui/ui/separator";
 import { Section } from "next-vibe-ui/ui/section";
+import { Separator } from "next-vibe-ui/ui/separator";
+import { Span } from "next-vibe-ui/ui/span";
+import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
+import { Ul } from "next-vibe-ui/ui/ul";
 import type { JSX } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
-import { envClient } from "@/config/env-client";
 
 interface JobType {
   title: string;

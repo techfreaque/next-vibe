@@ -1,8 +1,8 @@
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { H2, P } from "next-vibe-ui/ui/typography";
-import { Button } from "next-vibe-ui/ui/button";
 import type React from "react";
 
 import { useTranslation } from "@/i18n/core/client";

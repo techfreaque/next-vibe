@@ -4,8 +4,6 @@ import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Input } from "next-vibe-ui/ui/input";
-import { Span } from "next-vibe-ui/ui/span";
 import {
   ArrowBigDown,
   ArrowBigUp,
@@ -17,12 +15,14 @@ import {
   Search,
   TrendingUp,
 } from "next-vibe-ui/ui/icons";
+import { Input } from "next-vibe-ui/ui/input";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
 import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

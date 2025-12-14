@@ -6,21 +6,21 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import Stripe from "stripe";
 
+import { productsRepository } from "@/app/api/[locale]/products/repository-client";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { env } from "@/config/env";
-import { productsRepository } from "@/app/api/[locale]/products/repository-client";
 
 import { users } from "../../../user/db";
 import { paymentInvoices } from "../../db";
 import { InvoiceStatus } from "../../enum";
+import { paymentEnv } from "../../env";
 import type {
   CheckoutSessionParams,
   CheckoutSessionResult,
@@ -31,7 +31,7 @@ import type {
 } from "../types";
 
 // Singleton Stripe instance for direct access (legacy webhook support)
-export const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+export const stripe = new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
   apiVersion: "2025-11-17.clover",
 });
 
@@ -40,7 +40,7 @@ export class StripeProvider implements PaymentProvider {
   private stripe: Stripe;
 
   constructor() {
-    this.stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+    this.stripe = new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
       apiVersion: "2025-11-17.clover",
     });
   }
@@ -229,7 +229,7 @@ export class StripeProvider implements PaymentProvider {
       const event = this.stripe.webhooks.constructEvent(
         body,
         signature,
-        env.STRIPE_WEBHOOK_SECRET,
+        paymentEnv.STRIPE_WEBHOOK_SECRET,
       );
 
       // Extract common fields from Stripe event data

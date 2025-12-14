@@ -73,7 +73,7 @@ const pulseStatusEndpoint = createEndpoint({
           content:
             "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.successRate.title",
         },
-        z.number().nullable(),
+        z.coerce.number().nullable(),
       ),
 
       totalExecutions: responseField(
@@ -82,7 +82,7 @@ const pulseStatusEndpoint = createEndpoint({
           content:
             "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.totalExecutions.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

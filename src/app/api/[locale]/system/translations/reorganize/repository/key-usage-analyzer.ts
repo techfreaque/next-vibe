@@ -3,7 +3,6 @@ import fs from "node:fs";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { scanDirectory } from "./scanner";
 
 import {
   FILE_EXTENSIONS,
@@ -12,6 +11,7 @@ import {
   SRC_DIR,
   TEST_FILE_PATTERN,
 } from "../constants";
+import { scanDirectory } from "./scanner";
 
 export interface TranslationObject {
   [key: string]: string | number | boolean | TranslationObject;

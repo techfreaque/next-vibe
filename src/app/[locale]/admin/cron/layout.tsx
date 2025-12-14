@@ -6,10 +6,9 @@
 import type React from "react";
 import type { ReactNode } from "react";
 
+import { CronNavigation } from "@/app/api/[locale]/system/unified-interface/tasks/cron/_components/cron-navigation";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import { CronNavigation } from "@/app/api/[locale]/system/unified-interface/tasks/cron/_components/cron-navigation";
 
 interface AdminUsersLayoutProps {
   children: ReactNode;

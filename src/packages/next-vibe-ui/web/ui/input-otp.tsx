@@ -1,10 +1,11 @@
 "use client";
 
-import { DashIcon } from "next-vibe-ui/ui/icons";
 import type { SlotProps } from "input-otp";
 import { OTPInput, OTPInputContext } from "input-otp";
 import { cn } from "next-vibe/shared/utils/utils";
+import { DashIcon } from "next-vibe-ui/ui/icons";
 import * as React from "react";
+
 import type { StyleType } from "../utils/style-type";
 
 export type InputOTPProps = {

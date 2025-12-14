@@ -2,24 +2,24 @@
  * AutocompleteField Component for React Native
  * Production-ready autocomplete with search, categories, and custom values
  */
+import { cn } from "next-vibe/shared/utils/utils";
 import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text as RNText, View } from "react-native";
-import { Check, ChevronDown, Search, X } from "./icons";
 
 import { useTranslation } from "@/i18n/core/client";
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import type {
+  AutocompleteFieldProps,
+  AutocompleteFieldPropsBase,
+  AutocompleteOptionBase,
+} from "@/packages/next-vibe-ui/web/ui/autocomplete-field";
+
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Badge } from "./badge";
+import { Check, ChevronDown, Search, X } from "./icons";
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Text as UIText } from "./text";
-
-import type {
-  AutocompleteOptionBase,
-  AutocompleteFieldPropsBase,
-  AutocompleteFieldProps,
-} from "@/packages/next-vibe-ui/web/ui/autocomplete-field";
 
 // Re-export enum for type parity with web
 export { FormFieldCategory } from "@/packages/next-vibe-ui/web/ui/autocomplete-field";
@@ -265,7 +265,7 @@ export function AutocompleteField({
 
 // Re-export cross-platform types
 export type {
-  AutocompleteOptionBase,
-  AutocompleteFieldPropsBase,
   AutocompleteFieldProps,
+  AutocompleteFieldPropsBase,
+  AutocompleteOptionBase,
 };

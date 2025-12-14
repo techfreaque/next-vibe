@@ -1,17 +1,16 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
-import type { JSX } from "react";
-
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Progress } from "next-vibe-ui/ui/progress";
-import { Skeleton } from "next-vibe-ui/ui/skeleton";
-import { toast } from "sonner";
-import { Button } from "next-vibe-ui/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "next-vibe-ui/ui/avatar";
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Progress } from "next-vibe-ui/ui/progress";
 import { Section } from "next-vibe-ui/ui/section";
+import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { H2, H3 } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
+import { toast } from "sonner";
 
 export function FeedbackPreview(): JSX.Element {
   return (

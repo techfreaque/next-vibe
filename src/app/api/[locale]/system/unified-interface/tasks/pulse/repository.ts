@@ -5,18 +5,18 @@
  */
 
 import { count, desc, eq, sql } from "drizzle-orm";
+
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
-
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { PulseHealthStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import { pulseExecutions, pulseHealth, pulseNotifications } from "./db";
+
 import type {
   NewPulseExecution,
   NewPulseHealth,
@@ -25,6 +25,7 @@ import type {
   PulseHealth,
   PulseNotification,
 } from "./db";
+import { pulseExecutions, pulseHealth, pulseNotifications } from "./db";
 import type { PulseStatusResponseOutput } from "./status/definition";
 
 /**

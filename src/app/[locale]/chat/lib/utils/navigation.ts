@@ -7,9 +7,9 @@ import {
   DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
+import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
-import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
 
 /**
  * Get the root folder ID for a given folder

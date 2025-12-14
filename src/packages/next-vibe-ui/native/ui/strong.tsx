@@ -1,6 +1,6 @@
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Text } from "react-native";
-import { cn } from "next-vibe/shared/utils/utils";
 
 export interface StrongTouchEvent {
   preventDefault?: () => void;

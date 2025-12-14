@@ -4,16 +4,17 @@
  */
 
 import type { JSX } from "react";
-import type { TranslationKey } from "@/i18n/core/static-types";
+
+import { modelOptions } from "@/app/api/[locale]/agent/chat/model-access/models";
+import type { SubscriptionPlanValue } from "@/app/api/[locale]/subscription/enum";
+import { SubscriptionPlan } from "@/app/api/[locale]/subscription/enum";
 import type {
   Countries,
   CountryLanguage,
   Currencies,
 } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
-import { SubscriptionPlan } from "@/app/api/[locale]/subscription/enum";
-import type { SubscriptionPlanValue } from "@/app/api/[locale]/subscription/enum";
-import { modelOptions } from "@/app/api/[locale]/agent/chat/model-access/models";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 /**
  * Total number of AI models available

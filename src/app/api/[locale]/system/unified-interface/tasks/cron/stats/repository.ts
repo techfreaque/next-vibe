@@ -3,20 +3,19 @@
  * Business logic for cron task statistics and metrics
  */
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils/parse-error";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type {
   CronStatsGetRequestOutput,
-  CronStatsGetResponseInput,
   CronStatsGetResponseOutput,
 } from "./definition";
 
@@ -92,7 +91,7 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
             : undefined,
       };
 
-      const response: CronStatsGetResponseInput = {
+      const statsData: CronStatsGetResponseOutput = {
         success: true,
         data: {
           totalTasks: mockStats.totalTasks,
@@ -104,10 +103,13 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
       };
 
       logger.debug("Cron statistics retrieved successfully", {
-        stats: response.data,
+        totalTasks: mockStats.totalTasks,
+        executedTasks: mockStats.executedTasks,
+        successfulTasks: mockStats.successfulTasks,
+        failedTasks: mockStats.failedTasks,
       });
 
-      return success(response);
+      return success(statsData);
     } catch (error) {
       const errorDetails = parseError(error);
       logger.error("Failed to get cron statistics", {

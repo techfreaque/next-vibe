@@ -5,6 +5,10 @@
 
 "use client";
 
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Div } from "next-vibe-ui/ui/div";
 import {
   AlertCircle,
   CheckCircle,
@@ -14,12 +18,8 @@ import {
   RefreshCw,
   Square,
 } from "next-vibe-ui/ui/icons";
-import { Span } from "next-vibe-ui/ui/span";
-import { Div } from "next-vibe-ui/ui/div";
-import { Badge } from "next-vibe-ui/ui/badge";
-import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Progress } from "next-vibe-ui/ui/progress";
+import { Span } from "next-vibe-ui/ui/span";
 import {
   Table,
   TableBody,

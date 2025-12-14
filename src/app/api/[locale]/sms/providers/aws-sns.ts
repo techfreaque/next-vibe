@@ -2,14 +2,13 @@
 import { createHash, createHmac } from "node:crypto";
 
 import {
-  fail,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { env } from "@/config/env";
-
+import { smsEnv } from "../env";
 import type {
   SendSmsParams,
   SmsProvider,
@@ -47,9 +46,9 @@ interface AwsSnsMessageAttributes {
  * Implements AWS Signature Version 4 for secure API authentication
  */
 export function getAwsSnsProvider(): SmsProvider {
-  const accessKeyId = env.AWS_ACCESS_KEY_ID;
-  const secretAccessKey = env.AWS_SECRET_ACCESS_KEY;
-  const region = env.AWS_REGION;
+  const accessKeyId = smsEnv.AWS_ACCESS_KEY_ID;
+  const secretAccessKey = smsEnv.AWS_SECRET_ACCESS_KEY;
+  const region = smsEnv.AWS_REGION;
 
   return {
     name: SmsProviders.AWS_SNS,

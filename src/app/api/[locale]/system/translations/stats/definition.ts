@@ -85,28 +85,28 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content: "app.api.system.translations.stats.get.success.title",
             },
-            z.number(),
+            z.coerce.number(),
           ),
           usedKeys: responseField(
             {
               type: WidgetType.TEXT,
               content: "app.api.system.translations.stats.get.success.title",
             },
-            z.number(),
+            z.coerce.number(),
           ),
           unusedKeys: responseField(
             {
               type: WidgetType.TEXT,
               content: "app.api.system.translations.stats.get.success.title",
             },
-            z.number(),
+            z.coerce.number(),
           ),
           translationFiles: responseField(
             {
               type: WidgetType.TEXT,
               content: "app.api.system.translations.stats.get.success.title",
             },
-            z.number(),
+            z.coerce.number(),
           ),
           languages: responseArrayField(
             {

@@ -16,6 +16,11 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  formatActionCommand,
+  formatDatabase,
+  formatDuration,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -80,11 +85,12 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
     try {
       // Generate migrations if requested
       if (data.generate) {
-        logger.info("Generating migrations using drizzle-kit");
+        logger.debug(`⚙️  ${formatActionCommand("Generating migrations using:", "bunx drizzle-kit generate")}`);
         const generateResult = spawnSync("bunx", ["drizzle-kit", "generate"], {
           encoding: "utf8",
           cwd: process.cwd(),
         });
+        logger.info(formatDatabase(`${formatActionCommand("Generated migrations using:", "bunx drizzle-kit generate")}`, "⚙️ "));
 
         if (generateResult.error) {
           return fail({
@@ -127,7 +133,7 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
       }
 
       // Use drizzle-kit migrate for tracked migrations
-      logger.info("Running migrations using drizzle-kit migrate");
+      logger.debug(`🔄 ${formatActionCommand("Running migrations using:", "bunx drizzle-kit migrate")}`);
       const pushResult = spawnSync("bunx", ["drizzle-kit", "migrate"], {
         encoding: "utf8",
         cwd: process.cwd(),
@@ -163,7 +169,7 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
       }
 
       const duration = Date.now() - startTime;
-      logger.info(`Migrations completed successfully in ${duration}ms`);
+      logger.info(formatDatabase(`${formatActionCommand("Migrations completed using:", "bunx drizzle-kit migrate")} in ${formatDuration(duration)}`, "✅"));
 
       return success({
         success: true,

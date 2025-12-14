@@ -4,13 +4,12 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
+import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
+import { envClient, platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { Span } from "next-vibe-ui/ui/span";
-import { envClient } from "@/config/env-client";
 
 export function Logo({
   locale,
@@ -40,7 +39,7 @@ export function Logo({
       <Div className={cn("shrink-0", size)}>
         <Image
           fetchPriority="high"
-          src={`${envClient.platform.isReactNative ? envClient.NEXT_PUBLIC_APP_URL : ""}/images/unbottled-icon-white.png`}
+          src={`${platform.isReactNative ? envClient.NEXT_PUBLIC_APP_URL : ""}/images/unbottled-icon-white.png`}
           alt={t("config.appName")}
           className={cn(
             "hidden dark:block h-full w-auto object-contain",
@@ -52,7 +51,7 @@ export function Logo({
         />
         <Image
           fetchPriority="high"
-          src={`${envClient.platform.isReactNative ? envClient.NEXT_PUBLIC_APP_URL : ""}/images/unbottled-icon.png`}
+          src={`${platform.isReactNative ? envClient.NEXT_PUBLIC_APP_URL : ""}/images/unbottled-icon.png`}
           alt={t("config.appName")}
           className={cn(
             "hidden light:block h-full w-auto object-contain",

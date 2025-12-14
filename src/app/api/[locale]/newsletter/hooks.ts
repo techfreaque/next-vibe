@@ -7,11 +7,6 @@
 
 import { useCallback, useMemo } from "react";
 
-import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
-
-import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
-
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import {
   createCustomStateKey,
@@ -19,11 +14,14 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useTranslation } from "@/i18n/core/client";
+import type { TranslationKey } from "@/i18n/core/static-types";
+import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
+import type { MeGetResponseOutput } from "../user/private/me/definition";
 import statusEndpoints from "./status/definition";
 import subscribeEndpoints from "./subscribe/definition";
 import unsubscribeEndpoints from "./unsubscribe/definition";
-import type { MeGetResponseOutput } from "../user/private/me/definition";
 
 /****************************
  * TYPED STATE KEYS
@@ -185,8 +183,7 @@ export function useNewsletterManager(
         setManualEmail(e.target.value);
       }
     },
-    // oxlint-disable-next-line exhaustive-deps
-    [user],
+    [user, setManualEmail],
   );
 
   // Check if any operation is in progress

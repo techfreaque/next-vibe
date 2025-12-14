@@ -45,11 +45,11 @@ const leadResponseSchema = z.object({
   consultationBookedAt: z.string().datetime().nullable(),
   subscriptionConfirmedAt: z.string().datetime().nullable(),
   currentCampaignStage: z.enum(EmailCampaignStage).nullable(),
-  emailsSent: z.number(),
+  emailsSent: z.coerce.number(),
   lastEmailSentAt: z.string().datetime().nullable(),
   unsubscribedAt: z.string().datetime().nullable(),
-  emailsOpened: z.number(),
-  emailsClicked: z.number(),
+  emailsOpened: z.coerce.number(),
+  emailsClicked: z.coerce.number(),
   lastEngagementAt: z.string().datetime().nullable(),
   metadata: z.record(z.string(), z.unknown()).optional(),
   createdAt: z.string().datetime(),
@@ -149,7 +149,7 @@ const { GET } = createEndpoint({
               content: "app.api.leads.search.get.response.total" as const,
               fieldType: FieldDataType.NUMBER,
             },
-            z.number(),
+            z.coerce.number(),
           ),
           hasMore: responseField(
             {

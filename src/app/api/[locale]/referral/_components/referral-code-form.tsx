@@ -6,16 +6,17 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
-import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
-import { Div } from "next-vibe-ui/ui/div";
 import React from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import { useReferralCreate } from "../hooks";
+
 import referralDefinitions from "../definition";
+import { useReferralCreate } from "../hooks";
 
 interface ReferralCodeFormProps {
   locale: CountryLanguage;

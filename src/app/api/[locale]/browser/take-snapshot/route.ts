@@ -5,8 +5,8 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import takeSnapshotEndpoints from "./definition";
 import { executeTakeSnapshot, filterUndefinedArgs } from "../shared/repository";
+import takeSnapshotEndpoints from "./definition";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: takeSnapshotEndpoints,

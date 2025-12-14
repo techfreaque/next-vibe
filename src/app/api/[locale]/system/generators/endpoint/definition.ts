@@ -93,7 +93,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.system.generators.endpoint.post.fields.endpointsFound.title" as const,
         },
-        z.number(),
+        z.coerce.number(),
       ),
       duration: responseField(
         {
@@ -101,7 +101,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.system.generators.endpoint.post.fields.duration.title" as const,
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

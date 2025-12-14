@@ -8,9 +8,9 @@ import "server-only";
 import { render } from "@react-email/render";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -20,8 +20,8 @@ import { smtpSendingRepository } from "@/app/api/[locale]/emails/smtp-client/sen
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
-import { simpleT } from "@/i18n/core/shared";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import type { LeadWithEmailType } from "../../../types";
 import { emailService } from "../index";

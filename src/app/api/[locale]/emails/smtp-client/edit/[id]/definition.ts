@@ -20,12 +20,11 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-
 import {
   Countries,
   CountriesOptions,
-  LanguagesOptions,
   Languages,
+  LanguagesOptions,
 } from "@/i18n/core/config";
 
 import {
@@ -80,7 +79,7 @@ const accountResponseFields = {
       type: WidgetType.TEXT,
       content: "app.api.emails.smtpClient.edit.id.response.account.port",
     },
-    z.number().int(),
+    z.coerce.number().int(),
   ),
   securityType: responseField(
     {
@@ -122,7 +121,7 @@ const accountResponseFields = {
       type: WidgetType.TEXT,
       content: "app.api.emails.smtpClient.edit.id.response.account.priority",
     },
-    z.number().int().optional(),
+    z.coerce.number().int().optional(),
   ),
   totalEmailsSent: responseField(
     {
@@ -130,7 +129,7 @@ const accountResponseFields = {
       content:
         "app.api.emails.smtpClient.edit.id.response.account.totalEmailsSent",
     },
-    z.number().int(),
+    z.coerce.number().int(),
   ),
   lastUsedAt: responseField(
     {
@@ -436,7 +435,7 @@ const { PUT } = createEndpoint({
                 "app.api.emails.smtpClient.edit.id.fields.port.placeholder",
               columns: 6,
             },
-            z.number().min(1).max(65535).optional(),
+            z.coerce.number().min(1).max(65535).optional(),
           ),
 
           securityType: requestDataField(
@@ -508,7 +507,7 @@ const { PUT } = createEndpoint({
                 "app.api.emails.smtpClient.edit.id.fields.priority.placeholder",
               columns: 6,
             },
-            z.number().int().min(1).max(100).optional(),
+            z.coerce.number().int().min(1).max(100).optional(),
           ),
 
           campaignTypes: requestResponseField(

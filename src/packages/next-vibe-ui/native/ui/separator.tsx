@@ -1,11 +1,12 @@
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { View } from "react-native";
-import { styled } from "nativewind";
 
 import type { SeparatorRootProps } from "@/packages/next-vibe-ui/web/ui/separator";
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+
 import { applyStyleType } from "../../web/utils/style-type";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 
 export type { SeparatorRootProps };
 

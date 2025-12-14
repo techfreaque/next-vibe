@@ -9,9 +9,9 @@ import "server-only";
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type { Transporter } from "nodemailer";
@@ -23,6 +23,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+
 import { emails } from "../messages/db";
 import { EmailStatus, EmailType } from "../messages/enum";
 import { SMTP_ERROR_MESSAGES } from "./constants";

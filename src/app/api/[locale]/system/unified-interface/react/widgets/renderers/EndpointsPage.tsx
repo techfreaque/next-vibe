@@ -8,17 +8,16 @@
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
   EndpointRenderer,
   type SubmitButtonConfig,
 } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Props for EndpointsPage component

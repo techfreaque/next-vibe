@@ -153,7 +153,7 @@ const sideTasksPostEndpoint = createEndpoint({
             "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitDescription",
           columns: 3,
         },
-        z.number().optional().default(50),
+        z.coerce.number().optional().default(50),
       ),
 
       taskData: requestDataField(
@@ -185,7 +185,7 @@ const sideTasksPostEndpoint = createEndpoint({
           content:
             "app.api.system.unifiedInterface.tasks.sideTasks.tasks.side.response.count.title",
         },
-        z.number().optional(),
+        z.coerce.number().optional(),
       ),
     },
   ),
@@ -333,7 +333,7 @@ const sideTasksGetEndpoint = createEndpoint({
           content:
             "app.api.system.unifiedInterface.tasks.sideTasks.get.response.totalTasks.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       runningTasks: responseField(
@@ -342,7 +342,7 @@ const sideTasksGetEndpoint = createEndpoint({
           content:
             "app.api.system.unifiedInterface.tasks.sideTasks.get.response.runningTasks.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       healthyTasks: responseField(
@@ -351,7 +351,7 @@ const sideTasksGetEndpoint = createEndpoint({
           content:
             "app.api.system.unifiedInterface.tasks.sideTasks.get.response.healthyTasks.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
 
       unhealthyTasks: responseField(
@@ -360,7 +360,7 @@ const sideTasksGetEndpoint = createEndpoint({
           content:
             "app.api.system.unifiedInterface.tasks.sideTasks.get.response.unhealthyTasks.title",
         },
-        z.number(),
+        z.coerce.number(),
       ),
     },
   ),

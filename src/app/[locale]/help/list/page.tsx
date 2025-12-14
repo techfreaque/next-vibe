@@ -7,8 +7,8 @@ import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type { JSX } from "react";
 
 import { HelpListView } from "@/app/api/[locale]/system/help/list/_components/help-list-view";
-import type { CountryLanguage } from "@/i18n/core/config";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface HelpListPageProps {
   params: Promise<{ locale: CountryLanguage }>;

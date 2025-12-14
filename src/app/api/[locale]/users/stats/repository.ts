@@ -7,37 +7,36 @@ import "server-only";
 import { and, eq, gte, ilike, lte, or, type SQL, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { userLeadLinks } from "@/app/api/[locale]/leads/db";
+import { paymentRefunds, paymentTransactions } from "@/app/api/[locale]/payment/db";
+import { PaymentStatus } from "@/app/api/[locale]/payment/enum";
 import {
   DateRangePreset,
   getDateRangeFromPreset,
   TimePeriod,
 } from "@/app/api/[locale]/shared/stats-filtering";
-
-import { userLeadLinks } from "@/app/api/[locale]/leads/db";
-import { paymentRefunds, paymentTransactions } from "@/app/api/[locale]/payment/db";
-import { PaymentStatus } from "@/app/api/[locale]/payment/enum";
 import { subscriptions } from "@/app/api/[locale]/subscription/db";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { userRoles, users } from "@/app/api/[locale]/user/db";
 
-import type {
-  UserStatsRequestOutput,
-  UserStatsResponseOutput,
-} from "./definition";
 import {
   PaymentMethodFilter,
   SubscriptionStatusFilter,
   UserRoleFilter,
   UserStatusFilter,
 } from "../enum";
+import type {
+  UserStatsRequestOutput,
+  UserStatsResponseOutput,
+} from "./definition";
 
 export interface UsersStatsRepository {
   getUserStats(

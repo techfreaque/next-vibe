@@ -3,14 +3,14 @@
  * Layout for admin pages with navigation
  */
 
-import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import { redirect } from "next-vibe-ui/lib/redirect";
+import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type React from "react";
 import type { ReactNode } from "react";
 
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import { userByIdRepository } from "@/app/api/[locale]/users/user/[id]/repository";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { AdminLayoutClient } from "./_components/admin-layout-client";

@@ -1,30 +1,30 @@
-import type { translations as enTranslations } from "../en";
 import { translations as clickTranslations } from "../../click/i18n/de";
 import { translations as closePageTranslations } from "../../close-page/i18n/de";
 import { translations as dragTranslations } from "../../drag/i18n/de";
+import { translations as emulateTranslations } from "../../emulate/i18n/de";
+import { translations as evaluateScriptTranslations } from "../../evaluate-script/i18n/de";
 import { translations as fillTranslations } from "../../fill/i18n/de";
 import { translations as fillFormTranslations } from "../../fill-form/i18n/de";
+import { translations as getConsoleMessageTranslations } from "../../get-console-message/i18n/de";
+import { translations as getNetworkRequestTranslations } from "../../get-network-request/i18n/de";
 import { translations as handleDialogTranslations } from "../../handle-dialog/i18n/de";
 import { translations as hoverTranslations } from "../../hover/i18n/de";
-import { translations as pressKeyTranslations } from "../../press-key/i18n/de";
-import { translations as uploadFileTranslations } from "../../upload-file/i18n/de";
+import { translations as listConsoleMessagesTranslations } from "../../list-console-messages/i18n/de";
+import { translations as listNetworkRequestsTranslations } from "../../list-network-requests/i18n/de";
 import { translations as listPagesTranslations } from "../../list-pages/i18n/de";
 import { translations as navigatePageTranslations } from "../../navigate-page/i18n/de";
 import { translations as newPageTranslations } from "../../new-page/i18n/de";
-import { translations as selectPageTranslations } from "../../select-page/i18n/de";
-import { translations as emulateTranslations } from "../../emulate/i18n/de";
-import { translations as resizePageTranslations } from "../../resize-page/i18n/de";
-import { translations as evaluateScriptTranslations } from "../../evaluate-script/i18n/de";
-import { translations as getConsoleMessageTranslations } from "../../get-console-message/i18n/de";
-import { translations as listConsoleMessagesTranslations } from "../../list-console-messages/i18n/de";
-import { translations as getNetworkRequestTranslations } from "../../get-network-request/i18n/de";
-import { translations as listNetworkRequestsTranslations } from "../../list-network-requests/i18n/de";
 import { translations as performanceAnalyzeInsightTranslations } from "../../performance-analyze-insight/i18n/de";
 import { translations as performanceStartTraceTranslations } from "../../performance-start-trace/i18n/de";
 import { translations as performanceStopTraceTranslations } from "../../performance-stop-trace/i18n/de";
+import { translations as pressKeyTranslations } from "../../press-key/i18n/de";
+import { translations as resizePageTranslations } from "../../resize-page/i18n/de";
+import { translations as selectPageTranslations } from "../../select-page/i18n/de";
 import { translations as takeScreenshotTranslations } from "../../take-screenshot/i18n/de";
 import { translations as takeSnapshotTranslations } from "../../take-snapshot/i18n/de";
+import { translations as uploadFileTranslations } from "../../upload-file/i18n/de";
 import { translations as waitForTranslations } from "../../wait-for/i18n/de";
+import type { translations as enTranslations } from "../en";
 
 /**
  * Browser API translations (German)

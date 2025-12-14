@@ -1,19 +1,21 @@
 "use client";
 
 import * as Slot from "@rn-primitives/slot";
-import * as React from "react";
-import type { PressableProps, ViewProps } from "react-native";
-import { Pressable, View, ScrollView, Dimensions } from "react-native";
-import { styled } from "nativewind";
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
+import { styled } from "nativewind";
+import { cn } from "next-vibe/shared/utils/utils";
+import * as React from "react";
+import type { PressableProps, ViewProps } from "react-native";
+import { Dimensions,Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
 
+import { applyStyleType } from "../../web/utils/style-type";
 import { useIsMobile } from "../hooks/use-mobile";
+import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Button } from "./button";
 import { PanelLeft } from "./icons/PanelLeft";
-
 import { Separator } from "./separator";
 import { Sheet, SheetContent } from "./sheet";
 import { Skeleton } from "./skeleton";
@@ -23,10 +25,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./tooltip";
-
-import { cn } from "next-vibe/shared/utils/utils";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-import { applyStyleType } from "../../web/utils/style-type";
 
 // Constants
 export const SIDEBAR_COOKIE_NAME = "sidebar:state";
@@ -229,7 +227,8 @@ const SidebarContext = React.createContext<SidebarContextType | null>(null);
 function useSidebar(): SidebarContextType {
   const context = React.useContext(SidebarContext);
   if (!context) {
-    // eslint-disable-next-line no-restricted-syntax, i18next/no-literal-string -- Error handling for context
+    // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Standard React context hook pattern - throw is correct for developer mistakes
+    // eslint-disable-next-line i18next/no-literal-string -- Error handling for context
     throw new Error("useSidebar must be used within a SidebarProvider.");
   }
 

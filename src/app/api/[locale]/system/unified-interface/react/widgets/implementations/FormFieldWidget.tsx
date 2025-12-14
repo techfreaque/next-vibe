@@ -1,11 +1,12 @@
 "use client";
 
-import type { JSX } from "react";
-import type { Control, FieldPath, FieldValues } from "react-hook-form";
 import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
+import type { JSX } from "react";
+import type { Control, FieldPath, FieldValues } from "react-hook-form";
 
 import { simpleT } from "@/i18n/core/shared";
+
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
 

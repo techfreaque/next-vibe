@@ -99,7 +99,7 @@ securityInfo: objectOptionalField(
   { response: true },
   {
     tokenExpiry: responseField({ type: WidgetType.TEXT, content: "..." }, z.string()),
-    maxAttempts: responseField({ type: WidgetType.TEXT, content: "..." }, z.number()),
+    maxAttempts: responseField({ type: WidgetType.TEXT, content: "..." }, z.coerce.number()),
   }
 )
 
@@ -120,7 +120,7 @@ attachments: responseArrayOptionalField(
     { response: true },
     {
       filename: responseField({ type: WidgetType.TEXT, content: "..." }, z.string()),
-      size: responseField({ type: WidgetType.TEXT, content: "..." }, z.number()),
+      size: responseField({ type: WidgetType.TEXT, content: "..." }, z.coerce.number()),
     }
   )
 )

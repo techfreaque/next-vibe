@@ -64,7 +64,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.user.private.logout.response.sessionsCleaned" as const,
         },
-        z.number(),
+        z.coerce.number(),
       ),
       nextSteps: responseField(
         {
