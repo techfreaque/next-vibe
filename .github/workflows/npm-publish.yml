@@ -46,7 +46,7 @@ jobs:
         run: vibe check
 
       - name: Build package (dry run)
-        run: vibe builder --data '{"configPath": "build.config.ts"}'
+        run: vibe builder
 
   # Publish to npm on tag creation using the release tool
   publish-npm:
