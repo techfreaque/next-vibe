@@ -88,9 +88,7 @@ export async function buildSystemPrompt(params: {
     try {
       const persona = await getPersonaById(personaId, userId);
 
-      if (!persona) {
-        logger.warn("Persona not found, using default", { personaId });
-      } else {
+      if (persona) {
         logger.debug("Using persona system prompt", {
           personaId: persona.id,
           personaName: persona.name,
@@ -104,6 +102,8 @@ export async function buildSystemPrompt(params: {
             "Persona has empty system prompt, using default behavior",
           );
         }
+      } else {
+        logger.warn("Persona not found, using default", { personaId });
       }
     } catch (error) {
       logger.error("Failed to load persona, using default", {

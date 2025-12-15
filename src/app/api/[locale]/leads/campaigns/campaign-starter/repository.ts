@@ -155,7 +155,7 @@ export class CampaignStarterRepositoryImpl implements ICampaignStarterRepository
             totalRemainingCapacity,
           },
         );
-        return success(undefined);
+        return success();
       }
 
       // Query for NEW leads in this locale that are old enough to start campaigns
@@ -177,7 +177,7 @@ export class CampaignStarterRepositoryImpl implements ICampaignStarterRepository
       const localeLeads = await query.limit(adjustedLeadsPerRun);
 
       if (localeLeads.length === 0) {
-        return success(undefined);
+        return success();
       }
 
       // Process each lead
@@ -234,7 +234,7 @@ export class CampaignStarterRepositoryImpl implements ICampaignStarterRepository
         }
       }
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Failed to process locale leads", {
         error: parseError(error),
@@ -365,7 +365,7 @@ export class CampaignStarterRepositoryImpl implements ICampaignStarterRepository
         failedStates,
       });
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Failed to mark failed leads as processed", {
         error: parseError(error),

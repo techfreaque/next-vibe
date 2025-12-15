@@ -1,5 +1,4 @@
 import * as AvatarPrimitive from "@rn-primitives/avatar";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
@@ -10,14 +9,14 @@ import type {
   AvatarRootProps,
 } from "@/packages/next-vibe-ui/web/ui/avatar";
 
-// Re-export types for consistency
-export type { AvatarFallbackProps,AvatarImageProps, AvatarRootProps };
+import { styledNative } from "../utils/style-converter";
 
-const StyledAvatarRoot = styled(AvatarPrimitive.Root, { className: "style" });
-const StyledAvatarImage = styled(AvatarPrimitive.Image, { className: "style" });
-const StyledAvatarFallback = styled(AvatarPrimitive.Fallback, {
-  className: "style",
-});
+// Re-export types for consistency
+export type { AvatarFallbackProps, AvatarImageProps, AvatarRootProps };
+
+const StyledAvatarRoot = styledNative(AvatarPrimitive.Root);
+const StyledAvatarImage = styledNative(AvatarPrimitive.Image);
+const StyledAvatarFallback = styledNative(AvatarPrimitive.Fallback);
 
 function Avatar({
   className,

@@ -1,7 +1,6 @@
 import * as TogglePrimitive from "@rn-primitives/toggle";
 import { cva } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react-native";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
@@ -12,7 +11,7 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/toggle";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
 const toggleVariants = cva(
@@ -61,7 +60,7 @@ const toggleTextVariants = cva(
 
 export type { ToggleRootProps, ToggleSize, ToggleVariant };
 
-const StyledToggleRoot = styled(TogglePrimitive.Root, { className: "style" });
+const StyledToggleRoot = styledNative(TogglePrimitive.Root);
 
 export function Toggle({
   className,

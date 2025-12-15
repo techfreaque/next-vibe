@@ -401,13 +401,13 @@ export class LeadsImportRepository implements ILeadsImportRepository {
             updated: true,
             duplicate: false,
           });
-        } else {
+        }
           return success({
             created: false,
             updated: false,
             duplicate: true,
           });
-        }
+        
       }
 
       // Create new lead
@@ -521,10 +521,10 @@ export class LeadsImportRepository implements ILeadsImportRepository {
           isChunkedProcessing: result.data.isChunkedProcessing,
           jobId: result.data.jobId,
         });
-      } else {
+      }
         logger.error("CSV import failed", result.message);
         return result;
-      }
+      
     } catch (error) {
       logger.error("Error importing leads from CSV", parseError(error));
       return fail({

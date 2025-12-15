@@ -92,7 +92,7 @@ export const translations = {
     },
     commitMessage: {
       title: "Commit-Nachricht",
-      // eslint-disable-next-line no-template-curly-in-string -- Intentional placeholder documentation
+      // eslint-disable-next-line no-template-curly-in-string -- Intentional template placeholder documentation
       description: "Benutzerdefinierte Commit-Nachricht für Versionserhöhung (unterstützt ${version} Platzhalter)",
     },
     notifyWebhook: {
@@ -101,18 +101,31 @@ export const translations = {
     },
   },
   response: {
+    status: "Status",
     success: "Release-Status",
-    output: "Release-Ausgabe",
-    duration: "Dauer (ms)",
+    output: "Release-Log",
+    duration: "Dauer",
+    packages: "Pakete",
     packagesProcessed: "Verarbeitete Pakete",
     ciEnvironment: "CI-Umgebung",
     errors: "Fehler",
     warnings: "Warnungen",
     gitInfo: "Git-Informationen",
+    published: "Veröffentlichte Pakete",
     publishedPackages: "Veröffentlichte Pakete",
-    timings: "Zeitaufschlüsselung",
+    timings: "Performance",
     rollbackPerformed: "Rollback durchgeführt",
-    notificationsSent: "Benachrichtigungen gesendet",
+    notificationsSent: "Benachrichtigungen",
+  },
+  table: {
+    name: "Paket",
+    directory: "Verzeichnis",
+    version: "Version",
+    tag: "Tag",
+    status: "Status",
+    message: "Nachricht",
+    registry: "Registry",
+    url: "URL",
   },
   errors: {
     validation: {

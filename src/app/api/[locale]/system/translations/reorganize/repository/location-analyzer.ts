@@ -155,13 +155,12 @@ export class LocationAnalyzer {
     if (this.isSingleKeyUsage(originalKey, keyUsageFrequency)) {
       // Single key: keep full path like "app.(site).imprint.printButton"
       return locationKey ? `${locationKey}.${flattenedKey}` : flattenedKey;
-    } else {
-      // Multiple keys: use folder-level organization
-      // Extract just the final key part for folder-level grouping
-      const keyParts = flattenedKey.split(".");
-      const finalKey = keyParts[keyParts.length - 1];
-      return locationKey ? `${locationKey}.${finalKey}` : finalKey;
     }
+    // Multiple keys: use folder-level organization
+    // Extract just the final key part for folder-level grouping
+    const keyParts = flattenedKey.split(".");
+    const finalKey = keyParts[keyParts.length - 1];
+    return locationKey ? `${locationKey}.${finalKey}` : finalKey;
   }
 
   /**
@@ -384,10 +383,9 @@ export class LocationAnalyzer {
     if (apiFiles.length >= appFiles.length) {
       // Most files are API files, use API common location
       return this.findCommonApiLocation(apiFiles);
-    } else {
-      // Most files are app files, use app common location
-      return this.findCommonAppLocation(appFiles);
     }
+    // Most files are app files, use app common location
+    return this.findCommonAppLocation(appFiles);
   }
 
   /**

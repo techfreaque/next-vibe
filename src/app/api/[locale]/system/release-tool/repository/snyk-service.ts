@@ -14,7 +14,6 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-
 import { MESSAGES } from "./constants";
 
 // ============================================================================
@@ -70,20 +69,20 @@ export class SnykService implements ISnykService {
   ): ResponseType<void> {
     if (dryRun) {
       logger.info(MESSAGES.DRY_RUN_MODE, { action: "snyk test" });
-      return success(undefined);
+      return success();
     }
 
     logger.info(MESSAGES.SNYK_TESTING, { package: packageName });
 
     if (!this.isAvailable()) {
       logger.warn(MESSAGES.SNYK_CLI_NOT_FOUND);
-      return success(undefined);
+      return success();
     }
 
     try {
       execSync("snyk test", { cwd, stdio: "inherit" });
       logger.info(MESSAGES.SNYK_TEST_PASSED);
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error(MESSAGES.SNYK_TEST_FAILED, parseError(error));
       return fail({
@@ -102,26 +101,26 @@ export class SnykService implements ISnykService {
   ): ResponseType<void> {
     if (dryRun) {
       logger.info(MESSAGES.DRY_RUN_MODE, { action: "snyk monitor" });
-      return success(undefined);
+      return success();
     }
 
     logger.info(MESSAGES.SNYK_MONITORING, { package: packageName });
 
     if (!this.isAvailable()) {
       logger.warn(MESSAGES.SNYK_CLI_NOT_FOUND);
-      return success(undefined);
+      return success();
     }
 
     const env = process.env;
     if (!env["SNYK_TOKEN"]) {
       logger.warn(MESSAGES.SNYK_TOKEN_REQUIRED);
-      return success(undefined);
+      return success();
     }
 
     try {
       execSync("snyk monitor", { cwd, stdio: "inherit" });
       logger.info(MESSAGES.SNYK_MONITOR_PASSED);
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error(MESSAGES.SNYK_MONITOR_FAILED, parseError(error));
       return fail({

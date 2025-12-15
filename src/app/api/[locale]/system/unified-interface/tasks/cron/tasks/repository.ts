@@ -129,9 +129,9 @@ function determineTaskStatus(
 
     if (timeSinceNextRun < timeout) {
       return CronTaskStatus.RUNNING;
-    } else {
-      return CronTaskStatus.TIMEOUT;
     }
+      return CronTaskStatus.TIMEOUT;
+    
   }
 
   // If task completed successfully
@@ -216,14 +216,14 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       }
 
       // Apply multi-select status filter - skip for now since field doesn't exist
-      if (data.status && data.status.length) {
+      if (data.status && data.status.length > 0) {
         // Since we don't have lastExecutionStatus in the current schema,
         // we'll filter by enabled status as a placeholder
         logger.debug("Applied status filter", { statuses: data.status });
       }
 
       // Apply multi-select priority filter
-      if (data.priority && data.priority.length) {
+      if (data.priority && data.priority.length > 0) {
         conditions.push(inArray(cronTasks.priority, data.priority));
         logger.debug("Applied priority filter", {
           priorities: data.priority,
@@ -231,7 +231,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       }
 
       // Apply multi-select category filter
-      if (data.category && data.category.length) {
+      if (data.category && data.category.length > 0) {
         conditions.push(inArray(cronTasks.category, data.category));
         logger.debug("Applied category filter", {
           categories: data.category,
@@ -249,7 +249,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       const tasks = await db
         .select()
         .from(cronTasks)
-        .where(conditions.length ? and(...conditions) : undefined)
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
         .orderBy(sortOrder)
         .limit(limit)
         .offset(offset);
@@ -303,7 +303,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         .where(eq(cronTasks.name, data.name))
         .limit(1);
 
-      if (existingTask.length) {
+      if (existingTask.length > 0) {
         logger.warn("Task with same name already exists", {
           name: data.name,
         });

@@ -1,15 +1,14 @@
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
-import { type AccessibilityRole,Pressable, View } from "react-native";
+import { type AccessibilityRole, Pressable, View } from "react-native";
 
-import type { OlMouseEvent,OlProps } from "@/packages/next-vibe-ui/web/ui/ol";
+import type { OlMouseEvent, OlProps } from "@/packages/next-vibe-ui/web/ui/ol";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
-const StyledPressable = styled(Pressable, { className: "style" });
-const StyledView = styled(View, { className: "style" });
+const StyledPressable = styledNative(Pressable);
+const StyledView = styledNative(View);
 
 function Ol({
   className,
@@ -72,11 +71,34 @@ function Ol({
 
   // Valid React Native accessibility roles
   const validRoles: AccessibilityRole[] = [
-    'none', 'button', 'link', 'search', 'image', 'keyboardkey', 'text',
-    'adjustable', 'imagebutton', 'header', 'summary', 'alert', 'checkbox',
-    'combobox', 'menu', 'menubar', 'menuitem', 'progressbar', 'radio',
-    'radiogroup', 'scrollbar', 'spinbutton', 'switch', 'tab', 'tablist',
-    'timer', 'toolbar', 'list', 
+    "none",
+    "button",
+    "link",
+    "search",
+    "image",
+    "keyboardkey",
+    "text",
+    "adjustable",
+    "imagebutton",
+    "header",
+    "summary",
+    "alert",
+    "checkbox",
+    "combobox",
+    "menu",
+    "menubar",
+    "menuitem",
+    "progressbar",
+    "radio",
+    "radiogroup",
+    "scrollbar",
+    "spinbutton",
+    "switch",
+    "tab",
+    "tablist",
+    "timer",
+    "toolbar",
+    "list",
   ];
 
   const accessibilityRole: AccessibilityRole | undefined =
@@ -94,7 +116,9 @@ function Ol({
         onPressOut={handlePressOut}
         accessibilityRole={accessibilityRole}
         accessibilityLabel={ariaLabel}
-        accessibilityValue={start !== undefined ? { text: String(start) } : undefined}
+        accessibilityValue={
+          start === undefined ? undefined : { text: String(start) }
+        }
         nativeID={id}
       >
         {children}
@@ -107,7 +131,9 @@ function Ol({
       {...applyStyleType({ nativeStyle, className: cn(className) })}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={ariaLabel}
-      accessibilityValue={start !== undefined ? { text: String(start) } : undefined}
+      accessibilityValue={
+        start === undefined ? undefined : { text: String(start) }
+      }
       nativeID={id}
     >
       {children}

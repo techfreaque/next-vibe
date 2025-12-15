@@ -27,7 +27,7 @@ export class WindowsTyper extends BaseTyper {
 
   protected async insertTextImpl(text: string): Promise<void> {
     // Escape single quotes for PowerShell
-    const escapedText = text.replace(/'/g, "''");
+    const escapedText = text.replaceAll('\'', "''");
 
     // Step 1: Set clipboard using PowerShell
     const setClipCommand = `Set-Clipboard -Value '${escapedText}'`;

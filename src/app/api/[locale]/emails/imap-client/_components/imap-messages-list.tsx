@@ -54,9 +54,9 @@ function formatDate(dateString: string): string {
     });
   } else if (diffDays < 7) {
     return date.toLocaleDateString([], { weekday: "short" });
-  } else {
-    return date.toLocaleDateString([], { month: "short", day: "numeric" });
   }
+    return date.toLocaleDateString([], { month: "short", day: "numeric" });
+  
 }
 
 /**

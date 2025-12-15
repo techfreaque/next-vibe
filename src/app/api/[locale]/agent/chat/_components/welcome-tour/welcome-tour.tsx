@@ -4,7 +4,7 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import React, { useCallback, useEffect, useState } from "react";
 import type { CallBackProps } from "react-joyride";
-import Joyride, { ACTIONS,EVENTS, STATUS } from "react-joyride";
+import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
 
 import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -85,11 +85,10 @@ export function WelcomeTour({
         return !!modalDialog.querySelector(
           getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_FAVORITES),
         );
-      } else {
-        return !!modalDialog.querySelector(
-          getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_FAVORITES),
-        );
       }
+      return !!modalDialog.querySelector(
+        getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_FAVORITES),
+      );
     },
     [],
   );
@@ -359,17 +358,13 @@ export function WelcomeTour({
                 if (nextIsSidebar) {
                   // Transitioning TO sidebar - open it
                   ensureSidebarOpen();
-                } else {
+                } else if (!sidebarCollapsed) {
                   // Transitioning FROM sidebar - collapse it
-                  if (!sidebarCollapsed) {
-                    setSidebarCollapsed(true);
-                  }
+                  setSidebarCollapsed(true);
                 }
-              } else {
+              } else if (nextIsSidebar) {
                 // On desktop, ensure sidebar is open for sidebar targets
-                if (nextIsSidebar) {
-                  ensureSidebarOpen();
-                }
+                ensureSidebarOpen();
               }
             }
 
@@ -469,17 +464,13 @@ export function WelcomeTour({
               if (isSidebarTarget(target)) {
                 // Open sidebar for sidebar targets
                 ensureSidebarOpen();
-              } else {
+              } else if (!sidebarCollapsed) {
                 // Collapse sidebar for non-sidebar targets on mobile
-                if (!sidebarCollapsed) {
-                  setSidebarCollapsed(true);
-                }
+                setSidebarCollapsed(true);
               }
-            } else {
+            } else if (isSidebarTarget(target)) {
               // On desktop, ensure sidebar is open for sidebar targets
-              if (isSidebarTarget(target)) {
-                ensureSidebarOpen();
-              }
+              ensureSidebarOpen();
             }
 
             // Map tour targets to folder IDs (same logic for going back)

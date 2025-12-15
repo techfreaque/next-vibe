@@ -6,7 +6,7 @@
 import "server-only";
 
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { type JSONValue, stepCountIs,streamText } from "ai";
+import { type JSONValue, stepCountIs, streamText } from "ai";
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import {
@@ -550,46 +550,42 @@ class AiStreamRepository implements IAiStreamRepository {
                     pendingToolMessages.delete(part.toolCallId);
                   }
                 }
-              } else if (part.type === "tool-result") {
-                if (
-                  "toolCallId" in part &&
-                  "toolName" in part &&
-                  typeof part.toolCallId === "string" &&
-                  typeof part.toolName === "string"
-                ) {
-                  const pending = pendingToolMessages.get(part.toolCallId);
-                  const result = await AiStreamRepository.processToolResult({
-                    part: {
-                      type: "tool-result",
-                      toolCallId: part.toolCallId,
-                      toolName: part.toolName,
-                      output:
-                        "output" in part
-                          ? (part.output as JSONValue)
-                          : undefined,
-                      isError:
-                        "isError" in part ? Boolean(part.isError) : false,
-                    },
-                    pendingToolMessage: pending,
-                    threadId: threadResultThreadId,
-                    model: data.model,
-                    persona: data.persona,
-                    sequenceId,
-                    isIncognito,
-                    userId,
-                    controller,
-                    encoder,
-                    logger,
-                  });
-                  if (result) {
-                    // Update currentParentId/currentDepth for the next tool call
-                    // But DON'T update lastParentId/lastDepth here because tool results
-                    // can arrive in any order (async). lastParentId/lastDepth should only
-                    // be updated when tool CALLS arrive (which is the correct order).
-                    currentParentId = result.currentParentId;
-                    currentDepth = result.currentDepth;
-                    pendingToolMessages.delete(part.toolCallId);
-                  }
+              } else if (
+                part.type === "tool-result" &&
+                "toolCallId" in part &&
+                "toolName" in part &&
+                typeof part.toolCallId === "string" &&
+                typeof part.toolName === "string"
+              ) {
+                const pending = pendingToolMessages.get(part.toolCallId);
+                const result = await AiStreamRepository.processToolResult({
+                  part: {
+                    type: "tool-result",
+                    toolCallId: part.toolCallId,
+                    toolName: part.toolName,
+                    output:
+                      "output" in part ? (part.output as JSONValue) : undefined,
+                    isError: "isError" in part ? Boolean(part.isError) : false,
+                  },
+                  pendingToolMessage: pending,
+                  threadId: threadResultThreadId,
+                  model: data.model,
+                  persona: data.persona,
+                  sequenceId,
+                  isIncognito,
+                  userId,
+                  controller,
+                  encoder,
+                  logger,
+                });
+                if (result) {
+                  // Update currentParentId/currentDepth for the next tool call
+                  // But DON'T update lastParentId/lastDepth here because tool results
+                  // can arrive in any order (async). lastParentId/lastDepth should only
+                  // be updated when tool CALLS arrive (which is the correct order).
+                  currentParentId = result.currentParentId;
+                  currentDepth = result.currentDepth;
+                  pendingToolMessages.delete(part.toolCallId);
                 }
               }
             }
@@ -603,7 +599,7 @@ class AiStreamRepository implements IAiStreamRepository {
               currentAssistantMessageId,
               hasCurrentAssistantContent: !!currentAssistantContent,
               currentAssistantContentLength: currentAssistantContent.length,
-              currentAssistantContentPreview: currentAssistantContent.substring(
+              currentAssistantContentPreview: currentAssistantContent.slice(
                 0,
                 100,
               ),
@@ -779,7 +775,6 @@ class AiStreamRepository implements IAiStreamRepository {
       case ApiProvider.GAB_AI:
         return createGabAI();
 
-      case ApiProvider.OPENROUTER:
       default:
         return createOpenRouter({
           apiKey: agentEnv.OPENROUTER_API_KEY,
@@ -999,7 +994,7 @@ class AiStreamRepository implements IAiStreamRepository {
     logger.debug("[AI Stream] Emitting CONTENT_DELTA", {
       messageId,
       deltaLength: delta.length,
-      delta: delta.substring(0, 50),
+      delta: delta.slice(0, 50),
     });
 
     const deltaEvent = createStreamEvent.contentDelta({
@@ -1256,26 +1251,25 @@ class AiStreamRepository implements IAiStreamRepository {
           wasCreated: true,
           newDepth: currentDepth,
         };
-      } else {
-        // Accumulate content
-        const newContent = currentAssistantContent + textDelta;
-
-        // Emit content-delta event
-        AiStreamRepository.emitContentDelta({
-          messageId: currentAssistantMessageId,
-          delta: textDelta,
-          controller,
-          encoder,
-          logger,
-        });
-
-        return {
-          currentAssistantMessageId,
-          currentAssistantContent: newContent,
-          wasCreated: false,
-          newDepth: currentDepth,
-        };
       }
+      // Accumulate content
+      const newContent = currentAssistantContent + textDelta;
+
+      // Emit content-delta event
+      AiStreamRepository.emitContentDelta({
+        messageId: currentAssistantMessageId,
+        delta: textDelta,
+        controller,
+        encoder,
+        logger,
+      });
+
+      return {
+        currentAssistantMessageId,
+        currentAssistantContent: newContent,
+        wasCreated: false,
+        newDepth: currentDepth,
+      };
     }
 
     return {
@@ -1351,26 +1345,25 @@ class AiStreamRepository implements IAiStreamRepository {
         wasCreated: true,
         newDepth: currentDepth,
       };
-    } else {
-      // Add <think> tag to existing message
-      const newContent = currentAssistantContent + thinkTag;
-
-      // Emit delta for <think> tag
-      AiStreamRepository.emitContentDelta({
-        messageId: currentAssistantMessageId,
-        delta: thinkTag,
-        controller,
-        encoder,
-        logger,
-      });
-
-      return {
-        currentAssistantMessageId,
-        currentAssistantContent: newContent,
-        wasCreated: false,
-        newDepth: currentDepth,
-      };
     }
+    // Add <think> tag to existing message
+    const newContent = currentAssistantContent + thinkTag;
+
+    // Emit delta for <think> tag
+    AiStreamRepository.emitContentDelta({
+      messageId: currentAssistantMessageId,
+      delta: thinkTag,
+      controller,
+      encoder,
+      logger,
+    });
+
+    return {
+      currentAssistantMessageId,
+      currentAssistantContent: newContent,
+      wasCreated: false,
+      newDepth: currentDepth,
+    };
   }
 
   /**
@@ -2077,10 +2070,7 @@ class AiStreamRepository implements IAiStreamRepository {
       hasOutput: "output" in part,
       isError: Boolean(isError),
       outputType: typeof output,
-      outputStringified: (JSON.stringify(output) || "undefined").substring(
-        0,
-        500,
-      ),
+      outputStringified: (JSON.stringify(output) || "undefined").slice(0, 500),
     });
 
     // Extract error message from AI SDK and structure it for translation
@@ -2121,75 +2111,7 @@ class AiStreamRepository implements IAiStreamRepository {
     };
 
     // Update TOOL message in DB with result (or emit for incognito)
-    if (!isIncognito) {
-      // DB mode: Create ERROR message first if error (proper timestamp order)
-      if (toolError && userId) {
-        const errorMessageId = crypto.randomUUID();
-        const { serializeError } = await import("../error-utils");
-        await createErrorMessage({
-          messageId: errorMessageId,
-          threadId,
-          content: serializeError(toolError), // Serialize structured error for storage
-          errorType: "TOOL_ERROR",
-          parentId: toolMessageId, // Error is child of tool message
-          depth: toolCallData.depth + 1,
-          userId,
-          sequenceId,
-          logger,
-        });
-
-        logger.info("[AI Stream] ERROR message created for tool error", {
-          errorMessageId,
-          toolError,
-        });
-      }
-
-      // UPDATE existing TOOL message in DB with result/error
-      // Message was already created in processToolCall, now we just update it with the result
-      const updateResult = await db
-        .update(chatMessages)
-        .set({
-          metadata: { toolCall: toolCallWithResult },
-          updatedAt: new Date(),
-        })
-        .where(eq(chatMessages.id, toolMessageId))
-        .returning({ id: chatMessages.id });
-
-      if (updateResult.length === 0) {
-        logger.error(
-          "[AI Stream] CRITICAL: Tool message update failed - message not found in DB",
-          {
-            messageId: toolMessageId,
-            toolCallId: part.toolCallId,
-            toolName: part.toolName,
-            threadId,
-          },
-        );
-        // Message doesn't exist - this shouldn't happen since we created it in processToolCall
-        // But if it does, we need to create it now
-        await createToolMessage({
-          messageId: toolMessageId,
-          threadId,
-          toolCall: toolCallWithResult,
-          parentId: toolCallData.parentId,
-          depth: toolCallData.depth,
-          userId,
-          sequenceId,
-          model,
-          persona,
-          logger,
-        });
-        logger.warn("[AI Stream] Created missing tool message as fallback", {
-          messageId: toolMessageId,
-        });
-      } else {
-        logger.info("[AI Stream] Tool message updated with result", {
-          messageId: toolMessageId,
-          hasResult: !!validatedOutput,
-          hasError: !!toolError,
-        });
-      }
-    } else {
+    if (isIncognito) {
       // Incognito mode: Emit MESSAGE_CREATED events so client can save to localStorage
       // Emit TOOL message with toolCall object
       const toolMessageEvent = createStreamEvent.messageCreated({
@@ -2256,6 +2178,74 @@ class AiStreamRepository implements IAiStreamRepository {
             toolError,
           },
         );
+      }
+    } else {
+      // DB mode: Create ERROR message first if error (proper timestamp order)
+      if (toolError && userId) {
+        const errorMessageId = crypto.randomUUID();
+        const { serializeError } = await import("../error-utils");
+        await createErrorMessage({
+          messageId: errorMessageId,
+          threadId,
+          content: serializeError(toolError), // Serialize structured error for storage
+          errorType: "TOOL_ERROR",
+          parentId: toolMessageId, // Error is child of tool message
+          depth: toolCallData.depth + 1,
+          userId,
+          sequenceId,
+          logger,
+        });
+
+        logger.info("[AI Stream] ERROR message created for tool error", {
+          errorMessageId,
+          toolError,
+        });
+      }
+
+      // UPDATE existing TOOL message in DB with result/error
+      // Message was already created in processToolCall, now we just update it with the result
+      const updateResult = await db
+        .update(chatMessages)
+        .set({
+          metadata: { toolCall: toolCallWithResult },
+          updatedAt: new Date(),
+        })
+        .where(eq(chatMessages.id, toolMessageId))
+        .returning({ id: chatMessages.id });
+
+      if (updateResult.length === 0) {
+        logger.error(
+          "[AI Stream] CRITICAL: Tool message update failed - message not found in DB",
+          {
+            messageId: toolMessageId,
+            toolCallId: part.toolCallId,
+            toolName: part.toolName,
+            threadId,
+          },
+        );
+        // Message doesn't exist - this shouldn't happen since we created it in processToolCall
+        // But if it does, we need to create it now
+        await createToolMessage({
+          messageId: toolMessageId,
+          threadId,
+          toolCall: toolCallWithResult,
+          parentId: toolCallData.parentId,
+          depth: toolCallData.depth,
+          userId,
+          sequenceId,
+          model,
+          persona,
+          logger,
+        });
+        logger.warn("[AI Stream] Created missing tool message as fallback", {
+          messageId: toolMessageId,
+        });
+      } else {
+        logger.info("[AI Stream] Tool message updated with result", {
+          messageId: toolMessageId,
+          hasResult: !!validatedOutput,
+          hasError: !!toolError,
+        });
       }
     }
 

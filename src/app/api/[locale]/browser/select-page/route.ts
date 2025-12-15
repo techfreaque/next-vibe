@@ -14,8 +14,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: selectPageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executeSelectPage<SelectPageResponseOutput>(
+    handler: ({ data, logger }) =>
+      executeSelectPage<SelectPageResponseOutput>(
         {
           toolName: "select-page",
           args: filterUndefinedArgs({
@@ -23,7 +23,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

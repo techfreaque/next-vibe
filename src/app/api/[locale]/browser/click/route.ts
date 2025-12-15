@@ -12,8 +12,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: clickEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executeClick<ClickResponseOutput>(
+    handler: ({ data, logger }) =>
+      executeClick<ClickResponseOutput>(
         {
           toolName: "click",
           args: filterUndefinedArgs({
@@ -22,7 +22,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

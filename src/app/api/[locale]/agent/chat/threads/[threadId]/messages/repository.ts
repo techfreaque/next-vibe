@@ -322,7 +322,7 @@ export async function createTextMessage(params: {
       userId: params.userId ?? "public",
     });
 
-    return success(undefined);
+    return success();
   } catch (error) {
     params.logger.error("Failed to insert chat message", parseError(error), {
       messageId: params.messageId,
@@ -421,7 +421,7 @@ export async function handleEditOperation<
     hasParentMessageId: !!data.parentMessageId,
     parentMessageId: data.parentMessageId,
     threadId: data.threadId,
-    contentPreview: data.content.substring(0, 50),
+    contentPreview: data.content.slice(0, 50),
   });
 
   // If no parentMessageId, this is branching from the first message (creating a second root message)
@@ -461,7 +461,7 @@ export async function handleEditOperation<
   logger.info("handleEditOperation returning", {
     threadId: parentMessage.threadId,
     parentMessageId: parentMessageId,
-    contentPreview: data.content.substring(0, 50),
+    contentPreview: data.content.slice(0, 50),
   });
 
   return {

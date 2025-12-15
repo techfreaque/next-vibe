@@ -283,7 +283,7 @@ export function calculateColumnWidths(
 
   return config.columns.map((col) => {
     if (col.width?.endsWith("%")) {
-      const percentage = parseInt(col.width.replace("%", "")) / 100;
+      const percentage = parseInt(col.width.replace("%", ""), 10) / 100;
       return Math.floor(availableWidth * percentage);
     }
 
@@ -352,7 +352,7 @@ export function getColumnFormatter(
     default:
       return (value) => {
         const str = formatCellValue(value);
-        return str.length > 50 ? `${str.substring(0, 47)}...` : str;
+        return str.length > 50 ? `${str.slice(0, 47)}...` : str;
       };
   }
 }

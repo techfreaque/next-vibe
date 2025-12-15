@@ -156,7 +156,6 @@ export interface OxlintConfig {
     builtin?: boolean;
   };
   globals?: Record<string, "readonly" | "writable" | "off">;
-  ignorePatterns?: string[];
 }
 
 /**
@@ -193,35 +192,3 @@ interface LintConfigObject {
 
 type LintConfigElement = Record<string, LintConfigValue>;
 
-/**
- * ESLint Configuration
- * For import sorting, React hooks, and custom AST rules that oxlint doesn't support
- * i18n is now handled by oxlint JS plugin
- */
-export interface EslintConfig {
-  ignores: string[];
-  files: string[];
-  eslintOnlyRules: LintConfigElement;
-  ruleOverrides: LintConfigElement;
-  parserOptions: {
-    project: string;
-    tsconfigRootDir: string;
-  };
-}
-
-/**
- * Combined configuration for oxlint + prettier + eslint
- */
-export interface OxlintPrettierConfig {
-  oxlint: OxlintConfig;
-  prettier: PrettierConfig;
-}
-
-/**
- * Combined configuration for oxlint + prettier + eslint
- */
-export interface OxlintPrettierEslintConfig {
-  oxlint: OxlintConfig;
-  // eslint: EslintConfig;
-  prettier: PrettierConfig;
-}

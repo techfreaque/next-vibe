@@ -445,7 +445,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
 
       await db.delete(userRoles).where(eq(userRoles.userId, userId));
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Error deleting user roles by user ID", parseError(error));
       return fail({

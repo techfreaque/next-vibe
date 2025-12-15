@@ -164,7 +164,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       // Execute the tool with mapped name
       const result = await this.callTool(mcpToolName, parsedArgs, logger);
 
-      const executionId = `exec_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const executionId = `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
       logger.info("[Browser Repository] Tool execution completed", {
         tool: data.tool,

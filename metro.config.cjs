@@ -40,7 +40,7 @@ config.resolver.assetExts = config.resolver.assetExts.filter(
 config.resolver.blockList = [
   // Exclude EVERYTHING at root level except src and node_modules
   new RegExp(
-    `^${workspaceRoot.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/(?!src|node_modules).*`,
+    `^${workspaceRoot.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}/(?!src|node_modules).*`,
   ),
   // Exclude nested node_modules
   /node_modules\/.*\/node_modules\/.*/,

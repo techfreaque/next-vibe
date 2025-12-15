@@ -54,7 +54,12 @@ export class NewsletterUnsubscribeRepositoryImpl implements NewsletterUnsubscrib
           data.email,
           logger,
         );
-      if (!leadUpdateResult.success) {
+      if (leadUpdateResult.success) {
+        logger.debug("Lead status update result", {
+          email: data.email,
+          leadFound: leadUpdateResult.data?.leadFound,
+        });
+      } else {
         logger.error(
           "Failed to update lead status during newsletter unsubscribe",
           {
@@ -63,11 +68,6 @@ export class NewsletterUnsubscribeRepositoryImpl implements NewsletterUnsubscrib
             message: leadUpdateResult.message,
           },
         );
-      } else {
-        logger.debug("Lead status update result", {
-          email: data.email,
-          leadFound: leadUpdateResult.data?.leadFound,
-        });
       }
 
       // Handle newsletter subscription

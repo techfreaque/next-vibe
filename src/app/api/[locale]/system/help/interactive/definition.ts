@@ -19,6 +19,8 @@ import {
 
 import { UserRole } from "../../../user/user-roles/enum";
 
+export const INTERACTIVE_MODE_ALIAS = "interactive" as const;
+
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "help", "interactive"],
@@ -36,7 +38,7 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
-  aliases: ["interactive", "i"],
+  aliases: [INTERACTIVE_MODE_ALIAS, "i"],
 
   fields: objectField(
     {

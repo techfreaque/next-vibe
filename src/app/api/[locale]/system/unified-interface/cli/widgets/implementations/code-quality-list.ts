@@ -84,7 +84,7 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<typeof Wid
       groupBy: "file",
       sortBy: "severity",
       showSummary: true,
-      maxItemsPerGroup: 50,
+      maxItemsPerGroup: 100,
     };
   }
 
@@ -306,7 +306,7 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<typeof Wid
         );
       }
 
-      const countText = countParts.length ? countParts.join(", ") : "0 issues";
+      const countText = countParts.length > 0 ? countParts.join(", ") : "0 issues";
       output += `   ${displayPath} (${countText})\n`;
     }
 

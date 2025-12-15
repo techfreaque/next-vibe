@@ -4,21 +4,21 @@
  * Uses shared help service for unified command discovery
  */
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { definitionsRegistry } from "../../unified-interface/shared/endpoints/definitions/registry";
-import { Platform } from "../../unified-interface/shared/types/platform";
+import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
+import type { Platform } from "../../unified-interface/shared/types/platform";
 import type {
   HelpListRequestOutput,
   HelpListResponseOutput,
@@ -36,13 +36,14 @@ class HelpListRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    platform: Platform,
   ): ResponseType<HelpListResponseOutput> {
     logger.info("Discovering available commands");
 
     try {
       // Use unified endpoint listing service (filtered by user permissions from JWT)
       const endpoints = definitionsRegistry.getEndpointsForUser(
-        Platform.CLI,
+        platform,
         user,
         logger,
       );

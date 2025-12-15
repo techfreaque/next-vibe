@@ -3,12 +3,38 @@
  * Generates package.json for npm distribution
  */
 
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { TFunction } from "@/i18n/core/static-types";
+
+import type { NpmPackageConfig, PackageExportCondition } from "../definition";
 import { ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
-import type { Logger, NpmPackageConfig, TranslateFunction } from "./types";
+
+// ============================================================================
+// Generated Package.json Type
+// ============================================================================
+
+/** Generated package.json structure - type-safe */
+interface GeneratedPackageJson {
+  name: string;
+  version: string;
+  description: string;
+  type: "module" | "commonjs";
+  license?: string;
+  keywords?: string[];
+  repository?: string | { type: string; url: string };
+  bin?: Record<string, string>;
+  main?: string;
+  module?: string;
+  types?: string;
+  exports?: Record<string, PackageExportCondition>;
+  files?: string[];
+  dependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+}
 
 // ============================================================================
 // Interface
@@ -22,8 +48,8 @@ export interface INpmPackageGenerator {
     config: NpmPackageConfig,
     output: string[],
     filesCopied: string[],
-    logger: Logger,
-    t: TranslateFunction,
+    logger: EndpointLogger,
+    t: TFunction,
     dryRun?: boolean,
   ): Promise<string>;
 
@@ -42,8 +68,8 @@ export class NpmPackageGenerator implements INpmPackageGenerator {
     config: NpmPackageConfig,
     output: string[],
     filesCopied: string[],
-    logger: Logger,
-    t: TranslateFunction,
+    logger: EndpointLogger,
+    t: TFunction,
     dryRun?: boolean,
   ): Promise<string> {
     output.push(
@@ -59,10 +85,10 @@ export class NpmPackageGenerator implements INpmPackageGenerator {
       version = await this.getMainPackageVersion();
     }
 
-    const packageJson: Record<string, unknown> = {
+    const packageJson: GeneratedPackageJson = {
       name: config.name,
       version,
-      description: config.description || "",
+      description: config.description ?? "",
       type: "module",
       ...(config.license && { license: config.license }),
       ...(config.keywords &&
@@ -106,7 +132,9 @@ export class NpmPackageGenerator implements INpmPackageGenerator {
 
   async getMainPackageVersion(): Promise<string> {
     try {
-      const mainPackageJson = await import(`${ROOT_DIR}/package.json`);
+      const packageJsonPath = resolve(ROOT_DIR, "package.json");
+      const content = readFileSync(packageJsonPath, "utf-8");
+      const mainPackageJson = JSON.parse(content) as { version?: string };
       return mainPackageJson.version || "0.0.0";
     } catch {
       return "0.0.0";

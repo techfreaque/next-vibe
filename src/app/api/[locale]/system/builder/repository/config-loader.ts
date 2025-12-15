@@ -13,16 +13,17 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import { ROOT_DIR } from "./constants";
-import { outputFormatter } from "./output-formatter";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { TFunction } from "@/i18n/core/static-types";
+
 import type {
   BuildConfig,
   CopyConfig,
   FileToCompile,
-  Logger,
   NpmPackageConfig,
-  TranslateFunction,
-} from "./types";
+} from "../definition";
+import { ROOT_DIR } from "./constants";
+import { outputFormatter } from "./output-formatter";
 
 // ============================================================================
 // Types
@@ -53,8 +54,8 @@ export interface IConfigLoader {
     configPath: string | undefined,
     inlineConfig: InlineConfigInput | undefined,
     output: string[],
-    logger: Logger,
-    t: TranslateFunction,
+    logger: EndpointLogger,
+    t: TFunction,
   ): Promise<ResponseType<BuildConfig>>;
 
   /**
@@ -77,8 +78,8 @@ export class ConfigLoader implements IConfigLoader {
     configPath: string | undefined,
     inlineConfig: InlineConfigInput | undefined,
     output: string[],
-    logger: Logger,
-    t: TranslateFunction,
+    logger: EndpointLogger,
+    t: TFunction,
   ): Promise<ResponseType<BuildConfig>> {
     // Use config file if path provided
     if (configPath) {

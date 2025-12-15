@@ -5,35 +5,38 @@
 
 import "server-only";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import { confirm, select } from "@inquirer/prompts";
 import {
-  fail,
-  success,
   ErrorResponseTypes,
+  fail,
   type ResponseType,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   UserPermissionRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { definitionsRegistry } from "../../unified-interface/shared/endpoints/definitions/registry";
-import type { RouteExecutionContext } from "../../unified-interface/cli/runtime/route-executor";
+import type {
+  CliCompatiblePlatform,
+  RouteExecutionContext,
+} from "../../unified-interface/cli/runtime/route-executor";
 import { routeDelegationHandler } from "../../unified-interface/cli/runtime/route-executor";
+import { schemaUIHandler } from "../../unified-interface/cli/widgets/renderers/schema-handler";
+import { definitionsRegistry } from "../../unified-interface/shared/endpoints/definitions/registry";
+import type { CreateApiEndpointAny } from "../../unified-interface/shared/types/endpoint";
 import { Platform } from "../../unified-interface/shared/types/platform";
 import {
-  splitPath,
   endpointToToolName,
+  splitPath,
 } from "../../unified-interface/shared/utils/path";
-import { schemaUIHandler } from "../../unified-interface/cli/widgets/renderers/schema-handler";
-import type { CreateApiEndpointAny } from "../../unified-interface/shared/types/endpoint";
 
 /**
  * Interactive session state
@@ -41,6 +44,7 @@ import type { CreateApiEndpointAny } from "../../unified-interface/shared/types/
 interface InteractiveSession {
   user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
   locale: CountryLanguage;
+  platform: CliCompatiblePlatform;
   options?: {
     verbose?: boolean;
     output?: "json" | "table" | "pretty";
@@ -73,7 +77,7 @@ export interface InteractiveRepository {
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> | undefined,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    platform: Platform,
+    platform: CliCompatiblePlatform,
   ): Promise<ResponseType<{ started: boolean }>>;
 }
 
@@ -96,7 +100,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> | undefined,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    platform: Platform,
+    platform: CliCompatiblePlatform,
   ): Promise<ResponseType<{ started: boolean }>> {
     if (!user) {
       return fail({
@@ -107,7 +111,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
 
     try {
       this.logger = logger;
-      this.initializeDefaultSession(locale, user);
+      this.initializeDefaultSession(locale, user, platform);
       this.setupSignalHandlers();
 
       const { t } = simpleT(this.getSession().locale);
@@ -159,6 +163,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
           output: "pretty",
         },
         locale: "en-GLOBAL",
+        platform: Platform.CLI,
         user: {
           id: "system",
           leadId: "system",
@@ -188,6 +193,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
   private initializeDefaultSession(
     locale: CountryLanguage,
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
+    platform: CliCompatiblePlatform,
   ): void {
     this.session = {
       options: {
@@ -196,6 +202,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       },
       locale,
       user,
+      platform,
     };
   }
 
@@ -343,7 +350,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       }
     }
 
-    if (choices.length) {
+    if (choices.length > 0) {
       choices.push({ name: "─────────────────────", value: "separator" });
     }
 
@@ -549,10 +556,19 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       { name: "Polish (Poland)", value: "pl-PL" },
     ] satisfies Array<{ name: string; value: CountryLanguage }>;
 
+    const sessionLocale = this.getSession().locale;
+    // Only use as default if it's one of the available options
+    const defaultLocale = localeOptions.some(
+      (opt) => opt.value === sessionLocale,
+    )
+      ? sessionLocale
+      : undefined;
     const locale = await select({
       message: selectLocaleText,
       choices: localeOptions,
-      default: this.getSession().locale,
+      default: defaultLocale as
+        | (typeof localeOptions)[number]["value"]
+        | undefined,
     });
 
     return locale as CountryLanguage;
@@ -609,7 +625,10 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       );
     }
 
-    if (Object.keys(requestData).length || Object.keys(urlPathParams).length) {
+    if (
+      Object.keys(requestData).length > 0 ||
+      Object.keys(urlPathParams).length > 0
+    ) {
       const previewText = tSelected(
         "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.preview",
       );
@@ -624,12 +643,12 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       );
 
       this.logger.info(previewText);
-      if (Object.keys(requestData).length) {
+      if (Object.keys(requestData).length > 0) {
         this.logger.info(
           `${requestDataText}: ${JSON.stringify(requestData, null, 2)}`,
         );
       }
-      if (Object.keys(urlPathParams).length) {
+      if (Object.keys(urlPathParams).length > 0) {
         this.logger.info(
           `${urlParametersText}: ${JSON.stringify(urlPathParams, null, 2)}`,
         );
@@ -705,7 +724,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     const resolvedCommand = alias || routePath;
     const result = await definitionLoader.load({
       identifier: resolvedCommand,
-      platform: Platform.CLI,
+      platform: this.session.platform,
       user: this.session.user,
       logger: this.logger,
     });
@@ -763,7 +782,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       timestamp: Date.now(),
       options: session.options,
       logger: this.logger,
-      platform: Platform.CLI,
+      platform: session.platform,
     };
 
     try {
@@ -808,7 +827,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       timestamp: Date.now(),
       options: session.options,
       logger: this.logger,
-      platform: Platform.CLI,
+      platform: session.platform,
     };
 
     try {
@@ -999,14 +1018,23 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
           "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.polish",
         );
 
+        const localeChoices = [
+          { name: englishGlobalText, value: "en-GLOBAL" },
+          { name: germanText, value: "de-DE" },
+          { name: polishText, value: "pl-PL" },
+        ] satisfies Array<{ name: string; value: CountryLanguage }>;
+        // Only use as default if it's one of the available options
+        const defaultLocale = localeChoices.some(
+          (opt) => opt.value === session.locale,
+        )
+          ? session.locale
+          : undefined;
         const locale = await select({
           message: chooseLocaleText,
-          choices: [
-            { name: englishGlobalText, value: "en-GLOBAL" },
-            { name: germanText, value: "de-DE" },
-            { name: polishText, value: "pl-PL" },
-          ] satisfies Array<{ name: string; value: CountryLanguage }>,
-          default: session.locale,
+          choices: localeChoices,
+          default: defaultLocale as
+            | (typeof localeChoices)[number]["value"]
+            | undefined,
         });
         session.locale = locale as CountryLanguage;
         break;

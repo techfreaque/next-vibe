@@ -12,8 +12,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: fillEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executeFill<FillResponseOutput>(
+    handler: ({ data, logger }) =>
+      executeFill<FillResponseOutput>(
         {
           toolName: "fill",
           args: filterUndefinedArgs({
@@ -22,7 +22,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

@@ -14,8 +14,8 @@ import { helpListRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: helpListEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) => {
-      return helpListRepository.execute(data, user, locale, logger);
+    handler: ({ data, user, locale, logger, platform }) => {
+      return helpListRepository.execute(data, user, locale, logger, platform);
     },
   },
 });

@@ -53,9 +53,10 @@ export class LinuxWaylandRecorder extends BaseRecorder {
     };
   }
 
-  protected async stopProcess(process: Subprocess): Promise<void> {
+  protected stopProcess(process: Subprocess): Promise<void> {
     // Send SIGINT to gracefully stop wf-recorder
     process.kill("SIGINT");
+    return Promise.resolve();
   }
 
   protected override handleStderrLine(line: string): void {
@@ -116,8 +117,9 @@ export class LinuxWaylandFfmpegRecorder extends BaseRecorder {
     };
   }
 
-  protected async stopProcess(process: Subprocess): Promise<void> {
+  protected stopProcess(process: Subprocess): Promise<void> {
     process.kill("SIGINT");
+    return Promise.resolve();
   }
 
   protected override handleStderrLine(line: string): void {

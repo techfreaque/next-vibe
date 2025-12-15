@@ -84,7 +84,7 @@ export function DesignTestPageLayout({
                     onClick={() => {
                       if (!platform.isReactNative) {
                         document
-                          .getElementById("buttons")
+                          .querySelector("#buttons")
                           ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
@@ -99,7 +99,7 @@ export function DesignTestPageLayout({
                     onClick={() => {
                       if (!platform.isReactNative) {
                         document
-                          .getElementById("forms")
+                          .querySelector("#forms")
                           ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
@@ -114,7 +114,7 @@ export function DesignTestPageLayout({
                     onClick={() => {
                       if (!platform.isReactNative) {
                         document
-                          .getElementById("feedback")
+                          .querySelector("#feedback")
                           ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
@@ -129,7 +129,7 @@ export function DesignTestPageLayout({
                     onClick={() => {
                       if (!platform.isReactNative) {
                         document
-                          .getElementById("layouts")
+                          .querySelector("#layouts")
                           ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
@@ -144,7 +144,7 @@ export function DesignTestPageLayout({
                     onClick={() => {
                       if (!platform.isReactNative) {
                         document
-                          .getElementById("navigation")
+                          .querySelector("#navigation")
                           ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
@@ -159,7 +159,7 @@ export function DesignTestPageLayout({
                     onClick={() => {
                       if (!platform.isReactNative) {
                         document
-                          .getElementById("overlays")
+                          .querySelector("#overlays")
                           ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
@@ -174,7 +174,7 @@ export function DesignTestPageLayout({
                     onClick={() => {
                       if (!platform.isReactNative) {
                         document
-                          .getElementById("data-display")
+                          .querySelector("#data-display")
                           ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
@@ -189,7 +189,7 @@ export function DesignTestPageLayout({
                     onClick={() => {
                       if (!platform.isReactNative) {
                         document
-                          .getElementById("advanced")
+                          .querySelector("#advanced")
                           ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
@@ -204,7 +204,7 @@ export function DesignTestPageLayout({
                     onClick={() => {
                       if (!platform.isReactNative) {
                         document
-                          .getElementById("special")
+                          .querySelector("#special")
                           ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}

@@ -195,7 +195,7 @@ export async function writeSessionFile(
       userId: sessionData.userId,
     });
 
-    return success(undefined);
+    return success();
   } catch (error) {
     const parsedError = parseError(error);
     logger.error("Error writing session file", parsedError);
@@ -220,7 +220,7 @@ export async function deleteSessionFile(
     await fs.unlink(sessionPath);
 
     logger.debug("Session file deleted successfully", { path: sessionPath });
-    return success(undefined);
+    return success();
   } catch (error) {
     const parsedError = parseError(error);
 
@@ -230,7 +230,7 @@ export async function deleteSessionFile(
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.NO_SUCH_FILE);
     if (isFileNotFoundError) {
       logger.debug("Session file not found - already logged out");
-      return success(undefined);
+      return success();
     }
 
     logger.error("Error deleting session file", parsedError);

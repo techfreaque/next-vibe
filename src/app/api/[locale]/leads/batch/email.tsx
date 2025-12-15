@@ -50,8 +50,7 @@ function BatchUpdateCompletionEmailContent({
   const tracking = createTrackingContext(
     locale,
     undefined, // no specific leadId for batch operations
-    userId, // userId if available
-    undefined, // no campaignId for transactional emails
+    userId, // no campaignId for transactional emails
   );
 
   return (
@@ -212,8 +211,7 @@ function BatchDeleteCompletionEmailContent({
   const tracking = createTrackingContext(
     locale,
     undefined, // no specific leadId for batch operations
-    userId, // userId if available
-    undefined, // no campaignId for transactional emails
+    userId, // no campaignId for transactional emails
   );
 
   return (

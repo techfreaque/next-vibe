@@ -644,9 +644,9 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
                         const colonIndex = line.indexOf(":");
                         if (colonIndex > 0) {
                           const key = line
-                            .substring(0, colonIndex)
+                            .slice(0, colonIndex)
                             .toLowerCase();
-                          const value = line.substring(colonIndex + 1).trim();
+                          const value = line.slice(colonIndex + 1).trim();
                           if (key && value) {
                             headers[key] = [value];
                           }

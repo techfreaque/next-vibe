@@ -1,31 +1,32 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "next-vibe-ui/ui/accordion";
+import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, P } from "next-vibe-ui/ui/typography";
-import { Input } from "next-vibe-ui/ui/input";
-import { Button } from "next-vibe-ui/ui/button";
-import { useCallback, useEffect, useMemo, useState } from "react";
 import type { JSX } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+
 import { definitionsRegistry } from "../../../unified-interface/shared/endpoints/definitions/registry";
 import { Platform } from "../../../unified-interface/shared/types/platform";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 type GroupingMode = "category" | "tags" | "path";
 
@@ -162,7 +163,7 @@ function PathTreeAccordion({
                     {ep.method}
                   </Span>
                   <Span className="font-medium truncate text-xs">
-                    {ep.path[ep.path.length - 1]}
+                    {ep.path.at(-1)}
                   </Span>
                 </Div>
               </Link>
@@ -532,7 +533,7 @@ export function HelpInteractiveView({
                                       {ep.method}
                                     </Div>
                                     <Div className="font-medium truncate">
-                                      {toolName.replace(/_/g, "/")}
+                                      {toolName.replaceAll('_', "/")}
                                     </Div>
                                     {ep.aliases && ep.aliases.length > 0 && (
                                       <Div className="text-xs text-gray-500 dark:text-gray-400 mt-1">

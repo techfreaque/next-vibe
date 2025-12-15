@@ -85,7 +85,6 @@ export function useEndpointCreate<
       formOptions.defaultValues,
       autoPrefillData,
       initialState,
-      undefined,
     );
 
     return {
@@ -107,7 +106,7 @@ export function useEndpointCreate<
     if (
       autoPrefillData &&
       formResult?.form &&
-      Object.keys(autoPrefillData).length
+      Object.keys(autoPrefillData).length > 0
     ) {
       formResult.form.reset(autoPrefillData as never);
     }

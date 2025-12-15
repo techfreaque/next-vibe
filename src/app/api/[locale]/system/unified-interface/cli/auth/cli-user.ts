@@ -154,7 +154,7 @@ export async function getCliUser(
             verifyResult.data.roles,
           ),
         };
-      } else {
+      }
         logger.debug(
           "[CLI AUTH] Session token is invalid or expired, falling back to email auth",
           {
@@ -162,7 +162,7 @@ export async function getCliUser(
             verifyMessage: verifyResult.message,
           },
         );
-      }
+      
     } else {
       logger.debug("[CLI AUTH] No session data found in session file");
     }
@@ -183,7 +183,7 @@ export async function getCliUser(
 
   logger.debug("[CLI AUTH] VIBE_CLI_USER_EMAIL result", {
     hasEmail: !!cliUserEmail,
-    email: cliUserEmail ? `${cliUserEmail.substring(0, 3)}***` : null,
+    email: cliUserEmail ? `${cliUserEmail.slice(0, 3)}***` : null,
     envVarExists: "VIBE_CLI_USER_EMAIL" in process.env,
   });
 

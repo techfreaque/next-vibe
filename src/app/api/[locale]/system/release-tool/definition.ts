@@ -16,20 +16,20 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  objectField,
+  objectOptionalField,
+  requestDataArrayOptionalField,
+  requestDataField,
+  responseArrayOptionalField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import {
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import {
-  objectField,
-  objectOptionalField,
-  requestDataField,
-  requestDataArrayOptionalField,
-  responseField,
-  responseArrayOptionalField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 // ============================================================================
@@ -93,6 +93,7 @@ const CIProviderSchema = z.enum([
 /** Package status */
 const PackageStatusSchema = z.enum(["success", "skipped", "failed"]);
 
+
 // ============================================================================
 // Endpoint Definition
 // ============================================================================
@@ -124,7 +125,7 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // ========================================================================
-      // REQUEST FIELDS - Only configPath and configObject at root
+      // REQUEST FIELDS - Runtime options at root level for CLI access
       // ========================================================================
 
       configPath: requestDataField(
@@ -139,7 +140,245 @@ const { POST } = createEndpoint({
       ),
 
       // ========================================================================
-      // CONFIG OBJECT - Contains ALL configuration options
+      // Runtime options (CLI flags) - at root level for direct CLI access
+      // ========================================================================
+      ci: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.ci.title",
+          description: "app.api.system.releaseTool.fields.ci.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      dryRun: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.dryRun.title",
+          description:
+            "app.api.system.releaseTool.fields.dryRun.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      verbose: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.verbose.title",
+          description:
+            "app.api.system.releaseTool.fields.verbose.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      forceUpdate: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.forceUpdate.title",
+          description:
+            "app.api.system.releaseTool.fields.forceUpdate.description",
+        },
+        z.boolean().optional(), // No default - undefined means "ask user"
+      ),
+
+      // Skip options
+      skipLint: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.skipLint.title",
+          description:
+            "app.api.system.releaseTool.fields.skipLint.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      skipTypecheck: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.skipTypecheck.title",
+          description:
+            "app.api.system.releaseTool.fields.skipTypecheck.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      skipBuild: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.skipBuild.title",
+          description:
+            "app.api.system.releaseTool.fields.skipBuild.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      skipTests: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.skipTests.title",
+          description:
+            "app.api.system.releaseTool.fields.skipTests.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      skipSnyk: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.skipSnyk.title",
+          description:
+            "app.api.system.releaseTool.fields.skipSnyk.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      skipPublish: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.skipPublish.title",
+          description:
+            "app.api.system.releaseTool.fields.skipPublish.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      skipChangelog: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.skipChangelog.title",
+          description:
+            "app.api.system.releaseTool.fields.skipChangelog.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      skipGitTag: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.skipGitTag.title",
+          description:
+            "app.api.system.releaseTool.fields.skipGitTag.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      skipGitPush: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.skipGitPush.title",
+          description:
+            "app.api.system.releaseTool.fields.skipGitPush.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      skipInstall: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.skipInstall.title",
+          description:
+            "app.api.system.releaseTool.fields.skipInstall.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      skipClean: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.releaseTool.fields.skipClean.title",
+          description:
+            "app.api.system.releaseTool.fields.skipClean.description",
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      // Version options
+      versionIncrement: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.system.releaseTool.fields.versionIncrement.title",
+          description:
+            "app.api.system.releaseTool.fields.versionIncrement.description",
+          options: [
+            { value: "patch", label: "Patch" },
+            { value: "minor", label: "Minor" },
+            { value: "major", label: "Major" },
+            { value: "prepatch", label: "Pre-patch" },
+            { value: "preminor", label: "Pre-minor" },
+            { value: "premajor", label: "Pre-major" },
+            { value: "prerelease", label: "Prerelease" },
+          ],
+          optional: true,
+        },
+        VersionIncrementSchema.optional(),
+      ),
+
+      prereleaseId: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.system.releaseTool.fields.prereleaseId.title",
+          description:
+            "app.api.system.releaseTool.fields.prereleaseId.description",
+          optional: true,
+        },
+        z.string().optional(),
+      ),
+
+      targetPackage: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.system.releaseTool.fields.targetPackage.title",
+          description:
+            "app.api.system.releaseTool.fields.targetPackage.description",
+          optional: true,
+        },
+        z.string().optional(),
+      ),
+
+      commitMessage: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.system.releaseTool.fields.commitMessage.title",
+          description:
+            "app.api.system.releaseTool.fields.commitMessage.description",
+          optional: true,
+        },
+        z.string().optional(),
+      ),
+
+      notifyWebhook: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.system.releaseTool.fields.notifyWebhook.title",
+          description:
+            "app.api.system.releaseTool.fields.notifyWebhook.description",
+          optional: true,
+        },
+        z.string().optional(),
+      ),
+
+      // ========================================================================
+      // CONFIG OBJECT - Contains release configuration (not runtime flags)
       // ========================================================================
       configObject: objectOptionalField(
         {
@@ -153,247 +392,6 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          // ====================================================================
-          // Runtime options (CLI flags)
-          // ====================================================================
-          ci: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.ci.title",
-              description: "app.api.system.releaseTool.fields.ci.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          dryRun: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.dryRun.title",
-              description:
-                "app.api.system.releaseTool.fields.dryRun.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          verbose: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.verbose.title",
-              description:
-                "app.api.system.releaseTool.fields.verbose.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          forceUpdate: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.forceUpdate.title",
-              description:
-                "app.api.system.releaseTool.fields.forceUpdate.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          // Skip options
-          skipLint: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.skipLint.title",
-              description:
-                "app.api.system.releaseTool.fields.skipLint.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          skipTypecheck: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.skipTypecheck.title",
-              description:
-                "app.api.system.releaseTool.fields.skipTypecheck.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          skipBuild: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.skipBuild.title",
-              description:
-                "app.api.system.releaseTool.fields.skipBuild.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          skipTests: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.skipTests.title",
-              description:
-                "app.api.system.releaseTool.fields.skipTests.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          skipSnyk: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.skipSnyk.title",
-              description:
-                "app.api.system.releaseTool.fields.skipSnyk.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          skipPublish: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.skipPublish.title",
-              description:
-                "app.api.system.releaseTool.fields.skipPublish.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          skipChangelog: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.skipChangelog.title",
-              description:
-                "app.api.system.releaseTool.fields.skipChangelog.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          skipGitTag: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.skipGitTag.title",
-              description:
-                "app.api.system.releaseTool.fields.skipGitTag.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          skipGitPush: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.skipGitPush.title",
-              description:
-                "app.api.system.releaseTool.fields.skipGitPush.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          skipInstall: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.skipInstall.title",
-              description:
-                "app.api.system.releaseTool.fields.skipInstall.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          skipClean: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.skipClean.title",
-              description:
-                "app.api.system.releaseTool.fields.skipClean.description",
-            },
-            z.boolean().optional().default(false),
-          ),
-
-          // Version options
-          versionIncrement: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.SELECT,
-              label: "app.api.system.releaseTool.fields.versionIncrement.title",
-              description:
-                "app.api.system.releaseTool.fields.versionIncrement.description",
-              options: [
-                { value: "patch", label: "Patch" },
-                { value: "minor", label: "Minor" },
-                { value: "major", label: "Major" },
-                { value: "prepatch", label: "Pre-patch" },
-                { value: "preminor", label: "Pre-minor" },
-                { value: "premajor", label: "Pre-major" },
-                { value: "prerelease", label: "Prerelease" },
-              ],
-              optional: true,
-            },
-            VersionIncrementSchema.optional(),
-          ),
-
-          prereleaseId: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.system.releaseTool.fields.prereleaseId.title",
-              description:
-                "app.api.system.releaseTool.fields.prereleaseId.description",
-              optional: true,
-            },
-            z.string().optional(),
-          ),
-
-          targetPackage: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.system.releaseTool.fields.targetPackage.title",
-              description:
-                "app.api.system.releaseTool.fields.targetPackage.description",
-              optional: true,
-            },
-            z.string().optional(),
-          ),
-
-          commitMessage: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.system.releaseTool.fields.commitMessage.title",
-              description:
-                "app.api.system.releaseTool.fields.commitMessage.description",
-              optional: true,
-            },
-            z.string().optional(),
-          ),
-
-          notifyWebhook: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.TEXT,
-              label: "app.api.system.releaseTool.fields.notifyWebhook.title",
-              description:
-                "app.api.system.releaseTool.fields.notifyWebhook.description",
-              optional: true,
-            },
-            z.string().optional(),
-          ),
-
-          // ====================================================================
-          // Global config options
-          // ====================================================================
           packageManager: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
@@ -1765,22 +1763,16 @@ const { POST } = createEndpoint({
       ),
 
       // ========================================================================
-      // RESPONSE FIELDS
+      // RESPONSE FIELDS - Ordered for optimal display
       // ========================================================================
+
+      // Summary stats at the top
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.releaseTool.response.success",
+          content: "app.api.system.releaseTool.response.status",
         },
         z.boolean(),
-      ),
-
-      output: responseField(
-        {
-          type: WidgetType.CODE_OUTPUT,
-          title: "app.api.system.releaseTool.response.output",
-        },
-        z.string(),
       ),
 
       duration: responseField(
@@ -1791,16 +1783,46 @@ const { POST } = createEndpoint({
         z.coerce.number(),
       ),
 
+      // Output log
+      output: responseField(
+        {
+          type: WidgetType.CODE_OUTPUT,
+        },
+        z.string(),
+      ),
+
+      // Errors displayed prominently if present
+      errors: responseArrayOptionalField(
+        {
+          type: WidgetType.DATA_LIST,
+          title: "app.api.system.releaseTool.response.errors",
+          optional: true,
+        },
+        z.string(),
+      ),
+
+      // Warnings displayed if present
+      warnings: responseArrayOptionalField(
+        {
+          type: WidgetType.DATA_LIST,
+          title: "app.api.system.releaseTool.response.warnings",
+          optional: true,
+        },
+        z.string(),
+      ),
+
+      // Packages table with status highlighting
       packagesProcessed: responseArrayOptionalField(
         {
           type: WidgetType.DATA_TABLE,
+          title: "app.api.system.releaseTool.response.packages",
           columns: [
-            { key: "name", label: "Name" },
-            { key: "directory", label: "Directory" },
-            { key: "version", label: "Version" },
-            { key: "tag", label: "Tag" },
-            { key: "status", label: "Status" },
-            { key: "message", label: "Message" },
+            { key: "name", label: "app.api.system.releaseTool.table.name" },
+            { key: "directory", label: "app.api.system.releaseTool.table.directory" },
+            { key: "version", label: "app.api.system.releaseTool.table.version" },
+            { key: "tag", label: "app.api.system.releaseTool.table.tag" },
+            { key: "status", label: "app.api.system.releaseTool.table.status" },
+            { key: "message", label: "app.api.system.releaseTool.table.message" },
           ],
         },
         objectField(
@@ -1820,30 +1842,47 @@ const { POST } = createEndpoint({
               z.string(),
             ),
             version: responseField(
-              { type: WidgetType.TEXT, content: "Version", optional: true },
+              { type: WidgetType.TEXT, content: "Version" },
               z.string().optional(),
             ),
             tag: responseField(
-              { type: WidgetType.TEXT, content: "Tag", optional: true },
+              { type: WidgetType.TEXT, content: "Tag" },
               z.string().optional(),
             ),
             status: responseField(
-              { type: WidgetType.TEXT, content: "Status" },
+              { type: WidgetType.BADGE },
               PackageStatusSchema,
             ),
             message: responseField(
-              { type: WidgetType.TEXT, content: "Message", optional: true },
+              { type: WidgetType.TEXT, content: "Message" },
               z.string().optional(),
             ),
           },
         ),
       ),
 
+      // Git info displayed as metadata card
+      gitInfo: responseField(
+        {
+          type: WidgetType.METADATA_CARD,
+          title: "app.api.system.releaseTool.response.gitInfo",
+        },
+        z
+          .object({
+            currentBranch: z.string().nullable(),
+            lastTag: z.string().nullable(),
+            newTag: z.string().nullable(),
+            commitsSinceLastTag: z.coerce.number().nullable(),
+            hasUncommittedChanges: z.boolean(),
+          })
+          .optional(),
+      ),
+
+      // CI environment as metadata card
       ciEnvironment: responseField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.METADATA_CARD,
           title: "app.api.system.releaseTool.response.ciEnvironment",
-          optional: true,
         },
         z
           .object({
@@ -1857,51 +1896,17 @@ const { POST } = createEndpoint({
           .optional(),
       ),
 
-      errors: responseArrayOptionalField(
-        {
-          type: WidgetType.DATA_LIST,
-          title: "app.api.system.releaseTool.response.errors",
-          optional: true,
-        },
-        z.string(),
-      ),
-
-      warnings: responseArrayOptionalField(
-        {
-          type: WidgetType.DATA_LIST,
-          title: "app.api.system.releaseTool.response.warnings",
-          optional: true,
-        },
-        z.string(),
-      ),
-
-      gitInfo: responseField(
-        {
-          type: WidgetType.DATA_LIST,
-          title: "app.api.system.releaseTool.response.gitInfo",
-          optional: true,
-        },
-        z
-          .object({
-            currentBranch: z.string().nullable(),
-            lastTag: z.string().nullable(),
-            newTag: z.string().nullable(),
-            commitsSinceLastTag: z.coerce.number().nullable(),
-            hasUncommittedChanges: z.boolean(),
-          })
-          .optional(),
-      ),
-
+      // Published packages
       publishedPackages: responseArrayOptionalField(
         {
           type: WidgetType.DATA_TABLE,
+          title: "app.api.system.releaseTool.response.published",
           columns: [
-            { key: "name", label: "Package" },
-            { key: "version", label: "Version" },
-            { key: "registry", label: "Registry" },
-            { key: "url", label: "URL" },
+            { key: "name", label: "app.api.system.releaseTool.table.name" },
+            { key: "version", label: "app.api.system.releaseTool.table.version" },
+            { key: "registry", label: "app.api.system.releaseTool.table.registry" },
+            { key: "url", label: "app.api.system.releaseTool.table.url" },
           ],
-          optional: true,
         },
         objectField(
           {
@@ -1916,21 +1921,22 @@ const { POST } = createEndpoint({
               z.string(),
             ),
             version: responseField(
-              { type: WidgetType.TEXT, content: "Version" },
+              { type: WidgetType.BADGE, variant: "success" },
               z.string(),
             ),
             registry: responseField(
-              { type: WidgetType.TEXT, content: "Registry" },
+              { type: WidgetType.BADGE, variant: "info" },
               z.string(),
             ),
             url: responseField(
-              { type: WidgetType.TEXT, content: "URL", optional: true },
+              { type: WidgetType.TEXT, content: "URL" },
               z.string().optional(),
             ),
           },
         ),
       ),
 
+      // Timings
       timings: responseField(
         {
           type: WidgetType.DATA_LIST,
@@ -1956,9 +1962,8 @@ const { POST } = createEndpoint({
 
       rollbackPerformed: responseField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.system.releaseTool.response.rollbackPerformed",
-          optional: true,
+          type: WidgetType.BADGE,
+          variant: "warning",
         },
         z.boolean().optional(),
       ),
@@ -1978,19 +1983,200 @@ const { POST } = createEndpoint({
           { response: true },
           {
             type: responseField(
-              { type: WidgetType.TEXT, content: "Type" },
+              { type: WidgetType.BADGE, variant: "info" },
               z.string(),
             ),
             success: responseField(
-              { type: WidgetType.TEXT, content: "Success" },
+              { type: WidgetType.BADGE },
               z.boolean(),
             ),
             message: responseField(
-              { type: WidgetType.TEXT, content: "Message", optional: true },
+              { type: WidgetType.TEXT, content: "Message" },
               z.string().optional(),
             ),
           },
         ),
+      ),
+
+      // ========================================================================
+      // INTERNAL TYPES (for repository services - not shown in UI)
+      // ========================================================================
+
+      _internal: objectOptionalField(
+        { type: WidgetType.CONTAINER, optional: true },
+        { response: true },
+        {
+          // Package.json structure
+          packageJson: objectOptionalField(
+            { type: WidgetType.CONTAINER, optional: true },
+            { response: true },
+            {
+              name: responseField({ type: WidgetType.TEXT, content: "Name" }, z.string()),
+              version: responseField({ type: WidgetType.TEXT, content: "Version" }, z.string()),
+              scripts: responseField({ type: WidgetType.TEXT, content: "Scripts", optional: true }, z.record(z.string(), z.string()).optional()),
+              dependencies: responseField({ type: WidgetType.TEXT, content: "Dependencies", optional: true }, z.record(z.string(), z.string()).optional()),
+              devDependencies: responseField({ type: WidgetType.TEXT, content: "DevDependencies", optional: true }, z.record(z.string(), z.string()).optional()),
+              peerDependencies: responseField({ type: WidgetType.TEXT, content: "PeerDependencies", optional: true }, z.record(z.string(), z.string()).optional()),
+              optionalDependencies: responseField({ type: WidgetType.TEXT, content: "OptionalDependencies", optional: true }, z.record(z.string(), z.string()).optional()),
+              updateIgnoreDependencies: responseArrayOptionalField({ type: WidgetType.TEXT, content: "UpdateIgnore", optional: true }, z.string()),
+              private: responseField({ type: WidgetType.TEXT, content: "Private", optional: true }, z.boolean().optional()),
+              publishConfig: objectOptionalField(
+                { type: WidgetType.CONTAINER, optional: true },
+                { response: true },
+                {
+                  access: responseField({ type: WidgetType.TEXT, content: "Access", optional: true }, z.enum(["public", "restricted"]).optional()),
+                  registry: responseField({ type: WidgetType.TEXT, content: "Registry", optional: true }, z.string().optional()),
+                  tag: responseField({ type: WidgetType.TEXT, content: "Tag", optional: true }, z.string().optional()),
+                },
+              ),
+              repository: objectOptionalField(
+                { type: WidgetType.CONTAINER, optional: true },
+                { response: true },
+                {
+                  type: responseField({ type: WidgetType.TEXT, content: "Type" }, z.string()),
+                  url: responseField({ type: WidgetType.TEXT, content: "Url" }, z.string()),
+                },
+              ),
+            },
+          ),
+
+          // Version info
+          versionInfo: objectOptionalField(
+            { type: WidgetType.CONTAINER, optional: true },
+            { response: true },
+            {
+              newVersion: responseField({ type: WidgetType.TEXT, content: "NewVersion" }, z.string()),
+              lastTag: responseField({ type: WidgetType.TEXT, content: "LastTag" }, z.string()),
+              newTag: responseField({ type: WidgetType.TEXT, content: "NewTag" }, z.string()),
+            },
+          ),
+
+          // Parsed version
+          parsedVersion: objectOptionalField(
+            { type: WidgetType.CONTAINER, optional: true },
+            { response: true },
+            {
+              major: responseField({ type: WidgetType.TEXT, content: "Major" }, z.number()),
+              minor: responseField({ type: WidgetType.TEXT, content: "Minor" }, z.number()),
+              patch: responseField({ type: WidgetType.TEXT, content: "Patch" }, z.number()),
+              prerelease: responseField({ type: WidgetType.TEXT, content: "Prerelease", optional: true }, z.string().nullable()),
+              prereleaseNumber: responseField({ type: WidgetType.TEXT, content: "PrereleaseNumber", optional: true }, z.number().nullable()),
+              buildMetadata: responseField({ type: WidgetType.TEXT, content: "BuildMetadata", optional: true }, z.string().nullable()),
+            },
+          ),
+
+          // Repo info
+          repoInfo: objectOptionalField(
+            { type: WidgetType.CONTAINER, optional: true },
+            { response: true },
+            {
+              type: responseField({ type: WidgetType.TEXT, content: "Type" }, z.enum(["github", "gitlab", "bitbucket", "azure", "other"])),
+              url: responseField({ type: WidgetType.TEXT, content: "URL" }, z.string()),
+              owner: responseField({ type: WidgetType.TEXT, content: "Owner", optional: true }, z.string().optional()),
+              repo: responseField({ type: WidgetType.TEXT, content: "Repo", optional: true }, z.string().optional()),
+              defaultBranch: responseField({ type: WidgetType.TEXT, content: "DefaultBranch", optional: true }, z.string().optional()),
+            },
+          ),
+
+          // Commit info
+          commitInfo: objectOptionalField(
+            { type: WidgetType.CONTAINER, optional: true },
+            { response: true },
+            {
+              sha: responseField({ type: WidgetType.TEXT, content: "SHA" }, z.string()),
+              shortSha: responseField({ type: WidgetType.TEXT, content: "ShortSHA" }, z.string()),
+              subject: responseField({ type: WidgetType.TEXT, content: "Subject" }, z.string()),
+              body: responseField({ type: WidgetType.TEXT, content: "Body", optional: true }, z.string().optional()),
+              authorName: responseField({ type: WidgetType.TEXT, content: "AuthorName" }, z.string()),
+              authorEmail: responseField({ type: WidgetType.TEXT, content: "AuthorEmail" }, z.string()),
+              timestamp: responseField({ type: WidgetType.TEXT, content: "Timestamp" }, z.coerce.date()),
+              conventionalType: responseField({ type: WidgetType.TEXT, content: "ConventionalType", optional: true }, z.string().optional()),
+              conventionalScope: responseField({ type: WidgetType.TEXT, content: "ConventionalScope", optional: true }, z.string().optional()),
+              isBreaking: responseField({ type: WidgetType.TEXT, content: "IsBreaking", optional: true }, z.boolean().optional()),
+            },
+          ),
+
+          // Hook context
+          hookContext: objectOptionalField(
+            { type: WidgetType.CONTAINER, optional: true },
+            { response: true },
+            {
+              packageManager: responseField({ type: WidgetType.TEXT, content: "PackageManager" }, z.string()),
+              packageName: responseField({ type: WidgetType.TEXT, content: "PackageName", optional: true }, z.string().optional()),
+              version: responseField({ type: WidgetType.TEXT, content: "Version", optional: true }, z.string().optional()),
+              directory: responseField({ type: WidgetType.TEXT, content: "Directory", optional: true }, z.string().optional()),
+              previousVersion: responseField({ type: WidgetType.TEXT, content: "PreviousVersion", optional: true }, z.string().optional()),
+              tag: responseField({ type: WidgetType.TEXT, content: "Tag", optional: true }, z.string().optional()),
+              isCI: responseField({ type: WidgetType.TEXT, content: "IsCI", optional: true }, z.boolean().optional()),
+              ciProvider: responseField({ type: WidgetType.TEXT, content: "CIProvider", optional: true }, z.string().optional()),
+              dryRun: responseField({ type: WidgetType.TEXT, content: "DryRun", optional: true }, z.boolean().optional()),
+            },
+          ),
+
+          // Hook result
+          hookResult: objectOptionalField(
+            { type: WidgetType.CONTAINER, optional: true },
+            { response: true },
+            {
+              success: responseField({ type: WidgetType.TEXT, content: "Success" }, z.boolean()),
+              command: responseField({ type: WidgetType.TEXT, content: "Command" }, z.string()),
+              exitCode: responseField({ type: WidgetType.TEXT, content: "ExitCode", optional: true }, z.number().optional()),
+              stdout: responseField({ type: WidgetType.TEXT, content: "Stdout", optional: true }, z.string().optional()),
+              stderr: responseField({ type: WidgetType.TEXT, content: "Stderr", optional: true }, z.string().optional()),
+              duration: responseField({ type: WidgetType.TEXT, content: "Duration", optional: true }, z.number().optional()),
+              message: responseField({ type: WidgetType.TEXT, content: "Message", optional: true }, z.string().optional()),
+            },
+          ),
+
+          // Security scan result
+          securityScanResult: objectOptionalField(
+            { type: WidgetType.CONTAINER, optional: true },
+            { response: true },
+            {
+              passed: responseField({ type: WidgetType.TEXT, content: "Passed" }, z.boolean()),
+              vulnerabilities: objectField(
+                { type: WidgetType.CONTAINER },
+                { response: true },
+                {
+                  critical: responseField({ type: WidgetType.TEXT, content: "Critical" }, z.number()),
+                  high: responseField({ type: WidgetType.TEXT, content: "High" }, z.number()),
+                  medium: responseField({ type: WidgetType.TEXT, content: "Medium" }, z.number()),
+                  low: responseField({ type: WidgetType.TEXT, content: "Low" }, z.number()),
+                },
+              ),
+            },
+          ),
+
+          // Notification data
+          notificationData: objectOptionalField(
+            { type: WidgetType.CONTAINER, optional: true },
+            { response: true },
+            {
+              success: responseField({ type: WidgetType.TEXT, content: "Success" }, z.boolean()),
+              packageName: responseField({ type: WidgetType.TEXT, content: "PackageName", optional: true }, z.string().optional()),
+              version: responseField({ type: WidgetType.TEXT, content: "Version", optional: true }, z.string().optional()),
+              duration: responseField({ type: WidgetType.TEXT, content: "Duration", optional: true }, z.number().optional()),
+              error: responseField({ type: WidgetType.TEXT, content: "Error", optional: true }, z.string().optional()),
+              releaseUrl: responseField({ type: WidgetType.TEXT, content: "ReleaseUrl", optional: true }, z.string().optional()),
+              commitSha: responseField({ type: WidgetType.TEXT, content: "CommitSha", optional: true }, z.string().optional()),
+              branch: responseField({ type: WidgetType.TEXT, content: "Branch", optional: true }, z.string().optional()),
+              registryUrls: responseField({ type: WidgetType.TEXT, content: "RegistryUrls", optional: true }, z.array(z.string()).optional()),
+              timings: objectOptionalField(
+                { type: WidgetType.CONTAINER, optional: true },
+                { response: true },
+                {
+                  total: responseField({ type: WidgetType.TEXT, content: "Total", optional: true }, z.number().optional()),
+                  version: responseField({ type: WidgetType.TEXT, content: "Version", optional: true }, z.number().optional()),
+                  quality: responseField({ type: WidgetType.TEXT, content: "Quality", optional: true }, z.number().optional()),
+                  publish: responseField({ type: WidgetType.TEXT, content: "Publish", optional: true }, z.number().optional()),
+                  git: responseField({ type: WidgetType.TEXT, content: "Git", optional: true }, z.number().optional()),
+                  changelog: responseField({ type: WidgetType.TEXT, content: "Changelog", optional: true }, z.number().optional()),
+                  notification: responseField({ type: WidgetType.TEXT, content: "Notification", optional: true }, z.number().optional()),
+                },
+              ),
+            },
+          ),
+        },
       ),
     },
   ),
@@ -2047,15 +2233,15 @@ const { POST } = createEndpoint({
     requests: {
       default: {},
       ciRelease: {
+        ci: true,
         configObject: {
-          ci: true,
           packages: [{ directory: "./" }],
         },
       },
       dryRun: {
+        dryRun: true,
+        verbose: true,
         configObject: {
-          dryRun: true,
-          verbose: true,
           packages: [{ directory: "./" }],
         },
       },
@@ -2142,73 +2328,29 @@ export type RequestType = typeof POST.types.RequestOutput;
 /** Response type */
 export type ReleaseResponseType = typeof POST.types.ResponseOutput;
 
-/** Package manager types */
-export type PackageManager = "npm" | "yarn" | "pnpm" | "deno" | "bun";
+/** Package manager types - derived from schema */
+export type PackageManager = z.infer<typeof PackageManagerSchema>;
 
-/** Version increment types */
-export type VersionIncrement =
-  | "major"
-  | "minor"
-  | "patch"
-  | "premajor"
-  | "preminor"
-  | "prepatch"
-  | "prerelease";
+/** Version increment types - derived from schema */
+export type VersionIncrement = z.infer<typeof VersionIncrementSchema>;
 
-/** CI environment detection */
-export interface CIEnvironment {
-  isCI: boolean;
-  provider:
-    | "github"
-    | "gitlab"
-    | "jenkins"
-    | "circleci"
-    | "travis"
-    | "azure"
-    | "bitbucket"
-    | "drone"
-    | "buildkite"
-    | "woodpecker"
-    | "teamcity"
-    | "codeship"
-    | "appveyor"
-    | "codebuild"
-    | "cloudbuild"
-    | "semaphore"
-    | "buddy"
-    | "render"
-    | "vercel"
-    | "netlify"
-    | "unknown"
-    | null;
-  branch: string | null;
-  commit: string | null;
-  pr: string | null;
-  tag: string | null;
-}
+/** CI provider types - derived from schema */
+export type CIProvider = z.infer<typeof CIProviderSchema>;
 
-/** Package.json interface */
-export interface PackageJson {
-  name: string;
-  version: string;
-  scripts?: Record<string, string>;
-  dependencies?: Record<string, string>;
-  devDependencies?: Record<string, string>;
-  peerDependencies?: Record<string, string>;
-  optionalDependencies?: Record<string, string>;
-  updateIgnoreDependencies?: string[];
-  private?: boolean;
-  publishConfig?: {
-    access?: "public" | "restricted";
-    registry?: string;
-    tag?: string;
-  };
-  repository?: {
-    type: string;
-    url: string;
-  };
-  workspaces?: string[] | { packages: string[] };
-}
+/** Package status types - derived from schema */
+export type PackageStatus = z.infer<typeof PackageStatusSchema>;
+
+/** Webhook type - derived from schema */
+export type WebhookType = z.infer<typeof WebhookTypeSchema>;
+
+/** Changelog preset - derived from schema */
+export type ChangelogPreset = z.infer<typeof ChangelogPresetSchema>;
+
+/** NPM access level - derived from schema */
+export type NpmAccess = z.infer<typeof NpmAccessSchema>;
+
+/** CI environment - derived from response schema */
+export type CIEnvironment = NonNullable<ReleaseResponseType["ciEnvironment"]>;
 
 // Infer config types from request type
 export type ReleaseConfig = NonNullable<RequestType["configObject"]>;
@@ -2221,7 +2363,6 @@ export type ReleaseFileConfig = Partial<
     | "globalVersion"
     | "branch"
     | "continueOnError"
-    | "verbose"
     | "packages"
     | "notifications"
     | "hooks"
@@ -2262,23 +2403,80 @@ export type RetryConfig = NonNullable<ReleaseConfig["retry"]>;
 /** Rollback configuration */
 export type RollbackConfig = NonNullable<ReleaseConfig["rollback"]>;
 
-/** Hook configuration */
-export interface ReleaseHook {
-  command: string;
-  cwd?: string;
-  continueOnError?: boolean;
-  env?: Record<string, string>;
-  timeout?: number;
-  shell?: boolean;
-}
+/** Hook configuration - derived from hooks schema */
+export type ReleaseHook = NonNullable<
+  NonNullable<ReleaseConfig["hooks"]>["preRelease"]
+>;
 
-/** Folders to zip configuration */
-export type FoldersToZip = {
-  input: string;
-  output: string;
-}[];
+/** Folders to zip configuration - derived from package release schema */
+export type FoldersToZip = NonNullable<ReleaseOptions["foldersToZip"]>;
 
-/** Allowed version bumper file extensions */
-export type AllowedVersionBumperExtension = "php" | "ts" | "js" | "json";
-export type VersionBumperFileName =
-  `${string}.${AllowedVersionBumperExtension}`;
+/** Version bumper configuration - derived from package release schema */
+export type VersionBumper = NonNullable<ReleaseOptions["versionBumper"]>;
+
+/** Git release assets configuration */
+export type GitReleaseAsset = NonNullable<
+  NonNullable<ReleaseOptions["gitRelease"]>["assets"]
+>[number];
+
+// ============================================================================
+// Response-Derived Types
+// ============================================================================
+
+/** Package result - derived from response packagesProcessed */
+export type PackageResult = NonNullable<
+  ReleaseResponseType["packagesProcessed"]
+>[number];
+
+/** Published package - derived from response publishedPackages */
+export type PublishedPackage = NonNullable<
+  ReleaseResponseType["publishedPackages"]
+>[number];
+
+/** Timings breakdown - derived from response timings */
+export type Timings = NonNullable<ReleaseResponseType["timings"]>;
+
+/** Notification result - derived from response notificationsSent */
+export type NotificationResult = NonNullable<
+  ReleaseResponseType["notificationsSent"]
+>[number];
+
+/** Git info - derived from response gitInfo */
+export type GitInfo = NonNullable<ReleaseResponseType["gitInfo"]>;
+
+// ============================================================================
+// Internal Types - Derived from _internal response fields
+// ============================================================================
+
+/** Internal types helper */
+type InternalTypes = NonNullable<ReleaseResponseType["_internal"]>;
+
+/** Package.json structure - derived from _internal.packageJson */
+export type PackageJson = NonNullable<InternalTypes["packageJson"]>;
+
+/** Version info - derived from _internal.versionInfo */
+export type VersionInfo = NonNullable<InternalTypes["versionInfo"]>;
+
+/** Parsed semver version components - derived from _internal.parsedVersion */
+export type ParsedVersion = NonNullable<InternalTypes["parsedVersion"]>;
+
+/** Repository hosting information - derived from _internal.repoInfo */
+export type RepoInfo = NonNullable<InternalTypes["repoInfo"]>;
+
+/** Git commit information - derived from _internal.commitInfo */
+export type CommitInfo = NonNullable<InternalTypes["commitInfo"]>;
+
+/** Hook execution context - derived from _internal.hookContext */
+export type HookContext = NonNullable<InternalTypes["hookContext"]>;
+
+/** Hook execution result - derived from _internal.hookResult */
+export type HookResult = NonNullable<InternalTypes["hookResult"]>;
+
+/** Security scan results - derived from _internal.securityScanResult */
+export type SecurityScanResult = NonNullable<InternalTypes["securityScanResult"]>;
+
+/** Notification data for webhooks - derived from _internal.notificationData */
+export type NotificationData = NonNullable<InternalTypes["notificationData"]>;
+
+/** Notification timings - derived from _internal.notificationData.timings */
+export type NotificationTimings = NonNullable<NotificationData["timings"]>;

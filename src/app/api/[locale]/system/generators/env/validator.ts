@@ -29,13 +29,21 @@ export enum EnvValidationErrorType {
 }
 
 /**
+ * Typed details for different error types
+ */
+type EnvValidationErrorDetails =
+  | { hint: string }
+  | { error: string }
+  | { existingFile: string; duplicateFile: string };
+
+/**
  * Structure for env validation errors
  */
 interface EnvValidationError {
   type: EnvValidationErrorType;
   filePath: string;
   message: string;
-  details?: unknown;
+  details?: EnvValidationErrorDetails;
 }
 
 /**

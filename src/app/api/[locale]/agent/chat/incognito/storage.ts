@@ -115,7 +115,7 @@ export async function saveMessage(message: ChatMessage): Promise<void> {
     );
     messages[message.id] = message;
     await setItem(STORAGE_KEYS.MESSAGES, messages);
-    return;
+    return undefined;
   });
 
   // Wait for this operation to complete
@@ -280,7 +280,7 @@ export async function clearIncognitoData(): Promise<void> {
  * Generate unique ID for incognito mode
  */
 export function generateIncognitoId(prefix: string): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
 /**

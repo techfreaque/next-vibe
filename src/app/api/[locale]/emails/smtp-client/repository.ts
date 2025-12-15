@@ -119,7 +119,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
               language: data.selectionCriteria.language,
             },
           });
-        } else {
+        }
           return fail({
             message:
               "app.api.emails.smtpClient.sending.errors.no_account.title",
@@ -128,7 +128,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
               campaignType: data.selectionCriteria.campaignType,
             },
           });
-        }
+        
       }
 
       // Try primary account with retry logic

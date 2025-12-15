@@ -12,8 +12,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: waitForEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executeWaitFor(
+    handler: ({ data, logger }) =>
+      executeWaitFor(
         {
           toolName: "wait-for",
           args: filterUndefinedArgs({
@@ -22,7 +22,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

@@ -288,7 +288,7 @@ export function useNewsletterManager(
         subscriptionEndpoint.create.form.reset({
           email: emailToUse,
         });
-        subscriptionEndpoint.create.submitForm(undefined);
+        subscriptionEndpoint.create.submitForm();
       }
     },
     [
@@ -324,7 +324,7 @@ export function useNewsletterManager(
         unsubscribeEndpoint.create.form.reset({
           email: emailToUse,
         });
-        unsubscribeEndpoint.create.submitForm(undefined);
+        unsubscribeEndpoint.create.submitForm();
         setShowConfirmUnsubscribe(false);
       }
     },

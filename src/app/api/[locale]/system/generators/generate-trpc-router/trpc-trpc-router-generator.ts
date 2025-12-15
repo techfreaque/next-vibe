@@ -14,9 +14,10 @@ declare const process: {
 import fs from "node:fs";
 import path from "node:path";
 
-import { findRouteFiles } from "@/app/api/[locale]/system/translations/reorganize/repository/scanner";
-import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
+import { findRouteFiles } from "@/app/api/[locale]/system/unified-interface/shared/utils/scanner";
+
 import { parseError } from "../../../shared/utils";
+import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 
 // RouteFileStructure represents a route module with HTTP method handlers
 interface RouteFileStructure {
@@ -352,7 +353,7 @@ function generateRouterCode(
         path.dirname(path.join(cwd, outputFile)),
         routeFile.filePath.replace(/\.ts$/, ""),
       )
-      .replace(/\\/g, "/");
+      .replaceAll("\\", "/");
 
     // eslint-disable-next-line i18next/no-literal-string
     imports.push(`import { tools as ${toolsVarName} } from '${importPath}';`);

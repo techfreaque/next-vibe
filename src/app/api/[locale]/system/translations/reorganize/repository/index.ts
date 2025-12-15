@@ -264,8 +264,7 @@ export class TranslationReorganizeRepositoryImpl {
             languageTranslations,
             groups,
             keyUsageMap,
-            logger,
-            undefined, // No key mappings in removeUnused mode
+            logger, // No key mappings in removeUnused mode
           );
 
           allRegroupedTranslations.push(regroupedTranslations);
@@ -474,13 +473,10 @@ export class TranslationReorganizeRepositoryImpl {
               changes: changes || [],
             },
           });
-        } else {
-          output.push(
-            t(
-              "app.api.system.translations.reorganize.post.messages.noKeysInUse",
-            ),
-          );
         }
+        output.push(
+          t("app.api.system.translations.reorganize.post.messages.noKeysInUse"),
+        );
       }
 
       output.push(
@@ -591,7 +587,7 @@ export class TranslationReorganizeRepositoryImpl {
    * @returns The backup directory path
    */
   private createBackup(logger: EndpointLogger): string {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const timestamp = new Date().toISOString().replaceAll(/[:.]/g, "-");
     const backupPath = path.join(BACKUP_DIR, BACKUP_PREFIX + timestamp);
 
     if (!fs.existsSync(BACKUP_DIR)) {
@@ -1159,8 +1155,8 @@ export class TranslationReorganizeRepositoryImpl {
         for (const [oldKey, newKey] of keyMappings) {
           // Match t("oldKey") or t('oldKey')
           const patterns = [
-            new RegExp(`t\\("${oldKey.replace(/\./g, "\\.")}"\\)`, "g"),
-            new RegExp(`t\\('${oldKey.replace(/\./g, "\\.")}'\\)`, "g"),
+            new RegExp(`t\\("${oldKey.replaceAll(".", "\\.")}"\\)`, "g"),
+            new RegExp(`t\\('${oldKey.replaceAll(".", "\\.")}'\\)`, "g"),
           ];
 
           for (const pattern of patterns) {
@@ -1756,7 +1752,7 @@ export class TranslationReorganizeRepositoryImpl {
   private locationToObjectKey(location: string): string {
     return location
       .replace(/^src\//, "")
-      .replace(/\//g, ".")
+      .replaceAll("/", ".")
       .replace(/\[locale\]\.?/, "")
       .replace(/\.i18n.*$/, "");
   }
@@ -1767,9 +1763,7 @@ export class TranslationReorganizeRepositoryImpl {
    * @param logger - Logger instance for debugging
    * @returns Response containing translation statistics
    */
-  async getTranslationStats(
-    logger: EndpointLogger,
-  ): Promise<
+  async getTranslationStats(logger: EndpointLogger): Promise<
     ResponseType<{
       success: boolean;
       stats: {

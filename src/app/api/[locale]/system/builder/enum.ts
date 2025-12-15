@@ -57,7 +57,6 @@ export enum OutputFormatEnum {
 /** Step status */
 export enum StepStatusEnum {
   SUCCESS = "success",
-  CACHED = "cached",
   SKIPPED = "skipped",
   FAILED = "failed",
 }

@@ -15,10 +15,9 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-
 import type { PackageJson, ReleasePackage } from "../definition";
 import { MESSAGES } from "./constants";
-import { isPackageJson } from "./utils";
+import { parsePackageJson, safeJsonParse } from "./utils";
 
 // ============================================================================
 // Interface
@@ -59,10 +58,8 @@ export class PackageService implements IPackageService {
     }
 
     try {
-      const parsedJson: unknown = JSON.parse(
-        readFileSync(packageJsonPath, "utf8"),
-      );
-      if (!isPackageJson(parsedJson)) {
+      const parsedPkg = parsePackageJson(safeJsonParse(readFileSync(packageJsonPath, "utf8")));
+      if (!parsedPkg) {
         logger.error(MESSAGES.PACKAGE_JSON_INVALID, { path: packageJsonPath });
         return fail({
           message: "app.api.system.releaseTool.packageJson.invalidFormat",
@@ -70,7 +67,7 @@ export class PackageService implements IPackageService {
           messageParams: { path: packageJsonPath },
         });
       }
-      return success(parsedJson);
+      return success(parsedPkg);
     } catch (error) {
       logger.error(MESSAGES.PACKAGE_JSON_INVALID, parseError(error));
       return fail({
@@ -88,20 +85,37 @@ export class PackageService implements IPackageService {
     originalCwd: string,
     logger: EndpointLogger,
   ): ResponseType<void> {
-    const packageJsonResponse = this.getPackageJson(cwd, logger);
-    if (!packageJsonResponse.success) {
-      return packageJsonResponse;
+    const packageJsonPath = join(cwd, "package.json");
+
+    if (!existsSync(packageJsonPath)) {
+      logger.error(MESSAGES.PACKAGE_JSON_NOT_FOUND, { path: packageJsonPath });
+      return fail({
+        message: "app.api.system.releaseTool.packageJson.notFound",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+        messageParams: { path: packageJsonPath },
+      });
     }
 
-    const packageJson = packageJsonResponse.data;
-
     try {
-      packageJson.version = newVersion;
+      // Read the raw JSON and preserve all fields, only updating version
+      const rawContent = readFileSync(packageJsonPath, "utf8");
+      const rawParsed = safeJsonParse(rawContent);
 
-      const packageJsonPath = join(cwd, "package.json");
-      writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`);
+      if (typeof rawParsed !== "object" || rawParsed === null || Array.isArray(rawParsed)) {
+        logger.error(MESSAGES.PACKAGE_JSON_INVALID, { path: packageJsonPath });
+        return fail({
+          message: "app.api.system.releaseTool.packageJson.invalidFormat",
+          errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
+          messageParams: { path: packageJsonPath },
+        });
+      }
 
-      logger.info(MESSAGES.VERSION_BUMPED, {
+      // Update only the version field, preserving everything else
+      const updatedPackageJson = { ...rawParsed, version: newVersion };
+
+      writeFileSync(packageJsonPath, `${JSON.stringify(updatedPackageJson, null, 2)}\n`);
+
+      logger.debug(MESSAGES.VERSION_BUMPED, {
         directory: pkg.directory,
         newVersion,
       });
@@ -118,13 +132,13 @@ export class PackageService implements IPackageService {
         );
 
         writeFileSync(configPath, configContent);
-        logger.info(MESSAGES.VERSION_FILE_UPDATED, {
+        logger.debug(MESSAGES.VERSION_FILE_UPDATED, {
           file: "release.config.ts",
           newVersion,
         });
       }
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error(MESSAGES.VERSION_BUMPED, parseError(error));
       return fail({

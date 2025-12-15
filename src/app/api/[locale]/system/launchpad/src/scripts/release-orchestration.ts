@@ -37,7 +37,7 @@ export async function ciReleaseCommand(
     targetToRelease =
       targets.find((t) => t.directory === targetDirectory) || null;
     if (!targetToRelease) {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
       throw new Error(`Target directory not found: ${targetDirectory}`);
     }
   } else {
@@ -47,7 +47,7 @@ export async function ciReleaseCommand(
       getCurrentGitTag() ||
       process.env.GITHUB_REF?.replace("refs/tags/", "");
     if (!tagToUse) {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
       throw new Error(
         "No git tag found. Provide --tag option, set GITHUB_REF environment variable, or use --target option.",
       );
@@ -57,7 +57,7 @@ export async function ciReleaseCommand(
     targetToRelease = await findTargetByGitTag(targets, tagToUse);
 
     if (!targetToRelease) {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
       throw new Error(
         `No release target found for git tag: ${tagToUse}. Available targets: ${targets.map((t) => t.directory).join(", ")}`,
       );
@@ -68,7 +68,7 @@ export async function ciReleaseCommand(
 
   // Validate target
   if (!validateReleaseTarget(rootDir, targetToRelease)) {
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
     throw new Error(`Invalid release target: ${targetToRelease.directory}`);
   }
 
@@ -81,7 +81,7 @@ export async function ciReleaseCommand(
   const { t } = simpleT("en-GLOBAL");
   const success = executor.executeReleaseTarget(targetToRelease, options, t);
   if (!success) {
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
     throw new Error(`Release failed for: ${targetToRelease.directory}`);
   }
 

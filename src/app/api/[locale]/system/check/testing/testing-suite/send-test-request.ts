@@ -3,8 +3,8 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  fail,
   ErrorResponseTypes,
+  fail,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import request from "supertest";
@@ -100,7 +100,24 @@ export async function sendTestRequest<
         messageParams: { endpoint: endpoint.path.join("/") },
       });
     }
-    // TODO parse response schema
+
+    // Validate response against endpoint schema if available
+    if (endpoint.responseSchema && responseData.success) {
+      const parseResult = endpoint.responseSchema.safeParse(responseData.data);
+      if (!parseResult.success) {
+        return fail({
+          message: "app.api.system.check.testing.test.errors.internal.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          messageParams: {
+            endpoint: endpoint.path.join("/"),
+            errors: parseResult.error.issues
+              .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+              .join(", "),
+          },
+        });
+      }
+    }
+
     return responseData;
   } catch (error) {
     return fail({

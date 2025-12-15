@@ -16,11 +16,9 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-
-import type { ReleaseOptions } from "../definition";
+import type { ReleaseOptions, VersionInfo } from "../definition";
 import { MESSAGES } from "./constants";
 import { gitService } from "./git-service";
-import type { VersionInfo } from "./types";
 
 // ============================================================================
 // Interface
@@ -53,12 +51,12 @@ export class ChangelogGenerator implements IChangelogGenerator {
   ): ResponseType<void> {
     const changelogConfig = releaseConfig.changelog;
     if (!changelogConfig?.enabled) {
-      return success(undefined);
+      return success();
     }
 
     if (dryRun) {
       logger.info(MESSAGES.DRY_RUN_MODE, { action: "generate changelog" });
-      return success(undefined);
+      return success();
     }
 
     logger.info(MESSAGES.CHANGELOG_GENERATING);
@@ -123,7 +121,7 @@ export class ChangelogGenerator implements IChangelogGenerator {
 
       // Add compare link if previous tag exists
       if (repo && versionInfo.lastTag !== "v0.0.0") {
-        /* eslint-disable no-template-curly-in-string -- Intentional placeholder strings for user config */
+        /* eslint-disable no-template-curly-in-string -- Intentional URL format templates */
         const compareUrl = changelogConfig.compareUrlFormat
           ?.replace("${baseUrl}", repo.url)
           .replace("${prevTag}", versionInfo.lastTag)
@@ -158,7 +156,7 @@ export class ChangelogGenerator implements IChangelogGenerator {
         content += `### ${sectionName}\n\n`;
 
         for (const item of items) {
-          /* eslint-disable no-template-curly-in-string -- Intentional placeholder strings for user config */
+          /* eslint-disable no-template-curly-in-string -- Intentional URL format templates */
           const commitUrl = changelogConfig.commitUrlFormat
             ?.replace("${baseUrl}", repo?.url ?? "")
             .replace("${hash}", item.hash)
@@ -178,7 +176,7 @@ export class ChangelogGenerator implements IChangelogGenerator {
         if (existingContent.startsWith("# Changelog")) {
           const firstVersionIndex = existingContent.indexOf("## [");
           if (firstVersionIndex > 0) {
-            existingContent = existingContent.substring(firstVersionIndex);
+            existingContent = existingContent.slice(firstVersionIndex);
           }
         }
       }
@@ -187,7 +185,7 @@ export class ChangelogGenerator implements IChangelogGenerator {
       writeFileSync(changelogPath, finalContent);
 
       logger.info(MESSAGES.CHANGELOG_GENERATED, { path: changelogPath });
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error(MESSAGES.CHANGELOG_FAILED, parseError(error));
       return fail({

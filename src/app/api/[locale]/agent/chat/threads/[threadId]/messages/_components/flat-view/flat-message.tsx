@@ -203,7 +203,7 @@ export function FlatMessage({
             })}
           >
             {isUser
-              ? t("app.chat.flatView.idLabel", { id: userId.substring(0, 8) })
+              ? t("app.chat.flatView.idLabel", { id: userId.slice(0, 8) })
               : personaDisplayName}
           </Button>
         </Div>
@@ -297,11 +297,12 @@ export function FlatMessage({
                       content,
                       onBranchMessage,
                     )
-                : async (): Promise<void> => {
+                : (): Promise<void> => {
                     logger.warn(
                       "FlatMessageView",
                       "Branch operation not available - onBranchMessage handler not provided",
                     );
+                    return Promise.resolve();
                   }
             }
             onCancel={messageActions.cancelAction}

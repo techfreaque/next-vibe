@@ -6,8 +6,17 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
+import type { TFunction } from "@/i18n/core/static-types";
+
+import type { BuildConfig } from "../definition";
 import { ROOT_DIR } from "./constants";
-import type { BuildConfig, TranslateFunction, ValidationResult } from "./types";
+
+/** Validation result */
+interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+}
 
 // ============================================================================
 // Interface
@@ -17,7 +26,7 @@ export interface IConfigValidator {
   /**
    * Validate build configuration and return detailed errors/warnings
    */
-  validate(config: BuildConfig, t: TranslateFunction): ValidationResult;
+  validate(config: BuildConfig, t: TFunction): ValidationResult;
 }
 
 // ============================================================================
@@ -25,7 +34,7 @@ export interface IConfigValidator {
 // ============================================================================
 
 export class ConfigValidator implements IConfigValidator {
-  validate(config: BuildConfig, t: TranslateFunction): ValidationResult {
+  validate(config: BuildConfig, t: TFunction): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
 

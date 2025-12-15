@@ -397,7 +397,7 @@ export class SchemaUIHandler {
     } catch (error) {
       if (error instanceof z.ZodError) {
         const issues = error.issues;
-        if (Array.isArray(issues) && issues.length) {
+        if (Array.isArray(issues) && issues.length > 0) {
           const firstIssue = issues[0];
           if (firstIssue && typeof firstIssue.message === "string") {
             return firstIssue.message;

@@ -12,8 +12,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: pressKeyEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executePressKey(
+    handler: ({ data, logger }) =>
+      executePressKey(
         {
           toolName: "press-key",
           args: filterUndefinedArgs({
@@ -21,7 +21,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

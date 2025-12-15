@@ -15,8 +15,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: evaluateScriptEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executeEvaluateScript(
+    handler: ({ data, logger }) =>
+      executeEvaluateScript(
         {
           toolName: "evaluate-script",
           args: filterUndefinedArgs({
@@ -25,7 +25,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

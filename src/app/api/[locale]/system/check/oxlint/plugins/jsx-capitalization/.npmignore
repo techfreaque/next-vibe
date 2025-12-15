@@ -1,5 +1,0 @@
-src/
-tsconfig.json
-*.test.ts
-*.test.tsx
-test.tsx

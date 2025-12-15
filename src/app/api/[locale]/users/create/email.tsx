@@ -40,8 +40,7 @@ function WelcomeEmailContent({
   const tracking = createTrackingContext(
     locale,
     userData.responseLeadId ?? undefined, // leadId if available
-    userData.responseId, // userId
-    undefined, // no campaignId for transactional emails
+    userData.responseId, // no campaignId for transactional emails
   );
 
   return (
@@ -194,7 +193,6 @@ function AdminNotificationEmailContent({
     locale,
     userData.responseLeadId ?? undefined,
     userData.responseId,
-    undefined,
   );
 
   return (

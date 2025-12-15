@@ -24,7 +24,7 @@ interface LeadsEmailsPageProps {
 }
 
 const getStageDisplayName = (stage: string): string => {
-  return stage.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  return stage.replaceAll('_', " ").replaceAll(/\b\w/g, (l) => l.toUpperCase());
 };
 
 export default async function LeadsEmailsPage({

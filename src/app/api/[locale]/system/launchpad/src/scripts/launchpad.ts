@@ -2,8 +2,8 @@
 /// <reference types="node" />
 import { Command } from "commander";
 import inquirer from "inquirer";
-
 import { parseError } from "next-vibe/shared/utils/parse-error";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { defaultLocale } from "@/i18n/core/config";
@@ -128,7 +128,7 @@ program
         ) {
           versionBump = typedValue;
         } else {
-          // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
           throw new Error(
             `Invalid version bump type: ${typedValue}. Must be one of: patch, minor, major, init`,
           );
@@ -185,7 +185,7 @@ program
 function handleError(
   logger: EndpointLogger,
   message: string,
-  // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Package.json parsing requires 'unknown' for flexible config structure
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Package.json parsing requires 'unknown' for flexible config structure
   error: unknown,
 ): never {
   logger.error(message, parseError(error));
@@ -288,7 +288,7 @@ async function runInteractiveMode(logger: EndpointLogger): Promise<void> {
 program.parse();
 
 // If no command was provided, run interactive mode
-if (!process.argv.slice(2).length) {
+if (process.argv.slice(2).length === 0) {
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
   runInteractiveMode(logger).catch((error) => {
     handleError(logger, "An unexpected error occurred:", error);

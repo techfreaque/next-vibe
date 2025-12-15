@@ -170,7 +170,7 @@ export class StdioTransport implements IMCPTransport {
       const parsedError = parseError(error);
       this.logger.error("[MCP Transport] Failed to handle message", {
         error: parsedError.message,
-        line: line.substring(0, 100), // Log first 100 chars
+        line: line.slice(0, 100), // Log first 100 chars
       });
 
       // Send error response if we can parse the ID

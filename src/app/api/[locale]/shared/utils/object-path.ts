@@ -34,7 +34,7 @@ export function setNestedPath<TValue, TObject>(
   }
 
   // Set the final value
-  const lastSegment = path[path.length - 1];
+  const lastSegment = path.at(-1);
   if (lastSegment) {
     current[lastSegment] = value;
   }

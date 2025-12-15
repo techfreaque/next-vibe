@@ -14,6 +14,7 @@ import {
 
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import definitions, {
@@ -22,38 +23,18 @@ import definitions, {
   type FolderUpdateRequestOutput,
   type FolderUpdateResponseOutput,
 } from "./definition";
+import type { IFolderRepository } from "./repository";
 
 const getFolderEndpoint = definitions.GET;
-
-/**
- * Interface for folder repository operations (native version)
- */
-interface IFolderNativeRepository {
-  getFolder(
-    data: { id: string },
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<FolderGetResponseOutput>>;
-
-  updateFolder(
-    data: FolderUpdateRequestOutput & { id: string },
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<FolderUpdateResponseOutput>>;
-
-  deleteFolder(
-    data: { id: string },
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<FolderDeleteResponseOutput>>;
-}
 
 /**
  * Native folder repository implementation
  * Uses HTTP endpoints for React Native platform
  */
-export class FolderNativeRepository implements IFolderNativeRepository {
+export class FolderNativeRepository implements IFolderRepository {
   async getFolder(
+    // oxlint-disable-next-line no-unused-vars
+    user: JwtPayloadType,
     data: { id: string },
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -81,36 +62,40 @@ export class FolderNativeRepository implements IFolderNativeRepository {
     };
   }
 
-  async updateFolder(
+  updateFolder(
+    // oxlint-disable-next-line no-unused-vars
+    user: JwtPayloadType,
     data: FolderUpdateRequestOutput & { id: string },
     logger: EndpointLogger,
-    locale: CountryLanguage,
   ): Promise<ResponseType<FolderUpdateResponseOutput>> {
     logger.error("updateFolder not implemented on native", {
       folderId: data.id,
-      locale,
     });
-    return fail({
-      message: "app.api.agent.chat.folders.id.patch.errors.server.title",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { reason: "Not implemented for React Native" },
-    });
+    return Promise.resolve(
+      fail({
+        message: "app.api.agent.chat.folders.id.patch.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { reason: "Not implemented for React Native" },
+      }),
+    );
   }
 
-  async deleteFolder(
+  deleteFolder(
+    // oxlint-disable-next-line no-unused-vars
+    user: JwtPayloadType,
     data: { id: string },
     logger: EndpointLogger,
-    locale: CountryLanguage,
   ): Promise<ResponseType<FolderDeleteResponseOutput>> {
     logger.error("deleteFolder not implemented on native", {
       folderId: data.id,
-      locale,
     });
-    return fail({
-      message: "app.api.agent.chat.folders.id.delete.errors.server.title",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { reason: "Not implemented for React Native" },
-    });
+    return Promise.resolve(
+      fail({
+        message: "app.api.agent.chat.folders.id.delete.errors.server.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { reason: "Not implemented for React Native" },
+      }),
+    );
   }
 }
 

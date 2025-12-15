@@ -1,8 +1,7 @@
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import React from "react";
 import type { ScrollView as RNScrollView } from "react-native";
-import { Pressable, ScrollView, Text as RNText,View } from "react-native";
+import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
 import type {
@@ -14,19 +13,16 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/carousel";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+  styledNativeRef,
+} from "../utils/style-converter";
 
-// Type-safe ScrollView with className support (NativeWind)
-const StyledScrollView = styled(ScrollView, { className: "style" });
-
-// Type-safe View with className support (NativeWind)
-const StyledView = styled(View, { className: "style" });
-
-// Type-safe Pressable with className support (NativeWind)
-const StyledPressable = styled(Pressable, { className: "style" });
-
-// Type-safe Text with className support (NativeWind)
-const StyledText = styled(RNText, { className: "style" });
+const StyledScrollView = styledNativeRef<typeof ScrollView, RNScrollView>(ScrollView);
+const StyledView = styledNative(View);
+const StyledPressable = styledNative(Pressable);
+const StyledText = styledNative(RNText);
 
 interface CarouselContextProps {
   scrollViewRef: React.RefObject<RNScrollView | null>;
@@ -144,7 +140,7 @@ function CarouselContent(props: CarouselContentProps): React.JSX.Element {
 
 CarouselContent.displayName = "CarouselContent";
 
-export { Carousel, CarouselContent,CarouselItem };
+export { Carousel, CarouselContent, CarouselItem };
 
 function CarouselPrevious({
   className,
@@ -200,4 +196,4 @@ function CarouselNext({
   );
 }
 
-export { CarouselNext,CarouselPrevious };
+export { CarouselNext, CarouselPrevious };

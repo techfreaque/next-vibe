@@ -85,7 +85,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
           ),
           output: installResult.data.output,
         });
-      } else {
+      }
         return success({
           success: false,
           installed: false,
@@ -93,7 +93,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
             "app.api.system.unifiedInterface.cli.setup.update.post.errors.server.description",
           ),
         });
-      }
+      
     } catch (err) {
       const parsedError = parseError(err);
       return fail({

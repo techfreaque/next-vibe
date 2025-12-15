@@ -194,13 +194,12 @@ function handleMessageCreatedEvent(params: {
               updatedAt: new Date(),
               searchVector: null,
             });
-            return;
+            return undefined;
           })
           .catch((error: Error) => {
             logger.error("Failed to save incognito message", {
               error,
             });
-            return;
           });
       }
     } catch (error) {
@@ -433,13 +432,12 @@ export function useAIStream(
                         canDelete: true,
                         canManagePermissions: false,
                       });
-                      return;
+                      return undefined;
                     })
                     .catch((error: Error) => {
                       logger.error("Failed to save incognito thread", {
                         error,
                       });
-                      return;
                     });
                 }
 
@@ -782,7 +780,7 @@ export function useAIStream(
                             if (chatMessage) {
                               saveMessage(chatMessage);
                             }
-                            return Promise.resolve();
+                            return undefined;
                           },
                         );
                       })
@@ -963,13 +961,12 @@ export function useAIStream(
                         threadId: activeThreadId,
                         error: eventData.message,
                       });
-                      return;
+                      return undefined;
                     })
                     .catch((error: Error) => {
                       logger.error("Failed to create error message in chat", {
                         error: parseError(error).message,
                       });
-                      return;
                     });
                 }
 

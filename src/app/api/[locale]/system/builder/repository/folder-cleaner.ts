@@ -6,9 +6,11 @@
 import { existsSync, rmSync } from "node:fs";
 import { resolve } from "node:path";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { TFunction } from "@/i18n/core/static-types";
+
 import { ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
-import type { Logger, TranslateFunction } from "./types";
 
 // ============================================================================
 // Interface
@@ -21,8 +23,8 @@ export interface IFolderCleaner {
   clean(
     folders: string[],
     output: string[],
-    logger: Logger,
-    t: TranslateFunction,
+    logger: EndpointLogger,
+    t: TFunction,
     dryRun?: boolean,
   ): Promise<void>;
 
@@ -40,8 +42,8 @@ export class FolderCleaner implements IFolderCleaner {
   async clean(
     folders: string[],
     output: string[],
-    logger: Logger,
-    t: TranslateFunction,
+    logger: EndpointLogger,
+    t: TFunction,
     dryRun?: boolean,
   ): Promise<void> {
     output.push(

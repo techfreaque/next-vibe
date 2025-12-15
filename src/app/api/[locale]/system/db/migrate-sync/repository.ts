@@ -10,9 +10,9 @@ import { sql } from "drizzle-orm";
 import { migrate as drizzleMigrate } from "drizzle-orm/node-postgres/migrator";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
 import { db } from "@/app/api/[locale]/system/db";

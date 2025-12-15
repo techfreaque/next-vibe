@@ -359,7 +359,6 @@ export const useApiStore = create<ApiStore>((set, get) => ({
       logger,
       requestData,
       urlPathParams,
-      undefined,
     );
 
     // Update React Query cache (single source of truth)

@@ -5,14 +5,14 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 
+import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 // Import types from the endpoint definition
 import type generateTrpcRouterEndpoints from "./definition";
-import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 
 type GenerateTrpcRouterRequestType =
   typeof generateTrpcRouterEndpoints.POST.types.RequestOutput;

@@ -193,7 +193,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
     const debounceMs = 500; // 500ms debounce
 
     const subscription = formMethods.watch((formValues) => {
-      if (Object.keys(formValues).length) {
+      if (Object.keys(formValues).length > 0) {
         // Clear any existing timer
         if (debounceTimer !== null) {
           window.clearTimeout(debounceTimer);

@@ -5,7 +5,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { WidgetType } from "../../../shared/types/enums";
 import {
@@ -31,14 +31,21 @@ export function GroupedListWidget({
     field.type === "array" && groupBy ? { groupBy, sortBy } : undefined;
 
   const data = extractGroupedListData(value, config);
+  const prevGroupCount = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    if (data && data.groups.length > 0) {
+    const currentGroupCount = data?.groups.length ?? 0;
+    // Only update expanded groups when the count actually changes
+    if (
+      prevGroupCount.current !== currentGroupCount &&
+      data &&
+      data.groups.length > 0
+    ) {
+      prevGroupCount.current = currentGroupCount;
       const groupKeys = data.groups.map((g) => g.key).join(",");
       setExpandedGroups(new Set(groupKeys.split(",")));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data?.groups.length]);
+  }, [data]);
 
   if (!data) {
     return <Div className={className}>—</Div>;

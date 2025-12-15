@@ -11,6 +11,7 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import { INTERACTIVE_MODE_ALIAS } from "../../../help/interactive/definition";
 import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CliObject } from "./parsing";
@@ -60,7 +61,7 @@ class CliEntryPoint {
     locale: CountryLanguage,
   ): Promise<RouteExecutionResult> {
     // Default to interactive mode if no command provided
-    const resolvedCommand = !command ? "interactive" : command;
+    const resolvedCommand = command || INTERACTIVE_MODE_ALIAS;
 
     // Get CLI user for authentication if not provided
     let cliUser = options.user;

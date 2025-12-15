@@ -47,7 +47,7 @@ function joinPath(path: readonly string[]): string {
 function sanitizePathSegment(segment: string): string {
   // Remove square brackets to handle dynamic routes like [id]
   // Example: "[id]" becomes "id", "[threadId]" becomes "threadId"
-  return segment.replace(/\[|\]/g, "");
+  return segment.replaceAll(/\[|\]/g, "");
 }
 
 /**

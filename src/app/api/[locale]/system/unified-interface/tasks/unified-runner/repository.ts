@@ -260,7 +260,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
         cronUser: this.cronUser,
       });
       this.markTaskAsCompleted(taskName);
-      return success(undefined);
+      return success();
     } catch (error) {
       const errorObj = parseError(error);
       this.markTaskAsFailed(taskName, errorObj.message);
@@ -338,7 +338,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
 
       this.logger.debug("Task runner startup initiated");
 
-      return success(undefined);
+      return success();
     } catch (error) {
       const errorMsg = parseError(error).message;
 
@@ -438,7 +438,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
       const cronTasks = tasks.filter(
         (task): task is CronTask => task.type === "cron",
       );
-      if (cronTasks.length) {
+      if (cronTasks.length > 0) {
         this.logger.debug("Setting up cron task scheduler", {
           cronTaskCount: cronTasks.length,
           taskNames: cronTasks.map((t) => t.name),
@@ -491,7 +491,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerReposit
       setTimeout(resolve, 10);
     });
 
-    return success(undefined);
+    return success();
   }
 
   getStatus(): {

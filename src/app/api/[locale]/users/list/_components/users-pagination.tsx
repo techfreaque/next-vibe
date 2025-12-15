@@ -50,6 +50,7 @@ export function UsersPagination({
   const { t } = simpleT(locale);
 
   if (!usersEndpoint.read) {
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     return <></>;
   }
 
@@ -76,7 +77,7 @@ export function UsersPagination({
 
   return (
     <Div className={`flex items-center justify-between ${className}`}>
-      <Div className="flex items-center flex flex-row gap-2">
+      <Div className="flex items-center flex-row gap-2">
         <P className="text-sm text-gray-700 dark:text-gray-300">
           {t("app.admin.users.list.pagination.showing", {
             start: startItem,
@@ -86,9 +87,9 @@ export function UsersPagination({
         </P>
       </Div>
 
-      <Div className="flex items-center flex flex-row gap-6">
+      <Div className="items-center flex flex-row gap-6">
         {/* Items per page */}
-        <Div className="flex items-center flex flex-row gap-2">
+        <Div className="items-center flex flex-row gap-2">
           <P className="text-sm text-gray-700 dark:text-gray-300">
             {t("app.admin.users.list.pagination.per_page")}
           </P>
@@ -96,7 +97,7 @@ export function UsersPagination({
             value={currentLimit.toString()}
             onValueChange={handleLimitChange}
           >
-            <SelectTrigger className="w-[70px]">
+            <SelectTrigger className="w-17.5">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -109,7 +110,7 @@ export function UsersPagination({
         </Div>
 
         {/* Page navigation */}
-        <Div className="flex items-center flex flex-row gap-2">
+        <Div className="flex items-center flex-row gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -127,7 +128,7 @@ export function UsersPagination({
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          <Div className="flex items-center flex flex-row gap-1">
+          <Div className="items-center flex flex-row gap-1">
             <Span className="text-sm text-gray-700 dark:text-gray-300">
               {t("app.admin.users.list.pagination.page", {
                 current: currentPage,

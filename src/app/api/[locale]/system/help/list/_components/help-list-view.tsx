@@ -3,17 +3,17 @@
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { H1, P } from "next-vibe-ui/ui/typography";
-import { useMemo, useState } from "react";
 import type { JSX } from "react";
+import { useMemo, useState } from "react";
 
+import { useApiForm } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation-form";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useApiForm } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation-form";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import helpListEndpoints from "../definition";
 import type { HelpListResponseOutput } from "../definition";
+import helpListEndpoints from "../definition";
 
 interface HelpListViewProps {
   locale: CountryLanguage;

@@ -91,12 +91,12 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
       return success({
         success: !newStatus.installed,
         installed: newStatus.installed,
-        message: !newStatus.installed
+        message: newStatus.installed
           ? t(
-              "app.api.system.unifiedInterface.cli.setup.uninstall.post.success.description",
+              "app.api.system.unifiedInterface.cli.setup.uninstall.post.errors.server.description",
             )
           : t(
-              "app.api.system.unifiedInterface.cli.setup.uninstall.post.errors.server.description",
+              "app.api.system.unifiedInterface.cli.setup.uninstall.post.success.description",
             ),
         output: data.verbose ? output : undefined,
       });

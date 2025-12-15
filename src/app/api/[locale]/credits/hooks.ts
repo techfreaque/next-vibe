@@ -201,7 +201,7 @@ export function useCreditPurchase(
 
   // Success callback for credit purchase
   const handlePurchaseSuccess = useCallback(
-    async (data: {
+    (data: {
       requestData: CreditsPurchasePostRequestOutput;
       pathParams: Record<string, never>;
       responseData: CreditsPurchasePostResponseOutput;
@@ -244,7 +244,7 @@ export function useCreditPurchase(
 
   // Error callback for credit purchase
   const handlePurchaseError = useCallback(
-    async (data: {
+    (data: {
       error: ErrorResponseType;
       requestData: CreditsPurchasePostRequestOutput;
       pathParams: Record<string, never>;

@@ -138,12 +138,12 @@ export function useTTSAudio({
 
   // Fetch audio for a specific chunk
   const fetchChunkAudio = useCallback(
-    async (
+    (
       chunkIndex: number,
       chunkText: string,
     ): Promise<HTMLAudioElement | null> => {
       if (!endpoint.create) {
-        return null;
+        return Promise.resolve(null);
       }
 
       logger.debug(
@@ -301,9 +301,9 @@ export function useTTSAudio({
                 logger.info(
                   `TTS: NOT auto-playing chunk ${nextFetchIndex + 1}`,
                   {
-                    reason: !isProcessingRef.current
-                      ? "not processing"
-                      : "playing index mismatch",
+                    reason: isProcessingRef.current
+                      ? "playing index mismatch"
+                      : "not processing",
                     isProcessing: isProcessingRef.current,
                     currentPlayingIndex: currentPlayingIndexRef.current,
                     nextFetchIndex,
@@ -467,7 +467,7 @@ export function useTTSAudio({
     try {
       logger.info("TTS: Starting playAudio", {
         originalTextLength: text.length,
-        originalTextPreview: text.substring(0, 100),
+        originalTextPreview: text.slice(0, 100),
       });
 
       // Text has already been processed by processMessageGroupForTTS
@@ -485,7 +485,7 @@ export function useTTSAudio({
       logger.info("TTS: Text chunked", {
         numChunks: chunks.length,
         chunkLengths: chunks.map((c) => c.length),
-        firstChunkPreview: chunks[0]?.substring(0, 50),
+        firstChunkPreview: chunks[0]?.slice(0, 50),
       });
 
       // Initialize state

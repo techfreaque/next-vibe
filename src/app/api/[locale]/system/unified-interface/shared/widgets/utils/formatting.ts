@@ -63,10 +63,10 @@ export class BaseDataFormatter {
 
     if (truncateMiddle) {
       const halfLength = Math.floor((maxLength - ellipsis.length) / 2);
-      return `${value.substring(0, halfLength)}${ellipsis}${value.substring(value.length - halfLength)}`;
+      return `${value.slice(0, halfLength)}${ellipsis}${value.slice(value.length - halfLength)}`;
     }
 
-    return `${value.substring(0, maxLength - ellipsis.length)}${ellipsis}`;
+    return `${value.slice(0, maxLength - ellipsis.length)}${ellipsis}`;
   }
 
   /**
@@ -337,7 +337,7 @@ export function formatLocation(line?: number, column?: number): string {
  * Used by: container, stats-grid
  */
 export function formatCamelCaseLabel(key: string): string {
-  const spaced = key.replace(/([A-Z])/g, (match) => ` ${match}`);
+  const spaced = key.replaceAll(/([A-Z])/g, (match) => ` ${match}`);
   return spaced.replace(/^./, (str) => str.toUpperCase()).trim();
 }
 

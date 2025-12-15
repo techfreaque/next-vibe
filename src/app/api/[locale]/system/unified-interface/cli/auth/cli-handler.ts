@@ -32,7 +32,7 @@ export class CliAuthHandler extends BaseAuthHandler {
     if (context.request) {
       const authHeader = context.request.headers.get("authorization");
       if (authHeader?.startsWith("Bearer ")) {
-        const token = authHeader.substring(7); // Remove "Bearer " prefix
+        const token = authHeader.slice(7); // Remove "Bearer " prefix
         logger.debug("Found auth token in Authorization header");
         return token;
       }

@@ -21,7 +21,6 @@ type ParsedValue =
   | null
   | ParsedObject
   | readonly ParsedValue[];
-// eslint-disable-next-line typescript-eslint/consistent-type-definitions
 interface ParsedObject {
   [key: string]: ParsedValue;
 }
@@ -95,7 +94,7 @@ export function parseSearchParams(searchParams: URLSearchParams): ParsedObject {
         }
       }
 
-      const lastPart = parts[parts.length - 1];
+      const lastPart = parts.at(-1);
       if (lastPart) {
         current[lastPart] = tryParseValue(value);
       }
@@ -161,7 +160,7 @@ function parseFormData(
         }
       }
 
-      const lastPart = parts[parts.length - 1];
+      const lastPart = parts.at(-1);
       if (lastPart) {
         // Keep File objects as-is, convert strings to appropriate types
         if (

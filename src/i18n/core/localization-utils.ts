@@ -167,7 +167,7 @@ export function formatCurrencyNoDecimals(
   }).format(amount);
 
   // Remove spaces between currency symbol and amount
-  return formatted.replace(/\s/g, "");
+  return formatted.replaceAll(/\s/g, "");
 }
 
 /**

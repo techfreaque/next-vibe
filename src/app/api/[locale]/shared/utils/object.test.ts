@@ -2,7 +2,7 @@
  * Tests for object utilities to verify type preservation
  */
 
-import { describe, expect, test } from "vitest";
+import { describe, expect, test } from "bun:test";
 
 import { objectEntries, objectEntriesNumericEnum } from "./object";
 

@@ -109,7 +109,7 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
 
   // Check if the endpoint expects undefined for request data
   const isUndefinedSchema =
-    endpoint.requestSchema.safeParse(undefined).success &&
+    endpoint.requestSchema.safeParse().success &&
     !endpoint.requestSchema.safeParse({}).success;
 
   // Check if the endpoint expects an empty object for request data (GET endpoints with no params)

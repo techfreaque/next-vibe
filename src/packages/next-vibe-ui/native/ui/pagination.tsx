@@ -1,5 +1,4 @@
 "use client";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import {
   ChevronLeftIcon,
@@ -12,12 +11,12 @@ import { Pressable, Text as RNText, View } from "react-native";
 import { useTranslation } from "@/i18n/core/client";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { buttonVariants } from "./button";
 
-const StyledView = styled(View, { className: "style" });
-const StyledPressable = styled(Pressable, { className: "style" });
-const StyledText = styled(RNText, { className: "style" });
+const StyledView = styledNative(View);
+const StyledPressable = styledNative(Pressable);
+const StyledText = styledNative(RNText);
 
 // Import ALL types from web - ZERO definitions in native
 import type {

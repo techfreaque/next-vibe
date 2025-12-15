@@ -155,21 +155,19 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       const paymentMethodTypes = (data.paymentMethodTypes?.map((type) => {
         // Extract last part of translation key (e.g., "card" from "app.api.payment.enums.paymentMethodType.card")
         const parts = type.split(".");
-        const value = parts[parts.length - 1];
+        const value = parts.at(-1);
         if (!value) {
           return "";
         }
         // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
-        return value.replace(/([A-Z])/g, (match) => `_${match}`).toLowerCase();
+        return value.replaceAll(/([A-Z])/g, (match) => `_${match}`).toLowerCase();
       }) || [
         "card",
       ]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
 
       // Extract mode value from translation key
       const modeParts = data.mode.split(".");
-      const modeValue = modeParts[
-        modeParts.length - 1
-      ] as Stripe.Checkout.SessionCreateParams.Mode;
+      const modeValue = modeParts.at(-1) as Stripe.Checkout.SessionCreateParams.Mode;
 
       const sessionConfig: Stripe.Checkout.SessionCreateParams = {
         customer: stripeCustomerId,
@@ -389,7 +387,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
   ): Promise<ResponseType<{ received: boolean }>> {
     try {
       logger.debug("Processing webhook", {
-        signature: `${signature.substring(0, 20)}...`,
+        signature: `${signature.slice(0, 20)}...`,
         provider,
       });
 

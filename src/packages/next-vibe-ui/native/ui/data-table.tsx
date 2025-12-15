@@ -7,7 +7,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import type { JSX } from "react";
 import * as React from "react";
@@ -20,9 +19,9 @@ import {
 } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
-// Import ALL types from web version (web is source of truth)
 import type { DataTableProps } from "@/packages/next-vibe-ui/web/ui/data-table";
 
+import { styledNative } from "../utils/style-converter";
 import {
   Table,
   TableBody,
@@ -36,7 +35,7 @@ import {
 export type { DataTableProps };
 
 // Styled components for NativeWind support
-const StyledAnimatedView = styled(Animated.View, { className: "style" });
+const StyledAnimatedView = styledNative(Animated.View);
 
 // Helper to wrap flexRender output in Text if it's a string or number
 function wrapInTextIfNeeded(content: React.ReactNode): React.ReactNode {

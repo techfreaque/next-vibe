@@ -64,14 +64,19 @@ export function throwErrorResponse(
 
 /**
  * Create a standardized success response
- * @param data - The response data
+ * @param data - The response data (optional for void responses)
  * @param options - Optional settings for the response
  * @returns A standardized success response
  */
+export function success(): ResponseType<void>;
 export function success<TResponse>(
   data: TResponse,
   options?: { isErrorResponse?: true },
-): ResponseType<TResponse> {
+): ResponseType<TResponse>;
+export function success<TResponse>(
+  data?: TResponse,
+  options?: { isErrorResponse?: true },
+): ResponseType<TResponse | void> {
   return {
     success: true,
     data,

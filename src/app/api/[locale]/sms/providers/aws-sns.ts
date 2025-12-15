@@ -98,9 +98,9 @@ export function getAwsSnsProvider(): SmsProvider {
         const endpoint = `https://${host}/`;
         const dateStamp = new Date()
           .toISOString()
-          .replace(/[:-]|\.\d{3}/g, "")
-          .substring(0, 8);
-        const amzDate = new Date().toISOString().replace(/[:-]|\.\d{3}/g, "");
+          .replaceAll(/[:-]|\.\d{3}/g, "")
+          .slice(0, 8);
+        const amzDate = new Date().toISOString().replaceAll(/[:-]|\.\d{3}/g, "");
 
         // Create the canonical request
         const method = "POST";

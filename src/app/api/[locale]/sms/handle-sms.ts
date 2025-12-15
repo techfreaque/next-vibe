@@ -98,7 +98,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
                 message:
                   options?.enableTruncation &&
                   msg.message.length > maxMessageLength
-                    ? `${msg.message.substring(0, maxMessageLength - 3)}...`
+                    ? `${msg.message.slice(0, maxMessageLength - 3)}...`
                     : msg.message,
                 // Only include 'from' if it exists
                 ...(msg.from && { from: msg.from }),
@@ -143,7 +143,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
               message:
                 options?.enableTruncation &&
                 result.data.message.length > maxMessageLength
-                  ? `${result.data.message.substring(0, maxMessageLength - 3)}...`
+                  ? `${result.data.message.slice(0, maxMessageLength - 3)}...`
                   : result.data.message,
             };
 
@@ -194,7 +194,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
     );
   }
 
-  if (errors.length) {
+  if (errors.length > 0) {
     logger.error("SMS errors", {
       errorCount: errors.length,
       errors: errors.map((e) => e.message),

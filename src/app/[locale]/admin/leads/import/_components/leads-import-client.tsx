@@ -32,7 +32,7 @@ export function LeadsImportClient({
   const importEndpoint = useLeadsImportEndpoint(logger);
   const statusEndpoint = useImportJobsStatusEndpoint(logger);
 
-  const handleImportSubmit = async (): Promise<void> => {
+  const handleImportSubmit = (): void => {
     // After successful import, refetch the status list
     if (importEndpoint.create.response?.success) {
       void statusEndpoint.read.refetch?.();

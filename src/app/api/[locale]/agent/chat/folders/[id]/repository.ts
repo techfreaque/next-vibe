@@ -18,6 +18,7 @@ import { validateNoCircularReference } from "@/app/api/[locale]/agent/chat/valid
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   FolderDeleteResponseOutput,
@@ -37,6 +38,7 @@ export interface IFolderRepository {
     user: JwtPayloadType,
     data: { id: string },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FolderGetResponseOutput>>;
 
   /**
@@ -70,6 +72,8 @@ export class FolderRepository implements IFolderRepository {
     user: JwtPayloadType,
     data: { id: string },
     logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    locale: CountryLanguage,
   ): Promise<ResponseType<FolderGetResponseOutput>> {
     try {
       const [folder] = await db

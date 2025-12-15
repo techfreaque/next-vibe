@@ -6,18 +6,22 @@
 import { existsSync, mkdirSync, statSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import type { OutputOptions, RollupOptions } from "rollup";
 import type { BuildOptions, InlineConfig, PluginOption } from "vite";
 import { build as viteBuild } from "vite";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { TFunction } from "@/i18n/core/static-types";
+
+import type { BuildProfile, FileToCompile } from "../definition";
 import { PROFILE_DEFAULTS, ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
-import type {
-  BuildProfile,
-  FileToCompile,
-  Logger,
-  TranslateFunction,
-} from "./types";
 
 // ============================================================================
 // Interface
@@ -31,12 +35,12 @@ export interface IViteCompiler {
     fileConfig: FileToCompile,
     output: string[],
     filesBuilt: string[],
-    logger: Logger,
-    t: TranslateFunction,
+    logger: EndpointLogger,
+    t: TFunction,
     dryRun?: boolean,
     verbose?: boolean,
     profile?: BuildProfile,
-  ): Promise<string[]>;
+  ): Promise<ResponseType<string[]>>;
 
   /**
    * Build Vite configuration for a file
@@ -59,49 +63,50 @@ export class ViteCompiler implements IViteCompiler {
     fileConfig: FileToCompile,
     output: string[],
     filesBuilt: string[],
-    logger: Logger,
-    t: TranslateFunction,
+    logger: EndpointLogger,
+    t: TFunction,
     dryRun?: boolean,
     verbose?: boolean,
     profile: BuildProfile = "development",
-  ): Promise<string[]> {
-    const inputFilePath = resolve(ROOT_DIR, fileConfig.options.input);
-    const outputDir = resolve(ROOT_DIR, dirname(fileConfig.options.output));
+  ): Promise<ResponseType<string[]>> {
+    const inputFilePath = resolve(ROOT_DIR, fileConfig.input);
+    const outputDir = resolve(ROOT_DIR, dirname(fileConfig.output));
     const compiledFiles: string[] = [];
 
     if (!existsSync(inputFilePath)) {
-      throw new Error(
-        t("app.api.system.builder.errors.inputFileNotFound", {
-          filePath: fileConfig.options.input,
+      return fail({
+        message: t("app.api.system.builder.errors.inputFileNotFound", {
+          filePath: fileConfig.input,
         }),
-      );
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
     }
 
     output.push(
       outputFormatter.formatItem(
-        fileConfig.options.input,
-        `→ ${dirname(fileConfig.options.output)}/ (${fileConfig.options.type})`,
+        fileConfig.input,
+        `→ ${dirname(fileConfig.output)}/ (${fileConfig.type})`,
       ),
     );
     logger.info("Compiling file", {
-      input: fileConfig.options.input,
-      type: fileConfig.options.type,
+      input: fileConfig.input,
+      type: fileConfig.type,
     });
 
     if (dryRun) {
       // Simulate output files for dry run
-      if (fileConfig.options.packageConfig?.isPackage) {
+      if (fileConfig.packageConfig?.isPackage) {
         const outputFileName =
-          basename(fileConfig.options.output).split(".")[0] || "index";
+          basename(fileConfig.output).split(".")[0] || "index";
         compiledFiles.push(
-          `${dirname(fileConfig.options.output)}/${outputFileName}.mjs`,
-          `${dirname(fileConfig.options.output)}/${outputFileName}.cjs`,
+          `${dirname(fileConfig.output)}/${outputFileName}.mjs`,
+          `${dirname(fileConfig.output)}/${outputFileName}.cjs`,
         );
       } else {
-        compiledFiles.push(fileConfig.options.output);
+        compiledFiles.push(fileConfig.output);
       }
       filesBuilt.push(...compiledFiles);
-      return compiledFiles;
+      return success(compiledFiles);
     }
 
     // Ensure output directory exists
@@ -122,15 +127,15 @@ export class ViteCompiler implements IViteCompiler {
     await viteBuild(viteConfig);
 
     // Track built files
-    if (fileConfig.options.packageConfig?.isPackage) {
+    if (fileConfig.packageConfig?.isPackage) {
       const outputFileName =
-        basename(fileConfig.options.output).split(".")[0] || "index";
+        basename(fileConfig.output).split(".")[0] || "index";
       compiledFiles.push(
-        `${dirname(fileConfig.options.output)}/${outputFileName}.mjs`,
-        `${dirname(fileConfig.options.output)}/${outputFileName}.cjs`,
+        `${dirname(fileConfig.output)}/${outputFileName}.mjs`,
+        `${dirname(fileConfig.output)}/${outputFileName}.cjs`,
       );
     } else {
-      compiledFiles.push(fileConfig.options.output);
+      compiledFiles.push(fileConfig.output);
     }
 
     filesBuilt.push(...compiledFiles);
@@ -140,10 +145,10 @@ export class ViteCompiler implements IViteCompiler {
     }
 
     logger.info("File compiled", {
-      input: fileConfig.options.input,
+      input: fileConfig.input,
       output: compiledFiles,
     });
-    return compiledFiles;
+    return success(compiledFiles);
   }
 
   async buildViteConfig(
@@ -154,14 +159,19 @@ export class ViteCompiler implements IViteCompiler {
     profile: BuildProfile = "development",
   ): Promise<InlineConfig> {
     const profileSettings = PROFILE_DEFAULTS[profile];
-    const {
-      plugins: pluginsOverride,
-      build: {
-        rollupOptions: { output: outputOverride, ...rollupOptionsOverride } = {},
-        ...buildOptionsOverride
-      } = {},
-      ...otherOptions
-    } = fileConfig.viteOptions || {};
+    const viteOpts = fileConfig.viteOptions || {};
+
+    // Extract plugins (typed as unknown[] in schema for API compatibility)
+    const pluginsOverride = viteOpts.plugins as PluginOption[] | undefined;
+
+    // Extract build options with proper typing
+    const buildOpts = (viteOpts.build || {}) as BuildOptions & { rollupOptions?: RollupOptions & { output?: OutputOptions } };
+    const { rollupOptions: rollupOpts = {}, ...buildOptionsOverride } = buildOpts;
+    const { output: outputOverride, ...rollupOptionsOverride } = rollupOpts;
+
+    // Collect other vite options (excluding plugins and build which we handled separately)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Destructuring to exclude handled fields
+    const { plugins: _, build: __, ...otherOptions } = viteOpts;
 
     const plugins: PluginOption[] = pluginsOverride || [];
     const buildOptions: BuildOptions = {
@@ -169,7 +179,7 @@ export class ViteCompiler implements IViteCompiler {
       outDir: outputDir,
       minify: profileSettings.minify,
       emptyOutDir: false,
-      cssCodeSplit: !fileConfig.options.inlineCss,
+      cssCodeSplit: !fileConfig.inlineCss,
       cssMinify: profileSettings.minify,
       sourcemap: profileSettings.sourcemap !== false,
       ...buildOptionsOverride,
@@ -179,11 +189,11 @@ export class ViteCompiler implements IViteCompiler {
     const outputOptions: OutputOptions = {};
 
     // Configure plugins based on build type
-    if (fileConfig.options.type === "react-tailwind") {
+    if (fileConfig.type === "react-tailwind") {
       const tailwindcss = (await import("@tailwindcss/vite")).default;
       plugins.push(tailwindcss() as PluginOption);
 
-      if (fileConfig.options.inlineCss !== false) {
+      if (fileConfig.inlineCss !== false) {
         const cssInjectedByJsPlugin = (
           await import("vite-plugin-css-injected-by-js")
         ).default;
@@ -191,14 +201,14 @@ export class ViteCompiler implements IViteCompiler {
       }
     }
 
-    if (fileConfig.options.type.includes("react")) {
+    if (fileConfig.type.includes("react")) {
       outputOptions.globals = { react: "React", "react-dom": "ReactDOM" };
       const react = (await import("@vitejs/plugin-react")).default;
       plugins.push(react());
     }
 
     // Package mode with TypeScript declarations
-    const packageConfig = fileConfig.options.packageConfig;
+    const packageConfig = fileConfig.packageConfig;
     if (packageConfig?.isPackage) {
       const dts = (await import("vite-plugin-dts")).default;
       plugins.push(
@@ -209,7 +219,7 @@ export class ViteCompiler implements IViteCompiler {
       );
 
       const outputFileName =
-        basename(fileConfig.options.output).split(".")[0] || "index";
+        basename(fileConfig.output).split(".")[0] || "index";
 
       buildOptions.lib = {
         entry: inputFilePath,
@@ -222,9 +232,9 @@ export class ViteCompiler implements IViteCompiler {
       // Build externals list
       const modulesToExternalize = [
         ...new Set([
-          ...(fileConfig.options.modulesToExternalize || []),
-          ...(fileConfig.options.type.includes("react") &&
-          !fileConfig.options.bundleReact
+          ...(fileConfig.modulesToExternalize || []),
+          ...(fileConfig.type.includes("react") &&
+          !fileConfig.bundleReact
             ? ["react", "react-dom", "react/jsx-runtime"]
             : []),
         ]),
@@ -234,7 +244,7 @@ export class ViteCompiler implements IViteCompiler {
         modulesToExternalize.includes(id) || id.startsWith("node:");
     } else {
       // IIFE build for browser
-      outputOptions.entryFileNames = basename(fileConfig.options.output);
+      outputOptions.entryFileNames = basename(fileConfig.output);
       outputOptions.assetFileNames = "[name][extname]";
       outputOptions.exports = "none";
       outputOptions.format = "iife";

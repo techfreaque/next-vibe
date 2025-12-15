@@ -3,6 +3,8 @@
  * Compiles executable files using Bun.build
  */
 
+/// <reference types="bun-types" />
+
 import { existsSync, mkdirSync, statSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 
@@ -13,14 +15,12 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { TFunction } from "@/i18n/core/static-types";
+
+import type { BuildProfile, FileToCompile } from "../definition";
 import { PROFILE_DEFAULTS, ROOT_DIR, SIZE_THRESHOLDS } from "./constants";
 import { outputFormatter } from "./output-formatter";
-import type {
-  BuildProfile,
-  FileToCompile,
-  Logger,
-  TranslateFunction,
-} from "./types";
 
 // ============================================================================
 // Default Externals
@@ -60,8 +60,8 @@ export interface IBunCompiler {
     fileConfig: FileToCompile,
     output: string[],
     filesBuilt: string[],
-    logger: Logger,
-    t: TranslateFunction,
+    logger: EndpointLogger,
+    t: TFunction,
     dryRun?: boolean,
     verbose?: boolean,
     profile?: BuildProfile,
@@ -83,8 +83,8 @@ export class BunCompiler implements IBunCompiler {
     fileConfig: FileToCompile,
     output: string[],
     filesBuilt: string[],
-    logger: Logger,
-    t: TranslateFunction,
+    logger: EndpointLogger,
+    t: TFunction,
     dryRun?: boolean,
     verbose?: boolean,
     profile: BuildProfile = "development",
@@ -195,7 +195,7 @@ export class BunCompiler implements IBunCompiler {
 
     if (!result.success) {
       const errorMessages = result.logs
-        .filter((log) => log.level === "error")
+        .filter((log): log is BuildMessage => log.level === "error")
         .map((log) => log.message)
         .join("\n");
       return fail({

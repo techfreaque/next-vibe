@@ -388,7 +388,12 @@ export async function setupAiStream(params: {
       threadId: threadResult.threadId,
     });
 
-    if (!isIncognito) {
+    if (isIncognito) {
+      logger.debug("Generated incognito user message ID", {
+        messageId: userMessageId,
+        operation: data.operation,
+      });
+    } else {
       const authorName = await getUserPublicName(userId, logger);
 
       await createUserMessage({
@@ -401,11 +406,6 @@ export async function setupAiStream(params: {
         userId,
         authorName,
         logger,
-      });
-    } else {
-      logger.debug("Generated incognito user message ID", {
-        messageId: userMessageId,
-        operation: data.operation,
       });
     }
   } else if (data.toolConfirmation) {
@@ -658,20 +658,18 @@ async function buildMessageContext(params: {
           });
         }
         return messages;
-      } else {
-        params.logger.error("Parent message not found in thread", {
-          parentMessageId: params.parentMessageId,
-          threadId: params.threadId,
-        });
-        return params.content.trim()
-          ? [{ role: "user", content: params.content }]
-          : [];
       }
+      params.logger.error("Parent message not found in thread", {
+        parentMessageId: params.parentMessageId,
+        threadId: params.threadId,
+      });
+      return params.content.trim()
+        ? [{ role: "user", content: params.content }]
+        : [];
     } else if (params.content.trim()) {
       return [{ role: "user", content: params.content }];
-    } else {
-      return [];
     }
+    return [];
   } else if (!params.isIncognito && params.userId && params.threadId) {
     // Non-incognito mode: fetch history from database filtered by branch
     const history = await fetchMessageHistory(
@@ -710,17 +708,16 @@ async function buildMessageContext(params: {
       return historyMessages;
     }
     return [...historyMessages, currentMessage];
-  } else {
-    // Fallback: no thread or no history (new conversation)
-    const currentMessage = toAiSdkMessage({
-      role: params.role,
-      content: params.content,
-    });
-    if (!currentMessage) {
-      return [];
-    }
-    return [currentMessage];
   }
+  // Fallback: no thread or no history (new conversation)
+  const currentMessage = toAiSdkMessage({
+    role: params.role,
+    content: params.content,
+  });
+  if (!currentMessage) {
+    return [];
+  }
+  return [currentMessage];
 }
 
 /**

@@ -27,7 +27,7 @@ export type ParsedCliData = Record<string, CliValue | null>;
  * Example: "force-update" -> "forceUpdate"
  */
 function kebabToCamelCase(str: string): string {
-  return str.replace(/-([a-z])/g, (match) => match[1].toUpperCase());
+  return str.replaceAll(/-([a-z])/g, (match) => match[1].toUpperCase());
 }
 
 /**
@@ -153,7 +153,7 @@ export function parseCliArgumentsSimple(args: string[]): {
       const [key, ...valueParts] = sliced.split("=");
       let value: string | number | boolean;
 
-      if (valueParts.length) {
+      if (valueParts.length > 0) {
         // --key=value format
         value = valueParts.join("=");
       } else if (i + 1 < args.length && !args[i + 1].startsWith("-")) {
@@ -175,11 +175,7 @@ export function parseCliArgumentsSimple(args: string[]): {
     } else if (arg.startsWith("-")) {
       // Handle -k value (single dash)
       const key = arg.slice(1);
-      if (
-        i + 1 < args.length &&
-        args[i + 1] &&
-        !args[i + 1].startsWith("-")
-      ) {
+      if (i + 1 < args.length && args[i + 1] && !args[i + 1].startsWith("-")) {
         const value = convertCliValue(args[i + 1]);
         setNestedValue(namedArgs, key, value);
         i++;
@@ -247,7 +243,7 @@ export function parseCliArguments(
         const [key, ...valueParts] = sliced.split("=");
         let value: string | number | boolean;
 
-        if (valueParts.length) {
+        if (valueParts.length > 0) {
           // --key=value format
           value = valueParts.join("=");
         } else if (

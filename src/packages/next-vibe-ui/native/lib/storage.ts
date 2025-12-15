@@ -9,7 +9,7 @@ import type { Storage } from "@/packages/next-vibe-ui/web/lib/storage";
 const logStorageError = (operation: string, error: unknown): void => {
   // __DEV__ is a React Native global variable that exists at runtime
   if (
-    typeof (globalThis as { __DEV__?: boolean }).__DEV__ !== "undefined" &&
+    "__DEV__" in globalThis &&
     (globalThis as { __DEV__?: boolean }).__DEV__
   ) {
     const errorMsg = error instanceof Error ? error.message : String(error);

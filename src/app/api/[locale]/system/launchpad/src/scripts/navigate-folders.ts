@@ -93,7 +93,7 @@ type NavigationItem = {
  * Clears the terminal screen
  */
 function clearScreen(): void {
-  process.stdout.write("\x1Bc");
+  process.stdout.write("\u001Bc");
 }
 
 /**
@@ -394,7 +394,7 @@ export async function navigateFolders(
       "Error navigating folders:",
       error instanceof Error ? error : String(error),
     );
-    // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
     throw error;
   }
 }

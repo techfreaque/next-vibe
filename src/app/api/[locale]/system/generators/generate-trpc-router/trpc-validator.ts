@@ -12,8 +12,8 @@ import path from "node:path";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 /**

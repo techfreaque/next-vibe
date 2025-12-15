@@ -1,5 +1,4 @@
 import * as ContextMenuPrimitive from "@rn-primitives/context-menu";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -23,7 +22,7 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/context-menu";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Check } from "./icons/Check";
 import { ChevronRight } from "./icons/ChevronRight";
 import { Span } from "./span";
@@ -34,9 +33,9 @@ const TEXT_CLASS_ITEM =
   "select-none text-sm text-lg text-popover-foreground group-focus:text-accent-foreground";
 /* eslint-enable i18next/no-literal-string */
 
-const StyledView = styled(View, { className: "style" });
-const StyledText = styled(Text, { className: "style" });
-const StyledPressable = styled(Pressable, { className: "style" });
+const StyledView = styledNative(View);
+const StyledText = styledNative(Text);
+const StyledPressable = styledNative(Pressable);
 
 function ContextMenu({
   children,

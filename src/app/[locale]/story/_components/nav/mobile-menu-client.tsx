@@ -50,10 +50,8 @@ function getBadgeClasses(
       return VARIANT_STYLES.default;
     case "notification":
       return VARIANT_STYLES.notification;
-    case "secondary":
-    case null:
-    case undefined:
     default:
+      // Handles "secondary", null, undefined, and any other cases
       return VARIANT_STYLES.secondary;
   }
 }
@@ -221,69 +219,68 @@ export function MobileMenuClient({
                         )}
                       </Div>
                     );
-                  } else {
-                    // Single navigation item
-                    const isDisabled = item.disabled;
-                    const disabledReason = item.disabledReason;
-                    const isActive = item.isActive;
-                    const badge = item.badge;
-                    const badgeVariant = item.badgeVariant;
-                    const badgePayload = item.badgeTranslationPayload;
+                  }
+                  // Single navigation item
+                  const isDisabled = item.disabled;
+                  const disabledReason = item.disabledReason;
+                  const isActive = item.isActive;
+                  const badge = item.badge;
+                  const badgeVariant = item.badgeVariant;
+                  const badgePayload = item.badgeTranslationPayload;
 
-                    if (isDisabled && disabledReason) {
-                      return (
-                        <Div key={item.title} className="relative">
-                          <Div
-                            className={cn(
-                              "flex text-base font-medium py-2 opacity-50 cursor-not-allowed",
-                              isActive && "text-primary",
-                            )}
-                          >
-                            <Span className="mr-2.5">{item.icon}</Span>
-                            <Span className="flex-1">{t(item.title)}</Span>
-                            {badge && (
-                              <Span
-                                className={cn(
-                                  "ml-2 px-2 py-0.5 text-xs rounded",
-                                  getBadgeClasses(badgeVariant),
-                                )}
-                              >
-                                {t(badge, badgePayload)}
-                              </Span>
-                            )}
-                          </Div>
-                          <Div className="text-xs text-muted-foreground mt-1 pl-7">
-                            {t(disabledReason)}
-                          </Div>
-                        </Div>
-                      );
-                    }
-
+                  if (isDisabled && disabledReason) {
                     return (
-                      <Link
-                        key={item.title}
-                        href={`/${locale}/story${item.href}`}
-                        className={cn(
-                          "flex text-base font-medium hover:text-primary transition-colors py-2",
-                          isActive && "text-primary font-semibold",
-                        )}
-                        onClick={toggleMenu}
-                      >
-                        <Span className="mr-2.5">{item.icon}</Span>
-                        <Span className="flex-1">{t(item.title)}</Span>
-                        {badge && (
-                          <Span
-                            className={cn(
-                              "ml-2 px-2 py-0.5 text-xs rounded",
-                              getBadgeClasses(badgeVariant),
-                            )}
-                          >
-                            {t(badge, badgePayload)}
-                          </Span>
-                        )}
-                      </Link>
+                      <Div key={item.title} className="relative">
+                        <Div
+                          className={cn(
+                            "flex text-base font-medium py-2 opacity-50 cursor-not-allowed",
+                            isActive && "text-primary",
+                          )}
+                        >
+                          <Span className="mr-2.5">{item.icon}</Span>
+                          <Span className="flex-1">{t(item.title)}</Span>
+                          {badge && (
+                            <Span
+                              className={cn(
+                                "ml-2 px-2 py-0.5 text-xs rounded",
+                                getBadgeClasses(badgeVariant),
+                              )}
+                            >
+                              {t(badge, badgePayload)}
+                            </Span>
+                          )}
+                        </Div>
+                        <Div className="text-xs text-muted-foreground mt-1 pl-7">
+                          {t(disabledReason)}
+                        </Div>
+                      </Div>
                     );
                   }
+
+                  return (
+                    <Link
+                      key={item.title}
+                      href={`/${locale}/story${item.href}`}
+                      className={cn(
+                        "flex text-base font-medium hover:text-primary transition-colors py-2",
+                        isActive && "text-primary font-semibold",
+                      )}
+                      onClick={toggleMenu}
+                    >
+                      <Span className="mr-2.5">{item.icon}</Span>
+                      <Span className="flex-1">{t(item.title)}</Span>
+                      {badge && (
+                        <Span
+                          className={cn(
+                            "ml-2 px-2 py-0.5 text-xs rounded",
+                            getBadgeClasses(badgeVariant),
+                          )}
+                        >
+                          {t(badge, badgePayload)}
+                        </Span>
+                      )}
+                    </Link>
+                  );
                 })}
               </Div>
             </Div>

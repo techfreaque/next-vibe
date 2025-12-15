@@ -4,7 +4,7 @@ import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import { Check, ChevronDown,X } from "@/packages/next-vibe-ui/web/ui/icons";
+import { Check, ChevronDown, X } from "@/packages/next-vibe-ui/web/ui/icons";
 
 import type { StyleType } from "../utils/style-type";
 import { Badge } from "./badge";
@@ -57,11 +57,9 @@ export function MultiSelect(props: MultiSelectProps): React.JSX.Element {
     if (isSelected) {
       // Remove from selection
       onChange(value.filter((v) => v !== optionValue));
-    } else {
+    } else if (maxSelections === undefined || value.length < maxSelections) {
       // Add to selection (if not at max)
-      if (maxSelections === undefined || value.length < maxSelections) {
-        onChange([...value, optionValue]);
-      }
+      onChange([...value, optionValue]);
     }
   };
 
@@ -81,7 +79,7 @@ export function MultiSelect(props: MultiSelectProps): React.JSX.Element {
           aria-controls="multi-select-list"
           className={cn(
             "w-full justify-between min-h-10 h-auto",
-            !value.length && "text-muted-foreground",
+            value.length === 0 && "text-muted-foreground",
             className,
           )}
           disabled={disabled}

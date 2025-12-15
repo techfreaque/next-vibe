@@ -148,7 +148,7 @@ export function useEndpoint<
     if (autoPrefillEnabled && read?.response?.success) {
       return read.response.data;
     }
-    return undefined;
+    return;
   }, [autoPrefillEnabled, read?.response]);
 
   // Merge endpoint create options with hook options (hook options take priority)
@@ -249,7 +249,7 @@ export function useEndpoint<
         isDirty: createOperation.form.formState.isDirty,
         error:
           createOperation.submitError &&
-          Object.keys(createOperation.submitError).length
+          Object.keys(createOperation.submitError).length > 0
             ? createOperation.submitError
             : null,
       }

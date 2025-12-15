@@ -12,8 +12,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: takeSnapshotEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executeTakeSnapshot(
+    handler: ({ data, logger }) =>
+      executeTakeSnapshot(
         {
           toolName: "take-snapshot",
           args: filterUndefinedArgs({
@@ -22,7 +22,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

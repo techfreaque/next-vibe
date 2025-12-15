@@ -96,7 +96,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
         platform: platform.isReactNative ? "React Native" : "Web",
       });
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Error setting auth token", parseError(error));
       return fail({
@@ -163,7 +163,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
         platform: platform.isReactNative ? "React Native" : "Web",
       });
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Error removing auth token", parseError(error));
       return fail({

@@ -50,7 +50,7 @@ export function format4chanTimestamp(timestamp: number, t: TFunction): string {
   const date = new Date(timestamp);
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
-  const year = String(date.getFullYear()).substring(
+  const year = String(date.getFullYear()).slice(
     TEXT_FORMAT.YEAR_SUBSTRING_LENGTH,
   );
   const dayName = [
@@ -84,7 +84,7 @@ export function format4chanTimestamp(timestamp: number, t: TFunction): string {
  * @returns Short ID (8 characters)
  */
 export function getShortId(messageId: string): string {
-  return messageId.substring(0, TEXT_FORMAT.SHORT_ID_LENGTH);
+  return messageId.slice(0, TEXT_FORMAT.SHORT_ID_LENGTH);
 }
 
 /**

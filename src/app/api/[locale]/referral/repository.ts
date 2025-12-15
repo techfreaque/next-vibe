@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -74,6 +74,11 @@ export interface ReferralRepository {
     referralCode: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<LinkToLeadPostResponseOutput>>;
+
+  getLatestLeadReferralCode(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ referralCode: string | null }>>;
 
   convertLeadReferralToUser(
     userId: string,
@@ -259,6 +264,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Link referral code to lead (Phase 1: Pre-signup)
    * Called when user clicks referral link or enters code on signup form
+   * Multiple referral codes can be linked to a lead - on signup, the latest is used
    */
   async linkReferralToLead(
     leadId: string,
@@ -269,32 +275,37 @@ export class ReferralRepositoryImpl implements ReferralRepository {
       logger.debug("Linking referral to lead", { leadId, referralCode });
 
       // Validate referral code
-      const codeResult = await this.validateReferralCode(
-        referralCode,
-        logger,
-      );
+      const codeResult = await this.validateReferralCode(referralCode, logger);
       if (!codeResult.success) {
         return codeResult;
       }
 
       const { id: codeId } = codeResult.data;
 
-      // Check if lead already has a referral
+      // Check if this exact referral code is already linked to this lead
       const [existingReferral] = await db
         .select()
         .from(leadReferrals)
-        .where(eq(leadReferrals.leadId, leadId))
+        .where(
+          and(
+            eq(leadReferrals.leadId, leadId),
+            eq(leadReferrals.referralCodeId, codeId)
+          )
+        )
         .limit(1);
 
       if (existingReferral) {
-        // Already linked - idempotent
-        logger.debug("Lead already has referral", { leadId });
+        // Same code already linked - idempotent
+        logger.debug("Same referral code already linked to lead", {
+          leadId,
+          referralCode,
+        });
         return success({
           referralCode,
         });
       }
 
-      // Create lead referral record
+      // Create new lead referral record (allows multiple different codes per lead)
       await db.insert(leadReferrals).values({
         referralCodeId: codeId,
         leadId,
@@ -316,8 +327,47 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   }
 
   /**
+   * Get the latest referral code for a lead
+   * Returns the most recently linked referral code
+   */
+  async getLatestLeadReferralCode(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ referralCode: string | null }>> {
+    try {
+      logger.debug("Getting latest referral code for lead", { leadId });
+
+      // Get the most recent referral linked to this lead
+      const [latestReferral] = await db
+        .select({
+          code: referralCodes.code,
+        })
+        .from(leadReferrals)
+        .innerJoin(
+          referralCodes,
+          eq(leadReferrals.referralCodeId, referralCodes.id)
+        )
+        .where(eq(leadReferrals.leadId, leadId))
+        .orderBy(desc(leadReferrals.createdAt))
+        .limit(1);
+
+      return success({
+        referralCode: latestReferral?.code ?? null,
+      });
+    } catch (error) {
+      logger.error("Failed to get latest referral code", parseError(error));
+      return fail({
+        message: "app.api.referral.errors.serverError.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
+    }
+  }
+
+  /**
    * Convert lead referral to user referral (Phase 2: During signup)
    * Called after user account is created to make referral permanent
+   * Uses the LATEST referral code linked to the lead (most recent by createdAt)
    */
   async convertLeadReferralToUser(
     userId: string,
@@ -337,20 +387,21 @@ export class ReferralRepositoryImpl implements ReferralRepository {
       if (existingUserReferral) {
         // Already converted - idempotent
         logger.debug("User already has referral", { userId });
-        return success(undefined);
+        return success();
       }
 
-      // Get lead referral
+      // Get the LATEST lead referral (most recent by createdAt)
       const [leadReferral] = await db
         .select()
         .from(leadReferrals)
         .where(eq(leadReferrals.leadId, leadId))
+        .orderBy(desc(leadReferrals.createdAt))
         .limit(1);
 
       if (!leadReferral) {
         // No referral for this lead - not an error
         logger.debug("No referral found for lead", { leadId });
-        return success(undefined);
+        return success();
       }
 
       // Get referral code to find referrer
@@ -375,7 +426,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
       // Check for self-referral
       if (referrerUserId === userId) {
         logger.warn("Self-referral detected, skipping", { userId });
-        return success(undefined);
+        return success();
       }
 
       // Create user referral record (permanent)
@@ -397,9 +448,10 @@ export class ReferralRepositoryImpl implements ReferralRepository {
       logger.debug("Lead referral converted to user successfully", {
         userId,
         referrerUserId,
+        referralCode: referralCode.code,
       });
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Failed to convert lead referral", parseError(error));
       return fail({
@@ -532,7 +584,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
 
       if (chain.length === 0) {
         logger.debug("No referral chain found for user", { userId });
-        return success(undefined);
+        return success();
       }
 
       // Calculate commission shares
@@ -559,7 +611,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
         sharesCount: shares.length,
       });
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Failed to apply referral payout", parseError(error));
       return fail({

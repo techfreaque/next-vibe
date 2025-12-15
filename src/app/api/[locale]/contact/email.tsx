@@ -51,8 +51,7 @@ function ContactEmailContent({
   const tracking = createTrackingContext(
     locale,
     leadId, // leadId from contact form submission
-    userId, // userId if user is logged in
-    undefined, // no campaignId for transactional emails
+    userId, // no campaignId for transactional emails
   );
 
   return (

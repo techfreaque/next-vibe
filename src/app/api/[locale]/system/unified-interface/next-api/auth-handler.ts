@@ -40,7 +40,7 @@ export class WebAuthHandler extends BaseAuthHandler {
     if (context.request) {
       const authHeader = context.request.headers.get("authorization");
       if (authHeader?.startsWith("Bearer ")) {
-        const token = authHeader.substring(7); // Remove "Bearer " prefix
+        const token = authHeader.slice(7); // Remove "Bearer " prefix
         logger.debug("Found auth token in Authorization header");
         return token;
       }
@@ -95,7 +95,7 @@ export class WebAuthHandler extends BaseAuthHandler {
       });
 
       logger.debug("Auth token and lead ID stored in cookies");
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Error storing auth token", parseError(error));
       return fail({
@@ -123,7 +123,7 @@ export class WebAuthHandler extends BaseAuthHandler {
       }
 
       logger.debug("Auth token cleared from cookies");
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Error clearing auth token", parseError(error));
       return fail({

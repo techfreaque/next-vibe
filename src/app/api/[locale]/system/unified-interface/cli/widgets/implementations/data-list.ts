@@ -76,6 +76,6 @@ export class DataListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
         parts.push(`${key}: ${value}`);
       }
     }
-    return parts.length ? `  ${parts.join(", ")}` : "";
+    return parts.length > 0 ? `  ${parts.join(", ")}` : "";
   }
 }

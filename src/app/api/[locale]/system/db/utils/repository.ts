@@ -7,9 +7,9 @@ import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -283,7 +283,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
         if (resetResult.success) {
           logger.info(`Database ${operation.toLowerCase()} completed`);
           return success(true);
-        } else {
+        }
           const { t } = simpleT(locale);
           const errorMessage = t(
             "app.api.system.db.utils.errors.reset_operation_failed",
@@ -295,7 +295,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
             messageParams: { error: errorMessage },
             cause: resetResult,
           });
-        }
+        
       } catch (error) {
         logger.error("Failed to reset database:", parseError(error));
         return fail({

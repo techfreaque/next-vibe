@@ -13,7 +13,12 @@ import { useTranslation } from "@/i18n/core/client";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import { executeQuery } from "./query-executor";
 import { buildQueryKey } from "./query-key-builder";
-import { deserializeQueryParams, type FormQueryParams,useApiStore } from "./store";
+import {
+  deserializeQueryParams,
+  type FormQueryParams,
+  queryClient,
+  useApiStore,
+} from "./store";
 import type { ApiQueryReturn } from "./types";
 
 /**
@@ -121,9 +126,12 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
 
       // Use stored params if available and non-empty, otherwise fall back to the prop value
       // Deserialize any JSON-stringified nested objects
-      const hasStoredParams = storedParams && Object.keys(storedParams).length > 0;
+      const hasStoredParams =
+        storedParams && Object.keys(storedParams).length > 0;
       const currentRequestData = hasStoredParams
-        ? deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(storedParams as FormQueryParams)
+        ? deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(
+            storedParams as FormQueryParams,
+          )
         : requestData;
 
       logger.info("useApiQuery: Executing query", {
@@ -235,20 +243,25 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
         return result.data ?? responseData ?? success(undefined as never);
       },
       remove: () => {
-        // React Query v5 doesn't have remove on the query result
-        // We'll implement this using queryClient in the future
-        logger.warn("remove() is not yet implemented with React Query");
+        // Remove the query from React Query cache
+        queryClient.removeQueries({ queryKey });
       },
 
-      // Placeholder for setErrorType (deprecated, kept for compatibility)
-      setErrorType: (_newError: ErrorResponseType | null) => {
-        logger.warn(
-          "setErrorType is deprecated, use React Query's error handling instead",
-        );
-        // This is a no-op now, React Query manages errors
+      setErrorType: (newError: ErrorResponseType | null) => {
+        // Override the current response in React Query cache
+        if (newError) {
+          // Set error response
+          queryClient.setQueryData(
+            queryKey,
+            newError as ResponseType<TEndpoint["types"]["ResponseOutput"]>,
+          );
+        } else {
+          // Clear error by setting to undefined
+          queryClient.setQueryData(queryKey, undefined);
+        }
       },
     };
 
     return result;
-  }, [query, enabled, logger]);
+  }, [query, enabled, queryKey]);
 }

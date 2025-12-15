@@ -15,10 +15,8 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-
-import type { ReleaseHook } from "../definition";
+import type { HookContext, ReleaseHook } from "../definition";
 import { MESSAGES } from "./constants";
-import type { HookContext } from "./types";
 
 // ============================================================================
 // Interface
@@ -49,19 +47,27 @@ export class HookRunner implements IHookRunner {
     dryRun: boolean,
     context: HookContext,
   ): ResponseType<void> {
+    // Skip if no command is defined (hook config exists but is empty)
+    if (!hook.command) {
+      logger.debug("Hook skipped - no command defined");
+      return success();
+    }
+
     const hookCwd = hook.cwd ? join(cwd, hook.cwd) : cwd;
 
     // Replace placeholders in command
+    /* eslint-disable no-template-curly-in-string -- Intentional placeholder syntax for command templates */
     const command = hook.command
-      .replace(/\$\{packageManager\}/g, context.packageManager)
-      .replace(/\$\{PM\}/g, context.packageManager)
-      .replace(/\$\{version\}/g, context.version ?? "")
-      .replace(/\$\{name\}/g, context.packageName ?? "")
-      .replace(/\$\{directory\}/g, context.directory ?? "");
+      .replaceAll('${packageManager}', context.packageManager)
+      .replaceAll('${PM}', context.packageManager)
+      .replaceAll('${version}', context.version ?? "")
+      .replaceAll('${name}', context.packageName ?? "")
+      .replaceAll('${directory}', context.directory ?? "");
+    /* eslint-enable no-template-curly-in-string */
 
     if (dryRun) {
       logger.info(MESSAGES.DRY_RUN_MODE, { action: command });
-      return success(undefined);
+      return success();
     }
 
     logger.info(MESSAGES.HOOK_RUNNING, { command });
@@ -74,12 +80,12 @@ export class HookRunner implements IHookRunner {
         timeout: hook.timeout,
       });
       logger.info(MESSAGES.HOOK_SUCCESS);
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error(MESSAGES.HOOK_FAILED, parseError(error));
       if (hook.continueOnError) {
         logger.warn("Hook failed but continuing due to continueOnError");
-        return success(undefined);
+        return success();
       }
       return fail({
         message: "app.api.system.releaseTool.hooks.failed",

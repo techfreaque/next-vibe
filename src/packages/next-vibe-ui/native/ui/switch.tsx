@@ -1,5 +1,4 @@
 import * as SwitchPrimitives from "@rn-primitives/switch";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import Animated, {
@@ -12,7 +11,7 @@ import Animated, {
 import type { SwitchRootProps } from "@/packages/next-vibe-ui/web/ui/switch";
 
 import { useColorScheme } from "../lib/useColorScheme";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
 // Re-export all types from web
 export type { SwitchRootProps };
@@ -22,9 +21,9 @@ const THUMB_CLASSNAME =
   "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0";
 /* eslint-enable i18next/no-literal-string */
 
-const StyledAnimatedView = styled(Animated.View, { className: "style" });
-const StyledSwitchRoot = styled(SwitchPrimitives.Root, { className: "style" });
-const StyledSwitchThumb = styled(SwitchPrimitives.Thumb, { className: "style" });
+const StyledAnimatedView = styledNative(Animated.View);
+const StyledSwitchRoot = styledNative(SwitchPrimitives.Root);
+const StyledSwitchThumb = styledNative(SwitchPrimitives.Thumb);
 
 // eslint-disable-next-line i18n/no-literal-string
 const RGB_COLORS = {

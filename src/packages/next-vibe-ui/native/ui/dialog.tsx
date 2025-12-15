@@ -1,5 +1,4 @@
 import * as DialogPrimitive from "@rn-primitives/dialog";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
@@ -19,12 +18,12 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/dialog";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { X } from "./icons/X";
 
-const StyledView = styled(View, { className: "style" });
-const StyledText = styled(Text, { className: "style" });
-const StyledPressable = styled(Pressable, { className: "style" });
+const StyledView = styledNative(View);
+const StyledText = styledNative(Text);
+const StyledPressable = styledNative(Pressable);
 
 // CSS className for close button
 const CLOSE_BUTTON_CLASSNAME =

@@ -12,8 +12,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: emulateEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executeEmulate(
+    handler: ({ data, logger }) =>
+      executeEmulate(
         {
           toolName: "emulate",
           args: filterUndefinedArgs({
@@ -22,7 +22,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

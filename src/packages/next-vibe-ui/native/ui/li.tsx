@@ -1,15 +1,14 @@
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
-import { type AccessibilityRole,Pressable, View } from "react-native";
+import { type AccessibilityRole, Pressable, View } from "react-native";
 
-import type { LiMouseEvent,LiProps } from "@/packages/next-vibe-ui/web/ui/li";
+import type { LiMouseEvent, LiProps } from "@/packages/next-vibe-ui/web/ui/li";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
-const StyledPressable = styled(Pressable, { className: "style" });
-const StyledView = styled(View, { className: "style" });
+const StyledPressable = styledNative(Pressable);
+const StyledView = styledNative(View);
 
 function Li({
   className,
@@ -69,11 +68,34 @@ function Li({
 
   // Valid React Native accessibility roles
   const validRoles: AccessibilityRole[] = [
-    'none', 'button', 'link', 'search', 'image', 'keyboardkey', 'text',
-    'adjustable', 'imagebutton', 'header', 'summary', 'alert', 'checkbox',
-    'combobox', 'menu', 'menubar', 'menuitem', 'progressbar', 'radio',
-    'radiogroup', 'scrollbar', 'spinbutton', 'switch', 'tab', 'tablist',
-    'timer', 'toolbar', 'list',
+    "none",
+    "button",
+    "link",
+    "search",
+    "image",
+    "keyboardkey",
+    "text",
+    "adjustable",
+    "imagebutton",
+    "header",
+    "summary",
+    "alert",
+    "checkbox",
+    "combobox",
+    "menu",
+    "menubar",
+    "menuitem",
+    "progressbar",
+    "radio",
+    "radiogroup",
+    "scrollbar",
+    "spinbutton",
+    "switch",
+    "tab",
+    "tablist",
+    "timer",
+    "toolbar",
+    "list",
   ];
 
   const accessibilityRole: AccessibilityRole | undefined =
@@ -91,7 +113,9 @@ function Li({
         onPressOut={handlePressOut}
         accessibilityRole={accessibilityRole}
         accessibilityLabel={ariaLabel}
-        accessibilityValue={value !== undefined ? { text: String(value) } : undefined}
+        accessibilityValue={
+          value === undefined ? undefined : { text: String(value) }
+        }
         nativeID={id}
       >
         {children}
@@ -104,7 +128,9 @@ function Li({
       {...applyStyleType({ nativeStyle, className: cn(className) })}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={ariaLabel}
-      accessibilityValue={value !== undefined ? { text: String(value) } : undefined}
+      accessibilityValue={
+        value === undefined ? undefined : { text: String(value) }
+      }
       nativeID={id}
     >
       {children}

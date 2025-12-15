@@ -14,8 +14,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: resizePageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executeResizePage<ResizePageResponseOutput>(
+    handler: ({ data, logger }) =>
+      executeResizePage<ResizePageResponseOutput>(
         {
           toolName: "resize-page",
           args: filterUndefinedArgs({
@@ -24,7 +24,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

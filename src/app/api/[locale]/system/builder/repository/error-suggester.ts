@@ -3,7 +3,7 @@
  * Provides actionable suggestions based on error messages
  */
 
-import type { TranslateFunction } from "./types";
+import type { TFunction } from "@/i18n/core/static-types";
 
 // ============================================================================
 // Interface
@@ -13,7 +13,7 @@ export interface IErrorSuggester {
   /**
    * Get actionable suggestions based on an error message
    */
-  getSuggestions(errorMessage: string, t: TranslateFunction): string[];
+  getSuggestions(errorMessage: string, t: TFunction): string[];
 }
 
 // ============================================================================
@@ -21,7 +21,7 @@ export interface IErrorSuggester {
 // ============================================================================
 
 export class ErrorSuggester implements IErrorSuggester {
-  getSuggestions(errorMessage: string, t: TranslateFunction): string[] {
+  getSuggestions(errorMessage: string, t: TFunction): string[] {
     const suggestions: string[] = [];
     const lowerError = errorMessage.toLowerCase();
 

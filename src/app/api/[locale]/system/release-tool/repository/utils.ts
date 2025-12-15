@@ -4,39 +4,83 @@
  */
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-
-import type { PackageJson, ReleaseConfig, RetryConfig } from "../definition";
-import type { ParsedVersion } from "./types";
+import type { PackageJson, ParsedVersion, ReleaseConfig, RetryConfig } from "../definition";
 import { MESSAGES, RETRY_DEFAULTS } from "./constants";
+
+// ============================================================================
+// Type Definitions for Type Guards
+// ============================================================================
+
+/**
+ * Parsed JSON value type (result of JSON.parse)
+ */
+type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
+interface JsonObject { [key: string]: JsonValue }
+type JsonArray = JsonValue[];
+
+/**
+ * Error type from catch blocks - can be any value
+ */
+type CatchError = Error | { stdout?: string | Buffer; stderr?: string | Buffer; status?: number; message?: string };
+
+/**
+ * Exec sync error type with stdout/stderr
+ */
+interface ExecSyncError { stdout?: string | Buffer; stderr?: string | Buffer; status?: number }
 
 // ============================================================================
 // Type Guards
 // ============================================================================
 
 /**
- * Type guard for PackageJson objects
+ * Check if a parsed JSON value is a valid PackageJson
+ * Returns the value typed as PackageJson if valid, otherwise undefined
  */
-export function isPackageJson(value: unknown): value is PackageJson {
-  if (typeof value !== "object" || value === null) {
-    return false;
+export function parsePackageJson(value: JsonValue | undefined): PackageJson | undefined {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return undefined;
   }
-  const obj = value as Record<string, unknown>;
-  return typeof obj.name === "string" && typeof obj.version === "string";
+  const obj = value as JsonObject;
+  if (typeof obj.name === "string" && typeof obj.version === "string") {
+    // Build a properly typed PackageJson object
+    return {
+      name: obj.name,
+      version: obj.version,
+      scripts: obj.scripts as PackageJson["scripts"],
+      dependencies: obj.dependencies as PackageJson["dependencies"],
+      devDependencies: obj.devDependencies as PackageJson["devDependencies"],
+      peerDependencies: obj.peerDependencies as PackageJson["peerDependencies"],
+      optionalDependencies: obj.optionalDependencies as PackageJson["optionalDependencies"],
+      updateIgnoreDependencies: obj.updateIgnoreDependencies as PackageJson["updateIgnoreDependencies"],
+    };
+  }
+  return undefined;
+}
+
+/**
+ * Safe JSON parse that returns JsonValue type
+ */
+export function safeJsonParse(text: string): JsonValue | undefined {
+  try {
+    return JSON.parse(text) as JsonValue;
+  } catch {
+    return undefined;
+  }
 }
 
 /**
  * Type guard for ReleaseConfig modules
  */
 export function isReleaseConfigModule(
-  module: unknown,
+  module: { default?: ReleaseConfig } | null | undefined,
 ): module is { default: ReleaseConfig } {
   if (typeof module !== "object" || module === null) {
     return false;
   }
-  if (!("default" in module)) {
+  if (!("default" in module) || module.default === undefined) {
     return false;
   }
-  const defaultExport = module.default as ReleaseConfig | null;
+  const defaultExport = module.default;
   if (typeof defaultExport !== "object" || defaultExport === null) {
     return false;
   }
@@ -47,17 +91,35 @@ export function isReleaseConfigModule(
 }
 
 /**
+ * Convert catch error to typed error
+ * Accepts any value from catch block and converts to CatchError
+ */
+export function toCatchError(err: Error | ExecSyncError | string | null | undefined): CatchError {
+  if (err instanceof Error) {
+    return err;
+  }
+  if (typeof err === "string") {
+    return new Error(err);
+  }
+  if (typeof err === "object" && err !== null) {
+    return err as CatchError;
+  }
+  return new Error(String(err));
+}
+
+/**
  * Type guard for errors with stdout
  */
 export function hasStdout(
-  error: unknown,
-): error is { stdout: string | Buffer } {
+  error: CatchError,
+): error is CatchError & { stdout: string | Buffer } {
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
   return (
-    typeof error === "object" &&
-    error !== null &&
     "stdout" in error &&
-    (typeof (error as { stdout: unknown }).stdout === "string" ||
-      Buffer.isBuffer((error as { stdout: unknown }).stdout))
+    error.stdout !== undefined &&
+    (typeof error.stdout === "string" || Buffer.isBuffer(error.stdout))
   );
 }
 
@@ -65,33 +127,32 @@ export function hasStdout(
  * Type guard for errors with stderr
  */
 export function hasStderr(
-  error: unknown,
-): error is { stderr: string | Buffer } {
+  error: CatchError,
+): error is CatchError & { stderr: string | Buffer } {
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
   return (
-    typeof error === "object" &&
-    error !== null &&
     "stderr" in error &&
-    (typeof (error as { stderr: unknown }).stderr === "string" ||
-      Buffer.isBuffer((error as { stderr: unknown }).stderr))
+    error.stderr !== undefined &&
+    (typeof error.stderr === "string" || Buffer.isBuffer(error.stderr))
   );
 }
 
 /**
  * Type guard for errors with exit code
  */
-export function hasExitCode(error: unknown): error is { status: number } {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "status" in error &&
-    typeof (error as { status: unknown }).status === "number"
-  );
+export function hasExitCode(error: CatchError): error is CatchError & { status: number } {
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
+  return "status" in error && typeof error.status === "number";
 }
 
 /**
  * Check if a value is a non-empty string
  */
-export function isNonEmptyString(value: unknown): value is string {
+export function isNonEmptyString(value: string | undefined | null): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
@@ -106,6 +167,13 @@ export function isValidSemver(value: string): boolean {
 // ============================================================================
 // Retry Logic
 // ============================================================================
+
+/**
+ * Result type for retry operations
+ */
+export type RetryResult<T> =
+  | { success: true; data: T }
+  | { success: false; message: string };
 
 /**
  * Handler for retrying failed operations with exponential backoff
@@ -126,17 +194,19 @@ export class RetryHandler {
 
   /**
    * Execute an operation with retry logic
+   * Returns a result type instead of throwing
    */
   async withRetry<T>(
     operation: () => Promise<T>,
     logger: EndpointLogger,
     operationName: string,
-  ): Promise<T> {
+  ): Promise<RetryResult<T>> {
     let lastError: Error | undefined;
 
     for (let attempt = 1; attempt <= this.maxAttempts; attempt++) {
       try {
-        return await operation();
+        const data = await operation();
+        return { success: true, data };
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 
@@ -159,10 +229,11 @@ export class RetryHandler {
       attempts: this.maxAttempts,
       lastError: lastError?.message,
     });
-    throw (
-      lastError ??
-      new Error(`${operationName} failed after ${this.maxAttempts} attempts`)
-    );
+
+    return {
+      success: false,
+      message: lastError?.message ?? `${operationName} failed after ${this.maxAttempts} attempts`,
+    };
   }
 
   /**
@@ -238,14 +309,14 @@ export function createStopwatch(): {
  * Escape shell special characters in a string
  */
 export function sanitizeForShell(value: string): string {
-  return value.replace(/[`$\\!"']/g, "\\$&");
+  return value.replaceAll(/[`$\\!"']/g, "\\$&");
 }
 
 /**
  * Escape double quotes in a string for shell commands
  */
 export function escapeDoubleQuotes(value: string): string {
-  return value.replace(/"/g, '\\"');
+  return value.replaceAll('"', '\\"');
 }
 
 /**
@@ -263,8 +334,8 @@ export function truncate(str: string, maxLength: number): string {
  */
 export function toKebabCase(str: string): string {
   return str
-    .replace(/([a-z])([A-Z])/g, "$1-$2")
-    .replace(/[\s_]+/g, "-")
+    .replaceAll(/([a-z])([A-Z])/g, "$1-$2")
+    .replaceAll(/[\s_]+/g, "-")
     .toLowerCase();
 }
 
@@ -381,6 +452,7 @@ export function unique<T>(array: T[]): T[] {
 
 /**
  * Execute async operations with a concurrency limit
+ * Uses Promise.allSettled for cleaner implementation without type casts
  */
 export async function asyncPool<T, R>(
   items: T[],
@@ -388,34 +460,19 @@ export async function asyncPool<T, R>(
   fn: (item: T) => Promise<R>,
 ): Promise<R[]> {
   const results: R[] = [];
-  const executing: Promise<R>[] = [];
 
-  for (const item of items) {
-    const promise = fn(item).then((result) => {
-      results.push(result);
-      return result;
-    });
+  // Process items in batches of concurrency size
+  for (let i = 0; i < items.length; i += concurrency) {
+    const batch = items.slice(i, i + concurrency);
+    const batchResults = await Promise.allSettled(batch.map(fn));
 
-    executing.push(promise);
-
-    if (executing.length >= concurrency) {
-      await Promise.race(executing);
-      // Remove completed promises
-      for (let i = executing.length - 1; i >= 0; i--) {
-        const p = executing[i];
-        if (p !== undefined) {
-          void Promise.race([p, Promise.resolve("pending" as unknown as R)]).then((v) => {
-            if (v !== ("pending" as unknown as R)) {
-              executing.splice(i, 1);
-            }
-            return v;
-          });
-        }
+    for (const result of batchResults) {
+      if (result.status === "fulfilled") {
+        results.push(result.value);
       }
     }
   }
 
-  await Promise.all(executing);
   return results;
 }
 
@@ -433,7 +490,7 @@ export function deepClone<T>(obj: T): T {
 /**
  * Pick specific keys from an object
  */
-export function pick<T extends object, K extends keyof T>(
+export function pick<T extends Record<string, JsonValue>, K extends keyof T>(
   obj: T,
   keys: K[],
 ): Pick<T, K> {
@@ -449,7 +506,7 @@ export function pick<T extends object, K extends keyof T>(
 /**
  * Omit specific keys from an object
  */
-export function omit<T extends object, K extends keyof T>(
+export function omit<T extends Record<string, JsonValue>, K extends keyof T>(
   obj: T,
   keys: K[],
 ): Omit<T, K> {
@@ -465,6 +522,13 @@ export function omit<T extends object, K extends keyof T>(
 // ============================================================================
 
 /**
+ * Result type for environment variable retrieval
+ */
+export type EnvResult =
+  | { success: true; value: string }
+  | { success: false; message: string };
+
+/**
  * Get an environment variable with a default value
  */
 export function getEnv(key: string, defaultValue?: string): string | undefined {
@@ -472,14 +536,18 @@ export function getEnv(key: string, defaultValue?: string): string | undefined {
 }
 
 /**
- * Get a required environment variable (throws if not set)
+ * Get a required environment variable
+ * Returns a result type instead of throwing
  */
-export function requireEnv(key: string): string {
+export function requireEnv(key: string): EnvResult {
   const value = process.env[key];
   if (value === undefined || value === "") {
-    throw new Error(`Required environment variable ${key} is not set`);
+    return {
+      success: false,
+      message: `Required environment variable ${key} is not set`,
+    };
   }
-  return value;
+  return { success: true, value };
 }
 
 /**
@@ -504,7 +572,7 @@ export function isDevelopment(): boolean {
  * Normalize path separators to forward slashes
  */
 export function normalizePath(path: string): string {
-  return path.replace(/\\/g, "/");
+  return path.replaceAll('\\', "/");
 }
 
 /**
@@ -535,7 +603,7 @@ export function getISODate(): string {
 export function getFileTimestamp(): string {
   return new Date()
     .toISOString()
-    .replace(/[:.T]/g, "-")
+    .replaceAll(/[:.T]/g, "-")
     .split("-")
     .slice(0, 6)
     .join("-");

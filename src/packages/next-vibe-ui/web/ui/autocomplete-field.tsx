@@ -269,7 +269,7 @@ export function AutocompleteField({
 
               {allowCustom &&
                 searchValue &&
-                !Object.keys(filteredGroups).length && (
+                Object.keys(filteredGroups).length === 0 && (
                   <CommandGroup>
                     <CommandItem
                       onSelect={() => handleCustomValue(searchValue)}

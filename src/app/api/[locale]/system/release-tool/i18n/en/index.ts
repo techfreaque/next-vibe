@@ -92,7 +92,7 @@ export const translations = {
     },
     commitMessage: {
       title: "Commit Message",
-      // eslint-disable-next-line no-template-curly-in-string -- Intentional placeholder documentation
+      // eslint-disable-next-line no-template-curly-in-string -- Intentional template placeholder documentation
       description: "Custom commit message for version bump (supports ${version} placeholder)",
     },
     notifyWebhook: {
@@ -101,18 +101,31 @@ export const translations = {
     },
   },
   response: {
+    status: "Status",
     success: "Release Status",
-    output: "Release Output",
-    duration: "Duration (ms)",
+    output: "Release Log",
+    duration: "Duration",
+    packages: "Packages",
     packagesProcessed: "Packages Processed",
     ciEnvironment: "CI Environment",
     errors: "Errors",
     warnings: "Warnings",
     gitInfo: "Git Information",
+    published: "Published Packages",
     publishedPackages: "Published Packages",
-    timings: "Timing Breakdown",
+    timings: "Performance",
     rollbackPerformed: "Rollback Performed",
-    notificationsSent: "Notifications Sent",
+    notificationsSent: "Notifications",
+  },
+  table: {
+    name: "Package",
+    directory: "Directory",
+    version: "Version",
+    tag: "Tag",
+    status: "Status",
+    message: "Message",
+    registry: "Registry",
+    url: "URL",
   },
   errors: {
     validation: {

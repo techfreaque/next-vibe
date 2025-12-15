@@ -98,7 +98,7 @@ export function PhoneField({
 
   const handleNumberChange = (newNumber: string): void => {
     // Remove any non-digit characters except spaces and dashes
-    const cleanNumber = newNumber.replace(/[^\d\s-]/g, "");
+    const cleanNumber = newNumber.replaceAll(/[^\d\s-]/g, "");
     const newValue = cleanNumber
       ? `${currentCountry.prefix} ${cleanNumber}`
       : "";

@@ -87,7 +87,7 @@ export const voteRepository = {
       }
 
       // Check voting permissions - simplified
-      if (!canVoteMessage(userId, null, message)) {
+      if (!canVoteMessage(userId, message)) {
         return fail({
           message:
             "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.title",

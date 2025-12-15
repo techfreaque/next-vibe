@@ -1,5 +1,4 @@
 import * as AccordionPrimitive from "@rn-primitives/accordion";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Pressable } from "react-native";
@@ -23,12 +22,12 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/accordion";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { ChevronDown } from "./icons/ChevronDown";
 import { Text, TextClassContext } from "./text";
 
-const StyledAnimatedView = styled(Animated.View, { className: "style" });
-const StyledPressable = styled(Pressable, { className: "style" });
+const StyledAnimatedView = styledNative(Animated.View);
+const StyledPressable = styledNative(Pressable);
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
 const TEXT_CLASS_TRIGGER = "text-lg font-medium group-hover:underline";

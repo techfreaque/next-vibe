@@ -8,33 +8,33 @@
  */
 export const colors = {
   // Reset
-  reset: "\x1b[0m",
+  reset: "\u001B[0m",
   
   // Text colors
-  black: "\x1b[30m",
-  red: "\x1b[31m",
-  green: "\x1b[32m",
-  yellow: "\x1b[33m",
-  blue: "\x1b[34m",
-  magenta: "\x1b[35m",
-  cyan: "\x1b[36m",
-  white: "\x1b[37m",
-  gray: "\x1b[90m",
+  black: "\u001B[30m",
+  red: "\u001B[31m",
+  green: "\u001B[32m",
+  yellow: "\u001B[33m",
+  blue: "\u001B[34m",
+  magenta: "\u001B[35m",
+  cyan: "\u001B[36m",
+  white: "\u001B[37m",
+  gray: "\u001B[90m",
   
   // Bright colors
-  brightRed: "\x1b[91m",
-  brightGreen: "\x1b[92m",
-  brightYellow: "\x1b[93m",
-  brightBlue: "\x1b[94m",
-  brightMagenta: "\x1b[95m",
-  brightCyan: "\x1b[96m",
-  brightWhite: "\x1b[97m",
+  brightRed: "\u001B[91m",
+  brightGreen: "\u001B[92m",
+  brightYellow: "\u001B[93m",
+  brightBlue: "\u001B[94m",
+  brightMagenta: "\u001B[95m",
+  brightCyan: "\u001B[96m",
+  brightWhite: "\u001B[97m",
   
   // Text styles
-  bold: "\x1b[1m",
-  dim: "\x1b[2m",
-  italic: "\x1b[3m",
-  underline: "\x1b[4m",
+  bold: "\u001B[1m",
+  dim: "\u001B[2m",
+  italic: "\u001B[3m",
+  underline: "\u001B[4m",
 } as const;
 
 /**

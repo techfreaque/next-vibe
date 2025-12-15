@@ -53,9 +53,7 @@ export class CliNowpaymentsRepositoryImpl implements CliNowpaymentsRepository {
     }
   }
 
-  private async checkNgrokInstallation(): Promise<
-    ResponseType<ResponseSchema>
-  > {
+  private checkNgrokInstallation(): Promise<ResponseType<ResponseSchema>> {
     return new Promise((resolve) => {
       const ngrok = spawn("ngrok", ["version"]);
       let output = "";
@@ -98,9 +96,7 @@ export class CliNowpaymentsRepositoryImpl implements CliNowpaymentsRepository {
     });
   }
 
-  private async getInstallInstructions(): Promise<
-    ResponseType<ResponseSchema>
-  > {
+  private getInstallInstructions(): ResponseType<ResponseSchema> {
     return success({
       success: true,
       instructions: `To install ngrok:
@@ -212,12 +208,11 @@ Or use package managers:
           status: "Tunnel is running",
           tunnelUrl: tunnel.public_url,
         });
-      } else {
-        return success({
-          success: false,
-          status: "No tunnel found",
-        });
       }
+      return success({
+        success: false,
+        status: "No tunnel found",
+      });
     } catch {
       return success({
         success: false,

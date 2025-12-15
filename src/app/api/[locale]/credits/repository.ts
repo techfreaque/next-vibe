@@ -68,7 +68,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
-import { ProductIds,productsRepository } from "../products/repository-client";
+import { ProductIds, productsRepository } from "../products/repository-client";
 import { withTransaction } from "../system/db/utils/repository-helpers";
 import {
   creditPacks,
@@ -219,10 +219,6 @@ export interface CreditRepositoryInterface {
     leadIds: string[],
     logger: EndpointLogger,
   ): Promise<ResponseType<void>>;
-
-  cleanupOrphanedLeadWallets(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<number>>;
 
   hasSufficientCredits(
     identifier: CreditIdentifier,
@@ -1286,7 +1282,7 @@ class CreditRepository implements CreditRepositoryInterface {
         expiresAt,
       });
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Failed to add credits", parseError(error), {
         ...identifier,
@@ -1375,7 +1371,7 @@ class CreditRepository implements CreditRepositoryInterface {
         metadata: purchaseMetadata,
       });
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Failed to add user credits", parseError(error), {
         userId,
@@ -1745,7 +1741,7 @@ class CreditRepository implements CreditRepositoryInterface {
         walletCount: walletsForDeduction.length,
       });
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Failed to deduct credits", parseError(error), {
         ...identifier,
@@ -2416,7 +2412,7 @@ class CreditRepository implements CreditRepositoryInterface {
         leadWalletIds: poolResult.data.leadWallets.map((w) => w.id),
       });
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error(
         "Failed to link lead wallets during signup",
@@ -2431,18 +2427,6 @@ class CreditRepository implements CreditRepositoryInterface {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  }
-
-  /**
-   * Pool-based architecture: No orphaned wallets exist
-   * All wallets remain active in their pools
-   * Credits are automatically redistributed during signup/login
-   */
-  async cleanupOrphanedLeadWallets(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<number>> {
-    logger.info("Pool-based credits: No orphaned wallets to clean up");
-    return success(0);
   }
 
   /**
@@ -2517,7 +2501,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Moved from BaseCreditHandler to enforce repository-first architecture
    */
   generateMessageId(): string {
-    return `msg_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 15)}`;
   }
 }
 

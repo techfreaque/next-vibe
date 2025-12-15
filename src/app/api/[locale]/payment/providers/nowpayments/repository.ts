@@ -393,7 +393,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         logger.debug("Stored invoice in database", {
           invoiceId: invoice.id,
           userId: params.userId,
-          callbackToken: callbackToken.substring(0, 8),
+          callbackToken: callbackToken.slice(0, 8),
         });
       } catch (dbError) {
         logger.error("Failed to store invoice in database", {
@@ -471,7 +471,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         errorText: errorText,
         requestUrl: `${this.apiUrl}/subscriptions/plans`,
         requestBody: JSON.stringify(planData),
-        headers: { "x-api-key": `${this.apiKey.substring(0, 10)}...` },
+        headers: { "x-api-key": `${this.apiKey.slice(0, 10)}...` },
       });
       return fail({
         message:
@@ -562,8 +562,8 @@ export class NOWPaymentsProvider implements PaymentProvider {
         )
       ) {
         logger.error("NOWPayments webhook signature verification failed", {
-          receivedSignature: `${signature.substring(0, 10)}...`,
-          calculatedSignature: `${calculatedSignature.substring(0, 10)}...`,
+          receivedSignature: `${signature.slice(0, 10)}...`,
+          calculatedSignature: `${calculatedSignature.slice(0, 10)}...`,
         });
         return fail({
           message:
@@ -795,7 +795,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
       logger.info("Canceled NOWPayments subscription", { subscriptionId });
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Failed to cancel NOWPayments subscription", {
         error: parseError(error),

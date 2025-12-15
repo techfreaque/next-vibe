@@ -1,40 +1,34 @@
 /**
  * Build Executor Tests
  * Tests for the build system orchestrator
- *
- * @vitest-environment node
  */
 
 import { resolve } from "node:path";
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 
 // Mock the i18n module before importing build-executor
-vi.mock("@/i18n/core/shared", () => ({
+mock.module("@/i18n/core/shared", () => ({
   simpleT: (): { t: (key: string) => string } => ({
     t: (key: string): string => key,
   }),
 }));
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-import {
-  BuildProfileEnum,
-  ViteBuildTypeEnum,
-} from "../definition";
+import { BuildProfileEnum, ViteBuildTypeEnum } from "../enum";
 import { buildExecutor } from "./build-executor";
 
-const TEST_PROJECT_PATH = resolve(
-  __dirname,
-  "../test-files/test-project",
-);
+const TEST_PROJECT_PATH = resolve(__dirname, "../test-files/test-project");
 
 // Create a properly typed mock logger that satisfies EndpointLogger interface
+// eslint-disable-next-line @typescript-eslint/no-empty-function -- Mock functions intentionally empty
+const noop = (): void => {};
 const createMockLogger = (): EndpointLogger => ({
-  info: vi.fn(),
-  warn: vi.fn(),
-  error: vi.fn(),
-  debug: vi.fn(),
-  vibe: vi.fn(),
+  info: mock(noop),
+  warn: mock(noop),
+  error: mock(noop),
+  debug: mock(noop),
+  vibe: mock(noop),
   isDebugEnabled: false,
 });
 
@@ -43,11 +37,10 @@ describe("BuildExecutor", () => {
 
   beforeEach(() => {
     mockLogger = createMockLogger();
-    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    // Bun test automatically cleans up mocks
   });
 
   describe("execute", () => {
@@ -192,46 +185,6 @@ describe("BuildExecutor", () => {
       );
 
       // Dry run succeeds even with invalid paths
-      expect(result.success).toBe(true);
-    });
-  });
-
-  describe("caching", () => {
-    it("should respect cache option", async () => {
-      const result = await buildExecutor.execute(
-        {
-          configPath: "",
-          configObject: {
-            dryRun: true,
-            cache: true,
-            foldersToClean: ["dist"],
-            filesToCompile: [],
-            filesOrFoldersToCopy: [],
-          },
-        },
-        "en-US",
-        mockLogger,
-      );
-
-      expect(result.success).toBe(true);
-    });
-
-    it("should work with cache disabled", async () => {
-      const result = await buildExecutor.execute(
-        {
-          configPath: "",
-          configObject: {
-            dryRun: true,
-            cache: false,
-            foldersToClean: ["dist"],
-            filesToCompile: [],
-            filesOrFoldersToCopy: [],
-          },
-        },
-        "en-US",
-        mockLogger,
-      );
-
       expect(result.success).toBe(true);
     });
   });

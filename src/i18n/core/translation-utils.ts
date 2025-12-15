@@ -73,14 +73,15 @@ function navigateTranslationPath(
   const value = navigateTranslationObject(startValue, keys);
 
   // Handle error logging for missing keys
-  if (value === undefined) {
-    if (isUsingFallback || language === fallbackLanguage) {
-      logTranslationError(
-        isUsingFallback ? "fallback_missing" : "missing",
-        fullKey,
-        context,
-      );
-    }
+  if (
+    value === undefined &&
+    (isUsingFallback || language === fallbackLanguage)
+  ) {
+    logTranslationError(
+      isUsingFallback ? "fallback_missing" : "missing",
+      fullKey,
+      context,
+    );
   }
 
   return value as TranslationElement | string | undefined;

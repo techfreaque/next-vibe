@@ -388,7 +388,7 @@ export function useApiQueryForm<
     const persistDebounceMs = 500; // 500ms debounce for persistence
 
     const subscription = formMethods.watch((formValues) => {
-      if (formValues && Object.keys(formValues).length) {
+      if (formValues && Object.keys(formValues).length > 0) {
         // Clear any existing timer
         if (persistDebounceTimer !== null) {
           window.clearTimeout(persistDebounceTimer);
@@ -494,7 +494,7 @@ export function useApiQueryForm<
       const hasChanged =
         JSON.stringify(prevQueryParamsRef.current) !==
         JSON.stringify(queryParams);
-      if (hasChanged && Object.keys(queryParams).length) {
+      if (hasChanged && Object.keys(queryParams).length > 0) {
         // Only refetch if not already loading to avoid conflicts
         if (!query.isLoading) {
           void query.refetch();

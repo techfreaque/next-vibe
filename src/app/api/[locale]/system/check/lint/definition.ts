@@ -97,7 +97,7 @@ const { POST } = createEndpoint({
             "app.api.system.check.lint.fields.timeoutSeconds.description",
           columns: 3,
         },
-        z.number().min(1).max(3600).default(3600),
+        z.coerce.number().min(1).max(3600).default(3600),
       ),
 
       cacheDir: requestDataField(
@@ -109,6 +109,18 @@ const { POST } = createEndpoint({
           columns: 3,
         },
         z.string().optional().default("./.tmp"),
+      ),
+
+      createConfig: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.check.lint.fields.createConfig.label",
+          description:
+            "app.api.system.check.lint.fields.createConfig.description",
+          columns: 3,
+        },
+        z.boolean().default(false),
       ),
 
       // === RESPONSE FIELDS ===
@@ -151,7 +163,7 @@ const { POST } = createEndpoint({
                 type: WidgetType.TEXT,
                 content: "app.api.system.check.lint.response.errors.item.line",
               },
-              z.number().optional(),
+              z.coerce.number().optional(),
             ),
             column: responseField(
               {
@@ -159,7 +171,7 @@ const { POST } = createEndpoint({
                 content:
                   "app.api.system.check.lint.response.errors.item.column",
               },
-              z.number().optional(),
+              z.coerce.number().optional(),
             ),
             rule: responseField(
               {

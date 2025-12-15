@@ -11,7 +11,7 @@ import type { MCPTool } from "./types";
 
 function toolNameToApiPath(toolName: string): string {
   const parts = toolName.split("_");
-  const method = parts[parts.length - 1];
+  const method = parts.at(-1);
   const pathParts = parts.slice(0, -1);
   const apiPath = pathParts.join("/");
   return `api/[locale]/${apiPath} (${method})`;

@@ -55,7 +55,7 @@ export const translations = {
     },
     createConfig: {
       label: "Create Config",
-      description: "Create default lint.config.ts if missing",
+      description: "Create default check.config.ts if missing",
     },
     timeoutSeconds: {
       label: "Timeout (seconds)",

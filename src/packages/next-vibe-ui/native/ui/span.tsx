@@ -3,7 +3,7 @@
 import { styled } from "nativewind";
 import type { JSX } from "react";
 import * as React from "react";
-import { Pressable,Text as RNText } from "react-native";
+import { Pressable, Text as RNText } from "react-native";
 
 import type {
   SpanGenericTarget,
@@ -14,10 +14,10 @@ import type {
 import type { StyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
 import { applyStyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
 
-import { convertCSSToTextStyle } from "../utils/style-converter";
+import { convertCSSToTextStyle, styledNative } from "../utils/style-converter";
 
 const StyledText = styled(RNText);
-const StyledPressable = styled(Pressable, { className: "style" });
+const StyledPressable = styledNative(Pressable);
 
 export type SpanProps = SpanBaseProps & StyleType;
 

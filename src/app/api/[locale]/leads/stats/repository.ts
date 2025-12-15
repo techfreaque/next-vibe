@@ -765,35 +765,34 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         return results.map((result, index) => {
           if (result.status === "fulfilled") {
             return result.value;
-          } else {
-            const metricNames = [
-              "totalLeads",
-              "newLeads",
-              "activeLeads",
-              "campaignRunningLeads",
-              "websiteUserLeads",
-              "newsletterSubscriberLeads",
-              "convertedLeads",
-              "signedUpLeads",
-              "consultationBookedLeads",
-              "subscriptionConfirmedLeads",
-              "unsubscribedLeads",
-              "bouncedLeads",
-              "invalidLeads",
-              "emailsSent",
-              "emailsOpened",
-              "emailsClicked",
-            ];
-            logger.error(
-              `Error getting historical metric: ${metricNames[index]}`,
-              {
-                error: parseError(result.reason).message,
-                timePeriod,
-                intervalCount: intervals.length,
-              },
-            );
-            return emptyIntervalData;
           }
+          const metricNames = [
+            "totalLeads",
+            "newLeads",
+            "activeLeads",
+            "campaignRunningLeads",
+            "websiteUserLeads",
+            "newsletterSubscriberLeads",
+            "convertedLeads",
+            "signedUpLeads",
+            "consultationBookedLeads",
+            "subscriptionConfirmedLeads",
+            "unsubscribedLeads",
+            "bouncedLeads",
+            "invalidLeads",
+            "emailsSent",
+            "emailsOpened",
+            "emailsClicked",
+          ];
+          logger.error(
+            `Error getting historical metric: ${metricNames[index]}`,
+            {
+              error: parseError(result.reason).message,
+              timePeriod,
+              intervalCount: intervals.length,
+            },
+          );
+          return emptyIntervalData;
         });
       });
 
@@ -1303,7 +1302,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         dateTo: dateTo.toISOString(),
         intervalCount: intervals.length,
         firstInterval: intervals[0]?.label,
-        lastInterval: intervals[intervals.length - 1]?.label,
+        lastInterval: intervals.at(-1)?.label,
       });
 
       return intervals;

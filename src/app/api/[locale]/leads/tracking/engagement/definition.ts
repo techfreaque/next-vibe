@@ -514,6 +514,21 @@ const { GET } = createEndpoint({
         },
         z.string().url(),
       ),
+      ref: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.leads.tracking.engagement.get.ref.label" as const,
+          description:
+            "app.api.leads.tracking.engagement.get.ref.description" as const,
+          placeholder:
+            "app.api.leads.tracking.engagement.get.ref.placeholder" as const,
+          helpText:
+            "app.api.leads.tracking.engagement.get.ref.helpText" as const,
+          columns: 12,
+        },
+        z.string().optional(),
+      ),
 
       // === RESPONSE FIELDS ===
       success: responseField(

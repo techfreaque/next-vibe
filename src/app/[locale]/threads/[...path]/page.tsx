@@ -97,7 +97,12 @@ export default async function ThreadsPathPage({
 
     if (!threadResponse.success) {
       // Not a thread, check if it's a folder
-      const folderResponse = await folderRepository.getFolder(user, { id: initialThreadId }, logger);
+      const folderResponse = await folderRepository.getFolder(
+        user,
+        { id: initialThreadId },
+        logger,
+        locale,
+      );
 
       if (folderResponse.success) {
         // It's a folder! Correct the parsed values
@@ -142,14 +147,13 @@ export default async function ThreadsPathPage({
   // For private/shared/incognito: redirect from root to /new
   // For public: redirect from /new to root
   if (
-    initialRootFolderId === DefaultFolderId.PRIVATE ||
-    initialRootFolderId === DefaultFolderId.SHARED ||
-    initialRootFolderId === DefaultFolderId.INCOGNITO
+    (initialRootFolderId === DefaultFolderId.PRIVATE ||
+      initialRootFolderId === DefaultFolderId.SHARED ||
+      initialRootFolderId === DefaultFolderId.INCOGNITO) &&
+    !initialThreadId &&
+    !initialSubFolderId
   ) {
-    // Redirect to /new if no thread ID and no subfolder
-    if (!initialThreadId && !initialSubFolderId) {
-      redirect(`/${locale}/threads/${initialRootFolderId}/${NEW_MESSAGE_ID}`);
-    }
+    redirect(`/${locale}/threads/${initialRootFolderId}/${NEW_MESSAGE_ID}`);
   }
 
   return (

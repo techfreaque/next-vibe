@@ -62,9 +62,10 @@ export class MacRecorder extends BaseRecorder {
     };
   }
 
-  protected async stopProcess(process: Subprocess): Promise<void> {
+  protected stopProcess(process: Subprocess): Promise<void> {
     // Send SIGINT (Ctrl+C) to gracefully stop ffmpeg
     process.kill("SIGINT");
+    return Promise.resolve();
   }
 
   protected override handleStderrLine(line: string): void {

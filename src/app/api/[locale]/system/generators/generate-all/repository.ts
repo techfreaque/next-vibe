@@ -10,18 +10,19 @@ import "server-only";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import {
-  type EndpointLogger,
   createEndpointLogger,
+  type EndpointLogger,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type endpoints from "./definition";
 import { defaultLocale } from "@/i18n/core/config";
+
+import type endpoints from "./definition";
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 type GenerateAllResponseType = typeof endpoints.POST.types.ResponseOutput;
@@ -83,12 +84,11 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 outputLines.push("✅ Endpoints index generated successfully");
                 generatorsRun++;
                 return "endpoints";
-              } else {
-                outputLines.push(
-                  `❌ Endpoints index generation failed: ${result.message || "Unknown error"}`,
-                );
-                return null;
               }
+              outputLines.push(
+                `❌ Endpoints index generation failed: ${result.message || "Unknown error"}`,
+              );
+              return null;
             } catch (error) {
               outputLines.push(
                 `❌ Endpoints index generator failed: ${parseError(error).message}`,
@@ -123,12 +123,11 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 outputLines.push("✅ Endpoint generated successfully");
                 generatorsRun++;
                 return "endpoint";
-              } else {
-                outputLines.push(
-                  `❌ Endpoint generation failed: ${result.message || "Unknown error"}`,
-                );
-                return null;
               }
+              outputLines.push(
+                `❌ Endpoint generation failed: ${result.message || "Unknown error"}`,
+              );
+              return null;
             } catch (error) {
               outputLines.push(
                 `❌ Endpoint generator failed: ${parseError(error).message}`,
@@ -164,12 +163,11 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 outputLines.push("✅ Route handlers generated successfully");
                 generatorsRun++;
                 return "route-handlers";
-              } else {
-                outputLines.push(
-                  `❌ Route handlers generation failed: ${result.message || "Unknown error"}`,
-                );
-                return null;
               }
+              outputLines.push(
+                `❌ Route handlers generation failed: ${result.message || "Unknown error"}`,
+              );
+              return null;
             } catch (error) {
               outputLines.push(
                 `❌ Route handlers generator failed: ${parseError(error).message}`,
@@ -203,12 +201,11 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 outputLines.push("✅ Seeds generated successfully");
                 generatorsRun++;
                 return "seeds";
-              } else {
-                outputLines.push(
-                  `❌ Seeds generator failed: ${result.message || "Unknown error"}`,
-                );
-                return null;
               }
+              outputLines.push(
+                `❌ Seeds generator failed: ${result.message || "Unknown error"}`,
+              );
+              return null;
             } catch (error) {
               outputLines.push(
                 `❌ Seeds generator failed: ${parseError(error).message}`,
@@ -246,12 +243,11 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 );
                 generatorsRun++;
                 return "task-index";
-              } else {
-                outputLines.push(
-                  `❌ Task index generation failed: ${result.message || "Unknown error"}`,
-                );
-                return null;
               }
+              outputLines.push(
+                `❌ Task index generation failed: ${result.message || "Unknown error"}`,
+              );
+              return null;
             } catch (error) {
               outputLines.push(
                 `❌ Task index generator failed: ${parseError(error).message}`,
@@ -292,12 +288,11 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 );
                 generatorsRun++;
                 return "trpc-router";
-              } else {
-                outputLines.push(
-                  `❌ tRPC router generation failed: ${result.errorType?.errorKey || "Unknown error"}`,
-                );
-                return null;
               }
+              outputLines.push(
+                `❌ tRPC router generation failed: ${result.errorType?.errorKey || "Unknown error"}`,
+              );
+              return null;
             } catch (error) {
               outputLines.push(
                 `❌ tRPC router generator failed: ${parseError(error).message}`,

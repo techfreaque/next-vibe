@@ -16,11 +16,9 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-
-import type { PackageJson, ReleaseOptions } from "../definition";
+import type { PackageJson, ReleaseOptions, VersionInfo } from "../definition";
 import { MESSAGES } from "./constants";
 import { gitService } from "./git-service";
-import type { VersionInfo } from "./types";
 
 // ============================================================================
 // Interface
@@ -66,16 +64,34 @@ export class ReleaseCreator implements IReleaseCreator {
 
     // Route to appropriate platform
     if (repo.type === "gitlab") {
-      return this.createGitLabRelease(cwd, releaseConfig, packageJson, versionInfo, repo, logger, dryRun);
+      return this.createGitLabRelease(
+        cwd,
+        releaseConfig,
+        packageJson,
+        versionInfo,
+        repo,
+        logger,
+        dryRun,
+      );
     }
 
     if (repo.type !== "github") {
-      logger.warn(`Git releases only supported for GitHub and GitLab (found: ${repo.type})`);
+      logger.warn(
+        `Git releases only supported for GitHub and GitLab (found: ${repo.type})`,
+      );
       return success(undefined);
     }
 
     // GitHub release
-    return this.createGitHubRelease(cwd, releaseConfig, packageJson, versionInfo, repo, logger, dryRun);
+    return this.createGitHubRelease(
+      cwd,
+      releaseConfig,
+      packageJson,
+      versionInfo,
+      repo,
+      logger,
+      dryRun,
+    );
   }
 
   private createGitHubRelease(
@@ -109,19 +125,20 @@ export class ReleaseCreator implements IReleaseCreator {
       const commandParts = ["gh", "release", "create", versionInfo.newTag];
 
       // Add title
-      /* eslint-disable no-template-curly-in-string -- Intentional placeholder strings for user config */
-      const title = gitReleaseConfig?.title
-        ?.replace("${version}", versionInfo.newVersion)
-        .replace("${name}", packageJson.name)
+      /* eslint-disable no-template-curly-in-string -- Intentional release title/body templates */
+      const title =
+        gitReleaseConfig?.title
+          ?.replace("${version}", versionInfo.newVersion)
+          .replace("${name}", packageJson.name) ??
         /* eslint-enable no-template-curly-in-string */
-        ?? `Release ${versionInfo.newTag}`;
+        `Release ${versionInfo.newTag}`;
       commandParts.push(`--title "${title}"`);
 
       // Add notes
       if (gitReleaseConfig?.generateNotes) {
         commandParts.push("--generate-notes");
       } else if (gitReleaseConfig?.body) {
-        /* eslint-disable no-template-curly-in-string -- Intentional placeholder strings for user config */
+        /* eslint-disable no-template-curly-in-string -- Intentional release title/body templates */
         const body = gitReleaseConfig.body
           .replace("${version}", versionInfo.newVersion)
           .replace("${name}", packageJson.name);
@@ -140,7 +157,9 @@ export class ReleaseCreator implements IReleaseCreator {
         commandParts.push(`--target ${gitReleaseConfig.target}`);
       }
       if (gitReleaseConfig?.discussionCategory) {
-        commandParts.push(`--discussion-category ${gitReleaseConfig.discussionCategory}`);
+        commandParts.push(
+          `--discussion-category ${gitReleaseConfig.discussionCategory}`,
+        );
       }
 
       // Add assets
@@ -165,7 +184,8 @@ export class ReleaseCreator implements IReleaseCreator {
       logger.info(MESSAGES.GITHUB_RELEASE_SUCCESS, { tag: versionInfo.newTag });
 
       // Return the release URL
-      const releaseUrl = output || `${repo.url}/releases/tag/${versionInfo.newTag}`;
+      const releaseUrl =
+        output || `${repo.url}/releases/tag/${versionInfo.newTag}`;
       return success(releaseUrl);
     } catch (error) {
       logger.error(MESSAGES.GITHUB_RELEASE_FAILED, parseError(error));
@@ -208,17 +228,18 @@ export class ReleaseCreator implements IReleaseCreator {
       const commandParts = ["glab", "release", "create", versionInfo.newTag];
 
       // Add title/name
-      /* eslint-disable no-template-curly-in-string -- Intentional placeholder strings for user config */
-      const title = gitReleaseConfig?.title
-        ?.replace("${version}", versionInfo.newVersion)
-        .replace("${name}", packageJson.name)
+      /* eslint-disable no-template-curly-in-string -- Intentional release title/body templates */
+      const title =
+        gitReleaseConfig?.title
+          ?.replace("${version}", versionInfo.newVersion)
+          .replace("${name}", packageJson.name) ??
         /* eslint-enable no-template-curly-in-string */
-        ?? `Release ${versionInfo.newTag}`;
+        `Release ${versionInfo.newTag}`;
       commandParts.push(`--name "${title}"`);
 
       // Add notes
       if (gitReleaseConfig?.body) {
-        /* eslint-disable no-template-curly-in-string -- Intentional placeholder strings for user config */
+        /* eslint-disable no-template-curly-in-string -- Intentional release title/body templates */
         const body = gitReleaseConfig.body
           .replace("${version}", versionInfo.newVersion)
           .replace("${name}", packageJson.name);
@@ -239,7 +260,9 @@ export class ReleaseCreator implements IReleaseCreator {
           const assetPath = resolve(cwd, asset.path);
           if (existsSync(assetPath)) {
             const assetName = asset.name ?? basename(assetPath);
-            commandParts.push(`--assets-links '[{"name": "${assetName}", "url": "file://${assetPath}"}]'`);
+            commandParts.push(
+              `--assets-links '[{"name": "${assetName}", "url": "file://${assetPath}"}]'`,
+            );
           } else {
             logger.warn(`Release asset not found: ${asset.path}`);
           }
@@ -252,7 +275,8 @@ export class ReleaseCreator implements IReleaseCreator {
       logger.info(MESSAGES.GITLAB_RELEASE_SUCCESS, { tag: versionInfo.newTag });
 
       // Return the release URL
-      const releaseUrl = output || `${repo.url}/-/releases/${versionInfo.newTag}`;
+      const releaseUrl =
+        output || `${repo.url}/-/releases/${versionInfo.newTag}`;
       return success(releaseUrl);
     } catch (error) {
       logger.error(MESSAGES.GITLAB_RELEASE_FAILED, parseError(error));

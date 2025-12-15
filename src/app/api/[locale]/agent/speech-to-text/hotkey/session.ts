@@ -280,10 +280,10 @@ export class SpeechHotkeySession {
     if (this.isRecording) {
       await this.stopAndInsert();
       return false;
-    } else {
+    }
       await this.start();
       return true;
-    }
+    
   }
 
   /**

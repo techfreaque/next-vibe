@@ -265,8 +265,8 @@ class BraveSearchService {
    */
   private sanitizeText(text: string): string {
     return text
-      .replace(/<[^>]*>/g, "") // Remove HTML tags
-      .replace(/\s+/g, " ") // Normalize whitespace
+      .replaceAll(/<[^>]*>/g, "") // Remove HTML tags
+      .replaceAll(/\s+/g, " ") // Normalize whitespace
       .trim();
   }
 

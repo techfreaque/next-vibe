@@ -49,14 +49,14 @@ export function extractRepos(
   if (isLaunchpadPackage(obj)) {
     // This is a package
     return [{ path: [...currentPath], config: obj }];
-  } else {
+  }
     // This is a folder
     let results: { path: string[]; config: LaunchpadPackage }[] = [];
     for (const [key, value] of Object.entries(obj)) {
       results = [...results, ...extractRepos(value, [...currentPath, key])];
     }
     return results;
-  }
+  
 }
 
 // Get all repositories from config

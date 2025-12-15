@@ -466,11 +466,11 @@ export async function EmailImage({
       if (imageSrc.startsWith("http://") || imageSrc.startsWith("https://")) {
         // Already a full URL
         return imageSrc;
-      } else {
+      }
         // Local path - construct URL using envClient.NEXT_PUBLIC_APP_URL
         const cleanPath = imageSrc.startsWith("/") ? imageSrc : `/${imageSrc}`;
         return `${envClient.NEXT_PUBLIC_APP_URL}${cleanPath}`;
-      }
+      
     };
 
     const imageUrl = getImageUrl(src);
@@ -552,7 +552,7 @@ export async function LucideEmailIcon(
   // Handle both PascalCase (Check) and camelCase (checkCircle) to kebab-case
   const iconName = icon
     // Insert hyphens before uppercase letters that follow lowercase letters
-    .replace(/([a-z])([A-Z])/g, "$1-$2")
+    .replaceAll(/([a-z])([A-Z])/g, "$1-$2")
     // Convert to lowercase
     .toLowerCase();
 

@@ -1,9 +1,8 @@
 "use client";
 
-import { styled } from "nativewind";
 import type { JSX } from "react";
 import * as React from "react";
-import { Pressable,Text as RNText, View } from "react-native";
+import { Pressable, Text as RNText, View } from "react-native";
 
 import type {
   DivGenericTarget,
@@ -14,15 +13,19 @@ import type {
 import type { StyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
 import { applyStyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+  styledNativeRef,
+} from "../utils/style-converter";
 
-const StyledView = styled(View);
-const StyledPressable = styled(Pressable, { className: "style" });
+const StyledView = styledNativeRef(View);
+const StyledPressable = styledNative(Pressable);
 
 export type DivProps = DivBaseProps & StyleType;
 
 // Create compatibility layer functions
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Accepted for API compatibility with web
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Accepted for API compatibility with web
 function createDivRefObject(view: View | null): DivRefObject {
   // React Native doesn't have DOM refs, return polyfill object for compatibility
   // The web version returns actual DOM Element refs

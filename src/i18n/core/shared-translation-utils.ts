@@ -71,7 +71,7 @@ export function processTranslationValue<K extends string>(
     let translationValue: string = value;
     if (params) {
       Object.entries(params).forEach(([paramKey, paramValue]) => {
-        translationValue = translationValue.replace(
+        translationValue = translationValue.replaceAll(
           new RegExp(`{{${paramKey}}}`, "g"),
           String(paramValue),
         );

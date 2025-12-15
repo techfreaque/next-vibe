@@ -100,7 +100,19 @@ const { POST } = createEndpoint({
             "app.api.system.check.oxlint.fields.timeoutSeconds.description",
           columns: 3,
         },
-        z.number().min(1).max(3600).default(3600),
+        z.coerce.number().min(1).max(3600).default(3600),
+      ),
+
+      createConfig: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.check.oxlint.fields.createConfig.label",
+          description:
+            "app.api.system.check.oxlint.fields.createConfig.description",
+          columns: 3,
+        },
+        z.boolean().default(false),
       ),
 
       // === RESPONSE FIELDS ===
@@ -145,7 +157,7 @@ const { POST } = createEndpoint({
                 content:
                   "app.api.system.check.oxlint.response.errors.item.line",
               },
-              z.number().optional(),
+              z.coerce.number().optional(),
             ),
             column: responseField(
               {
@@ -153,7 +165,7 @@ const { POST } = createEndpoint({
                 content:
                   "app.api.system.check.oxlint.response.errors.item.column",
               },
-              z.number().optional(),
+              z.coerce.number().optional(),
             ),
             rule: responseField(
               {
@@ -189,6 +201,23 @@ const { POST } = createEndpoint({
             ),
           },
         ),
+      ),
+
+      // Config status response fields
+      configMissing: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.system.check.oxlint.response.configMissing",
+        },
+        z.boolean().optional(),
+      ),
+
+      configPath: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.system.check.oxlint.response.configPath",
+        },
+        z.string().optional(),
       ),
     },
   ),

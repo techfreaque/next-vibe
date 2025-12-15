@@ -130,7 +130,7 @@ export function ToolCallRenderer({
       });
 
       if (!result.success && toolCall.toolName.includes("_")) {
-        const convertedPath = `${toolCall.toolName.replace(/_/g, "/")}/GET`;
+        const convertedPath = `${toolCall.toolName.replaceAll('_', "/")}/GET`;
         logger.debug("[ToolCallRenderer] Trying converted GET path", {
           convertedPath,
         });
@@ -146,7 +146,7 @@ export function ToolCallRenderer({
       }
 
       if (!result.success && toolCall.toolName.includes("_")) {
-        const convertedPath = `${toolCall.toolName.replace(/_/g, "/")}/POST`;
+        const convertedPath = `${toolCall.toolName.replaceAll('_', "/")}/POST`;
         logger.debug("[ToolCallRenderer] Trying converted POST path", {
           convertedPath,
         });

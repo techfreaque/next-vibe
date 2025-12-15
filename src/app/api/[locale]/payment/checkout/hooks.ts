@@ -46,7 +46,7 @@ export function useSubscriptionCheckout(
 
   // Success callback for subscription checkout
   const handleCheckoutSuccess = useCallback(
-    async (data: {
+    (data: {
       requestData: CheckoutRequestOutput;
       pathParams: Record<string, never>;
       responseData: CheckoutResponseOutput;
@@ -89,7 +89,7 @@ export function useSubscriptionCheckout(
 
   // Error callback for subscription checkout
   const handleCheckoutError = useCallback(
-    async (data: {
+    (data: {
       error: ErrorResponseType;
       requestData: CheckoutRequestOutput;
       pathParams: Record<string, never>;
@@ -136,16 +136,18 @@ export function useCheckout(logger: EndpointLogger): {
 } {
   const endpoint = useSubscriptionCheckout(logger);
 
-  const createCheckout = async (
+  const createCheckout = (
     planId: typeof SubscriptionPlanValue,
     billingInterval: typeof BillingIntervalValue,
     metadata?: Record<string, string>,
   ): Promise<ResponseType<CheckoutResponseOutput>> => {
     if (!endpoint.create) {
-      return fail({
-        message: "app.api.subscription.checkout.error",
-        errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-      });
+      return Promise.resolve(
+        fail({
+          message: "app.api.subscription.checkout.error",
+          errorType: ErrorResponseTypes.UNKNOWN_ERROR,
+        }),
+      );
     }
 
     return new Promise((resolve) => {

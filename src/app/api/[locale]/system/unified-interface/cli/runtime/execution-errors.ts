@@ -357,7 +357,7 @@ export namespace ErrorHandler {
     // eslint-disable-next-line i18next/no-literal-string
     output += `   Time: ${error.timestamp.toISOString()}\n`;
 
-    if (error.context && Object.keys(error.context).length) {
+    if (error.context && Object.keys(error.context).length > 0) {
       // eslint-disable-next-line i18next/no-literal-string
       output += `   Context: ${JSON.stringify(error.context, null, 4)}\n`;
     }

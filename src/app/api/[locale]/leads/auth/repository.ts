@@ -173,10 +173,10 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
         .where(eq(leads.id, leadId));
 
       logger.debug("Linked lead to user", { leadId, userId });
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Failed to link lead to user", parseError(error).message);
-      return success(undefined); // Don't fail the operation
+      return success(); // Don't fail the operation
     }
   }
 

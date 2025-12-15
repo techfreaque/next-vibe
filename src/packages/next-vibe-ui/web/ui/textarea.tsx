@@ -164,9 +164,9 @@ const TextareaInner = (
 
     // Calculate line height
     const computedStyle = window.getComputedStyle(textarea);
-    const lineHeight = parseInt(computedStyle.lineHeight);
-    const paddingTop = parseInt(computedStyle.paddingTop);
-    const paddingBottom = parseInt(computedStyle.paddingBottom);
+    const lineHeight = parseInt(computedStyle.lineHeight, 10);
+    const paddingTop = parseInt(computedStyle.paddingTop, 10);
+    const paddingBottom = parseInt(computedStyle.paddingBottom, 10);
 
     // Calculate min and max heights
     const minHeight = lineHeight * minRows + paddingTop + paddingBottom;

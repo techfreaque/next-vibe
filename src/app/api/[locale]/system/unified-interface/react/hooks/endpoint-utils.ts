@@ -2,6 +2,7 @@ import { Environment } from "next-vibe/shared/utils";
 import { useMemo } from "react";
 import type { FieldValues } from "react-hook-form";
 
+import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   ALL_METHODS,
@@ -85,21 +86,68 @@ export function shouldClearFormAfterSuccess(): boolean {
 }
 
 /**
+ * Check if value is a plain object (not array, null, date, etc.)
+ * @param value - The value to check
+ * @returns True if value is a plain object
+ */
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard requires unknown for runtime type checking
+function isPlainObject(value: unknown): value is Record<string, DeepPartial<never>> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    !(value instanceof Date) &&
+    !(value instanceof RegExp)
+  );
+}
+
+/**
+ * Deep merge objects, with later sources taking priority
+ * Handles nested objects recursively
+ */
+function deepMerge<T>(
+  ...sources: (DeepPartial<T> | null | undefined)[]
+): DeepPartial<T> {
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Deep merge requires dynamic object building
+  const result: Record<string, DeepPartial<never>> = {};
+
+  for (const source of sources) {
+    if (!source) {
+      continue;
+    }
+
+    for (const key of Object.keys(source)) {
+      const sourceValue = source[key as keyof typeof source];
+      const resultValue = result[key];
+
+      if (isPlainObject(sourceValue) && isPlainObject(resultValue)) {
+        // Recursively merge nested objects
+        result[key] = deepMerge(
+          resultValue as DeepPartial<T>,
+          sourceValue as DeepPartial<T>
+        ) as DeepPartial<never>;
+      } else if (sourceValue !== undefined) {
+        // Primitive or array - later source wins
+        result[key] = sourceValue as DeepPartial<never>;
+      }
+    }
+  }
+
+  return result as DeepPartial<T>;
+}
+
+/**
  * Utility to safely merge form data with prefilled data
- * localStorage data takes precedence over all other data
+ * Performs deep merge for nested objects
+ * Priority (lowest to highest): defaultValues < prefillData < initialState < savedData
  */
 export function mergeFormData<T>(
-  defaultValues: Partial<T> | undefined,
-  prefillData: Partial<T> | undefined,
-  initialState: Partial<T> | undefined,
-  savedData?: Partial<T> | null,
-): Partial<T> {
-  return {
-    ...(defaultValues || {}),
-    ...(prefillData || {}),
-    ...(initialState || {}),
-    ...(savedData || {}), // localStorage wins
-  };
+  defaultValues: DeepPartial<T> | undefined,
+  prefillData: DeepPartial<T> | undefined,
+  initialState: DeepPartial<T> | undefined,
+  savedData?: DeepPartial<T> | null,
+): DeepPartial<T> {
+  return deepMerge<T>(defaultValues, prefillData, initialState, savedData);
 }
 
 /**

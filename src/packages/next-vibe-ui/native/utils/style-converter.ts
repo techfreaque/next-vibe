@@ -3,7 +3,48 @@
  * This ensures consistent style conversion across all native components
  */
 
-import type { ImageStyle,TextStyle, ViewStyle } from "react-native";
+import { styled } from "nativewind";
+import type * as React from "react";
+import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
+
+/**
+ * Type-safe wrapper for nativewind's styled() function.
+ * Handles the "Type instantiation is excessively deep" error from nativewind v5.
+ *
+ * @example
+ * const StyledView = styledNative(View);
+ * const StyledPressable = styledNative(Pressable);
+ */
+// oxlint-disable-next-line no-explicit-any
+export function styledNative<T extends React.ComponentType<any>>(
+  Component: T,
+): React.ComponentType<React.ComponentProps<T> & { className?: string }> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nativewind styled() produces complex union types that exceed TS depth limits
+  return styled(Component as any, {
+    className: "style",
+  }) as React.ComponentType<React.ComponentProps<T> & { className?: string }>;
+}
+
+/**
+ * Type-safe wrapper for nativewind's styled() with ref forwarding support.
+ * Use this for components that need ref forwarding (ScrollView, TextInput, etc.)
+ *
+ * @example
+ * const StyledScrollView = styledNativeRef(ScrollView);
+ */
+// oxlint-disable-next-line no-explicit-any
+export function styledNativeRef<T extends React.ComponentType<any>, R = any>(
+  Component: T,
+): React.ForwardRefExoticComponent<
+  React.ComponentProps<T> & { className?: string } & React.RefAttributes<R>
+> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nativewind styled() produces complex union types that exceed TS depth limits
+  return styled(Component as any, {
+    className: "style",
+  }) as React.ForwardRefExoticComponent<
+    React.ComponentProps<T> & { className?: string } & React.RefAttributes<R>
+  >;
+}
 
 /**
  * Convert React.CSSProperties to React Native ViewStyle

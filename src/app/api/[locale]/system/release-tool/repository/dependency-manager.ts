@@ -150,7 +150,7 @@ export class DependencyManager implements IDependencyManager {
   ): ResponseType<void> {
     if (dryRun) {
       logger.info(MESSAGES.DRY_RUN_MODE, { action: "update dependencies" });
-      return success(undefined);
+      return success();
     }
 
     logger.debug(MESSAGES.UPDATING_DEPS, { package: packageJson.name });
@@ -204,7 +204,7 @@ export class DependencyManager implements IDependencyManager {
       });
 
       logger.info(MESSAGES.DEPS_UPDATED, { package: packageJson.name });
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error(MESSAGES.DEPS_FAILED, parseError(error));
       return fail({
@@ -244,7 +244,7 @@ export class DependencyManager implements IDependencyManager {
       });
 
       logger.info(MESSAGES.DEPS_UPDATED);
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error(MESSAGES.DEPS_FAILED, parseError(error));
       return fail({
@@ -448,7 +448,7 @@ export class DependencyManager implements IDependencyManager {
         case "bun":
           // Bun doesn't have dedupe command
           logger.info("Bun handles deduplication automatically");
-          return success(undefined);
+          return success();
         default:
           command = "npm dedupe";
       }
@@ -460,7 +460,7 @@ export class DependencyManager implements IDependencyManager {
       });
 
       logger.info("Dependencies deduplicated successfully");
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Deduplication failed", parseError(error));
       return fail({
@@ -491,7 +491,7 @@ export class DependencyManager implements IDependencyManager {
         case "bun":
           // Bun doesn't have prune command
           logger.info("Bun handles pruning automatically");
-          return success(undefined);
+          return success();
         default:
           command = "npm prune";
       }
@@ -503,11 +503,11 @@ export class DependencyManager implements IDependencyManager {
       });
 
       logger.info("Dependencies pruned successfully");
-      return success(undefined);
+      return success();
     } catch (error) {
       // Prune errors are often non-critical
       logger.warn("Prune completed with warnings", parseError(error));
-      return success(undefined);
+      return success();
     }
   }
 }

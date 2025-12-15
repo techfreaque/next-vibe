@@ -1,13 +1,13 @@
 /// <reference types="node" />
 /* eslint-disable i18next/no-literal-string */
-/* eslint-disable no-restricted-syntax */
+ 
 import { execSync, spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import inquirer from "inquirer";
-
 import { parseError } from "next-vibe/shared/utils/parse-error";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -452,7 +452,7 @@ export class ReleaseExecutor {
         `❌ ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.failed")}:`,
         parseError(error),
       );
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw error;
     }
   }

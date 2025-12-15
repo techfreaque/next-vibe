@@ -564,13 +564,13 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
               message: err.message,
             })),
           });
-        } else {
+        }
           return fail({
             message: "app.api.emails.imapClient.imapErrors.sync.message.failed",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
           });
-        }
-      } else {
+        
+      }
         // Sync all accounts
         const syncResult = await imapSyncRepository.syncAllAccounts(logger);
 
@@ -596,13 +596,13 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
               message: err.message,
             })),
           });
-        } else {
+        }
           return fail({
             message: "app.api.emails.imapClient.imapErrors.sync.message.failed",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
           });
-        }
-      }
+        
+      
     } catch (error) {
       logger.error("Error syncing IMAP messages", parseError(error));
       return fail({

@@ -3,13 +3,13 @@
  * Send notifications via webhooks (Slack, Discord, Teams, Mattermost, Google Chat, etc.)
  */
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-
-import type { NotificationConfig } from "../definition";
+import type {
+  NotificationConfig,
+  NotificationData,
+  NotificationResult,
+} from "../definition";
 import { MESSAGES, RETRY_DEFAULTS, TIMEOUTS } from "./constants";
-import type { NotificationData, NotificationResult } from "./types";
 import { formatDuration, sleep } from "./utils";
 
 // ============================================================================
@@ -34,14 +34,51 @@ export interface ExtendedNotificationConfig extends NotificationConfig {
   throwOnFailure?: boolean;
 }
 
-/**
- * Payload builder function type
- */
-type PayloadBuilder = (
-  message: string,
-  data: NotificationData,
-  config: NotificationConfig,
-) => Record<string, unknown>;
+// Payload type definitions for webhook services
+interface SlackAttachmentField { title: string; value: string; short: boolean }
+interface SlackAttachment { color: string; title: string; fields: SlackAttachmentField[]; footer: string; ts: number }
+interface SlackPayload { text: string; username: string; icon_emoji: string; attachments?: SlackAttachment[] }
+
+interface DiscordEmbedField { name: string; value: string; inline: boolean }
+interface DiscordEmbed { title: string; color: number; fields: DiscordEmbedField[]; timestamp: string; footer: { text: string } }
+interface DiscordPayload { content: string; username: string; embeds?: DiscordEmbed[] }
+
+interface TeamsFact { name: string; value: string }
+interface TeamsSection { activityTitle: string; activitySubtitle?: string; facts?: TeamsFact[]; markdown: boolean }
+interface TeamsAction { "@type": string; name: string; targets: { os: string; uri: string }[] }
+interface TeamsPayload { "@type": string; "@context": string; themeColor: string; summary: string; sections: TeamsSection[]; potentialAction?: TeamsAction[] }
+
+interface MattermostField { title: string; value: string; short: boolean }
+interface MattermostAttachment { color: string; title: string; fields: MattermostField[] }
+interface MattermostPayload { text: string; username: string; icon_emoji: string; attachments?: MattermostAttachment[] }
+
+interface GoogleChatKeyValue { topLabel: string; content: string }
+interface GoogleChatWidget { textParagraph?: { text: string }; keyValue?: GoogleChatKeyValue }
+interface GoogleChatSection { widgets: GoogleChatWidget[] }
+interface GoogleChatCard { header: { title: string; subtitle: string; imageUrl: string }; sections: GoogleChatSection[] }
+interface GoogleChatPayload { cards: GoogleChatCard[] }
+
+interface TelegramPayload { text: string; parse_mode: string; disable_notification: boolean }
+
+interface CustomPayload {
+  event: string;
+  message: string;
+  success: boolean;
+  package?: string;
+  version?: string;
+  duration?: number;
+  durationFormatted?: string;
+  timings?: NotificationData["timings"];
+  error?: string;
+  releaseUrl?: string;
+  registryUrls?: string[];
+  commitSha?: string;
+  branch?: string;
+  timestamp: string;
+}
+
+type WebhookPayload = SlackPayload | DiscordPayload | TeamsPayload | MattermostPayload | GoogleChatPayload | TelegramPayload | CustomPayload;
+
 
 // ============================================================================
 // Interface
@@ -76,8 +113,8 @@ export interface INotificationService {
 // Payload Builders
 // ============================================================================
 
-const payloadBuilders: Record<string, PayloadBuilder> = {
-  slack: (message, data, config) => ({
+const payloadBuilders: Record<string, (message: string, data: NotificationData, config: NotificationConfig) => WebhookPayload> = {
+  slack: (message: string, data: NotificationData, config: NotificationConfig): SlackPayload => ({
     text: message,
     username: "Release Bot",
     icon_emoji: data.success ? ":rocket:" : ":x:",
@@ -102,7 +139,7 @@ const payloadBuilders: Record<string, PayloadBuilder> = {
       : undefined,
   }),
 
-  discord: (message, data, config) => ({
+  discord: (message: string, data: NotificationData, config: NotificationConfig) => ({
     content: message,
     username: "Release Bot",
     embeds: config.includeTimings && data.timings
@@ -126,7 +163,7 @@ const payloadBuilders: Record<string, PayloadBuilder> = {
       : undefined,
   }),
 
-  teams: (message, data, config) => ({
+  teams: (message: string, data: NotificationData, config: NotificationConfig) => ({
     "@type": "MessageCard",
     "@context": "http://schema.org/extensions",
     themeColor: data.success ? "00FF00" : "FF0000",
@@ -156,7 +193,7 @@ const payloadBuilders: Record<string, PayloadBuilder> = {
       : undefined,
   }),
 
-  mattermost: (message, data, config) => ({
+  mattermost: (message: string, data: NotificationData, config: NotificationConfig) => ({
     text: message,
     username: "Release Bot",
     icon_emoji: data.success ? ":rocket:" : ":x:",
@@ -175,7 +212,7 @@ const payloadBuilders: Record<string, PayloadBuilder> = {
       : undefined,
   }),
 
-  googlechat: (message, data, config) => ({
+  googlechat: (message: string, data: NotificationData, config: NotificationConfig) => ({
     cards: [{
       header: {
         title: data.success ? "Release Successful" : "Release Failed",
@@ -200,13 +237,13 @@ const payloadBuilders: Record<string, PayloadBuilder> = {
     }],
   }),
 
-  telegram: (message, data) => ({
+  telegram: (message: string, data: NotificationData) => ({
     text: `${data.success ? "" : ""} ${message}`,
     parse_mode: "HTML",
     disable_notification: data.success,
   }),
 
-  custom: (message, data, config) => ({
+  custom: (message: string, data: NotificationData, config: NotificationConfig) => ({
     event: data.success ? "release.success" : "release.failure",
     message,
     success: data.success,
@@ -263,49 +300,40 @@ export class NotificationService implements INotificationService {
     const backoff = extConfig.retry?.backoffMultiplier ?? RETRY_DEFAULTS.BACKOFF_MULTIPLIER;
     const timeout = extConfig.timeout ?? TIMEOUTS.NOTIFICATION;
 
-    let lastError: Error | undefined;
+    let lastErrorMsg = "Unknown error";
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        const result = await this.sendWithTimeout(config, data, timeout, extConfig.headers);
+      const result = await this.sendWithTimeout(config, data, timeout, extConfig.headers);
 
+      if (result.success) {
         logger.info(MESSAGES.NOTIFICATION_SENT, { type: config.type ?? "custom" });
         return {
           type: config.type ?? "custom",
           success: true,
-          statusCode: result.status,
-          retryCount: attempt > 1 ? attempt - 1 : undefined,
         };
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error));
+      }
 
-        if (attempt < maxAttempts) {
-          const delay = initialDelay * Math.pow(backoff, attempt - 1);
-          logger.warn(MESSAGES.NOTIFICATION_RETRYING, {
-            attempt,
-            maxAttempts,
-            delay: formatDuration(delay),
-            error: lastError.message,
-          });
-          await sleep(delay);
-        }
+      lastErrorMsg = result.error;
+
+      if (attempt < maxAttempts) {
+        const delay = initialDelay * Math.pow(backoff, attempt - 1);
+        logger.warn(MESSAGES.NOTIFICATION_RETRYING, {
+          attempt,
+          maxAttempts,
+          delay: formatDuration(delay),
+          error: lastErrorMsg,
+        });
+        await sleep(delay);
       }
     }
 
-    logger.error(MESSAGES.NOTIFICATION_FAILED, parseError(lastError));
+    logger.error(MESSAGES.NOTIFICATION_FAILED, { error: lastErrorMsg });
 
-    const result: NotificationResult = {
+    return {
       type: config.type ?? "custom",
       success: false,
-      message: lastError?.message ?? "Unknown error",
-      retryCount: maxAttempts - 1,
+      message: lastErrorMsg,
     };
-
-    if (extConfig.throwOnFailure) {
-      throw lastError ?? new Error("Notification failed");
-    }
-
-    return result;
   }
 
   async sendMultiple(
@@ -351,23 +379,25 @@ export class NotificationService implements INotificationService {
     data: NotificationData,
     timeout: number,
     customHeaders?: Record<string, string>,
-  ): Promise<Response> {
+  ): Promise<{ success: true } | { success: false; error: string }> {
     // Build message
     const status = data.success ? "succeeded" : "failed";
     const defaultMessage = data.packageName
       ? `Release of ${data.packageName}${data.version ? `@${data.version}` : ""} ${status}`
       : `Release ${status}`;
 
+    /* eslint-disable no-template-curly-in-string -- Intentional placeholder syntax for message templates */
     const message = config.messageTemplate
-      ?.replace(/\$\{name\}/g, data.packageName ?? "")
-      .replace(/\$\{version\}/g, data.version ?? "")
-      .replace(/\$\{status\}/g, status)
-      .replace(/\$\{duration\}/g, data.duration ? formatDuration(data.duration) : "")
-      .replace(/\$\{error\}/g, data.error ?? "")
-      .replace(/\$\{branch\}/g, data.branch ?? "")
-      .replace(/\$\{commit\}/g, data.commitSha ?? "")
-      .replace(/\$\{releaseUrl\}/g, data.releaseUrl ?? "")
+      ?.replaceAll('${name}', data.packageName ?? "")
+      .replaceAll('${version}', data.version ?? "")
+      .replaceAll('${status}', status)
+      .replaceAll('${duration}', data.duration ? formatDuration(data.duration) : "")
+      .replaceAll('${error}', data.error ?? "")
+      .replaceAll('${branch}', data.branch ?? "")
+      .replaceAll('${commit}', data.commitSha ?? "")
+      .replaceAll('${releaseUrl}', data.releaseUrl ?? "")
       ?? defaultMessage;
+    /* eslint-enable no-template-curly-in-string */
 
     // Get payload builder
     const builderType = config.type ?? "custom";
@@ -392,10 +422,13 @@ export class NotificationService implements INotificationService {
       });
 
       if (!response.ok) {
-        throw new Error(`Webhook returned ${response.status}: ${response.statusText}`);
+        return { success: false, error: `Webhook returned ${response.status}: ${response.statusText}` };
       }
 
-      return response;
+      return { success: true };
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      return { success: false, error: errorMsg };
     } finally {
       clearTimeout(timeoutId);
     }

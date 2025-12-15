@@ -1087,7 +1087,12 @@ class LeadsRepositoryImpl implements LeadsRepository {
       }
 
       // Only update if lead is not already unsubscribed
-      if (existingLead.status !== LeadStatus.UNSUBSCRIBED) {
+      if (existingLead.status === LeadStatus.UNSUBSCRIBED) {
+        logger.debug("Lead already unsubscribed", {
+          email,
+          leadId: existingLead.id,
+        });
+      } else {
         await db
           .update(leads)
           .set({
@@ -1098,11 +1103,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
           .where(eq(leads.email, email));
 
         logger.debug("Lead status updated to unsubscribed", {
-          email,
-          leadId: existingLead.id,
-        });
-      } else {
-        logger.debug("Lead already unsubscribed", {
           email,
           leadId: existingLead.id,
         });
@@ -1351,7 +1351,13 @@ class LeadsRepositoryImpl implements LeadsRepository {
               )
               .limit(1);
 
-            if (!existingRelationship) {
+            if (existingRelationship) {
+              logger.debug("User-lead relationship already exists (internal)", {
+                userId: options.userId,
+                leadId: existingLead.id,
+                relationshipId: existingRelationship.id,
+              });
+            } else {
               await tx
                 .insert(userLeadLinks)
                 .values({
@@ -1364,12 +1370,6 @@ class LeadsRepositoryImpl implements LeadsRepository {
               logger.debug("User-lead relationship created (internal)", {
                 userId: options.userId,
                 leadId: existingLead.id,
-              });
-            } else {
-              logger.debug("User-lead relationship already exists (internal)", {
-                userId: options.userId,
-                leadId: existingLead.id,
-                relationshipId: existingRelationship.id,
               });
             }
           }
@@ -1741,7 +1741,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         stringValue.includes(CSV_QUOTE) ||
         stringValue.includes(CSV_NEWLINE)
       ) {
-        const quotedValue = stringValue.replace(
+        const quotedValue = stringValue.replaceAll(
           new RegExp(CSV_QUOTE, "g"),
           CSV_DOUBLE_QUOTE,
         );
@@ -2060,14 +2060,16 @@ class LeadsRepositoryImpl implements LeadsRepository {
         for (const lead of matchingLeads) {
           try {
             // If status is being updated, validate the transition
-            if (updates.status && updates.status !== lead.status) {
-              if (!isStatusTransitionAllowed(lead.status, updates.status)) {
-                errors.push({
-                  leadId: lead.id,
-                  error: INVALID_STATUS_TRANSITION_ERROR,
-                });
-                continue;
-              }
+            if (
+              updates.status &&
+              updates.status !== lead.status &&
+              !isStatusTransitionAllowed(lead.status, updates.status)
+            ) {
+              errors.push({
+                leadId: lead.id,
+                error: INVALID_STATUS_TRANSITION_ERROR,
+              });
+              continue;
             }
 
             await tx.update(leads).set(updateData).where(eq(leads.id, lead.id));
@@ -2504,7 +2506,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         linkReason,
       });
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Failed to link leads", parseError(error));
       return fail({

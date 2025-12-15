@@ -255,7 +255,7 @@ export function ChatMessages({
   useEffect(() => {
     // Get the last message
     const allMessages = Object.values(activeThreadMessages);
-    const lastMessage = allMessages[allMessages.length - 1];
+    const lastMessage = allMessages.at(-1);
     if (!lastMessage) {
       return;
     }
@@ -379,8 +379,8 @@ export function ChatMessages({
                   logger={logger}
                   onMessageClick={(messageId): void => {
                     // Scroll to message when reference is clicked
-                    const element = document.getElementById(
-                      `${DOM_IDS.MESSAGE_PREFIX}${messageId}`,
+                    const element = document.querySelector(
+                      `#${CSS.escape(`${DOM_IDS.MESSAGE_PREFIX}${messageId}`)}`,
                     );
                     element?.scrollIntoView({
                       behavior: "smooth",

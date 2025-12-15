@@ -1,4 +1,3 @@
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Pressable, View } from "react-native";
@@ -17,7 +16,7 @@ import type {
 import { toastVariants } from "@/packages/next-vibe-ui/web/ui/toast";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Span } from "./span";
 
 // Re-export types for cross-platform compatibility
@@ -35,9 +34,9 @@ export type {
 export type ToastActionElement = React.ReactElement<ToastActionProps>;
 export type ToastProps = ToastRootProps;
 
-const StyledAnimatedView = styled(Animated.View, { className: "style" });
-const StyledView = styled(View, { className: "style" });
-const StyledPressable = styled(Pressable, { className: "style" });
+const StyledAnimatedView = styledNative(Animated.View);
+const StyledView = styledNative(View);
+const StyledPressable = styledNative(Pressable);
 
 export function ToastProvider({
   children,
@@ -189,9 +188,7 @@ export function ToastTitle({
 }: ToastTitleProps): React.JSX.Element {
   // Native uses className for styling via NativeWind (either style OR className, not both)
   return (
-    <Span
-      className={cn("text-sm font-semibold text-foreground", className)}
-    >
+    <Span className={cn("text-sm font-semibold text-foreground", className)}>
       {children}
     </Span>
   );

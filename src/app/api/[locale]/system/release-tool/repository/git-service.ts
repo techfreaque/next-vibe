@@ -330,7 +330,7 @@ export class GitService implements IGitService {
         }
       }
 
-      return success(undefined);
+      return success();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       return fail({

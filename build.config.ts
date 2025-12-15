@@ -9,6 +9,7 @@
  *   vibe builder --configPath="build.config.ts"  # Explicit config
  */
 
+import { BunBuildTypeEnum, BunTargetEnum, SourcemapModeEnum } from "@/app/api/[locale]/system/builder/enum";
 import type { BuildConfig } from "@/app/api/[locale]/system/builder/repository";
 
 const config: BuildConfig = {
@@ -20,7 +21,7 @@ const config: BuildConfig = {
     {
       input: "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
       output: ".dist/bin/vibe-runtime.js",
-      type: "executable",
+      type: BunBuildTypeEnum.EXECUTABLE,
       modulesToExternalize: [
         // React/Next.js should be peer dependencies
         "react",
@@ -42,8 +43,8 @@ const config: BuildConfig = {
         "lightningcss",
       ],
       bunOptions: {
-        target: "bun",
-        sourcemap: "external",
+        target: BunTargetEnum.BUN,
+        sourcemap: SourcemapModeEnum.EXTERNAL,
         // Note: Bun automatically adds #!/usr/bin/env bun when target is "bun"
       },
     },

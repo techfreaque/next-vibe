@@ -100,7 +100,6 @@ export default async function LoginPage({
   const loginOptionsResponse = await loginRepository.getLoginOptions(
     logger,
     locale,
-    undefined,
   );
   if (!loginOptionsResponse.success) {
     return (

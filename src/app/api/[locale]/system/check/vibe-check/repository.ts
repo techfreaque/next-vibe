@@ -8,14 +8,16 @@ import "server-only";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import { ensureConfigReady } from "../config/repository";
+import { lintRepository } from "../lint/repository";
 import { oxlintRepository } from "../oxlint/repository";
 import { typecheckRepository } from "../typecheck/repository";
 import type {
@@ -42,6 +44,26 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
     logger: EndpointLogger,
   ): Promise<BaseResponseType<VibeCheckResponseOutput>> {
     try {
+      // Use unified config management - checks, creates if needed, and regenerates
+      // This handles everything at the top level for all sub-checks
+      const configResult = await ensureConfigReady(logger, data.createConfig);
+
+      if (!configResult.ready) {
+        return success({
+          success: false,
+          issues: [{
+            file: configResult.configPath,
+            severity: "error" as const,
+            message: configResult.message,
+            type: "oxlint" as const,
+          }],
+        }, { isErrorResponse: true });
+      }
+
+      // Config is ready and all generated files are up-to-date
+      // Sub-repositories will also call ensureConfigReady but config will already exist
+      // so they will just verify it's up-to-date (fast check)
+
       // Prepare paths for checking - handle both string and array inputs
       let pathsToCheck: (string | undefined)[];
       if (data.paths) {
@@ -60,7 +82,7 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
           const promises = [];
 
           // Run oxlint if not skipped (fast Rust linter)
-          if (!data.skipLint) {
+          if (!data.skipLint && configResult.config.oxlint.enabled) {
             logger.info("Starting Oxlint check...");
             promises.push(
               oxlintRepository
@@ -70,7 +92,7 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
                     verbose: logger.isDebugEnabled,
                     fix: data.fix || false,
                     timeout: data.timeout,
-                    createConfig: data.createConfig || false,
+                    createConfig: false, // Config handled at vibe-check level
                   },
                   logger,
                 )
@@ -82,30 +104,30 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
           }
 
           // Run ESLint if not skipped (i18n + custom AST rules)
-          // if (!data.skipLint) {
-          //   logger.info("Starting ESLint check...");
-          //   promises.push(
-          //     lintRepository
-          //       .execute(
-          //         {
-          //           path: path || "./",
-          //           verbose: logger.isDebugEnabled,
-          //           fix: data.fix || false,
-          //           timeout: data.timeout,
-          //           cacheDir: "./.tmp",
-          //         },
-          //         locale,
-          //         logger,
-          //       )
-          //       .then((result) => {
-          //         logger.info("✓ ESLint check completed");
-          //         return result;
-          //       }),
-          //   );
-          // }
+          if (!data.skipLint && configResult.config.eslint.enabled) {
+            logger.info("Starting ESLint check...");
+            promises.push(
+              lintRepository
+                .execute(
+                  {
+                    path: path || "./",
+                    verbose: logger.isDebugEnabled,
+                    fix: data.fix || false,
+                    timeout: data.timeout,
+                    cacheDir: configResult.config.eslint.cachePath,
+                    createConfig: false, // Config handled at vibe-check level
+                  },
+                  logger,
+                )
+                .then((result) => {
+                  logger.info("✓ ESLint check completed");
+                  return result;
+                }),
+            );
+          }
 
           // Run typecheck if not skipped
-          if (!data.skipTypecheck) {
+          if (!data.skipTypecheck && configResult.config.typecheck.enabled) {
             logger.info("Starting TypeScript check...");
             promises.push(
               typecheckRepository
@@ -113,6 +135,8 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
                   {
                     path, // This can be undefined for full project check
                     disableFilter: false,
+                    createConfig: false, // Config handled at vibe-check level
+                    timeout: data.timeout, // Pass timeout from vibe-check
                   },
                   logger,
                 )
@@ -167,7 +191,8 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
         issues: allIssues,
       };
 
-      return success(response);
+      // Return with isErrorResponse: true if there are errors so CLI exits with non-zero code
+      return success(response, hasErrors ? { isErrorResponse: true } : undefined);
     } catch (error) {
       logger.error("Vibe check failed", parseError(error));
       return fail({

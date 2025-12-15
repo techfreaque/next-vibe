@@ -96,35 +96,35 @@ export async function executeMCPTool<T>(
 // Type-Safe Wrapper Functions
 // ============================================================================
 
-export async function executeClick<T = BrowserResponseOutput>(
+export function executeClick<T = BrowserResponseOutput>(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<ResponseType<T>> {
   return executeMCPTool<T>(params, logger);
 }
 
-export async function executeClosePage<T = BrowserResponseOutput>(
+export function executeClosePage<T = BrowserResponseOutput>(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<ResponseType<T>> {
   return executeMCPTool<T>(params, logger);
 }
 
-export async function executeDrag<T = BrowserResponseOutput>(
+export function executeDrag<T = BrowserResponseOutput>(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<ResponseType<T>> {
   return executeMCPTool<T>(params, logger);
 }
 
-export async function executeFill<T = BrowserResponseOutput>(
+export function executeFill<T = BrowserResponseOutput>(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<ResponseType<T>> {
   return executeMCPTool<T>(params, logger);
 }
 
-export async function executeEmulate(
+export function executeEmulate(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<
@@ -142,7 +142,7 @@ export async function executeEmulate(
   return executeMCPTool(params, logger);
 }
 
-export async function executeEvaluateScript(
+export function executeEvaluateScript(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<
@@ -160,7 +160,7 @@ export async function executeEvaluateScript(
   return executeMCPTool(params, logger);
 }
 
-export async function executeFillForm(
+export function executeFillForm(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<
@@ -181,7 +181,7 @@ export async function executeFillForm(
   return executeMCPTool(params, logger);
 }
 
-export async function executeGetConsoleMessage(
+export function executeGetConsoleMessage(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<
@@ -202,105 +202,105 @@ export async function executeGetConsoleMessage(
   return executeMCPTool(params, logger);
 }
 
-export async function executeGetNetworkRequest(
-  params: MCPToolParams,
-  logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, logger);
-}
-
-export async function executeHandleDialog(
-  params: MCPToolParams,
-  logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, logger);
-}
-
-export async function executeHover(
-  params: MCPToolParams,
-  logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, logger);
-}
-
-export async function executeListConsoleMessages(
-  params: MCPToolParams,
-  logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, logger);
-}
-
-export async function executeListNetworkRequests(
-  params: MCPToolParams,
-  logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, logger);
-}
-
-export async function executeListPages(
-  params: MCPToolParams,
-  logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, logger);
-}
-
-export async function executeNavigatePage(
-  params: MCPToolParams,
-  logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, logger);
-}
-
-export async function executeNewPage(
-  params: MCPToolParams,
-  logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, logger);
-}
-
-export async function executePerformanceAnalyzeInsight(
-  params: MCPToolParams,
-  logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, logger);
-}
-
-export async function executePerformanceStartTrace(
-  params: MCPToolParams,
-  logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, logger);
-}
-
-export async function executePerformanceStopTrace(
-  params: MCPToolParams,
-  logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, logger);
-}
-
-export async function executePressKey<T = BrowserResponseOutput>(
+export function executeGetNetworkRequest<T = BrowserResponseOutput>(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<ResponseType<T>> {
   return executeMCPTool<T>(params, logger);
 }
 
-export async function executeResizePage<T = BrowserResponseOutput>(
+export function executeHandleDialog(
+  params: MCPToolParams,
+  logger: EndpointLogger,
+): Promise<ResponseType<BrowserResponseOutput>> {
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
+}
+
+export function executeHover(
+  params: MCPToolParams,
+  logger: EndpointLogger,
+): Promise<ResponseType<BrowserResponseOutput>> {
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
+}
+
+export function executeListConsoleMessages(
+  params: MCPToolParams,
+  logger: EndpointLogger,
+): Promise<ResponseType<BrowserResponseOutput>> {
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
+}
+
+export function executeListNetworkRequests(
+  params: MCPToolParams,
+  logger: EndpointLogger,
+): Promise<ResponseType<BrowserResponseOutput>> {
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
+}
+
+export function executeListPages(
+  params: MCPToolParams,
+  logger: EndpointLogger,
+): Promise<ResponseType<BrowserResponseOutput>> {
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
+}
+
+export function executeNavigatePage(
+  params: MCPToolParams,
+  logger: EndpointLogger,
+): Promise<ResponseType<BrowserResponseOutput>> {
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
+}
+
+export function executeNewPage(
+  params: MCPToolParams,
+  logger: EndpointLogger,
+): Promise<ResponseType<BrowserResponseOutput>> {
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
+}
+
+export function executePerformanceAnalyzeInsight(
+  params: MCPToolParams,
+  logger: EndpointLogger,
+): Promise<ResponseType<BrowserResponseOutput>> {
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
+}
+
+export function executePerformanceStartTrace(
+  params: MCPToolParams,
+  logger: EndpointLogger,
+): Promise<ResponseType<BrowserResponseOutput>> {
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
+}
+
+export function executePerformanceStopTrace(
+  params: MCPToolParams,
+  logger: EndpointLogger,
+): Promise<ResponseType<BrowserResponseOutput>> {
+  return executeMCPTool<BrowserResponseOutput>(params, logger);
+}
+
+export function executePressKey<T = BrowserResponseOutput>(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<ResponseType<T>> {
   return executeMCPTool<T>(params, logger);
 }
 
-export async function executeSelectPage<T = BrowserResponseOutput>(
+export function executeResizePage<T = BrowserResponseOutput>(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<ResponseType<T>> {
   return executeMCPTool<T>(params, logger);
 }
 
-export async function executeTakeScreenshot(
+export function executeSelectPage<T = BrowserResponseOutput>(
+  params: MCPToolParams,
+  logger: EndpointLogger,
+): Promise<ResponseType<T>> {
+  return executeMCPTool<T>(params, logger);
+}
+
+export function executeTakeScreenshot(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<
@@ -319,7 +319,7 @@ export async function executeTakeScreenshot(
   return executeMCPTool(params, logger);
 }
 
-export async function executeTakeSnapshot(
+export function executeTakeSnapshot(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<
@@ -338,7 +338,7 @@ export async function executeTakeSnapshot(
   return executeMCPTool(params, logger);
 }
 
-export async function executeUploadFile(
+export function executeUploadFile(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<
@@ -355,7 +355,7 @@ export async function executeUploadFile(
   return executeMCPTool(params, logger);
 }
 
-export async function executeWaitFor(
+export function executeWaitFor(
   params: MCPToolParams,
   logger: EndpointLogger,
 ): Promise<

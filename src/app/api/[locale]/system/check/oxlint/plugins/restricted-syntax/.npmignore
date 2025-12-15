@@ -1,6 +1,0 @@
-src/
-tsconfig.json
-*.test.ts
-*.spec.ts
-.DS_Store
-node_modules/

@@ -15,9 +15,17 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type endpoints from "../definition";
-import { BuildProfileEnum, StepStatusEnum } from "../definition";
-import { buildCache } from "./build-cache";
+import type {
+  BuilderRequest,
+  BuilderResponse,
+  BuildProfile,
+  BuildReport,
+  BuildStepResult,
+  BundleAnalysis,
+  FileToCompile,
+} from "../definition";
+import { isBunBuildType } from "../definition";
+import { BuildProfileEnum, StepStatusEnum } from "../enum";
 import { bunCompiler } from "./bun-compiler";
 import { bundleAnalyzer } from "./bundle-analyzer";
 import { configLoader } from "./config-loader";
@@ -29,26 +37,7 @@ import { npmPackageGenerator } from "./npm-package-generator";
 import { outputFormatter } from "./output-formatter";
 import { profileService } from "./profile-service";
 import { reportGenerator } from "./report-generator";
-import type {
-  BuildProfile,
-  BuildReport,
-  BuildStepResult,
-  BundleAnalysis,
-  CacheStats,
-  FileToCompile,
-} from "./types";
-import { isBunBuild } from "./types";
 import { viteCompiler } from "./vite-compiler";
-
-// ============================================================================
-// Request/Response Types - Derived from Definition
-// ============================================================================
-
-/** Build request type derived from definition */
-export type BuildRequest = typeof endpoints.POST.types.RequestOutput;
-
-/** Build response type derived from definition */
-export type BuildResponse = typeof endpoints.POST.types.ResponseOutput;
 
 // ============================================================================
 // Interface
@@ -59,10 +48,10 @@ export interface IBuildExecutor {
    * Execute a build based on the provided configuration
    */
   execute(
-    data: BuildRequest,
+    data: BuilderRequest,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<BuildResponse>>;
+  ): Promise<ResponseType<BuilderResponse>>;
 }
 
 // ============================================================================
@@ -71,10 +60,10 @@ export interface IBuildExecutor {
 
 export class BuildExecutor implements IBuildExecutor {
   async execute(
-    data: BuildRequest,
+    data: BuilderRequest,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<BuildResponse>> {
+  ): Promise<ResponseType<BuilderResponse>> {
     const startTime = Date.now();
     const output: string[] = [];
     const filesBuilt: string[] = [];
@@ -84,22 +73,14 @@ export class BuildExecutor implements IBuildExecutor {
 
     // Extract config from configObject (new structure)
     const configObject = data.configObject;
-    const profile: BuildProfile = (configObject?.profile as BuildProfile) || "development";
-    const useCache = configObject?.cache !== false;
+    const profile: BuildProfile =
+      (configObject?.profile as BuildProfile) || "development";
     const useParallel = configObject?.parallel !== false;
     const dryRun = configObject?.dryRun;
     const verbose = configObject?.verbose;
     const analyze = configObject?.analyze;
     const minify = configObject?.minify;
     const report = configObject?.report;
-
-    // Reset cache stats
-    buildCache.resetStats();
-
-    // Load cache if enabled
-    if (useCache) {
-      buildCache.load();
-    }
 
     try {
       // Build header with profile info
@@ -120,7 +101,9 @@ export class BuildExecutor implements IBuildExecutor {
         data.configPath,
         {
           foldersToClean: configObject?.foldersToClean,
-          filesToCompile: configObject?.filesToCompile as FileToCompile[] | undefined,
+          filesToCompile: configObject?.filesToCompile as
+            | FileToCompile[]
+            | undefined,
           filesOrFoldersToCopy: configObject?.filesOrFoldersToCopy ?? undefined,
           npmPackage: configObject?.npmPackage ?? undefined,
         },
@@ -138,9 +121,13 @@ export class BuildExecutor implements IBuildExecutor {
       }
 
       // Apply profile-specific settings
-      let buildConfig = profileService.applySettings(configResult.data, profile, {
-        minify,
-      });
+      let buildConfig = profileService.applySettings(
+        configResult.data,
+        profile,
+        {
+          minify,
+        },
+      );
 
       // Validate configuration
       const validation = configValidator.validate(buildConfig, t);
@@ -160,21 +147,26 @@ export class BuildExecutor implements IBuildExecutor {
       // Dry run notice
       if (dryRun) {
         output.push(
-          outputFormatter.formatWarning(t("app.api.system.builder.messages.dryRunMode")),
+          outputFormatter.formatWarning(
+            t("app.api.system.builder.messages.dryRunMode"),
+          ),
         );
       }
 
       // Execute pre-build hook
       if (buildConfig.hooks?.preBuild) {
         output.push(
-          outputFormatter.formatStep(t("app.api.system.builder.messages.runningPreBuild")),
+          outputFormatter.formatStep(
+            t("app.api.system.builder.messages.runningPreBuild"),
+          ),
         );
         await buildConfig.hooks.preBuild({
           config: buildConfig,
           profile,
           outputDir: buildConfig.foldersToClean?.[0] || "dist",
           logger,
-          addOutput: (msg) => output.push(outputFormatter.formatItem("hook", msg)),
+          addOutput: (msg) =>
+            output.push(outputFormatter.formatItem("hook", msg)),
         });
       }
 
@@ -210,7 +202,6 @@ export class BuildExecutor implements IBuildExecutor {
           profile,
           buildConfig.hooks?.onFileCompiled,
           useParallel,
-          useCache,
         );
 
         if (!compileResult.success) {
@@ -289,20 +280,18 @@ export class BuildExecutor implements IBuildExecutor {
       // Execute post-build hook
       if (buildConfig.hooks?.postBuild) {
         output.push(
-          outputFormatter.formatStep(t("app.api.system.builder.messages.runningPostBuild")),
+          outputFormatter.formatStep(
+            t("app.api.system.builder.messages.runningPostBuild"),
+          ),
         );
         await buildConfig.hooks.postBuild({
           config: buildConfig,
           profile,
           outputDir: buildConfig.foldersToClean?.[0] || "dist",
           logger,
-          addOutput: (msg) => output.push(outputFormatter.formatItem("hook", msg)),
+          addOutput: (msg) =>
+            output.push(outputFormatter.formatItem("hook", msg)),
         });
-      }
-
-      // Save cache
-      if (useCache && !dryRun) {
-        buildCache.save();
       }
 
       // Build summary
@@ -317,16 +306,10 @@ export class BuildExecutor implements IBuildExecutor {
         profile,
       );
 
-      // Cache statistics
-      const cacheStats = buildCache.getStats();
-      if (useCache && (cacheStats.hits > 0 || cacheStats.misses > 0)) {
-        output.push(
-          outputFormatter.formatStep(reportGenerator.formatCacheStats(cacheStats, t)),
-        );
-      }
-
       output.push(
-        outputFormatter.formatSuccess(t("app.api.system.builder.messages.buildComplete")),
+        outputFormatter.formatSuccess(
+          t("app.api.system.builder.messages.buildComplete"),
+        ),
       );
       logger.info("Build complete", {
         duration,
@@ -352,7 +335,6 @@ export class BuildExecutor implements IBuildExecutor {
             stepResults,
             filesBuilt,
             filesCopied,
-            useCache ? cacheStats : undefined,
             bundleAnalysisResult,
           ),
           output,
@@ -360,34 +342,29 @@ export class BuildExecutor implements IBuildExecutor {
         );
       }
 
-      const response: BuildResponse = {
+      const response: BuilderResponse = {
         success: true,
         output: output.join("\n"),
         duration,
         filesBuilt: filesBuilt.length > 0 ? filesBuilt : null,
         filesCopied: filesCopied.length > 0 ? filesCopied : null,
         packageJson: packageJsonContent,
-        profileUsed: profile === "production"
-          ? BuildProfileEnum.PRODUCTION
-          : BuildProfileEnum.DEVELOPMENT,
-        cacheStats:
-          useCache && (cacheStats.hits > 0 || cacheStats.misses > 0)
-            ? {
-                hits: cacheStats.hits,
-                misses: cacheStats.misses,
-                hitRate: `${((cacheStats.hits / (cacheStats.hits + cacheStats.misses)) * 100).toFixed(1)}%`,
-                timeSaved: cacheStats.timeSaved,
-              }
-            : undefined,
+        profileUsed:
+          profile === "production"
+            ? BuildProfileEnum.PRODUCTION
+            : BuildProfileEnum.DEVELOPMENT,
         reportPath,
-        stepTimings: stepResults.length > 0
-          ? stepResults.map((s) => ({
-              step: s.step,
-              duration: s.duration,
-              status: s.success ? StepStatusEnum.SUCCESS : StepStatusEnum.FAILED,
-              filesAffected: s.filesAffected?.length,
-            }))
-          : null,
+        stepTimings:
+          stepResults.length > 0
+            ? stepResults.map((s) => ({
+                step: s.step,
+                duration: s.duration,
+                status: s.success
+                  ? StepStatusEnum.SUCCESS
+                  : StepStatusEnum.FAILED,
+                filesAffected: s.filesAffected?.length,
+              }))
+            : null,
       };
       return success(response);
     } catch (error) {
@@ -403,7 +380,9 @@ export class BuildExecutor implements IBuildExecutor {
       );
       if (suggestions.length > 0) {
         output.push(
-          outputFormatter.formatSection(t("app.api.system.builder.messages.suggestions")),
+          outputFormatter.formatSection(
+            t("app.api.system.builder.messages.suggestions"),
+          ),
         );
         for (const suggestion of suggestions) {
           output.push(outputFormatter.formatItem("→", suggestion));
@@ -434,12 +413,17 @@ export class BuildExecutor implements IBuildExecutor {
     profile: BuildProfile = "development",
     onFileCompiled?: (filePath: string, size: number) => void,
     parallel = true,
-    useCache = true,
   ): Promise<ResponseType<string[]>> {
     output.push(
-      outputFormatter.formatSection(t("app.api.system.builder.messages.compilingFiles")),
+      outputFormatter.formatSection(
+        t("app.api.system.builder.messages.compilingFiles"),
+      ),
     );
-    logger.info("Compiling files", { count: files.length, profile, parallel, useCache });
+    logger.info("Compiling files", {
+      count: files.length,
+      profile,
+      parallel,
+    });
 
     const compiled: string[] = [];
 
@@ -447,27 +431,15 @@ export class BuildExecutor implements IBuildExecutor {
       // Parallel compilation
       output.push(
         outputFormatter.formatStep(
-          t("app.api.system.builder.messages.parallelCompiling", { count: files.length }),
+          t("app.api.system.builder.messages.parallelCompiling", {
+            count: files.length,
+          }),
         ),
       );
       const startTime = Date.now();
 
       const results = await Promise.all(
         files.map(async (fileConfig): Promise<ResponseType<string[]>> => {
-          // Check cache first
-          if (useCache && !dryRun) {
-            const cacheKey = buildCache.getCacheKey(fileConfig);
-            const cached = buildCache.checkCache(cacheKey, fileConfig.input);
-            if (cached) {
-              buildCache.recordHit();
-              output.push(
-                outputFormatter.formatItem(fileConfig.input, `→ cached (skipped)`),
-              );
-              return success(cached.outputFiles);
-            }
-            buildCache.recordMiss();
-          }
-
           const result = await this.compileSingleFile(
             fileConfig,
             output,
@@ -478,17 +450,6 @@ export class BuildExecutor implements IBuildExecutor {
             verbose,
             profile,
           );
-
-          if (!result.success) {
-            return result;
-          }
-
-          // Update cache
-          if (useCache && !dryRun) {
-            const cacheKey = buildCache.getCacheKey(fileConfig);
-            const hash = buildCache.getFileHash(fileConfig.input);
-            buildCache.updateCache(cacheKey, hash, result.data);
-          }
 
           return result;
         }),
@@ -518,22 +479,6 @@ export class BuildExecutor implements IBuildExecutor {
     } else {
       // Sequential compilation
       for (const fileConfig of files) {
-        // Check cache first
-        if (useCache && !dryRun) {
-          const cacheKey = buildCache.getCacheKey(fileConfig);
-          const cached = buildCache.checkCache(cacheKey, fileConfig.input);
-          if (cached) {
-            buildCache.recordHit();
-            output.push(
-              outputFormatter.formatItem(fileConfig.input, `→ cached (skipped)`),
-            );
-            compiled.push(...cached.outputFiles);
-            filesBuilt.push(...cached.outputFiles);
-            continue;
-          }
-          buildCache.recordMiss();
-        }
-
         const result = await this.compileSingleFile(
           fileConfig,
           output,
@@ -547,13 +492,6 @@ export class BuildExecutor implements IBuildExecutor {
 
         if (!result.success) {
           return result;
-        }
-
-        // Update cache
-        if (useCache && !dryRun) {
-          const cacheKey = buildCache.getCacheKey(fileConfig);
-          const hash = buildCache.getFileHash(fileConfig.input);
-          buildCache.updateCache(cacheKey, hash, result.data);
         }
 
         compiled.push(...result.data);
@@ -587,7 +525,7 @@ export class BuildExecutor implements IBuildExecutor {
     verbose?: boolean,
     profile: BuildProfile = "development",
   ): Promise<ResponseType<string[]>> {
-    if (isBunBuild(fileConfig)) {
+    if (isBunBuildType(fileConfig.type)) {
       return bunCompiler.compileFile(
         fileConfig,
         output,
@@ -622,7 +560,6 @@ export class BuildExecutor implements IBuildExecutor {
     steps: BuildStepResult[],
     filesBuilt: string[],
     filesCopied: string[],
-    cacheStats?: CacheStats,
     bundleAnalysis?: BundleAnalysis,
   ): BuildReport {
     return {
@@ -632,7 +569,6 @@ export class BuildExecutor implements IBuildExecutor {
       success: true,
       steps,
       files: { built: filesBuilt, copied: filesCopied },
-      cache: cacheStats,
       bundleAnalysis,
       environment: {
         nodeVersion: process.version,

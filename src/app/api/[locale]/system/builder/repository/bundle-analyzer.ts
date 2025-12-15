@@ -6,9 +6,11 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, extname, resolve } from "node:path";
 
+import type { TFunction } from "@/i18n/core/static-types";
+
+import type { BundleAnalysis } from "../definition";
 import { ROOT_DIR, SIZE_THRESHOLDS } from "./constants";
 import { outputFormatter } from "./output-formatter";
-import type { BundleAnalysis, TranslateFunction } from "./types";
 
 // ============================================================================
 // Interface
@@ -21,7 +23,7 @@ export interface IBundleAnalyzer {
   analyze(
     outputDir: string,
     output: string[],
-    t: TranslateFunction,
+    t: TFunction,
   ): Promise<BundleAnalysis>;
 
   /**
@@ -48,7 +50,7 @@ export class BundleAnalyzer implements IBundleAnalyzer {
   async analyze(
     outputDir: string,
     output: string[],
-    t: TranslateFunction,
+    t: TFunction,
   ): Promise<BundleAnalysis> {
     const dirPath = resolve(ROOT_DIR, outputDir);
     const analysis: BundleAnalysis = {

@@ -232,94 +232,93 @@ export function SelectorBase<T extends string = string>({
       });
 
       return sortedGroups;
-    } else {
-      // Group by utility - convert utility keys to translated names
-      // Get utility icons and labels from options
-      const utilityIconsMap: Record<string, IconValue> = {};
-      const utilityLabelsMap: Record<string, string> = {};
-
-      // Collect utility icons and labels from options
-      for (const option of optionsToGroup) {
-        if (option.utilityIcons) {
-          Object.entries(option.utilityIcons).forEach(([key, icon]) => {
-            if (!utilityIconsMap[key]) {
-              utilityIconsMap[key] = icon;
-            }
-          });
-        }
-        if (option.utilityLabels) {
-          Object.entries(option.utilityLabels).forEach(([key, label]) => {
-            if (!utilityLabelsMap[key]) {
-              utilityLabelsMap[key] = label;
-            }
-          });
-        }
-      }
-
-      // Track utility order for each group
-      const utilityOrderMap = new Map<string, number>();
-
-      optionsToGroup.forEach((option) => {
-        if (option.utilities && option.utilities.length > 0) {
-          option.utilities.forEach((utilityKey) => {
-            // Use the translated label as the group key, fallback to the raw key
-            const groupKey = utilityLabelsMap[utilityKey] || utilityKey;
-
-            if (!grouped[groupKey]) {
-              grouped[groupKey] = {
-                options: [],
-                icon: utilityIconsMap[utilityKey],
-              };
-              // Store the order for this utility from utilityOrders map
-              if (
-                option.utilityOrders &&
-                option.utilityOrders[utilityKey] !== undefined
-              ) {
-                utilityOrderMap.set(groupKey, option.utilityOrders[utilityKey]);
-              }
-            }
-            grouped[groupKey].options.push(option);
-          });
-        } else {
-          // Options without utilities go to "Others"
-          const othersKey = t("app.chat.selectorBase.others");
-          if (!grouped[othersKey]) {
-            grouped[othersKey] = { options: [] };
-          }
-          grouped[othersKey].options.push(option);
-        }
-      });
-
-      // Sort groups by utility order
-      const sortedGroups: Record<
-        string,
-        { options: SelectorOption<T>[]; icon?: IconValue }
-      > = {};
-
-      // Sort group names by their utility order, "Others" goes last
-      const groupNames =
-        Object.keys(grouped).toSorted?.((a, b) => {
-          const othersKey = t("app.chat.selectorBase.others");
-          // "Others" always goes last
-          if (a === othersKey) {
-            return 1;
-          }
-          if (b === othersKey) {
-            return -1;
-          }
-
-          // Sort by utility order from utilityOrders map
-          const orderA = utilityOrderMap.get(a) ?? Number.MAX_SAFE_INTEGER;
-          const orderB = utilityOrderMap.get(b) ?? Number.MAX_SAFE_INTEGER;
-          return orderA - orderB;
-        }) || [];
-
-      groupNames.forEach((name) => {
-        sortedGroups[name] = grouped[name];
-      });
-
-      return sortedGroups;
     }
+    // Group by utility - convert utility keys to translated names
+    // Get utility icons and labels from options
+    const utilityIconsMap: Record<string, IconValue> = {};
+    const utilityLabelsMap: Record<string, string> = {};
+
+    // Collect utility icons and labels from options
+    for (const option of optionsToGroup) {
+      if (option.utilityIcons) {
+        Object.entries(option.utilityIcons).forEach(([key, icon]) => {
+          if (!utilityIconsMap[key]) {
+            utilityIconsMap[key] = icon;
+          }
+        });
+      }
+      if (option.utilityLabels) {
+        Object.entries(option.utilityLabels).forEach(([key, label]) => {
+          if (!utilityLabelsMap[key]) {
+            utilityLabelsMap[key] = label;
+          }
+        });
+      }
+    }
+
+    // Track utility order for each group
+    const utilityOrderMap = new Map<string, number>();
+
+    optionsToGroup.forEach((option) => {
+      if (option.utilities && option.utilities.length > 0) {
+        option.utilities.forEach((utilityKey) => {
+          // Use the translated label as the group key, fallback to the raw key
+          const groupKey = utilityLabelsMap[utilityKey] || utilityKey;
+
+          if (!grouped[groupKey]) {
+            grouped[groupKey] = {
+              options: [],
+              icon: utilityIconsMap[utilityKey],
+            };
+            // Store the order for this utility from utilityOrders map
+            if (
+              option.utilityOrders &&
+              option.utilityOrders[utilityKey] !== undefined
+            ) {
+              utilityOrderMap.set(groupKey, option.utilityOrders[utilityKey]);
+            }
+          }
+          grouped[groupKey].options.push(option);
+        });
+      } else {
+        // Options without utilities go to "Others"
+        const othersKey = t("app.chat.selectorBase.others");
+        if (!grouped[othersKey]) {
+          grouped[othersKey] = { options: [] };
+        }
+        grouped[othersKey].options.push(option);
+      }
+    });
+
+    // Sort groups by utility order
+    const sortedGroups: Record<
+      string,
+      { options: SelectorOption<T>[]; icon?: IconValue }
+    > = {};
+
+    // Sort group names by their utility order, "Others" goes last
+    const groupNames =
+      Object.keys(grouped).toSorted?.((a, b) => {
+        const othersKey = t("app.chat.selectorBase.others");
+        // "Others" always goes last
+        if (a === othersKey) {
+          return 1;
+        }
+        if (b === othersKey) {
+          return -1;
+        }
+
+        // Sort by utility order from utilityOrders map
+        const orderA = utilityOrderMap.get(a) ?? Number.MAX_SAFE_INTEGER;
+        const orderB = utilityOrderMap.get(b) ?? Number.MAX_SAFE_INTEGER;
+        return orderA - orderB;
+      }) || [];
+
+    groupNames.forEach((name) => {
+      sortedGroups[name] = grouped[name];
+    });
+
+    return sortedGroups;
   }, [filteredOptions, groupMode, sortOrder, t]);
 
   const handleSelect = (id: T): void => {
@@ -543,39 +542,7 @@ export function SelectorBase<T extends string = string>({
             </Div>
           )}
 
-          {!showAll ? (
-            /* Default List View - Favorites Always Visible */
-            <Div
-              className="overflow-y-auto max-h-[400px] overscroll-contain"
-              data-tour={
-                dataTourPrefix ? `${dataTourPrefix}-favorites` : undefined
-              }
-            >
-              <Div className="p-1.5 sm:p-2">
-                {favoriteOptions.length > 0 ? (
-                  favoriteOptions.map((option) => (
-                    <OptionListItem
-                      key={option.id}
-                      id={option.id}
-                      name={option.name}
-                      description={option.description}
-                      tooltip={option.tooltip}
-                      icon={renderIcon(option.icon, ICON_SIZE_MEDIUM)}
-                      isSelected={value === option.id}
-                      isTouch={isTouch}
-                      onSelect={handleSelect}
-                      onToggleFavorite={onToggleFavorite}
-                      locale={locale}
-                    />
-                  ))
-                ) : (
-                  <Div className="text-center py-8 text-muted-foreground text-sm">
-                    {t("app.chat.selectorBase.noFavorites")}
-                  </Div>
-                )}
-              </Div>
-            </Div>
-          ) : (
+          {showAll ? (
             /* Grid View - Favorites, Featured, then Grouped */
             <Div className="overflow-y-auto max-h-[500px] overscroll-contain">
               <Div className="p-3 sm:p-4 flex flex-col gap-5 sm:gap-6">
@@ -641,6 +608,38 @@ export function SelectorBase<T extends string = string>({
                     </Div>
                   </Div>
                 ))}
+              </Div>
+            </Div>
+          ) : (
+            /* Default List View - Favorites Always Visible */
+            <Div
+              className="overflow-y-auto max-h-[400px] overscroll-contain"
+              data-tour={
+                dataTourPrefix ? `${dataTourPrefix}-favorites` : undefined
+              }
+            >
+              <Div className="p-1.5 sm:p-2">
+                {favoriteOptions.length > 0 ? (
+                  favoriteOptions.map((option) => (
+                    <OptionListItem
+                      key={option.id}
+                      id={option.id}
+                      name={option.name}
+                      description={option.description}
+                      tooltip={option.tooltip}
+                      icon={renderIcon(option.icon, ICON_SIZE_MEDIUM)}
+                      isSelected={value === option.id}
+                      isTouch={isTouch}
+                      onSelect={handleSelect}
+                      onToggleFavorite={onToggleFavorite}
+                      locale={locale}
+                    />
+                  ))
+                ) : (
+                  <Div className="text-center py-8 text-muted-foreground text-sm">
+                    {t("app.chat.selectorBase.noFavorites")}
+                  </Div>
+                )}
               </Div>
             </Div>
           )}

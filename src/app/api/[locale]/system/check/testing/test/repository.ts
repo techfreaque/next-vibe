@@ -8,9 +8,9 @@
 
 import type { ResponseType as ApiResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -49,21 +49,16 @@ class TestRepositoryImpl implements TestRepositoryInterface {
       }
 
       // Build test command with optional path and flags
-      let command = "npm test";
+      let command = "bun test";
 
       // Add specific path if provided
       if (data.path) {
-        command += ` -- ${data.path}`;
+        command += ` ${data.path}`;
       }
 
       // Add watch flag if requested
       if (data.watch) {
         command += " --watch";
-      }
-
-      // Add verbose flag if requested
-      if (data.verbose) {
-        command += " --verbose";
       }
 
       if (data.verbose) {

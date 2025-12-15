@@ -104,12 +104,12 @@ export function useBranchManagement({
       const rootMessages: ChatMessage[] = [];
 
       for (const msg of messages) {
-        if (!msg.parentId) {
-          rootMessages.push(msg);
-        } else {
+        if (msg.parentId) {
           const siblings = childrenMap.get(msg.parentId) || [];
           siblings.push(msg);
           childrenMap.set(msg.parentId, siblings);
+        } else {
+          rootMessages.push(msg);
         }
       }
 
@@ -191,12 +191,10 @@ export function useBranchManagement({
       // Find the index of the new message among its siblings
       const newMsgIndex = siblings.findIndex((s) => s.id === newMsg.id);
 
-      if (newMsgIndex >= 0) {
-        // This is a new branch - auto-switch to it
-        // Only if we haven't already set this in this batch
-        if (!(parentKey in updatesToApply)) {
-          updatesToApply[parentKey] = newMsgIndex;
-        }
+      // This is a new branch - auto-switch to it
+      // Only if we haven't already set this in this batch
+      if (newMsgIndex >= 0 && !(parentKey in updatesToApply)) {
+        updatesToApply[parentKey] = newMsgIndex;
       }
     }
 

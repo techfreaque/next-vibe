@@ -50,13 +50,13 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
 
   const handleDecrement = (): void => {
     const newValue =
-      min !== undefined ? Math.max(min, value - step) : value - step;
+      min === undefined ? value - step : Math.max(min, value - step);
     onChange?.(newValue);
   };
 
   const handleIncrement = (): void => {
     const newValue =
-      max !== undefined ? Math.min(max, value + step) : value + step;
+      max === undefined ? value + step : Math.min(max, value + step);
     onChange?.(newValue);
   };
 

@@ -218,7 +218,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
       }
     }
 
-    if (errors.length) {
+    if (errors.length > 0) {
       logger.error("Email errors");
       return fail({
         message:

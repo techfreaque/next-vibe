@@ -62,8 +62,9 @@ export class LinuxX11FfmpegPulseRecorder extends BaseRecorder {
     };
   }
 
-  protected async stopProcess(process: Subprocess): Promise<void> {
+  protected stopProcess(process: Subprocess): Promise<void> {
     process.kill("SIGINT");
+    return Promise.resolve();
   }
 
   protected override handleStderrLine(line: string): void {
@@ -124,8 +125,9 @@ export class LinuxX11FfmpegAlsaRecorder extends BaseRecorder {
     };
   }
 
-  protected async stopProcess(process: Subprocess): Promise<void> {
+  protected stopProcess(process: Subprocess): Promise<void> {
     process.kill("SIGINT");
+    return Promise.resolve();
   }
 
   protected override handleStderrLine(line: string): void {

@@ -16,7 +16,7 @@ import { useTranslation } from "@/i18n/core/client";
 import type { StyleType } from "../utils/style-type";
 
 // Constants for non-translatable values
-const DECORATIVE_QUOTE = String.fromCharCode(0x201c); // Left double quotation mark
+const DECORATIVE_QUOTE = String.fromCodePoint(0x201c); // Left double quotation mark
 const CODE_BLOCK_BG_COLOR = `rgb(${30} ${41} ${59})`; // Slate-800 background
 
 export type MarkdownProps = {
@@ -171,10 +171,10 @@ export function Markdown({
       // Keep expanded while streaming
       const autoCollapsed = !isStreaming && (hasContent || hasContentAfter);
       return !collapseState.isCollapsed(key, autoCollapsed);
-    } else {
+    }
       // Legacy: use local state
       return expandedThinking.has(index);
-    }
+    
   };
 
   return (

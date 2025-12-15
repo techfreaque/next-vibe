@@ -74,10 +74,8 @@ export function ImapSyncOperations(): JSX.Element {
   // Extract sync status from accounts data
   const accountsResponse = accountsEndpoint.read.response;
   let accounts: ImapAccountsListResponseOutput["accounts"] = [];
-  if (accountsResponse) {
-    if (accountsResponse.success === true) {
-      accounts = accountsResponse.data.accounts;
-    }
+  if (accountsResponse?.success === true) {
+    accounts = accountsResponse.data.accounts;
   }
 
   const syncingAccounts = accounts.filter(

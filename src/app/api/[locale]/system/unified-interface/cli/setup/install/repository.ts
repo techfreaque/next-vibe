@@ -105,7 +105,7 @@ bun "${vibeTsPath}" %*
 REM Exit with the same code as the Bun process
 exit /b %errorlevel%
 `;
-    } else {
+    }
       // Unix shell script (Linux/macOS)
       // eslint-disable-next-line i18next/no-literal-string
       return `#!/bin/bash
@@ -116,7 +116,7 @@ exit /b %errorlevel%
 # Execute with Bun
 exec bun "${vibeTsPath}" "$@"
 `;
-    }
+    
   }
 
   /**

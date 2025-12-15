@@ -139,6 +139,7 @@ export function generateEngagementTrackingApiUrl(
     stage?: string;
     source?: string;
     url: string;
+    ref?: string;
   },
 ): string {
   const apiUrl = new URL(
@@ -155,6 +156,9 @@ export function generateEngagementTrackingApiUrl(
   }
   apiUrl.searchParams.set("source", params.source || "email");
   apiUrl.searchParams.set("url", params.url);
+  if (params.ref) {
+    apiUrl.searchParams.set("ref", params.ref);
+  }
 
   return apiUrl.toString();
 }

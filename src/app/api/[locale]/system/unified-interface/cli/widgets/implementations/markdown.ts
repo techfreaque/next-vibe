@@ -63,52 +63,52 @@ export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
 
     // Convert headings (# Heading)
     // oxlint-disable-next-line no-unused-vars
-    result = result.replace(/^#{1,6}\s+(.+)$/gm, (match, heading) => {
+    result = result.replaceAll(/^#{1,6}\s+(.+)$/gm, (match, heading) => {
       return this.styleText(heading, "bold", context);
     });
 
     // Convert bold (**text** or __text__)
     // oxlint-disable-next-line no-unused-vars
-    result = result.replace(/(\*\*|__)(.+?)\1/g, (match, marker, text) => {
+    result = result.replaceAll(/(\*\*|__)(.+?)\1/g, (match, marker, text) => {
       return this.styleText(text, "bold", context);
     });
 
     // Convert italic (*text* or _text_)
     // oxlint-disable-next-line no-unused-vars
-    result = result.replace(/(\*|_)(.+?)\1/g, (match, marker, text) => {
+    result = result.replaceAll(/(\*|_)(.+?)\1/g, (match, marker, text) => {
       return this.styleText(text, "dim", context);
     });
 
     // oxlint-disable-next-line no-unused-vars
     // Convert inline code (`code`)
     // oxlint-disable-next-line no-unused-vars
-    result = result.replace(/`([^`]+)`/g, (match, code) => {
+    result = result.replaceAll(/`([^`]+)`/g, (match, code) => {
       return this.styleText(code, "blue", context);
     });
 
     // Convert code blocks (```code```)
-    result = result.replace(/```[\s\S]*?```/g, (match) => {
+    result = result.replaceAll(/```[\s\S]*?```/g, (match) => {
       // Remove the backticks
-      const code = match.replace(/```/g, "");
+      const code = match.replaceAll('```', "");
       return this.styleText(code, "blue", context);
     });
 
     // Convert unordered lists (- item or * item)
     // oxlint-disable-next-line no-unused-vars
-    result = result.replace(/^[*-]\s+(.+)$/gm, (match, item) => {
+    result = result.replaceAll(/^[*-]\s+(.+)$/gm, (match, item) => {
       const bullet = context.options.useEmojis ? "•" : "-";
       // eslint-disable-next-line i18next/no-literal-string
       return `${bullet} ${item}`;
     });
 
     // Convert ordered lists (1. item)
-    result = result.replace(/^\d+\.\s+(.+)$/gm, (match) => {
+    result = result.replaceAll(/^\d+\.\s+(.+)$/gm, (match) => {
       return match; // Keep numbered lists as-is
     });
 
     // Convert links [text](url)
     // oxlint-disable-next-line no-unused-vars
-    result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
+    result = result.replaceAll(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
       // For CLI, just show the text with URL in dim
       const styledText = this.styleText(text, "blue", context);
       const styledUrl = this.styleText(`(${url})`, "dim", context);
@@ -117,7 +117,7 @@ export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     });
 
     // Convert horizontal rules (--- or ***)
-    result = result.replace(/^(\*{3,}|-{3,})$/gm, () => {
+    result = result.replaceAll(/^(\*{3,}|-{3,})$/gm, () => {
       return this.createSeparator(40, "─");
     });
 

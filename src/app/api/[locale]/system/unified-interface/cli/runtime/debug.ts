@@ -481,7 +481,7 @@ export class CliResourceManager {
         const handles = this.resourceMonitor.getActiveHandles();
         const requests = this.resourceMonitor.getActiveRequestsCount();
 
-        if (handles.length || requests > 0) {
+        if (handles.length > 0 || requests > 0) {
           logger.info(
             "app.api.system.unifiedInterface.cli.vibe.utils.debug.remainingResources",
           );

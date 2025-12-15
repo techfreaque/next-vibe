@@ -6,15 +6,11 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
+import type { TFunction } from "@/i18n/core/static-types";
+
+import type { BuildProfile, BuildReport, BuildStepResult } from "../definition";
 import { ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
-import type {
-  BuildProfile,
-  BuildReport,
-  BuildStepResult,
-  CacheStats,
-  TranslateFunction,
-} from "./types";
 
 // ============================================================================
 // Interface
@@ -27,7 +23,7 @@ export interface IReportGenerator {
   generate(
     report: BuildReport,
     output: string[],
-    t: TranslateFunction,
+    t: TFunction,
   ): Promise<string>;
 
   /**
@@ -39,14 +35,9 @@ export interface IReportGenerator {
     totalDuration: number,
     filesBuilt: string[],
     filesCopied: string[],
-    t: TranslateFunction,
+    t: TFunction,
     profile: BuildProfile,
   ): void;
-
-  /**
-   * Format cache statistics
-   */
-  formatCacheStats(stats: CacheStats, t: TranslateFunction): string;
 }
 
 // ============================================================================
@@ -57,10 +48,12 @@ export class ReportGenerator implements IReportGenerator {
   async generate(
     report: BuildReport,
     output: string[],
-    t: TranslateFunction,
+    t: TFunction,
   ): Promise<string> {
     output.push(
-      outputFormatter.formatStep(t("app.api.system.builder.messages.generatingReport")),
+      outputFormatter.formatStep(
+        t("app.api.system.builder.messages.generatingReport"),
+      ),
     );
 
     const reportPath = resolve(ROOT_DIR, "dist", "build-report.json");
@@ -75,7 +68,9 @@ export class ReportGenerator implements IReportGenerator {
     const relativePath = "dist/build-report.json";
     output.push(
       outputFormatter.formatSuccess(
-        t("app.api.system.builder.messages.reportGenerated", { path: relativePath }),
+        t("app.api.system.builder.messages.reportGenerated", {
+          path: relativePath,
+        }),
       ),
     );
 
@@ -88,7 +83,7 @@ export class ReportGenerator implements IReportGenerator {
     totalDuration: number,
     filesBuilt: string[],
     filesCopied: string[],
-    t: TranslateFunction,
+    t: TFunction,
     profile: BuildProfile,
   ): void {
     output.push(`\n${"─".repeat(60)}`);
@@ -110,7 +105,7 @@ export class ReportGenerator implements IReportGenerator {
       output.push(`  ${t("app.api.system.builder.messages.stepsCompleted")}:`);
       for (const step of stepResults) {
         let stepInfo = `    ${step.success ? "✓" : "✖"} ${step.step}: ${step.duration}ms`;
-        if (step.size) {
+        if (step.size !== undefined && step.size > 0) {
           stepInfo += ` (${outputFormatter.formatBytes(step.size)})`;
         }
         output.push(stepInfo);
@@ -123,19 +118,6 @@ export class ReportGenerator implements IReportGenerator {
         }
       }
     }
-  }
-
-  formatCacheStats(stats: CacheStats, t: TranslateFunction): string {
-    const hitRate =
-      stats.hits + stats.misses > 0
-        ? ((stats.hits / (stats.hits + stats.misses)) * 100).toFixed(1)
-        : "0";
-
-    return t("app.api.system.builder.messages.cacheStats", {
-      hits: stats.hits,
-      misses: stats.misses,
-      hitRate,
-    });
   }
 }
 

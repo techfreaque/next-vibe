@@ -267,7 +267,7 @@ export function useBatchOperations(
         });
 
         // Submit the form
-        await batchUpdateEndpoint.create.submitForm(undefined);
+        await batchUpdateEndpoint.create.submitForm();
 
         // Response will be handled by useEffect
       } catch (error) {
@@ -312,7 +312,7 @@ export function useBatchOperations(
         });
 
         // Submit the form
-        await batchUpdateEndpoint.create.submitForm(undefined);
+        await batchUpdateEndpoint.create.submitForm();
 
         // Check response
         if (
@@ -353,7 +353,7 @@ export function useBatchOperations(
         });
 
         // Submit the form
-        await batchUpdateEndpoint.create.submitForm(undefined);
+        await batchUpdateEndpoint.create.submitForm();
 
         // Check response
         if (batchUpdateEndpoint.create.response?.success) {
@@ -385,7 +385,7 @@ export function useBatchOperations(
         });
 
         // Submit the form
-        await batchDeleteEndpoint.create.submitForm(undefined);
+        await batchDeleteEndpoint.create.submitForm();
 
         // Check response
         if (
@@ -442,7 +442,7 @@ export function useBatchOperations(
 
         // Submit the form
         logger.debug("app.api.leads.batch.delete.form.submitting");
-        await batchDeleteEndpoint.create.submitForm(undefined);
+        await batchDeleteEndpoint.create.submitForm();
 
         // Response will be handled by useEffect
         logger.debug(
@@ -476,7 +476,7 @@ export function useBatchOperations(
         });
 
         // Submit the form
-        await batchDeleteEndpoint.create.submitForm(undefined);
+        await batchDeleteEndpoint.create.submitForm();
 
         // Check response
         if (batchDeleteEndpoint.create.response?.success) {

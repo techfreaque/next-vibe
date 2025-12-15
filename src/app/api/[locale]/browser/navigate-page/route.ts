@@ -12,8 +12,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: navigatePageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executeMCPTool(
+    handler: ({ data, logger }) =>
+      executeMCPTool(
         {
           toolName: "navigate-page",
           args: filterUndefinedArgs({
@@ -24,7 +24,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

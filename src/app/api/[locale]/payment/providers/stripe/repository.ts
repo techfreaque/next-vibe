@@ -192,7 +192,7 @@ export class StripeProvider implements PaymentProvider {
           logger.debug("Stored invoice in database", {
             sessionId: session.id,
             userId: params.userId,
-            callbackToken: callbackToken.substring(0, 8),
+            callbackToken: callbackToken.slice(0, 8),
           });
         } catch (dbError) {
           logger.error("Failed to store invoice in database", {
@@ -382,7 +382,7 @@ export class StripeProvider implements PaymentProvider {
 
       logger.info("Canceled Stripe subscription", { subscriptionId });
 
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Failed to cancel Stripe subscription", {
         error: parseError(error),

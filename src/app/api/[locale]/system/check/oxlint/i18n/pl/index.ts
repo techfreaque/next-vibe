@@ -80,9 +80,9 @@ export const translations: typeof enTranslations = {
       title: "Zabronione",
       description: "Dostęp zabroniony",
     },
-    configNotFound: "lint.config.ts nie znaleziono w katalogu głównym projektu",
+    configNotFound: "check.config.ts nie znaleziono w katalogu głównym projektu",
     configMissingExport:
-      "lint.config.ts musi eksportować 'config' lub 'default'",
+      "check.config.ts musi eksportować 'default' lub 'config'",
     oxlintFailed: "Oxlint nie powiodło się",
     prettierFailed: "Prettier nie powiódł się z kodem wyjścia",
   },

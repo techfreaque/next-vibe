@@ -12,8 +12,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: closePageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executeClosePage<ClosePageResponseOutput>(
+    handler: ({ data, logger }) =>
+      executeClosePage<ClosePageResponseOutput>(
         {
           toolName: "close-page",
           args: filterUndefinedArgs({
@@ -21,7 +21,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

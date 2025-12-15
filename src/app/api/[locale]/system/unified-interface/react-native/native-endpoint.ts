@@ -248,7 +248,7 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
       status: fetchResponse.status,
       contentType: fetchResponse.headers.get("content-type"),
       bodyLength: responseText.length,
-      bodyPreview: responseText.substring(0, 200),
+      bodyPreview: responseText.slice(0, 200),
     });
 
     // Try to parse as JSON
@@ -259,7 +259,7 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
       logger.error("Failed to parse response as JSON", {
         error:
           parseError instanceof Error ? parseError.message : String(parseError),
-        responseText: responseText.substring(0, 500),
+        responseText: responseText.slice(0, 500),
         contentType: fetchResponse.headers.get("content-type"),
       });
 

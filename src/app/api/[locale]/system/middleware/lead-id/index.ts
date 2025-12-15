@@ -6,16 +6,15 @@
 
 import type { NextRequest, NextResponse } from "next/server";
 import { NextResponse as NextResponseClass } from "next/server";
-
-import type { CountryLanguage } from "@/i18n/core/config";
+import { Environment } from "next-vibe/shared/utils";
 
 import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
 import { env } from "@/config/env";
-import { Environment } from "next-vibe/shared/utils";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import { shouldSkipPath } from "../utils";
-import { createEndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import { leadAuthRepository } from "../../../leads/auth/repository";
+import { createEndpointLogger } from "../../unified-interface/shared/logger/endpoint";
+import { shouldSkipPath } from "../utils";
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

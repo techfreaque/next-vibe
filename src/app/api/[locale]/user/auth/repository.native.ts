@@ -147,7 +147,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
       );
 
       logger.debug("Auth token stored successfully");
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Error storing auth token", parseError(error));
       return fail({
@@ -166,7 +166,7 @@ class AuthRepositoryNativeImpl implements AuthRepository {
       await storage.removeItem(AUTH_EXPIRES_AT_STORAGE_KEY);
 
       logger.debug("Auth token cleared successfully");
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error("Error clearing auth token", parseError(error));
       return fail({

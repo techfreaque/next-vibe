@@ -79,13 +79,13 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
           (key: string, value: SerializableValue) => {
             // Skip internal properties
             if (key.startsWith("_")) {
-              return undefined;
+              return;
             }
             // Handle circular references and complex objects
             if (typeof value === "object" && value !== null) {
               // Return a simplified version of objects
               const valueAsObject = value as SerializableObject;
-              if (Object.keys(valueAsObject).length) {
+              if (Object.keys(valueAsObject).length > 0) {
                 // Create a safe representation of the object
                 const safeObject: SerializableObject = {};
                 // Filter and transform entries
@@ -97,9 +97,9 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
                   }
                 }
                 return safeObject;
-              } else {
-                return value;
               }
+                return value;
+              
             }
             return value;
           },
@@ -134,13 +134,13 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
           (key: string, value: SerializableValue) => {
             // Skip internal properties
             if (key.startsWith("_")) {
-              return undefined;
+              return;
             }
             // Handle circular references and complex objects
             if (typeof value === "object" && value !== null) {
               // Return a simplified version of objects
               const valueAsObject = value as SerializableObject;
-              if (Object.keys(valueAsObject).length) {
+              if (Object.keys(valueAsObject).length > 0) {
                 // Create a safe representation of the object
                 const safeObject: SerializableObject = {};
                 // Filter and transform entries
@@ -152,9 +152,9 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
                   }
                 }
                 return safeObject;
-              } else {
-                return value;
               }
+                return value;
+              
             }
             return value;
           },

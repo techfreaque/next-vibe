@@ -123,7 +123,7 @@ export function format<
 >(strings: string[], values: T): string[] {
   return strings.map((part) =>
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Required by replace() API
-    part.replace(/{(\w+)}/g, (match, key: string) => {
+    part.replaceAll(/{(\w+)}/g, (match, key: string) => {
       const value = values[key];
       if (value === null || value === undefined) {
         return "";

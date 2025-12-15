@@ -65,10 +65,10 @@ const configWithParenthesizedJsx = {
 };
 
 export {
-  testUnknown,
+  configWithIcon,
+  configWithJsx,
+  configWithParenthesizedJsx,
   testObject,
   testThrow,
-  configWithJsx,
-  configWithIcon,
-  configWithParenthesizedJsx,
+  testUnknown,
 };

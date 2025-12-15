@@ -1,14 +1,14 @@
-import type { ReactElement,ReactNode } from "react";
+import type { ReactElement } from "react";
 
 // Cross-platform props interface
 export interface RootStackProps {
-  children?: ReactNode;
+  children?: ReactElement;
 }
 
 /**
  * Platform-agnostic RootStack component (Web implementation)
  * Web doesn't use Stack - just pass through children
  */
-export function RootStack({ children }: RootStackProps): ReactElement {
-  return <>{children}</>;
+export function RootStack({ children }: RootStackProps): ReactElement | null {
+  return children as ReactElement | null;
 }

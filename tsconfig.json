@@ -24,7 +24,7 @@
       "react-native"
     ],
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "typeRoots": [
       "./types",
@@ -56,7 +56,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "nativewind-env.d.ts"
+    "nativewind-env.d.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
@@ -65,6 +66,8 @@
     ".next",
     "to_migrate/**/*.ts",
     "to_migrate/**/*.tsx",
-  ],
-  "extends": "expo/tsconfig.base"
+    "**/test-project/**",
+    "**/test-files/**"
+  ]
+  // "extends": "expo/tsconfig.base"
 }

@@ -48,7 +48,7 @@ class DependencyCheckerImpl implements IDependencyChecker {
   /**
    * Check if a command exists in PATH
    */
-  async which(command: string): Promise<string | null> {
+  which(command: string): Promise<string | null> {
     return which(command);
   }
 
@@ -148,7 +148,7 @@ export async function executeCommand(
  */
 export function escapeShellString(str: string): string {
   // Escape special characters for shell
-  return str.replace(/(["$`\\])/g, "\\$1");
+  return str.replaceAll(/(["$`\\])/g, "\\$1");
 }
 
 /**
@@ -171,7 +171,7 @@ export function generateTempFilePath(
 ): string {
   const dir = tmpDir || getTempDirectory();
   const timestamp = Date.now();
-  const random = Math.random().toString(36).substring(2, 15);
+  const random = Math.random().toString(36).slice(2, 15);
   const filename = `${prefix}_${timestamp}_${random}.${extension}`;
 
   if (process.platform === "win32") {
@@ -206,12 +206,12 @@ export async function deleteFile(path: string): Promise<void> {
 /**
  * Get file size in bytes
  */
-export async function getFileSize(path: string): Promise<number> {
+export function getFileSize(path: string): Promise<number> {
   try {
     const file = Bun.file(path);
-    return file.size;
+    return Promise.resolve(file.size);
   } catch {
-    return 0;
+    return Promise.resolve(0);
   }
 }
 

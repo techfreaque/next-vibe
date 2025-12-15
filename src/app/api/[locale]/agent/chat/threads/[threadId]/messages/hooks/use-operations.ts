@@ -127,7 +127,7 @@ export function useMessageOperations(
     ): Promise<void> => {
       const content = params.content;
       logger.debug("Message operations: Sending message", {
-        content: content.substring(0, 50),
+        content: content.slice(0, 50),
         activeThreadId,
         currentRootFolderId,
         hasToolConfirmation: !!params.toolConfirmation,
@@ -200,7 +200,7 @@ export function useMessageOperations(
             parentMessageId = lastMessage.id;
             logger.debug("Message operations: Using last message as parent", {
               parentMessageId,
-              lastMessageContent: lastMessage.content.substring(0, 50),
+              lastMessageContent: lastMessage.content.slice(0, 50),
               isIncognito: currentRootFolderId === "incognito",
             });
           }
@@ -278,15 +278,15 @@ export function useMessageOperations(
         const { useAIStreamStore } =
           await import("../../../../../ai-stream/hooks/store");
         const streamError = useAIStreamStore.getState().error;
-        if (!streamError) {
+        if (streamError) {
+          logger.warn("Message operations: Stream failed, preserving input", {
+            error: streamError,
+          });
+        } else {
           setInput("");
           logger.debug(
             "Message operations: Input cleared after successful stream",
           );
-        } else {
-          logger.warn("Message operations: Stream failed, preserving input", {
-            error: streamError,
-          });
         }
       } catch (error) {
         const errorMessage = parseError(error);
@@ -424,7 +424,7 @@ export function useMessageOperations(
 
         logger.info("Branch operation details", {
           sourceMessageId: messageId,
-          sourceMessageContent: message.content.substring(0, 50),
+          sourceMessageContent: message.content.slice(0, 50),
           sourceMessageParentId: message.parentId,
           sourceMessageDepth: message.depth,
           branchParentId,

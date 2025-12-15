@@ -78,6 +78,30 @@ const { POST } = createEndpoint({
         z.boolean().default(false),
       ),
 
+      createConfig: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.check.typecheck.fields.createConfig.label",
+          description:
+            "app.api.system.check.typecheck.fields.createConfig.description",
+          columns: 4,
+        },
+        z.boolean().default(false),
+      ),
+
+      timeout: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.system.check.typecheck.fields.timeout.label",
+          description:
+            "app.api.system.check.typecheck.fields.timeout.description",
+          columns: 4,
+        },
+        z.coerce.number().min(1).max(3600).default(900),
+      ),
+
       // === RESPONSE FIELDS ===
       success: responseField(
         {

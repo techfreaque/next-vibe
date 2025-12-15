@@ -396,7 +396,7 @@ function generateRandomLead(index: number): NewLead {
   const websiteDomain = SAMPLE_WEBSITE_DOMAINS[websiteIndex];
 
   // Generate unique email
-  const baseEmail = contactName.toLowerCase().replace(/\s+/g, ".");
+  const baseEmail = contactName.toLowerCase().replaceAll(/\s+/g, ".");
   const uniqueSuffix = Math.floor(Math.random() * 1000)
     .toString()
     .padStart(3, "0");
@@ -415,9 +415,9 @@ function generateRandomLead(index: number): NewLead {
   // Generate timestamps based on status
   const createdAt = getRandomPastDate(180);
   const campaignStartedAt =
-    campaignStage !== EmailCampaignStage.NOT_STARTED
-      ? getRandomPastDate(90)
-      : null;
+    campaignStage === EmailCampaignStage.NOT_STARTED
+      ? null
+      : getRandomPastDate(90);
   const lastEmailSentAt = emailsSent > 0 ? getRandomPastDate(30) : null;
   const lastEngagementAt = emailsOpened > 0 ? getRandomPastDate(20) : null;
 

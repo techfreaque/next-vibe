@@ -1,5 +1,4 @@
 import * as NavigationMenuPrimitive from "@rn-primitives/navigation-menu";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { View } from "react-native";
@@ -23,12 +22,12 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/navigation-menu";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { buttonVariants } from "./button";
 import { ChevronDown } from "./icons/ChevronDown";
 
-const StyledView = styled(View, { className: "style" });
-const StyledAnimatedView = styled(Animated.View, { className: "style" });
+const StyledView = styledNative(View);
+const StyledAnimatedView = styledNative(Animated.View);
 
 // navigationMenuTriggerStyle helper function (native implementation)
 function navigationMenuTriggerStyle(): string {
@@ -66,7 +65,8 @@ function NavigationMenu({
     >
       <NavigationMenuPrimitive.Root
         value={value}
-        onValueChange={onValueChange ?? (() => undefined)}
+        // oxlint-disable-next-line no-empty-function
+        onValueChange={onValueChange ?? (() => {})}
         delayDuration={delayDuration}
         skipDelayDuration={skipDelayDuration}
         dir={dir}

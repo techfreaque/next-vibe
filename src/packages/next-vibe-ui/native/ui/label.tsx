@@ -1,11 +1,11 @@
 import * as LabelPrimitive from "@rn-primitives/label";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
 import type { LabelRootProps } from "../../web/ui/label";
+import { styledNative } from "../utils/style-converter";
 
-const StyledText = styled(LabelPrimitive.Text, { className: "style" });
+const StyledText = styledNative(LabelPrimitive.Text);
 
 export function Label({
   className,
@@ -16,7 +16,7 @@ export function Label({
     <LabelPrimitive.Root>
       <StyledText
         className={cn(
-          "text-sm text-foreground text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-default",
+          "text-foreground text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-default",
           className,
         )}
         nativeID={htmlFor}

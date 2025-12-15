@@ -124,11 +124,12 @@ export function getLayoutClassName(config: LayoutConfig): string {
   const gapClass = gapClassMap[gap] ?? "gap-4";
 
   switch (type) {
-    case "grid":
+    case "grid": {
       const gridColsClass = columns
         ? (gridColsMap[columns] ?? "grid-cols-1")
         : "grid-cols-1";
       return `grid ${gapClass} ${gridColsClass}`;
+    }
     case "flex":
       return `flex items-center ${gapClass}`;
     case "stack":

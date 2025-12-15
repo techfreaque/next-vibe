@@ -66,11 +66,11 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
 
     const config = this.getTableConfig(field, context.options.locale);
 
-    if (config.columns && config.columns.length) {
+    if (config.columns && config.columns.length > 0) {
       return this.renderTableWithColumns(data.rows, config, context);
-    } else {
-      return this.renderTableAutoColumns(data.rows, context);
     }
+      return this.renderTableAutoColumns(data.rows, context);
+    
   }
 
   private getTableConfig(
@@ -265,7 +265,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
 
     return config.columns.map((col) => {
       if (col.width?.endsWith("%")) {
-        const percentage = parseInt(col.width.replace("%", "")) / 100;
+        const percentage = parseInt(col.width.replace("%", ""), 10) / 100;
         return Math.floor(availableWidth * percentage);
       }
 

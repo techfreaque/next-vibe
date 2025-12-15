@@ -14,7 +14,6 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-
 import type { CIEnvironment, PackageJson, ReleaseOptions } from "../definition";
 import { MESSAGES } from "./constants";
 
@@ -69,7 +68,7 @@ export class Publisher implements IPublisher {
     dryRun: boolean,
   ): ResponseType<void> {
     if (!releaseConfig.ciReleaseCommand) {
-      return success(undefined);
+      return success();
     }
 
     const { command, env: envMapping } = releaseConfig.ciReleaseCommand;
@@ -77,7 +76,7 @@ export class Publisher implements IPublisher {
 
     if (dryRun) {
       logger.info(MESSAGES.DRY_RUN_MODE, { action: commandStr });
-      return success(undefined);
+      return success();
     }
 
     logger.info(MESSAGES.CI_COMMAND_RUNNING, {
@@ -114,7 +113,7 @@ export class Publisher implements IPublisher {
         env: ciEnv as NodeJS.ProcessEnv,
       });
       logger.info(MESSAGES.CI_COMMAND_SUCCESS, { package: packageName });
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error(MESSAGES.CI_COMMAND_FAILED, parseError(error));
       return fail({
@@ -136,12 +135,12 @@ export class Publisher implements IPublisher {
     // Skip private packages
     if (packageJson.private) {
       logger.info(MESSAGES.NPM_PUBLISH_SKIPPED, { package: packageJson.name });
-      return success(undefined);
+      return success();
     }
 
     const npmConfig = releaseConfig.npm;
     if (npmConfig && npmConfig.enabled === false) {
-      return success(undefined);
+      return success();
     }
 
     const tag = npmConfig?.tag ?? packageJson.publishConfig?.tag ?? "latest";
@@ -194,7 +193,7 @@ export class Publisher implements IPublisher {
     try {
       execSync(command, { stdio: "inherit", cwd });
       logger.info(MESSAGES.NPM_PUBLISH_SUCCESS, { package: packageJson.name });
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error(MESSAGES.NPM_PUBLISH_FAILED, parseError(error));
       return fail({
@@ -214,7 +213,7 @@ export class Publisher implements IPublisher {
   ): ResponseType<void> {
     const jsrConfig = releaseConfig.jsr;
     if (!jsrConfig || jsrConfig.enabled === false) {
-      return success(undefined);
+      return success();
     }
 
     logger.info(MESSAGES.JSR_PUBLISHING, { package: packageJson.name });
@@ -238,7 +237,7 @@ export class Publisher implements IPublisher {
     try {
       execSync(command, { stdio: "inherit", cwd });
       logger.info(MESSAGES.JSR_PUBLISH_SUCCESS, { package: packageJson.name });
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error(MESSAGES.JSR_PUBLISH_FAILED, parseError(error));
       return fail({

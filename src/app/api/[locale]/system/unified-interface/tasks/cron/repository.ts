@@ -243,7 +243,7 @@ export class CronTasksRepository implements ICronTasksRepository {
       logger.debug("Deleting cron task", { id });
       await db.delete(cronTasks).where(eq(cronTasks.id, id));
       logger.info("Successfully deleted cron task", { id });
-      return success(undefined);
+      return success();
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to delete cron task", {

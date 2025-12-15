@@ -1,4 +1,4 @@
-import type { BuildConfig } from "../src/config.js";
+import type { BuildConfig } from "../repository/types";
 
 export const testDir = "./test-files";
 export const distDir = `${testDir}/dist`;
@@ -8,25 +8,19 @@ const buildConfig: BuildConfig = {
   foldersToClean: [distDir],
   filesToCompile: [
     {
-      options: {
-        input: `${testDir}/file1.ts`,
-        output: `${distDir}/output1.js`,
-        type: "vanilla",
-      },
+      input: `${testDir}/file1.ts`,
+      output: `${distDir}/output1.js`,
+      type: "vanilla",
     },
     {
-      options: {
-        input: `${testDir}/file2.tsx`,
-        output: `${distDir}/output2.js`,
-        type: "react",
-      },
+      input: `${testDir}/file2.tsx`,
+      output: `${distDir}/output2.js`,
+      type: "react",
     },
     {
-      options: {
-        input: `${testDir}/file3.tsx`,
-        output: `${distDir}/output3.js`,
-        type: "react-tailwind",
-      },
+      input: `${testDir}/file3.tsx`,
+      output: `${distDir}/output3.js`,
+      type: "react-tailwind",
     },
   ],
   filesOrFoldersToCopy: [

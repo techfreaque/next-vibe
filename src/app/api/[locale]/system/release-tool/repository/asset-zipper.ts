@@ -16,7 +16,6 @@ import { success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-
 import type { PackageJson } from "../definition";
 import { MESSAGES } from "./constants";
 
@@ -60,12 +59,12 @@ export class AssetZipper implements IAssetZipper {
     dryRun: boolean,
   ): Promise<ResponseType<void>> {
     if (!foldersToZip || foldersToZip.length === 0) {
-      return success(undefined);
+      return success();
     }
 
     if (dryRun) {
       logger.info(MESSAGES.DRY_RUN_MODE, { action: "zip folders" });
-      return success(undefined);
+      return success();
     }
 
     logger.info(MESSAGES.ZIPPING_FOLDERS);
@@ -75,13 +74,13 @@ export class AssetZipper implements IAssetZipper {
 
       let outputFileName = basename(zipConfig.output);
       outputFileName = outputFileName
-        .replace(/%NAME%/g, packageJson.name)
-        .replace(/%VERSION%/g, newTag)
-        .replace(
-          /%TIMESTAMP%/g,
+        .replaceAll('%NAME%', packageJson.name)
+        .replaceAll('%VERSION%', newTag)
+        .replaceAll(
+          '%TIMESTAMP%',
           new Date()
             .toISOString()
-            .replace(/[:.T]/g, "-")
+            .replaceAll(/[:.T]/g, "-")
             .split("-")
             .slice(0, 6)
             .join("-"),
@@ -123,7 +122,7 @@ export class AssetZipper implements IAssetZipper {
       }
     }
 
-    return success(undefined);
+    return success();
   }
 }
 

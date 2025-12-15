@@ -121,9 +121,11 @@ export function ExecutionHistory({
   // Get current form values for pagination display
   const currentOffset = parseInt(
     historyEndpoint.read.form?.getValues("offset") || "0",
+    10,
   );
   const currentLimit = parseInt(
     historyEndpoint.read.form?.getValues("limit") || "20",
+    10,
   );
 
   const getDuration = (execution: CronExecutionType): string => {
@@ -358,8 +360,8 @@ export function ExecutionHistory({
                             </Div>
                             {execution.error.errorType && (
                               <Div className="text-xs opacity-75">
-                                {t("app.admin.cron.executionHistory.errorType")}:{" "}
-                                {execution.error.errorType}
+                                {t("app.admin.cron.executionHistory.errorType")}
+                                : {execution.error.errorType}
                               </Div>
                             )}
                           </Div>

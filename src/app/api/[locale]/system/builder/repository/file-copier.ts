@@ -8,9 +8,12 @@ import { dirname, resolve } from "node:path";
 
 import { copy } from "fs-extra";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { TFunction } from "@/i18n/core/static-types";
+
+import type { CopyConfig } from "../definition";
 import { ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
-import type { CopyConfig, Logger, TranslateFunction } from "./types";
 
 // ============================================================================
 // Interface
@@ -24,8 +27,8 @@ export interface IFileCopier {
     filesToCopy: CopyConfig[],
     output: string[],
     filesCopied: string[],
-    logger: Logger,
-    t: TranslateFunction,
+    logger: EndpointLogger,
+    t: TFunction,
     dryRun?: boolean,
   ): Promise<void>;
 
@@ -44,8 +47,8 @@ export class FileCopier implements IFileCopier {
     filesToCopy: CopyConfig[],
     output: string[],
     filesCopied: string[],
-    logger: Logger,
-    t: TranslateFunction,
+    logger: EndpointLogger,
+    t: TFunction,
     dryRun?: boolean,
   ): Promise<void> {
     output.push(

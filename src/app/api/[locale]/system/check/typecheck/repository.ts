@@ -1,39 +1,50 @@
 /**
  * Run TypeScript type checking Repository
  * Handles run typescript type checking operations
+ *
+ * This repository supports both tsc and tsgo type checkers.
+ * The choice is controlled by the `useTsgo` config option.
  */
 
+import { exec } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { promisify } from "node:util";
 
-import { exec } from "node:child_process";
 import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "../../../shared/types/response.schema";
 import { parseError } from "../../../shared/utils/parse-error";
 import { parseJsonWithComments } from "../../../shared/utils/parse-json";
-import { TYPECHECK_PATTERNS } from "./constants";
+import { ensureConfigReady } from "../config/repository";
 import type {
   TypecheckRequestOutput,
   TypecheckResponseOutput,
 } from "./definition";
 import {
   createTypecheckConfig,
-  findTypeScriptFiles,
   getDisplayPath,
   PathType,
   shouldIncludeFile,
   type TypecheckConfig,
 } from "./utils";
 
-const INCLUDE_PATTERNS_BLACKLIST = ["**/*.ts", "**/*.tsx"];
+// ============================================================
+// Constants
+// ============================================================
+
+/** Wildcard include patterns to remove (we specify explicit files instead) */
+const WILDCARD_INCLUDE_PATTERNS: readonly string[] = ["**/*.ts", "**/*.tsx"];
+
+// ============================================================
+// TypeScript Configuration Schema
+// ============================================================
 
 // TypeScript configuration Zod schema for runtime validation
 const TsConfigSchema = z.object({
@@ -52,111 +63,25 @@ const TsConfigSchema = z.object({
 // TypeScript configuration type inferred from Zod schema
 type TsConfig = z.infer<typeof TsConfigSchema>;
 
-const execAsync = promisify(exec);
+// ============================================================
+// Internal Types
+// ============================================================
 
-/**
- * Create a temporary tsconfig.json for specific files
- * This preserves all compiler options and path mappings from the main tsconfig
- * but limits the files to be checked to improve performance
- */
-function createTempTsConfig(
-  filesToCheck: string[],
-  tempConfigPath: string,
-): void {
-  // Read and validate the main tsconfig.json with Zod to avoid any type
-  let mainTsConfig: TsConfig;
-  try {
-    const tsConfigContent = readFileSync("tsconfig.json", "utf8");
-    const parsedJsonResult = parseJsonWithComments(tsConfigContent);
-    if (!parsedJsonResult.success) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Build infrastructure needs to throw for configuration errors
-      throw new Error("Failed to parse tsconfig.json");
-    }
-    mainTsConfig = TsConfigSchema.parse(parsedJsonResult.data);
-  } catch (error) {
-    /* eslint-disable oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Build infrastructure needs to throw for configuration errors */
-    throw new Error(
-      `Failed to read or parse tsconfig.json: ${error instanceof Error ? error.message : String(error)}`,
-      { cause: error },
-    );
-    /* eslint-enable oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string */
-  }
-  const generalFilesToInclude = (mainTsConfig.include || []).filter(
-    (includePattern) =>
-      INCLUDE_PATTERNS_BLACKLIST.includes(includePattern)
-        ? undefined
-        : includePattern,
-  );
-
-  // Convert relative file paths to be relative to the temp config location
-  // Since temp config is in .tmp/, we need to go up one level (../) to reach project root
-  const adjustedFiles = filesToCheck.map((file) => {
-    // If file is already relative to project root, prepend ../
-    if (!file.startsWith("/")) {
-      return `../${file}`;
-    }
-    return file;
-  });
-
-  // Adjust path mappings to account for temp config being in .tmp/ directory
-  const adjustedPaths: Record<string, string[]> = {};
-  if (mainTsConfig.compilerOptions?.paths) {
-    for (const [key, paths] of Object.entries(
-      mainTsConfig.compilerOptions.paths,
-    )) {
-      adjustedPaths[key] = paths.map((path) => {
-        // If path starts with ./, adjust it to ../
-        if (path.startsWith("./")) {
-          return `../${path.slice(2)}`;
-        }
-        // If path doesn't start with ./ or ../, assume it's relative to project root
-        if (!path.startsWith("../") && !path.startsWith("/")) {
-          return `../${path}`;
-        }
-        return path;
-      });
-    }
-  }
-
-  // Adjust exclude patterns to account for temp config being in .tmp/ directory
-  const adjustedExcludes = (mainTsConfig.exclude || []).map(
-    (excludePattern) => {
-      // If exclude pattern starts with ./, adjust it to ../
-      if (excludePattern.startsWith("./")) {
-        return `../${excludePattern.slice(2)}`;
-      }
-      // If exclude pattern doesn't start with ./ or ../, assume it's relative to project root
-      if (
-        !excludePattern.startsWith("../") &&
-        !excludePattern.startsWith("/")
-      ) {
-        return `../${excludePattern}`;
-      }
-      return excludePattern;
-    },
-  );
-
-  // Create a temporary tsconfig that includes only the specified files
-  // but preserves all compiler options, path mappings, and exclude patterns
-  const tempTsConfig: TsConfig = {
-    ...mainTsConfig,
-    compilerOptions: {
-      ...mainTsConfig.compilerOptions,
-      // eslint-disable-next-line i18next/no-literal-string
-      rootDir: "..", // Adjust rootDir to point to project root from .tmp/
-      // Remove baseUrl as tsgo doesn't support it, use paths instead
-      baseUrl: undefined,
-      paths: {
-        ...adjustedPaths, // Use adjusted path mappings
-        "*": ["./*"], // Replace baseUrl functionality for tsgo compatibility
-      },
-    },
-    include: [...generalFilesToInclude, ...adjustedFiles],
-    exclude: adjustedExcludes, // Preserve exclude patterns with adjusted paths
-  };
-
-  writeFileSync(tempConfigPath, JSON.stringify(tempTsConfig, null, 2));
+/** Parsed issue from typecheck output */
+interface ParsedIssue {
+  file: string;
+  line?: number;
+  column?: number;
+  code?: string;
+  severity: "error" | "warning" | "info";
+  message: string;
 }
+
+// ============================================================
+// Repository Interface
+// ============================================================
+
+const execAsync = promisify(exec);
 
 /**
  * Run TypeScript type checking Repository Interface
@@ -168,388 +93,625 @@ export interface TypecheckRepositoryInterface {
   ): Promise<ApiResponseType<TypecheckResponseOutput>>;
 }
 
+// ============================================================
+// Repository Implementation
+// ============================================================
+
 /**
  * Run TypeScript type checking Repository Implementation
  */
 export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
+  // --------------------------------------------------------
+  // Static Private Helpers - Command Configuration
+  // --------------------------------------------------------
+
+  /**
+   * Get the base command for type checking.
+   * @param useTsgo - Whether to use tsgo instead of tsc
+   * @returns The base command string
+   */
+  private static getBaseCommand(useTsgo: boolean): string {
+    if (useTsgo) {
+      // eslint-disable-next-line i18next/no-literal-string
+      return "bunx tsgo";
+    }
+    // tsc needs increased memory for large projects
+    // eslint-disable-next-line i18next/no-literal-string
+    return 'NODE_OPTIONS="--max-old-space-size=32768" bunx tsc';
+  }
+
+  /**
+   * Build the full typecheck command with all flags.
+   */
+  private static buildTypecheckCommand(
+    baseCommand: string,
+    buildInfoFile: string,
+    projectConfig: string,
+  ): string {
+    // eslint-disable-next-line i18next/no-literal-string
+    return `${baseCommand} --noEmit --incremental --tsBuildInfoFile ${buildInfoFile} --skipLibCheck --project ${projectConfig}`;
+  }
+
+  // --------------------------------------------------------
+  // Static Private Helpers - Error Patterns
+  // --------------------------------------------------------
+
+  /**
+   * Get the error pattern regex for tsc output.
+   * Format: file.ts(line,column): error TS1234: message
+   */
+  private static getTscErrorPattern(): RegExp {
+    return /^(.+?)\((\d+),(\d+)\):\s+(error|warning)\s+(TS\d+):\s*(.+)$/;
+  }
+
+  /**
+   * Get the error pattern regex for tsgo output.
+   * Format: file.ts:line:column - error TS1234: message
+   */
+  private static getTsgoErrorPattern(): RegExp {
+    return /^(.+?):(\d+):(\d+)\s+-\s+(error|warning)\s+(TS\d+):\s*(.+)$/;
+  }
+
+  // --------------------------------------------------------
+  // Static Private Helpers - Output Parsing
+  // --------------------------------------------------------
+
+  /**
+   * Strip ANSI color codes from output.
+   * tsgo adds color codes to its output which need to be removed for parsing.
+   */
+  private static stripAnsiCodes(text: string): string {
+    const ESC = String.fromCodePoint(0x1b);
+    const ansiPattern = new RegExp(`${ESC}\\[[0-9;]*m`, "g");
+    return text.replaceAll(ansiPattern, "");
+  }
+
+  /**
+   * Parse a single output line for TypeScript errors/warnings.
+   * Tries both tsc and tsgo patterns.
+   */
+  private static parseOutputLine(
+    line: string,
+    useTsgo: boolean,
+  ): ParsedIssue | null {
+    // Try patterns in order based on which tool is being used
+    const primaryPattern = useTsgo
+      ? TypecheckRepositoryImpl.getTsgoErrorPattern()
+      : TypecheckRepositoryImpl.getTscErrorPattern();
+    const fallbackPattern = useTsgo
+      ? TypecheckRepositoryImpl.getTscErrorPattern()
+      : TypecheckRepositoryImpl.getTsgoErrorPattern();
+
+    let match = line.match(primaryPattern);
+    if (!match) {
+      match = line.match(fallbackPattern);
+    }
+
+    if (!match) {
+      return null;
+    }
+
+    const [, file, lineNum, colNum, severity, code, message] = match;
+
+    return {
+      file: file.trim(),
+      line: parseInt(lineNum, 10),
+      column: parseInt(colNum, 10),
+      code: code.trim(),
+      severity: severity === "error" ? "error" : "warning",
+      message: message.trim(),
+    };
+  }
+
+  /**
+   * Parse typecheck output into structured issues.
+   */
+  private static parseTypecheckOutput(
+    output: string,
+    useTsgo: boolean,
+    targetPath: string | undefined,
+    disableFilter: boolean,
+  ): { errors: ParsedIssue[]; warnings: ParsedIssue[] } {
+    const errors: ParsedIssue[] = [];
+    const warnings: ParsedIssue[] = [];
+
+    const cleanOutput = TypecheckRepositoryImpl.stripAnsiCodes(output);
+    const lines = cleanOutput.split("\n");
+
+    for (const line of lines) {
+      const issue = TypecheckRepositoryImpl.parseOutputLine(line, useTsgo);
+
+      if (issue) {
+        // Apply filtering based on target path and disableFilter setting
+        if (!shouldIncludeFile(issue.file, targetPath, disableFilter)) {
+          continue;
+        }
+
+        // Convert file path to display format
+        issue.file = getDisplayPath(issue.file);
+
+        if (issue.severity === "error") {
+          errors.push(issue);
+        } else {
+          warnings.push(issue);
+        }
+      } else if (line.includes("error TS") && line.trim()) {
+        // Fallback for simpler error formats - only when filtering is disabled
+        if (targetPath && !disableFilter) {
+          continue;
+        }
+        errors.push({
+          file: "unknown",
+          severity: "error",
+          message: line.trim(),
+        });
+      } else if (
+        line.includes("warning") &&
+        [".ts", ".tsx"].some((ext) => line.includes(ext)) &&
+        line.trim()
+      ) {
+        // Fallback warning format - only when filtering is disabled
+        if (targetPath && !disableFilter) {
+          continue;
+        }
+        warnings.push({
+          file: "unknown",
+          severity: "warning",
+          message: line.trim(),
+        });
+      }
+    }
+
+    return { errors, warnings };
+  }
+
+  // --------------------------------------------------------
+  // Static Private Helpers - Temp TSConfig Management
+  // --------------------------------------------------------
+
+  /**
+   * Adjust file paths to be relative to temp config location.
+   * Since temp config is in .tmp/, we need to go up one level.
+   */
+  private static adjustFilePaths(files: string[]): string[] {
+    return files.map((file) => {
+      if (!file.startsWith("/")) {
+        return `../${file}`;
+      }
+      return file;
+    });
+  }
+
+  /**
+   * Adjust path mappings to account for temp config being in .tmp/ directory.
+   */
+  private static adjustPathMappings(
+    paths: Record<string, string[]> | undefined,
+  ): Record<string, string[]> {
+    const adjustedPaths: Record<string, string[]> = {};
+    if (!paths) {
+      return adjustedPaths;
+    }
+
+    for (const [key, pathArray] of Object.entries(paths)) {
+      adjustedPaths[key] = pathArray.map((path) => {
+        if (path.startsWith("./")) {
+          return `../${path.slice(2)}`;
+        }
+        if (!path.startsWith("../") && !path.startsWith("/")) {
+          return `../${path}`;
+        }
+        return path;
+      });
+    }
+
+    return adjustedPaths;
+  }
+
+  /**
+   * Adjust exclude patterns to account for temp config location.
+   */
+  private static adjustExcludePatterns(
+    excludes: string[] | undefined,
+  ): string[] {
+    if (!excludes) {
+      return [];
+    }
+
+    return excludes.map((excludePattern) => {
+      if (excludePattern.startsWith("./")) {
+        return `../${excludePattern.slice(2)}`;
+      }
+      if (
+        !excludePattern.startsWith("../") &&
+        !excludePattern.startsWith("/")
+      ) {
+        return `../${excludePattern}`;
+      }
+      return excludePattern;
+    });
+  }
+
+  /**
+   * Create a temporary tsconfig.json for specific files.
+   * Preserves compiler options and path mappings from main tsconfig
+   * but limits files to improve performance.
+   */
+  private static createTempTsConfig(
+    filesToCheck: string[],
+    tempConfigPath: string,
+  ): void {
+    // Read and validate the main tsconfig.json
+    let mainTsConfig: TsConfig;
+    try {
+      const tsConfigContent = readFileSync("tsconfig.json", "utf8");
+      const parsedJsonResult = parseJsonWithComments(tsConfigContent);
+      if (!parsedJsonResult.success) {
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Build infrastructure needs to throw for configuration errors
+        throw new Error("Failed to parse tsconfig.json");
+      }
+      mainTsConfig = TsConfigSchema.parse(parsedJsonResult.data);
+    } catch (error) {
+      /* eslint-disable oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Build infrastructure needs to throw for configuration errors */
+      throw new Error(
+        `Failed to read or parse tsconfig.json: ${error instanceof Error ? error.message : String(error)}`,
+        { cause: error },
+      );
+      /* eslint-enable oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string */
+    }
+
+    // Filter out wildcard patterns
+    const generalFilesToInclude = (mainTsConfig.include || []).filter(
+      (includePattern) =>
+        WILDCARD_INCLUDE_PATTERNS.includes(includePattern)
+          ? undefined
+          : includePattern,
+    );
+
+    // Adjust paths for temp config location
+    const adjustedFiles = TypecheckRepositoryImpl.adjustFilePaths(filesToCheck);
+    const adjustedPaths = TypecheckRepositoryImpl.adjustPathMappings(
+      mainTsConfig.compilerOptions?.paths,
+    );
+    const adjustedExcludes = TypecheckRepositoryImpl.adjustExcludePatterns(
+      mainTsConfig.exclude,
+    );
+
+    // Create temporary tsconfig
+    const tempTsConfig: TsConfig = {
+      ...mainTsConfig,
+      compilerOptions: {
+        ...mainTsConfig.compilerOptions,
+        // eslint-disable-next-line i18next/no-literal-string
+        rootDir: "..", // Adjust rootDir to point to project root from .tmp/
+        baseUrl: undefined, // Remove baseUrl as tsgo doesn't support it
+        paths: {
+          ...adjustedPaths,
+          "*": ["./*"], // Replace baseUrl functionality for tsgo compatibility
+        },
+      },
+      include: [...generalFilesToInclude, ...adjustedFiles],
+      exclude: adjustedExcludes,
+    };
+
+    writeFileSync(tempConfigPath, JSON.stringify(tempTsConfig, null, 2));
+  }
+
+  // --------------------------------------------------------
+  // Public Methods
+  // --------------------------------------------------------
+
+  /**
+   * Execute TypeScript type checking.
+   */
   async execute(
     data: TypecheckRequestOutput,
     logger: EndpointLogger,
   ): Promise<ApiResponseType<TypecheckResponseOutput>> {
     const startTime = Date.now();
     let output = "";
-
-    // Configuration setup
     let config: TypecheckConfig | undefined;
 
     try {
-      // Create TypeScript checking configuration
-      config = createTypecheckConfig(data.path);
+      // Load and validate configuration
+      const configResult = await ensureConfigReady(logger, data.createConfig);
 
-      // Build TypeScript command based on path type
-      let command: string;
-
-      if (config.pathType === PathType.NO_PATH) {
-        // No specific path provided, check entire project with increased memory
-        // eslint-disable-next-line i18next/no-literal-string
-        command = `${TYPECHECK_PATTERNS.TSGO_COMMAND}--noEmit --incremental --tsBuildInfoFile ${config.buildInfoFile} --skipLibCheck --project tsconfig.json`;
-        logger.debug(
-          "Running TypeScript check on entire project with increased memory",
-        );
-      } else if (config.pathType === PathType.SINGLE_FILE) {
-        // Single file - create temporary tsconfig that includes only this file
-        if (!config.tempConfigFile) {
-          return fail({
-            message: "app.api.system.check.typecheck.errors.noTsFiles.title",
-            errorType: ErrorResponseTypes.NOT_FOUND,
-            messageParams: {
-              message:
-                "app.api.system.check.typecheck.errors.noTsFiles.message",
+      if (!configResult.ready) {
+        return success({
+          success: false,
+          issues: [
+            {
+              file: configResult.configPath,
+              severity: "error" as const,
+              message: configResult.message,
+              type: "type" as const,
             },
-          });
-        }
-
-        // Create temporary tsconfig for the single file
-        createTempTsConfig([config.targetPath!], config.tempConfigFile);
-
-        // eslint-disable-next-line i18next/no-literal-string
-        command = `${TYPECHECK_PATTERNS.TSGO_COMMAND} --noEmit --incremental --tsBuildInfoFile ${config.buildInfoFile} --skipLibCheck --project ${config.tempConfigFile}`;
-      } else {
-        // Folder - create temporary tsconfig that includes only files from this folder
-        const tsFiles = findTypeScriptFiles(config.targetPath || ".");
-
-        if (tsFiles.length === 0) {
-          return success({
-            success: true,
-            issues: [],
-          });
-        }
-
-        if (!config.tempConfigFile) {
-          return fail({
-            message: "app.api.system.check.typecheck.errors.noTsFiles.title",
-            errorType: ErrorResponseTypes.NOT_FOUND,
-            messageParams: {
-              message:
-                "app.api.system.check.typecheck.errors.noTsFiles.message",
-            },
-          });
-        }
-
-        // Create temporary tsconfig for the folder files
-        createTempTsConfig(tsFiles, config.tempConfigFile);
-
-        // eslint-disable-next-line i18next/no-literal-string
-        command = `${TYPECHECK_PATTERNS.TSGO_COMMAND} --noEmit --incremental --tsBuildInfoFile ${config.buildInfoFile} --skipLibCheck --project ${config.tempConfigFile}`;
+          ],
+        });
       }
 
-      logger.debug("Executing TypeScript command:", command);
+      const checkConfig = configResult.config;
 
-      // Validate command before execution
-      if (!command || typeof command !== "string") {
+      // Check if typecheck is enabled
+      if (!checkConfig.typecheck.enabled) {
+        logger.info("Typecheck is disabled in check.config.ts");
+        return success({
+          success: true,
+          issues: [],
+        });
+      }
+
+      const typecheckConfig = checkConfig.typecheck;
+      const useTsgo = typecheckConfig.useTsgo ?? false;
+
+      // Get the appropriate base command
+      const baseCommand = TypecheckRepositoryImpl.getBaseCommand(useTsgo);
+      logger.debug(`Using ${useTsgo ? "tsgo" : "tsc"} for type checking`);
+
+      // Create TypeScript checking configuration
+      config = createTypecheckConfig(data.path, typecheckConfig.cachePath);
+
+      // Build the command based on path type
+      const command = this.buildCommand(baseCommand, config, logger);
+
+      if (!command) {
         return fail({
-          message: "app.api.system.check.typecheck.errors.invalidCommand.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: "app.api.system.check.typecheck.errors.noTsFiles.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
-            message:
-              "app.api.system.check.typecheck.errors.invalidCommand.message",
+            message: "app.api.system.check.typecheck.errors.noTsFiles.message",
           },
         });
       }
 
-      let stdout: string | undefined;
-      let stderr: string | undefined;
+      logger.debug("Executing TypeScript command:", command);
 
-      try {
-        const result = await execAsync(command, {
-          cwd: process.cwd(),
-          timeout: 900000, // 15 minute timeout for large projects
-          maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+      // Execute the typecheck command
+      const execResult = await this.executeCommand(
+        command,
+        data.timeout,
+        logger,
+      );
+
+      if (!execResult.success && !execResult.output) {
+        return fail({
+          message: "app.api.system.check.typecheck.errors.internal.title",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
+            error: execResult.error || "Unknown error",
+          },
         });
-        logger.debug("TypeScript command executed successfully");
-
-        stdout = result.stdout;
-        stderr = result.stderr;
-      } catch (execError) {
-        // TSC exit codes 1 and 2 mean TypeScript errors were found - check for them
-        const hasTypeErrors =
-          execError &&
-          typeof execError === "object" &&
-          "code" in execError &&
-          (execError.code === 1 || execError.code === 2);
-
-        if (hasTypeErrors && "stdout" in execError && "stderr" in execError) {
-          stdout =
-            typeof execError.stdout === "string" ? execError.stdout : undefined;
-          stderr =
-            typeof execError.stderr === "string" ? execError.stderr : undefined;
-          // TypeScript errors detected (exit codes 1 or 2)
-        } else {
-          // Other errors are unexpected
-          const parsedExecError = parseError(execError);
-          logger.error(
-            "Unexpected error executing TypeScript command",
-            parsedExecError,
-          );
-          return fail({
-            message: "app.api.system.check.typecheck.errors.internal.title",
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: {
-              error: parsedExecError.message,
-            },
-          });
-        }
       }
 
-      // Combine stdout and stderr for complete output
-      const fullOutput = [stdout, stderr].filter(Boolean).join("\n");
-      output += fullOutput;
+      output = execResult.output;
 
-      // Parse TypeScript output for structured errors and warnings
-      const errors: Array<{
-        file: string;
-        line?: number;
-        column?: number;
-        code?: string;
-        severity: "error" | "warning" | "info";
-        message: string;
-      }> = [];
+      // Parse the output into structured issues
+      const { errors, warnings } = TypecheckRepositoryImpl.parseTypecheckOutput(
+        output,
+        useTsgo,
+        config.targetPath,
+        data.disableFilter,
+      );
 
-      const warnings: Array<{
-        file: string;
-        line?: number;
-        column?: number;
-        code?: string;
-        severity: "error" | "warning" | "info";
-        message: string;
-      }> = [];
-
-      // Parse TypeScript output for structured errors and warnings
-      const combinedOutput = (stdout || "") + (stderr || "");
-
-      // Strip ANSI color codes that tsgo adds to the output
-      // eslint-disable-next-line no-control-regex
-      const cleanOutput = combinedOutput.replaceAll(/\u001B\[[0-9;]*m/g, "");
-      const outputLines = cleanOutput.split("\n");
-
-      for (const line of outputLines) {
-        // TypeScript format: file.ts(line,column): error TS1234: message (tsc)
-        // or: file.ts:line:column - error TS1234: message (tsgo)
-        let tsMatch = line.match(
-          /^(.+?)\((\d+),(\d+)\):\s+(error|warning)\s+(TS\d+):\s*(.+)$/,
-        );
-
-        // If tsc pattern doesn't match, try tsgo pattern
-        if (!tsMatch) {
-          tsMatch = line.match(
-            /^(.+?):(\d+):(\d+)\s+-\s+(error|warning)\s+(TS\d+):\s*(.+)$/,
-          );
-        }
-
-        if (tsMatch) {
-          const [, file, lineNum, colNum, severity, code, message] = tsMatch;
-          const filePath = file.trim();
-
-          // Apply filtering based on target path and disableFilter setting
-          if (
-            !shouldIncludeFile(filePath, config.targetPath, data.disableFilter)
-          ) {
-            continue;
-          }
-
-          // Severity is already validated by regex to be "error" or "warning"
-          const errorObj: {
-            file: string;
-            line: number;
-            column: number;
-            code: string;
-            severity: "error" | "warning" | "info";
-            message: string;
-          } = {
-            file: getDisplayPath(filePath),
-            line: parseInt(lineNum, 10),
-            column: parseInt(colNum, 10),
-            code: code.trim(),
-            severity:
-              severity === "error"
-                ? "error"
-                : severity === "warning"
-                  ? "warning"
-                  : "info",
-            message: message.trim(),
-          };
-
-          if (severity === "error") {
-            errors.push(errorObj);
-          } else if (severity === "warning") {
-            warnings.push(errorObj);
-          }
-        }
-        // Fallback for simpler error formats - only when filtering is disabled
-        else if (line.includes(TYPECHECK_PATTERNS.ERROR_TS) && line.trim()) {
-          // Skip fallback parsing when path filtering is active and not disabled
-          if (config.targetPath && !data.disableFilter) {
-            continue;
-          }
-          errors.push({
-            file: "unknown",
-            severity: "error",
-            message: line.trim(),
-          });
-        } else if (
-          line.includes(TYPECHECK_PATTERNS.WARNING_KEYWORD) &&
-          (line.includes(TYPECHECK_PATTERNS.TS_EXTENSION) ||
-            line.includes(TYPECHECK_PATTERNS.TSX_EXTENSION)) &&
-          line.trim()
-        ) {
-          // Skip fallback parsing when path filtering is active and not disabled
-          if (config.targetPath && !data.disableFilter) {
-            continue;
-          }
-          warnings.push({
-            file: "unknown",
-            severity: "warning",
-            message: line.trim(),
-          });
-        }
-      }
-
-      const hasErrors = errors.length > 0;
-
-      // Combine errors and warnings into issues array with type field
+      // Build response
       const issues = [
-        ...errors.map((error) => ({ ...error, type: "type" as const })),
-        ...warnings.map((warning) => ({ ...warning, type: "type" as const })),
+        ...errors.map((e) => ({ ...e, type: "type" as const })),
+        ...warnings.map((w) => ({ ...w, type: "type" as const })),
       ];
 
-      const response: TypecheckResponseOutput = {
-        success: !hasErrors,
+      return success({
+        success: errors.length === 0,
         issues,
-      };
-
-      return success(response);
+      });
     } catch (error) {
-      const duration = Date.now() - startTime;
-      const parsedError = parseError(error);
+      return this.handleError(
+        error as Error,
+        output,
+        config,
+        data,
+        startTime,
+        logger,
+      );
+    }
+  }
 
-      // Recreate config for error handling
-      const config = createTypecheckConfig(data.path);
+  // --------------------------------------------------------
+  // Private Methods
+  // --------------------------------------------------------
 
-      // Parse error output for structured errors
-      const errors: Array<{
-        file: string;
-        line?: number;
-        column?: number;
-        code?: string;
-        severity: "error" | "warning" | "info";
-        message: string;
-      }> = [];
+  /**
+   * Build the typecheck command based on path type.
+   */
+  private buildCommand(
+    baseCommand: string,
+    config: TypecheckConfig,
+    logger: EndpointLogger,
+  ): string | null {
+    if (config.pathType === PathType.NO_PATH) {
+      // No specific path provided, check entire project
+      logger.debug("Running TypeScript check on entire project");
+      return TypecheckRepositoryImpl.buildTypecheckCommand(
+        baseCommand,
+        config.buildInfoFile,
+        "tsconfig.json",
+      );
+    }
 
-      const warnings: Array<{
-        file: string;
-        line?: number;
-        column?: number;
-        code?: string;
-        severity: "error" | "warning" | "info";
-        message: string;
-      }> = [];
+    if (!config.tempConfigFile) {
+      return null;
+    }
 
-      // Handle exec error output - check structure without assertions
-      const hasStderr = error && typeof error === "object" && "stderr" in error;
-      const hasStdout = error && typeof error === "object" && "stdout" in error;
-      const hasCode = error && typeof error === "object" && "code" in error;
+    if (config.pathType === PathType.SINGLE_FILE) {
+      // Single file - create temporary tsconfig for this file
+      TypecheckRepositoryImpl.createTempTsConfig(
+        [config.targetPath!],
+        config.tempConfigFile,
+      );
+    } else {
+      // Folder - create temporary tsconfig with folder glob pattern
+      const folderPath = config.targetPath || ".";
+      // eslint-disable-next-line i18next/no-literal-string
+      TypecheckRepositoryImpl.createTempTsConfig(
+        [`${folderPath}/**/*`],
+        config.tempConfigFile,
+      );
+    }
 
-      if (hasStderr && typeof error.stderr === "string") {
-        output += error.stderr;
-        errors.push({
-          file: "unknown",
-          severity: "error",
-          message: error.stderr.trim(),
-        });
-      }
-      if (hasStdout && typeof error.stdout === "string") {
-        output += error.stdout;
+    return TypecheckRepositoryImpl.buildTypecheckCommand(
+      baseCommand,
+      config.buildInfoFile,
+      config.tempConfigFile,
+    );
+  }
 
-        // Parse TypeScript errors from stdout
-        const stdoutForSplit = error.stdout || "";
-        const lines = stdoutForSplit.split("\n");
-        for (const line of lines) {
-          const match = line.match(TYPECHECK_PATTERNS.FULL_ERROR_PATTERN);
-          if (match) {
-            const [, file, lineNum, colNum, , code, message] = match;
-            const filePath = file.trim();
+  /**
+   * Execute the typecheck command.
+   */
+  private async executeCommand(
+    command: string,
+    timeout: number | undefined,
+    logger: EndpointLogger,
+  ): Promise<{ success: boolean; output: string; error?: string }> {
+    try {
+      const result = await execAsync(command, {
+        cwd: process.cwd(),
+        timeout: (timeout ?? 900) * 1000,
+        maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+      });
 
-            // Apply filtering based on target path and disableFilter setting
-            if (
-              shouldIncludeFile(filePath, config.targetPath, data.disableFilter)
-            ) {
-              errors.push({
-                file: getDisplayPath(filePath),
-                line: parseInt(lineNum, 10),
-                column: parseInt(colNum, 10),
-                code: code.trim(),
-                severity: "error",
-                message: message.trim(),
-              });
-            }
-          } else if (
-            line.includes(TYPECHECK_PATTERNS.ERROR_TS) &&
-            line.trim() &&
-            (!config.targetPath || data.disableFilter)
-          ) {
-            // Fallback for other TypeScript error formats - only when filtering is disabled
-            errors.push({
-              file: "unknown",
-              severity: "error",
-              message: line.trim(),
-            });
-          }
-        }
-      }
-
-      // If no specific errors found, add the general error message
-      if (errors.length === 0) {
-        errors.push({
-          file: "unknown",
-          severity: "error",
-          message: parsedError.message,
-        });
-      }
-
-      // Combine errors and warnings into issues array with type field
-      const issues = [
-        ...errors.map((error) => ({ ...error, type: "type" as const })),
-        ...warnings.map((warning) => ({ ...warning, type: "type" as const })),
-      ];
-
-      const response: TypecheckResponseOutput = {
-        success: false,
-        issues,
+      logger.debug("TypeScript command executed successfully");
+      return {
+        success: true,
+        output: [result.stdout, result.stderr].filter(Boolean).join("\n"),
       };
+    } catch (execError) {
+      // TSC exit codes 1 and 2 mean TypeScript errors were found
+      const hasTypeErrors =
+        execError &&
+        typeof execError === "object" &&
+        "code" in execError &&
+        (execError.code === 1 || execError.code === 2);
 
-      // For TypeScript errors (exit code 2) or when we have parsed errors, return success with error details
-      // This allows the UI to display the actual TypeScript errors
-      const errorCode =
-        hasCode && typeof error.code === "number" ? error.code : 0;
-      if (errorCode === 2 || errors.length > 0) {
-        // TypeScript compilation errors - treat as successful response with issues
-        return success(response);
+      if (hasTypeErrors && "stdout" in execError && "stderr" in execError) {
+        const stdout =
+          typeof execError.stdout === "string" ? execError.stdout : "";
+        const stderr =
+          typeof execError.stderr === "string" ? execError.stderr : "";
+        return {
+          success: false,
+          output: [stdout, stderr].filter(Boolean).join("\n"),
+        };
       }
 
-      return fail({
-        message: "app.api.system.check.typecheck.errors.internal.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: {
-          error: parsedError.message,
-          output: output.trim(),
-          duration: duration.toString(),
-        },
+      // Other errors are unexpected
+      const parsedError = parseError(execError);
+      logger.error(
+        "Unexpected error executing TypeScript command",
+        parsedError,
+      );
+      return {
+        success: false,
+        output: "",
+        error: parsedError.message,
+      };
+    }
+  }
+
+  /**
+   * Handle errors during execution.
+   */
+  private handleError(
+    error: Error,
+    output: string,
+    config: TypecheckConfig | undefined,
+    data: TypecheckRequestOutput,
+    startTime: number,
+    logger: EndpointLogger,
+  ): ApiResponseType<TypecheckResponseOutput> {
+    const duration = Date.now() - startTime;
+    const parsedError = parseError(error);
+    const targetPath = config?.targetPath ?? data.path;
+
+    logger.warn("Typecheck execution error", {
+      error: parsedError.message,
+      duration,
+    });
+
+    // Try to extract issues from error output
+    const hasStderr = error && typeof error === "object" && "stderr" in error;
+    const hasStdout = error && typeof error === "object" && "stdout" in error;
+    const hasCode = error && typeof error === "object" && "code" in error;
+
+    const issues: Array<{
+      file: string;
+      line?: number;
+      column?: number;
+      code?: string;
+      severity: "error" | "warning" | "info";
+      message: string;
+      type: "type";
+    }> = [];
+
+    if (hasStderr && typeof error.stderr === "string") {
+      output += error.stderr;
+      issues.push({
+        file: "unknown",
+        severity: "error",
+        message: error.stderr.trim(),
+        type: "type",
       });
     }
+
+    if (hasStdout && typeof error.stdout === "string") {
+      output += error.stdout;
+
+      // Parse TypeScript errors from stdout
+      const { errors } = TypecheckRepositoryImpl.parseTypecheckOutput(
+        error.stdout,
+        false, // Try both patterns
+        targetPath,
+        data.disableFilter,
+      );
+
+      for (const err of errors) {
+        issues.push({ ...err, type: "type" });
+      }
+    }
+
+    // If no specific errors found, add the general error message
+    if (issues.length === 0) {
+      issues.push({
+        file: "unknown",
+        severity: "error",
+        message: parsedError.message,
+        type: "type",
+      });
+    }
+
+    // For TypeScript errors (exit code 2) or when we have parsed errors,
+    // return success with error details for UI display
+    const errorCode =
+      hasCode && typeof error.code === "number" ? error.code : 0;
+    if (errorCode === 2 || issues.length > 0) {
+      return success({
+        success: false,
+        issues,
+      });
+    }
+
+    return fail({
+      message: "app.api.system.check.typecheck.errors.internal.title",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      messageParams: {
+        error: parsedError.message,
+        output: output.trim(),
+        duration: duration.toString(),
+      },
+    });
   }
 }
 
-/**
- * Default repository instance
- */
+// ============================================================
+// Default Repository Instance
+// ============================================================
 export const typecheckRepository = new TypecheckRepositoryImpl();

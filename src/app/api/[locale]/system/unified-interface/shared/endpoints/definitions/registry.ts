@@ -74,7 +74,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
       );
 
       // Process methods if they exist
-      if (methods.length) {
+      if (methods.length > 0) {
         for (const method of methods) {
           const methodKey = method as Methods;
           const definition = obj[methodKey] as CreateApiEndpointAny;

@@ -8,9 +8,9 @@ import "server-only";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -322,7 +322,7 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
       logger.debug("✅ tRPC router generated successfully");
     } catch (error) {
       logger.error("❌ Error generating tRPC router:", parseError(error));
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generator needs to propagate errors
       throw error;
     }
   }

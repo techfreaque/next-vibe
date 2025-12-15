@@ -5,7 +5,7 @@
 
 import { resolve } from "node:path";
 
-import type { BuildProfile, ProfileSettings } from "./types";
+import type { BuildProfile, SourcemapMode } from "../definition";
 
 // ============================================================================
 // Path Constants
@@ -13,12 +13,6 @@ import type { BuildProfile, ProfileSettings } from "./types";
 
 /** Root directory for all path resolutions */
 export const ROOT_DIR = resolve(process.cwd());
-
-/** Cache file location */
-export const CACHE_FILE = resolve(ROOT_DIR, ".build-cache.json");
-
-/** Current cache version */
-export const CACHE_VERSION = "1.0";
 
 // ============================================================================
 // Size Thresholds
@@ -71,8 +65,13 @@ export const DEFAULT_CLI_EXTERNALS = [
 // Profile Defaults
 // ============================================================================
 
-/** Default settings per profile */
-export const PROFILE_DEFAULTS: Record<BuildProfile, ProfileSettings> = {
+/** Default settings per profile (type inlined - no separate types.ts needed) */
+export const PROFILE_DEFAULTS: Record<BuildProfile, {
+  minify: boolean;
+  sourcemap: boolean | SourcemapMode;
+  treeShaking: boolean;
+  analyze: boolean;
+}> = {
   development: {
     minify: false,
     sourcemap: "external",
@@ -114,7 +113,6 @@ export const MESSAGES = {
   PARALLEL_COMPLETE: "Parallel compilation complete",
   BUNDLE_SUCCESS: "Bundle created successfully",
   BUNDLE_FAILED: "Bundle creation failed",
-  CACHE_STATS: "Cache statistics",
   REPORT_GENERATED: "Build report generated",
   SUGGESTIONS: "Suggestions",
   TOTAL_DURATION: "Total duration",

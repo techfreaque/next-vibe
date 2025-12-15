@@ -240,7 +240,7 @@ export class SideTasksRepository implements ISideTasksRepository {
   async deleteTask(id: string): Promise<ResponseType<void>> {
     try {
       await db.delete(sideTasks).where(eq(sideTasks.id, id));
-      return success(undefined);
+      return success();
     } catch (error) {
       const parsedError = parseError(error);
       return fail({

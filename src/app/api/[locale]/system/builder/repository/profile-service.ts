@@ -3,8 +3,11 @@
  * Manages build profiles and applies profile-specific settings
  */
 
+import type { BuildConfig, BuildProfile } from "../definition";
 import { PROFILE_DEFAULTS } from "./constants";
-import type { BuildConfig, BuildProfile, ProfileSettings } from "./types";
+
+/** Profile settings type inferred from PROFILE_DEFAULTS */
+type ProfileSettings = (typeof PROFILE_DEFAULTS)[BuildProfile];
 
 // ============================================================================
 // Interface

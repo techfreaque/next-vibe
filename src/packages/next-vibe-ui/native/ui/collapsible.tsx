@@ -1,5 +1,4 @@
 import * as CollapsiblePrimitive from "@rn-primitives/collapsible";
-import { styled } from "nativewind";
 import * as React from "react";
 import Animated, {
   FadeIn,
@@ -14,9 +13,9 @@ import type {
   CollapsibleTriggerProps,
 } from "../../web/ui/collapsible";
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
-const StyledAnimatedView = styled(Animated.View, { className: "style" });
+const StyledAnimatedView = styledNative(Animated.View);
 
 export function Collapsible({
   children,

@@ -7,21 +7,20 @@
 /* eslint-disable i18next/no-literal-string */
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-
-import type { EndpointLogger } from "../../system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+
 import { definitionsRegistry } from "../../system/unified-interface/shared/endpoints/definitions/registry";
+import type { EndpointLogger } from "../../system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "../../system/unified-interface/shared/types/platform";
 import { endpointToToolName } from "../../system/unified-interface/shared/utils/path";
-
-import type { HelpRequestOutput, HelpResponseOutput } from "./definition";
 import type { CreateApiEndpointAny } from "../unified-interface/shared/types/endpoint";
+import type { HelpRequestOutput, HelpResponseOutput } from "./definition";
 
 /**
  * Help Repository

@@ -39,7 +39,8 @@ export const referralCodes = pgTable("referral_codes", {
 /**
  * Lead Referrals Table (Phase 1: Pre-signup)
  * Tracks which lead used which referral code - temporary tracking before signup
- * On signup, this data is copied to user_referrals for permanent storage
+ * Multiple referral codes can be linked to a lead (user may click multiple referral links)
+ * On signup, the latest referral is used and copied to user_referrals for permanent storage
  */
 export const leadReferrals = pgTable("lead_referrals", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -48,7 +49,7 @@ export const leadReferrals = pgTable("lead_referrals", {
     .references(() => referralCodes.id, { onDelete: "cascade" }),
   leadId: uuid("lead_id")
     .notNull()
-    .unique() // Each lead can only use one referral code
+    // No unique constraint - leads can have multiple referral codes (history)
     .references(() => leads.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

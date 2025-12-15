@@ -59,10 +59,10 @@ export function generateThreadTitle(content: string): string {
   const maxLength = 50;
   const minLastSpace = 20;
   const ellipsis = "...";
-  const truncated = content.substring(0, maxLength);
+  const truncated = content.slice(0, maxLength);
   const lastSpace = truncated.lastIndexOf(" ");
   return lastSpace > minLastSpace
-    ? `${truncated.substring(0, lastSpace)}${ellipsis}`
+    ? `${truncated.slice(0, lastSpace)}${ellipsis}`
     : truncated;
 }
 
@@ -187,7 +187,9 @@ export async function ensureThread({
   const title = generateThreadTitle(content);
 
   // Only store in DB if not incognito
-  if (!isIncognito) {
+  if (isIncognito) {
+    logger.debug("Generated incognito thread ID", { threadId: newThreadId });
+  } else {
     let folder: ChatFolder | null = null;
 
     if (subFolderId) {
@@ -307,8 +309,6 @@ export async function ensureThread({
       userId,
       leadId,
     });
-  } else {
-    logger.debug("Generated incognito thread ID", { threadId: newThreadId });
   }
 
   return { threadId: newThreadId, isNew: true };

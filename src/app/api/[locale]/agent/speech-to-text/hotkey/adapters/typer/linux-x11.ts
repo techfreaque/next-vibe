@@ -31,10 +31,10 @@ export class LinuxX11XdotoolTyper extends BaseTyper {
   protected async insertTextImpl(text: string): Promise<void> {
     const args: string[] = ["type"];
 
-    if (this.options.typingDelay !== undefined) {
-      args.push("--delay", String(this.options.typingDelay));
-    } else {
+    if (this.options.typingDelay === undefined) {
       args.push("--delay", "0");
+    } else {
+      args.push("--delay", String(this.options.typingDelay));
     }
 
     args.push("--", text);

@@ -21,10 +21,10 @@ import { parseError } from "../../shared/utils";
  */
 export function stripThinkTags(content: string): string {
   // Remove closed think tags: <think>...</think>
-  let processed = content.replace(/<think>[\s\S]*?<\/think>/gi, "");
+  let processed = content.replaceAll(/<think>[\s\S]*?<\/think>/gi, "");
 
   // Remove unclosed think tags: <think>... (everything after <think>)
-  processed = processed.replace(/<think>[\s\S]*$/gi, "");
+  processed = processed.replaceAll(/<think>[\s\S]*$/gi, "");
 
   // Trim whitespace
   const result = processed.trim();
@@ -40,33 +40,33 @@ function stripMarkdown(text: string): string {
   let result = text;
 
   // Remove code blocks (```...```)
-  result = result.replace(/```[\s\S]*?```/g, "");
+  result = result.replaceAll(/```[\s\S]*?```/g, "");
 
   // Remove inline code (`...`)
-  result = result.replace(/`([^`]+)`/g, "$1");
+  result = result.replaceAll(/`([^`]+)`/g, "$1");
 
   // Remove bold/italic (**text**, __text__, *text*, _text_)
-  result = result.replace(/(\*\*|__)(.*?)\1/g, "$2");
-  result = result.replace(/(\*|_)(.*?)\1/g, "$2");
+  result = result.replaceAll(/(\*\*|__)(.*?)\1/g, "$2");
+  result = result.replaceAll(/(\*|_)(.*?)\1/g, "$2");
 
   // Remove headings (# ## ### etc)
-  result = result.replace(/^#{1,6}\s+/gm, "");
+  result = result.replaceAll(/^#{1,6}\s+/gm, "");
 
   // Remove blockquotes (>)
-  result = result.replace(/^>\s+/gm, "");
+  result = result.replaceAll(/^>\s+/gm, "");
 
   // Remove list markers (-, *, +, 1.)
-  result = result.replace(/^[\s]*[-*+]\s+/gm, "");
-  result = result.replace(/^[\s]*\d+\.\s+/gm, "");
+  result = result.replaceAll(/^[\s]*[-*+]\s+/gm, "");
+  result = result.replaceAll(/^[\s]*\d+\.\s+/gm, "");
 
   // Remove links [text](url) -> text
-  result = result.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+  result = result.replaceAll(/\[([^\]]+)\]\([^)]+\)/g, "$1");
 
   // Remove images ![alt](url) -> alt
-  result = result.replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1");
+  result = result.replaceAll(/!\[([^\]]*)\]\([^)]+\)/g, "$1");
 
   // Remove horizontal rules (---, ***, ___)
-  result = result.replace(/^[\s]*[-*_]{3,}[\s]*$/gm, "");
+  result = result.replaceAll(/^[\s]*[-*_]{3,}[\s]*$/gm, "");
 
   return result;
 }
@@ -80,17 +80,17 @@ function convertLineBreaksToPauses(text: string): string {
 
   // Replace paragraph breaks (double newline) with period + space
   // This creates a longer pause
-  result = result.replace(/\n\n+/g, ". ");
+  result = result.replaceAll(/\n\n+/g, ". ");
 
   // Replace single newlines with period if the line doesn't end with punctuation
   // This creates a short pause between lines
-  result = result.replace(/([^.!?,;:])\n/g, "$1. ");
+  result = result.replaceAll(/([^.!?,;:])\n/g, "$1. ");
 
   // Clean up multiple periods
-  result = result.replace(/\.{2,}/g, ".");
+  result = result.replaceAll(/\.{2,}/g, ".");
 
   // Clean up period before existing punctuation
-  result = result.replace(/\.\s*([.!?,;:])/g, "$1");
+  result = result.replaceAll(/\.\s*([.!?,;:])/g, "$1");
 
   return result;
 }
@@ -106,7 +106,7 @@ export function prepareTextForTTS(content: string): string {
   text = convertLineBreaksToPauses(text);
 
   // 3. Clean up extra whitespace
-  text = text.replace(/\s+/g, " ").trim();
+  text = text.replaceAll(/\s+/g, " ").trim();
 
   return text;
 }
@@ -159,12 +159,12 @@ export async function extractToolCallText(
 
   // Fallback: use the tool name (last part after the last dot)
   const parts = toolName.split(".");
-  const lastPart = parts[parts.length - 1] ?? toolName;
+  const lastPart = parts.at(-1) ?? toolName;
 
   // Convert camelCase/PascalCase to readable text
   // e.g., "textToSpeech" -> "Text To Speech"
   const fallbackTitle = lastPart
-    .replace(/([A-Z])/g, " $1")
+    .replaceAll(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase())
     .trim();
 

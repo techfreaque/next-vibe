@@ -25,6 +25,7 @@ import {
 } from "@/i18n/core/language-utils";
 
 import { emails } from "../../emails/messages/db";
+import { referralRepository } from "../../referral/repository";
 import type { JwtPayloadType } from "../../user/auth/types";
 import { leadAuthRepository } from "../auth/repository";
 import { leads } from "../db";
@@ -1126,6 +1127,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Handle click tracking
    * Links tracking leadId with current user's leadId for attribution
+   * Also handles referral code linking if ref parameter is present
    */
   async handleClickTracking(
     data: ClickTrackingRequestOutput,
@@ -1133,7 +1135,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ClickTrackingResult>> {
     try {
-      const { id: trackingLeadId, campaignId, url } = data;
+      const { id: trackingLeadId, campaignId, url, ref } = data;
       const isLoggedIn = !user.isPublic;
       const currentLeadId = user.leadId;
       let engagementRecorded = false;
@@ -1146,6 +1148,30 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         ipAddress: "",
         timestamp: new Date().toISOString(),
       };
+
+      // Handle referral code linking if present
+      if (ref && currentLeadId) {
+        try {
+          const referralResult = await referralRepository.linkReferralToLead(
+            ref,
+            currentLeadId,
+            logger,
+          );
+          if (referralResult.success) {
+            logger.debug("app.api.leads.tracking.click.referralLinked", {
+              referralCode: ref,
+              leadId: currentLeadId,
+            });
+          }
+        } catch (error) {
+          // Don't fail tracking if referral linking fails
+          logger.error(
+            "app.api.leads.tracking.click.referralLinkFailed",
+            parseError(error).message,
+            { ref, leadId: currentLeadId },
+          );
+        }
+      }
 
       // Link tracking leadId with current user's leadId (lead-to-lead or lead-to-user tracking)
       if (trackingLeadId !== currentLeadId) {

@@ -157,7 +157,7 @@ export class ModularCLIResponseRenderer {
   private formatLabel(fieldName: string): string {
     /* eslint-disable i18next/no-literal-string */
     return fieldName
-      .replace(/([A-Z])/g, " $1")
+      .replaceAll(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase())
       .trim();
     /* eslint-enable i18next/no-literal-string */

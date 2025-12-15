@@ -62,7 +62,9 @@ interface TreeNode {
   children: Map<string, TreeNode>;
 }
 
-export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.GROUPED_LIST> {
+export class GroupedListWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.GROUPED_LIST
+> {
   readonly widgetType = WidgetType.GROUPED_LIST;
 
   render(props: CLIWidgetProps<typeof WidgetType.GROUPED_LIST>): string {
@@ -168,7 +170,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
 
     // Group header with file path and count
     const groupHeader = this.renderGroupHeader(groupKey, items.length, context);
-    output += `${groupHeader}${String.fromCharCode(10)}`;
+    output += `${groupHeader}${String.fromCodePoint(10)}`;
 
     // Sort items within group
     const sortedItems = this.sortItems(items, config.sortBy);
@@ -176,7 +178,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
     // Render each item
     for (const item of sortedItems.slice(0, config.maxItemsPerGroup)) {
       const itemLine = this.renderGroupItem(item, context, config);
-      output += `  ${itemLine}${String.fromCharCode(10)}`;
+      output += `  ${itemLine}${String.fromCodePoint(10)}`;
     }
 
     // Show truncation message if needed
@@ -191,7 +193,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
         "dim",
         context,
       );
-      output += `  ${truncationMsg}${String.fromCharCode(10)}`;
+      output += `  ${truncationMsg}${String.fromCodePoint(10)}`;
     }
 
     return output;
@@ -211,13 +213,13 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
 
     const pathText = this.styleText(displayPath, "underline", context);
     const countTextStyled = this.styleText(
-      String.fromCharCode(40) + countText + String.fromCharCode(41),
+      String.fromCodePoint(40) + countText + String.fromCodePoint(41),
       "dim",
       context,
     );
 
     const fileIcon = context.options.useEmojis
-      ? `${String.fromCharCode(128196)} `
+      ? `${String.fromCodePoint(128196)} `
       : "";
     return `${fileIcon}${pathText} ${countTextStyled}`;
   }
@@ -344,22 +346,22 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
     switch (severity) {
       case "error": {
         const errorIcon = icons
-          ? `${String.fromCharCode(10060)} `
-          : `${String.fromCharCode(10007)} `;
+          ? `${String.fromCodePoint(10060)} `
+          : `${String.fromCodePoint(10007)} `;
         const errorText = this.styleText("error", "red", context);
         return `${errorIcon}${errorText}`;
       }
       case "warning": {
         const warnIcon = icons
-          ? `${String.fromCharCode(9888)}${String.fromCharCode(65039)} `
-          : `${String.fromCharCode(33)}  `;
+          ? `${String.fromCodePoint(9888)}${String.fromCodePoint(65039)} `
+          : `${String.fromCodePoint(33)}  `;
         const warnText = this.styleText("warn", "yellow", context);
         return `${warnIcon}${warnText}`;
       }
       case "info": {
         const infoIcon = icons
-          ? `${String.fromCharCode(8505)}${String.fromCharCode(65039)} `
-          : `${String.fromCharCode(105)} `;
+          ? `${String.fromCodePoint(8505)}${String.fromCodePoint(65039)} `
+          : `${String.fromCodePoint(105)} `;
         const infoText = this.styleText("info", "blue", context);
         return `${infoIcon}${infoText}`;
       }
@@ -395,11 +397,11 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
     output += this.renderAffectedFilesList(groups, context);
 
     // Then add summary section
-    output += String.fromCharCode(10) + String.fromCharCode(10);
+    output += String.fromCodePoint(10) + String.fromCodePoint(10);
 
     // Beautiful header with separator
     const headerIcon = context.options.useEmojis
-      ? `${String.fromCharCode(128202)} `
+      ? `${String.fromCodePoint(128202)} `
       : "";
     const summaryTitle =
       config.summaryTitle ||
@@ -411,12 +413,12 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
       "bold",
       context,
     );
-    output += `${headerText}${String.fromCharCode(10)}`;
+    output += `${headerText}${String.fromCodePoint(10)}`;
 
     // Add subtle separator line
     const separatorLength = 50;
-    const separator = String.fromCharCode(9472).repeat(separatorLength);
-    output += `${this.styleText(separator, "dim", context)}${String.fromCharCode(10)}`;
+    const separator = String.fromCodePoint(9472).repeat(separatorLength);
+    output += `${this.styleText(separator, "dim", context)}${String.fromCodePoint(10)}`;
 
     // Meaningful summary stats for code quality tools
     const totalIssues = data.length;
@@ -431,31 +433,31 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
     const issuesLabel = t(
       "app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.issues",
     );
-    output += `   ${this.styleText(`${filesLabel}:`, "dim", context).padEnd(12)} ${totalFiles}${String.fromCharCode(10)}`;
-    output += `   ${this.styleText(`${issuesLabel}:`, "dim", context).padEnd(12)} ${totalIssues}${String.fromCharCode(10)}`;
+    output += `   ${this.styleText(`${filesLabel}:`, "dim", context).padEnd(12)} ${totalFiles}${String.fromCodePoint(10)}`;
+    output += `   ${this.styleText(`${issuesLabel}:`, "dim", context).padEnd(12)} ${totalIssues}${String.fromCodePoint(10)}`;
 
     if (errors > 0) {
       const errorIcon = context.options.useEmojis
-        ? `${String.fromCharCode(10060)} `
+        ? `${String.fromCodePoint(10060)} `
         : "";
       const errorText = this.styleText(
         `${errors} error${errors !== 1 ? "s" : ""}`,
         "red",
         context,
       );
-      output += `   ${errorIcon}${errorText}${String.fromCharCode(10)}`;
+      output += `   ${errorIcon}${errorText}${String.fromCodePoint(10)}`;
     }
 
     if (warnings > 0) {
       const warnIcon = context.options.useEmojis
-        ? `${String.fromCharCode(9888)}${String.fromCharCode(65039)} `
+        ? `${String.fromCodePoint(9888)}${String.fromCodePoint(65039)} `
         : "";
       const warnText = this.styleText(
         `${warnings} warning${warnings !== 1 ? "s" : ""}`,
         "yellow",
         context,
       );
-      output += `   ${warnIcon}${warnText}${String.fromCharCode(10)}`;
+      output += `   ${warnIcon}${warnText}${String.fromCodePoint(10)}`;
     }
 
     // Custom summary stats if configured
@@ -482,7 +484,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
             validColor,
             context,
           );
-          output += `   ${icon}${statText}${String.fromCharCode(10)}`;
+          output += `   ${icon}${statText}${String.fromCodePoint(10)}`;
         }
       }
     }
@@ -502,22 +504,22 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
       return "";
     }
 
-    let output = `${String.fromCharCode(10)}${String.fromCharCode(10)}`;
+    let output = `${String.fromCodePoint(10)}${String.fromCodePoint(10)}`;
 
     // Header
     const headerIcon = context.options.useEmojis
-      ? `${String.fromCharCode(128203)} `
+      ? `${String.fromCodePoint(128203)} `
       : "";
     const headerText = this.styleText(
       `${headerIcon}${t("app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.affectedFiles")}`,
       "bold",
       context,
     );
-    output += `${headerText}${String.fromCharCode(10)}`;
+    output += `${headerText}${String.fromCodePoint(10)}`;
 
     // Separator
-    const separator = String.fromCharCode(9472).repeat(50);
-    output += `${this.styleText(separator, "dim", context)}${String.fromCharCode(10)}`;
+    const separator = String.fromCodePoint(9472).repeat(50);
+    output += `${this.styleText(separator, "dim", context)}${String.fromCodePoint(10)}`;
 
     // Sort files by filename (alphabetically)
     const sortedFiles = [...groups.entries()].toSorted(([aKey], [bKey]) =>
@@ -563,12 +565,12 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
       }
 
       const fileIcon = context.options.useEmojis
-        ? `${String.fromCharCode(128196)} `
+        ? `${String.fromCodePoint(128196)} `
         : "";
       const fileText = fileName; // No styling for file names
 
-      const fileEntry = `   ${fileIcon}${fileText} ${String.fromCharCode(40)}${countText}${String.fromCharCode(41)}`;
-      output += `${fileEntry}${String.fromCharCode(10)}`;
+      const fileEntry = `   ${fileIcon}${fileText} ${String.fromCodePoint(40)}${countText}${String.fromCodePoint(41)}`;
+      output += `${fileEntry}${String.fromCodePoint(10)}`;
     }
 
     return output;
@@ -659,7 +661,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
     );
 
     // Render this node's items first if any
-    if (node.items.length && depth > 0) {
+    if (node.items.length > 0 && depth > 0) {
       // Calculate total count including children
       const totalCount = this.countItemsRecursive(node);
       const itemText = `${totalCount} item${totalCount !== 1 ? "s" : ""}`;
@@ -699,7 +701,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
       const childNode = childEntry[1];
       const childOutput = this.renderTreeNode(
         childNode,
-        depth + (node.items.length ? 1 : 0),
+        depth + (node.items.length > 0 ? 1 : 0),
         config,
         context,
       );

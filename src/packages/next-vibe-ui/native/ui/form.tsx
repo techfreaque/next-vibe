@@ -2,7 +2,6 @@
 // The code is licensed under the MIT License.
 // https://github.com/shadcn-ui/ui
 
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import type { JSX } from "react";
 import * as React from "react";
@@ -24,6 +23,7 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/form/form";
 
 import type { LabelRootProps } from "../../web/ui/label";
+import { styledNative } from "../utils/style-converter";
 import {
   BottomSheet,
   BottomSheetContent,
@@ -50,10 +50,9 @@ import { Span } from "./span";
 import { Switch } from "./switch";
 import { Textarea } from "./textarea";
 
-// Styled components for NativeWind support
-const StyledView = styled(View, { className: "style" });
-const StyledAnimatedText = styled(Animated.Text, { className: "style" });
-const StyledPressable = styled(Pressable, { className: "style" });
+const StyledPressable = styledNative(Pressable);
+const StyledView = styledNative(View);
+const StyledAnimatedText = styledNative(Animated.Text);
 
 const Form = FormProvider;
 
@@ -107,10 +106,7 @@ const FormItemContext = React.createContext<FormItemContextValue | undefined>(
   undefined,
 );
 
-function FormItem({
-  className,
-  children,
-}: FormItemProps): JSX.Element {
+function FormItem({ className, children }: FormItemProps): JSX.Element {
   const id = React.useId();
   const viewClassName = cn("space-y-1", className);
 

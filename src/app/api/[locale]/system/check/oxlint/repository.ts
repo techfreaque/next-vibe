@@ -4,86 +4,26 @@
  */
 
 import { existsSync, promises as fs } from "node:fs";
-import { cpus, freemem, totalmem } from "node:os";
-import { dirname, extname, join, relative, resolve } from "node:path";
+import { relative, resolve } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import { success } from "../../../shared/types/response.schema";
 import { parseError } from "../../../shared/utils/parse-error";
-import type { OxlintRequestOutput, OxlintResponseOutput } from "./definition";
+import { ensureConfigReady } from "../config/repository";
 import {
-  generateOxlintConfig,
-  needsConfigRegeneration,
-} from "./config-generator";
-import type { PrettierConfig } from "./types";
-
-/**
- * Constants for file patterns and ignore rules (based on eslint.config.mjs)
- */
-const LINTABLE_EXTENSIONS = [
-  ".ts",
-  ".tsx",
-  ".d.ts",
-  ".js",
-  ".jsx",
-  ".mjs",
-  ".cjs",
-] as const;
-
-// Updated to match eslint.config.mjs ignores exactly
-const IGNORED_DIRECTORIES = [
-  "dist",
-  ".next",
-  ".tmp",
-  "node_modules",
-  ".git",
-  "coverage",
-  "public",
-  "drizzle",
-  ".vscode",
-  ".vibe-guard-instance",
-  ".github",
-  ".claude",
-  "postgres_data",
-  "to_migrate",
-  // Additional common ignores
-  ".nyc_output",
-  "build",
-] as const;
-
-const IGNORED_FILES = [
-  ".DS_Store",
-  "thumbs.db",
-  "postcss.config.mjs",
-  // Additional common files
-  ".gitignore",
-  ".env",
-  ".env.local",
-  ".env.development",
-  ".env.production",
-] as const;
-
-const IGNORED_PATHS = [] as const;
-
-/**
- * Error message constants
- */
-const PERMISSION_ERROR_CODES = ["EACCES", "permission denied"] as const;
-
-export const LINT_CONFIG_PATH =
-  "../../../../../../../lint.config.ts" as const;
-export const OXLINT_CONFIG_PATH = "./.tmp/.oxlintrc.json" as const;
-
-/**
- * System resource information
- */
-interface SystemResources {
-  cpuCores: number;
-  availableMemoryMB: number;
-  maxWorkers: number;
-}
+  createWorkerExitCodeMessage,
+  createWorkerFailedMessage,
+  createWorkerTimeoutMessage,
+  discoverFiles,
+  distributeFilesAcrossWorkers,
+  generateIssueSummary,
+  sortIssuesByLocation,
+} from "../config/shared";
+import type { CheckConfig, PrettierConfig } from "../config/types";
+import { getSystemResources } from "../config/utils";
+import type { OxlintRequestOutput, OxlintResponseOutput } from "./definition";
 
 /**
  * Worker task for parallel processing
@@ -128,6 +68,8 @@ export interface OxlintRepositoryInterface {
  * Run Oxlint Repository Implementation (Parallel)
  */
 export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
+  private config: CheckConfig | null = null;
+
   async execute(
     data: OxlintRequestOutput,
     logger: EndpointLogger,
@@ -140,24 +82,54 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         verbose: data.verbose,
       });
 
-      // Ensure cache directory exists
-      const cacheDir = "./.tmp";
-      await fs.mkdir(cacheDir, { recursive: true });
+      // Use unified config management - checks, creates if needed, and regenerates
+      const configResult = await ensureConfigReady(logger, data.createConfig);
 
-      // Generate/update oxlint config if needed
-      const needsRegen = await needsConfigRegeneration(logger, cacheDir);
-      if (needsRegen) {
-        logger.debug("Regenerating oxlint config from TypeScript");
-        const configResult = await generateOxlintConfig(logger, cacheDir);
-        if (!configResult.success) {
-          logger.warn("Failed to generate oxlint config, using defaults", {
-            error: configResult.error,
-          });
-        }
+      if (!configResult.ready) {
+        return success({
+          success: false,
+          issues: [
+            {
+              file: configResult.configPath,
+              severity: "error" as const,
+              message: configResult.message,
+              type: "lint" as const,
+            },
+          ],
+          duration: Date.now() - startTime,
+          totalIssues: 1,
+          totalErrors: 1,
+          totalWarnings: 0,
+          totalFiles: 0,
+          summary: {
+            totalIssues: 1,
+            totalErrors: 1,
+            totalWarnings: 0,
+            totalFiles: 0,
+          },
+          configMissing: configResult.error === "missing",
+          configPath: configResult.configPath,
+        });
       }
 
+      // Config is ready - store it for use in methods
+      this.config = configResult.config;
+
+      // Check if oxlint is enabled
+      if (!this.config.oxlint.enabled) {
+        logger.info("Oxlint is disabled in check.config.ts");
+        return success({
+          success: true,
+          issues: [],
+        });
+      }
+
+      // Ensure cache directory exists
+      const cacheDir = this.config.oxlint.cachePath;
+      await fs.mkdir(cacheDir, { recursive: true });
+
       // Get system resources and determine optimal worker count
-      const resources = this.getSystemResources();
+      const resources = getSystemResources();
       logger.debug("System resources detected", {
         cpus: resources.cpuCores,
         memory: resources.availableMemoryMB,
@@ -175,7 +147,10 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       // Discover files to lint from all paths
       const filesToLint: string[] = [];
       for (const targetPath of targetPaths) {
-        const pathFiles = await this.discoverFiles(targetPath, logger);
+        const pathFiles = await discoverFiles(targetPath, logger, {
+          extensions: this.config.oxlint.lintableExtensions,
+          ignores: this.config.oxlint.ignores || [],
+        });
         filesToLint.push(...pathFiles);
       }
 
@@ -239,7 +214,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         },
       ];
 
-      const errorSummary = this.generateSummary(errorIssues);
+      const errorSummary = generateIssueSummary(errorIssues);
 
       return success({
         success: false,
@@ -260,223 +235,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   }
 
   /**
-   * Get system resources and calculate optimal worker count
-   */
-  private getSystemResources(): SystemResources {
-    const cpuCores = cpus().length;
-    const totalMemoryBytes = totalmem();
-    const freeMemoryBytes = freemem();
-
-    // Use actual available memory, but leave some buffer for the system
-    const systemBufferBytes = Math.max(
-      totalMemoryBytes * 0.1,
-      512 * 1024 * 1024,
-    ); // 10% or 512MB buffer, whichever is larger
-    const availableMemoryBytes = Math.max(
-      0,
-      freeMemoryBytes - systemBufferBytes,
-    );
-
-    // Dynamic memory per worker based on total system memory
-    const memoryPerWorkerBytes =
-      this.calculateMemoryPerWorker(totalMemoryBytes);
-
-    // Calculate optimal worker count based on CPU cores and memory
-    const memoryBasedWorkers = Math.floor(
-      availableMemoryBytes / memoryPerWorkerBytes,
-    );
-    const cpuBasedWorkers = Math.max(1, cpuCores - 1); // Leave one core for main process
-
-    // Dynamic worker cap based on system capabilities
-    const maxWorkerCap = this.calculateMaxWorkerCap(cpuCores, totalMemoryBytes);
-    const maxWorkers = Math.min(
-      memoryBasedWorkers,
-      cpuBasedWorkers,
-      maxWorkerCap,
-    );
-
-    return {
-      cpuCores,
-      availableMemoryMB: Math.floor(availableMemoryBytes / (1024 * 1024)),
-      maxWorkers: Math.max(1, maxWorkers), // Ensure at least 1 worker
-    };
-  }
-
-  /**
-   * Calculate memory per worker based on system total memory
-   */
-  private calculateMemoryPerWorker(totalMemoryBytes: number): number {
-    const totalMemoryGB = totalMemoryBytes / (1024 * 1024 * 1024);
-
-    // Scale memory per worker based on total system memory
-    if (totalMemoryGB >= 32) {
-      return 400 * 1024 * 1024;
-    } // 32GB+ systems: 400MB per worker
-    if (totalMemoryGB >= 16) {
-      return 300 * 1024 * 1024;
-    } // 16GB+ systems: 300MB per worker
-    if (totalMemoryGB >= 8) {
-      return 250 * 1024 * 1024;
-    } // 8GB+ systems: 250MB per worker
-    if (totalMemoryGB >= 4) {
-      return 200 * 1024 * 1024;
-    } // 4GB+ systems: 200MB per worker
-    return 150 * 1024 * 1024; // <4GB systems: 150MB per worker
-  }
-
-  /**
-   * Calculate maximum worker cap based on system capabilities
-   */
-  private calculateMaxWorkerCap(
-    cpuCores: number,
-    totalMemoryBytes: number,
-  ): number {
-    const hardCap = 4;
-    const totalMemoryGB = totalMemoryBytes / (1024 * 1024 * 1024);
-
-    // Base cap on CPU cores, but consider memory constraints
-    const cpuBasedCap = Math.max(2, cpuCores); // At least 2, up to CPU cores
-    const memoryBasedCap = Math.floor(totalMemoryGB / 2); // 1 worker per 2GB of RAM
-
-    // Use the minimum, but cap at reasonable limits
-    const dynamicCap = Math.min(cpuBasedCap, memoryBasedCap);
-    return Math.max(1, Math.min(dynamicCap, hardCap, cpuCores * 2)); // Between 1 and 2x CPU cores
-  }
-
-  /**
-   * Discover files to lint based on path input
-   */
-  private async discoverFiles(
-    inputPath: string,
-    logger: EndpointLogger,
-  ): Promise<string[]> {
-    const files: string[] = [];
-    const resolvedPath = resolve(inputPath);
-
-    if (!existsSync(resolvedPath)) {
-      logger.warn(`Path does not exist: ${inputPath}`);
-      return files;
-    }
-
-    const stats = await fs.stat(resolvedPath);
-
-    if (stats.isFile()) {
-      // Single file provided
-      if (this.isLintableFile(resolvedPath)) {
-        files.push(resolvedPath);
-      }
-    } else if (stats.isDirectory()) {
-      // Directory provided - scan recursively
-      await this.scanDirectory(resolvedPath, files, logger);
-    }
-
-    // Convert to relative paths for consistent display
-    return files.map((file) => relative(process.cwd(), file));
-  }
-
-  /**
-   * Recursively scan directory for lintable files
-   */
-  private async scanDirectory(
-    dirPath: string,
-    files: string[],
-    logger: EndpointLogger,
-  ): Promise<void> {
-    try {
-      // Check if directory should be ignored before trying to read it
-      const dirName = dirPath.split("/").pop() || "";
-      if (this.shouldIgnorePath(dirName, dirPath)) {
-        return;
-      }
-
-      const entries = await fs.readdir(dirPath);
-
-      for (const entry of entries) {
-        const fullPath = join(dirPath, entry);
-
-        // Skip ignored directories and files
-        if (this.shouldIgnorePath(entry, fullPath)) {
-          continue;
-        }
-
-        try {
-          const stats = await fs.stat(fullPath);
-
-          if (stats.isDirectory()) {
-            await this.scanDirectory(fullPath, files, logger);
-          } else if (stats.isFile() && this.isLintableFile(fullPath)) {
-            files.push(fullPath);
-          }
-        } catch (statError) {
-          const error = parseError(statError);
-          // Only warn for permission errors, skip silently for other errors
-          if (
-            PERMISSION_ERROR_CODES.some((code) => error.message.includes(code))
-          ) {
-            logger.debug(`Permission denied accessing: ${fullPath}`);
-          } else {
-            logger.warn(`Failed to stat path: ${fullPath}`, {
-              error: error.message,
-            });
-          }
-        }
-      }
-    } catch (error) {
-      const parsedError = parseError(error);
-      // Handle permission errors more gracefully
-      if (
-        PERMISSION_ERROR_CODES.some((code) =>
-          parsedError.message.includes(code),
-        )
-      ) {
-        logger.debug(`Permission denied scanning directory: ${dirPath}`);
-      } else {
-        logger.warn(`Failed to scan directory: ${dirPath}`, {
-          error: parsedError.message,
-        });
-      }
-    }
-  }
-
-  /**
-   * Check if a file should be linted (based on eslint.config.mjs patterns)
-   */
-  private isLintableFile(filePath: string): boolean {
-    const ext = extname(filePath);
-    return LINTABLE_EXTENSIONS.includes(
-      ext as (typeof LINTABLE_EXTENSIONS)[number],
-    );
-  }
-
-  /**
-   * Check if a path should be ignored (based on eslint.config.mjs ignores)
-   */
-  private shouldIgnorePath(name: string, fullPath: string): boolean {
-    // Check if it's an ignored directory or file
-    if (
-      IGNORED_DIRECTORIES.includes(
-        name as (typeof IGNORED_DIRECTORIES)[number],
-      ) ||
-      IGNORED_FILES.includes(name as (typeof IGNORED_FILES)[number])
-    ) {
-      return true;
-    }
-
-    // Check specific paths from eslint config
-    const relativePath = relative(process.cwd(), fullPath);
-    if (IGNORED_PATHS.some((path) => relativePath.startsWith(path))) {
-      return true;
-    }
-
-    // Check if it starts with a dot (hidden files/directories) except .d.ts files
-    if (name.startsWith(".") && !name.endsWith(".d.ts")) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
    * Distribute files across workers evenly
    */
   private distributeFiles(
@@ -484,25 +242,14 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     workerCount: number,
     data: OxlintRequestOutput,
   ): WorkerTask[] {
-    const tasks: WorkerTask[] = [];
-    const filesPerWorker = Math.ceil(files.length / workerCount);
+    const distributed = distributeFilesAcrossWorkers(files, workerCount);
 
-    for (let i = 0; i < workerCount; i++) {
-      const startIndex = i * filesPerWorker;
-      const endIndex = Math.min(startIndex + filesPerWorker, files.length);
-      const workerFiles = files.slice(startIndex, endIndex);
-
-      if (workerFiles.length > 0) {
-        tasks.push({
-          id: i,
-          files: workerFiles,
-          fix: data.fix,
-          timeout: data.timeout,
-        });
-      }
-    }
-
-    return tasks;
+    return distributed.map((workerFiles, index) => ({
+      id: index,
+      files: workerFiles,
+      fix: data.fix,
+      timeout: data.timeout,
+    }));
   }
 
   /**
@@ -517,14 +264,15 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     }
 
     try {
-      await fs.mkdir(dirname(OXLINT_CONFIG_PATH), { recursive: true });
+      // oxlint is guaranteed to be enabled when this method is called
+      // (this method is only invoked after config validation in execute())
+      if (this.config?.oxlint.enabled) {
+        await fs.mkdir(this.config.oxlint.cachePath, { recursive: true });
+      }
     } catch (error) {
-      logger.warn(
-        `Failed to create global cache directory: ${OXLINT_CONFIG_PATH}`,
-        {
-          error: parseError(error).message,
-        },
-      );
+      logger.warn("Failed to create global cache directory", {
+        error: parseError(error).message,
+      });
     }
   }
 
@@ -557,7 +305,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
             {
               file: "worker-error",
               severity: "error" as const,
-              message: this.createWorkerFailedMessage(
+              message: createWorkerFailedMessage(
                 tasks[i].id,
                 String(result.reason),
               ),
@@ -586,7 +334,13 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       // Cache directory already created in parallel during setup
 
       // Build oxlint command arguments
-      const oxlintConfigPath = resolve(OXLINT_CONFIG_PATH);
+      // oxlint is guaranteed to be enabled when this method is called
+      // (this method is only invoked after config validation in execute())
+      if (!this.config?.oxlint.enabled) {
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+        throw new Error("Oxlint config not available");
+      }
+      const oxlintConfigPath = resolve(this.config.oxlint.configPath);
 
       // Check if config exists, if not use default settings
       const configExists = existsSync(oxlintConfigPath);
@@ -728,25 +482,20 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     }
 
     // Sort issues by file, then by line number
-    allIssues.sort((a, b) => {
-      if (a.file !== b.file) {
-        return a.file.localeCompare(b.file);
-      }
-      return (a.line || 0) - (b.line || 0);
-    });
+    const sortedIssues = sortIssuesByLocation(allIssues);
 
     const hasErrors =
-      allIssues.some((i) => i.severity === "error") || hasWorkerErrors;
+      sortedIssues.some((i) => i.severity === "error") || hasWorkerErrors;
 
     logger.debug("Merged worker results", {
       totalWorkers: workerResults.length,
-      totalIssues: allIssues.length,
+      totalIssues: sortedIssues.length,
       hasErrors,
     });
 
     return {
       success: !hasErrors,
-      issues: allIssues,
+      issues: sortedIssues,
     };
   }
 
@@ -790,11 +539,11 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       });
 
       child.on("close", (code) => {
-        // Oxlint returns non-zero exit code when there are errors, but that's expected
-        // Exit code 0 = no issues, 1 = issues found, 2 = fatal error
-        // We accept 0 and 1 as valid, reject only on fatal errors (code >= 2)
+        // Oxlint exit codes: 0=no issues, 1=lint issues found, 2=fatal/config error
+        // Unlike ESLint, oxlint doesn't output valid results on fatal errors
+        // So we only accept 0 and 1, reject on code >= 2
         if (code !== null && code >= 2) {
-          reject(new Error(this.createWorkerExitCodeMessage(task.id, code)));
+          reject(new Error(createWorkerExitCodeMessage(task.id, code)));
         } else {
           resolve(output);
         }
@@ -811,7 +560,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
           child.kill("SIGKILL");
         }, 5000);
         reject(
-          new Error(this.createWorkerTimeoutMessage(task.id, task.timeout)),
+          new Error(createWorkerTimeoutMessage(task.id, task.timeout)),
         );
       }, task.timeout * 1000);
 
@@ -959,35 +708,22 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   }
 
   /**
-   * Get prettier config from TypeScript config
+   * Get prettier config from centralized config
    */
-  private async getPrettierConfig(
-    logger: EndpointLogger,
-  ): Promise<PrettierConfig> {
-    try {
-      const configModule = await import(LINT_CONFIG_PATH);
-      const fullConfig = configModule.config || configModule.default;
-
-      return fullConfig.prettier || {};
-    } catch (error) {
-      logger.warn("Failed to load prettier config, using defaults", {
-        error: parseError(error).message,
-      });
-      return {
-        semi: true,
-        singleQuote: false,
-        trailingComma: "all",
-        tabWidth: 2,
-        useTabs: false,
-        printWidth: 80,
-        arrowParens: "always",
-        endOfLine: "lf",
-        bracketSpacing: true,
-        jsxSingleQuote: false,
-        jsxBracketSameLine: false,
-        proseWrap: "preserve",
-      };
+  private getPrettierConfig(): PrettierConfig {
+    if (this.config?.prettier.enabled) {
+      return this.config.prettier;
     }
+    // Return default enabled config
+    return {
+      enabled: true,
+      configPath: ".tmp/.oxfmtrc.json",
+      semi: true,
+      singleQuote: false,
+      trailingComma: "all",
+      tabWidth: 2,
+      printWidth: 80,
+    };
   }
 
   /**
@@ -1074,8 +810,8 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     files: string[],
     logger: EndpointLogger,
   ): Promise<void> {
-    // Get prettier config from oxlint.config.ts
-    const prettierConfig = await this.getPrettierConfig(logger);
+    // Get prettier config from check.config.ts
+    const prettierConfig = this.getPrettierConfig();
 
     // First check which files actually need formatting
     const filesToFormat = await this.checkPrettierNeeded(
@@ -1149,57 +885,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     });
   }
 
-  /**
-   * Helper methods for error messages
-   */
-  private createWorkerFailedMessage(workerId: number, reason: string): string {
-    // eslint-disable-next-line i18next/no-literal-string
-    return `Worker ${workerId} failed: ${reason}`;
-  }
-
-  private createWorkerTimeoutMessage(
-    workerId: number,
-    timeout: number,
-  ): string {
-    // eslint-disable-next-line i18next/no-literal-string
-    return `Worker ${workerId} timed out after ${timeout}s`;
-  }
-
-  private createWorkerExitCodeMessage(
-    workerId: number,
-    exitCode: number,
-  ): string {
-    // eslint-disable-next-line i18next/no-literal-string
-    return `Worker ${workerId} failed with exit code ${exitCode}`;
-  }
-
-  /**
-   * Generate summary object based on issues
-   */
-  private generateSummary(
-    issues: Array<{
-      severity: "error" | "warning" | "info";
-      [key: string]: string | number | boolean;
-    }>,
-  ): {
-    total: number;
-    errors: number;
-    warnings: number;
-    info: number;
-    hasIssues: boolean;
-  } {
-    const errors = issues.filter((i) => i.severity === "error");
-    const warnings = issues.filter((i) => i.severity === "warning");
-    const info = issues.filter((i) => i.severity === "info");
-
-    return {
-      total: issues.length,
-      errors: errors.length,
-      warnings: warnings.length,
-      info: info.length,
-      hasIssues: issues.length > 0,
-    };
-  }
 }
 
 /**

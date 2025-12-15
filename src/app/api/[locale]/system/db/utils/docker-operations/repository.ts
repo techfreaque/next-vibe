@@ -8,9 +8,9 @@ import { spawn } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -22,6 +22,7 @@ import type {
   DockerOperationRequestOutput,
   DockerOperationResponseOutput,
 } from "./definition";
+import { formatDuration } from "../../../release-tool/repository/utils";
 
 /**
  * Docker command constants
@@ -139,6 +140,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
     timeout = 30000,
   ): Promise<ResponseType<boolean>> {
     try {
+      const startTime = Date.now();
       const { t } = simpleT(locale);
       const commandParts = [];
       commandParts.push("docker");
@@ -155,7 +157,10 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         logger,
       });
 
-      logger.info(`🗄️  Docker Compose down completed: ${result.success}`);
+      const duration = Date.now() - startTime;
+      logger.info(
+        `🗄️  Docker Compose down completed in ${formatDuration(duration)}`,
+      );
 
       return success(result.success);
     } catch (error) {
@@ -181,6 +186,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
     timeout = 60000,
   ): Promise<ResponseType<boolean>> {
     try {
+      const startTime = Date.now();
       const { t } = simpleT(locale);
       const commandParts = [];
       commandParts.push("docker");
@@ -198,7 +204,10 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         logger,
       });
 
-      logger.debug("Docker Compose up completed", { success: result.success });
+      const duration = Date.now() - startTime;
+      logger.debug(
+        `Docker Compose up completed in ${formatDuration(duration)}`,
+      );
 
       return success(result.success);
     } catch (error) {

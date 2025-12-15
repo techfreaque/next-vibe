@@ -15,8 +15,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: getConsoleMessageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executeGetConsoleMessage(
+    handler: ({ data, logger }) =>
+      executeGetConsoleMessage(
         {
           toolName: "get-console-message",
           args: filterUndefinedArgs({
@@ -24,7 +24,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

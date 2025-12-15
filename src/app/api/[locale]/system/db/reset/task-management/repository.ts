@@ -7,9 +7,9 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -142,10 +142,10 @@ export class ResetTaskManagementRepositoryImpl implements ResetTaskManagementRep
           );
           break;
         case "STOP_AUTO_RESET":
-          result = await this.stopAutoReset(logger, undefined);
+          result = await this.stopAutoReset(logger);
           break;
         case "STOP_BACKUP_VERIFICATION":
-          result = await this.stopBackupVerification(logger, undefined);
+          result = await this.stopBackupVerification(logger);
           break;
         case "GET_STATUS":
           result = await this.getTaskStatus("unknown", logger);
@@ -222,14 +222,14 @@ export class ResetTaskManagementRepositoryImpl implements ResetTaskManagementRep
             checksPerformed: 2,
           },
         };
-      } else {
+      }
         logger.info("Safety check skipped (not in production)");
         return {
           success: true,
           message: "Safety check skipped - not in production environment",
           data: { environment: nodeEnv },
         };
-      }
+      
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Database reset safety check failed", parsedError);

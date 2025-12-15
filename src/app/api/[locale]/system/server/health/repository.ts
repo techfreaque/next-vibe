@@ -234,14 +234,14 @@ export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface
           message: "Database connection successful", // eslint-disable-line i18next/no-literal-string
           duration: performance.now() - start,
         };
-      } else {
+      }
         return {
           name: "database",
           status: "fail",
           message: "Database connection failed", // eslint-disable-line i18next/no-literal-string
           duration: performance.now() - start,
         };
-      }
+      
     } catch (error) {
       return {
         name: "database",
@@ -349,7 +349,7 @@ export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface
    */
   private getCpuInfo(): { usage: number; loadAverage: number[] } {
     const loadAverageValues =
-      process.platform !== "win32" ? loadavg() : [0, 0, 0];
+      process.platform === "win32" ? [0, 0, 0] : loadavg();
     return {
       usage: 0, // Would require additional implementation to get actual CPU usage
       loadAverage: loadAverageValues,
@@ -392,9 +392,9 @@ export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface
       return "warning";
     } else if (checks.length > 0) {
       return "healthy";
-    } else {
-      return "unknown";
     }
+      return "unknown";
+    
   }
 }
 

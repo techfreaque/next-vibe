@@ -92,7 +92,7 @@ export const translations = {
     },
     commitMessage: {
       title: "Wiadomość commita",
-      // eslint-disable-next-line no-template-curly-in-string -- Intentional placeholder documentation
+      // eslint-disable-next-line no-template-curly-in-string -- Intentional template placeholder documentation
       description: "Własna wiadomość commita dla zmiany wersji (obsługuje placeholder ${version})",
     },
     notifyWebhook: {
@@ -101,18 +101,31 @@ export const translations = {
     },
   },
   response: {
+    status: "Status",
     success: "Status wydania",
-    output: "Wyjście wydania",
-    duration: "Czas trwania (ms)",
+    output: "Log wydania",
+    duration: "Czas trwania",
+    packages: "Pakiety",
     packagesProcessed: "Przetworzone pakiety",
     ciEnvironment: "Środowisko CI",
     errors: "Błędy",
     warnings: "Ostrzeżenia",
     gitInfo: "Informacje Git",
+    published: "Opublikowane pakiety",
     publishedPackages: "Opublikowane pakiety",
-    timings: "Rozkład czasowy",
+    timings: "Wydajność",
     rollbackPerformed: "Wykonano rollback",
-    notificationsSent: "Wysłane powiadomienia",
+    notificationsSent: "Powiadomienia",
+  },
+  table: {
+    name: "Pakiet",
+    directory: "Katalog",
+    version: "Wersja",
+    tag: "Tag",
+    status: "Status",
+    message: "Komunikat",
+    registry: "Rejestr",
+    url: "URL",
   },
   errors: {
     validation: {

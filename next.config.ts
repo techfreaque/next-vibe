@@ -39,8 +39,11 @@ const nextConfig: NextConfig = {
           "**/native/**": {
             loaders: ["ignore-loader"],
           },
+          "**/node_modules/**": {
+            loaders: ["ignore-loader"],
+          },
           // Ignore standalone package source files and routes in API routes
-          // These are tools/packages that happen to be in the API directory but aren't API routes
+          // These are CLI tools that use dynamic imports with process.cwd() which Turbopack can't resolve
           "src/app/api/**/builder/**": {
             loaders: ["ignore-loader"],
           },
@@ -56,6 +59,9 @@ const nextConfig: NextConfig = {
           "src/app/api/**/check/**": {
             loaders: ["ignore-loader"],
           },
+          "src/app/api/**/translations/reorganize/**": {
+            loaders: ["ignore-loader"],
+          },
           "src/app-native/**": {
             loaders: ["ignore-loader"],
           },
@@ -68,8 +74,9 @@ const nextConfig: NextConfig = {
   },
 
   // Webpack configuration - only when not using Turbopack
-  webpack: !useTurbopack
-    ? (config: Configuration, { isServer }): Configuration => {
+  webpack: useTurbopack
+    ? undefined
+    : (config: Configuration, { isServer }): Configuration => {
         if (!isServer) {
           config.module = config.module ?? {};
           config.module.rules = config.module.rules ?? [];
@@ -102,15 +109,30 @@ const nextConfig: NextConfig = {
         config.resolve.alias["@"] = sourcePath;
 
         return config;
-      }
-    : undefined,
+      },
 
-  // Support for WebSockets in server components
-  serverExternalPackages: ["socket.io", "socket.io-client"],
+  // Support for WebSockets and build tools in server components
+  serverExternalPackages: [
+    "socket.io",
+    "socket.io-client",
+    // Vite and related packages for builder tool (uses dynamic imports incompatible with Next.js bundling)
+    "vite",
+    "rollup",
+    "@vitejs/plugin-react",
+    "vite-plugin-dts",
+    "@vue/language-core",
+    "mlly",
+    "local-pkg",
+    "esbuild",
+    // Tailwind/CSS packages used by builder
+    "lightningcss",
+    "@tailwindcss/vite",
+    "@tailwindcss/node",
+  ],
 
   // Ensure WebSocket routes are properly handled
 
-  async rewrites() {
+  rewrites() {
     return [
       {
         source: "/api/ws",

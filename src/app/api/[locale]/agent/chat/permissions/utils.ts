@@ -13,7 +13,7 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
  */
 export function canVoteMessage(
   userId: string | null,
-  _leadId: string | null,
+  leadId: string | null,
   message: ChatMessage,
 ): boolean {
   // Must be authenticated to vote

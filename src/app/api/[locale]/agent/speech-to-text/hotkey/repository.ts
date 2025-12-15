@@ -28,7 +28,7 @@ import type {
   SttHotkeyPostResponseOutput,
 } from "./definition";
 import { HotkeyAction, RecordingStatus } from "./enum";
-import { createSession,type SpeechHotkeySession } from "./session";
+import { createSession, type SpeechHotkeySession } from "./session";
 import { checkPlatformDependencies, platformDetector } from "./utils/platform";
 
 /**
@@ -167,7 +167,7 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
   /**
    * Create new session
    */
-  private async createNewSession(
+  private createNewSession(
     data: SttHotkeyPostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -207,14 +207,16 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
     };
 
     // Create session
-    return createSession({
-      recorder,
-      typer,
-      stt: sttFunction,
-      insertPrefix: data.insertPrefix,
-      insertSuffix: data.insertSuffix,
-      autoCleanup: true,
-    });
+    return Promise.resolve(
+      createSession({
+        recorder,
+        typer,
+        stt: sttFunction,
+        insertPrefix: data.insertPrefix,
+        insertSuffix: data.insertSuffix,
+        autoCleanup: true,
+      }),
+    );
   }
 
   /**
@@ -305,9 +307,8 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (session.isRecording) {
       return await this.handleStop(session, user, logger);
-    } else {
-      return await this.handleStart(session, logger);
     }
+    return await this.handleStart(session, logger);
   }
 
   /**

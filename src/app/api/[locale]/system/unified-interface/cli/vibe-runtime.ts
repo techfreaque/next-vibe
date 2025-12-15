@@ -214,7 +214,7 @@ program
 
         // Execute the command with schema-driven UI
         performanceMonitor.mark("parseStart");
-        let parsedData: ParsedCliData | undefined = undefined;
+        let parsedData: ParsedCliData | undefined;
         if (options.data) {
           try {
             // Clean up the data string - remove any potential corruption
@@ -305,6 +305,6 @@ program
 program.parse();
 
 // If no arguments provided, show help
-if (!process.argv.slice(2).length) {
+if (process.argv.slice(2).length === 0) {
   program.help();
 }

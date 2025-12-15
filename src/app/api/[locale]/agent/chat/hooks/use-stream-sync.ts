@@ -47,7 +47,28 @@ export function useStreamSync(deps: StreamSyncDeps): void {
   useEffect(() => {
     Object.values(streamingMessages).forEach((streamMsg) => {
       const existingMsg = chatMessages[streamMsg.messageId];
-      if (!existingMsg) {
+      if (existingMsg) {
+        // Check if we need to update the message
+        const needsUpdate =
+          existingMsg.content !== streamMsg.content ||
+          existingMsg.tokens !== (streamMsg.totalTokens || null) ||
+          JSON.stringify(existingMsg.metadata?.toolCall) !==
+            JSON.stringify(streamMsg.toolCall);
+
+        if (needsUpdate) {
+          updateMessage(streamMsg.messageId, {
+            content: streamMsg.content,
+            tokens: streamMsg.totalTokens || null,
+            metadata: streamMsg.toolCall
+              ? { toolCall: streamMsg.toolCall }
+              : {},
+            errorType: streamMsg.error
+              ? t("app.api.agent.chat.aiStream.errorTypes.streamError")
+              : null,
+            errorMessage: streamMsg.error || null,
+          });
+        }
+      } else {
         addMessage({
           id: streamMsg.messageId,
           threadId: streamMsg.threadId,
@@ -78,27 +99,6 @@ export function useStreamSync(deps: StreamSyncDeps): void {
           updatedAt: new Date(),
           searchVector: null,
         });
-      } else {
-        // Check if we need to update the message
-        const needsUpdate =
-          existingMsg.content !== streamMsg.content ||
-          existingMsg.tokens !== (streamMsg.totalTokens || null) ||
-          JSON.stringify(existingMsg.metadata?.toolCall) !==
-            JSON.stringify(streamMsg.toolCall);
-
-        if (needsUpdate) {
-          updateMessage(streamMsg.messageId, {
-            content: streamMsg.content,
-            tokens: streamMsg.totalTokens || null,
-            metadata: streamMsg.toolCall
-              ? { toolCall: streamMsg.toolCall }
-              : {},
-            errorType: streamMsg.error
-              ? t("app.api.agent.chat.aiStream.errorTypes.streamError")
-              : null,
-            errorMessage: streamMsg.error || null,
-          });
-        }
       }
     });
   }, [streamingMessages, chatMessages, addMessage, updateMessage, t]);

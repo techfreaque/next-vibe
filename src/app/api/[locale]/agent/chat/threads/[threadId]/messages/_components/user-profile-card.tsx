@@ -84,7 +84,7 @@ export function UserProfileCard({
                   {formatRelativeTime(post.createdAt.getTime())}
                 </Div>
                 <Div className="text-sm text-foreground/90 line-clamp-2">
-                  {post.content.substring(0, 100)}
+                  {post.content.slice(0, 100)}
                   {post.content.length > 100 && "..."}
                 </Div>
               </Button>

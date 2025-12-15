@@ -8,7 +8,7 @@
 
 const upstreamTransformer = require("@expo/metro-config/babel-transformer");
 
-module.exports.transform = async (props) => {
+module.exports.transform = (props) => {
   const { filename, src } = props;
 
   // Check if this file imports 'server-only'

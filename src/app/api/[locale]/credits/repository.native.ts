@@ -201,12 +201,13 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     );
   }
 
-  async handleCreditPackPurchase(
+  handleCreditPackPurchase(
     session: CreditPackCheckoutSession,
     logger: EndpointLogger,
   ): Promise<void> {
     logger.error("handleCreditPackPurchase not implemented on native");
     void session;
+    return Promise.resolve();
   }
 
   async getCreditIdentifierBySubscription(
@@ -232,7 +233,7 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     );
   }
 
-  async deductCreditsForFeature(
+  deductCreditsForFeature(
     user: { id?: string; leadId?: string; isPublic: boolean },
     cost: number,
     feature: string,
@@ -242,7 +243,7 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     void user;
     void cost;
     void feature;
-    return { success: false };
+    return Promise.resolve({ success: false });
   }
 
   async mergePendingLeadWallets(
@@ -258,16 +259,7 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     );
   }
 
-  async cleanupOrphanedLeadWallets(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<number>> {
-    logger.error("cleanupOrphanedLeadWallets not implemented on native");
-    return await Promise.resolve(
-      this.createNotImplementedError<number>("cleanupOrphanedLeadWallets"),
-    );
-  }
-
-  async hasSufficientCredits(
+  hasSufficientCredits(
     identifier: CreditIdentifier,
     required: number,
     logger: EndpointLogger,
@@ -275,10 +267,10 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     logger.error("hasSufficientCredits not implemented on native");
     void identifier;
     void required;
-    return false;
+    return Promise.resolve(false);
   }
 
-  async deductCreditsWithValidation(
+  deductCreditsWithValidation(
     identifier: CreditIdentifier,
     amount: number,
     modelId: string,
@@ -288,11 +280,11 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     void identifier;
     void amount;
     void modelId;
-    return { success: false, error: "Not implemented on native" };
+    return Promise.resolve({ success: false, error: "Not implemented on native" });
   }
 
   generateMessageId(): string {
-    return `msg_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 15)}`;
   }
 }
 

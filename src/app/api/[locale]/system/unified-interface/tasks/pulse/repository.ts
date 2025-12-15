@@ -462,7 +462,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         });
       }
 
-      return success(undefined);
+      return success();
     } catch {
       return fail({
         message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,

@@ -7,9 +7,9 @@ import { spawn } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -120,10 +120,10 @@ export class StudioRepositoryImpl implements StudioRepositoryInterface {
         );
       } else if (exitResult.code !== null && exitResult.code !== 0) {
         logger.info(`Drizzle Studio exited with code ${exitResult.code}`);
-      } else if (exitResult.signal !== null) {
-        logger.info(`Drizzle Studio terminated by signal ${exitResult.signal}`);
-      } else {
+      } else if (exitResult.signal === null) {
         logger.info("Drizzle Studio stopped");
+      } else {
+        logger.info(`Drizzle Studio terminated by signal ${exitResult.signal}`);
       }
 
       const response: StudioResponseOutput = {

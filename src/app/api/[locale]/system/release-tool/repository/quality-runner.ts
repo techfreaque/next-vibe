@@ -16,9 +16,14 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-
+import {
+  formatError,
+  formatProgress,
+  formatSkip,
+  formatSuccess,
+} from "../../unified-interface/shared/logger/formatters";
 import { MESSAGES } from "./constants";
-import { hasStdout, isPackageJson } from "./utils";
+import { hasStdout, parsePackageJson, safeJsonParse, toCatchError } from "./utils";
 
 // ============================================================================
 // Interface
@@ -26,63 +31,69 @@ import { hasStdout, isPackageJson } from "./utils";
 
 export interface IQualityRunner {
   /**
-   * Run linting
+   * Run linting (with optional custom command)
    */
   runLint(
     cwd: string,
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    customCommand?: string,
   ): ResponseType<void>;
 
   /**
-   * Run type checking
+   * Run type checking (with optional custom command)
    */
   runTypecheck(
     cwd: string,
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    customCommand?: string,
   ): ResponseType<void>;
 
   /**
-   * Run build
+   * Run build (with optional custom command)
    */
   runBuild(
     cwd: string,
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    customCommand?: string,
   ): ResponseType<void>;
 
   /**
-   * Run tests
+   * Run tests (with optional custom command)
    */
   runTests(
     cwd: string,
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    customCommand?: string,
   ): ResponseType<void>;
 
   /**
-   * Run install
+   * Run install (with optional custom command)
    */
   runInstall(
     cwd: string,
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    customCommand?: string,
   ): ResponseType<void>;
 
   /**
-   * Run clean
+   * Run clean (with optional custom command)
    */
   runClean(
     cwd: string,
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    customCommand?: string,
   ): ResponseType<void>;
 }
 
@@ -96,20 +107,31 @@ export class QualityRunner implements IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    customCommand?: string,
   ): ResponseType<void> {
     if (dryRun) {
-      logger.info(MESSAGES.DRY_RUN_MODE, { action: "lint" });
-      return success(undefined);
+      logger.vibe(formatSkip("Lint (dry run)"));
+      return success();
     }
 
-    logger.info(MESSAGES.LINTING);
+    logger.vibe(formatProgress("Running lint..."));
 
     try {
-      // Always prefer package.json script as it may use custom linting setup
+      // If custom command provided, execute it directly
+      if (customCommand) {
+        execSync(customCommand, {
+          stdio: "inherit",
+          cwd,
+          env: { ...process.env, FORCE_COLOR: "1" },
+        });
+        logger.vibe(formatSuccess("Lint passed"));
+        return success();
+      }
+
+      // Default: prefer package.json script as it may use custom linting setup
       const pkgPath = join(cwd, "package.json");
-      const hasLintScript =
-        existsSync(pkgPath) &&
-        JSON.parse(readFileSync(pkgPath, "utf8")).scripts?.lint;
+      const parsedPkg = existsSync(pkgPath) ? parsePackageJson(safeJsonParse(readFileSync(pkgPath, "utf8"))) : undefined;
+      const hasLintScript = parsedPkg?.scripts?.lint;
 
       if (hasLintScript) {
         execSync(`${packageManager} run lint`, {
@@ -127,18 +149,17 @@ export class QualityRunner implements IQualityRunner {
             env: { ...process.env, FORCE_COLOR: "1" },
           });
         } else {
-          logger.info("No lint script or eslint found, skipping lint");
-          return success(undefined);
+          logger.vibe(formatSkip("No lint script found"));
+          return success();
         }
       }
-      logger.info(MESSAGES.LINT_PASSED);
-      return success(undefined);
-    } catch (error) {
-      let output = "";
-      if (hasStdout(error)) {
-        output = error.stdout.toString();
-      }
-      logger.error(MESSAGES.LINT_FAILED, { output });
+      logger.vibe(formatSuccess("Lint passed"));
+      return success();
+    } catch (err) {
+      const error = toCatchError(err as Error | { stdout?: string | Buffer });
+      const output = hasStdout(error) ? error.stdout.toString() : parseError(err).message;
+      logger.vibe(formatError("Lint failed"));
+      logger.debug(MESSAGES.LINT_FAILED, { output });
       return fail({
         message: "app.api.system.releaseTool.scripts.lintFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -152,39 +173,46 @@ export class QualityRunner implements IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    customCommand?: string,
   ): ResponseType<void> {
-    const tsconfigPath = join(cwd, "tsconfig.json");
-    if (!existsSync(tsconfigPath)) {
-      logger.info(`No tsconfig.json found in ${cwd}, skipping typecheck`);
-      return success(undefined);
+    // Skip tsconfig check if custom command provided
+    if (!customCommand) {
+      const tsconfigPath = join(cwd, "tsconfig.json");
+      if (!existsSync(tsconfigPath)) {
+        logger.vibe(formatSkip("No tsconfig.json found"));
+        return success();
+      }
     }
 
     if (dryRun) {
-      logger.info(MESSAGES.DRY_RUN_MODE, { action: "typecheck" });
-      return success(undefined);
+      logger.vibe(formatSkip("Typecheck (dry run)"));
+      return success();
     }
 
-    logger.info(MESSAGES.TYPECHECKING);
+    logger.vibe(formatProgress("Running typecheck..."));
 
     try {
-      const tscPath = join(cwd, "node_modules", ".bin", "tsc");
-
-      if (existsSync(tscPath)) {
-        execSync(`${tscPath} --noEmit`, {
+      // If custom command provided, execute it directly
+      if (customCommand) {
+        execSync(customCommand, {
           stdio: "inherit",
           cwd,
           env: { ...process.env, FORCE_COLOR: "1" },
         });
-      } else {
-        execSync(`${packageManager} run typecheck`, {
-          stdio: "inherit",
-          cwd,
-        });
+        logger.vibe(formatSuccess("Typecheck passed"));
+        return success();
       }
-      logger.info(MESSAGES.TYPECHECK_PASSED);
-      return success(undefined);
+
+      // Default behavior
+      execSync(`${packageManager} run typecheck`, {
+        stdio: "inherit",
+        cwd,
+      });
+      logger.vibe(formatSuccess("Typecheck passed"));
+      return success();
     } catch (error) {
-      logger.error(MESSAGES.TYPECHECK_FAILED, parseError(error));
+      logger.vibe(formatError("Typecheck failed"));
+      logger.debug(MESSAGES.TYPECHECK_FAILED, parseError(error));
       return fail({
         message: "app.api.system.releaseTool.scripts.typecheckFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -198,23 +226,26 @@ export class QualityRunner implements IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    customCommand?: string,
   ): ResponseType<void> {
     if (dryRun) {
-      logger.info(MESSAGES.DRY_RUN_MODE, { action: "build" });
-      return success(undefined);
+      logger.vibe(formatSkip("Build (dry run)"));
+      return success();
     }
 
-    logger.info(MESSAGES.BUILDING);
+    logger.vibe(formatProgress("Running build..."));
 
     try {
-      execSync(`${packageManager} run build`, {
+      const command = customCommand ?? `${packageManager} run build`;
+      execSync(command, {
         stdio: "inherit",
         cwd,
       });
-      logger.info(MESSAGES.BUILD_PASSED);
-      return success(undefined);
+      logger.vibe(formatSuccess("Build passed"));
+      return success();
     } catch (error) {
-      logger.error(MESSAGES.BUILD_FAILED, parseError(error));
+      logger.vibe(formatError("Build failed"));
+      logger.debug(MESSAGES.BUILD_FAILED, parseError(error));
       return fail({
         message: "app.api.system.releaseTool.scripts.buildFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -228,34 +259,40 @@ export class QualityRunner implements IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    customCommand?: string,
   ): ResponseType<void> {
-    const pkgPath = join(cwd, "package.json");
-    if (!existsSync(pkgPath)) {
-      return success(undefined);
-    }
+    // Skip package.json check if custom command provided
+    if (!customCommand) {
+      const pkgPath = join(cwd, "package.json");
+      if (!existsSync(pkgPath)) {
+        return success();
+      }
 
-    const parsedJson: unknown = JSON.parse(readFileSync(pkgPath, "utf8"));
-    if (!isPackageJson(parsedJson) || !parsedJson.scripts?.["test"]) {
-      logger.info(`No test script found, skipping tests`);
-      return success(undefined);
+      const parsedPkg = parsePackageJson(safeJsonParse(readFileSync(pkgPath, "utf8")));
+      if (!parsedPkg?.scripts?.["test"]) {
+        logger.vibe(formatSkip("No test script found"));
+        return success();
+      }
     }
 
     if (dryRun) {
-      logger.info(MESSAGES.DRY_RUN_MODE, { action: "test" });
-      return success(undefined);
+      logger.vibe(formatSkip("Tests (dry run)"));
+      return success();
     }
 
-    logger.info(MESSAGES.TESTING);
+    logger.vibe(formatProgress("Running tests..."));
 
     try {
-      execSync(`${packageManager} run test`, {
+      const command = customCommand ?? `${packageManager} run test`;
+      execSync(command, {
         stdio: "inherit",
         cwd,
       });
-      logger.info(MESSAGES.TESTS_PASSED);
-      return success(undefined);
+      logger.vibe(formatSuccess("Tests passed"));
+      return success();
     } catch (error) {
-      logger.error(MESSAGES.TESTS_FAILED, parseError(error));
+      logger.vibe(formatError("Tests failed"));
+      logger.debug(MESSAGES.TESTS_FAILED, parseError(error));
       return fail({
         message: "app.api.system.releaseTool.scripts.testsFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -269,24 +306,27 @@ export class QualityRunner implements IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    customCommand?: string,
   ): ResponseType<void> {
     if (dryRun) {
-      logger.info(MESSAGES.DRY_RUN_MODE, { action: "install" });
-      return success(undefined);
+      logger.vibe(formatSkip("Install (dry run)"));
+      return success();
     }
 
-    logger.info(MESSAGES.INSTALLING);
+    logger.vibe(formatProgress("Installing dependencies..."));
 
     try {
-      execSync(`${packageManager} install`, {
+      const command = customCommand ?? `${packageManager} install`;
+      execSync(command, {
         cwd,
         stdio: "inherit",
         timeout: 300000, // 5 minutes
       });
-      logger.info(MESSAGES.INSTALL_SUCCESS);
-      return success(undefined);
+      logger.vibe(formatSuccess("Dependencies installed"));
+      return success();
     } catch (error) {
-      logger.error(MESSAGES.INSTALL_FAILED, parseError(error));
+      logger.vibe(formatError("Install failed"));
+      logger.debug(MESSAGES.INSTALL_FAILED, parseError(error));
       return fail({
         message: "app.api.system.releaseTool.dependencies.failed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -300,19 +340,40 @@ export class QualityRunner implements IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    customCommand?: string,
   ): ResponseType<void> {
     if (dryRun) {
-      logger.info(MESSAGES.DRY_RUN_MODE, { action: "clean" });
-      return success(undefined);
+      logger.vibe(formatSkip("Clean (dry run)"));
+      return success();
     }
 
-    logger.info(MESSAGES.CLEANING);
+    logger.vibe(formatProgress("Cleaning..."));
+
+    // If custom command provided, execute it directly
+    if (customCommand) {
+      try {
+        execSync(customCommand, {
+          cwd,
+          stdio: "inherit",
+          timeout: 60000,
+        });
+        logger.info(MESSAGES.CLEAN_SUCCESS);
+        return success();
+      } catch (error) {
+        logger.error(MESSAGES.CLEAN_FAILED, parseError(error));
+        return fail({
+          message: "app.api.system.releaseTool.scripts.buildFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { path: cwd, error: String(error) },
+        });
+      }
+    }
 
     // Check if clean script exists in package.json
     const pkgPath = join(cwd, "package.json");
     if (existsSync(pkgPath)) {
-      const parsedJson: unknown = JSON.parse(readFileSync(pkgPath, "utf8"));
-      if (isPackageJson(parsedJson) && parsedJson.scripts?.["clean"]) {
+      const parsedPkg = parsePackageJson(safeJsonParse(readFileSync(pkgPath, "utf8")));
+      if (parsedPkg?.scripts?.["clean"]) {
         try {
           execSync(`${packageManager} run clean`, {
             cwd,
@@ -320,7 +381,7 @@ export class QualityRunner implements IQualityRunner {
             timeout: 60000,
           });
           logger.info(MESSAGES.CLEAN_SUCCESS);
-          return success(undefined);
+          return success();
         } catch (error) {
           logger.error(MESSAGES.CLEAN_FAILED, parseError(error));
           return fail({
@@ -346,7 +407,7 @@ export class QualityRunner implements IQualityRunner {
     }
 
     logger.info(MESSAGES.CLEAN_SUCCESS);
-    return success(undefined);
+    return success();
   }
 }
 

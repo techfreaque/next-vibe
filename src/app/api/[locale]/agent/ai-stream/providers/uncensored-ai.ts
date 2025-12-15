@@ -67,7 +67,7 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
     this.modelId = modelId;
   }
 
-  async doGenerate(): Promise<never> {
+  doGenerate(): Promise<never> {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     throw new Error("doGenerate not implemented - use doStream instead");
   }
@@ -274,7 +274,6 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
                 usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
               });
               controller.close();
-              return;
             }
           } catch {
             // Not yet a complete JSON, continue buffering

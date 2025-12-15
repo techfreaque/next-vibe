@@ -113,7 +113,7 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
 
   private formatStatLabel(key: string): string {
     // Convert camelCase to readable format
-    const spaced = key.replace(/([A-Z])/g, (match) => ` ${match}`);
+    const spaced = key.replaceAll(/([A-Z])/g, (match) => ` ${match}`);
     return spaced.replace(/^./, (str) => str.toUpperCase()).trim();
   }
 

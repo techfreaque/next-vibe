@@ -194,10 +194,12 @@ export class ABTestingService {
     const { targetAudience } = this.config;
 
     // Check country criteria
-    if (targetAudience.countries && leadData.country) {
-      if (!targetAudience.countries.includes(leadData.country)) {
-        return false;
-      }
+    if (
+      targetAudience.countries &&
+      leadData.country &&
+      !targetAudience.countries.includes(leadData.country)
+    ) {
+      return false;
     }
     return true;
   }

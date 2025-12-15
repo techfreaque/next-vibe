@@ -72,7 +72,7 @@ const truncateText = (text: string, maxLength = 50): string => {
   if (text.length <= maxLength) {
     return text;
   }
-  return `${text.substring(0, maxLength)}...`;
+  return `${text.slice(0, maxLength)}...`;
 };
 
 /**
@@ -133,7 +133,7 @@ export function ImapMessagesTable({
         {messages.map((message) => (
           <TableRow
             key={message.id}
-            className={!message.isRead ? "bg-blue-50 dark:bg-blue-950/20" : ""}
+            className={message.isRead ? "" : "bg-blue-50 dark:bg-blue-950/20"}
           >
             <TableCell>
               <Div className="flex items-center flex flex-row gap-2">
@@ -143,7 +143,7 @@ export function ImapMessagesTable({
             <TableCell>
               <Div className="flex flex-col gap-1">
                 <Div
-                  className={`font-medium ${!message.isRead ? "font-bold" : ""}`}
+                  className={`font-medium ${message.isRead ? "" : "font-bold"}`}
                 >
                   {truncateText(
                     message.subject ||

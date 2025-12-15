@@ -1,4 +1,3 @@
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Pressable, Text as RNText } from "react-native";
@@ -13,10 +12,10 @@ import {
 } from "@/packages/next-vibe-ui/web/ui/button";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 
-const StyledPressable = styled(Pressable, { className: "style" });
-const StyledText = styled(RNText, { className: "style" });
+const StyledPressable = styledNative(Pressable);
+const StyledText = styledNative(RNText);
 
 function Button({
   className,
@@ -38,8 +37,9 @@ function Button({
   ...props
 }: ButtonProps): React.JSX.Element {
   // Map web-only props to native equivalents where applicable
-  const accessibilityRole = role === "button" ? "button" : role === "link" ? "link" : "button";
-  const accessible = tabIndex !== undefined ? tabIndex >= 0 : true;
+  const accessibilityRole =
+    role === "button" ? "button" : role === "link" ? "link" : "button";
+  const accessible = tabIndex === undefined ? true : tabIndex >= 0;
   // type affects form submission behavior, provide hint for submit buttons
   const accessibilityHint = type === "submit" ? "Submit form" : undefined;
   // suppressHydrationWarning is web-only SSR prop - use in condition to satisfy linter

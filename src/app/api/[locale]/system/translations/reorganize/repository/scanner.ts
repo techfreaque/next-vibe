@@ -179,7 +179,7 @@ export function scanDirectory(
             } else {
               matches = filePattern.test(entry.name);
             }
-          } else if (extensions.length) {
+          } else if (extensions.length > 0) {
             matches = extensions.some((ext) => entry.name.endsWith(ext));
           } else {
             // No pattern specified, match all files

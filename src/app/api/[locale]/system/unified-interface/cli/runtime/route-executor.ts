@@ -236,7 +236,7 @@ export class RouteDelegationHandler {
         logger.info(`Data: ${JSON.stringify(inputData.data, null, 2)}`);
         if (
           inputData.urlPathParams &&
-          Object.keys(inputData.urlPathParams).length
+          Object.keys(inputData.urlPathParams).length > 0
         ) {
           logger.info(
             `URL Params: ${JSON.stringify(inputData.urlPathParams, null, 2)}`,
@@ -342,7 +342,7 @@ export class RouteDelegationHandler {
 
     // Merge CLI data with provided data using registry
     const contextData = context.data;
-    if (contextData || (cliData && Object.keys(cliData).length)) {
+    if (contextData || (cliData && Object.keys(cliData).length > 0)) {
       const mergedData = routeExecutionExecutor.mergeData(
         contextData || {},
         cliData || {},
@@ -358,7 +358,7 @@ export class RouteDelegationHandler {
       );
 
       if (
-        missingRequired.length &&
+        missingRequired.length > 0 &&
         context.options?.interactive &&
         !contextData &&
         endpoint
@@ -476,7 +476,7 @@ export class RouteDelegationHandler {
       let detailedError = errorMessage;
 
       // Always show error details from errorParams, even in non-verbose mode
-      if (result.errorParams && Object.keys(result.errorParams).length) {
+      if (result.errorParams && Object.keys(result.errorParams).length > 0) {
         // eslint-disable-next-line i18next/no-literal-string
         detailedError += "\n\nDetails:";
         for (const [key, value] of Object.entries(result.errorParams)) {
@@ -589,7 +589,7 @@ export class RouteDelegationHandler {
     // Add cause error params - ErrorResponseType uses 'messageParams' field
     if (
       result.cause.messageParams &&
-      Object.keys(result.cause.messageParams).length
+      Object.keys(result.cause.messageParams).length > 0
     ) {
       for (const [key, value] of Object.entries(result.cause.messageParams)) {
         // eslint-disable-next-line i18next/no-literal-string
@@ -812,7 +812,7 @@ export class RouteDelegationHandler {
     if (
       firstCliArgKey &&
       typeof firstCliArgKey === "string" &&
-      positionalArgs.length
+      positionalArgs.length > 0
     ) {
       // If there's only one positional arg, use it as a string for backward compatibility
       // If there are multiple positional args, use them as an array
@@ -831,7 +831,7 @@ export class RouteDelegationHandler {
     // Map named arguments to data fields (convert kebab-case to camelCase)
     for (const [key, value] of Object.entries(namedArgs)) {
       // Convert kebab-case to camelCase (e.g., skip-generation -> skipGeneration)
-      const camelCaseKey = key.replace(
+      const camelCaseKey = key.replaceAll(
         /-([a-z])/g,
         // oxlint-disable-next-line no-unused-vars
         (_, letter: string): string => letter.toUpperCase(),
@@ -866,7 +866,7 @@ export class RouteDelegationHandler {
         | InputData[]
         | Array<string | number | boolean | null | undefined>;
     }
-    return Object.keys(data).length ? data : null;
+    return Object.keys(data).length > 0 ? data : null;
   }
 }
 

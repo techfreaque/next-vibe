@@ -63,7 +63,7 @@ export class AccordionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     }
 
     // Remove trailing empty line
-    if (lines[lines.length - 1] === "") {
+    if (lines.at(-1) === "") {
       lines.pop();
     }
 

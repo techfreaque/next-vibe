@@ -278,10 +278,7 @@ function renderAdminSubscriptionNotificationEmailContent(
 ): React.ReactElement {
   // Create tracking context for admin subscription emails (transactional)
   const tracking = createTrackingContext(
-    locale,
-    undefined, // no leadId for admin emails
-    undefined, // no userId for admin emails
-    undefined, // no campaignId for transactional emails
+    locale, // no campaignId for transactional emails
   );
 
   return (

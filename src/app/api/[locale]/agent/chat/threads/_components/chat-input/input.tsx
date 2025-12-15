@@ -73,7 +73,10 @@ export function ChatInput({
       )}
     >
       {/* Input Area */}
-      <Div className="relative mb-2 @sm:mb-3" data-tour={TOUR_DATA_ATTRS.CHAT_INPUT}>
+      <Div
+        className="relative mb-2 @sm:mb-3"
+        data-tour={TOUR_DATA_ATTRS.CHAT_INPUT}
+      >
         <Textarea
           ref={inputRef}
           value={value}
@@ -86,7 +89,7 @@ export function ChatInput({
           className="px-0 text-base"
           variant={"ghost"}
           rows={2}
-          title={!canPost ? noPermissionReason : undefined}
+          title={canPost ? undefined : noPermissionReason}
         />
 
         {/* Hint Text - Shows when textarea is empty - Hidden on small containers */}
@@ -174,9 +177,9 @@ export function ChatInput({
               disabled={!value.trim() || isInputDisabled}
               className="h-8 w-8 @sm:h-9 @sm:w-9 shrink-0"
               title={
-                !canPost
-                  ? noPermissionReason || t("app.chat.input.noPermission")
-                  : t("app.chat.actions.sendMessage")
+                canPost
+                  ? t("app.chat.actions.sendMessage")
+                  : noPermissionReason || t("app.chat.input.noPermission")
               }
             >
               <Send className="h-3.5 w-3.5 @sm:h-4 @sm:w-4" />

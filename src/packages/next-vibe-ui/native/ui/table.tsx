@@ -1,9 +1,8 @@
 import * as TablePrimitive from "@rn-primitives/table";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
-import { Pressable,Text as RNText, View as RNView } from "react-native";
+import { Pressable, Text as RNText, View as RNView } from "react-native";
 
 // MUST import ALL props interfaces from web version (NO local type definitions)
 import type {
@@ -18,19 +17,19 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/table";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
-const StyledTableRoot = styled(TablePrimitive.Root, { className: "style" });
-const StyledTableHeader = styled(TablePrimitive.Header, { className: "style" });
-const StyledTableBody = styled(TablePrimitive.Body, { className: "style" });
-const StyledTableFooter = styled(TablePrimitive.Footer, { className: "style" });
-const StyledTableRow = styled(TablePrimitive.Row, { className: "style" });
-const StyledTableHead = styled(TablePrimitive.Head, { className: "style" });
-const StyledTableCell = styled(TablePrimitive.Cell, { className: "style" });
+const StyledTableRoot = styledNative(TablePrimitive.Root);
+const StyledTableHeader = styledNative(TablePrimitive.Header);
+const StyledTableBody = styledNative(TablePrimitive.Body);
+const StyledTableFooter = styledNative(TablePrimitive.Footer);
+const StyledTableRow = styledNative(TablePrimitive.Row);
+const StyledTableHead = styledNative(TablePrimitive.Head);
+const StyledTableCell = styledNative(TablePrimitive.Cell);
 
 // Wrapper view for table container (mimics web's div wrapper)
-const StyledView = styled(RNView, { className: "style" });
+const StyledView = styledNative(RNView);
 
 // Helper to wrap text strings in Text component for React Native
 function renderTableCellChildren(content: React.ReactNode): React.ReactNode {
@@ -168,7 +167,7 @@ function TableRow({
       })}
       onPress={onClick}
       accessibilityRole={role as "button" | "link" | "none" | undefined}
-      accessible={tabIndex !== undefined ? tabIndex >= 0 : undefined}
+      accessible={tabIndex === undefined ? undefined : tabIndex >= 0}
       onAccessibilityAction={
         onKeyDown
           ? (event): void => {
@@ -219,12 +218,12 @@ function TableHead({
   const headContent = (
     <StyledTableHead
       className={cn(
-        "h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5",
         className,
       )}
       style={computedStyle}
       accessibilityRole={role as "header" | "none" | undefined}
-      accessible={tabIndex !== undefined ? tabIndex >= 0 : undefined}
+      accessible={tabIndex === undefined ? undefined : tabIndex >= 0}
       accessibilityValue={ariaSort ? { text: ariaSort } : undefined}
       {...props}
     >
@@ -238,7 +237,7 @@ function TableHead({
         <Pressable
           onPress={onClick}
           accessibilityRole={role as "button" | "link" | "none" | undefined}
-          accessible={tabIndex !== undefined ? tabIndex >= 0 : undefined}
+          accessible={tabIndex === undefined ? undefined : tabIndex >= 0}
           accessibilityValue={ariaSort ? { text: ariaSort } : undefined}
           onAccessibilityAction={
             onKeyDown

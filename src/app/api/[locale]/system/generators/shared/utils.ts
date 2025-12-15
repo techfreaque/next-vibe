@@ -72,7 +72,7 @@ export function getRelativeImportPath(
   let relativePath = relative(outputDir, sourceFile);
 
   // Remove .ts extension and normalize path separators
-  relativePath = relativePath.replace(/\.ts$/, "").replace(/\\/g, "/");
+  relativePath = relativePath.replace(/\.ts$/, "").replaceAll('\\', "/");
 
   // Ensure it starts with ./ or ../
   if (!relativePath.startsWith(".")) {
@@ -139,11 +139,11 @@ export function extractModuleName(
   const coreIndex = pathParts.findIndex((p) => p === coreMarker);
 
   if (coreIndex === -1 || coreIndex >= pathParts.length - 1) {
-    return pathParts[pathParts.length - 2] || "unknown";
+    return pathParts.at(-2) || "unknown";
   }
 
   const moduleParts = pathParts.slice(coreIndex + 1, pathParts.length - 1);
-  return moduleParts[moduleParts.length - 1] || moduleParts.join("-");
+  return moduleParts.at(-1) || moduleParts.join("-");
 }
 
 /**
@@ -198,7 +198,7 @@ export function generateFileHeader(
 function sanitizePathSegment(segment: string): string {
   // Remove square brackets to handle dynamic routes like [id]
   // Example: "[id]" becomes "id", "[threadId]" becomes "threadId"
-  return segment.replace(/\[|\]/g, "");
+  return segment.replaceAll(/\[|\]/g, "");
 }
 
 /**

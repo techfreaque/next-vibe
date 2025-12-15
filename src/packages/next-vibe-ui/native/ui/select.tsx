@@ -1,5 +1,4 @@
 import * as SelectPrimitive from "@rn-primitives/select";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
@@ -20,13 +19,13 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/select";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 import { Check, ChevronDown, ChevronUp } from "./icons";
 
-const StyledAnimatedView = styled(Animated.View, { className: "style" });
-const StyledView = styled(View, { className: "style" });
-const StyledText = styled(Text, { className: "style" });
-const StyledPressable = styled(Pressable, { className: "style" });
+const StyledAnimatedView = styledNative(Animated.View);
+const StyledView = styledNative(View);
+const StyledText = styledNative(Text);
+const StyledPressable = styledNative(Pressable);
 
 type Option = SelectPrimitive.Option;
 

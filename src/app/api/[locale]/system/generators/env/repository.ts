@@ -9,9 +9,9 @@ import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -42,18 +42,26 @@ interface EnvFileInfo {
 }
 
 /**
+ * Typed details for different error types
+ */
+type EnvValidationErrorDetails =
+  | { hint: string }
+  | { error: string }
+  | { existingFile: string; duplicateFile: string };
+
+/**
  * Structure for env validation errors
  */
 interface EnvValidationError {
   type: EnvValidationErrorType;
   filePath: string;
   message: string;
-  details?: unknown;
+  details?: EnvValidationErrorDetails;
 }
 import {
-  formatGenerator,
   formatCount,
   formatDuration,
+  formatGenerator,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
 import {
@@ -63,9 +71,9 @@ import {
   writeGeneratedFile,
 } from "../shared/utils";
 import {
-  validateEnvFileExports,
-  formatValidationErrors,
   checkDuplicateModuleNames,
+  formatValidationErrors,
+  validateEnvFileExports,
 } from "./validator";
 
 // Type definitions
@@ -266,7 +274,7 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       logger.info(
         formatGenerator(
           `Generated env files with ${formatCount(validServerModules.length, "server module")} and ${formatCount(validClientModules.length, "client module")} in ${formatDuration(duration)}`,
-          "\u2699\ufe0f",
+          "\u2699\uFE0F",
         ),
       );
 

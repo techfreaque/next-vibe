@@ -250,7 +250,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           return;
         } catch {
           // Intentionally suppress pool.end() errors - pool might already be closed
-          await pool.end().catch(() => undefined);
+          // oxlint-disable-next-line no-empty-function
+          await pool.end().catch(() => {});
           // Log progress every 10 attempts
           if (attempt % 10 === 0) {
             logger.debug(
@@ -263,6 +264,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           logger.error(
             "❌ Database connection timeout - this will cause errors",
           );
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI fatal error requires throw to halt execution
           throw new Error(getDatabaseTimeoutMessage(maxAttempts, delayMs));
         }
 
@@ -413,32 +415,33 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   ): Promise<boolean> {
     try {
       if (data.dbReset || data.r) {
-        await this.resetDatabase(locale, logger);
+        // Reset includes migrations, so we pass the migration flags
+        await this.resetDatabase(locale, logger, data);
       } else {
         await this.startDatabaseWithoutReset(locale, logger);
-      }
 
-      // Run migrations if not skipped
-      if (!data.skipMigrations) {
-        await databaseMigrationRepository.runMigrations(
-          {
-            generate: !data.skipMigrationGeneration,
-            redo: false,
-            schema: "public",
-            dryRun: false,
-          },
-          locale,
-          logger,
-        );
-      } else {
-        logger.vibe(formatSkip("Migrations skipped"));
+        // Run migrations if not skipped (only when not resetting)
+        if (data.skipMigrations) {
+          logger.vibe(formatSkip("Migrations skipped"));
+        } else {
+          await databaseMigrationRepository.runMigrations(
+            {
+              generate: !data.skipMigrationGeneration,
+              redo: false,
+              schema: "public",
+              dryRun: false,
+            },
+            locale,
+            logger,
+          );
+        }
       }
 
       // Seed database if not skipped
-      if (!data.skipSeeding) {
-        await seedDatabase("dev", logger, locale);
-      } else {
+      if (data.skipSeeding) {
         logger.vibe(formatSkip("Database seeding skipped"));
+      } else {
+        await seedDatabase("dev", logger, locale);
       }
 
       return true;
@@ -454,23 +457,31 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   private async resetDatabase(
     locale: CountryLanguage,
     logger: EndpointLogger,
+    data: RequestType,
   ): Promise<void> {
+    const startTime = Date.now();
     logger.debug(
       `🔄 ${formatActionCommand("Resetting database using:", "docker compose down && docker volume rm")}`,
     );
     await this.performHardDatabaseReset(logger, locale);
-    logger.info("   ✓ Reset completed");
+    const duration = Date.now() - startTime;
+    logger.info(`✓  Reset completed in ${formatDuration(duration)}`);
 
-    await databaseMigrationRepository.runMigrations(
-      {
-        generate: true,
-        redo: false,
-        schema: "public",
-        dryRun: false,
-      },
-      locale,
-      logger,
-    );
+    // Run migrations if not skipped
+    if (data.skipMigrations) {
+      logger.vibe(formatSkip("Migrations skipped"));
+    } else {
+      await databaseMigrationRepository.runMigrations(
+        {
+          generate: !data.skipMigrationGeneration,
+          redo: false,
+          schema: "public",
+          dryRun: false,
+        },
+        locale,
+        logger,
+      );
+    }
   }
 
   /**
@@ -500,6 +511,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       logger.vibe(
         `   Try: ${formatCommand("docker compose -f docker-compose-dev.yml up -d")}`,
       );
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI fatal error requires throw to halt execution
       throw new Error("Failed to start database");
     }
 

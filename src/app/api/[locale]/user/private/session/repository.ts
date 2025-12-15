@@ -148,7 +148,7 @@ export class SessionRepositoryImpl implements SessionRepository {
         ),
       );
 
-      return success(undefined);
+      return success();
     } catch (error) {
       // Note: Logger not available for internal cleanup methods
       return fail({
@@ -191,7 +191,7 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       // Session extended successfully
 
-      return success(undefined);
+      return success();
     } catch (error) {
       // Note: Logger not available for internal session methods
       return fail({
@@ -252,7 +252,7 @@ export class SessionRepositoryImpl implements SessionRepository {
 
       await db.delete(sessions).where(eq(sessions.userId, userId));
 
-      return success(undefined);
+      return success();
     } catch (error) {
       // Note: Logger not available for internal session methods
       return fail({

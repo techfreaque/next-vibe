@@ -18,6 +18,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         props.user,
         { id: props.urlPathParams.id },
         props.logger,
+        props.locale,
       );
     },
   },

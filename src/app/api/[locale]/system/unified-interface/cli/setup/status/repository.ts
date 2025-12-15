@@ -179,10 +179,10 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
       });
 
       childProcess.on("error", (error: Error) => {
-        if (!options.ignoreErrors) {
-          reject(error);
-        } else {
+        if (options.ignoreErrors) {
           resolve(String());
+        } else {
+          reject(error);
         }
       });
     });

@@ -45,7 +45,7 @@ export function useFavorites<T extends string>(
     (newFavorites: T[]) => {
       setFavoritesState(newFavorites);
       if (mounted) {
-        async function saveFavorites(): Promise<void> {
+        void (async (): Promise<void> => {
           try {
             await storage.setItem(storageKey, JSON.stringify(newFavorites));
           } catch (error) {
@@ -55,8 +55,7 @@ export function useFavorites<T extends string>(
               parseError(error),
             );
           }
-        }
-        void saveFavorites();
+        })();
       }
     },
     [storageKey, mounted, logger],

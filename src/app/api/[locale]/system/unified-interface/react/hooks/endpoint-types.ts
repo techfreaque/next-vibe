@@ -9,6 +9,7 @@ import type { UseFormReturn } from "react-hook-form";
 import type { ZodType } from "zod";
 import type { ZodTypeDef } from "zod/v3";
 
+import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type {
   ExtractOutput,
@@ -182,14 +183,14 @@ export interface UseEndpointOptions<T> {
     urlPathParams?: PrimaryMutationTypes<T> extends never
       ? undefined
       : PrimaryMutationTypes<T>["urlPathParams"];
-    /** Data to auto-prefill the form with */
+    /** Data to auto-prefill the form with (supports nested partial data) */
     autoPrefillData?: PrimaryMutationTypes<T> extends never
       ? undefined
-      : Partial<PrimaryMutationTypes<T>["request"]>;
-    /** Initial state for the form */
+      : DeepPartial<PrimaryMutationTypes<T>["request"]>;
+    /** Initial state for the form (supports nested partial data) */
     initialState?: PrimaryMutationTypes<T> extends never
       ? undefined
-      : Partial<PrimaryMutationTypes<T>["request"]>;
+      : DeepPartial<PrimaryMutationTypes<T>["request"]>;
   };
 
   /**

@@ -13,20 +13,18 @@ export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, logger }) => {
-      return repository.getMemories({ userId: user.id, logger });
-    },
+    handler: ({ user, logger }) =>
+      repository.getMemories({ userId: user.id, logger }),
   },
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ user, data, logger }) => {
-      return repository.addMemory({
+    handler: ({ user, data, logger }) =>
+      repository.addMemory({
         userId: user.id,
         content: data.content,
         tags: data.tags,
         priority: data.priority,
         logger,
-      });
-    },
+      }),
   },
 });

@@ -116,7 +116,7 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
     // - Other SMS providers
 
     // eslint-disable-next-line i18next/no-literal-string
-    const messageId = `sms_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+    const messageId = `sms_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
     // Simulate network delay
     await new Promise<void>((resolve) => {
@@ -136,7 +136,7 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
    */
   private isValidPhoneNumber(phoneNumber: string): boolean {
     // Remove spaces, dashes, and parentheses
-    const cleaned = phoneNumber.replace(/[\s\-()]/g, "");
+    const cleaned = phoneNumber.replaceAll(/[\s\-()]/g, "");
 
     // Check if it's a valid international format (+1234567890) or national format
     const phoneRegex = /^(\+?[1-9]\d{1,14}|\d{10,15})$/;

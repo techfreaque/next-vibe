@@ -39,10 +39,7 @@ function UnsubscribeConfirmationEmailContent({
 }): JSX.Element {
   // Create tracking context for unsubscribe emails
   const tracking = createTrackingContext(
-    locale,
-    undefined, // no leadId for unsubscribe emails
-    undefined, // no userId for unsubscribe emails
-    undefined, // no campaignId for transactional emails
+    locale, // no campaignId for transactional emails
   );
 
   return (
@@ -134,10 +131,7 @@ function AdminUnsubscribeNotificationEmailContent({
 }): JSX.Element {
   // Create tracking context for admin emails
   const tracking = createTrackingContext(
-    locale,
-    undefined, // no leadId for admin emails
-    undefined, // no userId for admin emails
-    undefined, // no campaignId for transactional emails
+    locale, // no campaignId for transactional emails
   );
 
   return (

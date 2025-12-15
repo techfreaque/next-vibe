@@ -202,13 +202,13 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
 
       if (result.success) {
         return success(url);
-      } else {
+      }
         return fail({
           message: "app.api.stripe.errors.serverError.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: "stripe.errors.listener_failed" },
         });
-      }
+      
     } catch (error) {
       return fail({
         message: "app.api.stripe.errors.serverError.title",

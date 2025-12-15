@@ -110,7 +110,7 @@ export function getCodeOutputConfig(field: UnifiedField): CodeOutputConfig {
         icons[key] = val;
       }
     }
-    if (Object.keys(icons).length) {
+    if (Object.keys(icons).length > 0) {
       severityIcons = icons;
     }
   }

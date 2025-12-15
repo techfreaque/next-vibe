@@ -4,6 +4,7 @@ import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
+import { referralRepository } from "@/app/api/[locale]/referral/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import SignUpForm from "@/app/api/[locale]/user/public/signup/_components/sign-up-form";
 import { userRepository } from "@/app/api/[locale]/user/repository";
@@ -75,6 +76,18 @@ export default async function SignUpPage({
     redirect(`/${locale}/`);
   }
 
+  // Get the latest referral code for the lead (if any)
+  let initialReferralCode: string | undefined;
+  if (user.success && user.data.leadId) {
+    const referralResult = await referralRepository.getLatestLeadReferralCode(
+      user.data.leadId,
+      logger
+    );
+    if (referralResult.success && referralResult.data.referralCode) {
+      initialReferralCode = referralResult.data.referralCode;
+    }
+  }
+
   return (
     <>
       <Link
@@ -84,7 +97,7 @@ export default async function SignUpPage({
         <ArrowLeft className="mr-2 h-4 w-4" />
         {t("app.user.common.backToHome")}
       </Link>
-      <SignUpForm locale={locale} />
+      <SignUpForm locale={locale} initialReferralCode={initialReferralCode ?? null} />
     </>
   );
 }

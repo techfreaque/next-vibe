@@ -9,7 +9,7 @@ const repository = new CliNowpaymentsRepositoryImpl();
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, locale }) => {
+    handler: ({ data, locale }) => {
       return repository.execute(data, locale);
     },
   },

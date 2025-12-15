@@ -12,8 +12,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: uploadFileEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return executeUploadFile(
+    handler: ({ data, logger }) =>
+      executeUploadFile(
         {
           toolName: "upload-file",
           args: filterUndefinedArgs({
@@ -22,7 +22,6 @@ export const { POST, tools } = endpointsHandler({
           }),
         },
         logger,
-      );
-    },
+      ),
   },
 });

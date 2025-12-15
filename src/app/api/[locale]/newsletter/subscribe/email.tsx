@@ -45,8 +45,7 @@ function WelcomeEmailContent({
   const tracking = createTrackingContext(
     locale,
     leadId, // leadId from newsletter subscription
-    userId, // userId from newsletter subscription
-    undefined, // no campaignId for transactional emails
+    userId, // no campaignId for transactional emails
   );
 
   const appName = t("config.appName");
@@ -169,10 +168,7 @@ function AdminNotificationEmailContent({
 }): JSX.Element {
   // Create tracking context for newsletter admin emails
   const tracking = createTrackingContext(
-    locale,
-    undefined, // no leadId for newsletter admin emails
-    undefined, // no userId for newsletter admin emails
-    undefined, // no campaignId for transactional emails
+    locale, // no campaignId for transactional emails
   );
 
   return (

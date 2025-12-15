@@ -3,17 +3,20 @@
 import * as Slot from "@rn-primitives/slot";
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
-import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import type { PressableProps, ViewProps } from "react-native";
-import { Dimensions,Pressable, ScrollView, View } from "react-native";
+import { Dimensions, Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
 
 import { applyStyleType } from "../../web/utils/style-type";
 import { useIsMobile } from "../hooks/use-mobile";
-import { convertCSSToViewStyle } from "../utils/style-converter";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+  styledNativeRef,
+} from "../utils/style-converter";
 import { Button } from "./button";
 import { PanelLeft } from "./icons/PanelLeft";
 import { Separator } from "./separator";
@@ -219,8 +222,8 @@ export const sidebarMenuButtonVariants = cva(
   },
 );
 
-const StyledView = styled(View, { className: "style" });
-const StyledPressable = styled(Pressable, { className: "style" });
+const StyledView = styledNativeRef(View);
+const StyledPressable = styledNative(Pressable);
 
 const SidebarContext = React.createContext<SidebarContextType | null>(null);
 
@@ -548,7 +551,7 @@ SidebarFooter.displayName = "SidebarFooter";
 const SidebarSeparator = React.forwardRef<
   View,
   React.ComponentPropsWithoutRef<typeof Separator> & ViewProps
->(({ className, orientation,  }, ref) => {
+>(({ className, orientation }, ref) => {
   return (
     <StyledView ref={ref}>
       <Separator

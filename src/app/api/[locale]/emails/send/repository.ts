@@ -58,20 +58,19 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
       });
 
       // Validate SMS notification requirements
-      if (data.smsNotifications?.sendSmsNotification) {
-        if (
-          !data.smsNotifications.smsPhoneNumber ||
-          !data.smsNotifications.smsMessage
-        ) {
-          return fail({
-            message: "app.api.emails.send.errors.validation.title",
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: {
-              field: "app.api.emails.send.errors.validation.smsFields",
-              message: "app.api.emails.send.errors.validation.smsRequired",
-            },
-          });
-        }
+      if (
+        data.smsNotifications?.sendSmsNotification &&
+        (!data.smsNotifications.smsPhoneNumber ||
+          !data.smsNotifications.smsMessage)
+      ) {
+        return fail({
+          message: "app.api.emails.send.errors.validation.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          messageParams: {
+            field: "app.api.emails.send.errors.validation.smsFields",
+            message: "app.api.emails.send.errors.validation.smsRequired",
+          },
+        });
       }
 
       // Send email using email service

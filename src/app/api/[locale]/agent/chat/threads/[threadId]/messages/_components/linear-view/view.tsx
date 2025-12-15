@@ -112,7 +112,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   if (typeof window !== "undefined" && viewMode === ViewMode.DEBUG) {
     logger.debug("Generated system prompt", {
       systemPromptLength: systemPrompt.length,
-      systemPromptPreview: systemPrompt.substring(0, 500),
+      systemPromptPreview: systemPrompt.slice(0, 500),
       includesYourRole: systemPrompt.includes("## Your Role"),
       includesFormattingInstructions: systemPrompt.includes(
         "# Formatting Instructions",

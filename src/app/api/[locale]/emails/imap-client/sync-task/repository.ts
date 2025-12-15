@@ -87,7 +87,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
 
         logger.info("tasks.imap_sync.completed", result.summary);
         return success({ result });
-      } else {
+      }
         logger.error("tasks.imap_sync.failed", {
           error: syncResult.message,
         });
@@ -96,7 +96,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: syncResult,
         });
-      }
+      
     } catch (error) {
       logger.error("tasks.imap_sync.failed", {
         error:

@@ -134,7 +134,7 @@ export function PersonaSelector({
   // Save custom personas to storage
   const savePersonas = (newPersonas: Persona[]): void => {
     const customPersonas = newPersonas.filter(
-      (p) => !DEFAULT_PERSONAS.find((dp) => dp.id === p.id),
+      (p) => !DEFAULT_PERSONAS.some((dp) => dp.id === p.id),
     );
     async function save(): Promise<void> {
       await storage.setItem(
@@ -149,7 +149,7 @@ export function PersonaSelector({
   // Save custom categories to storage
   const saveCustomCategories = (newCategories: PersonaCategory[]): void => {
     const customCategories = newCategories.filter(
-      (c) => !DEFAULT_CATEGORIES.find((dc) => dc.id === c.id),
+      (c) => !DEFAULT_CATEGORIES.some((dc) => dc.id === c.id),
     );
     async function save(): Promise<void> {
       await storage.setItem(

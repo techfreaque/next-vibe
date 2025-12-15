@@ -25,8 +25,7 @@ function getImapSeedConfig(): NewImapAccount {
   const username = imapClientEnv.IMAP_SEED_USERNAME || "";
   const password = imapClientEnv.IMAP_SEED_PASSWORD || "";
   const port = imapClientEnv.IMAP_SEED_PORT || 993;
-  const secure =
-    imapClientEnv.IMAP_SEED_SECURE !== undefined ? imapClientEnv.IMAP_SEED_SECURE : true;
+  const secure = imapClientEnv.IMAP_SEED_SECURE ?? true;
 
   // Hardcoded settings for consistency
   const authMethod = ImapAuthMethod.PLAIN;

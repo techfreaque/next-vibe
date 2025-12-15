@@ -758,7 +758,7 @@ class AuthRepositoryImpl implements AuthRepository {
       const authHeader = request.headers.get("Authorization");
       // eslint-disable-next-line i18next/no-literal-string
       if (authHeader?.startsWith("Bearer ")) {
-        const headerToken = authHeader.substring(7);
+        const headerToken = authHeader.slice(7);
         if (headerToken) {
           logger.debug("app.api.user.auth.debug.tokenFromAuthHeader");
           return headerToken;

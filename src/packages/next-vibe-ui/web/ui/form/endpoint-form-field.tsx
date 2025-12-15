@@ -205,7 +205,7 @@ function getFieldStyleClassName(
         ),
         descriptionClassName: cn("text-sm", colors.descriptionClassName),
       };
-    } else {
+    }
       // Required field without value - enhanced blueish highlight
       const colorVariantsClassName = {
         blue: {
@@ -256,7 +256,7 @@ function getFieldStyleClassName(
         ),
         descriptionClassName: cn("text-sm", colors.descriptionClassName),
       };
-    }
+    
   }
 
   // Default styling - clean and minimal with blueish focus

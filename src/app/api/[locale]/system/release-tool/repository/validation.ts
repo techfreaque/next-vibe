@@ -15,10 +15,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-
-import type { ReleaseConfig } from "../definition";
+import type { GitInfo, ReleaseConfig } from "../definition";
 import { MESSAGES } from "./constants";
-import type { GitInfo } from "./types";
 
 // ============================================================================
 // Interface
@@ -62,6 +60,17 @@ export interface IValidationService {
     packageManager: string,
     logger: EndpointLogger,
   ): ResponseType<void>;
+
+  /**
+   * Run basic validations (without branch check - for early validation)
+   * Branch check should happen later, right before git operations
+   */
+  runBasicValidations(
+    config: ReleaseConfig,
+    cwd: string,
+    packageManager: string,
+    logger: EndpointLogger,
+  ): ResponseType<void>;
 }
 
 // ============================================================================
@@ -81,12 +90,12 @@ export class ValidationService implements IValidationService {
 
     const branchConfig = config.branch;
     if (!branchConfig) {
-      return success(undefined);
+      return success();
     }
 
     const currentBranch = gitInfo.currentBranch;
     if (!currentBranch) {
-      return success(undefined); // Can't validate without branch info
+      return success(); // Can't validate without branch info
     }
 
     const mainBranch = branchConfig.main ?? "main";
@@ -112,7 +121,7 @@ export class ValidationService implements IValidationService {
       logger.warn(`Branch ${currentBranch} is protected`);
     }
 
-    return success(undefined);
+    return success();
   }
 
   /**
@@ -124,7 +133,7 @@ export class ValidationService implements IValidationService {
     logger: EndpointLogger,
   ): ResponseType<void> {
     if (!config.requireCleanWorkingDir) {
-      return success(undefined);
+      return success();
     }
 
     if (gitInfo.hasUncommittedChanges) {
@@ -135,7 +144,7 @@ export class ValidationService implements IValidationService {
       });
     }
 
-    return success(undefined);
+    return success();
   }
 
   /**
@@ -158,14 +167,14 @@ export class ValidationService implements IValidationService {
 
     const lockfileName = lockfileMap[packageManager];
     if (!lockfileName) {
-      return success(undefined);
+      return success();
     }
 
     const lockfilePath = join(cwd, lockfileName);
 
     if (!existsSync(lockfilePath)) {
       logger.warn(MESSAGES.LOCKFILE_MISSING, { expected: lockfileName });
-      return success(undefined);
+      return success();
     }
 
     try {
@@ -204,7 +213,7 @@ export class ValidationService implements IValidationService {
       }
 
       logger.info(MESSAGES.LOCKFILE_VALID);
-      return success(undefined);
+      return success();
     } catch (error) {
       logger.error(MESSAGES.LOCKFILE_INVALID, { error: String(error) });
       return fail({
@@ -250,7 +259,29 @@ export class ValidationService implements IValidationService {
     }
 
     logger.info(MESSAGES.VALIDATION_PASSED);
-    return success(undefined);
+    return success();
+  }
+
+  /**
+   * Run basic validations without branch check
+   * Branch check is deferred to right before git operations
+   */
+  runBasicValidations(
+    config: ReleaseConfig,
+    cwd: string,
+    packageManager: string,
+    logger: EndpointLogger,
+  ): ResponseType<void> {
+    // Verify lockfile if configured
+    if (config.verifyLockfile) {
+      const lockfileResult = this.verifyLockfile(cwd, packageManager, logger);
+      if (!lockfileResult.success) {
+        return lockfileResult;
+      }
+    }
+
+    logger.debug(MESSAGES.VALIDATION_PASSED);
+    return success();
   }
 }
 

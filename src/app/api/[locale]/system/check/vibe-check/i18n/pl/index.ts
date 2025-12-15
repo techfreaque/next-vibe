@@ -58,7 +58,7 @@ export const translations: typeof enTranslations = {
     },
     createConfig: {
       label: "Utwórz Konfigurację",
-      description: "Utwórz domyślny lint.config.ts jeśli brakuje",
+      description: "Utwórz domyślny check.config.ts jeśli brakuje",
     },
     timeoutSeconds: {
       label: "Limit czasu (sekundy)",

@@ -245,14 +245,14 @@ export class FileGenerator {
       ) {
         const valueStr = this.objectToString(value, indent + 1);
         return `${nextIndentStr}${keyStr}: ${valueStr}`;
-      } else {
+      }
         const escapedValue =
           typeof value === "string"
             ? // eslint-disable-next-line i18next/no-literal-string
-              JSON.stringify(value.replaceAll(/\n/g, "\\n"))
+              JSON.stringify(value.replaceAll('\n', "\\n"))
             : JSON.stringify(value);
         return `${nextIndentStr}${keyStr}: ${escapedValue}`;
-      }
+      
     });
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -389,13 +389,13 @@ export class FileGenerator {
     let key = normalizedLocation.replace(/^src(\/|$)/, "");
 
     // Remove [locale] segments
-    key = key.replace(/\/\[locale\]/g, "");
+    key = key.replaceAll('/[locale]', "");
 
     // Convert kebab-case folder names to camelCase
     // e.g., unified-interface -> unifiedInterface, react-native -> reactNative
-    key = key.replace(/\/([a-z0-9-]+)/g, (fullMatch: string, segment: string) => {
+    key = key.replaceAll(/\/([a-z0-9-]+)/g, (fullMatch: string, segment: string) => {
       // Convert kebab-case to camelCase (use fullMatch to verify it starts with /)
-      const camelCased = segment.replace(
+      const camelCased = segment.replaceAll(
         /-([a-z0-9])/g,
         (hyphenAndChar: string, letter: string) =>
           hyphenAndChar.length > 1 ? letter.toUpperCase() : hyphenAndChar,
@@ -404,7 +404,7 @@ export class FileGenerator {
     });
 
     // Convert to dot notation
-    key = key.replaceAll(/\//g, ".");
+    key = key.replaceAll('/', ".");
 
     return key;
   }
@@ -421,22 +421,22 @@ export class FileGenerator {
    */
   private sanitizeIdentifier(name: string): string {
     // Remove parentheses: (site) -> site
-    let sanitized = name.replace(/[()]/g, "");
+    let sanitized = name.replaceAll(/[()]/g, "");
 
     // Remove brackets and dots: [...notFound] -> notFound, [locale] -> locale
-    sanitized = sanitized.replace(/[[\].]/g, "");
+    sanitized = sanitized.replaceAll(/[[\].]/g, "");
 
     // Remove leading underscore: _components -> components
     sanitized = sanitized.replace(/^_/, "");
 
     // Convert kebab-case to camelCase: unified-interface -> unifiedUi
     // oxlint-disable-next-line no-unused-vars
-    sanitized = sanitized.replace(/-([a-z])/g, (_, letter: string) =>
+    sanitized = sanitized.replaceAll(/-([a-z])/g, (_, letter: string) =>
       letter.toUpperCase(),
     );
 
     // Replace remaining invalid characters with empty string (remove them)
-    sanitized = sanitized.replace(/[^a-zA-Z0-9]/g, "");
+    sanitized = sanitized.replaceAll(/[^a-zA-Z0-9]/g, "");
 
     // Ensure it starts with a letter or underscore
     if (!/^[a-zA-Z_]/.test(sanitized)) {
@@ -772,7 +772,7 @@ export class FileGenerator {
       // Check if the section index file exists or will be created
       const relativePath = path
         .relative(path.dirname(mainIndexPath), sectionIndexPath)
-        .replaceAll(/\\/g, "/")
+        .replaceAll('\\', "/")
         .replace(/\.ts$/, "")
         .replace(/\/index$/, ""); // Remove /index from the end
 

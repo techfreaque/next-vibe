@@ -490,7 +490,7 @@ export function formatCronScheduleShort(
 
     // Truncate if too long
     if (fullDescription.length > 50) {
-      return `${fullDescription.substring(0, 47)}...`;
+      return `${fullDescription.slice(0, 47)}...`;
     }
 
     return fullDescription;

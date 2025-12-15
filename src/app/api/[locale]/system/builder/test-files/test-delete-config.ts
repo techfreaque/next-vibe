@@ -1,4 +1,4 @@
-import type { BuildConfig } from "../src/config";
+import type { BuildConfig } from "../repository/types";
 import { distDir } from "./test-config";
 
 const buildConfig: BuildConfig = {

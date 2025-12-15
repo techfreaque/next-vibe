@@ -257,7 +257,7 @@ export function extractGroupedListData(
         maxItemsPerGroup: undefined,
         showGroupSummary: false,
       };
-    } else {
+    }
       // Single group with all items
       let allItems = items;
       if (config?.sortBy) {
@@ -275,7 +275,7 @@ export function extractGroupedListData(
         maxItemsPerGroup: undefined,
         showGroupSummary: false,
       };
-    }
+    
   }
 
   // Narrow to object type
@@ -357,7 +357,7 @@ export function extractGroupedListData(
             maxItemsPerGroup,
             showGroupSummary: false,
           };
-        } else {
+        }
           // Single group with all items
           let allItems = items;
           if (config?.sortBy) {
@@ -375,7 +375,7 @@ export function extractGroupedListData(
             maxItemsPerGroup,
             showGroupSummary: false,
           };
-        }
+        
       }
     }
 
