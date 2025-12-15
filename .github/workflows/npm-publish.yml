@@ -43,10 +43,10 @@ jobs:
         run: bun install
 
       - name: Run checks (lint, typecheck, tests)
-        run: vibe check
+        run: src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts check
 
       - name: Build package (dry run)
-        run: vibe builder
+        run: src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts builder
 
   # Publish to npm on tag creation using the release tool
   publish-npm:
@@ -87,7 +87,7 @@ jobs:
       # Use release tool in CI mode for proper release workflow
       # This runs checks, builds, and publishes according to release.config.ts
       - name: Run release (CI mode)
-        run: vibe release --ci --skip-git-tag --skip-git-push
+        run: src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts release --ci --skip-git-tag --skip-git-push
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
