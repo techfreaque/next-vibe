@@ -5,7 +5,10 @@ import {
   getSeedModule,
 } from "@/app/api/[locale]/system/generated/seeds";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { formatDatabase, formatDuration } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+import {
+  formatDatabase,
+  formatDuration,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 export type SeedFn = (
@@ -21,28 +24,6 @@ export interface EnvironmentSeeds {
 
 // Registry for all seed functions
 const seedRegistry: Record<string, EnvironmentSeeds> = {};
-
-/**
- * Registers seed functions for a module
- * @param moduleId - The unique identifier for the module
- * @param seeds - The seed functions for different environments
- * @param priority - Optional priority (higher number = higher priority, runs first)
- */
-export function registerSeed(
-  moduleId: string,
-  seeds: EnvironmentSeeds,
-  priority?: number,
-): void {
-  // Set priority if provided as a parameter or in the seeds object
-  if (priority !== undefined) {
-    seeds.priority = priority;
-  } else if (seeds.priority === undefined) {
-    // Default priority is 0 if not specified
-    seeds.priority = 0;
-  }
-
-  seedRegistry[moduleId] = seeds;
-}
 
 /**
  * Load all seed modules using the generated index
@@ -128,7 +109,12 @@ export async function runSeeds(
   }
 
   const duration = Date.now() - startTime;
-  logger.info(formatDatabase(`${environment} seeds completed successfully in ${formatDuration(duration)}`, "🌱"));
+  logger.info(
+    formatDatabase(
+      `${environment} seeds completed successfully in ${formatDuration(duration)}`,
+      "🌱",
+    ),
+  );
 }
 
 /**

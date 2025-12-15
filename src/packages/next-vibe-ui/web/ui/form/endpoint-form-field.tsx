@@ -26,6 +26,7 @@ import type {
   FieldConfig,
   FieldStyleClassName,
   FieldValidationState,
+  PrefillDisplayConfig,
   RequiredFieldTheme,
 } from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
 import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
@@ -206,57 +207,53 @@ function getFieldStyleClassName(
         descriptionClassName: cn("text-sm", colors.descriptionClassName),
       };
     }
-      // Required field without value - enhanced blueish highlight
-      const colorVariantsClassName = {
-        blue: {
-          containerClassName:
-            "p-4 rounded-lg border border-blue-300/40 dark:border-blue-600/40 bg-blue-50/60 bg-linear-to-br from-blue-50/60 to-blue-100/30 dark:bg-blue-950/30 dark:from-blue-950/30 dark:to-blue-900/20",
-          labelClassName: "text-blue-700 dark:text-blue-400 font-semibold",
-          inputClassName:
-            "border-blue-300 dark:border-blue-600 focus-visible:border-blue-500 focus-visible:ring-blue-500/30 bg-blue-50/60 dark:bg-blue-950/30 placeholder:text-blue-500/60",
-          descriptionClassName: "text-blue-600 dark:text-blue-400",
-        },
-        amber: {
-          containerClassName:
-            "p-4 rounded-lg border border-amber-300/40 dark:border-amber-600/40 bg-amber-50/60 bg-linear-to-br from-amber-50/60 to-amber-100/30 dark:bg-amber-950/30 dark:from-amber-950/30 dark:to-amber-900/20",
-          labelClassName: "text-amber-700 dark:text-amber-400 font-semibold",
-          inputClassName:
-            "border-amber-300 dark:border-amber-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/30 bg-amber-50/60 dark:bg-amber-950/30",
-          descriptionClassName: "text-amber-600 dark:text-amber-400",
-        },
-        red: {
-          containerClassName:
-            "p-4 rounded-lg border border-red-300/40 dark:border-red-600/40 bg-red-50/60 bg-linear-to-br from-red-50/60 to-red-100/30 dark:bg-red-950/30 dark:from-red-950/30 dark:to-red-900/20",
-          labelClassName: "text-red-700 dark:text-red-400 font-semibold",
-          inputClassName:
-            "border-red-300 dark:border-red-600 focus-visible:border-red-500 focus-visible:ring-red-500/30 bg-red-50/60 dark:bg-red-950/30",
-          descriptionClassName: "text-red-600 dark:text-red-400",
-        },
-        green: {
-          containerClassName:
-            "p-4 rounded-lg border border-green-300/40 dark:border-green-600/40 bg-green-50/60 bg-linear-to-br from-green-50/60 to-green-100/30 dark:bg-green-950/30 dark:from-green-950/30 dark:to-green-900/20",
-          labelClassName: "text-green-700 dark:text-green-400 font-semibold",
-          inputClassName:
-            "border-green-300 dark:border-green-600 focus-visible:border-green-500 focus-visible:ring-green-500/30 bg-green-50/60 dark:bg-green-950/30",
-          descriptionClassName: "text-green-600 dark:text-green-400",
-        },
-      };
+    // Required field without value - enhanced blueish highlight
+    const colorVariantsClassName = {
+      blue: {
+        containerClassName:
+          "p-4 rounded-lg border border-blue-300/40 dark:border-blue-600/40 bg-blue-50/60 bg-linear-to-br from-blue-50/60 to-blue-100/30 dark:bg-blue-950/30 dark:from-blue-950/30 dark:to-blue-900/20",
+        labelClassName: "text-blue-700 dark:text-blue-400 font-semibold",
+        inputClassName:
+          "border-blue-300 dark:border-blue-600 focus-visible:border-blue-500 focus-visible:ring-blue-500/30 bg-blue-50/60 dark:bg-blue-950/30 placeholder:text-blue-500/60",
+        descriptionClassName: "text-blue-600 dark:text-blue-400",
+      },
+      amber: {
+        containerClassName:
+          "p-4 rounded-lg border border-amber-300/40 dark:border-amber-600/40 bg-amber-50/60 bg-linear-to-br from-amber-50/60 to-amber-100/30 dark:bg-amber-950/30 dark:from-amber-950/30 dark:to-amber-900/20",
+        labelClassName: "text-amber-700 dark:text-amber-400 font-semibold",
+        inputClassName:
+          "border-amber-300 dark:border-amber-600 focus-visible:border-amber-500 focus-visible:ring-amber-500/30 bg-amber-50/60 dark:bg-amber-950/30",
+        descriptionClassName: "text-amber-600 dark:text-amber-400",
+      },
+      red: {
+        containerClassName:
+          "p-4 rounded-lg border border-red-300/40 dark:border-red-600/40 bg-red-50/60 bg-linear-to-br from-red-50/60 to-red-100/30 dark:bg-red-950/30 dark:from-red-950/30 dark:to-red-900/20",
+        labelClassName: "text-red-700 dark:text-red-400 font-semibold",
+        inputClassName:
+          "border-red-300 dark:border-red-600 focus-visible:border-red-500 focus-visible:ring-red-500/30 bg-red-50/60 dark:bg-red-950/30",
+        descriptionClassName: "text-red-600 dark:text-red-400",
+      },
+      green: {
+        containerClassName:
+          "p-4 rounded-lg border border-green-300/40 dark:border-green-600/40 bg-green-50/60 bg-linear-to-br from-green-50/60 to-green-100/30 dark:bg-green-950/30 dark:from-green-950/30 dark:to-green-900/20",
+        labelClassName: "text-green-700 dark:text-green-400 font-semibold",
+        inputClassName:
+          "border-green-300 dark:border-green-600 focus-visible:border-green-500 focus-visible:ring-green-500/30 bg-green-50/60 dark:bg-green-950/30",
+        descriptionClassName: "text-green-600 dark:text-green-400",
+      },
+    };
 
-      const colors = colorVariantsClassName[requiredColor];
-      return {
-        containerClassName: cn(
-          baseContainerClassName,
-          colors.containerClassName,
-        ),
-        labelClassName: cn(baseLabelClassName, colors.labelClassName),
-        inputClassName: cn(baseInputClassName, colors.inputClassName),
-        errorClassName: cn(
-          "text-sm text-red-600 dark:text-red-400 flex items-center gap-2 mt-2",
-          "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
-        ),
-        descriptionClassName: cn("text-sm", colors.descriptionClassName),
-      };
-    
+    const colors = colorVariantsClassName[requiredColor];
+    return {
+      containerClassName: cn(baseContainerClassName, colors.containerClassName),
+      labelClassName: cn(baseLabelClassName, colors.labelClassName),
+      inputClassName: cn(baseInputClassName, colors.inputClassName),
+      errorClassName: cn(
+        "text-sm text-red-600 dark:text-red-400 flex items-center gap-2 mt-2",
+        "[&>svg]:text-red-600 dark:[&>svg]:text-red-400",
+      ),
+      descriptionClassName: cn("text-sm", colors.descriptionClassName),
+    };
   }
 
   // Default styling - clean and minimal with blueish focus
@@ -270,6 +267,60 @@ function getFieldStyleClassName(
     ),
     descriptionClassName: "text-sm text-muted-foreground",
   };
+}
+
+/**
+ * Render prefilled readonly display
+ * Shows the prefilled value with styled card/badge based on prefillDisplay config
+ */
+function renderPrefillDisplay(
+  value: string,
+  label: TranslationKey | undefined,
+  prefillDisplay: PrefillDisplayConfig,
+  t: TFunction,
+): JSX.Element {
+  const displayLabel = prefillDisplay.labelKey
+    ? t(prefillDisplay.labelKey)
+    : label
+      ? t(label)
+      : "";
+
+  switch (prefillDisplay.variant) {
+    case "card":
+      return (
+        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+          <p className="text-sm text-blue-700 dark:text-blue-300">
+            {displayLabel}: <span className="font-semibold">{value}</span>
+          </p>
+        </div>
+      );
+    case "highlight":
+      return (
+        <div className="p-4 rounded-lg border border-green-200 dark:border-green-800 bg-green-50/60 dark:bg-green-950/30">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-green-700 dark:text-green-400 font-medium">
+              {displayLabel}:
+            </span>
+            <span className="text-sm text-green-800 dark:text-green-300 font-semibold">
+              {value}
+            </span>
+          </div>
+        </div>
+      );
+    case "badge":
+    default:
+      return (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">{displayLabel}:</span>
+          <Badge
+            variant="secondary"
+            className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
+          >
+            {value}
+          </Badge>
+        </div>
+      );
+  }
 }
 
 /**
@@ -723,13 +774,25 @@ export function EndpointFormField<
             )}
 
             <FormControl>
-              {renderFieldInput(
-                config,
-                field,
-                styleClassName.inputClassName,
-                t,
-                config.disabled,
-              )}
+              {config.prefillDisplay && field.value && !fieldState.isDirty
+                ? // Render prefilled readonly display ONLY when:
+                  // 1. prefillDisplay is configured
+                  // 2. Field has a value
+                  // 3. Field is NOT dirty (value hasn't changed from initial/prefilled)
+                  renderPrefillDisplay(
+                    String(field.value),
+                    config.label,
+                    config.prefillDisplay,
+                    t,
+                  )
+                : // Render normal form input
+                  renderFieldInput(
+                    config,
+                    field,
+                    styleClassName.inputClassName,
+                    t,
+                    config.disabled || config.readonly,
+                  )}
             </FormControl>
 
             {fieldState.error && (

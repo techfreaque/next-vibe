@@ -2,9 +2,6 @@
  * Production-ready error handling for Vibe CLI
  */
 
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../types/node.d.ts" />
-
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 
 /**

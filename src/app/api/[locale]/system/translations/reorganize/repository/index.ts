@@ -47,7 +47,7 @@ import type {
   TranslationReorganizeRequestOutput,
   TranslationReorganizeResponseOutput,
 } from "../definition";
-import { FileGenerator } from "./file-generator";
+import type { FileGenerator as FileGeneratorType } from "./file-generator";
 import { KeyUsageAnalyzer, type TranslationObject } from "./key-usage-analyzer";
 import { LocationAnalyzer } from "./location-analyzer";
 
@@ -61,7 +61,19 @@ interface TranslationModule {
 export class TranslationReorganizeRepositoryImpl {
   private keyUsageAnalyzer = new KeyUsageAnalyzer();
   private locationAnalyzer = new LocationAnalyzer();
-  private fileGenerator = new FileGenerator();
+  private fileGenerator: FileGeneratorType | null = null;
+
+  /**
+   * Get or create the FileGenerator instance (lazy-loaded to avoid Turbopack warnings)
+   * The FileGenerator uses dynamic file paths that can't be statically analyzed
+   */
+  private async getFileGenerator(): Promise<FileGeneratorType> {
+    if (!this.fileGenerator) {
+      const { FileGenerator } = await import("./file-generator");
+      this.fileGenerator = new FileGenerator();
+    }
+    return this.fileGenerator;
+  }
 
   /**
    * Reorganize translation files based on usage patterns and location-based co-location
@@ -272,7 +284,8 @@ export class TranslationReorganizeRepositoryImpl {
         }
 
         // Register all locations from all languages so parent aggregators are created correctly
-        this.fileGenerator.registerAllLocations(allRegroupedTranslations);
+        const fileGen = await this.getFileGenerator();
+        fileGen.registerAllLocations(allRegroupedTranslations);
 
         // Second pass: Generate files for each language
         for (const language of languages) {
@@ -280,7 +293,7 @@ export class TranslationReorganizeRepositoryImpl {
 
           // Generate files
           try {
-            const generated = this.fileGenerator.generateTranslationFiles(
+            const generated = fileGen.generateTranslationFiles(
               regroupedTranslations,
               language,
               logger,
@@ -417,7 +430,8 @@ export class TranslationReorganizeRepositoryImpl {
           }
 
           // Register all locations from all languages so parent aggregators are created correctly
-          this.fileGenerator.registerAllLocations(allRegroupedTranslations);
+          const fileGen2 = await this.getFileGenerator();
+          fileGen2.registerAllLocations(allRegroupedTranslations);
 
           // Second pass: Generate files for each language
           for (const language of languages) {
@@ -426,7 +440,7 @@ export class TranslationReorganizeRepositoryImpl {
 
             // Generate files
             try {
-              const generated = this.fileGenerator.generateTranslationFiles(
+              const generated = fileGen2.generateTranslationFiles(
                 regroupedTranslations,
                 language,
                 logger,
@@ -1280,8 +1294,9 @@ export class TranslationReorganizeRepositoryImpl {
         }
 
         // Calculate what the key SHOULD be based on the actual location
-        const actualLocationPrefix =
-          this.fileGenerator.locationToFlatKeyPublic(location);
+        const actualLocationPrefix = this.fileGenerator
+          ? this.fileGenerator.locationToFlatKeyPublic(location)
+          : "";
 
         logger.debug(
           `Co-locating key: ${fullPath} at location: ${location} (actual location prefix: ${actualLocationPrefix}, isShared: ${isShared})`,

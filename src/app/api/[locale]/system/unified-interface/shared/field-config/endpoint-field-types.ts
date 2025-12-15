@@ -5,12 +5,13 @@
 
 import { type Countries } from "@/i18n/core/config";
 
-import type { FieldConfig } from "./field-config-types";
+import type { FieldConfig, PrefillDisplayConfig } from "./field-config-types";
 
 /**
  * Type for endpoint field structure from unified interface
  * This matches the structure created by objectField() in endpoint definitions
  */
+
 export interface EndpointFieldStructure {
   type?: string;
   children?: Record<string, EndpointFieldStructure>;
@@ -39,6 +40,9 @@ export interface EndpointFieldStructure {
       icon?: string;
     }>;
     maxTags?: number;
+    // Readonly and prefill display options
+    readonly?: boolean;
+    prefillDisplay?: PrefillDisplayConfig;
   };
 }
 

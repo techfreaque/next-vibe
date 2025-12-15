@@ -6,6 +6,7 @@
 
 import type { NextRequest, NextResponse } from "next/server";
 import {
+  ErrorResponseError,
   isStreamingResponse,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
@@ -114,6 +115,14 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         200,
       );
     } catch (error) {
+      // Handle ErrorResponseError - return the contained proper error response
+      if (error instanceof ErrorResponseError) {
+        logger.debug("ErrorResponseError caught", {
+          errorType: error.errorResponse.errorType,
+        });
+        return wrapErrorResponse(error.errorResponse, locale, logger);
+      }
+
       // Handle unexpected errors
       logger.error("Unexpected error in Next.js handler", parseError(error));
       return wrapErrorResponse(

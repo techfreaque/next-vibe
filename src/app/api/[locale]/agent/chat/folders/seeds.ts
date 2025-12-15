@@ -6,7 +6,6 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
-import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   UserPermissionRole,
@@ -329,15 +328,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
   await seedCategories(logger, "production");
 }
 
-// Register seeds with the seed manager
+// Export priority for seed manager
 // Chat folders should be created after users (priority 100)
 // Set priority to 90 to ensure users exist first
-registerSeed(
-  "chat-folders",
-  {
-    dev,
-    test,
-    prod,
-  },
-  90,
-);
+export const priority = 90;

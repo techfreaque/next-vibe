@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Badge } from "next-vibe-ui/ui/badge";
 import {
   Card,
@@ -10,9 +11,9 @@ import {
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import {
-  AlertCircle,
   Calendar,
   Coins,
+  Gift,
   Sparkles,
   Zap,
 } from "next-vibe-ui/ui/icons";
@@ -30,8 +31,6 @@ import {
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import { formatDate } from "./types";
 
 /**
  * Format credit amount for display
@@ -165,27 +164,23 @@ export function CreditBalanceCard({
               </Div>
             </Div>
 
-            {/* Expiration Notice */}
-            {credits?.expiresAt && credits.expiring > 0 && (
-              <Div className="p-4 rounded-lg bg-accent border">
-                <Div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                  <AlertCircle className="h-4 w-4" />
-                  {t("app.subscription.subscription.balance.nextExpiration")}
+            {/* Earned Credits (from referrals) */}
+            <Link href={`/${locale}/user/referral`} className="block">
+              <Div className="p-4 rounded-lg bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-colors cursor-pointer h-full">
+                <Div className="flex items-center gap-2 text-sm text-violet-700 dark:text-violet-300 mb-2">
+                  <Gift className="h-4 w-4" />
+                  {t("app.subscription.subscription.balance.earned.title")}
                 </Div>
-                <Div className="text-lg font-semibold">
-                  {formatDate(credits.expiresAt, locale)}
+                <Div className="text-2xl font-bold text-violet-900 dark:text-violet-100">
+                  {formatCredits(credits?.earned ?? 0)}
                 </Div>
-                <Div className="text-xs text-muted-foreground mt-1">
-                  {credits.expiring === 1
-                    ? t("app.subscription.subscription.balance.credit", {
-                        count: formatCredits(credits.expiring),
-                      })
-                    : t("app.subscription.subscription.balance.credits", {
-                        count: formatCredits(credits.expiring),
-                      })}
+                <Div className="text-xs text-violet-600 dark:text-violet-400 mt-1">
+                  {t(
+                    "app.subscription.subscription.balance.earned.description",
+                  )}
                 </Div>
               </Div>
-            )}
+            </Link>
           </Div>
         </CardContent>
       </Card>

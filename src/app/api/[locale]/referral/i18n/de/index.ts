@@ -100,6 +100,13 @@ export const translations = {
       title: "Statistiken abgerufen",
       description: "Ihre Empfehlungsstatistiken erfolgreich abgerufen",
     },
+    fields: {
+      totalSignups: "Anmeldungen gesamt",
+      totalRevenueCredits: "Gesamtumsatz (Credits)",
+      totalEarnedCredits: "Gesamt verdient (Credits)",
+      totalPaidOutCredits: "Gesamt ausgezahlt (Credits)",
+      availableCredits: "Verfügbare Credits",
+    },
   },
 
   // Earnings List endpoint
@@ -171,6 +178,17 @@ export const translations = {
     referralCode: "Empfehlungscode",
     success: "Erfolg",
     message: "Nachricht",
+  },
+
+  // Payout errors
+  payout: {
+    errors: {
+      minimumAmount: "Mindestauszahlungsbetrag ist $40",
+      walletRequired: "Wallet-Adresse für Krypto-Auszahlungen erforderlich",
+      insufficientBalance: "Unzureichendes Guthaben für Auszahlung",
+      notFound: "Auszahlungsanfrage nicht gefunden",
+      invalidStatus: "Ungültiger Status der Auszahlungsanfrage für diesen Vorgang",
+    },
   },
 
   // Error types

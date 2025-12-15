@@ -5,7 +5,6 @@
 
 import { parseError } from "next-vibe/shared/utils";
 
-import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -153,13 +152,6 @@ export async function prod(logger: EndpointLogger): Promise<void> {
   }
 }
 
-// Register seeds with low priority since newsletters depend on users
-registerSeed(
-  "newsletter",
-  {
-    dev,
-    test,
-    prod,
-  },
-  20,
-);
+// Export priority for seed manager
+// Low priority since newsletters depend on users
+export const priority = 20;

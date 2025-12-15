@@ -6,7 +6,6 @@
 import { and, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
-import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { translations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -367,9 +366,7 @@ export async function dev(
 /**
  * Test seed function for auth module
  */
-export async function test(
-  logger: EndpointLogger,
-): Promise<void> {
+export async function test(logger: EndpointLogger): Promise<void> {
   logger.debug("🌱 Seeding auth data for test environment");
 
   // Create test users
@@ -503,9 +500,7 @@ export async function test(
 /**
  * Production seed function for auth module
  */
-export async function prod(
-  logger: EndpointLogger,
-): Promise<void> {
+export async function prod(logger: EndpointLogger): Promise<void> {
   logger.debug("🌱 Seeding auth data for production environment");
 
   // Create admin user
@@ -588,14 +583,6 @@ export async function prod(
   logger.debug("✅ Inserted essential production users with roles");
 }
 
-// Register seeds with the seed manager
+// Export priority for seed manager
 // User has highest priority (100) as users must be created first
-registerSeed(
-  "user",
-  {
-    dev,
-    test,
-    prod,
-  },
-  100,
-);
+export const priority = 100;

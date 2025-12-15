@@ -5,7 +5,6 @@
 
 import { parseError } from "next-vibe/shared/utils";
 
-import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { NewContact } from "./db";
@@ -140,13 +139,5 @@ export async function prod(logger: EndpointLogger): Promise<void> {
   }
 }
 
-// Register seeds with medium priority
-registerSeed(
-  "contact",
-  {
-    dev,
-    test,
-    prod,
-  },
-  30,
-);
+// Export priority for seed manager
+export const priority = 30;

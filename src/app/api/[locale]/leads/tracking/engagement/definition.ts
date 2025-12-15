@@ -449,7 +449,7 @@ const { GET } = createEndpoint({
             "app.api.leads.tracking.engagement.get.id.helpText" as const,
           columns: 12,
         },
-        z.uuid(),
+        z.uuid().optional(),
       ),
       campaignId: requestDataField(
         {
@@ -502,7 +502,7 @@ const { GET } = createEndpoint({
       url: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.URL,
+          fieldType: FieldDataType.TEXT,
           label: "app.api.leads.tracking.engagement.get.url.label" as const,
           description:
             "app.api.leads.tracking.engagement.get.url.description" as const,
@@ -512,7 +512,7 @@ const { GET } = createEndpoint({
             "app.api.leads.tracking.engagement.get.url.helpText" as const,
           columns: 12,
         },
-        z.string().url(),
+        z.string(),
       ),
       ref: requestDataField(
         {
@@ -545,7 +545,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.leads.tracking.engagement.get.response.redirectUrl" as const,
         },
-        z.string().url(),
+        z.string(),
       ),
       responseLeadId: responseField(
         {
@@ -553,7 +553,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.leads.tracking.engagement.get.response.leadId" as const,
         },
-        z.uuid(),
+        z.string().optional(),
       ),
       responseCampaignId: responseField(
         {

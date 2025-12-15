@@ -20,6 +20,14 @@ export const translations: typeof enTranslations = {
       refund: "Zwrot",
       transfer: "Transfer",
       otherDevices: "Wydatki z innych urządzeń",
+      referralEarning: "Zarobki z polecenia",
+      referralPayout: "Wypłata z polecenia",
+    },
+    packType: {
+      subscription: "Subskrypcja",
+      permanent: "Stałe",
+      bonus: "Bonus",
+      earned: "Zarobione",
     },
   },
   expire: {
@@ -66,6 +74,11 @@ export const translations: typeof enTranslations = {
     invalidAmount: "Kwota kredytu musi być liczbą dodatnią",
     walletNotFound: "Nie znaleziono portfela",
     walletCreationFailed: "Nie udało się utworzyć portfela",
+    addEarnedCreditsFailed: "Nie udało się dodać zarobionych kredytów",
+    getEarnedBalanceFailed: "Nie udało się pobrać salda zarobionych kredytów",
+    insufficientEarnedCredits: "Niewystarczające zarobione kredyty dla tej operacji",
+    deductEarnedCreditsFailed: "Nie udało się odjąć zarobionych kredytów",
+    getReferralTransactionsFailed: "Nie udało się pobrać transakcji poleceń",
   },
   get: {
     title: "Pobierz saldo kredytów",
@@ -85,6 +98,9 @@ export const translations: typeof enTranslations = {
     },
     free: {
       content: "Darmowe kredyty",
+    },
+    earned: {
+      content: "Zarobione kredyty (Polecenia)",
     },
     expiresAt: {
       content: "Wygasa",

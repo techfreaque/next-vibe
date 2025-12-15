@@ -26,8 +26,13 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { env } from "@/config/env";
 
 import { users } from "../../../user/db";
-import { paymentInvoices } from "../../db";
-import { InvoiceStatus } from "../../enum";
+import { paymentInvoices, paymentTransactions } from "../../db";
+import {
+  CheckoutMode,
+  InvoiceStatus,
+  PaymentProvider as PaymentProviderEnum,
+  PaymentStatus,
+} from "../../enum";
 import { paymentEnv } from "../../env";
 import type {
   CheckoutSessionParams,
@@ -404,6 +409,31 @@ export class NOWPaymentsProvider implements PaymentProvider {
       }
     }
 
+    // Create payment transaction record for tracking and referral payouts
+    try {
+      await db.insert(paymentTransactions).values({
+        userId: params.userId,
+        providerSessionId: invoice.id,
+        amount: totalAmount.toFixed(2),
+        currency: product.currency,
+        status: PaymentStatus.PENDING,
+        provider: PaymentProviderEnum.NOWPAYMENTS,
+        mode: CheckoutMode.PAYMENT,
+        metadata: params.metadata,
+      });
+
+      logger.debug("Created payment transaction for NowPayments", {
+        invoiceId: invoice.id,
+        userId: params.userId,
+      });
+    } catch (txError) {
+      logger.error("Failed to create payment transaction", {
+        error: parseError(txError),
+        invoiceId: invoice.id,
+      });
+      // Continue - webhook can still process
+    }
+
     return success<CheckoutSessionResult>({
       sessionId: invoice.id,
       checkoutUrl: invoice.invoice_url,
@@ -526,6 +556,31 @@ export class NOWPaymentsProvider implements PaymentProvider {
       email,
       status: subscription.status,
     });
+
+    // Create payment transaction record for tracking and referral payouts
+    try {
+      await db.insert(paymentTransactions).values({
+        userId: params.userId,
+        providerSessionId: subscription.id.toString(),
+        amount: product.price.toFixed(2),
+        currency: product.currency,
+        status: PaymentStatus.PENDING,
+        provider: PaymentProviderEnum.NOWPAYMENTS,
+        mode: CheckoutMode.SUBSCRIPTION,
+        metadata: params.metadata,
+      });
+
+      logger.debug("Created payment transaction for NowPayments subscription", {
+        subscriptionId: subscription.id,
+        userId: params.userId,
+      });
+    } catch (txError) {
+      logger.error("Failed to create payment transaction", {
+        error: parseError(txError),
+        subscriptionId: subscription.id,
+      });
+      // Continue - webhook can still process
+    }
 
     // Return the subscription ID as session ID
     // The user will receive payment links via email

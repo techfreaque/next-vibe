@@ -96,7 +96,7 @@ ls src/app/api/[locale]/{domain}/{subdomain}/seeds.ts 2>/dev/null || echo "No se
 
 - All three functions exist: dev, test, prod
 - Correct EndpointLogger signatures
-- Proper registerSeed() call with priority
+- Proper exported priority
 - Error handling with try-catch
 
 **Fix Priority Order:**
@@ -138,7 +138,7 @@ Verify against `/docs/patterns/seeds.md`:
 - ✅ All three functions (dev, test, prod) exist
 - ✅ Correct EndpointLogger signatures
 - ✅ Only EndpointLogger used (no forbidden loggers)
-- ✅ Proper registerSeed() call with name, functions, priority
+- ✅ Proper priority
 - ✅ Error handling with try-catch blocks
 - ✅ Repository method calls use correct parameters
 - ✅ Import paths follow standards

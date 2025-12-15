@@ -5,7 +5,6 @@
 
 import { parseError } from "next-vibe/shared/utils";
 
-import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { translations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -297,13 +296,6 @@ export function prod(logger: EndpointLogger): void {
   }
 }
 
-// Register seeds with low priority since email messages are typically created dynamically
-registerSeed(
-  "email-messages",
-  {
-    dev,
-    test,
-    prod,
-  },
-  15,
-);
+// Export priority for seed manager
+// Low priority since email messages are typically created dynamically
+export const priority = 15;

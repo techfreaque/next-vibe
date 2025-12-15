@@ -8,7 +8,7 @@ import { create } from "zustand";
 
 import { aliasToPathMap } from "../../../system/generated/endpoint";
 import { DEFAULT_TOOL_IDS } from "../config";
-import type { ChatFolder,ChatMessage, ChatThread } from "../db";
+import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { ViewMode, type ViewModeValue } from "../enum";
 import {
   saveMessage as saveIncognitoMessage,
@@ -16,7 +16,7 @@ import {
 } from "../incognito/storage";
 import { ModelId, type ModelId as ModelIdType } from "../model-access/models";
 
-export type { ChatFolder,ChatMessage, ChatThread };
+export type { ChatFolder, ChatMessage, ChatThread };
 
 /**
  * Chat settings type
@@ -48,6 +48,10 @@ interface ChatState {
   isLoading: boolean;
   isDataLoaded: boolean;
 
+  // Branch state - tracks which branch is selected at each level for each thread
+  // Key: threadId, Value: Record<parentMessageId, branchIndex>
+  branchIndices: Record<string, Record<string, number>>;
+
   // Settings (persisted to localStorage)
   settings: ChatSettings;
 
@@ -61,6 +65,15 @@ interface ChatState {
   updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void;
   deleteMessage: (messageId: string) => void;
   getThreadMessages: (threadId: string) => ChatMessage[];
+
+  // Branch actions
+  getBranchIndices: (threadId: string) => Record<string, number>;
+  setBranchIndices: (threadId: string, indices: Record<string, number>) => void;
+  updateBranchIndex: (
+    threadId: string,
+    parentMessageId: string,
+    branchIndex: number,
+  ) => void;
 
   // Settings actions
   hydrateSettings: () => Promise<void>;
@@ -165,6 +178,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   folders: {},
   isLoading: false,
   isDataLoaded: false,
+  branchIndices: {},
 
   // Use default settings for SSR - will be hydrated from localStorage after mount
   settings: getDefaultSettings(),
@@ -313,6 +327,43 @@ export const useChatStore = create<ChatState>((set, get) => ({
     return Object.values(state.messages)
       .filter((msg) => msg.threadId === threadId)
       .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  },
+
+  // Branch actions
+  getBranchIndices: (threadId: string): Record<string, number> => {
+    const state = get();
+    return state.branchIndices[threadId] || {};
+  },
+
+  setBranchIndices: (
+    threadId: string,
+    indices: Record<string, number>,
+  ): void => {
+    set((state) => ({
+      branchIndices: {
+        ...state.branchIndices,
+        [threadId]: indices,
+      },
+    }));
+  },
+
+  updateBranchIndex: (
+    threadId: string,
+    parentMessageId: string,
+    branchIndex: number,
+  ): void => {
+    set((state) => {
+      const currentIndices = state.branchIndices[threadId] || {};
+      return {
+        branchIndices: {
+          ...state.branchIndices,
+          [threadId]: {
+            ...currentIndices,
+            [parentMessageId]: branchIndex,
+          },
+        },
+      };
+    });
   },
 
   // Folder actions

@@ -17,7 +17,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { findFilesByName } from "@/app/api/[locale]/system/translations/reorganize/repository/scanner";
+import { findFilesByName } from "@/app/api/[locale]/system/unified-interface/shared/utils/scanner";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

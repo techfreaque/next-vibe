@@ -5,7 +5,7 @@
  * for form initialization in the unified interface system.
  */
 
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import { z } from "zod";
 
 import { extractSchemaDefaults } from "./utils";
@@ -267,21 +267,23 @@ describe("extractSchemaDefaults", () => {
     });
 
     it("returns empty values for primitives when forFormInit is true", () => {
-      expect(extractSchemaDefaults(z.string(), undefined, "", true)).toBe("");
-      expect(
-        extractSchemaDefaults(z.coerce.number(), undefined, "", true),
-      ).toBe(0);
-      expect(extractSchemaDefaults(z.boolean(), undefined, "", true)).toBe(
-        false,
-      );
-      expect(
-        extractSchemaDefaults(z.array(z.string()), undefined, "", true),
-      ).toEqual([]);
+      const stringResult = extractSchemaDefaults<string>(z.string(), undefined, "", true);
+      expect(stringResult).toBe("");
+
+      const numberResult = extractSchemaDefaults<number>(z.coerce.number(), undefined, "", true);
+      expect(numberResult).toBe(0);
+
+      const booleanResult = extractSchemaDefaults<boolean>(z.boolean(), undefined, "", true);
+      expect(booleanResult).toBe(false);
+
+      const arrayResult = extractSchemaDefaults<string[]>(z.array(z.string()), undefined, "", true);
+      expect(arrayResult).toEqual([]);
     });
 
     it("returns empty values for transformed string when forFormInit is true", () => {
       const schema = z.string().transform((x) => x.toLowerCase());
-      expect(extractSchemaDefaults(schema, undefined, "", true)).toBe("");
+      const result = extractSchemaDefaults<string>(schema, undefined, "", true);
+      expect(result).toBe("");
     });
 
     it("handles nested objects with forFormInit", () => {

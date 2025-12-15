@@ -76,11 +76,6 @@ export function SearchToggle({
         disabled={disabled}
         className="h-3.5 w-6 sm:h-4 sm:w-7 data-[state=checked]:bg-primary"
       />
-      {enabled && (
-        <Span className="hidden xl:inline text-[10px] opacity-75">
-          {t("app.chat.searchToggle.creditIndicator")}
-        </Span>
-      )}
     </Div>
   );
 }

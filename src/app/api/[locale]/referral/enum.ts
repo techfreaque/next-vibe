@@ -43,3 +43,45 @@ export const ReferralEarningStatusDB = [
   ReferralEarningStatus.CONFIRMED,
   ReferralEarningStatus.CANCELED,
 ] as const;
+
+/**
+ * Payout request status
+ */
+export const PayoutStatus = {
+  PENDING: "PENDING",
+  APPROVED: "APPROVED",
+  REJECTED: "REJECTED",
+  PROCESSING: "PROCESSING",
+  COMPLETED: "COMPLETED",
+  FAILED: "FAILED",
+} as const;
+
+export type PayoutStatusValue =
+  (typeof PayoutStatus)[keyof typeof PayoutStatus];
+
+export const PayoutStatusDB = [
+  PayoutStatus.PENDING,
+  PayoutStatus.APPROVED,
+  PayoutStatus.REJECTED,
+  PayoutStatus.PROCESSING,
+  PayoutStatus.COMPLETED,
+  PayoutStatus.FAILED,
+] as const;
+
+/**
+ * Payout currency options
+ */
+export const PayoutCurrency = {
+  BTC: "BTC",
+  USDC: "USDC",
+  CREDITS: "CREDITS",
+} as const;
+
+export type PayoutCurrencyValue =
+  (typeof PayoutCurrency)[keyof typeof PayoutCurrency];
+
+export const PayoutCurrencyDB = [
+  PayoutCurrency.BTC,
+  PayoutCurrency.USDC,
+  PayoutCurrency.CREDITS,
+] as const;

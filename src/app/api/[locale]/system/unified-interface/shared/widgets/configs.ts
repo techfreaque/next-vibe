@@ -10,8 +10,18 @@ import type { z } from "zod";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { FieldUsageConfig, InferSchemaFromField, ObjectField } from "../types/endpoint";
-import type { FieldDataType, FieldUsage,LayoutType, SpacingSize, WidgetType } from "../types/enums";
+import type {
+  FieldUsageConfig,
+  InferSchemaFromField,
+  ObjectField,
+} from "../types/endpoint";
+import type {
+  FieldDataType,
+  FieldUsage,
+  LayoutType,
+  SpacingSize,
+  WidgetType,
+} from "../types/enums";
 
 /**
  * Layout configuration for containers and widgets
@@ -40,356 +50,197 @@ interface BaseWidgetConfig {
   order?: number;
 }
 
+/**
+ * Prefill display configuration for form fields
+ * When a field has a prefilled value from server/URL params, this controls how it's displayed
+ */
+export interface PrefillDisplayConfig {
+  /** Display variant when field is prefilled */
+  variant: "badge" | "highlight" | "card";
+  /** Translation key for the label shown with prefilled value */
+  labelKey?: TranslationKey;
+  /** Icon to show with prefilled value */
+  icon?: string;
+}
+
+/**
+ * Common properties for form field widgets
+ */
+interface BaseFormFieldWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.FORM_FIELD;
+  label?: TranslationKey;
+  description?: TranslationKey;
+  placeholder?: TranslationKey;
+  helpText?: TranslationKey;
+  required?: boolean;
+  disabled?: boolean;
+  columns?: number;
+  /**
+   * Make field readonly - displays value but cannot be edited
+   * Use with prefillDisplay to show special styling for server-provided values
+   */
+  readonly?: boolean;
+  /**
+   * Configure how prefilled values are displayed when readonly
+   * Only applies when field has a prefilled value
+   */
+  prefillDisplay?: PrefillDisplayConfig;
+}
+
 // ============================================================================
 // FORM WIDGETS
 // ============================================================================
 
 // Text input
-export interface TextFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface TextFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.TEXT;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Email input
-export interface EmailFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface EmailFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.EMAIL;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Password input
-export interface PasswordFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface PasswordFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.PASSWORD;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Number input
-export interface NumberFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface NumberFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.NUMBER;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Boolean/Checkbox input
-export interface BooleanFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface BooleanFieldWidgetConfig extends Omit<
+  BaseFormFieldWidgetConfig,
+  "placeholder"
+> {
   fieldType: FieldDataType.BOOLEAN;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Select dropdown
-export interface SelectFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface SelectFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.SELECT;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
   options: Array<{ label: TranslationKey; value: string | number }>;
-  columns?: number;
 }
 
 // Multi-select
-export interface MultiSelectFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface MultiSelectFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.MULTISELECT;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
   options: Array<{ label: TranslationKey; value: string | number }>;
-  columns?: number;
 }
 
 // Textarea
-export interface TextareaFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface TextareaFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.TEXTAREA;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Phone input
-export interface PhoneFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface PhoneFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.PHONE;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // URL input
-export interface UrlFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface UrlFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.URL;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Integer input
-export interface IntFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface IntFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.INT;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Date input
-export interface DateFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface DateFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.DATE;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // DateTime input
-export interface DateTimeFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface DateTimeFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.DATETIME;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Time input
-export interface TimeFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface TimeFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.TIME;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // File input
-export interface FileFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface FileFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.FILE;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // UUID input
-export interface UuidFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface UuidFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.UUID;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // JSON input
-export interface JsonFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface JsonFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.JSON;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Date range input
-export interface DateRangeFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface DateRangeFieldWidgetConfig extends Omit<
+  BaseFormFieldWidgetConfig,
+  "placeholder"
+> {
   fieldType: FieldDataType.DATE_RANGE;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Time range input
-export interface TimeRangeFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface TimeRangeFieldWidgetConfig extends Omit<
+  BaseFormFieldWidgetConfig,
+  "placeholder"
+> {
   fieldType: FieldDataType.TIME_RANGE;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Timezone select
-export interface TimezoneFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface TimezoneFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.TIMEZONE;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Currency select
-export interface CurrencySelectFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface CurrencySelectFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.CURRENCY_SELECT;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Language select
-export interface LanguageSelectFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface LanguageSelectFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.LANGUAGE_SELECT;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Country select
-export interface CountrySelectFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface CountrySelectFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.COUNTRY_SELECT;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Color picker
-export interface ColorFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface ColorFieldWidgetConfig extends Omit<
+  BaseFormFieldWidgetConfig,
+  "placeholder"
+> {
   fieldType: FieldDataType.COLOR;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Slider input
-export interface SliderFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface SliderFieldWidgetConfig extends Omit<
+  BaseFormFieldWidgetConfig,
+  "placeholder"
+> {
   fieldType: FieldDataType.SLIDER;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Tags input
-export interface TagsFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface TagsFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.TAGS;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Text array input
-export interface TextArrayFieldWidgetConfig extends BaseWidgetConfig {
-  type: WidgetType.FORM_FIELD;
+export interface TextArrayFieldWidgetConfig extends BaseFormFieldWidgetConfig {
   fieldType: FieldDataType.TEXT_ARRAY;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
-  required?: boolean;
-  disabled?: boolean;
-  columns?: number;
 }
 
 // Union type for all form field widgets
@@ -541,11 +392,7 @@ export interface MetadataCardWidgetConfig extends BaseWidgetConfig {
  * Helper to infer request/response schemas from children
  * Creates a minimal ObjectField-like structure for type inference
  */
-// eslint-disable-next-line typescript-eslint/consistent-type-definitions
-type InferSchemasFromChildren<
-  TChildren,
-  TUsage extends FieldUsageConfig,
-> = {
+interface InferSchemasFromChildren<TChildren, TUsage extends FieldUsageConfig> {
   request: z.output<
     InferSchemaFromField<
       ObjectField<TChildren, TUsage, ContainerWidgetConfig>,
@@ -558,7 +405,7 @@ type InferSchemasFromChildren<
       FieldUsage.Response
     >
   >;
-};
+}
 
 /**
  * Typed Container Widget Config with inferred request/response types
@@ -1009,7 +856,10 @@ export interface PasswordStrengthWidgetConfig extends BaseWidgetConfig {
 // CUSTOM WIDGETS
 // ============================================================================
 
-export interface CustomWidgetConfig<TProps extends Record<string, string | number | boolean | null | undefined> = Record<string, never>> extends BaseWidgetConfig {
+export interface CustomWidgetConfig<
+  TProps extends Record<string, string | number | boolean | null | undefined> =
+    Record<string, never>,
+> extends BaseWidgetConfig {
   type: WidgetType.CUSTOM;
   componentId: string;
   props?: TProps;

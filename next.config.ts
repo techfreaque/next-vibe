@@ -39,9 +39,6 @@ const nextConfig: NextConfig = {
           "**/native/**": {
             loaders: ["ignore-loader"],
           },
-          "**/node_modules/**": {
-            loaders: ["ignore-loader"],
-          },
           // Ignore standalone package source files and routes in API routes
           // These are CLI tools that use dynamic imports with process.cwd() which Turbopack can't resolve
           "src/app/api/**/builder/**": {
@@ -128,6 +125,9 @@ const nextConfig: NextConfig = {
     "lightningcss",
     "@tailwindcss/vite",
     "@tailwindcss/node",
+    // Drizzle packages (needed for middleware module resolution with Zod v4)
+    "drizzle-zod",
+    "zod",
   ],
 
   // Ensure WebSocket routes are properly handled

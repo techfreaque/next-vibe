@@ -38,6 +38,7 @@ export function updateCreditBalanceForTTS(logger: EndpointLogger): void {
         total: newTotal,
         expiring: data.expiring,
         permanent: data.permanent,
+        earned: data.earned,
         free: data.free,
         expiresAt: data.expiresAt,
       },

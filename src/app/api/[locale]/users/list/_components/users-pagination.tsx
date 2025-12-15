@@ -50,7 +50,6 @@ export function UsersPagination({
   const { t } = simpleT(locale);
 
   if (!usersEndpoint.read) {
-    // eslint-disable-next-line react/jsx-no-useless-fragment
     return <></>;
   }
 

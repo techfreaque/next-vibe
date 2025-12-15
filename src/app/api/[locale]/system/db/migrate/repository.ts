@@ -85,12 +85,21 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
     try {
       // Generate migrations if requested
       if (data.generate) {
-        logger.debug(`⚙️  ${formatActionCommand("Generating migrations using:", "bunx drizzle-kit generate")}`);
+        const generateStartTime = Date.now();
+        logger.debug(
+          `⚙️  ${formatActionCommand("Generating migrations using:", "bunx drizzle-kit generate")}`,
+        );
         const generateResult = spawnSync("bunx", ["drizzle-kit", "generate"], {
           encoding: "utf8",
           cwd: process.cwd(),
         });
-        logger.info(formatDatabase(`${formatActionCommand("Generated migrations using:", "bunx drizzle-kit generate")}`, "⚙️ "));
+        const generateDuration = Date.now() - generateStartTime;
+        logger.info(
+          formatDatabase(
+            `${formatActionCommand("Generated migrations using:", "bunx drizzle-kit generate")} in ${formatDuration(generateDuration)}`,
+            "⚙️ ",
+          ),
+        );
 
         if (generateResult.error) {
           return fail({
@@ -111,10 +120,13 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
             message: "app.api.system.db.migrate.post.errors.network.title",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
-              error: t("app.api.system.db.migrate.errors.generationFailedWithCode", {
-                code: String(generateResult.status ?? "unknown"),
-                output: errorOutput,
-              }),
+              error: t(
+                "app.api.system.db.migrate.errors.generationFailedWithCode",
+                {
+                  code: String(generateResult.status ?? "unknown"),
+                  output: errorOutput,
+                },
+              ),
             },
           });
         }
@@ -133,7 +145,9 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
       }
 
       // Use drizzle-kit migrate for tracked migrations
-      logger.debug(`🔄 ${formatActionCommand("Running migrations using:", "bunx drizzle-kit migrate")}`);
+      logger.debug(
+        `🔄 ${formatActionCommand("Running migrations using:", "bunx drizzle-kit migrate")}`,
+      );
       const pushResult = spawnSync("bunx", ["drizzle-kit", "migrate"], {
         encoding: "utf8",
         cwd: process.cwd(),
@@ -169,7 +183,12 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
       }
 
       const duration = Date.now() - startTime;
-      logger.info(formatDatabase(`${formatActionCommand("Migrations completed using:", "bunx drizzle-kit migrate")} in ${formatDuration(duration)}`, "✅"));
+      logger.info(
+        formatDatabase(
+          `${formatActionCommand("Migrations completed using:", "bunx drizzle-kit migrate")} in ${formatDuration(duration)}`,
+          "✅",
+        ),
+      );
 
       return success({
         success: true,

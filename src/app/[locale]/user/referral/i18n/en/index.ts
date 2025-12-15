@@ -1,56 +1,68 @@
 export const translations = {
-  title: "Earn money with {{appName}}",
+  title: "Earn with {{appName}}",
   description:
-    "Turn your network into a passive income stream. Invite people to {{appName}}, and earn real money when they buy credits — not only from your direct referrals but also from their referrals through our multi-level earnings model.",
-  tagline: "Referral & multi-level earnings",
+    "Turn your network into passive income. Share your referral link and earn 20% commission when people subscribe — plus smaller earnings from their referrals through our multi-level system.",
+  tagline: "Referral Program",
   howItWorks: {
-    title: "How the referral system works",
-    step1Title: "Create your personal referral codes",
-    step1Body:
-      "Set labels, limits, and expiry options for different audiences like friends, community, or campaigns.",
-    step2Title: "Share your links and grow your network",
-    step2Body:
-      "Share your referral links anywhere. When people sign up and buy credits, they become part of your referral tree.",
-    step3Title: "Earn from direct and indirect referrals",
-    step3Body:
-      "You earn when your referrals buy credits, and you also earn smaller amounts from their referrals thanks to the multi-level structure.",
+    title: "How It Works",
+    step1Title: "Create referral codes",
+    step1Body: "Generate unique codes for different audiences — friends, social media, or campaigns.",
+    step2Title: "Share your link",
+    step2Body: "When someone signs up using your link and subscribes, you earn commission.",
+    step3Title: "Get paid",
+    step3Body: "Earnings are instant. Use them as chat credits or withdraw to crypto.",
   },
   overview: {
-    title: "Your earnings overview",
-    subtitle:
-      "Live stats for your total referrals and MLM earnings. Updated automatically with every purchase.",
+    title: "Your Earnings",
+    subtitle: "Real-time stats updated with every purchase.",
+  },
+  payout: {
+    title: "Withdraw Your Earnings",
+    description: "Multiple ways to use your referral earnings",
+    useAsCredits: "Use as Chat Credits",
+    useAsCreditsDesc: "Instantly convert earnings to chat credits for AI conversations.",
+    cryptoPayout: "Withdraw to Crypto",
+    cryptoPayoutDesc: "Request payout in BTC or USDC to your wallet address.",
+    minimumNote: "Minimum payout: $40. Crypto payouts are processed within 48 hours after approval.",
   },
   manage: {
-    createSubtitle:
-      "Set up new codes for specific audiences and campaigns in seconds.",
-    codesSubtitle:
-      "See all your referral links, performance, and earnings in one place.",
+    createSubtitle: "Create codes for specific campaigns or audiences.",
+    codesSubtitle: "Track performance and earnings for each referral code.",
   },
   createCode: {
-    title: "Create New Referral Code",
+    title: "Create Referral Code",
     create: "Create Code",
     creating: "Creating...",
   },
   myCodes: {
-    title: "My Referral Codes",
+    title: "Your Referral Codes",
     loading: "Loading codes...",
     error: "Failed to load codes",
-    empty:
-      "No referral codes yet. Create your first one above and start earning.",
+    empty: "No referral codes yet. Create your first one above!",
     copy: "Copy Link",
     copied: "Copied!",
     uses: "Uses",
     signups: "Signups",
     revenue: "Revenue",
-    earnings: "Earnings",
+    earnings: "Earned",
     inactive: "Inactive",
   },
   stats: {
     loading: "Loading stats...",
     error: "Failed to load stats",
-    totalReferrals: "Total Referrals",
-    totalEarnings: "Total Earnings",
-    pendingEarnings: "Pending Earnings",
-    confirmedEarnings: "Confirmed Earnings",
+    totalSignups: "Total Signups",
+    totalSignupsDesc: "People who signed up via your links",
+    totalRevenue: "Revenue Generated",
+    totalRevenueDesc: "Total value from your referrals",
+    totalEarned: "Total Earned",
+    totalEarnedDesc: "Your 20% commission earnings",
+    availableBalance: "Available Balance",
+    availableBalanceDesc: "Ready to use or withdraw",
+  },
+  cta: {
+    title: "Start Earning Today",
+    description: "Create an account or log in to generate your referral codes and start earning commission on every subscription.",
+    signUp: "Create Account",
+    logIn: "Log In",
   },
 };

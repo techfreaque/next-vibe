@@ -1,14 +1,28 @@
 /**
  * Production-ready debug utilities for CLI performance monitoring and resource cleanup
- *
- * Note: Triple-slash reference required for Node.js internal API types
- * These are not available in standard @types/node and must be augmented locally
  */
 
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../types/node.d.ts" />
-
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
+/**
+ * Internal Node.js handle type for resource monitoring
+ * These are internal APIs not in @types/node, accessed via type assertion
+ */
+interface InternalNodeHandle {
+  constructor: { name: string };
+  close?: () => void;
+  destroy?: () => void;
+  end?: () => void;
+}
+
+/**
+ * Extended process type with internal Node.js APIs
+ * Used for resource monitoring - these are undocumented internal APIs
+ */
+interface ProcessWithInternals {
+  _getActiveHandles?: () => InternalNodeHandle[];
+  _getActiveRequests?: () => unknown[];
+}
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -206,8 +220,10 @@ export class ResourceMonitor {
     const handles: ActiveHandle[] = [];
 
     try {
-      if (process._getActiveHandles) {
-        const activeHandles = process._getActiveHandles();
+      // Cast to access internal Node.js APIs
+      const proc = process as unknown as ProcessWithInternals;
+      if (proc._getActiveHandles) {
+        const activeHandles = proc._getActiveHandles();
         for (const handle of activeHandles) {
           handles.push({
             type: handle.constructor.name,
@@ -227,8 +243,10 @@ export class ResourceMonitor {
    */
   getActiveRequestsCount(): number {
     try {
-      if (process._getActiveRequests) {
-        return process._getActiveRequests().length;
+      // Cast to access internal Node.js APIs
+      const proc = process as unknown as ProcessWithInternals;
+      if (proc._getActiveRequests) {
+        return proc._getActiveRequests().length;
       }
     } catch {
       // Ignore errors accessing internal APIs
@@ -256,8 +274,10 @@ export class ResourceMonitor {
    */
   forceCloseHandles(): void {
     try {
-      if (process._getActiveHandles) {
-        const handles = process._getActiveHandles();
+      // Cast to access internal Node.js APIs
+      const proc = process as unknown as ProcessWithInternals;
+      if (proc._getActiveHandles) {
+        const handles = proc._getActiveHandles();
         for (const handle of handles) {
           try {
             // Skip stdio handles

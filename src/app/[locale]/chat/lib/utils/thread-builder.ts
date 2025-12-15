@@ -128,3 +128,19 @@ export function buildMessagePath(
 
   return { path, branchInfo };
 }
+
+/**
+ * Get the last message in the currently selected branch path
+ * This is the message that should be used as the parent for new messages
+ *
+ * @param messages - All messages in the thread
+ * @param branchIndices - Current branch selection state
+ * @returns The last message in the selected path, or null if no messages
+ */
+export function getLastMessageInBranch(
+  messages: ChatMessage[],
+  branchIndices: Record<string, number> = {},
+): ChatMessage | null {
+  const { path } = buildMessagePath(messages, branchIndices);
+  return path.length > 0 ? path[path.length - 1] : null;
+}

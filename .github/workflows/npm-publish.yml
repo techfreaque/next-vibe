@@ -12,7 +12,8 @@ on:
       - "*"
 
 jobs:
-  test:
+  # Run checks on PRs and non-tag pushes
+  check:
     if: "!startsWith(github.ref, 'refs/tags/')"
     runs-on: ubuntu-latest
 
@@ -20,36 +21,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
+          bun-version: latest
 
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             **/node_modules
-            ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+            ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
-            ${{ runner.os }}-
+            ${{ runner.os }}-bun-
+
+      - name: Setup environment
+        run: cp .env.example .env
 
       - name: Install dependencies
-        run: yarn install
+        run: bun install
 
-      - name: Run linter
-        run: yarn lint
+      - name: Run checks (lint, typecheck, tests)
+        run: vibe check
 
-      - name: Run tests
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn test
+      - name: Build package (dry run)
+        run: vibe builder --data '{"configPath": "build.config.ts"}'
 
-      - name: Build package
-        run: yarn build
-
+  # Publish to npm on tag creation using the release tool
   publish-npm:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
@@ -58,46 +57,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Set up Node.js (for npm publish)
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: https://registry.npmjs.org/
 
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             **/node_modules
-            ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+            ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
-            ${{ runner.os }}-
+            ${{ runner.os }}-bun-
+
+      - name: Setup environment
+        run: cp .env.example .env
 
       - name: Install dependencies
-        run: yarn install
+        run: bun install
 
-      - name: Run linter
-        run: yarn lint
-
-      - name: Run tests
+      # Use release tool in CI mode for proper release workflow
+      # This runs checks, builds, and publishes according to release.config.ts
+      - name: Run release (CI mode)
+        run: vibe release --ci --skip-git-tag --skip-git-push
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn test
-
-      - name: Build package
-        run: yarn build
-
-      - name: Install Snyk CLI
-        run: npm install -g snyk
-
-      - name: Run Snyk
-        run: snyk monitor --org=${{ secrets.SNYK_ORG_KEY }} --project-name="/github/${{ github.repository }}" --file=yarn.lock
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
-      - name: Publish to npm
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

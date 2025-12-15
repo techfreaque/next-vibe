@@ -20,6 +20,14 @@ export const translations = {
       refund: "Refund",
       transfer: "Transfer",
       otherDevices: "Spending from other devices",
+      referralEarning: "Referral Earning",
+      referralPayout: "Referral Payout",
+    },
+    packType: {
+      subscription: "Subscription",
+      permanent: "Permanent",
+      bonus: "Bonus",
+      earned: "Earned",
     },
   },
   expire: {
@@ -64,6 +72,11 @@ export const translations = {
     invalidAmount: "Credit amount must be a positive number",
     walletNotFound: "Wallet not found",
     walletCreationFailed: "Failed to create wallet",
+    addEarnedCreditsFailed: "Failed to add earned credits",
+    getEarnedBalanceFailed: "Failed to get earned credits balance",
+    insufficientEarnedCredits: "Insufficient earned credits for this operation",
+    deductEarnedCreditsFailed: "Failed to deduct earned credits",
+    getReferralTransactionsFailed: "Failed to get referral transactions",
   },
   get: {
     title: "Get Credit Balance",
@@ -83,6 +96,9 @@ export const translations = {
     },
     free: {
       content: "Free Tier Credits",
+    },
+    earned: {
+      content: "Earned Credits (Referrals)",
     },
     expiresAt: {
       content: "Expires At",

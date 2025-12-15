@@ -3,6 +3,10 @@ import fs from "node:fs";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  scanDirectory,
+  type ScanResultWithSegments,
+} from "@/app/api/[locale]/system/unified-interface/shared/utils/scanner";
 
 import {
   FILE_EXTENSIONS,
@@ -11,7 +15,6 @@ import {
   SRC_DIR,
   TEST_FILE_PATTERN,
 } from "../constants";
-import { scanDirectory } from "./scanner";
 
 export interface TranslationObject {
   [key: string]: string | number | boolean | TranslationObject;
@@ -131,6 +134,6 @@ export class KeyUsageAnalyzer {
       excludeFiles: IGNORED_FILES,
     });
 
-    return results.map((r) => r.fullPath);
+    return results.map((r: ScanResultWithSegments) => r.fullPath);
   }
 }

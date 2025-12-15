@@ -36,7 +36,7 @@ export function ReferralCodesList({
   const [copiedCode, setCopiedCode] = React.useState<string | null>(null);
 
   const handleCopy = async (code: string): Promise<void> => {
-    const url = `${window.location.origin}/${locale}/track?ref=${code}`;
+    const url = `${window.location.origin}/track?ref=${code}`;
     await navigator.clipboard.writeText(url);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);

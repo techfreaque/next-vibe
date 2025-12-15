@@ -6,7 +6,6 @@
 import { sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
-import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Countries, Languages } from "@/i18n/core/config";
 
@@ -842,14 +841,6 @@ export async function test(logger: EndpointLogger): Promise<void> {
   logger.debug(`✅ Generated ${testCampaigns.length} test email campaigns`);
 }
 
-// Register seeds with the seed manager
+// Export priority for seed manager
 // Leads have medium priority (50) - after users (100) but before business data (10)
-registerSeed(
-  "leads",
-  {
-    dev,
-    test,
-    prod,
-  },
-  50,
-);
+export const priority = 50;

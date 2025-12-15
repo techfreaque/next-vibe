@@ -7,12 +7,14 @@
  * - Persistence of user-selected branches (survives page refresh)
  * - Distinguishes between user-initiated and automatic switches
  * - Safe validation of stored state
+ * - Uses Zustand store for centralized state management
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
 import type { ChatMessage } from "../db";
+import { useChatStore } from "./store";
 import { useBranchPersistence } from "./use-branch-persistence";
 
 interface UseBranchManagementProps {
@@ -26,16 +28,26 @@ interface UseBranchManagementReturn {
   handleSwitchBranch: (parentMessageId: string, branchIndex: number) => void;
 }
 
+// Stable empty object to avoid creating new objects on every render
+const EMPTY_BRANCH_INDICES: Record<string, number> = {};
+
 export function useBranchManagement({
   activeThreadMessages,
   threadId,
   logger,
 }: UseBranchManagementProps): UseBranchManagementReturn {
-  // Branch indices for linear view - tracks which branch is selected at each level
-  // Key: parent message ID (or "__root__"), Value: index of selected child
-  const [branchIndices, setBranchIndices] = useState<Record<string, number>>(
-    {},
+  // Get branch indices from Zustand store
+  // Get the raw branchIndices object and memoize the result for this thread
+  const allBranchIndices = useChatStore((state) => state.branchIndices);
+  const branchIndices = useMemo(
+    () => allBranchIndices[threadId] ?? EMPTY_BRANCH_INDICES,
+    [allBranchIndices, threadId],
   );
+
+  const setBranchIndicesInStore = useChatStore(
+    (state) => state.setBranchIndices,
+  );
+  const updateBranchIndex = useChatStore((state) => state.updateBranchIndex);
 
   // Track initialization state
   const isInitializedRef = useRef(false);
@@ -67,12 +79,12 @@ export function useBranchManagement({
     // Load persisted state for this thread
     void (async (): Promise<void> => {
       const persistedIndices = await loadPersistedState();
-      setBranchIndices(persistedIndices);
+      setBranchIndicesInStore(threadId, persistedIndices);
 
       // Mark as initialized
       isInitializedRef.current = true;
     })();
-  }, [threadId, loadPersistedState]);
+  }, [threadId, loadPersistedState, setBranchIndicesInStore]);
 
   /**
    * Handler for user-initiated branch switching
@@ -80,15 +92,13 @@ export function useBranchManagement({
    */
   const handleSwitchBranch = useCallback(
     (parentMessageId: string, branchIndex: number): void => {
-      setBranchIndices((prev) => ({
-        ...prev,
-        [parentMessageId]: branchIndex,
-      }));
+      // Update store
+      updateBranchIndex(threadId, parentMessageId, branchIndex);
 
       // Save user's selection for persistence
       saveUserSelection(parentMessageId, branchIndex);
     },
-    [saveUserSelection],
+    [threadId, updateBranchIndex, saveUserSelection],
   );
 
   /**
@@ -200,14 +210,23 @@ export function useBranchManagement({
 
     // Apply all updates at once if any were found
     if (Object.keys(updatesToApply).length > 0) {
-      setBranchIndices((prev) => ({
-        ...prev,
+      // Update store with new branch indices
+      // Create a new object to avoid mutating the constant
+      const newIndices: Record<string, number> = {
+        ...branchIndices,
         ...updatesToApply,
-      }));
+      };
+      setBranchIndicesInStore(threadId, newIndices);
       // Note: We don't save auto-switches to localStorage
       // Only user-initiated switches are persisted
     }
-  }, [activeThreadMessages, buildBranchMap]);
+  }, [
+    activeThreadMessages,
+    buildBranchMap,
+    threadId,
+    branchIndices,
+    setBranchIndicesInStore,
+  ]);
 
   /**
    * Validate branch indices when messages are DELETED
@@ -234,16 +253,20 @@ export function useBranchManagement({
       return; // Skip validation for message additions
     }
 
-    setBranchIndices((prev) => {
-      const validated = validateIndices(prev);
+    const currentIndices = branchIndices;
+    const validated = validateIndices(currentIndices);
 
-      // Only update if something changed
-      if (JSON.stringify(validated) !== JSON.stringify(prev)) {
-        return validated;
-      }
-      return prev;
-    });
-  }, [activeThreadMessages, validateIndices]);
+    // Only update if something changed
+    if (JSON.stringify(validated) !== JSON.stringify(currentIndices)) {
+      setBranchIndicesInStore(threadId, validated);
+    }
+  }, [
+    activeThreadMessages,
+    validateIndices,
+    threadId,
+    branchIndices,
+    setBranchIndicesInStore,
+  ]);
 
   return {
     branchIndices,

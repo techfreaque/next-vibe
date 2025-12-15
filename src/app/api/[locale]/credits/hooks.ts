@@ -98,11 +98,12 @@ export function useCredits(
           return oldData;
         }
 
-        // Deduct credits in the correct order: free → expiring → permanent
+        // Deduct credits in the correct order: free → expiring → permanent → earned
         let remaining = creditCost;
         let newFree = data.free;
         let newExpiring = data.expiring;
         let newPermanent = data.permanent;
+        let newEarned = data.earned;
 
         // Step 1: Deduct from free credits first (includes lead credits)
         if (remaining > 0 && newFree > 0) {
@@ -125,7 +126,14 @@ export function useCredits(
           remaining -= deduction;
         }
 
-        const newTotal = newFree + newExpiring + newPermanent;
+        // Step 4: Deduct from earned credits (lowest priority)
+        if (remaining > 0 && newEarned > 0) {
+          const deduction = Math.min(newEarned, remaining);
+          newEarned -= deduction;
+          remaining -= deduction;
+        }
+
+        const newTotal = newFree + newExpiring + newPermanent + newEarned;
 
         return {
           success: true,
@@ -133,6 +141,7 @@ export function useCredits(
             total: newTotal,
             expiring: newExpiring,
             permanent: newPermanent,
+            earned: newEarned,
             free: newFree,
             expiresAt: data.expiresAt,
           },

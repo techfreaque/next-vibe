@@ -40,6 +40,10 @@ export const translations = {
         title: "Free Monthly Credits",
         description: "{{count}} free credits per month for everyone",
       },
+      earned: {
+        title: "Earned Credits",
+        description: "Earn by inviting friends →",
+      },
     },
     overview: {
       howItWorks: {
@@ -168,6 +172,8 @@ export const translations = {
         refund: "Refund",
         transfer: "Transfer",
         other_devices: "Spending from other devices",
+        referral_earning: "Referral Earning",
+        referral_payout: "Referral Payout",
       },
     },
     tabs: {

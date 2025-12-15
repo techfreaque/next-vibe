@@ -41,6 +41,10 @@ export const getTransactionTypeKey = (
       return "app.subscription.subscription.history.types.transfer";
     case CreditTransactionType.OTHER_DEVICES:
       return "app.subscription.subscription.history.types.other_devices";
+    case CreditTransactionType.REFERRAL_EARNING:
+      return "app.subscription.subscription.history.types.referral_earning";
+    case CreditTransactionType.REFERRAL_PAYOUT:
+      return "app.subscription.subscription.history.types.referral_payout";
     default:
       return "app.subscription.subscription.history.types.usage"; // fallback
   }

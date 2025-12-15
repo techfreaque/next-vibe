@@ -677,43 +677,73 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         });
       }
 
-      // Apply referral payout after successful checkout
-      const userId =
-        metadata && typeof metadata === "object" && "userId" in metadata
-          ? String(metadata.userId)
-          : undefined;
-      const amountTotal =
-        "amount_total" in data && typeof data.amount_total === "number"
-          ? data.amount_total
-          : undefined;
-      const currency =
-        "currency" in data && typeof data.currency === "string"
-          ? data.currency.toUpperCase()
-          : undefined;
+      // Find transaction by session ID and process referral payout
+      // This is provider-agnostic - uses transaction data, not raw webhook data
+      const [transaction] = await db
+        .select()
+        .from(paymentTransactions)
+        .where(eq(paymentTransactions.providerSessionId, sessionId))
+        .limit(1);
 
-      if (userId && amountTotal && currency) {
-        // Find transaction by session ID
-        const [transaction] = await db
-          .select()
-          .from(paymentTransactions)
-          .where(eq(paymentTransactions.providerSessionId, sessionId))
-          .limit(1);
+      if (transaction) {
+        // Update transaction status to SUCCEEDED
+        await db
+          .update(paymentTransactions)
+          .set({
+            status: PaymentStatus.SUCCEEDED,
+            updatedAt: new Date(),
+          })
+          .where(eq(paymentTransactions.id, transaction.id));
 
-        if (transaction) {
+        logger.debug("Transaction status updated to succeeded", {
+          transactionId: transaction.id,
+          sessionId,
+        });
+
+        // Apply referral payout using credits (currency-independent)
+        // Credits are determined from product type, not payment amount
+        const {
+          productsRepository,
+          ProductIds,
+        } = await import("../products/repository-client");
+
+        let creditsAmount = 0;
+        if (type === "subscription") {
+          // Subscription: fixed credits from product definition
+          // Use "en-US" as default locale since we only need the credits value
+          const subscriptionProduct = productsRepository.getProduct(
+            ProductIds.SUBSCRIPTION,
+            "en-US",
+          );
+          creditsAmount = subscriptionProduct.credits; // 800
+        } else if (type === "credit_pack") {
+          // Credit pack: quantity * credits per pack
+          const quantity =
+            metadata &&
+            typeof metadata === "object" &&
+            "quantity" in metadata
+              ? Number(metadata.quantity) || 1
+              : 1;
+          const creditPackProduct = productsRepository.getProduct(
+            ProductIds.CREDIT_PACK,
+            "en-US",
+          );
+          creditsAmount = quantity * creditPackProduct.credits; // quantity * 500
+        }
+
+        if (creditsAmount > 0) {
           const { referralRepository } = await import("../referral/repository");
           await referralRepository.applyReferralPayoutOnPayment(
             transaction.id,
-            userId,
-            amountTotal,
-            currency,
+            transaction.userId,
+            creditsAmount,
             logger,
           );
-        } else {
-          logger.warn("No transaction found for referral payout", {
-            sessionId,
-            userId,
-          });
         }
+      } else {
+        logger.warn("No transaction found for checkout session", {
+          sessionId,
+        });
       }
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {

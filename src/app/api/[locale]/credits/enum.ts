@@ -33,7 +33,32 @@ export const {
   REFUND: "app.api.credits.enums.transactionType.refund",
   TRANSFER: "app.api.credits.enums.transactionType.transfer",
   OTHER_DEVICES: "app.api.credits.enums.transactionType.otherDevices",
+  REFERRAL_EARNING: "app.api.credits.enums.transactionType.referralEarning",
+  REFERRAL_PAYOUT: "app.api.credits.enums.transactionType.referralPayout",
 });
+
+/**
+ * Credit pack type for categorizing credit sources
+ */
+export const {
+  enum: CreditPackType,
+  options: CreditPackTypeOptions,
+  Value: CreditPackTypeValues,
+} = createEnumOptions({
+  SUBSCRIPTION: "app.api.credits.enums.packType.subscription",
+  PERMANENT: "app.api.credits.enums.packType.permanent",
+  BONUS: "app.api.credits.enums.packType.bonus",
+  EARNED: "app.api.credits.enums.packType.earned",
+});
+
+export const CreditPackTypeDB = [
+  CreditPackType.SUBSCRIPTION,
+  CreditPackType.PERMANENT,
+  CreditPackType.BONUS,
+  CreditPackType.EARNED,
+] as const;
+
+export type CreditPackTypeValue = (typeof CreditPackTypeDB)[number];
 
 /**
  * Database enum arrays for Drizzle ORM
@@ -52,6 +77,8 @@ export const CreditTransactionTypeDB = [
   CreditTransactionType.REFUND,
   CreditTransactionType.TRANSFER,
   CreditTransactionType.OTHER_DEVICES,
+  CreditTransactionType.REFERRAL_EARNING,
+  CreditTransactionType.REFERRAL_PAYOUT,
 ] as const;
 
 /**

@@ -68,6 +68,15 @@ const { GET } = createEndpoint({
         z.coerce.number(),
       ),
 
+      // Earned credits (from referrals)
+      earned: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.agent.chat.credits.get.earned.content",
+        },
+        z.coerce.number(),
+      ),
+
       // Free tier credits
       free: responseField(
         {
@@ -145,6 +154,7 @@ const { GET } = createEndpoint({
         total: 1500,
         expiring: 1000,
         permanent: 500,
+        earned: 0,
         free: 0,
         expiresAt: "2025-11-16T00:00:00.000Z",
       },

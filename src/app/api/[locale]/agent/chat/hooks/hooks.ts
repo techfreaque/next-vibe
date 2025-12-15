@@ -38,7 +38,7 @@ import { usePersonasList } from "../personas/hooks";
 import { useMessageOperations } from "../threads/[threadId]/messages/hooks/use-operations";
 import type { ThreadUpdate } from "../threads/hooks/use-operations";
 import { useThreadOperations } from "../threads/hooks/use-operations";
-import { type ChatSettings,useChatStore } from "./store";
+import { type ChatSettings, useChatStore } from "./store";
 import { useBranchManagement } from "./use-branch-management";
 import type { UseCollapseStateReturn } from "./use-collapse-state";
 import { useCollapseState } from "./use-collapse-state";
@@ -268,10 +268,35 @@ export function useChat(
   const folders = useChatStore((state) => state.folders);
   const isLoading = useChatStore((state) => state.isLoading);
   const isDataLoaded = useChatStore((state) => state.isDataLoaded);
+  const settings = useChatStore((state) => state.settings);
 
-  // Get store instances
-  const chatStore = useChatStore();
-  const streamStore = useAIStreamStore();
+  // Get stable store methods (these are stable references from Zustand)
+  const addThread = useChatStore((state) => state.addThread);
+  const updateThread = useChatStore((state) => state.updateThread);
+  const deleteThread = useChatStore((state) => state.deleteThread);
+  const addMessage = useChatStore((state) => state.addMessage);
+  const updateMessage = useChatStore((state) => state.updateMessage);
+  const deleteMessage = useChatStore((state) => state.deleteMessage);
+  const getThreadMessages = useChatStore((state) => state.getThreadMessages);
+  const getBranchIndices = useChatStore((state) => state.getBranchIndices);
+  const addFolder = useChatStore((state) => state.addFolder);
+  const updateFolder = useChatStore((state) => state.updateFolder);
+  const deleteFolder = useChatStore((state) => state.deleteFolder);
+  const setLoading = useChatStore((state) => state.setLoading);
+  const setDataLoaded = useChatStore((state) => state.setDataLoaded);
+  const updateSettings = useChatStore((state) => state.updateSettings);
+  const hydrateSettings = useChatStore((state) => state.hydrateSettings);
+
+  // Get stream store methods
+  const streamingMessages = useAIStreamStore(
+    (state) => state.streamingMessages,
+  );
+  const streamThreads = useAIStreamStore((state) => state.threads);
+  const isStreaming = useAIStreamStore((state) => state.isStreaming);
+  const streamError = useAIStreamStore((state) => state.error);
+  const streamReset = useAIStreamStore((state) => state.reset);
+  const streamAddThread = useAIStreamStore((state) => state.addThread);
+  const streamAddMessage = useAIStreamStore((state) => state.addMessage);
 
   // Get translations
   const { t } = simpleT(locale);
@@ -332,10 +357,10 @@ export function useChat(
     user,
     locale,
     logger,
-    chatStore.addThread,
-    chatStore.addMessage,
-    chatStore.addFolder,
-    chatStore.setDataLoaded,
+    addThread,
+    addMessage,
+    addFolder,
+    setDataLoaded,
   );
 
   useMessageLoader(
@@ -343,40 +368,53 @@ export function useChat(
     logger,
     activeThreadId,
     threads,
-    chatStore.addMessage,
+    addMessage,
     isDataLoaded,
   );
 
   const settingsOps = useSettings({
     chatStore: {
-      settings: chatStore.settings,
-      updateSettings: chatStore.updateSettings,
-      hydrateSettings: chatStore.hydrateSettings,
+      settings,
+      updateSettings,
+      hydrateSettings,
     },
   });
 
   useStreamSync({
-    streamingMessages: streamStore.streamingMessages,
-    streamThreads: streamStore.threads,
+    streamingMessages,
+    streamThreads,
     chatMessages: messages,
     chatThreads: threads,
-    addMessage: chatStore.addMessage,
-    updateMessage: chatStore.updateMessage,
-    addThread: chatStore.addThread,
+    addMessage,
+    updateMessage,
+    addThread,
     t,
   });
 
   const threadOps = useThreadOperations({
     locale,
     logger,
-    chatStore,
-    streamStore,
+    chatStore: {
+      threads,
+      deleteThread,
+      updateThread,
+    },
+    streamStore: {
+      threads: streamThreads,
+      reset: streamReset,
+      addThread: streamAddThread,
+    },
   });
 
   const folderOps = useFolderOperations({
     locale,
     logger,
-    chatStore,
+    chatStore: {
+      folders,
+      addFolder,
+      updateFolder,
+      deleteFolder,
+    },
   });
 
   const messageOps = useMessageOperations({
@@ -386,8 +424,21 @@ export function useChat(
     activeThreadId,
     currentRootFolderId,
     currentSubFolderId,
-    chatStore,
-    streamStore,
+    chatStore: {
+      messages,
+      threads,
+      setLoading,
+      getThreadMessages,
+      getBranchIndices,
+      deleteMessage,
+      updateMessage,
+    },
+    streamStore: {
+      streamingMessages,
+      error: streamError,
+      reset: streamReset,
+      addMessage: streamAddMessage,
+    },
     settings: settingsOps.settings,
     setInput: setInputAndSaveDraft,
     deductCredits: creditsHook.deductCredits,
@@ -398,9 +449,6 @@ export function useChat(
   // Compute active thread messages
   const activeThreadMessages = useMemo(() => {
     if (!activeThreadId || activeThreadId === NEW_MESSAGE_ID) {
-      logger.debug("Chat: activeThreadMessages - no active thread", {
-        activeThreadId,
-      });
       return [];
     }
 
@@ -408,20 +456,10 @@ export function useChat(
       (msg) => msg.threadId === activeThreadId,
     );
 
-    logger.debug("Chat: activeThreadMessages computed", {
-      activeThreadId,
-      totalMessagesInStore: Object.keys(messages).length,
-      filteredCount: filtered.length,
-      allThreadIdsInStore: [
-        ...new Set(Object.values(messages).map((m) => m.threadId)),
-      ],
-      currentRootFolderId,
-    });
-
     return filtered.toSorted(
       (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
     );
-  }, [activeThreadId, messages, logger, currentRootFolderId]);
+  }, [activeThreadId, messages]);
 
   // Branch management
   const branchManagement = useBranchManagement({
@@ -550,7 +588,7 @@ export function useChat(
     activeThreadMessages,
     isLoading,
     isDataLoaded,
-    isStreaming: streamStore.isStreaming,
+    isStreaming,
 
     // Current context (from URL props)
     activeThreadId,

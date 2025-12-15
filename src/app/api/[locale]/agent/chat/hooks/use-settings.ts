@@ -37,66 +37,71 @@ export function useSettings(deps: {
   const { chatStore } = deps;
   const { setTheme: setNextTheme } = useTheme();
 
+  // Extract stable functions to avoid React Compiler warnings
+  const updateSettings = chatStore.updateSettings;
+  const hydrateSettings = chatStore.hydrateSettings;
+
   // Hydrate settings from localStorage after mount
   useEffect(() => {
-    void chatStore.hydrateSettings();
-  }, [chatStore]);
+    void hydrateSettings();
+  }, [hydrateSettings]);
 
+  // Zustand store methods are stable, so we only depend on the specific method
   const setSelectedPersona = useCallback(
     (persona: string) => {
-      chatStore.updateSettings({ selectedPersona: persona });
+      updateSettings({ selectedPersona: persona });
     },
-    [chatStore],
+    [updateSettings],
   );
 
   const setSelectedModel = useCallback(
     (model: ModelId) => {
-      chatStore.updateSettings({ selectedModel: model });
+      updateSettings({ selectedModel: model });
     },
-    [chatStore],
+    [updateSettings],
   );
 
   const setTemperature = useCallback(
     (temp: number) => {
-      chatStore.updateSettings({ temperature: temp });
+      updateSettings({ temperature: temp });
     },
-    [chatStore],
+    [updateSettings],
   );
 
   const setMaxTokens = useCallback(
     (tokens: number) => {
-      chatStore.updateSettings({ maxTokens: tokens });
+      updateSettings({ maxTokens: tokens });
     },
-    [chatStore],
+    [updateSettings],
   );
 
   const setTTSAutoplay = useCallback(
     (autoplay: boolean) => {
-      chatStore.updateSettings({ ttsAutoplay: autoplay });
+      updateSettings({ ttsAutoplay: autoplay });
     },
-    [chatStore],
+    [updateSettings],
   );
 
   const setTheme = useCallback(
     (newTheme: "light" | "dark") => {
       setNextTheme(newTheme);
-      chatStore.updateSettings({ theme: newTheme });
+      updateSettings({ theme: newTheme });
     },
-    [chatStore, setNextTheme],
+    [updateSettings, setNextTheme],
   );
 
   const setViewMode = useCallback(
     (mode: ChatSettings["viewMode"]) => {
-      chatStore.updateSettings({ viewMode: mode });
+      updateSettings({ viewMode: mode });
     },
-    [chatStore],
+    [updateSettings],
   );
 
   const setEnabledToolIds = useCallback(
     (toolIds: string[]) => {
-      chatStore.updateSettings({ enabledToolIds: toolIds });
+      updateSettings({ enabledToolIds: toolIds });
     },
-    [chatStore],
+    [updateSettings],
   );
 
   return {

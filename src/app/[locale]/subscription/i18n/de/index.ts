@@ -43,6 +43,10 @@ export const translations: typeof enTranslations = {
         title: "Kostenlose monatliche Credits",
         description: "{{count}} kostenlose Credits pro Monat für alle",
       },
+      earned: {
+        title: "Verdiente Credits",
+        description: "Verdiene durch Freunde einladen →",
+      },
     },
     overview: {
       howItWorks: {
@@ -171,6 +175,8 @@ export const translations: typeof enTranslations = {
         refund: "Rückerstattung",
         transfer: "Übertragung",
         other_devices: "Verbrauch von anderen Geräten",
+        referral_earning: "Empfehlungsvergütung",
+        referral_payout: "Empfehlungsauszahlung",
       },
     },
     tabs: {

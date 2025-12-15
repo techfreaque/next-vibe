@@ -44,7 +44,6 @@ NextVibe uses an **optional** hierarchical seed system where:
 - Seed files are **optionally** located at `src/app/api/[locale]/{domain}/{subdomain}/seeds.ts`
 - Each file exports `dev`, `test`, and `prod` functions with proper signatures
 - All functions must use `EndpointLogger` only - no other logger types allowed
-- Seeds are registered using `registerSeed(name, {dev, test, prod}, priority)`
 - Priority determines execution order (higher numbers run first)
 - Logger parameters are passed to all seed functions
 
@@ -70,11 +69,13 @@ src/app/api/[locale]/
  * Provides seed data for {module}-related tables
  */
 
-import { registerSeed } from "next-vibe/server/db/seed-manager";
 import type { EndpointLogger } from "../system/unified-interface/shared/logger/endpoint";
 
 import type { NewEntity } from "./db";
 import { entityRepository } from "./repository";
+
+// Export priority value
+export const priority = 50;
 
 /**
  * Development seed function
@@ -123,17 +124,6 @@ export async function prod(logger: EndpointLogger): Promise<void> {
     logger.error("Error seeding production {module} data:", error);
   }
 }
-
-// Register seeds with appropriate priority
-registerSeed(
-  "{module}",
-  {
-    dev,
-    test,
-    prod,
-  },
-  50, // Adjust priority based on dependencies
-);
 ```
 
 ---
@@ -230,30 +220,6 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 ```
 
 ---
-
-## Priority System
-
-### Priority Levels
-
-Seeds execute in priority order (highest first):
-
-```typescript
-// User data (must exist first)
-registerSeed("user", { dev, test, prod }, 100);
-
-// Core system data
-registerSeed("roles", { dev, test, prod }, 90);
-registerSeed("permissions", { dev, test, prod }, 85);
-
-// Business data (depends on users)
-registerSeed("consultation", { dev, test, prod }, 50);
-registerSeed("profile", { dev, test, prod }, 40);
-registerSeed("audience", { dev, test, prod }, 30);
-
-// Optional/supplementary data
-registerSeed("analytics", { dev, test, prod }, 10);
-registerSeed("cache", { dev, test, prod }, 5);
-```
 
 ### Priority Guidelines
 
@@ -568,7 +534,6 @@ vibe db:seed --verbose
 - [ ] Proper error handling with try-catch
 - [ ] Logger used for all messages
 - [ ] Priority set appropriately based on dependencies
-- [ ] `registerSeed()` called at bottom of file
 - [ ] Locale parameter only included if actually used
 - [ ] No unused parameters in function signatures
 - [ ] Production seeds minimal and essential only

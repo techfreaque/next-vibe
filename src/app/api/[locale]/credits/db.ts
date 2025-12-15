@@ -90,7 +90,7 @@ export interface UsageMetadata {
 export interface ExpiryMetadata {
   expiredPackId: string;
   expiredAmount: number;
-  packType?: "subscription" | "permanent" | "bonus";
+  packType?: "subscription" | "permanent" | "bonus" | "earned";
   originalAmount: number;
   expiresAt?: string | null;
   expiredAt?: string | null;
@@ -108,6 +108,20 @@ export interface TransferMetadata {
   mergedFreeCredits: number;
   mergedPackCredits?: number;
   reason: "lead_to_user_merge";
+}
+
+export interface ReferralEarningMetadata {
+  sourceUserId: string;
+  sourceUserEmail?: string;
+  transactionId: string;
+  commissionPercent: number;
+  originalAmountCents: number;
+}
+
+export interface ReferralPayoutMetadata {
+  payoutRequestId: string;
+  currency: "BTC" | "USDC" | "CREDITS";
+  amountCents: number;
 }
 
 export interface TransferredUsageMetadata extends UsageMetadata {
@@ -128,7 +142,9 @@ export type CreditTransactionMetadata =
   | ExpiryMetadata
   | RefundMetadata
   | TransferMetadata
-  | TransferredUsageMetadata;
+  | TransferredUsageMetadata
+  | ReferralEarningMetadata
+  | ReferralPayoutMetadata;
 
 /**
  * Pack metadata for tracking source
@@ -138,6 +154,9 @@ export interface CreditPackMetadata {
   subscriptionId?: string;
   adminId?: string;
   reason?: string;
+  // For earned credits from referrals
+  sourceUserId?: string;
+  transactionId?: string;
 }
 
 /**
@@ -223,7 +242,7 @@ export const creditPacks = pgTable(
     originalAmount: numericNumber("original_amount").notNull(), // Initial amount purchased
     remaining: numericNumber("remaining").notNull(), // Current remaining credits
     type: text("type", {
-      enum: ["subscription", "permanent", "bonus"],
+      enum: ["subscription", "permanent", "bonus", "earned"],
     }).notNull(),
 
     // Expiration (NULL = never expires)

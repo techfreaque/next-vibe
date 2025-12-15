@@ -43,7 +43,7 @@ import type {
 import { assetZipper } from "./asset-zipper";
 import { changelogGenerator } from "./changelog-generator";
 import { ciDetector } from "./ci-detector";
-import { configLoader } from "./config";
+import type { IConfigLoader } from "./config";
 import { MESSAGES } from "./constants";
 import { dependencyManager } from "./dependency-manager";
 import { gitService } from "./git-service";
@@ -112,6 +112,9 @@ export class ReleaseExecutor implements IReleaseExecutor {
         config = data.configObject;
         logger.debug("Using inline configuration");
       } else {
+        // Lazy-load configLoader to avoid Turbopack warning about dynamic imports
+        // The config module uses dynamic imports that can't be statically analyzed
+        const { configLoader } = await import("./config") as { configLoader: IConfigLoader };
         const configResult = await configLoader.load(logger, data.configPath);
         if (!configResult.success) {
           return fail({

@@ -235,6 +235,11 @@ const { POST } = createEndpoint({
                 "app.api.user.public.signup.fields.referralCode.placeholder",
               columns: 12,
               order: 8,
+              // Show as readonly card when prefilled from server (only if value unchanged)
+              prefillDisplay: {
+                variant: "card",
+                labelKey: "app.api.user.public.signup.fields.referralCode.label",
+              },
             },
             z.string().optional(),
           ),

@@ -120,6 +120,7 @@ export interface ILeadTrackingRepository {
   handleClickTracking(
     data: ClickTrackingRequestOutput,
     user: JwtPayloadType,
+    locale: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<ClickTrackingResult>>;
 
@@ -1126,12 +1127,14 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
   /**
    * Handle click tracking
-   * Links tracking leadId with current user's leadId for attribution
-   * Also handles referral code linking if ref parameter is present
+   * Two modes:
+   * 1. With tracking id: Link tracking lead to current user's lead from JWT
+   * 2. Without tracking id (ref only): Link referral code to current user's lead from JWT
    */
   async handleClickTracking(
     data: ClickTrackingRequestOutput,
     user: JwtPayloadType,
+    locale: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<ClickTrackingResult>> {
     try {
@@ -1142,19 +1145,12 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       let leadStatusUpdated = false;
       let leadsLinked = false;
 
-      const clientInfo: ClientInfo = {
-        userAgent: "",
-        referer: "",
-        ipAddress: "",
-        timestamp: new Date().toISOString(),
-      };
-
-      // Handle referral code linking if present
+      // Handle referral code linking to current user's lead
       if (ref && currentLeadId) {
         try {
           const referralResult = await referralRepository.linkReferralToLead(
-            ref,
             currentLeadId,
+            ref,
             logger,
           );
           if (referralResult.success) {
@@ -1164,7 +1160,6 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
             });
           }
         } catch (error) {
-          // Don't fail tracking if referral linking fails
           logger.error(
             "app.api.leads.tracking.click.referralLinkFailed",
             parseError(error).message,
@@ -1173,10 +1168,29 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         }
       }
 
+      // If no tracking id, return with redirect to home
+      if (!trackingLeadId) {
+        return success({
+          success: true,
+          redirectUrl: url ?? `/${locale}`,
+          responseLeadId: currentLeadId ?? "",
+          responseCampaignId: campaignId,
+          engagementRecorded: false,
+          leadStatusUpdated: false,
+          isLoggedIn,
+        });
+      }
+
+      const clientInfo: ClientInfo = {
+        userAgent: "",
+        referer: "",
+        ipAddress: "",
+        timestamp: new Date().toISOString(),
+      };
+
       // Link tracking leadId with current user's leadId (lead-to-lead or lead-to-user tracking)
-      if (trackingLeadId !== currentLeadId) {
+      if (trackingLeadId !== currentLeadId && currentLeadId) {
         try {
-          // If user is logged in, link tracking lead to their user account
           if (isLoggedIn && user.id) {
             await leadAuthRepository.linkLeadToUser(
               trackingLeadId,
@@ -1190,19 +1204,17 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
               currentLeadId,
             });
           } else {
-            // For anonymous users, create lead-to-lead link
             await leadsRepository.linkLeadToLead(
               trackingLeadId,
               currentLeadId,
               "track_page",
               logger,
             );
-
             leadsLinked = true;
             logger.debug("app.api.leads.tracking.click.leadLinked", {
               currentLeadId,
               trackingLeadId,
-              campaignId: campaignId || "",
+              campaignId: campaignId,
               url,
             });
           }
@@ -1211,7 +1223,6 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
             "app.api.leads.tracking.click.linkFailed",
             parseError(error).message,
           );
-          // Don't fail the tracking if linking fails
         }
       }
 
@@ -1233,7 +1244,6 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           clientInfo,
           logger,
         );
-
         engagementRecorded = clickResult.success;
       }
 
@@ -1247,9 +1257,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
           if (leadResult.success) {
             await leadsRepository.updateLeadInternal(
               trackingLeadId,
-              {
-                status: LeadStatus.SIGNED_UP,
-              },
+              { status: LeadStatus.SIGNED_UP },
               logger,
             );
             leadStatusUpdated = true;

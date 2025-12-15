@@ -125,14 +125,16 @@ Seed files should be placed in the appropriate API module directory and follow t
 
 1. Name the file `seeds.ts` or `seed.ts` or with a `.seed.ts` or `.seeds.ts` extension
 2. Export functions named `dev`, `test`, and `prod` for the respective environments
-3. Register the seed functions with the seed manager using `registerSeed`
-4. Specify a priority value to control execution order (higher number = higher priority)
+3. Specify a priority value to control execution order (higher number = higher priority)
 
 Example:
 
 ```typescript
-import { registerSeed } from "next-vibe/server/db/seed-manager";
 import { cliDebugLogger } from "next-vibe/shared/utils/logger";
+
+
+// Export priority value
+export const priority = 50;
 
 // Export functions for each environment
 export async function dev(): Promise<void> {
@@ -149,17 +151,6 @@ export async function prod(): Promise<void> {
   cliDebugLogger("🌱 Seeding data for production environment");
   // Create production data
 }
-
-// Register seeds with priority (higher number = higher priority)
-registerSeed(
-  "my-module",
-  {
-    dev,
-    test,
-    prod,
-  },
-  50, // Priority value - determines execution order
-);
 ```
 
 ## Seed Generation

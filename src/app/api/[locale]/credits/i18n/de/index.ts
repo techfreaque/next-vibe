@@ -20,6 +20,14 @@ export const translations: typeof enTranslations = {
       refund: "Rückerstattung",
       transfer: "Übertragung",
       otherDevices: "Verbrauch von anderen Geräten",
+      referralEarning: "Empfehlungsverdienst",
+      referralPayout: "Empfehlungsauszahlung",
+    },
+    packType: {
+      subscription: "Abonnement",
+      permanent: "Permanent",
+      bonus: "Bonus",
+      earned: "Verdient",
     },
   },
   expire: {
@@ -66,6 +74,11 @@ export const translations: typeof enTranslations = {
     invalidAmount: "Credit-Betrag muss eine positive Zahl sein",
     walletNotFound: "Wallet nicht gefunden",
     walletCreationFailed: "Fehler beim Erstellen des Wallets",
+    addEarnedCreditsFailed: "Fehler beim Hinzufügen verdienter Credits",
+    getEarnedBalanceFailed: "Fehler beim Abrufen des verdienten Credit-Guthabens",
+    insufficientEarnedCredits: "Unzureichende verdiente Credits für diesen Vorgang",
+    deductEarnedCreditsFailed: "Fehler beim Abziehen verdienter Credits",
+    getReferralTransactionsFailed: "Fehler beim Abrufen der Empfehlungstransaktionen",
   },
   get: {
     title: "Credit-Guthaben abrufen",
@@ -85,6 +98,9 @@ export const translations: typeof enTranslations = {
     },
     free: {
       content: "Kostenlose Credits",
+    },
+    earned: {
+      content: "Verdiente Credits (Empfehlungen)",
     },
     expiresAt: {
       content: "Läuft ab am",

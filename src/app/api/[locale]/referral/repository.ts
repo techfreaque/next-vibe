@@ -14,12 +14,17 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { creditRepository } from "@/app/api/[locale]/credits/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { users } from "@/app/api/[locale]/user/db";
 
+import { leads } from "../leads/db";
+import { LeadStatus } from "../leads/enum";
 import type { CodesListGetResponseOutput } from "./codes/list/definition";
 import {
   leadReferrals,
+  payoutRequests,
   referralCodes,
   referralEarnings,
   userReferrals,
@@ -29,7 +34,13 @@ import type {
   ReferralPostResponseOutput,
 } from "./definition";
 import type { EarningsListGetResponseOutput } from "./earnings/list/definition";
-import { ReferralEarningStatus } from "./enum";
+import {
+  PayoutCurrency,
+  type PayoutCurrencyValue,
+  PayoutStatus,
+  type PayoutStatusValue,
+  ReferralEarningStatus,
+} from "./enum";
 import type { LinkToLeadPostResponseOutput } from "./link-to-lead/definition";
 import type { StatsGetResponseOutput } from "./stats/definition";
 
@@ -101,8 +112,7 @@ export interface ReferralRepository {
   applyReferralPayoutOnPayment(
     transactionId: string,
     userId: string,
-    amountCents: number,
-    currency: string,
+    creditsAmount: number,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>>;
 }
@@ -191,19 +201,51 @@ export class ReferralRepositoryImpl implements ReferralRepository {
         .orderBy(desc(referralCodes.createdAt));
 
       // Get stats for each code
-      const codesWithStats = codes.map((code) => {
-        return {
-          id: code.id,
-          code: code.code,
-          label: code.label,
-          currentUses: code.currentUses,
-          isActive: code.isActive,
-          createdAt: code.createdAt.toISOString(),
-          totalSignups: 0,
-          totalRevenueCents: 0,
-          totalEarningsCents: 0,
-        };
-      });
+      const codesWithStats = await Promise.all(
+        codes.map(async (code) => {
+          // Count signups: leads linked to this code that have signedUp status
+          const [signupCount] = await db
+            .select({ count: sql<number>`count(*)::int` })
+            .from(leadReferrals)
+            .innerJoin(leads, eq(leadReferrals.leadId, leads.id))
+            .where(
+              and(
+                eq(leadReferrals.referralCodeId, code.id),
+                eq(leads.status, LeadStatus.SIGNED_UP),
+              ),
+            );
+
+          // Get earnings and revenue for this code from users referred by this code
+          // Revenue = total amount paid by referred users (amountCents / POOL_PERCENTAGE)
+          // Earnings = commission earned by code owner
+          const [stats] = await db
+            .select({
+              totalEarnings: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int`,
+              // Revenue is earnings divided by pool percentage (0.2) = earnings * 5
+              totalRevenue: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int * 5`,
+            })
+            .from(referralEarnings)
+            .innerJoin(userReferrals, eq(referralEarnings.sourceUserId, userReferrals.referredUserId))
+            .where(
+              and(
+                eq(userReferrals.referralCodeId, code.id),
+                eq(referralEarnings.earnerUserId, userId), // Only count earnings for this code owner
+              ),
+            );
+
+          return {
+            id: code.id,
+            code: code.code,
+            label: code.label,
+            currentUses: code.currentUses,
+            isActive: code.isActive,
+            createdAt: code.createdAt.toISOString(),
+            totalSignups: signupCount?.count ?? 0,
+            totalRevenueCents: stats?.totalRevenue ?? 0,
+            totalEarningsCents: stats?.totalEarnings ?? 0,
+          };
+        }),
+      );
 
       return success({ codes: codesWithStats });
     } catch (error) {
@@ -464,6 +506,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
 
   /**
    * Get referral stats for a user
+   * Returns: signups, revenue generated, earned credits, paid out, available
    */
   async getReferralStats(
     userId: string,
@@ -472,36 +515,51 @@ export class ReferralRepositoryImpl implements ReferralRepository {
     try {
       logger.debug("Getting referral stats", { userId });
 
-      // Count total referrals
-      const totalReferrals = await db
-        .select({ count: sql<number>`count(*)` })
+      // Count total signups (users who signed up via this user's referral codes)
+      const [signupsResult] = await db
+        .select({ count: sql<number>`count(*)::int` })
         .from(userReferrals)
         .where(eq(userReferrals.referrerUserId, userId));
 
-      // Calculate earnings by status
-      const earningsByStatus = await db
+      const totalSignups = signupsResult?.count || 0;
+
+      // Calculate total earned credits (sum of all earnings)
+      const [earningsResult] = await db
         .select({
-          status: referralEarnings.status,
-          total: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)`,
+          total: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int`,
         })
         .from(referralEarnings)
-        .where(eq(referralEarnings.earnerUserId, userId))
-        .groupBy(referralEarnings.status);
+        .where(eq(referralEarnings.earnerUserId, userId));
 
-      const pendingEarnings =
-        earningsByStatus.find((e) => e.status === ReferralEarningStatus.PENDING)
-          ?.total || 0;
-      const confirmedEarnings =
-        earningsByStatus.find(
-          (e) => e.status === ReferralEarningStatus.CONFIRMED,
-        )?.total || 0;
+      const totalEarnedCredits = earningsResult?.total || 0;
+
+      // Total revenue = earned credits * 5 (since pool is 20% of transaction)
+      const totalRevenueCredits = totalEarnedCredits * 5;
+
+      // Calculate total paid out (from completed payout requests)
+      const [payoutResult] = await db
+        .select({
+          total: sql<number>`COALESCE(SUM(${payoutRequests.amountCents}), 0)::int`,
+        })
+        .from(payoutRequests)
+        .where(
+          and(
+            eq(payoutRequests.userId, userId),
+            eq(payoutRequests.status, PayoutStatus.COMPLETED),
+          ),
+        );
+
+      const totalPaidOutCredits = payoutResult?.total || 0;
+
+      // Available = earned - paid out
+      const availableCredits = totalEarnedCredits - totalPaidOutCredits;
 
       return success({
-        totalReferrals: Number(totalReferrals[0]?.count || 0),
-        totalEarningsCents: Number(pendingEarnings) + Number(confirmedEarnings),
-        pendingEarningsCents: Number(pendingEarnings),
-        confirmedEarningsCents: Number(confirmedEarnings),
-        currency: "EUR", // TODO: Get from user's currency preference
+        totalSignups,
+        totalRevenueCredits,
+        totalEarnedCredits,
+        totalPaidOutCredits,
+        availableCredits,
       });
     } catch (error) {
       logger.error("Failed to get referral stats", parseError(error));
@@ -564,19 +622,20 @@ export class ReferralRepositoryImpl implements ReferralRepository {
 
   /**
    * Apply referral payout on payment success
+   * Uses credits as the base for commission calculation (currency-independent)
+   * 1 credit = 1 cent in commission value
    */
   async applyReferralPayoutOnPayment(
     transactionId: string,
     userId: string,
-    amountCents: number,
-    currency: string,
+    creditsAmount: number,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Applying referral payout", {
         transactionId,
         userId,
-        amountCents,
+        creditsAmount,
       });
 
       // Get referral chain for the user
@@ -587,28 +646,55 @@ export class ReferralRepositoryImpl implements ReferralRepository {
         return success();
       }
 
-      // Calculate commission shares
-      const shares = this.calculateCommissionShares(amountCents, chain);
+      // Calculate commission shares based on credits (1 credit = 1 cent for commission)
+      const shares = this.calculateCommissionShares(creditsAmount, chain);
 
-      // Insert earnings records
+      // Get source user email for transaction metadata
+      const [sourceUser] = await db
+        .select({ email: users.email })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      // Insert earnings records and add earned credits
       for (const share of shares) {
-        await db
+        // Insert referral earnings record (audit trail)
+        // Note: amountCents here represents earned credits (1:1 mapping)
+        const [insertedEarning] = await db
           .insert(referralEarnings)
           .values({
             earnerUserId: share.earnerUserId,
             sourceUserId: userId,
             transactionId,
             level: share.level,
-            amountCents: share.amountCents,
-            currency,
+            amountCents: share.amountCents, // Credits earned (1 credit = 1 cent value)
+            currency: "CREDITS", // Currency-independent, stored as credits
             status: ReferralEarningStatus.CONFIRMED,
           })
-          .onConflictDoNothing(); // Idempotency: ignore if already exists
+          .onConflictDoNothing() // Idempotency: ignore if already exists
+          .returning();
+
+        // Add earned credits to user's wallet (only if earning was inserted)
+        if (insertedEarning) {
+          const commissionPercent =
+            (share.amountCents / creditsAmount) * 100;
+          await creditRepository.addEarnedCredits(
+            share.earnerUserId,
+            share.amountCents, // Credits earned
+            userId,
+            transactionId,
+            commissionPercent,
+            creditsAmount, // Original credits purchased
+            logger,
+            sourceUser?.email,
+          );
+        }
       }
 
       logger.debug("Referral payout applied successfully", {
         transactionId,
         sharesCount: shares.length,
+        totalCredits: creditsAmount,
       });
 
       return success();
@@ -696,6 +782,470 @@ export class ReferralRepositoryImpl implements ReferralRepository {
     }
 
     return shares;
+  }
+
+  // ==================== PAYOUT METHODS ====================
+
+  /**
+   * Minimum payout amount in cents ($40)
+   */
+  private static readonly MIN_PAYOUT_CENTS = 4000;
+
+  /**
+   * Get user's earned credits balance and payout history
+   */
+  async getEarnedBalance(
+    userId: string,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      earnedCredits: {
+        total: number;
+        available: number;
+        locked: number;
+      };
+      payoutHistory: Array<{
+        id: string;
+        amountCents: number;
+        currency: PayoutCurrencyValue;
+        status: PayoutStatusValue;
+        walletAddress: string | null;
+        rejectionReason: string | null;
+        createdAt: string;
+        processedAt: string | null;
+      }>;
+    }>
+  > {
+    try {
+      // Get earned credits balance
+      const balanceResult =
+        await creditRepository.getEarnedCreditsBalance(userId, logger);
+      if (!balanceResult.success) {
+        return balanceResult;
+      }
+
+      // Get payout history
+      const history = await db
+        .select()
+        .from(payoutRequests)
+        .where(eq(payoutRequests.userId, userId))
+        .orderBy(desc(payoutRequests.createdAt))
+        .limit(50);
+
+      return success({
+        earnedCredits: balanceResult.data,
+        payoutHistory: history.map((p) => ({
+          id: p.id,
+          amountCents: p.amountCents,
+          currency: p.currency as PayoutCurrencyValue,
+          status: p.status as PayoutStatusValue,
+          walletAddress: p.walletAddress,
+          rejectionReason: p.rejectionReason,
+          createdAt: p.createdAt.toISOString(),
+          processedAt: p.processedAt?.toISOString() ?? null,
+        })),
+      });
+    } catch (error) {
+      logger.error("Failed to get earned balance", parseError(error));
+      return fail({
+        message: "app.api.referral.errors.serverError.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Request a payout (BTC/USDC)
+   */
+  async requestPayout(
+    userId: string,
+    amountCents: number,
+    currency: PayoutCurrencyValue,
+    walletAddress: string | null,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ payoutRequestId: string }>> {
+    try {
+      // Validate minimum amount
+      if (amountCents < ReferralRepositoryImpl.MIN_PAYOUT_CENTS) {
+        return fail({
+          message: "app.api.referral.payout.errors.minimumAmount",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      // Validate wallet address for crypto payouts
+      if (currency !== PayoutCurrency.CREDITS && !walletAddress) {
+        return fail({
+          message: "app.api.referral.payout.errors.walletRequired",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      // Get earned balance
+      const balanceResult =
+        await creditRepository.getEarnedCreditsBalance(userId, logger);
+      if (!balanceResult.success) {
+        return balanceResult;
+      }
+
+      // Check sufficient available balance
+      if (balanceResult.data.available < amountCents) {
+        return fail({
+          message: "app.api.referral.payout.errors.insufficientBalance",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      // Create payout request
+      const [request] = await db
+        .insert(payoutRequests)
+        .values({
+          userId,
+          amountCents,
+          currency,
+          status: PayoutStatus.PENDING,
+          walletAddress,
+        })
+        .returning();
+
+      // If converting to credits, process immediately
+      if (currency === PayoutCurrency.CREDITS) {
+        await this.processCreditsConversion(request.id, userId, amountCents, logger);
+      }
+
+      logger.info("Payout request created", {
+        userId,
+        amountCents,
+        currency,
+        requestId: request.id,
+      });
+
+      return success({ payoutRequestId: request.id });
+    } catch (error) {
+      logger.error("Failed to create payout request", parseError(error));
+      return fail({
+        message: "app.api.referral.errors.serverError.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Process credits conversion (instant)
+   */
+  private async processCreditsConversion(
+    requestId: string,
+    userId: string,
+    amountCents: number,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    // Deduct from earned credits
+    const deductResult = await creditRepository.deductEarnedCredits(
+      userId,
+      amountCents,
+      requestId,
+      "CREDITS",
+      logger,
+    );
+
+    if (!deductResult.success) {
+      // Mark request as failed
+      await db
+        .update(payoutRequests)
+        .set({
+          status: PayoutStatus.FAILED,
+          adminNotes: "Failed to deduct earned credits",
+          updatedAt: new Date(),
+        })
+        .where(eq(payoutRequests.id, requestId));
+      return;
+    }
+
+    // Add to permanent credits
+    await creditRepository.addUserCredits(
+      userId,
+      amountCents,
+      "permanent",
+      logger,
+    );
+
+    // Mark request as completed
+    await db
+      .update(payoutRequests)
+      .set({
+        status: PayoutStatus.COMPLETED,
+        processedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(payoutRequests.id, requestId));
+
+    logger.info("Credits conversion completed", {
+      requestId,
+      userId,
+      amountCents,
+    });
+  }
+
+  /**
+   * Admin: List all payout requests
+   */
+  async listPayoutRequests(
+    status: PayoutStatusValue | null,
+    limit: number,
+    offset: number,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      requests: Array<{
+        id: string;
+        userId: string;
+        userEmail: string;
+        amountCents: number;
+        currency: PayoutCurrencyValue;
+        status: PayoutStatusValue;
+        walletAddress: string | null;
+        adminNotes: string | null;
+        rejectionReason: string | null;
+        createdAt: string;
+        processedAt: string | null;
+      }>;
+      totalCount: number;
+    }>
+  > {
+    try {
+      const whereClause = status
+        ? eq(payoutRequests.status, status)
+        : undefined;
+
+      const requests = await db
+        .select({
+          id: payoutRequests.id,
+          userId: payoutRequests.userId,
+          userEmail: users.email,
+          amountCents: payoutRequests.amountCents,
+          currency: payoutRequests.currency,
+          status: payoutRequests.status,
+          walletAddress: payoutRequests.walletAddress,
+          adminNotes: payoutRequests.adminNotes,
+          rejectionReason: payoutRequests.rejectionReason,
+          createdAt: payoutRequests.createdAt,
+          processedAt: payoutRequests.processedAt,
+        })
+        .from(payoutRequests)
+        .innerJoin(users, eq(payoutRequests.userId, users.id))
+        .where(whereClause)
+        .orderBy(desc(payoutRequests.createdAt))
+        .limit(limit)
+        .offset(offset);
+
+      const [countResult] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(payoutRequests)
+        .where(whereClause);
+
+      return success({
+        requests: requests.map((r) => ({
+          id: r.id,
+          userId: r.userId,
+          userEmail: r.userEmail,
+          amountCents: r.amountCents,
+          currency: r.currency as PayoutCurrencyValue,
+          status: r.status as PayoutStatusValue,
+          walletAddress: r.walletAddress,
+          adminNotes: r.adminNotes,
+          rejectionReason: r.rejectionReason,
+          createdAt: r.createdAt.toISOString(),
+          processedAt: r.processedAt?.toISOString() ?? null,
+        })),
+        totalCount: Number(countResult?.count || 0),
+      });
+    } catch (error) {
+      logger.error("Failed to list payout requests", parseError(error));
+      return fail({
+        message: "app.api.referral.errors.serverError.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Admin: Approve payout request
+   */
+  async approvePayoutRequest(
+    requestId: string,
+    adminUserId: string,
+    adminNotes: string | null,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    try {
+      const [request] = await db
+        .select()
+        .from(payoutRequests)
+        .where(eq(payoutRequests.id, requestId))
+        .limit(1);
+
+      if (!request) {
+        return fail({
+          message: "app.api.referral.payout.errors.notFound",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      if (request.status !== PayoutStatus.PENDING) {
+        return fail({
+          message: "app.api.referral.payout.errors.invalidStatus",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      await db
+        .update(payoutRequests)
+        .set({
+          status: PayoutStatus.APPROVED,
+          adminNotes,
+          processedByUserId: adminUserId,
+          updatedAt: new Date(),
+        })
+        .where(eq(payoutRequests.id, requestId));
+
+      logger.info("Payout request approved", { requestId, adminUserId });
+      return success();
+    } catch (error) {
+      logger.error("Failed to approve payout request", parseError(error));
+      return fail({
+        message: "app.api.referral.errors.serverError.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Admin: Reject payout request
+   */
+  async rejectPayoutRequest(
+    requestId: string,
+    adminUserId: string,
+    rejectionReason: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    try {
+      const [request] = await db
+        .select()
+        .from(payoutRequests)
+        .where(eq(payoutRequests.id, requestId))
+        .limit(1);
+
+      if (!request) {
+        return fail({
+          message: "app.api.referral.payout.errors.notFound",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      if (request.status !== PayoutStatus.PENDING) {
+        return fail({
+          message: "app.api.referral.payout.errors.invalidStatus",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      await db
+        .update(payoutRequests)
+        .set({
+          status: PayoutStatus.REJECTED,
+          rejectionReason,
+          processedByUserId: adminUserId,
+          processedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(payoutRequests.id, requestId));
+
+      logger.info("Payout request rejected", {
+        requestId,
+        adminUserId,
+        reason: rejectionReason,
+      });
+      return success();
+    } catch (error) {
+      logger.error("Failed to reject payout request", parseError(error));
+      return fail({
+        message: "app.api.referral.errors.serverError.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Admin: Complete payout request (after external transfer)
+   */
+  async completePayoutRequest(
+    requestId: string,
+    adminUserId: string,
+    adminNotes: string | null,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    try {
+      const [request] = await db
+        .select()
+        .from(payoutRequests)
+        .where(eq(payoutRequests.id, requestId))
+        .limit(1);
+
+      if (!request) {
+        return fail({
+          message: "app.api.referral.payout.errors.notFound",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      if (request.status !== PayoutStatus.APPROVED) {
+        return fail({
+          message: "app.api.referral.payout.errors.invalidStatus",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      // Deduct from earned credits
+      const deductResult = await creditRepository.deductEarnedCredits(
+        request.userId,
+        request.amountCents,
+        requestId,
+        request.currency as "BTC" | "USDC" | "CREDITS",
+        logger,
+      );
+
+      if (!deductResult.success) {
+        await db
+          .update(payoutRequests)
+          .set({
+            status: PayoutStatus.FAILED,
+            adminNotes: `Deduction failed: ${deductResult.message}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(payoutRequests.id, requestId));
+        return deductResult;
+      }
+
+      await db
+        .update(payoutRequests)
+        .set({
+          status: PayoutStatus.COMPLETED,
+          adminNotes,
+          processedByUserId: adminUserId,
+          processedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(payoutRequests.id, requestId));
+
+      logger.info("Payout request completed", { requestId, adminUserId });
+      return success();
+    } catch (error) {
+      logger.error("Failed to complete payout request", parseError(error));
+      return fail({
+        message: "app.api.referral.errors.serverError.title",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
   }
 }
 

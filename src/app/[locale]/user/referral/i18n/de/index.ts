@@ -1,56 +1,68 @@
 export const translations = {
-  title: "Mit {{appName}} Geld verdienen",
+  title: "Verdienen mit {{appName}}",
   description:
-    "Machen Sie Ihr Netzwerk zur Einkommensquelle. Laden Sie Menschen zu {{appName}} ein und verdienen Sie echtes Geld, wenn sie Guthaben kaufen – nicht nur von direkten Empfehlungen, sondern auch von deren Empfehlungen über unser Multi-Level-Vergütungsmodell.",
-  tagline: "Empfehlungen & Multi-Level-Einnahmen",
+    "Verwandeln Sie Ihr Netzwerk in passives Einkommen. Teilen Sie Ihren Empfehlungslink und verdienen Sie 20% Provision, wenn Leute abonnieren — plus kleinere Einnahmen von deren Empfehlungen durch unser Multi-Level-System.",
+  tagline: "Empfehlungsprogramm",
   howItWorks: {
-    title: "So funktioniert das Empfehlungsprogramm",
-    step1Title: "Erstellen Sie Ihre persönlichen Empfehlungscodes",
-    step1Body:
-      "Legen Sie Bezeichnungen, Limits und Ablaufdaten für unterschiedliche Zielgruppen wie Freunde, Community oder Kampagnen fest.",
-    step2Title: "Teilen Sie Ihre Links und bauen Sie Ihr Netzwerk auf",
-    step2Body:
-      "Teilen Sie Ihre Empfehlungslinks überall. Wenn sich Personen anmelden und Guthaben kaufen, werden sie Teil Ihres Empfehlungsbaums.",
-    step3Title: "Verdienen Sie an direkten und indirekten Empfehlungen",
-    step3Body:
-      "Sie verdienen, wenn Ihre Empfehlungen Guthaben kaufen – und zusätzlich kleinere Beträge, wenn deren Empfehlungen aktiv werden, dank der Multi-Level-Struktur.",
+    title: "So funktioniert's",
+    step1Title: "Empfehlungscodes erstellen",
+    step1Body: "Generieren Sie einzigartige Codes für verschiedene Zielgruppen — Freunde, Social Media oder Kampagnen.",
+    step2Title: "Link teilen",
+    step2Body: "Wenn sich jemand über Ihren Link anmeldet und abonniert, verdienen Sie Provision.",
+    step3Title: "Auszahlung erhalten",
+    step3Body: "Einnahmen sind sofort verfügbar. Nutzen Sie sie als Chat-Guthaben oder lassen Sie sich in Krypto auszahlen.",
   },
   overview: {
-    title: "Ihre Einnahmen im Überblick",
-    subtitle:
-      "Live-Statistiken zu Empfehlungen und MLM-Einnahmen. Automatisch aktualisiert nach jedem Kauf.",
+    title: "Ihre Einnahmen",
+    subtitle: "Echtzeit-Statistiken, aktualisiert bei jedem Kauf.",
+  },
+  payout: {
+    title: "Einnahmen auszahlen",
+    description: "Mehrere Möglichkeiten, Ihre Empfehlungseinnahmen zu nutzen",
+    useAsCredits: "Als Chat-Guthaben nutzen",
+    useAsCreditsDesc: "Wandeln Sie Einnahmen sofort in Chat-Guthaben für KI-Gespräche um.",
+    cryptoPayout: "Krypto-Auszahlung",
+    cryptoPayoutDesc: "Fordern Sie eine Auszahlung in BTC oder USDC an Ihre Wallet an.",
+    minimumNote: "Mindestauszahlung: $40. Krypto-Auszahlungen werden innerhalb von 48 Stunden nach Genehmigung bearbeitet.",
   },
   manage: {
-    createSubtitle:
-      "Richten Sie in Sekunden neue Codes für bestimmte Zielgruppen und Kampagnen ein.",
-    codesSubtitle:
-      "Sehen Sie alle Empfehlungslinks, Performance und Einnahmen an einem Ort.",
+    createSubtitle: "Erstellen Sie Codes für bestimmte Kampagnen oder Zielgruppen.",
+    codesSubtitle: "Verfolgen Sie Leistung und Einnahmen für jeden Empfehlungscode.",
   },
   createCode: {
-    title: "Neuen Empfehlungscode erstellen",
+    title: "Empfehlungscode erstellen",
     create: "Code erstellen",
     creating: "Wird erstellt...",
   },
   myCodes: {
-    title: "Meine Empfehlungscodes",
+    title: "Ihre Empfehlungscodes",
     loading: "Codes werden geladen...",
     error: "Fehler beim Laden der Codes",
-    empty:
-      "Noch keine Empfehlungscodes. Erstellen Sie Ihren ersten oben und starten Sie mit dem Verdienen.",
+    empty: "Noch keine Empfehlungscodes. Erstellen Sie Ihren ersten oben!",
     copy: "Link kopieren",
     copied: "Kopiert!",
     uses: "Verwendungen",
     signups: "Anmeldungen",
     revenue: "Umsatz",
-    earnings: "Verdienste",
+    earnings: "Verdient",
     inactive: "Inaktiv",
   },
   stats: {
     loading: "Statistiken werden geladen...",
     error: "Fehler beim Laden der Statistiken",
-    totalReferrals: "Gesamte Empfehlungen",
-    totalEarnings: "Gesamtverdienste",
-    pendingEarnings: "Ausstehende Verdienste",
-    confirmedEarnings: "Bestätigte Verdienste",
+    totalSignups: "Anmeldungen gesamt",
+    totalSignupsDesc: "Personen, die sich über Ihre Links angemeldet haben",
+    totalRevenue: "Generierter Umsatz",
+    totalRevenueDesc: "Gesamtwert Ihrer Empfehlungen",
+    totalEarned: "Gesamt verdient",
+    totalEarnedDesc: "Ihre 20% Provisionseinnahmen",
+    availableBalance: "Verfügbares Guthaben",
+    availableBalanceDesc: "Bereit zur Nutzung oder Auszahlung",
+  },
+  cta: {
+    title: "Heute anfangen zu verdienen",
+    description: "Erstellen Sie ein Konto oder melden Sie sich an, um Ihre Empfehlungscodes zu generieren und bei jedem Abonnement Provision zu verdienen.",
+    signUp: "Konto erstellen",
+    logIn: "Anmelden",
   },
 };

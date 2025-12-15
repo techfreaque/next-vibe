@@ -18,8 +18,8 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { users } from "../../../user/db";
-import { paymentInvoices } from "../../db";
-import { InvoiceStatus } from "../../enum";
+import { paymentInvoices, paymentTransactions } from "../../db";
+import { InvoiceStatus, PaymentProvider as PaymentProviderEnum, PaymentStatus } from "../../enum";
 import { paymentEnv } from "../../env";
 import type {
   CheckoutSessionParams,
@@ -169,15 +169,40 @@ export class StripeProvider implements PaymentProvider {
         interval: params.interval,
       });
 
+      // Always create a payment transaction record for tracking and referral payouts
+      const product = productsRepository.getProduct(
+        params.productId,
+        params.locale,
+        params.interval,
+      );
+
+      try {
+        await db.insert(paymentTransactions).values({
+          userId: params.userId,
+          providerSessionId: session.id,
+          amount: product.price.toFixed(2),
+          currency: product.currency,
+          status: PaymentStatus.PENDING,
+          provider: PaymentProviderEnum.STRIPE,
+          mode: mode === "payment" ? "app.api.payment.enums.checkoutMode.payment" : "app.api.payment.enums.checkoutMode.subscription",
+          metadata: params.metadata,
+        });
+
+        logger.debug("Created payment transaction", {
+          sessionId: session.id,
+          userId: params.userId,
+        });
+      } catch (txError) {
+        logger.error("Failed to create payment transaction", {
+          error: parseError(txError),
+          sessionId: session.id,
+        });
+        // Continue - webhook can still process
+      }
+
       // Store invoice in database with callback token for one-time payments
       if (mode === "payment") {
         try {
-          const product = productsRepository.getProduct(
-            params.productId,
-            params.locale,
-            params.interval,
-          );
-
           await db.insert(paymentInvoices).values({
             userId: params.userId,
             providerInvoiceId: session.id,

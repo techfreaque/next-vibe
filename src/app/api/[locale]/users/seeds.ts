@@ -5,10 +5,9 @@
 
 import { parseError } from "next-vibe/shared/utils";
 
-import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import { simpleT } from "@/i18n/core/shared";
 
 import type { JwtPrivatePayloadType } from "../user/auth/types";
 import { UserDetailLevel } from "../user/enum";
@@ -18,11 +17,6 @@ import type { UserCreateRequestOutput } from "./create/definition";
 import { userCreateRepository } from "./create/repository";
 
 /**
- * Dummy translation function for seeds
- */
-const dummyT: TFunction = ((key: string) => key) as TFunction;
-
-/**
  * Helper function to create user management seed data
  */
 function createUserManagementSeed(
@@ -30,6 +24,10 @@ function createUserManagementSeed(
 ): UserCreateRequestOutput {
   return config;
 }
+
+// Export seeds with priority
+// Users management depends on existing users (priority 100) so it has lower priority (20)
+export const priority = 20;
 
 /**
  * Development seed function for users management module
@@ -52,6 +50,7 @@ export async function dev(
     if (!adminUserResponse.success || !adminUserResponse.data) {
       logger.error(
         "❌ Admin user not found, skipping users management seeding",
+        { error: adminUserResponse.message || "User not found" },
       );
       return;
     }
@@ -140,14 +139,15 @@ export async function dev(
           );
           continue;
         }
+        const { t } = simpleT(locale);
 
         // Create the user
         const createResponse = await userCreateRepository.createUser(
           userData,
           adminJwtPayload,
-          "en-GLOBAL",
+          locale,
           logger,
-          dummyT,
+          t,
         );
 
         if (createResponse.success) {
@@ -197,6 +197,7 @@ export async function test(
     if (!adminUserResponse.success || !adminUserResponse.data) {
       logger.error(
         "❌ Admin user not found, skipping test users management seeding",
+        { error: adminUserResponse.message || "User not found" },
       );
       return;
     }
@@ -245,14 +246,15 @@ export async function test(
       logger.debug("Test management user already exists, skipping creation");
       return;
     }
+    const { t } = simpleT(locale);
 
     // Create test user
     const createResponse = await userCreateRepository.createUser(
       testUserData,
       adminJwtPayload,
-      "en-GLOBAL",
+      locale,
       logger,
-      dummyT,
+      t,
     );
 
     if (createResponse.success) {
@@ -275,9 +277,7 @@ export async function test(
 /**
  * Production seed function for users management module
  */
-export async function prod(
-  logger: EndpointLogger,
-): Promise<void> {
+export async function prod(logger: EndpointLogger): Promise<void> {
   logger.debug("🌱 Seeding users management data for production environment");
 
   try {
@@ -293,15 +293,3 @@ export async function prod(
     );
   }
 }
-
-// Register seeds with lower priority than core user seeds
-// Users management depends on existing users (100) but runs after business data (30)
-registerSeed(
-  "users-management",
-  {
-    dev,
-    test,
-    prod,
-  },
-  20,
-);

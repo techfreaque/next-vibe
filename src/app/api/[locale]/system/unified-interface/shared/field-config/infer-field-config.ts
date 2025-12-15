@@ -38,6 +38,9 @@ function extractFieldConfig(
     description: widget.description as FieldConfig["description"],
     disabled: widget.disabled,
     className: widget.className,
+    // Readonly and prefill display options
+    readonly: widget.readonly,
+    prefillDisplay: widget.prefillDisplay,
   };
 
   // Map FieldDataType to FieldConfig

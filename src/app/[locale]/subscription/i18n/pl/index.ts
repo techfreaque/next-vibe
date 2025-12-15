@@ -43,6 +43,10 @@ export const translations: typeof enTranslations = {
         title: "Darmowe miesięczne kredyty",
         description: "{{count}} darmowych kredytów miesięcznie dla wszystkich",
       },
+      earned: {
+        title: "Zarobione kredyty",
+        description: "Zarabiaj zapraszając znajomych →",
+      },
     },
     overview: {
       howItWorks: {
@@ -172,6 +176,8 @@ export const translations: typeof enTranslations = {
         refund: "Zwrot",
         transfer: "Transfer",
         other_devices: "Wydatki z innych urządzeń",
+        referral_earning: "Zarobki z poleceń",
+        referral_payout: "Wypłata z poleceń",
       },
     },
     tabs: {

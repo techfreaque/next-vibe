@@ -6,7 +6,6 @@
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
-import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { userRepository } from "@/app/api/[locale]/user/repository";
@@ -610,14 +609,6 @@ export async function prod(
   logger.debug("✅ Subscription production seeding completed");
 }
 
-// Register seeds with appropriate priority
+// Export priority for seed manager
 // Subscription seeds should run after user seeds but before business data (priority 45)
-registerSeed(
-  "subscription",
-  {
-    dev,
-    test,
-    prod,
-  },
-  45,
-);
+export const priority = 45;

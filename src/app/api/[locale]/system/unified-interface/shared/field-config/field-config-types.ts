@@ -27,6 +27,19 @@ export interface EndpointFormFieldProps<
   schema?: z.ZodTypeAny; // Zod schema for validation
 }
 
+/**
+ * Prefill display configuration for form fields
+ * When a field has a prefilled value from server/URL params, this controls how it's displayed
+ */
+export interface PrefillDisplayConfig {
+  /** Display variant when field is prefilled */
+  variant: "badge" | "highlight" | "card";
+  /** Translation key for the label shown with prefilled value */
+  labelKey?: TranslationKey;
+  /** Icon to show with prefilled value */
+  icon?: string;
+}
+
 // Base field configuration
 export interface BaseFieldConfig {
   label: TranslationKey | undefined;
@@ -34,6 +47,16 @@ export interface BaseFieldConfig {
   description?: TranslationKey;
   disabled?: boolean;
   className?: string;
+  /**
+   * Make field readonly - displays value but cannot be edited
+   * Use with prefillDisplay to show special styling for server-provided values
+   */
+  readonly?: boolean;
+  /**
+   * Configure how prefilled values are displayed when readonly
+   * Only applies when field has a prefilled value and readonly is true
+   */
+  prefillDisplay?: PrefillDisplayConfig;
 }
 
 // Field type specific configurations

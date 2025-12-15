@@ -11,7 +11,6 @@ import {
   EmailJourneyVariant,
 } from "@/app/api/[locale]/leads/enum";
 import { db } from "@/app/api/[locale]/system/db";
-import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Countries, Languages } from "@/i18n/core/config";
 
@@ -228,13 +227,5 @@ export function prod(logger: EndpointLogger): void {
   logger.debug("🌱 Skipping production SMTP accounts seeding");
 }
 
-// Register seeds
-registerSeed(
-  "smtp-client",
-  {
-    dev,
-    test,
-    prod,
-  },
-  75,
-);
+// Export priority for seed manager
+export const priority = 75;

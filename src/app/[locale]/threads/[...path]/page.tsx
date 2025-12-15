@@ -120,6 +120,7 @@ export default async function ThreadsPathPage({
     total: 0,
     expiring: 0,
     permanent: 0,
+    earned: 0,
     free: 0,
     expiresAt: null,
   };

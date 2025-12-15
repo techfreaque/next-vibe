@@ -7,7 +7,6 @@ import { eq } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
-import { registerSeed } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { imapAccounts, type NewImapAccount } from "./db";
@@ -19,9 +18,11 @@ import { imapClientEnv } from "./env";
  */
 function getImapSeedConfig(): NewImapAccount {
   // Required account-specific environment variables
-  const name = imapClientEnv.IMAP_SEED_ACCOUNT_NAME || "Development IMAP Account";
+  const name =
+    imapClientEnv.IMAP_SEED_ACCOUNT_NAME || "Development IMAP Account";
   const email = imapClientEnv.IMAP_SEED_EMAIL || "test@example.com";
-  const host = imapClientEnv.IMAP_SEED_HOST || "app.api.emails.imapClient.imap.gmail.com";
+  const host =
+    imapClientEnv.IMAP_SEED_HOST || "app.api.emails.imapClient.imap.gmail.com";
   const username = imapClientEnv.IMAP_SEED_USERNAME || "";
   const password = imapClientEnv.IMAP_SEED_PASSWORD || "";
   const port = imapClientEnv.IMAP_SEED_PORT || 993;
@@ -118,14 +119,6 @@ export function test(logger: EndpointLogger): void {
   logger.debug("🌱 Skipping test IMAP accounts seeding");
 }
 
-// Register seeds with the seed manager
+// Export priority for seed manager
 // IMAP accounts have medium-low priority (30) - after users (100), leads (50), but before business data (10)
-registerSeed(
-  "imap-accounts",
-  {
-    dev,
-    test,
-    prod,
-  },
-  30,
-);
+export const priority = 30;

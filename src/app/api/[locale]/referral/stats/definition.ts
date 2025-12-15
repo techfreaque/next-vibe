@@ -47,40 +47,40 @@ export const { GET } = createEndpoint({
     },
     { response: true },
     {
-      totalReferrals: responseField(
+      totalSignups: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.browser.tags.browserAutomation",
+          content: "app.api.referral.stats.fields.totalSignups",
         },
         z.coerce.number(),
       ),
-      totalEarningsCents: responseField(
+      totalRevenueCredits: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.browser.tags.browserAutomation",
+          content: "app.api.referral.stats.fields.totalRevenueCredits",
         },
         z.coerce.number(),
       ),
-      pendingEarningsCents: responseField(
+      totalEarnedCredits: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.browser.tags.browserAutomation",
+          content: "app.api.referral.stats.fields.totalEarnedCredits",
         },
         z.coerce.number(),
       ),
-      confirmedEarningsCents: responseField(
+      totalPaidOutCredits: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.browser.tags.browserAutomation",
+          content: "app.api.referral.stats.fields.totalPaidOutCredits",
         },
         z.coerce.number(),
       ),
-      currency: responseField(
+      availableCredits: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.browser.tags.browserAutomation",
+          content: "app.api.referral.stats.fields.availableCredits",
         },
-        z.string(),
+        z.coerce.number(),
       ),
     },
   ),
@@ -88,11 +88,11 @@ export const { GET } = createEndpoint({
   examples: {
     responses: {
       default: {
-        totalReferrals: 10,
-        totalEarningsCents: 5000,
-        pendingEarningsCents: 1000,
-        confirmedEarningsCents: 4000,
-        currency: "EUR",
+        totalSignups: 10,
+        totalRevenueCredits: 8000,
+        totalEarnedCredits: 1600,
+        totalPaidOutCredits: 0,
+        availableCredits: 1600,
       },
     },
   },

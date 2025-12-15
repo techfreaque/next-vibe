@@ -69,6 +69,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { ProductIds, productsRepository } from "../products/repository-client";
+import { payoutRequests } from "../referral/db";
+import { PayoutStatus } from "../referral/enum";
 import { withTransaction } from "../system/db/utils/repository-helpers";
 import {
   creditPacks,
@@ -90,6 +92,7 @@ export interface CreditBalance {
   total: number;
   expiring: number;
   permanent: number;
+  earned: number;
   free: number;
   expiresAt: string | null;
 }
@@ -463,6 +466,7 @@ class CreditRepository implements CreditRepositoryInterface {
     let totalPaid = 0;
     let totalExpiring = 0;
     let totalPermanent = 0;
+    let totalEarned = 0;
     let earliestExpiry: Date | null = null;
 
     const now = new Date();
@@ -490,6 +494,8 @@ class CreditRepository implements CreditRepositoryInterface {
           if (!earliestExpiry || pack.expiresAt < earliestExpiry) {
             earliestExpiry = pack.expiresAt;
           }
+        } else if (pack.type === "earned") {
+          totalEarned += pack.remaining;
         } else {
           totalPermanent += pack.remaining;
         }
@@ -556,6 +562,7 @@ class CreditRepository implements CreditRepositoryInterface {
       free: freeCreditsAvailable,
       expiring: totalExpiring,
       permanent: totalPermanent,
+      earned: totalEarned,
       expiresAt: earliestExpiry?.toISOString() || null,
     };
   }
@@ -1717,6 +1724,84 @@ class CreditRepository implements CreditRepositoryInterface {
           }
         }
 
+        // Step 4: Deduct from earned credit packs (LOWEST PRIORITY - for referral earnings)
+        if (remaining > 0 && pool.userWallet) {
+          const walletIds = [pool.userWallet.id];
+          const earnedPacks = await tx
+            .select()
+            .from(creditPacks)
+            .where(
+              and(
+                inArray(creditPacks.walletId, walletIds),
+                eq(creditPacks.type, "earned"),
+              ),
+            )
+            .orderBy(creditPacks.createdAt); // FIFO for earned credits
+
+          for (const pack of earnedPacks) {
+            if (remaining <= 0) {
+              break;
+            }
+
+            const deduction = Math.min(pack.remaining, remaining);
+
+            if (deduction === pack.remaining) {
+              await tx.delete(creditPacks).where(eq(creditPacks.id, pack.id));
+            } else {
+              await tx
+                .update(creditPacks)
+                .set({
+                  remaining: pack.remaining - deduction,
+                  updatedAt: new Date(),
+                })
+                .where(eq(creditPacks.id, pack.id));
+            }
+
+            // Update wallet balance
+            await tx
+              .update(creditWallets)
+              .set({
+                balance: sql`${creditWallets.balance} - ${deduction}`,
+                updatedAt: new Date(),
+              })
+              .where(eq(creditWallets.id, pack.walletId));
+
+            // Get updated balance for transaction record
+            const [updatedWallet] = await tx
+              .select({ balance: creditWallets.balance })
+              .from(creditWallets)
+              .where(eq(creditWallets.id, pack.walletId));
+
+            // Get wallet's freePeriodId for transaction
+            const [walletInfo] = await tx
+              .select({ freePeriodId: creditWallets.freePeriodId })
+              .from(creditWallets)
+              .where(eq(creditWallets.id, pack.walletId));
+
+            // Record transaction
+            await tx.insert(creditTransactions).values({
+              walletId: pack.walletId,
+              amount: -deduction,
+              balanceAfter: updatedWallet?.balance || 0,
+              type: CreditTransactionType.USAGE,
+              modelId,
+              messageId,
+              packId: pack.id,
+              freePeriodId: walletInfo?.freePeriodId || null,
+              metadata: {
+                feature: "credit_usage",
+                cost: amount,
+                modelId,
+                messageId,
+                freeCreditsUsed: 0,
+                packCreditsUsed: deduction,
+              },
+            });
+
+            remaining -= deduction;
+          }
+        }
+
         if (remaining > 0) {
           return {
             success: false as const,
@@ -1789,23 +1874,19 @@ class CreditRepository implements CreditRepositoryInterface {
         });
       }
 
-      // Find current lead's wallet
+      // Find current lead's wallet (may not exist if user has no lead on this device)
       const currentLeadWallet = pool.leadWallets.find(
         (w) => w.leadId === leadId,
       );
-      if (!currentLeadWallet) {
-        return success({
-          transactions: [],
-          totalCount: 0,
-        });
-      }
 
       // Get current period
       const now = new Date();
       const currentPeriodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-      // Fetch transactions from current lead wallet AND user wallet
-      const walletIds = [currentLeadWallet.id, pool.userWallet.id];
+      // Fetch transactions from current lead wallet (if exists) AND user wallet
+      const walletIds = currentLeadWallet
+        ? [currentLeadWallet.id, pool.userWallet.id]
+        : [pool.userWallet.id];
       const transactions = await db
         .select()
         .from(creditTransactions)
@@ -1822,7 +1903,7 @@ class CreditRepository implements CreditRepositoryInterface {
       // Calculate spending from OTHER linked leads (not current lead)
       let otherLeadsSpending = 0;
       for (const leadWallet of pool.leadWallets) {
-        if (leadWallet.id === currentLeadWallet.id) {
+        if (currentLeadWallet && leadWallet.id === currentLeadWallet.id) {
           continue; // Skip current lead
         }
 
@@ -2502,6 +2583,348 @@ class CreditRepository implements CreditRepositoryInterface {
    */
   generateMessageId(): string {
     return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 15)}`;
+  }
+
+  /**
+   * Add earned credits from referral commission
+   * Creates an "earned" credit pack with REFERRAL_EARNING transaction
+   */
+  async addEarnedCredits(
+    userId: string,
+    amountCents: number,
+    sourceUserId: string,
+    transactionId: string,
+    commissionPercent: number,
+    originalAmountCents: number,
+    logger: EndpointLogger,
+    sourceUserEmail?: string,
+  ): Promise<ResponseType<{ packId: string; transactionId: string }>> {
+    try {
+      // Get or create user wallet
+      const walletResult = await this.getOrCreateUserWallet(userId, logger);
+      if (!walletResult.success) {
+        return walletResult;
+      }
+
+      const wallet = walletResult.data;
+
+      // Create earned credit pack (no expiration)
+      const [newPack] = await db
+        .insert(creditPacks)
+        .values({
+          walletId: wallet.id,
+          originalAmount: amountCents,
+          remaining: amountCents,
+          type: "earned",
+          expiresAt: null,
+          source: "referral_earning",
+          metadata: {
+            sourceUserId,
+            transactionId,
+          },
+        })
+        .returning();
+
+      // Update wallet balance
+      const newBalance = wallet.balance + amountCents;
+      await db
+        .update(creditWallets)
+        .set({ balance: newBalance, updatedAt: new Date() })
+        .where(eq(creditWallets.id, wallet.id));
+
+      // Create REFERRAL_EARNING transaction
+      const [txRecord] = await db
+        .insert(creditTransactions)
+        .values({
+          walletId: wallet.id,
+          amount: amountCents,
+          balanceAfter: newBalance,
+          type: CreditTransactionType.REFERRAL_EARNING,
+          packId: newPack.id,
+          freePeriodId: wallet.freePeriodId,
+          metadata: {
+            sourceUserId,
+            sourceUserEmail,
+            transactionId,
+            commissionPercent,
+            originalAmountCents,
+          },
+        })
+        .returning();
+
+      logger.info("Earned credits added from referral", {
+        userId,
+        amountCents,
+        sourceUserId,
+        packId: newPack.id,
+        transactionId: txRecord.id,
+      });
+
+      return success({
+        packId: newPack.id,
+        transactionId: txRecord.id,
+      });
+    } catch (error) {
+      logger.error("Failed to add earned credits", parseError(error), {
+        userId,
+        amountCents,
+        sourceUserId,
+      });
+      return fail({
+        message: "app.api.credits.errors.addEarnedCreditsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Get earned credits balance for a user
+   * Returns total earned, available (not locked), and locked amounts
+   */
+  async getEarnedCreditsBalance(
+    userId: string,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      total: number;
+      available: number;
+      locked: number;
+    }>
+  > {
+    try {
+      const walletResult = await this.getOrCreateUserWallet(userId, logger);
+      if (!walletResult.success) {
+        return walletResult;
+      }
+
+      const wallet = walletResult.data;
+
+      // Sum all earned credit packs
+      const earnedPacks = await db
+        .select()
+        .from(creditPacks)
+        .where(
+          and(
+            eq(creditPacks.walletId, wallet.id),
+            eq(creditPacks.type, "earned"),
+          ),
+        );
+
+      const total = earnedPacks.reduce((sum, pack) => sum + pack.remaining, 0);
+
+      // Calculate locked amount from pending/approved/processing payout requests
+      const pendingPayouts = await db
+        .select({ amountCents: payoutRequests.amountCents })
+        .from(payoutRequests)
+        .where(
+          and(
+            eq(payoutRequests.userId, userId),
+            inArray(payoutRequests.status, [
+              PayoutStatus.PENDING,
+              PayoutStatus.APPROVED,
+              PayoutStatus.PROCESSING,
+            ]),
+          ),
+        );
+
+      const locked = pendingPayouts.reduce((sum, p) => sum + p.amountCents, 0);
+      const available = Math.max(0, total - locked);
+
+      return success({
+        total,
+        available,
+        locked,
+      });
+    } catch (error) {
+      logger.error("Failed to get earned credits balance", parseError(error), {
+        userId,
+      });
+      return fail({
+        message: "app.api.credits.errors.getEarnedBalanceFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Deduct earned credits for payout
+   * Creates REFERRAL_PAYOUT transaction
+   */
+  async deductEarnedCredits(
+    userId: string,
+    amountCents: number,
+    payoutRequestId: string,
+    currency: "BTC" | "USDC" | "CREDITS",
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    try {
+      const walletResult = await this.getOrCreateUserWallet(userId, logger);
+      if (!walletResult.success) {
+        return walletResult;
+      }
+
+      const wallet = walletResult.data;
+
+      // Get earned packs ordered by creation (FIFO)
+      const earnedPacks = await db
+        .select()
+        .from(creditPacks)
+        .where(
+          and(
+            eq(creditPacks.walletId, wallet.id),
+            eq(creditPacks.type, "earned"),
+          ),
+        )
+        .orderBy(creditPacks.createdAt);
+
+      let remaining = amountCents;
+
+      for (const pack of earnedPacks) {
+        if (remaining <= 0) {
+          break;
+        }
+
+        const deduction = Math.min(pack.remaining, remaining);
+
+        if (deduction === pack.remaining) {
+          await db.delete(creditPacks).where(eq(creditPacks.id, pack.id));
+        } else {
+          await db
+            .update(creditPacks)
+            .set({
+              remaining: pack.remaining - deduction,
+              updatedAt: new Date(),
+            })
+            .where(eq(creditPacks.id, pack.id));
+        }
+
+        remaining -= deduction;
+      }
+
+      if (remaining > 0) {
+        return fail({
+          message: "app.api.credits.errors.insufficientEarnedCredits",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      // Update wallet balance
+      const newBalance = wallet.balance - amountCents;
+      await db
+        .update(creditWallets)
+        .set({ balance: newBalance, updatedAt: new Date() })
+        .where(eq(creditWallets.id, wallet.id));
+
+      // Create REFERRAL_PAYOUT transaction
+      await db.insert(creditTransactions).values({
+        walletId: wallet.id,
+        amount: -amountCents,
+        balanceAfter: newBalance,
+        type: CreditTransactionType.REFERRAL_PAYOUT,
+        freePeriodId: wallet.freePeriodId,
+        metadata: {
+          payoutRequestId,
+          currency,
+          amountCents,
+        },
+      });
+
+      logger.info("Earned credits deducted for payout", {
+        userId,
+        amountCents,
+        payoutRequestId,
+        currency,
+      });
+
+      return success();
+    } catch (error) {
+      logger.error("Failed to deduct earned credits", parseError(error), {
+        userId,
+        amountCents,
+        payoutRequestId,
+      });
+      return fail({
+        message: "app.api.credits.errors.deductEarnedCreditsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Get referral transactions for a user (earnings and payouts)
+   */
+  async getReferralTransactions(
+    userId: string,
+    limit: number,
+    offset: number,
+    logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      transactions: CreditTransactionOutput[];
+      totalCount: number;
+    }>
+  > {
+    try {
+      const walletResult = await this.getOrCreateUserWallet(userId, logger);
+      if (!walletResult.success) {
+        return walletResult;
+      }
+
+      const wallet = walletResult.data;
+
+      // Get only referral-related transactions
+      const transactions = await db
+        .select()
+        .from(creditTransactions)
+        .where(
+          and(
+            eq(creditTransactions.walletId, wallet.id),
+            inArray(creditTransactions.type, [
+              CreditTransactionType.REFERRAL_EARNING,
+              CreditTransactionType.REFERRAL_PAYOUT,
+            ]),
+          ),
+        )
+        .orderBy(desc(creditTransactions.createdAt))
+        .limit(limit)
+        .offset(offset);
+
+      const [{ count }] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(creditTransactions)
+        .where(
+          and(
+            eq(creditTransactions.walletId, wallet.id),
+            inArray(creditTransactions.type, [
+              CreditTransactionType.REFERRAL_EARNING,
+              CreditTransactionType.REFERRAL_PAYOUT,
+            ]),
+          ),
+        );
+
+      const result: CreditTransactionOutput[] = transactions.map((t) => ({
+        id: t.id,
+        amount: t.amount,
+        balanceAfter: t.balanceAfter,
+        type: t.type,
+        modelId: t.modelId,
+        messageId: t.messageId,
+        createdAt: t.createdAt.toISOString(),
+      }));
+
+      return success({
+        transactions: result,
+        totalCount: count,
+      });
+    } catch (error) {
+      logger.error("Failed to get referral transactions", parseError(error), {
+        userId,
+      });
+      return fail({
+        message: "app.api.credits.errors.getReferralTransactionsFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
   }
 }
 

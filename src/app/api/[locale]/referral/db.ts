@@ -17,7 +17,13 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { leads } from "../leads/db";
 import { paymentTransactions } from "../payment/db";
 import { users } from "../user/db";
-import { ReferralEarningStatus,ReferralEarningStatusDB } from "./enum";
+import {
+  PayoutCurrencyDB,
+  PayoutStatus,
+  PayoutStatusDB,
+  ReferralEarningStatus,
+  ReferralEarningStatusDB,
+} from "./enum";
 
 /**
  * Referral Codes Table
@@ -110,6 +116,29 @@ export const referralEarnings = pgTable(
 );
 
 /**
+ * Payout Requests Table
+ * Tracks user requests to withdraw earned credits
+ */
+export const payoutRequests = pgTable("payout_requests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  amountCents: integer("amount_cents").notNull(),
+  currency: text("currency", { enum: PayoutCurrencyDB }).notNull(),
+  status: text("status", { enum: PayoutStatusDB })
+    .notNull()
+    .default(PayoutStatus.PENDING),
+  walletAddress: text("wallet_address"), // For BTC/USDC payouts
+  adminNotes: text("admin_notes"),
+  rejectionReason: text("rejection_reason"),
+  processedAt: timestamp("processed_at"),
+  processedByUserId: uuid("processed_by_user_id").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+/**
  * Relations
  */
 export const referralCodesRelations = relations(
@@ -186,3 +215,22 @@ export const insertUserReferralSchema = createInsertSchema(userReferrals);
 
 export const selectReferralEarningSchema = createSelectSchema(referralEarnings);
 export const insertReferralEarningSchema = createInsertSchema(referralEarnings);
+
+export const selectPayoutRequestSchema = createSelectSchema(payoutRequests);
+export const insertPayoutRequestSchema = createInsertSchema(payoutRequests);
+
+/**
+ * Payout Request Relations
+ */
+export const payoutRequestsRelations = relations(payoutRequests, ({ one }) => ({
+  user: one(users, {
+    fields: [payoutRequests.userId],
+    references: [users.id],
+    relationName: "payoutUser",
+  }),
+  processedBy: one(users, {
+    fields: [payoutRequests.processedByUserId],
+    references: [users.id],
+    relationName: "payoutProcessor",
+  }),
+}));

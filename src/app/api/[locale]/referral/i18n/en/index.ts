@@ -100,6 +100,13 @@ export const translations = {
       title: "Stats Retrieved",
       description: "Successfully retrieved your referral statistics",
     },
+    fields: {
+      totalSignups: "Total Signups",
+      totalRevenueCredits: "Total Revenue (Credits)",
+      totalEarnedCredits: "Total Earned (Credits)",
+      totalPaidOutCredits: "Total Paid Out (Credits)",
+      availableCredits: "Available Credits",
+    },
   },
 
   // Earnings List endpoint
@@ -171,6 +178,17 @@ export const translations = {
     referralCode: "Referral Code",
     success: "Success",
     message: "Message",
+  },
+
+  // Payout errors
+  payout: {
+    errors: {
+      minimumAmount: "Minimum payout amount is $40",
+      walletRequired: "Wallet address is required for crypto payouts",
+      insufficientBalance: "Insufficient balance for payout",
+      notFound: "Payout request not found",
+      invalidStatus: "Invalid payout request status for this operation",
+    },
   },
 
   // Error types

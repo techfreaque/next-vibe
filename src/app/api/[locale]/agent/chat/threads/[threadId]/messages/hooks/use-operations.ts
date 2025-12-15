@@ -7,6 +7,7 @@
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback } from "react";
 
+import { getLastMessageInBranch } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -65,6 +66,7 @@ interface MessageOperationsDeps {
     threads: Record<string, { rootFolderId: DefaultFolderId }>;
     setLoading: (loading: boolean) => void;
     getThreadMessages: (threadId: string) => ChatMessage[];
+    getBranchIndices: (threadId: string) => Record<string, number>;
     deleteMessage: (messageId: string) => void;
     updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void;
   };
@@ -196,13 +198,38 @@ export function useMessageOperations(
           if (params.toolConfirmation && params.parentId) {
             parentMessageId = params.parentId;
           } else if (threadMessages.length > 0) {
-            const lastMessage = threadMessages[threadMessages.length - 1];
-            parentMessageId = lastMessage.id;
-            logger.debug("Message operations: Using last message as parent", {
-              parentMessageId,
-              lastMessageContent: lastMessage.content.slice(0, 50),
-              isIncognito: currentRootFolderId === "incognito",
-            });
+            // Get branch indices for this thread to find the correct parent
+            const branchIndices = chatStore.getBranchIndices(threadIdToUse);
+
+            // Use branch-aware function to get the last message in the selected branch
+            const lastMessage = getLastMessageInBranch(
+              threadMessages,
+              branchIndices,
+            );
+
+            if (lastMessage) {
+              parentMessageId = lastMessage.id;
+              logger.debug(
+                "Message operations: Using last message in branch as parent",
+                {
+                  parentMessageId,
+                  lastMessageContent: lastMessage.content.slice(0, 50),
+                  isIncognito: currentRootFolderId === "incognito",
+                  branchIndices,
+                },
+              );
+            } else {
+              // Fallback to last message by creation time if branch path is empty
+              const fallbackMessage = threadMessages[threadMessages.length - 1];
+              parentMessageId = fallbackMessage.id;
+              logger.debug(
+                "Message operations: Using fallback last message as parent",
+                {
+                  parentMessageId,
+                  lastMessageContent: fallbackMessage.content.substring(0, 50),
+                },
+              );
+            }
           }
 
           // ALWAYS build messageHistory for incognito mode (needed for tool confirmations)

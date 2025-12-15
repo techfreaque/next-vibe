@@ -100,6 +100,13 @@ export const translations = {
       title: "Statystyki pobrane",
       description: "Pomyślnie pobrano Twoje statystyki poleceń",
     },
+    fields: {
+      totalSignups: "Łączne rejestracje",
+      totalRevenueCredits: "Łączny przychód (Kredyty)",
+      totalEarnedCredits: "Łącznie zarobione (Kredyty)",
+      totalPaidOutCredits: "Łącznie wypłacone (Kredyty)",
+      availableCredits: "Dostępne kredyty",
+    },
   },
 
   // Earnings List endpoint
@@ -171,6 +178,17 @@ export const translations = {
     referralCode: "Kod polecający",
     success: "Sukces",
     message: "Wiadomość",
+  },
+
+  // Payout errors
+  payout: {
+    errors: {
+      minimumAmount: "Minimalna kwota wypłaty to $40",
+      walletRequired: "Adres portfela wymagany dla wypłat krypto",
+      insufficientBalance: "Niewystarczające saldo do wypłaty",
+      notFound: "Nie znaleziono żądania wypłaty",
+      invalidStatus: "Nieprawidłowy status żądania wypłaty dla tej operacji",
+    },
   },
 
   // Error types
