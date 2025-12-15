@@ -51,6 +51,14 @@ export const translations: typeof enTranslations = {
       description:
         "Filterung deaktivieren und alle TypeScript-Probleme anzeigen",
     },
+    createConfig: {
+      label: "Konfiguration erstellen",
+      description: "Konfigurationsdatei automatisch erstellen, falls vorhanden",
+    },
+    timeout: {
+      label: "Timeout (Sekunden)",
+      description: "Maximale Ausführungszeit in Sekunden",
+    },
   },
 
   // Response fields

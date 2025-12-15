@@ -49,6 +49,14 @@ export const translations: typeof enTranslations = {
       label: "Wyłącz filtr",
       description: "Wyłącz filtrowanie i pokaż wszystkie problemy TypeScript",
     },
+    createConfig: {
+      label: "Utwórz konfigurację",
+      description: "Automatycznie utwórz plik konfiguracyjny, jeśli brakuje",
+    },
+    timeout: {
+      label: "Limit czasu (sekundy)",
+      description: "Maksymalny czas wykonania w sekundach",
+    },
   },
 
   // Response fields

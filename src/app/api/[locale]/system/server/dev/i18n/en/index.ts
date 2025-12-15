@@ -44,6 +44,18 @@ export const translations = {
         title: "Skip Task Runner",
         description: "Skip starting the task runner system",
       },
+      skipMigrations: {
+        title: "Skip Migrations",
+        description: "Skip database migrations",
+      },
+      skipMigrationGeneration: {
+        title: "Skip Migration Generation",
+        description: "Skip automatic migration generation",
+      },
+      skipSeeding: {
+        title: "Skip Seeding",
+        description: "Skip database seeding with initial data",
+      },
       success: {
         title: "Success",
       },

@@ -46,6 +46,18 @@ export const translations: typeof enTranslations = {
         title: "Pomiń runner zadań",
         description: "Pomiń uruchamianie systemu runnera zadań",
       },
+      skipMigrations: {
+        title: "Pomiń migracje",
+        description: "Pomiń migracje bazy danych",
+      },
+      skipMigrationGeneration: {
+        title: "Pomiń generowanie migracji",
+        description: "Pomiń automatyczne generowanie migracji",
+      },
+      skipSeeding: {
+        title: "Pomiń seeding",
+        description: "Pomiń seedowanie bazy danych z danymi początkowymi",
+      },
       success: {
         title: "Sukces",
       },

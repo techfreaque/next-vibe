@@ -47,9 +47,15 @@ export const translations: typeof enTranslations = {
       label: "Cache-Verzeichnis",
       description: "Verzeichnis für Cache-Dateien",
     },
+    createConfig: {
+      label: "Konfiguration erstellen",
+      description: "Konfigurationsdatei automatisch erstellen, falls vorhanden",
+    },
   },
   response: {
     success: "Lint erfolgreich abgeschlossen",
+    configMissing: "Konfigurationsdatei fehlt",
+    configPath: "Konfigurationsdateipfad",
     errors: {
       item: {
         file: "Datei",

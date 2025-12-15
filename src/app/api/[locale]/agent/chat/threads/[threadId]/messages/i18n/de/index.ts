@@ -220,6 +220,10 @@ export const translations: typeof enTranslations = {
         title: "Conflict",
         description: "A conflict occurred",
       },
+      createFailed: {
+        title: "Fehler beim Erstellen der Nachricht",
+        description: "Ein Fehler ist beim Erstellen der Nachricht aufgetreten",
+      },
     },
     success: {
       title: "Success",

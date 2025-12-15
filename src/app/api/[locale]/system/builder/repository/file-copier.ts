@@ -6,8 +6,6 @@
 import { existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
-import { copy } from "fs-extra";
-
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -77,6 +75,8 @@ export class FileCopier implements IFileCopier {
         if (!existsSync(destDir)) {
           mkdirSync(destDir, { recursive: true });
         }
+        const fsExtraPkg = "fs-extra";
+        const { copy } = await import(/* webpackIgnore: true */ fsExtraPkg);
         await copy(srcPath, destPath);
       }
 

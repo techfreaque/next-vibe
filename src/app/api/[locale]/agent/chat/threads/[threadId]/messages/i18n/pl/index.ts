@@ -219,6 +219,10 @@ export const translations: typeof enTranslations = {
         title: "Conflict",
         description: "A conflict occurred",
       },
+      createFailed: {
+        title: "Nie udało się utworzyć wiadomości",
+        description: "Błąd podczas tworzenia wiadomości",
+      },
     },
     success: {
       title: "Success",

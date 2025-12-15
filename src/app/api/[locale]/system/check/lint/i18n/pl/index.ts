@@ -47,6 +47,10 @@ export const translations: typeof enTranslations = {
       label: "Katalog pamięci podręcznej",
       description: "Katalog dla plików pamięci podręcznej",
     },
+    createConfig: {
+      label: "Utwórz konfigurację",
+      description: "Automatycznie utwórz plik konfiguracyjny, jeśli brakuje",
+    },
   },
   response: {
     success: "Lint zakończony pomyślnie",

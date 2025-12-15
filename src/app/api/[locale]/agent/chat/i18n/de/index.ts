@@ -265,6 +265,12 @@ export const translations: typeof enTranslations = {
         "Google Gemini 3 Pro - Fortgeschrittenes multimodales KI-Modell mit großem Kontextfenster",
       deepseekV32:
         "DeepSeek V3.2 - Hochleistungs-Reasoning-Modell mit erweiterten Coding-Fähigkeiten",
+      gpt52Pro:
+        "GPT-5.2 Pro - Fortgeschrittenes OpenAI-Modell mit verbessertem Reasoning und Coding-Fähigkeiten",
+      gpt52:
+        "GPT-5.2 - Hochleistungs-OpenAI-Modell für komplexe Aufgaben und Analyse",
+      gpt52_chat:
+        "GPT-5.2 Chat - Optimiertes OpenAI-Modell für Konversationsinteraktionen",
     },
   },
 };

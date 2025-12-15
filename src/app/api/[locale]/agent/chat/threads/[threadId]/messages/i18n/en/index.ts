@@ -219,6 +219,10 @@ export const translations = {
         title: "Conflict",
         description: "A conflict occurred",
       },
+      createFailed: {
+        title: "Failed to create message",
+        description: "An error occurred while creating the message",
+      },
     },
     success: {
       title: "Success",

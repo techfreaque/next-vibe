@@ -11,4 +11,9 @@ export const translations = {
   },
   noEndpoints: "Keine Endpunkte gefunden",
   selectEndpoint: "Wählen Sie einen Endpunkt aus, um Details anzuzeigen",
+  errors: {
+    cliOnly: {
+      title: "Nur CLI",
+    },
+  },
 } as const;

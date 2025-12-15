@@ -119,6 +119,7 @@ export { Lightbulb } from "./Lightbulb";
 export { LineChart } from "./LineChart";
 export { LineChartIcon } from "./LineChartIcon";
 export { Link } from "./Link";
+export { Link2 } from "./Link2";
 export { Linkedin } from "./Linkedin";
 export { List } from "./List";
 export { Loader2 } from "./Loader2";

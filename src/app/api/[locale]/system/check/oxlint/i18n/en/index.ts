@@ -45,9 +45,15 @@ export const translations = {
       label: "Cache Directory",
       description: "Directory for cache files",
     },
+    createConfig: {
+      label: "Create Config",
+      description: "Automatically create configuration file if missing",
+    },
   },
   response: {
     success: "Lint completed successfully",
+    configMissing: "Configuration file is missing",
+    configPath: "Configuration file path",
     errors: {
       item: {
         file: "File",

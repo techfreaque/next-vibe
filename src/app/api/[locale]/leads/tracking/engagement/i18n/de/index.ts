@@ -131,6 +131,12 @@ export const translations: typeof enTranslations = {
       placeholder: "https://example.com",
       helpText: "Die URL, zu der der Lead weitergeleitet wird",
     },
+    ref: {
+      label: "Referenz-ID",
+      description: "Referenzkennung zum Nachverfolgen",
+      placeholder: "Referenz-ID eingeben",
+      helpText: "Optionale Referenz-ID für zusätzliche Tracking-Kontexte",
+    },
     response: {
       success: "Erfolg",
       redirectUrl: "Weiterleitungs-URL",

@@ -128,6 +128,12 @@ export const translations = {
       placeholder: "Enter target URL",
       helpText: "The destination URL for redirection",
     },
+    ref: {
+      label: "Reference ID",
+      description: "Reference identifier for tracking",
+      placeholder: "Enter reference ID",
+      helpText: "Optional reference ID for additional tracking context",
+    },
     response: {
       success: "Success",
       redirectUrl: "Redirect URL",

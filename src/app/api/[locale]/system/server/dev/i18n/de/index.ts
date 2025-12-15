@@ -46,6 +46,18 @@ export const translations: typeof enTranslations = {
         title: "Task-Runner überspringen",
         description: "Task-Runner-System nicht starten",
       },
+      skipMigrations: {
+        title: "Migrationen überspringen",
+        description: "Datenbankmigrationen überspringen",
+      },
+      skipMigrationGeneration: {
+        title: "Migrationsgenerierung überspringen",
+        description: "Automatische Migrationsgenerierung überspringen",
+      },
+      skipSeeding: {
+        title: "Seeding überspringen",
+        description: "Datenbank-Seeding mit Anfangsdaten überspringen",
+      },
       success: {
         title: "Erfolg",
       },

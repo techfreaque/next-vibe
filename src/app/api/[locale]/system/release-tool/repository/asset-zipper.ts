@@ -10,7 +10,6 @@ import {
 } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 
-import archiver from "archiver";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -100,6 +99,8 @@ export class AssetZipper implements IAssetZipper {
 
       try {
         const output = createWriteStream(outputPath);
+        const archiverPkg = "archiver";
+        const archiver = (await import(/* webpackIgnore: true */ archiverPkg)).default;
         const archive = archiver("zip", { zlib: { level: 9 } });
 
         await new Promise<void>((resolve, reject) => {

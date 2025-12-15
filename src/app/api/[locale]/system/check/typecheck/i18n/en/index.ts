@@ -45,6 +45,14 @@ export const translations = {
       label: "Disable Filter",
       description: "Disable filtering and show all TypeScript issues",
     },
+    createConfig: {
+      label: "Create Config",
+      description: "Automatically create configuration file if missing",
+    },
+    timeout: {
+      label: "Timeout (seconds)",
+      description: "Maximum execution time in seconds",
+    },
   },
 
   // Response fields

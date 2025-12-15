@@ -21,7 +21,7 @@ interface InternalNodeHandle {
  */
 interface ProcessWithInternals {
   _getActiveHandles?: () => InternalNodeHandle[];
-  _getActiveRequests?: () => unknown[];
+  _getActiveRequests?: () => never[];
 }
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -221,7 +221,7 @@ export class ResourceMonitor {
 
     try {
       // Cast to access internal Node.js APIs
-      const proc = process as unknown as ProcessWithInternals;
+      const proc = process as ProcessWithInternals;
       if (proc._getActiveHandles) {
         const activeHandles = proc._getActiveHandles();
         for (const handle of activeHandles) {
@@ -244,7 +244,7 @@ export class ResourceMonitor {
   getActiveRequestsCount(): number {
     try {
       // Cast to access internal Node.js APIs
-      const proc = process as unknown as ProcessWithInternals;
+      const proc = process as ProcessWithInternals;
       if (proc._getActiveRequests) {
         return proc._getActiveRequests().length;
       }
@@ -275,7 +275,7 @@ export class ResourceMonitor {
   forceCloseHandles(): void {
     try {
       // Cast to access internal Node.js APIs
-      const proc = process as unknown as ProcessWithInternals;
+      const proc = process as ProcessWithInternals;
       if (proc._getActiveHandles) {
         const handles = proc._getActiveHandles();
         for (const handle of handles) {

@@ -189,13 +189,16 @@ export class ViteCompiler implements IViteCompiler {
     const outputOptions: OutputOptions = {};
 
     // Configure plugins based on build type
+    // Use string variables to prevent Turbopack static analysis of CLI-only packages
     if (fileConfig.type === "react-tailwind") {
-      const tailwindcss = (await import("@tailwindcss/vite")).default;
+      const tailwindPkg = "@tailwindcss/vite";
+      const tailwindcss = (await import(/* webpackIgnore: true */ tailwindPkg)).default;
       plugins.push(tailwindcss() as PluginOption);
 
       if (fileConfig.inlineCss !== false) {
+        const cssPkg = "vite-plugin-css-injected-by-js";
         const cssInjectedByJsPlugin = (
-          await import("vite-plugin-css-injected-by-js")
+          await import(/* webpackIgnore: true */ cssPkg)
         ).default;
         plugins.push(cssInjectedByJsPlugin() as PluginOption);
       }
@@ -210,7 +213,8 @@ export class ViteCompiler implements IViteCompiler {
     // Package mode with TypeScript declarations
     const packageConfig = fileConfig.packageConfig;
     if (packageConfig?.isPackage) {
-      const dts = (await import("vite-plugin-dts")).default;
+      const dtsPkg = "vite-plugin-dts";
+      const dts = (await import(/* webpackIgnore: true */ dtsPkg)).default;
       plugins.push(
         dts({
           include: packageConfig.dtsInclude,

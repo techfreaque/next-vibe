@@ -11,4 +11,9 @@ export const translations = {
   },
   noEndpoints: "No endpoints found",
   selectEndpoint: "Select an endpoint to view details",
+  errors: {
+    cliOnly: {
+      title: "CLI only",
+    },
+  },
 } as const;
