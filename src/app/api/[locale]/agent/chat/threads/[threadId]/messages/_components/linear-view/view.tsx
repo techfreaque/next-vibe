@@ -336,17 +336,21 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                 ) : (
                   <>
                     {message.role === "user" && (
-                      <UserMessageBubble
-                        message={message}
-                        locale={locale}
-                        logger={logger}
-                        onBranch={onStartEdit}
-                        onRetry={onStartRetry}
-                        onDelete={onDeleteMessage}
-                        showAuthor={rootFolderId === "public"}
-                        rootFolderId={rootFolderId}
-                        currentUserId={currentUserId}
-                      />
+                      // First message: on md+ has left margin to align next to sticky logo (same line)
+                      // Below md: no margin (logo is above on separate line)
+                      <Div className={index === 0 ? "md:ml-18" : undefined}>
+                        <UserMessageBubble
+                          message={message}
+                          locale={locale}
+                          logger={logger}
+                          onBranch={onStartEdit}
+                          onRetry={onStartRetry}
+                          onDelete={onDeleteMessage}
+                          showAuthor={rootFolderId === "public"}
+                          rootFolderId={rootFolderId}
+                          currentUserId={currentUserId}
+                        />
+                      </Div>
                     )}
                     {(message.role === "assistant" ||
                       message.role === "tool") &&

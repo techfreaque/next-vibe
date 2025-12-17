@@ -12,6 +12,7 @@ import React, {
 } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
+import { Logo } from "@/app/[locale]/_components/logo";
 import {
   DOM_IDS,
   LAYOUT,
@@ -42,6 +43,8 @@ interface ChatMessagesProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
   currentUserId?: string;
+  /** Whether to show the branding logo (sticky inside scroll container) */
+  showBranding?: boolean;
 }
 
 export function ChatMessages({
@@ -49,6 +52,7 @@ export function ChatMessages({
   locale,
   logger,
   currentUserId,
+  showBranding = false,
 }: ChatMessagesProps): JSX.Element {
   const chat = useChatContext();
   const {
@@ -345,6 +349,19 @@ export function ChatMessages({
         "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full",
       )}
     >
+      {/* Sticky logo - inside scroll container for proper sticky behavior */}
+      {/* Uses h-0 overflow-visible so it doesn't push content down on md+ (same line layout) */}
+      {/* Below md: content has pt-20 to position below logo (separate line) */}
+      {showBranding && (
+        <Div className="sticky top-0 z-10 h-0 overflow-visible pointer-events-none">
+          <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15">
+            <Div className="pointer-events-auto flex bg-background/20 backdrop-blur rounded-lg p-2 shadow-sm border border-border/20 w-fit">
+              <Logo locale={locale} disabled size="h-10" />
+            </Div>
+          </Div>
+        </Div>
+      )}
+
       {/* Inner container with consistent padding and dynamic bottom padding */}
       {/* On native: no bottom padding needed since input is in normal flow */}
       <Div
@@ -357,7 +374,18 @@ export function ChatMessages({
               }
         }
       >
-        <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-35 md:pt-15 flex flex-col gap-5">
+        {/*
+          Responsive top padding:
+          - With branding (LINEAR view):
+            - Below md: pt-35 (logo on separate line above)
+            - md+: pt-15 (first message next to logo)
+          - Without branding (FLAT/THREADED/DEBUG views):
+            - pt-15 to clear the top toolbar
+        */}
+        <Div className={cn(
+          "max-w-3xl mx-auto px-4 sm:px-8 md:px-10 flex flex-col gap-5",
+          showBranding ? "pt-35 md:pt-15" : "pt-15"
+        )}>
           {mergedMessages.length === 0 && !isLoading ? (
             <Div style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}>
               <Div className="flex items-center justify-center h-full">

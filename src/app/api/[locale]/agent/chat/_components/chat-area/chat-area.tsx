@@ -14,7 +14,6 @@ import { AIToolsModal } from "@/app/api/[locale]/agent/chat/threads/_components/
 import { ChatInputContainer } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/input-container";
 import { ChatEmptyState } from "@/app/api/[locale]/agent/chat/threads/_components/new-thread/empty-state";
 import { PublicFeed } from "@/app/api/[locale]/agent/chat/threads/_components/public-feed/public-feed";
-import { ChatBranding } from "@/app/api/[locale]/agent/chat/threads/[threadId]/_components/branding";
 import { ChatToolbar } from "@/app/api/[locale]/agent/chat/threads/[threadId]/_components/toolbar";
 import { ChatMessages } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/_components/messages";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -80,13 +79,6 @@ export function ChatArea({
             </ErrorBoundary>
           )}
 
-          {/* Logo/Branding - Only show in linear view (not debug - logo is in card header) */}
-          {viewMode === ViewMode.LINEAR && messages.length > 0 && (
-            <ErrorBoundary locale={locale}>
-              <ChatBranding locale={locale} />
-            </ErrorBoundary>
-          )}
-
           {/* Messages Area - Full height, scrollable inside */}
           <ErrorBoundary locale={locale}>
             <Div className="max-w-screen overflow-hidden h-screen h-max-screen">
@@ -96,6 +88,7 @@ export function ChatArea({
                   locale={locale}
                   logger={logger}
                   currentUserId={currentUserId}
+                  showBranding={viewMode === ViewMode.LINEAR && messages.length > 0}
                 />
               ) : rootFolderId === "public" && !chat.currentSubFolderId ? (
                 // Public folder root (no subfolder) - show feed view

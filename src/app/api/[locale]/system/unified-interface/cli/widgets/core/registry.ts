@@ -31,7 +31,11 @@ import { StatsGridWidgetRenderer } from "../implementations/stats-grid";
 import { TabsWidgetRenderer } from "../implementations/tabs";
 import { TextWidgetRenderer } from "../implementations/text";
 import { TitleWidgetRenderer } from "../implementations/title";
-import type { WidgetRenderContext, WidgetRenderer } from "./types";
+import type {
+  CLIWidgetProps,
+  WidgetRenderContext,
+  WidgetRenderer,
+} from "./types";
 
 /**
  * Widget registry that manages all available widget renderers.
@@ -103,12 +107,12 @@ export class WidgetRegistry {
     const renderer = this.getRenderer(input.field.ui.type);
     // Type assertion needed because registry handles all widget types dynamically
     // The renderer's widgetType ensures props are handled correctly
-    const props = {
+    const props: CLIWidgetProps<WidgetType> = {
       widgetType: input.field.ui.type,
       field: input.field,
       value: input.value,
       context,
-    } as CLIWidgetPropsUnion;
+    };
     return renderer.render(props);
   }
 
