@@ -117,7 +117,9 @@ function extractChartData(value: WidgetData): {
     }
 
     // Single series of points - filter and convert to ChartDataPoint
-    const validPoints = value.filter(looksLikeChartDataPoint).map(toChartDataPoint);
+    const validPoints = value
+      .filter(looksLikeChartDataPoint)
+      .map(toChartDataPoint);
     if (validPoints.length > 0) {
       return {
         type: "single",
@@ -134,7 +136,9 @@ function extractChartData(value: WidgetData): {
     for (const [key, val] of Object.entries(obj)) {
       if (Array.isArray(val)) {
         // Filter and convert to ChartDataPoint
-        const validPoints = val.filter(looksLikeChartDataPoint).map(toChartDataPoint);
+        const validPoints = val
+          .filter(looksLikeChartDataPoint)
+          .map(toChartDataPoint);
         if (validPoints.length > 0) {
           series.push({
             name: key,

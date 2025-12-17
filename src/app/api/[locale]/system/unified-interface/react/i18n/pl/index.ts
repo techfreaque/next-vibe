@@ -77,5 +77,9 @@ export const translations: typeof enTranslations = {
     title: {
       noData: "Brak danych tytułu",
     },
+    chart: {
+      noDataAvailable: "Brak dostępnych danych",
+      noDataToDisplay: "Brak danych do wyświetlenia",
+    },
   },
 };

@@ -1,9 +1,46 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   title: "Narzędzie do wydań",
   description: "Zarządzaj wydaniami pakietów z wersjonowaniem, tagowaniem Git i integracją CI/CD",
   category: "Narzędzie do wydań",
   tags: {
     release: "Wydanie",
+  },
+  enums: {
+    versionIncrement: {
+      patch: "Patch",
+      minor: "Minor",
+      major: "Major",
+      prepatch: "Pre-patch",
+      preminor: "Pre-minor",
+      premajor: "Pre-major",
+      prerelease: "Prerelease",
+    },
+    packageManager: {
+      bun: "Bun",
+      npm: "NPM",
+      yarn: "Yarn",
+      pnpm: "PNPM",
+      deno: "Deno",
+    },
+    webhookType: {
+      slack: "Slack",
+      discord: "Discord",
+      teams: "Microsoft Teams",
+      custom: "Własny",
+    },
+    npmAccess: {
+      public: "Publiczny",
+      restricted: "Ograniczony",
+    },
+    changelogPreset: {
+      "conventional-commits": "Conventional Commits",
+      angular: "Angular",
+      atom: "Atom",
+      eslint: "ESLint",
+      ember: "Ember",
+    },
   },
   form: {
     title: "Konfiguracja wydania",
@@ -99,6 +136,375 @@ export const translations = {
       title: "Webhook powiadomień",
       description: "URL webhooka do wysyłania powiadomień o wydaniu (Slack, Discord, Teams lub własny)",
     },
+    configObject: {
+      title: "Obiekt konfiguracji",
+      description: "Ustawienia konfiguracji wydania",
+    },
+    packageManager: {
+      title: "Menedżer pakietów",
+      description: "Menedżer pakietów do użycia (bun, npm, yarn, pnpm, deno)",
+    },
+    globalVersion: {
+      title: "Wersja globalna",
+      description: "Ustaw globalną wersję dla wszystkich pakietów w monorepo",
+    },
+    parallel: {
+      title: "Wykonywanie równoległe",
+      description: "Włącz równoległe przetwarzanie pakietów",
+    },
+    maxParallelJobs: {
+      title: "Maks. równoległych zadań",
+      description: "Maksymalna liczba równoległych zadań",
+    },
+    continueOnError: {
+      title: "Kontynuuj przy błędzie",
+      description: "Kontynuuj przetwarzanie pozostałych pakietów, jeśli jeden się nie powiedzie",
+    },
+    verifyGitStatus: {
+      title: "Weryfikuj status Git",
+      description: "Weryfikuj status Git przed wydaniem",
+    },
+    requireCleanWorkingDir: {
+      title: "Wymagaj czystego katalogu roboczego",
+      description: "Wymagaj czystego katalogu roboczego przed wydaniem",
+    },
+    verifyLockfile: {
+      title: "Weryfikuj plik blokady",
+      description: "Weryfikuj integralność pliku blokady przed wydaniem",
+    },
+    branch: {
+      title: "Konfiguracja gałęzi",
+      description: "Ustawienia konfiguracji gałęzi Git",
+    },
+    branchMain: {
+      title: "Gałąź główna",
+      description: "Nazwa gałęzi głównej/produkcyjnej",
+    },
+    branchDevelop: {
+      title: "Gałąź deweloperska",
+      description: "Nazwa gałęzi deweloperskiej",
+    },
+    allowNonMain: {
+      title: "Zezwalaj na wydania spoza main",
+      description: "Zezwalaj na wydania z gałęzi innych niż main",
+    },
+    protectedBranches: {
+      title: "Chronione gałęzie",
+      description: "Lista chronionych nazw gałęzi",
+    },
+    notifications: {
+      title: "Powiadomienia",
+      description: "Konfiguracja powiadomień dla zdarzeń wydania",
+    },
+    notificationsEnabled: {
+      title: "Włącz powiadomienia",
+      description: "Włącz powiadomienia o wydaniach",
+    },
+    webhookUrl: {
+      title: "URL webhooka",
+      description: "URL dla powiadomień webhook",
+    },
+    webhookType: {
+      title: "Typ webhooka",
+      description: "Typ webhooka (Slack, Discord, Teams, Własny)",
+    },
+    onSuccess: {
+      title: "Powiadom przy sukcesie",
+      description: "Wyślij powiadomienie przy udanym wydaniu",
+    },
+    onFailure: {
+      title: "Powiadom przy błędzie",
+      description: "Wyślij powiadomienie przy nieudanym wydaniu",
+    },
+    messageTemplate: {
+      title: "Szablon wiadomości",
+      description: "Własny szablon wiadomości dla powiadomień",
+    },
+    includeTimings: {
+      title: "Uwzględnij czasy",
+      description: "Uwzględnij informacje o czasach w powiadomieniach",
+    },
+    retry: {
+      title: "Konfiguracja ponowień",
+      description: "Ustawienia ponowień dla nieudanych operacji",
+    },
+    maxAttempts: {
+      title: "Maks. prób",
+      description: "Maksymalna liczba prób ponowienia",
+    },
+    delayMs: {
+      title: "Opóźnienie ponowienia",
+      description: "Początkowe opóźnienie między ponowieniami w milisekundach",
+    },
+    backoffMultiplier: {
+      title: "Mnożnik cofania",
+      description: "Mnożnik dla wykładniczego cofania",
+    },
+    maxDelayMs: {
+      title: "Maks. opóźnienie",
+      description: "Maksymalne opóźnienie między ponowieniami w milisekundach",
+    },
+    rollback: {
+      title: "Konfiguracja rollbacku",
+      description: "Automatyczne ustawienia rollbacku przy błędzie",
+    },
+    rollbackEnabled: {
+      title: "Włącz rollback",
+      description: "Włącz automatyczny rollback przy błędzie",
+    },
+    rollbackGit: {
+      title: "Rollback zmian Git",
+      description: "Cofnij commity i tagi Git przy błędzie",
+    },
+    rollbackVersion: {
+      title: "Rollback zmian wersji",
+      description: "Cofnij zmiany wersji przy błędzie",
+    },
+    packages: {
+      title: "Pakiety",
+      description: "Lista pakietów do wydania",
+    },
+    package: {
+      title: "Konfiguracja pakietu",
+    },
+    directory: {
+      title: "Katalog",
+    },
+    name: {
+      title: "Nazwa",
+    },
+    updateDeps: {
+      title: "Aktualizuj zależności",
+      description: "Aktualizuj zależności w zależnych pakietach",
+    },
+    clean: {
+      title: "Polecenie clean",
+      description: "Polecenie lub skrypt do czyszczenia pakietu",
+    },
+    lint: {
+      title: "Polecenie lint",
+      description: "Polecenie lub skrypt do lintingu pakietu",
+    },
+    typecheck: {
+      title: "Polecenie typecheck",
+      description: "Polecenie lub skrypt do sprawdzania typów pakietu",
+    },
+    build: {
+      title: "Polecenie build",
+      description: "Polecenie lub skrypt do budowania pakietu",
+    },
+    test: {
+      title: "Polecenie test",
+      description: "Polecenie lub skrypt do testowania pakietu",
+    },
+    snyk: {
+      title: "Skanowanie Snyk",
+      description: "Włącz skanowanie bezpieczeństwa Snyk",
+    },
+    install: {
+      title: "Polecenie install",
+      description: "Polecenie lub skrypt do instalacji zależności",
+    },
+    release: {
+      title: "Konfiguracja wydania",
+    },
+    releaseVersion: {
+      title: "Wersja wydania",
+    },
+    tagPrefix: {
+      title: "Prefiks tagu",
+    },
+    tagSuffix: {
+      title: "Sufiks tagu",
+    },
+    ciReleaseCommand: {
+      title: "Polecenie wydania CI",
+      description: "Polecenie do uruchomienia w trybie CI",
+    },
+    ciCommand: {
+      title: "Polecenie",
+      description: "Tablica poleceń do wykonania",
+    },
+    ciEnvMapping: {
+      title: "Mapowanie środowiska",
+      description: "Mapowania zmiennych środowiskowych dla CI",
+    },
+    gitOps: {
+      title: "Operacje Git",
+    },
+    skipTag: {
+      title: "Pomiń tag",
+    },
+    skipPush: {
+      title: "Pomiń push",
+    },
+    skipCommit: {
+      title: "Pomiń commit",
+    },
+    signCommit: {
+      title: "Podpisz commit",
+    },
+    signTag: {
+      title: "Podpisz tag",
+    },
+    remote: {
+      title: "Zdalne repozytorium",
+    },
+    npm: {
+      title: "Konfiguracja NPM",
+    },
+    npmEnabled: {
+      title: "Włącz publikację NPM",
+    },
+    npmRegistry: {
+      title: "Rejestr NPM",
+    },
+    npmTag: {
+      title: "Tag NPM",
+    },
+    npmAccess: {
+      title: "Dostęp NPM",
+    },
+    otpEnvVar: {
+      title: "Zmienna środowiskowa OTP",
+    },
+    provenance: {
+      title: "Pochodzenie",
+    },
+    ignoreScripts: {
+      title: "Ignoruj skrypty",
+    },
+    npmDryRun: {
+      title: "Testowe uruchomienie NPM",
+    },
+    jsr: {
+      title: "Konfiguracja JSR",
+    },
+    jsrEnabled: {
+      title: "Włącz publikację JSR",
+    },
+    allowSlowTypes: {
+      title: "Zezwalaj na wolne typy",
+    },
+    allowDirty: {
+      title: "Zezwalaj na dirty",
+    },
+    jsrDryRun: {
+      title: "Testowe uruchomienie JSR",
+    },
+    changelog: {
+      title: "Konfiguracja changelogu",
+    },
+    changelogEnabled: {
+      title: "Włącz changelog",
+    },
+    changelogFile: {
+      title: "Plik changelogu",
+    },
+    changelogHeader: {
+      title: "Nagłówek changelogu",
+    },
+    compareUrlFormat: {
+      title: "Format URL porównania",
+    },
+    commitUrlFormat: {
+      title: "Format URL commita",
+    },
+    includeBody: {
+      title: "Uwzględnij treść",
+    },
+    changelogPreset: {
+      title: "Preset changelogu",
+    },
+    gitRelease: {
+      title: "Konfiguracja wydania Git",
+    },
+    gitReleaseEnabled: {
+      title: "Włącz wydanie Git",
+    },
+    releaseTitle: {
+      title: "Tytuł wydania",
+    },
+    generateNotes: {
+      title: "Generuj notatki",
+    },
+    releaseBody: {
+      title: "Treść wydania",
+    },
+    draft: {
+      title: "Szkic",
+    },
+    prerelease: {
+      title: "Prerelease",
+    },
+    discussionCategory: {
+      title: "Kategoria dyskusji",
+    },
+    target: {
+      title: "Cel",
+    },
+    assets: {
+      title: "Zasoby",
+      description: "Zasoby wydania do przesłania",
+    },
+    foldersToZip: {
+      title: "Foldery do spakowania",
+      description: "Foldery do spakowania dla wydania",
+    },
+    versionBumper: {
+      title: "Zwiększacz wersji",
+      description: "Konfiguracja zwiększania wersji dla plików innych niż package.json",
+    },
+    hooks: {
+      title: "Hooki cyklu życia",
+      description: "Polecenia do uruchomienia na różnych etapach",
+    },
+    preInstall: {
+      title: "Hook pre-install",
+    },
+    postInstall: {
+      title: "Hook post-install",
+    },
+    preClean: {
+      title: "Hook pre-clean",
+    },
+    postClean: {
+      title: "Hook post-clean",
+    },
+    preLint: {
+      title: "Hook pre-lint",
+    },
+    postLint: {
+      title: "Hook post-lint",
+    },
+    preBuild: {
+      title: "Hook pre-build",
+    },
+    postBuild: {
+      title: "Hook post-build",
+    },
+    preTest: {
+      title: "Hook pre-test",
+    },
+    postTest: {
+      title: "Hook post-test",
+    },
+    prePublish: {
+      title: "Hook pre-publish",
+    },
+    postPublish: {
+      title: "Hook post-publish",
+    },
+    preRelease: {
+      title: "Hook pre-release",
+    },
+    postRelease: {
+      title: "Hook post-release",
+    },
+    globalHooks: {
+      title: "Globalne hooki",
+      description: "Globalne hooki cyklu życia dla całego procesu wydania",
+    },
   },
   response: {
     status: "Status",
@@ -160,10 +566,12 @@ export const translations = {
       title: "Konflikt",
       description: "Wykryto konflikt wydania (tag może już istnieć)",
     },
-    packageNotFound: {
-      title: "Nie znaleziono pakietu",
-      description: "Pakiet docelowy '{{targetPackage}}' nie znaleziony w konfiguracji",
+    unsavedChanges: {
+      title: "Niezapisane zmiany",
+      description: "Istnieją niezapisane zmiany, które muszą zostać najpierw zatwierdzone",
     },
+    packageNotFound: "Pakiet '{{targetPackage}}' nie znaleziony w konfiguracji",
+    gitOperationFailed: "Operacja git nie powiodła się: {{error}}",
   },
   success: {
     title: "Wydanie zakończone",
@@ -271,6 +679,10 @@ export const translations = {
     updated: "Zależności zaktualizowane dla {{directory}}",
     failed: "Aktualizacja zależności nie powiodła się dla {{directory}}: {{error}}",
     skipped: "Pomijanie aktualizacji zależności dla {{directory}}",
+    dedupeFailed: "Deduplikacja zależności nie powiodła się dla {{directory}}: {{error}}",
+  },
+  security: {
+    auditFailed: "Audyt bezpieczeństwa nie powiódł się dla {{directory}}: {{error}}",
   },
   hooks: {
     running: "Uruchamianie hooka {{hook}} dla {{package}}...",

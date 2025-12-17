@@ -1,4 +1,6 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   title: "Interaktiver API-Explorer",
   description: "Durchsuchen und testen Sie alle Endpunktdefinitionen interaktiv",
   grouping: {
@@ -16,4 +18,4 @@ export const translations = {
       title: "Nur CLI",
     },
   },
-} as const;
+};

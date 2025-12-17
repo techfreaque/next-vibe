@@ -11,41 +11,19 @@ import {
 import {
   extractDataTableData,
   formatCellValue,
+  type TableRenderConfig,
   type TableRow,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/data-table";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-/**
- * CLI-specific table rendering configuration.
- * Derived from DataTableWidgetConfig but includes CLI-specific formatting.
- */
-interface TableRenderConfig {
-  columns: Array<{
-    key: string;
-    label: string;
-    type: FieldDataType;
-    width?: string;
-    align?: "left" | "center" | "right";
-    formatter?: (value: WidgetData) => string;
-  }>;
-  pagination?: {
-    enabled: boolean;
-    pageSize: number;
-  };
-  sorting?: {
-    enabled: boolean;
-    defaultSort?: { key: string; direction: "asc" | "desc" };
-  };
-  filtering?: {
-    enabled: boolean;
-  };
-}
-
-export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_TABLE> {
+export class DataTableWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.DATA_TABLE
+> {
   readonly widgetType = WidgetType.DATA_TABLE;
 
   render(props: CLIWidgetProps<typeof WidgetType.DATA_TABLE>): string {
@@ -69,8 +47,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     if (config.columns && config.columns.length > 0) {
       return this.renderTableWithColumns(data.rows, config, context);
     }
-      return this.renderTableAutoColumns(data.rows, context);
-    
+    return this.renderTableAutoColumns(data.rows, context);
   }
 
   private getTableConfig(
@@ -322,7 +299,8 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     const cells = config.columns.map((col, index) => {
       const value = row[col.key];
       // Translate string values (handles translation keys in data)
-      const translatedValue = typeof value === "string" ? t(value) : value;
+      const translatedValue =
+        typeof value === "string" ? t(value as TranslationKey) : value;
       const formatted = col.formatter
         ? col.formatter(translatedValue)
         : formatCellValue(translatedValue);
@@ -369,7 +347,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
       const fieldType = this.detectFieldType(firstRowObj[key]);
       return {
         key,
-        label: key,
+        label: key as TranslationKey,
         type: fieldType,
         align: "left" as const,
         formatter: this.getColumnFormatter(fieldType, context.options.locale),

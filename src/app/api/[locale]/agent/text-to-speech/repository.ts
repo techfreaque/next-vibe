@@ -88,7 +88,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
     }>
   > {
     // Server-side configuration
-    const provider = "amazon";
+    const provider = "openai";
     const language = mapLocaleToLanguage(locale);
 
     logger.info("Starting text-to-speech conversion", {

@@ -1,9 +1,46 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   title: "Release-Tool",
   description: "Verwalte Paket-Releases mit Versionierung, Git-Tagging und CI/CD-Integration",
   category: "Release Tool",
   tags: {
     release: "Release",
+  },
+  enums: {
+    versionIncrement: {
+      patch: "Patch",
+      minor: "Minor",
+      major: "Major",
+      prepatch: "Pre-patch",
+      preminor: "Pre-minor",
+      premajor: "Pre-major",
+      prerelease: "Prerelease",
+    },
+    packageManager: {
+      bun: "Bun",
+      npm: "NPM",
+      yarn: "Yarn",
+      pnpm: "PNPM",
+      deno: "Deno",
+    },
+    webhookType: {
+      slack: "Slack",
+      discord: "Discord",
+      teams: "Microsoft Teams",
+      custom: "Benutzerdefiniert",
+    },
+    npmAccess: {
+      public: "Öffentlich",
+      restricted: "Eingeschränkt",
+    },
+    changelogPreset: {
+      "conventional-commits": "Conventional Commits",
+      angular: "Angular",
+      atom: "Atom",
+      eslint: "ESLint",
+      ember: "Ember",
+    },
   },
   form: {
     title: "Release-Konfiguration",
@@ -99,6 +136,375 @@ export const translations = {
       title: "Benachrichtigungs-Webhook",
       description: "Webhook-URL für Release-Benachrichtigungen (Slack, Discord, Teams oder benutzerdefiniert)",
     },
+    configObject: {
+      title: "Konfigurationsobjekt",
+      description: "Release-Konfigurationseinstellungen",
+    },
+    packageManager: {
+      title: "Paketmanager",
+      description: "Zu verwendender Paketmanager (bun, npm, yarn, pnpm, deno)",
+    },
+    globalVersion: {
+      title: "Globale Version",
+      description: "Globale Version für alle Pakete im Monorepo festlegen",
+    },
+    parallel: {
+      title: "Parallele Ausführung",
+      description: "Parallele Paketverarbeitung aktivieren",
+    },
+    maxParallelJobs: {
+      title: "Max. parallele Jobs",
+      description: "Maximale Anzahl paralleler Jobs",
+    },
+    continueOnError: {
+      title: "Bei Fehler fortfahren",
+      description: "Verarbeitung verbleibender Pakete fortsetzen, wenn eines fehlschlägt",
+    },
+    verifyGitStatus: {
+      title: "Git-Status prüfen",
+      description: "Git-Status vor Release prüfen",
+    },
+    requireCleanWorkingDir: {
+      title: "Sauberes Arbeitsverzeichnis erforderlich",
+      description: "Sauberes Arbeitsverzeichnis vor Release erforderlich",
+    },
+    verifyLockfile: {
+      title: "Lockfile prüfen",
+      description: "Lockfile-Integrität vor Release prüfen",
+    },
+    branch: {
+      title: "Branch-Konfiguration",
+      description: "Git-Branch-Konfigurationseinstellungen",
+    },
+    branchMain: {
+      title: "Main-Branch",
+      description: "Name des Main-/Produktions-Branches",
+    },
+    branchDevelop: {
+      title: "Develop-Branch",
+      description: "Name des Entwicklungs-Branches",
+    },
+    allowNonMain: {
+      title: "Nicht-Main-Releases erlauben",
+      description: "Releases von anderen Branches als Main erlauben",
+    },
+    protectedBranches: {
+      title: "Geschützte Branches",
+      description: "Liste geschützter Branch-Namen",
+    },
+    notifications: {
+      title: "Benachrichtigungen",
+      description: "Benachrichtigungskonfiguration für Release-Ereignisse",
+    },
+    notificationsEnabled: {
+      title: "Benachrichtigungen aktivieren",
+      description: "Release-Benachrichtigungen aktivieren",
+    },
+    webhookUrl: {
+      title: "Webhook-URL",
+      description: "URL für Webhook-Benachrichtigungen",
+    },
+    webhookType: {
+      title: "Webhook-Typ",
+      description: "Webhook-Typ (Slack, Discord, Teams, Benutzerdefiniert)",
+    },
+    onSuccess: {
+      title: "Bei Erfolg benachrichtigen",
+      description: "Benachrichtigung bei erfolgreichem Release senden",
+    },
+    onFailure: {
+      title: "Bei Fehler benachrichtigen",
+      description: "Benachrichtigung bei fehlgeschlagenem Release senden",
+    },
+    messageTemplate: {
+      title: "Nachrichtenvorlage",
+      description: "Benutzerdefinierte Nachrichtenvorlage für Benachrichtigungen",
+    },
+    includeTimings: {
+      title: "Zeitinformationen einschließen",
+      description: "Zeitinformationen in Benachrichtigungen einschließen",
+    },
+    retry: {
+      title: "Wiederholungskonfiguration",
+      description: "Wiederholungseinstellungen für fehlgeschlagene Operationen",
+    },
+    maxAttempts: {
+      title: "Max. Versuche",
+      description: "Maximale Anzahl von Wiederholungsversuchen",
+    },
+    delayMs: {
+      title: "Wiederholungsverzögerung",
+      description: "Anfängliche Verzögerung zwischen Wiederholungen in Millisekunden",
+    },
+    backoffMultiplier: {
+      title: "Backoff-Multiplikator",
+      description: "Multiplikator für exponentiellen Backoff",
+    },
+    maxDelayMs: {
+      title: "Max. Verzögerung",
+      description: "Maximale Verzögerung zwischen Wiederholungen in Millisekunden",
+    },
+    rollback: {
+      title: "Rollback-Konfiguration",
+      description: "Automatische Rollback-Einstellungen bei Fehler",
+    },
+    rollbackEnabled: {
+      title: "Rollback aktivieren",
+      description: "Automatischen Rollback bei Fehler aktivieren",
+    },
+    rollbackGit: {
+      title: "Git-Änderungen rückgängig machen",
+      description: "Git-Commits und -Tags bei Fehler rückgängig machen",
+    },
+    rollbackVersion: {
+      title: "Versionsänderungen rückgängig machen",
+      description: "Versionsänderungen bei Fehler rückgängig machen",
+    },
+    packages: {
+      title: "Pakete",
+      description: "Liste der zu veröffentlichenden Pakete",
+    },
+    package: {
+      title: "Paketkonfiguration",
+    },
+    directory: {
+      title: "Verzeichnis",
+    },
+    name: {
+      title: "Name",
+    },
+    updateDeps: {
+      title: "Abhängigkeiten aktualisieren",
+      description: "Abhängigkeiten in abhängigen Paketen aktualisieren",
+    },
+    clean: {
+      title: "Clean-Befehl",
+      description: "Befehl oder Skript zum Bereinigen des Pakets",
+    },
+    lint: {
+      title: "Lint-Befehl",
+      description: "Befehl oder Skript zum Linten des Pakets",
+    },
+    typecheck: {
+      title: "Typecheck-Befehl",
+      description: "Befehl oder Skript zur Typprüfung des Pakets",
+    },
+    build: {
+      title: "Build-Befehl",
+      description: "Befehl oder Skript zum Bauen des Pakets",
+    },
+    test: {
+      title: "Test-Befehl",
+      description: "Befehl oder Skript zum Testen des Pakets",
+    },
+    snyk: {
+      title: "Snyk-Scan",
+      description: "Snyk-Sicherheitsscan aktivieren",
+    },
+    install: {
+      title: "Install-Befehl",
+      description: "Befehl oder Skript zur Installation von Abhängigkeiten",
+    },
+    release: {
+      title: "Release-Konfiguration",
+    },
+    releaseVersion: {
+      title: "Release-Version",
+    },
+    tagPrefix: {
+      title: "Tag-Präfix",
+    },
+    tagSuffix: {
+      title: "Tag-Suffix",
+    },
+    ciReleaseCommand: {
+      title: "CI-Release-Befehl",
+      description: "Befehl zur Ausführung im CI-Modus",
+    },
+    ciCommand: {
+      title: "Befehl",
+      description: "Auszuführendes Befehlsarray",
+    },
+    ciEnvMapping: {
+      title: "Umgebungs-Mapping",
+      description: "Umgebungsvariablen-Mappings für CI",
+    },
+    gitOps: {
+      title: "Git-Operationen",
+    },
+    skipTag: {
+      title: "Tag überspringen",
+    },
+    skipPush: {
+      title: "Push überspringen",
+    },
+    skipCommit: {
+      title: "Commit überspringen",
+    },
+    signCommit: {
+      title: "Commit signieren",
+    },
+    signTag: {
+      title: "Tag signieren",
+    },
+    remote: {
+      title: "Remote",
+    },
+    npm: {
+      title: "NPM-Konfiguration",
+    },
+    npmEnabled: {
+      title: "NPM-Veröffentlichung aktivieren",
+    },
+    npmRegistry: {
+      title: "NPM-Registry",
+    },
+    npmTag: {
+      title: "NPM-Tag",
+    },
+    npmAccess: {
+      title: "NPM-Zugriff",
+    },
+    otpEnvVar: {
+      title: "OTP-Umgebungsvariable",
+    },
+    provenance: {
+      title: "Provenance",
+    },
+    ignoreScripts: {
+      title: "Skripte ignorieren",
+    },
+    npmDryRun: {
+      title: "NPM-Testlauf",
+    },
+    jsr: {
+      title: "JSR-Konfiguration",
+    },
+    jsrEnabled: {
+      title: "JSR-Veröffentlichung aktivieren",
+    },
+    allowSlowTypes: {
+      title: "Langsame Typen erlauben",
+    },
+    allowDirty: {
+      title: "Dirty erlauben",
+    },
+    jsrDryRun: {
+      title: "JSR-Testlauf",
+    },
+    changelog: {
+      title: "Changelog-Konfiguration",
+    },
+    changelogEnabled: {
+      title: "Changelog aktivieren",
+    },
+    changelogFile: {
+      title: "Changelog-Datei",
+    },
+    changelogHeader: {
+      title: "Changelog-Header",
+    },
+    compareUrlFormat: {
+      title: "Vergleichs-URL-Format",
+    },
+    commitUrlFormat: {
+      title: "Commit-URL-Format",
+    },
+    includeBody: {
+      title: "Body einschließen",
+    },
+    changelogPreset: {
+      title: "Changelog-Preset",
+    },
+    gitRelease: {
+      title: "Git-Release-Konfiguration",
+    },
+    gitReleaseEnabled: {
+      title: "Git-Release aktivieren",
+    },
+    releaseTitle: {
+      title: "Release-Titel",
+    },
+    generateNotes: {
+      title: "Notizen generieren",
+    },
+    releaseBody: {
+      title: "Release-Body",
+    },
+    draft: {
+      title: "Entwurf",
+    },
+    prerelease: {
+      title: "Prerelease",
+    },
+    discussionCategory: {
+      title: "Diskussionskategorie",
+    },
+    target: {
+      title: "Ziel",
+    },
+    assets: {
+      title: "Assets",
+      description: "Hochzuladende Release-Assets",
+    },
+    foldersToZip: {
+      title: "Zu zippende Ordner",
+      description: "Für Release zu zippende Ordner",
+    },
+    versionBumper: {
+      title: "Versions-Bumper",
+      description: "Versionierungskonfiguration für Nicht-package.json-Dateien",
+    },
+    hooks: {
+      title: "Lifecycle-Hooks",
+      description: "Befehle, die in verschiedenen Phasen ausgeführt werden",
+    },
+    preInstall: {
+      title: "Pre-Install-Hook",
+    },
+    postInstall: {
+      title: "Post-Install-Hook",
+    },
+    preClean: {
+      title: "Pre-Clean-Hook",
+    },
+    postClean: {
+      title: "Post-Clean-Hook",
+    },
+    preLint: {
+      title: "Pre-Lint-Hook",
+    },
+    postLint: {
+      title: "Post-Lint-Hook",
+    },
+    preBuild: {
+      title: "Pre-Build-Hook",
+    },
+    postBuild: {
+      title: "Post-Build-Hook",
+    },
+    preTest: {
+      title: "Pre-Test-Hook",
+    },
+    postTest: {
+      title: "Post-Test-Hook",
+    },
+    prePublish: {
+      title: "Pre-Publish-Hook",
+    },
+    postPublish: {
+      title: "Post-Publish-Hook",
+    },
+    preRelease: {
+      title: "Pre-Release-Hook",
+    },
+    postRelease: {
+      title: "Post-Release-Hook",
+    },
+    globalHooks: {
+      title: "Globale Hooks",
+      description: "Globale Lifecycle-Hooks für gesamten Release-Prozess",
+    },
   },
   response: {
     status: "Status",
@@ -160,10 +566,12 @@ export const translations = {
       title: "Konflikt",
       description: "Release-Konflikt erkannt (Tag existiert möglicherweise bereits)",
     },
-    packageNotFound: {
-      title: "Paket nicht gefunden",
-      description: "Zielpaket '{{targetPackage}}' nicht in Konfiguration gefunden",
+    unsavedChanges: {
+      title: "Nicht gespeicherte Änderungen",
+      description: "Es gibt nicht gespeicherte Änderungen, die zuerst committet werden müssen",
     },
+    packageNotFound: "Paket '{{targetPackage}}' nicht in Konfiguration gefunden",
+    gitOperationFailed: "Git-Operation fehlgeschlagen: {{error}}",
   },
   success: {
     title: "Release abgeschlossen",
@@ -271,6 +679,10 @@ export const translations = {
     updated: "Abhängigkeiten aktualisiert für {{directory}}",
     failed: "Abhängigkeitsaktualisierung fehlgeschlagen für {{directory}}: {{error}}",
     skipped: "Überspringe Abhängigkeitsaktualisierung für {{directory}}",
+    dedupeFailed: "Deduplizierung der Abhängigkeiten fehlgeschlagen für {{directory}}: {{error}}",
+  },
+  security: {
+    auditFailed: "Sicherheitsüberprüfung fehlgeschlagen für {{directory}}: {{error}}",
   },
   hooks: {
     running: "Führe {{hook}}-Hook für {{package}} aus...",

@@ -121,7 +121,10 @@ export function DataListWidget({
                   // Check for label first, then fallback to content/text/href, then key
                   let label = key;
                   if (fieldUi) {
-                    if ("label" in fieldUi && typeof fieldUi.label === "string") {
+                    if (
+                      "label" in fieldUi &&
+                      typeof fieldUi.label === "string"
+                    ) {
                       label = t(fieldUi.label);
                     } else if (
                       "content" in fieldUi &&
@@ -138,7 +141,7 @@ export function DataListWidget({
                       typeof fieldUi.href === "string"
                     ) {
                       // For LINK widgets that use href as the label key
-                      label = t(fieldUi.href);
+                      label = fieldUi.href;
                     }
                   }
 
@@ -231,7 +234,7 @@ export function DataListWidget({
                           "href" in fieldUi &&
                           typeof fieldUi.href === "string"
                         ) {
-                          label = t(fieldUi.href);
+                          label = fieldUi.href;
                         }
                       }
 

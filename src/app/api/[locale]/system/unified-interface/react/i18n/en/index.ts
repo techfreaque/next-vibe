@@ -76,5 +76,9 @@ export const translations = {
     title: {
       noData: "No title data available",
     },
+    chart: {
+      noDataAvailable: "No data available",
+      noDataToDisplay: "No data to display",
+    },
   },
 };

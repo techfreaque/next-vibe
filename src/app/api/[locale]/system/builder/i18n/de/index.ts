@@ -61,6 +61,35 @@ export const translations: typeof enTranslations = {
       "Ungültiges Build-Config-Format. Stellen Sie sicher, dass die Konfiguration ein Standard-BuildConfig-Objekt exportiert.",
     configNotFound: "Konfigurationsdatei nicht gefunden: {{path}}",
     inputRequired: "Eingabedatei ist für dieses Build-Ziel erforderlich",
+    emptyConfig: "Leere Konfiguration - keine Build-Schritte definiert",
+  },
+  warnings: {
+    outputIsDirectory:
+      "Ausgabepfad sollte eine Datei sein, kein Verzeichnis: {{path}}",
+    sourceNotFound: "Quelldatei nicht gefunden: {{path}}",
+  },
+  suggestions: {
+    checkFilePaths:
+      "Überprüfen Sie, ob alle Dateipfade korrekt sind und die Dateien existieren",
+    runFromProjectRoot:
+      "Stellen Sie sicher, dass Sie vom Projektstammverzeichnis aus ausführen",
+    checkPermissions:
+      "Überprüfen Sie die Dateiberechtigungen für Ein- und Ausgabeverzeichnisse",
+    checkDependencies:
+      "Einige Abhängigkeiten könnten fehlen - überprüfen Sie die Imports",
+    runInstall:
+      "Versuchen Sie 'bun install' auszuführen, um sicherzustellen, dass alle Abhängigkeiten verfügbar sind",
+    increaseMemory:
+      "Für große Builds versuchen Sie, den Speicher zu erhöhen: NODE_OPTIONS=--max-old-space-size=4096",
+    useExternals:
+      "Erwägen Sie, große Abhängigkeiten als extern zu markieren",
+    checkSyntax: "Überprüfen Sie Ihre Quelldateien auf Syntaxfehler",
+    runTypecheck:
+      "Führen Sie 'bun typecheck' aus, um Typfehler zu überprüfen",
+    increaseTimeout: "Erhöhen Sie den Timeout-Wert für die Build-Operation",
+    checkNetworkConnection: "Überprüfen Sie Ihre Netzwerkverbindung",
+    checkDiskSpace: "Überprüfen Sie den verfügbaren Speicherplatz",
+    cleanBuildCache: "Versuchen Sie, den Build-Cache und temporäre Dateien zu löschen",
   },
   messages: {
     buildStart: "Build wird gestartet...",
@@ -97,46 +126,13 @@ export const translations: typeof enTranslations = {
     postBuildComplete: "Post-Build-Hook abgeschlossen",
     analyzingBundles: "Bundle-Größen werden analysiert...",
     bundleAnalysis: "Bundle-Analyse",
-    totalSize: "Gesamtgröße",
-    largestFiles: "Größte Dateien",
-    criticalSize: "KRITISCH: Bundle überschreitet {{size}}-Schwellenwert",
-    largeBundle: "WARNUNG: Bundle ist groß ({{size}})",
-    considerTreeShaking:
-      "Erwägen Sie Tree-Shaking zu aktivieren, um die Bundle-Größe zu reduzieren",
-    checkLargeDeps:
-      "Prüfen Sie große Abhängigkeiten, die ersetzt werden könnten",
-    largeSourcemaps:
-      "Große Sourcemaps erkannt - erwägen Sie, diese in der Produktion zu deaktivieren",
-    possibleDuplicates:
-      "Mögliche doppelte Abhängigkeiten erkannt - erwägen Sie Deduplizierung",
     optimizationTips: "Optimierungstipps",
     suggestions: "Vorschläge",
     validatingConfig: "Build-Konfiguration wird validiert...",
     configValid: "Konfiguration ist gültig",
     configWarnings: "Konfigurationswarnungen",
-    emptyConfig: "Leere Konfiguration - keine Build-Schritte definiert",
-    outputIsDirectory:
-      "Ausgabepfad sollte eine Datei sein, kein Verzeichnis: {{path}}",
     tsEntrypointWithNode:
       "TypeScript-Einstiegspunkt mit Node-Ziel - erwägen Sie Bun-Ziel für bessere Kompatibilität",
-    sourceNotFound: "Quelldatei nicht gefunden: {{path}}",
-    checkFilePaths:
-      "Überprüfen Sie, ob alle Dateipfade korrekt sind und die Dateien existieren",
-    runFromProjectRoot:
-      "Stellen Sie sicher, dass Sie vom Projektstammverzeichnis aus ausführen",
-    checkPermissions:
-      "Überprüfen Sie die Dateiberechtigungen für Ein- und Ausgabeverzeichnisse",
-    checkDependencies:
-      "Einige Abhängigkeiten könnten fehlen - überprüfen Sie die Imports",
-    runInstall:
-      "Versuchen Sie 'bun install' auszuführen, um sicherzustellen, dass alle Abhängigkeiten verfügbar sind",
-    increaseMemory:
-      "Für große Builds versuchen Sie, den Speicher zu erhöhen: NODE_OPTIONS=--max-old-space-size=4096",
-    useExternals:
-      "Erwägen Sie, große Abhängigkeiten als extern zu markieren",
-    checkSyntax: "Überprüfen Sie Ihre Quelldateien auf Syntaxfehler",
-    runTypecheck:
-      "Führen Sie 'bun typecheck' aus, um Typfehler zu überprüfen",
     watchModeStarted: "Watch-Modus gestartet - warte auf Dateiänderungen...",
     watchModeRebuild: "Datei geändert: {{file}} - baue neu...",
     watchModeReady: "Build abgeschlossen - überwache Änderungen...",
@@ -170,6 +166,7 @@ export const translations: typeof enTranslations = {
       configPath: {
         title: "Konfigurationsdateipfad",
         description: "Pfad zur Build-Konfigurationsdatei (build.config.ts)",
+        placeholder: "build.config.ts",
       },
       configObject: {
         title: "Build-Optionen",
@@ -214,6 +211,7 @@ export const translations: typeof enTranslations = {
       foldersToClean: {
         title: "Zu bereinigende Ordner",
         description: "Ordner, die vor dem Build gelöscht werden (z.B. dist, build)",
+        placeholder: "dist, build, .cache",
       },
       filesToCompile: {
         title: "Zu kompilierende Dateien",
@@ -225,10 +223,12 @@ export const translations: typeof enTranslations = {
       input: {
         title: "Eingabedatei",
         description: "Einstiegspunkt-Dateipfad (z.B. src/index.ts)",
+        placeholder: "src/index.ts",
       },
       output: {
         title: "Ausgabedatei",
         description: "Ausgabe-Dateipfad (z.B. dist/index.js)",
+        placeholder: "dist/index.js",
       },
       type: {
         title: "Build-Typ",
@@ -237,6 +237,7 @@ export const translations: typeof enTranslations = {
       modulesToExternalize: {
         title: "Externe Module",
         description: "Module, die vom Bundle ausgeschlossen werden (z.B. react, lodash)",
+        placeholder: "react, react-dom, lodash",
       },
       inlineCss: {
         title: "CSS einbetten",
@@ -257,10 +258,12 @@ export const translations: typeof enTranslations = {
       dtsInclude: {
         title: "DTS-Include",
         description: "Glob-Muster für TypeScript-Dateien in Deklarationen",
+        placeholder: "src/**/*.ts",
       },
       dtsEntryRoot: {
         title: "DTS-Entry-Root",
         description: "Wurzelverzeichnis für Deklarationsdateigenerierung",
+        placeholder: "src",
       },
       bunOptions: {
         title: "Bun-Optionen",
@@ -281,10 +284,12 @@ export const translations: typeof enTranslations = {
       external: {
         title: "Externe Module",
         description: "Module, die vom Bundle ausgeschlossen werden",
+        placeholder: "react, react-dom",
       },
       define: {
         title: "Konstanten definieren",
         description: "Compile-Zeit-Konstanten als JSON (z.B. process.env.NODE_ENV)",
+        placeholder: '{"process.env.NODE_ENV": "\\"production\\""}',
       },
       splitting: {
         title: "Code-Splitting",
@@ -301,10 +306,42 @@ export const translations: typeof enTranslations = {
       banner: {
         title: "Banner",
         description: "Text, der der Ausgabe vorangestellt wird (z.B. Shebang-Zeile)",
+        placeholder: "#!/usr/bin/env node",
       },
       footer: {
         title: "Footer",
         description: "Text, der an die Ausgabe angehängt wird",
+        placeholder: "// End of file",
+      },
+      publicPath: {
+        title: "Öffentlicher Pfad",
+        label: "Öffentlicher Pfad",
+        description: "Öffentliches Pfadpräfix für Assets",
+      },
+      naming: {
+        title: "Benennung",
+        label: "Benennung",
+        description: "Ausgabe-Benennungsmuster",
+      },
+      root: {
+        title: "Wurzel",
+        label: "Wurzel",
+        description: "Wurzelverzeichnis",
+      },
+      conditions: {
+        title: "Bedingungen",
+        label: "Bedingungen",
+        description: "Export-Bedingungen",
+      },
+      loader: {
+        title: "Loader",
+        label: "Loader",
+        description: "Datei-Loader-Zuordnung",
+      },
+      drop: {
+        title: "Drop",
+        label: "Drop",
+        description: "Zu entfernende Bezeichner",
       },
       viteOptions: {
         title: "Vite-Optionen",
@@ -313,22 +350,27 @@ export const translations: typeof enTranslations = {
       viteTarget: {
         title: "Build-Ziel",
         description: "Browser/Umgebungs-Ziele (z.B. es2020, chrome80)",
+        placeholder: "es2020, chrome80, node18",
       },
       viteOutDir: {
         title: "Ausgabeverzeichnis",
         description: "Verzeichnis für Build-Ausgabe",
+        placeholder: "dist",
       },
       viteAssetsDir: {
         title: "Assets-Verzeichnis",
         description: "Unterverzeichnis für statische Assets",
+        placeholder: "assets",
       },
       viteAssetsInlineLimit: {
         title: "Inline-Limit",
         description: "Maximale Größe (Bytes) zum Inline-Einbetten von Assets als Base64",
+        placeholder: "4096",
       },
       viteChunkSizeWarningLimit: {
         title: "Chunk-Größen-Warnung",
         description: "Chunk-Größe (KB), die eine Warnung auslöst",
+        placeholder: "500",
       },
       viteCssCodeSplit: {
         title: "CSS-Code-Splitting",
@@ -361,10 +403,12 @@ export const translations: typeof enTranslations = {
       viteLibEntry: {
         title: "Einstiegspunkt",
         description: "Library-Einstiegspunkt-Datei(en)",
+        placeholder: "src/index.ts",
       },
       viteLibName: {
         title: "Library-Name",
         description: "Globaler Variablenname für UMD/IIFE-Builds",
+        placeholder: "MyLibrary",
       },
       viteLibFormats: {
         title: "Ausgabeformate",
@@ -373,6 +417,7 @@ export const translations: typeof enTranslations = {
       viteLibFileName: {
         title: "Dateiname",
         description: "Ausgabedateiname (ohne Erweiterung)",
+        placeholder: "my-library",
       },
       viteRollupOptions: {
         title: "Rollup-Optionen",
@@ -381,10 +426,26 @@ export const translations: typeof enTranslations = {
       rollupExternal: {
         title: "Externe Module",
         description: "Module, die vom Bundle ausgeschlossen werden",
+        placeholder: "react, react-dom",
       },
       rollupTreeshake: {
         title: "Tree Shaking",
         description: "Unbenutzten Code aus Bundle entfernen",
+      },
+      rollupOutput: {
+        title: "Rollup-Ausgabe-Optionen",
+        label: "Rollup-Ausgabe-Optionen",
+        description: "Passthrough Rollup-Ausgabe-Optionen",
+      },
+      vitePlugins: {
+        title: "Vite-Plugins",
+        label: "Vite-Plugins",
+        description: "Raw Vite-Plugins-Array (für programmatische Nutzung)",
+      },
+      viteBuild: {
+        title: "Raw Build-Optionen",
+        label: "Raw Build-Optionen",
+        description: "Passthrough Vite-Build-Optionen",
       },
       filesOrFoldersToCopy: {
         title: "Zu kopierende Dateien",
@@ -396,14 +457,17 @@ export const translations: typeof enTranslations = {
       copyInput: {
         title: "Quelle",
         description: "Quell-Datei- oder Ordnerpfad",
+        placeholder: "README.md",
       },
       copyOutput: {
         title: "Ziel",
         description: "Ziel-Datei- oder Ordnerpfad",
+        placeholder: "dist/README.md",
       },
       copyPattern: {
         title: "Muster",
         description: "Glob-Muster zum Filtern von Dateien",
+        placeholder: "**/*.json",
       },
       npmPackage: {
         title: "NPM-Paket",
@@ -412,58 +476,72 @@ export const translations: typeof enTranslations = {
       packageName: {
         title: "Paketname",
         description: "npm-Paketname (z.B. @scope/package)",
+        placeholder: "@myorg/package-name",
       },
       packageVersion: {
         title: "Version",
         description: "Paketversion (Standard: Root-package.json)",
+        placeholder: "1.0.0",
       },
       packageDescription: {
         title: "Beschreibung",
         description: "Kurze Paketbeschreibung für npm",
+        placeholder: "Eine kurze Beschreibung Ihres Pakets",
       },
       packageMain: {
         title: "Main-Einstiegspunkt",
         description: "CommonJS-Einstiegspunkt (main-Feld)",
+        placeholder: "./dist/index.cjs",
       },
       packageModule: {
         title: "Module-Einstiegspunkt",
         description: "ES-Module-Einstiegspunkt (module-Feld)",
+        placeholder: "./dist/index.mjs",
       },
       packageTypes: {
         title: "Types-Einstiegspunkt",
         description: "TypeScript-Deklarations-Einstiegspunkt (types-Feld)",
+        placeholder: "./dist/index.d.ts",
       },
       packageBin: {
         title: "Binärdateien",
         description: "CLI-Ausführbare-Zuordnungen als JSON",
+        placeholder: '{"my-cli": "./dist/bin/cli.js"}',
       },
       packageExports: {
         title: "Exports-Map",
         description: "Paket-Exports-Feld als JSON",
+        placeholder: '{".": {"import": "./dist/index.mjs", "require": "./dist/index.cjs"}}',
       },
       packageDependencies: {
         title: "Abhängigkeiten",
         description: "Runtime-Abhängigkeiten als JSON",
+        placeholder: '{"lodash": "^4.17.21"}',
       },
       packagePeerDependencies: {
         title: "Peer-Abhängigkeiten",
         description: "Peer-Abhängigkeiten als JSON",
+        placeholder: '{"react": ">=18.0.0"}',
       },
       packageFiles: {
         title: "Enthaltene Dateien",
         description: "Dateien, die im veröffentlichten Paket enthalten sein sollen",
+        placeholder: "dist, README.md, LICENSE",
       },
       packageKeywords: {
         title: "Schlüsselwörter",
         description: "npm-Such-Schlüsselwörter",
+        placeholder: "typescript, build, vite",
       },
       packageLicense: {
         title: "Lizenz",
         description: "Paketlizenz (z.B. MIT, Apache-2.0)",
+        placeholder: "MIT",
       },
       packageRepository: {
         title: "Repository",
         description: "Git-Repository-URL",
+        placeholder: "https://github.com/user/repo",
       },
       success: {
         title: "Erfolg",
@@ -500,9 +578,17 @@ export const translations: typeof enTranslations = {
       stepTimings: {
         title: "Schritt-Zeiten",
         description: "Detaillierte Zeitaufschlüsselung für jeden Build-Schritt",
+        step: "Schritt",
+        duration: "Dauer (ms)",
+        status: "Status",
+        filesAffected: "Dateien",
       },
     },
     errors: {
+      buildFailed: {
+        title: "Build fehlgeschlagen",
+        description: "Der Build-Prozess ist mit einem Fehler fehlgeschlagen",
+      },
       validation: {
         title: "Validierungsfehler",
         description: "Die angegebene Build-Konfiguration ist ungültig",
@@ -560,5 +646,15 @@ export const translations: typeof enTranslations = {
   analysis: {
     criticalSize: "KRITISCH: Bundle-Größe ({{size}}) überschreitet Schwellenwert",
     largeBundle: "WARNUNG: Großes Bundle erkannt ({{size}})",
+    considerTreeShaking:
+      "Erwägen Sie Tree-Shaking zu aktivieren, um die Bundle-Größe zu reduzieren",
+    checkLargeDeps:
+      "Prüfen Sie große Abhängigkeiten, die ersetzt werden könnten",
+    largeSourcemaps:
+      "Große Sourcemaps erkannt - erwägen Sie, diese in der Produktion zu deaktivieren",
+    possibleDuplicates:
+      "Mögliche doppelte Abhängigkeiten erkannt - erwägen Sie Deduplizierung",
+    totalSize: "Gesamtgröße",
+    largestFiles: "Größte Dateien",
   },
 };

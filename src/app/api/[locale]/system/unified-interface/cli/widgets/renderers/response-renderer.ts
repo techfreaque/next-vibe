@@ -14,7 +14,6 @@ import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/sh
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { WidgetData } from "../../../shared/widgets/types";
 import type { WidgetRegistry } from "../core/registry";
@@ -68,7 +67,7 @@ export class ModularCLIResponseRenderer {
     const context: WidgetRenderContext = {
       options: this.options,
       depth: 0,
-      t: (key: TranslationKey, params) => t(key, params),
+      t,
       formatValue: (field, value) => this.formatFieldValue(field, value),
       getFieldIcon: (type) => this.getFieldIcon(type),
       renderEmptyState: (message) => this.renderEmptyState(message),

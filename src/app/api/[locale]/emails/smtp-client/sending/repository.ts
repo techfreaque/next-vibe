@@ -20,8 +20,6 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { emailCampaigns } from "../../../leads/db";
 import type { JwtPayloadType } from "../../../user/auth/types";
@@ -56,7 +54,6 @@ export interface SmtpSendingRepository {
   getTotalSendingCapacity(
     data: SmtpCapacityRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpCapacityResponseOutput>>;
 }
@@ -450,15 +447,13 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
             },
           });
         }
-          return fail({
-            message:
-              "app.api.emails.smtpClient.sending.errors.no_account.title",
-            errorType: ErrorResponseTypes.NOT_FOUND,
-            messageParams: {
-              campaignType: data.selectionCriteria.campaignType,
-            },
-          });
-        
+        return fail({
+          message: "app.api.emails.smtpClient.sending.errors.no_account.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: {
+            campaignType: data.selectionCriteria.campaignType,
+          },
+        });
       }
 
       // Try primary account with retry logic
@@ -1046,16 +1041,14 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   async getTotalSendingCapacity(
     data: SmtpCapacityRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpCapacityResponseOutput>> {
     try {
-      const { t } = simpleT(locale);
-
       // Check user authorization
       if (user.isPublic) {
         return fail({
-          message: t("app.api.emails.smtpClient.sending.errors.unauthorized.title"),
+          message:
+            "app.api.emails.smtpClient.sending.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }

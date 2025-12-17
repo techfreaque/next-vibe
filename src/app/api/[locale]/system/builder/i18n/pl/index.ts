@@ -61,6 +61,35 @@ export const translations: typeof enTranslations = {
       "Nieprawidłowy format konfiguracji build. Upewnij się, że konfiguracja eksportuje domyślny obiekt BuildConfig.",
     configNotFound: "Nie znaleziono pliku konfiguracyjnego: {{path}}",
     inputRequired: "Plik wejściowy jest wymagany dla tego celu kompilacji",
+    emptyConfig: "Pusta konfiguracja - brak zdefiniowanych kroków kompilacji",
+  },
+  warnings: {
+    outputIsDirectory:
+      "Ścieżka wyjściowa powinna być plikiem, nie katalogiem: {{path}}",
+    sourceNotFound: "Nie znaleziono pliku źródłowego: {{path}}",
+  },
+  suggestions: {
+    checkFilePaths:
+      "Sprawdź, czy wszystkie ścieżki plików są poprawne i pliki istnieją",
+    runFromProjectRoot:
+      "Upewnij się, że uruchamiasz z głównego katalogu projektu",
+    checkPermissions:
+      "Sprawdź uprawnienia do plików dla katalogów wejściowych i wyjściowych",
+    checkDependencies:
+      "Niektóre zależności mogą brakować - sprawdź importy",
+    runInstall:
+      "Spróbuj uruchomić 'bun install', aby upewnić się, że wszystkie zależności są dostępne",
+    increaseMemory:
+      "Dla dużych kompilacji spróbuj zwiększyć pamięć: NODE_OPTIONS=--max-old-space-size=4096",
+    useExternals:
+      "Rozważ oznaczenie dużych zależności jako zewnętrzne",
+    checkSyntax: "Sprawdź pliki źródłowe pod kątem błędów składni",
+    runTypecheck:
+      "Uruchom 'bun typecheck', aby sprawdzić błędy typów",
+    increaseTimeout: "Zwiększ wartość limitu czasu dla operacji kompilacji",
+    checkNetworkConnection: "Sprawdź swoje połączenie sieciowe",
+    checkDiskSpace: "Sprawdź dostępne miejsce na dysku",
+    cleanBuildCache: "Spróbuj wyczyścić cache kompilacji i pliki tymczasowe",
   },
   messages: {
     buildStart: "Rozpoczynanie kompilacji...",
@@ -97,46 +126,13 @@ export const translations: typeof enTranslations = {
     postBuildComplete: "Hook post-build zakończony",
     analyzingBundles: "Analizowanie rozmiarów paczek...",
     bundleAnalysis: "Analiza paczki",
-    totalSize: "Całkowity rozmiar",
-    largestFiles: "Największe pliki",
-    criticalSize: "KRYTYCZNE: Paczka przekracza próg {{size}}",
-    largeBundle: "OSTRZEŻENIE: Paczka jest duża ({{size}})",
-    considerTreeShaking:
-      "Rozważ włączenie tree-shaking, aby zmniejszyć rozmiar paczki",
-    checkLargeDeps:
-      "Sprawdź duże zależności, które można zastąpić",
-    largeSourcemaps:
-      "Wykryto duże sourcemapy - rozważ wyłączenie ich w produkcji",
-    possibleDuplicates:
-      "Wykryto możliwe zduplikowane zależności - rozważ deduplikację",
     optimizationTips: "Wskazówki optymalizacyjne",
     suggestions: "Sugestie",
     validatingConfig: "Walidacja konfiguracji kompilacji...",
     configValid: "Konfiguracja jest prawidłowa",
     configWarnings: "Ostrzeżenia konfiguracji",
-    emptyConfig: "Pusta konfiguracja - brak zdefiniowanych kroków kompilacji",
-    outputIsDirectory:
-      "Ścieżka wyjściowa powinna być plikiem, nie katalogiem: {{path}}",
     tsEntrypointWithNode:
       "Punkt wejścia TypeScript z celem Node - rozważ użycie celu Bun dla lepszej kompatybilności",
-    sourceNotFound: "Nie znaleziono pliku źródłowego: {{path}}",
-    checkFilePaths:
-      "Sprawdź, czy wszystkie ścieżki plików są poprawne i pliki istnieją",
-    runFromProjectRoot:
-      "Upewnij się, że uruchamiasz z głównego katalogu projektu",
-    checkPermissions:
-      "Sprawdź uprawnienia do plików dla katalogów wejściowych i wyjściowych",
-    checkDependencies:
-      "Niektóre zależności mogą brakować - sprawdź importy",
-    runInstall:
-      "Spróbuj uruchomić 'bun install', aby upewnić się, że wszystkie zależności są dostępne",
-    increaseMemory:
-      "Dla dużych kompilacji spróbuj zwiększyć pamięć: NODE_OPTIONS=--max-old-space-size=4096",
-    useExternals:
-      "Rozważ oznaczenie dużych zależności jako zewnętrzne",
-    checkSyntax: "Sprawdź pliki źródłowe pod kątem błędów składni",
-    runTypecheck:
-      "Uruchom 'bun typecheck', aby sprawdzić błędy typów",
     watchModeStarted: "Tryb obserwacji uruchomiony - oczekiwanie na zmiany plików...",
     watchModeRebuild: "Plik zmieniony: {{file}} - przebudowywanie...",
     watchModeReady: "Kompilacja zakończona - obserwowanie zmian...",
@@ -170,6 +166,7 @@ export const translations: typeof enTranslations = {
       configPath: {
         title: "Ścieżka pliku konfiguracyjnego",
         description: "Ścieżka do pliku konfiguracyjnego kompilacji (build.config.ts)",
+        placeholder: "build.config.ts",
       },
       configObject: {
         title: "Opcje kompilacji",
@@ -214,6 +211,7 @@ export const translations: typeof enTranslations = {
       foldersToClean: {
         title: "Foldery do wyczyszczenia",
         description: "Foldery do usunięcia przed kompilacją (np. dist, build)",
+        placeholder: "dist, build, .cache",
       },
       filesToCompile: {
         title: "Pliki do skompilowania",
@@ -225,10 +223,12 @@ export const translations: typeof enTranslations = {
       input: {
         title: "Plik wejściowy",
         description: "Ścieżka pliku punktu wejścia (np. src/index.ts)",
+        placeholder: "src/index.ts",
       },
       output: {
         title: "Plik wyjściowy",
         description: "Ścieżka pliku wyjściowego (np. dist/index.js)",
+        placeholder: "dist/index.js",
       },
       type: {
         title: "Typ kompilacji",
@@ -237,6 +237,7 @@ export const translations: typeof enTranslations = {
       modulesToExternalize: {
         title: "Zewnętrzne moduły",
         description: "Moduły do wykluczenia z paczki (np. react, lodash)",
+        placeholder: "react, react-dom, lodash",
       },
       inlineCss: {
         title: "Wbudowany CSS",
@@ -257,10 +258,12 @@ export const translations: typeof enTranslations = {
       dtsInclude: {
         title: "DTS Include",
         description: "Wzorce glob dla plików TypeScript do uwzględnienia w deklaracjach",
+        placeholder: "src/**/*.ts",
       },
       dtsEntryRoot: {
         title: "DTS Entry Root",
         description: "Katalog główny dla generowania plików deklaracji",
+        placeholder: "src",
       },
       bunOptions: {
         title: "Opcje Bun",
@@ -281,10 +284,12 @@ export const translations: typeof enTranslations = {
       external: {
         title: "Zewnętrzne moduły",
         description: "Moduły do wykluczenia z paczki",
+        placeholder: "react, react-dom",
       },
       define: {
         title: "Zdefiniuj stałe",
         description: "Stałe czasu kompilacji jako JSON (np. process.env.NODE_ENV)",
+        placeholder: '{"process.env.NODE_ENV": "\\"production\\""}',
       },
       splitting: {
         title: "Podział kodu",
@@ -301,10 +306,42 @@ export const translations: typeof enTranslations = {
       banner: {
         title: "Banner",
         description: "Tekst do dodania na początku wyjścia (np. linia shebang)",
+        placeholder: "#!/usr/bin/env node",
       },
       footer: {
         title: "Stopka",
         description: "Tekst do dodania na końcu wyjścia",
+        placeholder: "// Koniec pliku",
+      },
+      publicPath: {
+        title: "Ścieżka publiczna",
+        label: "Ścieżka publiczna",
+        description: "Prefiks ścieżki publicznej dla zasobów",
+      },
+      naming: {
+        title: "Nazewnictwo",
+        label: "Nazewnictwo",
+        description: "Wzorzec nazewnictwa wyjścia",
+      },
+      root: {
+        title: "Katalog główny",
+        label: "Katalog główny",
+        description: "Katalog główny",
+      },
+      conditions: {
+        title: "Warunki",
+        label: "Warunki",
+        description: "Warunki eksportu",
+      },
+      loader: {
+        title: "Loader",
+        label: "Loader",
+        description: "Mapowanie loaderów plików",
+      },
+      drop: {
+        title: "Drop",
+        label: "Drop",
+        description: "Identyfikatory do usunięcia",
       },
       viteOptions: {
         title: "Opcje Vite",
@@ -313,22 +350,27 @@ export const translations: typeof enTranslations = {
       viteTarget: {
         title: "Cel kompilacji",
         description: "Cele przeglądarki/środowiska (np. es2020, chrome80)",
+        placeholder: "es2020, chrome80, node18",
       },
       viteOutDir: {
         title: "Katalog wyjściowy",
         description: "Katalog dla wyjścia kompilacji",
+        placeholder: "dist",
       },
       viteAssetsDir: {
         title: "Katalog zasobów",
         description: "Podkatalog dla statycznych zasobów",
+        placeholder: "assets",
       },
       viteAssetsInlineLimit: {
         title: "Limit wbudowania",
         description: "Maksymalny rozmiar (bajty) do wbudowania zasobów jako base64",
+        placeholder: "4096",
       },
       viteChunkSizeWarningLimit: {
         title: "Ostrzeżenie o rozmiarze chunka",
         description: "Rozmiar chunka (KB), który wyzwala ostrzeżenie",
+        placeholder: "500",
       },
       viteCssCodeSplit: {
         title: "Podział kodu CSS",
@@ -361,10 +403,12 @@ export const translations: typeof enTranslations = {
       viteLibEntry: {
         title: "Punkt wejścia",
         description: "Plik(i) punktu wejścia biblioteki",
+        placeholder: "src/index.ts",
       },
       viteLibName: {
         title: "Nazwa biblioteki",
         description: "Globalna nazwa zmiennej dla kompilacji UMD/IIFE",
+        placeholder: "MyLibrary",
       },
       viteLibFormats: {
         title: "Formaty wyjściowe",
@@ -373,6 +417,7 @@ export const translations: typeof enTranslations = {
       viteLibFileName: {
         title: "Nazwa pliku",
         description: "Nazwa pliku wyjściowego (bez rozszerzenia)",
+        placeholder: "my-library",
       },
       viteRollupOptions: {
         title: "Opcje Rollup",
@@ -381,10 +426,26 @@ export const translations: typeof enTranslations = {
       rollupExternal: {
         title: "Zewnętrzne moduły",
         description: "Moduły do wykluczenia z paczki",
+        placeholder: "react, react-dom",
       },
       rollupTreeshake: {
         title: "Tree Shaking",
         description: "Usuń nieużywany kod z paczki",
+      },
+      rollupOutput: {
+        title: "Opcje wyjścia Rollup",
+        label: "Opcje wyjścia Rollup",
+        description: "Opcje wyjścia Rollup (passthrough)",
+      },
+      vitePlugins: {
+        title: "Wtyczki Vite",
+        label: "Wtyczki Vite",
+        description: "Surowa tablica wtyczek Vite (do użytku programowego)",
+      },
+      viteBuild: {
+        title: "Surowe opcje kompilacji",
+        label: "Surowe opcje kompilacji",
+        description: "Opcje kompilacji Vite (passthrough)",
       },
       filesOrFoldersToCopy: {
         title: "Pliki do skopiowania",
@@ -396,14 +457,17 @@ export const translations: typeof enTranslations = {
       copyInput: {
         title: "Źródło",
         description: "Ścieżka pliku lub folderu źródłowego",
+        placeholder: "README.md",
       },
       copyOutput: {
         title: "Cel",
         description: "Ścieżka pliku lub folderu docelowego",
+        placeholder: "dist/README.md",
       },
       copyPattern: {
         title: "Wzorzec",
         description: "Wzorzec glob do filtrowania plików",
+        placeholder: "**/*.json",
       },
       npmPackage: {
         title: "Pakiet NPM",
@@ -412,58 +476,72 @@ export const translations: typeof enTranslations = {
       packageName: {
         title: "Nazwa pakietu",
         description: "Nazwa pakietu npm (np. @scope/package)",
+        placeholder: "@myorg/package-name",
       },
       packageVersion: {
         title: "Wersja",
         description: "Wersja pakietu (domyślnie: root package.json)",
+        placeholder: "1.0.0",
       },
       packageDescription: {
         title: "Opis",
         description: "Krótki opis pakietu dla npm",
+        placeholder: "Krótki opis pakietu",
       },
       packageMain: {
         title: "Główny punkt wejścia",
         description: "Punkt wejścia CommonJS (pole main)",
+        placeholder: "./dist/index.cjs",
       },
       packageModule: {
         title: "Punkt wejścia modułu",
         description: "Punkt wejścia ES module (pole module)",
+        placeholder: "./dist/index.mjs",
       },
       packageTypes: {
         title: "Punkt wejścia typów",
         description: "Punkt wejścia deklaracji TypeScript (pole types)",
+        placeholder: "./dist/index.d.ts",
       },
       packageBin: {
         title: "Pliki binarne",
         description: "Mapowania wykonywalnych CLI jako JSON",
+        placeholder: '{"my-cli": "./dist/bin/cli.js"}',
       },
       packageExports: {
         title: "Mapa eksportów",
         description: "Pole exports pakietu jako JSON",
+        placeholder: '{".": {"import": "./dist/index.mjs", "require": "./dist/index.cjs"}}',
       },
       packageDependencies: {
         title: "Zależności",
         description: "Zależności runtime jako JSON",
+        placeholder: '{"lodash": "^4.17.21"}',
       },
       packagePeerDependencies: {
         title: "Zależności peer",
         description: "Zależności peer jako JSON",
+        placeholder: '{"react": ">=18.0.0"}',
       },
       packageFiles: {
         title: "Dołączone pliki",
         description: "Pliki do dołączenia do opublikowanego pakietu",
+        placeholder: "dist, README.md, LICENSE",
       },
       packageKeywords: {
         title: "Słowa kluczowe",
         description: "Słowa kluczowe wyszukiwania npm",
+        placeholder: "typescript, build, vite",
       },
       packageLicense: {
         title: "Licencja",
         description: "Licencja pakietu (np. MIT, Apache-2.0)",
+        placeholder: "MIT",
       },
       packageRepository: {
         title: "Repozytorium",
         description: "URL repozytorium Git",
+        placeholder: "https://github.com/user/repo",
       },
       success: {
         title: "Sukces",
@@ -500,9 +578,17 @@ export const translations: typeof enTranslations = {
       stepTimings: {
         title: "Czasy kroków",
         description: "Szczegółowy podział czasu dla każdego kroku kompilacji",
+        step: "Krok",
+        duration: "Czas (ms)",
+        status: "Status",
+        filesAffected: "Pliki",
       },
     },
     errors: {
+      buildFailed: {
+        title: "Kompilacja nie powiodła się",
+        description: "Proces kompilacji zakończył się błędem",
+      },
       validation: {
         title: "Błąd walidacji",
         description: "Podana konfiguracja kompilacji jest nieprawidłowa",
@@ -557,5 +643,15 @@ export const translations: typeof enTranslations = {
   analysis: {
     criticalSize: "KRYTYCZNE: Rozmiar paczki ({{size}}) przekracza próg",
     largeBundle: "OSTRZEŻENIE: Wykryto dużą paczkę ({{size}})",
+    considerTreeShaking:
+      "Rozważ włączenie tree-shaking, aby zmniejszyć rozmiar paczki",
+    checkLargeDeps:
+      "Sprawdź duże zależności, które można zastąpić",
+    largeSourcemaps:
+      "Wykryto duże sourcemapy - rozważ wyłączenie ich w produkcji",
+    possibleDuplicates:
+      "Wykryto możliwe zduplikowane zależności - rozważ deduplikację",
+    totalSize: "Całkowity rozmiar",
+    largestFiles: "Największe pliki",
   },
 };

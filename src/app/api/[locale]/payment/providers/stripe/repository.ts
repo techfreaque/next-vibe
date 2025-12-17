@@ -19,7 +19,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { users } from "../../../user/db";
 import { paymentInvoices, paymentTransactions } from "../../db";
-import { InvoiceStatus, PaymentProvider as PaymentProviderEnum, PaymentStatus } from "../../enum";
+import {
+  InvoiceStatus,
+  PaymentProvider as PaymentProviderEnum,
+  PaymentStatus,
+} from "../../enum";
 import { paymentEnv } from "../../env";
 import type {
   CheckoutSessionParams,
@@ -32,18 +36,11 @@ import type {
 
 // Singleton Stripe instance for direct access (legacy webhook support)
 export const stripe = new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-11-17.clover",
+  apiVersion: "2025-12-15.clover",
 });
 
 export class StripeProvider implements PaymentProvider {
   name = "stripe";
-  private stripe: Stripe;
-
-  constructor() {
-    this.stripe = new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
-      apiVersion: "2025-11-17.clover",
-    });
-  }
 
   async ensureCustomer(
     userId: string,
@@ -72,7 +69,7 @@ export class StripeProvider implements PaymentProvider {
         });
       }
 
-      const customer = await this.stripe.customers.create({
+      const customer = await stripe.customers.create({
         email,
         name: name || undefined,
         metadata: { userId },
@@ -144,7 +141,7 @@ export class StripeProvider implements PaymentProvider {
       const mode = params.interval === "one_time" ? "payment" : "subscription";
 
       // Create checkout session
-      const session = await this.stripe.checkout.sessions.create({
+      const session = await stripe.checkout.sessions.create({
         customer: customerId,
         payment_method_types: ["card"],
         mode: mode,
@@ -184,7 +181,10 @@ export class StripeProvider implements PaymentProvider {
           currency: product.currency,
           status: PaymentStatus.PENDING,
           provider: PaymentProviderEnum.STRIPE,
-          mode: mode === "payment" ? "app.api.payment.enums.checkoutMode.payment" : "app.api.payment.enums.checkoutMode.subscription",
+          mode:
+            mode === "payment"
+              ? "app.api.payment.enums.checkoutMode.payment"
+              : "app.api.payment.enums.checkoutMode.subscription",
           metadata: params.metadata,
         });
 
@@ -251,7 +251,7 @@ export class StripeProvider implements PaymentProvider {
 
   async verifyWebhook(body: string, signature: string, logger: EndpointLogger) {
     try {
-      const event = this.stripe.webhooks.constructEvent(
+      const event = stripe.webhooks.constructEvent(
         body,
         signature,
         paymentEnv.STRIPE_WEBHOOK_SECRET,
@@ -331,8 +331,7 @@ export class StripeProvider implements PaymentProvider {
 
   async retrieveSubscription(subscriptionId: string, logger: EndpointLogger) {
     try {
-      const subscription =
-        await this.stripe.subscriptions.retrieve(subscriptionId);
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
       // In API version 2025-09-30.clover, current_period_end/start were removed from Subscription
       // Use start_date/created for period start and billing_cycle_anchor for the cycle anchor
@@ -403,7 +402,7 @@ export class StripeProvider implements PaymentProvider {
 
   async cancelSubscription(subscriptionId: string, logger: EndpointLogger) {
     try {
-      await this.stripe.subscriptions.cancel(subscriptionId);
+      await stripe.subscriptions.cancel(subscriptionId);
 
       logger.info("Canceled Stripe subscription", { subscriptionId });
 

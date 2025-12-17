@@ -16,4 +16,4 @@ export const translations = {
       title: "CLI only",
     },
   },
-} as const;
+};

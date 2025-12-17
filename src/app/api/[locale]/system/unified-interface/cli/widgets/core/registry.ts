@@ -31,7 +31,7 @@ import { StatsGridWidgetRenderer } from "../implementations/stats-grid";
 import { TabsWidgetRenderer } from "../implementations/tabs";
 import { TextWidgetRenderer } from "../implementations/text";
 import { TitleWidgetRenderer } from "../implementations/title";
-import type { CLIWidgetPropsUnion, WidgetRenderContext, WidgetRenderer } from "./types";
+import type { WidgetRenderContext, WidgetRenderer } from "./types";
 
 /**
  * Widget registry that manages all available widget renderers.

@@ -613,6 +613,12 @@ export const translations: typeof enTranslations = {
         "FreedomGPT Liberty - Niecenzurowany model AI skoncentrowany na wolności wypowiedzi i treściach kreatywnych",
       gabAiArya:
         "Gab AI Arya - Niecenzurowany model konwersacyjny AI z wolnością wypowiedzi i kreatywnymi możliwościami",
+      gpt52Pro:
+        "GPT 5.2 Pro - zaawansowany model rozumowania z ulepszonymi możliwościami dla złożonych zadań",
+      gpt52:
+        "GPT 5.2 - model najnowszej generacji z ulepszoną wydajnością i efektywnością",
+      gpt52_chat:
+        "GPT 5.2 Chat - wariant konwersacyjny zoptymalizowany pod kątem dialogu i interakcji",
     },
   },
   tones: {

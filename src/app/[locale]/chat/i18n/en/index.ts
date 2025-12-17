@@ -635,6 +635,12 @@ export const translations = {
         "FreedomGPT Liberty - Uncensored AI model focused on free expression and creative content",
       gabAiArya:
         "Gab AI Arya - Uncensored conversational AI model with free expression and creative capabilities",
+      gpt52Pro:
+        "GPT 5.2 Pro - advanced reasoning model with enhanced capabilities for complex tasks",
+      gpt52:
+        "GPT 5.2 - latest generation model with improved performance and efficiency",
+      gpt52_chat:
+        "GPT 5.2 Chat - conversational variant optimized for dialogue and interactions",
     },
   },
   tones: {

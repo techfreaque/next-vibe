@@ -330,7 +330,7 @@ export async function createTextMessage(params: {
       model: params.model,
     });
     return fail({
-      message: "app.api.agent.chat.messages.errors.createFailed.title",
+      message: "app.api.agent.chat.threads.messages.post.errors.createFailed.title",
       errorType: ErrorResponseTypes.DATABASE_ERROR,
     });
   }

@@ -17,7 +17,6 @@ import type { BuildOptions, InlineConfig, PluginOption } from "vite";
 import { build as viteBuild } from "vite";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import type { BuildProfile, FileToCompile } from "../definition";
 import { PROFILE_DEFAULTS, ROOT_DIR } from "./constants";
@@ -36,7 +35,6 @@ export interface IViteCompiler {
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,
-    t: TFunction,
     dryRun?: boolean,
     verbose?: boolean,
     profile?: BuildProfile,
@@ -64,7 +62,6 @@ export class ViteCompiler implements IViteCompiler {
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,
-    t: TFunction,
     dryRun?: boolean,
     verbose?: boolean,
     profile: BuildProfile = "development",
@@ -75,9 +72,10 @@ export class ViteCompiler implements IViteCompiler {
 
     if (!existsSync(inputFilePath)) {
       return fail({
-        message: t("app.api.system.builder.errors.inputFileNotFound", {
+        message: "app.api.system.builder.errors.inputFileNotFound",
+        messageParams: {
           filePath: fileConfig.input,
-        }),
+        },
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -141,7 +139,9 @@ export class ViteCompiler implements IViteCompiler {
     filesBuilt.push(...compiledFiles);
 
     if (verbose) {
-      output.push(outputFormatter.formatVerbose(`Compiled: ${compiledFiles.join(", ")}`));
+      output.push(
+        outputFormatter.formatVerbose(`Compiled: ${compiledFiles.join(", ")}`),
+      );
     }
 
     logger.info("File compiled", {
@@ -165,8 +165,11 @@ export class ViteCompiler implements IViteCompiler {
     const pluginsOverride = viteOpts.plugins as PluginOption[] | undefined;
 
     // Extract build options with proper typing
-    const buildOpts = (viteOpts.build || {}) as BuildOptions & { rollupOptions?: RollupOptions & { output?: OutputOptions } };
-    const { rollupOptions: rollupOpts = {}, ...buildOptionsOverride } = buildOpts;
+    const buildOpts = (viteOpts.build || {}) as BuildOptions & {
+      rollupOptions?: RollupOptions & { output?: OutputOptions };
+    };
+    const { rollupOptions: rollupOpts = {}, ...buildOptionsOverride } =
+      buildOpts;
     const { output: outputOverride, ...rollupOptionsOverride } = rollupOpts;
 
     // Collect other vite options (excluding plugins and build which we handled separately)
@@ -192,7 +195,8 @@ export class ViteCompiler implements IViteCompiler {
     // Use string variables to prevent Turbopack static analysis of CLI-only packages
     if (fileConfig.type === "react-tailwind") {
       const tailwindPkg = "@tailwindcss/vite";
-      const tailwindcss = (await import(/* webpackIgnore: true */ tailwindPkg)).default;
+      const tailwindcss = (await import(/* webpackIgnore: true */ tailwindPkg))
+        .default;
       plugins.push(tailwindcss() as PluginOption);
 
       if (fileConfig.inlineCss !== false) {
@@ -237,8 +241,7 @@ export class ViteCompiler implements IViteCompiler {
       const modulesToExternalize = [
         ...new Set([
           ...(fileConfig.modulesToExternalize || []),
-          ...(fileConfig.type.includes("react") &&
-          !fileConfig.bundleReact
+          ...(fileConfig.type.includes("react") && !fileConfig.bundleReact
             ? ["react", "react-dom", "react/jsx-runtime"]
             : []),
         ]),

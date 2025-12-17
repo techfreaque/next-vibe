@@ -93,7 +93,6 @@ const CIProviderSchema = z.enum([
 /** Package status */
 const PackageStatusSchema = z.enum(["success", "skipped", "failed"]);
 
-
 // ============================================================================
 // Endpoint Definition
 // ============================================================================
@@ -157,8 +156,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.dryRun.title",
-          description:
-            "app.api.system.releaseTool.fields.dryRun.description",
+          description: "app.api.system.releaseTool.fields.dryRun.description",
         },
         z.boolean().optional().default(false),
       ),
@@ -168,8 +166,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.verbose.title",
-          description:
-            "app.api.system.releaseTool.fields.verbose.description",
+          description: "app.api.system.releaseTool.fields.verbose.description",
         },
         z.boolean().optional().default(false),
       ),
@@ -191,8 +188,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.skipLint.title",
-          description:
-            "app.api.system.releaseTool.fields.skipLint.description",
+          description: "app.api.system.releaseTool.fields.skipLint.description",
         },
         z.boolean().optional().default(false),
       ),
@@ -235,8 +231,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.skipSnyk.title",
-          description:
-            "app.api.system.releaseTool.fields.skipSnyk.description",
+          description: "app.api.system.releaseTool.fields.skipSnyk.description",
         },
         z.boolean().optional().default(false),
       ),
@@ -316,13 +311,38 @@ const { POST } = createEndpoint({
           description:
             "app.api.system.releaseTool.fields.versionIncrement.description",
           options: [
-            { value: "patch", label: "Patch" },
-            { value: "minor", label: "Minor" },
-            { value: "major", label: "Major" },
-            { value: "prepatch", label: "Pre-patch" },
-            { value: "preminor", label: "Pre-minor" },
-            { value: "premajor", label: "Pre-major" },
-            { value: "prerelease", label: "Prerelease" },
+            {
+              value: "patch",
+              label: "app.api.system.releaseTool.enums.versionIncrement.patch",
+            },
+            {
+              value: "minor",
+              label: "app.api.system.releaseTool.enums.versionIncrement.minor",
+            },
+            {
+              value: "major",
+              label: "app.api.system.releaseTool.enums.versionIncrement.major",
+            },
+            {
+              value: "prepatch",
+              label:
+                "app.api.system.releaseTool.enums.versionIncrement.prepatch",
+            },
+            {
+              value: "preminor",
+              label:
+                "app.api.system.releaseTool.enums.versionIncrement.preminor",
+            },
+            {
+              value: "premajor",
+              label:
+                "app.api.system.releaseTool.enums.versionIncrement.premajor",
+            },
+            {
+              value: "prerelease",
+              label:
+                "app.api.system.releaseTool.enums.versionIncrement.prerelease",
+            },
           ],
           optional: true,
         },
@@ -400,11 +420,26 @@ const { POST } = createEndpoint({
               description:
                 "app.api.system.releaseTool.fields.packageManager.description",
               options: [
-                { value: "bun", label: "Bun" },
-                { value: "npm", label: "NPM" },
-                { value: "yarn", label: "Yarn" },
-                { value: "pnpm", label: "PNPM" },
-                { value: "deno", label: "Deno" },
+                {
+                  value: "bun",
+                  label: "app.api.system.releaseTool.enums.packageManager.bun",
+                },
+                {
+                  value: "npm",
+                  label: "app.api.system.releaseTool.enums.packageManager.npm",
+                },
+                {
+                  value: "yarn",
+                  label: "app.api.system.releaseTool.enums.packageManager.yarn",
+                },
+                {
+                  value: "pnpm",
+                  label: "app.api.system.releaseTool.enums.packageManager.pnpm",
+                },
+                {
+                  value: "deno",
+                  label: "app.api.system.releaseTool.enums.packageManager.deno",
+                },
               ],
             },
             PackageManagerSchema.optional().default("bun"),
@@ -584,10 +619,26 @@ const { POST } = createEndpoint({
                   fieldType: FieldDataType.SELECT,
                   label: "app.api.system.releaseTool.fields.webhookType.title",
                   options: [
-                    { value: "slack", label: "Slack" },
-                    { value: "discord", label: "Discord" },
-                    { value: "teams", label: "Microsoft Teams" },
-                    { value: "custom", label: "Custom" },
+                    {
+                      value: "slack",
+                      label:
+                        "app.api.system.releaseTool.enums.webhookType.slack",
+                    },
+                    {
+                      value: "discord",
+                      label:
+                        "app.api.system.releaseTool.enums.webhookType.discord",
+                    },
+                    {
+                      value: "teams",
+                      label:
+                        "app.api.system.releaseTool.enums.webhookType.teams",
+                    },
+                    {
+                      value: "custom",
+                      label:
+                        "app.api.system.releaseTool.enums.webhookType.custom",
+                    },
                   ],
                   optional: true,
                 },
@@ -1066,8 +1117,16 @@ const { POST } = createEndpoint({
                             label:
                               "app.api.system.releaseTool.fields.npmAccess.title",
                             options: [
-                              { value: "public", label: "Public" },
-                              { value: "restricted", label: "Restricted" },
+                              {
+                                value: "public",
+                                label:
+                                  "app.api.system.releaseTool.enums.npmAccess.public",
+                              },
+                              {
+                                value: "restricted",
+                                label:
+                                  "app.api.system.releaseTool.enums.npmAccess.restricted",
+                              },
                             ],
                             optional: true,
                           },
@@ -1248,12 +1307,29 @@ const { POST } = createEndpoint({
                             options: [
                               {
                                 value: "conventional-commits",
-                                label: "Conventional Commits",
+                                label:
+                                  "app.api.system.releaseTool.enums.changelogPreset.conventional-commits",
                               },
-                              { value: "angular", label: "Angular" },
-                              { value: "atom", label: "Atom" },
-                              { value: "eslint", label: "ESLint" },
-                              { value: "ember", label: "Ember" },
+                              {
+                                value: "angular",
+                                label:
+                                  "app.api.system.releaseTool.enums.changelogPreset.angular",
+                              },
+                              {
+                                value: "atom",
+                                label:
+                                  "app.api.system.releaseTool.enums.changelogPreset.atom",
+                              },
+                              {
+                                value: "eslint",
+                                label:
+                                  "app.api.system.releaseTool.enums.changelogPreset.eslint",
+                              },
+                              {
+                                value: "ember",
+                                label:
+                                  "app.api.system.releaseTool.enums.changelogPreset.ember",
+                              },
                             ],
                             optional: true,
                           },
@@ -1818,11 +1894,20 @@ const { POST } = createEndpoint({
           title: "app.api.system.releaseTool.response.packages",
           columns: [
             { key: "name", label: "app.api.system.releaseTool.table.name" },
-            { key: "directory", label: "app.api.system.releaseTool.table.directory" },
-            { key: "version", label: "app.api.system.releaseTool.table.version" },
+            {
+              key: "directory",
+              label: "app.api.system.releaseTool.table.directory",
+            },
+            {
+              key: "version",
+              label: "app.api.system.releaseTool.table.version",
+            },
             { key: "tag", label: "app.api.system.releaseTool.table.tag" },
             { key: "status", label: "app.api.system.releaseTool.table.status" },
-            { key: "message", label: "app.api.system.releaseTool.table.message" },
+            {
+              key: "message",
+              label: "app.api.system.releaseTool.table.message",
+            },
           ],
         },
         objectField(
@@ -1834,19 +1919,31 @@ const { POST } = createEndpoint({
           { response: true },
           {
             name: responseField(
-              { type: WidgetType.TEXT, content: "Name" },
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.system.releaseTool.table.name",
+              },
               z.string(),
             ),
             directory: responseField(
-              { type: WidgetType.TEXT, content: "Directory" },
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.system.releaseTool.table.directory",
+              },
               z.string(),
             ),
             version: responseField(
-              { type: WidgetType.TEXT, content: "Version" },
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.system.releaseTool.table.version",
+              },
               z.string().optional(),
             ),
             tag: responseField(
-              { type: WidgetType.TEXT, content: "Tag" },
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.system.releaseTool.table.tag",
+              },
               z.string().optional(),
             ),
             status: responseField(
@@ -1854,7 +1951,10 @@ const { POST } = createEndpoint({
               PackageStatusSchema,
             ),
             message: responseField(
-              { type: WidgetType.TEXT, content: "Message" },
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.system.releaseTool.table.message",
+              },
               z.string().optional(),
             ),
           },
@@ -1903,8 +2003,14 @@ const { POST } = createEndpoint({
           title: "app.api.system.releaseTool.response.published",
           columns: [
             { key: "name", label: "app.api.system.releaseTool.table.name" },
-            { key: "version", label: "app.api.system.releaseTool.table.version" },
-            { key: "registry", label: "app.api.system.releaseTool.table.registry" },
+            {
+              key: "version",
+              label: "app.api.system.releaseTool.table.version",
+            },
+            {
+              key: "registry",
+              label: "app.api.system.releaseTool.table.registry",
+            },
             { key: "url", label: "app.api.system.releaseTool.table.url" },
           ],
         },
@@ -1917,7 +2023,10 @@ const { POST } = createEndpoint({
           { response: true },
           {
             name: responseField(
-              { type: WidgetType.TEXT, content: "Name" },
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.system.releaseTool.table.name",
+              },
               z.string(),
             ),
             version: responseField(
@@ -1929,7 +2038,10 @@ const { POST } = createEndpoint({
               z.string(),
             ),
             url: responseField(
-              { type: WidgetType.TEXT, content: "URL" },
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.system.releaseTool.table.url",
+              },
               z.string().optional(),
             ),
           },
@@ -1986,12 +2098,12 @@ const { POST } = createEndpoint({
               { type: WidgetType.BADGE, variant: "info" },
               z.string(),
             ),
-            success: responseField(
-              { type: WidgetType.BADGE },
-              z.boolean(),
-            ),
+            success: responseField({ type: WidgetType.BADGE }, z.boolean()),
             message: responseField(
-              { type: WidgetType.TEXT, content: "Message" },
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.system.releaseTool.table.message",
+              },
               z.string().optional(),
             ),
           },
@@ -2011,30 +2123,125 @@ const { POST } = createEndpoint({
             { type: WidgetType.CONTAINER, optional: true },
             { response: true },
             {
-              name: responseField({ type: WidgetType.TEXT, content: "Name" }, z.string()),
-              version: responseField({ type: WidgetType.TEXT, content: "Version" }, z.string()),
-              scripts: responseField({ type: WidgetType.TEXT, content: "Scripts", optional: true }, z.record(z.string(), z.string()).optional()),
-              dependencies: responseField({ type: WidgetType.TEXT, content: "Dependencies", optional: true }, z.record(z.string(), z.string()).optional()),
-              devDependencies: responseField({ type: WidgetType.TEXT, content: "DevDependencies", optional: true }, z.record(z.string(), z.string()).optional()),
-              peerDependencies: responseField({ type: WidgetType.TEXT, content: "PeerDependencies", optional: true }, z.record(z.string(), z.string()).optional()),
-              optionalDependencies: responseField({ type: WidgetType.TEXT, content: "OptionalDependencies", optional: true }, z.record(z.string(), z.string()).optional()),
-              updateIgnoreDependencies: responseArrayOptionalField({ type: WidgetType.TEXT, content: "UpdateIgnore", optional: true }, z.string()),
-              private: responseField({ type: WidgetType.TEXT, content: "Private", optional: true }, z.boolean().optional()),
+              name: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                },
+                z.string(),
+              ),
+              version: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.table.version",
+                },
+                z.string(),
+              ),
+              scripts: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.record(z.string(), z.string()).optional(),
+              ),
+              dependencies: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.record(z.string(), z.string()).optional(),
+              ),
+              devDependencies: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.record(z.string(), z.string()).optional(),
+              ),
+              peerDependencies: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.record(z.string(), z.string()).optional(),
+              ),
+              optionalDependencies: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.record(z.string(), z.string()).optional(),
+              ),
+              updateIgnoreDependencies: responseArrayOptionalField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.string(),
+              ),
+              private: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.boolean().optional(),
+              ),
               publishConfig: objectOptionalField(
                 { type: WidgetType.CONTAINER, optional: true },
                 { response: true },
                 {
-                  access: responseField({ type: WidgetType.TEXT, content: "Access", optional: true }, z.enum(["public", "restricted"]).optional()),
-                  registry: responseField({ type: WidgetType.TEXT, content: "Registry", optional: true }, z.string().optional()),
-                  tag: responseField({ type: WidgetType.TEXT, content: "Tag", optional: true }, z.string().optional()),
+                  access: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content:
+                        "app.api.system.releaseTool.fields.npmAccess.title",
+                      optional: true,
+                    },
+                    z.enum(["public", "restricted"]).optional(),
+                  ),
+                  registry: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.table.registry",
+                      optional: true,
+                    },
+                    z.string().optional(),
+                  ),
+                  tag: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.table.tag",
+                      optional: true,
+                    },
+                    z.string().optional(),
+                  ),
                 },
               ),
               repository: objectOptionalField(
                 { type: WidgetType.CONTAINER, optional: true },
                 { response: true },
                 {
-                  type: responseField({ type: WidgetType.TEXT, content: "Type" }, z.string()),
-                  url: responseField({ type: WidgetType.TEXT, content: "Url" }, z.string()),
+                  type: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.fields.name.title",
+                    },
+                    z.string(),
+                  ),
+                  url: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.table.url",
+                    },
+                    z.string(),
+                  ),
                 },
               ),
             },
@@ -2045,9 +2252,27 @@ const { POST } = createEndpoint({
             { type: WidgetType.CONTAINER, optional: true },
             { response: true },
             {
-              newVersion: responseField({ type: WidgetType.TEXT, content: "NewVersion" }, z.string()),
-              lastTag: responseField({ type: WidgetType.TEXT, content: "LastTag" }, z.string()),
-              newTag: responseField({ type: WidgetType.TEXT, content: "NewTag" }, z.string()),
+              newVersion: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.table.version",
+                },
+                z.string(),
+              ),
+              lastTag: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.table.tag",
+                },
+                z.string(),
+              ),
+              newTag: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.table.tag",
+                },
+                z.string(),
+              ),
             },
           ),
 
@@ -2056,12 +2281,56 @@ const { POST } = createEndpoint({
             { type: WidgetType.CONTAINER, optional: true },
             { response: true },
             {
-              major: responseField({ type: WidgetType.TEXT, content: "Major" }, z.number()),
-              minor: responseField({ type: WidgetType.TEXT, content: "Minor" }, z.number()),
-              patch: responseField({ type: WidgetType.TEXT, content: "Patch" }, z.number()),
-              prerelease: responseField({ type: WidgetType.TEXT, content: "Prerelease", optional: true }, z.string().nullable()),
-              prereleaseNumber: responseField({ type: WidgetType.TEXT, content: "PrereleaseNumber", optional: true }, z.number().nullable()),
-              buildMetadata: responseField({ type: WidgetType.TEXT, content: "BuildMetadata", optional: true }, z.string().nullable()),
+              major: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.releaseTool.enums.versionIncrement.major",
+                },
+                z.number(),
+              ),
+              minor: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.releaseTool.enums.versionIncrement.minor",
+                },
+                z.number(),
+              ),
+              patch: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.releaseTool.enums.versionIncrement.patch",
+                },
+                z.number(),
+              ),
+              prerelease: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.releaseTool.enums.versionIncrement.prerelease",
+                  optional: true,
+                },
+                z.string().nullable(),
+              ),
+              prereleaseNumber: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.releaseTool.fields.prereleaseId.title",
+                  optional: true,
+                },
+                z.number().nullable(),
+              ),
+              buildMetadata: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.string().nullable(),
+              ),
             },
           ),
 
@@ -2070,11 +2339,44 @@ const { POST } = createEndpoint({
             { type: WidgetType.CONTAINER, optional: true },
             { response: true },
             {
-              type: responseField({ type: WidgetType.TEXT, content: "Type" }, z.enum(["github", "gitlab", "bitbucket", "azure", "other"])),
-              url: responseField({ type: WidgetType.TEXT, content: "URL" }, z.string()),
-              owner: responseField({ type: WidgetType.TEXT, content: "Owner", optional: true }, z.string().optional()),
-              repo: responseField({ type: WidgetType.TEXT, content: "Repo", optional: true }, z.string().optional()),
-              defaultBranch: responseField({ type: WidgetType.TEXT, content: "DefaultBranch", optional: true }, z.string().optional()),
+              type: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                },
+                z.enum(["github", "gitlab", "bitbucket", "azure", "other"]),
+              ),
+              url: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.table.url",
+                },
+                z.string(),
+              ),
+              owner: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              repo: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              defaultBranch: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.branchMain.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
             },
           ),
 
@@ -2083,16 +2385,81 @@ const { POST } = createEndpoint({
             { type: WidgetType.CONTAINER, optional: true },
             { response: true },
             {
-              sha: responseField({ type: WidgetType.TEXT, content: "SHA" }, z.string()),
-              shortSha: responseField({ type: WidgetType.TEXT, content: "ShortSHA" }, z.string()),
-              subject: responseField({ type: WidgetType.TEXT, content: "Subject" }, z.string()),
-              body: responseField({ type: WidgetType.TEXT, content: "Body", optional: true }, z.string().optional()),
-              authorName: responseField({ type: WidgetType.TEXT, content: "AuthorName" }, z.string()),
-              authorEmail: responseField({ type: WidgetType.TEXT, content: "AuthorEmail" }, z.string()),
-              timestamp: responseField({ type: WidgetType.TEXT, content: "Timestamp" }, z.coerce.date()),
-              conventionalType: responseField({ type: WidgetType.TEXT, content: "ConventionalType", optional: true }, z.string().optional()),
-              conventionalScope: responseField({ type: WidgetType.TEXT, content: "ConventionalScope", optional: true }, z.string().optional()),
-              isBreaking: responseField({ type: WidgetType.TEXT, content: "IsBreaking", optional: true }, z.boolean().optional()),
+              sha: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                },
+                z.string(),
+              ),
+              shortSha: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                },
+                z.string(),
+              ),
+              subject: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                },
+                z.string(),
+              ),
+              body: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.releaseTool.fields.releaseBody.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              authorName: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                },
+                z.string(),
+              ),
+              authorEmail: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                },
+                z.string(),
+              ),
+              timestamp: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                },
+                z.coerce.date(),
+              ),
+              conventionalType: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              conventionalScope: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              isBreaking: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.boolean().optional(),
+              ),
             },
           ),
 
@@ -2101,15 +2468,78 @@ const { POST } = createEndpoint({
             { type: WidgetType.CONTAINER, optional: true },
             { response: true },
             {
-              packageManager: responseField({ type: WidgetType.TEXT, content: "PackageManager" }, z.string()),
-              packageName: responseField({ type: WidgetType.TEXT, content: "PackageName", optional: true }, z.string().optional()),
-              version: responseField({ type: WidgetType.TEXT, content: "Version", optional: true }, z.string().optional()),
-              directory: responseField({ type: WidgetType.TEXT, content: "Directory", optional: true }, z.string().optional()),
-              previousVersion: responseField({ type: WidgetType.TEXT, content: "PreviousVersion", optional: true }, z.string().optional()),
-              tag: responseField({ type: WidgetType.TEXT, content: "Tag", optional: true }, z.string().optional()),
-              isCI: responseField({ type: WidgetType.TEXT, content: "IsCI", optional: true }, z.boolean().optional()),
-              ciProvider: responseField({ type: WidgetType.TEXT, content: "CIProvider", optional: true }, z.string().optional()),
-              dryRun: responseField({ type: WidgetType.TEXT, content: "DryRun", optional: true }, z.boolean().optional()),
+              packageManager: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.system.releaseTool.fields.packageManager.title",
+                },
+                z.string(),
+              ),
+              packageName: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              version: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.table.version",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              directory: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.directory.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              previousVersion: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.table.version",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              tag: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.table.tag",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              isCI: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.ci.title",
+                  optional: true,
+                },
+                z.boolean().optional(),
+              ),
+              ciProvider: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              dryRun: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.dryRun.title",
+                  optional: true,
+                },
+                z.boolean().optional(),
+              ),
             },
           ),
 
@@ -2118,13 +2548,60 @@ const { POST } = createEndpoint({
             { type: WidgetType.CONTAINER, optional: true },
             { response: true },
             {
-              success: responseField({ type: WidgetType.TEXT, content: "Success" }, z.boolean()),
-              command: responseField({ type: WidgetType.TEXT, content: "Command" }, z.string()),
-              exitCode: responseField({ type: WidgetType.TEXT, content: "ExitCode", optional: true }, z.number().optional()),
-              stdout: responseField({ type: WidgetType.TEXT, content: "Stdout", optional: true }, z.string().optional()),
-              stderr: responseField({ type: WidgetType.TEXT, content: "Stderr", optional: true }, z.string().optional()),
-              duration: responseField({ type: WidgetType.TEXT, content: "Duration", optional: true }, z.number().optional()),
-              message: responseField({ type: WidgetType.TEXT, content: "Message", optional: true }, z.string().optional()),
+              success: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.response.status",
+                },
+                z.boolean(),
+              ),
+              command: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.ciCommand.title",
+                },
+                z.string(),
+              ),
+              exitCode: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.number().optional(),
+              ),
+              stdout: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              stderr: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              duration: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.response.duration",
+                  optional: true,
+                },
+                z.number().optional(),
+              ),
+              message: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.table.message",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
             },
           ),
 
@@ -2133,15 +2610,45 @@ const { POST } = createEndpoint({
             { type: WidgetType.CONTAINER, optional: true },
             { response: true },
             {
-              passed: responseField({ type: WidgetType.TEXT, content: "Passed" }, z.boolean()),
+              passed: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                },
+                z.boolean(),
+              ),
               vulnerabilities: objectField(
                 { type: WidgetType.CONTAINER },
                 { response: true },
                 {
-                  critical: responseField({ type: WidgetType.TEXT, content: "Critical" }, z.number()),
-                  high: responseField({ type: WidgetType.TEXT, content: "High" }, z.number()),
-                  medium: responseField({ type: WidgetType.TEXT, content: "Medium" }, z.number()),
-                  low: responseField({ type: WidgetType.TEXT, content: "Low" }, z.number()),
+                  critical: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.fields.name.title",
+                    },
+                    z.number(),
+                  ),
+                  high: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.fields.name.title",
+                    },
+                    z.number(),
+                  ),
+                  medium: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.fields.name.title",
+                    },
+                    z.number(),
+                  ),
+                  low: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.fields.name.title",
+                    },
+                    z.number(),
+                  ),
                 },
               ),
             },
@@ -2152,26 +2659,138 @@ const { POST } = createEndpoint({
             { type: WidgetType.CONTAINER, optional: true },
             { response: true },
             {
-              success: responseField({ type: WidgetType.TEXT, content: "Success" }, z.boolean()),
-              packageName: responseField({ type: WidgetType.TEXT, content: "PackageName", optional: true }, z.string().optional()),
-              version: responseField({ type: WidgetType.TEXT, content: "Version", optional: true }, z.string().optional()),
-              duration: responseField({ type: WidgetType.TEXT, content: "Duration", optional: true }, z.number().optional()),
-              error: responseField({ type: WidgetType.TEXT, content: "Error", optional: true }, z.string().optional()),
-              releaseUrl: responseField({ type: WidgetType.TEXT, content: "ReleaseUrl", optional: true }, z.string().optional()),
-              commitSha: responseField({ type: WidgetType.TEXT, content: "CommitSha", optional: true }, z.string().optional()),
-              branch: responseField({ type: WidgetType.TEXT, content: "Branch", optional: true }, z.string().optional()),
-              registryUrls: responseField({ type: WidgetType.TEXT, content: "RegistryUrls", optional: true }, z.array(z.string()).optional()),
+              success: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.response.status",
+                },
+                z.boolean(),
+              ),
+              packageName: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              version: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.table.version",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              duration: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.response.duration",
+                  optional: true,
+                },
+                z.number().optional(),
+              ),
+              error: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.response.errors",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              releaseUrl: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.table.url",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              commitSha: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.name.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              branch: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.fields.branch.title",
+                  optional: true,
+                },
+                z.string().optional(),
+              ),
+              registryUrls: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content: "app.api.system.releaseTool.table.url",
+                  optional: true,
+                },
+                z.array(z.string()).optional(),
+              ),
               timings: objectOptionalField(
                 { type: WidgetType.CONTAINER, optional: true },
                 { response: true },
                 {
-                  total: responseField({ type: WidgetType.TEXT, content: "Total", optional: true }, z.number().optional()),
-                  version: responseField({ type: WidgetType.TEXT, content: "Version", optional: true }, z.number().optional()),
-                  quality: responseField({ type: WidgetType.TEXT, content: "Quality", optional: true }, z.number().optional()),
-                  publish: responseField({ type: WidgetType.TEXT, content: "Publish", optional: true }, z.number().optional()),
-                  git: responseField({ type: WidgetType.TEXT, content: "Git", optional: true }, z.number().optional()),
-                  changelog: responseField({ type: WidgetType.TEXT, content: "Changelog", optional: true }, z.number().optional()),
-                  notification: responseField({ type: WidgetType.TEXT, content: "Notification", optional: true }, z.number().optional()),
+                  total: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.response.duration",
+                      optional: true,
+                    },
+                    z.number().optional(),
+                  ),
+                  version: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.table.version",
+                      optional: true,
+                    },
+                    z.number().optional(),
+                  ),
+                  quality: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.fields.name.title",
+                      optional: true,
+                    },
+                    z.number().optional(),
+                  ),
+                  publish: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.fields.name.title",
+                      optional: true,
+                    },
+                    z.number().optional(),
+                  ),
+                  git: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.fields.name.title",
+                      optional: true,
+                    },
+                    z.number().optional(),
+                  ),
+                  changelog: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content:
+                        "app.api.system.releaseTool.fields.changelog.title",
+                      optional: true,
+                    },
+                    z.number().optional(),
+                  ),
+                  notification: responseField(
+                    {
+                      type: WidgetType.TEXT,
+                      content: "app.api.system.releaseTool.fields.name.title",
+                      optional: true,
+                    },
+                    z.number().optional(),
+                  ),
                 },
               ),
             },
@@ -2473,7 +3092,9 @@ export type HookContext = NonNullable<InternalTypes["hookContext"]>;
 export type HookResult = NonNullable<InternalTypes["hookResult"]>;
 
 /** Security scan results - derived from _internal.securityScanResult */
-export type SecurityScanResult = NonNullable<InternalTypes["securityScanResult"]>;
+export type SecurityScanResult = NonNullable<
+  InternalTypes["securityScanResult"]
+>;
 
 /** Notification data for webhooks - derived from _internal.notificationData */
 export type NotificationData = NonNullable<InternalTypes["notificationData"]>;

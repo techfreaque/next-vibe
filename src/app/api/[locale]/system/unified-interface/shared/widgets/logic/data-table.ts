@@ -5,6 +5,7 @@
  */
 
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { UnifiedField } from "../../types/endpoint";
 import { FieldDataType, WidgetType } from "../../types/enums";
@@ -22,7 +23,7 @@ export interface TableRow {
  */
 export interface TableColumn {
   key: string;
-  label: string;
+  label: TranslationKey;
   type?: FieldDataType;
   width?: string;
   align?: "left" | "center" | "right";
@@ -71,7 +72,7 @@ export function extractDataTableData(
     ) {
       const columns = Object.keys(firstRow).map((key) => ({
         key,
-        label: key,
+        label: key as TranslationKey,
       }));
 
       const rows = value.filter(
@@ -131,7 +132,7 @@ export function extractDataTableData(
       const firstRow = validRows[0];
       const autoColumns = Object.keys(firstRow).map((key) => ({
         key,
-        label: key,
+        label: key as TranslationKey,
       }));
       return {
         rows: validRows,

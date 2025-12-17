@@ -101,9 +101,10 @@ export class BunCompiler implements IBunCompiler {
 
     if (!existsSync(entrypointPath)) {
       return fail({
-        message: t("app.api.system.builder.errors.inputFileNotFound", {
+        message: "app.api.system.builder.errors.inputFileNotFound",
+        messageParams: {
           filePath: fileConfig.input,
-        }),
+        },
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -121,7 +122,9 @@ export class BunCompiler implements IBunCompiler {
     });
 
     if (verbose) {
-      output.push(outputFormatter.formatVerbose(`Target: ${bunOptions?.target || "bun"}`));
+      output.push(
+        outputFormatter.formatVerbose(`Target: ${bunOptions?.target || "bun"}`),
+      );
       output.push(outputFormatter.formatVerbose(`Profile: ${profile}`));
       output.push(
         outputFormatter.formatVerbose(
@@ -164,7 +167,8 @@ export class BunCompiler implements IBunCompiler {
     }
 
     // Determine sourcemap setting
-    const sourcemap = bunOptions?.sourcemap ||
+    const sourcemap =
+      bunOptions?.sourcemap ||
       (profileSettings.sourcemap === false
         ? "none"
         : profileSettings.sourcemap === true
@@ -199,7 +203,10 @@ export class BunCompiler implements IBunCompiler {
         .map((log) => log.message)
         .join("\n");
       return fail({
-        message: `${t("app.api.system.builder.messages.bundleFailed")}: ${errorMessages || "Unknown error"}`,
+        message: "app.api.system.builder.messages.bundleFailed",
+        messageParams: {
+          error: errorMessages || "Unknown error",
+        },
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

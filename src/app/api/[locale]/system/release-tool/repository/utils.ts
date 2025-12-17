@@ -4,7 +4,12 @@
  */
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-import type { PackageJson, ParsedVersion, ReleaseConfig, RetryConfig } from "../definition";
+import type {
+  PackageJson,
+  ParsedVersion,
+  ReleaseConfig,
+  RetryConfig,
+} from "../definition";
 import { MESSAGES, RETRY_DEFAULTS } from "./constants";
 
 // ============================================================================
@@ -15,18 +20,31 @@ import { MESSAGES, RETRY_DEFAULTS } from "./constants";
  * Parsed JSON value type (result of JSON.parse)
  */
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-interface JsonObject { [key: string]: JsonValue }
+interface JsonObject {
+  [key: string]: JsonValue;
+}
 type JsonArray = JsonValue[];
 
 /**
  * Error type from catch blocks - can be any value
  */
-type CatchError = Error | { stdout?: string | Buffer; stderr?: string | Buffer; status?: number; message?: string };
+type CatchError =
+  | Error
+  | {
+      stdout?: string | Buffer;
+      stderr?: string | Buffer;
+      status?: number;
+      message?: string;
+    };
 
 /**
  * Exec sync error type with stdout/stderr
  */
-interface ExecSyncError { stdout?: string | Buffer; stderr?: string | Buffer; status?: number }
+interface ExecSyncError {
+  stdout?: string | Buffer;
+  stderr?: string | Buffer;
+  status?: number;
+}
 
 // ============================================================================
 // Type Guards
@@ -36,7 +54,9 @@ interface ExecSyncError { stdout?: string | Buffer; stderr?: string | Buffer; st
  * Check if a parsed JSON value is a valid PackageJson
  * Returns the value typed as PackageJson if valid, otherwise undefined
  */
-export function parsePackageJson(value: JsonValue | undefined): PackageJson | undefined {
+export function parsePackageJson(
+  value: JsonValue | undefined,
+): PackageJson | undefined {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return undefined;
   }
@@ -50,8 +70,10 @@ export function parsePackageJson(value: JsonValue | undefined): PackageJson | un
       dependencies: obj.dependencies as PackageJson["dependencies"],
       devDependencies: obj.devDependencies as PackageJson["devDependencies"],
       peerDependencies: obj.peerDependencies as PackageJson["peerDependencies"],
-      optionalDependencies: obj.optionalDependencies as PackageJson["optionalDependencies"],
-      updateIgnoreDependencies: obj.updateIgnoreDependencies as PackageJson["updateIgnoreDependencies"],
+      optionalDependencies:
+        obj.optionalDependencies as PackageJson["optionalDependencies"],
+      updateIgnoreDependencies:
+        obj.updateIgnoreDependencies as PackageJson["updateIgnoreDependencies"],
     };
   }
   return undefined;
@@ -94,7 +116,9 @@ export function isReleaseConfigModule(
  * Convert catch error to typed error
  * Accepts any value from catch block and converts to CatchError
  */
-export function toCatchError(err: Error | ExecSyncError | string | null | undefined): CatchError {
+export function toCatchError(
+  err: Error | ExecSyncError | string | null | undefined,
+): CatchError {
   if (err instanceof Error) {
     return err;
   }
@@ -142,7 +166,9 @@ export function hasStderr(
 /**
  * Type guard for errors with exit code
  */
-export function hasExitCode(error: CatchError): error is CatchError & { status: number } {
+export function hasExitCode(
+  error: CatchError,
+): error is CatchError & { status: number } {
   if (typeof error !== "object" || error === null) {
     return false;
   }
@@ -152,7 +178,9 @@ export function hasExitCode(error: CatchError): error is CatchError & { status: 
 /**
  * Check if a value is a non-empty string
  */
-export function isNonEmptyString(value: string | undefined | null): value is string {
+export function isNonEmptyString(
+  value: string | undefined | null,
+): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
@@ -232,7 +260,9 @@ export class RetryHandler {
 
     return {
       success: false,
-      message: lastError?.message ?? `${operationName} failed after ${this.maxAttempts} attempts`,
+      message:
+        lastError?.message ??
+        `${operationName} failed after ${this.maxAttempts} attempts`,
     };
   }
 
@@ -253,7 +283,9 @@ export class RetryHandler {
  * Sleep for a specified duration
  */
 export function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
 
 /**
@@ -572,7 +604,7 @@ export function isDevelopment(): boolean {
  * Normalize path separators to forward slashes
  */
 export function normalizePath(path: string): string {
-  return path.replaceAll('\\', "/");
+  return path.replaceAll("\\", "/");
 }
 
 /**

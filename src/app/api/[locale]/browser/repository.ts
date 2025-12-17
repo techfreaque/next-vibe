@@ -252,7 +252,9 @@ export class BrowserRepositoryImpl implements BrowserRepository {
     });
 
     // Wait for process to start
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 3000);
+    });
   }
 
   /**

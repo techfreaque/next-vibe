@@ -544,7 +544,6 @@ export class BuildExecutor implements IBuildExecutor {
       output,
       filesBuilt,
       logger,
-      t,
       dryRun,
       verbose,
       profile,

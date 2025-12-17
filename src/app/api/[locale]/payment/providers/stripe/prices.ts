@@ -12,7 +12,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import Stripe from "stripe";
+import type Stripe from "stripe";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Countries, CountryLanguage } from "@/i18n/core/config";
@@ -23,12 +23,8 @@ import {
   productsRepository,
   TOTAL_MODEL_COUNT,
 } from "../../../products/repository-client";
-import { paymentEnv } from "../../env";
 import type { PaymentInterval } from "../types";
-
-const stripe = new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-11-17.clover",
-});
+import { stripe } from "./repository";
 
 export interface StripePriceResult {
   priceId: string;

@@ -124,7 +124,9 @@ Or use package managers:
     });
 
     // Wait for ngrok to start
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000);
+    });
 
     // Query ngrok API to get tunnel URL
     const tunnelUrl = await this.getTunnelUrl();

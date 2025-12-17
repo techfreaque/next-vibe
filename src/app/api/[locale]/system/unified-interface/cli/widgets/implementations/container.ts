@@ -17,7 +17,9 @@ import { formatCamelCaseLabel } from "@/app/api/[locale]/system/unified-interfac
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.CONTAINER> {
+export class ContainerWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.CONTAINER
+> {
   readonly widgetType = WidgetType.CONTAINER;
 
   render(props: CLIWidgetProps<typeof WidgetType.CONTAINER>): string {
@@ -182,9 +184,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Get icon for metric based on configuration (RENDERING ONLY)
    */
-  private getMetricIcon(
-    context: WidgetRenderContext,
-  ): string {
+  private getMetricIcon(context: WidgetRenderContext): string {
     if (!context.options.useEmojis) {
       return "";
     }

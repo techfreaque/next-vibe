@@ -113,7 +113,7 @@ export class AssetZipper implements IAssetZipper {
             resolve();
           });
 
-          archive.on("error", (err) => reject(err));
+          archive.on("error", (err: Error) => reject(err));
           archive.pipe(output);
           archive.directory(inputPath, false);
           archive.finalize().then(resolve).catch(reject);

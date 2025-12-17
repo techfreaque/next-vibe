@@ -66,7 +66,9 @@ export interface IConfigLoader {
   /**
    * Validate that a module exports a valid build config
    */
-  isValidBuildConfigModule(module: BuildConfigModule | Record<string, BuildConfig | undefined>): module is BuildConfigModule;
+  isValidBuildConfigModule(
+    module: BuildConfigModule | Record<string, BuildConfig | undefined>,
+  ): module is BuildConfigModule;
 }
 
 // ============================================================================
@@ -87,23 +89,30 @@ export class ConfigLoader implements IConfigLoader {
 
       if (!existsSync(fullPath)) {
         return fail({
-          message: t("app.api.system.builder.errors.configNotFound", { path: configPath }),
+          message: "app.api.system.builder.errors.configNotFound",
+          messageParams: {
+            path: configPath,
+          },
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       output.push(
         outputFormatter.formatStep(
-          t("app.api.system.builder.messages.loadingConfig", { path: configPath }),
+          t("app.api.system.builder.messages.loadingConfig", {
+            path: configPath,
+          }),
         ),
       );
       logger.info("Loading build config", { path: fullPath });
 
-      const importedModule = (await import(fullPath)) as BuildConfigModule | Record<string, BuildConfig | undefined>;
+      const importedModule = (await import(fullPath)) as
+        | BuildConfigModule
+        | Record<string, BuildConfig | undefined>;
 
       if (!this.isValidBuildConfigModule(importedModule)) {
         return fail({
-          message: t("app.api.system.builder.errors.invalidBuildConfig"),
+          message: "app.api.system.builder.errors.invalidBuildConfig",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -113,7 +122,9 @@ export class ConfigLoader implements IConfigLoader {
 
     // Use inline configuration
     output.push(
-      outputFormatter.formatStep(t("app.api.system.builder.messages.usingInlineConfig")),
+      outputFormatter.formatStep(
+        t("app.api.system.builder.messages.usingInlineConfig"),
+      ),
     );
     logger.info("Using inline config");
 
@@ -130,7 +141,9 @@ export class ConfigLoader implements IConfigLoader {
     return existsSync(fullPath);
   }
 
-  isValidBuildConfigModule(module: BuildConfigModule | Record<string, BuildConfig | undefined>): module is BuildConfigModule {
+  isValidBuildConfigModule(
+    module: BuildConfigModule | Record<string, BuildConfig | undefined>,
+  ): module is BuildConfigModule {
     if (typeof module !== "object" || module === null) {
       return false;
     }

@@ -55,7 +55,9 @@ export class StudioRepositoryImpl implements StudioRepositoryInterface {
       );
 
       // Wait a bit to ensure the process started successfully
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 2000);
+      });
 
       // Open browser if requested
       if (data.openBrowser) {

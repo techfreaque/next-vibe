@@ -264,7 +264,9 @@ export function WelcomeTour({
       // Wait for modal to actually render (poll with timeout)
       const maxAttempts = 20; // 2 seconds max
       for (let i = 0; i < maxAttempts; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        await new Promise((resolve) => {
+          setTimeout(resolve, 100);
+        });
         if (isCorrectModalOpen(modalType)) {
           return;
         }
