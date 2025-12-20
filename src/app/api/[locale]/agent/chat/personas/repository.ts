@@ -6,40 +6,22 @@
 import { and, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { DEFAULT_PERSONAS, type Persona } from "./config";
-import {
-  type CustomPersona,
-  customPersonas,
-  type NewCustomPersona,
-} from "./db";
+import { type CustomPersona, customPersonas, type NewCustomPersona } from "./db";
 
 /**
  * Get all personas for a user (default + custom)
  */
 export async function getAllPersonas(userId: string): Promise<Persona[]> {
-  // Get custom personas from database
   const customPersonasList = await db
     .select()
     .from(customPersonas)
     .where(eq(customPersonas.userId, userId));
 
-  // Convert custom personas to Persona format
-  // Custom personas use regular strings (user-provided) treated as TranslationKey for API compatibility
-  const customPersonasFormatted: Persona[] = customPersonasList.map((cp) => ({
-    id: cp.id,
-    name: cp.name as TranslationKey,
-    description: cp.description as TranslationKey,
-    icon: cp.icon,
-    systemPrompt: cp.systemPrompt,
-    category: cp.category,
-    source: "my" as const,
-    preferredModel: cp.preferredModel ?? undefined,
-    suggestedPrompts: (cp.suggestedPrompts ?? []) as TranslationKey[],
-  }));
+  // CustomPersona now has the same structure as Persona
+  const customPersonasFormatted = customPersonasList as Persona[];
 
-  // Merge default personas with custom personas
   return [...DEFAULT_PERSONAS, ...customPersonasFormatted];
 }
 
@@ -50,13 +32,11 @@ export async function getPersonaById(
   personaId: string,
   userId?: string,
 ): Promise<Persona | null> {
-  // Check if it's a default persona
   const defaultPersona = DEFAULT_PERSONAS.find((p) => p.id === personaId);
   if (defaultPersona) {
     return defaultPersona;
   }
 
-  // Check if it's a custom persona (UUID)
   if (!userId) {
     return null;
   }
@@ -73,33 +53,19 @@ export async function getPersonaById(
     return null;
   }
 
-  // Convert to Persona format
-  // Custom personas use regular strings (user-provided) treated as TranslationKey for API compatibility
-  return {
-    id: customPersona.id,
-    name: customPersona.name as TranslationKey,
-    description: customPersona.description as TranslationKey,
-    icon: customPersona.icon,
-    systemPrompt: customPersona.systemPrompt,
-    category: customPersona.category,
-    source: "my" as const,
-    preferredModel: customPersona.preferredModel ?? undefined,
-    suggestedPrompts: (customPersona.suggestedPrompts ?? []) as TranslationKey[],
-  };
+  // CustomPersona now has the same structure as Persona
+  return customPersona as Persona;
 }
 
 /**
  * Create a new custom persona
  */
 export async function createCustomPersona(
-  data: Omit<NewCustomPersona, "id" | "createdAt" | "updatedAt" | "source">,
+  data: Omit<NewCustomPersona, "id" | "createdAt" | "updatedAt">,
 ): Promise<CustomPersona> {
   const [persona] = await db
     .insert(customPersonas)
-    .values({
-      ...(data as typeof customPersonas.$inferInsert),
-      source: "my" as const,
-    })
+    .values(data as typeof customPersonas.$inferInsert)
     .returning();
 
   return persona;
@@ -115,7 +81,6 @@ export async function updateCustomPersona(
     Omit<NewCustomPersona, "id" | "userId" | "createdAt" | "updatedAt">
   >,
 ): Promise<CustomPersona | null> {
-  // Filter out undefined values
   const updateValues = Object.fromEntries(
     Object.entries(data).filter(([, value]) => value !== undefined),
   );
@@ -167,16 +132,6 @@ export async function getCustomPersonas(userId: string): Promise<Persona[]> {
     .from(customPersonas)
     .where(eq(customPersonas.userId, userId));
 
-  // Custom personas use regular strings (user-provided) treated as TranslationKey for API compatibility
-  return customPersonasList.map((cp) => ({
-    id: cp.id,
-    name: cp.name as TranslationKey,
-    description: cp.description as TranslationKey,
-    icon: cp.icon,
-    systemPrompt: cp.systemPrompt,
-    category: cp.category,
-    source: "my" as const,
-    preferredModel: cp.preferredModel ?? undefined,
-    suggestedPrompts: (cp.suggestedPrompts ?? []) as TranslationKey[],
-  }));
+  // CustomPersona now has the same structure as Persona
+  return customPersonasList as Persona[];
 }

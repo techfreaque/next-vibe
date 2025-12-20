@@ -18,23 +18,28 @@ import type { z } from "zod";
 
 import { users } from "@/app/api/[locale]/user/db";
 
-import type { ContentLevel, IntelligenceLevel, PriceLevel } from "../types";
+import type {
+  ContentLevelFilterType,
+  IntelligenceLevelFilterType,
+  ModelSelectionModeType,
+  PriceLevelFilterType,
+} from "./enum";
 
 /**
  * Model settings filters structure
  * Supports "any" to disable specific filters
  */
 export interface FavoriteModelFilters {
-  intelligence: IntelligenceLevel | "any";
-  maxPrice: PriceLevel | "any";
-  content: ContentLevel | "any";
+  intelligence: IntelligenceLevelFilterType;
+  maxPrice: PriceLevelFilterType;
+  content: ContentLevelFilterType;
 }
 
 /**
  * Model settings structure
  */
 export interface FavoriteModelSettings {
-  mode: "auto" | "manual";
+  mode: ModelSelectionModeType;
   filters: FavoriteModelFilters;
   manualModelId?: string;
 }
@@ -69,7 +74,9 @@ export const chatFavorites = pgTable("chat_favorites", {
   customName: text("name"),
 
   // Model settings (mode, filters, manual model id)
-  modelSettings: jsonb("model_settings").$type<FavoriteModelSettings>().notNull(),
+  modelSettings: jsonb("model_settings")
+    .$type<FavoriteModelSettings>()
+    .notNull(),
 
   // UI settings (position, color)
   uiSettings: jsonb("ui_settings").$type<FavoriteUISettings>().notNull(),

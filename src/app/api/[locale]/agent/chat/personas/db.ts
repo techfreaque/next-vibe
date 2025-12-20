@@ -19,15 +19,14 @@ import { users } from "@/app/api/[locale]/user/db";
 
 import type { IconKey } from "../model-access/icons";
 import type { ModelId } from "../model-access/models";
-import type { PersonaCategoryValue } from "./enum";
-
-/**
- * Persona metadata structure
- */
-interface PersonaMetadata {
-  tags?: string[];
-  version?: number;
-}
+import type {
+  ModelUtility,
+  PersonaDisplay,
+  PersonaOwnership,
+  PersonaPreferences,
+  PersonaRequirements,
+} from "../types";
+import type { PersonaCategoryValue, PersonaSourceValue } from "./enum";
 
 /**
  * Custom Personas Table
@@ -45,24 +44,35 @@ export const customPersonas = pgTable("custom_personas", {
   // Persona details
   name: text("name").notNull(),
   description: text("description").notNull(),
-  icon: text("icon").$type<IconKey>().notNull(), // emoji or icon identifier
+  icon: text("icon").$type<IconKey>().notNull(),
+  avatar: text("avatar"), // Optional avatar URL
   systemPrompt: text("system_prompt").notNull(),
 
   // Categorization
   category: text("category").$type<typeof PersonaCategoryValue>().notNull(),
-  source: text("source").notNull().default("my"), // Always "my" for custom personas
+  source: text("source").$type<typeof PersonaSourceValue>().notNull().default("app.api.agent.chat.personas.enums.source.my"),
+  task: text("task").$type<ModelUtility>().notNull(), // Primary utility
 
   // Optional settings
-  preferredModel: text("preferred_model").$type<ModelId | null>(), // ModelId from config
+  preferredModel: text("preferred_model").$type<ModelId>(),
 
   // Suggested prompts (up to 4)
   suggestedPrompts: jsonb("suggested_prompts").$type<string[]>().default([]),
 
+  // Requirements (hard filters)
+  requirements: jsonb("requirements").$type<PersonaRequirements>().notNull().default({}),
+
+  // Preferences (soft scoring)
+  preferences: jsonb("preferences").$type<PersonaPreferences>().notNull().default({}),
+
+  // Ownership
+  ownership: jsonb("ownership").$type<PersonaOwnership>().notNull(),
+
+  // Display
+  display: jsonb("display").$type<PersonaDisplay>().notNull(),
+
   // Sharing
   isPublic: boolean("is_public").default(false).notNull(),
-
-  // Metadata
-  metadata: jsonb("metadata").$type<PersonaMetadata>().default({}),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
