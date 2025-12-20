@@ -19,7 +19,7 @@ import { users } from "@/app/api/[locale]/user/db";
 
 import type { IconKey } from "../model-access/icons";
 import type { ModelId } from "../model-access/models";
-import type { PersonaCategoryId } from "./config";
+import type { PersonaCategoryValue } from "./enum";
 
 /**
  * Persona metadata structure
@@ -49,7 +49,7 @@ export const customPersonas = pgTable("custom_personas", {
   systemPrompt: text("system_prompt").notNull(),
 
   // Categorization
-  category: text("category").$type<PersonaCategoryId>().notNull(), // PersonaCategoryId from config
+  category: text("category").$type<typeof PersonaCategoryValue>().notNull(),
   source: text("source").notNull().default("my"), // Always "my" for custom personas
 
   // Optional settings

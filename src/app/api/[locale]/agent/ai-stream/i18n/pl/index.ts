@@ -241,6 +241,8 @@ export const translations: typeof enTranslations = {
     userDeclinedTool: "Użytkownik odrzucił wykonanie narzędzia",
     streamError: "Błąd strumienia: {{error}}",
     streamProcessingError: "Błąd przetwarzania strumienia",
+    timeout:
+      "Odpowiedź przekroczyła limit czasu po {{seconds}} sekundach. AI mogło generować bardzo długą odpowiedź. Spróbuj ponownie z krótszym promptem.",
   },
   providers: {
     uncensoredHandler: {

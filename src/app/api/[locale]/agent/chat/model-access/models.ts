@@ -1,7 +1,13 @@
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type {
+  ContentLevel,
+  IntelligenceLevel,
+  ModelFeatures,
+  SpeedLevel,
+} from "../types";
+import { ModelUtility } from "../types";
 import type { IconKey } from "./icons";
-import { ModelUtility } from "./model-utilities";
 
 /**
  * Available AI model identifiers for the chat system.
@@ -42,22 +48,12 @@ export enum ModelId {
   GLM_4_5V = "glm-4.5v",
   VENICE_UNCENSORED = "venice-uncensored-free",
   DOLPHIN_3_0_MISTRAL_24B = "dolphin-3.0-mistral-24b",
+  DOLPHIN_LLAMA_3_70B = "dolphin-llama-3.70b",
+  DOLPHIN_3_0_R1_MISTRAL_24B = "dolphin-3.0-r1-mistral-24b",
   FREEDOMGPT_LIBERTY = "freedomgpt-liberty",
   GAB_AI_ARYA = "gab-ai-arya",
 }
 
-export const DEFAULT_MODEL = ModelId.GPT_5_NANO;
-
-export const DEFAULT_FAVORITES: ModelId[] = [
-  ModelId.UNCENSORED_LM_V1_1,
-  ModelId.GAB_AI_ARYA,
-  ModelId.GPT_5_NANO,
-  ModelId.GPT_5,
-  ModelId.CLAUDE_HAIKU_4_5,
-  ModelId.CLAUDE_SONNET_4_5,
-  ModelId.KIMI_K2,
-  ModelId.KIMI_K2_THINKING,
-];
 
 /**
  * API Provider enum - determines which API to use for the model
@@ -94,10 +90,22 @@ export interface ModelOption {
   openRouterModel: string;
   /** Credit cost per message (0 = free) */
   creditCost: number;
-  /** Utility categories this model belongs to */
+  /** Utility categories this model belongs to (strengths) */
   utilities: ModelUtility[];
   /** Whether this model supports tool/function calling (for search, etc.) */
   supportsTools: boolean;
+
+  // Tier properties for the new model selection system
+  /** Intelligence tier: quick, smart, or brilliant */
+  intelligence: IntelligenceLevel;
+  /** Speed tier: fast, balanced, or thorough */
+  speed: SpeedLevel;
+  /** Content policy tier: mainstream, open, or uncensored */
+  content: ContentLevel;
+  /** Binary features the model supports */
+  features: ModelFeatures;
+  /** What the model is NOT good at (optional) */
+  weaknesses?: ModelUtility[];
 }
 
 export interface ModelProvider {
@@ -172,6 +180,15 @@ export const modelProviders: Record<string, ModelProvider> = {
   },
 };
 
+// Default features for models without specific features
+const defaultFeatures: ModelFeatures = {
+  imageInput: false,
+  pdfInput: false,
+  imageOutput: false,
+  streaming: true,
+  toolCalling: false,
+};
+
 // Model names and icons are technical identifiers that should not be translated
 /* eslint-disable i18next/no-literal-string */
 export const modelOptions: Record<ModelId, ModelOption> = {
@@ -190,8 +207,14 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.UNCENSORED,
       ModelUtility.CREATIVE,
       ModelUtility.SMART,
+      ModelUtility.ROLEPLAY,
     ],
     supportsTools: false,
+    intelligence: "smart",
+    speed: "balanced",
+    content: "uncensored",
+    features: { ...defaultFeatures },
+    weaknesses: [ModelUtility.CODING],
   },
   [ModelId.FREEDOMGPT_LIBERTY]: {
     id: ModelId.FREEDOMGPT_LIBERTY,
@@ -208,8 +231,14 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.UNCENSORED,
       ModelUtility.CREATIVE,
       ModelUtility.CHAT,
+      ModelUtility.ROLEPLAY,
     ],
     supportsTools: false,
+    intelligence: "smart",
+    speed: "balanced",
+    content: "uncensored",
+    features: { ...defaultFeatures },
+    weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
   [ModelId.GAB_AI_ARYA]: {
     id: ModelId.GAB_AI_ARYA,
@@ -228,8 +257,15 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.CHAT,
       ModelUtility.ANALYSIS,
       ModelUtility.SMART,
+      ModelUtility.ROLEPLAY,
+      ModelUtility.CONTROVERSIAL,
+      ModelUtility.POLITICAL_RIGHT,
     ],
     supportsTools: false,
+    intelligence: "smart",
+    speed: "balanced",
+    content: "uncensored",
+    features: { ...defaultFeatures },
   },
   [ModelId.VENICE_UNCENSORED]: {
     id: ModelId.VENICE_UNCENSORED,
@@ -243,8 +279,55 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     openRouterModel:
       "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
     creditCost: 1,
-    utilities: [ModelUtility.UNCENSORED, ModelUtility.CREATIVE],
-    supportsTools: false, // OpenRouter reports: "No endpoints found that support tool use"
+    utilities: [
+      ModelUtility.UNCENSORED,
+      ModelUtility.CREATIVE,
+      ModelUtility.ROLEPLAY,
+    ],
+    supportsTools: false,
+    intelligence: "quick",
+    speed: "fast",
+    content: "uncensored",
+    features: { ...defaultFeatures },
+    weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
+  },
+  [ModelId.DOLPHIN_LLAMA_3_70B]: {
+    id: ModelId.DOLPHIN_LLAMA_3_70B,
+    name: "Dolphin Llama 3 70B",
+    provider: "cognitiveComputations",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.chat.models.descriptions.dolphinLlama3_70B",
+    parameterCount: 70,
+    contextWindow: 8192,
+    icon: "ocean",
+    openRouterModel: "cognitivecomputations/dolphin-llama-3-70b",
+    creditCost: 1,
+    utilities: [ModelUtility.FAST, ModelUtility.CHAT],
+    supportsTools: false,
+    intelligence: "quick",
+    speed: "fast",
+    content: "open",
+    features: { ...defaultFeatures },
+    weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
+  },
+  [ModelId.DOLPHIN_3_0_R1_MISTRAL_24B]: {
+    id: ModelId.DOLPHIN_3_0_R1_MISTRAL_24B,
+    name: "Dolphin 3.0 R1 Mistral 24B",
+    provider: "cognitiveComputations",
+    apiProvider: ApiProvider.OPENROUTER,
+    description: "app.chat.models.descriptions.dolphin3_0_r1_mistral_24b",
+    parameterCount: 24,
+    contextWindow: 32768,
+    icon: "ocean",
+    openRouterModel: "cognitivecomputations/dolphin3.0-r1-mistral-24b",
+    creditCost: 1,
+    utilities: [ModelUtility.FAST, ModelUtility.REASONING],
+    supportsTools: false,
+    intelligence: "smart",
+    speed: "fast",
+    content: "open",
+    features: { ...defaultFeatures },
+    weaknesses: [ModelUtility.CODING],
   },
   [ModelId.DOLPHIN_3_0_MISTRAL_24B]: {
     id: ModelId.DOLPHIN_3_0_MISTRAL_24B,
@@ -257,8 +340,13 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "ocean",
     openRouterModel: "cognitivecomputations/dolphin3.0-mistral-24b:free",
     creditCost: 1,
-    utilities: [ModelUtility.FAST],
-    supportsTools: false, // OpenRouter reports: "No endpoints found that support tool use"
+    utilities: [ModelUtility.FAST, ModelUtility.CHAT],
+    supportsTools: false,
+    intelligence: "quick",
+    speed: "fast",
+    content: "open",
+    features: { ...defaultFeatures },
+    weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
   [ModelId.GLM_4_5_AIR]: {
     id: ModelId.GLM_4_5_AIR,
@@ -273,6 +361,10 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     creditCost: 1,
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
+    intelligence: "quick",
+    speed: "fast",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.GLM_4_6]: {
     id: ModelId.GLM_4_6,
@@ -285,8 +377,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "si-zendesk",
     openRouterModel: "z-ai/glm-4.6",
     creditCost: 5,
-    utilities: [ModelUtility.SMART],
+    utilities: [ModelUtility.SMART, ModelUtility.CHAT, ModelUtility.ANALYSIS],
     supportsTools: true,
+    intelligence: "smart",
+    speed: "balanced",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.GLM_4_5V]: {
     id: ModelId.GLM_4_5V,
@@ -299,8 +395,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "si-zendesk",
     openRouterModel: "z-ai/glm-4.5v",
     creditCost: 1,
-    utilities: [ModelUtility.VISION],
+    utilities: [ModelUtility.VISION, ModelUtility.CHAT],
     supportsTools: true,
+    intelligence: "smart",
+    speed: "balanced",
+    content: "mainstream",
+    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
   },
   [ModelId.CLAUDE_HAIKU_4_5]: {
     id: ModelId.CLAUDE_HAIKU_4_5,
@@ -315,6 +415,16 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     creditCost: 3,
     utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.CODING],
     supportsTools: true,
+    intelligence: "smart",
+    speed: "fast",
+    content: "mainstream",
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
   },
   [ModelId.CLAUDE_SONNET_4_5]: {
     id: ModelId.CLAUDE_SONNET_4_5,
@@ -332,8 +442,19 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
       ModelUtility.CREATIVE,
+      ModelUtility.REASONING,
     ],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "balanced",
+    content: "mainstream",
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
   },
   [ModelId.GTP_5_PRO]: {
     id: ModelId.GTP_5_PRO,
@@ -345,9 +466,14 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5-pro",
-    creditCost: 20, // Premium model
-    utilities: [ModelUtility.LEGACY],
+    creditCost: 20,
+    utilities: [ModelUtility.LEGACY, ModelUtility.SMART],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "thorough",
+    content: "mainstream",
+    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_2_PRO]: {
     id: ModelId.GPT_5_2_PRO,
@@ -359,14 +485,20 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5.2-pro",
-    creditCost: 30, // Premium model
+    creditCost: 30,
     utilities: [
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.CREATIVE,
       ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
     ],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "thorough",
+    content: "mainstream",
+    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_CODEX]: {
     id: ModelId.GPT_5_CODEX,
@@ -378,9 +510,14 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5-codex",
-    creditCost: 10, // Premium model
-    utilities: [ModelUtility.LEGACY],
+    creditCost: 10,
+    utilities: [ModelUtility.LEGACY, ModelUtility.CODING],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "balanced",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CREATIVE],
   },
   [ModelId.GPT_5_1_CODEX]: {
     id: ModelId.GPT_5_1_CODEX,
@@ -392,9 +529,14 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5.1-codex",
-    creditCost: 10, // Premium model
+    creditCost: 10,
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "balanced",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_1]: {
     id: ModelId.GPT_5_1,
@@ -406,9 +548,14 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5.1",
-    creditCost: 10, // Premium model
-    utilities: [ModelUtility.LEGACY],
+    creditCost: 10,
+    utilities: [ModelUtility.LEGACY, ModelUtility.SMART],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "balanced",
+    content: "mainstream",
+    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_2]: {
     id: ModelId.GPT_5_2,
@@ -421,8 +568,13 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "si-openai",
     openRouterModel: "openai/gpt-5.2",
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
-    creditCost: 10, // Premium model
+    creditCost: 10,
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "balanced",
+    content: "mainstream",
+    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_2_CHAT]: {
     id: ModelId.GPT_5_2_CHAT,
@@ -439,9 +591,15 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.CODING,
       ModelUtility.CREATIVE,
       ModelUtility.FAST,
+      ModelUtility.CHAT,
     ],
-    creditCost: 10, // Premium model
+    creditCost: 10,
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "fast",
+    content: "mainstream",
+    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5]: {
     id: ModelId.GPT_5,
@@ -453,9 +611,14 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5",
-    creditCost: 10, // Premium model
-    utilities: [ModelUtility.LEGACY],
+    creditCost: 10,
+    utilities: [ModelUtility.LEGACY, ModelUtility.SMART, ModelUtility.CHAT],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "balanced",
+    content: "mainstream",
+    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_MINI]: {
     id: ModelId.GPT_5_MINI,
@@ -470,6 +633,11 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     creditCost: 3,
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
+    intelligence: "smart",
+    speed: "fast",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.ANALYSIS],
   },
   [ModelId.GPT_5_NANO]: {
     id: ModelId.GPT_5_NANO,
@@ -481,9 +649,18 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 400000,
     icon: "si-openai",
     openRouterModel: "openai/gpt-5-nano",
-    creditCost: 2, // Basic model
+    creditCost: 2,
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
+    intelligence: "quick",
+    speed: "fast",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [
+      ModelUtility.ROLEPLAY,
+      ModelUtility.ANALYSIS,
+      ModelUtility.CODING,
+    ],
   },
   [ModelId.GPT_OSS_120B]: {
     id: ModelId.GPT_OSS_120B,
@@ -498,6 +675,10 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     creditCost: 1,
     utilities: [ModelUtility.CHAT, ModelUtility.CODING],
     supportsTools: true,
+    intelligence: "smart",
+    speed: "balanced",
+    content: "open",
+    features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.KIMI_K2]: {
     id: ModelId.KIMI_K2,
@@ -517,7 +698,11 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     ],
     icon: "moon",
     openRouterModel: "moonshotai/kimi-k2-0905",
-    supportsTools: true, // OpenRouter reports: "No endpoints found that support tool use"
+    supportsTools: true,
+    intelligence: "brilliant",
+    speed: "fast",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.KIMI_K2_THINKING]: {
     id: ModelId.KIMI_K2_THINKING,
@@ -533,10 +718,15 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
       ModelUtility.CREATIVE,
+      ModelUtility.REASONING,
     ],
     icon: "moon",
     openRouterModel: "moonshotai/kimi-k2-thinking",
-    supportsTools: true, // OpenRouter reports: "No endpoints found that support tool use"
+    supportsTools: true,
+    intelligence: "brilliant",
+    speed: "thorough",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.GEMINI_2_5_FLASH_LITE]: {
     id: ModelId.GEMINI_2_5_FLASH_LITE,
@@ -551,6 +741,10 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     creditCost: 1,
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
+    intelligence: "quick",
+    speed: "fast",
+    content: "mainstream",
+    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
   },
   [ModelId.GEMINI_2_5_FLASH]: {
     id: ModelId.GEMINI_2_5_FLASH,
@@ -563,8 +757,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "si-googlegemini",
     openRouterModel: "google/gemini-2.5-flash",
     creditCost: 2,
-    utilities: [ModelUtility.CHAT],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
+    intelligence: "smart",
+    speed: "fast",
+    content: "mainstream",
+    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
   },
   [ModelId.GEMINI_2_5_PRO]: {
     id: ModelId.GEMINI_2_5_PRO,
@@ -577,8 +775,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "si-googlegemini",
     openRouterModel: "google/gemini-2.5-flash-pro",
     creditCost: 10,
-    utilities: [ModelUtility.LEGACY],
+    utilities: [ModelUtility.LEGACY, ModelUtility.SMART],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "balanced",
+    content: "mainstream",
+    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
   },
   [ModelId.GEMINI_3_PRO]: {
     id: ModelId.GEMINI_3_PRO,
@@ -591,8 +793,21 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "si-googlegemini",
     openRouterModel: "google/gemini-3-pro-preview",
     creditCost: 15,
-    utilities: [ModelUtility.SMART, ModelUtility.CODING],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.REASONING,
+    ],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "balanced",
+    content: "mainstream",
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
   },
   [ModelId.MISTRAL_NEMO]: {
     id: ModelId.MISTRAL_NEMO,
@@ -604,9 +819,14 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 131072,
     icon: "si-mistralai",
     openRouterModel: "mistralai/mistral-nemo:free",
-    creditCost: 0, // Free model
+    creditCost: 0,
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
+    intelligence: "quick",
+    speed: "fast",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ANALYSIS, ModelUtility.CODING],
   },
   [ModelId.DEEPSEEK_V32]: {
     id: ModelId.DEEPSEEK_V32,
@@ -619,8 +839,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "whale",
     openRouterModel: "deepseek/deepseek-v3.2",
     creditCost: 10,
-    utilities: [ModelUtility.SMART, ModelUtility.CODING],
+    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "balanced",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.DEEPSEEK_V31]: {
     id: ModelId.DEEPSEEK_V31,
@@ -633,8 +857,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "whale",
     openRouterModel: "deepseek/deepseek-chat-v3.1",
     creditCost: 10,
-    utilities: [ModelUtility.LEGACY],
+    utilities: [ModelUtility.LEGACY, ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "balanced",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.DEEPSEEK_R1]: {
     id: ModelId.DEEPSEEK_R1,
@@ -647,10 +875,18 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "whale",
     openRouterModel: "deepseek/deepseek-r1-0528",
     creditCost: 10,
-    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "thorough",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
   },
-
   [ModelId.QWEN3_235B_FREE]: {
     id: ModelId.QWEN3_235B_FREE,
     name: "Qwen3 235B ",
@@ -661,9 +897,13 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 131000,
     icon: "si-alibabadotcom",
     openRouterModel: "qwen/qwen3-235b-a22b:free",
-    creditCost: 0, // Free model
+    creditCost: 0,
     utilities: [ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
+    intelligence: "smart",
+    speed: "balanced",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.DEEPSEEK_R1_DISTILL]: {
     id: ModelId.DEEPSEEK_R1_DISTILL,
@@ -675,9 +915,17 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 64000,
     icon: "whale",
     openRouterModel: "deepseek/deepseek-r1-distill-qwen-32b",
-    creditCost: 2, // Pro model
-    utilities: [ModelUtility.CODING, ModelUtility.ANALYSIS],
+    creditCost: 2,
+    utilities: [
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
     supportsTools: true,
+    intelligence: "smart",
+    speed: "balanced",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.QWEN_2_5_7B]: {
     id: ModelId.QWEN_2_5_7B,
@@ -689,9 +937,14 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     contextWindow: 32768,
     icon: "si-alibabadotcom",
     openRouterModel: "qwen/qwen-2.5-7b-instruct",
-    creditCost: 2, // Pro model
-    utilities: [ModelUtility.CHAT],
+    creditCost: 2,
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
+    intelligence: "quick",
+    speed: "fast",
+    content: "mainstream",
+    features: { ...defaultFeatures, toolCalling: true },
+    weaknesses: [ModelUtility.ANALYSIS, ModelUtility.CODING],
   },
   [ModelId.GROK_4]: {
     id: ModelId.GROK_4,
@@ -704,8 +957,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "si-x",
     openRouterModel: "x-ai/grok-4",
     creditCost: 10,
-    utilities: [ModelUtility.SMART, ModelUtility.CODING],
+    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS],
     supportsTools: true,
+    intelligence: "brilliant",
+    speed: "balanced",
+    content: "open",
+    features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.GROK_4_FAST]: {
     id: ModelId.GROK_4_FAST,
@@ -720,6 +977,10 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     creditCost: 2,
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
+    intelligence: "smart",
+    speed: "fast",
+    content: "open",
+    features: { ...defaultFeatures, toolCalling: true },
   },
 };
 /* eslint-enable i18next/no-literal-string */
@@ -760,5 +1021,5 @@ export function getAllModelIds(): ModelId[] {
  */
 export const ModelIdOptions = Object.values(modelOptions).map((model) => ({
   value: model.id,
-  label: model.name as TranslationKey,
+  label: model.name,
 }));

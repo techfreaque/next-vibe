@@ -240,6 +240,8 @@ export const translations: typeof enTranslations = {
     userDeclinedTool: "Benutzer hat die Werkzeug-Ausführung abgelehnt",
     streamError: "Stream-Fehler: {{error}}",
     streamProcessingError: "Fehler beim Verarbeiten des Streams",
+    timeout:
+      "Die Antwort hat nach {{seconds}} Sekunden eine Zeitüberschreitung erreicht. Die KI hat möglicherweise eine sehr lange Antwort generiert. Bitte versuchen Sie es erneut mit einer kürzeren Eingabe.",
   },
   providers: {
     uncensoredHandler: {

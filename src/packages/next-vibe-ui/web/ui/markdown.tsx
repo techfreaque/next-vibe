@@ -86,6 +86,26 @@ function extractThinkingSections(content: string): {
   };
 }
 
+/**
+ * Process <Chat> tags - remove the tags but keep the content
+ * Chat tags mark content that should only appear in chat (hidden in TTS, exports, etc.)
+ * Returns the content with <Chat> tags replaced by their inner content
+ */
+function processChatTags(content: string): string {
+  let processedContent = content;
+
+  // Replace complete <Chat>...</Chat> tags with just their content
+  processedContent = processedContent.replace(
+    /<Chat>([\s\S]*?)<\/Chat>/gi,
+    "$1",
+  );
+
+  // Handle incomplete <Chat> tag (streaming case) - keep the content
+  processedContent = processedContent.replace(/<Chat>([\s\S]*)$/i, "$1");
+
+  return processedContent;
+}
+
 export function Markdown({
   content,
   className,
@@ -95,8 +115,13 @@ export function Markdown({
   collapseState,
 }: MarkdownProps): JSX.Element {
   const { t } = useTranslation();
+
+  // First process Chat tags (just strip the tags, keep content)
+  const contentWithChatProcessed = processChatTags(content);
+
+  // Then extract thinking sections
   const { thinkingSections, contentWithoutThinking, incompleteThinking } =
-    extractThinkingSections(content);
+    extractThinkingSections(contentWithChatProcessed);
 
   // Combine complete and incomplete thinking sections
   const allThinkingSections = [

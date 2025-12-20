@@ -26,7 +26,7 @@ import { TopBar } from "./sidebar/top-area/top-bar";
 import { WelcomeTour } from "./welcome-tour/welcome-tour";
 
 interface ChatInterfaceProps {
-  user: JwtPayloadType | undefined;
+  user: JwtPayloadType;
 }
 
 export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
@@ -93,11 +93,7 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
           <SidebarWrapper user={user} locale={locale} logger={logger}>
             {/* Main Chat Area */}
             <ErrorBoundary locale={locale}>
-              <ChatArea
-                locale={locale}
-                logger={logger}
-                currentUserId={user?.id}
-              />
+              <ChatArea locale={locale} logger={logger} user={user} />
             </ErrorBoundary>
           </SidebarWrapper>
         </ErrorBoundary>

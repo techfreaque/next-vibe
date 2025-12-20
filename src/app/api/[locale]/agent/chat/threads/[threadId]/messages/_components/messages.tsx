@@ -352,8 +352,9 @@ export function ChatMessages({
       {/* Sticky logo - inside scroll container for proper sticky behavior */}
       {/* Uses h-0 overflow-visible so it doesn't push content down on md+ (same line layout) */}
       {/* Below md: content has pt-20 to position below logo (separate line) */}
+      {/* z-[1] so message editors (z-10+) appear above the logo */}
       {showBranding && (
-        <Div className="sticky top-0 z-10 h-0 overflow-visible pointer-events-none">
+        <Div className="sticky top-0 z-1 h-0 overflow-visible pointer-events-none">
           <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15">
             <Div className="pointer-events-auto flex bg-background/20 backdrop-blur rounded-lg p-2 shadow-sm border border-border/20 w-fit">
               <Logo locale={locale} disabled size="h-10" />

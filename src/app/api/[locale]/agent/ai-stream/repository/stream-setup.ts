@@ -44,6 +44,7 @@ import {
   handleRetryOperation,
 } from "../../chat/threads/[threadId]/messages/repository";
 import { ensureThread } from "../../chat/threads/repository";
+import { speechToTextRepository } from "../../speech-to-text/repository";
 import type { AiStreamPostRequestOutput } from "../definition";
 import { createMetadataSystemMessage } from "../message-metadata-generator";
 import { CONTINUE_CONVERSATION_PROMPT } from "../system-prompt";
@@ -71,6 +72,21 @@ export interface StreamSetupResult {
     sequenceId: string;
     toolCall: ToolCall; // Full ToolCall object with all fields including args
   };
+  /** Voice mode settings for TTS streaming */
+  voiceMode?: {
+    streamTTS: boolean;
+    callMode: boolean;
+    voice: "MALE" | "FEMALE";
+  } | null;
+  /** Voice transcription metadata (when audioInput was provided) */
+  voiceTranscription?: {
+    /** Whether audio was transcribed */
+    wasTranscribed: boolean;
+    /** Confidence score from STT */
+    confidence: number | null;
+    /** Audio duration in seconds */
+    durationSeconds: number | null;
+  } | null;
 }
 
 export async function setupAiStream(params: {
@@ -240,10 +256,60 @@ export async function setupAiStream(params: {
     role: ChatMessageRole;
   };
 
+  // Track voice transcription metadata
+  let voiceTranscription: StreamSetupResult["voiceTranscription"] = null;
+
   switch (data.operation) {
-    case "send":
-      operationResult = data;
+    case "send": {
+      // Check if audio input is provided - transcribe first
+      if (data.audioInput?.file) {
+        logger.info("[Setup] Audio input detected, transcribing...", {
+          fileSize: data.audioInput.file.size,
+          fileType: data.audioInput.file.type,
+        });
+
+        const transcriptionResult =
+          await speechToTextRepository.transcribeAudio(
+            data.audioInput.file,
+            user,
+            locale,
+            logger,
+          );
+
+        if (!transcriptionResult.success) {
+          logger.error("[Setup] Audio transcription failed", {
+            error: transcriptionResult.message,
+          });
+          return {
+            success: false,
+            error: transcriptionResult,
+          };
+        }
+
+        const transcribedText = transcriptionResult.data.response.text;
+        const confidence = transcriptionResult.data.response.confidence ?? null;
+        logger.info("[Setup] Audio transcription successful", {
+          textLength: transcribedText.length,
+          confidence,
+        });
+
+        // Store transcription metadata for VOICE_TRANSCRIBED event
+        voiceTranscription = {
+          wasTranscribed: true,
+          confidence,
+          durationSeconds: null, // STT response doesn't expose duration here
+        };
+
+        // Use transcribed text as content
+        operationResult = {
+          ...data,
+          content: transcribedText,
+        };
+      } else {
+        operationResult = data;
+      }
       break;
+    }
 
     case "retry":
       if (isIncognito) {
@@ -435,6 +501,7 @@ export async function setupAiStream(params: {
     locale,
     rootFolderId: data.rootFolderId,
     subFolderId: data.subFolderId,
+    callMode: data.voiceMode?.callMode,
   });
 
   logger.debug("System prompt built", {
@@ -453,6 +520,7 @@ export async function setupAiStream(params: {
     rootFolderId: data.rootFolderId,
     messageHistory: data.messageHistory ?? null,
     logger,
+    upcomingResponseContext: { model: data.model, persona: data.persona },
   });
 
   if (
@@ -568,6 +636,14 @@ export async function setupAiStream(params: {
       messages,
       systemPrompt,
       toolConfirmationResult,
+      voiceMode: data.voiceMode
+        ? {
+            streamTTS: data.voiceMode.streamTTS ?? false,
+            callMode: data.voiceMode.callMode ?? false,
+            voice: data.voiceMode.voice ?? "MALE",
+          }
+        : null,
+      voiceTranscription,
     },
   };
 }
@@ -592,6 +668,7 @@ async function buildMessageContext(params: {
   rootFolderId?: DefaultFolderId;
   messageHistory?: Array<z.infer<typeof messageHistorySchema>> | null;
   logger: EndpointLogger;
+  upcomingResponseContext?: { model: string; persona: string | null };
 }): Promise<CoreMessage[]> {
   // SECURITY: Reject messageHistory for non-incognito threads
   // Non-incognito threads must fetch history from database to prevent manipulation
@@ -616,6 +693,7 @@ async function buildMessageContext(params: {
       const messages = toAiSdkMessages(
         params.messageHistory,
         params.rootFolderId,
+        params.upcomingResponseContext,
       );
       if (params.content.trim()) {
         messages.push({ role: "user", content: params.content });
@@ -647,7 +725,11 @@ async function buildMessageContext(params: {
 
       if (parentIndex !== -1) {
         const contextMessages = allMessages.slice(0, parentIndex + 1);
-        const messages = toAiSdkMessages(contextMessages, params.rootFolderId);
+        const messages = toAiSdkMessages(
+          contextMessages,
+          params.rootFolderId,
+          params.upcomingResponseContext,
+        );
 
         if (params.content.trim()) {
           messages.push({ role: "user", content: params.content });
@@ -677,7 +759,11 @@ async function buildMessageContext(params: {
       params.logger,
       params.parentMessageId ?? null, // Pass parent message ID for branch filtering, convert undefined to null
     );
-    const historyMessages = toAiSdkMessages(history, params.rootFolderId);
+    const historyMessages = toAiSdkMessages(
+      history,
+      params.rootFolderId,
+      params.upcomingResponseContext,
+    );
     const currentMessage = toAiSdkMessage({
       role: params.role,
       content: params.content,
@@ -695,6 +781,7 @@ async function buildMessageContext(params: {
     const historyMessages = toAiSdkMessages(
       params.messageHistory,
       params.rootFolderId,
+      params.upcomingResponseContext,
     );
     // Don't add empty content as a message (happens with tool confirmations)
     if (!params.content.trim()) {
@@ -1000,6 +1087,7 @@ async function handleToolConfirmationInSetup(params: {
 function toAiSdkMessages(
   messages: Array<ChatMessage | { role: ChatMessageRole; content: string }>,
   rootFolderId?: DefaultFolderId,
+  upcomingResponseContext?: { model: string; persona: string | null },
 ): CoreMessage[] {
   const result: CoreMessage[] = [];
 
@@ -1023,6 +1111,21 @@ function toAiSdkMessages(
     if (converted !== null) {
       result.push(converted);
     }
+  }
+
+  // Add context for the upcoming assistant response at the END
+  // This tells the model what config will be used for its response
+  // and explicitly instructs not to echo this metadata
+  if (upcomingResponseContext) {
+    const parts: string[] = [];
+    parts.push(`Model:${upcomingResponseContext.model}`);
+    if (upcomingResponseContext.persona) {
+      parts.push(`Persona:${upcomingResponseContext.persona}`);
+    }
+    result.push({
+      role: "system",
+      content: `[Your response context: ${parts.join(" | ")}] DO NOT include this in your response.`,
+    });
   }
 
   return result;

@@ -21,7 +21,7 @@ type EndpointNode =
 
 export interface SerializableToolMetadata {
   name: string;
-  method: string;
+  method: Methods;
   description: string;
   category?: string;
   tags: string[];
@@ -172,7 +172,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     const { t } = simpleT(locale);
 
     return endpoints.map((definition) => {
-      const method = definition.method.toUpperCase();
+      const method = definition.method;
       const toolName = endpointToToolName(definition);
 
       const descriptionKey = definition.description || definition.title;

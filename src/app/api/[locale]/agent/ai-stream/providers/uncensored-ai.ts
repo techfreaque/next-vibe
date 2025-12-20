@@ -11,6 +11,8 @@ import type {
   LanguageModelV2StreamPart,
 } from "@ai-sdk/provider";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
 /**
  * Check if a model ID is an Uncensored.ai model
  *
@@ -28,6 +30,7 @@ export function isUncensoredAIModel(modelId: string): boolean {
 export interface UncensoredAIConfig {
   apiKey: string;
   baseURL?: string;
+  logger: EndpointLogger;
 }
 
 /**
@@ -42,11 +45,12 @@ export function createUncensoredAI(config: UncensoredAIConfig): {
   const {
     apiKey,
     baseURL = "https://mkstqjtsujvcaobdksxs.functions.supabase.co/functions/v1/chat-backup",
+    logger,
   } = config;
 
   return {
     chat: (modelId: string) =>
-      new UncensoredAILanguageModel(modelId, apiKey, baseURL),
+      new UncensoredAILanguageModel(modelId, apiKey, baseURL, logger),
   };
 }
 
@@ -63,6 +67,7 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
     modelId: string,
     private readonly apiKey: string,
     private readonly baseURL: string,
+    private readonly logger: EndpointLogger,
   ) {
     this.modelId = modelId;
   }
@@ -139,28 +144,45 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
       ...(openAITools && openAITools.length > 0 ? { tools: openAITools } : {}),
     };
 
-    // Debug logging disabled in production
+    const startTime = Date.now();
 
-    const response = await fetch(this.baseURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // eslint-disable-next-line i18next/no-literal-string
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify(requestBody),
-      signal: settings.abortSignal,
-    });
+    let response: Response;
+    try {
+      response = await fetch(this.baseURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify(requestBody),
+        signal: settings.abortSignal,
+      });
+    } catch (fetchError) {
+      const elapsed = Date.now() - startTime;
+      if (fetchError instanceof Error) {
+        this.logger.error("[UncensoredAI] Request failed", {
+          elapsed: `${elapsed}ms`,
+          error: fetchError.message,
+        });
+      }
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      throw fetchError;
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
+      this.logger.error("[UncensoredAI] API error", {
+        status: response.status,
+        error: errorText.slice(0, 500),
+      });
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
       throw new Error(
         `UncensoredAI API error: ${response.status} ${response.statusText} - ${errorText}`,
       );
     }
 
-    const stream = this.createStreamTransformer(response.body!);
+    const stream = this.createStreamTransformer(response.body!, this.logger);
 
     return {
       stream,
@@ -175,112 +197,146 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
 
   private createStreamTransformer(
     responseBody: ReadableStream<Uint8Array>,
+    logger: EndpointLogger,
   ): ReadableStream<LanguageModelV2StreamPart> {
     const reader = responseBody.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
-    let textId = `text-${Date.now()}`;
+    const textId = `text-${Date.now()}`;
+    let chunkCount = 0;
+    const streamStartTime = Date.now();
+
+    // Stall timeout - if no data received for 30 seconds, abort
+    const STALL_TIMEOUT_MS = 30000;
 
     return new ReadableStream<LanguageModelV2StreamPart>({
       async pull(controller): Promise<void> {
-        try {
-          const { done, value } = await reader.read();
+        // Keep reading until we can emit something or error out
+        while (true) {
+          try {
+            // Add stall timeout to reader.read()
+            const readPromise = reader.read();
+            // eslint-disable-next-line no-unused-vars
+            const timeoutPromise = new Promise<never>((_resolve, reject) => {
+              setTimeout(() => {
+                reject(
+                  new Error(
+                    `No data received for ${STALL_TIMEOUT_MS / 1000} seconds - connection stalled`,
+                  ),
+                );
+              }, STALL_TIMEOUT_MS);
+            });
 
-          if (done) {
-            // Handle any remaining buffered data
-            if (buffer.trim()) {
-              try {
-                const parsed = JSON.parse(buffer);
-                const message = parsed.choices?.[0]?.message;
+            const { done, value } = await Promise.race([
+              readPromise,
+              timeoutPromise,
+            ]);
+            chunkCount++;
 
-                // Handle tool calls
-                if (message?.tool_calls && Array.isArray(message.tool_calls)) {
-                  for (const toolCall of message.tool_calls) {
+            if (done) {
+              // Handle any remaining buffered data
+              if (buffer.trim()) {
+                try {
+                  const parsed = JSON.parse(buffer);
+                  const message = parsed.choices?.[0]?.message;
+
+                  // Handle tool calls
+                  if (message?.tool_calls && Array.isArray(message.tool_calls)) {
+                    for (const toolCall of message.tool_calls) {
+                      controller.enqueue({
+                        type: "tool-call",
+                        toolCallId: toolCall.id,
+                        toolName: toolCall.function?.name,
+                        input:
+                          typeof toolCall.function?.arguments === "string"
+                            ? JSON.parse(toolCall.function.arguments)
+                            : toolCall.function?.arguments,
+                      });
+                    }
+                  }
+
+                  // Handle text content
+                  const content = message?.content;
+                  if (content) {
                     controller.enqueue({
-                      type: "tool-call",
-                      toolCallId: toolCall.id,
-                      toolName: toolCall.function?.name,
-                      input:
-                        typeof toolCall.function?.arguments === "string"
-                          ? JSON.parse(toolCall.function.arguments)
-                          : toolCall.function?.arguments,
+                      type: "text-delta",
+                      delta: content,
+                      id: textId,
                     });
                   }
+                } catch {
+                  logger.warn("[UncensoredAI] Failed to parse final buffer as JSON");
                 }
-
-                // Handle text content
-                const content = message?.content;
-                if (content) {
-                  controller.enqueue({
-                    type: "text-delta",
-                    delta: content,
-                    id: textId,
-                  });
-                }
-              } catch {
-                // Ignore invalid JSON
               }
-            }
-            controller.enqueue({
-              type: "finish",
-              finishReason: "stop",
-              usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
-            });
-            controller.close();
-            return;
-          }
-
-          const chunk = decoder.decode(value, { stream: true });
-          buffer += chunk;
-
-          // Try to parse as complete JSON (non-streaming response)
-          // The API returns a complete JSON object, not streaming chunks
-          try {
-            const parsed = JSON.parse(buffer);
-            const message = parsed.choices?.[0]?.message;
-
-            // Handle tool calls
-            if (message?.tool_calls && Array.isArray(message.tool_calls)) {
-              for (const toolCall of message.tool_calls) {
-                controller.enqueue({
-                  type: "tool-call",
-                  toolCallId: toolCall.id,
-                  toolName: toolCall.function?.name,
-                  input:
-                    typeof toolCall.function?.arguments === "string"
-                      ? JSON.parse(toolCall.function.arguments)
-                      : toolCall.function?.arguments,
-                });
-              }
-            }
-
-            // Handle text content
-            const content = message?.content;
-            if (content) {
-              // Emit the complete content
-              controller.enqueue({
-                type: "text-delta",
-                delta: content,
-                id: textId,
-              });
-            }
-
-            // Clear buffer and signal completion if we got a response
-            if (message) {
-              buffer = "";
               controller.enqueue({
                 type: "finish",
                 finishReason: "stop",
                 usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
               });
               controller.close();
+              return;
             }
-          } catch {
-            // Not yet a complete JSON, continue buffering
+
+            const chunk = decoder.decode(value, { stream: true });
+            buffer += chunk;
+
+            // Try to parse as complete JSON (non-streaming response)
+            // The API returns a complete JSON object, not streaming chunks
+            try {
+              const parsed = JSON.parse(buffer);
+              const message = parsed.choices?.[0]?.message;
+
+              // Handle tool calls
+              if (message?.tool_calls && Array.isArray(message.tool_calls)) {
+                for (const toolCall of message.tool_calls) {
+                  controller.enqueue({
+                    type: "tool-call",
+                    toolCallId: toolCall.id,
+                    toolName: toolCall.function?.name,
+                    input:
+                      typeof toolCall.function?.arguments === "string"
+                        ? JSON.parse(toolCall.function.arguments)
+                        : toolCall.function?.arguments,
+                  });
+                }
+              }
+
+              // Handle text content
+              const content = message?.content;
+              if (content) {
+                controller.enqueue({
+                  type: "text-delta",
+                  delta: content,
+                  id: textId,
+                });
+              }
+
+              // Clear buffer and signal completion if we got a response
+              if (message) {
+                buffer = "";
+                controller.enqueue({
+                  type: "finish",
+                  finishReason: "stop",
+                  usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+                });
+                controller.close();
+                return; // Exit the while loop after closing
+              }
+            } catch {
+              // Not yet a complete JSON, continue looping to read more data
+              continue;
+            }
+          } catch (error) {
+            const streamDuration = Date.now() - streamStartTime;
+            logger.error("[UncensoredAI] Stream error", {
+              error: error instanceof Error ? error.message : String(error),
+              chunkCount,
+              duration: `${streamDuration}ms`,
+            });
+            controller.error(error);
+            return; // Exit the while loop and function on error
           }
-        } catch (error) {
-          controller.error(error);
-        }
+        } // end while
       },
 
       cancel(): void {

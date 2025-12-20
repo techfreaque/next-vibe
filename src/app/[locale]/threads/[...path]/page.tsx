@@ -12,6 +12,7 @@
  */
 
 import { redirect } from "next-vibe-ui/lib/redirect";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
@@ -28,6 +29,7 @@ import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { userRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 interface ThreadsPathPageProps {
   params: Promise<{
@@ -41,37 +43,38 @@ export default async function ThreadsPathPage({
 }: ThreadsPathPageProps): Promise<JSX.Element> {
   const { locale, path } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
+  const { t } = simpleT(locale);
 
   // Get authenticated user
   const userResponse = await userRepository.getUserByAuth(
     {
       detailLevel: UserDetailLevel.MINIMAL,
-      roles: [UserRole.PUBLIC, UserRole.CUSTOMER],
+      roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
     },
     locale,
     logger,
   );
 
   const user = userResponse.success ? userResponse.data : undefined;
+  if (!user) {
+    return <Div>{t("app.api.user.auth.errors.unknownError")}</Div>;
+  }
 
   // Fetch credit balance for all users (both authenticated and public)
   // Always fetch credits if we have a user (even public users have leadId)
-  let initialCredits = null;
-  if (userResponse.success && userResponse.data) {
-    const creditsResponse = await creditRepository.getCreditBalanceForUser(
-      userResponse.data,
-      locale,
-      logger,
-    );
-    initialCredits = creditsResponse.success ? creditsResponse.data : null;
+  const creditsResponse = await creditRepository.getCreditBalanceForUser(
+    user,
+    locale,
+    logger,
+  );
+  const initialCredits = creditsResponse.success ? creditsResponse.data : null;
 
-    logger.debug("Server-side credits fetch", {
-      success: creditsResponse.success,
-      hasData: !!initialCredits,
-      isPublic: userResponse.data.isPublic,
-      leadId: userResponse.data.leadId,
-    });
-  }
+  logger.debug("Server-side credits fetch", {
+    success: creditsResponse.success,
+    hasData: !!initialCredits,
+    isPublic: user.isPublic,
+    leadId: user.leadId,
+  });
 
   // Parse URL server-side to get navigation state
   // This prevents hydration mismatch - URL is the single source of truth

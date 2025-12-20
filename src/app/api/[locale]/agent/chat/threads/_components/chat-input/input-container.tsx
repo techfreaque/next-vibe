@@ -6,6 +6,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -14,6 +15,7 @@ import { ChatInput } from "./input";
 interface ChatInputContainerProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
+  user: JwtPayloadType;
   inputContainerRef: React.RefObject<DivRefObject | null>;
 }
 
@@ -27,6 +29,7 @@ interface ChatInputContainerProps {
 export function ChatInputContainer({
   locale,
   logger,
+  user,
   inputContainerRef,
 }: ChatInputContainerProps): JSX.Element {
   const insets = useSafeAreaInsets();
@@ -54,7 +57,7 @@ export function ChatInputContainer({
               : "max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pointer-events-auto"
           }
         >
-          <ChatInput locale={locale} logger={logger} />
+          <ChatInput locale={locale} logger={logger} user={user} />
         </Div>
       </Div>
     </Div>

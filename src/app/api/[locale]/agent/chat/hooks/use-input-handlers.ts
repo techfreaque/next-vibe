@@ -38,6 +38,8 @@ interface UseInputHandlersProps {
         confirmed: boolean;
         updatedArgs?: Record<string, string | number | boolean | null>;
       };
+      /** Audio input for voice-to-voice mode */
+      audioInput?: { file: File };
     },
     onNewThread?: (
       threadId: string,
@@ -57,6 +59,10 @@ interface UseInputHandlersProps {
 
 interface UseInputHandlersReturn {
   submitMessage: () => Promise<void>;
+  /** Submit with explicit content - bypasses async state issues */
+  submitWithContent: (content: string) => Promise<void>;
+  /** Submit with audio file - for voice-to-voice mode (server transcribes) */
+  submitWithAudio: (audioFile: File) => Promise<void>;
   handleSubmit: () => Promise<void>;
   handleKeyDown: (e: TextareaKeyboardEvent) => void;
   handleModelChange: (modelId: ModelId) => void;
@@ -118,6 +124,86 @@ export function useInputHandlers({
     }
   }, [input, isLoading, sendMessage, logger, locale, router, draftKey]);
 
+  /**
+   * Submit with explicit content - bypasses async state issues
+   * Used for voice input direct submit where we need to send immediately
+   */
+  const submitWithContent = useCallback(
+    async (content: string) => {
+      logger.debug("Chat", "submitWithContent called", {
+        contentLength: content.length,
+        isLoading,
+      });
+
+      if (isValidInput(content) && !isLoading) {
+        logger.debug("Chat", "submitWithContent calling sendMessage");
+        // Also update the input state for UI consistency
+        setInput(content);
+        await sendMessage(
+          { content },
+          (threadId, rootFolderId, subFolderId) => {
+            logger.debug("Chat", "Navigating to newly created thread", {
+              threadId,
+              rootFolderId,
+              subFolderId,
+            });
+            const url = subFolderId
+              ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
+              : `/${locale}/threads/${rootFolderId}/${threadId}`;
+            router.push(url);
+          },
+        );
+        await clearDraft(draftKey, logger);
+        // Clear input after send
+        setInput("");
+      } else {
+        logger.debug("Chat", "submitWithContent blocked", { isLoading });
+      }
+    },
+    [isLoading, sendMessage, setInput, logger, locale, router, draftKey],
+  );
+
+  /**
+   * Submit with audio file - for voice-to-voice mode
+   * Server will transcribe audio and respond with TTS
+   */
+  const submitWithAudio = useCallback(
+    async (audioFile: File) => {
+      logger.debug("Chat", "submitWithAudio called", {
+        fileSize: audioFile.size,
+        fileType: audioFile.type,
+        isLoading,
+      });
+
+      if (isLoading) {
+        logger.debug("Chat", "submitWithAudio blocked - isLoading");
+        return;
+      }
+
+      logger.debug("Chat", "submitWithAudio calling sendMessage with audio");
+      await sendMessage(
+        {
+          content: "", // Server will use transcribed audio as content
+          audioInput: { file: audioFile },
+        },
+        (threadId, rootFolderId, subFolderId) => {
+          logger.debug("Chat", "Navigating to newly created thread", {
+            threadId,
+            rootFolderId,
+            subFolderId,
+          });
+          // Build URL with proper subfolder path if present (same as text flow)
+          const url = subFolderId
+            ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
+            : `/${locale}/threads/${rootFolderId}/${threadId}`;
+          router.push(url);
+        },
+      );
+      await clearDraft(draftKey, logger);
+    },
+    [isLoading, sendMessage, logger, locale, router, draftKey],
+  );
+
   const handleKeyDown = useCallback(
     (e: TextareaKeyboardEvent) => {
       if (isSubmitKeyPress(e)) {
@@ -173,6 +259,8 @@ export function useInputHandlers({
 
   return {
     submitMessage,
+    submitWithContent,
+    submitWithAudio,
     handleSubmit: submitMessage,
     handleKeyDown,
     handleModelChange,

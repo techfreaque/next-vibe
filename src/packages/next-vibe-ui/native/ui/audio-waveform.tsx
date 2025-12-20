@@ -19,6 +19,7 @@ export type AudioWaveformProps = WebAudioWaveformProps & {
  */
 export function AudioWaveform({
   stream,
+  isPaused = false,
   className,
   nativeStyle,
   barCount = 96,
@@ -31,6 +32,12 @@ export function AudioWaveform({
   ).current;
 
   const fullHistoryRef = React.useRef<number[]>([]); // Grows indefinitely
+  const isPausedRef = React.useRef(isPaused);
+
+  // Keep isPausedRef in sync with isPaused prop
+  React.useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
 
   React.useEffect(() => {
     if (!stream) {
@@ -78,6 +85,11 @@ export function AudioWaveform({
 
     // Simulate time-series waveform with growing history
     const updateInterval = setInterval(() => {
+      // Skip when paused
+      if (isPausedRef.current) {
+        return;
+      }
+
       // Generate new amplitude value (simulated audio level)
       const newAmplitude = 0.3 + Math.random() * 0.7;
 

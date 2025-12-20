@@ -12,8 +12,7 @@ import React, { useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
-import { PersonaSelector } from "@/app/api/[locale]/agent/chat/personas/_components/persona-selector";
-import { ModelSelector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/model-selector";
+import { Selector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/selector";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -78,7 +77,7 @@ export function ModelPersonaSelectorModal({
   const isDisabled = isLoading || isSubmitting;
 
   return (
-    <Div className="w-full max-h-[80dvh] overflow-y-auto">
+    <Div className="w-full max-h-[80dvh] overflow-y-auto relative z-10">
       <Div
         className={cn(
           "p-4 bg-card backdrop-blur",
@@ -107,23 +106,16 @@ export function ModelPersonaSelectorModal({
 
         {/* Selectors & Actions - ALL IN ONE LINE */}
         <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 flex-nowrap">
-          {/* Left side: Model & Persona Selectors */}
+          {/* Left side: Combined Persona + Model Selector */}
           <Div className="flex flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 flex-1 min-w-0">
-            <ModelSelector
-              value={selectedModel}
-              onChange={onModelChange}
+            <Selector
+              personaId={selectedPersona}
+              modelId={selectedModel}
+              onPersonaChange={onPersonaChange}
+              onModelChange={onModelChange}
               locale={locale}
               logger={logger}
               buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
-              showTextAt="sm"
-            />
-            <PersonaSelector
-              value={selectedPersona}
-              onChange={onPersonaChange}
-              locale={locale}
-              logger={logger}
-              buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
-              showTextAt="md"
             />
           </Div>
 

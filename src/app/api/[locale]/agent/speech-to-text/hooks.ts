@@ -25,10 +25,18 @@ interface UseEdenAISpeechOptions {
 
 interface UseEdenAISpeechReturn {
   isRecording: boolean;
+  isPaused: boolean;
   isProcessing: boolean;
   startRecording: () => Promise<void>;
   stopRecording: () => void;
+  /** Stop recording and return raw audio blob without transcribing */
+  stopRecordingAndGetBlob: () => Promise<File | null>;
+  /** Cancel recording and discard all audio data */
+  cancelRecording: () => void;
+  pauseRecording: () => void;
+  resumeRecording: () => void;
   toggleRecording: () => Promise<void>;
+  togglePause: () => void;
   error: string | null;
   transcript: string | null;
   stream: MediaStream | null;
@@ -44,6 +52,7 @@ export function useEdenAISpeech({
 }: UseEdenAISpeechOptions): UseEdenAISpeechReturn {
   const { t } = simpleT(locale);
   const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [transcript, setTranscript] = useState<string | null>(null);
@@ -232,8 +241,114 @@ export function useEdenAISpeech({
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      setIsPaused(false);
     }
   }, [isRecording, logger]);
+
+  /**
+   * Stop recording and return raw audio blob without transcribing
+   * Used for direct audio submission to ai-stream
+   */
+  const stopRecordingAndGetBlob = useCallback(async (): Promise<File | null> => {
+    logger.debug("STT: Stop recording and get blob called");
+
+    if (!mediaRecorderRef.current || !isRecording) {
+      logger.warn("STT: Cannot get blob - not recording");
+      return null;
+    }
+
+    return new Promise((resolve) => {
+      const mediaRecorder = mediaRecorderRef.current;
+      if (!mediaRecorder) {
+        resolve(null);
+        return;
+      }
+
+      // Override the onstop handler for blob extraction
+      mediaRecorder.onstop = (): void => {
+        logger.debug("STT: Recording stopped for blob extraction", {
+          chunksCount: audioChunksRef.current.length,
+        });
+
+        // Create audio blob from chunks
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: mediaRecorder.mimeType || "audio/webm",
+        });
+
+        // Create File object
+        const audioFile = new File([audioBlob], "recording.webm", {
+          type: audioBlob.type,
+        });
+
+        logger.debug("STT: Audio file created", {
+          size: audioFile.size,
+          type: audioFile.type,
+        });
+
+        // Cleanup without processing
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
+        audioChunksRef.current = [];
+        mediaRecorderRef.current = null;
+
+        setIsRecording(false);
+        setIsPaused(false);
+
+        // Note: Don't restore handler since we nullified mediaRecorderRef
+
+        resolve(audioFile);
+      };
+
+      // Stop recording to trigger onstop
+      mediaRecorder.stop();
+    });
+  }, [isRecording, logger]);
+
+  const pauseRecording = useCallback((): void => {
+    logger.debug("STT: Pause recording called");
+    if (mediaRecorderRef.current && isRecording && !isPaused) {
+      mediaRecorderRef.current.pause();
+      setIsPaused(true);
+    }
+  }, [isRecording, isPaused, logger]);
+
+  const resumeRecording = useCallback((): void => {
+    logger.debug("STT: Resume recording called");
+    if (mediaRecorderRef.current && isRecording && isPaused) {
+      mediaRecorderRef.current.resume();
+      setIsPaused(false);
+    }
+  }, [isRecording, isPaused, logger]);
+
+  const togglePause = useCallback((): void => {
+    if (isPaused) {
+      resumeRecording();
+    } else {
+      pauseRecording();
+    }
+  }, [isPaused, pauseRecording, resumeRecording]);
+
+  /**
+   * Cancel recording and discard all audio data
+   * Does not trigger transcription or any processing
+   */
+  const cancelRecording = useCallback((): void => {
+    logger.debug("STT: Cancel recording called");
+
+    // Override onstop to prevent processing
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.onstop = (): void => {
+        logger.debug("STT: Recording cancelled - discarding audio");
+      };
+    }
+
+    // Clean up everything
+    cleanup();
+    setIsRecording(false);
+    setIsPaused(false);
+  }, [cleanup, logger]);
 
   const toggleRecording = useCallback(async (): Promise<void> => {
     if (isRecording) {
@@ -249,10 +364,16 @@ export function useEdenAISpeech({
 
   return {
     isRecording,
+    isPaused,
     isProcessing,
     startRecording,
     stopRecording,
+    stopRecordingAndGetBlob,
+    cancelRecording,
+    pauseRecording,
+    resumeRecording,
     toggleRecording,
+    togglePause,
     error,
     transcript,
     stream: streamRef.current,

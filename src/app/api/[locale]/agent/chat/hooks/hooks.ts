@@ -121,6 +121,8 @@ export interface UseChatReturn {
         confirmed: boolean;
         updatedArgs?: Record<string, string | number | boolean | null>;
       };
+      /** Audio input for voice-to-voice mode - bypasses text content */
+      audioInput?: { file: File };
     },
     onThreadCreated?: (
       threadId: string,
@@ -212,6 +214,10 @@ export interface UseChatReturn {
 
   // Input handlers
   submitMessage: () => Promise<void>;
+  /** Submit with explicit content - bypasses async state issues for voice input */
+  submitWithContent: (content: string) => Promise<void>;
+  /** Submit with audio file - for voice-to-voice mode (server transcribes) */
+  submitWithAudio: (audioFile: File) => Promise<void>;
   handleSubmit: () => Promise<void>;
   handleKeyDown: (e: TextareaKeyboardEvent) => void;
   handleModelChange: (modelId: ModelId) => void;
@@ -691,6 +697,8 @@ export function useChat(
 
     // Input handlers
     submitMessage: inputHandlers.submitMessage,
+    submitWithContent: inputHandlers.submitWithContent,
+    submitWithAudio: inputHandlers.submitWithAudio,
     handleSubmit: inputHandlers.handleSubmit,
     handleKeyDown: inputHandlers.handleKeyDown,
     handleModelChange: inputHandlers.handleModelChange,

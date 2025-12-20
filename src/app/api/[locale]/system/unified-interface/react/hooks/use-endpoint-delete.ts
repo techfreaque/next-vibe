@@ -78,8 +78,7 @@ export function useEndpointDelete<
         requestData: data || ({} as TEndpoint["types"]["RequestOutput"]),
         urlPathParams: urlPathParams,
       };
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await mutation.mutateAsync(mutationVariables as any);
+      await mutation.mutateAsync(mutationVariables );
     },
     [mutation, urlPathParams],
   );

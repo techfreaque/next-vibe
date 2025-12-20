@@ -22,61 +22,62 @@ import { requestDataField } from "./utils";
 export const CURRENCY_OPTIONS = [
   {
     value: "USD",
-    label: "currency.usd" as TranslationKey,
+    label: "currency.usd" as const,
     symbol: "$",
   },
   {
     value: "EUR",
-    label: "currency.eur" as TranslationKey,
+    label: "currency.eur" as const,
     symbol: "€",
   },
   {
     value: "GBP",
-    label: "currency.gbp" as TranslationKey,
+    label: "currency.gbp" as const,
     symbol: "£",
   },
   {
     value: "JPY",
-    label: "currency.jpy" as TranslationKey,
+    label: "currency.jpy" as const,
     symbol: "¥",
   },
   {
     value: "CHF",
-    label: "currency.chf" as TranslationKey,
+    label: "currency.chf" as const,
     symbol: "CHF",
   },
   {
     value: "CAD",
-    label: "currency.cad" as TranslationKey,
+    label: "currency.cad" as const,
     symbol: "C$",
   },
   {
     value: "AUD",
-    label: "currency.aud" as TranslationKey,
+    label: "currency.aud" as const,
     symbol: "A$",
   },
   {
     value: "CNY",
-    label: "currency.cny" as TranslationKey,
+    label: "currency.cny" as const,
     symbol: "¥",
   },
   {
     value: "INR",
-    label: "currency.inr" as TranslationKey,
+    label: "currency.inr" as const,
     symbol: "₹",
   },
   {
     value: "BRL",
-    label: "currency.brl" as TranslationKey,
+    label: "currency.brl" as const,
     symbol: "R$",
   },
 ] as const;
 
 // Separate options for form fields (without symbol)
-const CURRENCY_FORM_OPTIONS: Array<{ value: string; label: TranslationKey }> = CURRENCY_OPTIONS.map(({ value, label }) => ({
-  value,
-  label,
-}));
+const CURRENCY_FORM_OPTIONS: Array<{ value: string; label: TranslationKey }> =
+  CURRENCY_OPTIONS.map(({ value, label }) => ({
+    value,
+    label,
+  }));
 
 export type CurrencyCode = (typeof CURRENCY_OPTIONS)[number]["value"];
 
@@ -116,19 +117,19 @@ export function currencyField(
  * Common language codes with their names
  */
 export const LANGUAGE_OPTIONS = [
-  { value: "en", label: "language.english" as TranslationKey },
-  { value: "de", label: "language.german" as TranslationKey },
-  { value: "fr", label: "language.french" as TranslationKey },
-  { value: "es", label: "language.spanish" as TranslationKey },
-  { value: "it", label: "language.italian" as TranslationKey },
-  { value: "pt", label: "language.portuguese" as TranslationKey },
-  { value: "nl", label: "language.dutch" as TranslationKey },
-  { value: "ru", label: "language.russian" as TranslationKey },
-  { value: "zh", label: "language.chinese" as TranslationKey },
-  { value: "ja", label: "language.japanese" as TranslationKey },
-  { value: "ko", label: "language.korean" as TranslationKey },
-  { value: "ar", label: "language.arabic" as TranslationKey },
-  { value: "hi", label: "language.hindi" as TranslationKey },
+  { value: "en", label: "language.english" as const },
+  { value: "de", label: "language.german" as const },
+  { value: "fr", label: "language.french" as const },
+  { value: "es", label: "language.spanish" as const },
+  { value: "it", label: "language.italian" as const },
+  { value: "pt", label: "language.portuguese" as const },
+  { value: "nl", label: "language.dutch" as const },
+  { value: "ru", label: "language.russian" as const },
+  { value: "zh", label: "language.chinese" as const },
+  { value: "ja", label: "language.japanese" as const },
+  { value: "ko", label: "language.korean" as const },
+  { value: "ar", label: "language.arabic" as const },
+  { value: "hi", label: "language.hindi" as const },
 ] as const;
 
 export type LanguageCode = (typeof LANGUAGE_OPTIONS)[number]["value"];
@@ -169,33 +170,33 @@ export function languageField(
  * Common country codes with their names
  */
 export const COUNTRY_OPTIONS = [
-  { value: "US", label: "country.united_states" as TranslationKey },
-  { value: "CA", label: "country.canada" as TranslationKey },
+  { value: "US", label: "country.united_states" as const },
+  { value: "CA", label: "country.canada" as const },
   {
     value: "GB",
-    label: "country.united_kingdom" as TranslationKey,
+    label: "country.united_kingdom" as const,
   },
-  { value: "DE", label: "country.germany" as TranslationKey },
-  { value: "FR", label: "country.france" as TranslationKey },
-  { value: "IT", label: "country.italy" as TranslationKey },
-  { value: "ES", label: "country.spain" as TranslationKey },
-  { value: "NL", label: "country.netherlands" as TranslationKey },
-  { value: "CH", label: "country.switzerland" as TranslationKey },
-  { value: "AT", label: "country.austria" as TranslationKey },
-  { value: "BE", label: "country.belgium" as TranslationKey },
-  { value: "SE", label: "country.sweden" as TranslationKey },
-  { value: "NO", label: "country.norway" as TranslationKey },
-  { value: "DK", label: "country.denmark" as TranslationKey },
-  { value: "FI", label: "country.finland" as TranslationKey },
-  { value: "AU", label: "country.australia" as TranslationKey },
-  { value: "NZ", label: "country.new_zealand" as TranslationKey },
-  { value: "JP", label: "country.japan" as TranslationKey },
-  { value: "KR", label: "country.south_korea" as TranslationKey },
-  { value: "CN", label: "country.china" as TranslationKey },
-  { value: "IN", label: "country.india" as TranslationKey },
-  { value: "BR", label: "country.brazil" as TranslationKey },
-  { value: "MX", label: "country.mexico" as TranslationKey },
-  { value: "AR", label: "country.argentina" as TranslationKey },
+  { value: "DE", label: "country.germany" as const },
+  { value: "FR", label: "country.france" as const },
+  { value: "IT", label: "country.italy" as const },
+  { value: "ES", label: "country.spain" as const },
+  { value: "NL", label: "country.netherlands" as const },
+  { value: "CH", label: "country.switzerland" as const },
+  { value: "AT", label: "country.austria" as const },
+  { value: "BE", label: "country.belgium" as const },
+  { value: "SE", label: "country.sweden" as const },
+  { value: "NO", label: "country.norway" as const },
+  { value: "DK", label: "country.denmark" as const },
+  { value: "FI", label: "country.finland" as const },
+  { value: "AU", label: "country.australia" as const },
+  { value: "NZ", label: "country.new_zealand" as const },
+  { value: "JP", label: "country.japan" as const },
+  { value: "KR", label: "country.south_korea" as const },
+  { value: "CN", label: "country.china" as const },
+  { value: "IN", label: "country.india" as const },
+  { value: "BR", label: "country.brazil" as const },
+  { value: "MX", label: "country.mexico" as const },
+  { value: "AR", label: "country.argentina" as const },
 ] as const;
 
 export type CountryCode = (typeof COUNTRY_OPTIONS)[number]["value"];
@@ -236,74 +237,74 @@ export function countryField(
  * Common timezone identifiers
  */
 export const TIMEZONE_OPTIONS = [
-  { value: "UTC", label: "timezone.utc" as TranslationKey },
+  { value: "UTC", label: "timezone.utc" as const },
   {
     value: "America/New_York",
-    label: "timezone.eastern" as TranslationKey,
+    label: "timezone.eastern" as const,
   },
   {
     value: "America/Chicago",
-    label: "timezone.central" as TranslationKey,
+    label: "timezone.central" as const,
   },
   {
     value: "America/Denver",
-    label: "timezone.mountain" as TranslationKey,
+    label: "timezone.mountain" as const,
   },
   {
     value: "America/Los_Angeles",
-    label: "timezone.pacific" as TranslationKey,
+    label: "timezone.pacific" as const,
   },
   {
     value: "Europe/London",
-    label: "timezone.london" as TranslationKey,
+    label: "timezone.london" as const,
   },
   {
     value: "Europe/Paris",
-    label: "timezone.paris" as TranslationKey,
+    label: "timezone.paris" as const,
   },
   {
     value: "Europe/Berlin",
-    label: "timezone.berlin" as TranslationKey,
+    label: "timezone.berlin" as const,
   },
   {
     value: "Europe/Rome",
-    label: "timezone.rome" as TranslationKey,
+    label: "timezone.rome" as const,
   },
   {
     value: "Europe/Madrid",
-    label: "timezone.madrid" as TranslationKey,
+    label: "timezone.madrid" as const,
   },
   {
     value: "Europe/Amsterdam",
-    label: "timezone.amsterdam" as TranslationKey,
+    label: "timezone.amsterdam" as const,
   },
   {
     value: "Europe/Zurich",
-    label: "timezone.zurich" as TranslationKey,
+    label: "timezone.zurich" as const,
   },
   {
     value: "Asia/Tokyo",
-    label: "timezone.tokyo" as TranslationKey,
+    label: "timezone.tokyo" as const,
   },
   {
     value: "Asia/Shanghai",
-    label: "timezone.shanghai" as TranslationKey,
+    label: "timezone.shanghai" as const,
   },
   {
     value: "Asia/Seoul",
-    label: "timezone.seoul" as TranslationKey,
+    label: "timezone.seoul" as const,
   },
   {
     value: "Asia/Mumbai",
-    label: "timezone.mumbai" as TranslationKey,
+    label: "timezone.mumbai" as const,
   },
   {
     value: "Australia/Sydney",
-    label: "timezone.sydney" as TranslationKey,
+    label: "timezone.sydney" as const,
   },
   {
     value: "Pacific/Auckland",
-    label: "timezone.auckland" as TranslationKey,
+    label: "timezone.auckland" as const,
   },
 ] as const;
 

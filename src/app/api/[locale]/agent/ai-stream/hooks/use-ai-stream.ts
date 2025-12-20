@@ -18,6 +18,7 @@ import type { TFunction } from "@/i18n/core/static-types";
 import { ChatMessageRole, ThreadStatus } from "../../chat/enum";
 import type { AiStreamPostRequestOutput } from "../definition";
 import {
+  type AudioChunkEventData,
   type ContentDeltaEventData,
   type ContentDoneEventData,
   type ErrorEventData,
@@ -31,6 +32,7 @@ import {
   type ToolResultEventData,
   type ToolWaitingEventData,
 } from "../events";
+import { getAudioQueue } from "./audio-queue";
 import type { StreamingMessage, StreamingThread } from "./store";
 import { useAIStreamStore } from "./store";
 
@@ -235,6 +237,10 @@ export function useAIStream(
         abortControllerRef.current.abort();
       }
 
+      // Reset audio queue to prevent old audio from playing
+      const audioQueue = getAudioQueue();
+      audioQueue.stop();
+
       // Create new abort controller
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
@@ -248,14 +254,40 @@ export function useAIStream(
         logger.info("Making AI stream request", {
           operation: data.operation,
           model: data.model,
+          hasAudioInput: !!data.audioInput?.file,
         });
+
+        // Determine if we need FormData (when there's a file to upload)
+        const hasFileUpload = data.audioInput?.file instanceof File;
+
+        let requestBody: BodyInit;
+        let headers: HeadersInit;
+
+        if (hasFileUpload) {
+          // Use FormData for file uploads
+          const formData = new FormData();
+
+          // Add all non-file fields as JSON in a 'data' field
+          const { audioInput, ...restData } = data;
+          formData.append("data", JSON.stringify({ ...restData, audioInput: { file: null } }));
+
+          // Add the audio file
+          if (audioInput?.file) {
+            formData.append("audioInput.file", audioInput.file, audioInput.file.name);
+          }
+
+          requestBody = formData;
+          headers = {}; // Let browser set Content-Type with boundary
+        } else {
+          // Use JSON for regular requests
+          requestBody = JSON.stringify(data);
+          headers = { "Content-Type": "application/json" };
+        }
 
         const response = await fetch(`/api/${locale}/agent/ai-stream`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+          headers,
+          body: requestBody,
           signal: options.signal || abortController.signal,
         });
 
@@ -908,6 +940,28 @@ export function useAIStream(
 
                 // Call the onContentDone callback for credit deduction (only once!)
                 options.onContentDone?.(eventData);
+                break;
+              }
+
+              case StreamEventType.AUDIO_CHUNK: {
+                const eventData = event.data as AudioChunkEventData;
+                logger.debug("[AUDIO_CHUNK] Received", {
+                  messageId: eventData.messageId,
+                  chunkIndex: eventData.chunkIndex,
+                  isFinal: eventData.isFinal,
+                  textLength: eventData.text.length,
+                  callModeEnabled: data.voiceMode?.callMode,
+                });
+
+                // Only queue audio for auto-playback if call mode is enabled
+                // Otherwise TTS is generated but not played (user can manually play)
+                if (eventData.audioData && !eventData.isFinal && data.voiceMode?.callMode) {
+                  const audioQueue = getAudioQueue();
+                  audioQueue.enqueue(eventData.audioData, eventData.chunkIndex);
+                  logger.debug("[AUDIO_CHUNK] Queued for playback (call mode)", {
+                    chunkIndex: eventData.chunkIndex,
+                  });
+                }
                 break;
               }
 

@@ -33,6 +33,33 @@ export function stripThinkTags(content: string): string {
 }
 
 /**
+ * Strip <Chat> tags from content
+ * Used to remove chat-only content (TL;DR, references) for TTS, exports, etc.
+ * Handles both closed tags <Chat>...</Chat> and unclosed tags <Chat>...
+ */
+export function stripChatTags(content: string): string {
+  // Remove closed Chat tags: <Chat>...</Chat>
+  let processed = content.replaceAll(/<Chat>[\s\S]*?<\/Chat>/gi, "");
+
+  // Remove unclosed Chat tags: <Chat>... (everything after <Chat>)
+  processed = processed.replaceAll(/<Chat>[\s\S]*$/gi, "");
+
+  // Trim whitespace
+  const result = processed.trim();
+
+  return result;
+}
+
+/**
+ * Strip both think and chat tags from content
+ */
+export function stripSpecialTags(content: string): string {
+  let processed = stripThinkTags(content);
+  processed = stripChatTags(processed);
+  return processed;
+}
+
+/**
  * Strip markdown formatting from text
  * Removes markdown syntax while keeping the actual content
  */
@@ -186,10 +213,10 @@ export async function processMessageForTTS(
     return await extractToolCallText(toolName, locale, logger);
   }
 
-  // Regular message - strip think tags, then prepare for TTS
+  // Regular message - strip special tags (think, chat), then prepare for TTS
   if (message.content) {
-    const withoutThinkTags = stripThinkTags(message.content);
-    return prepareTextForTTS(withoutThinkTags);
+    const withoutSpecialTags = stripSpecialTags(message.content);
+    return prepareTextForTTS(withoutSpecialTags);
   }
 
   return "";
@@ -299,15 +326,15 @@ export async function processMessageGroupForCopy(
       );
       parts.push(formatted);
     } else if (message.content) {
-      // ALWAYS strip think tags first (both closed <think>...</think> and unclosed <think>...)
-      const withoutThinkTags = stripThinkTags(message.content);
+      // ALWAYS strip special tags first (think and chat tags)
+      const withoutSpecialTags = stripSpecialTags(message.content);
 
       if (asMarkdown) {
-        // Keep markdown formatting, but think tags are already stripped
-        parts.push(withoutThinkTags);
+        // Keep markdown formatting, but special tags are already stripped
+        parts.push(withoutSpecialTags);
       } else {
         // Plain text: also strip markdown
-        const plainText = stripMarkdown(withoutThinkTags);
+        const plainText = stripMarkdown(withoutSpecialTags);
         parts.push(plainText);
       }
     }

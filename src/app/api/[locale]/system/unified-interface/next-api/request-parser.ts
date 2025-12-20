@@ -193,8 +193,62 @@ function parseFormData(
 }
 
 /**
+ * Merged value type - extends ParsedValue to include File
+ */
+type MergedValue =
+  | string
+  | number
+  | boolean
+  | null
+  | File
+  | MergedObject
+  | readonly MergedValue[];
+interface MergedObject {
+  [key: string]: MergedValue;
+}
+
+/**
+ * Deep merge two objects, with source values overwriting target values
+ * Used to merge file fields into JSON data
+ */
+function deepMerge(
+  target: MergedObject,
+  source: MergedObject,
+): MergedObject {
+  const result: MergedObject = { ...target };
+
+  for (const key of Object.keys(source)) {
+    const sourceValue = source[key];
+    const targetValue = result[key];
+
+    if (
+      sourceValue &&
+      typeof sourceValue === "object" &&
+      !Array.isArray(sourceValue) &&
+      !(sourceValue instanceof File) &&
+      targetValue &&
+      typeof targetValue === "object" &&
+      !Array.isArray(targetValue) &&
+      !(targetValue instanceof File)
+    ) {
+      // Recursively merge nested objects
+      result[key] = deepMerge(
+        targetValue as MergedObject,
+        sourceValue as MergedObject,
+      );
+    } else {
+      // Overwrite with source value
+      result[key] = sourceValue;
+    }
+  }
+
+  return result;
+}
+
+/**
  * Extract request body from Next.js request
  * Handles both JSON and multipart/form-data
+ * Also handles mixed FormData with JSON "data" field plus file fields
  * Returns raw parsed data without validation
  */
 export async function parseRequestBody(
@@ -217,6 +271,40 @@ export async function parseRequestBody(
     // Handle multipart/form-data (file uploads)
     if (contentType.includes("multipart/form-data")) {
       const formData = await request.formData();
+
+      // Check if there's a "data" field with JSON (mixed FormData + JSON pattern)
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility
+      const dataField = (formData as any).get("data") as string | File | null;
+      if (dataField && typeof dataField === "string") {
+        // Parse the JSON data field
+        const jsonData = JSON.parse(dataField) as MergedObject;
+
+        // Parse remaining FormData fields (files with dot notation)
+        const fileFields = parseFormData(formData);
+        // Remove the "data" field from fileFields since we already parsed it
+        delete fileFields["data"];
+
+        // Merge JSON data with file fields (files override null placeholders)
+        const merged = deepMerge(jsonData, fileFields);
+
+        logger.debug("Parsed mixed FormData + JSON request", {
+          jsonDataKeys: Object.keys(jsonData),
+          fileFieldKeys: Object.keys(fileFields),
+          mergedKeys: Object.keys(merged),
+        });
+
+        return merged as Record<
+          string,
+          | string
+          | number
+          | boolean
+          | null
+          | File
+          | Record<string, string | number | boolean | null | File>
+        >;
+      }
+
+      // Standard FormData parsing (dot notation only)
       return parseFormData(formData);
     }
 

@@ -57,6 +57,7 @@ const {
   ChevronsLeft,
   ChevronsRight,
   Circle,
+  CircleDashed,
   Clock,
   Cloud,
   Code,
@@ -232,6 +233,7 @@ const {
   TrendingUpIcon,
   Trophy,
   Tv,
+  Type,
   Twitter,
   Upload,
   User,
@@ -277,6 +279,8 @@ const {
   SiTypescript,
   SiX,
   SiZendesk,
+  Theater,
+  Pencil,
   ...exhaustiveCheck
 } = Icons;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -362,6 +366,7 @@ export const ICON_REGISTRY = {
   "package-plus": PackagePlus,
   "package-x": PackageX,
   box: Box,
+  pencil: Pencil,
 
   // AI & Technology
   brain: Brain,
@@ -421,6 +426,7 @@ export const ICON_REGISTRY = {
   facebook: Facebook,
   instagram: Instagram,
   linkedin: Linkedin,
+  theater: Theater,
   twitter: Twitter,
   youtube: Youtube,
   handshake: Handshake,
@@ -534,6 +540,7 @@ export const ICON_REGISTRY = {
   "square-check": SquareCheck,
   "x-square": XSquare,
   circle: Circle,
+  "circle-dashed": CircleDashed,
   move: Move,
   maximize: Maximize,
   keyboard: Keyboard,
@@ -591,6 +598,7 @@ export const ICON_REGISTRY = {
   // Lists & Content
   list: List,
   "file-text": FileText,
+  type: Type,
   hash: Hash,
   tag: Tag,
   "git-branch": GitBranch,

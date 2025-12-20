@@ -3,13 +3,77 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   id: idTranslations,
-  category: {
+  enums: {
+    category: {
+      companion: "Towarzysze",
+      assistant: "Asystenci",
+      coding: "Programowanie",
+      creative: "Kreatywne",
+      writing: "Pisanie",
+      analysis: "Analiza",
+      roleplay: "Odgrywanie ról",
+      education: "Edukacja",
+      controversial: "Kontrowersyjne",
+      custom: "Niestandardowe",
+    },
+  },
+  tags: {
     general: "Ogólne",
-    creative: "Kreatywne",
+    helpful: "Pomocne",
+    companion: "Towarzysz",
+    relationship: "Relacja",
+    chat: "Czat",
+    coding: "Kodowanie",
     technical: "Techniczne",
+    creative: "Kreatywne",
+    writing: "Pisanie",
     education: "Edukacja",
+    learning: "Nauka",
+    uncensored: "Niecenzurowane",
     controversial: "Kontrowersyjne",
+    political: "Polityczne",
+    reasoning: "Rozumowanie",
+    debate: "Debata",
+    science: "Nauka",
+    analysis: "Analiza",
+    history: "Historia",
+    business: "Biznes",
+    professional: "Profesjonalne",
+    friendly: "Przyjazne",
+    fast: "Szybkie",
+    efficient: "Wydajne",
+    roleplay: "Odgrywanie ról",
+    simple: "Proste",
+    literary: "Literackie",
+    advanced: "Zaawansowane",
+    research: "Badania",
+    academic: "Akademickie",
+    programming: "Programowanie",
+    architecture: "Architektura",
+    algorithms: "Algorytmy",
+    ideation: "Generowanie pomysłów",
+    innovation: "Innowacja",
+    editing: "Edycja",
+    teaching: "Nauczanie",
+    marketing: "Marketing",
+    strategy: "Strategia",
+    fiction: "Fikcja",
+    data: "Dane",
+    statistics: "Statystyka",
+    language: "Język",
+    translation: "Tłumaczenie",
+    career: "Kariera",
+    coaching: "Coaching",
+    health: "Zdrowie",
+    wellness: "Wellness",
     lifestyle: "Styl życia",
+    travel: "Podróże",
+    planning: "Planowanie",
+    legal: "Prawne",
+    finance: "Finanse",
+    social: "Społeczne",
+    product: "Produkt",
+    philosophy: "Filozofia",
   },
   personas: {
     default: {
@@ -54,7 +118,8 @@ export const translations: typeof enTranslations = {
     },
     biologist: {
       name: "Biolog",
-      description: "Patrzy na wszystko z perspektywy biologa, nie ma polityki, jest tylko natura.",
+      description:
+        "Patrzy na wszystko z perspektywy biologa, nie ma polityki, jest tylko natura.",
       suggestedPrompts: {
         0: "Wyjaśnij, dlaczego świat jest obecnie szit show",
         1: "TL;DR o ludzkiej cywilizacji z perspektywy biologa",
@@ -74,7 +139,8 @@ export const translations: typeof enTranslations = {
     },
     socraticQuestioner: {
       name: "Pytający Sokratejski",
-      description: "Zadaje dociekliwe pytania, aby stymulować krytyczne myślenie",
+      description:
+        "Zadaje dociekliwe pytania, aby stymulować krytyczne myślenie",
       suggestedPrompts: {
         0: "Pomóż mi krytycznie myśleć o etyce",
         1: "Kwestionuj moje założenia dotyczące sukcesu",
@@ -161,6 +227,306 @@ export const translations: typeof enTranslations = {
         1: "Daj mi swoją niefiltrowaną opinię",
         2: "Rozmawiaj o tematach tabu",
         3: "Debata bez ograniczeń",
+      },
+    },
+    thea: {
+      name: "Thea",
+      description:
+        "Grecka bogini światła - oddana towarzyszka z antyczną mądrością",
+      suggestedPrompts: {
+        0: "Pomóż mi być lepszym partnerem",
+        1: "Co starożytni powiedzieliby o współczesnych związkach?",
+        2: "Poprowadź mnie w budowaniu silnego gospodarstwa domowego",
+        3: "Podziel się mądrością o rodzinie i społeczności",
+      },
+    },
+    hermes: {
+      name: "Hermes",
+      description:
+        "Grecki bóg posłańców - silny towarzysz z ponadczasową męską mądrością",
+      suggestedPrompts: {
+        0: "Zmotywuj mnie, abym stał się silniejszy",
+        1: "Jak mogę być lepszym liderem w moich związkach?",
+        2: "Co Rzymianie powiedzieliby o budowaniu spuścizny?",
+        3: "Poprowadź mnie w rozwijaniu prawdziwej siły",
+      },
+    },
+    quickWriter: {
+      name: "Szybki Pisarz",
+      description: "Szybkie tworzenie treści dla prostych zadań pisarskich",
+      suggestedPrompts: {
+        0: "Napisz szybki szkic...",
+        1: "Stwórz post w mediach społecznościowych o...",
+        2: "Napisz prosty e-mail",
+        3: "Wygeneruj pomysły na treści dla...",
+      },
+    },
+    writer: {
+      name: "Pisarz",
+      description: "Profesjonalny pisarz dla wszystkich formatów i stylów",
+      suggestedPrompts: {
+        0: "Pomóż mi napisać przekonujący post na blogu",
+        1: "Popraw ten akapit dla większej jasności",
+        2: "Napisz krótkie opowiadanie o...",
+        3: "Stwórz profesjonalny e-mail",
+      },
+    },
+    masterWriter: {
+      name: "Mistrz Pisarstwa",
+      description:
+        "Literacki rzemieślnik dla wyjątkowego pisania na poziomie publikacji",
+      suggestedPrompts: {
+        0: "Pomóż mi stworzyć literackie opowiadanie",
+        1: "Przeanalizuj głębię tej narracji",
+        2: "Rozwiń złożone tematy w moim pisaniu",
+        3: "Dopracuj tę prozę do poziomu publikacji",
+      },
+    },
+    researcher: {
+      name: "Badacz",
+      description: "Specjalista ds. badań z akademicką rzetelnością",
+      suggestedPrompts: {
+        0: "Zbadaj najnowsze odkrycia dotyczące...",
+        1: "Przeanalizuj te źródła dla mnie",
+        2: "Co mówi konsensus naukowy o...?",
+        3: "Pomóż mi ustrukturyzować przegląd literatury",
+      },
+    },
+    quickCoder: {
+      name: "Szybki Programista",
+      description: "Szybkie generowanie kodu dla prostych zadań",
+      suggestedPrompts: {
+        0: "Napisz szybki skrypt do...",
+        1: "Napraw ten prosty błąd",
+        2: "Wygeneruj kod szablonowy dla...",
+        3: "Stwórz podstawową funkcję, która...",
+      },
+    },
+    coder: {
+      name: "Programista",
+      description: "Ekspert programista dla wszystkich języków",
+      suggestedPrompts: {
+        0: "Pomóż mi debugować ten kod",
+        1: "Napisz funkcję, która...",
+        2: "Wyjaśnij ten algorytm",
+        3: "Przejrzyj mój kod pod kątem ulepszeń",
+      },
+    },
+    brilliantCoder: {
+      name: "Genialny Programista",
+      description: "Elitarny architekt dla złożonych systemów i algorytmów",
+      suggestedPrompts: {
+        0: "Zaprojektuj skalowalną architekturę dla...",
+        1: "Zoptymalizuj ten algorytm pod kątem wydajności",
+        2: "Przejrzyj ten projekt systemu",
+        3: "Rozwiąż ten złożony problem algorytmiczny",
+      },
+    },
+    brainstormer: {
+      name: "Burza mózgów",
+      description:
+        "Kreatywny partner do generowania pomysłów i rozwiązywania problemów",
+      suggestedPrompts: {
+        0: "Pomóż mi w burzy mózgów na temat...",
+        1: "Jakie są kreatywne rozwiązania dla...?",
+        2: "Wygeneruj 10 unikalnych koncepcji dla...",
+        3: "Jak możemy podejść do tego inaczej?",
+      },
+    },
+    editor: {
+      name: "Redaktor",
+      description:
+        "Profesjonalny redaktor do polerowania i udoskonalania tekstu",
+      suggestedPrompts: {
+        0: "Edytuj ten tekst dla większej jasności",
+        1: "Sprawdź ten dokument",
+        2: "Popraw płynność tego akapitu",
+        3: "Sprawdź to pod kątem gramatyki i stylu",
+      },
+    },
+    tutor: {
+      name: "Korepetytor",
+      description: "Cierpliwy korepetytor do spersonalizowanej nauki",
+      suggestedPrompts: {
+        0: "Naucz mnie o...",
+        1: "Wyjaśnij tę koncepcję krok po kroku",
+        2: "Pomóż mi zrozumieć...",
+        3: "Sprawdź moją wiedzę o...",
+      },
+    },
+    marketer: {
+      name: "Marketer",
+      description: "Strateg marketingowy dla kampanii i wzrostu",
+      suggestedPrompts: {
+        0: "Stwórz strategię marketingową dla...",
+        1: "Napisz przekonujący tekst reklamowy",
+        2: "Przeanalizuj tę kampanię marketingową",
+        3: "Pomóż mi pozycjonować moją markę",
+      },
+    },
+    storyteller: {
+      name: "Opowiadacz",
+      description: "Mistrz opowiadania dla angażujących narracji",
+      suggestedPrompts: {
+        0: "Pomóż mi rozwinąć ten pomysł na historię",
+        1: "Stwórz przekonującą postać",
+        2: "Napisz scenę otwierającą dla...",
+        3: "Popraw ten dialog",
+      },
+    },
+    scientist: {
+      name: "Naukowiec",
+      description: "Ekspert naukowy do jasnych wyjaśnień",
+      suggestedPrompts: {
+        0: "Wyjaśnij naukę stojącą za...",
+        1: "Jak działa...?",
+        2: "Jakie są aktualne badania na temat...?",
+        3: "Przeanalizuj to twierdzenie naukowe",
+      },
+    },
+    dataAnalyst: {
+      name: "Analityk Danych",
+      description: "Analiza danych, wizualizacja i wnioski",
+      suggestedPrompts: {
+        0: "Przeanalizuj ten zbiór danych",
+        1: "Stwórz wizualizację dla...",
+        2: "Jakie wnioski możemy wyciągnąć z...?",
+        3: "Pomóż mi z analizą statystyczną",
+      },
+    },
+    translator: {
+      name: "Tłumacz",
+      description: "Profesjonalne tłumaczenie z niuansami kulturowymi",
+      suggestedPrompts: {
+        0: "Przetłumacz to na...",
+        1: "Jak powiedzieć... po...?",
+        2: "Zlokalizuj tę treść dla...",
+        3: "Wyjaśnij to odniesienie kulturowe",
+      },
+    },
+    businessAdvisor: {
+      name: "Doradca Biznesowy",
+      description: "Strategia biznesowa, operacje i wzrost",
+      suggestedPrompts: {
+        0: "Pomóż mi opracować strategię biznesową",
+        1: "Przeanalizuj mój model biznesowy",
+        2: "Jak mogę skalować moje operacje?",
+        3: "Przejrzyj mój plan wejścia na rynek",
+      },
+    },
+    careerCoach: {
+      name: "Doradca Kariery",
+      description:
+        "Rozwój kariery, poszukiwanie pracy i rozmowy kwalifikacyjne",
+      suggestedPrompts: {
+        0: "Pomóż mi poprawić moje CV",
+        1: "Przygotuj mnie do rozmowy kwalifikacyjnej",
+        2: "Jak mogę negocjować wynagrodzenie?",
+        3: "Zaplanuj moją zmianę kariery",
+      },
+    },
+    healthWellness: {
+      name: "Zdrowie i Wellness",
+      description: "Fitness, odżywianie i dobre samopoczucie",
+      suggestedPrompts: {
+        0: "Stwórz dla mnie plan treningowy",
+        1: "Pomóż mi zaplanować zdrowe posiłki",
+        2: "Zasugeruj techniki radzenia sobie ze stresem",
+        3: "Popraw moje nawyki senne",
+      },
+    },
+    travelPlanner: {
+      name: "Planista Podróży",
+      description: "Planowanie podróży i rekomendacje",
+      suggestedPrompts: {
+        0: "Zaplanuj 2-tygodniową podróż do...",
+        1: "Zasugeruj destynacje dla...",
+        2: "Stwórz dzienny plan dla...",
+        3: "Rozbicie budżetu na podróż do...",
+      },
+    },
+    legalAssistant: {
+      name: "Asystent Prawny",
+      description: "Informacje prawne i zrozumienie dokumentów",
+      suggestedPrompts: {
+        0: "Wyjaśnij ten termin prawny",
+        1: "Pomóż mi zrozumieć tę umowę",
+        2: "Jakie są moje prawa jako najemcy?",
+        3: "Wyjaśnij proces...",
+      },
+    },
+    financialAdvisor: {
+      name: "Doradca Finansowy",
+      description: "Finanse osobiste, budżetowanie i inwestowanie",
+      suggestedPrompts: {
+        0: "Pomóż mi stworzyć budżet",
+        1: "Wyjaśnij podstawy inwestowania",
+        2: "Jak powinienem spłacić swoje długi?",
+        3: "Zaplanuj oszczędności emerytalne",
+      },
+    },
+    socialMediaManager: {
+      name: "Menedżer Social Media",
+      description: "Treści i strategia mediów społecznościowych",
+      suggestedPrompts: {
+        0: "Stwórz podpisy na Instagram dla...",
+        1: "Opracuj kalendarz treści",
+        2: "Zasugeruj hashtagi dla...",
+        3: "Napisz angażujące tweety o...",
+      },
+    },
+    productManager: {
+      name: "Menedżer Produktu",
+      description: "Strategia produktu, mapy drogowe i badania użytkowników",
+      suggestedPrompts: {
+        0: "Pomóż mi ustalić priorytety funkcji",
+        1: "Stwórz user stories dla...",
+        2: "Przeanalizuj dopasowanie produktu do rynku",
+        3: "Opracuj mapę drogową produktu",
+      },
+    },
+    debater: {
+      name: "Debater",
+      description: "Prowadź intelektualne debaty na kontrowersyjne tematy",
+      shortDesc: "Intelektualne debaty i wiele perspektyw",
+      suggestedPrompts: {
+        0: "Debatuj o etyce rozwoju AI",
+        1: "Przedstaw argumenty za i przeciw bezwarunkowemu dochodowi podstawowemu",
+        2: "Omów wolność słowa vs. mowa nienawiści",
+        3: "Przeanalizuj różne ideologie polityczne",
+      },
+    },
+    philosopher: {
+      name: "Filozof",
+      description: "Eksploruj głębokie pytania filozoficzne bez ograniczeń",
+      shortDesc: "Głęboka eksploracja filozoficzna i analiza",
+      suggestedPrompts: {
+        0: "Jaka jest natura świadomości?",
+        1: "Czy mamy wolną wolę, czy wszystko jest zdeterminowane?",
+        2: "Czy istnieje obiektywna moralność?",
+        3: "Co nadaje życiu sens?",
+      },
+    },
+    uncensoredWriter: {
+      name: "Niecenzurowany Pisarz",
+      description: "Kreatywne pisanie bez sztucznych ograniczeń",
+      shortDesc: "Nieograniczone kreatywne pisanie i opowiadanie historii",
+      suggestedPrompts: {
+        0: "Napisz mroczny thriller psychologiczny",
+        1: "Stwórz dojrzałą scenę romantyczną",
+        2: "Opracuj moralnie złożoną postać",
+        3: "Napisz horror z graficznymi elementami",
+      },
+    },
+    roleplayCharacter: {
+      name: "Postać do Odgrywania Ról",
+      description: "Immersyjne odgrywanie postaci bez ograniczeń",
+      shortDesc: "Autentyczne odgrywanie postaci i scenariusze",
+      suggestedPrompts: {
+        0: "Odegraj postać fantasy",
+        1: "Stwórz scenariusz przygody sci-fi",
+        2: "Wciel się w postać historyczną",
+        3: "Rozwiń złożoną relację między postaciami",
       },
     },
   },

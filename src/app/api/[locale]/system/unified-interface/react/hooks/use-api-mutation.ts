@@ -17,19 +17,24 @@ import type { ApiMutationOptions } from "./types";
 
 /**
  * Type for mutation variables
- * When both TRequest and TUrlVariables are never (no request data needed),
- * the variables should be an empty object.
- * When TUrlVariables is never, urlPathParams is optional (can be omitted).
+ * Union type supporting all valid combinations of request data and URL path parameters
  */
-export type MutationVariables<TRequest, TUrlVariables> = [TRequest] extends [
-  never,
-]
-  ? [TUrlVariables] extends [never]
-    ? Record<string, never> // Both are never - empty object
-    : { requestData: TRequest; urlPathParams: TUrlVariables }
-  : [TUrlVariables] extends [never]
-    ? { requestData: TRequest; urlPathParams?: never } // TRequest exists, TUrlVariables is never - urlPathParams is optional
-    : { requestData: TRequest; urlPathParams: TUrlVariables };
+export type MutationVariables<TRequest, TUrlVariables> =
+  // Check if TRequest is never
+  [TRequest] extends [never]
+    ? // TRequest is never, check TUrlVariables
+      [TUrlVariables] extends [never]
+      ? // Both are never - allow empty object
+        // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+        { requestData?: undefined | never; urlPathParams?: undefined | never }
+      : // Only TUrlVariables exists
+        { requestData?: undefined | never; urlPathParams: TUrlVariables }
+    : // TRequest exists, check TUrlVariables
+      [TUrlVariables] extends [never]
+      ? // Only TRequest exists
+        { requestData: TRequest; urlPathParams?: undefined | never }
+      : // Both exist
+        { requestData: TRequest; urlPathParams: TUrlVariables };
 
 /**
  * Mutation context type for tracking additional mutation state

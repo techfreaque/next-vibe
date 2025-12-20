@@ -17,6 +17,8 @@ import { createCreditUpdateCallback } from "../../../../credit-updater";
 import type { ChatMessage } from "../../../../db";
 import { ChatMessageRole, NEW_MESSAGE_ID } from "../../../../enum";
 import type { ModelId } from "../../../../model-access/models";
+import { useVoiceModeStore } from "../../../../voice-mode/store";
+import { getCallModeKey } from "../../../../voice-mode/types";
 
 // TODO: Get from tool config
 const REQUIRE_TOOL_CONFIRMATION = false;
@@ -35,6 +37,8 @@ export interface MessageOperations {
         confirmed: boolean;
         updatedArgs?: Record<string, string | number | boolean | null>;
       };
+      /** Audio input for voice-to-voice mode - bypasses text content */
+      audioInput?: { file: File };
     },
     onThreadCreated?: (
       threadId: string,
@@ -43,7 +47,12 @@ export interface MessageOperations {
     ) => void,
   ) => Promise<void>;
   retryMessage: (messageId: string) => Promise<void>;
-  branchMessage: (messageId: string, newContent: string) => Promise<void>;
+  branchMessage: (
+    messageId: string,
+    newContent: string,
+    /** Optional audio input for voice-to-voice mode */
+    audioInput?: { file: File },
+  ) => Promise<void>;
   answerAsAI: (messageId: string, content: string) => Promise<void>;
   deleteMessage: (messageId: string) => Promise<void>;
   voteMessage: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
@@ -120,6 +129,8 @@ export function useMessageOperations(
           confirmed: boolean;
           updatedArgs?: Record<string, string | number | boolean | null>;
         };
+        /** Audio input for voice-to-voice mode - bypasses text content */
+        audioInput?: { file: File };
       },
       onThreadCreated?: (
         threadId: string,
@@ -254,6 +265,30 @@ export function useMessageOperations(
           );
         }
 
+        // Get voice mode settings for streaming TTS
+        // Call mode is stored per model+persona combination
+        const voiceModeSettings = useVoiceModeStore.getState().settings;
+        const callModeKey = getCallModeKey(settings.selectedModel, settings.selectedPersona ?? "default");
+        const isCallModeEnabled = voiceModeSettings.callModeByConfig?.[callModeKey] ?? false;
+
+        // Voice mode for TTS: always stream TTS for voice input, but only auto-play if call mode is enabled
+        // For text input, only enable TTS if call mode is enabled
+        const effectiveVoiceMode = params.audioInput
+          ? {
+              // Voice input: always generate TTS, but respect callMode for auto-play
+              streamTTS: true,
+              callMode: isCallModeEnabled, // Respect the actual toggle state
+              voice: "MALE" as const,
+            }
+          : isCallModeEnabled
+            ? {
+                // Text input with call mode: generate and auto-play TTS
+                streamTTS: true,
+                callMode: true,
+                voice: "MALE" as const,
+              }
+            : null;
+
         await aiStream.startStream(
           {
             operation: "send" as const,
@@ -274,6 +309,8 @@ export function useMessageOperations(
               })) ?? null,
             toolConfirmation: params.toolConfirmation ?? null,
             messageHistory: messageHistory ?? null,
+            voiceMode: effectiveVoiceMode,
+            audioInput: params.audioInput ?? { file: null },
           },
           {
             onThreadCreated: (data) => {
@@ -399,6 +436,8 @@ export function useMessageOperations(
                 requiresConfirmation: REQUIRE_TOOL_CONFIRMATION,
               })) ?? null,
             messageHistory: messageHistory ?? null,
+            voiceMode: null,
+            audioInput: { file: null },
           },
           {
             onContentDone: createCreditUpdateCallback(
@@ -428,10 +467,15 @@ export function useMessageOperations(
   );
 
   const branchMessage = useCallback(
-    async (messageId: string, newContent: string): Promise<void> => {
+    async (
+      messageId: string,
+      newContent: string,
+      audioInput?: { file: File },
+    ): Promise<void> => {
       logger.debug("Message operations: Branching message", {
         messageId,
         newContent,
+        hasAudioInput: !!audioInput,
       });
 
       const message = chatStore.messages[messageId];
@@ -474,6 +518,26 @@ export function useMessageOperations(
           }
         }
 
+        // Get voice mode settings for streaming TTS (same logic as sendMessage)
+        const voiceModeSettings = useVoiceModeStore.getState().settings;
+        const callModeKey = getCallModeKey(settings.selectedModel, settings.selectedPersona ?? "default");
+        const isCallModeEnabled = voiceModeSettings.callModeByConfig?.[callModeKey] ?? false;
+
+        // Voice mode for TTS: always stream TTS for voice input, but only auto-play if call mode is enabled
+        const effectiveVoiceMode = audioInput
+          ? {
+              streamTTS: true,
+              callMode: isCallModeEnabled,
+              voice: "MALE" as const,
+            }
+          : isCallModeEnabled
+            ? {
+                streamTTS: true,
+                callMode: true,
+                voice: "MALE" as const,
+              }
+            : null;
+
         await aiStream.startStream(
           {
             operation: "edit" as const,
@@ -493,6 +557,8 @@ export function useMessageOperations(
                 requiresConfirmation: REQUIRE_TOOL_CONFIRMATION,
               })) ?? null,
             messageHistory: messageHistory ?? null,
+            voiceMode: effectiveVoiceMode,
+            audioInput: audioInput ?? { file: null },
           },
           {
             onContentDone: createCreditUpdateCallback(
@@ -572,6 +638,8 @@ export function useMessageOperations(
                 requiresConfirmation: REQUIRE_TOOL_CONFIRMATION,
               })) ?? null,
             messageHistory: messageHistory ?? null,
+            voiceMode: null,
+            audioInput: { file: null },
           },
           {
             onContentDone: createCreditUpdateCallback(

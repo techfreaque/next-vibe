@@ -315,6 +315,75 @@ const { POST } = createEndpoint({
         z.string().nullable().optional(),
       ),
 
+      // === VOICE MODE ===
+      voiceMode: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.JSON,
+          label: "app.api.agent.chat.aiStream.post.voiceMode.label",
+          description: "app.api.agent.chat.aiStream.post.voiceMode.description",
+          columns: 6,
+          optional: true,
+        },
+        z
+          .object({
+            /** Enable streaming TTS - emit AUDIO_CHUNK events */
+            streamTTS: z.boolean().default(false),
+            /** Use call mode system prompt (short responses) */
+            callMode: z.boolean().default(false),
+            /** TTS voice preference */
+            voice: z.enum(["MALE", "FEMALE"]).default("MALE"),
+          })
+          .nullable()
+          .optional(),
+      ),
+
+      // === AUDIO INPUT (for voice-to-voice mode) ===
+      audioInput: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title: "app.api.agent.chat.aiStream.post.audioInput.title",
+          description: "app.api.agent.chat.aiStream.post.audioInput.description",
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          optional: true,
+        },
+        { request: "data" },
+        {
+          file: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.FILE,
+              label: "app.api.agent.chat.aiStream.post.audioInput.file.label",
+              description:
+                "app.api.agent.chat.aiStream.post.audioInput.file.description",
+              columns: 12,
+              optional: true,
+            },
+            z
+              .instanceof(File)
+              .refine((file) => file.size <= 25 * 1024 * 1024, {
+                message:
+                  "app.api.agent.chat.aiStream.post.audioInput.validation.maxSize",
+              })
+              .refine(
+                (file) => {
+                  const allowedTypes = ["audio/", "application/octet-stream"];
+                  return allowedTypes.some((type) =>
+                    file.type.startsWith(type),
+                  );
+                },
+                {
+                  message:
+                    "app.api.agent.chat.aiStream.post.audioInput.validation.audioOnly",
+                },
+              )
+              .nullable()
+              .optional(),
+          ),
+        },
+      ),
+
       // === RESPONSE FIELDS ===
       success: responseField(
         {
@@ -414,6 +483,8 @@ const { POST } = createEndpoint({
         temperature: 0.7,
         maxTokens: 1000,
         messageHistory: [],
+        voiceMode: null,
+        audioInput: { file: null },
       },
       withPersona: {
         operation: "send",
@@ -428,6 +499,8 @@ const { POST } = createEndpoint({
         temperature: 0.8,
         maxTokens: 1500,
         messageHistory: [],
+        voiceMode: null,
+        audioInput: { file: null },
       },
       retry: {
         operation: "retry",
@@ -442,6 +515,8 @@ const { POST } = createEndpoint({
         temperature: 0.7,
         maxTokens: 1200,
         messageHistory: [],
+        voiceMode: null,
+        audioInput: { file: null },
       },
     },
     responses: {

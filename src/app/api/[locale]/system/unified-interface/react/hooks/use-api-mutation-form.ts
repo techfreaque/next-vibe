@@ -256,7 +256,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
       endpoint: endpoint.path.join("/"),
     });
 
-    const _submitForm = async (validatedData: FormData): Promise<void> => {
+    const _submitForm = async (validatedData: TEndpoint["types"]["RequestOutput"]): Promise<void> => {
       logger.debug("_submitForm called with validated data", {
         endpoint: endpoint.path.join("/"),
         validatedData,
@@ -268,14 +268,14 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
         clearFormError();
 
         // Call the API with the validated form data using React Query mutation
-        const urlPathParams =
-          (options?.urlParamVariables as TEndpoint["types"]["UrlVariablesOutput"]) ||
-          ({} as TEndpoint["types"]["UrlVariablesOutput"]);
+        const urlPathParams = options?.urlParamVariables;
+
+
 
         const result = await mutation.mutateAsync({
           requestData: validatedData,
           urlPathParams,
-        } as never);
+          });
 
         if (result === undefined) {
           logger.error("Mutation result is undefined", {

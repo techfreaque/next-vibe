@@ -22,7 +22,7 @@ import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
 import {
-  DEFAULT_CATEGORIES,
+  CategoryOptions,
   DEFAULT_PERSONAS,
   type Persona,
 } from "@/app/api/[locale]/agent/chat/personas/config";
@@ -158,8 +158,8 @@ export function SuggestedPrompts({
               <Div className="flex flex-col gap-4">
                 {DEFAULT_PERSONAS.map((persona: Persona) => {
                   const isExpanded = expandedPersonaId === persona.id;
-                  const categoryConfig = DEFAULT_CATEGORIES.find(
-                    (cat) => cat.id === persona.category,
+                  const categoryConfig = CategoryOptions.find(
+                    (cat) => cat.value === persona.category,
                   );
                   const modelConfig = persona.preferredModel
                     ? getModelById(persona.preferredModel)
@@ -202,7 +202,7 @@ export function SuggestedPrompts({
                                       className: "text-sm",
                                     },
                                   )}
-                                  <Span>{t(categoryConfig.name)}</Span>
+                                  <Span>{t(categoryConfig.label)}</Span>
                                 </Div>
                               )}
                               {modelConfig && (

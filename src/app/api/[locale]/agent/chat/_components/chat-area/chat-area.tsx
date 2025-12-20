@@ -17,19 +17,20 @@ import { PublicFeed } from "@/app/api/[locale]/agent/chat/threads/_components/pu
 import { ChatToolbar } from "@/app/api/[locale]/agent/chat/threads/[threadId]/_components/toolbar";
 import { ChatMessages } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/_components/messages";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ChatAreaProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
-  currentUserId?: string;
+  user: JwtPayloadType;
 }
 
 export function ChatArea({
   locale,
   logger,
-  currentUserId,
+  user,
 }: ChatAreaProps): JSX.Element {
   const chat = useChatContext();
   const {
@@ -87,7 +88,7 @@ export function ChatArea({
                   inputHeight={inputHeight}
                   locale={locale}
                   logger={logger}
-                  currentUserId={currentUserId}
+                  currentUserId={user?.id}
                   showBranding={viewMode === ViewMode.LINEAR && messages.length > 0}
                 />
               ) : rootFolderId === "public" && !chat.currentSubFolderId ? (
@@ -109,6 +110,7 @@ export function ChatArea({
               <ChatInputContainer
                 locale={locale}
                 logger={logger}
+                user={user}
                 inputContainerRef={inputContainerRef}
               />
             </ErrorBoundary>

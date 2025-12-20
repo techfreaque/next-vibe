@@ -9,6 +9,8 @@ import type { StyleType } from "../utils/style-type";
 export type AudioWaveformProps = {
   /** MediaStream from getUserMedia or null when not recording */
   stream: MediaStream | null;
+  /** Whether the recording is paused (stops animation while preserving history) */
+  isPaused?: boolean;
   /** Number of bars to display (time points) */
   barCount?: number;
   /** Height of the waveform container in pixels */
@@ -24,6 +26,7 @@ export type AudioWaveformProps = {
  */
 export function AudioWaveform({
   stream,
+  isPaused = false,
   className,
   barCount = 96,
   height = 32,
@@ -36,6 +39,12 @@ export function AudioWaveform({
   const audioContextRef = React.useRef<AudioContext | null>(null);
   const analyserRef = React.useRef<AnalyserNode | null>(null);
   const fullHistoryRef = React.useRef<number[]>([]); // Grows indefinitely
+  const isPausedRef = React.useRef(isPaused);
+
+  // Keep isPausedRef in sync with isPaused prop
+  React.useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
 
   React.useEffect(() => {
     if (!stream) {
@@ -101,6 +110,12 @@ export function AudioWaveform({
           return;
         }
 
+        // Skip capturing data when paused - just continue the animation frame
+        if (isPausedRef.current) {
+          animationFrameRef.current = requestAnimationFrame(updateWaveform);
+          return;
+        }
+
         // Get time-domain data (amplitude over time)
         analyserRef.current.getByteTimeDomainData(dataArray);
 
@@ -134,6 +149,11 @@ export function AudioWaveform({
     } catch {
       // Fallback: simple animated pattern when Web Audio API fails
       const fallbackInterval = setInterval(() => {
+        // Skip when paused
+        if (isPausedRef.current) {
+          return;
+        }
+
         const newAmplitude = 0.3 + Math.random() * 0.4;
         fullHistoryRef.current.push(newAmplitude);
 

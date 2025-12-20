@@ -38,6 +38,7 @@ export const TOUR_DATA_ATTRS = {
   SUBSCRIPTION_BUTTON: "subscription-button",
   CHAT_INPUT: "chat-input",
   SPEECH_INPUT: "speech-input",
+  CALL_MODE_BUTTON: "call-mode-button",
 } as const;
 
 // Type for tour data attribute keys
@@ -148,14 +149,20 @@ export const getTourSteps = (
   const appName = t("config.appName");
 
   // Get icon components from folder configs
-  const PrivateFolderIcon = getIconComponent(DEFAULT_FOLDER_CONFIGS.private.icon);
-  const IncognitoFolderIcon = getIconComponent(DEFAULT_FOLDER_CONFIGS.incognito.icon);
+  const PrivateFolderIcon = getIconComponent(
+    DEFAULT_FOLDER_CONFIGS.private.icon,
+  );
+  const IncognitoFolderIcon = getIconComponent(
+    DEFAULT_FOLDER_CONFIGS.incognito.icon,
+  );
   const SharedFolderIcon = getIconComponent(DEFAULT_FOLDER_CONFIGS.shared.icon);
   const PublicFolderIcon = getIconComponent(DEFAULT_FOLDER_CONFIGS.public.icon);
   const KeyboardIcon = getIconComponent("keyboard");
   const MicIcon = getIconComponent("mic");
+  const PhoneIcon = getIconComponent("phone");
 
   return [
+    // Step 1: Welcome
     {
       target: "body",
       content: (
@@ -174,152 +181,29 @@ export const getTourSteps = (
       placement: TOUR_PLACEMENTS.CENTER,
       disableBeacon: true,
     },
+    // Step 2: AI Companion Selector - clicking opens the selector with its own onboarding
     {
       target: getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR),
       content: (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.modelSelector.title")}
+            {t("app.chat.welcomeTour.aiCompanion.title")}
           </H3>
           <P className="text-sm">
-            {t("app.chat.welcomeTour.modelSelector.description")}
+            {t("app.chat.welcomeTour.aiCompanion.description")}
           </P>
           <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.modelSelector.tip")}
+            {t("app.chat.welcomeTour.aiCompanion.tip")}
           </P>
         </Div>
       ),
       placement: TOUR_PLACEMENTS.TOP,
+      // Allow user to click the selector to open it
+      spotlightClicks: true,
     },
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_FAVORITES),
-      content: (
-        <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.modelSelectorFavorites.title")}
-          </H3>
-          <P className="text-sm">
-            {t("app.chat.welcomeTour.modelSelectorFavorites.description")}
-          </P>
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.BOTTOM,
-    },
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_SHOW_ALL),
-      content: (
-        <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.modelSelectorShowAll.title")}
-          </H3>
-          <P className="text-sm">
-            {t("app.chat.welcomeTour.modelSelectorShowAll.description")}
-          </P>
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.TOP,
-    },
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_SEARCH),
-      content: (
-        <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.modelSelectorSearch.title")}
-          </H3>
-          <P className="text-sm">
-            {t("app.chat.welcomeTour.modelSelectorSearch.description")}
-          </P>
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.BOTTOM,
-    },
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_GROUP),
-      content: (
-        <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.modelSelectorGroup.title")}
-          </H3>
-          <P className="text-sm">
-            {t("app.chat.welcomeTour.modelSelectorGroup.description")}
-          </P>
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.BOTTOM,
-    },
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR),
-      content: (
-        <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.personaSelector.title")}
-          </H3>
-          <P className="text-sm">
-            {t("app.chat.welcomeTour.personaSelector.description")}
-          </P>
-          <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.personaSelector.tip")}
-          </P>
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.TOP,
-    },
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_FAVORITES),
-      content: (
-        <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.personaSelectorFavorites.title")}
-          </H3>
-          <P className="text-sm">
-            {t("app.chat.welcomeTour.personaSelectorFavorites.description")}
-          </P>
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.BOTTOM,
-    },
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_SHOW_ALL),
-      content: (
-        <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.personaSelectorShowAll.title")}
-          </H3>
-          <P className="text-sm">
-            {t("app.chat.welcomeTour.personaSelectorShowAll.description")}
-          </P>
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.TOP,
-    },
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_SEARCH),
-      content: (
-        <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.personaSelectorSearch.title")}
-          </H3>
-          <P className="text-sm">
-            {t("app.chat.welcomeTour.personaSelectorSearch.description")}
-          </P>
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.BOTTOM,
-    },
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_GROUP),
-      content: (
-        <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.personaSelectorGroup.title")}
-          </H3>
-          <P className="text-sm">
-            {t("app.chat.welcomeTour.personaSelectorGroup.description")}
-          </P>
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.BOTTOM,
-    },
+    // NOTE: Selector internal steps removed - the unified selector now has its own
+    // built-in onboarding ("Meet Your AI Companion") that handles companion selection.
+    // When selector closes after user picks a companion, tour continues to sidebar steps.
     {
       target: getTourSelector(TOUR_DATA_ATTRS.ROOT_FOLDERS),
       content: (
@@ -465,23 +349,28 @@ export const getTourSteps = (
       ),
       placement: TOUR_PLACEMENTS.RIGHT,
     },
-    {
-      target: getTourSelector(TOUR_DATA_ATTRS.SIDEBAR_LOGIN),
-      content: (
-        <Div className="space-y-2">
-          <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.sidebarLogin.title")}
-          </H3>
-          <P className="text-sm">
-            {t("app.chat.welcomeTour.sidebarLogin.description")}
-          </P>
-          <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.sidebarLogin.tip")}
-          </P>
-        </Div>
-      ),
-      placement: TOUR_PLACEMENTS.RIGHT,
-    },
+    // Sidebar Login - Only show if NOT authenticated (element doesn't exist when logged in)
+    ...(!isAuthenticated
+      ? [
+          {
+            target: getTourSelector(TOUR_DATA_ATTRS.SIDEBAR_LOGIN),
+            content: (
+              <Div className="space-y-2">
+                <H3 className="text-lg font-semibold">
+                  {t("app.chat.welcomeTour.sidebarLogin.title")}
+                </H3>
+                <P className="text-sm">
+                  {t("app.chat.welcomeTour.sidebarLogin.description")}
+                </P>
+                <P className="text-xs text-muted-foreground">
+                  {t("app.chat.welcomeTour.sidebarLogin.tip")}
+                </P>
+              </Div>
+            ),
+            placement: TOUR_PLACEMENTS.RIGHT,
+          },
+        ]
+      : []),
     {
       target: getTourSelector(TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON),
       content: (
@@ -490,7 +379,10 @@ export const getTourSteps = (
             {t("app.chat.welcomeTour.subscriptionButton.title")}
           </H3>
           <P className="text-sm">
-            {t("app.chat.welcomeTour.subscriptionButton.description")}
+            {t("app.chat.welcomeTour.subscriptionButton.description", {
+              credits: "800",
+              price: t("app.chat.welcomeTour.subscriptionButton.price"),
+            })}
           </P>
           <P className="text-xs text-muted-foreground">
             {t("app.chat.welcomeTour.subscriptionButton.tip")}
@@ -499,40 +391,61 @@ export const getTourSteps = (
       ),
       placement: TOUR_PLACEMENTS.RIGHT,
     },
+    // Step: Text Input
     {
       target: getTourSelector(TOUR_DATA_ATTRS.CHAT_INPUT),
       content: (
-        <Div className="space-y-3">
-          <H3 className="text-lg font-semibold">
+        <Div className="space-y-2">
+          <H3 className="text-lg font-semibold flex items-center gap-2">
+            <KeyboardIcon className="h-5 w-5" />
             {t("app.chat.welcomeTour.chatInput.title")}
           </H3>
           <P className="text-sm">
             {t("app.chat.welcomeTour.chatInput.description")}
           </P>
-          <Div className="space-y-2">
-            <Div className="flex items-start gap-2">
-              <KeyboardIcon className="h-5 w-5 mt-0.5" />
-              <Div>
-                <P className="text-sm font-medium">
-                  {t("app.chat.welcomeTour.chatInput.typing.title")}
-                </P>
-                <P className="text-xs text-muted-foreground">
-                  {t("app.chat.welcomeTour.chatInput.typing.description")}
-                </P>
-              </Div>
-            </Div>
-            <Div className="flex items-start gap-2">
-              <MicIcon className="h-5 w-5 mt-0.5" />
-              <Div>
-                <P className="text-sm font-medium">
-                  {t("app.chat.welcomeTour.chatInput.voice.title")}
-                </P>
-                <P className="text-xs text-muted-foreground">
-                  {t("app.chat.welcomeTour.chatInput.voice.description")}
-                </P>
-              </Div>
-            </Div>
-          </Div>
+          <P className="text-xs text-muted-foreground">
+            {t("app.chat.welcomeTour.chatInput.tip")}
+          </P>
+        </Div>
+      ),
+      placement: TOUR_PLACEMENTS.TOP,
+    },
+    // Step: Voice Input (Mic button)
+    {
+      target: getTourSelector(TOUR_DATA_ATTRS.SPEECH_INPUT),
+      content: (
+        <Div className="space-y-2">
+          <H3 className="text-lg font-semibold flex items-center gap-2">
+            <MicIcon className="h-5 w-5" />
+            {t("app.chat.welcomeTour.voiceInput.title")}
+          </H3>
+          <P className="text-sm">
+            {t("app.chat.welcomeTour.voiceInput.description")}
+          </P>
+          <Ul className="text-xs space-y-1 ml-4 list-disc text-muted-foreground">
+            <Li>{t("app.chat.welcomeTour.voiceInput.options.transcribe")}</Li>
+            <Li>{t("app.chat.welcomeTour.voiceInput.options.sendAudio")}</Li>
+            <Li>{t("app.chat.welcomeTour.voiceInput.options.pauseResume")}</Li>
+          </Ul>
+        </Div>
+      ),
+      placement: TOUR_PLACEMENTS.TOP,
+    },
+    // Step: Call Mode (Phone button)
+    {
+      target: getTourSelector(TOUR_DATA_ATTRS.CALL_MODE_BUTTON),
+      content: (
+        <Div className="space-y-2">
+          <H3 className="text-lg font-semibold flex items-center gap-2">
+            <PhoneIcon className="h-5 w-5 text-green-500" />
+            {t("app.chat.welcomeTour.callMode.title")}
+          </H3>
+          <P className="text-sm">
+            {t("app.chat.welcomeTour.callMode.description")}
+          </P>
+          <P className="text-xs text-muted-foreground">
+            {t("app.chat.welcomeTour.callMode.tip")}
+          </P>
         </Div>
       ),
       placement: TOUR_PLACEMENTS.TOP,

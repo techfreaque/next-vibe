@@ -12,7 +12,11 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import { type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import type {
+  TFunction,
+  TParams,
+  TranslationKey,
+} from "@/i18n/core/static-types";
 
 import { isEmptySchema } from "../../../../shared/utils/validation";
 import type { CreateApiEndpoint } from "../../shared/endpoints/definition/create";
@@ -126,10 +130,10 @@ export interface RouteExecutionResult {
   data?: CliResponseData;
 
   /** Error message (translation key or plain text) */
-  error?: string;
+  error?: TranslationKey;
 
   /** Error parameters for translation */
-  errorParams?: Record<string, string | number | boolean | null | undefined>;
+  errorParams?: TParams;
 
   /** CLI-specific metadata */
   metadata?: {
@@ -254,7 +258,6 @@ export class RouteDelegationHandler {
         logger,
         platform: context.platform,
       });
-
 
       // 7. Convert ResponseType to RouteExecutionResult
       const routeResult: RouteExecutionResult = {
@@ -449,28 +452,11 @@ export class RouteDelegationHandler {
     if (!result.success) {
       // Translate error message if it's a translation key
       const { t } = simpleT(locale);
-      let errorMessage =
+      let errorMessage = t(
         result.error ||
-        t("app.api.system.unifiedInterface.cli.vibe.errors.unknownError");
-
-      // Try to translate if it looks like a translation key (contains dots)
-      if (errorMessage.includes(".")) {
-        try {
-          const translationParams = result.errorParams
-            ? Object.fromEntries(
-                Object.entries(result.errorParams).map(([key, value]) => [
-                  key,
-                  typeof value === "string" || typeof value === "number"
-                    ? value
-                    : String(value),
-                ]),
-              )
-            : undefined;
-          errorMessage = t(errorMessage as TranslationKey, translationParams);
-        } catch {
-          // If translation fails, use the key as-is
-        }
-      }
+          "app.api.system.unifiedInterface.cli.vibe.errors.unknownError",
+        result.errorParams,
+      );
 
       // Build detailed error message with errorParams
       let detailedError = errorMessage;

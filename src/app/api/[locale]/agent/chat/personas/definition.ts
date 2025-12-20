@@ -23,7 +23,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../shared/types/common.schema";
 import { ModelId, ModelIdOptions } from "../model-access/models";
-import { CategoryOptions } from "./config";
+import { CategoryOptions, PersonaCategory } from "./config";
+import { PersonaCategoryDB, PersonaSource, PersonaSourceDB } from "./enum";
 
 /**
  * Get Personas List Endpoint (GET)
@@ -112,14 +113,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.personas.get.response.personas.persona.category.content" as const,
               },
-              z.enum([
-                "general",
-                "creative",
-                "technical",
-                "education",
-                "controversial",
-                "lifestyle",
-              ]),
+              z.enum(PersonaCategoryDB),
             ),
             source: responseField(
               {
@@ -127,7 +121,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.personas.get.response.personas.persona.source.content" as const,
               },
-              z.enum(["built-in", "my", "community"]),
+              z.enum(PersonaSourceDB),
             ),
             preferredModel: responseField(
               {
@@ -217,8 +211,8 @@ const { GET } = createEndpoint({
             description: "The models unmodified behavior",
             icon: "robot-face",
             systemPrompt: "",
-            category: "general",
-            source: "built-in",
+            category: PersonaCategory.ASSISTANT,
+            source: PersonaSource.BUILT_IN,
             suggestedPrompts: [
               "Help me brainstorm ideas for a new project",
               "Explain quantum computing in simple terms",
@@ -230,8 +224,8 @@ const { GET } = createEndpoint({
             description: "A custom persona I created",
             icon: "direct-hit",
             systemPrompt: "You are a helpful assistant specialized in...",
-            category: "technical",
-            source: "my",
+            category: PersonaCategory.CODING,
+            source: PersonaSource.MY,
             preferredModel: ModelId.GPT_5,
             suggestedPrompts: ["Help me with coding", "Review my architecture"],
           },
@@ -324,14 +318,7 @@ const { POST } = createEndpoint({
           options: CategoryOptions,
           columns: 6,
         },
-        z.enum([
-          "general",
-          "creative",
-          "technical",
-          "education",
-          "controversial",
-          "lifestyle",
-        ]),
+        z.enum(PersonaCategoryDB),
       ),
       preferredModel: requestDataField(
         {
@@ -436,7 +423,7 @@ const { POST } = createEndpoint({
         icon: "technologist",
         systemPrompt:
           "You are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
-        category: "technical",
+        category: PersonaCategory.CODING,
         preferredModel: ModelId.GPT_5,
         suggestedPrompts: [
           "Review this code for bugs",

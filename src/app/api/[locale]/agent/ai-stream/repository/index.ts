@@ -57,6 +57,10 @@ import { createFreedomGPT } from "../providers/freedomgpt";
 import { createGabAI } from "../providers/gab-ai";
 import { createUncensoredAI } from "../providers/uncensored-ai";
 import { setupAiStream } from "./stream-setup";
+import {
+  createStreamingTTSHandler,
+  type StreamingTTSHandler,
+} from "./streaming-tts";
 
 /**
  * Maximum duration for streaming responses (in seconds)
@@ -190,6 +194,8 @@ class AiStreamRepository implements IAiStreamRepository {
       messages,
       systemPrompt: initialSystemPrompt,
       toolConfirmationResult,
+      voiceMode,
+      voiceTranscription,
     } = setupResult.data;
 
     let systemPrompt = initialSystemPrompt;
@@ -213,7 +219,7 @@ class AiStreamRepository implements IAiStreamRepository {
       systemPrompt = updatedSystemPrompt;
 
       // Configure provider based on model
-      const provider = this.getProviderForModel(data.model);
+      const provider = this.getProviderForModel(data.model, logger);
 
       logger.info("[AI Stream] Starting OpenRouter stream", {
         model: data.model,
@@ -251,13 +257,32 @@ class AiStreamRepository implements IAiStreamRepository {
 
       const stream = new ReadableStream({
         async start(controller): Promise<void> {
+          // Create streaming TTS handler if voice mode enabled
+          let ttsHandler: StreamingTTSHandler | null = null;
+          if (voiceMode?.streamTTS) {
+            ttsHandler = createStreamingTTSHandler({
+              controller,
+              encoder,
+              logger,
+              locale,
+              voice: voiceMode.voice,
+              userId,
+              enabled: true,
+            });
+            logger.info("[AI Stream] Voice mode enabled - streaming TTS active", {
+              voice: voiceMode.voice,
+              callMode: voiceMode.callMode,
+            });
+          }
+
           try {
             AiStreamRepository.emitInitialEvents({
               isNewThread,
               threadId: threadResultThreadId,
               rootFolderId: data.rootFolderId,
               subFolderId: data.subFolderId || null,
-              content: data.content,
+              // Use effectiveContent for thread title (includes transcribed text for voice input)
+              content: effectiveContent,
               operation: data.operation,
               userMessageId,
               effectiveRole,
@@ -265,6 +290,7 @@ class AiStreamRepository implements IAiStreamRepository {
               messageDepth,
               effectiveContent,
               toolConfirmationResult,
+              voiceTranscription,
               controller,
               encoder,
               logger,
@@ -403,11 +429,13 @@ class AiStreamRepository implements IAiStreamRepository {
                   controller,
                   encoder,
                   logger,
+                  ttsHandler,
                 });
                 currentAssistantMessageId = result.currentAssistantMessageId;
                 currentAssistantContent = result.currentAssistantContent;
 
                 // If a new ASSISTANT message was created, update currentParentId/currentDepth
+                // Note: TTS handler messageId is already set inside processTextDelta
                 if (result.wasCreated) {
                   currentParentId = result.currentAssistantMessageId;
                   currentDepth = result.newDepth;
@@ -631,6 +659,12 @@ class AiStreamRepository implements IAiStreamRepository {
               });
             }
 
+            // Flush TTS handler to emit any remaining audio
+            if (ttsHandler) {
+              await ttsHandler.flush();
+              logger.info("[AI Stream] TTS handler flushed");
+            }
+
             logger.info("[AI Stream] Stream completed", {
               totalTokens: usage.totalTokens,
             });
@@ -676,6 +710,65 @@ class AiStreamRepository implements IAiStreamRepository {
                 );
                 controller.close();
               }
+              return;
+            }
+
+            // Check if this is a timeout error
+            if (
+              error instanceof Error &&
+              error.message === "Stream timeout"
+            ) {
+              logger.error("[AI Stream] Stream timed out", {
+                message: error.message,
+                maxDuration: `${maxDuration} seconds`,
+                model: data.model,
+                threadId: threadResultThreadId,
+                hasContent: !!lastSequenceId,
+              });
+
+              // Create a timeout-specific error message for the UI
+              const timeoutError: MessageResponseType = {
+                message: "app.api.agent.chat.aiStream.errors.timeout",
+                messageParams: { seconds: String(maxDuration) },
+              };
+
+              // Create ERROR message in DB if not incognito
+              const errorMessageId = crypto.randomUUID();
+              if (!isIncognito) {
+                const { serializeError } = await import("../error-utils");
+                await createErrorMessage({
+                  messageId: errorMessageId,
+                  threadId: threadResultThreadId,
+                  content: serializeError(timeoutError),
+                  errorType: "TIMEOUT_ERROR",
+                  parentId: lastParentId,
+                  depth: lastDepth,
+                  userId,
+                  sequenceId: lastSequenceId,
+                  logger,
+                });
+              }
+
+              // Emit ERROR message event for UI
+              const { serializeError } = await import("../error-utils");
+              const errorMessageEvent = createStreamEvent.messageCreated({
+                messageId: errorMessageId,
+                threadId: threadResultThreadId,
+                role: ChatMessageRole.ERROR,
+                content: serializeError(timeoutError),
+                parentId: lastParentId,
+                depth: lastDepth,
+                sequenceId: lastSequenceId,
+              });
+              controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
+
+              // Also emit legacy error event for compatibility
+              const errorEvent = createStreamEvent.error({
+                code: "TIMEOUT_ERROR",
+                message: `Stream timed out after ${maxDuration} seconds. The response may have been too long.`,
+              });
+              controller.enqueue(encoder.encode(formatSSEEvent(errorEvent)));
+              controller.close();
               return;
             }
 
@@ -755,6 +848,7 @@ class AiStreamRepository implements IAiStreamRepository {
    */
   private getProviderForModel(
     model: ModelId,
+    logger: EndpointLogger,
   ): ReturnType<
     | typeof createOpenRouter
     | typeof createUncensoredAI
@@ -767,6 +861,7 @@ class AiStreamRepository implements IAiStreamRepository {
       case ApiProvider.UNCENSORED_AI:
         return createUncensoredAI({
           apiKey: agentEnv.UNCENSORED_AI_API_KEY,
+          logger,
         });
 
       case ApiProvider.FREEDOMGPT:
@@ -874,6 +969,12 @@ class AiStreamRepository implements IAiStreamRepository {
       sequenceId: string;
       toolCall: ToolCall; // Full ToolCall object with all required fields including args
     };
+    /** Voice transcription metadata (when audio input was transcribed) */
+    voiceTranscription?: {
+      wasTranscribed: boolean;
+      confidence: number | null;
+      durationSeconds: number | null;
+    } | null;
   }): void {
     const {
       isNewThread,
@@ -891,6 +992,7 @@ class AiStreamRepository implements IAiStreamRepository {
       encoder,
       logger,
       toolConfirmationResult,
+      voiceTranscription,
     } = params;
 
     // Emit thread-created event if new thread
@@ -914,6 +1016,21 @@ class AiStreamRepository implements IAiStreamRepository {
         threadId,
         isNew: isNewThread,
       });
+    }
+
+    // Emit VOICE_TRANSCRIBED event if audio was transcribed
+    if (voiceTranscription?.wasTranscribed) {
+      logger.debug("Emitting VOICE_TRANSCRIBED event", {
+        textLength: effectiveContent.length,
+        confidence: voiceTranscription.confidence,
+      });
+      const voiceTranscribedEvent = createStreamEvent.voiceTranscribed({
+        text: effectiveContent,
+        confidence: voiceTranscription.confidence,
+        durationSeconds: voiceTranscription.durationSeconds,
+      });
+      controller.enqueue(encoder.encode(formatSSEEvent(voiceTranscribedEvent)));
+      logger.debug("VOICE_TRANSCRIBED event emitted");
     }
 
     // For answer-as-ai, retry, or tool confirmation - skip user message event
@@ -1203,6 +1320,7 @@ class AiStreamRepository implements IAiStreamRepository {
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
     logger: EndpointLogger;
+    ttsHandler: StreamingTTSHandler | null;
   }): Promise<{
     currentAssistantMessageId: string;
     currentAssistantContent: string;
@@ -1223,6 +1341,7 @@ class AiStreamRepository implements IAiStreamRepository {
       controller,
       encoder,
       logger,
+      ttsHandler,
     } = params;
 
     let { currentAssistantMessageId } = params;
@@ -1245,6 +1364,14 @@ class AiStreamRepository implements IAiStreamRepository {
           logger,
         });
         currentAssistantMessageId = result.messageId;
+
+        // IMPORTANT: Set messageId on TTS handler BEFORE calling addDelta
+        // Otherwise the chunk will be skipped because messageId is not set
+        if (ttsHandler) {
+          ttsHandler.setMessageId(result.messageId);
+          await ttsHandler.addDelta(textDelta);
+        }
+
         return {
           currentAssistantMessageId,
           currentAssistantContent: result.content,
@@ -1263,6 +1390,11 @@ class AiStreamRepository implements IAiStreamRepository {
         encoder,
         logger,
       });
+
+      // Send delta to TTS handler for audio generation
+      if (ttsHandler) {
+        await ttsHandler.addDelta(textDelta);
+      }
 
       return {
         currentAssistantMessageId,

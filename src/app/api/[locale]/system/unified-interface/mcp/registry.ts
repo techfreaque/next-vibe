@@ -13,12 +13,11 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { TParams,TranslationKey } from "@/i18n/core/static-types";
+import type { TParams } from "@/i18n/core/static-types";
 
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
 import { routeExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint";
-import type { Methods } from "../shared/types/enums";
 import { Platform } from "../shared/types/platform";
 import type {
   MCPExecutionContext,
@@ -107,13 +106,13 @@ export class MCPRegistry implements IMCPRegistry {
       id: tool.name,
       toolName: tool.name,
       name: tool.name,
-      description: tool.description as TranslationKey,
-      category: tool.category as TranslationKey | undefined,
-      tags: tool.tags as readonly (TranslationKey | undefined)[],
+      description: tool.description,
+      category: tool.category,
+      tags: tool.tags,
       path: tool.name,
       routePath: tool.name,
       definitionPath: tool.name,
-      method: tool.method as Methods,
+      method: tool.method,
       allowedRoles: tool.allowedRoles,
       requiresAuth: tool.allowedRoles.length > 0,
       aliases: tool.aliases,
@@ -245,7 +244,7 @@ export class MCPRegistry implements IMCPRegistry {
   }: {
     error: string;
     code: MCPErrorCode;
-     
+
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Tool registration requires 'unknown' for flexible tool definitions
     details?: { [key: string]: unknown };
   }): MCPToolCallResult {

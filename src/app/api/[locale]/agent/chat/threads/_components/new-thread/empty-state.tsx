@@ -1,36 +1,17 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronDown, ChevronUp, MoreHorizontal } from "next-vibe-ui/ui/icons";
-import { Markdown } from "next-vibe-ui/ui/markdown";
-import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
-import { Span } from "next-vibe-ui/ui/span";
-import { H1, H3, P } from "next-vibe-ui/ui/typography";
+import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import React, { useState } from "react";
+import React from "react";
 
 import { DOM_IDS, LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
 import { getDefaultFolderConfig } from "@/app/api/[locale]/agent/chat/config";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
-import {
-  DEFAULT_CATEGORIES,
-  DEFAULT_PERSONAS,
-  type Persona,
-} from "@/app/api/[locale]/agent/chat/personas/config";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 interface ChatEmptyStateProps {
   locale: CountryLanguage;
@@ -46,23 +27,7 @@ export function ChatEmptyState({
   inputHeight,
 }: ChatEmptyStateProps): JSX.Element {
   const { t } = simpleT(locale);
-  const {
-    currentRootFolderId: rootFolderId,
-    handleFillInputWithPrompt,
-    selectedPersona: selectedPersonaId,
-    setSelectedPersona: setSelectedPersonaId,
-    handleModelChange,
-  } = useChatContext();
-
-  // Get the actual persona object from the ID
-  const selectedPersona: Persona =
-    DEFAULT_PERSONAS.find((p) => p.id === selectedPersonaId) ||
-    DEFAULT_PERSONAS[0];
-
-  const [modalOpen, setModalOpen] = useState(false);
-  const [expandedPersonaId, setExpandedPersonaId] = useState<string | null>(
-    null,
-  );
+  const { currentRootFolderId: rootFolderId } = useChatContext();
 
   const folderConfig = getDefaultFolderConfig(rootFolderId);
   const color = folderConfig?.color || "blue";
@@ -108,62 +73,6 @@ export function ChatEmptyState({
     };
 
     return colorMap[color]?.[variant] || colorMap.blue[variant];
-  };
-
-  // Get personas to display in tabs - always include selected persona
-  const getDisplayedPersonas = (): Persona[] => {
-    const firstSix = DEFAULT_PERSONAS.slice(0, 6);
-    const selectedIsInFirstSix = firstSix.some(
-      (p) => p.id === selectedPersona.id,
-    );
-
-    if (selectedIsInFirstSix) {
-      return firstSix;
-    }
-
-    // Replace the last one with the selected persona
-    return [...firstSix.slice(0, 5), selectedPersona];
-  };
-
-  const handlePersonaClick = (persona: Persona): void => {
-    setSelectedPersonaId(persona.id);
-    // If persona has a preferred model, switch to it
-    if (persona.preferredModel) {
-      handleModelChange(persona.preferredModel);
-    }
-  };
-
-  const handlePersonaSelect = (persona: Persona): void => {
-    setSelectedPersonaId(persona.id);
-    // If persona has a preferred model, switch to it
-    if (persona.preferredModel) {
-      handleModelChange(persona.preferredModel);
-    }
-    setModalOpen(false);
-  };
-
-  const handlePromptClick = (
-    promptKey: TranslationKey,
-    persona?: Persona,
-  ): void => {
-    const prompt = t(promptKey);
-    const personaToUse = persona || selectedPersona;
-
-    // Update persona and model when clicking a prompt
-    setSelectedPersonaId(personaToUse.id);
-    if (personaToUse.preferredModel) {
-      handleModelChange(personaToUse.preferredModel);
-    }
-
-    handleFillInputWithPrompt(
-      prompt,
-      personaToUse.id,
-      personaToUse.preferredModel,
-    );
-  };
-
-  const toggleExpanded = (personaId: string): void => {
-    setExpandedPersonaId((prev) => (prev === personaId ? null : personaId));
   };
 
   const getTitle = (): string => {
@@ -228,215 +137,6 @@ export function ChatEmptyState({
             {getDescription()}
           </P>
 
-          {/* Horizontal persona selector */}
-          <Div className="flex flex-wrap gap-2 justify-center mb-6 w-full">
-            {getDisplayedPersonas().map((persona) => (
-              <Button
-                key={persona.id}
-                onClick={(): void => handlePersonaClick(persona)}
-                variant="ghost"
-                size="sm"
-                className={`flex gap-2 border ${
-                  selectedPersona.id === persona.id
-                    ? `${getColorClasses("bg")} ${getColorClasses("border")}`
-                    : "border-transparent"
-                }`}
-              >
-                <Div className="text-base">
-                  {React.createElement(getIconComponent(persona.icon))}
-                </Div>
-                <Span className="text-sm">{t(persona.name)}</Span>
-              </Button>
-            ))}
-
-            {/* More button - opens modal */}
-            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="flex gap-2 border border-transparent"
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                  <Span className="text-sm">
-                    {t("app.chat.suggestedPrompts.more")}
-                  </Span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl max-h-[85vh]">
-                <DialogHeader>
-                  <DialogTitle>
-                    {t("app.chat.suggestedPrompts.selectPersona")}
-                  </DialogTitle>
-                </DialogHeader>
-                <ScrollArea className="h-[70vh] pr-4">
-                  <Div className="flex flex-col gap-4">
-                    {DEFAULT_PERSONAS.map((persona: Persona) => {
-                      const isExpanded = expandedPersonaId === persona.id;
-                      const categoryConfig = DEFAULT_CATEGORIES.find(
-                        (cat) => cat.id === persona.category,
-                      );
-                      const modelConfig = persona.preferredModel
-                        ? getModelById(persona.preferredModel)
-                        : null;
-
-                      return (
-                        <Div
-                          key={persona.id}
-                          className={`rounded-lg border transition-all ${
-                            selectedPersona.id === persona.id
-                              ? `${getColorClasses("border").replace("/50", "")} ${getColorClasses("bg").replace("/20", "/5")}`
-                              : ""
-                          }`}
-                        >
-                          {/* Header - clickable to select persona */}
-                          <Button
-                            onClick={(): void => handlePersonaSelect(persona)}
-                            variant="ghost"
-                            size="unset"
-                            className="w-full text-left p-4 rounded-lg"
-                          >
-                            <Div className="flex items-start gap-4 w-full">
-                              <Div className="text-3xl shrink-0">
-                                {React.createElement(
-                                  getIconComponent(persona.icon),
-                                )}
-                              </Div>
-                              <Div className="flex-1 min-w-0">
-                                <H3 className="text-lg font-semibold mb-1">
-                                  {t(persona.name)}
-                                </H3>
-                                <P className="text-sm text-muted-foreground">
-                                  {t(persona.description)}
-                                </P>
-                                {/* Category and Model badges */}
-                                <Div className="flex flex-wrap gap-2 mt-2">
-                                  {categoryConfig && (
-                                    <Div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50 text-xs">
-                                      <Div className="text-sm">
-                                        {React.createElement(
-                                          getIconComponent(categoryConfig.icon),
-                                        )}
-                                      </Div>
-                                      <Span>{t(categoryConfig.name)}</Span>
-                                    </Div>
-                                  )}
-                                  {modelConfig && (
-                                    <Div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50 text-xs">
-                                      <Div className="text-sm">
-                                        {React.createElement(
-                                          getIconComponent(modelConfig.icon),
-                                        )}
-                                      </Div>
-                                      <Span>{modelConfig.name}</Span>
-                                    </Div>
-                                  )}
-                                </Div>
-                              </Div>
-                            </Div>
-                          </Button>
-
-                          {/* Toggle button for more details */}
-                          <Div className="px-4 pb-2">
-                            <Button
-                              onClick={(): void => toggleExpanded(persona.id)}
-                              variant="ghost"
-                              size="sm"
-                              className="w-full justify-start text-xs gap-2 h-8"
-                            >
-                              <Div className="h-3.5 w-3.5 shrink-0">
-                                {React.createElement(
-                                  isExpanded ? ChevronUp : ChevronDown,
-                                )}
-                              </Div>
-                              <Span className="text-muted-foreground">
-                                {isExpanded
-                                  ? t("app.chat.suggestedPrompts.hideDetails")
-                                  : t("app.chat.suggestedPrompts.showDetails")}
-                              </Span>
-                            </Button>
-                          </Div>
-
-                          {/* Expanded details */}
-                          {isExpanded && (
-                            <Div className="px-4 pb-4 pt-2 border-t border-border">
-                              <Div className="flex flex-col gap-4">
-                                {/* System Prompt with Markdown */}
-                                {persona.systemPrompt && (
-                                  <Div className="flex flex-col gap-2">
-                                    <Span className="text-sm font-semibold">
-                                      {t(
-                                        "app.chat.suggestedPrompts.systemPromptLabel",
-                                      )}
-                                    </Span>
-                                    <Div className="prose prose-sm dark:prose-invert max-w-none bg-muted/30 p-3 rounded-md border border-border">
-                                      <Markdown
-                                        content={persona.systemPrompt}
-                                      />
-                                    </Div>
-                                  </Div>
-                                )}
-
-                                {/* Suggested Prompts - Same style as outside modal */}
-                                {persona.suggestedPrompts &&
-                                  persona.suggestedPrompts.length > 0 && (
-                                    <Div className="flex flex-col gap-2">
-                                      <Span className="text-sm font-semibold">
-                                        {t(
-                                          "app.chat.suggestedPrompts.suggestedPromptsLabel",
-                                        )}
-                                      </Span>
-                                      <Div className="flex flex-col gap-2">
-                                        {persona.suggestedPrompts.map(
-                                          (promptKey, idx) => (
-                                            <Button
-                                              key={idx}
-                                              onClick={(): void => {
-                                                handlePromptClick(
-                                                  promptKey,
-                                                  persona,
-                                                );
-                                                setModalOpen(false);
-                                              }}
-                                              variant="ghost"
-                                              size="unset"
-                                              className="w-full text-left p-3 rounded-lg hover:bg-accent transition-all border border-border text-sm"
-                                            >
-                                              {t(promptKey)}
-                                            </Button>
-                                          ),
-                                        )}
-                                      </Div>
-                                    </Div>
-                                  )}
-                              </Div>
-                            </Div>
-                          )}
-                        </Div>
-                      );
-                    })}
-                  </Div>
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
-          </Div>
-
-          {/* Selected persona prompts */}
-          <Div className="w-full space-y-2">
-            {(selectedPersona.suggestedPrompts || [])
-              .slice(0, 4)
-              .map((promptKey, idx) => (
-                <Button
-                  key={idx}
-                  onClick={(): void => handlePromptClick(promptKey)}
-                  variant="ghost"
-                  size="unset"
-                  className={`w-full p-4 border ${getColorClasses("border").replace("/50", "/20")} ${getColorClasses("hover-bg")}`}
-                >
-                  <Span className="text-sm">{t(promptKey)}</Span>
-                </Button>
-              ))}
-          </Div>
         </Div>
       </Div>
     </Div>

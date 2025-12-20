@@ -32,6 +32,10 @@ export enum StreamEventType {
   TOOL_WAITING = "tool-waiting",
   TOOL_RESULT = "tool-result",
   ERROR = "error",
+  // Voice mode events
+  VOICE_TRANSCRIBED = "voice-transcribed",
+  AUDIO_CHUNK = "audio-chunk",
+  VOICE_MODE_ACTIVE = "voice-mode-active",
 }
 
 /**
@@ -133,6 +137,49 @@ export interface ErrorEventData {
 }
 
 /**
+ * Voice transcribed event data
+ * Emitted when STT completes in voice mode (before LLM processes)
+ */
+export interface VoiceTranscribedEventData {
+  /** Transcribed text from user's voice */
+  text: string;
+  /** Confidence score (0-1) if available */
+  confidence: number | null;
+  /** Duration of the audio in seconds */
+  durationSeconds: number | null;
+}
+
+/**
+ * Audio chunk event data
+ * Emitted for streaming TTS - each chunk is a playable audio segment
+ */
+export interface AudioChunkEventData {
+  /** Message ID this audio belongs to */
+  messageId: string;
+  /** Base64-encoded audio data (data URL format) */
+  audioData: string;
+  /** Chunk index (0-based) */
+  chunkIndex: number;
+  /** Whether this is the final chunk */
+  isFinal: boolean;
+  /** Text that was converted to this audio */
+  text: string;
+}
+
+/**
+ * Voice mode active event data
+ * Signals that voice mode is active for this response
+ */
+export interface VoiceModeActiveEventData {
+  /** Whether voice mode is enabled */
+  enabled: boolean;
+  /** Whether auto-play TTS is enabled */
+  autoPlayTTS: boolean;
+  /** Whether call mode (short responses) is active */
+  callMode: boolean;
+}
+
+/**
  * Event type to data mapping
  */
 export interface StreamEventDataMap {
@@ -146,6 +193,10 @@ export interface StreamEventDataMap {
   [StreamEventType.TOOL_WAITING]: ToolWaitingEventData;
   [StreamEventType.TOOL_RESULT]: ToolResultEventData;
   [StreamEventType.ERROR]: ErrorEventData;
+  // Voice mode events
+  [StreamEventType.VOICE_TRANSCRIBED]: VoiceTranscribedEventData;
+  [StreamEventType.AUDIO_CHUNK]: AudioChunkEventData;
+  [StreamEventType.VOICE_MODE_ACTIVE]: VoiceModeActiveEventData;
 }
 
 /**
@@ -225,6 +276,28 @@ export const createStreamEvent = {
 
   error: (data: ErrorEventData): StreamEvent<StreamEventType.ERROR> => ({
     type: StreamEventType.ERROR,
+    data,
+  }),
+
+  // Voice mode event creators
+  voiceTranscribed: (
+    data: VoiceTranscribedEventData,
+  ): StreamEvent<StreamEventType.VOICE_TRANSCRIBED> => ({
+    type: StreamEventType.VOICE_TRANSCRIBED,
+    data,
+  }),
+
+  audioChunk: (
+    data: AudioChunkEventData,
+  ): StreamEvent<StreamEventType.AUDIO_CHUNK> => ({
+    type: StreamEventType.AUDIO_CHUNK,
+    data,
+  }),
+
+  voiceModeActive: (
+    data: VoiceModeActiveEventData,
+  ): StreamEvent<StreamEventType.VOICE_MODE_ACTIVE> => ({
+    type: StreamEventType.VOICE_MODE_ACTIVE,
     data,
   }),
 };

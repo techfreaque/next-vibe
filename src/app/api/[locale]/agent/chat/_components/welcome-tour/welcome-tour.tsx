@@ -2,7 +2,7 @@
 /* eslint-disable react-compiler/react-compiler -- Complex mount-only effect requires intentional dependency exclusion */
 
 import { useRouter } from "next-vibe-ui/hooks";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { CallBackProps } from "react-joyride";
 import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
 
@@ -30,6 +30,9 @@ import {
 } from "./tour-config";
 import { useTourState } from "./tour-state-context";
 
+// Model selector step index (step after welcome)
+const MODEL_SELECTOR_STEP_INDEX = 1;
+
 interface WelcomeTourProps {
   isAuthenticated: boolean;
   locale: CountryLanguage;
@@ -55,43 +58,18 @@ export function WelcomeTour({
   const setModelSelectorOpen = useTourState(
     (state) => state.setModelSelectorOpen,
   );
-  const setPersonaSelectorOpen = useTourState(
-    (state) => state.setPersonaSelectorOpen,
-  );
-  const setModelSelectorShowAll = useTourState(
-    (state) => state.setModelSelectorShowAll,
-  );
-  const setPersonaSelectorShowAll = useTourState(
-    (state) => state.setPersonaSelectorShowAll,
+  const setAdvanceTour = useTourState((state) => state.setAdvanceTour);
+  const modelSelectorOpen = useTourState((state) => state.modelSelectorOpen);
+  const setBottomSheetExpanded = useTourState(
+    (state) => state.setBottomSheetExpanded,
   );
 
-  // Helper to check if the correct modal is actually open
-  const isCorrectModalOpen = useCallback(
-    (requiredType: "model" | "persona" | null): boolean => {
-      if (!requiredType) {
-        // No modal required - check that no modal is open
-        return !document.querySelector("[role='dialog']");
-      }
+  // Ref to track if we're waiting for selector to close
+  const waitingForSelectorRef = useRef(false);
 
-      // Modal required - check if correct modal is open
-      const modalDialog = document.querySelector("[role='dialog']");
-      if (!modalDialog) {
-        return false;
-      }
-
-      // Check if the modal contains the expected elements
-      // Look for favorites element which is always present (not search which only shows in "Show all" mode)
-      if (requiredType === "model") {
-        return !!modalDialog.querySelector(
-          getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_FAVORITES),
-        );
-      }
-      return !!modalDialog.querySelector(
-        getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_FAVORITES),
-      );
-    },
-    [],
-  );
+  // Track if we're waiting for bottom sheet to expand
+  const [waitingForBottomSheet, setWaitingForBottomSheet] = useState(false);
+  const pendingStepIndexRef = useRef<number | null>(null);
 
   // Detect mobile on mount
   useEffect(() => {
@@ -107,7 +85,6 @@ export function WelcomeTour({
   const tourSteps = getTourSteps(t, isAuthenticated);
 
   // Initialize tour on mount - uses empty deps intentionally as this should only run once
-  // The callbacks used inside (isSidebarTarget, ensureSidebarOpen, etc.) are stable and defined below
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     // Check if tour was already completed or skipped
@@ -135,26 +112,6 @@ export function WelcomeTour({
         } else if (isMobile && target !== "body") {
           // On mobile, collapse sidebar for non-body, non-sidebar steps
           setSidebarCollapsed(true);
-        }
-
-        // Ensure modal is open if resuming on a modal step
-        const requiredModalType = getRequiredModalType(target);
-        if (requiredModalType) {
-          // Open modal using tour state
-          if (requiredModalType === "model") {
-            setModelSelectorOpen(true);
-          } else {
-            setPersonaSelectorOpen(true);
-          }
-
-          // If this step requires "show all" mode, enable it
-          if (requiresShowAll(target)) {
-            if (requiredModalType === "model") {
-              setModelSelectorShowAll(true);
-            } else {
-              setPersonaSelectorShowAll(true);
-            }
-          }
         }
       }
 
@@ -192,41 +149,16 @@ export function WelcomeTour({
       target === getTourSelector(TOUR_DATA_ATTRS.PRIVATE_FOLDER) ||
       target === getTourSelector(TOUR_DATA_ATTRS.SHARED_FOLDER) ||
       target === getTourSelector(TOUR_DATA_ATTRS.NEW_CHAT_BUTTON) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.SIDEBAR_LOGIN)
+      target === getTourSelector(TOUR_DATA_ATTRS.SIDEBAR_LOGIN) ||
+      target === getTourSelector(TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON)
     );
   }, []);
 
-  // Helper to check if a target is inside model selector modal
-  const isModelSelectorModalTarget = useCallback((target: string): boolean => {
+  // Helper to check if a target needs the bottom sheet expanded
+  const needsBottomSheetExpanded = useCallback((target: string): boolean => {
     return (
-      target === getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_FAVORITES) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_SHOW_ALL) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_SEARCH) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_GROUP)
-    );
-  }, []);
-
-  // Helper to check if a target is inside persona selector modal
-  const isPersonaSelectorModalTarget = useCallback(
-    (target: string): boolean => {
-      return (
-        target ===
-          getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_FAVORITES) ||
-        target === getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_SHOW_ALL) ||
-        target === getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_SEARCH) ||
-        target === getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_GROUP)
-      );
-    },
-    [],
-  );
-
-  // Helper to check if a target requires "show all" mode
-  const requiresShowAll = useCallback((target: string): boolean => {
-    return (
-      target === getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_SEARCH) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.MODEL_SELECTOR_GROUP) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_SEARCH) ||
-      target === getTourSelector(TOUR_DATA_ATTRS.PERSONA_SELECTOR_GROUP)
+      target === getTourSelector(TOUR_DATA_ATTRS.SIDEBAR_LOGIN) ||
+      target === getTourSelector(TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON)
     );
   }, []);
 
@@ -237,107 +169,149 @@ export function WelcomeTour({
     }
   }, [sidebarCollapsed, setSidebarCollapsed]);
 
-  // Helper to get which modal type a step needs (if any)
-  const getRequiredModalType = useCallback(
-    (target: string): "model" | "persona" | null => {
-      if (isModelSelectorModalTarget(target)) {
-        return "model";
+  // Advance to next step
+  const goToNextStep = useCallback((): void => {
+    const nextIndex = stepIndex + 1;
+    if (nextIndex < steps.length) {
+      setStepIndex(nextIndex);
+      localStorage.setItem(TOUR_LAST_STEP_KEY, nextIndex.toString());
+    }
+  }, [stepIndex, steps.length]);
+
+  // Register advanceTour callback so Selector can call it
+  useEffect(() => {
+    if (run) {
+      setAdvanceTour(() => goToNextStep);
+    }
+    return (): void => {
+      setAdvanceTour(null);
+    };
+  }, [run, setAdvanceTour, goToNextStep]);
+
+  // Pause/resume tour based on selector state
+  // When selector is open during tour step 2, hide the tooltip
+  useEffect(() => {
+    // Handle both: clicking "Next" on step 2 (sets waitingForSelectorRef)
+    // AND clicking the selector directly during step 2
+    const isOnSelectorStep = stepIndex === MODEL_SELECTOR_STEP_INDEX;
+
+    if (modelSelectorOpen && isOnSelectorStep && run) {
+      // Selector opened during step 2 - pause tour (hide tooltip)
+      waitingForSelectorRef.current = true;
+      setRun(false);
+    } else if (!modelSelectorOpen && waitingForSelectorRef.current) {
+      // Selector closed - resume tour and advance
+      waitingForSelectorRef.current = false;
+      goToNextStep();
+      // Small delay to ensure step index updates before showing tooltip
+      setTimeout(() => setRun(true), 100);
+    }
+  }, [modelSelectorOpen, stepIndex, run, goToNextStep]);
+
+  // Resume tour after bottom sheet animation completes
+  useEffect(() => {
+    if (waitingForBottomSheet && pendingStepIndexRef.current !== null) {
+      // Wait for collapsible animation to complete (~300ms)
+      const timer = setTimeout(() => {
+        setStepIndex(pendingStepIndexRef.current!);
+        localStorage.setItem(
+          TOUR_LAST_STEP_KEY,
+          pendingStepIndexRef.current!.toString(),
+        );
+        pendingStepIndexRef.current = null;
+        setWaitingForBottomSheet(false);
+        setRun(true);
+      }, 400);
+
+      return (): void => clearTimeout(timer);
+    }
+  }, [waitingForBottomSheet]);
+
+  // Helper to navigate based on tour target
+  const navigateForTarget = useCallback(
+    (target: string): void => {
+      if (target === getTourSelector(TOUR_DATA_ATTRS.INCOGNITO_FOLDER)) {
+        router.push(buildFolderUrl(locale, DefaultFolderId.INCOGNITO, null));
+      } else if (target === getTourSelector(TOUR_DATA_ATTRS.PUBLIC_FOLDER)) {
+        router.push(buildFolderUrl(locale, DefaultFolderId.PUBLIC, null));
+      } else if (target === getTourSelector(TOUR_DATA_ATTRS.PRIVATE_FOLDER)) {
+        router.push(buildFolderUrl(locale, DefaultFolderId.PRIVATE, null));
+      } else if (target === getTourSelector(TOUR_DATA_ATTRS.SHARED_FOLDER)) {
+        router.push(buildFolderUrl(locale, DefaultFolderId.SHARED, null));
+      } else if (target === getTourSelector(TOUR_DATA_ATTRS.NEW_CHAT_BUTTON)) {
+        const folderId = isAuthenticated
+          ? DefaultFolderId.PRIVATE
+          : DefaultFolderId.INCOGNITO;
+        router.push(buildFolderUrl(locale, folderId, null));
+      } else if (target === getTourSelector(TOUR_DATA_ATTRS.CHAT_INPUT)) {
+        // Chat input requires a thread page, not folder page
+        const folderId = isAuthenticated
+          ? DefaultFolderId.PRIVATE
+          : DefaultFolderId.INCOGNITO;
+        router.push(getNewChatUrl(locale, folderId));
       }
-      if (isPersonaSelectorModalTarget(target)) {
-        return "persona";
-      }
-      return null;
     },
-    [isModelSelectorModalTarget, isPersonaSelectorModalTarget],
+    [router, locale, isAuthenticated],
   );
-
-  // Helper to open modal using tour state
-  const openModal = useCallback(
-    async (modalType: "model" | "persona"): Promise<void> => {
-      // Set tour state to open the modal
-      if (modalType === "model") {
-        setModelSelectorOpen(true);
-      } else {
-        setPersonaSelectorOpen(true);
-      }
-
-      // Wait for modal to actually render (poll with timeout)
-      const maxAttempts = 20; // 2 seconds max
-      for (let i = 0; i < maxAttempts; i++) {
-        await new Promise((resolve) => {
-          setTimeout(resolve, 100);
-        });
-        if (isCorrectModalOpen(modalType)) {
-          return;
-        }
-      }
-    },
-    [isCorrectModalOpen, setModelSelectorOpen, setPersonaSelectorOpen],
-  );
-
-  // Helper to close modal using tour state
-  const closeModal = useCallback((): void => {
-    setModelSelectorOpen(false);
-    setPersonaSelectorOpen(false);
-  }, [setModelSelectorOpen, setPersonaSelectorOpen]);
 
   const handleJoyrideCallback = useCallback(
     (data: CallBackProps) => {
       const { status, type, action, index } = data;
 
-      // Handle STEP_BEFORE - ensure modal is open BEFORE Joyride tries to find target
+      // Handle STEP_BEFORE - prepare for the step
       if (type === EVENTS.STEP_BEFORE) {
         const currentStep = steps[index];
         if (currentStep?.target) {
           const target = currentStep.target as string;
-          const requiredModalType = getRequiredModalType(target);
-
-          // If this step needs a modal, ensure it's open (async but don't wait)
-          if (requiredModalType) {
-            void openModal(requiredModalType);
-          }
-
-          // If this step requires "show all" mode, ensure it's enabled
-          if (requiresShowAll(target)) {
-            if (requiredModalType === "model") {
-              setModelSelectorShowAll(true);
-            } else if (requiredModalType === "persona") {
-              setPersonaSelectorShowAll(true);
-            }
-          }
 
           // If this step needs sidebar, ensure it's open
           if (isSidebarTarget(target)) {
             ensureSidebarOpen();
           }
+
+          // If this step needs bottom sheet expanded, expand it
+          if (needsBottomSheetExpanded(target)) {
+            setBottomSheetExpanded(true);
+          } else {
+            setBottomSheetExpanded(false);
+          }
         }
         return;
       }
 
-      // Handle TARGET_NOT_FOUND - this fires when Joyride can't find the target element
+      // Handle TARGET_NOT_FOUND
       if (type === EVENTS.TARGET_NOT_FOUND) {
         const currentStep = steps[index];
         if (currentStep?.target) {
           const target = currentStep.target as string;
 
-          // Try to open modal if needed
-          const requiredModalType = getRequiredModalType(target);
-          if (requiredModalType) {
-            void openModal(requiredModalType);
-          }
-
           // Try to open sidebar if needed
           if (isSidebarTarget(target)) {
             ensureSidebarOpen();
           }
+
+          // Try to expand bottom sheet if needed
+          if (needsBottomSheetExpanded(target)) {
+            setBottomSheetExpanded(true);
+          }
         }
-        return; // Don't continue to STEP_AFTER logic
+        return;
       }
 
       // Handle step changes
       if (type === EVENTS.STEP_AFTER) {
-        // Navigate to appropriate folder BEFORE moving to next step
         if (action === ACTIONS.NEXT) {
+          // Special handling for MODEL_SELECTOR step
+          // When user clicks "Next" on this step, open the selector and wait for it to close
+          if (index === MODEL_SELECTOR_STEP_INDEX) {
+            // Open the selector modal
+            setModelSelectorOpen(true);
+            // Mark that we're waiting for the selector to close
+            waitingForSelectorRef.current = true;
+            // Don't advance - the selector will call advanceTour when done
+            return;
+          }
+
           const nextIndex = index + 1;
           const nextStep = steps[nextIndex];
 
@@ -354,100 +328,29 @@ export function WelcomeTour({
               : false;
             const nextIsSidebar = isSidebarTarget(target);
 
-            // Only change sidebar state if transitioning
+            // Handle sidebar state transitions
             if (currentIsSidebar !== nextIsSidebar) {
               if (isMobile) {
                 if (nextIsSidebar) {
-                  // Transitioning TO sidebar - open it
                   ensureSidebarOpen();
                 } else if (!sidebarCollapsed) {
-                  // Transitioning FROM sidebar - collapse it
                   setSidebarCollapsed(true);
                 }
               } else if (nextIsSidebar) {
-                // On desktop, ensure sidebar is open for sidebar targets
                 ensureSidebarOpen();
               }
             }
 
-            // Map tour targets to folder IDs
-            if (target === getTourSelector(TOUR_DATA_ATTRS.INCOGNITO_FOLDER)) {
-              const url = buildFolderUrl(
-                locale,
-                DefaultFolderId.INCOGNITO,
-                null,
-              );
-              router.push(url);
-            } else if (
-              target === getTourSelector(TOUR_DATA_ATTRS.PUBLIC_FOLDER)
-            ) {
-              const url = buildFolderUrl(locale, DefaultFolderId.PUBLIC, null);
-              router.push(url);
-            } else if (
-              target === getTourSelector(TOUR_DATA_ATTRS.PRIVATE_FOLDER)
-            ) {
-              const url = buildFolderUrl(locale, DefaultFolderId.PRIVATE, null);
-              router.push(url);
-            } else if (
-              target === getTourSelector(TOUR_DATA_ATTRS.SHARED_FOLDER)
-            ) {
-              const url = buildFolderUrl(locale, DefaultFolderId.SHARED, null);
-              router.push(url);
-            } else if (
-              target === getTourSelector(TOUR_DATA_ATTRS.NEW_CHAT_BUTTON)
-            ) {
-              // Navigate to Private if authenticated, otherwise Incognito
-              const folderId = isAuthenticated
-                ? DefaultFolderId.PRIVATE
-                : DefaultFolderId.INCOGNITO;
-              const url = buildFolderUrl(locale, folderId, null);
-              router.push(url);
-            }
+            // Navigate to appropriate folder
+            navigateForTarget(target);
 
-            // Handle modal state for next step
-            const nextRequiredModalType = getRequiredModalType(target);
-            const currentRequiredModalType = currentTarget
-              ? getRequiredModalType(currentTarget)
-              : null;
-
-            // Set show all state if needed for next step
-            if (requiresShowAll(target)) {
-              if (nextRequiredModalType === "model") {
-                setModelSelectorShowAll(true);
-              } else if (nextRequiredModalType === "persona") {
-                setPersonaSelectorShowAll(true);
-              }
-            }
-
-            // Update modal state - wait for modal to be ready before advancing
-            if (
-              nextRequiredModalType &&
-              nextRequiredModalType !== currentRequiredModalType
-            ) {
-              // Need to open a different modal
-              if (currentRequiredModalType) {
-                closeModal(); // Close current modal first
-              }
-              void openModal(nextRequiredModalType).then(() => {
-                setStepIndex(nextIndex);
-                localStorage.setItem(TOUR_LAST_STEP_KEY, nextIndex.toString());
-                return undefined;
-              });
-              return; // Don't advance synchronously
-            } else if (!nextRequiredModalType && currentRequiredModalType) {
-              // Need to close modal
-              closeModal();
-            } else if (
-              nextRequiredModalType === currentRequiredModalType &&
-              nextRequiredModalType
-            ) {
-              // Same modal - ensure it's still open
-              void openModal(nextRequiredModalType).then(() => {
-                setStepIndex(nextIndex);
-                localStorage.setItem(TOUR_LAST_STEP_KEY, nextIndex.toString());
-                return undefined;
-              });
-              return; // Don't advance synchronously
+            // If next step needs bottom sheet, expand it and wait
+            if (needsBottomSheetExpanded(target)) {
+              setBottomSheetExpanded(true);
+              pendingStepIndexRef.current = nextIndex;
+              setWaitingForBottomSheet(true);
+              setRun(false);
+              return;
             }
           }
 
@@ -464,89 +367,24 @@ export function WelcomeTour({
             // Handle sidebar state for mobile
             if (isMobile) {
               if (isSidebarTarget(target)) {
-                // Open sidebar for sidebar targets
                 ensureSidebarOpen();
               } else if (!sidebarCollapsed) {
-                // Collapse sidebar for non-sidebar targets on mobile
                 setSidebarCollapsed(true);
               }
             } else if (isSidebarTarget(target)) {
-              // On desktop, ensure sidebar is open for sidebar targets
               ensureSidebarOpen();
             }
 
-            // Map tour targets to folder IDs (same logic for going back)
-            if (target === getTourSelector(TOUR_DATA_ATTRS.INCOGNITO_FOLDER)) {
-              const url = buildFolderUrl(
-                locale,
-                DefaultFolderId.INCOGNITO,
-                null,
-              );
-              router.push(url);
-            } else if (
-              target === getTourSelector(TOUR_DATA_ATTRS.PUBLIC_FOLDER)
-            ) {
-              const url = buildFolderUrl(locale, DefaultFolderId.PUBLIC, null);
-              router.push(url);
-            } else if (
-              target === getTourSelector(TOUR_DATA_ATTRS.PRIVATE_FOLDER)
-            ) {
-              const url = buildFolderUrl(locale, DefaultFolderId.PRIVATE, null);
-              router.push(url);
-            } else if (
-              target === getTourSelector(TOUR_DATA_ATTRS.SHARED_FOLDER)
-            ) {
-              const url = buildFolderUrl(locale, DefaultFolderId.SHARED, null);
-              router.push(url);
-            } else if (
-              target === getTourSelector(TOUR_DATA_ATTRS.NEW_CHAT_BUTTON)
-            ) {
-              // Navigate to Private if authenticated, otherwise Incognito
-              const folderId = isAuthenticated
-                ? DefaultFolderId.PRIVATE
-                : DefaultFolderId.INCOGNITO;
-              const url = buildFolderUrl(locale, folderId, null);
-              router.push(url);
-            }
+            // Navigate to appropriate folder
+            navigateForTarget(target);
 
-            // Handle modal state for prev step
-            const prevRequiredModalType = getRequiredModalType(target);
-
-            // Check current step's modal requirement
-            const currentStep = steps[index];
-            const currentRequiredModalType = currentStep?.target
-              ? getRequiredModalType(currentStep.target as string)
-              : null;
-
-            // Update modal state - wait for modal to be ready before going back
-            if (
-              prevRequiredModalType &&
-              prevRequiredModalType !== currentRequiredModalType
-            ) {
-              // Need to open a different modal
-              if (currentRequiredModalType) {
-                closeModal(); // Close current modal first
-              }
-              void openModal(prevRequiredModalType).then(() => {
-                setStepIndex(prevIndex);
-                localStorage.setItem(TOUR_LAST_STEP_KEY, prevIndex.toString());
-                return undefined;
-              });
-              return; // Don't go back synchronously
-            } else if (!prevRequiredModalType && currentRequiredModalType) {
-              // Need to close modal
-              closeModal();
-            } else if (
-              prevRequiredModalType === currentRequiredModalType &&
-              prevRequiredModalType
-            ) {
-              // Same modal - ensure it's still open
-              void openModal(prevRequiredModalType).then(() => {
-                setStepIndex(prevIndex);
-                localStorage.setItem(TOUR_LAST_STEP_KEY, prevIndex.toString());
-                return undefined;
-              });
-              return; // Don't go back synchronously
+            // Handle bottom sheet state
+            if (needsBottomSheetExpanded(target)) {
+              // Keep it expanded if going back to a bottom sheet step
+              setBottomSheetExpanded(true);
+            } else {
+              // Close bottom sheet if leaving bottom sheet steps
+              setBottomSheetExpanded(false);
             }
           }
 
@@ -556,11 +394,12 @@ export function WelcomeTour({
         }
       }
 
-      // Handle tour completion or closure
+      // Handle tour completion
       if (status === STATUS.FINISHED) {
         setRun(false);
         setTourActive(false);
-        closeModal();
+        setModelSelectorOpen(false);
+        setBottomSheetExpanded(false);
         localStorage.setItem(TOUR_STORAGE_KEY, "true");
         localStorage.removeItem(TOUR_AUTH_PENDING_KEY);
         localStorage.removeItem(TOUR_LAST_STEP_KEY);
@@ -575,10 +414,12 @@ export function WelcomeTour({
         router.push(newThreadUrl);
       }
 
+      // Handle tour skip
       if (status === STATUS.SKIPPED) {
         setRun(false);
         setTourActive(false);
-        closeModal();
+        setModelSelectorOpen(false);
+        setBottomSheetExpanded(false);
         localStorage.setItem(TOUR_SKIPPED_KEY, "true");
         localStorage.removeItem(TOUR_AUTH_PENDING_KEY);
         localStorage.removeItem(TOUR_LAST_STEP_KEY);
@@ -593,16 +434,14 @@ export function WelcomeTour({
       isAuthenticated,
       isSidebarTarget,
       ensureSidebarOpen,
-      getRequiredModalType,
-      requiresShowAll,
+      navigateForTarget,
       isMobile,
       sidebarCollapsed,
       setSidebarCollapsed,
-      openModal,
-      closeModal,
       setTourActive,
-      setModelSelectorShowAll,
-      setPersonaSelectorShowAll,
+      setModelSelectorOpen,
+      setBottomSheetExpanded,
+      needsBottomSheetExpanded,
     ],
   );
 
@@ -614,8 +453,9 @@ export function WelcomeTour({
     localStorage.removeItem(TOUR_LAST_STEP_KEY);
     localStorage.removeItem(TOUR_IN_PROGRESS_KEY);
 
-    // Close any open modals
-    closeModal();
+    // Close any open modals and reset UI state
+    setModelSelectorOpen(false);
+    setBottomSheetExpanded(false);
 
     // Reset tour state
     setSteps(tourSteps);
@@ -624,7 +464,7 @@ export function WelcomeTour({
     localStorage.setItem(TOUR_IN_PROGRESS_KEY, "true");
     localStorage.setItem(TOUR_LAST_STEP_KEY, "0");
     setRun(true);
-  }, [tourSteps, closeModal, setTourActive]);
+  }, [tourSteps, setModelSelectorOpen, setTourActive, setBottomSheetExpanded]);
 
   // Expose restart method via window for debugging
   useEffect(() => {

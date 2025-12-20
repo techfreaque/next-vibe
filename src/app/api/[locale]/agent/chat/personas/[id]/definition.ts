@@ -24,7 +24,8 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ModelId, ModelIdOptions } from "../../model-access/models";
-import { CategoryOptions, DEFAULT_CATEGORIES } from "../config";
+import { CategoryOptions, PersonaCategory } from "../config";
+import { PersonaCategoryDB, PersonaSource, PersonaSourceDB } from "../enum";
 
 /**
  * Get Single Persona Endpoint (GET)
@@ -120,7 +121,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.personas.id.get.response.persona.category.content" as const,
             },
-            z.enum(DEFAULT_CATEGORIES.map((c) => c.id)),
+            z.enum(PersonaCategoryDB),
           ),
           source: responseField(
             {
@@ -128,7 +129,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.personas.id.get.response.persona.source.content" as const,
             },
-            z.enum(["built-in", "my", "community"]),
+            z.enum(PersonaSourceDB),
           ),
           preferredModel: responseField(
             {
@@ -227,8 +228,8 @@ const { GET } = createEndpoint({
           description: "The models unmodified behavior",
           icon: "🤖",
           systemPrompt: "",
-          category: "general",
-          source: "built-in",
+          category: PersonaCategory.ASSISTANT,
+          source: PersonaSource.BUILT_IN,
           suggestedPrompts: ["Help me brainstorm ideas"],
         },
       },
@@ -239,8 +240,8 @@ const { GET } = createEndpoint({
           description: "Expert at reviewing code",
           icon: "👨‍💻",
           systemPrompt: "You are an expert code reviewer...",
-          category: "technical",
-          source: "my",
+          category: PersonaCategory.CODING,
+          source: PersonaSource.MY,
           preferredModel: ModelId.GPT_5,
           suggestedPrompts: ["Review this code"],
         },
@@ -347,7 +348,7 @@ const { PATCH } = createEndpoint({
           options: CategoryOptions,
           columns: 6,
         },
-        z.enum(DEFAULT_CATEGORIES.map((c) => c.id)).optional(),
+        z.enum(PersonaCategory).optional(),
       ),
       preferredModel: requestDataField(
         {

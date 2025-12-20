@@ -234,6 +234,8 @@ export const translations = {
     userDeclinedTool: "User declined tool execution",
     streamError: "Stream error: {{error}}",
     streamProcessingError: "Error processing stream",
+    timeout:
+      "The response timed out after {{seconds}} seconds. The AI may have been generating a very long response. Please try again with a shorter prompt.",
   },
   providers: {
     uncensoredHandler: {
