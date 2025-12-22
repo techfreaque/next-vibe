@@ -53,7 +53,6 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    * Handle incoming JSON-RPC request
    */
   async handleRequest(
-     
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol message handling requires 'unknown' for flexible message types
     request: JsonRpcRequest<unknown>,
   ): Promise<JsonRpcResponse> {
@@ -73,7 +72,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       }
 
       // Route to appropriate handler
-       
+
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Request parsing requires 'unknown' for untrusted input
       let result: unknown;
 
@@ -248,7 +247,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
    */
   private success(
     id: string | number | null,
-     
+
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response serialization requires 'unknown' for flexible response types
     result: unknown,
   ): JsonRpcResponse {

@@ -17,7 +17,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { Countries, Languages } from "@/i18n/core/config";
 
-import { emailServiceRepository as emailService } from "../email-service/repository";
+import { EmailServiceRepository } from "../email-service/repository";
 import { smsServiceRepository as smsService } from "../sms-service/repository";
 import type {
   EmailSendRequestOutput,
@@ -74,7 +74,7 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
       }
 
       // Send email using email service
-      const emailResult = await emailService.sendEmail(
+      const emailResult = await EmailServiceRepository.sendEmail(
         {
           recipientInfo: {
             to: data.recipient.to,

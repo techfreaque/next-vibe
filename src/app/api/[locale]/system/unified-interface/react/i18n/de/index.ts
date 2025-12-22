@@ -12,9 +12,7 @@ export const translations: typeof enTranslations = {
       noContent: "Kein Inhalt",
     },
     dataTable: {
-      showing: "Zeige",
-      of: "von",
-      results: "Ergebnisse",
+      showingResults: "Zeige {{count}} von {{total}} Ergebnisse",
       noData: "Keine Daten verfügbar",
     },
     dataList: {
@@ -42,6 +40,10 @@ export const translations: typeof enTranslations = {
       requiresContext:
         "Formularfeld erfordert Formularkontext und Feldkonfiguration",
     },
+    filterPills: {
+      requiresContext:
+        "Filter-Pills-Widget erfordert Formularkontext und Feldname",
+    },
     toolCall: {
       status: {
         error: "Fehler",
@@ -60,7 +62,8 @@ export const translations: typeof enTranslations = {
         noResult: "Kein Ergebnis",
         metadataNotAvailable:
           "Widget-Metadaten nicht verfügbar. Zeige Rohdaten.",
-        confirmationRequired: "Parameter prüfen und bearbeiten, dann bestätigen.",
+        confirmationRequired:
+          "Parameter prüfen und bearbeiten, dann bestätigen.",
       },
       actions: {
         confirm: "Bestätigen",

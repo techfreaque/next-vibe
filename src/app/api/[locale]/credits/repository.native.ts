@@ -1,26 +1,9 @@
 /**
  * Native Credit Repository
- * Implements CreditRepositoryInterface for React Native
- *
- * POLYFILL PATTERN: This file makes the same repository interface work on native
- * by calling HTTP endpoints instead of direct database access using typesafe endpoint definitions.
- *
- * IMPLEMENTATION STRATEGY:
- * - getCreditBalanceForUser(): Fully implemented with nativeEndpoint()
- * - Other methods: Return "not implemented" errors (can be added when needed)
- *
- * Server code can call creditRepository.getCreditBalanceForUser() and it will:
- * - On Web/Server: Query the database directly
- * - On React Native: Make HTTP call via nativeEndpoint() with full type safety
- *
- * This allows the SAME code to work on both platforms!
+ * Implements CreditRepository static interface for React Native
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
 
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -33,47 +16,30 @@ import type { CreditTypeIdentifierValue } from "./enum";
 import type {
   CreditBalance,
   CreditIdentifier,
-  CreditRepositoryInterface,
+  CreditPool,
+  CreditRepositoryType,
   CreditTransactionOutput,
 } from "./repository";
 
 /**
- * Native Credit Repository Implementation
- * Uses HTTP client to call API endpoints, providing the same interface as server
+ * Native Credit Repository - Static class pattern
  */
-class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
-  private createNotImplementedError<T>(method: string): ResponseType<T> {
-    return fail({
-      message: "app.api.credits.errors.not_implemented_on_native",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { method },
-    });
-  }
-
-  async getCreditBalanceForUser(
-    user: JwtPayloadType,
+export class CreditRepository {
+  static async getCreditBalanceForUser(
+    // oxlint-disable-next-line no-unused-vars
+    _user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditBalance>> {
-    logger.debug("Getting credit balance for user", { userId: user.id, locale });
-    // Use typesafe nativeEndpoint() with endpoint definition
-    // This provides full type inference from the endpoint's schema
     const response = await nativeEndpoint(
       getCreditsEndpoint,
       {},
       logger,
       locale,
     );
-
     if (response.success) {
-      return {
-        success: true,
-        data: response.data,
-        message: response.message,
-      };
+      return { success: true, data: response.data, message: response.message };
     }
-
-    // Error response - preserve all error information
     return {
       success: false,
       errorType: response.errorType,
@@ -82,138 +48,132 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
     };
   }
 
-  async getBalance(
-    identifier: CreditIdentifier,
-    logger: EndpointLogger,
+  static async getBalance(
+    // oxlint-disable-next-line no-unused-vars
+    _identifier: CreditIdentifier,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<CreditBalance>> {
-    logger.error("getBalance not implemented on native");
-    void identifier;
-    return await Promise.resolve(
-      this.createNotImplementedError<CreditBalance>("getBalance"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getBalance is not implemented on native");
   }
 
-  async deductCredits(
-    identifier: CreditIdentifier,
-    amount: number,
-    modelId: string,
-    messageId: string,
-    logger: EndpointLogger,
+  static async deductCredits(
+    // oxlint-disable-next-line no-unused-vars
+    _identifier: CreditIdentifier,
+    // oxlint-disable-next-line no-unused-vars
+    _amount: number,
+    // oxlint-disable-next-line no-unused-vars
+    _modelId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _messageId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
-    logger.error("deductCredits not implemented on native");
-    void identifier;
-    void amount;
-    void modelId;
-    void messageId;
-    return await Promise.resolve(
-      this.createNotImplementedError<void>("deductCredits"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("deductCredits is not implemented on native");
   }
 
-  async addCredits(
-    identifier: CreditIdentifier,
-    amount: number,
-    type: "subscription" | "permanent" | "bonus",
-    logger: EndpointLogger,
+  static async addCredits(
+    // oxlint-disable-next-line no-unused-vars
+    _identifier: CreditIdentifier,
+    // oxlint-disable-next-line no-unused-vars
+    _amount: number,
+    // oxlint-disable-next-line no-unused-vars
+    _type: "subscription" | "permanent" | "bonus",
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
-    logger.error("addCredits not implemented on native");
-    void identifier;
-    void amount;
-    void type;
-    return await Promise.resolve(
-      this.createNotImplementedError<void>("addCredits"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("addCredits is not implemented on native");
   }
 
-  async getLeadBalance(
-    leadId: string,
-    logger: EndpointLogger,
+  static async getLeadBalance(
+    // oxlint-disable-next-line no-unused-vars
+    _leadId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<number>> {
-    logger.error("getLeadBalance not implemented on native");
-    void leadId;
-    return await Promise.resolve(
-      this.createNotImplementedError<number>("getLeadBalance"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getLeadBalance is not implemented on native");
   }
 
-  async getOrCreateLeadByIp(
-    ipAddress: string,
-    locale: string,
-    logger: EndpointLogger,
+  static async getOrCreateLeadByIp(
+    // oxlint-disable-next-line no-unused-vars
+    _ipAddress: string,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<{ leadId: string; credits: number }>> {
-    logger.error("getOrCreateLeadByIp not implemented on native");
-    void ipAddress;
-    void locale;
-    return await Promise.resolve(
-      this.createNotImplementedError<{ leadId: string; credits: number }>(
-        "getOrCreateLeadByIp",
-      ),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getOrCreateLeadByIp is not implemented on native");
   }
 
-  async addUserCredits(
-    userId: string,
-    amount: number,
-    type: "subscription" | "permanent" | "free",
-    logger: EndpointLogger,
-    expiresAt?: Date,
-    sessionId?: string,
+  static async addUserCredits(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _amount: number,
+    // oxlint-disable-next-line no-unused-vars
+    _type: "subscription" | "permanent" | "free",
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _expiresAt?: Date,
+    // oxlint-disable-next-line no-unused-vars
+    _sessionId?: string,
   ): Promise<ResponseType<void>> {
-    logger.error("addUserCredits not implemented on native");
-    void userId;
-    void amount;
-    void type;
-    void expiresAt;
-    void sessionId;
-    return await Promise.resolve(
-      this.createNotImplementedError<void>("addUserCredits"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("addUserCredits is not implemented on native");
   }
 
-  async getTransactions(
-    userId: string,
-    leadId: string,
-    limit: number,
-    offset: number,
-    logger: EndpointLogger,
+  static async getTransactions(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _leadId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _limit: number,
+    // oxlint-disable-next-line no-unused-vars
+    _offset: number,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
       totalCount: number;
     }>
   > {
-    logger.error("getTransactions not implemented on native");
-    void userId;
-    void leadId;
-    void limit;
-    void offset;
-    return await Promise.resolve(
-      this.createNotImplementedError<{
-        transactions: CreditTransactionOutput[];
-        totalCount: number;
-      }>("getTransactions"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getTransactions is not implemented on native");
   }
 
-  async expireCredits(): Promise<ResponseType<number>> {
-    return await Promise.resolve(
-      this.createNotImplementedError<number>("expireCredits"),
-    );
+  static async expireCredits(
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<ResponseType<number>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("expireCredits is not implemented on native");
   }
 
-  handleCreditPackPurchase(
-    session: CreditPackCheckoutSession,
-    logger: EndpointLogger,
+  static async handleCreditPackPurchase(
+    // oxlint-disable-next-line no-unused-vars
+    _session: CreditPackCheckoutSession,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<void> {
-    logger.error("handleCreditPackPurchase not implemented on native");
-    void session;
-    return Promise.resolve();
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("handleCreditPackPurchase is not implemented on native");
   }
 
-  async getCreditIdentifierBySubscription(
-    userId: string,
-    leadId: string,
-    logger: EndpointLogger,
+  static async getCreditIdentifierBySubscription(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _leadId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<
     ResponseType<{
       userId?: string;
@@ -221,75 +181,206 @@ class CreditRepositoryNativeImpl implements CreditRepositoryInterface {
       creditType: CreditTypeIdentifierValue;
     }>
   > {
-    logger.error("getCreditIdentifierBySubscription not implemented on native");
-    void userId;
-    void leadId;
-    return await Promise.resolve(
-      this.createNotImplementedError<{
-        userId?: string;
-        leadId?: string;
-        creditType: CreditTypeIdentifierValue;
-      }>("getCreditIdentifierBySubscription"),
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error(
+      "getCreditIdentifierBySubscription is not implemented on native",
     );
   }
 
-  deductCreditsForFeature(
-    user: { id?: string; leadId?: string; isPublic: boolean },
-    cost: number,
-    feature: string,
-    logger: EndpointLogger,
+  static async deductCreditsForFeature(
+    // oxlint-disable-next-line no-unused-vars
+    _user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars
+    _cost: number,
+    // oxlint-disable-next-line no-unused-vars
+    _feature: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<{ success: boolean; messageId?: string }> {
-    logger.error("deductCreditsForFeature not implemented on native");
-    void user;
-    void cost;
-    void feature;
-    return Promise.resolve({ success: false });
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("deductCreditsForFeature is not implemented on native");
   }
 
-  async mergePendingLeadWallets(
-    userId: string,
-    leadIds: string[],
-    logger: EndpointLogger,
+  static async mergePendingLeadWallets(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _leadIds: string[],
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
-    logger.error("mergePendingLeadWallets not implemented on native");
-    void userId;
-    void leadIds;
-    return await Promise.resolve(
-      this.createNotImplementedError<void>("mergePendingLeadWallets"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("mergePendingLeadWallets is not implemented on native");
   }
 
-  hasSufficientCredits(
-    identifier: CreditIdentifier,
-    required: number,
-    logger: EndpointLogger,
+  static async hasSufficientCredits(
+    // oxlint-disable-next-line no-unused-vars
+    _identifier: CreditIdentifier,
+    // oxlint-disable-next-line no-unused-vars
+    _required: number,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<boolean> {
-    logger.error("hasSufficientCredits not implemented on native");
-    void identifier;
-    void required;
-    return Promise.resolve(false);
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("hasSufficientCredits is not implemented on native");
   }
 
-  deductCreditsWithValidation(
-    identifier: CreditIdentifier,
-    amount: number,
-    modelId: string,
-    logger: EndpointLogger,
+  static async deductCreditsWithValidation(
+    // oxlint-disable-next-line no-unused-vars
+    _identifier: CreditIdentifier,
+    // oxlint-disable-next-line no-unused-vars
+    _amount: number,
+    // oxlint-disable-next-line no-unused-vars
+    _modelId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
-    logger.error("deductCreditsWithValidation not implemented on native");
-    void identifier;
-    void amount;
-    void modelId;
-    return Promise.resolve({ success: false, error: "Not implemented on native" });
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("deductCreditsWithValidation is not implemented on native");
   }
 
-  generateMessageId(): string {
+  static generateMessageId(): string {
     return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 15)}`;
+  }
+
+  static async getUserPool(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<ResponseType<CreditPool>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getUserPool is not implemented on native");
+  }
+
+  static async getLeadPoolOnly(
+    // oxlint-disable-next-line no-unused-vars
+    _leadId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<ResponseType<CreditPool>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getLeadPoolOnly is not implemented on native");
+  }
+
+  static async getLeadPool(
+    // oxlint-disable-next-line no-unused-vars
+    _leadId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<ResponseType<CreditPool>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getLeadPool is not implemented on native");
+  }
+
+  static async getTransactionsByLeadId(
+    // oxlint-disable-next-line no-unused-vars
+    _leadId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _limit: number,
+    // oxlint-disable-next-line no-unused-vars
+    _offset: number,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      transactions: CreditTransactionOutput[];
+      totalCount: number;
+    }>
+  > {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getTransactionsByLeadId is not implemented on native");
+  }
+
+  static async getTransactionsByUserId(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _limit: number,
+    // oxlint-disable-next-line no-unused-vars
+    _offset: number,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      transactions: CreditTransactionOutput[];
+      totalCount: number;
+    }>
+  > {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getTransactionsByUserId is not implemented on native");
+  }
+
+  static async addEarnedCredits(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _amountCents: number,
+    // oxlint-disable-next-line no-unused-vars
+    _sourceUserId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _transactionId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _commissionPercent: number,
+    // oxlint-disable-next-line no-unused-vars
+    _originalAmountCents: number,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _sourceUserEmail?: string,
+  ): Promise<ResponseType<{ packId: string; transactionId: string }>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("addEarnedCredits is not implemented on native");
+  }
+
+  static async getEarnedCreditsBalance(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{ total: number; available: number; locked: number }>
+  > {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getEarnedCreditsBalance is not implemented on native");
+  }
+
+  static async deductEarnedCredits(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _amount: number,
+    // oxlint-disable-next-line no-unused-vars
+    _modelId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _messageId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("deductEarnedCredits is not implemented on native");
+  }
+
+  static async getReferralTransactions(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _limit: number,
+    // oxlint-disable-next-line no-unused-vars
+    _offset: number,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      transactions: CreditTransactionOutput[];
+      totalCount: number;
+    }>
+  > {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getReferralTransactions is not implemented on native");
   }
 }
 
-/**
- * Singleton instance
- * Export with same name as server implementation for drop-in replacement
- */
-export const creditRepository = new CreditRepositoryNativeImpl();
+// Compile-time type check
+const _typeCheck: CreditRepositoryType = CreditRepository;
+void _typeCheck;

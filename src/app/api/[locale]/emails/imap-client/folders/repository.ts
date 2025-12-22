@@ -329,18 +329,16 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
           };
           return success(syncResults);
         }
-          return fail({
-            message: "app.api.emails.imapClient.imapErrors.sync.folder.failed",
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          });
-        
-      }
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.folders.sync.error.missing_account.title",
-          errorType: ErrorResponseTypes.BAD_REQUEST,
+          message: "app.api.emails.imapClient.imapErrors.sync.folder.failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
-      
+      }
+      return fail({
+        message:
+          "app.api.emails.imapClient.imapErrors.folders.sync.error.missing_account.title",
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
     } catch (error) {
       logger.error(
         "app.api.emails.imapClient.folders.sync.error.server",

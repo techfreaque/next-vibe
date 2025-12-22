@@ -14,7 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { creditRepository } from "@/app/api/[locale]/credits/repository";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { users } from "@/app/api/[locale]/user/db";
@@ -225,7 +225,10 @@ export class ReferralRepositoryImpl implements ReferralRepository {
               totalRevenue: sql<number>`COALESCE(SUM(${referralEarnings.amountCents}), 0)::int * 5`,
             })
             .from(referralEarnings)
-            .innerJoin(userReferrals, eq(referralEarnings.sourceUserId, userReferrals.referredUserId))
+            .innerJoin(
+              userReferrals,
+              eq(referralEarnings.sourceUserId, userReferrals.referredUserId),
+            )
             .where(
               and(
                 eq(userReferrals.referralCodeId, code.id),
@@ -331,8 +334,8 @@ export class ReferralRepositoryImpl implements ReferralRepository {
         .where(
           and(
             eq(leadReferrals.leadId, leadId),
-            eq(leadReferrals.referralCodeId, codeId)
-          )
+            eq(leadReferrals.referralCodeId, codeId),
+          ),
         )
         .limit(1);
 
@@ -387,7 +390,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
         .from(leadReferrals)
         .innerJoin(
           referralCodes,
-          eq(leadReferrals.referralCodeId, referralCodes.id)
+          eq(leadReferrals.referralCodeId, referralCodes.id),
         )
         .where(eq(leadReferrals.leadId, leadId))
         .orderBy(desc(leadReferrals.createdAt))
@@ -676,9 +679,8 @@ export class ReferralRepositoryImpl implements ReferralRepository {
 
         // Add earned credits to user's wallet (only if earning was inserted)
         if (insertedEarning) {
-          const commissionPercent =
-            (share.amountCents / creditsAmount) * 100;
-          await creditRepository.addEarnedCredits(
+          const commissionPercent = (share.amountCents / creditsAmount) * 100;
+          await CreditRepository.addEarnedCredits(
             share.earnerUserId,
             share.amountCents, // Credits earned
             userId,
@@ -818,8 +820,10 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   > {
     try {
       // Get earned credits balance
-      const balanceResult =
-        await creditRepository.getEarnedCreditsBalance(userId, logger);
+      const balanceResult = await CreditRepository.getEarnedCreditsBalance(
+        userId,
+        logger,
+      );
       if (!balanceResult.success) {
         return balanceResult;
       }
@@ -882,8 +886,10 @@ export class ReferralRepositoryImpl implements ReferralRepository {
       }
 
       // Get earned balance
-      const balanceResult =
-        await creditRepository.getEarnedCreditsBalance(userId, logger);
+      const balanceResult = await CreditRepository.getEarnedCreditsBalance(
+        userId,
+        logger,
+      );
       if (!balanceResult.success) {
         return balanceResult;
       }
@@ -910,7 +916,12 @@ export class ReferralRepositoryImpl implements ReferralRepository {
 
       // If converting to credits, process immediately
       if (currency === PayoutCurrency.CREDITS) {
-        await this.processCreditsConversion(request.id, userId, amountCents, logger);
+        await this.processCreditsConversion(
+          request.id,
+          userId,
+          amountCents,
+          logger,
+        );
       }
 
       logger.info("Payout request created", {
@@ -940,7 +951,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
     logger: EndpointLogger,
   ): Promise<void> {
     // Deduct from earned credits
-    const deductResult = await creditRepository.deductEarnedCredits(
+    const deductResult = await CreditRepository.deductEarnedCredits(
       userId,
       amountCents,
       requestId,
@@ -962,7 +973,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
     }
 
     // Add to permanent credits
-    await creditRepository.addUserCredits(
+    await CreditRepository.addUserCredits(
       userId,
       amountCents,
       "permanent",
@@ -1206,7 +1217,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
       }
 
       // Deduct from earned credits
-      const deductResult = await creditRepository.deductEarnedCredits(
+      const deductResult = await CreditRepository.deductEarnedCredits(
         request.userId,
         request.amountCents,
         requestId,

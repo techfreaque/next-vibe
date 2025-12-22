@@ -6,11 +6,14 @@ export const translations = {
   howItWorks: {
     title: "How It Works",
     step1Title: "Create referral codes",
-    step1Body: "Generate unique codes for different audiences — friends, social media, or campaigns.",
+    step1Body:
+      "Generate unique codes for different audiences — friends, social media, or campaigns.",
     step2Title: "Share your link",
-    step2Body: "When someone signs up using your link and subscribes, you earn commission.",
+    step2Body:
+      "When someone signs up using your link and subscribes, you earn commission.",
     step3Title: "Get paid",
-    step3Body: "Earnings are instant. Use them as chat credits or withdraw to crypto.",
+    step3Body:
+      "Earnings are instant. Use them as chat credits or withdraw to crypto.",
   },
   overview: {
     title: "Your Earnings",
@@ -20,10 +23,12 @@ export const translations = {
     title: "Withdraw Your Earnings",
     description: "Multiple ways to use your referral earnings",
     useAsCredits: "Use as Chat Credits",
-    useAsCreditsDesc: "Instantly convert earnings to chat credits for AI conversations.",
+    useAsCreditsDesc:
+      "Instantly convert earnings to chat credits for AI conversations.",
     cryptoPayout: "Withdraw to Crypto",
     cryptoPayoutDesc: "Request payout in BTC or USDC to your wallet address.",
-    minimumNote: "Minimum payout: $40. Crypto payouts are processed within 48 hours after approval.",
+    minimumNote:
+      "Minimum payout: $40. Crypto payouts are processed within 48 hours after approval.",
   },
   manage: {
     createSubtitle: "Create codes for specific campaigns or audiences.",
@@ -61,7 +66,8 @@ export const translations = {
   },
   cta: {
     title: "Start Earning Today",
-    description: "Create an account or log in to generate your referral codes and start earning commission on every subscription.",
+    description:
+      "Create an account or log in to generate your referral codes and start earning commission on every subscription.",
     signUp: "Create Account",
     logIn: "Log In",
   },

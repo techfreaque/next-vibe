@@ -1,7 +1,5 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
-import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
-
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import {
   type AuthContext,
@@ -17,7 +15,7 @@ import {
 /**
  * CLI/MCP Authentication Handler
  * Handles platform-specific storage for CLI/MCP (session files)
- * All authentication business logic is in authRepository
+ * All authentication business logic is in AuthRepository
  */
 export class CliAuthHandler extends BaseAuthHandler {
   /**
@@ -50,16 +48,21 @@ export class CliAuthHandler extends BaseAuthHandler {
 
   /**
    * Store authentication token in .vibe.session file
+   * @param rememberMe - If true, session lasts 30 days; if false, 7 days
    */
   async storeAuthToken(
     token: string,
     userId: string,
     leadId: string,
     logger: EndpointLogger,
+    rememberMe = true, // Default to true (30 days)
   ): Promise<ResponseType<void>> {
-    const expiresAt = new Date(
-      Date.now() + AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS * 1000,
-    );
+    // Set session duration based on rememberMe flag
+    // Remember me: 30 days, Regular session: 7 days
+    const sessionDurationDays = rememberMe ? 30 : 7;
+    const sessionDurationSeconds = sessionDurationDays * 24 * 60 * 60;
+
+    const expiresAt = new Date(Date.now() + sessionDurationSeconds * 1000);
 
     const sessionData: SessionData = {
       token,
@@ -69,6 +72,12 @@ export class CliAuthHandler extends BaseAuthHandler {
       createdAt: new Date().toISOString(),
     };
 
+    logger.debug("Storing CLI session", {
+      userId,
+      leadId,
+      rememberMe,
+      sessionType: rememberMe ? "persistent (30 days)" : "regular (7 days)",
+    });
     return await writeSessionFile(sessionData, logger);
   }
 

@@ -11,9 +11,7 @@ import type { TParams } from "./static-types";
 /**
  * Nested translation value type supporting deep nesting
  */
-type NestedValue =
-  | string
-  | { [key: string]: string | { [key: string]: string } };
+export type NestedValue = string | { [key: string]: NestedValue };
 
 /**
  * Navigate through a translation object using an array of keys

@@ -31,7 +31,11 @@ function formatCount(count: number): string {
   return count.toString();
 }
 
-const Hero = ({ locale, activeUserCount, totalConversations }: HeroProps): JSX.Element => {
+const Hero = ({
+  locale,
+  activeUserCount,
+  totalConversations,
+}: HeroProps): JSX.Element => {
   const { t } = simpleT(locale);
 
   const formattedUsers = formatCount(activeUserCount);
@@ -97,25 +101,19 @@ const Hero = ({ locale, activeUserCount, totalConversations }: HeroProps): JSX.E
             transition={{ delay: 0.3, duration: 0.6 }}
           >
             <Div className="text-center">
-              <P className="text-3xl font-bold">
-                {formattedUsers}+
-              </P>
+              <P className="text-3xl font-bold">{formattedUsers}+</P>
               <P className="text-sm text-muted-foreground mt-1">
                 {t("app.story._components.home.hero.stats.usersLabel")}
               </P>
             </Div>
             <Div className="text-center">
-              <P className="text-3xl font-bold">
-                {TOTAL_MODEL_COUNT}
-              </P>
+              <P className="text-3xl font-bold">{TOTAL_MODEL_COUNT}</P>
               <P className="text-sm text-muted-foreground mt-1">
                 {t("app.story._components.home.hero.stats.modelsLabel")}
               </P>
             </Div>
             <Div className="text-center">
-              <P className="text-3xl font-bold">
-                {formattedConversations}+
-              </P>
+              <P className="text-3xl font-bold">{formattedConversations}+</P>
               <P className="text-sm text-muted-foreground mt-1">
                 {t("app.story._components.home.hero.stats.messagesLabel")}
               </P>

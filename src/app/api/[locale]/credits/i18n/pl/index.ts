@@ -76,7 +76,8 @@ export const translations: typeof enTranslations = {
     walletCreationFailed: "Nie udało się utworzyć portfela",
     addEarnedCreditsFailed: "Nie udało się dodać zarobionych kredytów",
     getEarnedBalanceFailed: "Nie udało się pobrać salda zarobionych kredytów",
-    insufficientEarnedCredits: "Niewystarczające zarobione kredyty dla tej operacji",
+    insufficientEarnedCredits:
+      "Niewystarczające zarobione kredyty dla tej operacji",
     deductEarnedCreditsFailed: "Nie udało się odjąć zarobionych kredytów",
     getReferralTransactionsFailed: "Nie udało się pobrać transakcji poleceń",
   },

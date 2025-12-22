@@ -73,6 +73,8 @@ export default function ContactForm({
               showAllRequired: false,
             }}
             endpointFields={contactDefinitions.POST.fields}
+            scopedT={contactDefinitions.POST.scopedTranslation?.scopedT}
+            locale={locale}
           />
 
           <EndpointFormField
@@ -83,6 +85,8 @@ export default function ContactForm({
               showAllRequired: false,
             }}
             endpointFields={contactDefinitions.POST.fields}
+            scopedT={contactDefinitions.POST.scopedTranslation?.scopedT}
+            locale={locale}
           />
         </Div>
 
@@ -94,6 +98,8 @@ export default function ContactForm({
             showAllRequired: false,
           }}
           endpointFields={contactDefinitions.POST.fields}
+          scopedT={contactDefinitions.POST.scopedTranslation?.scopedT}
+          locale={locale}
         />
 
         <EndpointFormField
@@ -104,6 +110,8 @@ export default function ContactForm({
             showAllRequired: false,
           }}
           endpointFields={contactDefinitions.POST.fields}
+          scopedT={contactDefinitions.POST.scopedTranslation?.scopedT}
+          locale={locale}
         />
 
         <EndpointFormField
@@ -114,6 +122,8 @@ export default function ContactForm({
             showAllRequired: false,
           }}
           endpointFields={contactDefinitions.POST.fields}
+          scopedT={contactDefinitions.POST.scopedTranslation?.scopedT}
+          locale={locale}
         />
 
         <Button

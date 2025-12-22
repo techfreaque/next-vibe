@@ -93,7 +93,8 @@ export async function sendSms(
   logger: EndpointLogger,
 ): Promise<ResponseType<SmsResult>> {
   const maxAttempts =
-    params.retry?.attempts || parseInt(smsEnv.SMS_MAX_RETRY_ATTEMPTS || "3", 10);
+    params.retry?.attempts ||
+    parseInt(smsEnv.SMS_MAX_RETRY_ATTEMPTS || "3", 10);
   const delayMs =
     params.retry?.delayMs || parseInt(smsEnv.SMS_RETRY_DELAY_MS || "1000", 10);
 

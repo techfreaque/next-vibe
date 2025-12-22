@@ -31,10 +31,14 @@ interface CodeQualityConfig {
   maxItemsPerGroup: number;
 }
 
-export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.CODE_QUALITY_LIST> {
+export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.CODE_QUALITY_LIST
+> {
   readonly widgetType = WidgetType.CODE_QUALITY_LIST;
 
-  render(props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_LIST>): string {
+  render(
+    props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_LIST, string>,
+  ): string {
     const { value, context } = props;
     const t = context.t;
 
@@ -306,7 +310,8 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<typeof Wid
         );
       }
 
-      const countText = countParts.length > 0 ? countParts.join(", ") : "0 issues";
+      const countText =
+        countParts.length > 0 ? countParts.join(", ") : "0 issues";
       output += `   ${displayPath} (${countText})\n`;
     }
 

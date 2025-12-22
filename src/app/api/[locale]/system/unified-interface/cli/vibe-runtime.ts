@@ -13,7 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { createEndpointLogger } from "../shared/logger/endpoint";
-import { type EnvironmentResult,loadEnvironment } from "./runtime/environment";
+import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";
 import {
   ErrorHandler,
   setupGlobalErrorHandlers,

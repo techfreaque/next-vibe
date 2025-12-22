@@ -13,10 +13,12 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.MARKDOWN> {
+export class MarkdownWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.MARKDOWN
+> {
   readonly widgetType = WidgetType.MARKDOWN;
 
-  render(props: CLIWidgetProps<typeof WidgetType.MARKDOWN>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.MARKDOWN, string>): string {
     const { value, context } = props;
     const t = context.t;
 
@@ -89,7 +91,7 @@ export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     // Convert code blocks (```code```)
     result = result.replaceAll(/```[\s\S]*?```/g, (match) => {
       // Remove the backticks
-      const code = match.replaceAll('```', "");
+      const code = match.replaceAll("```", "");
       return this.styleText(code, "blue", context);
     });
 
@@ -107,14 +109,17 @@ export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     });
 
     // Convert links [text](url)
-    // oxlint-disable-next-line no-unused-vars
-    result = result.replaceAll(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
-      // For CLI, just show the text with URL in dim
-      const styledText = this.styleText(text, "blue", context);
-      const styledUrl = this.styleText(`(${url})`, "dim", context);
-      // eslint-disable-next-line i18next/no-literal-string
-      return `${styledText} ${styledUrl}`;
-    });
+    result = result.replaceAll(
+      /\[([^\]]+)\]\(([^)]+)\)/g,
+      // oxlint-disable-next-line no-unused-vars
+      (match, text, url) => {
+        // For CLI, just show the text with URL in dim
+        const styledText = this.styleText(text, "blue", context);
+        const styledUrl = this.styleText(`(${url})`, "dim", context);
+        // eslint-disable-next-line i18next/no-literal-string
+        return `${styledText} ${styledUrl}`;
+      },
+    );
 
     // Convert horizontal rules (--- or ***)
     result = result.replaceAll(/^(\*{3,}|-{3,})$/gm, () => {

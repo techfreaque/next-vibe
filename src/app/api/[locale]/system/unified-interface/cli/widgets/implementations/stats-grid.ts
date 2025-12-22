@@ -9,10 +9,12 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class StatsGridWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.STATS_GRID> {
+export class StatsGridWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.STATS_GRID
+> {
   readonly widgetType = WidgetType.STATS_GRID;
 
-  render(props: CLIWidgetProps<typeof WidgetType.STATS_GRID>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.STATS_GRID, string>): string {
     const { field, value, context } = props;
     const indent = this.createIndent(context.depth, context);
 
@@ -144,5 +146,4 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     // eslint-disable-next-line i18next/no-literal-string
     return context.options.useColors ? "ℹ️ " : "i ";
   }
-
 }

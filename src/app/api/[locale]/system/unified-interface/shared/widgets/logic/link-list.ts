@@ -77,8 +77,7 @@ export function extractLinkListData(
         return null;
       }
 
-      const url =
-        "url" in item && typeof item.url === "string" ? item.url : "";
+      const url = "url" in item && typeof item.url === "string" ? item.url : "";
       if (!url) {
         return null;
       }

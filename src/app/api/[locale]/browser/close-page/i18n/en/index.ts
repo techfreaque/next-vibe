@@ -4,7 +4,8 @@
 
 export const translations = {
   title: "Close Page",
-  description: "Closes the page by its index. The last open page cannot be closed",
+  description:
+    "Closes the page by its index. The last open page cannot be closed",
 
   form: {
     label: "Close Page",
@@ -12,7 +13,8 @@ export const translations = {
     fields: {
       pageIdx: {
         label: "Page Index",
-        description: "The index of the page to close. Call list_pages to list pages",
+        description:
+          "The index of the page to close. Call list_pages to list pages",
         placeholder: "Enter page index (e.g., 0)",
       },
     },

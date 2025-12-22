@@ -17,7 +17,6 @@ export const { GET, POST, tools } = endpointsHandler({
     handler: ({ logger }) => repository.getConfig(logger),
   },
   [Methods.POST]: {
-    handler: ({ data, logger }) =>
-      repository.updateConfig(data, logger),
+    handler: ({ data, logger }) => repository.updateConfig(data, logger),
   },
 });

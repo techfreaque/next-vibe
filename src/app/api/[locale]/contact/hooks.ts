@@ -54,21 +54,23 @@ export function useContactWithEngagement(
 
   // Set default values based on user data
   useEffect(() => {
-    if (user && formResult.create) {
+    if (formResult.create) {
       const form = formResult.create.form;
 
-      // Set default values if they're not already set
-      // Use privateName (user's private name) for the name field
-      if (!form.getValues("name") && user.privateName) {
-        form.setValue("name", user.privateName);
-      }
-      if (!form.getValues("email") && user.email) {
-        form.setValue("email", user.email);
-      }
-      // Note: company field is optional in contact form and not part of user type
-      // If needed, this should be sourced from business data or lead information
+      // Set default subject value for all users (required field)
       if (!form.getValues("subject")) {
         form.setValue("subject", ContactSubject.HELP_SUPPORT);
+      }
+
+      // Set user-specific values if logged in
+      if (user) {
+        // Use privateName (user's private name) for the name field
+        if (!form.getValues("name") && user.privateName) {
+          form.setValue("name", user.privateName);
+        }
+        if (!form.getValues("email") && user.email) {
+          form.setValue("email", user.email);
+        }
       }
     }
   }, [user, formResult.create]);

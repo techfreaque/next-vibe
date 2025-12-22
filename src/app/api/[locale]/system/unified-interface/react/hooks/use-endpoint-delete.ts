@@ -8,11 +8,9 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import { useCallback } from "react";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import type { ApiMutationOptions } from "./types";
 import { useApiMutation } from "./use-api-mutation";
 
@@ -26,15 +24,7 @@ import { useApiMutation } from "./use-api-mutation";
  * - Type-safe with full TypeScript inference
  * - Consistent with mutation-form pattern
  */
-export function useEndpointDelete<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
->(
+export function useEndpointDelete<TEndpoint extends CreateApiEndpointAny>(
   deleteEndpoint: TEndpoint | null,
   logger: EndpointLogger,
   options: {
@@ -78,7 +68,7 @@ export function useEndpointDelete<
         requestData: data || ({} as TEndpoint["types"]["RequestOutput"]),
         urlPathParams: urlPathParams,
       };
-      await mutation.mutateAsync(mutationVariables );
+      await mutation.mutateAsync(mutationVariables);
     },
     [mutation, urlPathParams],
   );

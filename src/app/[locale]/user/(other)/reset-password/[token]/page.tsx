@@ -9,8 +9,8 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import ResetPasswordConfirmForm from "@/app/api/[locale]/user/public/reset-password/confirm/_components/reset-password-confirm-form";
-import { passwordRepository } from "@/app/api/[locale]/user/public/reset-password/repository";
-import { userRepository } from "@/app/api/[locale]/user/repository";
+import { PasswordRepository } from "@/app/api/[locale]/user/public/reset-password/repository";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -71,7 +71,7 @@ export default async function ResetPasswordConfirmPage({
 
   const logger = createEndpointLogger(false, Date.now(), locale);
   // Check if user is already logged in using repository-first pattern
-  const verifiedUserResponse = await userRepository.getUserByAuth(
+  const verifiedUserResponse = await UserRepository.getUserByAuth(
     {},
     locale,
     logger,
@@ -87,7 +87,7 @@ export default async function ResetPasswordConfirmPage({
   }
 
   // Validate token on the server side
-  const tokenValidationResponse = await passwordRepository.verifyResetToken(
+  const tokenValidationResponse = await PasswordRepository.verifyResetToken(
     token,
     logger,
   );

@@ -259,7 +259,9 @@ export class StreamingTTSHandler {
    */
   private async generateTTS(text: string): Promise<string | null> {
     if (!agentEnv.EDEN_AI_API_KEY) {
-      this.logger.error("[Streaming TTS] Eden AI API key not configured - TTS disabled");
+      this.logger.error(
+        "[Streaming TTS] Eden AI API key not configured - TTS disabled",
+      );
       return null;
     }
 
@@ -333,11 +335,14 @@ export class StreamingTTSHandler {
       // Fetch the audio file and convert to base64
       const audioResponse = await fetch(audioResourceUrl);
       if (!audioResponse.ok) {
-        this.logger.error("[Streaming TTS] Failed to fetch audio file from URL", {
-          status: audioResponse.status,
-          statusText: audioResponse.statusText,
-          url: audioResourceUrl.substring(0, 100),
-        });
+        this.logger.error(
+          "[Streaming TTS] Failed to fetch audio file from URL",
+          {
+            status: audioResponse.status,
+            statusText: audioResponse.statusText,
+            url: audioResourceUrl.substring(0, 100),
+          },
+        );
         return null;
       }
 
@@ -383,7 +388,9 @@ export class StreamingTTSHandler {
     });
 
     if (!this.isEnabled || !this.messageId) {
-      this.logger.info("[Streaming TTS] flush() skipped - not enabled or no messageId");
+      this.logger.info(
+        "[Streaming TTS] flush() skipped - not enabled or no messageId",
+      );
       return;
     }
 

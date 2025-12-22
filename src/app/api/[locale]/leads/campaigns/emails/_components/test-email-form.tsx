@@ -204,6 +204,7 @@ export function TestEmailForm({
               }}
               control={endpoint.create.form.control}
               schema={schema}
+              locale={locale}
             />
           </Div>
 
@@ -233,6 +234,7 @@ export function TestEmailForm({
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -247,6 +249,7 @@ export function TestEmailForm({
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -261,6 +264,7 @@ export function TestEmailForm({
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
+                locale={locale}
               />
             </Div>
           </Div>
@@ -284,6 +288,7 @@ export function TestEmailForm({
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
+                locale={locale}
               />
               <EndpointFormField
                 name="leadData.contactName"
@@ -296,6 +301,7 @@ export function TestEmailForm({
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -309,6 +315,7 @@ export function TestEmailForm({
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
+                locale={locale}
               />
               <EndpointFormField
                 name="leadData.country"
@@ -320,6 +327,7 @@ export function TestEmailForm({
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
+                locale={locale}
               />
               <EndpointFormField
                 name="leadData.language"
@@ -331,6 +339,7 @@ export function TestEmailForm({
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
+                locale={locale}
               />
               <EndpointFormField
                 name="leadData.status"
@@ -372,6 +381,7 @@ export function TestEmailForm({
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
+                locale={locale}
               />
               <EndpointFormField
                 name="leadData.source"
@@ -413,6 +423,7 @@ export function TestEmailForm({
                 }}
                 control={endpoint.create.form.control}
                 schema={schema}
+                locale={locale}
               />
             </Div>
             <EndpointFormField
@@ -427,6 +438,7 @@ export function TestEmailForm({
               }}
               control={endpoint.create.form.control}
               schema={schema}
+              locale={locale}
             />
           </Div>
           <FormAlert alert={endpoint.alert} />

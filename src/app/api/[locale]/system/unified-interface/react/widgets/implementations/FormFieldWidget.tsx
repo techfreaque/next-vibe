@@ -14,13 +14,14 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
  * Renders form fields based on fieldType (TEXT, SELECT, BOOLEAN, etc.).
  * Always renders as editable input - no "readonly" mode.
  */
-export function FormFieldWidget({
+export function FormFieldWidget<TKey extends string>({
   field,
   fieldName = "field",
   className,
   form,
   context,
-}: ReactWidgetProps<typeof WidgetType.FORM_FIELD>): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.FORM_FIELD, TKey>): JSX.Element {
+  // Global translation for hardcoded widget keys
   const { t } = simpleT(context.locale);
 
   if (!form || !field.ui) {
@@ -43,6 +44,9 @@ export function FormFieldWidget({
       control={formControl.control}
       endpointFields={context.endpointFields ?? {}}
       className={className}
+      // Pass scoped translation from context for definition keys
+      scopedT={context.scopedT}
+      locale={context.locale}
     />
   );
 }

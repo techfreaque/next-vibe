@@ -154,7 +154,6 @@ export function Markdown({
       // Content arrived - auto-collapse all thinking sections
       setExpandedThinking(new Set());
     }
-     
   }, [hasContent, userToggledThinking, allThinkingSections.length]);
 
   const toggleThinking = (index: number): void => {
@@ -197,9 +196,8 @@ export function Markdown({
       const autoCollapsed = !isStreaming && (hasContent || hasContentAfter);
       return !collapseState.isCollapsed(key, autoCollapsed);
     }
-      // Legacy: use local state
-      return expandedThinking.has(index);
-    
+    // Legacy: use local state
+    return expandedThinking.has(index);
   };
 
   return (
@@ -210,7 +208,8 @@ export function Markdown({
           {allThinkingSections.map((thinking, thinkIndex) => {
             const isExpanded = isThinkingExpanded(thinkIndex);
             const isIncomplete =
-              thinkIndex === allThinkingSections.length - 1 && incompleteThinking;
+              thinkIndex === allThinkingSections.length - 1 &&
+              incompleteThinking;
             return (
               <div
                 key={thinkIndex}
@@ -553,7 +552,9 @@ function handleImageInModalClick(e: React.MouseEvent<HTMLImageElement>): void {
   e.stopPropagation();
 }
 
-function handleImageInModalKeyDown(e: React.KeyboardEvent<HTMLImageElement>): void {
+function handleImageInModalKeyDown(
+  e: React.KeyboardEvent<HTMLImageElement>,
+): void {
   e.stopPropagation();
 }
 
@@ -579,7 +580,9 @@ function MarkdownImage({
     setIsOpen(false);
   };
 
-  const handleModalKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
+  const handleModalKeyDown = (
+    e: React.KeyboardEvent<HTMLButtonElement>,
+  ): void => {
     if (e.key === "Escape") {
       setIsOpen(false);
     }

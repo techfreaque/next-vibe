@@ -13,10 +13,12 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class DataListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_LIST> {
+export class DataListWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.DATA_LIST
+> {
   readonly widgetType = WidgetType.DATA_LIST;
 
-  render(props: CLIWidgetProps<typeof WidgetType.DATA_LIST>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.DATA_LIST, string>): string {
     const { value, context } = props;
 
     // Extract data using shared logic
@@ -47,10 +49,7 @@ export class DataListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     return result.join("\n");
   }
 
-  private renderListItem(
-    item: ListItem,
-    context: WidgetRenderContext,
-  ): string {
+  private renderListItem(item: ListItem, context: WidgetRenderContext): string {
     // Special handling for command lists (command + description)
     if ("command" in item && "description" in item) {
       const command = String(item.command || "");

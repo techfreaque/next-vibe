@@ -15,7 +15,7 @@ import type {
   MessagePatchResponseOutput,
 } from "./definition";
 import definitions from "./definition";
-import { messageRepository } from "./repository";
+import { MessageRepository } from "./repository";
 
 /**
  * Export route handlers
@@ -32,7 +32,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         typeof definitions.GET.allowedRoles
       >,
     ): Promise<ResponseType<MessageGetResponseOutput>> => {
-      return await messageRepository.getMessage(
+      return await MessageRepository.getMessage(
         props.urlPathParams,
         props.user,
         props.locale,
@@ -50,7 +50,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         typeof definitions.PATCH.allowedRoles
       >,
     ): Promise<ResponseType<MessagePatchResponseOutput>> => {
-      return await messageRepository.updateMessage(
+      return await MessageRepository.updateMessage(
         props.data,
         props.urlPathParams,
         props.user,
@@ -69,7 +69,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
         typeof definitions.DELETE.allowedRoles
       >,
     ): Promise<ResponseType<MessageDeleteResponseOutput>> => {
-      return await messageRepository.deleteMessage(
+      return await MessageRepository.deleteMessage(
         props.urlPathParams,
         props.user,
         props.locale,

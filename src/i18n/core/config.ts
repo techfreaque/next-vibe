@@ -23,13 +23,13 @@ export interface CountryInfo {
 }
 
 // Enum-like objects to replace the enums
- 
+
 export const Countries = languageConfig.countries;
 export const CountriesArr = languageConfig.countriesArr;
- 
+
 export const Currencies = languageConfig.currencies;
 export const CurrenciesArr = languageConfig.currenciesArr;
- 
+
 export const Languages = languageConfig.languages;
 export const LanguagesArr = languageConfig.languagesArr;
 

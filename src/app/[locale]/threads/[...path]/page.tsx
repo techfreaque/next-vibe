@@ -19,14 +19,14 @@ import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
 import { ChatInterface } from "@/app/api/[locale]/agent/chat/_components/chat-interface";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
-import { folderRepository } from "@/app/api/[locale]/agent/chat/folders/[id]/repository";
-import { rootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/root-permissions/repository";
+import { FolderRepository } from "@/app/api/[locale]/agent/chat/folders/[id]/repository";
+import { RootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/root-permissions/repository";
 import { ChatProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { threadByIdRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/repository";
-import { creditRepository } from "@/app/api/[locale]/credits/repository";
+import { ThreadByIdRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/repository";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -46,7 +46,7 @@ export default async function ThreadsPathPage({
   const { t } = simpleT(locale);
 
   // Get authenticated user
-  const userResponse = await userRepository.getUserByAuth(
+  const userResponse = await UserRepository.getUserByAuth(
     {
       detailLevel: UserDetailLevel.MINIMAL,
       roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
@@ -62,7 +62,7 @@ export default async function ThreadsPathPage({
 
   // Fetch credit balance for all users (both authenticated and public)
   // Always fetch credits if we have a user (even public users have leadId)
-  const creditsResponse = await creditRepository.getCreditBalanceForUser(
+  const creditsResponse = await CreditRepository.getCreditBalanceForUser(
     user,
     locale,
     logger,
@@ -91,7 +91,7 @@ export default async function ThreadsPathPage({
     user
   ) {
     // Check if it's a thread first
-    const threadResponse = await threadByIdRepository.getThreadById(
+    const threadResponse = await ThreadByIdRepository.getThreadById(
       initialThreadId,
       user,
       locale,
@@ -100,7 +100,7 @@ export default async function ThreadsPathPage({
 
     if (!threadResponse.success) {
       // Not a thread, check if it's a folder
-      const folderResponse = await folderRepository.getFolder(
+      const folderResponse = await FolderRepository.getFolder(
         user,
         { id: initialThreadId },
         logger,
@@ -136,7 +136,7 @@ export default async function ThreadsPathPage({
   };
   if (user) {
     const permissionsResult =
-      await rootFolderPermissionsRepository.getRootFolderPermissions(
+      await RootFolderPermissionsRepository.getRootFolderPermissions(
         { rootFolderId: initialRootFolderId },
         user,
         locale,

@@ -1,10 +1,7 @@
 "use client";
 
 // Inspired by react-hot-toast library
-import type {
-  ToastActionElement,
-  ToastRootProps,
-} from "next-vibe-ui/ui/toast";
+import type { ToastActionElement, ToastRootProps } from "next-vibe-ui/ui/toast";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 
@@ -86,7 +83,9 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         toasts: state.toasts.map((t) =>
-          t.id === action.toast.id ? ({ ...t, ...action.toast } as ToasterToast) : t,
+          t.id === action.toast.id
+            ? ({ ...t, ...action.toast } as ToasterToast)
+            : t,
         ),
       };
 

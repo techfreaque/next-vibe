@@ -136,7 +136,6 @@ export function ChatEmptyState({
           <P className="text-muted-foreground text-center mb-8">
             {getDescription()}
           </P>
-
         </Div>
       </Div>
     </Div>

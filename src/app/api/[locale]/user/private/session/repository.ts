@@ -25,63 +25,15 @@ import { sessions } from "./db";
 import { SessionErrorReason } from "./enum";
 
 /**
- * Session repository interface
- */
-export interface SessionRepository {
-  /**
-   * Find a session by token
-   * @param token - The session token
-   * @returns Session or error response
-   */
-  findByToken(token: string): Promise<ResponseType<Session>>;
-
-  /**
-   * Create a new session
-   * @param data - The session data
-   * @returns Created session or error response
-   */
-  create(data: NewSession): Promise<ResponseType<Session>>;
-
-  /**
-   * Extend an existing session's expiration time
-   * @param token - The session token
-   * @param newExpiresAt - The new expiration date
-   * @returns Success or error response
-   */
-  extendSession(token: string, newExpiresAt: Date): Promise<ResponseType<void>>;
-
-  /**
-   * Delete expired sessions
-   * @returns Success or error response
-   */
-  deleteExpired(): Promise<ResponseType<void>>;
-
-  /**
-   * Delete sessions by user ID
-   * @param userId - The user ID
-   * @returns Success or error response
-   */
-  deleteByUserId(userId: DbId): Promise<ResponseType<void>>;
-
-  /**
-   * Get the current session from cookies
-   * @returns Session data if valid, error if not
-   */
-  getCurrentSession(): Promise<
-    ResponseType<{ userId: string; expiresAt: Date; token: string }>
-  >;
-}
-
-/**
  * Session repository implementation
  */
-export class SessionRepositoryImpl implements SessionRepository {
+export class SessionRepository {
   /**
    * Find a session by token
    * @param token - The session token
    * @returns Session or error response
    */
-  async findByToken(token: string): Promise<ResponseType<Session>> {
+  static async findByToken(token: string): Promise<ResponseType<Session>> {
     try {
       // Note: Logger not available for internal session methods
 
@@ -135,7 +87,7 @@ export class SessionRepositoryImpl implements SessionRepository {
    * Delete expired sessions
    * @returns Success or error response
    */
-  async deleteExpired(): Promise<ResponseType<void>> {
+  static async deleteExpired(): Promise<ResponseType<void>> {
     try {
       // Note: Logger not available for internal cleanup methods
 
@@ -168,7 +120,7 @@ export class SessionRepositoryImpl implements SessionRepository {
    * @param newExpiresAt - The new expiration date
    * @returns Success or error response
    */
-  async extendSession(
+  static async extendSession(
     token: string,
     newExpiresAt: Date,
   ): Promise<ResponseType<void>> {
@@ -210,7 +162,7 @@ export class SessionRepositoryImpl implements SessionRepository {
    * @param data - The session data
    * @returns Created session or error response
    */
-  async create(data: NewSession): Promise<ResponseType<Session>> {
+  static async create(data: NewSession): Promise<ResponseType<Session>> {
     try {
       // Note: Logger not available for internal session methods
 
@@ -246,7 +198,7 @@ export class SessionRepositoryImpl implements SessionRepository {
    * @param userId - The user ID
    * @returns Success or error response
    */
-  async deleteByUserId(userId: DbId): Promise<ResponseType<void>> {
+  static async deleteByUserId(userId: DbId): Promise<ResponseType<void>> {
     try {
       // Note: Logger not available for internal session methods
 
@@ -271,7 +223,7 @@ export class SessionRepositoryImpl implements SessionRepository {
    * Get the current session from cookies
    * @returns Session data if valid, error if not
    */
-  async getCurrentSession(): Promise<
+  static async getCurrentSession(): Promise<
     ResponseType<{ userId: string; expiresAt: Date; token: string }>
   > {
     try {
@@ -288,7 +240,7 @@ export class SessionRepositoryImpl implements SessionRepository {
       }
 
       // Find the current session
-      const sessionResponse = await this.findByToken(token);
+      const sessionResponse = await SessionRepository.findByToken(token);
       if (!sessionResponse.success) {
         return sessionResponse;
       }
@@ -322,6 +274,3 @@ export class SessionRepositoryImpl implements SessionRepository {
     }
   }
 }
-
-// Export singleton instance of the repository
-export const sessionRepository = new SessionRepositoryImpl();

@@ -11,7 +11,7 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { leadsRepository } from "../repository";
+import { LeadsRepository } from "../repository";
 import type {
   LeadListGetRequestTypeOutput,
   LeadListGetResponseTypeOutput,
@@ -38,8 +38,8 @@ export class LeadsListRepositoryImpl implements LeadsListRepository {
     logger.info("Listing leads with filters");
     logger.debug("Request data", data);
 
-    // Pass data directly - it matches the structure expected by leadsRepository
-    const result = await leadsRepository.listLeads(data, logger);
+    // Pass data directly - it matches the structure expected by LeadsRepository
+    const result = await LeadsRepository.listLeads(data, logger);
 
     if (result.success && result.data) {
       // Type-safe access to success response data
@@ -63,12 +63,11 @@ export class LeadsListRepositoryImpl implements LeadsListRepository {
         },
       } satisfies ResponseType<LeadListGetResponseTypeOutput>;
     }
-      logger.error("Failed to list leads", { message: result.message });
-      return fail({
-        message: "app.api.leads.list.get.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    
+    logger.error("Failed to list leads", { message: result.message });
+    return fail({
+      message: "app.api.leads.list.get.errors.server.title",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 }
 

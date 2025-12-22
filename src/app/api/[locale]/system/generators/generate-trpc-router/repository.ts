@@ -32,7 +32,9 @@ export interface GenerateTrpcRouterRepository {
 /**
  * Generate tRPC Router Repository Implementation
  */
-export class GenerateTrpcRouterRepositoryImpl implements GenerateTrpcRouterRepository {
+export class GenerateTrpcRouterRepositoryImpl
+  implements GenerateTrpcRouterRepository
+{
   async generateTrpcRouter(
     data: GenerateTrpcRouterRequestType,
     logger: EndpointLogger,
@@ -95,8 +97,9 @@ export class GenerateTrpcRouterRepositoryImpl implements GenerateTrpcRouterRepos
       outputLines.push(SCANNING_ROUTES);
 
       // Import the tRPC router generator
-      const { generateTRPCRouter } =
-        await import("./trpc-trpc-router-generator");
+      const { generateTRPCRouter } = await import(
+        "./trpc-trpc-router-generator"
+      );
 
       // Prepare options for the generator
       const generatorOptions = {

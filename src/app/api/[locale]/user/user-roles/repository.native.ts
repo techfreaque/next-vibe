@@ -1,144 +1,108 @@
 /**
  * Native User Roles Repository
  * Implements UserRolesRepository interface for React Native
- *
- * POLYFILL PATTERN: This file makes the same repository interface work on native
- * by calling HTTP endpoints instead of direct database access.
- *
- * IMPLEMENTATION STRATEGY:
- * - All methods return "not implemented" errors (not used in page.tsx)
- * - Can be implemented with nativeEndpoint() when needed
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
 
 import type { DbId } from "@/app/api/[locale]/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { NewUserRole, UserRole } from "../db";
-import type { UserPermissionRoleValue,UserRole as UserRoleEnum } from "./enum";
-// Import interface for type compatibility
-import type { UserRolesRepository } from "./repository";
+import type { UserPermissionRoleValue, UserRole as UserRoleEnum } from "./enum";
+import type { UserRolesRepositoryType } from "./repository";
 
 /**
- * Native User Roles Repository Implementation
- * Uses HTTP client to call API endpoints
+ * Native User Roles Repository
  */
-class UserRolesRepositoryNativeImpl implements UserRolesRepository {
-  private createNotImplementedError<T>(method: string): ResponseType<T> {
-    return fail({
-      message: "app.api.user.userRoles.errors.endpoint_not_created",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { method },
-    });
-  }
-
-  async findByUserId(
-    userId: DbId,
-    logger: EndpointLogger,
+export class UserRolesRepository {
+  static async findByUserId(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: DbId,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<UserRole[]>> {
-    logger.warn("findByUserId not implemented on native", { userId });
-    return await Promise.resolve(
-      this.createNotImplementedError<UserRole[]>("findByUserId"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("findByUserId is not implemented on native");
   }
 
-  async findByUserIds(
-    userIds: DbId[],
-    logger: EndpointLogger,
+  static async findByUserIds(
+    // oxlint-disable-next-line no-unused-vars
+    _userIds: DbId[],
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<Map<DbId, UserRole[]>>> {
-    logger.warn("findByUserIds not implemented on native", {
-      userIdsCount: userIds.length,
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<Map<DbId, UserRole[]>>("findByUserIds"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("findByUserIds is not implemented on native");
   }
 
-  async deleteByUserId(
-    userId: DbId,
-    logger: EndpointLogger,
+  static async deleteByUserId(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: DbId,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
-    logger.warn("deleteByUserId not implemented on native", { userId });
-    return await Promise.resolve(
-      this.createNotImplementedError<void>("deleteByUserId"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("deleteByUserId is not implemented on native");
   }
 
-  async findByUserIdAndRole(
-    userId: DbId,
-    role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
-    logger: EndpointLogger,
+  static async findByUserIdAndRole(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: DbId,
+    // oxlint-disable-next-line no-unused-vars
+    _role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<UserRole>> {
-    logger.warn("findByUserIdAndRole not implemented on native", {
-      userId,
-      role: String(role),
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<UserRole>("findByUserIdAndRole"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("findByUserIdAndRole is not implemented on native");
   }
 
-  async addRole(
-    data: NewUserRole,
-    logger: EndpointLogger,
+  static async addRole(
+    // oxlint-disable-next-line no-unused-vars
+    _data: NewUserRole,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<UserRole>> {
-    logger.warn("addRole not implemented on native", {
-      userId: data.userId,
-      role: String(data.role),
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<UserRole>("addRole"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("addRole is not implemented on native");
   }
 
-  async removeRole(
-    userId: DbId,
-    role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
-    logger: EndpointLogger,
+  static async removeRole(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: DbId,
+    // oxlint-disable-next-line no-unused-vars
+    _role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
-    logger.warn("removeRole not implemented on native", {
-      userId,
-      role: String(role),
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<boolean>("removeRole"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("removeRole is not implemented on native");
   }
 
-  async hasRole(
-    userId: DbId,
-    role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
-    logger: EndpointLogger,
+  static async hasRole(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: DbId,
+    // oxlint-disable-next-line no-unused-vars
+    _role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
-    logger.warn("hasRole not implemented on native", {
-      userId,
-      role: String(role),
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<boolean>("hasRole"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("hasRole is not implemented on native");
   }
 
-  async getUserRoles(
-    userId: DbId,
-    logger: EndpointLogger,
+  static async getUserRoles(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: DbId,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<(typeof UserPermissionRoleValue)[]>> {
-    logger.warn("getUserRoles not implemented on native", { userId });
-    return await Promise.resolve(
-      this.createNotImplementedError<(typeof UserPermissionRoleValue)[]>(
-        "getUserRoles",
-      ),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getUserRoles is not implemented on native");
   }
 }
 
-/**
- * Singleton instance
- * Export with same name as server implementation for drop-in replacement
- */
-export const userRolesRepository = new UserRolesRepositoryNativeImpl();
+// Compile-time type check
+const _typeCheck: UserRolesRepositoryType = UserRolesRepository;
+void _typeCheck;

@@ -82,7 +82,7 @@ export function useStreamSync(deps: StreamSyncDeps): void {
           authorColor: null,
           isAI: streamMsg.role === ChatMessageRole.ASSISTANT,
           model: streamMsg.model || null,
-          persona: null,
+          character: null,
           errorType: streamMsg.error
             ? t("app.api.agent.chat.aiStream.errorTypes.streamError")
             : null,
@@ -117,7 +117,7 @@ export function useStreamSync(deps: StreamSyncDeps): void {
           folderId: streamThread.subFolderId,
           status: ThreadStatus.ACTIVE,
           defaultModel: null,
-          defaultPersona: null,
+          defaultCharacter: null,
           systemPrompt: null,
           pinned: false,
           archived: false,

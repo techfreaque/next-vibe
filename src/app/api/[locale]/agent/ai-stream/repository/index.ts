@@ -18,7 +18,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { creditRepository } from "@/app/api/[locale]/credits/repository";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import { getFullPath } from "@/app/api/[locale]/system/generated/endpoint";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
@@ -269,10 +269,13 @@ class AiStreamRepository implements IAiStreamRepository {
               userId,
               enabled: true,
             });
-            logger.info("[AI Stream] Voice mode enabled - streaming TTS active", {
-              voice: voiceMode.voice,
-              callMode: voiceMode.callMode,
-            });
+            logger.info(
+              "[AI Stream] Voice mode enabled - streaming TTS active",
+              {
+                voice: voiceMode.voice,
+                callMode: voiceMode.callMode,
+              },
+            );
           }
 
           try {
@@ -422,7 +425,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   currentParentId,
                   currentDepth,
                   model: data.model,
-                  persona: data.persona,
+                  character: data.character,
                   sequenceId,
                   isIncognito,
                   userId,
@@ -451,7 +454,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   currentParentId,
                   currentDepth,
                   model: data.model,
-                  persona: data.persona,
+                  character: data.character,
                   sequenceId,
                   isIncognito,
                   userId,
@@ -514,7 +517,7 @@ class AiStreamRepository implements IAiStreamRepository {
                     currentParentId,
                     currentDepth,
                     model: data.model,
-                    persona: data.persona,
+                    character: data.character,
                     sequenceId,
                     isIncognito,
                     userId,
@@ -562,7 +565,7 @@ class AiStreamRepository implements IAiStreamRepository {
                     pendingToolMessage: pending,
                     threadId: threadResultThreadId,
                     model: data.model,
-                    persona: data.persona,
+                    character: data.character,
                     sequenceId,
                     isIncognito,
                     userId,
@@ -598,7 +601,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   pendingToolMessage: pending,
                   threadId: threadResultThreadId,
                   model: data.model,
-                  persona: data.persona,
+                  character: data.character,
                   sequenceId,
                   isIncognito,
                   userId,
@@ -714,10 +717,7 @@ class AiStreamRepository implements IAiStreamRepository {
             }
 
             // Check if this is a timeout error
-            if (
-              error instanceof Error &&
-              error.message === "Stream timeout"
-            ) {
+            if (error instanceof Error && error.message === "Stream timeout") {
               logger.error("[AI Stream] Stream timed out", {
                 message: error.message,
                 maxDuration: `${maxDuration} seconds`,
@@ -760,7 +760,9 @@ class AiStreamRepository implements IAiStreamRepository {
                 depth: lastDepth,
                 sequenceId: lastSequenceId,
               });
-              controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
+              controller.enqueue(
+                encoder.encode(formatSSEEvent(errorMessageEvent)),
+              );
 
               // Also emit legacy error event for compatibility
               const errorEvent = createStreamEvent.error({
@@ -835,7 +837,7 @@ class AiStreamRepository implements IAiStreamRepository {
     model: ModelId;
     logger: EndpointLogger;
   }): Promise<void> {
-    await creditRepository.deductCreditsForFeature(
+    await CreditRepository.deductCreditsForFeature(
       params.user,
       params.modelCost,
       params.model,
@@ -1131,7 +1133,7 @@ class AiStreamRepository implements IAiStreamRepository {
     parentId: string | null;
     depth: number;
     model: ModelId;
-    persona: string;
+    character: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
@@ -1145,7 +1147,7 @@ class AiStreamRepository implements IAiStreamRepository {
       parentId,
       depth,
       model,
-      persona,
+      character,
       sequenceId,
       isIncognito,
       userId,
@@ -1174,7 +1176,7 @@ class AiStreamRepository implements IAiStreamRepository {
       parentId,
       depth,
       model,
-      persona,
+      character,
       sequenceId,
     });
     controller.enqueue(encoder.encode(formatSSEEvent(messageEvent)));
@@ -1207,7 +1209,7 @@ class AiStreamRepository implements IAiStreamRepository {
         depth,
         userId,
         model,
-        persona,
+        character,
         sequenceId,
         logger,
       });
@@ -1313,7 +1315,7 @@ class AiStreamRepository implements IAiStreamRepository {
     currentParentId: string | null;
     currentDepth: number;
     model: ModelId;
-    persona: string;
+    character: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
@@ -1334,7 +1336,7 @@ class AiStreamRepository implements IAiStreamRepository {
       currentParentId,
       currentDepth,
       model,
-      persona,
+      character,
       sequenceId,
       isIncognito,
       userId,
@@ -1355,7 +1357,7 @@ class AiStreamRepository implements IAiStreamRepository {
           parentId: currentParentId,
           depth: currentDepth,
           model,
-          persona,
+          character,
           sequenceId,
           isIncognito,
           userId,
@@ -1422,7 +1424,7 @@ class AiStreamRepository implements IAiStreamRepository {
     currentParentId: string | null;
     currentDepth: number;
     model: ModelId;
-    persona: string;
+    character: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
@@ -1441,7 +1443,7 @@ class AiStreamRepository implements IAiStreamRepository {
       currentParentId,
       currentDepth,
       model,
-      persona,
+      character,
       sequenceId,
       isIncognito,
       userId,
@@ -1462,7 +1464,7 @@ class AiStreamRepository implements IAiStreamRepository {
         parentId: currentParentId,
         depth: currentDepth,
         model,
-        persona,
+        character,
         sequenceId,
         isIncognito,
         userId,
@@ -1598,7 +1600,7 @@ class AiStreamRepository implements IAiStreamRepository {
     currentParentId: string | null;
     currentDepth: number;
     model: ModelId;
-    persona: string;
+    character: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
@@ -1628,7 +1630,7 @@ class AiStreamRepository implements IAiStreamRepository {
       isInReasoningBlock,
       threadId,
       model,
-      persona,
+      character,
       sequenceId,
       isIncognito,
       userId,
@@ -1650,7 +1652,7 @@ class AiStreamRepository implements IAiStreamRepository {
         parentId: currentParentId,
         depth: currentDepth,
         model,
-        persona,
+        character,
         sequenceId,
         isIncognito,
         userId,
@@ -1803,7 +1805,7 @@ class AiStreamRepository implements IAiStreamRepository {
         userId,
         sequenceId,
         model,
-        persona,
+        character,
         logger,
       });
 
@@ -1939,7 +1941,7 @@ class AiStreamRepository implements IAiStreamRepository {
       | undefined;
     threadId: string;
     model: ModelId;
-    persona: string;
+    character: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
@@ -1955,7 +1957,7 @@ class AiStreamRepository implements IAiStreamRepository {
       pendingToolMessage,
       threadId,
       model,
-      persona,
+      character,
       sequenceId,
       isIncognito,
       userId,
@@ -2039,7 +2041,7 @@ class AiStreamRepository implements IAiStreamRepository {
           userId,
           sequenceId,
           model,
-          persona,
+          character,
           logger,
         });
         logger.warn("[AI Stream] Created missing tool message as fallback", {
@@ -2068,7 +2070,7 @@ class AiStreamRepository implements IAiStreamRepository {
         parentId: toolCallData.parentId,
         depth: toolCallData.depth,
         model,
-        persona,
+        character,
         sequenceId,
         toolCall: toolCallWithError, // Include tool call data with error (singular - each TOOL message has exactly one tool call)
       });
@@ -2126,7 +2128,7 @@ class AiStreamRepository implements IAiStreamRepository {
       | undefined;
     threadId: string;
     model: ModelId;
-    persona: string;
+    character: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
@@ -2142,7 +2144,7 @@ class AiStreamRepository implements IAiStreamRepository {
       pendingToolMessage,
       threadId,
       model,
-      persona,
+      character,
       sequenceId,
       isIncognito,
       userId,
@@ -2254,7 +2256,7 @@ class AiStreamRepository implements IAiStreamRepository {
         parentId: toolCallData.parentId,
         depth: toolCallData.depth,
         model,
-        persona,
+        character,
         sequenceId,
         toolCall: toolCallWithResult, // Include tool call data with result (singular - each TOOL message has exactly one tool call)
       });
@@ -2298,7 +2300,7 @@ class AiStreamRepository implements IAiStreamRepository {
           parentId: toolMessageId,
           depth: toolCallData.depth + 1,
           model,
-          persona,
+          character,
           sequenceId,
         });
         controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
@@ -2366,7 +2368,7 @@ class AiStreamRepository implements IAiStreamRepository {
           userId,
           sequenceId,
           model,
-          persona,
+          character,
           logger,
         });
         logger.warn("[AI Stream] Created missing tool message as fallback", {

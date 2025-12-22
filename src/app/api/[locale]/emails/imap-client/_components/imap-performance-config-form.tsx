@@ -11,9 +11,11 @@ import type { JSX } from "react";
 import type { Control } from "react-hook-form";
 
 import type { ImapConfigPostRequestOutput } from "@/app/api/[locale]/emails/imap-client/config/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ImapPerformanceConfigFormProps {
   control: Control<ImapConfigPostRequestOutput>;
+  locale: CountryLanguage;
 }
 
 /**
@@ -21,6 +23,7 @@ interface ImapPerformanceConfigFormProps {
  */
 export function ImapPerformanceConfigForm({
   control,
+  locale,
 }: ImapPerformanceConfigFormProps): JSX.Element {
   return (
     <Div className="flex flex-col gap-4">
@@ -31,6 +34,7 @@ export function ImapPerformanceConfigForm({
           label: "app.admin.emails.imap.config.performance.cacheEnabled",
         }}
         control={control}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -41,6 +45,7 @@ export function ImapPerformanceConfigForm({
           placeholder: undefined,
         }}
         control={control}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -51,6 +56,7 @@ export function ImapPerformanceConfigForm({
           placeholder: undefined,
         }}
         control={control}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -61,6 +67,7 @@ export function ImapPerformanceConfigForm({
           placeholder: undefined,
         }}
         control={control}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -71,6 +78,7 @@ export function ImapPerformanceConfigForm({
           placeholder: undefined,
         }}
         control={control}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -81,6 +89,7 @@ export function ImapPerformanceConfigForm({
           placeholder: undefined,
         }}
         control={control}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -92,6 +101,7 @@ export function ImapPerformanceConfigForm({
           placeholder: undefined,
         }}
         control={control}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -103,6 +113,7 @@ export function ImapPerformanceConfigForm({
           placeholder: undefined,
         }}
         control={control}
+        locale={locale}
       />
     </Div>
   );

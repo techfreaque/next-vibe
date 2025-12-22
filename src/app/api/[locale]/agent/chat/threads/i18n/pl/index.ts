@@ -94,25 +94,25 @@ export const translations: typeof enTranslations = {
             content: "Utworzono",
           },
           updatedAt: {
-          content: "Zaktualizowano",
-        },
-        canEdit: {
-          content: "Może edytować",
-        },
-        canPost: {
-          content: "Może publikować",
-        },
-        canModerate: {
-          content: "Może moderować",
-        },
-        canDelete: {
-          content: "Może usuwać",
-        },
-        canManagePermissions: {
-          content: "Może zarządzać uprawnieniami",
+            content: "Zaktualizowano",
+          },
+          canEdit: {
+            content: "Może edytować",
+          },
+          canPost: {
+            content: "Może publikować",
+          },
+          canModerate: {
+            content: "Może moderować",
+          },
+          canDelete: {
+            content: "Może usuwać",
+          },
+          canManagePermissions: {
+            content: "Może zarządzać uprawnieniami",
+          },
         },
       },
-    },
       totalCount: {
         content: "Całkowita liczba",
       },

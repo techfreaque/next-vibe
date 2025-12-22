@@ -15,6 +15,7 @@ import { DataCardsWidget } from "../implementations/DataCardsWidget";
 import { DataListWidget } from "../implementations/DataListWidget";
 import { DataTableWidget } from "../implementations/DataTableWidget";
 import { EditableTextWidget } from "../implementations/EditableTextWidget";
+import { FilterPillsWidget } from "../implementations/FilterPillsWidget";
 import { GroupedListWidget } from "../implementations/GroupedListWidget";
 import { LinkCardWidget } from "../implementations/LinkCardWidget";
 import { LinkListWidget } from "../implementations/LinkListWidget";
@@ -62,6 +63,9 @@ export function registerAllWidgets(): void {
   // Layout widgets
   widgetRegistry.register(WidgetType.CONTAINER, ContainerWidget);
   widgetRegistry.register(WidgetType.SECTION, SectionWidget);
+
+  // Form widgets
+  widgetRegistry.register(WidgetType.FILTER_PILLS, FilterPillsWidget);
 
   // Editable widgets (for CRUD operations)
   widgetRegistry.register(WidgetType.MARKDOWN_EDITOR, EditableTextWidget);

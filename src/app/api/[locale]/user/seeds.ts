@@ -14,15 +14,15 @@ import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 import { leads, userLeadLinks } from "../leads/db";
 import { LeadSource, LeadStatus } from "../leads/enum";
 import { parseError } from "../shared/utils";
-import { authRepository } from "./auth/repository";
+import { AuthRepository } from "./auth/repository";
 import type { NewUser } from "./db";
 import { users } from "./db";
 import { UserDetailLevel } from "./enum";
-import { sessionRepository } from "./private/session/repository";
-import { userRepository } from "./repository";
+import { SessionRepository } from "./private/session/repository";
+import { UserRepository } from "./repository";
 import type { StandardUserType } from "./types";
 import { UserRole } from "./user-roles/enum";
-import { userRolesRepository } from "./user-roles/repository";
+import { UserRolesRepository } from "./user-roles/repository";
 
 /**
  * Helper function to create user seed data
@@ -91,7 +91,7 @@ export async function dev(
   for (const user of allUsers) {
     try {
       // Check if user already exists using emailExists (doesn't fetch full user)
-      const emailExistsResponse = await userRepository.emailExists(
+      const emailExistsResponse = await UserRepository.emailExists(
         user.email,
         logger,
       );
@@ -128,7 +128,7 @@ export async function dev(
         continue;
       }
       // Create new user
-      const newUserResponse = await userRepository.createWithHashedPassword(
+      const newUserResponse = await UserRepository.createWithHashedPassword(
         user,
         logger,
       );
@@ -224,7 +224,7 @@ export async function dev(
 
         for (const role of adminRoles) {
           try {
-            await userRolesRepository.addRole(
+            await UserRolesRepository.addRole(
               {
                 userId: adminUserId,
                 role,
@@ -243,7 +243,7 @@ export async function dev(
 
       if (createdUsers[1]) {
         // Second user is demo user
-        await userRolesRepository.addRole(
+        await UserRolesRepository.addRole(
           {
             userId: createdUsers[1].id,
             role: UserRole.CUSTOMER,
@@ -256,7 +256,7 @@ export async function dev(
       // Create roles for regular users (starting from index 2)
       for (let i = 2; i < createdUsers.length; i++) {
         if (createdUsers[i]) {
-          await userRolesRepository.addRole(
+          await UserRolesRepository.addRole(
             {
               userId: createdUsers[i].id,
               role: UserRole.CUSTOMER,
@@ -326,7 +326,7 @@ export async function dev(
       logger.debug(`Creating CLI authentication for user ${adminUserId}`);
 
       // Create CLI token
-      const cliTokenResponse = await authRepository.createCliToken(
+      const cliTokenResponse = await AuthRepository.createCliToken(
         adminUserId,
         "en-GLOBAL",
         logger,
@@ -338,7 +338,7 @@ export async function dev(
         const sessionExpiresAt = new Date(
           Date.now() + 365 * 24 * 60 * 60 * 1000,
         ); // 1 year
-        const sessionResult = await sessionRepository.create({
+        const sessionResult = await SessionRepository.create({
           userId: adminUserId,
           token: cliTokenResponse.data,
           expiresAt: sessionExpiresAt,
@@ -388,7 +388,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
     testUsers.map(async (user) => {
       try {
         // Check if user already exists
-        const existingUser = await userRepository.getUserByEmail(
+        const existingUser = await UserRepository.getUserByEmail(
           user.email,
           UserDetailLevel.STANDARD,
           "en-GLOBAL",
@@ -401,7 +401,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
           return existingUser.data;
         }
         // Create new user
-        const userResponse = await userRepository.createWithHashedPassword(
+        const userResponse = await UserRepository.createWithHashedPassword(
           user,
           logger,
         );
@@ -454,7 +454,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
     // Check if user_roles table exists
     try {
       // Try to assign admin role to first user
-      await userRolesRepository.addRole(
+      await UserRolesRepository.addRole(
         {
           userId: createdUsers[0].id,
           role: UserRole.ADMIN,
@@ -464,7 +464,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       logger.debug(`Created admin role for test user ${createdUsers[0].id}`);
 
       // Assign customer role to second user
-      await userRolesRepository.addRole(
+      await UserRolesRepository.addRole(
         {
           userId: createdUsers[1].id,
           role: UserRole.CUSTOMER,
@@ -514,7 +514,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
   let createdAdmin: StandardUserType;
   try {
     // Check if admin user already exists
-    const existingAdmin = await userRepository.getUserByEmail(
+    const existingAdmin = await UserRepository.getUserByEmail(
       adminUser.email,
       UserDetailLevel.STANDARD,
       "en-GLOBAL",
@@ -530,7 +530,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
       logger.debug(
         `Admin user with email ${adminUser.email} does not exist, creating new user`,
       );
-      const adminResponse = await userRepository.createWithHashedPassword(
+      const adminResponse = await UserRepository.createWithHashedPassword(
         adminUser,
         logger,
       );
@@ -548,7 +548,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
 
     // Create admin role for admin user
     try {
-      await userRolesRepository.addRole(
+      await UserRolesRepository.addRole(
         {
           userId: createdAdmin.id,
           role: UserRole.ADMIN,

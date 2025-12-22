@@ -9,10 +9,12 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class SectionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.SECTION> {
+export class SectionWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.SECTION
+> {
   readonly widgetType = WidgetType.SECTION;
 
-  render(props: CLIWidgetProps<typeof WidgetType.SECTION>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.SECTION, string>): string {
     const { value, context } = props;
 
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
@@ -24,7 +26,7 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.
 
   private renderSection(
     value: { [key: string]: WidgetData },
-    props: CLIWidgetProps<typeof WidgetType.SECTION>,
+    props: CLIWidgetProps<typeof WidgetType.SECTION, string>,
     context: WidgetRenderContext,
   ): string {
     const result: string[] = [];
@@ -50,17 +52,13 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.
 
       if (field.type === "object" && field.children?.[key]) {
         const childField = field.children[key];
-        const renderer = context.getRenderer(childField.ui.type);
-        if (renderer) {
-          const rendered = renderer.render({
-            widgetType: childField.ui.type,
-            field: childField,
-            value: val,
-            context,
-          });
-          if (rendered) {
-            result.push(rendered);
-          }
+        const rendered = context.renderWidget(
+          childField.ui.type,
+          childField,
+          val,
+        );
+        if (rendered) {
+          result.push(rendered);
         }
       } else {
         // Fallback rendering

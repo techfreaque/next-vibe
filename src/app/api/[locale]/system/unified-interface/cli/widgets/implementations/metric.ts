@@ -15,10 +15,12 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.METRIC_CARD> {
+export class MetricWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.METRIC_CARD
+> {
   readonly widgetType = WidgetType.METRIC_CARD;
 
-  render(props: CLIWidgetProps<typeof WidgetType.METRIC_CARD>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.METRIC_CARD, string>): string {
     const { field, value, context } = props;
     const config = this.getMetricConfig(field);
     const indent = this.createIndent(context.depth, context);
@@ -46,9 +48,12 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     return `${indent}${icon}${label}: ${formattedValue}`;
   }
 
-  private renderMetricObject(
+  private renderMetricObject<TKey extends string>(
     value: { [key: string]: WidgetData },
-    config: Pick<MetricCardWidgetConfig, "icon" | "unit" | "precision" | "threshold" | "format">,
+    config: Pick<
+      MetricCardWidgetConfig<TKey>,
+      "icon" | "unit" | "precision" | "threshold" | "format"
+    >,
     context: WidgetRenderContext,
     indent: string,
   ): string {
@@ -140,7 +145,12 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     return parts.join("\n");
   }
 
-  private getMetricConfig(field: UnifiedField): Pick<MetricCardWidgetConfig, "icon" | "unit" | "precision" | "threshold" | "format"> {
+  private getMetricConfig<TKey extends string>(
+    field: UnifiedField<TKey>,
+  ): Pick<
+    MetricCardWidgetConfig<TKey>,
+    "icon" | "unit" | "precision" | "threshold" | "format"
+  > {
     if (field.ui.type !== WidgetType.METRIC_CARD) {
       return {
         format: "number",
@@ -170,9 +180,12 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     };
   }
 
-  private formatMetricValueLocal(
+  private formatMetricValueLocal<TKey extends string>(
     value: WidgetData,
-    config: Pick<MetricCardWidgetConfig, "icon" | "unit" | "precision" | "threshold" | "format">,
+    config: Pick<
+      MetricCardWidgetConfig<TKey>,
+      "icon" | "unit" | "precision" | "threshold" | "format"
+    >,
     context: WidgetRenderContext,
   ): string {
     if (
@@ -225,8 +238,8 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     return formatted;
   }
 
-  private getMetricIcon(
-    config: Pick<MetricCardWidgetConfig, "icon" | "threshold">,
+  private getMetricIcon<TKey extends string>(
+    config: Pick<MetricCardWidgetConfig<TKey>, "icon" | "threshold">,
     value: WidgetData,
     context: WidgetRenderContext,
   ): string {

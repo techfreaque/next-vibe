@@ -1,7 +1,7 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
-import { Text as RNText,View } from "react-native";
+import { Text as RNText, View } from "react-native";
 
 import type {
   CardContentProps,
@@ -13,13 +13,21 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/card";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToTextStyle,convertCSSToViewStyle } from "../utils/style-converter";
+import {
+  convertCSSToTextStyle,
+  convertCSSToViewStyle,
+} from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });
 const StyledText = styled(RNText, { className: "style" });
 
-function Card({ className, style, id, children }: CardProps): React.JSX.Element {
+function Card({
+  className,
+  style,
+  id,
+  children,
+}: CardProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
@@ -61,7 +69,12 @@ function CardHeader({
 }
 CardHeader.displayName = "CardHeader";
 
-function CardTitle({ className, style, id, children }: CardTitleProps): React.JSX.Element {
+function CardTitle({
+  className,
+  style,
+  id,
+  children,
+}: CardTitleProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
 
   return (

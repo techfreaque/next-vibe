@@ -92,7 +92,7 @@ export const translations: typeof enTranslations = {
         result: {
           content: {
             type: "Inhaltstyp",
-            text: "Inhalt"
+            text: "Inhalt",
           },
           isError: "Ist Fehler",
         },

@@ -98,14 +98,14 @@ export const translations = {
       leadId: {
         content: "Zugehörige Lead-ID",
       },
-    country: {
-      label: "Land",
-      description: "Wohnsitzland des Benutzers",
-    },
-    language: {
-      label: "Sprache",
-      description: "Bevorzugte Sprache des Benutzers",
-    },
+      country: {
+        label: "Land",
+        description: "Wohnsitzland des Benutzers",
+      },
+      language: {
+        label: "Sprache",
+        description: "Bevorzugte Sprache des Benutzers",
+      },
       email: {
         content: "E-Mail-Adresse",
       },

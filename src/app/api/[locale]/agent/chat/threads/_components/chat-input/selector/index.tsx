@@ -4,13 +4,33 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-state-context";
+import {
+  type Character,
+  getCharacterById,
+} from "@/app/api/[locale]/agent/chat/characters/config";
+import personasDefinition, {
+  type CharacterListResponseOutput,
+} from "@/app/api/[locale]/agent/chat/characters/definition";
+import {
+  ContentLevelFilter,
+  type ContentLevelFilterValue,
+  IntelligenceLevelFilter,
+  type IntelligenceLevelFilterValue,
+  ModelSelectionMode,
+  PriceLevelFilter,
+  type PriceLevelFilterValue,
+} from "@/app/api/[locale]/agent/chat/favorites/enum";
 import {
   getIconComponent,
   type IconKey,
@@ -19,19 +39,15 @@ import {
   type ModelId,
   modelOptions,
 } from "@/app/api/[locale]/agent/chat/model-access/models";
-import { getPersonaById } from "@/app/api/[locale]/agent/chat/personas/config";
-import {
-  type ContentLevel,
-  type IntelligenceLevel,
-  type PriceLevel,
-} from "@/app/api/[locale]/agent/chat/types";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { CharacterBrowser } from "./character-browser";
-import { CreatePersonaForm } from "./create-persona-form";
+import { CreatePersonaForm } from "./create-character-form";
+import { EditCharacterModal } from "./edit-character-modal";
 import { type FavoriteItem, FavoritesBar } from "./favorites-bar";
 import { QuickSettingsPanel } from "./quick-settings-panel";
 import { SelectorOnboarding } from "./selector-onboarding";
@@ -39,9 +55,9 @@ import { findBestModel } from "./types";
 import { useChatFavorites } from "./use-chat-favorites";
 
 interface SelectorProps {
-  personaId: string;
+  characterId: string;
   modelId: ModelId;
-  onPersonaChange: (personaId: string) => void;
+  onCharacterChange: (characterId: string) => void;
   onModelChange: (modelId: ModelId) => void;
   locale: CountryLanguage;
   user?: JwtPayloadType;
@@ -51,36 +67,106 @@ interface SelectorProps {
   triggerSize?: "default" | "sm" | "lg" | "icon";
 }
 
-type SelectorView = "onboarding" | "favorites" | "settings" | "browser" | "create";
-
+type SelectorView =
+  | "onboarding"
+  | "favorites"
+  | "settings"
+  | "browser"
+  | "create"
+  | "edit"
+  | "character-switch";
 
 /**
- * Create a new favorite from persona
+ * Create a new favorite from character
  */
-function createFavoriteFromPersona(
-  personaId: string | null,
-  intelligence: IntelligenceLevel = "smart",
-  maxPrice: PriceLevel = "standard",
-  content: ContentLevel = "open",
+function createFavoriteFromCharacter(
+  characterId: string | null,
+  intelligence: typeof IntelligenceLevelFilterValue = IntelligenceLevelFilter.SMART,
+  maxPrice: typeof PriceLevelFilterValue = PriceLevelFilter.STANDARD,
+  content: typeof ContentLevelFilterValue = ContentLevelFilter.OPEN,
 ): FavoriteItem {
-  const persona = personaId ? getPersonaById(personaId) : null;
+  const character = characterId ? getCharacterById(characterId) : null;
 
-  // Use persona requirements to set defaults
+  // Use character requirements to set defaults
   let defaultContent = content;
-  if (persona?.requirements?.minContent) {
-    const contentOrder: ContentLevel[] = ["mainstream", "open", "uncensored"];
-    const requiredIndex = contentOrder.indexOf(persona.requirements.minContent);
-    const currentIndex = contentOrder.indexOf(content);
-    if (currentIndex < requiredIndex) {
-      defaultContent = persona.requirements.minContent;
+  if (character?.requirements?.minContent) {
+    const contentOrder = [
+      ContentLevelFilter.MAINSTREAM,
+      ContentLevelFilter.OPEN,
+      ContentLevelFilter.UNCENSORED,
+    ];
+    const requiredIndex = contentOrder.indexOf(
+      character.requirements.minContent,
+    );
+    // If content is ANY, use the character's minimum requirement
+    if (content === ContentLevelFilter.ANY) {
+      defaultContent = character.requirements.minContent;
+    } else {
+      const currentIndex = contentOrder.indexOf(content);
+      if (currentIndex < requiredIndex) {
+        defaultContent = character.requirements.minContent;
+      }
     }
   }
 
   return {
-    id: `local-${Date.now()}-${personaId ?? "model"}`,
-    personaId,
+    id: `local-${Date.now()}-${characterId ?? "model"}`,
+    characterId,
+    voice: character?.voice,
     modelSettings: {
-      mode: "auto",
+      mode: ModelSelectionMode.AUTO,
+      filters: {
+        intelligence,
+        maxPrice,
+        content: defaultContent,
+      },
+    },
+    isActive: false,
+  };
+}
+
+/**
+ * Create a new favorite from a character object
+ * This version accepts the character object from API response, avoiding the need for getCharacterById()
+ * Used when we have the character object already (e.g., from API response or refetched data)
+ */
+function createFavoriteFromCharacterObject(
+  character: CharacterListResponseOutput["characters"][number],
+  intelligence: typeof IntelligenceLevelFilterValue = IntelligenceLevelFilter.SMART,
+  maxPrice: typeof PriceLevelFilterValue = PriceLevelFilter.STANDARD,
+  content: typeof ContentLevelFilterValue = ContentLevelFilter.OPEN,
+): FavoriteItem {
+  // Use character requirements to set defaults
+  let defaultContent = content;
+  if (
+    character.requirements?.minContent &&
+    character.requirements.minContent !== ContentLevelFilter.ANY
+  ) {
+    const contentOrder = [
+      ContentLevelFilter.MAINSTREAM,
+      ContentLevelFilter.OPEN,
+      ContentLevelFilter.UNCENSORED,
+    ] as const;
+    const requiredIndex = contentOrder.indexOf(
+      character.requirements.minContent,
+    );
+    // If content is ANY, use the character's minimum requirement
+    if (content === ContentLevelFilter.ANY) {
+      defaultContent = character.requirements.minContent;
+    } else {
+      const currentIndex = contentOrder.indexOf(content);
+      if (currentIndex >= 0 && currentIndex < requiredIndex) {
+        defaultContent = character.requirements.minContent;
+      }
+    }
+  }
+
+  return {
+    id: `local-${Date.now()}-${character.id}`,
+    characterId: character.id,
+    voice: character.voice,
+    modelSettings: {
+      mode: ModelSelectionMode.AUTO,
       filters: {
         intelligence,
         maxPrice,
@@ -92,9 +178,9 @@ function createFavoriteFromPersona(
 }
 
 export function Selector({
-  personaId,
+  characterId,
   modelId,
-  onPersonaChange,
+  onCharacterChange,
   onModelChange,
   locale,
   user,
@@ -123,38 +209,78 @@ export function Selector({
     logger,
   });
 
+  // Fetch characters list (for edit character feature)
+  const charactersEndpoint = useEndpoint(personasDefinition, {}, logger);
+  const characters = useMemo(() => {
+    const response = charactersEndpoint.read?.response;
+    if (
+      response &&
+      "success" in response &&
+      response.success &&
+      "data" in response &&
+      response.data &&
+      "characters" in response.data
+    ) {
+      const charactersList = response.data.characters;
+      const map: Record<
+        string,
+        CharacterListResponseOutput["characters"][number]
+      > = {};
+      charactersList.forEach((p) => {
+        map[p.id] = p;
+      });
+      return map;
+    }
+    return {};
+  }, [charactersEndpoint.read?.response]);
+
   // Local state
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [view, setView] = useState<SelectorView>("favorites");
 
   const [needsOnboarding, setNeedsOnboarding] = useState(true);
 
+  // Use tour state if active
+  const open = tourIsActive ? tourOpen : popoverOpen;
+
   // Show onboarding when there are no favorites
   useEffect(() => {
     if (!favoritesLoading) {
       // Show onboarding if user has no favorites
-      setNeedsOnboarding(favorites.length === 0);
+      const shouldShowOnboarding = favorites.length === 0;
+      setNeedsOnboarding(shouldShowOnboarding);
+
+      // If popover is open, update view based on loading completion
+      if (open) {
+        setView(shouldShowOnboarding ? "onboarding" : "favorites");
+      }
     }
-  }, [favoritesLoading, favorites.length]);
-  const [editingFavoriteId, setEditingFavoriteId] = useState<string | null>(null);
+  }, [favoritesLoading, favorites.length, open]);
+  const [editingFavoriteId, setEditingFavoriteId] = useState<string | null>(
+    null,
+  );
+  const [editingCharacterData, setEditingCharacterData] = useState<
+    CharacterListResponseOutput["characters"][number] | null
+  >(null);
 
   // Handle tour opening the selector - set correct view only on OPEN
   const prevTourOpen = useRef(tourOpen);
   useEffect(() => {
     // Only run when tourOpen transitions from false to true (opening)
     if (tourIsActive && tourOpen && !prevTourOpen.current) {
-      // When tour opens the selector, show onboarding if needed
-      if (needsOnboarding) {
-        setView("onboarding");
-      } else {
-        setView("favorites");
+      // When tour opens the selector, only set view if favorites are loaded
+      if (!favoritesLoading) {
+        setView(needsOnboarding ? "onboarding" : "favorites");
       }
     }
     prevTourOpen.current = tourOpen;
-  }, [tourIsActive, tourOpen, needsOnboarding]);
+  }, [tourIsActive, tourOpen, needsOnboarding, favoritesLoading]);
 
   // Get current selections
-  const currentPersona = useMemo(() => getPersonaById(personaId), [personaId]);
+  const currentCharacter = useMemo(
+    () => getCharacterById(characterId),
+    [characterId],
+  );
   const currentModel = useMemo(() => modelOptions[modelId], [modelId]);
 
   // Get active favorite
@@ -165,12 +291,12 @@ export function Selector({
 
   // Get the favorite being edited (could be different from active)
   const editingFavorite = useMemo(
-    () => editingFavoriteId ? favorites.find((f) => f.id === editingFavoriteId) : activeFavorite,
+    () =>
+      editingFavoriteId
+        ? favorites.find((f) => f.id === editingFavoriteId)
+        : activeFavorite,
     [editingFavoriteId, favorites, activeFavorite],
   );
-
-  // Use tour state if active
-  const open = tourIsActive ? tourOpen : popoverOpen;
 
   // Handle open state changes
   const handleOpenChange = useCallback(
@@ -182,18 +308,17 @@ export function Selector({
       }
 
       if (newOpen) {
-        // When opening, check if we need onboarding
-        if (needsOnboarding) {
-          setView("onboarding");
-        } else {
-          setView("favorites");
+        // When opening, only set view if favorites are loaded
+        // Otherwise, the useEffect will set it when loading completes
+        if (!favoritesLoading) {
+          setView(needsOnboarding ? "onboarding" : "favorites");
         }
       } else {
         // When closing, reset view
         setView("favorites");
       }
     },
-    [tourIsActive, setTourOpen, needsOnboarding],
+    [tourIsActive, setTourOpen, needsOnboarding, favoritesLoading],
   );
 
   // Handle favorite selection
@@ -204,25 +329,25 @@ export function Selector({
 
       const selected = favorites.find((f) => f.id === favoriteId);
       if (selected) {
-        // Only change persona if not model-only
-        if (selected.personaId) {
-          onPersonaChange(selected.personaId);
+        // Only change character if not model-only
+        if (selected.characterId) {
+          onCharacterChange(selected.characterId);
         }
 
         // Resolve model
         const allModels = Object.values(modelOptions);
-        const persona = selected.personaId
-          ? getPersonaById(selected.personaId)
+        const character = selected.characterId
+          ? getCharacterById(selected.characterId)
           : null;
         if (
-          selected.modelSettings.mode === "manual" &&
+          selected.modelSettings.mode === ModelSelectionMode.MANUAL &&
           selected.modelSettings.manualModelId
         ) {
           // Manual mode - use selected model
           onModelChange(selected.modelSettings.manualModelId as ModelId);
-        } else if (persona) {
-          // Auto mode with persona - find best matching model
-          const bestModel = findBestModel(allModels, persona, {
+        } else if (character) {
+          // Auto mode with character - find best matching model
+          const bestModel = findBestModel(allModels, character, {
             intelligence: selected.modelSettings.filters.intelligence,
             maxPrice: selected.modelSettings.filters.maxPrice,
             minContent: selected.modelSettings.filters.content,
@@ -235,7 +360,7 @@ export function Selector({
           const matchingModel = allModels.find((m) => {
             const { filters } = selected.modelSettings;
             if (
-              filters.intelligence !== "any" &&
+              filters.intelligence !== IntelligenceLevelFilter.ANY &&
               m.intelligence !== filters.intelligence
             ) {
               return false;
@@ -249,7 +374,13 @@ export function Selector({
       }
       handleOpenChange(false);
     },
-    [favorites, onPersonaChange, onModelChange, handleOpenChange, setActiveFavorite],
+    [
+      favorites,
+      onCharacterChange,
+      onModelChange,
+      handleOpenChange,
+      setActiveFavorite,
+    ],
   );
 
   // Handle settings click (from FavoritesBar)
@@ -276,14 +407,17 @@ export function Selector({
       // Helper to apply model changes
       const applyModelChange = (): void => {
         const allModels = Object.values(modelOptions);
-        if (settings.mode === "manual" && settings.manualModelId) {
-          onModelChange(settings.manualModelId as ModelId);
+        if (
+          settings.mode === ModelSelectionMode.MANUAL &&
+          settings.manualModelId
+        ) {
+          onModelChange(settings.manualModelId);
         } else {
-          const persona = editingFavorite.personaId
-            ? getPersonaById(editingFavorite.personaId)
+          const character = editingFavorite.characterId
+            ? getCharacterById(editingFavorite.characterId)
             : null;
-          if (persona) {
-            const bestModel = findBestModel(allModels, persona, {
+          if (character) {
+            const bestModel = findBestModel(allModels, character, {
               intelligence: settings.filters.intelligence,
               maxPrice: settings.filters.maxPrice,
               minContent: settings.filters.content,
@@ -309,7 +443,7 @@ export function Selector({
       } else {
         // Create new favorite (persists to server if authenticated)
         const newFavorite = await addFavorite({
-          personaId: editingFavorite.personaId,
+          characterId: editingFavorite.characterId,
           modelSettings: settings,
           isActive: true,
         });
@@ -329,13 +463,20 @@ export function Selector({
       setView("favorites");
       handleOpenChange(false);
     },
-    [editingFavorite, favorites, onModelChange, handleOpenChange, addFavorite, updateFavorite],
+    [
+      editingFavorite,
+      favorites,
+      onModelChange,
+      handleOpenChange,
+      addFavorite,
+      updateFavorite,
+    ],
   );
 
   // Handle add character with defaults
   const handleAddWithDefaults = useCallback(
-    async (newPersonaId: string): Promise<void> => {
-      const favoriteData = createFavoriteFromPersona(newPersonaId);
+    async (newCharacterId: string): Promise<void> => {
+      const favoriteData = createFavoriteFromCharacter(newCharacterId);
 
       // Deactivate existing favorites
       for (const f of favorites) {
@@ -346,17 +487,17 @@ export function Selector({
 
       // Add new favorite (persists to server if authenticated)
       await addFavorite({
-        personaId: favoriteData.personaId,
+        characterId: favoriteData.characterId,
         modelSettings: favoriteData.modelSettings,
         isActive: true,
       });
 
       // Apply selection
-      onPersonaChange(newPersonaId);
-      const persona = getPersonaById(newPersonaId);
-      if (persona) {
+      onCharacterChange(newCharacterId);
+      const character = getCharacterById(newCharacterId);
+      if (character) {
         const allModels = Object.values(modelOptions);
-        const bestModel = findBestModel(allModels, persona, {
+        const bestModel = findBestModel(allModels, character, {
           intelligence: favoriteData.modelSettings.filters.intelligence,
           maxPrice: favoriteData.modelSettings.filters.maxPrice,
           minContent: favoriteData.modelSettings.filters.content,
@@ -369,14 +510,21 @@ export function Selector({
       setView("favorites");
       handleOpenChange(false);
     },
-    [favorites, onPersonaChange, onModelChange, handleOpenChange, addFavorite, updateFavorite],
+    [
+      favorites,
+      onCharacterChange,
+      onModelChange,
+      handleOpenChange,
+      addFavorite,
+      updateFavorite,
+    ],
   );
 
   // Handle customize character
   const handleCustomize = useCallback(
-    async (newPersonaId: string): Promise<void> => {
+    async (newCharacterId: string): Promise<void> => {
       // Create favorite for customization
-      const favoriteData = createFavoriteFromPersona(newPersonaId);
+      const favoriteData = createFavoriteFromCharacter(newCharacterId);
 
       // Deactivate existing favorites
       for (const f of favorites) {
@@ -387,7 +535,7 @@ export function Selector({
 
       // Add new favorite (persists to server if authenticated)
       const newFavorite = await addFavorite({
-        personaId: favoriteData.personaId,
+        characterId: favoriteData.characterId,
         modelSettings: favoriteData.modelSettings,
         isActive: true,
       });
@@ -398,16 +546,48 @@ export function Selector({
     [favorites, addFavorite, updateFavorite],
   );
 
-  // Handle create custom persona
+  // Handle create custom character
   const handleCreateCustom = useCallback((): void => {
     setView("create");
   }, []);
 
-  // Handle custom persona created
-  const handlePersonaCreated = useCallback(
-    async (personaId: string): Promise<void> => {
-      // Create favorite from the new custom persona
-      const favoriteData = createFavoriteFromPersona(personaId);
+  // Handle custom character created
+  const handleCharacterCreated = useCallback(
+    async (characterId: string): Promise<void> => {
+      // Refetch characters to get the newly created custom character
+      if (charactersEndpoint.read?.refetch) {
+        await charactersEndpoint.read.refetch();
+      }
+
+      // Get character from refreshed characters map
+      const character = characters[characterId];
+
+      if (!character) {
+        logger.error("Character not found after creation", { characterId });
+        // Fallback to old behavior if character not found
+        const fallbackData = createFavoriteFromCharacter(characterId);
+
+        // Deactivate existing favorites
+        for (const f of favorites) {
+          if (f.isActive) {
+            await updateFavorite(f.id, { isActive: false });
+          }
+        }
+
+        await addFavorite({
+          characterId: fallbackData.characterId,
+          modelSettings: fallbackData.modelSettings,
+          isActive: true,
+        });
+
+        onCharacterChange(characterId);
+        setView("favorites");
+        handleOpenChange(false);
+        return;
+      }
+
+      // Create favorite from the character object
+      const favoriteData = createFavoriteFromCharacterObject(character);
 
       // Deactivate existing favorites
       for (const f of favorites) {
@@ -418,59 +598,131 @@ export function Selector({
 
       // Add new favorite (persists to server if authenticated)
       await addFavorite({
-        personaId: favoriteData.personaId,
+        characterId: favoriteData.characterId,
         modelSettings: favoriteData.modelSettings,
         isActive: true,
       });
 
       // Apply selection
-      onPersonaChange(personaId);
+      onCharacterChange(characterId);
 
-      // Try to get persona and find best model
-      const persona = getPersonaById(personaId);
-      if (persona) {
-        const allModels = Object.values(modelOptions);
-        const bestModel = findBestModel(allModels, persona, {
-          intelligence: favoriteData.modelSettings.filters.intelligence,
-          maxPrice: favoriteData.modelSettings.filters.maxPrice,
-          minContent: favoriteData.modelSettings.filters.content,
-        });
-        if (bestModel) {
-          onModelChange(bestModel.id);
-        }
+      // Find best model using the character from API (now has requirements)
+      // Try getCharacterById first for full character with all fields, fallback to API character
+      const fullCharacter = getCharacterById(characterId) || character;
+      const allModels = Object.values(modelOptions);
+      const bestModel = findBestModel(allModels, fullCharacter as Character, {
+        intelligence: favoriteData.modelSettings.filters.intelligence,
+        maxPrice: favoriteData.modelSettings.filters.maxPrice,
+        minContent: favoriteData.modelSettings.filters.content,
+      });
+      if (bestModel) {
+        onModelChange(bestModel.id);
       }
 
       setView("favorites");
       handleOpenChange(false);
     },
-    [favorites, onPersonaChange, onModelChange, handleOpenChange, addFavorite, updateFavorite],
+    [
+      favorites,
+      onCharacterChange,
+      onModelChange,
+      handleOpenChange,
+      addFavorite,
+      updateFavorite,
+      logger,
+      characters,
+      charactersEndpoint.read,
+    ],
+  );
+
+  // Handle character switch from QuickSettingsPanel
+  const handleCharacterSwitch = useCallback(
+    async (newCharacterId: string, keepSettings: boolean): Promise<void> => {
+      if (!editingFavorite) {
+        return;
+      }
+
+      // Prepare update
+      const updates: Partial<FavoriteItem> = {
+        characterId: newCharacterId,
+      };
+
+      if (!keepSettings) {
+        // Reset to character defaults
+        const character = characters[newCharacterId];
+        if (character) {
+          updates.modelSettings = {
+            mode: ModelSelectionMode.AUTO,
+            filters: {
+              intelligence:
+                character.requirements?.minIntelligence ||
+                IntelligenceLevelFilter.SMART,
+              content:
+                character.requirements?.minContent || ContentLevelFilter.OPEN,
+              maxPrice: PriceLevelFilter.STANDARD,
+            },
+          };
+        }
+      }
+
+      // Update the favorite (persists to server if authenticated)
+      await updateFavorite(editingFavorite.id, updates);
+
+      // If this is the active favorite, apply the character change
+      if (editingFavorite.isActive) {
+        onCharacterChange(newCharacterId);
+
+        // Update model if needed
+        const character = getCharacterById(newCharacterId);
+        if (character) {
+          const allModels = Object.values(modelOptions);
+          const settings =
+            updates.modelSettings || editingFavorite.modelSettings;
+          const bestModel = findBestModel(allModels, character, {
+            intelligence: settings.filters.intelligence,
+            maxPrice: settings.filters.maxPrice,
+            minContent: settings.filters.content,
+          });
+          if (bestModel) {
+            onModelChange(bestModel.id);
+          }
+        }
+      }
+    },
+    [
+      editingFavorite,
+      updateFavorite,
+      onCharacterChange,
+      onModelChange,
+      characters,
+    ],
   );
 
   // Track if favorite was already saved during onboarding
-  const savedOnboardingPersonaRef = useRef<string | null>(null);
+  const savedOnboardingCharacterRef = useRef<string | null>(null);
 
   // Handle saving favorite during onboarding (called when clicking Continue on pick screen)
   const handleSaveFavorite = useCallback(
-    async (selectedPersonaId: string): Promise<void> => {
+    async (selectedCharacterId: string): Promise<void> => {
       // Create favorite from selected character
-      const favoriteData = createFavoriteFromPersona(selectedPersonaId);
+      const favoriteData = createFavoriteFromCharacter(selectedCharacterId);
 
       // Add new favorite (persists to server if authenticated)
       await addFavorite({
-        personaId: favoriteData.personaId,
+        characterId: favoriteData.characterId,
         modelSettings: favoriteData.modelSettings,
         isActive: true,
       });
 
-      // Track that we saved this persona's favorite
-      savedOnboardingPersonaRef.current = selectedPersonaId;
+      // Track that we saved this character's favorite
+      savedOnboardingCharacterRef.current = selectedCharacterId;
 
       // Apply selection immediately
-      onPersonaChange(selectedPersonaId);
-      const persona = getPersonaById(selectedPersonaId);
-      if (persona) {
+      onCharacterChange(selectedCharacterId);
+      const character = getCharacterById(selectedCharacterId);
+      if (character) {
         const allModels = Object.values(modelOptions);
-        const bestModel = findBestModel(allModels, persona, {
+        const bestModel = findBestModel(allModels, character, {
           intelligence: favoriteData.modelSettings.filters.intelligence,
           maxPrice: favoriteData.modelSettings.filters.maxPrice,
           minContent: favoriteData.modelSettings.filters.content,
@@ -480,38 +732,38 @@ export function Selector({
         }
       }
     },
-    [onPersonaChange, onModelChange, addFavorite],
+    [onCharacterChange, onModelChange, addFavorite],
   );
 
   // Handle onboarding completion (Start Chatting clicked)
   const handleOnboardingComplete = useCallback(
-    async (selectedPersonaId: string): Promise<void> => {
+    async (selectedCharacterId: string): Promise<void> => {
       // Close the popover FIRST to ensure tour resumes
       // Tour advancement is handled by welcome-tour when modal closes
       handleOpenChange(false);
 
       // If favorite was already saved in handleSaveFavorite, skip saving again
-      if (savedOnboardingPersonaRef.current === selectedPersonaId) {
-        savedOnboardingPersonaRef.current = null;
+      if (savedOnboardingCharacterRef.current === selectedCharacterId) {
+        savedOnboardingCharacterRef.current = null;
         return;
       }
 
       // Fallback: save favorite if not already saved (shouldn't happen normally)
-      const favoriteData = createFavoriteFromPersona(selectedPersonaId);
+      const favoriteData = createFavoriteFromCharacter(selectedCharacterId);
 
       // Add new favorite (persists to server if authenticated)
       await addFavorite({
-        personaId: favoriteData.personaId,
+        characterId: favoriteData.characterId,
         modelSettings: favoriteData.modelSettings,
         isActive: true,
       });
 
       // Apply selection
-      onPersonaChange(selectedPersonaId);
-      const persona = getPersonaById(selectedPersonaId);
-      if (persona) {
+      onCharacterChange(selectedCharacterId);
+      const character = getCharacterById(selectedCharacterId);
+      if (character) {
         const allModels = Object.values(modelOptions);
-        const bestModel = findBestModel(allModels, persona, {
+        const bestModel = findBestModel(allModels, character, {
           intelligence: favoriteData.modelSettings.filters.intelligence,
           maxPrice: favoriteData.modelSettings.filters.maxPrice,
           minContent: favoriteData.modelSettings.filters.content,
@@ -521,7 +773,7 @@ export function Selector({
         }
       }
     },
-    [onPersonaChange, onModelChange, handleOpenChange, addFavorite],
+    [onCharacterChange, onModelChange, handleOpenChange, addFavorite],
   );
 
   // Handle browse all characters from onboarding
@@ -530,7 +782,10 @@ export function Selector({
   }, []);
 
   // Render icon helper
-  const renderIcon = (icon: IconKey, iconClassName = "h-4 w-4"): JSX.Element => {
+  const renderIcon = (
+    icon: IconKey,
+    iconClassName = "h-4 w-4",
+  ): JSX.Element => {
     const Icon = getIconComponent(icon);
     return <Icon className={iconClassName} />;
   };
@@ -548,14 +803,16 @@ export function Selector({
           )}
           data-tour={TOUR_DATA_ATTRS.MODEL_SELECTOR}
         >
-          {/* Persona icon */}
+          {/* Character icon */}
           <Span className="flex items-center justify-center w-5 h-5 shrink-0">
-            {renderIcon(currentPersona.icon, "h-4 w-4")}
+            {currentCharacter
+              ? renderIcon(currentCharacter.icon, "h-4 w-4")
+              : null}
           </Span>
 
-          {/* Persona name - hidden on mobile */}
+          {/* Character name - hidden on mobile */}
           <Span className="hidden sm:inline max-w-[80px] md:max-w-[100px] truncate">
-            {t(currentPersona.name)}
+            {currentCharacter ? t(currentCharacter.name) : ""}
           </Span>
 
           {/* Separator - hidden on mobile */}
@@ -577,7 +834,7 @@ export function Selector({
 
       <PopoverContent
         className={cn(
-          "p-0 w-[calc(100vw-16px)] sm:w-[480px] max-w-[520px]",
+          "p-0 w-screen sm:w-[480px] sm:max-w-[520px]",
           // Ensure popover appears above tour overlay (z-index 10000) when tour is active
           tourIsActive && "z-[10001]",
           className,
@@ -587,8 +844,20 @@ export function Selector({
         sideOffset={8}
       >
         <Div className="flex flex-col max-h-[min(600px,calc(100dvh-100px))] overflow-hidden">
-          {/* Onboarding view - shown on first open */}
-          {view === "onboarding" && (
+          {/* Loading state */}
+          {favoritesLoading && (
+            <Div className="flex items-center justify-center p-8">
+              <Div className="flex flex-col items-center gap-3">
+                <Div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                <Span className="text-sm text-muted-foreground">
+                  {t("app.chat.selector.loading")}
+                </Span>
+              </Div>
+            </Div>
+          )}
+
+          {/* Onboarding view - shown on first open when no favorites exist */}
+          {!favoritesLoading && view === "onboarding" && (
             <SelectorOnboarding
               onSelect={handleOnboardingComplete}
               onSaveFavorite={handleSaveFavorite}
@@ -598,7 +867,7 @@ export function Selector({
           )}
 
           {/* Favorites view */}
-          {view === "favorites" && (
+          {!favoritesLoading && view === "favorites" && (
             <Div className="p-4 overflow-y-auto">
               <FavoritesBar
                 favorites={favorites}
@@ -625,7 +894,9 @@ export function Selector({
 
                 // If we deleted the active one, make the first remaining active
                 if (editingFavorite.isActive) {
-                  const remaining = favorites.filter((f) => f.id !== editingFavorite.id);
+                  const remaining = favorites.filter(
+                    (f) => f.id !== editingFavorite.id,
+                  );
                   if (remaining.length > 0) {
                     await setActiveFavorite(remaining[0].id);
                   }
@@ -634,6 +905,14 @@ export function Selector({
                 setEditingFavoriteId(null);
                 setView("favorites");
               }}
+              onEditCharacter={(characterData) => {
+                setEditingCharacterData(characterData);
+                setView("edit");
+              }}
+              onSwitchCharacterView={() => setView("character-switch")}
+              onCharacterSwitch={handleCharacterSwitch}
+              characters={characters}
+              isAuthenticated={!!(user && !user.isPublic)}
               locale={locale}
             />
           )}
@@ -649,11 +928,52 @@ export function Selector({
             />
           )}
 
-          {/* Create persona view */}
+          {/* Create character view */}
           {view === "create" && (
             <CreatePersonaForm
-              onSave={handlePersonaCreated}
-              onCancel={() => setView("browser")}
+              onBack={() => setView("browser")}
+              onSave={handleCharacterCreated}
+              isAuthenticated={!!(user && !user.isPublic)}
+              locale={locale}
+            />
+          )}
+
+          {/* Edit character view */}
+          {view === "edit" && editingCharacterData && (
+            <EditCharacterModal
+              onBack={() => setView("settings")}
+              onCharacterCreated={async (newCharacterId) => {
+                logger.info("Character edited, updating favorite", {
+                  newCharacterId,
+                });
+                if (editingFavorite) {
+                  await updateFavorite(editingFavorite.id, {
+                    characterId: newCharacterId,
+                  });
+                }
+                setView("favorites");
+              }}
+              initialData={editingCharacterData}
+              isAuthenticated={!!(user && !user.isPublic)}
+              locale={locale}
+            />
+          )}
+
+          {/* Character switch view - allows changing character without deleting favorite */}
+          {view === "character-switch" && editingFavorite && (
+            <CharacterBrowser
+              onAddWithDefaults={async (characterId) => {
+                // Switch character and reset to defaults
+                await handleCharacterSwitch(characterId, false);
+                setView("settings");
+              }}
+              onCustomize={async (characterId) => {
+                // Switch character but keep current settings
+                await handleCharacterSwitch(characterId, true);
+                setView("settings");
+              }}
+              onCreateCustom={handleCreateCustom}
+              onBack={() => setView("settings")}
               locale={locale}
             />
           )}

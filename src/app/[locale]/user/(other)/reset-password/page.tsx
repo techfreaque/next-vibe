@@ -6,7 +6,7 @@ import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import ResetPasswordForm from "@/app/api/[locale]/user/public/reset-password/request/_components/reset-password-form";
-import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -67,7 +67,7 @@ export default async function ResetPasswordPage({
 
   const logger = createEndpointLogger(false, Date.now(), locale);
   // Check if user is already logged in using repository-first pattern
-  const verifiedUserResponse = await userRepository.getUserByAuth(
+  const verifiedUserResponse = await UserRepository.getUserByAuth(
     {},
     locale,
     logger,

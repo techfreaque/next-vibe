@@ -3,7 +3,7 @@
  * Creates module-specific translation functions that work only within a defined scope
  */
 
-import { type CountryLanguage, defaultLocale,type Languages } from "./config";
+import { type CountryLanguage, defaultLocale, type Languages } from "./config";
 import { getLanguageFromLocale } from "./language-utils";
 import {
   navigateTranslationObject,
@@ -12,23 +12,16 @@ import {
 import type { TParams } from "./static-types";
 import type { DotNotation } from "./static-types";
 
-/**
- * Generic translation parameter type for scoped translations
- */
-export type ScopedTParams = Record<string, string | number | boolean>;
-
 // this value should never be used at runtime
 export type TranslatedKeyType = "createScopedTranslation-key";
 
 /**
  * Translation schema type for scoped modules
- * Supports nested structures like { sms: { error: { key: "value" } } }
+ * Supports deeply nested structures with recursive type definition
  */
-type NestedTranslation =
-  | string
-  | { [key: string]: string | { [key: string]: string } };
-
-export type ScopedTranslationSchema = Record<string, NestedTranslation>;
+export interface ScopedTranslationSchema {
+  [key: string]: string | ScopedTranslationSchema;
+}
 
 /**
  * Creates a scoped translation system for a specific module
@@ -54,16 +47,25 @@ export type ScopedTranslationSchema = Record<string, NestedTranslation>;
  * const { t } = simpleT("en-GLOBAL");
  * t("sms.error.invalid_phone_format"); // Type-safe based on EN schema
  */
+/**
+ * Helper type to extract the scoped translation key type from createScopedTranslation return
+ */
+export type ExtractScopedTranslationKey<T> = T extends {
+  ScopedTranslationKey: infer K;
+}
+  ? K
+  : never;
+
 export function createScopedTranslation<
   const TTranslations extends Record<Languages, ScopedTranslationSchema>,
 >(
   translationsByLanguage: TTranslations,
 ): {
-  ScopedTranslationKey: DotNotation<TTranslations["en"]>;
-  scopedT: (locale: CountryLanguage) => {
-    t: <K extends DotNotation<TTranslations["en"]>>(
-      key: K,
-      params?: ScopedTParams,
+  readonly ScopedTranslationKey: DotNotation<TTranslations["en"]>;
+  readonly scopedT: (locale: CountryLanguage) => {
+    t: (
+      key: DotNotation<TTranslations["en"]>,
+      params?: TParams,
     ) => TranslatedKeyType;
   };
 } {
@@ -71,15 +73,15 @@ export function createScopedTranslation<
     ScopedTranslationKey: undefined as DotNotation<TTranslations["en"]>,
 
     scopedT: function simpleT(locale: CountryLanguage): {
-      t: <K extends DotNotation<TTranslations["en"]>>(
-        key: K,
-        params?: ScopedTParams,
+      t: (
+        key: DotNotation<TTranslations["en"]>,
+        params?: TParams,
       ) => TranslatedKeyType;
     } {
       return {
-        t: <K extends DotNotation<TTranslations["en"]>>(
-          key: K,
-          params?: ScopedTParams,
+        t: (
+          key: DotNotation<TTranslations["en"]>,
+          params?: TParams,
         ): TranslatedKeyType => {
           // Extract language from locale with safety check
           if (!locale || typeof locale !== "string") {

@@ -251,8 +251,9 @@ const startPollingWatcher = async (
       watchCount++;
 
       // Import generators dynamically
-      const { generateAllRepository } =
-        await import("@/app/api/[locale]/system/generators/generate-all/repository");
+      const { generateAllRepository } = await import(
+        "@/app/api/[locale]/system/generators/generate-all/repository"
+      );
 
       const action = watchCount === 1 ? "Initial startup" : "Polling cycle";
       logger.info(`⏰ ${action} #${watchCount} - Running generators...`);
@@ -343,8 +344,9 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
 
         if (checkCount % 10 === 0) {
           // Log every 10th check (5 minutes)
-          logger.info(formatDatabase(`Database health check #${checkCount} - OK`, "🗄️ "));
-
+          logger.info(
+            formatDatabase(`Database health check #${checkCount} - OK`, "🗄️ "),
+          );
         }
       } catch (error) {
         consecutiveFailures++;

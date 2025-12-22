@@ -94,7 +94,11 @@ export class SpeechHotkeySession {
     }
 
     // Generate temp file path
-    const audioPath = generateTempFilePath("stt_recording", "wav", this.config.tmpDir);
+    const audioPath = generateTempFilePath(
+      "stt_recording",
+      "wav",
+      this.config.tmpDir,
+    );
 
     try {
       // Start recording
@@ -281,9 +285,8 @@ export class SpeechHotkeySession {
       await this.stopAndInsert();
       return false;
     }
-      await this.start();
-      return true;
-    
+    await this.start();
+    return true;
   }
 
   /**
@@ -311,7 +314,10 @@ export class SpeechHotkeySession {
       }
 
       // Emit specific events based on status
-      if (currentStatus === RecordingStatus.RECORDING && this.state.recordingStartedAt) {
+      if (
+        currentStatus === RecordingStatus.RECORDING &&
+        this.state.recordingStartedAt
+      ) {
         yield {
           type: "recording_started",
           status: currentStatus,
@@ -322,7 +328,10 @@ export class SpeechHotkeySession {
         };
       }
 
-      if (currentStatus === RecordingStatus.COMPLETED && this.state.lastTranscription) {
+      if (
+        currentStatus === RecordingStatus.COMPLETED &&
+        this.state.lastTranscription
+      ) {
         yield {
           type: "text_inserted",
           status: currentStatus,

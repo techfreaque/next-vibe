@@ -5,8 +5,6 @@
  * For widget configurations, import from widget-configs.ts.
  */
 
-import type { TranslationKey } from "@/i18n/core/static-types";
-
 import type {
   ComponentSize,
   ComponentVariant,
@@ -25,10 +23,10 @@ import type {
 /**
  * Widget preset for common patterns
  */
-export interface WidgetPreset {
+export interface WidgetPreset<TKey extends string> {
   name: string;
-  description: TranslationKey;
-  widgets: WidgetConfig[];
+  description: TKey;
+  widgets: WidgetConfig<TKey>[];
   contexts?: InterfaceContext[];
 }
 
@@ -46,20 +44,22 @@ export interface WidgetTheme {
 /**
  * Widget factory for creating common widget patterns
  */
-export interface WidgetFactory {
+export interface WidgetFactory<TKey extends string> {
   createFormField(
-    config: Partial<FormFieldWidgetConfig>,
-  ): FormFieldWidgetConfig;
+    config: Partial<FormFieldWidgetConfig<TKey>>,
+  ): FormFieldWidgetConfig<TKey>;
   createDataTable(
-    config: Partial<DataTableWidgetConfig>,
-  ): DataTableWidgetConfig;
+    config: Partial<DataTableWidgetConfig<TKey>>,
+  ): DataTableWidgetConfig<TKey>;
   createMetricCard(
-    config: Partial<MetricCardWidgetConfig>,
-  ): MetricCardWidgetConfig;
-  createChart(config: Partial<ChartWidgetConfig>): ChartWidgetConfig;
+    config: Partial<MetricCardWidgetConfig<TKey>>,
+  ): MetricCardWidgetConfig<TKey>;
+  createChart(
+    config: Partial<ChartWidgetConfig<TKey>>,
+  ): ChartWidgetConfig<TKey>;
   createContainer(
-    config: Partial<ContainerWidgetConfig>,
-  ): ContainerWidgetConfig;
+    config: Partial<ContainerWidgetConfig<TKey>>,
+  ): ContainerWidgetConfig<TKey>;
 }
 
 /**

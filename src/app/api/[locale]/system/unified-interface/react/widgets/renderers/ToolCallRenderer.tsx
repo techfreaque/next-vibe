@@ -28,7 +28,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown, ChevronRight, Loader2 } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import type { FieldValues } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
@@ -113,8 +113,9 @@ export function ToolCallRenderer({
         toolName: toolCall.toolName,
       });
 
-      const { createPublicUser } =
-        await import("@/app/api/[locale]/user/auth/helpers");
+      const { createPublicUser } = await import(
+        "@/app/api/[locale]/user/auth/helpers"
+      );
       const user = createPublicUser(crypto.randomUUID());
 
       let result = await definitionLoader.load({
@@ -130,7 +131,7 @@ export function ToolCallRenderer({
       });
 
       if (!result.success && toolCall.toolName.includes("_")) {
-        const convertedPath = `${toolCall.toolName.replaceAll('_', "/")}/GET`;
+        const convertedPath = `${toolCall.toolName.replaceAll("_", "/")}/GET`;
         logger.debug("[ToolCallRenderer] Trying converted GET path", {
           convertedPath,
         });
@@ -146,7 +147,7 @@ export function ToolCallRenderer({
       }
 
       if (!result.success && toolCall.toolName.includes("_")) {
-        const convertedPath = `${toolCall.toolName.replaceAll('_', "/")}/POST`;
+        const convertedPath = `${toolCall.toolName.replaceAll("_", "/")}/POST`;
         logger.debug("[ToolCallRenderer] Trying converted POST path", {
           convertedPath,
         });

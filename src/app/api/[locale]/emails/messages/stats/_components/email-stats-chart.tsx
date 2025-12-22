@@ -8,13 +8,7 @@
 import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schema";
 import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import {
-  Area,
-  Axis,
-  Bar,
-  Chart,
-  Line,
-} from "next-vibe-ui/ui/chart";
+import { Area, Axis, Bar, Chart, Line } from "next-vibe-ui/ui/chart";
 import { Div } from "next-vibe-ui/ui/div";
 import {
   BarChart3Icon,
@@ -279,4 +273,3 @@ function formatDateForChart(
     return dateString;
   }
 }
-

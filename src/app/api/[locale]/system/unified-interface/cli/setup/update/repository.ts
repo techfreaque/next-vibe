@@ -86,14 +86,13 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
           output: installResult.data.output,
         });
       }
-        return success({
-          success: false,
-          installed: false,
-          message: t(
-            "app.api.system.unifiedInterface.cli.setup.update.post.errors.server.description",
-          ),
-        });
-      
+      return success({
+        success: false,
+        installed: false,
+        message: t(
+          "app.api.system.unifiedInterface.cli.setup.update.post.errors.server.description",
+        ),
+      });
     } catch (err) {
       const parsedError = parseError(err);
       return fail({

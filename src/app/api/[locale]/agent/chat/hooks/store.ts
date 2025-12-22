@@ -23,7 +23,7 @@ export type { ChatFolder, ChatMessage, ChatThread };
  */
 export interface ChatSettings {
   selectedModel: ModelIdType;
-  selectedPersona: string;
+  selectedCharacter: string;
   temperature: number;
   maxTokens: number;
   ttsAutoplay: boolean;
@@ -95,7 +95,7 @@ interface ChatState {
 // Default settings (used for both server and initial client render)
 const getDefaultSettings = (): ChatSettings => ({
   selectedModel: ModelId.CLAUDE_HAIKU_4_5,
-  selectedPersona: "default",
+  selectedCharacter: "default",
   temperature: 0.7,
   maxTokens: 2000,
   ttsAutoplay: false,

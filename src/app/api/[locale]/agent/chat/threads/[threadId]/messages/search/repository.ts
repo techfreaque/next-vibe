@@ -28,26 +28,14 @@ import type {
 } from "./definition";
 
 /**
- * Message Search Repository Interface
+ * Message Search Repository - Static class pattern
+ * All methods return ResponseType for consistent error handling
  */
-export interface MessageSearchRepositoryInterface {
-  searchMessages(
-    data: MessageSearchRequestOutput,
-    urlPathParams: MessageSearchUrlVariablesOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MessageSearchResponseOutput>>;
-}
-
-/**
- * Message Search Repository Implementation
- */
-export class MessageSearchRepositoryImpl implements MessageSearchRepositoryInterface {
+export class MessageSearchRepository {
   /**
    * Search messages within a specific thread using full-text search
    */
-  async searchMessages(
+  static async searchMessages(
     data: MessageSearchRequestOutput,
     urlPathParams: MessageSearchUrlVariablesOutput,
     user: JwtPayloadType,

@@ -4,8 +4,8 @@ import type { JSX } from "react";
 import { NewsletterPage } from "@/app/api/[locale]/newsletter/subscribe/_components/newsletter-page";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { authRepository } from "@/app/api/[locale]/user/auth/repository";
-import { userProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
+import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
+import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -49,14 +49,14 @@ export default async function Newsletter({
 }: PageProps): Promise<JSX.Element> {
   const { locale } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const authUser = await authRepository.getAuthMinimalUser(
+  const authUser = await AuthRepository.getAuthMinimalUser(
     [UserRole.PUBLIC, UserRole.CUSTOMER],
     { platform: Platform.NEXT_PAGE, locale },
     logger,
   );
 
   const userResponse = authUser
-    ? await userProfileRepository.getProfile(authUser, locale, logger)
+    ? await UserProfileRepository.getProfile(authUser, locale, logger)
     : undefined;
 
   const user = userResponse?.success ? userResponse.data : undefined;

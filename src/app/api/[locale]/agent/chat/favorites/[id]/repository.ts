@@ -6,10 +6,10 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
-  type ResponseType,
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -17,63 +17,33 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import { chatFavorites } from "../db";
+import { chatFavorites, type FavoriteModelSettings } from "../db";
 import type {
-  FavoriteDeleteRequestOutput,
   FavoriteDeleteResponseOutput,
-  FavoriteGetRequestOutput,
+  FavoriteDeleteUrlVariablesOutput,
   FavoriteGetResponseOutput,
+  FavoriteGetUrlVariablesOutput,
   FavoriteUpdateRequestOutput,
   FavoriteUpdateResponseOutput,
+  FavoriteUpdateUrlVariablesOutput,
 } from "./definition";
 
 /**
- * Single Favorite Repository Interface
+ * Single Favorite Repository
  */
-export interface SingleFavoriteRepositoryInterface {
-  getFavorite(
-    data: FavoriteGetRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<FavoriteGetResponseOutput>>;
-
-  updateFavorite(
-    data: FavoriteUpdateRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<FavoriteUpdateResponseOutput>>;
-
-  deleteFavorite(
-    data: FavoriteDeleteRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<FavoriteDeleteResponseOutput>>;
-}
-
-/**
- * Single Favorite Repository Implementation
- */
-export class SingleFavoriteRepositoryImpl
-  implements SingleFavoriteRepositoryInterface
-{
+export class SingleFavoriteRepository {
   /**
    * Get a single favorite by ID
    */
-  async getFavorite(
-    data: FavoriteGetRequestOutput,
+  static async getFavorite(
+    urlPathParams: FavoriteGetUrlVariablesOutput,
     user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<FavoriteGetResponseOutput>> {
     const userId = user.id;
 
     if (!userId) {
-      logger.error("Missing user identifier", { user });
       return fail({
         message:
           "app.api.agent.chat.favorites.id.get.errors.unauthorized.title",
@@ -82,65 +52,40 @@ export class SingleFavoriteRepositoryImpl
     }
 
     try {
-      const favoriteId = data.id;
-      logger.debug("Fetching favorite", { userId, favoriteId });
+      logger.debug("Fetching favorite", {
+        userId,
+        favoriteId: urlPathParams.id,
+      });
 
       const [favorite] = await db
         .select()
         .from(chatFavorites)
         .where(
           and(
-            eq(chatFavorites.id, favoriteId),
+            eq(chatFavorites.id, urlPathParams.id),
             eq(chatFavorites.userId, userId),
           ),
         )
         .limit(1);
 
       if (!favorite) {
-        logger.error("Favorite not found", { favoriteId, userId });
         return fail({
-          message:
-            "app.api.agent.chat.favorites.id.get.errors.notFound.title",
+          message: "app.api.agent.chat.favorites.id.get.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
-      const modelSettings = favorite.modelSettings as {
-        mode: string;
-        filters: {
-          intelligence: string;
-          maxPrice: string;
-          content: string;
-        };
-        manualModelId?: string;
-      };
-      const uiSettings = favorite.uiSettings as {
-        position: number;
-        color?: string;
-      };
-
       return success({
-        personaId: favorite.personaId,
+        characterId: favorite.characterId,
         customName: favorite.customName,
-        mode: modelSettings.mode as "AUTO" | "MANUAL",
-        intelligence: modelSettings.filters.intelligence as
-          | "ANY"
-          | "QUICK"
-          | "SMART"
-          | "BRILLIANT",
-        maxPrice: modelSettings.filters.maxPrice as
-          | "ANY"
-          | "CHEAP"
-          | "STANDARD"
-          | "PREMIUM",
-        content: modelSettings.filters.content as
-          | "ANY"
-          | "MAINSTREAM"
-          | "OPEN"
-          | "UNCENSORED",
-        manualModelId: modelSettings.manualModelId ?? null,
-        position: uiSettings.position,
-        color: uiSettings.color ?? null,
+        voice: favorite.voice,
+        mode: favorite.modelSettings.mode,
+        intelligence: favorite.modelSettings.filters.intelligence,
+        maxPrice: favorite.modelSettings.filters.maxPrice,
+        content: favorite.modelSettings.filters.content,
+        manualModelId: favorite.modelSettings.manualModelId ?? null,
+        position: favorite.uiSettings.position,
+        color: favorite.uiSettings.color ?? null,
         isActive: favorite.isActive,
         useCount: favorite.useCount,
       });
@@ -156,16 +101,15 @@ export class SingleFavoriteRepositoryImpl
   /**
    * Update a favorite
    */
-  async updateFavorite(
+  static async updateFavorite(
     data: FavoriteUpdateRequestOutput,
+    urlPathParams: FavoriteUpdateUrlVariablesOutput,
     user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<FavoriteUpdateResponseOutput>> {
     const userId = user.id;
 
     if (!userId) {
-      logger.error("Missing user identifier", { user });
       return fail({
         message:
           "app.api.agent.chat.favorites.id.patch.errors.unauthorized.title",
@@ -174,7 +118,7 @@ export class SingleFavoriteRepositoryImpl
     }
 
     try {
-      const favoriteId = data.id;
+      const favoriteId = urlPathParams.id;
       logger.debug("Updating favorite", { userId, favoriteId });
 
       // First, get the existing favorite
@@ -190,7 +134,6 @@ export class SingleFavoriteRepositoryImpl
         .limit(1);
 
       if (!existing) {
-        logger.error("Favorite not found", { favoriteId, userId });
         return fail({
           message:
             "app.api.agent.chat.favorites.id.patch.errors.notFound.title",
@@ -198,40 +141,24 @@ export class SingleFavoriteRepositoryImpl
         });
       }
 
-      // Build update values
-      const currentModelSettings = existing.modelSettings as {
-        mode: string;
-        filters: {
-          intelligence: string;
-          maxPrice: string;
-          content: string;
-        };
-        manualModelId?: string;
-      };
-      const currentUiSettings = existing.uiSettings as {
-        position: number;
-        color?: string;
-      };
-
-      // Update model settings if any filter fields are provided
-      const newModelSettings = {
-        mode: data.mode ?? currentModelSettings.mode,
+      // Build update values - merge with existing
+      const newModelSettings: FavoriteModelSettings = {
+        mode: data.mode ?? existing.modelSettings.mode,
         filters: {
           intelligence:
-            data.intelligence ?? currentModelSettings.filters.intelligence,
-          maxPrice: data.maxPrice ?? currentModelSettings.filters.maxPrice,
-          content: data.content ?? currentModelSettings.filters.content,
+            data.intelligence ?? existing.modelSettings.filters.intelligence,
+          maxPrice: data.maxPrice ?? existing.modelSettings.filters.maxPrice,
+          content: data.content ?? existing.modelSettings.filters.content,
         },
         manualModelId:
           data.manualModelId !== undefined
-            ? data.manualModelId
-            : currentModelSettings.manualModelId,
+            ? (data.manualModelId ?? undefined)
+            : existing.modelSettings.manualModelId,
       };
 
-      // Update UI settings if position is provided
       const newUiSettings = {
-        position: data.position ?? currentUiSettings.position,
-        color: currentUiSettings.color,
+        position: data.position ?? existing.uiSettings.position,
+        color: existing.uiSettings.color,
       };
 
       // Handle isActive - if setting to true, deactivate others first
@@ -242,15 +169,15 @@ export class SingleFavoriteRepositoryImpl
           .where(eq(chatFavorites.userId, userId));
       }
 
-      // Perform the update
       const [updated] = await db
         .update(chatFavorites)
         .set({
-          personaId: data.personaId ?? existing.personaId,
+          characterId: data.characterId ?? existing.characterId,
           customName:
             data.customName !== undefined
               ? data.customName
               : existing.customName,
+          voice: data.voice !== undefined ? data.voice : existing.voice,
           modelSettings: newModelSettings,
           uiSettings: newUiSettings,
           isActive: data.isActive ?? existing.isActive,
@@ -265,17 +192,13 @@ export class SingleFavoriteRepositoryImpl
         .returning();
 
       if (!updated) {
-        logger.error("Failed to update favorite", { favoriteId, userId });
         return fail({
-          message:
-            "app.api.agent.chat.favorites.id.patch.errors.server.title",
+          message: "app.api.agent.chat.favorites.id.patch.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
 
-      return success({
-        success: true,
-      });
+      return success({ success: true });
     } catch (error) {
       logger.error("Failed to update favorite", parseError(error));
       return fail({
@@ -288,16 +211,14 @@ export class SingleFavoriteRepositoryImpl
   /**
    * Delete a favorite
    */
-  async deleteFavorite(
-    data: FavoriteDeleteRequestOutput,
+  static async deleteFavorite(
+    urlPathParams: FavoriteDeleteUrlVariablesOutput,
     user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<FavoriteDeleteResponseOutput>> {
     const userId = user.id;
 
     if (!userId) {
-      logger.error("Missing user identifier", { user });
       return fail({
         message:
           "app.api.agent.chat.favorites.id.delete.errors.unauthorized.title",
@@ -306,21 +227,22 @@ export class SingleFavoriteRepositoryImpl
     }
 
     try {
-      const favoriteId = data.id;
-      logger.debug("Deleting favorite", { userId, favoriteId });
+      logger.debug("Deleting favorite", {
+        userId,
+        favoriteId: urlPathParams.id,
+      });
 
       const result = await db
         .delete(chatFavorites)
         .where(
           and(
-            eq(chatFavorites.id, favoriteId),
+            eq(chatFavorites.id, urlPathParams.id),
             eq(chatFavorites.userId, userId),
           ),
         )
         .returning();
 
       if (result.length === 0) {
-        logger.error("Favorite not found", { favoriteId, userId });
         return fail({
           message:
             "app.api.agent.chat.favorites.id.delete.errors.notFound.title",
@@ -328,9 +250,7 @@ export class SingleFavoriteRepositoryImpl
         });
       }
 
-      return success({
-        success: true,
-      });
+      return success({ success: true });
     } catch (error) {
       logger.error("Failed to delete favorite", parseError(error));
       return fail({
@@ -340,5 +260,3 @@ export class SingleFavoriteRepositoryImpl
     }
   }
 }
-
-export const singleFavoriteRepository = new SingleFavoriteRepositoryImpl();

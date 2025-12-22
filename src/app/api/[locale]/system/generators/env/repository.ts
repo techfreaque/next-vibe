@@ -161,11 +161,7 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       for (const filePath of serverEnvFilePaths) {
         const result = validateEnvFileExports(filePath, false);
         if (result.isValid && result.module && result.exportName) {
-          const outputFile = join(
-            process.cwd(),
-            data.outputDir,
-            "env.ts",
-          );
+          const outputFile = join(process.cwd(), data.outputDir, "env.ts");
           validServerModules.push({
             filePath,
             relativePath: getRelativeImportPath(filePath, outputFile),
@@ -219,7 +215,10 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       // Fail if there are validation errors
       if (allErrors.length > 0) {
         const errorMessage = formatValidationErrors(allErrors);
-        logger.error("Env file validation failed", { errorCount: allErrors.length, details: errorMessage });
+        logger.error("Env file validation failed", {
+          errorCount: allErrors.length,
+          details: errorMessage,
+        });
         return fail({
           message: "app.api.system.generators.env.error.validation_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
@@ -327,9 +326,7 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
     const imports: string[] = [];
     for (const mod of modules) {
       const relativePath = getRelativeImportPath(mod.filePath, outputFile);
-      imports.push(
-        `import { ${mod.exportName} } from "${relativePath}";`,
-      );
+      imports.push(`import { ${mod.exportName} } from "${relativePath}";`);
     }
 
     // Generate module names for registry
@@ -339,7 +336,9 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
 
     // Generate schema merge chain
     const schemaChain = modules
-      .map((m, i) => (i === 0 ? `${m.exportName}.schema` : `.merge(${m.exportName}.schema)`))
+      .map((m, i) =>
+        i === 0 ? `${m.exportName}.schema` : `.merge(${m.exportName}.schema)`,
+      )
       .join("\n  ");
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -427,9 +426,7 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
     const imports: string[] = [];
     for (const mod of modules) {
       const relativePath = getRelativeImportPath(mod.filePath, outputFile);
-      imports.push(
-        `import { ${mod.exportName} } from "${relativePath}";`,
-      );
+      imports.push(`import { ${mod.exportName} } from "${relativePath}";`);
     }
 
     // Generate module names for registry
@@ -439,7 +436,9 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
 
     // Generate schema merge chain
     const schemaChain = modules
-      .map((m, i) => (i === 0 ? `${m.exportName}.schema` : `.merge(${m.exportName}.schema)`))
+      .map((m, i) =>
+        i === 0 ? `${m.exportName}.schema` : `.merge(${m.exportName}.schema)`,
+      )
       .join("\n  ");
 
     // eslint-disable-next-line i18next/no-literal-string

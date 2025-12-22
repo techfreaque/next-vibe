@@ -8,7 +8,7 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Code,Copy, FileText } from "next-vibe-ui/ui/icons";
+import { Code, Copy, FileText } from "next-vibe-ui/ui/icons";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
@@ -38,7 +38,7 @@ import { GroupedAssistantMessage } from "../grouped-assistant-message";
 import { MessageAuthorInfo } from "../message-author";
 import { MessageEditor } from "../message-editor";
 import { groupMessagesBySequence } from "../message-grouping";
-import { ModelPersonaSelectorModal } from "../model-persona-selector-modal";
+import { ModelPersonaSelectorModal } from "../model-character-selector-modal";
 import { UserMessageBubble } from "../user-message-bubble";
 
 interface LinearMessageViewProps {
@@ -68,7 +68,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     retryMessage: onRetryMessage,
     answerAsAI: onAnswerAsModel,
     handleModelChange: onModelChange,
-    setSelectedPersona: onPersonaChange,
+    setSelectedCharacter: onCharacterChange,
     handleSwitchBranch: onSwitchBranch,
     branchMessage,
     // Editor actions
@@ -86,26 +86,26 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     collapseState,
     // View mode to check if we should show system messages
     viewMode,
-    // Personas and selected persona
-    personas,
-    selectedPersona,
+    // Characters and selected character
+    characters,
+    selectedCharacter,
   } = useChatContext();
 
-  // Get the current persona's system prompt (memoized to ensure stable reference)
-  const personaPrompt = useMemo(() => {
-    const prompt = selectedPersona
-      ? personas[selectedPersona]?.systemPrompt || ""
+  // Get the current character's system prompt (memoized to ensure stable reference)
+  const characterPrompt = useMemo(() => {
+    const prompt = selectedCharacter
+      ? characters[selectedCharacter]?.systemPrompt || ""
       : "";
 
     return prompt;
-  }, [selectedPersona, personas]);
+  }, [selectedCharacter, characters]);
 
   // Generate system prompt on client side (same as server)
   const systemPrompt = useSystemPrompt({
     locale,
     rootFolderId,
     subFolderId,
-    personaPrompt,
+    personaPrompt: characterPrompt,
   });
 
   // Debug: Log final system prompt
@@ -299,7 +299,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                       onBranch={handleBranch}
                       onCancel={onCancelAction}
                       onModelChange={onModelChange}
-                      onPersonaChange={onPersonaChange}
+                      onCharacterChange={onCharacterChange}
                       locale={locale}
                       logger={logger}
                     />
@@ -315,8 +315,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                           /* no-op */
                         })
                       }
-                      onPersonaChange={
-                        onPersonaChange ||
+                      onCharacterChange={
+                        onCharacterChange ||
                         ((): void => {
                           /* no-op */
                         })
@@ -384,7 +384,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                                 model={message.model}
                                 timestamp={message.createdAt}
                                 edited={message.edited}
-                                persona={null}
+                                character={null}
                                 locale={locale}
                                 rootFolderId={rootFolderId}
                                 compact
@@ -424,8 +424,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                       /* no-op */
                     })
                   }
-                  onPersonaChange={
-                    onPersonaChange ||
+                  onCharacterChange={
+                    onCharacterChange ||
                     ((): void => {
                       /* no-op */
                     })

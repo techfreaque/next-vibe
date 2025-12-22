@@ -32,7 +32,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { DefaultFolderId } from "../config";
-import { type ChatFolder,chatFolders, chatThreads } from "../db";
+import { type ChatFolder, chatFolders, chatThreads } from "../db";
 import { ThreadStatus } from "../enum";
 import {
   canCreateThreadInFolder,
@@ -317,40 +317,18 @@ export async function ensureThread({
 /**
  * 24h cache for total conversations count
  */
-let totalConversationsCountCache: { count: number; timestamp: number } | null = null;
+let totalConversationsCountCache: { count: number; timestamp: number } | null =
+  null;
 const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
- * Threads Repository Interface
+ * Threads Repository - Static class pattern
  */
-export interface ThreadsRepositoryInterface {
-  listThreads(
-    data: ThreadListRequestOutput,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ThreadListResponseOutput>>;
-
-  createThread(
-    data: ThreadCreateRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ThreadCreateResponseOutput>>;
-
-  /**
-   * Get total count of conversations/threads (cached for 24h)
-   */
-  getTotalConversationsCount(logger: EndpointLogger): Promise<ResponseType<number>>;
-}
-
-/**
- * Threads Repository Implementation
- */
-export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
+export class ThreadsRepository {
   /**
    * List threads with pagination and filtering
    */
-  async listThreads(
+  static async listThreads(
     data: ThreadListRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
@@ -640,7 +618,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
   /**
    * Create a new thread
    */
-  async createThread(
+  static async createThread(
     data: ThreadCreateRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -755,7 +733,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         folderId: data.thread?.subFolderId ?? null,
         status: ThreadStatus.ACTIVE,
         defaultModel: data.thread?.model ?? null,
-        defaultPersona: data.thread?.persona ?? null,
+        defaultCharacter: data.thread?.character ?? null,
         systemPrompt: data.thread?.systemPrompt ?? null,
         pinned: false,
         archived: false,
@@ -801,15 +779,20 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
   /**
    * Get total count of conversations/threads with 24h caching
    */
-  async getTotalConversationsCount(logger: EndpointLogger): Promise<ResponseType<number>> {
+  static async getTotalConversationsCount(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<number>> {
     try {
       const now = Date.now();
 
       // Check if cache exists and is still valid (within 24h)
-      if (totalConversationsCountCache && (now - totalConversationsCountCache.timestamp) < CACHE_DURATION_MS) {
+      if (
+        totalConversationsCountCache &&
+        now - totalConversationsCountCache.timestamp < CACHE_DURATION_MS
+      ) {
         logger.debug("Returning cached total conversations count", {
           count: totalConversationsCountCache.count,
-          age: `${Math.floor((now - totalConversationsCountCache.timestamp) / 1000 / 60 / 60)}h`
+          age: `${Math.floor((now - totalConversationsCountCache.timestamp) / 1000 / 60 / 60)}h`,
         });
         return success(totalConversationsCountCache.count);
       }
@@ -817,9 +800,7 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
       // Cache is invalid or doesn't exist - query database
       logger.debug("Fetching fresh total conversations count from database");
 
-      const [{ total }] = await db
-        .select({ total: count() })
-        .from(chatThreads);
+      const [{ total }] = await db.select({ total: count() }).from(chatThreads);
 
       // Update cache
       totalConversationsCountCache = {
@@ -827,11 +808,16 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
         timestamp: now,
       };
 
-      logger.debug("Total conversations count fetched and cached", { count: total });
+      logger.debug("Total conversations count fetched and cached", {
+        count: total,
+      });
 
       return success(total);
     } catch (error) {
-      logger.error("Error getting total conversations count", parseError(error));
+      logger.error(
+        "Error getting total conversations count",
+        parseError(error),
+      );
       return fail({
         message: "app.api.agent.chat.threads.errors.count_failed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
@@ -840,8 +826,3 @@ export class ThreadsRepositoryImpl implements ThreadsRepositoryInterface {
     }
   }
 }
-
-/**
- * Default repository instance
- */
-export const threadsRepository = new ThreadsRepositoryImpl();

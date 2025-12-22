@@ -19,12 +19,12 @@ import { useWidgetActions } from "../renderers/ToolActionHandler";
 /**
  * Text display with inline editing capability.
  */
-export function EditableTextWidget({
+export function EditableTextWidget<TKey extends string>({
   value: data,
   context,
   onAction,
   className,
-}: ReactWidgetProps<typeof WidgetType.MARKDOWN_EDITOR>): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.MARKDOWN_EDITOR, TKey>): JSX.Element {
   const extractedData = extractEditableTextData(data);
 
   const { value, placeholder, readonly } = extractedData ?? {

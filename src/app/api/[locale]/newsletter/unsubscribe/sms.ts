@@ -48,7 +48,9 @@ export interface NewsletterUnsubscribeSmsService {
 /**
  * SMS Service Repository Implementation for Newsletter Unsubscriptions
  */
-export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscribeSmsService {
+export class NewsletterUnsubscribeSmsServiceImpl
+  implements NewsletterUnsubscribeSmsService
+{
   /**
    * Send confirmation SMS to user who unsubscribed from newsletter
    */

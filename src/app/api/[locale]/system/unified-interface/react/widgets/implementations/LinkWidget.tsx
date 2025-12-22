@@ -14,11 +14,11 @@ import { isExternalUrl } from "../../../shared/widgets/utils/widget-helpers";
 /**
  * Renders a clickable link with optional external link indicator.
  */
-export function LinkWidget({
+export function LinkWidget<TKey extends string>({
   value,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.LINK>): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.LINK, TKey>): JSX.Element {
   // Handle null/undefined/empty - just show dash for empty values
   if (value === null || value === undefined || value === "") {
     return <Span className="text-muted-foreground">—</Span>;

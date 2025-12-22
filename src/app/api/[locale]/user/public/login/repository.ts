@@ -15,14 +15,14 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { verifyPassword } from "next-vibe/shared/utils/password";
 
-import { leadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
-import { leadsRepository } from "@/app/api/[locale]/leads/repository";
+import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
+import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import { authRepository } from "../../auth/repository";
+import { AuthRepository } from "../../auth/repository";
 import type {
   JWTPublicPayloadType,
   JwtPrivatePayloadType,
@@ -30,13 +30,14 @@ import type {
 import { UserPermissionRole } from "../../user-roles/enum";
 import { users } from "../../db";
 import { UserDetailLevel } from "../../enum";
-import { sessionRepository } from "../../private/session/repository";
-import { userRepository } from "../../repository";
-import { userRolesRepository } from "../../user-roles/repository";
+import { SessionRepository } from "../../private/session/repository";
+import { UserRepository } from "../../repository";
+import { UserRolesRepository } from "../../user-roles/repository";
 import type {
   LoginPostRequestOutput,
   LoginPostResponseOutput,
 } from "./definition";
+import type { LoginOptionsGetRequestOutput, LoginOptionsGetResponseOutput } from "./options/definition";
 import { SocialProviders } from "./options/enum";
 import type { Platform } from "../../../system/unified-interface/shared/types/platform";
 
@@ -67,55 +68,13 @@ interface LoginAttempt {
   ipAddress?: string;
 }
 
-/**
- * Login repository interface
- */
-export interface LoginRepository {
-  /**
-   * Login a user with email and password
-   * @param data - Login request data
-   * @param user - JWT payload (public user)
-   * @param locale - User locale
-   * @param request - Next.js request object for platform detection
-   * @param logger - Logger instance for debugging and monitoring
-   * @returns Login response with boolean success
-   */
-  login(
-    data: LoginPostRequestOutput,
-    user: JWTPublicPayloadType,
-    locale: CountryLanguage,
-    request: NextRequest,
-    logger: EndpointLogger,
-    platform: Platform,
-  ): Promise<ResponseType<LoginPostResponseOutput>>;
-
-  /**
-   * Get login options with ResponseType wrapper
-   * @param logger - Logger instance for debugging and monitoring
-   * @param locale - User locale
-   * @param email - Optional email to check user-specific options
-   * @returns Login options wrapped in ResponseType
-   */
-  getLoginOptions(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-    email?: string,
-  ): Promise<ResponseType<LoginOptions>>;
-
-  /**
-   * Track login attempt for security monitoring
-   * @param attempt - Login attempt details
-   */
-  trackLoginAttempt(attempt: LoginAttempt): void;
-}
-
 // In-memory login attempt tracking (in a real app, use Redis or database)
 const loginAttempts = new Map<string, LoginAttempt[]>();
 
 /**
  * Login repository implementation
  */
-export class LoginRepositoryImpl implements LoginRepository {
+export class LoginRepository {
   /**
    * Login a user with email and password
    * @param email - User email
@@ -125,7 +84,7 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param logger - Logger instance for debugging and monitoring
    * @returns Login response with user session
    */
-  async login(
+  static async login(
     data: LoginPostRequestOutput,
     user: JWTPublicPayloadType,
     locale: CountryLanguage,
@@ -169,7 +128,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       }
 
       // Find user by email
-      const userResponse = await userRepository.getUserByEmail(
+      const userResponse = await UserRepository.getUserByEmail(
         email,
         UserDetailLevel.STANDARD,
         locale,
@@ -289,7 +248,7 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param handlerUser - User object from route handler containing leadId
    * @returns Login response with user session
    */
-  private async createSessionAndGetUser(
+  private static async createSessionAndGetUser(
     userId: string,
     rememberMe = false,
     locale: CountryLanguage,
@@ -320,7 +279,7 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param handlerUser - User object from route handler containing leadId
    * @returns Login response with renewed session
    */
-  private async renewSession(
+  private static async renewSession(
     userId: string,
     rememberMe = false,
     locale: CountryLanguage,
@@ -352,7 +311,7 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param handlerUser - User object from route handler containing leadId
    * @returns Login response with session data
    */
-  private async createOrRenewSession(
+  private static async createOrRenewSession(
     userId: string,
     isRenewal = false,
     rememberMe = false,
@@ -374,7 +333,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       );
 
       // Get full user data
-      const userResponse = await userRepository.getUserById(
+      const userResponse = await UserRepository.getUserById(
         userId,
         UserDetailLevel.COMPLETE,
         locale,
@@ -395,12 +354,12 @@ export class LoginRepositoryImpl implements LoginRepository {
 
       // Link the leadId to the user
       // This ensures the userLeads table has the relationship for credit lookups
-      await leadAuthRepository.linkLeadToUser(leadId, userId, logger);
+      await LeadAuthRepository.linkLeadToUser(leadId, userId, logger);
 
       // Merge lead wallet into user wallet immediately
       // This ensures user gets their pre-login credits
-      const { creditRepository } = await import("../../../credits/repository");
-      const mergeResult = await creditRepository.mergePendingLeadWallets(
+      const { CreditRepository } = await import("../../../credits/repository");
+      const mergeResult = await CreditRepository.mergePendingLeadWallets(
         userId,
         [leadId],
         logger,
@@ -419,7 +378,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       const sessionDurationSeconds = sessionDurationDays * 24 * 60 * 60;
 
       // Fetch user roles from DB to include in JWT
-      const rolesResult = await userRolesRepository.getUserRoles(
+      const rolesResult = await UserRolesRepository.getUserRoles(
         userResponse.data.id,
         logger,
       );
@@ -446,7 +405,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       };
 
       // Sign JWT token
-      const tokenResponse = await authRepository.signJwt(tokenPayload, logger);
+      const tokenResponse = await AuthRepository.signJwt(tokenPayload, logger);
       if (!tokenResponse.success) {
         return tokenResponse;
       }
@@ -459,7 +418,7 @@ export class LoginRepositoryImpl implements LoginRepository {
         token: tokenResponse.data,
         expiresAt,
       };
-      await sessionRepository.create(sessionData);
+      await SessionRepository.create(sessionData);
 
       // Create the response data - LoginPostResponseOutput
       const responseData: LoginPostResponseOutput = {
@@ -467,18 +426,21 @@ export class LoginRepositoryImpl implements LoginRepository {
       };
 
       // Store auth token using platform-specific handler
-      const storeResult = await authRepository.storeAuthTokenForPlatform(
+      // Pass rememberMe flag to control cookie expiration
+      const storeResult = await AuthRepository.storeAuthTokenForPlatform(
         tokenResponse.data,
         userId,
         leadId,
         platform,
         logger,
+        rememberMe, // Pass rememberMe to control session duration
       );
       if (storeResult.success) {
         logger.debug("Auth token stored successfully", {
           userId,
           isRenewal,
           rememberMe,
+          sessionType: rememberMe ? "persistent (30 days)" : "session-only",
         });
       } else {
         logger.error("Error storing auth token", parseError(storeResult));
@@ -507,12 +469,104 @@ export class LoginRepositoryImpl implements LoginRepository {
   }
 
   /**
+   * Get formatted login options matching definition response type
+   * @param data - Request data with optional email
+   * @param locale - Locale for translations
+   * @param logger - Logger instance
+   * @returns Login options formatted per definition
+   */
+  static async getLoginOptionsFormatted(
+    data: LoginOptionsGetRequestOutput,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LoginOptionsGetResponseOutput>> {
+    const { getLanguageFromLocale } = await import("@/i18n/core/language-utils");
+    const { translateKey } = await import("@/i18n/core/translation-utils");
+
+    const email = data.email;
+    const language = getLanguageFromLocale(locale);
+    const optionsResult = await this.getLoginOptions(logger, locale, email);
+
+    if (!optionsResult.success) {
+      return optionsResult;
+    }
+
+    const options = optionsResult.data;
+
+    return success({
+      response: {
+        success: true,
+        message: translateKey(
+          "app.api.user.public.login.options.messages.successMessage",
+          language,
+        ),
+        forUser: email,
+        loginMethods: {
+          password: {
+            enabled: options.allowPasswordAuth,
+            passwordDescription: translateKey(
+              "app.api.user.public.login.options.messages.passwordAuthDescription",
+              language,
+            ),
+          },
+          social: {
+            enabled: options.allowSocialAuth,
+            socialDescription: translateKey(
+              "app.api.user.public.login.options.messages.socialAuthDescription",
+              language,
+            ),
+            providers:
+              options.socialProviders?.map((provider) => ({
+                name: provider.name,
+                id: provider.providers[0] || "unknown",
+                enabled: provider.enabled,
+                description: translateKey(
+                  "app.api.user.public.login.options.messages.continueWithProvider",
+                  language,
+                  { provider: translateKey(provider.name, language) },
+                ),
+              })) || [],
+          },
+        },
+        security: {
+          maxAttempts: options.maxAttempts,
+          requireTwoFactor: options.requireTwoFactor,
+          securityDescription: options.requireTwoFactor
+            ? translateKey(
+                "app.api.user.public.login.options.messages.twoFactorRequired",
+                language,
+              )
+            : translateKey(
+                "app.api.user.public.login.options.messages.standardSecurity",
+                language,
+              ),
+        },
+        recommendations: [
+          options.allowPasswordAuth
+            ? translateKey(
+                "app.api.user.public.login.options.messages.tryPasswordFirst",
+                language,
+              )
+            : translateKey(
+                "app.api.user.public.login.options.messages.useSocialLogin",
+                language,
+              ),
+          translateKey(
+            "app.api.user.public.login.options.messages.socialLoginFaster",
+            language,
+          ),
+        ],
+      },
+    });
+  }
+
+  /**
    * Get login options based on configuration and user state
    * @param logger - Logger instance for debugging and monitoring
    * @param email - Optional email to check user-specific options
    * @returns Login options
    */
-  async getLoginOptions(
+  static async getLoginOptions(
     logger: EndpointLogger,
     locale: CountryLanguage,
     email?: string,
@@ -547,7 +601,7 @@ export class LoginRepositoryImpl implements LoginRepository {
 
       // If email provided, check user-specific settings
       if (email) {
-        const user = await userRepository.getUserByEmail(
+        const user = await UserRepository.getUserByEmail(
           email,
           UserDetailLevel.STANDARD,
           locale,
@@ -589,7 +643,7 @@ export class LoginRepositoryImpl implements LoginRepository {
    * Track login attempt for security monitoring
    * @param attempt - Login attempt details
    */
-  trackLoginAttempt(attempt: LoginAttempt): void {
+  static trackLoginAttempt(attempt: LoginAttempt): void {
     const attempts = loginAttempts.get(attempt.email) || [];
     attempts.push(attempt);
     loginAttempts.set(attempt.email, attempts);
@@ -600,7 +654,7 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param email - Email to check
    * @returns Whether the account is locked
    */
-  private isAccountLocked(email: string): boolean {
+  private static isAccountLocked(email: string): boolean {
     const attempts = loginAttempts.get(email) || [];
     const recentAttempts = attempts.filter(
       (attempt: LoginAttempt) =>
@@ -621,7 +675,7 @@ export class LoginRepositoryImpl implements LoginRepository {
    * @param logger - Logger instance
    * @param user - JWT payload for authorization
    */
-  private async handleLeadConversion(
+  private static async handleLeadConversion(
     leadId: string,
     email: string,
     userId: string,
@@ -635,7 +689,7 @@ export class LoginRepositoryImpl implements LoginRepository {
       });
 
       // Convert lead with both email (for anonymous leads) and userId (for user relationship)
-      const convertResult = await leadsRepository.convertLead(
+      const convertResult = await LeadsRepository.convertLead(
         leadId,
         {
           email,
@@ -680,6 +734,3 @@ export class LoginRepositoryImpl implements LoginRepository {
     }
   }
 }
-
-// Export singleton instance of the repository
-export const loginRepository = new LoginRepositoryImpl();

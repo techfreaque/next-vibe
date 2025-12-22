@@ -69,10 +69,7 @@ export async function executeMCPTool<T>(
     };
 
     // Call main browser repository
-    const result = await browserRepository.executeTool(
-      requestData,
-      logger,
-    );
+    const result = await browserRepository.executeTool(requestData, logger);
 
     if (!result.success) {
       return result as ResponseType<T>;

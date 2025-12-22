@@ -1,5 +1,5 @@
 /// <reference types="node" />
- 
+
 import { existsSync } from "node:fs";
 import { dirname, join, parse, resolve } from "node:path";
 

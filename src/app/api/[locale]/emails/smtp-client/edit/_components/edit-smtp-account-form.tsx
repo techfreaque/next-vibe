@@ -147,6 +147,7 @@ export function EditSmtpAccountForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -163,6 +164,7 @@ export function EditSmtpAccountForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
             </FormFieldGroup>
 
@@ -187,6 +189,7 @@ export function EditSmtpAccountForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -202,6 +205,7 @@ export function EditSmtpAccountForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -218,6 +222,7 @@ export function EditSmtpAccountForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
               </Div>
             </FormFieldGroup>
@@ -244,6 +249,7 @@ export function EditSmtpAccountForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
             </FormFieldGroup>
 
@@ -267,6 +273,7 @@ export function EditSmtpAccountForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -278,6 +285,7 @@ export function EditSmtpAccountForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -288,6 +296,7 @@ export function EditSmtpAccountForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -298,6 +307,7 @@ export function EditSmtpAccountForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -308,6 +318,7 @@ export function EditSmtpAccountForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -318,6 +329,7 @@ export function EditSmtpAccountForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
               </Div>
             </FormFieldGroup>
@@ -343,6 +355,7 @@ export function EditSmtpAccountForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
               </Div>
             </FormFieldGroup>

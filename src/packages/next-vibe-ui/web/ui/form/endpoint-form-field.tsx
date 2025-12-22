@@ -21,6 +21,7 @@ import type {
 } from "react-hook-form";
 import type { z } from "zod";
 
+import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type { EndpointFieldStructure } from "@/app/api/[locale]/system/unified-interface/shared/field-config/endpoint-field-types";
 import type {
   FieldConfig,
@@ -30,14 +31,21 @@ import type {
   RequiredFieldTheme,
 } from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
 import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
-import { useTranslation } from "@/i18n/core/client";
-import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import { simpleT } from "@/i18n/core/shared";
+import type {
+  TFunction,
+  TParams,
+  TranslationKey,
+} from "@/i18n/core/static-types";
 
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
 import { Button } from "../button";
 import { Calendar as CalendarComponent } from "../calendar";
 import { Checkbox } from "../checkbox";
+import { IconPicker } from "../icon-picker";
 import { Info } from "../icons/Info";
 import { Input } from "../input";
 import { Label } from "../label";
@@ -97,9 +105,9 @@ function getFieldValidationState<T>(
 ): FieldValidationState {
   const hasValue = Boolean(
     fieldValue !== undefined &&
-    fieldValue !== null &&
-    fieldValue !== "" &&
-    (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
+      fieldValue !== null &&
+      fieldValue !== "" &&
+      (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
   );
 
   return {
@@ -323,9 +331,6 @@ function renderPrefillDisplay(
   }
 }
 
-/**
- * Render field input based on type
- */
 function renderFieldInput<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
@@ -333,7 +338,8 @@ function renderFieldInput<
   config: FieldConfig,
   field: ControllerRenderProps<TFieldValues, TName>,
   inputClassName: string,
-  t: TFunction,
+  t: TFunction, // Adapted translation for definition keys (uses scopedT when available)
+  globalT: TFunction, // Global translation for hardcoded framework keys
   disabled?: boolean,
 ): JSX.Element {
   switch (config.type) {
@@ -345,7 +351,7 @@ function renderFieldInput<
       return (
         <Input
           name={field.name}
-          value={String(field.value || "")}
+          value={t(field.value as TranslationKey)}
           onChange={(e) => field.onChange(e.target.value)}
           onBlur={field.onBlur}
           type={config.type}
@@ -374,7 +380,7 @@ function renderFieldInput<
       return (
         <Textarea
           name={field.name}
-          value={String(field.value || "")}
+          value={t(field.value as TranslationKey)}
           onChange={(e) => field.onChange(e.target.value)}
           onBlur={field.onBlur}
           className={cn(inputClassName, "min-h-20 resize-none")}
@@ -518,7 +524,7 @@ function renderFieldInput<
                 <span>
                   {config.placeholder
                     ? t(config.placeholder)
-                    : t("packages.nextVibeUi.web.common.selectDate")}
+                    : globalT("packages.nextVibeUi.web.common.selectDate")}
                 </span>
               )}
             </Button>
@@ -583,13 +589,11 @@ function renderFieldInput<
         // eslint-disable-next-line i18next/no-literal-string -- Error handling for invalid config
         throw new Error("Invalid config type for phone field");
       }
-      // Extract placeholder to avoid complex union type error
-      let phonePlaceholder: TranslationKey;
-      if (config.placeholder !== undefined) {
-        phonePlaceholder = config.placeholder;
-      } else {
-        phonePlaceholder = "packages.nextVibeUi.web.common.enterPhoneNumber";
-      }
+      // Translate placeholder - use adapted t for definition keys, globalT for hardcoded default
+      const phonePlaceholder =
+        config.placeholder !== undefined
+          ? t(config.placeholder)
+          : globalT("packages.nextVibeUi.web.common.enterPhoneNumber");
       return (
         <PhoneField
           value={String(field.value ?? "")}
@@ -628,6 +632,17 @@ function renderFieldInput<
       );
     }
 
+    case "icon": {
+      return (
+        <IconPicker
+          value={field.value as IconKey | undefined}
+          onChange={(iconKey) => field.onChange(iconKey)}
+          className={inputClassName}
+          size="default"
+        />
+      );
+    }
+
     default: {
       // Fallback for any unknown field types
       return (
@@ -638,7 +653,9 @@ function renderFieldInput<
           onBlur={field.onBlur}
           disabled={disabled || false}
           className={cn(inputClassName, "h-10")}
-          placeholder={t("packages.nextVibeUi.web.common.unknownFieldType")}
+          placeholder={globalT(
+            "packages.nextVibeUi.web.common.unknownFieldType",
+          )}
         />
       );
     }
@@ -649,7 +666,7 @@ function renderFieldInput<
 export interface EndpointFormFieldProps<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
-  TFields extends EndpointFieldStructure = EndpointFieldStructure,
+  TFields = EndpointFieldStructure,
 > {
   name: TName;
   config?: FieldConfig; // Optional - auto-inferred from endpointFields if not provided
@@ -658,6 +675,19 @@ export interface EndpointFormFieldProps<
   endpointFields?: TFields; // Endpoint fields for auto-inference (from definition.POST.fields) - now fully typed
   theme?: RequiredFieldTheme;
   className?: string;
+  /**
+   * Optional scoped translation function for definition keys (label, placeholder, description, etc.)
+   * When provided, uses this for translating keys from the endpoint definition
+   * Falls back to global translation when not provided
+   * Note: Uses method syntax for bivariance - accepts both narrow (scoped) and broad (string) key types
+   */
+  scopedT?: (locale: CountryLanguage) => {
+    t(key: string, params?: TParams): TranslatedKeyType;
+  };
+  /**
+   * Current locale for translations (defaults to "en-GLOBAL" if not provided)
+   */
+  locale?: CountryLanguage;
 }
 
 /**
@@ -674,7 +704,7 @@ export interface EndpointFormFieldProps<
 export function EndpointFormField<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
-  TFields extends EndpointFieldStructure = EndpointFieldStructure,
+  TFields = EndpointFieldStructure,
 >({
   name,
   config: providedConfig,
@@ -683,8 +713,14 @@ export function EndpointFormField<
   theme = DEFAULT_THEME,
   className,
   endpointFields,
+  scopedT,
+  locale,
 }: EndpointFormFieldProps<TFieldValues, TName, TFields>): JSX.Element {
-  const { t } = useTranslation();
+  // Use same pattern as getTranslator utility:
+  // - scopedT for definition keys when available (label, placeholder, description, option labels)
+  // - simpleT for fallback and hardcoded framework keys
+  const { t: globalT } = simpleT(locale ?? "en-GLOBAL");
+  const { t } = scopedT && locale ? scopedT(locale) : { t: globalT };
 
   // Auto-infer config from endpoint fields if not provided
   const config =
@@ -767,7 +803,7 @@ export function EndpointFormField<
                     variant="secondary"
                     className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
                   >
-                    {t("packages.nextVibeUi.web.common.required")}
+                    {globalT("packages.nextVibeUi.web.common.required")}
                   </Badge>
                 )}
               </div>
@@ -791,6 +827,7 @@ export function EndpointFormField<
                     field,
                     styleClassName.inputClassName,
                     t,
+                    globalT,
                     config.disabled || config.readonly,
                   )}
             </FormControl>
@@ -818,7 +855,7 @@ export function EndpointFormField<
  */
 export interface EndpointFormFieldsProps<
   TFieldValues extends FieldValues,
-  TFields extends EndpointFieldStructure = EndpointFieldStructure,
+  TFields = EndpointFieldStructure,
 > {
   fields: Array<{
     name: Path<TFieldValues>;
@@ -831,11 +868,22 @@ export interface EndpointFormFieldsProps<
   theme?: RequiredFieldTheme;
   className?: string;
   fieldClassName?: string;
+  /**
+   * Optional scoped translation function for definition keys
+   * Note: Uses method syntax for bivariance - accepts both narrow (scoped) and broad (string) key types
+   */
+  scopedT?: (locale: CountryLanguage) => {
+    t(key: string, params?: TParams): TranslatedKeyType;
+  };
+  /**
+   * Current locale for translations (defaults to "en-GLOBAL" if not provided)
+   */
+  locale?: CountryLanguage;
 }
 
 export function EndpointFormFields<
   TFieldValues extends FieldValues,
-  TFields extends EndpointFieldStructure = EndpointFieldStructure,
+  TFields = EndpointFieldStructure,
 >({
   fields,
   control,
@@ -844,6 +892,8 @@ export function EndpointFormFields<
   theme = DEFAULT_THEME,
   className,
   fieldClassName,
+  scopedT,
+  locale,
 }: EndpointFormFieldsProps<TFieldValues, TFields>): JSX.Element {
   return (
     <div className={cn("space-y-6", className)}>
@@ -857,6 +907,8 @@ export function EndpointFormFields<
           endpointFields={endpointFields}
           theme={theme}
           className={fieldClassName}
+          scopedT={scopedT}
+          locale={locale}
         />
       ))}
     </div>

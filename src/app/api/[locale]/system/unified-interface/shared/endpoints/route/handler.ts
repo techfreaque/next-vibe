@@ -15,13 +15,13 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import type { z } from "zod";
 
-import { creditRepository } from "@/app/api/[locale]/credits/repository";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { emailHandlingRepository } from "@/app/api/[locale]/emails/smtp-client/email-handling/repository";
 import type { EmailHandleRequestOutput } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { handleSms } from "@/app/api/[locale]/sms/handle-sms";
 import type { SmsFunctionType } from "@/app/api/[locale]/sms/utils";
-import { authRepository } from "@/app/api/[locale]/user/auth/repository";
+import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -273,7 +273,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     if (providedUser) {
       user = providedUser as InferJwtPayloadTypeFromRoles<T["allowedRoles"]>;
     } else {
-      const authUser = await authRepository.getAuthMinimalUser(
+      const authUser = await AuthRepository.getAuthMinimalUser(
         endpoint.allowedRoles,
         { platform, locale, request },
         logger,
@@ -327,7 +327,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
 
     // 4. Check and deduct credits if endpoint has credit cost
     if (endpoint.credits && endpoint.credits > 0) {
-      const hasSufficient = await creditRepository.hasSufficientCredits(
+      const hasSufficient = await CreditRepository.hasSufficientCredits(
         user.id
           ? { userId: user.id, leadId: user.leadId }
           : { leadId: user.leadId },
@@ -349,7 +349,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
         };
       }
 
-      const deductResult = await creditRepository.deductCreditsForFeature(
+      const deductResult = await CreditRepository.deductCreditsForFeature(
         user,
         endpoint.credits,
         `${endpoint.path.join("/")}/${endpoint.method}`,

@@ -30,13 +30,13 @@ import {
 /**
  * Renders sortable data table with column headers.
  */
-export const DataTableWidget = ({
+export const DataTableWidget = <TKey extends string>({
   value,
   field,
   context,
   className = "",
   form,
-}: ReactWidgetProps<typeof WidgetType.DATA_TABLE>): JSX.Element => {
+}: ReactWidgetProps<typeof WidgetType.DATA_TABLE, TKey>): JSX.Element => {
   const hasRequestUsage = field.usage && "request" in field.usage;
 
   if (hasRequestUsage && form) {
@@ -165,13 +165,11 @@ export const DataTableWidget = ({
           <Div className="mt-4 flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-700">
             <Div className="text-sm text-gray-700 dark:text-gray-300">
               {t(
-                "app.api.system.unifiedInterface.react.widgets.dataTable.showing",
-              )}{" "}
-              {rows.length}{" "}
-              {t("app.api.system.unifiedInterface.react.widgets.dataTable.of")}{" "}
-              {sortConfig.totalRows}{" "}
-              {t(
-                "app.api.system.unifiedInterface.react.widgets.dataTable.results",
+                "app.api.system.unifiedInterface.react.widgets.dataTable.showingResults",
+                {
+                  count: rows.length,
+                  total: sortConfig.totalRows,
+                },
               )}
             </Div>
           </Div>

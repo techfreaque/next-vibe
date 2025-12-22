@@ -15,7 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { getNewsletterSubscriptionStatus } from "@/app/api/[locale]/leads/enum";
-import { leadsRepository } from "@/app/api/[locale]/leads/repository";
+import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -29,17 +29,8 @@ import type {
   SubscribePostResponseOutput,
 } from "./definition";
 
-export interface NewsletterSubscribeRepository {
-  subscribe(
-    data: SubscribePostRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SubscribePostResponseOutput>>;
-}
-
-export class NewsletterSubscribeRepositoryImpl implements NewsletterSubscribeRepository {
-  async subscribe(
+export class NewsletterSubscribeRepository {
+  static async subscribe(
     data: SubscribePostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -68,7 +59,7 @@ export class NewsletterSubscribeRepositoryImpl implements NewsletterSubscribeRep
           },
         );
 
-        const leadResult = await leadsRepository.getLeadById(leadId, logger);
+        const leadResult = await LeadsRepository.getLeadById(leadId, logger);
         if (leadResult.success) {
           logger.debug("app.api.newsletter.subscribe.repository.lead_found", {
             leadId,
@@ -80,17 +71,25 @@ export class NewsletterSubscribeRepositoryImpl implements NewsletterSubscribeRep
           const newStatus = getNewsletterSubscriptionStatus(currentStatus);
 
           const updateData = {
-            status: newStatus,
-            metadata: {
-              ...leadResult.data.lead.metadata.metadata,
-              newsletterSubscribed: true,
-              newsletterSubscriptionDate: new Date().toISOString(),
-              subscribedEmail: data.email,
-              subscribedName: data.name || "",
+            updates: {
+              basicInfo: {
+                status: newStatus,
+              },
+              contactDetails: {},
+              campaignManagement: {},
+              additionalDetails: {
+                metadata: {
+                  ...leadResult.data.lead.metadata.metadata,
+                  newsletterSubscribed: true,
+                  newsletterSubscriptionDate: new Date().toISOString(),
+                  subscribedEmail: data.email,
+                  subscribedName: data.name || "",
+                },
+              },
             },
           };
 
-          const updateResult = await leadsRepository.updateLead(
+          const updateResult = await LeadsRepository.updateLead(
             leadId,
             updateData,
             logger,
@@ -214,6 +213,18 @@ export class NewsletterSubscribeRepositoryImpl implements NewsletterSubscribeRep
         },
       );
 
+      // Send SMS notifications after successful subscription (fire-and-forget)
+      const { sendWelcomeSms, sendAdminNotificationSms } = await import(
+        "./sms"
+      );
+      sendWelcomeSms(data, user, locale, logger).catch((smsError: Error) =>
+        logger.debug("Welcome SMS failed but continuing", { smsError }),
+      );
+      sendAdminNotificationSms(data, user, locale, logger).catch(
+        (smsError: Error) =>
+          logger.debug("Admin SMS failed but continuing", { smsError }),
+      );
+
       return success({
         success: true,
         message: t("app.api.newsletter.subscribe.response.success"),
@@ -239,6 +250,3 @@ export class NewsletterSubscribeRepositoryImpl implements NewsletterSubscribeRep
     }
   }
 }
-
-export const newsletterSubscribeRepository =
-  new NewsletterSubscribeRepositoryImpl();

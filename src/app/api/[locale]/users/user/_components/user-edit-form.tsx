@@ -103,6 +103,7 @@ export function UserEditForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -118,6 +119,7 @@ export function UserEditForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -133,6 +135,7 @@ export function UserEditForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -148,6 +151,7 @@ export function UserEditForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -163,6 +167,7 @@ export function UserEditForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -178,6 +183,7 @@ export function UserEditForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
             </FormFieldGroup>
 

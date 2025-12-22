@@ -7,9 +7,7 @@ import chalk from "chalk";
 
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type {
-  WidgetData,
-} from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -22,19 +20,20 @@ import type {
 
 /**
  * Base widget renderer with common utilities.
- * Generic over WidgetType T to enable type-safe props within each implementation.
+ * TWidget is the specific widget type this renderer handles.
  */
-export abstract class BaseWidgetRenderer<T extends WidgetType = WidgetType>
-  implements WidgetRenderer<T>
+export abstract class BaseWidgetRenderer<
+  TWidget extends WidgetType = WidgetType,
+> implements WidgetRenderer<TWidget>
 {
-  abstract readonly widgetType: T;
+  abstract readonly widgetType: TWidget;
   protected formatter: DataFormatter;
 
   constructor() {
     this.formatter = new DefaultDataFormatter();
   }
 
-  abstract render(props: CLIWidgetProps<T>): string;
+  abstract render(props: CLIWidgetProps<TWidget, string>): string;
 
   /**
    * Create indentation for the given depth
@@ -99,8 +98,8 @@ export abstract class BaseWidgetRenderer<T extends WidgetType = WidgetType>
     return `${icon} ${text}`;
   }
 
-  protected formatLabel(
-    field: UnifiedField,
+  protected formatLabel<TKey extends string>(
+    field: UnifiedField<TKey>,
     context: WidgetRenderContext,
   ): string {
     // Check if ui config has a label property

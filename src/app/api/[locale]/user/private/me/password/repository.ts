@@ -1,7 +1,9 @@
 /**
- * Password repository implementation
+ * Password Repository - Static class pattern
  * Handles password resets and updates
  */
+
+import "server-only";
 
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -16,71 +18,42 @@ import { hashPassword, verifyPassword } from "next-vibe/shared/utils/password";
 import { db } from "@/app/api/[locale]/system/db";
 import type { DbId } from "@/app/api/[locale]/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { users } from "../../../db";
 import { UserDetailLevel } from "../../../enum";
-import { userRepository } from "../../../repository";
+import { UserRepository } from "../../../repository";
 import type {
   PasswordPostRequestOutput,
   PasswordPostResponseOutput,
 } from "./definition";
 
 /**
- * Password repository interface
+ * Password Update Repository - Static class pattern
  */
-export interface PasswordUpdateRepository {
+export class PasswordUpdateRepository {
   /**
    * Update a user's password
-   * @param userId - The user ID
-   * @param passwords - The password data
-   * @param locale - The user's locale
-   * @param logger - Logger for debugging
-   * @returns ResponseType with null data on success
    */
-  updatePassword(
-    userId: DbId,
-    passwords: PasswordPostRequestOutput,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PasswordPostResponseOutput>>;
-
-  /**
-   * Set a user's password
-   * This is used for initial password setup and password reset
-   * @param userId - The user ID
-   * @param newPassword - The new password
-   * @returns ResponseType with null data on success
-   */
-  setPassword(
-    userId: DbId,
-    newPassword: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<null>>;
-}
-
-/**
- * Password repository implementation
- */
-export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
-  /**
-   * Update a user's password
-   * @param userId - The user ID
-   * @param passwords - The password data
-   * @returns ResponseType with null data on success
-   */
-  async updatePassword(
-    userId: DbId,
+  static async updatePassword(
+    user: JwtPayloadType,
     passwords: PasswordPostRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<PasswordPostResponseOutput>> {
-    try {
-      logger.debug("app.api.user.private.me.password.debug.updatingPassword", {
-        userId,
-      });
+    const userId = user.id;
 
-      // Safely access nested properties
+    if (!userId) {
+      return fail({
+        message: "app.api.user.private.me.password.errors.unauthorized",
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
+      });
+    }
+
+    try {
+      logger.debug("Updating password", { userId });
+
       if (!passwords.currentCredentials || !passwords.newCredentials) {
         return fail({
           message:
@@ -100,7 +73,6 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
       const { currentPassword } = currentCredentials;
       const { newPassword, confirmPassword } = newCredentials;
 
-      // Validate passwords match
       if (newPassword !== confirmPassword) {
         return fail({
           message:
@@ -109,8 +81,7 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         });
       }
 
-      // Get user to verify current password and 2FA status
-      const userResponse = await userRepository.getUserById(
+      const userResponse = await UserRepository.getUserById(
         userId,
         UserDetailLevel.STANDARD,
         locale,
@@ -125,7 +96,6 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         });
       }
 
-      // Verify current password
       const user = await db
         .select({
           password: users.password,
@@ -144,7 +114,6 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         });
       }
 
-      // Check if current password is correct
       const isPasswordValid = await verifyPassword(
         currentPassword,
         user.password,
@@ -156,9 +125,7 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         });
       }
 
-      // Check 2FA if enabled
       if (user.twoFactorEnabled && user.twoFactorSecret) {
-        // Get 2FA code from request (if provided via passwords parameter)
         const twoFactorCode = (passwords as { twoFactorCode?: string })
           .twoFactorCode;
 
@@ -167,32 +134,18 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
             message:
               "app.api.user.private.me.password.errors.two_factor_code_required",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: {
-              message:
-                "Two-factor authentication is enabled. Please provide your 2FA code.",
-            },
           });
         }
 
-        // Verify 2FA code
-        // Note: In a production environment, you would use a library like 'speakeasy' or 'otpauth'
-        // to verify TOTP codes. For now, we'll add a placeholder for the verification logic.
-        // Example with speakeasy: speakeasy.totp.verify({ secret: user.twoFactorSecret, token: twoFactorCode })
-
-        // Placeholder: Simple 6-digit code validation
         const is2FAValid = this.verify2FACode(
           twoFactorCode,
           user.twoFactorSecret,
         );
-
         if (!is2FAValid) {
           return fail({
             message:
               "app.api.user.private.me.password.errors.invalid_two_factor_code",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
-            messageParams: {
-              message: "Invalid 2FA code. Please try again.",
-            },
           });
         }
 
@@ -222,68 +175,39 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
         },
       });
     } catch (error) {
-      logger.error(
-        "app.api.user.private.me.password.debug.errorUpdatingPassword",
-        parseError(error),
-      );
+      logger.error("Error updating password", parseError(error));
       return fail({
         message: "app.api.user.private.me.password.errors.update_failed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
-          userId,
-          error: parseError(error).message,
-        },
       });
     }
   }
 
   /**
-   * Verify 2FA code
-   * This is a placeholder implementation. In production, use a library like 'speakeasy'
-   * @param code - The 2FA code provided by the user
-   * @param secret - The 2FA secret stored in the database (currently unused in placeholder implementation)
-   * @returns boolean indicating if the code is valid
+   * Verify 2FA code (placeholder)
    */
-  private verify2FACode(code: string, secret: string): boolean {
-    // Placeholder implementation
-    // In production, use: speakeasy.totp.verify({ secret, token: code, window: 1 })
-    // For now, we'll just validate the format (6 digits)
+  private static verify2FACode(code: string, secret: string): boolean {
     const codeRegex = /^\d{6}$/;
     if (!codeRegex.test(code)) {
       return false;
     }
-
-    // TODO: Implement actual TOTP verification using speakeasy or similar library
-    // This is a security-critical operation and should use proper time-based one-time password verification
-    // The 'secret' parameter will be used once proper TOTP verification is implemented
-
-    // For development purposes only - this would never be used in production
-    // In production, you must implement proper TOTP verification
-    void secret; // Acknowledge unused parameter in placeholder implementation
-    return true; // Placeholder - always returns true for development
+    void secret;
+    return true;
   }
 
   /**
-   * Set a user's password
-   * This is used for initial password setup and password reset
-   * @param userId - The user ID
-   * @param newPassword - The new password
-   * @returns ResponseType with null data on success
+   * Set a user's password (for initial setup and password reset)
    */
-  async setPassword(
+  static async setPassword(
     userId: DbId,
     newPassword: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<null>> {
     try {
-      logger.debug("app.api.user.private.me.password.debug.settingPassword", {
-        userId,
-      });
+      logger.debug("Setting password", { userId });
 
-      // Hash new password
       const hashedPassword = await hashPassword(newPassword);
 
-      // Update password in database
       await db
         .update(users)
         .set({
@@ -294,22 +218,12 @@ export class PasswordUpdateRepositoryImpl implements PasswordUpdateRepository {
 
       return success(null);
     } catch (error) {
-      logger.error(
-        "app.api.user.private.me.password.debug.errorSettingPassword",
-        parseError(error),
-      );
+      logger.error("Error setting password", parseError(error));
       return fail({
         message:
           "app.api.user.private.me.password.errors.token_creation_failed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
-        messageParams: {
-          userId,
-          error: parseError(error).message,
-        },
       });
     }
   }
 }
-
-// Export singleton instance of the repository
-export const passwordUpdateRepository = new PasswordUpdateRepositoryImpl();

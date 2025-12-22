@@ -32,7 +32,7 @@ import type { useCollapseState } from "../hooks/use-collapse-state";
 import { useMessageActions } from "../hooks/use-message-actions";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
-import { ModelPersonaSelectorModal } from "../model-persona-selector-modal";
+import { ModelPersonaSelectorModal } from "../model-character-selector-modal";
 import { UserProfileCard } from "../user-profile-card";
 import { ThreadedMessageActions } from "./actions";
 import { ThreadedMessageContent } from "./content";
@@ -75,8 +75,14 @@ export function ThreadedMessage({
     answerAsAI: onAnswerAsModel,
     voteMessage: onVoteMessage,
     handleModelChange: onModelChange,
-    setSelectedPersona: onPersonaChange,
+    setSelectedCharacter: onCharacterChange,
+    selectedCharacter,
+    characters,
   } = useChatContext();
+
+  // Get voice from current character
+  const currentCharacter = characters[selectedCharacter];
+  const characterVoice = currentCharacter?.voice;
 
   const { t } = simpleT(locale);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -133,6 +139,7 @@ export function ThreadedMessage({
     locale,
     logger,
     deductCredits,
+    voice: characterVoice,
   });
 
   const hasReplies = replies.length > 0;
@@ -236,7 +243,7 @@ export function ThreadedMessage({
                   }
                   onCancel={messageActions.cancelAction}
                   onModelChange={onModelChange}
-                  onPersonaChange={onPersonaChange}
+                  onCharacterChange={onCharacterChange}
                   locale={locale}
                   logger={logger}
                 />
@@ -256,13 +263,13 @@ export function ThreadedMessage({
                       );
                     })
                   }
-                  onPersonaChange={
-                    onPersonaChange ||
-                    ((persona: string): void => {
+                  onCharacterChange={
+                    onCharacterChange ||
+                    ((character: string): void => {
                       logger.debug(
                         "ThreadedMessage",
-                        "Persona selection changed (no handler)",
-                        { persona },
+                        "Character selection changed (no handler)",
+                        { character },
                       );
                     })
                   }
@@ -335,13 +342,13 @@ export function ThreadedMessage({
                     );
                   })
                 }
-                onPersonaChange={
-                  onPersonaChange ||
-                  ((persona: string): void => {
+                onCharacterChange={
+                  onCharacterChange ||
+                  ((character: string): void => {
                     logger.debug(
                       "ThreadedMessage",
-                      "Persona selection changed (no handler)",
-                      { persona },
+                      "Character selection changed (no handler)",
+                      { character },
                     );
                   })
                 }

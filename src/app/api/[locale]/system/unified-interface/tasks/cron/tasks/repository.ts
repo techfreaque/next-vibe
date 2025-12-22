@@ -130,8 +130,7 @@ function determineTaskStatus(
     if (timeSinceNextRun < timeout) {
       return CronTaskStatus.RUNNING;
     }
-      return CronTaskStatus.TIMEOUT;
-    
+    return CronTaskStatus.TIMEOUT;
   }
 
   // If task completed successfully

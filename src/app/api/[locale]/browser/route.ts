@@ -15,10 +15,7 @@ export const { POST, tools } = endpointsHandler({
     email: undefined,
     handler: async ({ data, logger }) => {
       // Execute the Chrome DevTools MCP tool
-      const result = await browserRepository.executeTool(
-        data,
-        logger,
-      );
+      const result = await browserRepository.executeTool(data, logger);
 
       return result;
     },

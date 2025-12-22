@@ -63,13 +63,17 @@ export class FileCopier implements IFileCopier {
 
       if (!existsSync(srcPath)) {
         output.push(
-          outputFormatter.formatWarning(`${fileData.input} → skipped (not found)`),
+          outputFormatter.formatWarning(
+            `${fileData.input} → skipped (not found)`,
+          ),
         );
         logger.warn("Source file not found, skipping", { src: srcPath });
         continue;
       }
 
-      output.push(outputFormatter.formatItem(fileData.input, `→ ${fileData.output}`));
+      output.push(
+        outputFormatter.formatItem(fileData.input, `→ ${fileData.output}`),
+      );
 
       if (!dryRun) {
         if (!existsSync(destDir)) {

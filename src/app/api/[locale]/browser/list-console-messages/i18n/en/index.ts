@@ -1,13 +1,15 @@
 export const translations = {
   title: "List Console Messages",
-  description: "List all console messages for the currently selected page since the last navigation",
+  description:
+    "List all console messages for the currently selected page since the last navigation",
   form: {
     label: "List Console Messages",
     description: "Get all console messages from the browser page",
     fields: {
       includePreservedMessages: {
         label: "Include Preserved Messages",
-        description: "Set to true to return the preserved messages over the last 3 navigations",
+        description:
+          "Set to true to return the preserved messages over the last 3 navigations",
         placeholder: "false",
       },
       pageIdx: {
@@ -17,12 +19,14 @@ export const translations = {
       },
       pageSize: {
         label: "Page Size",
-        description: "Maximum number of messages to return (omit to return all messages)",
+        description:
+          "Maximum number of messages to return (omit to return all messages)",
         placeholder: "Enter page size",
       },
       types: {
         label: "Message Types",
-        description: "Filter messages to only return messages of the specified types (omit to return all)",
+        description:
+          "Filter messages to only return messages of the specified types (omit to return all)",
         placeholder: "Select message types",
         options: {
           log: "Log",
@@ -56,15 +60,43 @@ export const translations = {
     executionId: "Execution ID for tracking",
   },
   errors: {
-    validation: { title: "Validation Error", description: "Please check your input and try again" },
-    network: { title: "Network Error", description: "A network error occurred while listing console messages" },
-    unauthorized: { title: "Unauthorized", description: "You are not authorized to list console messages" },
-    forbidden: { title: "Forbidden", description: "Listing console messages is forbidden" },
-    notFound: { title: "Not Found", description: "The requested resource was not found" },
-    serverError: { title: "Server Error", description: "An internal server error occurred while listing console messages" },
-    unknown: { title: "Unknown Error", description: "An unknown error occurred while listing console messages" },
-    unsavedChanges: { title: "Unsaved Changes", description: "You have unsaved changes that may be lost" },
-    conflict: { title: "Conflict", description: "A conflict occurred while listing console messages" },
+    validation: {
+      title: "Validation Error",
+      description: "Please check your input and try again",
+    },
+    network: {
+      title: "Network Error",
+      description: "A network error occurred while listing console messages",
+    },
+    unauthorized: {
+      title: "Unauthorized",
+      description: "You are not authorized to list console messages",
+    },
+    forbidden: {
+      title: "Forbidden",
+      description: "Listing console messages is forbidden",
+    },
+    notFound: {
+      title: "Not Found",
+      description: "The requested resource was not found",
+    },
+    serverError: {
+      title: "Server Error",
+      description:
+        "An internal server error occurred while listing console messages",
+    },
+    unknown: {
+      title: "Unknown Error",
+      description: "An unknown error occurred while listing console messages",
+    },
+    unsavedChanges: {
+      title: "Unsaved Changes",
+      description: "You have unsaved changes that may be lost",
+    },
+    conflict: {
+      title: "Conflict",
+      description: "A conflict occurred while listing console messages",
+    },
   },
   success: {
     title: "Console Messages Retrieved Successfully",

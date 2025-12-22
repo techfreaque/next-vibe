@@ -30,10 +30,12 @@ const DEFAULT_SEVERITY_ICONS = {
   SPARKLE: "✨ ",
 } as const;
 
-export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.CODE_OUTPUT> {
+export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.CODE_OUTPUT
+> {
   readonly widgetType = WidgetType.CODE_OUTPUT;
 
-  render(props: CLIWidgetProps<typeof WidgetType.CODE_OUTPUT>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.CODE_OUTPUT, string>): string {
     const { field, value, context } = props;
     // Use shared logic to extract config
     const config = getCodeOutputConfig(field);
@@ -67,9 +69,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
     }
   }
 
-  private renderEmptyState(
-    context: WidgetRenderContext,
-  ): string {
+  private renderEmptyState(context: WidgetRenderContext): string {
     const t = context.t;
     const icon = context.options.useEmojis
       ? DEFAULT_SEVERITY_ICONS.SPARKLE

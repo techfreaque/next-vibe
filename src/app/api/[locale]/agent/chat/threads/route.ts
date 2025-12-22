@@ -16,7 +16,7 @@ import type {
   ThreadListResponseOutput,
 } from "./definition";
 import definitions from "./definition";
-import { threadsRepository } from "./repository";
+import { ThreadsRepository } from "./repository";
 
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
@@ -29,7 +29,7 @@ export const { GET, POST, tools } = endpointsHandler({
         typeof definitions.GET.allowedRoles
       >,
     ): Promise<ResponseType<ThreadListResponseOutput>> => {
-      return await threadsRepository.listThreads(
+      return await ThreadsRepository.listThreads(
         props.data,
         props.user,
         props.logger,
@@ -45,7 +45,7 @@ export const { GET, POST, tools } = endpointsHandler({
         typeof definitions.POST.allowedRoles
       >,
     ): Promise<ResponseType<ThreadCreateResponseOutput>> => {
-      return await threadsRepository.createThread(
+      return await ThreadsRepository.createThread(
         props.data,
         props.user,
         props.locale,

@@ -18,11 +18,11 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
 /**
  * Displays code with syntax highlighting and optional line numbers.
  */
-export function CodeOutputWidget({
+export function CodeOutputWidget<TKey extends string>({
   value,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.CODE_OUTPUT>): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.CODE_OUTPUT, TKey>): JSX.Element {
   const data = extractCodeOutputData(value, context.theme ?? "light");
 
   if (!data) {

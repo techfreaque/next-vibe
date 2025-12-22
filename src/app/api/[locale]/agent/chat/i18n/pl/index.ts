@@ -1,9 +1,9 @@
 import { translations as creditsTranslations } from "../../../../credits/i18n/pl";
 import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/pl";
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/pl";
+import { translations as postaćsTranslations } from "../../characters/i18n/pl";
 import { translations as foldersTranslations } from "../../folders/i18n/pl";
 import { translations as memoriesTranslations } from "../../memories/i18n/pl";
-import { translations as personasTranslations } from "../../personas/i18n/pl";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/pl";
 import { translations as threadsTranslations } from "../../threads/i18n/pl";
 import type { translations as enTranslations } from "../en";
@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     threads: "Wątki",
     folders: "Foldery",
     messages: "Wiadomości",
-    personas: "Persony",
+    characters: "Persony",
     memories: "Wspomnienia",
     credits: "Kredyty",
     balance: "Saldo",
@@ -51,6 +51,38 @@ export const translations: typeof enTranslations = {
       debug: "Debug",
     },
   },
+  favorites: {
+    enums: {
+      mode: {
+        auto: "Auto",
+        manual: "Ręczny",
+      },
+      intelligence: {
+        any: "Dowolny",
+        quick: "Szybki",
+        smart: "Inteligentny",
+        brilliant: "Genialny",
+      },
+      price: {
+        any: "Dowolny",
+        cheap: "Tani",
+        standard: "Standardowy",
+        premium: "Premium",
+      },
+      content: {
+        any: "Dowolny",
+        mainstream: "Główny nurt",
+        open: "Otwarty",
+        uncensored: "Bez cenzury",
+      },
+      speed: {
+        any: "Dowolny",
+        fast: "Szybki",
+        balanced: "Zrównoważony",
+        thorough: "Dokładny",
+      },
+    },
+  },
   components: {
     sidebar: {
       login: "Zaloguj się",
@@ -62,6 +94,47 @@ export const translations: typeof enTranslations = {
         buy: "Kup",
         freeCreditsLeft: "Darmowe kredyty",
       },
+    },
+  },
+  selector: {
+    loading: "Ładowanie...",
+    best: "Najlepsze dopasowanie",
+    free: "DARMOWE",
+    creditsSingle: "1 kredyt",
+    creditsExact: "{{cost}} kredytów",
+    modelOnly: "Tylko model",
+    editModelSettings: "Edytuj ustawienia modelu",
+    editSettings: "Edytuj ustawienia",
+    switchPersona: "Zmień personę",
+    editPersona: "Edytuj personę",
+    delete: "Usuń",
+    autoSelectedModel: "AUTO-WYBRANE",
+    manualSelectedModel: "WYBRANE RĘCZNIE",
+    intelligence: "Inteligencja",
+    contentFilter: "Treść",
+    maxPrice: "Maksymalna cena",
+    modelSelection: "Wybór modelu",
+    autoModeDescription:
+      "Najlepszy model jest wybierany na podstawie Twoich filtrów",
+    manualModeDescription: "Wybierz konkretny model ręcznie",
+    autoMode: "Auto",
+    manualMode: "Ręczny",
+    allModelsCount: "Wszystkie {{count}} modeli",
+    filteredModelsCount: "{{count}} modeli pasuje do filtrów",
+    showFiltered: "Pokaż przefiltrowane",
+    showAllModels: "Pokaż wszystkie modele",
+    showLess: "Pokaż mniej",
+    showMore: "Pokaż {{remaining}} więcej",
+    noMatchingModels: "Brak pasujących modeli",
+    noModelsWarning: "Żaden model nie pasuje do Twoich filtrów",
+    applyOnce: "Zastosuj raz",
+    saveChanges: "Zapisz zmiany",
+    requirements: {
+      personaConflict: "Konflikty wymagań persony",
+      tooLow: "zbyt niski",
+      tooHigh: "zbyt wysoki",
+      min: "min",
+      max: "max",
     },
   },
   common: {
@@ -100,7 +173,7 @@ export const translations: typeof enTranslations = {
       answerAsAI: "Odpowiedz jako model AI",
       deleteMessage: "Usuń wiadomość",
     },
-    personaSelector: {
+    characterSelector: {
       placeholder: "Wybierz personę",
       addNewLabel: "Utwórz własną personę",
       grouping: {
@@ -134,7 +207,7 @@ export const translations: typeof enTranslations = {
           },
           systemPrompt: {
             label: "Prompt systemowy",
-            placeholder: "Zdefiniuj, jak zachowuje się persona...",
+            placeholder: "Zdefiniuj, jak zachowuje się postać...",
           },
           category: {
             label: "Kategoria",
@@ -245,7 +318,7 @@ export const translations: typeof enTranslations = {
   credits: creditsTranslations,
   folders: foldersTranslations,
   memories: memoriesTranslations,
-  personas: personasTranslations,
+  characters: postaćsTranslations,
   threads: {
     ...threadsTranslations,
     messages: messagesTranslations,

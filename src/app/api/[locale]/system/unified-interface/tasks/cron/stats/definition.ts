@@ -343,10 +343,10 @@ const { GET } = createEndpoint({
 
           // Distribution fields
           tasksByPriority: z
-            .record(z.nativeEnum(CronTaskPriority), z.coerce.number())
+            .record(z.enum(CronTaskPriority), z.coerce.number())
             .optional(),
           tasksByStatus: z
-            .record(z.nativeEnum(CronTaskStatus), z.coerce.number())
+            .record(z.enum(CronTaskStatus), z.coerce.number())
             .optional(),
           executionsByHour: z.record(z.string(), z.coerce.number()).optional(),
           executionsByDay: z.record(z.string(), z.coerce.number()).optional(),

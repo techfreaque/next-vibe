@@ -280,7 +280,8 @@ export const translations: typeof enTranslations = {
         start: "Verbindung zum Chrome DevTools MCP Server herstellen",
         success: "Erfolgreich mit MCP Server verbunden",
         error: "Fehler beim Verbinden mit MCP Server",
-        failedToInitialize: "Fehler beim Initialisieren des Chrome DevTools MCP Servers",
+        failedToInitialize:
+          "Fehler beim Initialisieren des Chrome DevTools MCP Servers",
       },
       tool: {
         call: {

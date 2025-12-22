@@ -35,7 +35,9 @@ export interface SchemaVerifyRepositoryInterface {
 /**
  * Verify database schema Repository Implementation
  */
-export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterface {
+export class SchemaVerifyRepositoryImpl
+  implements SchemaVerifyRepositoryInterface
+{
   async execute(
     data: RequestType,
     locale: CountryLanguage,

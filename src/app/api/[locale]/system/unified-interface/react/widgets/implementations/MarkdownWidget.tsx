@@ -14,11 +14,11 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
 /**
  * Renders markdown content with optional sanitization.
  */
-export function MarkdownWidget({
+export function MarkdownWidget<TKey extends string>({
   value,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.MARKDOWN>): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.MARKDOWN, TKey>): JSX.Element {
   const { t } = simpleT(context.locale);
   const data = extractMarkdownData(value);
 

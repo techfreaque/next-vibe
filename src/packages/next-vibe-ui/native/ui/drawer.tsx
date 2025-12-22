@@ -101,49 +101,50 @@ export const DrawerTrigger = React.forwardRef<
 
 DrawerTrigger.displayName = "DrawerTrigger";
 
-export const DrawerClose = React.forwardRef<DrawerCloseRefObject, DrawerCloseProps>(
-  ({ children, asChild }, ref) => {
-    const { setOpen } = useDrawer();
-    const pressableRef = React.useRef<React.ElementRef<typeof Pressable>>(null);
+export const DrawerClose = React.forwardRef<
+  DrawerCloseRefObject,
+  DrawerCloseProps
+>(({ children, asChild }, ref) => {
+  const { setOpen } = useDrawer();
+  const pressableRef = React.useRef<React.ElementRef<typeof Pressable>>(null);
 
-    React.useImperativeHandle(ref, (): DrawerCloseRefObject => {
-      return {
-        click: (): void => {
-          setOpen(false);
-        },
-        focus: (): void => {
-          // No-op for React Native
-        },
-        blur: (): void => {
-          // No-op for React Native
-        },
-      };
-    }, [setOpen]);
+  React.useImperativeHandle(ref, (): DrawerCloseRefObject => {
+    return {
+      click: (): void => {
+        setOpen(false);
+      },
+      focus: (): void => {
+        // No-op for React Native
+      },
+      blur: (): void => {
+        // No-op for React Native
+      },
+    };
+  }, [setOpen]);
 
-    if (asChild && React.isValidElement(children)) {
-      // Clone element with properly typed onPress handler
-      const childElement = children as React.ReactElement<{
-        onPress?: () => void;
-      }>;
-      return React.cloneElement(childElement, {
-        onPress: () => {
-          setOpen(false);
-        },
-      });
-    }
+  if (asChild && React.isValidElement(children)) {
+    // Clone element with properly typed onPress handler
+    const childElement = children as React.ReactElement<{
+      onPress?: () => void;
+    }>;
+    return React.cloneElement(childElement, {
+      onPress: () => {
+        setOpen(false);
+      },
+    });
+  }
 
-    return (
-      <Pressable
-        ref={pressableRef}
-        onPress={() => {
-          setOpen(false);
-        }}
-      >
-        {children}
-      </Pressable>
-    );
-  },
-);
+  return (
+    <Pressable
+      ref={pressableRef}
+      onPress={() => {
+        setOpen(false);
+      }}
+    >
+      {children}
+    </Pressable>
+  );
+});
 
 DrawerClose.displayName = "DrawerClose";
 

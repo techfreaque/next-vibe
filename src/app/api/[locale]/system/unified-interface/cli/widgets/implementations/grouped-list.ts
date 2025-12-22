@@ -67,7 +67,9 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<
 > {
   readonly widgetType = WidgetType.GROUPED_LIST;
 
-  render(props: CLIWidgetProps<typeof WidgetType.GROUPED_LIST>): string {
+  render(
+    props: CLIWidgetProps<typeof WidgetType.GROUPED_LIST, string>,
+  ): string {
     const { value: data, context } = props;
     const t = context.t;
 

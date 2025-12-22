@@ -86,7 +86,8 @@ export const translations: typeof enTranslations = {
       title: "Zabronione",
       description: "Dostęp zabroniony",
     },
-    configNotFound: "check.config.ts nie znaleziono w katalogu głównym projektu",
+    configNotFound:
+      "check.config.ts nie znaleziono w katalogu głównym projektu",
     configMissingExport:
       "check.config.ts musi eksportować 'default' lub 'config'",
     oxlintFailed: "Oxlint nie powiodło się",

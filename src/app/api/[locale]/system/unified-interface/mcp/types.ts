@@ -24,7 +24,7 @@ export type JsonRpcVersion = "2.0";
 /**
  * JSON-RPC Request (generic version)
  */
- 
+
 // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: MCP tool parameters require 'unknown' for flexible schema definitions
 export interface JsonRpcRequest<TParams = unknown> {
   jsonrpc: JsonRpcVersion;
@@ -36,7 +36,7 @@ export interface JsonRpcRequest<TParams = unknown> {
 /**
  * JSON-RPC Response (generic version)
  */
- 
+
 // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Tool result type requires 'unknown' for flexible return values
 export interface JsonRpcResponse<TResult = unknown> {
   jsonrpc: JsonRpcVersion;
@@ -191,9 +191,8 @@ export interface MCPServerConfig {
  * MCP Execution Context
  * Extends BaseExecutionContext with MCP-specific fields
  */
-export interface MCPExecutionContext<
-  TData = { [key: string]: ParameterValue },
-> extends Omit<BaseExecutionContext<TData>, "user" | "requestId"> {
+export interface MCPExecutionContext<TData = { [key: string]: ParameterValue }>
+  extends Omit<BaseExecutionContext<TData>, "user" | "requestId"> {
   /** More specific user type for MCP */
   user: JwtPayloadType;
 
@@ -237,7 +236,6 @@ export interface IMCPTransport {
  * MCP Protocol Handler Interface
  */
 export interface IMCPProtocolHandler {
-   
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Protocol extension requires 'unknown' for flexible message payloads
   handleRequest(request: JsonRpcRequest<unknown>): Promise<JsonRpcResponse>;
   handleInitialize(params: MCPInitializeParams): Promise<MCPInitializeResult>;

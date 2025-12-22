@@ -14,11 +14,13 @@ export const translations: typeof enTranslations = {
     },
     content: {
       label: "Treść wspomnienia",
-      description: "Fakt do zapamiętania (pozostaw puste, aby zachować bieżący)",
+      description:
+        "Fakt do zapamiętania (pozostaw puste, aby zachować bieżący)",
     },
     tags: {
       label: "Tagi",
-      description: "Tagi do kategoryzacji (pozostaw puste, aby zachować bieżący)",
+      description:
+        "Tagi do kategoryzacji (pozostaw puste, aby zachować bieżący)",
     },
     priority: {
       label: "Priorytet",

@@ -131,27 +131,23 @@ const TextareaInner = (
 ): React.JSX.Element => {
   const internalRef = React.useRef<HTMLTextAreaElement | null>(null);
 
-  React.useImperativeHandle(
-    ref,
-    (): TextareaRefObject => {
-      const element = internalRef.current;
-      if (!element) {
-        return {
-          focus: (): void => undefined,
-          blur: (): void => undefined,
-          select: (): void => undefined,
-          value: "",
-        };
-      }
+  React.useImperativeHandle(ref, (): TextareaRefObject => {
+    const element = internalRef.current;
+    if (!element) {
       return {
-        focus: (): void => element.focus(),
-        blur: (): void => element.blur(),
-        select: (): void => element.select(),
-        value: element.value,
+        focus: (): void => undefined,
+        blur: (): void => undefined,
+        select: (): void => undefined,
+        value: "",
       };
-    },
-    [],
-  );
+    }
+    return {
+      focus: (): void => element.focus(),
+      blur: (): void => element.blur(),
+      select: (): void => element.select(),
+      value: element.value,
+    };
+  }, []);
 
   const adjustHeight = React.useCallback(() => {
     const textarea = internalRef.current;

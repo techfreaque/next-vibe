@@ -33,12 +33,56 @@ import {
   UserRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 // Extract schema type directly from field, bypassing complex field structure
 type ExtractSchemaType<F> = F extends { schema: z.ZodType<infer T> }
   ? T
   : never;
+
+/**
+ * NoInfer utility type - prevents TypeScript from using this position for inference
+ * This ensures TScopedTranslationKey is inferred ONLY from scopedTranslation.ScopedTranslationKey
+ * and then used to CONSTRAIN all other translation key properties (title, description, etc.)
+ *
+ * Without NoInfer: createEndpoint({ scopedTranslation: { ScopedTranslationKey: "a"|"b" }, title: "c" })
+ *   would infer TScopedTranslationKey as "a"|"b"|"c" (unions all positions)
+ *   and error would appear on scopedTranslation because its type doesn't include "c"
+ *
+ * With NoInfer on title: TScopedTranslationKey is inferred as "a"|"b" from scopedTranslation only
+ *   then title: "c" fails because "c" is not in "a"|"b"
+ *   and error appears on title property (which is what we want!)
+ */
+type NoInfer<T> = [T][T extends T ? 0 : never];
+
+/**
+ * Simplified constraint - just check the top-level ui properties
+ * Note: Using type instead of interface for proper intersection constraint checking
+ */
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- Type required for proper intersection constraint checking
+type FieldUIConstraint<TKey extends string> = {
+  ui?: {
+    label?: NoInfer<TKey>;
+    title?: NoInfer<TKey>;
+    description?: NoInfer<TKey>;
+    placeholder?: NoInfer<TKey>;
+    helpText?: NoInfer<TKey>;
+  };
+};
+
+/**
+ * Check children's ui properties recursively through all levels
+ * Note: Using type instead of interface for proper intersection constraint checking
+ */
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- Type required for proper intersection constraint checking
+type ChildrenUIConstraint<TKey extends string> = {
+  children?: Record<
+    string,
+    FieldUIConstraint<TKey> & ChildrenUIConstraint<TKey>
+  >;
+};
 
 /**
  * Validation mode for forms
@@ -131,22 +175,53 @@ export interface EndpointDeleteOptions<TUrlVariables> {
  * - Complete type safety with proper error handling
  * - Support for all 5 consumption interfaces
  * - Simplified type parameters - only 4 core types needed
+ * - Optional scoped translation keys - use TScopedTranslationKey to restrict translation keys to a specific scope
+ *
  */
 export interface ApiEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
   TFields,
+  TScopedTranslationKey extends string = TranslationKey,
 > {
   // Core endpoint metadata - all required for type safety
   readonly method: TMethod;
   readonly path: readonly string[];
   readonly allowedRoles: TUserRoleValue;
 
-  readonly title: TranslationKey;
-  readonly description: TranslationKey;
-  readonly category: TranslationKey;
-  readonly tags: readonly TranslationKey[];
+  // Translation keys use NoInfer to ensure they don't contribute to TScopedTranslationKey inference
+  // This makes errors appear on the specific property with the invalid key
+  readonly title: NoInfer<TScopedTranslationKey>;
+  readonly description: NoInfer<TScopedTranslationKey>;
+  readonly category: NoInfer<TScopedTranslationKey>;
+  readonly tags: readonly NoInfer<TScopedTranslationKey>[];
+
+  /**
+   * Scoped translation function for this endpoint
+   * When provided, all translation keys in this endpoint are scoped to this function
+   * This enables type-safe, module-specific translations
+   *
+   * The key type is automatically inferred from the ScopedTranslationKey property
+   * of the scopedTranslation object.
+   *
+   * Example:
+   * ```ts
+   * import { scopedTranslation } from "./i18n";
+   * createEndpoint({
+   *   scopedT: scopedTranslation, // Pass the FULL object, not just the function
+   *   title: "title", // Scoped key (relative to contact module)
+   *   // ...
+   * });
+   * ```
+   */
+  readonly scopedTranslation?: {
+    readonly ScopedTranslationKey: TScopedTranslationKey;
+    readonly scopedT: (locale: CountryLanguage) => {
+      // Uses method syntax for bivariance - allows both narrow (scoped) and broad (string) key types
+      t(key: TScopedTranslationKey, params?: TParams): TranslatedKeyType;
+    };
+  };
 
   readonly debug?: boolean;
   readonly aliases?: readonly string[];
@@ -163,32 +238,54 @@ export interface ApiEndpoint<
   readonly icon: IconValue;
 
   // Unified fields for schema generation
-  readonly fields: TFields;
+  // TFields is inferred for proper examples/schema inference
+  // FieldUIConstraint and ChildrenUIConstraint validate all translation keys against TScopedTranslationKey
+  readonly fields: TFields &
+    FieldUIConstraint<TScopedTranslationKey> &
+    ChildrenUIConstraint<TScopedTranslationKey>;
 
   lifecycle?: LifecycleActions;
 
   readonly examples: (ExtractInput<
-    InferSchemaFromField<TFields, FieldUsage.RequestData>
+    InferSchemaFromField<TFields, FieldUsage.RequestData, TScopedTranslationKey>
   > extends undefined
     ? { requests?: undefined }
     : ExtractInput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
+          InferSchemaFromField<
+            TFields,
+            FieldUsage.RequestData,
+            TScopedTranslationKey
+          >
         > extends never
       ? {
           requests?: undefined;
         }
       : {
           requests: ExamplesList<
-            ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
+            ExtractInput<
+              InferSchemaFromField<
+                TFields,
+                FieldUsage.RequestData,
+                TScopedTranslationKey
+              >
+            >,
             TExampleKey
           >;
         }) &
     (ExtractInput<
-      InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+      InferSchemaFromField<
+        TFields,
+        FieldUsage.RequestUrlParams,
+        TScopedTranslationKey
+      >
     > extends undefined
       ? { urlPathParams?: undefined }
       : ExtractInput<
-            InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+            InferSchemaFromField<
+              TFields,
+              FieldUsage.RequestUrlParams,
+              TScopedTranslationKey
+            >
           > extends never
         ? {
             urlPathParams?: undefined;
@@ -196,24 +293,38 @@ export interface ApiEndpoint<
         : {
             urlPathParams: ExamplesList<
               ExtractInput<
-                InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+                InferSchemaFromField<
+                  TFields,
+                  FieldUsage.RequestUrlParams,
+                  TScopedTranslationKey
+                >
               >,
               TExampleKey
             >;
           }) &
     (ExtractInput<
-      InferSchemaFromField<TFields, FieldUsage.Response>
+      InferSchemaFromField<TFields, FieldUsage.Response, TScopedTranslationKey>
     > extends undefined
       ? { responses?: undefined }
       : ExtractInput<
-            InferSchemaFromField<TFields, FieldUsage.Response>
+            InferSchemaFromField<
+              TFields,
+              FieldUsage.Response,
+              TScopedTranslationKey
+            >
           > extends never
         ? {
             responses?: undefined;
           }
         : {
             responses: ExamplesList<
-              ExtractInput<InferSchemaFromField<TFields, FieldUsage.Response>>,
+              ExtractInput<
+                InferSchemaFromField<
+                  TFields,
+                  FieldUsage.Response,
+                  TScopedTranslationKey
+                >
+              >,
               TExampleKey
             >;
           });
@@ -221,41 +332,65 @@ export interface ApiEndpoint<
   // Additional configuration - optional
   // readonly config: EndpointConfig;
 
-  // Error handling configuration
+  // Error handling configuration - NoInfer ensures errors appear on specific invalid keys
   readonly errorTypes: Record<
     EndpointErrorTypes,
     {
-      title: TranslationKey;
-      description: TranslationKey;
+      title: NoInfer<TScopedTranslationKey>;
+      description: NoInfer<TScopedTranslationKey>;
     }
   >;
 
-  // Success handling configuration
+  // Success handling configuration - NoInfer ensures errors appear on specific invalid keys
   readonly successTypes: {
-    title: TranslationKey;
-    description: TranslationKey;
+    title: NoInfer<TScopedTranslationKey>;
+    description: NoInfer<TScopedTranslationKey>;
   };
 
   // Method-specific options that will be merged with hook-provided options
   // Hook options take priority over endpoint options
   readonly options?: TMethod extends Methods.GET
     ? EndpointReadOptions<
-        ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
         ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+          InferSchemaFromField<
+            TFields,
+            FieldUsage.RequestData,
+            TScopedTranslationKey
+          >
+        >,
+        ExtractOutput<
+          InferSchemaFromField<
+            TFields,
+            FieldUsage.RequestUrlParams,
+            TScopedTranslationKey
+          >
         >
       >
     : TMethod extends Methods.POST | Methods.PUT | Methods.PATCH
       ? EndpointCreateOptions<
-          ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
           ExtractOutput<
-            InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+            InferSchemaFromField<
+              TFields,
+              FieldUsage.RequestData,
+              TScopedTranslationKey
+            >
+          >,
+          ExtractOutput<
+            InferSchemaFromField<
+              TFields,
+              FieldUsage.RequestUrlParams,
+              TScopedTranslationKey
+            >
           >
         >
       : TMethod extends Methods.DELETE
         ? EndpointDeleteOptions<
             ExtractOutput<
-              InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+              InferSchemaFromField<
+                TFields,
+                FieldUsage.RequestUrlParams,
+                TScopedTranslationKey
+              >
             >
           >
         : never;
@@ -330,7 +465,7 @@ export type InferFieldType<F, Usage extends FieldUsage> =
 // Fixed object type inference - filter out never fields and remove readonly
 // Uses flexible constraint that accepts both readonly and mutable properties
 type InferObjectType<C, Usage extends FieldUsage> =
-  C extends Record<string, UnifiedField<z.ZodTypeAny>>
+  C extends Record<string, UnifiedField<string, z.ZodTypeAny>>
     ? {
         -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
           ? never
@@ -344,63 +479,91 @@ const generateSchemaForUsage = generateSchemaFromUtils;
 
 // Schema generation that preserves actual Zod types for proper input/output inference
 // CRITICAL: These functions must preserve the actual schema types for z.input<>/z.output<>
-function generateRequestDataSchema<F>(
+function generateRequestDataSchema<F, TTranslationKey extends string>(
   field: F,
-): InferSchemaFromField<F, FieldUsage.RequestData> {
-  return generateSchemaForUsage(
+): InferSchemaFromField<F, FieldUsage.RequestData, TTranslationKey> {
+  return generateSchemaForUsage<F, FieldUsage.RequestData, TTranslationKey>(
     field,
     FieldUsage.RequestData,
-  ) as InferSchemaFromField<F, FieldUsage.RequestData>;
+  );
 }
 
-function generateRequestUrlSchema<F>(
+function generateRequestUrlSchema<F, TTranslationKey extends string>(
   field: F,
-): InferSchemaFromField<F, FieldUsage.RequestUrlParams> {
-  return generateSchemaForUsage(
-    field,
+): InferSchemaFromField<F, FieldUsage.RequestUrlParams, TTranslationKey> {
+  return generateSchemaForUsage<
+    F,
     FieldUsage.RequestUrlParams,
-  ) as InferSchemaFromField<F, FieldUsage.RequestUrlParams>;
+    TTranslationKey
+  >(field, FieldUsage.RequestUrlParams);
 }
 
-function generateResponseSchema<F>(
+function generateResponseSchema<F, TTranslationKey extends string>(
   field: F,
-): InferSchemaFromField<F, FieldUsage.Response> {
-  return generateSchemaForUsage(
+): InferSchemaFromField<F, FieldUsage.Response, TTranslationKey> {
+  return generateSchemaForUsage<F, FieldUsage.Response, TTranslationKey>(
     field,
     FieldUsage.Response,
-  ) as InferSchemaFromField<F, FieldUsage.Response>;
+  );
 }
 
 export type CreateApiEndpoint<
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<
+    string,
+    z.ZodTypeAny
+  >,
   RequestInput = ExtractInput<
-    InferSchemaFromField<TFields, FieldUsage.RequestData>
+    InferSchemaFromField<TFields, FieldUsage.RequestData, TScopedTranslationKey>
   >,
   RequestOutput = ExtractOutput<
-    InferSchemaFromField<TFields, FieldUsage.RequestData>
+    InferSchemaFromField<TFields, FieldUsage.RequestData, TScopedTranslationKey>
   >,
   ResponseInput = ExtractInput<
-    InferSchemaFromField<TFields, FieldUsage.Response>
+    InferSchemaFromField<TFields, FieldUsage.Response, TScopedTranslationKey>
   >,
   ResponseOutput = ExtractOutput<
-    InferSchemaFromField<TFields, FieldUsage.Response>
+    InferSchemaFromField<TFields, FieldUsage.Response, TScopedTranslationKey>
   >,
   UrlVariablesInput = ExtractInput<
-    InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+    InferSchemaFromField<
+      TFields,
+      FieldUsage.RequestUrlParams,
+      TScopedTranslationKey
+    >
   >,
   UrlVariablesOutput = ExtractOutput<
-    InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+    InferSchemaFromField<
+      TFields,
+      FieldUsage.RequestUrlParams,
+      TScopedTranslationKey
+    >
   >,
-> = ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields> & {
-  readonly requestSchema: InferSchemaFromField<TFields, FieldUsage.RequestData>;
+> = ApiEndpoint<
+  TExampleKey,
+  TMethod,
+  TUserRoleValue,
+  TFields,
+  TScopedTranslationKey
+> & {
+  readonly requestSchema: InferSchemaFromField<
+    TFields,
+    FieldUsage.RequestData,
+    TScopedTranslationKey
+  >;
   readonly requestUrlPathParamsSchema: InferSchemaFromField<
     TFields,
-    FieldUsage.RequestUrlParams
+    FieldUsage.RequestUrlParams,
+    TScopedTranslationKey
   >;
-  readonly responseSchema: InferSchemaFromField<TFields, FieldUsage.Response>;
+  readonly responseSchema: InferSchemaFromField<
+    TFields,
+    FieldUsage.Response,
+    TScopedTranslationKey
+  >;
 
   readonly requiresAuthentication: () => boolean;
 
@@ -415,21 +578,24 @@ export type CreateApiEndpoint<
     ExampleKey: TExampleKey;
     Method: TMethod;
     UserRoleValue: TUserRoleValue;
+    ScopedTranslationKey: TScopedTranslationKey;
   };
 };
 /**
  * Return type for createEndpoint with full type inference from fields
  */
 export type CreateEndpointReturnInMethod<
-  TFields extends UnifiedField<z.ZodTypeAny>,
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<string, z.ZodTypeAny>,
 > = {
   readonly [KMethod in TMethod]: CreateApiEndpoint<
     TExampleKey,
     KMethod,
     TUserRoleValue,
+    TScopedTranslationKey,
     TFields
   >;
 };
@@ -437,25 +603,67 @@ export type CreateEndpointReturnInMethod<
 /**
  * Create an endpoint definition with perfect type inference from unified fields
  * Returns both legacy format and new destructured format for maximum compatibility
+ *
+ * Translation keys are automatically inferred:
+ * - If scopedTranslation is provided: keys are constrained to scoped keys
+ * - If no scopedTranslation: keys must be valid global TranslationKey
+ *
+ * Errors appear on the specific property with the invalid key, not as generic "no overload matches"
  */
+
+// Implementation
+// TFields captures the exact field structure for proper type inference
+// TScopedTranslationKey is inferred from scopedTranslation and used to validate translation keys
 export function createEndpoint<
-  const TFields extends UnifiedField<z.ZodTypeAny>,
+  const TScopedTranslationKey extends string,
+  const TFields extends UnifiedField<
+    NoInfer<TScopedTranslationKey>,
+    z.ZodTypeAny
+  >,
   const TExampleKey extends string,
   const TMethod extends Methods,
   const TUserRoleValue extends readonly UserRoleValue[],
 >(
-  config: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TFields>,
-): CreateEndpointReturnInMethod<TFields, TExampleKey, TMethod, TUserRoleValue> {
+  config: ApiEndpoint<
+    TExampleKey,
+    TMethod,
+    TUserRoleValue,
+    TFields,
+    TScopedTranslationKey
+  >,
+): CreateEndpointReturnInMethod<
+  TExampleKey,
+  TMethod,
+  TUserRoleValue,
+  TScopedTranslationKey,
+  TFields
+> {
   // Generate schemas from unified fields with type assertions for better TypeScript display
-  const requestSchema = generateRequestDataSchema(
-    config.fields,
-  ) as InferSchemaFromField<TFields, FieldUsage.RequestData>;
-  const responseSchema = generateResponseSchema(
-    config.fields,
-  ) as InferSchemaFromField<TFields, FieldUsage.Response>;
-  const requestUrlSchema = generateRequestUrlSchema(
-    config.fields,
-  ) as InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>;
+  // Cast fields to TFields since the conditional type is for validation only
+  const fields = config.fields as TFields;
+  const requestSchema = generateRequestDataSchema<
+    TFields,
+    TScopedTranslationKey
+  >(fields) as InferSchemaFromField<
+    TFields,
+    FieldUsage.RequestData,
+    TScopedTranslationKey
+  >;
+  const responseSchema = generateResponseSchema<TFields, TScopedTranslationKey>(
+    fields,
+  ) as InferSchemaFromField<
+    TFields,
+    FieldUsage.Response,
+    TScopedTranslationKey
+  >;
+  const requestUrlSchema = generateRequestUrlSchema<
+    TFields,
+    TScopedTranslationKey
+  >(fields) as InferSchemaFromField<
+    TFields,
+    FieldUsage.RequestUrlParams,
+    TScopedTranslationKey
+  >;
 
   function requiresAuthentication(): boolean {
     // Endpoint requires authentication if PUBLIC role is NOT in the allowed roles
@@ -467,6 +675,7 @@ export function createEndpoint<
     TExampleKey,
     TMethod,
     TUserRoleValue,
+    TScopedTranslationKey,
     TFields
   > = {
     method: config.method,
@@ -475,11 +684,12 @@ export function createEndpoint<
     description: config.description,
     category: config.category,
     tags: config.tags,
-    fields: config.fields,
+    fields: fields as typeof config.fields,
     allowedRoles: config.allowedRoles,
     examples: config.examples,
     errorTypes: config.errorTypes,
     successTypes: config.successTypes,
+    scopedTranslation: config.scopedTranslation,
     debug: config.debug,
     aliases: config.aliases,
     cli: config.cli,
@@ -492,27 +702,52 @@ export function createEndpoint<
     requiresAuthentication,
     types: {
       RequestInput: undefined! as ExtractInput<
-        InferSchemaFromField<TFields, FieldUsage.RequestData>
+        InferSchemaFromField<
+          TFields,
+          FieldUsage.RequestData,
+          TScopedTranslationKey
+        >
       >,
       RequestOutput: undefined! as ExtractOutput<
-        InferSchemaFromField<TFields, FieldUsage.RequestData>
+        InferSchemaFromField<
+          TFields,
+          FieldUsage.RequestData,
+          TScopedTranslationKey
+        >
       >,
       ResponseInput: undefined! as ExtractInput<
-        InferSchemaFromField<TFields, FieldUsage.Response>
+        InferSchemaFromField<
+          TFields,
+          FieldUsage.Response,
+          TScopedTranslationKey
+        >
       >,
       ResponseOutput: undefined! as ExtractOutput<
-        InferSchemaFromField<TFields, FieldUsage.Response>
+        InferSchemaFromField<
+          TFields,
+          FieldUsage.Response,
+          TScopedTranslationKey
+        >
       >,
       UrlVariablesInput: undefined! as ExtractInput<
-        InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+        InferSchemaFromField<
+          TFields,
+          FieldUsage.RequestUrlParams,
+          TScopedTranslationKey
+        >
       >,
       UrlVariablesOutput: undefined! as ExtractOutput<
-        InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+        InferSchemaFromField<
+          TFields,
+          FieldUsage.RequestUrlParams,
+          TScopedTranslationKey
+        >
       >,
       Fields: undefined! as TFields,
       ExampleKey: undefined! as TExampleKey,
       Method: undefined! as TMethod,
       UserRoleValue: undefined! as TUserRoleValue,
+      ScopedTranslationKey: undefined! as TScopedTranslationKey,
     },
   };
 
@@ -520,9 +755,10 @@ export function createEndpoint<
   return {
     [config.method]: endpointDefinition,
   } as CreateEndpointReturnInMethod<
-    TFields,
     TExampleKey,
     TMethod,
-    TUserRoleValue
+    TUserRoleValue,
+    TScopedTranslationKey,
+    TFields
   >;
 }

@@ -564,9 +564,7 @@ export function getPlanDetails(
 /**
  * Get all pricing plans as an array
  */
-export function getPricingPlansArray(
-  icon?: JSX.Element,
-): PricingPlan[] {
+export function getPricingPlansArray(icon?: JSX.Element): PricingPlan[] {
   return Object.values(getPricingPlans(icon));
 }
 

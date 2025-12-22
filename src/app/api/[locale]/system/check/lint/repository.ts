@@ -521,9 +521,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         setTimeout(() => {
           child.kill("SIGKILL");
         }, 5000);
-        reject(
-          new Error(createWorkerTimeoutMessage(task.id, task.timeout)),
-        );
+        reject(new Error(createWorkerTimeoutMessage(task.id, task.timeout)));
       }, task.timeout * 1000);
 
       // Clear timeout when process completes
@@ -679,7 +677,6 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
 
     return { issues, hasFixableIssues };
   }
-
 }
 
 /**

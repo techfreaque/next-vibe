@@ -91,7 +91,7 @@ export const translations: typeof enTranslations = {
         result: {
           content: {
             type: "Typ zawartości",
-            text: "Zawartość"
+            text: "Zawartość",
           },
           isError: "Czy błąd",
         },

@@ -9,7 +9,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { textToSpeechRepository } from "./repository";
+import { TextToSpeechRepository } from "./repository";
 
 /**
  * Export endpoint handlers
@@ -17,13 +17,7 @@ import { textToSpeechRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, user, locale, logger }) => {
-      return await textToSpeechRepository.convertTextToSpeech(
-        data,
-        user,
-        locale,
-        logger,
-      );
-    },
+    handler: ({ data, user, locale, logger }) =>
+      TextToSpeechRepository.convertTextToSpeech(data, user, locale, logger),
   },
 });

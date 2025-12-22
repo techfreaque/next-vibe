@@ -1,26 +1,9 @@
 /**
  * Native Thread by ID Repository
- * Implements ThreadByIdRepositoryInterface for React Native
- *
- * POLYFILL PATTERN: This file makes the same repository interface work on native
- * by calling HTTP endpoints instead of direct database access using typesafe endpoint definitions.
- *
- * IMPLEMENTATION STRATEGY:
- * - getThreadById(): Fully implemented with nativeEndpoint()
- * - Other methods: Return "not implemented" errors (can be added when needed)
- *
- * Server code can call threadByIdRepository.getThreadById() and it will:
- * - On Web/Server: Query the database directly
- * - On React Native: Make HTTP call via nativeEndpoint() with full type safety
- *
- * This allows the SAME code to work on both platforms!
+ * Implements ThreadByIdRepository static interface for React Native
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
 
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -34,31 +17,19 @@ import type {
   ThreadPatchResponseOutput,
 } from "./definition";
 import { GET as getThreadEndpoint } from "./definition";
-import type { ThreadByIdRepositoryInterface } from "./repository";
+import type { ThreadByIdRepositoryType } from "./repository";
 
 /**
- * Native Thread by ID Repository Implementation
- * Uses HTTP client to call API endpoints, providing the same interface as server
+ * Native Thread by ID Repository - Static class pattern
  */
-class ThreadByIdRepositoryNativeImpl implements ThreadByIdRepositoryInterface {
-  private createNotImplementedError<T>(method: string): ResponseType<T> {
-    return fail({
-      message:
-        "app.api.agent.chat.threads.threadId.errors.not_implemented_on_native",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { method },
-    });
-  }
-
-  async getThreadById(
+export class ThreadByIdRepository {
+  static async getThreadById(
     threadId: string,
     // oxlint-disable-next-line no-unused-vars
-    user: JwtPayloadType,
+    _user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadGetResponseOutput>> {
-    // Use typesafe nativeEndpoint() with endpoint definition
-    // This provides full type inference from the endpoint's schema
     const response = await nativeEndpoint(
       getThreadEndpoint,
       { urlPathParams: { threadId } },
@@ -74,7 +45,6 @@ class ThreadByIdRepositoryNativeImpl implements ThreadByIdRepositoryInterface {
       };
     }
 
-    // Error response - preserve all error information
     return {
       success: false,
       errorType: response.errorType,
@@ -83,41 +53,33 @@ class ThreadByIdRepositoryNativeImpl implements ThreadByIdRepositoryInterface {
     };
   }
 
-  async updateThread(
-    data: ThreadPatchRequestOutput,
-    threadId: string,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
+  static async updateThread(
+    // oxlint-disable-next-line no-unused-vars
+    _data: ThreadPatchRequestOutput,
+    // oxlint-disable-next-line no-unused-vars
+    _threadId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<ThreadPatchResponseOutput>> {
-    logger.error("updateThread not implemented on native", {
-      threadId,
-      userId: user.isPublic ? "public" : user.id,
-      data,
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<ThreadPatchResponseOutput>("updateThread"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("updateThread is not implemented on native");
   }
 
-  async deleteThread(
-    threadId: string,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
+  static async deleteThread(
+    // oxlint-disable-next-line no-unused-vars
+    _threadId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<ThreadDeleteResponseOutput>> {
-    logger.error("deleteThread not implemented on native", {
-      threadId,
-      userId: user.isPublic ? "public" : user.id,
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<ThreadDeleteResponseOutput>(
-        "deleteThread",
-      ),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("deleteThread is not implemented on native");
   }
 }
 
-/**
- * Singleton instance
- * Export with same name as server implementation for drop-in replacement
- */
-export const threadByIdRepository = new ThreadByIdRepositoryNativeImpl();
+// Compile-time type check
+const _typeCheck: ThreadByIdRepositoryType = ThreadByIdRepository;
+void _typeCheck;

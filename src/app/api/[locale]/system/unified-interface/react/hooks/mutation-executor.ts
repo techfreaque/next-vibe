@@ -172,12 +172,7 @@ export async function executeMutation<
 
   try {
     // Make API call
-    const response = await callApi<TEndpoint["types"]["ResponseOutput"]>(
-      endpoint,
-      endpointUrl,
-      body,
-      logger,
-    );
+    const response = await callApi(endpoint, endpointUrl, body, logger);
 
     // Handle success callback
     if (response.success && options.onSuccess) {

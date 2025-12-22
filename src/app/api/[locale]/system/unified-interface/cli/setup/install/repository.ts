@@ -106,9 +106,9 @@ REM Exit with the same code as the Bun process
 exit /b %errorlevel%
 `;
     }
-      // Unix shell script (Linux/macOS)
-      // eslint-disable-next-line i18next/no-literal-string
-      return `#!/bin/bash
+    // Unix shell script (Linux/macOS)
+    // eslint-disable-next-line i18next/no-literal-string
+    return `#!/bin/bash
 
 # Vibe CLI Unix Binary
 # Executes vibe.ts with Bun
@@ -116,7 +116,6 @@ exit /b %errorlevel%
 # Execute with Bun
 exec bun "${vibeTsPath}" "$@"
 `;
-    
   }
 
   /**

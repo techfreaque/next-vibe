@@ -214,7 +214,7 @@ export async function createAiMessagePlaceholder(params: {
   depth: number;
   userId: string | undefined;
   model: ModelId;
-  persona: string | null | undefined;
+  character: string | null | undefined;
   sequenceId: string | null;
   logger: EndpointLogger;
 }): Promise<void> {
@@ -229,7 +229,7 @@ export async function createAiMessagePlaceholder(params: {
     sequenceId: params.sequenceId,
     isAI: true,
     model: params.model,
-    persona: params.persona ?? null,
+    character: params.character ?? null,
   });
 
   params.logger.info("Created AI message placeholder", {
@@ -296,7 +296,7 @@ export async function createTextMessage(params: {
   depth: number;
   userId: string | undefined;
   model: ModelId;
-  persona: string;
+  character: string;
   sequenceId: string | null;
   logger: EndpointLogger;
 }): Promise<ResponseType<void>> {
@@ -312,7 +312,7 @@ export async function createTextMessage(params: {
       sequenceId: params.sequenceId,
       isAI: true,
       model: params.model,
-      persona: params.persona,
+      character: params.character,
     });
 
     params.logger.debug("Created text message", {
@@ -326,11 +326,12 @@ export async function createTextMessage(params: {
   } catch (error) {
     params.logger.error("Failed to insert chat message", parseError(error), {
       messageId: params.messageId,
-      persona: params.persona,
+      character: params.character,
       model: params.model,
     });
     return fail({
-      message: "app.api.agent.chat.threads.messages.post.errors.createFailed.title",
+      message:
+        "app.api.agent.chat.threads.messages.post.errors.createFailed.title",
       errorType: ErrorResponseTypes.DATABASE_ERROR,
     });
   }
@@ -361,7 +362,7 @@ export async function createToolMessage(params: {
   userId: string | undefined;
   sequenceId: string | null;
   model: ModelId;
-  persona: string;
+  character: string;
   logger: EndpointLogger;
 }): Promise<void> {
   const metadata: Record<
@@ -387,7 +388,7 @@ export async function createToolMessage(params: {
     sequenceId: params.sequenceId,
     isAI: true,
     model: params.model,
-    persona: params.persona,
+    character: params.character,
     metadata,
   });
 
@@ -552,11 +553,11 @@ export interface MessagesRepositoryInterface {
 /**
  * Messages Repository Implementation
  */
-export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
+export class MessagesRepository {
   /**
    * List all messages in a thread
    */
-  async listMessages(
+  static async listMessages(
     data: { threadId: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -642,7 +643,7 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
    * Create a new message in a thread
    * PUBLIC users can respond in PUBLIC threads, but authenticated users are needed for other threads
    */
-  async createMessage(
+  static async createMessage(
     data: MessageCreateRequestOutput & { threadId: string },
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -817,5 +818,3 @@ export class MessagesRepositoryImpl implements MessagesRepositoryInterface {
     }
   }
 }
-
-export const messagesRepository = new MessagesRepositoryImpl();

@@ -188,7 +188,10 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
       }
 
       if (result.success) {
-        return success(result.data, result.isErrorResponse ? { isErrorResponse: true } : undefined);
+        return success(
+          result.data,
+          result.isErrorResponse ? { isErrorResponse: true } : undefined,
+        );
       }
 
       // Return the original error from the handler

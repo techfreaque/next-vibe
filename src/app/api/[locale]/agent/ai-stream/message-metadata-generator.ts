@@ -46,11 +46,11 @@ export function createMessageMetadata(
   const shortId = message.id.slice(-8);
   parts.push(`ID:${shortId}`);
 
-  // Model and Persona (for assistant messages)
+  // Model and Character (for assistant messages)
   if (message.role === "assistant" && message.model) {
     parts.push(`Model:${message.model}`);
-    if (message.persona) {
-      parts.push(`Persona:${message.persona}`);
+    if (message.character) {
+      parts.push(`Character:${message.character}`);
     }
   }
 

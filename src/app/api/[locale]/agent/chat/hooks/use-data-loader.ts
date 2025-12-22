@@ -117,7 +117,7 @@ async function loadThreadsFromServer(
         page: 1,
         limit: 100,
       },
-      {},
+      undefined,
       locale,
       {
         disableLocalCache: true,
@@ -142,7 +142,7 @@ async function loadThreadsFromServer(
             folderId: thread.folderId,
             status: thread.status,
             defaultModel: null,
-            defaultPersona: null,
+            defaultCharacter: null,
             systemPrompt: null,
             pinned: thread.pinned,
             archived: false,
@@ -188,7 +188,7 @@ async function loadFoldersFromServer(
       foldersGetEndpoint,
       logger,
       {},
-      {},
+      undefined,
       locale,
       {
         disableLocalCache: true,

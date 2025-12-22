@@ -9,10 +9,7 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined,
     handler: async ({ user, logger }) => {
-      return await referralRepository.getUserReferralCodes(
-        user.id,
-        logger,
-      );
+      return await referralRepository.getUserReferralCodes(user.id, logger);
     },
   },
 });

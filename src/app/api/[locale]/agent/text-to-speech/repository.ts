@@ -18,10 +18,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
-import { creditRepository } from "../../credits/repository";
+import { CreditRepository } from "../../credits/repository";
 import { TTS_COST_PER_CHARACTER } from "../../products/repository-client";
 import type { JwtPayloadType } from "../../user/auth/types";
 import type { TextToSpeechPostRequestOutput } from "./definition";
+import { TtsVoice } from "./enum";
 
 /**
  * Eden AI TTS response structure
@@ -47,37 +48,29 @@ function mapLocaleToLanguage(locale: CountryLanguage): string {
 }
 
 /**
- * Text-to-Speech Repository Interface
+ * Convert localized TtsVoiceValue to raw API string
+ * Converts "app.api.agent.textToSpeech.voices.MALE" -> "MALE"
  */
-export interface TextToSpeechRepository {
-  /**
-   * Convert text to speech
-   * @param data - TTS request data
-   * @param user - User information
-   * @param locale - User locale
-   * @param logger - Logger instance
-   * @returns Audio data URL and metadata
-   */
-  convertTextToSpeech(
-    data: TextToSpeechPostRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      response: { success: boolean; audioUrl: string; provider: string };
-    }>
-  >;
+function convertVoiceToApiFormat(voice: string): "MALE" | "FEMALE" {
+  switch (voice) {
+    case TtsVoice.MALE:
+      return "MALE";
+    case TtsVoice.FEMALE:
+      return "FEMALE";
+    default:
+      // Default to MALE if unknown
+      return "FEMALE";
+  }
 }
 
 /**
- * Text-to-Speech Repository Implementation
+ * Text-to-Speech Repository - Static class pattern
  */
-export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
+export class TextToSpeechRepository {
   /**
    * Convert text to speech
    */
-  async convertTextToSpeech(
+  static async convertTextToSpeech(
     data: TextToSpeechPostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -90,10 +83,12 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
     // Server-side configuration
     const provider = "openai";
     const language = mapLocaleToLanguage(locale);
+    const apiVoice = convertVoiceToApiFormat(data.voice);
 
     logger.info("Starting text-to-speech conversion", {
       provider,
       voice: data.voice,
+      apiVoice,
       language,
       textLength: data.text.length,
     });
@@ -121,7 +116,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
     // Deduct credits BEFORE making the API call
     // This ensures credits are deducted even if the request is interrupted
     try {
-      await creditRepository.deductCreditsForFeature(
+      await CreditRepository.deductCreditsForFeature(
         user,
         creditsNeeded,
         "tts",
@@ -164,7 +159,7 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
             providers: provider,
             text: data.text,
             language: language.toLowerCase(),
-            option: data.voice,
+            option: apiVoice,
           }),
         },
       );
@@ -286,6 +281,3 @@ export class TextToSpeechRepositoryImpl implements TextToSpeechRepository {
     }
   }
 }
-
-// Export singleton instance
-export const textToSpeechRepository = new TextToSpeechRepositoryImpl();

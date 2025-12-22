@@ -134,6 +134,7 @@ export default function ResetPasswordForm({
                 style: "none",
                 showAllRequired: false,
               }}
+              locale={locale}
             />
 
             <Button

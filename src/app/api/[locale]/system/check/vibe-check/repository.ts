@@ -1,12 +1,10 @@
 /**
- * Vibe Check Repository
- * Orchestrates comprehensive code quality checks by running oxlint, eslint, and typecheck in parallel
- * No duplicate check logic - imports from oxlint, lint, and typecheck repositories
+ * Vibe Check Repository Implementation
  */
 
 import "server-only";
 
-import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
@@ -25,39 +23,31 @@ import type {
   VibeCheckResponseOutput,
 } from "./definition";
 
-/**
- * Vibe Check Repository Interface
- */
-export interface VibeCheckRepository {
-  execute(
+export class VibeCheckRepository {
+  static async execute(
     data: VibeCheckRequestOutput,
     logger: EndpointLogger,
-  ): Promise<BaseResponseType<VibeCheckResponseOutput>>;
-}
-
-/**
- * Vibe Check Repository Implementation
- */
-export class VibeCheckRepositoryImpl implements VibeCheckRepository {
-  async execute(
-    data: VibeCheckRequestOutput,
-    logger: EndpointLogger,
-  ): Promise<BaseResponseType<VibeCheckResponseOutput>> {
+  ): Promise<ResponseType<VibeCheckResponseOutput>> {
     try {
       // Use unified config management - checks, creates if needed, and regenerates
       // This handles everything at the top level for all sub-checks
       const configResult = await ensureConfigReady(logger, data.createConfig);
 
       if (!configResult.ready) {
-        return success({
-          success: false,
-          issues: [{
-            file: configResult.configPath,
-            severity: "error" as const,
-            message: configResult.message,
-            type: "oxlint" as const,
-          }],
-        }, { isErrorResponse: true });
+        return success(
+          {
+            success: false,
+            issues: [
+              {
+                file: configResult.configPath,
+                severity: "error" as const,
+                message: configResult.message,
+                type: "oxlint" as const,
+              },
+            ],
+          },
+          { isErrorResponse: true },
+        );
       }
 
       // Config is ready and all generated files are up-to-date
@@ -192,7 +182,10 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
       };
 
       // Return with isErrorResponse: true if there are errors so CLI exits with non-zero code
-      return success(response, hasErrors ? { isErrorResponse: true } : undefined);
+      return success(
+        response,
+        hasErrors ? { isErrorResponse: true } : undefined,
+      );
     } catch (error) {
       logger.error("Vibe check failed", parseError(error));
       return fail({
@@ -203,8 +196,3 @@ export class VibeCheckRepositoryImpl implements VibeCheckRepository {
     }
   }
 }
-
-/**
- * Default repository instance
- */
-export const vibeCheckRepository = new VibeCheckRepositoryImpl();

@@ -15,7 +15,7 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { LeadSortField, SortOrder } from "../enum";
-import { leadsRepository } from "../repository";
+import { LeadsRepository } from "../repository";
 import type { LeadSearchGetResponseOutput } from "./definition";
 
 /**
@@ -64,7 +64,7 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
     const limit = data.limit ?? 10;
 
     // Use the existing listLeads method with search filter
-    const searchResult = await leadsRepository.listLeads(
+    const searchResult = await LeadsRepository.listLeads(
       {
         statusFilters: {
           search: data.search ?? undefined,

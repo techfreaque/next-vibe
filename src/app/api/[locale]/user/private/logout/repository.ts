@@ -16,15 +16,15 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 
-import { authRepository } from "../../auth/repository";
+import { AuthRepository } from "../../auth/repository";
 import type { JwtPrivatePayloadType } from "../../auth/types";
-import { sessionRepository } from "../session/repository";
+import { SessionRepository } from "../session/repository";
 import type { LogoutPostResponseOutput } from "./definition";
 
 /**
- * Logout repository interface
+ * Logout Repository - Static class pattern
  */
-export interface LogoutRepository {
+export class LogoutRepository {
   /**
    * Logout a user
    * @param user - User from JWT
@@ -32,25 +32,7 @@ export interface LogoutRepository {
    * @param platform - Platform context (web, cli, ai-tool, etc.)
    * @returns Success message
    */
-  logout(
-    user: JwtPrivatePayloadType,
-    logger: EndpointLogger,
-    platform: Platform,
-  ): Promise<ResponseType<LogoutPostResponseOutput>>;
-}
-
-/**
- * Logout repository implementation
- */
-export class LogoutRepositoryImpl implements LogoutRepository {
-  /**
-   * Logout a user
-   * @param user - User from JWT
-   * @param logger - Logger instance for debugging and monitoring
-   * @param platform - Platform context (web, cli, ai-tool, etc.)
-   * @returns Success message
-   */
-  async logout(
+  static async logout(
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
     platform: Platform,
@@ -68,7 +50,7 @@ export class LogoutRepositoryImpl implements LogoutRepository {
       });
 
       // Clear auth token using platform-specific handler
-      const clearResult = await authRepository.clearAuthTokenForPlatform(
+      const clearResult = await AuthRepository.clearAuthTokenForPlatform(
         platform,
         logger,
       );
@@ -86,7 +68,7 @@ export class LogoutRepositoryImpl implements LogoutRepository {
 
       // Remove sessions from database
       try {
-        await sessionRepository.deleteByUserId(userId);
+        await SessionRepository.deleteByUserId(userId);
         logger.debug("app.api.user.private.logout.debug.deletedUserSessions", {
           userId,
         });
@@ -134,6 +116,3 @@ export class LogoutRepositoryImpl implements LogoutRepository {
     }
   }
 }
-
-// Export singleton instance of the repository
-export const logoutRepository = new LogoutRepositoryImpl();

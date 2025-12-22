@@ -21,29 +21,14 @@ import type {
   PulseExecuteRequestOutput,
   PulseExecuteResponseOutput,
 } from "./definition";
-
-/**
- * Pulse Execute Repository Interface
- */
-export interface PulseExecuteRepository {
-  /**
-   * Execute pulse health check cycle
-   */
-  executePulse(
-    data: PulseExecuteRequestOutput,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PulseExecuteResponseOutput>>;
-}
-
 /**
  * Pulse Execute Repository Implementation
  */
-export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
+export class PulseExecuteRepository {
   /**
    * Execute pulse health check cycle
    */
-  async executePulse(
+  static async executePulse(
     data: PulseExecuteRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -174,7 +159,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
   /**
    * Execute a specific pulse task
    */
-  private async executeTask(
+  private static async executeTask(
     taskName: string,
     dryRun: boolean,
     force: boolean,
@@ -248,7 +233,7 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
   /**
    * Utility function to simulate async delay
    */
-  private async delay(ms: number): Promise<void> {
+  private static async delay(ms: number): Promise<void> {
     return await new Promise((resolve) => {
       setTimeout(resolve, ms);
     });
@@ -256,4 +241,3 @@ export class PulseExecuteRepositoryImpl implements PulseExecuteRepository {
 }
 
 // Export singleton instance of the repository
-export const pulseExecuteRepository = new PulseExecuteRepositoryImpl();

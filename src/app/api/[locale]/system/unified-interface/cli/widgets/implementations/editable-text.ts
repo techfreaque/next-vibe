@@ -13,10 +13,14 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class EditableTextWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.MARKDOWN_EDITOR> {
+export class EditableTextWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.MARKDOWN_EDITOR
+> {
   readonly widgetType = WidgetType.MARKDOWN_EDITOR;
 
-  render(props: CLIWidgetProps<typeof WidgetType.MARKDOWN_EDITOR>): string {
+  render(
+    props: CLIWidgetProps<typeof WidgetType.MARKDOWN_EDITOR, string>,
+  ): string {
     const { field, value, context } = props;
     const t = context.t;
 
@@ -38,7 +42,7 @@ export class EditableTextWidgetRenderer extends BaseWidgetRenderer<typeof Widget
 
   private renderEditableText(
     data: ProcessedEditableText,
-    field: CLIWidgetProps<typeof WidgetType.MARKDOWN_EDITOR>["field"],
+    field: CLIWidgetProps<typeof WidgetType.MARKDOWN_EDITOR, string>["field"],
     context: WidgetRenderContext,
   ): string {
     const { value, placeholder, multiline, maxLength, readonly } = data;

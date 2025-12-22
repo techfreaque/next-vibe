@@ -37,7 +37,7 @@ export interface SessionData {
  *
  * ARCHITECTURE:
  * - Platform handlers: ONLY handle storage (cookies, session files, AsyncStorage)
- * - authRepository: Contains ALL authentication business logic
+ * - AuthRepository: Contains ALL authentication business logic
  *
  * Platform implementations:
  * - Web: Uses Next.js cookies for session storage
@@ -64,12 +64,14 @@ export abstract class BaseAuthHandler {
    * Web: Sets HTTP-only cookies
    * CLI/MCP: Writes to .vibe.session file
    * Native: Writes to AsyncStorage
+   * @param rememberMe - If true, session cookie lasts 30 days; if false, session-only (browser session)
    */
   abstract storeAuthToken(
     token: string,
     userId: string,
     leadId: string,
     logger: EndpointLogger,
+    rememberMe?: boolean,
   ): Promise<ResponseType<void>>;
 
   /**

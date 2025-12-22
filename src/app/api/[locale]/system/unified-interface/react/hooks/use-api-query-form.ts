@@ -13,16 +13,14 @@ import { storage } from "next-vibe-ui/lib/storage";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type {
+  CreateApiEndpointAny,
   ExtractOutput,
   InferSchemaFromField,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { ApiStore, FormQueryParams } from "./store";
 import { useApiStore } from "./store";
@@ -64,7 +62,11 @@ function mergeWithDefaults<T>(saved: T, defaults: T): T {
 
     if (savedValue !== undefined && savedValue !== null && savedValue !== "") {
       // Saved value exists and is not empty - use it (with recursive merge for objects)
-      if (typeof savedValue === "object" && !Array.isArray(savedValue) && savedValue !== null) {
+      if (
+        typeof savedValue === "object" &&
+        !Array.isArray(savedValue) &&
+        savedValue !== null
+      ) {
         result[key] = mergeWithDefaults(savedValue, defaultValue);
       } else {
         result[key] = savedValue;
@@ -91,15 +93,7 @@ function mergeWithDefaults<T>(saved: T, defaults: T): T {
  * @param queryOptions - API query options
  * @returns Form and query for API interaction with enhanced error handling
  */
-export function useApiQueryForm<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
->({
+export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
   urlPathParams,
   formOptions = { persistForm: true, autoSubmit: true, debounceMs: 500 },
@@ -121,25 +115,15 @@ export function useApiQueryForm<
     persistenceKey?: string;
   };
   queryOptions: ApiQueryOptions<
-    ExtractOutput<
-      InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-    >,
-    ExtractOutput<
-      InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
-    >,
-    ExtractOutput<
-      InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
-    >
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"]
   >;
   logger: EndpointLogger;
 }): ApiQueryFormReturn<
-  ExtractOutput<
-    InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-  >,
-  ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>>,
-  ExtractOutput<
-    InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
-  >
+  TEndpoint["types"]["RequestOutput"],
+  TEndpoint["types"]["ResponseOutput"],
+  TEndpoint["types"]["UrlVariablesOutput"]
 > {
   if (!endpoint) {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- React hook requires throwing for missing required endpoint parameter
@@ -162,7 +146,11 @@ export function useApiQueryForm<
 
   // Create base form configuration
   type FormData = ExtractOutput<
-    InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+    InferSchemaFromField<
+      TEndpoint["fields"],
+      FieldUsage.RequestData,
+      TEndpoint["types"]["ScopedTranslationKey"]
+    >
   >;
 
   // Recursively extract default values from the Zod schema
@@ -172,7 +160,12 @@ export function useApiQueryForm<
     // Step 1: Extract defaults recursively from schema structure
     // Use forFormInit=true to get empty defaults for primitives (e.g., "" for strings)
     // This ensures required fields are initialized with proper empty values
-    const extracted = extractSchemaDefaults<FormData>(endpoint.requestSchema, logger, "", true);
+    const extracted = extractSchemaDefaults<FormData>(
+      endpoint.requestSchema,
+      logger,
+      "",
+      true,
+    );
     const baseDefaults = (extracted ?? {}) as FormData;
 
     // Step 2: Pass through Zod's parse to validate and apply transformations
@@ -202,7 +195,11 @@ export function useApiQueryForm<
     () =>
       mergedDefaultValues ||
       ({} as ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+        InferSchemaFromField<
+          TEndpoint["fields"],
+          FieldUsage.RequestData,
+          TEndpoint["types"]["ScopedTranslationKey"]
+        >
       >),
     [mergedDefaultValues],
   );
@@ -217,7 +214,11 @@ export function useApiQueryForm<
 
   // Deserialize outside selector to avoid infinite loop from new object references
   const queryParams = useMemo((): ExtractOutput<
-    InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+    InferSchemaFromField<
+      TEndpoint["fields"],
+      FieldUsage.RequestData,
+      TEndpoint["types"]["ScopedTranslationKey"]
+    >
   > => {
     if (!rawQueryParams) {
       return defaultQueryParams;
@@ -225,7 +226,11 @@ export function useApiQueryForm<
     // Deserialize JSON-stringified nested objects back to their original form
     return deserializeQueryParams<
       ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+        InferSchemaFromField<
+          TEndpoint["fields"],
+          FieldUsage.RequestData,
+          TEndpoint["types"]["ScopedTranslationKey"]
+        >
       >
     >(rawQueryParams);
   }, [rawQueryParams, defaultQueryParams]);
@@ -234,7 +239,11 @@ export function useApiQueryForm<
   const setQueryParams = useCallback(
     (
       params: ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+        InferSchemaFromField<
+          TEndpoint["fields"],
+          FieldUsage.RequestData,
+          TEndpoint["types"]["ScopedTranslationKey"]
+        >
       >,
     ) => {
       // Type-safe conversion for form query params
@@ -337,10 +346,18 @@ export function useApiQueryForm<
         // Reset the form to default values if available, otherwise empty
         const resetData =
           (restFormOptions.defaultValues as ExtractOutput<
-            InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+            InferSchemaFromField<
+              TEndpoint["fields"],
+              FieldUsage.RequestData,
+              TEndpoint["types"]["ScopedTranslationKey"]
+            >
           >) ||
           ({} as ExtractOutput<
-            InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+            InferSchemaFromField<
+              TEndpoint["fields"],
+              FieldUsage.RequestData,
+              TEndpoint["types"]["ScopedTranslationKey"]
+            >
           >);
         formMethods.reset(resetData);
         // Update query params with reset data
@@ -363,7 +380,11 @@ export function useApiQueryForm<
         const savedFormData = await storage.getItem(storageKey);
         if (savedFormData) {
           const parsedData = JSON.parse(savedFormData) as ExtractOutput<
-            InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+            InferSchemaFromField<
+              TEndpoint["fields"],
+              FieldUsage.RequestData,
+              TEndpoint["types"]["ScopedTranslationKey"]
+            >
           >;
           // Merge saved data with schema defaults - defaults take precedence for undefined/null values
           const mergedData = mergeWithDefaults(parsedData, mergedDefaultValues);
@@ -376,7 +397,13 @@ export function useApiQueryForm<
         // In a production app, this would use a proper error logging service
       }
     })();
-  }, [formMethods, storageKey, persistForm, setQueryParams, mergedDefaultValues]);
+  }, [
+    formMethods,
+    storageKey,
+    persistForm,
+    setQueryParams,
+    mergedDefaultValues,
+  ]);
 
   // Save form values when they change
   useEffect(() => {
@@ -479,7 +506,11 @@ export function useApiQueryForm<
   // Force refetch when queryParams change (since useApiQuery doesn't auto-refetch)
   const prevQueryParamsRef = useRef<
     | ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+        InferSchemaFromField<
+          TEndpoint["fields"],
+          FieldUsage.RequestData,
+          TEndpoint["types"]["ScopedTranslationKey"]
+        >
       >
     | undefined
   >(undefined);
@@ -571,44 +602,84 @@ export function useApiQueryForm<
   // Create a submit handler that validates and submits the form
   const submitForm: SubmitFormFunction<
     ExtractOutput<
-      InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+      InferSchemaFromField<
+        TEndpoint["fields"],
+        FieldUsage.RequestData,
+        TEndpoint["types"]["ScopedTranslationKey"]
+      >
     >,
     ExtractOutput<
-      InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
+      InferSchemaFromField<
+        TEndpoint["fields"],
+        FieldUsage.Response,
+        TEndpoint["types"]["ScopedTranslationKey"]
+      >
     >,
     ExtractOutput<
-      InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
+      InferSchemaFromField<
+        TEndpoint["fields"],
+        FieldUsage.RequestUrlParams,
+        TEndpoint["types"]["ScopedTranslationKey"]
+      >
     >
   > = (
     inputOptions?: SubmitFormFunctionOptions<
       ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+        InferSchemaFromField<
+          TEndpoint["fields"],
+          FieldUsage.RequestData,
+          TEndpoint["types"]["ScopedTranslationKey"]
+        >
       >,
       ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
+        InferSchemaFromField<
+          TEndpoint["fields"],
+          FieldUsage.Response,
+          TEndpoint["types"]["ScopedTranslationKey"]
+        >
       >,
       ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
+        InferSchemaFromField<
+          TEndpoint["fields"],
+          FieldUsage.RequestUrlParams,
+          TEndpoint["types"]["ScopedTranslationKey"]
+        >
       >
     >,
   ): void => {
     // Create a properly typed options object with urlParamVariables
     const options: SubmitFormFunctionOptions<
       ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+        InferSchemaFromField<
+          TEndpoint["fields"],
+          FieldUsage.RequestData,
+          TEndpoint["types"]["ScopedTranslationKey"]
+        >
       >,
       ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
+        InferSchemaFromField<
+          TEndpoint["fields"],
+          FieldUsage.Response,
+          TEndpoint["types"]["ScopedTranslationKey"]
+        >
       >,
       ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
+        InferSchemaFromField<
+          TEndpoint["fields"],
+          FieldUsage.RequestUrlParams,
+          TEndpoint["types"]["ScopedTranslationKey"]
+        >
       >
     > = {
       ...(inputOptions || {}),
       urlParamVariables:
         inputOptions?.urlParamVariables ||
         ({} as ExtractOutput<
-          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
+          InferSchemaFromField<
+            TEndpoint["fields"],
+            FieldUsage.RequestUrlParams,
+            TEndpoint["types"]["ScopedTranslationKey"]
+          >
         >),
     };
     // Define the internal submit function that will be called after validation
@@ -650,12 +721,16 @@ export function useApiQueryForm<
         // This is safe because we're not depending on the previous value
         // and we're not in a concurrent environment where this would be an issue
         // This is a false positive for race conditions
-         
+
         lastSubmitTimeRef.current = Date.now();
 
         // Get form data
         const formData: ExtractOutput<
-          InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
+          InferSchemaFromField<
+            TEndpoint["fields"],
+            FieldUsage.RequestData,
+            TEndpoint["types"]["ScopedTranslationKey"]
+          >
         > = formMethods.getValues();
 
         // Clear any previous errors
@@ -699,7 +774,8 @@ export function useApiQueryForm<
               ({} as ExtractOutput<
                 InferSchemaFromField<
                   TEndpoint["fields"],
-                  FieldUsage.RequestUrlParams
+                  FieldUsage.RequestUrlParams,
+                  TEndpoint["types"]["ScopedTranslationKey"]
                 >
               >),
           });
@@ -732,7 +808,8 @@ export function useApiQueryForm<
               ({} as ExtractOutput<
                 InferSchemaFromField<
                   TEndpoint["fields"],
-                  FieldUsage.RequestUrlParams
+                  FieldUsage.RequestUrlParams,
+                  TEndpoint["types"]["ScopedTranslationKey"]
                 >
               >),
           });
@@ -742,7 +819,7 @@ export function useApiQueryForm<
         // This is safe because we're not depending on the previous value
         // and we're not in a concurrent environment where this would be an issue
         // This is a false positive for race conditions
-         
+
         isSubmittingRef.current = false;
       }
     };
@@ -771,7 +848,8 @@ export function useApiQueryForm<
               ({} as ExtractOutput<
                 InferSchemaFromField<
                   TEndpoint["fields"],
-                  FieldUsage.RequestUrlParams
+                  FieldUsage.RequestUrlParams,
+                  TEndpoint["types"]["ScopedTranslationKey"]
                 >
               >),
           });

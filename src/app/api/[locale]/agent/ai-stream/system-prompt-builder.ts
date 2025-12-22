@@ -6,9 +6,9 @@
 
 import "server-only";
 
+import { getCharacterById } from "@/app/api/[locale]/agent/chat/characters/repository";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { generateMemorySummary } from "@/app/api/[locale]/agent/chat/memories/repository";
-import { getPersonaById } from "@/app/api/[locale]/agent/chat/personas/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -59,7 +59,7 @@ export async function buildSystemPrompt(params: {
   } = params;
 
   logger.debug("Building system prompt", {
-    hasPersonaId: !!personaId,
+    hasCharacterId: !!personaId,
     hasUserId: !!userId,
     rootFolderId,
     subFolderId,
@@ -95,7 +95,7 @@ export async function buildSystemPrompt(params: {
   // Get persona system prompt if provided
   if (personaId) {
     try {
-      const persona = await getPersonaById(personaId, userId);
+      const persona = await getCharacterById(personaId, userId);
 
       if (persona) {
         logger.debug("Using persona system prompt", {
@@ -108,11 +108,11 @@ export async function buildSystemPrompt(params: {
           personaPrompt = persona.systemPrompt.trim();
         } else {
           logger.debug(
-            "Persona has empty system prompt, using default behavior",
+            "Character has empty system prompt, using default behavior",
           );
         }
       } else {
-        logger.warn("Persona not found, using default", { personaId });
+        logger.warn("Character not found, using default", { personaId });
       }
     } catch (error) {
       logger.error("Failed to load persona, using default", {
@@ -138,7 +138,7 @@ export async function buildSystemPrompt(params: {
 
   logger.debug("Built complete system prompt", {
     systemPromptLength: systemPrompt.length,
-    hasPersonaPrompt: !!personaPrompt,
+    hasCharacterPrompt: !!personaPrompt,
     hasMemories: !!memorySummary,
     callMode: callMode ?? false,
   });

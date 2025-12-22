@@ -18,6 +18,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
+import { CreditRepository } from "../../credits/repository";
 import { leads, userLeadLinks } from "../db";
 import { LeadSource, LeadStatus } from "../enum";
 
@@ -31,59 +32,15 @@ export interface ClientInfo {
 }
 
 /**
- * Lead Auth Repository Interface
+ * Lead Auth Repository
+ * Static class for all lead ID management and authentication integration
  */
-export interface LeadAuthRepository {
-  ensurePublicLeadId(
-    cookieLeadId: string | undefined,
-    clientInfo: ClientInfo,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<{ leadId: string; isNew: boolean }>;
-
-  getAuthenticatedUserLeadId(
-    userId: string,
-    cookieLeadId: string | undefined,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<{ leadId: string; shouldUpdateCookie: boolean }>;
-
-  linkLeadToUser(
-    leadId: string,
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>>;
-
-  validateLeadId(
-    leadId: string,
-    logger: EndpointLogger,
-  ): Promise<boolean>;
-
-  getOrCreateLeadId(
-    leadId: string | undefined,
-    clientInfo: ClientInfo,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<string>;
-
-  createLeadForUser(
-    userId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<string>;
-
-  getUserLeadIds(userId: string, logger: EndpointLogger): Promise<string[]>;
-}
-
-/**
- * Lead Auth Repository Implementation
- */
-class LeadAuthRepositoryImpl implements LeadAuthRepository {
+export class LeadAuthRepository {
   /**
    * Ensure public user has a valid leadId
    * Creates new lead if cookie missing or invalid
    */
-  async ensurePublicLeadId(
+  static async ensurePublicLeadId(
     cookieLeadId: string | undefined,
     clientInfo: ClientInfo,
     locale: CountryLanguage,
@@ -91,7 +48,10 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
   ): Promise<{ leadId: string; isNew: boolean }> {
     // If cookie has leadId, validate it
     if (cookieLeadId) {
-      const isValid = await this.validateLeadId(cookieLeadId, logger);
+      const isValid = await LeadAuthRepository.validateLeadId(
+        cookieLeadId,
+        logger,
+      );
       if (isValid) {
         logger.debug("Valid lead cookie found", { leadId: cookieLeadId });
         return { leadId: cookieLeadId, isNew: false };
@@ -100,7 +60,11 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
     }
 
     // Create new anonymous lead
-    const leadId = await this.createAnonymousLead(clientInfo, locale, logger);
+    const leadId = await LeadAuthRepository.createAnonymousLead(
+      clientInfo,
+      locale,
+      logger,
+    );
     logger.debug("Created new anonymous lead", { leadId });
     return { leadId, isNew: true };
   }
@@ -109,7 +73,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
    * Get leadId for authenticated user
    * With wallet-based system, we just get any linked lead (no primary concept)
    */
-  async getAuthenticatedUserLeadId(
+  static async getAuthenticatedUserLeadId(
     userId: string,
     cookieLeadId: string | undefined,
     locale: CountryLanguage,
@@ -124,7 +88,11 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
 
     if (!userLeadLink) {
       logger.debug("No lead found for user, creating one", { userId });
-      const newLeadId = await this.createLeadForUser(userId, locale, logger);
+      const newLeadId = await LeadAuthRepository.createLeadForUser(
+        userId,
+        locale,
+        logger,
+      );
       return {
         leadId: newLeadId,
         shouldUpdateCookie: true,
@@ -147,7 +115,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
    * Link leadId to user
    * Uses userLeadLinks table with UNIQUE constraint (prevents duplicates)
    */
-  async linkLeadToUser(
+  static async linkLeadToUser(
     leadId: string,
     userId: string,
     logger: EndpointLogger,
@@ -183,7 +151,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
   /**
    * Validate that leadId exists in database
    */
-  async validateLeadId(
+  static async validateLeadId(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<boolean> {
@@ -205,7 +173,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
    * Get or create leadId
    * Validates existing leadId or creates new one
    */
-  async getOrCreateLeadId(
+  static async getOrCreateLeadId(
     leadId: string | undefined,
     clientInfo: ClientInfo,
     locale: CountryLanguage,
@@ -213,7 +181,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
   ): Promise<string> {
     // If leadId provided, validate it
     if (leadId) {
-      const isValid = await this.validateLeadId(leadId, logger);
+      const isValid = await LeadAuthRepository.validateLeadId(leadId, logger);
       if (isValid) {
         return leadId;
       }
@@ -223,13 +191,17 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
     }
 
     // Create new lead
-    return await this.createAnonymousLead(clientInfo, locale, logger);
+    return await LeadAuthRepository.createAnonymousLead(
+      clientInfo,
+      locale,
+      logger,
+    );
   }
 
   /**
    * Create anonymous lead for website visitors
    */
-  private async createAnonymousLead(
+  private static async createAnonymousLead(
     clientInfo: ClientInfo,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -301,8 +273,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
     logger.debug("Created new anonymous lead", { leadId: newLead.id });
 
     // Create credit wallet for new lead (triggers via getLeadBalance)
-    const { creditRepository } = await import("../../credits/repository");
-    await creditRepository.getLeadBalance(newLead.id, logger);
+    await CreditRepository.getLeadBalance(newLead.id, logger);
 
     return newLead.id;
   }
@@ -310,7 +281,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
   /**
    * Create lead for user (when user has no leads)
    */
-  async createLeadForUser(
+  static async createLeadForUser(
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -411,7 +382,7 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
   /**
    * Get all leadIds for a user
    */
-  async getUserLeadIds(
+  static async getUserLeadIds(
     userId: string,
     logger: EndpointLogger,
   ): Promise<string[]> {
@@ -428,6 +399,3 @@ class LeadAuthRepositoryImpl implements LeadAuthRepository {
     }
   }
 }
-
-// Export singleton instance
-export const leadAuthRepository = new LeadAuthRepositoryImpl();

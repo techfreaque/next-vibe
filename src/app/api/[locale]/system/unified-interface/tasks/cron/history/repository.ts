@@ -27,21 +27,10 @@ import type {
 } from "./definition";
 
 /**
- * Repository interface
- */
-export interface CronHistoryRepository {
-  getTaskHistory(
-    data: CronHistoryRequestOutput,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronHistoryResponseOutput>>;
-}
-
-/**
  * Repository implementation
  */
-export class CronHistoryRepositoryImpl implements CronHistoryRepository {
-  async getTaskHistory(
+export class CronHistoryRepository {
+  static async getTaskHistory(
     data: CronHistoryRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -248,4 +237,3 @@ export class CronHistoryRepositoryImpl implements CronHistoryRepository {
 }
 
 // Export singleton instance
-export const cronHistoryRepository = new CronHistoryRepositoryImpl();

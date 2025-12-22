@@ -3,23 +3,23 @@
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import type { JSX } from "react";
 
-import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
+import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
 
 /**
  * Displays alert messages with configurable variants.
  * Value should be a translation key string.
  */
-export function AlertWidget({
+export function AlertWidget<TKey extends string>({
   value,
   field,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.ALERT>): JSX.Element | null {
-  const { t } = simpleT(context.locale);
+}: ReactWidgetProps<typeof WidgetType.ALERT, TKey>): JSX.Element | null {
+  const { t } = getTranslator(context);
   const { variant = "default" } = field.ui;
 
   let content: string | undefined;

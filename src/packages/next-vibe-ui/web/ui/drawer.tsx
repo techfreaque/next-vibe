@@ -84,33 +84,34 @@ const Drawer = ({
 );
 Drawer.displayName = "Drawer";
 
-const DrawerTrigger = React.forwardRef<DrawerTriggerRefObject, DrawerTriggerProps>(
-  ({ asChild, children }, ref) => {
-    const buttonRef = React.useRef<HTMLButtonElement>(null);
+const DrawerTrigger = React.forwardRef<
+  DrawerTriggerRefObject,
+  DrawerTriggerProps
+>(({ asChild, children }, ref) => {
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
 
-    React.useImperativeHandle(ref, (): DrawerTriggerRefObject => {
-      const element = buttonRef.current;
-      if (!element) {
-        return {
-          click: (): void => undefined,
-          focus: (): void => undefined,
-          blur: (): void => undefined,
-        };
-      }
+  React.useImperativeHandle(ref, (): DrawerTriggerRefObject => {
+    const element = buttonRef.current;
+    if (!element) {
       return {
-        click: (): void => element.click(),
-        focus: (): void => element.focus(),
-        blur: (): void => element.blur(),
+        click: (): void => undefined,
+        focus: (): void => undefined,
+        blur: (): void => undefined,
       };
-    }, []);
+    }
+    return {
+      click: (): void => element.click(),
+      focus: (): void => element.focus(),
+      blur: (): void => element.blur(),
+    };
+  }, []);
 
-    return (
-      <DrawerPrimitive.Trigger ref={buttonRef} asChild={asChild}>
-        {children}
-      </DrawerPrimitive.Trigger>
-    );
-  },
-);
+  return (
+    <DrawerPrimitive.Trigger ref={buttonRef} asChild={asChild}>
+      {children}
+    </DrawerPrimitive.Trigger>
+  );
+});
 DrawerTrigger.displayName = "DrawerTrigger";
 
 const DrawerPortal = DrawerPrimitive.Portal;

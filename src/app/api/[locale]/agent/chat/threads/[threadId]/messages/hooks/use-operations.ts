@@ -89,7 +89,7 @@ interface MessageOperationsDeps {
   };
   settings: {
     selectedModel: ModelId;
-    selectedPersona: string;
+    selectedCharacter: string;
     temperature: number;
     maxTokens: number;
     enabledToolIds: string[];
@@ -198,8 +198,9 @@ export function useMessageOperations(
         if (threadIdToUse) {
           let threadMessages: ChatMessage[] = [];
           if (currentRootFolderId === "incognito") {
-            const { getMessagesForThread } =
-              await import("../../../../incognito/storage");
+            const { getMessagesForThread } = await import(
+              "../../../../incognito/storage"
+            );
             threadMessages = await getMessagesForThread(threadIdToUse);
           } else {
             threadMessages = chatStore.getThreadMessages(threadIdToUse);
@@ -268,8 +269,12 @@ export function useMessageOperations(
         // Get voice mode settings for streaming TTS
         // Call mode is stored per model+persona combination
         const voiceModeSettings = useVoiceModeStore.getState().settings;
-        const callModeKey = getCallModeKey(settings.selectedModel, settings.selectedPersona ?? "default");
-        const isCallModeEnabled = voiceModeSettings.callModeByConfig?.[callModeKey] ?? false;
+        const callModeKey = getCallModeKey(
+          settings.selectedModel,
+          settings.selectedCharacter ?? "default",
+        );
+        const isCallModeEnabled =
+          voiceModeSettings.callModeByConfig?.[callModeKey] ?? false;
 
         // Voice mode for TTS: always stream TTS for voice input, but only auto-play if call mode is enabled
         // For text input, only enable TTS if call mode is enabled
@@ -299,7 +304,7 @@ export function useMessageOperations(
             content,
             role: ChatMessageRole.USER,
             model: settings.selectedModel,
-            persona: settings.selectedPersona ?? null,
+            character: settings.selectedCharacter ?? null,
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,
             tools:
@@ -339,8 +344,9 @@ export function useMessageOperations(
         // If stream failed with SSE error during streaming, the error is set in stream store
         // and we should NOT clear the input so user can try again
         // IMPORTANT: Use getState() to get current value from Zustand store
-        const { useAIStreamStore } =
-          await import("../../../../../ai-stream/hooks/store");
+        const { useAIStreamStore } = await import(
+          "../../../../../ai-stream/hooks/store"
+        );
         const streamError = useAIStreamStore.getState().error;
         if (streamError) {
           logger.warn("Message operations: Stream failed, preserving input", {
@@ -427,7 +433,7 @@ export function useMessageOperations(
             content: message.content,
             role: message.role,
             model: settings.selectedModel,
-            persona: settings.selectedPersona ?? null,
+            character: settings.selectedCharacter ?? null,
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,
             tools:
@@ -520,8 +526,12 @@ export function useMessageOperations(
 
         // Get voice mode settings for streaming TTS (same logic as sendMessage)
         const voiceModeSettings = useVoiceModeStore.getState().settings;
-        const callModeKey = getCallModeKey(settings.selectedModel, settings.selectedPersona ?? "default");
-        const isCallModeEnabled = voiceModeSettings.callModeByConfig?.[callModeKey] ?? false;
+        const callModeKey = getCallModeKey(
+          settings.selectedModel,
+          settings.selectedCharacter ?? "default",
+        );
+        const isCallModeEnabled =
+          voiceModeSettings.callModeByConfig?.[callModeKey] ?? false;
 
         // Voice mode for TTS: always stream TTS for voice input, but only auto-play if call mode is enabled
         const effectiveVoiceMode = audioInput
@@ -548,7 +558,7 @@ export function useMessageOperations(
             content: newContent,
             role: ChatMessageRole.USER,
             model: settings.selectedModel,
-            persona: settings.selectedPersona ?? null,
+            character: settings.selectedCharacter ?? null,
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,
             tools:
@@ -629,7 +639,7 @@ export function useMessageOperations(
             content,
             role: ChatMessageRole.ASSISTANT,
             model: settings.selectedModel,
-            persona: settings.selectedPersona ?? null,
+            character: settings.selectedCharacter ?? null,
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,
             tools:
@@ -728,8 +738,9 @@ export function useMessageOperations(
         }
 
         try {
-          const { deleteMessage: deleteIncognitoMessage } =
-            await import("../../../../incognito/storage");
+          const { deleteMessage: deleteIncognitoMessage } = await import(
+            "../../../../incognito/storage"
+          );
           deleteIncognitoMessage(messageId);
           logger.debug(
             "Message operations: Deleted incognito message from localStorage",

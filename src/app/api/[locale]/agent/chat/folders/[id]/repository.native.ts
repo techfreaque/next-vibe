@@ -1,16 +1,9 @@
 /**
  * Native Folder Repository
- * Implements folder operations for React Native
- *
- * POLYFILL PATTERN: This file makes folder operations work on native
- * by calling HTTP endpoints instead of direct database access using typesafe endpoint definitions.
+ * Implements FolderRepository static interface for React Native
  */
 
-import {
-  ErrorResponseTypes,
-  fail,
-  type ResponseType,
-} from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -23,24 +16,21 @@ import definitions, {
   type FolderUpdateRequestOutput,
   type FolderUpdateResponseOutput,
 } from "./definition";
-import type { IFolderRepository } from "./repository";
-
-const getFolderEndpoint = definitions.GET;
+import type { FolderRepositoryType } from "./repository";
 
 /**
- * Native folder repository implementation
- * Uses HTTP endpoints for React Native platform
+ * Native Folder Repository - Static class pattern
  */
-export class FolderNativeRepository implements IFolderRepository {
-  async getFolder(
+export class FolderRepository {
+  static async getFolder(
     // oxlint-disable-next-line no-unused-vars
-    user: JwtPayloadType,
+    _user: JwtPayloadType,
     data: { id: string },
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<FolderGetResponseOutput>> {
     const response = await nativeEndpoint(
-      getFolderEndpoint,
+      definitions.GET,
       { urlPathParams: { id: data.id } },
       logger,
       locale,
@@ -62,41 +52,31 @@ export class FolderNativeRepository implements IFolderRepository {
     };
   }
 
-  updateFolder(
+  static updateFolder(
     // oxlint-disable-next-line no-unused-vars
-    user: JwtPayloadType,
-    data: FolderUpdateRequestOutput & { id: string },
-    logger: EndpointLogger,
+    _user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars
+    _data: FolderUpdateRequestOutput & { id: string },
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<FolderUpdateResponseOutput>> {
-    logger.error("updateFolder not implemented on native", {
-      folderId: data.id,
-    });
-    return Promise.resolve(
-      fail({
-        message: "app.api.agent.chat.folders.id.patch.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { reason: "Not implemented for React Native" },
-      }),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("updateFolder is not implemented on native");
   }
 
-  deleteFolder(
+  static deleteFolder(
     // oxlint-disable-next-line no-unused-vars
-    user: JwtPayloadType,
-    data: { id: string },
-    logger: EndpointLogger,
+    _user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars
+    _data: { id: string },
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<FolderDeleteResponseOutput>> {
-    logger.error("deleteFolder not implemented on native", {
-      folderId: data.id,
-    });
-    return Promise.resolve(
-      fail({
-        message: "app.api.agent.chat.folders.id.delete.errors.server.title",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { reason: "Not implemented for React Native" },
-      }),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("deleteFolder is not implemented on native");
   }
 }
 
-export const folderNativeRepository = new FolderNativeRepository();
+// Compile-time type check
+const _typeCheck: FolderRepositoryType = FolderRepository;
+void _typeCheck;

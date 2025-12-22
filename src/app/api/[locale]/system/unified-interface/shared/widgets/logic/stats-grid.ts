@@ -41,9 +41,7 @@ export function extractStatsGridData(
 
   // Extract optional properties
   const columns =
-    "columns" in value && typeof value.columns === "number"
-      ? value.columns
-      : 3;
+    "columns" in value && typeof value.columns === "number" ? value.columns : 3;
   const title =
     "title" in value && typeof value.title === "string"
       ? value.title

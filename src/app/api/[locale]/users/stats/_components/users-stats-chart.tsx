@@ -9,13 +9,7 @@ import type { ChartDataType } from "next-vibe/shared/types/stats-filtering.schem
 import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import {
-  Area,
-  Axis,
-  Bar,
-  Chart,
-  Line,
-} from "next-vibe-ui/ui/chart";
+import { Area, Axis, Bar, Chart, Line } from "next-vibe-ui/ui/chart";
 import { Div } from "next-vibe-ui/ui/div";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
@@ -233,7 +227,6 @@ export function UsersStatsChart({
       return dataPoint;
     }) || [];
 
-
   // Determine chart type
   const chartType: ChartType = data.chartType || ChartType.LINE;
 
@@ -271,7 +264,12 @@ export function UsersStatsChart({
               y={series.name}
               interpolation="monotoneX"
               style={{
-                data: { fill: color, fillOpacity: 0.3, stroke: color, strokeWidth: 2 },
+                data: {
+                  fill: color,
+                  fillOpacity: 0.3,
+                  stroke: color,
+                  strokeWidth: 2,
+                },
               }}
             />
           );

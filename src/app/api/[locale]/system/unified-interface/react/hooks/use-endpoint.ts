@@ -1,15 +1,18 @@
 "use client";
-/* oxlint-disable oxlint-plugin-restricted/restricted-syntax -- Core endpoint hook needs 'unknown' for dynamic endpoint type handling. Foundational infrastructure for unified interface. */
 
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { useMemo } from "react";
-import type { z } from "zod";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+
+/**
+ * Options record type for endpoint configuration
+ * Uses WidgetData to avoid 'unknown' type restrictions
+ */
+type OptionsRecord = Record<string, WidgetData>;
 
 import type {
   EndpointReturn,
@@ -44,8 +47,7 @@ import { useEndpointRead } from "./use-endpoint-read";
  * @returns Object with all available operations based on endpoint methods
  */
 export function useEndpoint<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends Partial<Record<Methods, CreateApiEndpoint<any, any, any, any>>>,
+  T extends Partial<Record<Methods, CreateApiEndpointAny>>,
 >(
   endpoints: T,
   options: UseEndpointOptions<T> = {},
@@ -59,12 +61,7 @@ export function useEndpoint<
   const readEndpoint = endpoints.GET ?? null;
 
   type PrimaryEndpoint = T[keyof T & Methods] extends infer E
-    ? E extends CreateApiEndpoint<
-        string,
-        Methods,
-        readonly UserRoleValue[],
-        UnifiedField<z.ZodTypeAny>
-      >
+    ? E extends CreateApiEndpointAny
       ? E
       : never
     : never;
@@ -78,11 +75,11 @@ export function useEndpoint<
   // Merge endpoint options with hook options (hook options take priority)
   const mergedReadOptions = useMemo(() => {
     const endpointReadOptions = readEndpoint?.options as
-      | Record<string, unknown>
+      | OptionsRecord
       | undefined;
     return mergeReadOptions(
       endpointReadOptions,
-      options.read as Record<string, unknown> | undefined,
+      options.read as OptionsRecord | undefined,
     );
   }, [readEndpoint?.options, options.read]);
 
@@ -154,11 +151,11 @@ export function useEndpoint<
   // Merge endpoint create options with hook options (hook options take priority)
   const mergedCreateOptions = useMemo(() => {
     const endpointCreateOptions = primaryEndpoint?.options as
-      | Record<string, unknown>
+      | OptionsRecord
       | undefined;
     return mergeCreateOptions(
       endpointCreateOptions,
-      options.create as Record<string, unknown> | undefined,
+      options.create as OptionsRecord | undefined,
     );
   }, [primaryEndpoint?.options, options.create]);
 
@@ -210,11 +207,11 @@ export function useEndpoint<
   // Merge endpoint delete options with hook options (hook options take priority)
   const mergedDeleteOptions = useMemo(() => {
     const endpointDeleteOptions = deleteEndpoint?.options as
-      | Record<string, unknown>
+      | OptionsRecord
       | undefined;
     return mergeDeleteOptions(
       endpointDeleteOptions,
-      options.delete as Record<string, unknown> | undefined,
+      options.delete as OptionsRecord | undefined,
     );
   }, [deleteEndpoint?.options, options.delete]);
 

@@ -28,47 +28,14 @@ import type {
 } from "./definition";
 
 /**
- * Interface for folder repository operations
- */
-export interface IFolderRepository {
-  /**
-   * Get a single folder by ID
-   */
-  getFolder(
-    user: JwtPayloadType,
-    data: { id: string },
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<FolderGetResponseOutput>>;
-
-  /**
-   * Update a folder
-   */
-  updateFolder(
-    user: JwtPayloadType,
-    data: FolderUpdateRequestOutput & { id: string },
-    logger: EndpointLogger,
-  ): Promise<ResponseType<FolderUpdateResponseOutput>>;
-
-  /**
-   * Delete a folder (cascade deletes handled by database)
-   */
-  deleteFolder(
-    user: JwtPayloadType,
-    data: { id: string },
-    logger: EndpointLogger,
-  ): Promise<ResponseType<FolderDeleteResponseOutput>>;
-}
-
-/**
- * Server-side folder repository implementation
+ * Folder Repository - Static class pattern
  * Uses direct database access for folder operations
  */
-export class FolderRepository implements IFolderRepository {
+export class FolderRepository {
   /**
    * Get a single folder by ID
    */
-  async getFolder(
+  static async getFolder(
     user: JwtPayloadType,
     data: { id: string },
     logger: EndpointLogger,
@@ -130,7 +97,7 @@ export class FolderRepository implements IFolderRepository {
   /**
    * Update a folder
    */
-  async updateFolder(
+  static async updateFolder(
     user: JwtPayloadType,
     data: FolderUpdateRequestOutput & { id: string },
     logger: EndpointLogger,
@@ -266,7 +233,7 @@ export class FolderRepository implements IFolderRepository {
   /**
    * Delete a folder (cascade deletes handled by database)
    */
-  async deleteFolder(
+  static async deleteFolder(
     user: JwtPayloadType,
     data: { id: string },
     logger: EndpointLogger,
@@ -325,5 +292,8 @@ export class FolderRepository implements IFolderRepository {
   }
 }
 
-// Export singleton instance for convenience
-export const folderRepository = new FolderRepository();
+// Type for native repository type checking
+export type FolderRepositoryType = Pick<
+  typeof FolderRepository,
+  keyof typeof FolderRepository
+>;

@@ -13,7 +13,7 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import { contactClientRepository } from "../../../contact/repository-client";
 import { UserDetailLevel } from "../../enum";
-import { userRepository } from "../../repository";
+import { UserRepository } from "../../repository";
 import {
   type SignupPostRequestOutput,
   type SignupPostResponseOutput,
@@ -143,7 +143,7 @@ export const renderRegisterMail: EmailFunctionType<
   Record<string, string>
 > = async ({ requestData, locale, t, logger }) => {
   const baseUrl = env.NEXT_PUBLIC_APP_URL;
-  const userResponse = await userRepository.getUserByEmail(
+  const userResponse = await UserRepository.getUserByEmail(
     requestData.formCard.email,
     UserDetailLevel.STANDARD,
     locale,
@@ -483,7 +483,7 @@ export const renderAdminSignupNotification: EmailFunctionType<
   SignupPostResponseOutput,
   Record<string, string>
 > = async ({ requestData, locale, t, logger }) => {
-  const userResponse = await userRepository.getUserByEmail(
+  const userResponse = await UserRepository.getUserByEmail(
     requestData.formCard.email,
     UserDetailLevel.STANDARD,
     locale,

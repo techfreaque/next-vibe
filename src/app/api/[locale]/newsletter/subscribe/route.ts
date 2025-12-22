@@ -1,17 +1,14 @@
 /**
  * Newsletter Subscribe API Route
- * Subscribe to newsletter
+ * POST /api/[locale]/newsletter/subscribe
  */
-
-import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
 import { renderAdminNotificationMail, renderWelcomeMail } from "./email";
-import { newsletterSubscribeRepository as repository } from "./repository";
-import { sendAdminNotificationSms, sendWelcomeSms } from "./sms";
+import { NewsletterSubscribeRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
@@ -26,21 +23,7 @@ export const { POST, tools } = endpointsHandler({
         ignoreErrors: false,
       },
     ],
-    handler: async ({ data, user, locale, logger }) => {
-      const result = await repository.subscribe(data, user, locale, logger);
-
-      // Send SMS notifications after successful subscription (fire-and-forget)
-      if (result.success) {
-        sendWelcomeSms(data, user, locale, logger).catch(
-          (smsError: Error) =>
-            logger.debug("Welcome SMS failed but continuing", { smsError }),
-        );
-        sendAdminNotificationSms(data, user, locale, logger).catch(
-          (smsError: Error) =>
-            logger.debug("Admin SMS failed but continuing", { smsError }),
-        );
-      }
-      return result;
-    },
+    handler: ({ data, user, locale, logger }) =>
+      NewsletterSubscribeRepository.subscribe(data, user, locale, logger),
   },
 });

@@ -4,11 +4,9 @@
 
 import { useMemo } from "react";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import type {
   ApiQueryFormOptions,
   ApiQueryFormReturn,
@@ -32,15 +30,7 @@ import { useApiQueryForm } from "./use-api-query-form";
  * @param options - Form and query options
  * @returns Filter form for API interaction with enhanced error handling
  */
-export function useEndpointFilter<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
->(
+export function useEndpointFilter<TEndpoint extends CreateApiEndpointAny>(
   filterEndpoint: TEndpoint | null,
   logger: EndpointLogger,
   options: {
@@ -70,27 +60,34 @@ export function useEndpointFilter<
   } = options;
 
   // Merge initial filters with pagination and sorting
-  const enhancedFormOptions = useMemo(() => {
+  const enhancedFormOptions: ApiQueryFormOptions<
+    TEndpoint["types"]["RequestOutput"]
+  > = useMemo(() => {
     if (!filterEndpoint) {
       return formOptions;
     }
 
-    return {
+    const mergedDefaultValues: Partial<TEndpoint["types"]["RequestOutput"]> = {
       ...formOptions,
       defaultValues: {
         ...formOptions.defaultValues,
         ...initialFilters,
-      } as Partial<TEndpoint["types"]["RequestInput"]>, // Type assertion for form defaults
+      },
       // Generate storage key for form persistence
       persistenceKey:
         formOptions.persistenceKey ||
         // eslint-disable-next-line i18next/no-literal-string
         `filter-${filterEndpoint.path.join("-")}-${filterEndpoint.method}`,
     };
+    return mergedDefaultValues;
   }, [formOptions, initialFilters, filterEndpoint]);
 
   // Enhanced query options for filtering
-  const enhancedQueryOptions = useMemo(() => {
+  const enhancedQueryOptions: ApiQueryOptions<
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"]
+  > = useMemo(() => {
     return {
       enabled: true,
       refetchOnWindowFocus: false, // Don't refetch on focus for filters
@@ -105,9 +102,7 @@ export function useEndpointFilter<
     endpoint: filterEndpoint,
     urlPathParams: urlPathParams,
     queryOptions: enhancedQueryOptions,
-    formOptions: enhancedFormOptions as ApiQueryFormOptions<
-      TEndpoint["types"]["RequestOutput"]
-    >,
+    formOptions: enhancedFormOptions,
     logger: logger,
   });
 

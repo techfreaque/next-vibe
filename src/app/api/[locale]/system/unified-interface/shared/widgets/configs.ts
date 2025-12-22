@@ -8,8 +8,6 @@
 import type { Route } from "next";
 import type { z } from "zod";
 
-import type { TranslationKey } from "@/i18n/core/static-types";
-
 import type {
   FieldUsageConfig,
   InferSchemaFromField,
@@ -22,6 +20,13 @@ import type {
   SpacingSize,
   WidgetType,
 } from "../types/enums";
+
+/**
+ * NoInfer utility type - prevents TypeScript from inferring TKey from these positions.
+ * Forces TKey to be inferred from context (e.g., createEndpoint's TScopedTranslationKey)
+ * then validates these properties against that inferred type.
+ */
+type NoInfer<T> = [T][T extends T ? 0 : never];
 
 /**
  * Layout configuration for containers and widgets
@@ -43,35 +48,41 @@ export interface LayoutConfig {
 
 /**
  * Common widget properties
+ * TKey allows using either global TranslationKey or scoped translation keys
  */
-interface BaseWidgetConfig {
+interface BaseWidgetConfig<TKey extends string> {
   type: WidgetType;
   className?: string;
   order?: number;
+  /** Phantom type for translation key inference - never set at runtime */
+  _translationKeyType?: TKey;
 }
 
 /**
  * Prefill display configuration for form fields
  * When a field has a prefilled value from server/URL params, this controls how it's displayed
  */
-export interface PrefillDisplayConfig {
+export interface PrefillDisplayConfig<TKey extends string> {
   /** Display variant when field is prefilled */
   variant: "badge" | "highlight" | "card";
   /** Translation key for the label shown with prefilled value */
-  labelKey?: TranslationKey;
+  labelKey?: TKey;
   /** Icon to show with prefilled value */
   icon?: string;
 }
 
 /**
  * Common properties for form field widgets
+ * TKey allows using either global TranslationKey or scoped translation keys
+ * NoInfer on translation properties forces validation against context-inferred TKey
  */
-interface BaseFormFieldWidgetConfig extends BaseWidgetConfig {
+interface BaseFormFieldWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.FORM_FIELD;
-  label?: TranslationKey;
-  description?: TranslationKey;
-  placeholder?: TranslationKey;
-  helpText?: TranslationKey;
+  label?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
+  placeholder?: NoInfer<TKey>;
+  helpText?: NoInfer<TKey>;
   required?: boolean;
   disabled?: boolean;
   columns?: number;
@@ -84,7 +95,7 @@ interface BaseFormFieldWidgetConfig extends BaseWidgetConfig {
    * Configure how prefilled values are displayed when readonly
    * Only applies when field has a prefilled value
    */
-  prefillDisplay?: PrefillDisplayConfig;
+  prefillDisplay?: PrefillDisplayConfig<TKey>;
 }
 
 // ============================================================================
@@ -92,211 +103,262 @@ interface BaseFormFieldWidgetConfig extends BaseWidgetConfig {
 // ============================================================================
 
 // Text input
-export interface TextFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface TextFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TEXT;
 }
 
 // Email input
-export interface EmailFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface EmailFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.EMAIL;
 }
 
 // Password input
-export interface PasswordFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface PasswordFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.PASSWORD;
 }
 
 // Number input
-export interface NumberFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface NumberFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.NUMBER;
 }
 
 // Boolean/Checkbox input
-export interface BooleanFieldWidgetConfig extends Omit<
-  BaseFormFieldWidgetConfig,
-  "placeholder"
-> {
+export interface BooleanFieldWidgetConfig<TKey extends string>
+  extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
   fieldType: FieldDataType.BOOLEAN;
 }
 
 // Select dropdown
-export interface SelectFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface SelectFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.SELECT;
-  options: Array<{ label: TranslationKey; value: string | number }>;
+  options: Array<{ label: NoInfer<TKey>; value: string | number }>;
 }
 
 // Multi-select
-export interface MultiSelectFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface MultiSelectFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.MULTISELECT;
-  options: Array<{ label: TranslationKey; value: string | number }>;
+  options: Array<{ label: NoInfer<TKey>; value: string | number }>;
 }
 
 // Textarea
-export interface TextareaFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface TextareaFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TEXTAREA;
 }
 
 // Phone input
-export interface PhoneFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface PhoneFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.PHONE;
 }
 
 // URL input
-export interface UrlFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface UrlFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.URL;
 }
 
 // Integer input
-export interface IntFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface IntFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.INT;
 }
 
 // Date input
-export interface DateFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface DateFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.DATE;
 }
 
 // DateTime input
-export interface DateTimeFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface DateTimeFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.DATETIME;
 }
 
 // Time input
-export interface TimeFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface TimeFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TIME;
 }
 
 // File input
-export interface FileFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface FileFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.FILE;
 }
 
 // UUID input
-export interface UuidFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface UuidFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.UUID;
 }
 
 // JSON input
-export interface JsonFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface JsonFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.JSON;
 }
 
 // Date range input
-export interface DateRangeFieldWidgetConfig extends Omit<
-  BaseFormFieldWidgetConfig,
-  "placeholder"
-> {
+export interface DateRangeFieldWidgetConfig<TKey extends string>
+  extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
   fieldType: FieldDataType.DATE_RANGE;
 }
 
 // Time range input
-export interface TimeRangeFieldWidgetConfig extends Omit<
-  BaseFormFieldWidgetConfig,
-  "placeholder"
-> {
+export interface TimeRangeFieldWidgetConfig<TKey extends string>
+  extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
   fieldType: FieldDataType.TIME_RANGE;
 }
 
 // Timezone select
-export interface TimezoneFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface TimezoneFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TIMEZONE;
 }
 
 // Currency select
-export interface CurrencySelectFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface CurrencySelectFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.CURRENCY_SELECT;
 }
 
 // Language select
-export interface LanguageSelectFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface LanguageSelectFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.LANGUAGE_SELECT;
 }
 
 // Country select
-export interface CountrySelectFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface CountrySelectFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.COUNTRY_SELECT;
 }
 
 // Color picker
-export interface ColorFieldWidgetConfig extends Omit<
-  BaseFormFieldWidgetConfig,
-  "placeholder"
-> {
+export interface ColorFieldWidgetConfig<TKey extends string>
+  extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
   fieldType: FieldDataType.COLOR;
 }
 
+// Icon picker
+export interface IconFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
+  fieldType: FieldDataType.ICON;
+}
+
 // Slider input
-export interface SliderFieldWidgetConfig extends Omit<
-  BaseFormFieldWidgetConfig,
-  "placeholder"
-> {
+export interface SliderFieldWidgetConfig<TKey extends string>
+  extends Omit<BaseFormFieldWidgetConfig<TKey>, "placeholder"> {
   fieldType: FieldDataType.SLIDER;
 }
 
 // Tags input
-export interface TagsFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface TagsFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TAGS;
 }
 
 // Text array input
-export interface TextArrayFieldWidgetConfig extends BaseFormFieldWidgetConfig {
+export interface TextArrayFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TEXT_ARRAY;
 }
 
 // Union type for all form field widgets
-export type FormFieldWidgetConfig =
-  | TextFieldWidgetConfig
-  | EmailFieldWidgetConfig
-  | PasswordFieldWidgetConfig
-  | NumberFieldWidgetConfig
-  | BooleanFieldWidgetConfig
-  | SelectFieldWidgetConfig
-  | MultiSelectFieldWidgetConfig
-  | TextareaFieldWidgetConfig
-  | PhoneFieldWidgetConfig
-  | UrlFieldWidgetConfig
-  | IntFieldWidgetConfig
-  | DateFieldWidgetConfig
-  | DateTimeFieldWidgetConfig
-  | TimeFieldWidgetConfig
-  | FileFieldWidgetConfig
-  | UuidFieldWidgetConfig
-  | JsonFieldWidgetConfig
-  | DateRangeFieldWidgetConfig
-  | TimeRangeFieldWidgetConfig
-  | TimezoneFieldWidgetConfig
-  | CurrencySelectFieldWidgetConfig
-  | LanguageSelectFieldWidgetConfig
-  | CountrySelectFieldWidgetConfig
-  | ColorFieldWidgetConfig
-  | SliderFieldWidgetConfig
-  | TagsFieldWidgetConfig
-  | TextArrayFieldWidgetConfig;
+export type FormFieldWidgetConfig<TKey extends string> =
+  | TextFieldWidgetConfig<TKey>
+  | EmailFieldWidgetConfig<TKey>
+  | PasswordFieldWidgetConfig<TKey>
+  | NumberFieldWidgetConfig<TKey>
+  | BooleanFieldWidgetConfig<TKey>
+  | SelectFieldWidgetConfig<TKey>
+  | MultiSelectFieldWidgetConfig<TKey>
+  | TextareaFieldWidgetConfig<TKey>
+  | PhoneFieldWidgetConfig<TKey>
+  | UrlFieldWidgetConfig<TKey>
+  | IntFieldWidgetConfig<TKey>
+  | DateFieldWidgetConfig<TKey>
+  | DateTimeFieldWidgetConfig<TKey>
+  | TimeFieldWidgetConfig<TKey>
+  | FileFieldWidgetConfig<TKey>
+  | UuidFieldWidgetConfig<TKey>
+  | JsonFieldWidgetConfig<TKey>
+  | DateRangeFieldWidgetConfig<TKey>
+  | TimeRangeFieldWidgetConfig<TKey>
+  | TimezoneFieldWidgetConfig<TKey>
+  | CurrencySelectFieldWidgetConfig<TKey>
+  | LanguageSelectFieldWidgetConfig<TKey>
+  | CountrySelectFieldWidgetConfig<TKey>
+  | ColorFieldWidgetConfig<TKey>
+  | IconFieldWidgetConfig<TKey>
+  | SliderFieldWidgetConfig<TKey>
+  | TagsFieldWidgetConfig<TKey>
+  | TextArrayFieldWidgetConfig<TKey>;
 
-export interface FormGroupWidgetConfig extends BaseWidgetConfig {
+export interface FormGroupWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.FORM_GROUP;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
   layoutType?: LayoutType;
 }
 
-export interface FormSectionWidgetConfig extends BaseWidgetConfig {
+export interface FormSectionWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.FORM_SECTION;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
+}
+
+/**
+ * Filter Pills Widget Config
+ * Visual pill/chip radio button group for single-selection enums
+ * Renders as horizontal pill buttons with icons, similar to SELECT but with better UX
+ */
+export interface FilterPillsWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
+  type: WidgetType.FILTER_PILLS;
+  label?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
+  placeholder?: NoInfer<TKey>;
+  helpText?: NoInfer<TKey>;
+  required?: boolean;
+  disabled?: boolean;
+  readonly?: boolean;
+  options: Array<{
+    label: NoInfer<TKey>;
+    value: string | number;
+    icon?: string;
+    description?: NoInfer<TKey>;
+  }>;
+  layout?: {
+    wrap?: boolean;
+    gap?: "sm" | "md" | "lg";
+  };
+  showIcon?: boolean;
+  showLabel?: boolean;
 }
 
 // ============================================================================
 // DATA DISPLAY WIDGETS
 // ============================================================================
 
-export interface DataTableWidgetConfig extends BaseWidgetConfig {
+export interface DataTableWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.DATA_TABLE;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
   columns?: Array<{
     key: string; // Field name from the data object (e.g., "id", "name", "email")
-    label: TranslationKey;
+    label: NoInfer<TKey>;
     sortable?: boolean;
     width?: string | number;
     align?: "left" | "center" | "right";
@@ -319,10 +381,11 @@ export interface DataTableWidgetConfig extends BaseWidgetConfig {
   };
 }
 
-export interface DataCardsWidgetConfig extends BaseWidgetConfig {
+export interface DataCardsWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.DATA_CARDS;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
   // Card field mapping - these are field names from child objects to display in card layout
   cardTitle?: string; // Field name to use as card title (e.g., "name", "title")
   cardSubtitle?: string; // Field name to use as card subtitle (e.g., "email", "description")
@@ -341,25 +404,28 @@ export interface DataCardsWidgetConfig extends BaseWidgetConfig {
   };
 }
 
-export interface DataListWidgetConfig extends BaseWidgetConfig {
+export interface DataListWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.DATA_LIST;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
   optional?: boolean;
   renderMode?: string;
   hierarchical?: boolean;
 }
 
-export interface DataGridWidgetConfig extends BaseWidgetConfig {
+export interface DataGridWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.DATA_GRID;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
 }
 
-export interface GroupedListWidgetConfig extends BaseWidgetConfig {
+export interface GroupedListWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.GROUPED_LIST;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
   groupBy?: string; // Field name from data object to group by (e.g., "file", "status", "category")
   sortBy?: string; // Field name from data object to sort by (e.g., "severity", "createdAt", "name")
   columns?: number;
@@ -367,10 +433,11 @@ export interface GroupedListWidgetConfig extends BaseWidgetConfig {
   renderMode?: string;
 }
 
-export interface CodeQualityListWidgetConfig extends BaseWidgetConfig {
+export interface CodeQualityListWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.CODE_QUALITY_LIST;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
   groupBy?: string; // Field name from data object to group by (e.g., "file", "code")
   sortBy?: string; // Field name from data object to sort by (e.g., "severity")
   showSummary?: boolean;
@@ -378,10 +445,11 @@ export interface CodeQualityListWidgetConfig extends BaseWidgetConfig {
   layoutType?: LayoutType;
 }
 
-export interface MetadataCardWidgetConfig extends BaseWidgetConfig {
+export interface MetadataCardWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.METADATA_CARD;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
 }
 
 // ============================================================================
@@ -392,62 +460,59 @@ export interface MetadataCardWidgetConfig extends BaseWidgetConfig {
  * Helper to infer request/response schemas from children
  * Creates a minimal ObjectField-like structure for type inference
  */
-interface InferSchemasFromChildren<TChildren, TUsage extends FieldUsageConfig> {
+interface InferSchemasFromChildren<
+  TChildren,
+  TUsage extends FieldUsageConfig,
+  TTranslationKey extends string = string,
+> {
   request: z.output<
     InferSchemaFromField<
-      ObjectField<TChildren, TUsage, ContainerWidgetConfig>,
-      FieldUsage.RequestData
+      ObjectField<
+        TChildren,
+        TUsage,
+        TTranslationKey,
+        ContainerWidgetConfig<TTranslationKey>
+      >,
+      FieldUsage.RequestData,
+      TTranslationKey
     >
   >;
   response: z.output<
     InferSchemaFromField<
-      ObjectField<TChildren, TUsage, ContainerWidgetConfig>,
-      FieldUsage.Response
+      ObjectField<
+        TChildren,
+        TUsage,
+        TTranslationKey,
+        ContainerWidgetConfig<TTranslationKey>
+      >,
+      FieldUsage.Response,
+      TTranslationKey
     >
   >;
 }
 
 /**
- * Typed Container Widget Config with inferred request/response types
- * TChildren should be the record of child fields passed to objectField
- * TUsage should be the usage config passed to objectField
+ * Base Container Widget Config - shared properties without getCount
+ * Used as the base for both typed and untyped container configs
  */
-export interface TypedContainerWidgetConfig<
-  TChildren = Record<string, never>,
-  TUsage extends FieldUsageConfig = FieldUsageConfig,
-> extends BaseWidgetConfig {
+interface ContainerWidgetConfigBase<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.CONTAINER;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
   layoutType?: LayoutType;
   layout?: LayoutConfig;
   columns?: number;
   /** Tailwind spacing value for gap between children (0, 1, 2, 3, 4, 6, 8) */
   gap?: "0" | "1" | "2" | "3" | "4" | "6" | "8";
+  /** Tailwind spacing value for top padding (0, 2, 3, 4, 6, 8) */
+  paddingTop?: "0" | "2" | "3" | "4" | "6" | "8";
   optional?: boolean;
   icon?: string;
   border?: boolean;
   spacing?: "compact" | "normal" | "relaxed";
   /** Render without Card wrapper for inline layouts */
   noCard?: boolean;
-  /**
-   * Type-safe function to extract count from data for title display (e.g., "Leads (42)")
-   * Types are inferred from the field children and usage
-   *
-   * @param data - Object containing request and response data
-   * @param data.request - Request data (typed from requestSchema)
-   * @param data.response - Response data (typed from responseSchema)
-   * @returns The count to display in the title, or undefined to not show a count
-   *
-   * @example
-   * ```typescript
-   * getCount: (data) => data.response?.paginationInfo?.total
-   * ```
-   */
-  getCount?: (data: {
-    request?: InferSchemasFromChildren<TChildren, TUsage>["request"];
-    response?: InferSchemasFromChildren<TChildren, TUsage>["response"];
-  }) => number | undefined;
   /**
    * Submit/Refresh button configuration for the container
    * Rendered in the header next to the title when position is "header"
@@ -466,9 +531,9 @@ export interface TypedContainerWidgetConfig<
    */
   submitButton?: {
     /** Submit button text translation key */
-    text?: TranslationKey;
+    text?: TKey;
     /** Submit button loading text translation key */
-    loadingText?: TranslationKey;
+    loadingText?: TKey;
     /** Submit button position - 'bottom' (default) or 'header' */
     position?: "bottom" | "header";
     /** Icon identifier (e.g., "refresh-cw", "save", "send") */
@@ -502,51 +567,97 @@ export interface TypedContainerWidgetConfig<
 }
 
 /**
- * Container Widget Config - untyped version for backward compatibility
- * When you don't have access to TChildren/TUsage, use this simpler version
+ * Container Widget Config - permissive version for use in WidgetConfig union
+ * getCount accepts any data structure to allow proper inference in objectField
  */
-export type ContainerWidgetConfig = TypedContainerWidgetConfig<
-  Record<string, never>,
-  FieldUsageConfig
->;
+export interface ContainerWidgetConfig<TKey extends string>
+  extends ContainerWidgetConfigBase<TKey> {
+  /**
+   * Function to extract count from data for title display (e.g., "Leads (42)")
+   * Type is permissive here - proper typing happens in objectField return type
+   *
+   * @example
+   * ```typescript
+   * getCount: (data) => data.response?.paginationInfo?.total
+   * ```
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getCount?: (data: { request?: any; response?: any }) => number | undefined;
+}
 
-export interface SectionWidgetConfig extends BaseWidgetConfig {
+/**
+ * Typed Container Widget Config with inferred request/response types
+ * TChildren should be the record of child fields passed to objectField
+ * TUsage should be the usage config passed to objectField
+ * TKey allows using either global TranslationKey or scoped translation keys
+ */
+export interface TypedContainerWidgetConfig<
+  TKey extends string,
+  TChildren = Record<string, never>,
+  TUsage extends FieldUsageConfig = FieldUsageConfig,
+> extends ContainerWidgetConfigBase<TKey> {
+  /**
+   * Type-safe function to extract count from data for title display (e.g., "Leads (42)")
+   * Types are inferred from the field children and usage
+   *
+   * @param data - Object containing request and response data
+   * @param data.request - Request data (typed from requestSchema)
+   * @param data.response - Response data (typed from responseSchema)
+   * @returns The count to display in the title, or undefined to not show a count
+   *
+   * @example
+   * ```typescript
+   * getCount: (data) => data.response?.paginationInfo?.total
+   * ```
+   */
+  getCount?: (data: {
+    request?: InferSchemasFromChildren<TChildren, TUsage>["request"];
+    response?: InferSchemasFromChildren<TChildren, TUsage>["response"];
+  }) => number | undefined;
+}
+
+export interface SectionWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.SECTION;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
   layoutType?: LayoutType;
 }
 
-export interface TabsWidgetConfig extends BaseWidgetConfig {
+export interface TabsWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.TABS;
-  title?: TranslationKey;
+  title?: NoInfer<TKey>;
   tabs?: Array<{
     id: string;
-    label: TranslationKey;
+    label: NoInfer<TKey>;
   }>;
 }
 
-export interface AccordionWidgetConfig extends BaseWidgetConfig {
+export interface AccordionWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.ACCORDION;
-  title?: TranslationKey;
+  title?: NoInfer<TKey>;
 }
 
 // ============================================================================
 // CONTENT WIDGETS
 // ============================================================================
 
-export interface TitleWidgetConfig extends BaseWidgetConfig {
+export interface TitleWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.TITLE;
-  content: TranslationKey;
+  content: TKey;
   level?: 1 | 2 | 3 | 4 | 5 | 6;
   fieldType?: FieldDataType;
 }
 
-export interface TextWidgetConfig extends BaseWidgetConfig {
+export interface TextWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.TEXT;
-  content: TranslationKey;
+  content: TKey;
   fieldType?: FieldDataType;
-  label?: TranslationKey;
+  label?: NoInfer<TKey>;
   variant?: "default" | "error" | "info" | "success" | "warning";
   multiline?: boolean;
   emphasis?: "bold" | "italic" | "underline";
@@ -556,53 +667,60 @@ export interface TextWidgetConfig extends BaseWidgetConfig {
   textAlign?: "left" | "center" | "right";
 }
 
-export interface BadgeWidgetConfig extends BaseWidgetConfig {
+export interface BadgeWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.BADGE;
-  text?: TranslationKey; // Static text - use when displaying a fixed label
-  enumOptions?: Array<{ label: TranslationKey; value: string | number }>; // Dynamic enum mapping - use when displaying enum values
+  text?: TKey; // Static text - use when displaying a fixed label
+  enumOptions?: Array<{ label: NoInfer<TKey>; value: string | number }>; // Dynamic enum mapping - use when displaying enum values
   variant?: "default" | "success" | "warning" | "error" | "info";
 }
 
-export interface AvatarWidgetConfig extends BaseWidgetConfig {
+export interface AvatarWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.AVATAR;
   src?: string; // Field name containing avatar URL (e.g., "avatarUrl", "imageUrl") or literal URL
-  alt?: TranslationKey;
+  alt?: TKey;
   fallback?: string; // Fallback text/initials to display if image fails (e.g., "JD", "?")
 }
 
-export interface MarkdownWidgetConfig extends BaseWidgetConfig {
+export interface MarkdownWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.MARKDOWN;
-  content: TranslationKey;
+  content: TKey;
 }
 
-export interface MarkdownEditorWidgetConfig extends BaseWidgetConfig {
+export interface MarkdownEditorWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.MARKDOWN_EDITOR;
-  label?: TranslationKey;
-  placeholder?: TranslationKey;
+  label?: NoInfer<TKey>;
+  placeholder?: NoInfer<TKey>;
 }
 
-export interface LinkWidgetConfig extends BaseWidgetConfig {
+export interface LinkWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.LINK;
   href: Route | string; // URL path or route
-  text?: TranslationKey; // Link text to display
-  label?: TranslationKey; // Accessible label (aria-label) - use if text is not descriptive
+  text?: TKey; // Link text to display
+  label?: NoInfer<TKey>; // Accessible label (aria-label) - use if text is not descriptive
   external?: boolean; // Opens in new tab if true
 }
 
-export interface LinkCardWidgetConfig extends BaseWidgetConfig {
+export interface LinkCardWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.LINK_CARD;
   href: Route | string;
-  title: TranslationKey;
-  description?: TranslationKey;
+  title: TKey;
+  description?: NoInfer<TKey>;
   external?: boolean;
 }
 
-export interface LinkListWidgetConfig extends BaseWidgetConfig {
+export interface LinkListWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.LINK_LIST;
-  title?: TranslationKey;
+  title?: NoInfer<TKey>;
   links?: Array<{
     href: Route | string;
-    text: TranslationKey;
+    text: TKey;
     external?: boolean;
   }>;
   layoutType?: LayoutType;
@@ -610,10 +728,11 @@ export interface LinkListWidgetConfig extends BaseWidgetConfig {
 }
 
 // Data-driven card - renders object data as a card with link capability
-export interface DataCardWidgetConfig extends BaseWidgetConfig {
+export interface DataCardWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.DATA_CARD;
-  title?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
   linkable?: boolean; // If true, looks for href/url field in children
   layoutType?: LayoutType;
   columns?: number;
@@ -627,27 +746,32 @@ export interface DataCardWidgetConfig extends BaseWidgetConfig {
 // They use literal values from data rather than translation keys.
 // These are NOT fully data-driven and are specialized for specific use cases.
 
-export interface FilePathWidgetConfig extends BaseWidgetConfig {
+export interface FilePathWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.FILE_PATH;
   path: string; // Literal file path from data (e.g., "src/app/page.tsx")
 }
 
-export interface LineNumberWidgetConfig extends BaseWidgetConfig {
+export interface LineNumberWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.LINE_NUMBER;
   line: number; // Literal line number from data
 }
 
-export interface ColumnNumberWidgetConfig extends BaseWidgetConfig {
+export interface ColumnNumberWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.COLUMN_NUMBER;
   column: number; // Literal column number from data
 }
 
-export interface CodeRuleWidgetConfig extends BaseWidgetConfig {
+export interface CodeRuleWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.CODE_RULE;
   rule: string; // Literal rule ID/name from data (e.g., "no-unused-vars", "typescript/no-explicit-any")
 }
 
-export interface CodeOutputWidgetConfig extends BaseWidgetConfig {
+export interface CodeOutputWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.CODE_OUTPUT;
   code?: string; // Literal code snippet from data
   language?: string; // Programming language for syntax highlighting
@@ -660,29 +784,33 @@ export interface CodeOutputWidgetConfig extends BaseWidgetConfig {
   summaryTemplate?: string;
 }
 
-export interface SeverityBadgeWidgetConfig extends BaseWidgetConfig {
+export interface SeverityBadgeWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.SEVERITY_BADGE;
   severity: "error" | "warning" | "info"; // Literal severity level from data
 }
 
-export interface MessageTextWidgetConfig extends BaseWidgetConfig {
+export interface MessageTextWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.MESSAGE_TEXT;
-  message: TranslationKey; // Message to display
+  message: TKey; // Message to display
 }
 
-export interface IssueCardWidgetConfig extends BaseWidgetConfig {
+export interface IssueCardWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.ISSUE_CARD;
-  title: TranslationKey;
-  description?: TranslationKey;
+  title: TKey;
+  description?: NoInfer<TKey>;
 }
 
 // ============================================================================
 // INTERACTIVE WIDGETS
 // ============================================================================
 
-export interface ButtonWidgetConfig extends BaseWidgetConfig {
+export interface ButtonWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.BUTTON;
-  text: TranslationKey;
+  text: TKey;
   variant?:
     | "default"
     | "primary"
@@ -693,33 +821,37 @@ export interface ButtonWidgetConfig extends BaseWidgetConfig {
   onClick?: string; // Action ID
 }
 
-export interface ButtonGroupWidgetConfig extends BaseWidgetConfig {
+export interface ButtonGroupWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.BUTTON_GROUP;
   buttons?: Array<{
-    text: TranslationKey;
+    text: TKey;
     onClick?: string;
   }>;
 }
 
-export interface ActionBarWidgetConfig extends BaseWidgetConfig {
+export interface ActionBarWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.ACTION_BAR;
   actions?: Array<{
-    text: TranslationKey;
+    text: TKey;
     onClick?: string;
   }>;
 }
 
-export interface PaginationInfoWidgetConfig extends BaseWidgetConfig {
+export interface PaginationInfoWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.PAGINATION_INFO;
   total?: number;
   page?: number;
   pageSize?: number;
 }
 
-export interface ActionListWidgetConfig extends BaseWidgetConfig {
+export interface ActionListWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.ACTION_LIST;
   actions?: Array<{
-    text: TranslationKey;
+    text: TKey;
     onClick?: string;
   }>;
 }
@@ -728,9 +860,10 @@ export interface ActionListWidgetConfig extends BaseWidgetConfig {
 // STATS WIDGETS
 // ============================================================================
 
-export interface MetricCardWidgetConfig extends BaseWidgetConfig {
+export interface MetricCardWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.METRIC_CARD;
-  title: TranslationKey;
+  title: TKey;
   value: string | number;
   change?: number;
   trend?: "up" | "down" | "neutral";
@@ -748,9 +881,10 @@ export interface MetricCardWidgetConfig extends BaseWidgetConfig {
  * Stat Widget Config - Simple stat display from field definition
  * Takes a numeric value and displays with label from field.ui.label
  */
-export interface StatWidgetConfig extends BaseWidgetConfig {
+export interface StatWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.STAT;
-  label?: TranslationKey;
+  label?: NoInfer<TKey>;
   format?: "number" | "percentage" | "currency" | "compact";
   icon?: string;
   variant?: "default" | "success" | "warning" | "danger" | "info" | "muted";
@@ -759,20 +893,22 @@ export interface StatWidgetConfig extends BaseWidgetConfig {
   size?: "sm" | "md" | "lg";
 }
 
-export interface StatsGridWidgetConfig extends BaseWidgetConfig {
+export interface StatsGridWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.STATS_GRID;
-  title?: TranslationKey;
+  title?: NoInfer<TKey>;
   stats?: Array<{
-    label: TranslationKey;
+    label: NoInfer<TKey>;
     value: string | number;
   }>;
 }
 
-export interface ChartWidgetConfig extends BaseWidgetConfig {
+export interface ChartWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.CHART;
-  title?: TranslationKey;
-  label?: TranslationKey;
-  description?: TranslationKey;
+  title?: NoInfer<TKey>;
+  label?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
   chartType?: "line" | "bar" | "pie" | "area" | "donut";
   xAxisLabel?: string;
   yAxisLabel?: string;
@@ -782,57 +918,65 @@ export interface ChartWidgetConfig extends BaseWidgetConfig {
   animate?: boolean;
 }
 
-export interface ProgressWidgetConfig extends BaseWidgetConfig {
+export interface ProgressWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.PROGRESS;
   value: number;
   max?: number;
-  label?: TranslationKey;
+  label?: NoInfer<TKey>;
 }
 
 // ============================================================================
 // STATUS WIDGETS
 // ============================================================================
 
-export interface LoadingWidgetConfig extends BaseWidgetConfig {
+export interface LoadingWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.LOADING;
-  message?: TranslationKey;
+  message?: TKey;
 }
 
-export interface ErrorWidgetConfig extends BaseWidgetConfig {
+export interface ErrorWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.ERROR;
-  title: TranslationKey;
-  message?: TranslationKey;
+  title: TKey;
+  message?: TKey;
 }
 
-export interface EmptyStateWidgetConfig extends BaseWidgetConfig {
+export interface EmptyStateWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.EMPTY_STATE;
-  title: TranslationKey;
-  message?: TranslationKey;
+  title: TKey;
+  message?: TKey;
   action?: {
-    text: TranslationKey;
+    text: TKey;
     onClick?: string;
   };
 }
 
-export interface StatusIndicatorWidgetConfig extends BaseWidgetConfig {
+export interface StatusIndicatorWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.STATUS_INDICATOR;
   status: "success" | "warning" | "error" | "info" | "pending";
-  label?: TranslationKey;
+  label?: NoInfer<TKey>;
 }
 
-export interface AlertWidgetConfig extends BaseWidgetConfig {
+export interface AlertWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.ALERT;
   variant?: "default" | "destructive" | "success" | "warning";
 }
 
-export interface FormAlertWidgetConfig extends BaseWidgetConfig {
+export interface FormAlertWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.FORM_ALERT;
 }
 
-export interface SubmitButtonWidgetConfig extends BaseWidgetConfig {
+export interface SubmitButtonWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.SUBMIT_BUTTON;
-  text?: TranslationKey;
-  loadingText?: TranslationKey;
+  text?: TKey;
+  loadingText?: TKey;
   icon?: string;
   variant?:
     | "default"
@@ -846,7 +990,8 @@ export interface SubmitButtonWidgetConfig extends BaseWidgetConfig {
 }
 
 // Password strength indicator
-export interface PasswordStrengthWidgetConfig extends BaseWidgetConfig {
+export interface PasswordStrengthWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
   type: WidgetType.PASSWORD_STRENGTH;
   /** Field name to watch for password value (defaults to "password") */
   watchField?: string;
@@ -857,9 +1002,12 @@ export interface PasswordStrengthWidgetConfig extends BaseWidgetConfig {
 // ============================================================================
 
 export interface CustomWidgetConfig<
-  TProps extends Record<string, string | number | boolean | null | undefined> =
-    Record<string, never>,
-> extends BaseWidgetConfig {
+  TKey extends string,
+  TProps extends Record<
+    string,
+    string | number | boolean | null | undefined
+  > = Record<string, never>,
+> extends BaseWidgetConfig<TKey> {
   type: WidgetType.CUSTOM;
   componentId: string;
   props?: TProps;
@@ -869,72 +1017,73 @@ export interface CustomWidgetConfig<
 // UNION TYPE FOR ALL WIDGET CONFIGS
 // ============================================================================
 
-export type WidgetConfig =
+export type WidgetConfig<TKey extends string> =
   // Form widgets
-  | FormFieldWidgetConfig
-  | FormGroupWidgetConfig
-  | FormSectionWidgetConfig
+  | FormFieldWidgetConfig<TKey>
+  | FormGroupWidgetConfig<TKey>
+  | FormSectionWidgetConfig<TKey>
+  | FilterPillsWidgetConfig<TKey>
   // Data display widgets
-  | DataTableWidgetConfig
-  | DataCardWidgetConfig
-  | DataCardsWidgetConfig
-  | DataListWidgetConfig
-  | DataGridWidgetConfig
-  | GroupedListWidgetConfig
-  | CodeQualityListWidgetConfig
-  | MetadataCardWidgetConfig
+  | DataTableWidgetConfig<TKey>
+  | DataCardWidgetConfig<TKey>
+  | DataCardsWidgetConfig<TKey>
+  | DataListWidgetConfig<TKey>
+  | DataGridWidgetConfig<TKey>
+  | GroupedListWidgetConfig<TKey>
+  | CodeQualityListWidgetConfig<TKey>
+  | MetadataCardWidgetConfig<TKey>
   // Layout widgets
-  | ContainerWidgetConfig
-  | SectionWidgetConfig
-  | TabsWidgetConfig
-  | AccordionWidgetConfig
+  | ContainerWidgetConfig<TKey>
+  | SectionWidgetConfig<TKey>
+  | TabsWidgetConfig<TKey>
+  | AccordionWidgetConfig<TKey>
   // Content widgets
-  | TitleWidgetConfig
-  | TextWidgetConfig
-  | BadgeWidgetConfig
-  | AvatarWidgetConfig
-  | MarkdownWidgetConfig
-  | MarkdownEditorWidgetConfig
-  | LinkWidgetConfig
-  | LinkCardWidgetConfig
-  | LinkListWidgetConfig
+  | TitleWidgetConfig<TKey>
+  | TextWidgetConfig<TKey>
+  | BadgeWidgetConfig<TKey>
+  | AvatarWidgetConfig<TKey>
+  | MarkdownWidgetConfig<TKey>
+  | MarkdownEditorWidgetConfig<TKey>
+  | LinkWidgetConfig<TKey>
+  | LinkCardWidgetConfig<TKey>
+  | LinkListWidgetConfig<TKey>
   // Specialized content widgets
-  | FilePathWidgetConfig
-  | LineNumberWidgetConfig
-  | ColumnNumberWidgetConfig
-  | CodeRuleWidgetConfig
-  | CodeOutputWidgetConfig
-  | SeverityBadgeWidgetConfig
-  | MessageTextWidgetConfig
-  | IssueCardWidgetConfig
+  | FilePathWidgetConfig<TKey>
+  | LineNumberWidgetConfig<TKey>
+  | ColumnNumberWidgetConfig<TKey>
+  | CodeRuleWidgetConfig<TKey>
+  | CodeOutputWidgetConfig<TKey>
+  | SeverityBadgeWidgetConfig<TKey>
+  | MessageTextWidgetConfig<TKey>
+  | IssueCardWidgetConfig<TKey>
   // Interactive widgets
-  | ButtonWidgetConfig
-  | ButtonGroupWidgetConfig
-  | ActionBarWidgetConfig
-  | PaginationInfoWidgetConfig
-  | ActionListWidgetConfig
+  | ButtonWidgetConfig<TKey>
+  | ButtonGroupWidgetConfig<TKey>
+  | ActionBarWidgetConfig<TKey>
+  | PaginationInfoWidgetConfig<TKey>
+  | ActionListWidgetConfig<TKey>
   // Stats widgets
-  | StatWidgetConfig
-  | MetricCardWidgetConfig
-  | StatsGridWidgetConfig
-  | ChartWidgetConfig
-  | ProgressWidgetConfig
+  | StatWidgetConfig<TKey>
+  | MetricCardWidgetConfig<TKey>
+  | StatsGridWidgetConfig<TKey>
+  | ChartWidgetConfig<TKey>
+  | ProgressWidgetConfig<TKey>
   // Status widgets
-  | LoadingWidgetConfig
-  | ErrorWidgetConfig
-  | EmptyStateWidgetConfig
-  | StatusIndicatorWidgetConfig
-  | AlertWidgetConfig
-  | FormAlertWidgetConfig
-  | SubmitButtonWidgetConfig
-  | PasswordStrengthWidgetConfig
+  | LoadingWidgetConfig<TKey>
+  | ErrorWidgetConfig<TKey>
+  | EmptyStateWidgetConfig<TKey>
+  | StatusIndicatorWidgetConfig<TKey>
+  | AlertWidgetConfig<TKey>
+  | FormAlertWidgetConfig<TKey>
+  | SubmitButtonWidgetConfig<TKey>
+  | PasswordStrengthWidgetConfig<TKey>
   // Custom widgets
-  | CustomWidgetConfig;
+  | CustomWidgetConfig<TKey, Record<string, never>>;
 
 /**
  * Extract widget config type from WidgetType enum
  */
-export type ExtractWidgetConfig<T extends WidgetType> = Extract<
-  WidgetConfig,
-  { type: T }
->;
+export type ExtractWidgetConfig<
+  T extends WidgetType,
+  TKey extends string,
+> = Extract<WidgetConfig<TKey>, { type: T }>;

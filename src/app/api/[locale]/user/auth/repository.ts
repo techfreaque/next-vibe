@@ -7,7 +7,6 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
-import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -20,25 +19,25 @@ import { redirect } from "next-vibe-ui/lib/redirect";
 
 import { cliEnv } from "@/app/api/[locale]/system/unified-interface/cli/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import {
-  AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
-  AUTH_TOKEN_COOKIE_NAME,
-} from "@/config/constants";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/config/constants";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
-import { leadAuthRepository } from "../../leads/auth/repository";
+import { LeadAuthRepository } from "../../leads/auth/repository";
 import { leads, userLeadLinks } from "../../leads/db";
 import { LeadSource, LeadStatus } from "../../leads/enum";
 import { db } from "../../system/db";
 import { type AuthContext } from "../../system/unified-interface/shared/server-only/auth/base-auth-handler";
 import { getPlatformAuthHandler } from "../../system/unified-interface/shared/server-only/auth/factory";
-import { isCliPlatform,Platform } from "../../system/unified-interface/shared/types/platform";
+import {
+  isCliPlatform,
+  Platform,
+} from "../../system/unified-interface/shared/types/platform";
 import { users } from "../db";
 import { UserDetailLevel } from "../enum";
-import { sessionRepository } from "../private/session/repository";
-import { userRepository } from "../repository";
+import { SessionRepository } from "../private/session/repository";
+import { UserRepository } from "../repository";
 import type { CompleteUserType } from "../types";
 import type { UserRoleValue } from "../user-roles/enum";
 import {
@@ -46,7 +45,7 @@ import {
   UserPermissionRole,
   UserRole,
 } from "../user-roles/enum";
-import { userRolesRepository } from "../user-roles/repository";
+import { UserRolesRepository } from "../user-roles/repository";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -91,140 +90,78 @@ function createPrivateUser<TRoles extends readonly UserRoleValue[]>(
 }
 
 /**
- * Unified Auth Repository Interface with type-safe authentication
- * Platform-agnostic authentication business logic
+ * Module-level secret key for JWT operations
  */
-export interface AuthRepository {
-  /**
-   * Sign a JWT token
-   */
-  signJwt(
-    payload: JwtPrivatePayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<string>>;
-
-  /**
-   * Verify a JWT token
-   */
-  verifyJwt(
-    token: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<JwtPrivatePayloadType>>;
-
-  /**
-   * Get current user (platform-aware)
-   */
-  getCurrentUser(
-    context: AuthContext,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<JwtPrivatePayloadType>>;
-
-  /**
-   * Get authenticated user with role checking (platform-aware) - returns generic type
-   */
-  getAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
-    roles: TRoles,
-    context: AuthContext,
-    logger: EndpointLogger,
-  ): Promise<InferUserType<TRoles>>;
-
-  /**
-   * Get user roles (platform-aware)
-   */
-  getUserRoles(
-    requiredRoles: readonly UserRoleValue[],
-    context: AuthContext,
-    logger: EndpointLogger,
-  ): Promise<UserRoleValue[]>;
-
-  /**
-   * Store authentication token using platform-specific handler
-   * Automatically detects platform from request context
-   */
-  storeAuthTokenForPlatform(
-    token: string,
-    userId: string,
-    leadId: string,
-    platform: Platform,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>>;
-
-  /**
-   * Clear authentication token using platform-specific handler
-   */
-  clearAuthTokenForPlatform(
-    platform: Platform,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>>;
-
-  /**
-   * Create CLI token
-   */
-  createCliToken(
-    userId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<string>>;
-
-  /**
-   * Validate CLI token (stateless)
-   */
-  validateCliToken(
-    token: string,
-    logger: EndpointLogger,
-  ): Promise<JwtPrivatePayloadType | null>;
-
-  /**
-   * Safely extract user ID from JWT payload
-   */
-  extractUserId(payload: JwtPrivatePayloadType): string | null;
-
-  /**
-   * Safely extract user ID from JWT payload or throw error
-   */
-  requireUserId(payload: JwtPrivatePayloadType): string;
-
-  /**
-   * Require admin user authentication and redirect to login if not authenticated or not admin
-   */
-  requireAdminUser(
-    locale: CountryLanguage,
-    callbackUrl: string,
-    logger: EndpointLogger,
-  ): Promise<CompleteUserType>;
-
-  /**
-   * Authenticate user by email (for CLI authentication)
-   * Returns JWT payload for authenticated user
-   */
-  authenticateUserByEmail(
-    email: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<JwtPrivatePayloadType>>;
-}
+const SECRET_KEY: Uint8Array = new TextEncoder().encode(env.JWT_SECRET_KEY);
 
 /**
- * Unified Auth Repository Implementation
+ * Unified Auth Repository - Static class pattern
  * Contains all authentication business logic consolidated from handlers and core
  * Platform-agnostic - delegates to platform handlers for storage
  */
-class AuthRepositoryImpl implements AuthRepository {
-  private readonly secretKey: Uint8Array = new TextEncoder().encode(
-    env.JWT_SECRET_KEY,
-  );
+export class AuthRepository {
+  /**
+   * Update lead ID cookie (for API routes only, not pages)
+   * This is called when a new lead is created for a public user
+   * IMPORTANT: Lead ID cookie NEVER expires - it persists across all sessions
+   */
+  private static async updateLeadIdCookieIfPossible(
+    leadId: string,
+    platform: Platform,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    // Only update cookies in API route context, not in page context
+    if (platform !== Platform.NEXT_API) {
+      logger.debug("Skipping cookie update (not in API context)", { platform });
+      return;
+    }
+
+    try {
+      const { cookies } = await import("next/headers");
+      const { LEAD_ID_COOKIE_NAME } = await import("@/config/constants");
+      const { env } = await import("@/config/env");
+      const { Environment } = await import("next-vibe/shared/utils");
+
+      const cookieStore = await cookies();
+      cookieStore.set({
+        name: LEAD_ID_COOKIE_NAME,
+        value: leadId,
+        httpOnly: false, // Needs to be readable by client
+        path: "/",
+        secure: env.NODE_ENV === Environment.PRODUCTION,
+        sameSite: "lax" as const,
+        maxAge: 365 * 24 * 60 * 60 * 10, // 10 years (effectively permanent)
+      });
+
+      logger.info("Updated lead ID cookie after creating new lead", { leadId });
+    } catch (error) {
+      // Cookie update might fail in some contexts
+      // This is not critical, the middleware will set it on next request
+      logger.debug("Could not update lead ID cookie", {
+        leadId,
+        error: parseError(error).message,
+      });
+    }
+  }
 
   /**
    * Get leadId from database (platform-agnostic)
    * Note: This method should not access cookies directly - platform handlers manage storage
+   * Returns both the leadId and a flag indicating if the cookie should be updated
    */
-  private async getLeadIdFromDb(
+  private static async getLeadIdFromDb(
     userId: string | undefined,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<string | null> {
+    platform?: Platform,
+  ): Promise<{ leadId: string | null; shouldUpdateCookie: boolean }> {
     if (userId) {
-      return await this.getLeadIdForUser(userId, locale, logger);
+      const leadId = await AuthRepository.getLeadIdForUser(
+        userId,
+        locale,
+        logger,
+      );
+      return { leadId, shouldUpdateCookie: false };
     }
 
     // For public users, use the platform handler to check cookies first
@@ -234,11 +171,9 @@ class AuthRepositoryImpl implements AuthRepository {
     const cookieStore = await cookies();
     const existingLeadId = cookieStore.get(LEAD_ID_COOKIE_NAME)?.value;
 
-    // Use leadAuthRepository to validate and reuse existing leadId
-    const { leadAuthRepository } = await import("../../leads/auth/repository");
-
+    // Use LeadAuthRepository to validate and reuse existing leadId
     if (existingLeadId) {
-      const isValid = await leadAuthRepository.validateLeadId(
+      const isValid = await LeadAuthRepository.validateLeadId(
         existingLeadId,
         logger,
       );
@@ -246,18 +181,43 @@ class AuthRepositoryImpl implements AuthRepository {
         logger.debug("Reusing existing leadId from cookie for public user", {
           leadId: existingLeadId,
         });
-        return existingLeadId;
+        return { leadId: existingLeadId, shouldUpdateCookie: false };
       }
-      logger.debug("Invalid leadId in cookie, creating new one", {
-        invalidLeadId: existingLeadId,
-      });
+      logger.warn(
+        "Invalid leadId in cookie (possibly after DB reset), creating new one",
+        {
+          invalidLeadId: existingLeadId,
+          platform,
+        },
+      );
     }
 
-    // No valid leadId in cookie, create a new one
-    return await this.getLeadIdForPublicUser(locale, logger);
+    // For page context, don't create new leads - return null and let middleware handle it
+    // Pages can't set cookies, so creating a lead here would be wasted
+    if (platform === Platform.NEXT_PAGE) {
+      logger.debug(
+        "Skipping lead creation in page context (middleware will handle)",
+        {
+          platform,
+        },
+      );
+      // Return the invalid leadId temporarily - middleware will fix it on next request
+      return { leadId: existingLeadId || null, shouldUpdateCookie: false };
+    }
+
+    // No valid leadId in cookie, create a new one and flag that cookie needs update
+    const newLeadId = await AuthRepository.getLeadIdForPublicUser(
+      locale,
+      logger,
+    );
+    logger.info("Created new lead for public user, cookie will be updated", {
+      leadId: newLeadId,
+      platform,
+    });
+    return { leadId: newLeadId, shouldUpdateCookie: true };
   }
 
-  async getPrimaryLeadId(userId: string): Promise<string | null> {
+  static async getPrimaryLeadId(userId: string): Promise<string | null> {
     const [userLeadLink] = await db
       .select()
       .from(userLeadLinks)
@@ -267,7 +227,7 @@ class AuthRepositoryImpl implements AuthRepository {
     return userLeadLink?.leadId || null;
   }
 
-  async getAllLeadIds(userId: string): Promise<string[]> {
+  static async getAllLeadIds(userId: string): Promise<string[]> {
     const userLeadRecords = await db
       .select({ leadId: userLeadLinks.leadId })
       .from(userLeadLinks)
@@ -279,7 +239,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Validate user exists and session is active
    * Implements BaseAuthHandler.validateSession
    */
-  async validateSession(
+  static async validateSession(
     token: string,
     userId: string,
     locale: CountryLanguage,
@@ -287,7 +247,7 @@ class AuthRepositoryImpl implements AuthRepository {
   ): Promise<JwtPrivatePayloadType | null> {
     try {
       // Validate that the user ID from the JWT token still exists in the database
-      const userExistsResponse = await userRepository.exists(userId, logger);
+      const userExistsResponse = await UserRepository.exists(userId, logger);
       if (!userExistsResponse.success || !userExistsResponse.data) {
         logger.debug("app.api.user.auth.debug.userIdNotExistsInDb", {
           userId,
@@ -296,7 +256,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // Validate that the session exists in the database
-      const sessionResponse = await sessionRepository.findByToken(token);
+      const sessionResponse = await SessionRepository.findByToken(token);
       if (!sessionResponse.success) {
         logger.debug("app.api.user.auth.debug.sessionNotFound", {
           userId,
@@ -313,18 +273,23 @@ class AuthRepositoryImpl implements AuthRepository {
           expiresAt: session.expiresAt,
         });
         // Delete expired session from database
-        await sessionRepository.deleteByUserId(userId);
+        await SessionRepository.deleteByUserId(userId);
         return null;
       }
 
-      const leadId = await this.getLeadIdFromDb(userId, locale, logger);
+      const { leadId } = await AuthRepository.getLeadIdFromDb(
+        userId,
+        locale,
+        logger,
+        undefined,
+      );
       if (!leadId) {
         logger.error("Failed to get or create lead for user", { userId });
         return null;
       }
 
       // Fetch user roles
-      const userRolesResponse = await userRolesRepository.findByUserId(
+      const userRolesResponse = await UserRolesRepository.findByUserId(
         userId,
         logger,
       );
@@ -349,7 +314,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * @param logger - Logger for debugging
    * @returns User roles or empty array
    */
-  private async getUserRolesInternal(
+  private static async getUserRolesInternal(
     userId: string,
     requiredRoles: readonly UserRoleValue[],
     logger: EndpointLogger,
@@ -363,7 +328,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // Check for other roles in database (e.g., ADMIN, MODERATOR)
-      const userRolesResponse = await userRolesRepository.findByUserId(
+      const userRolesResponse = await UserRolesRepository.findByUserId(
         userId,
         logger,
       );
@@ -420,7 +385,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * @param logger - Logger for debugging
    * @returns leadId
    */
-  private async getLeadIdForUser(
+  private static async getLeadIdForUser(
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -439,18 +404,18 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // Create new lead if none exists
-      return await this.createLeadForUser(userId, locale, logger);
+      return await AuthRepository.createLeadForUser(userId, locale, logger);
     } catch (error) {
       logger.error(
         "app.api.user.auth.debug.errorGettingLeadId",
         parseError(error),
       );
       // Try to create lead as fallback
-      return await this.createLeadForUser(userId, locale, logger);
+      return await AuthRepository.createLeadForUser(userId, locale, logger);
     }
   }
 
-  private async createLeadForUser(
+  private static async createLeadForUser(
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -528,7 +493,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * @param logger - Logger for debugging
    * @returns leadId or null if creation fails
    */
-  private async getLeadIdForPublicUser(
+  private static async getLeadIdForPublicUser(
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<string> {
@@ -570,7 +535,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * @param logger - Logger for debugging
    * @returns Authenticated user or public user
    */
-  private async getAuthenticatedUserInternal<
+  private static async getAuthenticatedUserInternal<
     TRoles extends readonly UserRoleValue[],
   >(
     userId: string,
@@ -591,7 +556,7 @@ class AuthRepositoryImpl implements AuthRepository {
           originalRoles: [...requiredRoles] as string[],
         },
       );
-      const userRoles = await this.getUserRolesInternal(
+      const userRoles = await AuthRepository.getUserRolesInternal(
         userId,
         requiredRoles,
         logger,
@@ -622,7 +587,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     // Get user roles from database
-    const userRoles = await this.getUserRolesInternal(
+    const userRoles = await AuthRepository.getUserRolesInternal(
       userId,
       requiredRoles,
       logger,
@@ -639,7 +604,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
     // For other roles (ADMIN, etc.), check the user's roles
     try {
-      const userRolesResponse = await userRolesRepository.findByUserId(
+      const userRolesResponse = await UserRolesRepository.findByUserId(
         userId,
         logger,
       );
@@ -725,7 +690,7 @@ class AuthRepositoryImpl implements AuthRepository {
       // If there's an error but PUBLIC is allowed (mixed with other roles), return authenticated user
       if (permissionRoles.includes(UserPermissionRole.PUBLIC)) {
         // Fetch roles for error case
-        const errorUserRoles = await this.getUserRolesInternal(
+        const errorUserRoles = await AuthRepository.getUserRolesInternal(
           userId,
           requiredRoles,
           logger,
@@ -742,89 +707,12 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   /**
-   * Extract JWT token from NextRequest
-   * Checks both Authorization header and cookies
-   * @param request - NextRequest from tRPC context
-   * @param logger - Logger for debugging
-   * @returns JWT token or null
-   */
-  private extractTokenFromRequest(
-    request: NextRequest,
-    logger: EndpointLogger,
-  ): string | null {
-    try {
-      // First check for Authorization header (for API clients)
-      // eslint-disable-next-line i18next/no-literal-string
-      const authHeader = request.headers.get("Authorization");
-      // eslint-disable-next-line i18next/no-literal-string
-      if (authHeader?.startsWith("Bearer ")) {
-        const headerToken = authHeader.slice(7);
-        if (headerToken) {
-          logger.debug("app.api.user.auth.debug.tokenFromAuthHeader");
-          return headerToken;
-        }
-      }
-
-      // Then check for cookies (for browser requests)
-      const cookieHeader = request.headers.get("cookie");
-      if (cookieHeader) {
-        const cookies = this.parseCookies(cookieHeader, logger);
-        const cookieToken = cookies[AUTH_TOKEN_COOKIE_NAME];
-        if (cookieToken) {
-          logger.debug("app.api.user.auth.debug.tokenFromCookie");
-          return cookieToken;
-        }
-      }
-
-      logger.debug("app.api.user.auth.debug.noTokenFound");
-      return null;
-    } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorExtractingToken",
-        parseError(error),
-      );
-      return null;
-    }
-  }
-
-  /**
-   * Parse cookie header string into key-value pairs
-   * @param cookieHeader - Raw cookie header string
-   * @param logger - Logger for debugging
-   * @returns Parsed cookies object
-   */
-  private parseCookies(
-    cookieHeader: string,
-    logger: EndpointLogger,
-  ): Record<string, string> {
-    const cookies: Record<string, string> = {};
-
-    try {
-      cookieHeader.split(";").forEach((cookie) => {
-        // eslint-disable-next-line i18next/no-literal-string
-        const [name, ...rest] = cookie.trim().split("=");
-        if (name && rest.length > 0) {
-          // eslint-disable-next-line i18next/no-literal-string
-          cookies[name] = rest.join("=");
-        }
-      });
-    } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorParsingCookies",
-        parseError(error),
-      );
-    }
-
-    return cookies;
-  }
-
-  /**
    * Sign a JWT token
    * @param payload - The payload to sign
    * @param logger - Logger for debugging
    * @returns ResponseType with the signed token
    */
-  async signJwt(
+  static async signJwt(
     payload: JwtPrivatePayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<string>> {
@@ -837,7 +725,7 @@ class AuthRepositoryImpl implements AuthRepository {
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
         .setExpirationTime(`${AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS}s`)
-        .sign(this.secretKey);
+        .sign(SECRET_KEY);
 
       logger.debug("app.api.user.auth.debug.jwtSignedSuccessfully", {
         userId: payload.id,
@@ -860,7 +748,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Verify a JWT token
    * Implements BaseAuthHandler.verifyToken
    */
-  async verifyJwt(
+  static async verifyJwt(
     token: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
@@ -870,7 +758,7 @@ class AuthRepositoryImpl implements AuthRepository {
       // Verify the token
       const { payload } = await jwtVerify<JwtPrivatePayloadType>(
         token,
-        this.secretKey,
+        SECRET_KEY,
       );
 
       // Validate the payload structure
@@ -925,7 +813,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Contains all authentication business logic
    * Platform handlers only provide storage access
    */
-  async authenticate(
+  static async authenticate(
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPayloadType>> {
@@ -949,7 +837,7 @@ class AuthRepositoryImpl implements AuthRepository {
           const cliEmail = cliEnv.VIBE_CLI_USER_EMAIL;
           if (cliEmail) {
             logger.debug("Attempting CLI email authentication");
-            return await this.authenticateUserByEmail(
+            return await AuthRepository.authenticateUserByEmail(
               cliEmail,
               context.locale,
               logger,
@@ -958,24 +846,45 @@ class AuthRepositoryImpl implements AuthRepository {
         }
 
         // Fall back to public user
-        const leadId = await this.getLeadIdFromDb(
-          undefined,
-          context.locale,
-          logger,
-        );
+        const { leadId, shouldUpdateCookie } =
+          await AuthRepository.getLeadIdFromDb(
+            undefined,
+            context.locale,
+            logger,
+            context.platform,
+          );
+        if (shouldUpdateCookie && leadId) {
+          await AuthRepository.updateLeadIdCookieIfPossible(
+            leadId,
+            context.platform,
+            logger,
+          );
+        }
         return success(createPublicUser(leadId || ""));
       }
 
       // Verify token
-      const verifyResult = await this.verifyJwt(token, logger);
+      const verifyResult = await AuthRepository.verifyJwt(token, logger);
       if (!verifyResult.success) {
-        logger.debug("Token verification failed");
-        await authHandler.clearAuthToken(logger);
-        const leadId = await this.getLeadIdFromDb(
-          undefined,
-          context.locale,
-          logger,
+        logger.debug(
+          "Token verification failed - returning public user without clearing cookies",
         );
+        // NEVER clear cookies on verification failure
+        // Let tokens expire naturally to prevent losing sessions on temporary issues
+        const { leadId, shouldUpdateCookie } =
+          await AuthRepository.getLeadIdFromDb(
+            undefined,
+            context.locale,
+            logger,
+            context.platform,
+          );
+        if (shouldUpdateCookie && leadId) {
+          await AuthRepository.updateLeadIdCookieIfPossible(
+            leadId,
+            context.platform,
+            logger,
+          );
+        }
         return success(createPublicUser(leadId || ""));
       }
 
@@ -984,19 +893,31 @@ class AuthRepositoryImpl implements AuthRepository {
         context.platform === Platform.NEXT_PAGE ||
         context.platform === Platform.NEXT_API
       ) {
-        const sessionValid = await this.validateWebSession(
+        const sessionValid = await AuthRepository.validateWebSession(
           token,
           verifyResult.data.id,
           logger,
         );
         if (!sessionValid) {
-          logger.debug("Session validation failed");
-          await authHandler.clearAuthToken(logger);
-          const leadId = await this.getLeadIdFromDb(
-            undefined,
-            context.locale,
-            logger,
+          logger.debug(
+            "Session validation failed - returning public user without clearing cookies",
           );
+          // NEVER clear cookies on session validation failure
+          // Let tokens expire naturally to prevent losing sessions on DB resets
+          const { leadId, shouldUpdateCookie } =
+            await AuthRepository.getLeadIdFromDb(
+              undefined,
+              context.locale,
+              logger,
+              context.platform,
+            );
+          if (shouldUpdateCookie && leadId) {
+            await AuthRepository.updateLeadIdCookieIfPossible(
+              leadId,
+              context.platform,
+              logger,
+            );
+          }
           return success(createPublicUser(leadId || ""));
         }
       }
@@ -1008,7 +929,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       // For authenticated users, always refetch roles from database
       // Never trust roles from JWT/cookies - they may be stale
-      const userRolesResponse = await userRolesRepository.findByUserId(
+      const userRolesResponse = await UserRolesRepository.findByUserId(
         verifyResult.data.id,
         logger,
       );
@@ -1027,11 +948,20 @@ class AuthRepositoryImpl implements AuthRepository {
       return success(payload);
     } catch (error) {
       logger.error("Authentication failed", parseError(error));
-      const leadId = await this.getLeadIdFromDb(
-        undefined,
-        context.locale,
-        logger,
-      );
+      const { leadId, shouldUpdateCookie } =
+        await AuthRepository.getLeadIdFromDb(
+          undefined,
+          context.locale,
+          logger,
+          context.platform,
+        );
+      if (shouldUpdateCookie && leadId) {
+        await AuthRepository.updateLeadIdCookieIfPossible(
+          leadId,
+          context.platform,
+          logger,
+        );
+      }
       return success(createPublicUser(leadId || ""));
     }
   }
@@ -1039,13 +969,13 @@ class AuthRepositoryImpl implements AuthRepository {
   /**
    * Validate web session against database
    */
-  private async validateWebSession(
+  private static async validateWebSession(
     token: string,
     userId: string,
     logger: EndpointLogger,
   ): Promise<boolean> {
     try {
-      const sessionResult = await sessionRepository.findByToken(token);
+      const sessionResult = await SessionRepository.findByToken(token);
       if (!sessionResult.success) {
         return false;
       }
@@ -1075,11 +1005,11 @@ class AuthRepositoryImpl implements AuthRepository {
   /**
    * Get current user with platform-aware handling
    */
-  async getCurrentUser(
+  static async getCurrentUser(
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
-    const authResult = await this.authenticate(context, logger);
+    const authResult = await AuthRepository.authenticate(context, logger);
 
     if (!authResult.success || authResult.data.isPublic) {
       return fail({
@@ -1094,29 +1024,38 @@ class AuthRepositoryImpl implements AuthRepository {
   /**
    * Get authenticated user with role checking (platform-aware) - generic return type
    */
-  async getAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
+  static async getAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
     roles: TRoles,
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
     try {
-      const authResult = await this.authenticate(context, logger);
+      const authResult = await AuthRepository.authenticate(context, logger);
 
       if (!authResult.success) {
         logger.error("Platform authentication failed", {
           platform: context.platform,
           error: authResult.message,
         });
-        const leadId = await this.getLeadIdFromDb(
-          undefined,
-          context.locale,
-          logger,
-        );
+        const { leadId, shouldUpdateCookie } =
+          await AuthRepository.getLeadIdFromDb(
+            undefined,
+            context.locale,
+            logger,
+            context.platform,
+          );
         if (!leadId) {
           logger.error("Failed to get lead ID for public user");
           return throwErrorResponse(
             "app.api.user.auth.errors.session_retrieval_failed",
             ErrorResponseTypes.INTERNAL_ERROR,
+          );
+        }
+        if (shouldUpdateCookie) {
+          await AuthRepository.updateLeadIdCookieIfPossible(
+            leadId,
+            context.platform,
+            logger,
           );
         }
         return createPublicUser<TRoles>(leadId);
@@ -1139,7 +1078,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // Authenticate with payload for private users
-      return await this.authenticateWithPayload<TRoles>(
+      return await AuthRepository.authenticateWithPayload<TRoles>(
         jwtPayload,
         roles,
         context.locale,
@@ -1150,16 +1089,25 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.user.auth.debug.errorInUnifiedGetAuthMinimalUser",
         parseError(error),
       );
-      const leadId = await this.getLeadIdFromDb(
-        undefined,
-        context.locale,
-        logger,
-      );
+      const { leadId, shouldUpdateCookie } =
+        await AuthRepository.getLeadIdFromDb(
+          undefined,
+          context.locale,
+          logger,
+          context.platform,
+        );
       if (!leadId) {
         logger.error("Failed to get lead ID for public user");
         return throwErrorResponse(
           "app.api.user.auth.errors.session_retrieval_failed",
           ErrorResponseTypes.INTERNAL_ERROR,
+        );
+      }
+      if (shouldUpdateCookie) {
+        await AuthRepository.updateLeadIdCookieIfPossible(
+          leadId,
+          context.platform,
+          logger,
         );
       }
       return createPublicUser<TRoles>(leadId);
@@ -1175,7 +1123,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * @param logger - Logger for debugging
    * @returns Authenticated user
    */
-  private async authenticateWithPayload<
+  private static async authenticateWithPayload<
     TRoles extends readonly UserRoleValue[],
   >(
     jwtPayload: JwtPrivatePayloadType,
@@ -1212,7 +1160,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // Use internal method to check authentication with roles
-      return await this.getAuthenticatedUserInternal(
+      return await AuthRepository.getAuthenticatedUserInternal(
         userId,
         leadId,
         roles,
@@ -1223,7 +1171,10 @@ class AuthRepositoryImpl implements AuthRepository {
         "app.api.user.auth.debug.errorAuthenticatingCliUserWithPayload",
         parseError(error),
       );
-      const leadId = await this.getLeadIdForPublicUser(locale, logger);
+      const leadId = await AuthRepository.getLeadIdForPublicUser(
+        locale,
+        logger,
+      );
       if (!leadId) {
         // Try to use leadId from payload as last resort
         if (jwtPayload.leadId) {
@@ -1248,13 +1199,17 @@ class AuthRepositoryImpl implements AuthRepository {
    * Type-safe authentication based on endpoint roles
    * Returns the correct user type based on the allowed roles
    */
-  async getTypedAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
+  static async getTypedAuthMinimalUser<TRoles extends readonly UserRoleValue[]>(
     roles: TRoles,
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles> | null> {
     // Don't spread roles - preserve readonly tuple type for proper type inference
-    const user = await this.getAuthMinimalUser(roles, context, logger);
+    const user = await AuthRepository.getAuthMinimalUser(
+      roles,
+      context,
+      logger,
+    );
     return user as InferUserType<TRoles> | null;
   }
 
@@ -1262,7 +1217,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Get user roles (platform-aware)
    * Delegates to platform handlers for authentication
    */
-  async getUserRoles(
+  static async getUserRoles(
     requiredRoles: readonly UserRoleValue[],
     context: AuthContext,
     logger: EndpointLogger,
@@ -1275,7 +1230,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // Get user using platform handler
-      const user = await this.getAuthMinimalUser(
+      const user = await AuthRepository.getAuthMinimalUser(
         requiredRoles,
         context,
         logger,
@@ -1283,7 +1238,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
       // Return roles for authenticated users
       if (user && !user.isPublic) {
-        return await this.getUserRolesInternal(user.id, requiredRoles, logger);
+        return await AuthRepository.getUserRolesInternal(
+          user.id,
+          requiredRoles,
+          logger,
+        );
       }
 
       return [];
@@ -1299,22 +1258,34 @@ class AuthRepositoryImpl implements AuthRepository {
   /**
    * Store authentication token using platform-specific handler
    * Automatically detects platform from request context
+   * @param rememberMe - If true, session cookie lasts 30 days; if false, session-only (browser session)
    */
-  async storeAuthTokenForPlatform(
+  static async storeAuthTokenForPlatform(
     token: string,
     userId: string,
     leadId: string,
     platform: Platform,
     logger: EndpointLogger,
+    rememberMe = true, // Default to true (30 days)
   ): Promise<ResponseType<void>> {
     try {
-      logger.debug("Storing auth token for platform", { platform, userId });
+      logger.debug("Storing auth token for platform", {
+        platform,
+        userId,
+        rememberMe,
+      });
 
       // Get platform-specific handler
       const handler = getPlatformAuthHandler(platform);
 
       // Delegate to platform handler
-      return await handler.storeAuthToken(token, userId, leadId, logger);
+      return await handler.storeAuthToken(
+        token,
+        userId,
+        leadId,
+        logger,
+        rememberMe,
+      );
     } catch (error) {
       logger.error("Error storing auth token for platform", parseError(error));
       return fail({
@@ -1328,7 +1299,7 @@ class AuthRepositoryImpl implements AuthRepository {
   /**
    * Clear authentication token using platform-specific handler
    */
-  async clearAuthTokenForPlatform(
+  static async clearAuthTokenForPlatform(
     platform: Platform,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
@@ -1353,7 +1324,7 @@ class AuthRepositoryImpl implements AuthRepository {
   /**
    * Create CLI token
    */
-  async createCliToken(
+  static async createCliToken(
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -1363,7 +1334,7 @@ class AuthRepositoryImpl implements AuthRepository {
         userId,
       });
 
-      const leadIdResult = await leadAuthRepository.getAuthenticatedUserLeadId(
+      const leadIdResult = await LeadAuthRepository.getAuthenticatedUserLeadId(
         userId,
         undefined,
         locale,
@@ -1371,7 +1342,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
       // Fetch user roles from DB to include in JWT
-      const rolesResult = await userRolesRepository.getUserRoles(
+      const rolesResult = await UserRolesRepository.getUserRoles(
         userId,
         logger,
       );
@@ -1395,7 +1366,7 @@ class AuthRepositoryImpl implements AuthRepository {
         roles,
       };
 
-      return await this.signJwt(payload, logger);
+      return await AuthRepository.signJwt(payload, logger);
     } catch (error) {
       logger.error(
         "app.api.user.auth.debug.errorCreatingCliToken",
@@ -1412,7 +1383,7 @@ class AuthRepositoryImpl implements AuthRepository {
   /**
    * Validate CLI token (stateless)
    */
-  async validateCliToken(
+  static async validateCliToken(
     token: string,
     logger: EndpointLogger,
   ): Promise<JwtPrivatePayloadType | null> {
@@ -1420,7 +1391,7 @@ class AuthRepositoryImpl implements AuthRepository {
       logger.debug("app.api.user.auth.debug.validatingCliToken");
 
       // Verify the token
-      const verifyResult = await this.verifyJwt(token, logger);
+      const verifyResult = await AuthRepository.verifyJwt(token, logger);
       if (!verifyResult.success) {
         return null;
       }
@@ -1447,7 +1418,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * @param payload - The JWT payload to check
    * @returns The user ID if available, null otherwise
    */
-  extractUserId(payload: JwtPrivatePayloadType): string | null {
+  static extractUserId(payload: JwtPrivatePayloadType): string | null {
     if (
       !payload.isPublic &&
       "id" in payload &&
@@ -1464,8 +1435,8 @@ class AuthRepositoryImpl implements AuthRepository {
    * @returns The user ID
    * @throws Error if user ID is not available
    */
-  requireUserId(payload: JwtPrivatePayloadType): string {
-    const userId = this.extractUserId(payload);
+  static requireUserId(payload: JwtPrivatePayloadType): string {
+    const userId = AuthRepository.extractUserId(payload);
     if (!userId) {
       throwErrorResponse(
         "app.api.user.auth.errors.jwt_payload_missing_id",
@@ -1482,13 +1453,13 @@ class AuthRepositoryImpl implements AuthRepository {
    * @param logger - Logger for debugging
    * @returns Promise that resolves to the authenticated admin user or redirects
    */
-  async requireAdminUser(
+  static async requireAdminUser(
     locale: CountryLanguage,
     callbackUrl: string,
     logger: EndpointLogger,
   ): Promise<CompleteUserType> {
     // Check authentication
-    const userResponse = await userRepository.getUserByAuth(
+    const userResponse = await UserRepository.getUserByAuth(
       {
         detailLevel: UserDetailLevel.COMPLETE,
       },
@@ -1505,7 +1476,7 @@ class AuthRepositoryImpl implements AuthRepository {
     const user = userResponse.data;
 
     // Check if user has admin role
-    const hasAdminRole = await userRolesRepository.hasRole(
+    const hasAdminRole = await UserRolesRepository.hasRole(
       user.id,
       UserRole.ADMIN,
       logger,
@@ -1522,7 +1493,7 @@ class AuthRepositoryImpl implements AuthRepository {
    * Authenticate user by email (for CLI authentication)
    * Moved from CLI handler to enforce repository-first architecture
    */
-  async authenticateUserByEmail(
+  static async authenticateUserByEmail(
     email: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -1530,7 +1501,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       logger.debug("Authenticating user by email", { email });
 
-      const userResult = await userRepository.getUserByEmail(
+      const userResult = await UserRepository.getUserByEmail(
         email,
         UserDetailLevel.COMPLETE,
         locale,
@@ -1547,7 +1518,12 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       const user = userResult.data;
-      const leadId = await this.getLeadIdFromDb(user.id, locale, logger);
+      const { leadId } = await AuthRepository.getLeadIdFromDb(
+        user.id,
+        locale,
+        logger,
+        undefined,
+      );
 
       if (!leadId) {
         logger.error("Failed to get lead ID for user", { userId: user.id });
@@ -1558,7 +1534,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // Fetch user roles
-      const userRolesResponse = await userRolesRepository.findByUserId(
+      const userRolesResponse = await UserRolesRepository.findByUserId(
         user.id,
         logger,
       );
@@ -1584,5 +1560,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 }
 
-// Singleton instance
-export const authRepository = new AuthRepositoryImpl();
+// Pick + keyof excludes private members automatically
+export type AuthRepositoryType = Pick<
+  typeof AuthRepository,
+  keyof typeof AuthRepository
+>;

@@ -127,6 +127,7 @@ export function ImapConfigurationManagement({
                 {configEndpoint.create && (
                   <ImapServerConfigForm
                     control={configEndpoint.create.form.control}
+                    locale={locale}
                   />
                 )}
               </TabsContent>
@@ -135,6 +136,7 @@ export function ImapConfigurationManagement({
                 {configEndpoint.create && (
                   <ImapSyncConfigForm
                     control={configEndpoint.create.form.control}
+                    locale={locale}
                   />
                 )}
               </TabsContent>
@@ -143,6 +145,7 @@ export function ImapConfigurationManagement({
                 {configEndpoint.create && (
                   <ImapPerformanceConfigForm
                     control={configEndpoint.create.form.control}
+                    locale={locale}
                   />
                 )}
               </TabsContent>
@@ -164,6 +167,7 @@ export function ImapConfigurationManagement({
                             "app.admin.emails.imap.config.resilience.maxRetries",
                         }}
                         control={configEndpoint.create.form.control}
+                        locale={locale}
                       />
                       <EndpointFormField
                         name="retryDelay"
@@ -173,6 +177,7 @@ export function ImapConfigurationManagement({
                             "app.admin.emails.imap.config.resilience.retryDelay",
                         }}
                         control={configEndpoint.create.form.control}
+                        locale={locale}
                       />
                       <EndpointFormField
                         name="circuitBreakerThreshold"
@@ -182,6 +187,7 @@ export function ImapConfigurationManagement({
                             "app.admin.emails.imap.config.resilience.circuitBreakerThreshold",
                         }}
                         control={configEndpoint.create.form.control}
+                        locale={locale}
                       />
                     </Div>
                   </CardContent>
@@ -205,6 +211,7 @@ export function ImapConfigurationManagement({
                             "app.admin.emails.imap.config.monitoring.healthCheckInterval",
                         }}
                         control={configEndpoint.create.form.control}
+                        locale={locale}
                       />
                       <EndpointFormField
                         name="metricsEnabled"
@@ -214,6 +221,7 @@ export function ImapConfigurationManagement({
                             "app.admin.emails.imap.config.monitoring.metricsEnabled",
                         }}
                         control={configEndpoint.create.form.control}
+                        locale={locale}
                       />
                       <EndpointFormField
                         name="loggingLevel"
@@ -242,6 +250,7 @@ export function ImapConfigurationManagement({
                           ],
                         }}
                         control={configEndpoint.create.form.control}
+                        locale={locale}
                       />
                     </Div>
                   </CardContent>
@@ -267,6 +276,7 @@ export function ImapConfigurationManagement({
                             "app.admin.emails.imap.config.development.debugMode",
                         }}
                         control={configEndpoint.create.form.control}
+                        locale={locale}
                       />
                       <EndpointFormField
                         name="testMode"
@@ -276,6 +286,7 @@ export function ImapConfigurationManagement({
                             "app.admin.emails.imap.config.development.testMode",
                         }}
                         control={configEndpoint.create.form.control}
+                        locale={locale}
                       />
                     </Div>
                   </CardContent>

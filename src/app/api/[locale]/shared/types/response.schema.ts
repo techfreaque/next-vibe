@@ -63,6 +63,16 @@ export function throwErrorResponse(
 }
 
 /**
+ * Options for success response
+ */
+export interface SuccessResponseOptions {
+  /** Mark as error response (for special handling) */
+  isErrorResponse?: true;
+  /** Custom headers to include in the HTTP response */
+  headers?: Record<string, string>;
+}
+
+/**
  * Create a standardized success response
  * @param data - The response data (optional for void responses)
  * @param options - Optional settings for the response
@@ -71,16 +81,17 @@ export function throwErrorResponse(
 export function success(): ResponseType<void>;
 export function success<TResponse>(
   data: TResponse,
-  options?: { isErrorResponse?: true },
+  options?: SuccessResponseOptions,
 ): ResponseType<TResponse>;
 export function success<TResponse>(
   data?: TResponse,
-  options?: { isErrorResponse?: true },
+  options?: SuccessResponseOptions,
 ): ResponseType<TResponse | void> {
   return {
     success: true,
     data,
     ...(options?.isErrorResponse && { isErrorResponse: true }),
+    ...(options?.headers && { headers: options.headers }),
   };
 }
 

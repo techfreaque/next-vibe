@@ -88,7 +88,8 @@ export const translations: typeof enTranslations = {
     },
     priority: {
       label: "Priorytet",
-      description: "Wspomnienia o wyższym priorytecie pojawiają się pierwsze (0-100)",
+      description:
+        "Wspomnienia o wyższym priorytecie pojawiają się pierwsze (0-100)",
     },
     response: {
       id: { content: "ID wspomnienia" },

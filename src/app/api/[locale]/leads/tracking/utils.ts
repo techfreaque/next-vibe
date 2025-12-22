@@ -142,10 +142,7 @@ export function generateEngagementTrackingApiUrl(
     ref?: string;
   },
 ): string {
-  const apiUrl = new URL(
-    `/api/${locale}/leads/tracking/engagement`,
-    baseUrl,
-  );
+  const apiUrl = new URL(`/api/${locale}/leads/tracking/engagement`, baseUrl);
 
   apiUrl.searchParams.set("id", params.id);
   if (params.campaignId) {

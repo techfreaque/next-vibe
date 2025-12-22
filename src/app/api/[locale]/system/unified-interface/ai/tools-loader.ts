@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { jsonSchema, type JSONSchema7,tool } from "ai";
+import { jsonSchema, type JSONSchema7, tool } from "ai";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
@@ -119,15 +119,21 @@ function generateInputSchema(
 
   try {
     // Combine request data and URL params
-    const requestDataSchema = generateSchemaForUsage(
-      endpoint.fields,
+    const requestDataSchema = generateSchemaForUsage<
+      typeof endpoint.fields,
       FieldUsage.RequestData,
-    ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+      string
+    >(endpoint.fields, FieldUsage.RequestData) as
+      | z.ZodObject<Record<string, z.ZodTypeAny>>
+      | z.ZodNever;
 
-    const urlPathParamsSchema = generateSchemaForUsage(
-      endpoint.fields,
+    const urlPathParamsSchema = generateSchemaForUsage<
+      typeof endpoint.fields,
       FieldUsage.RequestUrlParams,
-    ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+      string
+    >(endpoint.fields, FieldUsage.RequestUrlParams) as
+      | z.ZodObject<Record<string, z.ZodTypeAny>>
+      | z.ZodNever;
 
     const combinedShape: { [key: string]: z.ZodTypeAny } = {};
 

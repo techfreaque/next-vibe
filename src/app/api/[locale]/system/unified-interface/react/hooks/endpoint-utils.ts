@@ -3,15 +3,14 @@ import { useMemo } from "react";
 import type { FieldValues } from "react-hook-form";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   ALL_METHODS,
   Methods,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import { clearFormsAfterSuccessInDev } from "@/config/debug";
 import { envClient } from "@/config/env-client";
 
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import type {
   AutoPrefillConfig,
   FormDataPriority,
@@ -28,18 +27,7 @@ import type {
  * Utility to detect available HTTP methods from endpoints object
  */
 export function useAvailableMethods<
-  T extends Partial<
-    Record<
-      Methods,
-      CreateApiEndpoint<
-        string,
-        Methods,
-        readonly UserRoleValue[],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        any
-      >
-    >
-  >,
+  T extends Partial<Record<Methods, CreateApiEndpointAny>>,
 >(endpoints: T): Methods[] {
   return useMemo(() => {
     return Object.keys(endpoints).filter((method) =>
@@ -90,8 +78,10 @@ export function shouldClearFormAfterSuccess(): boolean {
  * @param value - The value to check
  * @returns True if value is a plain object
  */
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard requires unknown for runtime type checking
-function isPlainObject(value: unknown): value is Record<string, DeepPartial<never>> {
+function isPlainObject(
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard requires unknown for runtime type checking
+  value: unknown,
+): value is Record<string, DeepPartial<never>> {
   return (
     typeof value === "object" &&
     value !== null &&
@@ -124,7 +114,7 @@ function deepMerge<T>(
         // Recursively merge nested objects
         result[key] = deepMerge(
           resultValue as DeepPartial<T>,
-          sourceValue as DeepPartial<T>
+          sourceValue as DeepPartial<T>,
         ) as DeepPartial<never>;
       } else if (sourceValue !== undefined) {
         // Primitive or array - later source wins
@@ -270,7 +260,11 @@ export function mergeCreateOptions<
   endpointOptions:
     | {
         formOptions?: ApiFormOptions<TRequest>;
-        mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
+        mutationOptions?: ApiMutationOptions<
+          TRequest,
+          TResponse,
+          TUrlVariables
+        >;
         urlPathParams?: TUrlVariables;
         autoPrefillData?: Partial<TRequest>;
         initialState?: Partial<TRequest>;
@@ -279,7 +273,11 @@ export function mergeCreateOptions<
   hookOptions:
     | {
         formOptions?: ApiFormOptions<TRequest>;
-        mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
+        mutationOptions?: ApiMutationOptions<
+          TRequest,
+          TResponse,
+          TUrlVariables
+        >;
         urlPathParams?: TUrlVariables;
         autoPrefillData?: Partial<TRequest>;
         initialState?: Partial<TRequest>;
@@ -320,13 +318,21 @@ export function mergeCreateOptions<
 export function mergeDeleteOptions<TRequest, TResponse, TUrlVariables>(
   endpointOptions:
     | {
-        mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
+        mutationOptions?: ApiMutationOptions<
+          TRequest,
+          TResponse,
+          TUrlVariables
+        >;
         urlPathParams?: TUrlVariables;
       }
     | undefined,
   hookOptions:
     | {
-        mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
+        mutationOptions?: ApiMutationOptions<
+          TRequest,
+          TResponse,
+          TUrlVariables
+        >;
         urlPathParams?: TUrlVariables;
       }
     | undefined,

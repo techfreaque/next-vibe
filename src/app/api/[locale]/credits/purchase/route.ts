@@ -7,13 +7,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { creditPurchaseRepository } from "./repository";
+import { CreditPurchaseRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: async ({ data, user, locale, logger }) => {
-      return await creditPurchaseRepository.createCheckoutSession(
+      return await CreditPurchaseRepository.createCheckoutSession(
         data,
         user.id,
         locale,

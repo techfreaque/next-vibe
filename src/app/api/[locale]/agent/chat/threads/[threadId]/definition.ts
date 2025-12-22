@@ -122,7 +122,7 @@ const { GET } = createEndpoint({
             },
             z.string().nullable(),
           ),
-          persona: responseField(
+          character: responseField(
             {
               type: WidgetType.TEXT,
               content:
@@ -268,7 +268,7 @@ const { GET } = createEndpoint({
           folderId: null,
           status: ThreadStatus.ACTIVE,
           defaultModel: "gpt-4o",
-          persona: "professional",
+          character: "professional",
           systemPrompt: null,
           pinned: false,
           archived: false,
@@ -382,9 +382,9 @@ const { PATCH } = createEndpoint({
                 "app.api.agent.chat.threads.threadId.patch.defaultModel.description" as const,
               columns: 6,
             },
-            z.nativeEnum(ModelId).nullable().optional(),
+            z.enum(ModelId).nullable().optional(),
           ),
-          persona: requestDataField(
+          character: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
@@ -519,7 +519,7 @@ const { PATCH } = createEndpoint({
             },
             z.string().nullable(),
           ),
-          persona: responseField(
+          character: responseField(
             {
               type: WidgetType.TEXT,
               content:
@@ -682,7 +682,7 @@ const { PATCH } = createEndpoint({
           folderId: null,
           status: ThreadStatus.ACTIVE,
           defaultModel: "gpt-4o",
-          persona: "professional",
+          character: "professional",
           systemPrompt: null,
           pinned: true,
           archived: false,

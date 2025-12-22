@@ -66,11 +66,11 @@ export interface MessageRepositoryInterface {
 /**
  * Message Repository Implementation
  */
-class MessageRepository implements MessageRepositoryInterface {
+export class MessageRepository {
   /**
    * Get a specific message by ID
    */
-  async getMessage(
+  static async getMessage(
     urlPathParams: MessageGetUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -170,7 +170,7 @@ class MessageRepository implements MessageRepositoryInterface {
   /**
    * Update a message's content
    */
-  async updateMessage(
+  static async updateMessage(
     data: MessagePatchRequestOutput,
     urlPathParams: MessagePatchUrlVariablesOutput,
     user: JwtPayloadType,
@@ -292,7 +292,7 @@ class MessageRepository implements MessageRepositoryInterface {
   /**
    * Delete a message
    */
-  async deleteMessage(
+  static async deleteMessage(
     urlPathParams: MessageDeleteUrlVariablesOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -383,5 +383,3 @@ class MessageRepository implements MessageRepositoryInterface {
     }
   }
 }
-
-export const messageRepository = new MessageRepository();

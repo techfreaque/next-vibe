@@ -66,12 +66,15 @@ export const DEFAULT_CLI_EXTERNALS = [
 // ============================================================================
 
 /** Default settings per profile (type inlined - no separate types.ts needed) */
-export const PROFILE_DEFAULTS: Record<BuildProfile, {
-  minify: boolean;
-  sourcemap: boolean | SourcemapMode;
-  treeShaking: boolean;
-  analyze: boolean;
-}> = {
+export const PROFILE_DEFAULTS: Record<
+  BuildProfile,
+  {
+    minify: boolean;
+    sourcemap: boolean | SourcemapMode;
+    treeShaking: boolean;
+    analyze: boolean;
+  }
+> = {
   development: {
     minify: false,
     sourcemap: "external",

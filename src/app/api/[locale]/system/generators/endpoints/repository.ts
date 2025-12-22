@@ -53,7 +53,9 @@ export interface FunctionalGeneratorsRepository {
 /**
  * Functional Generators Repository Implementation
  */
-export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsRepository {
+export class FunctionalGeneratorsRepositoryImpl
+  implements FunctionalGeneratorsRepository
+{
   private readonly optionDefinitions =
     defineOptions<FunctionalGeneratorOptions>({
       skipEndpoints: {
@@ -246,9 +248,7 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
   /**
    * Generate endpoints
    */
-  private async generateEndpoints(
-    logger: EndpointLogger,
-  ): Promise<void> {
+  private async generateEndpoints(logger: EndpointLogger): Promise<void> {
     try {
       logger.debug("📝 Generating endpoints...");
 
@@ -267,9 +267,7 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
   /**
    * Generate seeds
    */
-  private async generateSeeds(
-    logger: EndpointLogger,
-  ): Promise<void> {
+  private async generateSeeds(logger: EndpointLogger): Promise<void> {
     try {
       logger.debug("🌱 Generating seeds...");
 
@@ -288,9 +286,7 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
   /**
    * Generate cron tasks
    */
-  private async generateCronTasks(
-    logger: EndpointLogger,
-  ): Promise<void> {
+  private async generateCronTasks(logger: EndpointLogger): Promise<void> {
     try {
       logger.debug("⏰ Generating cron tasks...");
 
@@ -309,9 +305,7 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
   /**
    * Generate tRPC router (development mode)
    */
-  private async generateTRPCRouterDev(
-    logger: EndpointLogger,
-  ): Promise<void> {
+  private async generateTRPCRouterDev(logger: EndpointLogger): Promise<void> {
     try {
       logger.debug("🔄 Generating tRPC router...");
 
@@ -353,9 +347,7 @@ export const runFunctionalGenerators = async (
       logger.debug("⏭️ Skipping endpoints generation");
     } else {
       logger.debug("📝 Generating endpoints...");
-      await functionalGeneratorsRepository["generateEndpoints"](
-        logger,
-      );
+      await functionalGeneratorsRepository["generateEndpoints"](logger);
       logger.debug("✅ Endpoints generated successfully");
     }
 
@@ -373,9 +365,7 @@ export const runFunctionalGenerators = async (
       logger.debug("⏭️ Skipping cron tasks generation");
     } else {
       logger.debug("⏰ Generating cron tasks...");
-      await functionalGeneratorsRepository["generateCronTasks"](
-        logger,
-      );
+      await functionalGeneratorsRepository["generateCronTasks"](logger);
       logger.debug("✅ Cron tasks generated successfully");
     }
 
@@ -384,9 +374,7 @@ export const runFunctionalGenerators = async (
       logger.debug("⏭️ Skipping tRPC router generation");
     } else {
       logger.debug("🔄 Generating tRPC router...");
-      await functionalGeneratorsRepository["generateTRPCRouterDev"](
-        logger,
-      );
+      await functionalGeneratorsRepository["generateTRPCRouterDev"](logger);
       logger.debug("✅ tRPC router generated successfully");
     }
   } catch (error) {

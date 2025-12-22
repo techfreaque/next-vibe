@@ -16,11 +16,7 @@ export const { GET, PUT, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
     handler: ({ urlPathParams, user, logger }) =>
-      smtpAccountEditRepository.getSmtpAccount(
-        urlPathParams,
-        user,
-        logger,
-      ),
+      smtpAccountEditRepository.getSmtpAccount(urlPathParams, user, logger),
   },
   [Methods.PUT]: {
     email: undefined, // No emails for PUT requests

@@ -20,6 +20,7 @@ import {
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
+  EndpointErrorTypes,
   LayoutType,
   Methods,
   WidgetType,
@@ -51,11 +52,45 @@ const testPublicEndpoint = createEndpoint({
     {},
     {},
   ),
-  errorTypes: {} as Record<
-    string,
-    { title: TranslationKey; description: TranslationKey }
-  >,
-  successTypes: {} as { title: TranslationKey; description: TranslationKey },
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+  },
+  successTypes: { title: "test" as any, description: "test" as any },
   examples: {
     requests: undefined,
     urlPathParams: undefined,
@@ -77,11 +112,45 @@ const testAdminEndpoint = createEndpoint({
     {},
     {},
   ),
-  errorTypes: {} as Record<
-    string,
-    { title: TranslationKey; description: TranslationKey }
-  >,
-  successTypes: {} as { title: TranslationKey; description: TranslationKey },
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+  },
+  successTypes: { title: "test" as any, description: "test" as any },
   examples: {
     requests: undefined,
     urlPathParams: undefined,
@@ -132,11 +201,45 @@ const testResponseEndpoint = createEndpoint({
       ),
     },
   ),
-  errorTypes: {} as Record<
-    string,
-    { title: TranslationKey; description: TranslationKey }
-  >,
-  successTypes: {} as { title: TranslationKey; description: TranslationKey },
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "test" as any,
+      description: "test" as any,
+    },
+  },
+  successTypes: { title: "test" as any, description: "test" as any },
   examples: {
     requests: undefined,
     urlPathParams: undefined,

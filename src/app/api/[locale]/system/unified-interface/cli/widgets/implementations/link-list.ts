@@ -13,10 +13,12 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class LinkListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LINK_LIST> {
+export class LinkListWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.LINK_LIST
+> {
   readonly widgetType = WidgetType.LINK_LIST;
 
-  render(props: CLIWidgetProps<typeof WidgetType.LINK_LIST>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.LINK_LIST, string>): string {
     const { value, context } = props;
     const t = context.t;
 

@@ -55,7 +55,9 @@ export interface DatabaseMigrateRepairRepository {
 /**
  * Database Migration Repair Repository Implementation
  */
-export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepairRepository {
+export class DatabaseMigrateRepairRepositoryImpl
+  implements DatabaseMigrateRepairRepository
+{
   async repairMigrations(
     data: MigrateRepairRequestType,
     locale: CountryLanguage,

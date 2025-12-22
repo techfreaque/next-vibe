@@ -11,7 +11,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { UserDetailLevel } from "../../../enum";
-import { userRepository } from "../../../repository";
+import { UserRepository } from "../../../repository";
 import type { StandardUserType } from "../../../types";
 import type {
   ResetPasswordConfirmPostRequestOutput,
@@ -137,7 +137,7 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
     email: requestData.verification.email,
   });
 
-  const userResponse = await userRepository.getUserByEmail(
+  const userResponse = await UserRepository.getUserByEmail(
     requestData.verification.email,
     UserDetailLevel.STANDARD,
     locale,

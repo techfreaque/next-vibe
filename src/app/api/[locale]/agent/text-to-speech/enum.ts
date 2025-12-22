@@ -33,6 +33,16 @@ export const {
 });
 
 /**
+ * Database enum array for Drizzle
+ */
+export const TtsVoiceDB = [TtsVoice.MALE, TtsVoice.FEMALE] as const;
+
+/**
+ * Default voice
+ */
+export const DEFAULT_TTS_VOICE = TtsVoice.FEMALE;
+
+/**
  * TTS Language enum
  */
 export const {

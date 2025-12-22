@@ -449,11 +449,15 @@ export class ImportRepositoryImpl implements ImportRepository {
       return [];
     }
 
-    const headers = lines[0].split(",").map((h) => h.trim().replaceAll('"', ""));
+    const headers = lines[0]
+      .split(",")
+      .map((h) => h.trim().replaceAll('"', ""));
     const rows: Record<string, string>[] = [];
 
     for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(",").map((v) => v.trim().replaceAll('"', ""));
+      const values = lines[i]
+        .split(",")
+        .map((v) => v.trim().replaceAll('"', ""));
       const row: Record<string, string> = {};
 
       headers.forEach((header, index) => {
@@ -795,7 +799,45 @@ export class ImportRepositoryImpl implements ImportRepository {
   /**
    * Perform actions on import jobs (stop, retry)
    */
-  async performJobAction(
+  /**
+   * Stop an import job (returns type matching stop definition)
+   */
+  async stopJob(
+    userId: DbId,
+    jobId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ result: { success: boolean; message: string } }>> {
+    const response = await this.performJobAction(userId, jobId, "stop", logger);
+    if (!response.success) {
+      return response;
+    }
+    return success({ result: response.data });
+  }
+
+  /**
+   * Retry a failed import job (returns type matching retry definition)
+   */
+  async retryJob(
+    userId: DbId,
+    jobId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ result: { success: boolean; message: string } }>> {
+    const response = await this.performJobAction(
+      userId,
+      jobId,
+      "retry",
+      logger,
+    );
+    if (!response.success) {
+      return response;
+    }
+    return success({ result: response.data });
+  }
+
+  /**
+   * Internal method to perform job actions
+   */
+  private async performJobAction(
     userId: DbId,
     jobId: string,
     action: "stop" | "retry",

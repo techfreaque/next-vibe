@@ -32,7 +32,8 @@ export function extractAvatarData(value: WidgetData): ProcessedAvatar | null {
 
   // Handle object value with avatar properties
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const src = "src" in value && typeof value.src === "string" ? value.src : "";
+    const src =
+      "src" in value && typeof value.src === "string" ? value.src : "";
     const alt =
       "alt" in value && typeof value.alt === "string" ? value.alt : "Avatar";
     const fallback =

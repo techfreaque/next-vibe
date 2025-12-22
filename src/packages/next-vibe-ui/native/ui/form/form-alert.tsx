@@ -66,7 +66,11 @@ export function FormAlert({
   // Alert uses className for styling via NativeWind (either style OR className, not both)
   void nativeStyle; // Acknowledge nativeStyle is intentionally unused for Alert
   return (
-    <Alert variant={alert.variant} icon={Icon} className={cn("my-4", className)}>
+    <Alert
+      variant={alert.variant}
+      icon={Icon}
+      className={cn("my-4", className)}
+    >
       {alert.title && (
         <AlertTitle>
           {t(alert.title.message, alert.title.messageParams)}

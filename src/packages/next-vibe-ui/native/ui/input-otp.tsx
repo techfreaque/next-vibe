@@ -52,9 +52,7 @@ function InputOTP({
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
-    <OTPContext.Provider
-      value={{ value, onChange: onChangeValue, maxLength }}
-    >
+    <OTPContext.Provider value={{ value, onChange: onChangeValue, maxLength }}>
       <StyledView
         className={cn(
           "flex flex-row items-center gap-2 opacity-100",

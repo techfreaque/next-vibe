@@ -121,10 +121,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
             .where(eq(imapAccounts.id, account.id));
 
           // Sync account
-          const accountResult = await this.syncAccount(
-            { account },
-            logger,
-          );
+          const accountResult = await this.syncAccount({ account }, logger);
 
           if (accountResult.success) {
             foldersProcessed +=

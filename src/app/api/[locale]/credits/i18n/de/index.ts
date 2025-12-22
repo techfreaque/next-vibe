@@ -75,10 +75,13 @@ export const translations: typeof enTranslations = {
     walletNotFound: "Wallet nicht gefunden",
     walletCreationFailed: "Fehler beim Erstellen des Wallets",
     addEarnedCreditsFailed: "Fehler beim Hinzufügen verdienter Credits",
-    getEarnedBalanceFailed: "Fehler beim Abrufen des verdienten Credit-Guthabens",
-    insufficientEarnedCredits: "Unzureichende verdiente Credits für diesen Vorgang",
+    getEarnedBalanceFailed:
+      "Fehler beim Abrufen des verdienten Credit-Guthabens",
+    insufficientEarnedCredits:
+      "Unzureichende verdiente Credits für diesen Vorgang",
     deductEarnedCreditsFailed: "Fehler beim Abziehen verdienter Credits",
-    getReferralTransactionsFailed: "Fehler beim Abrufen der Empfehlungstransaktionen",
+    getReferralTransactionsFailed:
+      "Fehler beim Abrufen der Empfehlungstransaktionen",
   },
   get: {
     title: "Credit-Guthaben abrufen",

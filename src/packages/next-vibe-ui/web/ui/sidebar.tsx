@@ -40,9 +40,7 @@ export function SidebarLayout({
   topBarLeft,
   topBarRight,
 }: SidebarLayoutProps): JSX.Element {
-  const [isMobile, setIsMobile] = React.useState(
-    platform.isReactNative,
-  );
+  const [isMobile, setIsMobile] = React.useState(platform.isReactNative);
 
   React.useEffect(() => {
     if (platform.isReactNative) {

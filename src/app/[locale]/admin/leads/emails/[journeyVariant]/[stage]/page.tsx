@@ -109,7 +109,7 @@ export default async function EmailPreviewPage({
                 <P className="text-gray-600 dark:text-gray-400">
                   {journeyInfo.name} -{" "}
                   {stage
-                    .replaceAll('_', " ")
+                    .replaceAll("_", " ")
                     .replaceAll(/\b\w/g, (l) => l.toUpperCase())}
                 </P>
               </Div>
@@ -141,7 +141,7 @@ export default async function EmailPreviewPage({
                     <ChevronLeft className="h-4 w-4" />
                     <Span>
                       {previousStage
-                        .replaceAll('_', " ")
+                        .replaceAll("_", " ")
                         .replaceAll(/\b\w/g, (l) => l.toUpperCase())}
                     </Span>
                   </Button>
@@ -177,7 +177,7 @@ export default async function EmailPreviewPage({
                   >
                     <Span>
                       {nextStage
-                        .replaceAll('_', " ")
+                        .replaceAll("_", " ")
                         .replaceAll(/\b\w/g, (l) => l.toUpperCase())}
                     </Span>
                     <ChevronRight className="h-4 w-4" />

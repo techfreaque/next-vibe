@@ -262,7 +262,8 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
           createdAt: updatedAccount.createdAt.toISOString(),
           updatedAt: updatedAccount.updatedAt.toISOString(),
           campaignTypes: updatedAccount.campaignTypes || undefined,
-          emailJourneyVariants: updatedAccount.emailJourneyVariants || undefined,
+          emailJourneyVariants:
+            updatedAccount.emailJourneyVariants || undefined,
           emailCampaignStages: updatedAccount.emailCampaignStages || undefined,
           countries: updatedAccount.countries || undefined,
           languages: updatedAccount.languages || undefined,

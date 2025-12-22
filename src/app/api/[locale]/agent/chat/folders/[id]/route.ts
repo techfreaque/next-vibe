@@ -7,43 +7,27 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { folderRepository } from "./repository";
+import { FolderRepository } from "./repository";
 
 export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async (props) => {
-      return await folderRepository.getFolder(
-        props.user,
-        { id: props.urlPathParams.id },
-        props.logger,
-        props.locale,
-      );
-    },
+    handler: ({ user, urlPathParams, logger, locale }) =>
+      FolderRepository.getFolder(user, urlPathParams, logger, locale),
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: async (props) => {
-      const dataWithId = {
-        ...props.data,
-        id: props.urlPathParams.id,
-      };
-      return await folderRepository.updateFolder(
-        props.user,
-        dataWithId,
-        props.logger,
-      );
-    },
+    handler: ({ data, urlPathParams, user, logger }) =>
+      FolderRepository.updateFolder(
+        user,
+        { ...data, id: urlPathParams.id },
+        logger,
+      ),
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: async (props) => {
-      return await folderRepository.deleteFolder(
-        props.user,
-        { id: props.urlPathParams.id },
-        props.logger,
-      );
-    },
+    handler: ({ user, urlPathParams, logger }) =>
+      FolderRepository.deleteFolder(user, urlPathParams, logger),
   },
 });

@@ -5,17 +5,16 @@
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { authRepository } from "@/app/api/[locale]/user/auth/repository";
 
 import definitions from "./definition";
-import { subscriptionRepository } from "./repository";
+import { SubscriptionRepository } from "./repository";
 
 export const { GET, POST, PUT, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: async ({ user, logger, locale }) => {
-      return await subscriptionRepository.getSubscription(
+      return await SubscriptionRepository.getSubscription(
         user.id,
         logger,
         locale,
@@ -25,10 +24,9 @@ export const { GET, POST, PUT, DELETE, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined, // Email integration to be implemented when needed
     handler: async ({ data, user, locale, logger }) => {
-      const userId = authRepository.requireUserId(user);
-      return await subscriptionRepository.createSubscription(
+      return await SubscriptionRepository.createSubscription(
         data,
-        userId,
+        user.id,
         locale,
         logger,
       );
@@ -37,10 +35,9 @@ export const { GET, POST, PUT, DELETE, tools } = endpointsHandler({
   [Methods.PUT]: {
     email: undefined, // Email integration to be implemented when needed
     handler: async ({ data, user, locale, logger }) => {
-      const userId = authRepository.requireUserId(user);
-      return await subscriptionRepository.updateSubscription(
+      return await SubscriptionRepository.updateSubscription(
         data,
-        userId,
+        user.id,
         locale,
         logger,
       );
@@ -55,12 +52,10 @@ export const { GET, POST, PUT, DELETE, tools } = endpointsHandler({
         userId: user?.id,
       });
 
-      const userId = authRepository.requireUserId(user);
-
       // Delegate to repository for business logic and data access
-      return await subscriptionRepository.cancelSubscription(
+      return await SubscriptionRepository.cancelSubscription(
         data,
-        userId,
+        user.id,
         logger,
         locale,
       );

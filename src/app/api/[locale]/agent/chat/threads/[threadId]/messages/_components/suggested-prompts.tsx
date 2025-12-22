@@ -18,14 +18,14 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import {
+  CategoryOptions,
+  type Character,
+  DEFAULT_CHARACTERS,
+} from "@/app/api/[locale]/agent/chat/characters/config";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
-import {
-  CategoryOptions,
-  DEFAULT_PERSONAS,
-  type Persona,
-} from "@/app/api/[locale]/agent/chat/personas/config";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -34,8 +34,8 @@ interface SuggestedPromptsProps {
   locale: CountryLanguage;
 }
 
-// Get first 5 personas for tabs
-const FEATURED_PERSONAS = DEFAULT_PERSONAS.slice(0, 5);
+// Get first 5 characters for tabs
+const FEATURED_CHARACTERS = DEFAULT_CHARACTERS.slice(0, 5);
 
 export function SuggestedPrompts({
   locale,
@@ -47,28 +47,34 @@ export function SuggestedPrompts({
   } = useChatContext();
 
   const { t } = simpleT(locale);
-  const [selectedPersona, setSelectedPersona] = useState<Persona>(
-    FEATURED_PERSONAS[0],
+  const [selectedCharacter, setSelectedCharacter] = useState<Character>(
+    FEATURED_CHARACTERS[0],
   );
   const [modalOpen, setModalOpen] = useState(false);
-  const [expandedPersonaId, setExpandedPersonaId] = useState<string | null>(
+  const [expandedCharacterId, setExpandedCharacterId] = useState<string | null>(
     null,
   );
 
-  const handlePersonaSelect = (persona: Persona): void => {
-    setSelectedPersona(persona);
+  const handleCharacterSelect = (character: Character): void => {
+    setSelectedCharacter(character);
     setModalOpen(false);
   };
 
   const handlePromptClick = (prompt: string): void => {
-    onSelectPrompt(prompt, selectedPersona.id, selectedPersona.preferredModel);
+    onSelectPrompt(
+      prompt,
+      selectedCharacter.id,
+      selectedCharacter.preferredModel,
+    );
   };
 
-  const toggleExpanded = (personaId: string): void => {
-    setExpandedPersonaId((prev) => (prev === personaId ? null : personaId));
+  const toggleExpanded = (characterId: string): void => {
+    setExpandedCharacterId((prev) =>
+      prev === characterId ? null : characterId,
+    );
   };
 
-  const prompts = selectedPersona.suggestedPrompts || [];
+  const prompts = selectedCharacter.suggestedPrompts || [];
 
   // Get title based on root folder
   const getTitleKey = (): TranslationKey => {
@@ -115,22 +121,24 @@ export function SuggestedPrompts({
 
       {/* Persona Tabs */}
       <Div className="flex flex-row gap-2 justify-center flex-wrap">
-        {FEATURED_PERSONAS.map((persona) => (
+        {FEATURED_CHARACTERS.map((character) => (
           <Button
-            key={persona.id}
-            onClick={(): void => handlePersonaSelect(persona)}
+            key={character.id}
+            onClick={(): void => handleCharacterSelect(character)}
             variant="ghost"
             size="unset"
             className={`px-3 sm:px-4 py-2 rounded-full transition-all flex items-center gap-2 text-sm sm:text-base cursor-pointer ${
-              selectedPersona.id === persona.id
+              selectedCharacter.id === character.id
                 ? "bg-linear-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30"
                 : "hover:bg-accent border border-transparent"
             }`}
           >
-            {React.createElement(getIconComponent(persona.icon), {
+            {React.createElement(getIconComponent(character.icon), {
               className: "text-base sm:text-lg",
             })}
-            <Span className="font-medium hidden sm:inline">{persona.name}</Span>
+            <Span className="font-medium hidden sm:inline">
+              {character.name}
+            </Span>
           </Button>
         ))}
 
@@ -156,41 +164,44 @@ export function SuggestedPrompts({
             </DialogHeader>
             <ScrollArea className="h-[70vh] pr-4">
               <Div className="flex flex-col gap-4">
-                {DEFAULT_PERSONAS.map((persona: Persona) => {
-                  const isExpanded = expandedPersonaId === persona.id;
+                {DEFAULT_CHARACTERS.map((character: Character) => {
+                  const isExpanded = expandedCharacterId === character.id;
                   const categoryConfig = CategoryOptions.find(
-                    (cat) => cat.value === persona.category,
+                    (cat) => cat.value === character.category,
                   );
-                  const modelConfig = persona.preferredModel
-                    ? getModelById(persona.preferredModel)
+                  const modelConfig = character.preferredModel
+                    ? getModelById(character.preferredModel)
                     : null;
 
                   return (
                     <Div
-                      key={persona.id}
+                      key={character.id}
                       className={`rounded-lg border transition-all ${
-                        selectedPersona.id === persona.id
+                        selectedCharacter.id === character.id
                           ? "border-purple-500 bg-purple-500/5"
                           : "border-border hover:border-purple-500/50"
                       }`}
                     >
-                      {/* Header - clickable to select persona */}
+                      {/* Header - clickable to select character */}
                       <Button
-                        onClick={(): void => handlePersonaSelect(persona)}
+                        onClick={(): void => handleCharacterSelect(character)}
                         variant="ghost"
                         size="unset"
                         className="w-full text-left p-4 hover:bg-accent/50 rounded-lg"
                       >
                         <Div className="flex items-start gap-4 w-full">
-                          {React.createElement(getIconComponent(persona.icon), {
-                            className: "text-3xl shrink-0",
-                          })}
+                          {React.createElement(
+                            getIconComponent(character.icon),
+                            {
+                              className: "text-3xl shrink-0",
+                            },
+                          )}
                           <Div className="flex-1 min-w-0">
                             <H3 className="text-lg font-semibold mb-1">
-                              {t(persona.name)}
+                              {t(character.name)}
                             </H3>
                             <P className="text-sm text-muted-foreground">
-                              {t(persona.description)}
+                              {t(character.description)}
                             </P>
                             {/* Category and Model badges */}
                             <Div className="flex flex-wrap gap-2 mt-2">
@@ -224,7 +235,7 @@ export function SuggestedPrompts({
                       {/* Toggle button for more details */}
                       <Div className="px-4 pb-2">
                         <Button
-                          onClick={(): void => toggleExpanded(persona.id)}
+                          onClick={(): void => toggleExpanded(character.id)}
                           variant="ghost"
                           size="sm"
                           className="w-full justify-start text-xs gap-2 h-8"
@@ -248,7 +259,7 @@ export function SuggestedPrompts({
                         <Div className="px-4 pb-4 pt-2 border-t border-border">
                           <Div className="flex flex-col gap-4">
                             {/* System Prompt with Markdown */}
-                            {persona.systemPrompt && (
+                            {character.systemPrompt && (
                               <Div className="flex flex-col gap-2">
                                 <Span className="text-sm font-semibold">
                                   {t(
@@ -256,14 +267,14 @@ export function SuggestedPrompts({
                                   )}
                                 </Span>
                                 <Div className="prose prose-sm dark:prose-invert max-w-none bg-muted/30 p-3 rounded-md border border-border">
-                                  <Markdown content={persona.systemPrompt} />
+                                  <Markdown content={character.systemPrompt} />
                                 </Div>
                               </Div>
                             )}
 
                             {/* Suggested Prompts - Same style as outside modal */}
-                            {persona.suggestedPrompts &&
-                              persona.suggestedPrompts.length > 0 && (
+                            {character.suggestedPrompts &&
+                              character.suggestedPrompts.length > 0 && (
                                 <Div className="flex flex-col gap-2">
                                   <Span className="text-sm font-semibold">
                                     {t(
@@ -271,7 +282,7 @@ export function SuggestedPrompts({
                                     )}
                                   </Span>
                                   <Div className="flex flex-col gap-2">
-                                    {persona.suggestedPrompts.map(
+                                    {character.suggestedPrompts.map(
                                       (promptKey, idx) => (
                                         <Button
                                           key={idx}
@@ -302,7 +313,7 @@ export function SuggestedPrompts({
         </Dialog>
       </Div>
 
-      {/* Suggested Prompts for selected persona */}
+      {/* Suggested Prompts for selected character */}
       <Div className="flex flex-col gap-3">
         {prompts.length > 0 ? (
           prompts.map((prompt, index) => (

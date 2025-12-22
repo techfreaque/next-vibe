@@ -3,17 +3,17 @@ import type { JSX } from "react";
 
 import {
   type CreditBalance,
-  creditRepository,
+  CreditRepository,
 } from "@/app/api/[locale]/credits/repository";
 import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
-import { subscriptionRepository } from "@/app/api/[locale]/subscription/repository";
+import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -55,7 +55,7 @@ export default async function BuyCreditsPage({
   // Check authentication
   const logger = createEndpointLogger(false, Date.now(), locale);
 
-  const userResponse = await userRepository.getUserByAuth(
+  const userResponse = await UserRepository.getUserByAuth(
     {
       roles: [UserRole.PUBLIC, UserRole.CUSTOMER],
       detailLevel: UserDetailLevel.MINIMAL,
@@ -76,7 +76,7 @@ export default async function BuyCreditsPage({
   let subscription: SubscriptionGetResponseOutput | null = null;
 
   if (userResponse.success && userResponse.data && userResponse.data.leadId) {
-    const creditsResponse = await creditRepository.getCreditBalanceForUser(
+    const creditsResponse = await CreditRepository.getCreditBalanceForUser(
       userResponse.data,
       locale,
       logger,
@@ -91,7 +91,7 @@ export default async function BuyCreditsPage({
     "id" in userResponse.data &&
     userResponse.data.id
   ) {
-    const subscriptionResponse = await subscriptionRepository.getSubscription(
+    const subscriptionResponse = await SubscriptionRepository.getSubscription(
       userResponse.data.id,
       logger,
       locale,

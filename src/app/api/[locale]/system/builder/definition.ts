@@ -150,7 +150,8 @@ const { POST } = createEndpoint({
           label: "app.api.system.builder.post.fields.configPath.title",
           description:
             "app.api.system.builder.post.fields.configPath.description",
-          placeholder: "app.api.system.builder.post.fields.configPath.placeholder",
+          placeholder:
+            "app.api.system.builder.post.fields.configPath.placeholder",
           icon: "file-code",
           colSpan: 12,
         },
@@ -189,7 +190,7 @@ const { POST } = createEndpoint({
               icon: "layers",
               colSpan: 4,
             },
-            z.nativeEnum(BuildProfileEnum).optional(),
+            z.enum(BuildProfileEnum).optional(),
           ),
 
           dryRun: requestDataField(
@@ -300,7 +301,8 @@ const { POST } = createEndpoint({
               label: "app.api.system.builder.post.fields.foldersToClean.title",
               description:
                 "app.api.system.builder.post.fields.foldersToClean.description",
-              placeholder: "app.api.system.builder.post.fields.foldersToClean.placeholder",
+              placeholder:
+                "app.api.system.builder.post.fields.foldersToClean.placeholder",
               optional: true,
               icon: "trash-2",
               colSpan: 12,
@@ -339,7 +341,8 @@ const { POST } = createEndpoint({
                     label: "app.api.system.builder.post.fields.input.title",
                     description:
                       "app.api.system.builder.post.fields.input.description",
-                    placeholder: "app.api.system.builder.post.fields.input.placeholder",
+                    placeholder:
+                      "app.api.system.builder.post.fields.input.placeholder",
                     icon: "file-input",
                     colSpan: 6,
                   },
@@ -353,7 +356,8 @@ const { POST } = createEndpoint({
                     label: "app.api.system.builder.post.fields.output.title",
                     description:
                       "app.api.system.builder.post.fields.output.description",
-                    placeholder: "app.api.system.builder.post.fields.output.placeholder",
+                    placeholder:
+                      "app.api.system.builder.post.fields.output.placeholder",
                     icon: "file-output",
                     colSpan: 6,
                   },
@@ -371,7 +375,10 @@ const { POST } = createEndpoint({
                     icon: "box",
                     colSpan: 6,
                   },
-                  z.union([z.nativeEnum(ViteBuildTypeEnum), z.nativeEnum(BunBuildTypeEnum)]),
+                  z.union([
+                    z.enum(ViteBuildTypeEnum),
+                    z.enum(BunBuildTypeEnum),
+                  ]),
                 ),
 
                 modulesToExternalize: requestDataField(
@@ -382,7 +389,8 @@ const { POST } = createEndpoint({
                       "app.api.system.builder.post.fields.modulesToExternalize.title",
                     description:
                       "app.api.system.builder.post.fields.modulesToExternalize.description",
-                    placeholder: "app.api.system.builder.post.fields.modulesToExternalize.placeholder",
+                    placeholder:
+                      "app.api.system.builder.post.fields.modulesToExternalize.placeholder",
                     optional: true,
                     icon: "package",
                     colSpan: 6,
@@ -456,7 +464,8 @@ const { POST } = createEndpoint({
                           "app.api.system.builder.post.fields.dtsInclude.title",
                         description:
                           "app.api.system.builder.post.fields.dtsInclude.description",
-                        placeholder: "app.api.system.builder.post.fields.dtsInclude.placeholder",
+                        placeholder:
+                          "app.api.system.builder.post.fields.dtsInclude.placeholder",
                         icon: "file-type",
                         colSpan: 8,
                       },
@@ -471,7 +480,8 @@ const { POST } = createEndpoint({
                           "app.api.system.builder.post.fields.dtsEntryRoot.title",
                         description:
                           "app.api.system.builder.post.fields.dtsEntryRoot.description",
-                        placeholder: "app.api.system.builder.post.fields.dtsEntryRoot.placeholder",
+                        placeholder:
+                          "app.api.system.builder.post.fields.dtsEntryRoot.placeholder",
                         icon: "folder",
                         colSpan: 12,
                       },
@@ -508,7 +518,7 @@ const { POST } = createEndpoint({
                         icon: "target",
                         colSpan: 4,
                       },
-                      z.nativeEnum(BunTargetEnum).optional(),
+                      z.enum(BunTargetEnum).optional(),
                     ),
 
                     minify: requestDataField(
@@ -539,7 +549,7 @@ const { POST } = createEndpoint({
                         icon: "map",
                         colSpan: 4,
                       },
-                      z.nativeEnum(SourcemapModeEnum).optional(),
+                      z.enum(SourcemapModeEnum).optional(),
                     ),
 
                     external: requestDataField(
@@ -550,7 +560,8 @@ const { POST } = createEndpoint({
                           "app.api.system.builder.post.fields.external.title",
                         description:
                           "app.api.system.builder.post.fields.external.description",
-                        placeholder: "app.api.system.builder.post.fields.external.placeholder",
+                        placeholder:
+                          "app.api.system.builder.post.fields.external.placeholder",
                         optional: true,
                         icon: "external-link",
                         colSpan: 12,
@@ -603,7 +614,7 @@ const { POST } = createEndpoint({
                         icon: "file-code",
                         colSpan: 4,
                       },
-                      z.nativeEnum(OutputFormatEnum).optional(),
+                      z.enum(OutputFormatEnum).optional(),
                     ),
 
                     bytecode: requestDataField(
@@ -629,7 +640,8 @@ const { POST } = createEndpoint({
                           "app.api.system.builder.post.fields.banner.title",
                         description:
                           "app.api.system.builder.post.fields.banner.description",
-                        placeholder: "app.api.system.builder.post.fields.banner.placeholder",
+                        placeholder:
+                          "app.api.system.builder.post.fields.banner.placeholder",
                         optional: true,
                         icon: "chevron-up",
                         colSpan: 6,
@@ -645,7 +657,8 @@ const { POST } = createEndpoint({
                           "app.api.system.builder.post.fields.footer.title",
                         description:
                           "app.api.system.builder.post.fields.footer.description",
-                        placeholder: "app.api.system.builder.post.fields.footer.placeholder",
+                        placeholder:
+                          "app.api.system.builder.post.fields.footer.placeholder",
                         optional: true,
                         icon: "chevron-down",
                         colSpan: 6,
@@ -658,8 +671,10 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.builder.post.fields.publicPath.label",
-                        description: "app.api.system.builder.post.fields.publicPath.description",
+                        label:
+                          "app.api.system.builder.post.fields.publicPath.label",
+                        description:
+                          "app.api.system.builder.post.fields.publicPath.description",
                         optional: true,
                         colSpan: 6,
                       },
@@ -670,8 +685,10 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.JSON,
-                        label: "app.api.system.builder.post.fields.naming.label",
-                        description: "app.api.system.builder.post.fields.naming.description",
+                        label:
+                          "app.api.system.builder.post.fields.naming.label",
+                        description:
+                          "app.api.system.builder.post.fields.naming.description",
                         optional: true,
                         colSpan: 6,
                       },
@@ -692,7 +709,8 @@ const { POST } = createEndpoint({
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
                         label: "app.api.system.builder.post.fields.root.label",
-                        description: "app.api.system.builder.post.fields.root.description",
+                        description:
+                          "app.api.system.builder.post.fields.root.description",
                         optional: true,
                         colSpan: 6,
                       },
@@ -703,8 +721,10 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.JSON,
-                        label: "app.api.system.builder.post.fields.conditions.label",
-                        description: "app.api.system.builder.post.fields.conditions.description",
+                        label:
+                          "app.api.system.builder.post.fields.conditions.label",
+                        description:
+                          "app.api.system.builder.post.fields.conditions.description",
                         optional: true,
                         colSpan: 6,
                       },
@@ -715,8 +735,10 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.JSON,
-                        label: "app.api.system.builder.post.fields.loader.label",
-                        description: "app.api.system.builder.post.fields.loader.description",
+                        label:
+                          "app.api.system.builder.post.fields.loader.label",
+                        description:
+                          "app.api.system.builder.post.fields.loader.description",
                         optional: true,
                         colSpan: 6,
                       },
@@ -744,7 +766,8 @@ const { POST } = createEndpoint({
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.JSON,
                         label: "app.api.system.builder.post.fields.drop.label",
-                        description: "app.api.system.builder.post.fields.drop.description",
+                        description:
+                          "app.api.system.builder.post.fields.drop.description",
                         optional: true,
                         colSpan: 6,
                       },
@@ -776,7 +799,8 @@ const { POST } = createEndpoint({
                           "app.api.system.builder.post.fields.viteTarget.title",
                         description:
                           "app.api.system.builder.post.fields.viteTarget.description",
-                        placeholder: "app.api.system.builder.post.fields.viteTarget.placeholder",
+                        placeholder:
+                          "app.api.system.builder.post.fields.viteTarget.placeholder",
                         optional: true,
                         icon: "target",
                         colSpan: 6,
@@ -792,7 +816,8 @@ const { POST } = createEndpoint({
                           "app.api.system.builder.post.fields.viteOutDir.title",
                         description:
                           "app.api.system.builder.post.fields.viteOutDir.description",
-                        placeholder: "app.api.system.builder.post.fields.viteOutDir.placeholder",
+                        placeholder:
+                          "app.api.system.builder.post.fields.viteOutDir.placeholder",
                         optional: true,
                         icon: "folder-output",
                         colSpan: 6,
@@ -808,7 +833,8 @@ const { POST } = createEndpoint({
                           "app.api.system.builder.post.fields.viteAssetsDir.title",
                         description:
                           "app.api.system.builder.post.fields.viteAssetsDir.description",
-                        placeholder: "app.api.system.builder.post.fields.viteAssetsDir.placeholder",
+                        placeholder:
+                          "app.api.system.builder.post.fields.viteAssetsDir.placeholder",
                         optional: true,
                         icon: "folder",
                         colSpan: 4,
@@ -824,7 +850,8 @@ const { POST } = createEndpoint({
                           "app.api.system.builder.post.fields.viteAssetsInlineLimit.title",
                         description:
                           "app.api.system.builder.post.fields.viteAssetsInlineLimit.description",
-                        placeholder: "app.api.system.builder.post.fields.viteAssetsInlineLimit.placeholder",
+                        placeholder:
+                          "app.api.system.builder.post.fields.viteAssetsInlineLimit.placeholder",
                         optional: true,
                         icon: "file-image",
                         colSpan: 4,
@@ -840,7 +867,8 @@ const { POST } = createEndpoint({
                           "app.api.system.builder.post.fields.viteChunkSizeWarningLimit.title",
                         description:
                           "app.api.system.builder.post.fields.viteChunkSizeWarningLimit.description",
-                        placeholder: "app.api.system.builder.post.fields.viteChunkSizeWarningLimit.placeholder",
+                        placeholder:
+                          "app.api.system.builder.post.fields.viteChunkSizeWarningLimit.placeholder",
                         optional: true,
                         icon: "alert-triangle",
                         colSpan: 4,
@@ -996,7 +1024,8 @@ const { POST } = createEndpoint({
                               "app.api.system.builder.post.fields.viteLibEntry.title",
                             description:
                               "app.api.system.builder.post.fields.viteLibEntry.description",
-                            placeholder: "app.api.system.builder.post.fields.viteLibEntry.placeholder",
+                            placeholder:
+                              "app.api.system.builder.post.fields.viteLibEntry.placeholder",
                             icon: "file-input",
                             colSpan: 6,
                           },
@@ -1015,7 +1044,8 @@ const { POST } = createEndpoint({
                               "app.api.system.builder.post.fields.viteLibName.title",
                             description:
                               "app.api.system.builder.post.fields.viteLibName.description",
-                            placeholder: "app.api.system.builder.post.fields.viteLibName.placeholder",
+                            placeholder:
+                              "app.api.system.builder.post.fields.viteLibName.placeholder",
                             optional: true,
                             icon: "tag",
                             colSpan: 6,
@@ -1036,7 +1066,7 @@ const { POST } = createEndpoint({
                             icon: "file-code",
                             colSpan: 6,
                           },
-                          z.array(z.nativeEnum(ViteLibFormatEnum)).optional(),
+                          z.array(z.enum(ViteLibFormatEnum)).optional(),
                         ),
 
                         fileName: requestDataField(
@@ -1047,7 +1077,8 @@ const { POST } = createEndpoint({
                               "app.api.system.builder.post.fields.viteLibFileName.title",
                             description:
                               "app.api.system.builder.post.fields.viteLibFileName.description",
-                            placeholder: "app.api.system.builder.post.fields.viteLibFileName.placeholder",
+                            placeholder:
+                              "app.api.system.builder.post.fields.viteLibFileName.placeholder",
                             optional: true,
                             icon: "file",
                             colSpan: 6,
@@ -1080,7 +1111,8 @@ const { POST } = createEndpoint({
                               "app.api.system.builder.post.fields.rollupExternal.title",
                             description:
                               "app.api.system.builder.post.fields.rollupExternal.description",
-                            placeholder: "app.api.system.builder.post.fields.rollupExternal.placeholder",
+                            placeholder:
+                              "app.api.system.builder.post.fields.rollupExternal.placeholder",
                             optional: true,
                             icon: "external-link",
                             colSpan: 12,
@@ -1114,8 +1146,10 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.JSON,
-                            label: "app.api.system.builder.post.fields.rollupOutput.label",
-                            description: "app.api.system.builder.post.fields.rollupOutput.description",
+                            label:
+                              "app.api.system.builder.post.fields.rollupOutput.label",
+                            description:
+                              "app.api.system.builder.post.fields.rollupOutput.description",
                             optional: true,
                             icon: "file-output",
                             colSpan: 12,
@@ -1130,7 +1164,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.JSON,
-                        label: "app.api.system.builder.post.fields.vitePlugins.label",
+                        label:
+                          "app.api.system.builder.post.fields.vitePlugins.label",
                         description:
                           "app.api.system.builder.post.fields.vitePlugins.description",
                         optional: true,
@@ -1145,8 +1180,10 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.JSON,
-                        label: "app.api.system.builder.post.fields.viteBuild.label",
-                        description: "app.api.system.builder.post.fields.viteBuild.description",
+                        label:
+                          "app.api.system.builder.post.fields.viteBuild.label",
+                        description:
+                          "app.api.system.builder.post.fields.viteBuild.description",
                         optional: true,
                         icon: "settings",
                         colSpan: 12,
@@ -1191,7 +1228,8 @@ const { POST } = createEndpoint({
                     label: "app.api.system.builder.post.fields.copyInput.title",
                     description:
                       "app.api.system.builder.post.fields.copyInput.description",
-                    placeholder: "app.api.system.builder.post.fields.copyInput.placeholder",
+                    placeholder:
+                      "app.api.system.builder.post.fields.copyInput.placeholder",
                     icon: "file-input",
                     colSpan: 5,
                   },
@@ -1206,7 +1244,8 @@ const { POST } = createEndpoint({
                       "app.api.system.builder.post.fields.copyOutput.title",
                     description:
                       "app.api.system.builder.post.fields.copyOutput.description",
-                    placeholder: "app.api.system.builder.post.fields.copyOutput.placeholder",
+                    placeholder:
+                      "app.api.system.builder.post.fields.copyOutput.placeholder",
                     icon: "file-output",
                     colSpan: 5,
                   },
@@ -1221,7 +1260,8 @@ const { POST } = createEndpoint({
                       "app.api.system.builder.post.fields.copyPattern.title",
                     description:
                       "app.api.system.builder.post.fields.copyPattern.description",
-                    placeholder: "app.api.system.builder.post.fields.copyPattern.placeholder",
+                    placeholder:
+                      "app.api.system.builder.post.fields.copyPattern.placeholder",
                     optional: true,
                     icon: "filter",
                     colSpan: 2,
@@ -1256,7 +1296,8 @@ const { POST } = createEndpoint({
                   label: "app.api.system.builder.post.fields.packageName.title",
                   description:
                     "app.api.system.builder.post.fields.packageName.description",
-                  placeholder: "app.api.system.builder.post.fields.packageName.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packageName.placeholder",
                   icon: "package",
                   colSpan: 6,
                 },
@@ -1271,7 +1312,8 @@ const { POST } = createEndpoint({
                     "app.api.system.builder.post.fields.packageVersion.title",
                   description:
                     "app.api.system.builder.post.fields.packageVersion.description",
-                  placeholder: "app.api.system.builder.post.fields.packageVersion.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packageVersion.placeholder",
                   optional: true,
                   icon: "tag",
                   colSpan: 6,
@@ -1287,7 +1329,8 @@ const { POST } = createEndpoint({
                     "app.api.system.builder.post.fields.packageDescription.title",
                   description:
                     "app.api.system.builder.post.fields.packageDescription.description",
-                  placeholder: "app.api.system.builder.post.fields.packageDescription.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packageDescription.placeholder",
                   optional: true,
                   icon: "text",
                   colSpan: 12,
@@ -1302,7 +1345,8 @@ const { POST } = createEndpoint({
                   label: "app.api.system.builder.post.fields.packageMain.title",
                   description:
                     "app.api.system.builder.post.fields.packageMain.description",
-                  placeholder: "app.api.system.builder.post.fields.packageMain.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packageMain.placeholder",
                   optional: true,
                   icon: "file-code",
                   colSpan: 4,
@@ -1318,7 +1362,8 @@ const { POST } = createEndpoint({
                     "app.api.system.builder.post.fields.packageModule.title",
                   description:
                     "app.api.system.builder.post.fields.packageModule.description",
-                  placeholder: "app.api.system.builder.post.fields.packageModule.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packageModule.placeholder",
                   optional: true,
                   icon: "file-code-2",
                   colSpan: 4,
@@ -1334,7 +1379,8 @@ const { POST } = createEndpoint({
                     "app.api.system.builder.post.fields.packageTypes.title",
                   description:
                     "app.api.system.builder.post.fields.packageTypes.description",
-                  placeholder: "app.api.system.builder.post.fields.packageTypes.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packageTypes.placeholder",
                   optional: true,
                   icon: "file-type",
                   colSpan: 4,
@@ -1349,7 +1395,8 @@ const { POST } = createEndpoint({
                   label: "app.api.system.builder.post.fields.packageBin.title",
                   description:
                     "app.api.system.builder.post.fields.packageBin.description",
-                  placeholder: "app.api.system.builder.post.fields.packageBin.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packageBin.placeholder",
                   optional: true,
                   icon: "terminal",
                   colSpan: 12,
@@ -1382,7 +1429,8 @@ const { POST } = createEndpoint({
                     "app.api.system.builder.post.fields.packageDependencies.title",
                   description:
                     "app.api.system.builder.post.fields.packageDependencies.description",
-                  placeholder: "app.api.system.builder.post.fields.packageDependencies.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packageDependencies.placeholder",
                   optional: true,
                   icon: "package",
                   colSpan: 6,
@@ -1398,7 +1446,8 @@ const { POST } = createEndpoint({
                     "app.api.system.builder.post.fields.packagePeerDependencies.title",
                   description:
                     "app.api.system.builder.post.fields.packagePeerDependencies.description",
-                  placeholder: "app.api.system.builder.post.fields.packagePeerDependencies.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packagePeerDependencies.placeholder",
                   optional: true,
                   icon: "users",
                   colSpan: 6,
@@ -1414,7 +1463,8 @@ const { POST } = createEndpoint({
                     "app.api.system.builder.post.fields.packageFiles.title",
                   description:
                     "app.api.system.builder.post.fields.packageFiles.description",
-                  placeholder: "app.api.system.builder.post.fields.packageFiles.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packageFiles.placeholder",
                   optional: true,
                   icon: "files",
                   colSpan: 6,
@@ -1430,7 +1480,8 @@ const { POST } = createEndpoint({
                     "app.api.system.builder.post.fields.packageKeywords.title",
                   description:
                     "app.api.system.builder.post.fields.packageKeywords.description",
-                  placeholder: "app.api.system.builder.post.fields.packageKeywords.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packageKeywords.placeholder",
                   optional: true,
                   icon: "hash",
                   colSpan: 6,
@@ -1446,7 +1497,8 @@ const { POST } = createEndpoint({
                     "app.api.system.builder.post.fields.packageLicense.title",
                   description:
                     "app.api.system.builder.post.fields.packageLicense.description",
-                  placeholder: "app.api.system.builder.post.fields.packageLicense.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packageLicense.placeholder",
                   optional: true,
                   icon: "scale",
                   colSpan: 6,
@@ -1462,7 +1514,8 @@ const { POST } = createEndpoint({
                     "app.api.system.builder.post.fields.packageRepository.title",
                   description:
                     "app.api.system.builder.post.fields.packageRepository.description",
-                  placeholder: "app.api.system.builder.post.fields.packageRepository.placeholder",
+                  placeholder:
+                    "app.api.system.builder.post.fields.packageRepository.placeholder",
                   optional: true,
                   icon: "github",
                   colSpan: 6,
@@ -1550,7 +1603,7 @@ const { POST } = createEndpoint({
           optional: true,
           icon: "layers",
         },
-        z.nativeEnum(BuildProfileEnum).optional(),
+        z.enum(BuildProfileEnum).optional(),
       ),
 
       reportPath: responseField(
@@ -1565,10 +1618,23 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.DATA_TABLE,
           columns: [
-            { key: "step", label: "app.api.system.builder.post.fields.stepTimings.step" },
-            { key: "duration", label: "app.api.system.builder.post.fields.stepTimings.duration" },
-            { key: "status", label: "app.api.system.builder.post.fields.stepTimings.status" },
-            { key: "filesAffected", label: "app.api.system.builder.post.fields.stepTimings.filesAffected" },
+            {
+              key: "step",
+              label: "app.api.system.builder.post.fields.stepTimings.step",
+            },
+            {
+              key: "duration",
+              label: "app.api.system.builder.post.fields.stepTimings.duration",
+            },
+            {
+              key: "status",
+              label: "app.api.system.builder.post.fields.stepTimings.status",
+            },
+            {
+              key: "filesAffected",
+              label:
+                "app.api.system.builder.post.fields.stepTimings.filesAffected",
+            },
           ],
           optional: true,
           icon: "list-checks",
@@ -1582,26 +1648,36 @@ const { POST } = createEndpoint({
           { response: true },
           {
             step: responseField(
-              { type: WidgetType.TEXT, content: "app.api.system.builder.post.fields.stepTimings.step", icon: "chevron-right" },
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.system.builder.post.fields.stepTimings.step",
+                icon: "chevron-right",
+              },
               z.string(),
             ),
             duration: responseField(
               {
                 type: WidgetType.STAT,
-                label: "app.api.system.builder.post.fields.stepTimings.duration",
+                label:
+                  "app.api.system.builder.post.fields.stepTimings.duration",
                 icon: "clock",
                 suffix: "ms",
               },
               z.coerce.number(),
             ),
             status: responseField(
-              { type: WidgetType.BADGE, label: "app.api.system.builder.post.fields.stepTimings.status", icon: "activity" },
-              z.nativeEnum(StepStatusEnum),
+              {
+                type: WidgetType.BADGE,
+                label: "app.api.system.builder.post.fields.stepTimings.status",
+                icon: "activity",
+              },
+              z.enum(StepStatusEnum),
             ),
             filesAffected: responseField(
               {
                 type: WidgetType.STAT,
-                label: "app.api.system.builder.post.fields.stepTimings.filesAffected",
+                label:
+                  "app.api.system.builder.post.fields.stepTimings.filesAffected",
                 optional: true,
                 icon: "files",
               },
@@ -1847,10 +1923,11 @@ export interface BuildHookContext {
 export type BuildHook = (context: BuildHookContext) => Promise<void> | void;
 
 /** Full BuildConfig type - API config + runtime-only fields (hooks, env, profiles) */
-export interface BuildConfig extends Omit<
-  ApiConfigObject,
-  "filesToCompile" | "filesOrFoldersToCopy" | "npmPackage"
-> {
+export interface BuildConfig
+  extends Omit<
+    ApiConfigObject,
+    "filesToCompile" | "filesOrFoldersToCopy" | "npmPackage"
+  > {
   foldersToClean?: string[];
   filesToCompile?: FileToCompile[];
   filesOrFoldersToCopy?: CopyConfig[];

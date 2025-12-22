@@ -1,15 +1,6 @@
 /**
  * Native Root Folder Permissions Repository
- * Implements RootFolderPermissionsRepositoryInterface for React Native
- *
- * POLYFILL PATTERN: This file makes the same repository interface work on native
- * by calling HTTP endpoints instead of direct database access using typesafe endpoint definitions.
- *
- * Server code can call rootFolderPermissionsRepository.getRootFolderPermissions() and it will:
- * - On Web/Server: Compute permissions directly
- * - On React Native: Make HTTP call via nativeEndpoint() with full type safety
- *
- * This allows the SAME code to work on both platforms!
+ * Implements RootFolderPermissionsRepository static interface for React Native
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -24,22 +15,19 @@ import type {
   RootPermissionsGetResponseOutput,
 } from "./definition";
 import { GET as getRootPermissionsEndpoint } from "./definition";
-import type { RootFolderPermissionsRepositoryInterface } from "./repository";
+import type { RootFolderPermissionsRepositoryType } from "./repository";
 
 /**
- * Native Root Folder Permissions Repository Implementation
- * Uses HTTP client to call API endpoints, providing the same interface as server
+ * Native Root Folder Permissions Repository - Static class pattern
  */
-class RootFolderPermissionsRepositoryNativeImpl implements RootFolderPermissionsRepositoryInterface {
-  async getRootFolderPermissions(
+export class RootFolderPermissionsRepository {
+  static async getRootFolderPermissions(
     data: RootPermissionsGetRequestOutput,
-    // eslint-disable-next-line no-unused-vars -- Required by interface, native impl uses HTTP client instead
+    // oxlint-disable-next-line no-unused-vars
     _user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<RootPermissionsGetResponseOutput>> {
-    // Use typesafe nativeEndpoint() with endpoint definition
-    // This provides full type inference from the endpoint's schema
     const response = await nativeEndpoint(
       getRootPermissionsEndpoint,
       { data },
@@ -55,7 +43,6 @@ class RootFolderPermissionsRepositoryNativeImpl implements RootFolderPermissions
       };
     }
 
-    // Error response - preserve all error information
     return {
       success: false,
       errorType: response.errorType,
@@ -65,9 +52,7 @@ class RootFolderPermissionsRepositoryNativeImpl implements RootFolderPermissions
   }
 }
 
-/**
- * Singleton instance
- * Export with same name as server implementation for drop-in replacement
- */
-export const rootFolderPermissionsRepository =
-  new RootFolderPermissionsRepositoryNativeImpl();
+// Compile-time type check: ensures native has same static methods as server
+const _typeCheck: RootFolderPermissionsRepositoryType =
+  RootFolderPermissionsRepository;
+void _typeCheck;

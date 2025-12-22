@@ -7,18 +7,18 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { chatFoldersRepository } from "./repository";
+import { ChatFoldersRepository } from "./repository";
 
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: ({ data, user, locale, logger }) =>
-      chatFoldersRepository.getFolders(data, user, locale, logger),
+      ChatFoldersRepository.getFolders(data, user, locale, logger),
   },
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, user, locale, logger }) =>
-      chatFoldersRepository.createFolder(data, user, locale, logger),
+      ChatFoldersRepository.createFolder(data, user, locale, logger),
   },
 });

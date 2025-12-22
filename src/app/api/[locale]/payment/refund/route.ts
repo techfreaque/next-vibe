@@ -7,9 +7,8 @@ import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { authRepository } from "@/app/api/[locale]/user/auth/repository";
 
-import { paymentRepository } from "../repository";
+import { PaymentRepository } from "../repository";
 import refundDefinitions from "./definition";
 
 export const { POST, tools } = endpointsHandler({
@@ -17,16 +16,11 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     handler: ({ data, user, locale, logger }) => {
       logger.debug("Payment refund API POST request", {
-        userId: authRepository.requireUserId(user),
+        userId: user.id,
         transactionId: data.transactionId,
         amount: data.amount,
       });
-      return paymentRepository.createRefund(
-        authRepository.requireUserId(user),
-        data,
-        locale,
-        logger,
-      );
+      return PaymentRepository.createRefund(user.id, data, locale, logger);
     },
   },
 });

@@ -71,7 +71,8 @@ export const translations: typeof enTranslations = {
       completed: "Zakończono",
       noKeysInUse: "Brak kluczy w użyciu",
       writingFilteredTranslations: "Zapisywanie przefiltrowanych tłumaczeń",
-      removeUnusedRequiresRegenerate: "removeUnused wymaga włączenia regenerateStructure",
+      removeUnusedRequiresRegenerate:
+        "removeUnused wymaga włączenia regenerateStructure",
     },
     response: {
       title: "Wynik reorganizacji",

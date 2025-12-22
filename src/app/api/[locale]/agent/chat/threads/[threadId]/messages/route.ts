@@ -18,7 +18,7 @@ import type {
   MessageListUrlParamsTypeOutput,
 } from "./definition";
 import definitions from "./definition";
-import { messagesRepository } from "./repository";
+import { MessagesRepository } from "./repository";
 
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
@@ -31,7 +31,7 @@ export const { GET, POST, tools } = endpointsHandler({
         typeof definitions.GET.allowedRoles
       >,
     ): Promise<ResponseType<MessageListResponseOutput>> => {
-      return await messagesRepository.listMessages(
+      return await MessagesRepository.listMessages(
         { threadId: props.urlPathParams.threadId },
         props.user,
         props.locale,
@@ -48,7 +48,7 @@ export const { GET, POST, tools } = endpointsHandler({
         typeof definitions.POST.allowedRoles
       >,
     ): Promise<ResponseType<MessageCreateResponseOutput>> => {
-      return await messagesRepository.createMessage(
+      return await MessagesRepository.createMessage(
         {
           ...props.data,
           threadId: props.urlPathParams.threadId,

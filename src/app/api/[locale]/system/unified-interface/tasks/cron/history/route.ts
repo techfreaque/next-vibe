@@ -7,12 +7,12 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { cronHistoryRepository } from "./repository";
+import { CronHistoryRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
     handler: ({ data, locale, logger }) =>
-      cronHistoryRepository.getTaskHistory(data, locale, logger),
+      CronHistoryRepository.getTaskHistory(data, locale, logger),
   },
 });

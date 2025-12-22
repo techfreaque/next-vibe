@@ -1,8 +1,8 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import { Div,type DivMouseEvent } from "next-vibe-ui/ui/div";
+import { Div, type DivMouseEvent } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
-import { Span,type SpanMouseEvent } from "next-vibe-ui/ui/span";
+import { Span, type SpanMouseEvent } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React from "react";
 
@@ -26,9 +26,9 @@ import type { useCollapseState } from "../hooks/use-collapse-state";
 import type { useMessageActions } from "../hooks/use-message-actions";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
-import { ModelPersonaSelectorModal } from "../model-persona-selector-modal";
+import { ModelPersonaSelectorModal } from "../model-character-selector-modal";
 import { ToolDisplay } from "../tool-display";
-import { countPostsByUserId,countReplies, getDirectReplies } from "./helpers";
+import { countPostsByUserId, countReplies, getDirectReplies } from "./helpers";
 
 export interface FlatMessageProps {
   message: ChatMessage;
@@ -73,13 +73,13 @@ export function FlatMessage({
 }: FlatMessageProps): JSX.Element {
   // Get callbacks and state from context
   const {
-    personas,
+    characters,
     branchMessage: onBranchMessage,
     retryMessage: onRetryMessage,
     answerAsAI: onAnswerAsModel,
     handleDeleteMessage: onDeleteMessage,
     handleModelChange: onModelChange,
-    setSelectedPersona: onPersonaChange,
+    setSelectedCharacter: onCharacterChange,
   } = useChatContext();
   const { t } = simpleT(locale);
 
@@ -109,10 +109,11 @@ export function FlatMessage({
       : null;
   const modelDisplayName =
     modelData?.name || t("app.chat.flatView.assistantFallback");
-  // Get persona name from personas map (fetched from server)
-  const personaDisplayName =
-    (message.role === "user" || message.role === "assistant") && message.persona
-      ? personas[message.persona]?.name || message.persona
+  // Get character name from characters map (fetched from server)
+  const characterDisplayName =
+    (message.role === "user" || message.role === "assistant") &&
+    message.character
+      ? characters[message.character]?.name || message.character
       : t("app.chat.flatView.anonymous");
 
   // Determine display name for user messages
@@ -204,7 +205,7 @@ export function FlatMessage({
           >
             {isUser
               ? t("app.chat.flatView.idLabel", { id: userId.slice(0, 8) })
-              : personaDisplayName}
+              : characterDisplayName}
           </Button>
         </Div>
 
@@ -307,7 +308,7 @@ export function FlatMessage({
             }
             onCancel={messageActions.cancelAction}
             onModelChange={onModelChange}
-            onPersonaChange={onPersonaChange}
+            onCharacterChange={onCharacterChange}
             locale={locale}
             logger={logger}
           />
@@ -327,13 +328,13 @@ export function FlatMessage({
                 );
               })
             }
-            onPersonaChange={
-              onPersonaChange ||
-              ((persona: string): void => {
+            onCharacterChange={
+              onCharacterChange ||
+              ((character: string): void => {
                 logger.debug(
                   "FlatMessageView",
-                  "Persona selection changed (no handler)",
-                  { persona },
+                  "Character selection changed (no handler)",
+                  { character },
                 );
               })
             }
@@ -471,13 +472,13 @@ export function FlatMessage({
                 );
               })
             }
-            onPersonaChange={
-              onPersonaChange ||
-              ((persona: string): void => {
+            onCharacterChange={
+              onCharacterChange ||
+              ((character: string): void => {
                 logger.debug(
                   "FlatMessageView",
-                  "Persona selection changed (no handler)",
-                  { persona },
+                  "Character selection changed (no handler)",
+                  { character },
                 );
               })
             }

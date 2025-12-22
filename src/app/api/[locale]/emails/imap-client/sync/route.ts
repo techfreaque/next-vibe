@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { imapSyncRepository } from "./repository";
+import { ImapSyncRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, user, logger }) =>
-      imapSyncRepository.startSync(data, user, logger),
+      ImapSyncRepository.startSync(data, user, logger),
   },
 });

@@ -300,10 +300,7 @@ export class SideTasksRepository implements ISideTasksRepository {
     }
   }
 
-  async getExecutionsByTaskId(
-    taskId: string,
-    limit = 50,
-  ) {
+  async getExecutionsByTaskId(taskId: string, limit = 50) {
     try {
       const executions = await db
         .select()
@@ -324,7 +321,7 @@ export class SideTasksRepository implements ISideTasksRepository {
     }
   }
 
-  async getRecentExecutions( limit = 100) {
+  async getRecentExecutions(limit = 100) {
     try {
       const executions = await db
         .select()
@@ -385,10 +382,7 @@ export class SideTasksRepository implements ISideTasksRepository {
     }
   }
 
-  async getHealthCheckHistory(
-    taskId: string,
-    limit = 50,
-  ) {
+  async getHealthCheckHistory(taskId: string, limit = 50) {
     try {
       const healthChecks = await db
         .select()

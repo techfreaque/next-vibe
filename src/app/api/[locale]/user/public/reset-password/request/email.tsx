@@ -13,8 +13,8 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 import { UserDetailLevel } from "../../../enum";
-import { userRepository } from "../../../repository";
-import { passwordRepository } from "../repository";
+import { UserRepository } from "../../../repository";
+import { PasswordRepository } from "../repository";
 import type {
   ResetPasswordRequestPostRequestOutput,
   ResetPasswordRequestPostResponseOutput,
@@ -146,7 +146,7 @@ export const renderResetPasswordMail: EmailFunctionType<
   });
 
   try {
-    const userResponse = await userRepository.getUserByEmail(
+    const userResponse = await UserRepository.getUserByEmail(
       requestData.emailInput.email,
       UserDetailLevel.STANDARD,
       locale,
@@ -165,7 +165,7 @@ export const renderResetPasswordMail: EmailFunctionType<
     const user = userResponse.data;
 
     // Create a reset token
-    const tokenResponse = await passwordRepository.createResetToken(
+    const tokenResponse = await PasswordRepository.createResetToken(
       requestData.emailInput.email,
       locale,
       logger,

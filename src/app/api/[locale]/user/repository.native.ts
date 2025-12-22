@@ -1,26 +1,9 @@
 /**
  * Native User Repository
  * Implements UserRepository interface for React Native
- *
- * POLYFILL PATTERN: This file makes the same repository interface work on native
- * by calling HTTP endpoints instead of direct database access using typesafe endpoint definitions.
- *
- * IMPLEMENTATION STRATEGY:
- * - getUserByAuth(): Fully implemented with nativeEndpoint() (used in 8 page.tsx files)
- * - Other methods: Return "not implemented" errors (not used in page.tsx, can be added when needed)
- *
- * Server code (like page.tsx) can call userRepository.getUserByAuth() and it will:
- * - On Web/Server: Query the database directly
- * - On React Native: Make HTTP call via nativeEndpoint() with full type safety
- *
- * This allows the SAME code to work on both platforms!
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
 
 import type { DbId } from "@/app/api/[locale]/system/db/types";
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
@@ -28,10 +11,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NewUser } from "./db";
-import type { UserDetailLevel } from "./enum";
+import { UserDetailLevel } from "./enum";
 import { GET as getUserMeEndpoint } from "./private/me/definition";
-// Import the interface for type compatibility
-import type { UserRepository } from "./repository";
+import type { UserRepositoryType } from "./repository";
 import type {
   ExtendedUserDetailLevel,
   ExtendedUserType,
@@ -43,68 +25,51 @@ import type {
 import type { UserRoleValue } from "./user-roles/enum";
 
 /**
- * Native User Repository Implementation
- * Uses HTTP client to call API endpoints, providing the same interface as server
+ * Native User Repository - Static class pattern
  */
-class UserRepositoryNativeImpl implements UserRepository {
-  private createNotImplementedError<T>(method: string): ResponseType<T> {
-    return fail({
-      message: "app.api.user.errors.not_implemented_on_native",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { method },
-    });
-  }
-
-  async getUserById<
+export class UserRepository {
+  static async getUserById<
     T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
   >(
-    userId: DbId,
-    detailLevel: T,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _userId: DbId,
+    // oxlint-disable-next-line no-unused-vars
+    _detailLevel: T = UserDetailLevel.STANDARD as T,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
-    logger.error("getUserById not implemented on native", {
-      userId,
-      detailLevel: String(detailLevel),
-      locale,
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<ExtendedUserType<T>>("getUserById"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getUserById is not implemented on native");
   }
 
-  async getUserByEmail<
+  static async getUserByEmail<
     T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
   >(
-    email: string,
-    detailLevel: T,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _email: string,
+    // oxlint-disable-next-line no-unused-vars
+    _detailLevel: T = UserDetailLevel.STANDARD as T,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
-    logger.error("getUserByEmail not implemented on native", {
-      email,
-      detailLevel: String(detailLevel),
-      locale,
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<ExtendedUserType<T>>("getUserByEmail"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getUserByEmail is not implemented on native");
   }
 
-  async getUserByAuth<
-    T extends typeof UserDetailLevel.MINIMAL | ExtendedUserDetailLevel =
-      typeof UserDetailLevel.MINIMAL,
+  static async getUserByAuth<
+    T extends
+      | typeof UserDetailLevel.MINIMAL
+      | ExtendedUserDetailLevel = typeof UserDetailLevel.MINIMAL,
   >(
-    options: Omit<UserFetchOptions, "detailLevel"> & { detailLevel?: T },
+    // oxlint-disable-next-line no-unused-vars
+    _options: Omit<UserFetchOptions, "detailLevel"> & { detailLevel?: T },
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserType<T>>> {
-    logger.debug("getUserByAuth on native", {
-      detailLevel: String(options.detailLevel),
-      locale,
-    });
-    // Use typesafe nativeEndpoint() with endpoint definition
-    // This provides full type inference from the endpoint's schema
     const response = await nativeEndpoint(
       getUserMeEndpoint,
       {},
@@ -112,10 +77,6 @@ class UserRepositoryNativeImpl implements UserRepository {
       locale,
     );
 
-    // The response from /me endpoint returns flat user data (CompleteUserType)
-    // Since native always calls GET /me which returns CompleteUserType,
-    // and CompleteUserType satisfies all UserType<T> variants (it's the most complete),
-    // we can safely return it for any UserType<T> generic parameter.
     if (response.success) {
       return {
         success: true,
@@ -124,7 +85,6 @@ class UserRepositoryNativeImpl implements UserRepository {
       };
     }
 
-    // Error response - preserve all error information
     return {
       success: false,
       errorType: response.errorType,
@@ -133,100 +93,91 @@ class UserRepositoryNativeImpl implements UserRepository {
     };
   }
 
-  async exists(
-    userId: DbId,
-    logger: EndpointLogger,
+  static async exists(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: DbId,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
-    logger.error("exists not implemented on native", { userId });
-    return await Promise.resolve(
-      this.createNotImplementedError<boolean>("exists"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("exists is not implemented on native");
   }
 
-  async emailExists(
-    email: string,
-    logger: EndpointLogger,
+  static async emailExists(
+    // oxlint-disable-next-line no-unused-vars
+    _email: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
-    logger.error("emailExists not implemented on native", { email });
-    return await Promise.resolve(
-      this.createNotImplementedError<boolean>("emailExists"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("emailExists is not implemented on native");
   }
 
-  async emailExistsByOtherUser(
-    email: string,
-    excludeUserId: DbId,
-    logger: EndpointLogger,
+  static async emailExistsByOtherUser(
+    // oxlint-disable-next-line no-unused-vars
+    _email: string,
+    // oxlint-disable-next-line no-unused-vars
+    _excludeUserId: DbId,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
-    logger.error("emailExistsByOtherUser not implemented on native", {
-      email,
-      excludeUserId,
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<boolean>("emailExistsByOtherUser"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("emailExistsByOtherUser is not implemented on native");
   }
 
-  async createWithHashedPassword(
-    data: NewUser,
-    logger: EndpointLogger,
+  static async createWithHashedPassword(
+    // oxlint-disable-next-line no-unused-vars
+    _data: NewUser,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<StandardUserType>> {
-    logger.error("createWithHashedPassword not implemented on native", {
-      email: data.email,
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<StandardUserType>(
-        "createWithHashedPassword",
-      ),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("createWithHashedPassword is not implemented on native");
   }
 
-  async searchUsers(
-    query: string,
-    options: UserSearchOptions,
-    logger: EndpointLogger,
+  static async searchUsers(
+    // oxlint-disable-next-line no-unused-vars
+    _query: string,
+    // oxlint-disable-next-line no-unused-vars
+    _options: UserSearchOptions,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<StandardUserType[]>> {
-    logger.error("searchUsers not implemented on native", {
-      query,
-      limit: options.limit,
-      offset: options.offset,
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<StandardUserType[]>("searchUsers"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("searchUsers is not implemented on native");
   }
 
-  async getAllUsers(
-    options: UserSearchOptions,
-    logger: EndpointLogger,
+  static async getAllUsers(
+    // oxlint-disable-next-line no-unused-vars
+    _options: UserSearchOptions,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<StandardUserType[]>> {
-    logger.error("getAllUsers not implemented on native", {
-      limit: options.limit,
-      offset: options.offset,
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<StandardUserType[]>("getAllUsers"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getAllUsers is not implemented on native");
   }
 
-  async getUserSearchCount(
-    query: string,
-    logger: EndpointLogger,
+  static async getUserSearchCount(
+    // oxlint-disable-next-line no-unused-vars
+    _query: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<number>> {
-    logger.error("getUserSearchCount not implemented on native", { query });
-    return await Promise.resolve(
-      this.createNotImplementedError<number>("getUserSearchCount"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getUserSearchCount is not implemented on native");
   }
 
-  async searchUsersWithPagination(
-    searchTerm: string,
-    options: {
+  static async searchUsersWithPagination(
+    // oxlint-disable-next-line no-unused-vars
+    _searchTerm: string,
+    // oxlint-disable-next-line no-unused-vars
+    _options: {
       limit?: number;
       offset?: number;
       roles?: UserRoleValue[];
     },
-    logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<
     ResponseType<{
       users: Array<StandardUserType & { createdAt: string; updatedAt: string }>;
@@ -246,47 +197,29 @@ class UserRepositoryNativeImpl implements UserRepository {
       };
     }>
   > {
-    logger.warn("searchUsersWithPagination not implemented on native", {
-      searchTerm,
-      limit: options.limit,
-      offset: options.offset,
-      roles: options.roles,
-    });
-    return await Promise.resolve(
-      this.createNotImplementedError<{
-        users: Array<
-          StandardUserType & { createdAt: string; updatedAt: string }
-        >;
-        pagination: {
-          currentPage: number;
-          totalPages: number;
-          itemsPerPage: number;
-          totalItems: number;
-          hasMore: boolean;
-          hasPrevious: boolean;
-        };
-        searchInfo: {
-          searchTerm: string | undefined;
-          appliedFilters: UserRoleValue[];
-          searchTime: string;
-          totalResults: number;
-        };
-      }>("searchUsersWithPagination"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("searchUsersWithPagination is not implemented on native");
   }
 
-  async getActiveUserCount(
-    logger: EndpointLogger,
+  static async getActiveUserCount(
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
   ): Promise<ResponseType<number>> {
-    logger.error("getActiveUserCount not implemented on native");
-    return await Promise.resolve(
-      this.createNotImplementedError<number>("getActiveUserCount"),
-    );
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getActiveUserCount is not implemented on native");
+  }
+
+  static async getUserPublicName(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string | undefined,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<string | null> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getUserPublicName is not implemented on native");
   }
 }
 
-/**
- * Singleton instance
- * Export with same name as server implementation for drop-in replacement
- */
-export const userRepository = new UserRepositoryNativeImpl();
+// Compile-time type check
+const _typeCheck: UserRepositoryType = UserRepository;
+void _typeCheck;

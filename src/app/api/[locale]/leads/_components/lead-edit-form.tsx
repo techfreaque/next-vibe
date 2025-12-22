@@ -57,7 +57,8 @@ export function LeadEditForm({
       <Card>
         <CardHeader>
           <CardTitle>
-            {t("app.admin.common.actions.edit")} - {lead.lead.basicInfo.businessName}
+            {t("app.admin.common.actions.edit")} -{" "}
+            {lead.lead.basicInfo.businessName}
           </CardTitle>
         </CardHeader>
         <CardContent>

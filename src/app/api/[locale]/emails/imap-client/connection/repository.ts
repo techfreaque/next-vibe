@@ -643,9 +643,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
                       for (const line of lines) {
                         const colonIndex = line.indexOf(":");
                         if (colonIndex > 0) {
-                          const key = line
-                            .slice(0, colonIndex)
-                            .toLowerCase();
+                          const key = line.slice(0, colonIndex).toLowerCase();
                           const value = line.slice(colonIndex + 1).trim();
                           if (key && value) {
                             headers[key] = [value];
@@ -732,8 +730,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
         const disposition = part.disposition;
         return Boolean(
           disposition?.type &&
-          typeof disposition.type === "string" &&
-          disposition.type.toLowerCase() === "attachment",
+            typeof disposition.type === "string" &&
+            disposition.type.toLowerCase() === "attachment",
         );
       });
     }
@@ -742,8 +740,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
     const disposition = struct.disposition;
     return Boolean(
       disposition?.type &&
-      typeof disposition.type === "string" &&
-      disposition.type.toLowerCase() === "attachment",
+        typeof disposition.type === "string" &&
+        disposition.type.toLowerCase() === "attachment",
     );
   }
 

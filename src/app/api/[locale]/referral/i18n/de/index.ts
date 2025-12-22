@@ -187,7 +187,8 @@ export const translations = {
       walletRequired: "Wallet-Adresse für Krypto-Auszahlungen erforderlich",
       insufficientBalance: "Unzureichendes Guthaben für Auszahlung",
       notFound: "Auszahlungsanfrage nicht gefunden",
-      invalidStatus: "Ungültiger Status der Auszahlungsanfrage für diesen Vorgang",
+      invalidStatus:
+        "Ungültiger Status der Auszahlungsanfrage für diesen Vorgang",
     },
   },
 

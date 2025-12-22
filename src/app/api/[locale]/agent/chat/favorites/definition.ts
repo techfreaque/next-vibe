@@ -21,19 +21,22 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { TtsVoiceDB, TtsVoiceOptions } from "../../text-to-speech/enum";
+import { IconKeyDB } from "../model-access/icons";
+import { ModelId } from "../model-access/models";
 import {
-  ContentLevel,
-  ContentLevelDB,
-  ContentLevelOptions,
-  IntelligenceLevel,
-  IntelligenceLevelDB,
-  IntelligenceLevelOptions,
+  ContentLevelFilter,
+  ContentLevelFilterDB,
+  ContentLevelFilterOptions,
+  IntelligenceLevelFilter,
+  IntelligenceLevelFilterDB,
+  IntelligenceLevelFilterOptions,
   ModelSelectionMode,
   ModelSelectionModeDB,
   ModelSelectionModeOptions,
-  PriceLevel,
-  PriceLevelDB,
-  PriceLevelOptions,
+  PriceLevelFilter,
+  PriceLevelFilterDB,
+  PriceLevelFilterOptions,
 } from "./enum";
 
 /**
@@ -83,11 +86,11 @@ const { GET } = createEndpoint({
               },
               z.string().uuid(),
             ),
-            personaId: responseField(
+            characterId: responseField(
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.agent.chat.favorites.get.response.favorite.personaId.content" as const,
+                  "app.api.agent.chat.favorites.get.response.favorite.characterId.content" as const,
               },
               z.string(),
             ),
@@ -98,6 +101,22 @@ const { GET } = createEndpoint({
                   "app.api.agent.chat.favorites.get.response.favorite.customName.content" as const,
               },
               z.string().nullable(),
+            ),
+            customIcon: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.favorites.get.response.favorite.customIcon.content" as const,
+              },
+              z.enum(IconKeyDB).nullable(),
+            ),
+            voice: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.favorites.get.response.favorite.voice.content" as const,
+              },
+              z.enum(TtsVoiceDB).nullable(),
             ),
             mode: responseField(
               {
@@ -113,7 +132,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.favorites.get.response.favorite.intelligence.content" as const,
               },
-              z.enum(IntelligenceLevelDB),
+              z.enum(IntelligenceLevelFilterDB),
             ),
             maxPrice: responseField(
               {
@@ -121,7 +140,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.favorites.get.response.favorite.maxPrice.content" as const,
               },
-              z.enum(PriceLevelDB),
+              z.enum(PriceLevelFilterDB),
             ),
             content: responseField(
               {
@@ -129,7 +148,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.favorites.get.response.favorite.content.content" as const,
               },
-              z.enum(ContentLevelDB),
+              z.enum(ContentLevelFilterDB),
             ),
             manualModelId: responseField(
               {
@@ -137,7 +156,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.favorites.get.response.favorite.manualModelId.content" as const,
               },
-              z.string().nullable(),
+              z.enum(ModelId).nullable(),
             ),
             position: responseField(
               {
@@ -249,12 +268,14 @@ const { GET } = createEndpoint({
         favorites: [
           {
             id: "550e8400-e29b-41d4-a716-446655440000",
-            personaId: "thea",
+            characterId: "thea",
             customName: "Thea (Smart)",
+            customIcon: null,
+            voice: null,
             mode: ModelSelectionMode.AUTO,
-            intelligence: IntelligenceLevel.SMART,
-            maxPrice: PriceLevel.STANDARD,
-            content: ContentLevel.OPEN,
+            intelligence: IntelligenceLevelFilter.SMART,
+            maxPrice: PriceLevelFilter.STANDARD,
+            content: ContentLevelFilter.OPEN,
             manualModelId: null,
             position: 0,
             color: null,
@@ -295,13 +316,13 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST ===
-      personaId: requestDataField(
+      characterId: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.favorites.post.personaId.label" as const,
+          label: "app.api.agent.chat.favorites.post.characterId.label" as const,
           description:
-            "app.api.agent.chat.favorites.post.personaId.description" as const,
+            "app.api.agent.chat.favorites.post.characterId.description" as const,
           columns: 6,
         },
         z.string(),
@@ -316,6 +337,18 @@ const { POST } = createEndpoint({
           columns: 6,
         },
         z.string().optional(),
+      ),
+      voice: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.agent.chat.favorites.post.voice.label" as const,
+          description:
+            "app.api.agent.chat.favorites.post.voice.description" as const,
+          options: TtsVoiceOptions,
+          columns: 6,
+        },
+        z.enum(TtsVoiceDB).nullable().optional(),
       ),
       mode: requestDataField(
         {
@@ -337,10 +370,10 @@ const { POST } = createEndpoint({
             "app.api.agent.chat.favorites.post.intelligence.label" as const,
           description:
             "app.api.agent.chat.favorites.post.intelligence.description" as const,
-          options: IntelligenceLevelOptions,
+          options: IntelligenceLevelFilterOptions,
           columns: 6,
         },
-        z.enum(IntelligenceLevelDB),
+        z.enum(IntelligenceLevelFilterDB),
       ),
       maxPrice: requestDataField(
         {
@@ -349,10 +382,10 @@ const { POST } = createEndpoint({
           label: "app.api.agent.chat.favorites.post.maxPrice.label" as const,
           description:
             "app.api.agent.chat.favorites.post.maxPrice.description" as const,
-          options: PriceLevelOptions,
+          options: PriceLevelFilterOptions,
           columns: 6,
         },
-        z.enum(PriceLevelDB),
+        z.enum(PriceLevelFilterDB),
       ),
       content: requestDataField(
         {
@@ -361,10 +394,10 @@ const { POST } = createEndpoint({
           label: "app.api.agent.chat.favorites.post.content.label" as const,
           description:
             "app.api.agent.chat.favorites.post.content.description" as const,
-          options: ContentLevelOptions,
+          options: ContentLevelFilterOptions,
           columns: 6,
         },
-        z.enum(ContentLevelDB),
+        z.enum(ContentLevelFilterDB),
       ),
       manualModelId: requestDataField(
         {
@@ -376,7 +409,7 @@ const { POST } = createEndpoint({
             "app.api.agent.chat.favorites.post.manualModelId.description" as const,
           columns: 6,
         },
-        z.string().optional(),
+        z.enum(ModelId).optional(),
       ),
 
       // === RESPONSE ===
@@ -452,12 +485,12 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       create: {
-        personaId: "thea",
+        characterId: "thea",
         customName: "Thea (Smart)",
         mode: ModelSelectionMode.AUTO,
-        intelligence: IntelligenceLevel.SMART,
-        maxPrice: PriceLevel.STANDARD,
-        content: ContentLevel.OPEN,
+        intelligence: IntelligenceLevelFilter.SMART,
+        maxPrice: PriceLevelFilter.STANDARD,
+        content: ContentLevelFilter.OPEN,
       },
     },
     responses: {

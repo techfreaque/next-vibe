@@ -61,10 +61,10 @@ export function ChatInput({
     isLoading,
     stopGeneration,
     inputRef,
-    selectedPersona,
+    selectedCharacter,
     selectedModel,
     handleModelChange,
-    setSelectedPersona,
+    setSelectedCharacter,
     deductCredits,
   } = chat;
 
@@ -78,7 +78,7 @@ export function ChatInput({
   // Call mode state
   const { isCallMode, toggleCallMode } = useCallMode({
     modelId: selectedModel,
-    personaId: selectedPersona,
+    characterId: selectedCharacter,
   });
 
   // Voice recording state
@@ -162,7 +162,7 @@ export function ChatInput({
 
           {/* No permission message */}
           {!canPost && (
-            <Div className="absolute top-2 left-0 pointer-events-none text-sm text-destructive">
+            <Div className="absolute pl-3 top-2 left-0 pointer-events-none text-sm text-destructive">
               {noPermissionReason || t("app.chat.input.noPermission")}
             </Div>
           )}
@@ -174,9 +174,9 @@ export function ChatInput({
         {/* Left: Selector + Tools */}
         <Div className="flex flex-row items-center gap-0.5 @sm:gap-1 @md:gap-1.5 flex-1 min-w-0">
           <Selector
-            personaId={selectedPersona}
+            characterId={selectedCharacter}
             modelId={selectedModel}
-            onPersonaChange={setSelectedPersona}
+            onCharacterChange={setSelectedCharacter}
             onModelChange={handleModelChange}
             locale={locale}
             user={user}

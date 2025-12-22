@@ -31,7 +31,9 @@ export interface NewsletterStatusRepository {
   ): Promise<ResponseType<StatusGetResponseOutput>>;
 }
 
-export class NewsletterStatusRepositoryImpl implements NewsletterStatusRepository {
+export class NewsletterStatusRepositoryImpl
+  implements NewsletterStatusRepository
+{
   async getStatus(
     data: StatusGetRequestOutput,
     logger: EndpointLogger,

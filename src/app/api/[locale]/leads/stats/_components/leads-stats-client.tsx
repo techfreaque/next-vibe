@@ -49,7 +49,11 @@ export function LeadsStatsClient({
             onSubmit={handleSubmit}
             locale={locale}
             isSubmitting={endpoint.read.isLoading || false}
-            data={endpoint.read.response?.success ? endpoint.read.response.data : undefined}
+            data={
+              endpoint.read.response?.success
+                ? endpoint.read.response.data
+                : undefined
+            }
             submitButtonText="app.admin.common.actions.filter"
           />
         </CardContent>

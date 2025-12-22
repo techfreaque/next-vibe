@@ -105,7 +105,13 @@ function getConfigPaths(): string[] {
     resolve(projectRoot, "check.config.js"),
     // NPM package scenarios
     resolve(projectRoot, "node_modules", "next-vibe", "check.config.js"),
-    resolve(projectRoot, "node_modules", "next-vibe", "dist", "check.config.js"),
+    resolve(
+      projectRoot,
+      "node_modules",
+      "next-vibe",
+      "dist",
+      "check.config.js",
+    ),
   ];
 }
 
@@ -146,7 +152,8 @@ function loadCheckConfigSync(): CheckConfig | null {
       }
 
       // Support both direct object exports and factory functions
-      const config = typeof exportedValue === "function" ? exportedValue() : exportedValue;
+      const config =
+        typeof exportedValue === "function" ? exportedValue() : exportedValue;
 
       cachedCheckConfig = config;
       return config;
@@ -219,7 +226,10 @@ export function loadPluginConfig<K extends PluginName>(
 
   if (checkConfig) {
     // Try to extract plugin options from rule config
-    const pluginOptions = extractPluginOptions<PluginConfigMap[K]>(checkConfig, pluginName);
+    const pluginOptions = extractPluginOptions<PluginConfigMap[K]>(
+      checkConfig,
+      pluginName,
+    );
 
     if (pluginOptions) {
       const result: ConfigLoadResult<PluginConfigMap[K]> = {
@@ -227,7 +237,10 @@ export function loadPluginConfig<K extends PluginName>(
         config: pluginOptions,
         source: "rule-config",
       };
-      pluginConfigCache.set(pluginName, result as ConfigLoadResult<LintConfigValue>);
+      pluginConfigCache.set(
+        pluginName,
+        result as ConfigLoadResult<LintConfigValue>,
+      );
       return result;
     }
   }
@@ -239,7 +252,10 @@ export function loadPluginConfig<K extends PluginName>(
       config: defaultConfig,
       source: "default",
     };
-    pluginConfigCache.set(pluginName, result as ConfigLoadResult<LintConfigValue>);
+    pluginConfigCache.set(
+      pluginName,
+      result as ConfigLoadResult<LintConfigValue>,
+    );
     return result;
   }
 
@@ -250,7 +266,10 @@ export function loadPluginConfig<K extends PluginName>(
     source: "error",
     error: `No configuration found for ${pluginName}`,
   };
-  pluginConfigCache.set(pluginName, result as ConfigLoadResult<LintConfigValue>);
+  pluginConfigCache.set(
+    pluginName,
+    result as ConfigLoadResult<LintConfigValue>,
+  );
   return result;
 }
 

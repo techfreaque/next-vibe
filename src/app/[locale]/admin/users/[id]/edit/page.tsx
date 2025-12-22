@@ -11,7 +11,7 @@ import type React from "react";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import { UserEditForm } from "@/app/api/[locale]/users/user/_components/user-edit-form";
-import { userByIdRepository } from "@/app/api/[locale]/users/user/[id]/repository";
+import { UserByIdRepository } from "@/app/api/[locale]/users/user/[id]/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -34,10 +34,9 @@ export default async function UserEditPage({
     `/${locale}/admin/users/${id}/edit`,
   );
 
-
   // Fetch user data
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const userResponse = await userByIdRepository.getUserById(
+  const userResponse = await UserByIdRepository.getUserById(
     { id },
     user,
     logger,

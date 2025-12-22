@@ -16,11 +16,7 @@ const StyledView = styled(View);
  * Provides a horizontal rule/separator
  * Supports both className (via NativeWind) and style (via React.CSSProperties)
  */
-export function Hr({
-  className,
-  style,
-  id,
-}: HrProps): React.JSX.Element {
+export function Hr({ className, style, id }: HrProps): React.JSX.Element {
   // Convert CSS style to React Native ViewStyle if provided
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 

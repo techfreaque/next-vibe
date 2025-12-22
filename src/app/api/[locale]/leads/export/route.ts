@@ -5,7 +5,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { leadsRepository } from "../repository";
+import { LeadsRepository } from "../repository";
 import definitions from "./definition";
 
 export const { GET, tools } = endpointsHandler({
@@ -13,7 +13,7 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined,
     handler: async ({ data, logger, t }) => {
-      return await leadsRepository.exportLeads(data, logger, t);
+      return await LeadsRepository.exportLeads(data, logger, t);
     },
   },
 });

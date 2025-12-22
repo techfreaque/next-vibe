@@ -565,44 +565,40 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
             })),
           });
         }
-          return fail({
-            message: "app.api.emails.imapClient.imapErrors.sync.message.failed",
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          });
-        
+        return fail({
+          message: "app.api.emails.imapClient.imapErrors.sync.message.failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
-        // Sync all accounts
-        const syncResult = await imapSyncRepository.syncAllAccounts(logger);
+      // Sync all accounts
+      const syncResult = await imapSyncRepository.syncAllAccounts(logger);
 
-        if (syncResult.success) {
-          const rawErrors = syncResult.data.result?.results?.errors ?? [];
-          return success({
-            success: true,
-            message:
-              "app.api.emails.imapClient.messages.sync.response.success.message",
-            results: {
-              messagesProcessed:
-                syncResult.data.result?.results?.messagesProcessed ?? 0,
-              messagesAdded:
-                syncResult.data.result?.results?.messagesAdded ?? 0,
-              messagesUpdated:
-                syncResult.data.result?.results?.messagesUpdated ?? 0,
-              messagesDeleted:
-                syncResult.data.result?.results?.messagesDeleted ?? 0,
-              duration: syncResult.data.result?.results?.duration ?? 0,
-            },
-            errors: rawErrors.map((err) => ({
-              code: err.errorType?.errorKey ?? "UNKNOWN_ERROR",
-              message: err.message,
-            })),
-          });
-        }
-          return fail({
-            message: "app.api.emails.imapClient.imapErrors.sync.message.failed",
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          });
-        
-      
+      if (syncResult.success) {
+        const rawErrors = syncResult.data.result?.results?.errors ?? [];
+        return success({
+          success: true,
+          message:
+            "app.api.emails.imapClient.messages.sync.response.success.message",
+          results: {
+            messagesProcessed:
+              syncResult.data.result?.results?.messagesProcessed ?? 0,
+            messagesAdded: syncResult.data.result?.results?.messagesAdded ?? 0,
+            messagesUpdated:
+              syncResult.data.result?.results?.messagesUpdated ?? 0,
+            messagesDeleted:
+              syncResult.data.result?.results?.messagesDeleted ?? 0,
+            duration: syncResult.data.result?.results?.duration ?? 0,
+          },
+          errors: rawErrors.map((err) => ({
+            code: err.errorType?.errorKey ?? "UNKNOWN_ERROR",
+            message: err.message,
+          })),
+        });
+      }
+      return fail({
+        message: "app.api.emails.imapClient.imapErrors.sync.message.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     } catch (error) {
       logger.error("Error syncing IMAP messages", parseError(error));
       return fail({

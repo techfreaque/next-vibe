@@ -178,7 +178,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
           {/* eslint-disable-next-line @typescript-eslint/no-unused-vars -- Array.from callback requires first parameter */}
           {Array.from({ length: 8 }).map((unused, i) => (
             <Card key={i}>
-              <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between gap-0 pb-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-4 w-4" />
               </CardHeader>
@@ -194,7 +194,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-32" />
-            <Div className="flex flex flex-row gap-2 mt-4">
+            <Div className="flex flex-row gap-2 mt-4">
               {/* eslint-disable-next-line @typescript-eslint/no-unused-vars -- Array.from callback requires first parameter */}
               {Array.from({ length: 4 }).map((unused, i) => (
                 <Skeleton key={i} className="h-8 w-20" />
@@ -217,14 +217,14 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
         onRefresh={refreshStats}
         form={form}
       >
-        <CronStatsFilters control={form.control} />
+        <CronStatsFilters locale={locale} control={form.control} />
       </CronStatsFiltersContainer>
 
       {/* Key Metrics Overview */}
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Executions */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.totalExecutions")}
             </CardTitle>
@@ -245,7 +245,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* Success Rate */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.successRate")}
             </CardTitle>
@@ -266,7 +266,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* Active Tasks */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.activeTasks")}
             </CardTitle>
@@ -289,7 +289,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* System Performance */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.systemLoad")}
             </CardTitle>
@@ -313,7 +313,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
       <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Failed Executions */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.failedExecutions")}
             </CardTitle>
@@ -332,7 +332,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* Average Execution Time */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.avgExecutionTime")}
             </CardTitle>
@@ -354,7 +354,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* Healthy Tasks */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.healthyTasks")}
             </CardTitle>
@@ -373,7 +373,7 @@ export function CronStatsClient({ locale }: CronStatsClientProps): JSX.Element {
 
         {/* Queue Status */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between flex flex-col gap-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t("app.admin.cron.stats.queueStatus")}
             </CardTitle>

@@ -4,10 +4,9 @@ import { cn } from "next-vibe/shared/utils";
 import { Badge, type BadgeVariant } from "next-vibe-ui/ui/badge";
 import type { JSX } from "react";
 
-import { simpleT } from "@/i18n/core/shared";
-
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
+import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
 
 type SemanticVariant = "default" | "success" | "warning" | "error" | "info";
 
@@ -32,13 +31,13 @@ function mapVariant(variant: SemanticVariant): BadgeVariant {
 /**
  * Displays a badge for enum values with translation support.
  */
-export function BadgeWidget({
+export function BadgeWidget<TKey extends string>({
   value,
   field,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.BADGE>): JSX.Element {
-  const { t } = simpleT(context.locale);
+}: ReactWidgetProps<typeof WidgetType.BADGE, TKey>): JSX.Element {
+  const { t } = getTranslator(context);
 
   if (!value) {
     return (

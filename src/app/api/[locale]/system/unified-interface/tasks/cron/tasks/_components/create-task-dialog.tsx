@@ -106,6 +106,7 @@ export function CreateTaskDialog({
                       showAllRequired: true,
                       requiredColor: "red",
                     }}
+                    locale={locale}
                   />
 
                   <EndpointFormField
@@ -139,6 +140,7 @@ export function CreateTaskDialog({
                       style: "none",
                       showAllRequired: false,
                     }}
+                    locale={locale}
                   />
                 </Div>
 
@@ -157,6 +159,7 @@ export function CreateTaskDialog({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
               </FormFieldGroup>
 
@@ -182,6 +185,7 @@ export function CreateTaskDialog({
                       showAllRequired: true,
                       requiredColor: "red",
                     }}
+                    locale={locale}
                   />
                 </Div>
 
@@ -213,6 +217,7 @@ export function CreateTaskDialog({
                       style: "none",
                       showAllRequired: false,
                     }}
+                    locale={locale}
                   />
 
                   <EndpointFormField
@@ -228,6 +233,7 @@ export function CreateTaskDialog({
                       style: "none",
                       showAllRequired: false,
                     }}
+                    locale={locale}
                   />
                 </Div>
 
@@ -245,6 +251,7 @@ export function CreateTaskDialog({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 {/* Enabled Switch */}
@@ -261,6 +268,7 @@ export function CreateTaskDialog({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
               </FormFieldGroup>
 

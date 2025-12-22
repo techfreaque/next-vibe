@@ -21,9 +21,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { leadAuthRepository } from "../leads/auth/repository";
+import { LeadAuthRepository } from "../leads/auth/repository";
 import { userLeadLinks } from "../leads/db";
-import { authRepository } from "./auth/repository";
+import { AuthRepository } from "./auth/repository";
 import type { NewUser, User } from "./db";
 import { users } from "./db";
 import { UserDetailLevel } from "./enum";
@@ -37,7 +37,7 @@ import type {
   UserType,
 } from "./types";
 import { UserRole, type UserRoleValue } from "./user-roles/enum";
-import { userRolesRepository } from "./user-roles/repository";
+import { UserRolesRepository } from "./user-roles/repository";
 
 /**
  * 24h cache for active user count
@@ -46,150 +46,16 @@ let activeUserCountCache: { count: number; timestamp: number } | null = null;
 const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
- * User Repository Interface
- * User-related functionality
+ * User Repository
  */
-export interface UserRepository {
-  /**
-   * Get user by ID
-   */
-  getUserById<
-    T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
-  >(
-    userId: DbId,
-    detailLevel: T,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ExtendedUserType<T>>>;
-
-  /**
-   * Get user by email
-   */
-  getUserByEmail<
-    T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
-  >(
-    email: string,
-    detailLevel: T,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ExtendedUserType<T>>>;
-
-  /**
-   * Get authenticated user
-   */
-  getUserByAuth<
-    T extends typeof UserDetailLevel.MINIMAL | ExtendedUserDetailLevel =
-      typeof UserDetailLevel.MINIMAL,
-  >(
-    options: Omit<UserFetchOptions, "detailLevel"> & { detailLevel?: T },
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<UserType<T>>>;
-
-  /**
-   * Check if user exists
-   */
-  exists(userId: DbId, logger: EndpointLogger): Promise<ResponseType<boolean>>;
-
-  /**
-   * Check if email is registered
-   */
-  emailExists(
-    email: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<boolean>>;
-
-  /**
-   * Check if email is registered by another user
-   */
-  emailExistsByOtherUser(
-    email: string,
-    excludeUserId: DbId,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<boolean>>;
-
-  /**
-   * Create user with hashed password
-   */
-  createWithHashedPassword(
-    data: NewUser,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<StandardUserType>>;
-
-  /**
-   * Search users
-   */
-  searchUsers(
-    query: string,
-    options: UserSearchOptions,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<StandardUserType[]>>;
-
-  /**
-   * Get all users with pagination
-   */
-  getAllUsers(
-    options: UserSearchOptions,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<StandardUserType[]>>;
-
-  /**
-   * Get total count of users matching search query
-   */
-  getUserSearchCount(
-    query: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<number>>;
-
-  /**
-   * Search users with pagination metadata
-   */
-  searchUsersWithPagination(
-    searchTerm: string,
-    options: {
-      limit?: number;
-      offset?: number;
-      roles?: UserRoleValue[];
-    },
-    logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      users: Array<StandardUserType & { createdAt: string; updatedAt: string }>;
-      pagination: {
-        currentPage: number;
-        totalPages: number;
-        itemsPerPage: number;
-        totalItems: number;
-        hasMore: boolean;
-        hasPrevious: boolean;
-      };
-      searchInfo: {
-        searchTerm: string | undefined;
-        appliedFilters: UserRoleValue[];
-        searchTime: string;
-        totalResults: number;
-      };
-    }>
-  >;
-
-  /**
-   * Get total count of active users (cached for 24h)
-   * "Active" is defined as users who have isActive=true
-   */
-  getActiveUserCount(logger: EndpointLogger): Promise<ResponseType<number>>;
-}
-
-/**
- * User Repository Implementation
- * Core user operations
- */
-export class BaseUserRepositoryImpl implements UserRepository {
+export class UserRepository {
   /**
    * Get authenticated user with specified detail level
    */
-  async getUserByAuth<
-    T extends typeof UserDetailLevel.MINIMAL | ExtendedUserDetailLevel =
-      typeof UserDetailLevel.MINIMAL,
+  static async getUserByAuth<
+    T extends
+      | typeof UserDetailLevel.MINIMAL
+      | ExtendedUserDetailLevel = typeof UserDetailLevel.MINIMAL,
   >(
     options: Omit<UserFetchOptions, "detailLevel"> & { detailLevel?: T },
     locale: CountryLanguage,
@@ -206,8 +72,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         detailLevel: String(detailLevel),
       });
 
-      // Get the authenticated user
-      const verifiedUser = await authRepository.getAuthMinimalUser(
+      const verifiedUser = await AuthRepository.getAuthMinimalUser(
         roles,
         { platform: Platform.NEXT_PAGE, locale },
         logger,
@@ -221,18 +86,15 @@ export class BaseUserRepositoryImpl implements UserRepository {
         });
       }
 
-      // If minimal detail level is requested and we already have the data, return it
       if (detailLevel === UserDetailLevel.MINIMAL) {
         return success(verifiedUser) as ResponseType<UserType<T>>;
       }
 
-      // Type guard to check if user has ID property
       if (
         verifiedUser.isPublic ||
         !("id" in verifiedUser) ||
         !verifiedUser.id
       ) {
-        // This is expected for public/unauthenticated users, log as debug
         logger.debug("No user ID in JWT payload (public user)", {
           isPublic: verifiedUser.isPublic,
         });
@@ -242,8 +104,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
         });
       }
 
-      // For other detail levels, fetch user by ID with the requested detail level
-      return (await this.getUserById(
+      return (await UserRepository.getUserById(
         verifiedUser.id,
         detailLevel,
         locale,
@@ -262,7 +123,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   /**
    * Get user by ID with specified detail level
    */
-  async getUserById<
+  static async getUserById<
     T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
   >(
     userId: DbId,
@@ -273,7 +134,6 @@ export class BaseUserRepositoryImpl implements UserRepository {
     try {
       logger.debug("Getting user by ID", { userId, detailLevel });
 
-      // Query the database for the user
       const results = await db.select().from(users).where(eq(users.id, userId));
 
       if (results.length === 0) {
@@ -286,8 +146,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       const user = results[0];
 
-      // For standard and complete detail levels, we need to fetch roles
-      const userRolesResponse = await userRolesRepository.findByUserId(
+      const userRolesResponse = await UserRolesRepository.findByUserId(
         userId,
         logger,
       );
@@ -300,14 +159,13 @@ export class BaseUserRepositoryImpl implements UserRepository {
         });
       }
 
-      const leadResult = await leadAuthRepository.getAuthenticatedUserLeadId(
+      const leadResult = await LeadAuthRepository.getAuthenticatedUserLeadId(
         userId,
         undefined,
         locale,
         logger,
       );
 
-      // Standard user data
       const standardUser: StandardUserType = {
         id: user.id,
         leadId: leadResult.leadId,
@@ -329,7 +187,6 @@ export class BaseUserRepositoryImpl implements UserRepository {
         return success(standardUser) as ResponseType<ExtendedUserType<T>>;
       }
 
-      // For complete detail level, add additional profile data
       const completeUser: CompleteUserType = {
         ...standardUser,
         stripeCustomerId: user.stripeCustomerId,
@@ -349,7 +206,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   /**
    * Get user by email with specified detail level
    */
-  async getUserByEmail<
+  static async getUserByEmail<
     T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
   >(
     email: string,
@@ -360,11 +217,8 @@ export class BaseUserRepositoryImpl implements UserRepository {
     try {
       logger.debug("Getting user by email", { email, detailLevel });
 
-      // Just get the ID and use getUserById for full details
       const results = await db
-        .select({
-          id: users.id,
-        })
+        .select({ id: users.id })
         .from(users)
         .where(eq(users.email, email));
 
@@ -376,8 +230,12 @@ export class BaseUserRepositoryImpl implements UserRepository {
         });
       }
 
-      // Use the found ID to get complete user details
-      return await this.getUserById(results[0].id, detailLevel, locale, logger);
+      return await UserRepository.getUserById(
+        results[0].id,
+        detailLevel,
+        locale,
+        logger,
+      );
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Error getting user by email", parseError(error));
@@ -392,7 +250,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   /**
    * Check if user exists by ID
    */
-  async exists(
+  static async exists(
     userId: DbId,
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
@@ -416,7 +274,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   /**
    * Check if an email is already registered
    */
-  async emailExists(
+  static async emailExists(
     email: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
@@ -440,7 +298,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   /**
    * Check if an email is already registered by another user
    */
-  async emailExistsByOtherUser(
+  static async emailExistsByOtherUser(
     email: string,
     excludeUserId: DbId,
     logger: EndpointLogger,
@@ -473,7 +331,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   /**
    * Search for users
    */
-  async searchUsers(
+  static async searchUsers(
     query: string,
     options: UserSearchOptions,
     logger: EndpointLogger,
@@ -486,7 +344,6 @@ export class BaseUserRepositoryImpl implements UserRepository {
       let searchResults;
 
       if (query.trim().length === 0) {
-        // Get all users when no search query
         searchResults = await db
           .select()
           .from(users)
@@ -494,7 +351,6 @@ export class BaseUserRepositoryImpl implements UserRepository {
           .offset(offset)
           .orderBy(users.privateName, users.publicName);
       } else {
-        // Search users with query
         const privateNamePattern = `%${query}%`;
         const publicNamePattern = `%${query}%`;
         const emailPattern = `%${query}%`;
@@ -514,9 +370,8 @@ export class BaseUserRepositoryImpl implements UserRepository {
           .orderBy(users.privateName, users.publicName);
       }
 
-      // Batch fetch all user roles to avoid N+1 query problem
       const userIds = searchResults.map((u) => u.id);
-      const rolesMapResponse = await userRolesRepository.findByUserIds(
+      const rolesMapResponse = await UserRolesRepository.findByUserIds(
         userIds,
         logger,
       );
@@ -532,14 +387,12 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       const rolesMap = rolesMapResponse.data;
 
-      // Batch fetch leadIds for all users
       const leadLinks = await db
         .select({ userId: userLeadLinks.userId, leadId: userLeadLinks.leadId })
         .from(userLeadLinks)
         .where(inArray(userLeadLinks.userId, userIds));
       const leadIdMap = new Map(leadLinks.map((l) => [l.userId, l.leadId]));
 
-      // Map to StandardUserType with all required fields
       const mappedResults: StandardUserType[] = searchResults.map((user) => ({
         id: user.id,
         leadId: leadIdMap.get(user.id) ?? "",
@@ -571,7 +424,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   /**
    * Get all users with pagination
    */
-  async getAllUsers(
+  static async getAllUsers(
     options: UserSearchOptions,
     logger: EndpointLogger,
   ): Promise<ResponseType<StandardUserType[]>> {
@@ -587,9 +440,8 @@ export class BaseUserRepositoryImpl implements UserRepository {
         .offset(offset)
         .orderBy(users.privateName, users.publicName);
 
-      // Batch fetch all user roles to avoid N+1 query problem
       const userIds = allUsers.map((u) => u.id);
-      const rolesMapResponse = await userRolesRepository.findByUserIds(
+      const rolesMapResponse = await UserRolesRepository.findByUserIds(
         userIds,
         logger,
       );
@@ -605,14 +457,12 @@ export class BaseUserRepositoryImpl implements UserRepository {
 
       const rolesMap = rolesMapResponse.data;
 
-      // Batch fetch leadIds for all users
       const leadLinks = await db
         .select({ userId: userLeadLinks.userId, leadId: userLeadLinks.leadId })
         .from(userLeadLinks)
         .where(inArray(userLeadLinks.userId, userIds));
       const leadIdMap = new Map(leadLinks.map((l) => [l.userId, l.leadId]));
 
-      // Map to StandardUserType with all required fields
       const mappedResults: StandardUserType[] = allUsers.map((user) => ({
         id: user.id,
         leadId: leadIdMap.get(user.id) ?? user.id,
@@ -644,7 +494,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   /**
    * Get total count of users matching search query
    */
-  async getUserSearchCount(
+  static async getUserSearchCount(
     query: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<number>> {
@@ -654,10 +504,8 @@ export class BaseUserRepositoryImpl implements UserRepository {
       let countQuery;
 
       if (query.trim().length === 0) {
-        // Count all users
         countQuery = db.select({ count: count() }).from(users);
       } else {
-        // Count users matching search criteria
         const privateNamePattern = `%${query}%`;
         const publicNamePattern = `%${query}%`;
         const emailPattern = `%${query}%`;
@@ -691,7 +539,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   /**
    * Create a new user with hashed password
    */
-  async createWithHashedPassword(
+  static async createWithHashedPassword(
     data: NewUser,
     logger: EndpointLogger,
   ): Promise<ResponseType<StandardUserType>> {
@@ -709,17 +557,14 @@ export class BaseUserRepositoryImpl implements UserRepository {
         return fail({
           message: "app.api.user.errors.creation_failed",
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: {
-            error: "app.api.user.errors.no_data_returned",
-          },
+          messageParams: { error: "app.api.user.errors.no_data_returned" },
         });
       }
       const createdUser = results[0] as User;
 
-      // Return minimal user data without fetching leadId (which doesn't exist yet)
       const standardUser: StandardUserType = {
         id: createdUser.id,
-        leadId: "" as string, // Empty string as placeholder - will be set when lead is created
+        leadId: "" as string,
         isPublic: false,
         privateName: createdUser.privateName,
         publicName: createdUser.publicName,
@@ -751,7 +596,7 @@ export class BaseUserRepositoryImpl implements UserRepository {
   /**
    * Search users with pagination metadata
    */
-  async searchUsersWithPagination(
+  static async searchUsersWithPagination(
     searchTerm: string,
     options: {
       limit?: number;
@@ -781,14 +626,9 @@ export class BaseUserRepositoryImpl implements UserRepository {
     const currentLimit = options.limit ?? 20;
     const currentOffset = options.offset ?? 0;
 
-    // Search users
-    const searchResult = await this.searchUsers(
+    const searchResult = await UserRepository.searchUsers(
       searchTerm,
-      {
-        limit: currentLimit,
-        offset: currentOffset,
-        roles: options.roles,
-      },
+      { limit: currentLimit, offset: currentOffset, roles: options.roles },
       logger,
     );
 
@@ -796,8 +636,10 @@ export class BaseUserRepositoryImpl implements UserRepository {
       return searchResult;
     }
 
-    // Get total count
-    const totalCountResult = await this.getUserSearchCount(searchTerm, logger);
+    const totalCountResult = await UserRepository.getUserSearchCount(
+      searchTerm,
+      logger,
+    );
 
     if (!totalCountResult.success) {
       return totalCountResult;
@@ -808,7 +650,6 @@ export class BaseUserRepositoryImpl implements UserRepository {
     const totalPages = Math.ceil(total / currentLimit);
     const currentPage = Math.floor(currentOffset / currentLimit) + 1;
 
-    // Serialize dates to strings
     const serializedUsers = searchResult.data.map((user) => ({
       ...user,
       createdAt:
@@ -847,13 +688,12 @@ export class BaseUserRepositoryImpl implements UserRepository {
   /**
    * Get total count of active users with 24h caching
    */
-  async getActiveUserCount(
+  static async getActiveUserCount(
     logger: EndpointLogger,
   ): Promise<ResponseType<number>> {
     try {
       const now = Date.now();
 
-      // Check if cache exists and is still valid (within 24h)
       if (
         activeUserCountCache &&
         now - activeUserCountCache.timestamp < CACHE_DURATION_MS
@@ -865,7 +705,6 @@ export class BaseUserRepositoryImpl implements UserRepository {
         return success(activeUserCountCache.count);
       }
 
-      // Cache is invalid or doesn't exist - query database
       logger.debug("Fetching fresh active user count from database");
 
       const [{ total }] = await db
@@ -873,7 +712,6 @@ export class BaseUserRepositoryImpl implements UserRepository {
         .from(users)
         .where(eq(users.isActive, true));
 
-      // Update cache
       activeUserCountCache = {
         count: total,
         timestamp: now,
@@ -891,36 +729,39 @@ export class BaseUserRepositoryImpl implements UserRepository {
       });
     }
   }
-}
-
-export async function getUserPublicName(
-  userId: string | undefined,
-  logger: EndpointLogger,
-): Promise<string | null> {
-  if (!userId) {
-    return null;
-  }
-
-  try {
-    const userResult = await db
-      .select({ publicName: users.publicName })
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
-
-    if (userResult.length === 0) {
-      logger.warn("User not found when fetching public name", { userId });
+  static async getUserPublicName(
+    userId: string | undefined,
+    logger: EndpointLogger,
+  ): Promise<string | null> {
+    if (!userId) {
       return null;
     }
 
-    return userResult[0].publicName || null;
-  } catch (error) {
-    logger.error("Failed to fetch user public name", {
-      userId,
-      error: error instanceof Error ? error.message : String(error),
-    });
-    return null;
+    try {
+      const userResult = await db
+        .select({ publicName: users.publicName })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (userResult.length === 0) {
+        logger.warn("User not found when fetching public name", { userId });
+        return null;
+      }
+
+      return userResult[0].publicName || null;
+    } catch (error) {
+      logger.error("Failed to fetch user public name", {
+        userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return null;
+    }
   }
 }
 
-export const userRepository = new BaseUserRepositoryImpl();
+/**
+ * Type for the static interface of UserRepository
+ * Used by repository.native.ts for compile-time type checking
+ */
+export type UserRepositoryType = typeof UserRepository;

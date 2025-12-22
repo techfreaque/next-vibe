@@ -39,12 +39,10 @@ export function createEnumOptions<
 } {
   const enumObj = createEnumObjectWithKeyValues(enumMap);
 
-  const optionsArray = Object.entries(enumMap).map(
-    ([, translationValue]) => ({
-      value: translationValue,
-      label: translationValue,
-    }),
-  ) as Array<{ [K in keyof T]: { value: T[K]; label: T[K] } }[keyof T]>;
+  const optionsArray = Object.entries(enumMap).map(([, translationValue]) => ({
+    value: translationValue,
+    label: translationValue,
+  })) as Array<{ [K in keyof T]: { value: T[K]; label: T[K] } }[keyof T]>;
 
   return {
     enum: enumObj,

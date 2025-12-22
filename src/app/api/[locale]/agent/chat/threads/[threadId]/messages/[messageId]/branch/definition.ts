@@ -163,7 +163,7 @@ const { POST } = createEndpoint({
             "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.role.description" as const,
           options: ChatMessageRoleOptions,
         },
-        z.nativeEnum(ChatMessageRole),
+        z.enum(ChatMessageRole),
       ),
       model: requestDataField(
         {
@@ -174,7 +174,7 @@ const { POST } = createEndpoint({
           description:
             "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.model.description" as const,
         },
-        z.nativeEnum(ModelId).optional(),
+        z.enum(ModelId).optional(),
       ),
 
       // === RESPONSE ===

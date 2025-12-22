@@ -4,8 +4,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
-import { simpleT } from "@/i18n/core/shared";
-
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import type { WidgetType } from "../../../shared/types/enums";
 import { extractDataCardsData } from "../../../shared/widgets/logic/data-cards";
@@ -13,19 +11,20 @@ import type {
   ReactWidgetProps,
   WidgetData,
 } from "../../../shared/widgets/types";
+import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
 import { getGridClassName } from "../../../shared/widgets/utils/widget-helpers";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**
  * Renders data as a grid of cards with nested field widgets.
  */
-export const DataCardsWidget = ({
+export const DataCardsWidget = <TKey extends string>({
   value,
   field,
   context,
   className = "",
-}: ReactWidgetProps<typeof WidgetType.DATA_CARDS>): JSX.Element => {
-  const { t } = simpleT(context.locale);
+}: ReactWidgetProps<typeof WidgetType.DATA_CARDS, TKey>): JSX.Element => {
+  const { t } = getTranslator(context);
   const data = extractDataCardsData(value);
 
   if (!data) {
@@ -35,13 +34,13 @@ export const DataCardsWidget = ({
   const { cards, columns } = data;
   const gridCols = getGridClassName(columns as 1 | 2 | 3);
 
-  let fieldDefinitions: Record<string, UnifiedField> = {};
+  let fieldDefinitions: Record<string, UnifiedField<string>> = {};
   if (
     "type" in field &&
     (field.type === "array" || field.type === "array-optional")
   ) {
     if ("child" in field && field.child) {
-      const childField = field.child as UnifiedField;
+      const childField = field.child as UnifiedField<string>;
       if (
         "type" in childField &&
         (childField.type === "object" || childField.type === "object-optional")
@@ -49,7 +48,7 @@ export const DataCardsWidget = ({
         if ("children" in childField && childField.children) {
           fieldDefinitions = childField.children as Record<
             string,
-            UnifiedField
+            UnifiedField<string>
           >;
         }
       }

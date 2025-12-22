@@ -421,30 +421,27 @@ export const apiClient = {
   /**
    * Fetch data from an API endpoint without using React hooks
    */
-  fetch: async <
-    TRequestOutput,
-    TResponseOutput,
-    TUrlVariablesOutput,
-    TEndpoint extends CreateApiEndpoint<
-      string,
-      Methods,
-      readonly UserRoleValue[],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      any
-    >,
-  >(
+  fetch: async <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    requestData: TRequestOutput,
-    pathParams: TUrlVariablesOutput,
+    requestData: TEndpoint["types"]["RequestOutput"] extends never
+      ? undefined
+      : TEndpoint["types"]["RequestOutput"],
+    pathParams: TEndpoint["types"]["UrlVariablesOutput"] extends never
+      ? undefined
+      : TEndpoint["types"]["UrlVariablesOutput"],
     locale: CountryLanguage,
     options: Omit<
-      ApiQueryOptions<TRequestOutput, TResponseOutput, TUrlVariablesOutput>,
+      ApiQueryOptions<
+        TEndpoint["types"]["RequestOutput"],
+        TEndpoint["types"]["ResponseOutput"],
+        TEndpoint["types"]["UrlVariablesOutput"]
+      >,
       "queryKey"
     > & {
       queryKey?: QueryKey;
     } = {},
-  ): Promise<ResponseType<TResponseOutput>> => {
+  ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> => {
     // Check if the endpoint expects undefined for request data
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
     const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;

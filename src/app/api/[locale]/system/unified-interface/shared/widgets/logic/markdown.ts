@@ -19,7 +19,15 @@ export interface ProcessedMarkdown {
  * Markdown element types
  */
 export interface MarkdownElement {
-  type: "heading" | "paragraph" | "bold" | "italic" | "code" | "list" | "link" | "text";
+  type:
+    | "heading"
+    | "paragraph"
+    | "bold"
+    | "italic"
+    | "code"
+    | "list"
+    | "link"
+    | "text";
   content: string;
   level?: number; // for headings (1-6)
   ordered?: boolean; // for lists
@@ -126,7 +134,9 @@ export function parseMarkdownElements(content: string): MarkdownElement[] {
 /**
  * Extract and validate markdown data from WidgetData
  */
-export function extractMarkdownData(value: WidgetData): ProcessedMarkdown | null {
+export function extractMarkdownData(
+  value: WidgetData,
+): ProcessedMarkdown | null {
   // Handle string value directly
   if (typeof value === "string") {
     return {

@@ -1,4 +1,3 @@
- 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { enableDebugLogger, mcpSilentMode } from "@/config/debug";
@@ -101,10 +100,7 @@ export function createEndpointLogger(
       if (mcpSilentMode) {
         // In MCP mode, dynamically import and log to file instead of console
         const metadataObj = metadata.length > 0 ? { metadata } : undefined;
-        void writeToFile(
-          `[INFO] ${formatMessage(message)}`,
-          metadataObj,
-        );
+        void writeToFile(`[INFO] ${formatMessage(message)}`, metadataObj);
       } else {
         // oxlint-disable-next-line no-console
         console.log(formatMessage(message), ...metadata);
@@ -123,10 +119,7 @@ export function createEndpointLogger(
           error: typedError,
           ...(metadata.length > 0 && { metadata }),
         };
-        void writeToFile(
-          `[ERROR] ${formatMessage(message)}`,
-          metadataObj,
-        );
+        void writeToFile(`[ERROR] ${formatMessage(message)}`, metadataObj);
       } else {
         const typedError = error ? parseError(error) : undefined;
         // oxlint-disable-next-line no-console
@@ -154,10 +147,7 @@ export function createEndpointLogger(
         if (mcpSilentMode) {
           // In MCP mode, dynamically import and log to file instead of console
           const metadataObj = metadata.length > 0 ? { metadata } : undefined;
-          void writeToFile(
-            `[DEBUG] ${formatMessage(message)}`,
-            metadataObj,
-          );
+          void writeToFile(`[DEBUG] ${formatMessage(message)}`, metadataObj);
         } else {
           // oxlint-disable-next-line no-console
           console.log(formatMessage(message), ...metadata);
@@ -168,10 +158,7 @@ export function createEndpointLogger(
       if (mcpSilentMode) {
         // In MCP mode, dynamically import and log to file instead of console
         const metadataObj = metadata.length > 0 ? { metadata } : undefined;
-        void writeToFile(
-          `[WARN] ${formatMessage(message)}`,
-          metadataObj,
-        );
+        void writeToFile(`[WARN] ${formatMessage(message)}`, metadataObj);
       } else {
         // oxlint-disable-next-line no-console
         console.warn(formatMessage(message), ...metadata);

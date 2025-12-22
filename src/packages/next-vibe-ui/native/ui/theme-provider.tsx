@@ -1,7 +1,7 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import React, { useEffect, useState } from "react";
-import { Appearance,useColorScheme, View } from "react-native";
+import { Appearance, useColorScheme, View } from "react-native";
 
 import type {
   ThemeProviderProps,

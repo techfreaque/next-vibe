@@ -6,7 +6,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { leadsRepository } from "../repository";
+import { LeadsRepository } from "../repository";
 import definitions from "./definition";
 import { renderAdminNotificationMail, renderWelcomeMail } from "./email";
 
@@ -23,8 +23,6 @@ export const { POST, tools } = endpointsHandler({
         ignoreErrors: true, // Don't fail lead creation if admin notification fails
       },
     ],
-    handler: async ({ data, logger }) => {
-      return await leadsRepository.createLead(data, logger);
-    },
+    handler: ({ data, logger }) => LeadsRepository.createLead(data, logger),
   },
 });

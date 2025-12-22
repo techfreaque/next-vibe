@@ -9,10 +9,12 @@ import { extractEmptyStateData } from "@/app/api/[locale]/system/unified-interfa
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class EmptyStateWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.EMPTY_STATE> {
+export class EmptyStateWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.EMPTY_STATE
+> {
   readonly widgetType = WidgetType.EMPTY_STATE;
 
-  render(props: CLIWidgetProps<typeof WidgetType.EMPTY_STATE>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.EMPTY_STATE, string>): string {
     const { value, context } = props;
     const indent = this.createIndent(context.depth, context);
 

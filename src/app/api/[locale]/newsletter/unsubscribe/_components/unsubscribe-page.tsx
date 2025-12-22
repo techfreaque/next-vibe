@@ -14,9 +14,7 @@ import { useNewsletterManager } from "@/app/api/[locale]/newsletter/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type {
-  MeGetResponseOutput,
-} from "../../../user/private/me/definition";
+import type { MeGetResponseOutput } from "../../../user/private/me/definition";
 
 interface UnsubscribePageProps {
   locale: CountryLanguage;

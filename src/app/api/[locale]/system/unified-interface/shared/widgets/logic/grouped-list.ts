@@ -235,13 +235,11 @@ export function extractGroupedListData(
     const groupByField = config?.groupBy ?? "status";
     if (groupByField in items[0]) {
       const grouped = groupListData(items, groupByField);
-      let autoGroups = [...grouped.entries()].map(
-        ([key, groupItems]) => ({
-          key,
-          label: key,
-          items: groupItems,
-        }),
-      );
+      let autoGroups = [...grouped.entries()].map(([key, groupItems]) => ({
+        key,
+        label: key,
+        items: groupItems,
+      }));
 
       // Apply sorting if sortBy is specified
       const sortBy = config?.sortBy;
@@ -258,24 +256,23 @@ export function extractGroupedListData(
         showGroupSummary: false,
       };
     }
-      // Single group with all items
-      let allItems = items;
-      if (config?.sortBy) {
-        allItems = sortGroupedItems(items, config.sortBy);
-      }
+    // Single group with all items
+    let allItems = items;
+    if (config?.sortBy) {
+      allItems = sortGroupedItems(items, config.sortBy);
+    }
 
-      return {
-        groups: [
-          {
-            key: "all",
-            label: "All Items",
-            items: allItems,
-          },
-        ],
-        maxItemsPerGroup: undefined,
-        showGroupSummary: false,
-      };
-    
+    return {
+      groups: [
+        {
+          key: "all",
+          label: "All Items",
+          items: allItems,
+        },
+      ],
+      maxItemsPerGroup: undefined,
+      showGroupSummary: false,
+    };
   }
 
   // Narrow to object type
@@ -335,13 +332,11 @@ export function extractGroupedListData(
         const groupByField = config?.groupBy || "status";
         if (groupByField in items[0]) {
           const grouped = groupListData(items, groupByField);
-          let autoGroups = [...grouped.entries()].map(
-            ([key, groupItems]) => ({
-              key,
-              label: key,
-              items: groupItems,
-            }),
-          );
+          let autoGroups = [...grouped.entries()].map(([key, groupItems]) => ({
+            key,
+            label: key,
+            items: groupItems,
+          }));
 
           // Apply sorting if sortBy is specified
           const sortBy = config?.sortBy;
@@ -358,24 +353,23 @@ export function extractGroupedListData(
             showGroupSummary: false,
           };
         }
-          // Single group with all items
-          let allItems = items;
-          if (config?.sortBy) {
-            allItems = sortGroupedItems(items, config.sortBy);
-          }
+        // Single group with all items
+        let allItems = items;
+        if (config?.sortBy) {
+          allItems = sortGroupedItems(items, config.sortBy);
+        }
 
-          return {
-            groups: [
-              {
-                key: "all",
-                label: "All Items",
-                items: allItems,
-              },
-            ],
-            maxItemsPerGroup,
-            showGroupSummary: false,
-          };
-        
+        return {
+          groups: [
+            {
+              key: "all",
+              label: "All Items",
+              items: allItems,
+            },
+          ],
+          maxItemsPerGroup,
+          showGroupSummary: false,
+        };
       }
     }
 

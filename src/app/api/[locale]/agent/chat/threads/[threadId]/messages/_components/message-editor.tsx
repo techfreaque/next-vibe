@@ -43,7 +43,7 @@ interface MessageEditorProps {
   ) => Promise<void>;
   onCancel: () => void;
   onModelChange?: (model: ModelId) => void;
-  onPersonaChange?: (persona: string) => void;
+  onCharacterChange?: (character: string) => void;
   locale: CountryLanguage;
   logger: EndpointLogger;
 }
@@ -53,17 +53,17 @@ export function MessageEditor({
   onBranch,
   onCancel,
   onModelChange,
-  onPersonaChange,
+  onCharacterChange,
   locale,
   logger,
 }: MessageEditorProps): JSX.Element {
-  const { selectedModel, selectedPersona, deductCredits } = useChatContext();
+  const { selectedModel, selectedCharacter, deductCredits } = useChatContext();
   const { t } = simpleT(locale);
 
   // Call mode state
   const { isCallMode, toggleCallMode } = useCallMode({
     modelId: selectedModel,
-    personaId: selectedPersona,
+    characterId: selectedCharacter,
   });
 
   // Message editor logic
@@ -157,11 +157,11 @@ export function MessageEditor({
         <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 flex-nowrap">
           {/* Left: Selector */}
           <Div className="flex flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 flex-1 min-w-0">
-            {(onModelChange || onPersonaChange) && (
+            {(onModelChange || onCharacterChange) && (
               <Selector
-                personaId={selectedPersona}
+                characterId={selectedCharacter}
                 modelId={selectedModel}
-                onPersonaChange={onPersonaChange ?? ((): void => undefined)}
+                onCharacterChange={onCharacterChange ?? ((): void => undefined)}
                 onModelChange={onModelChange ?? ((): void => undefined)}
                 locale={locale}
                 logger={logger}

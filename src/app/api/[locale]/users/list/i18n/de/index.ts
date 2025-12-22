@@ -95,7 +95,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konfliktfehler",
-        description: "Benutzer können aufgrund von Konflikten nicht aufgelistet werden",
+        description:
+          "Benutzer können aufgrund von Konflikten nicht aufgelistet werden",
       },
       network: {
         title: "Netzwerkfehler",

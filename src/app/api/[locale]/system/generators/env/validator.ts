@@ -62,7 +62,8 @@ function extractEnvExampleEntries(content: string): EnvExampleEntry[] {
   const entries: EnvExampleEntry[] = [];
 
   // Match field definitions: KEY: { schema: ..., example: "...", comment?: "..." }
-  const fieldPattern = /(\w+):\s*\{[^}]*example:\s*["']([^"']*)["'](?:[^}]*comment:\s*["']([^"']+)["'])?[^}]*\}/g;
+  const fieldPattern =
+    /(\w+):\s*\{[^}]*example:\s*["']([^"']*)["'](?:[^}]*comment:\s*["']([^"']+)["'])?[^}]*\}/g;
 
   let match;
   while ((match = fieldPattern.exec(content)) !== null) {
@@ -113,8 +114,8 @@ export function validateEnvFileExports(
         message: `File must export using ${isClient ? "defineEnvClient" : "defineEnv"}`,
         details: {
           hint: isClient
-            ? 'Add: export const { envClient: myEnv } = defineEnvClient({ ... })'
-            : 'Add: export const { env: myEnv } = defineEnv({ ... })',
+            ? "Add: export const { envClient: myEnv } = defineEnvClient({ ... })"
+            : "Add: export const { env: myEnv } = defineEnv({ ... })",
         },
       });
       return { isValid: false, errors };
@@ -130,7 +131,8 @@ export function validateEnvFileExports(
 
     const envModule: EnvModuleInfo = {
       moduleName,
-      envExampleEntries: envExampleEntries.length > 0 ? envExampleEntries : undefined,
+      envExampleEntries:
+        envExampleEntries.length > 0 ? envExampleEntries : undefined,
     };
 
     return { isValid: true, errors: [], module: envModule, exportName };

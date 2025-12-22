@@ -1,4 +1,3 @@
- 
 /* eslint-disable i18next/no-literal-string */
 import Constants from "expo-constants";
 import { Environment } from "next-vibe/shared/utils/env-util";

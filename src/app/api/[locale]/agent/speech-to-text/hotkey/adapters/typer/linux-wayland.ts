@@ -4,7 +4,6 @@
  */
 /// <reference types="bun-types" />
 
-
 import "server-only";
 
 import { TyperBackend } from "../../enum";
@@ -78,7 +77,9 @@ export class LinuxWaylandClipboardTyper extends BaseTyper {
     const copyExitCode = await copyProc.exited;
     if (copyExitCode !== 0) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Typer execution error
-      throw new Error(`Failed to copy to clipboard (exit code: ${copyExitCode})`);
+      throw new Error(
+        `Failed to copy to clipboard (exit code: ${copyExitCode})`,
+      );
     }
 
     // Step 2: Paste using wtype (Ctrl+V)

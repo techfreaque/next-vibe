@@ -3,11 +3,7 @@
  * Zip folders for release assets
  */
 
-import {
-  createWriteStream,
-  existsSync,
-  mkdirSync,
-} from "node:fs";
+import { createWriteStream, existsSync, mkdirSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -73,10 +69,10 @@ export class AssetZipper implements IAssetZipper {
 
       let outputFileName = basename(zipConfig.output);
       outputFileName = outputFileName
-        .replaceAll('%NAME%', packageJson.name)
-        .replaceAll('%VERSION%', newTag)
+        .replaceAll("%NAME%", packageJson.name)
+        .replaceAll("%VERSION%", newTag)
         .replaceAll(
-          '%TIMESTAMP%',
+          "%TIMESTAMP%",
           new Date()
             .toISOString()
             .replaceAll(/[:.T]/g, "-")
@@ -100,7 +96,8 @@ export class AssetZipper implements IAssetZipper {
       try {
         const output = createWriteStream(outputPath);
         const archiverPkg = "archiver";
-        const archiver = (await import(/* webpackIgnore: true */ archiverPkg)).default;
+        const archiver = (await import(/* webpackIgnore: true */ archiverPkg))
+          .default;
         const archive = archiver("zip", { zlib: { level: 9 } });
 
         await new Promise<void>((resolve, reject) => {

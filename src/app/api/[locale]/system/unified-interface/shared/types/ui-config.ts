@@ -32,12 +32,12 @@ import type { FieldDataType, InterfaceContext } from "./enums";
 /**
  * UI configuration that can be attached to any field
  */
-export interface UIConfig {
+export interface UIConfig<TKey extends string> {
   // Context-specific configurations
-  contexts?: Partial<Record<InterfaceContext, ContextSpecificConfig>>;
+  contexts?: Partial<Record<InterfaceContext, ContextSpecificConfig<TKey>>>;
 
   // Default configuration (applies to all contexts unless overridden)
-  default?: ContextSpecificConfig;
+  default?: ContextSpecificConfig<TKey>;
 
   // Global actions that apply across all contexts
   globalActions?: LifecycleActions;
@@ -52,9 +52,9 @@ export interface UIConfig {
 /**
  * Context-specific UI configuration
  */
-export interface ContextSpecificConfig {
+export interface ContextSpecificConfig<TKey extends string> {
   // Widget configuration for this context
-  widget?: WidgetConfig;
+  widget?: WidgetConfig<TKey>;
 
   // Field-specific overrides
   field?: {
@@ -92,14 +92,14 @@ export interface ContextSpecificConfig {
 /**
  * Enhanced field configuration that extends our existing field system
  */
-export interface EnhancedFieldConfig {
+export interface EnhancedFieldConfig<TKey extends string> {
   // Core field properties (from existing system)
   key: string;
   schema: z.ZodTypeAny;
   usage: { request?: "data" | "urlPathParams"; response?: boolean };
 
   // Enhanced UI configuration
-  ui?: UIConfig;
+  ui?: UIConfig<TKey>;
 
   // Cache strategy
   cache?: {
@@ -124,38 +124,42 @@ export interface EnhancedFieldConfig {
 /**
  * Preset configurations for common field patterns
  */
-export interface FieldPresets {
+export interface FieldPresets<TKey extends string> {
   // Form field presets
-  textInput: (label: TranslationKey, required?: boolean) => UIConfig;
-  emailInput: (label: TranslationKey, required?: boolean) => UIConfig;
-  passwordInput: (label: TranslationKey, required?: boolean) => UIConfig;
-  numberInput: (label: TranslationKey, min?: number, max?: number) => UIConfig;
+  textInput: (label: TranslationKey, required?: boolean) => UIConfig<TKey>;
+  emailInput: (label: TranslationKey, required?: boolean) => UIConfig<TKey>;
+  passwordInput: (label: TranslationKey, required?: boolean) => UIConfig<TKey>;
+  numberInput: (
+    label: TranslationKey,
+    min?: number,
+    max?: number,
+  ) => UIConfig<TKey>;
   selectInput: (
     label: TranslationKey,
     options: Array<{ value: string; label: TranslationKey }>,
-  ) => UIConfig;
-  dateInput: (label: TranslationKey, required?: boolean) => UIConfig;
-  textareaInput: (label: TranslationKey, rows?: number) => UIConfig;
+  ) => UIConfig<TKey>;
+  dateInput: (label: TranslationKey, required?: boolean) => UIConfig<TKey>;
+  textareaInput: (label: TranslationKey, rows?: number) => UIConfig<TKey>;
 
   // Display field presets
-  badge: (variant?: "success" | "warning" | "error") => UIConfig;
-  avatar: (size?: "sm" | "md" | "lg") => UIConfig;
-  link: (external?: boolean) => UIConfig;
-  currency: (currency?: string) => UIConfig;
-  percentage: (decimals?: number) => UIConfig;
-  date: (format?: string) => UIConfig;
+  badge: (variant?: "success" | "warning" | "error") => UIConfig<TKey>;
+  avatar: (size?: "sm" | "md" | "lg") => UIConfig<TKey>;
+  link: (external?: boolean) => UIConfig<TKey>;
+  currency: (currency?: string) => UIConfig<TKey>;
+  percentage: (decimals?: number) => UIConfig<TKey>;
+  date: (format?: string) => UIConfig<TKey>;
 
   // Action presets
-  editButton: (editAction: ActionConfig[]) => UIConfig;
-  deleteButton: (deleteAction: ActionConfig[]) => UIConfig;
-  viewButton: (viewAction: ActionConfig[]) => UIConfig;
-  copyButton: (copyAction: ActionConfig[]) => UIConfig;
+  editButton: (editAction: ActionConfig[]) => UIConfig<TKey>;
+  deleteButton: (deleteAction: ActionConfig[]) => UIConfig<TKey>;
+  viewButton: (viewAction: ActionConfig[]) => UIConfig<TKey>;
+  copyButton: (copyAction: ActionConfig[]) => UIConfig<TKey>;
 }
 
 /**
  * Widget factory for creating complex UI patterns
  */
-export interface EnhancedWidgetFactory {
+export interface EnhancedWidgetFactory<TKey extends string> {
   // Data display widgets
   createDataTable: (config: {
     columns: Array<{
@@ -170,7 +174,7 @@ export interface EnhancedWidgetFactory {
       bulk?: BulkAction[];
       toolbar?: ButtonAction[];
     };
-  }) => DataTableWidgetConfig;
+  }) => DataTableWidgetConfig<TKey>;
 
   createDataCards: (config: {
     layout: "grid" | "list";
@@ -181,7 +185,7 @@ export interface EnhancedWidgetFactory {
       image?: string;
     };
     actions?: ButtonAction[];
-  }) => DataCardsWidgetConfig;
+  }) => DataCardsWidgetConfig<TKey>;
 
   // Stats widgets
   createMetricsGrid: (
@@ -194,7 +198,7 @@ export interface EnhancedWidgetFactory {
         direction: "up" | "down" | "neutral";
       };
     }>,
-  ) => WidgetConfig[];
+  ) => WidgetConfig<TKey>[];
 
   createChart: (config: {
     type: "line" | "bar" | "pie" | "area";
@@ -202,83 +206,97 @@ export interface EnhancedWidgetFactory {
     xField: string;
     yField: string | string[];
     seriesField?: string;
-  }) => ChartWidgetConfig;
+  }) => ChartWidgetConfig<TKey>;
 
   // Form widgets
   createFormSection: (config: {
     title: TranslationKey;
     description?: TranslationKey;
-    fields: EnhancedFieldConfig[];
+    fields: EnhancedFieldConfig<TKey>[];
     layout?: "vertical" | "horizontal" | "grid";
     collapsible?: boolean;
-  }) => WidgetConfig;
+  }) => WidgetConfig<TKey>;
 
   createFormWizard: (
     steps: Array<{
       title: TranslationKey;
       description?: TranslationKey;
-      fields: EnhancedFieldConfig[];
+      fields: EnhancedFieldConfig<TKey>[];
       validation?: ActionConfig[];
     }>,
-  ) => WidgetConfig;
+  ) => WidgetConfig<TKey>;
 }
 
 /**
  * UI configuration builder for fluent API
  */
-export interface UIConfigBuilder {
+export interface UIConfigBuilder<TKey extends string> {
   // Context targeting
-  forContext(context: InterfaceContext): UIConfigBuilder;
-  forAllContexts(): UIConfigBuilder;
+  forContext(context: InterfaceContext): UIConfigBuilder<TKey>;
+  forAllContexts(): UIConfigBuilder<TKey>;
 
   // Widget configuration
-  withWidget(widget: WidgetConfig): UIConfigBuilder;
-  withFormField(config: Partial<FormFieldWidgetConfig>): UIConfigBuilder;
-  withDataTable(config: Partial<DataTableWidgetConfig>): UIConfigBuilder;
-  withMetricCard(config: Partial<MetricCardWidgetConfig>): UIConfigBuilder;
+  withWidget(widget: WidgetConfig<TKey>): UIConfigBuilder<TKey>;
+  withFormField(
+    config: Partial<FormFieldWidgetConfig<TKey>>,
+  ): UIConfigBuilder<TKey>;
+  withDataTable(
+    config: Partial<DataTableWidgetConfig<TKey>>,
+  ): UIConfigBuilder<TKey>;
+  withMetricCard(
+    config: Partial<MetricCardWidgetConfig<TKey>>,
+  ): UIConfigBuilder<TKey>;
 
   // Actions
-  withActions(actions: FieldActions & InteractiveActions): UIConfigBuilder;
-  withLifecycleActions(actions: LifecycleActions): UIConfigBuilder;
-  onSuccess(actions: ActionConfig[]): UIConfigBuilder;
-  onError(actions: ActionConfig[]): UIConfigBuilder;
-  onClick(actions: ActionConfig[]): UIConfigBuilder;
-  onChange(actions: ActionConfig[]): UIConfigBuilder;
+  withActions(
+    actions: FieldActions & InteractiveActions,
+  ): UIConfigBuilder<TKey>;
+  withLifecycleActions(actions: LifecycleActions): UIConfigBuilder<TKey>;
+  onSuccess(actions: ActionConfig[]): UIConfigBuilder<TKey>;
+  onError(actions: ActionConfig[]): UIConfigBuilder<TKey>;
+  onClick(actions: ActionConfig[]): UIConfigBuilder<TKey>;
+  onChange(actions: ActionConfig[]): UIConfigBuilder<TKey>;
 
   // Layout
-  withLayout(layout: LayoutConfig): UIConfigBuilder;
+  withLayout(layout: LayoutConfig): UIConfigBuilder<TKey>;
   withResponsive(config: {
     breakpoints?: Record<string, number>;
     behavior?: "hide" | "collapse" | "stack" | "scroll";
-  }): UIConfigBuilder;
+  }): UIConfigBuilder<TKey>;
 
   // Conditions
   showWhen(
     field: string,
     operator: "equals" | "not_equals" | "exists" | "not_exists",
     value?: string | number | boolean,
-  ): UIConfigBuilder;
+  ): UIConfigBuilder<TKey>;
   hideWhen(
     field: string,
     operator: "equals" | "not_equals" | "exists" | "not_exists",
     value?: string | number | boolean,
-  ): UIConfigBuilder;
+  ): UIConfigBuilder<TKey>;
 
   // Build
-  build(): UIConfig;
+  build(): UIConfig<TKey>;
 }
 
 /**
  * Factory function to create UI config
  */
-export declare function createUIConfig(config: Partial<UIConfig>): UIConfig;
+export declare function createUIConfig<TKey extends string>(
+  config: Partial<UIConfig<TKey>>,
+): UIConfig<TKey>;
 
 /**
  * Factory function to create field presets
  */
-export declare function createFieldPresets(): FieldPresets;
+export declare function createFieldPresets<
+  TKey extends string,
+>(): FieldPresets<TKey>;
 
 /**
  * Factory function to create widget factory
  */
-export declare function createWidgetFactory(): EnhancedWidgetFactory;
+export declare function createWidgetFactory<
+  TKey extends string,
+>(): EnhancedWidgetFactory<TKey>;

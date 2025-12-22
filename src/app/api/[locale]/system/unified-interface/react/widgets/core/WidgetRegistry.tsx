@@ -5,17 +5,31 @@
 
 "use client";
 
-import type { FC } from "react";
+import type { FC, JSX } from "react";
+import type { FieldValues } from "react-hook-form";
 
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { type ReactWidgetProps,type WidgetComponentProps } from "../../../shared/widgets/types";
+import {
+  type ReactWidgetProps,
+  type ValueOnlyReactWidgetProps,
+  type WidgetComponentProps,
+} from "../../../shared/widgets/types";
 
 /**
- * Widget component type - accepts either base props or narrowed props.
+ * Widget component type for registry storage - uses WidgetComponentProps for retrieval
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type WidgetComponent = FC<WidgetComponentProps> | FC<ReactWidgetProps<any>>;
+export type WidgetComponent = FC<WidgetComponentProps<string>>;
+
+/**
+ * Accepted component types for registration - supports all widget prop variants
+ */
+type RegisterableComponent<T extends WidgetType> =
+  | FC<WidgetComponentProps<string>>
+  | (<TKey extends string>(
+      props: ReactWidgetProps<T, TKey, FieldValues>,
+    ) => JSX.Element)
+  | FC<ValueOnlyReactWidgetProps<T>>;
 
 /**
  * Widget registry entry
@@ -34,9 +48,14 @@ export class WidgetRegistry {
 
   /**
    * Register a widget component
+   * Accepts various widget prop types and stores as WidgetComponent
    */
-  register(type: WidgetType, component: WidgetComponent): void {
-    this.widgets.set(type, component);
+  register<T extends WidgetType>(
+    type: T,
+    component: RegisterableComponent<T>,
+  ): void {
+    // Safe cast: widgets are stored generically but called with correct props at runtime
+    this.widgets.set(type, component as WidgetComponent);
   }
 
   /**

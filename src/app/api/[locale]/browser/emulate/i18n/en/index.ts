@@ -32,15 +32,42 @@ export const translations = {
     executionId: "Execution ID for tracking",
   },
   errors: {
-    validation: { title: "Validation Error", description: "Please check your input and try again" },
-    network: { title: "Network Error", description: "A network error occurred during emulation" },
-    unauthorized: { title: "Unauthorized", description: "You are not authorized to emulate device features" },
-    forbidden: { title: "Forbidden", description: "Device emulation operation is forbidden" },
-    notFound: { title: "Not Found", description: "The requested resource was not found" },
-    serverError: { title: "Server Error", description: "An internal server error occurred during emulation" },
-    unknown: { title: "Unknown Error", description: "An unknown error occurred during emulation" },
-    unsavedChanges: { title: "Unsaved Changes", description: "You have unsaved changes that may be lost" },
-    conflict: { title: "Conflict", description: "A conflict occurred during emulation" },
+    validation: {
+      title: "Validation Error",
+      description: "Please check your input and try again",
+    },
+    network: {
+      title: "Network Error",
+      description: "A network error occurred during emulation",
+    },
+    unauthorized: {
+      title: "Unauthorized",
+      description: "You are not authorized to emulate device features",
+    },
+    forbidden: {
+      title: "Forbidden",
+      description: "Device emulation operation is forbidden",
+    },
+    notFound: {
+      title: "Not Found",
+      description: "The requested resource was not found",
+    },
+    serverError: {
+      title: "Server Error",
+      description: "An internal server error occurred during emulation",
+    },
+    unknown: {
+      title: "Unknown Error",
+      description: "An unknown error occurred during emulation",
+    },
+    unsavedChanges: {
+      title: "Unsaved Changes",
+      description: "You have unsaved changes that may be lost",
+    },
+    conflict: {
+      title: "Conflict",
+      description: "A conflict occurred during emulation",
+    },
   },
   success: {
     title: "Emulation Successful",

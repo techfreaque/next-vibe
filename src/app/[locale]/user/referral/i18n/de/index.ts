@@ -6,11 +6,14 @@ export const translations = {
   howItWorks: {
     title: "So funktioniert's",
     step1Title: "Empfehlungscodes erstellen",
-    step1Body: "Generieren Sie einzigartige Codes für verschiedene Zielgruppen — Freunde, Social Media oder Kampagnen.",
+    step1Body:
+      "Generieren Sie einzigartige Codes für verschiedene Zielgruppen — Freunde, Social Media oder Kampagnen.",
     step2Title: "Link teilen",
-    step2Body: "Wenn sich jemand über Ihren Link anmeldet und abonniert, verdienen Sie Provision.",
+    step2Body:
+      "Wenn sich jemand über Ihren Link anmeldet und abonniert, verdienen Sie Provision.",
     step3Title: "Auszahlung erhalten",
-    step3Body: "Einnahmen sind sofort verfügbar. Nutzen Sie sie als Chat-Guthaben oder lassen Sie sich in Krypto auszahlen.",
+    step3Body:
+      "Einnahmen sind sofort verfügbar. Nutzen Sie sie als Chat-Guthaben oder lassen Sie sich in Krypto auszahlen.",
   },
   overview: {
     title: "Ihre Einnahmen",
@@ -20,14 +23,19 @@ export const translations = {
     title: "Einnahmen auszahlen",
     description: "Mehrere Möglichkeiten, Ihre Empfehlungseinnahmen zu nutzen",
     useAsCredits: "Als Chat-Guthaben nutzen",
-    useAsCreditsDesc: "Wandeln Sie Einnahmen sofort in Chat-Guthaben für KI-Gespräche um.",
+    useAsCreditsDesc:
+      "Wandeln Sie Einnahmen sofort in Chat-Guthaben für KI-Gespräche um.",
     cryptoPayout: "Krypto-Auszahlung",
-    cryptoPayoutDesc: "Fordern Sie eine Auszahlung in BTC oder USDC an Ihre Wallet an.",
-    minimumNote: "Mindestauszahlung: $40. Krypto-Auszahlungen werden innerhalb von 48 Stunden nach Genehmigung bearbeitet.",
+    cryptoPayoutDesc:
+      "Fordern Sie eine Auszahlung in BTC oder USDC an Ihre Wallet an.",
+    minimumNote:
+      "Mindestauszahlung: $40. Krypto-Auszahlungen werden innerhalb von 48 Stunden nach Genehmigung bearbeitet.",
   },
   manage: {
-    createSubtitle: "Erstellen Sie Codes für bestimmte Kampagnen oder Zielgruppen.",
-    codesSubtitle: "Verfolgen Sie Leistung und Einnahmen für jeden Empfehlungscode.",
+    createSubtitle:
+      "Erstellen Sie Codes für bestimmte Kampagnen oder Zielgruppen.",
+    codesSubtitle:
+      "Verfolgen Sie Leistung und Einnahmen für jeden Empfehlungscode.",
   },
   createCode: {
     title: "Empfehlungscode erstellen",
@@ -61,7 +69,8 @@ export const translations = {
   },
   cta: {
     title: "Heute anfangen zu verdienen",
-    description: "Erstellen Sie ein Konto oder melden Sie sich an, um Ihre Empfehlungscodes zu generieren und bei jedem Abonnement Provision zu verdienen.",
+    description:
+      "Erstellen Sie ein Konto oder melden Sie sich an, um Ihre Empfehlungscodes zu generieren und bei jedem Abonnement Provision zu verdienen.",
     signUp: "Konto erstellen",
     logIn: "Anmelden",
   },

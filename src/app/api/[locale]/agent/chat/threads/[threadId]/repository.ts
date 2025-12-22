@@ -33,38 +33,13 @@ import type {
 } from "./definition";
 
 /**
- * Thread by ID Repository Interface
+ * Thread by ID Repository - Static class pattern
  */
-export interface ThreadByIdRepositoryInterface {
-  getThreadById(
-    threadId: string,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ThreadGetResponseOutput>>;
-
-  updateThread(
-    data: ThreadPatchRequestOutput,
-    threadId: string,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ThreadPatchResponseOutput>>;
-
-  deleteThread(
-    threadId: string,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ThreadDeleteResponseOutput>>;
-}
-
-/**
- * Thread by ID Repository Implementation
- */
-export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
+export class ThreadByIdRepository {
   /**
    * Get thread by ID
    */
-  async getThreadById(
+  static async getThreadById(
     threadId: string,
     user: JwtPayloadType,
     // oxlint-disable-next-line no-unused-vars - locale is unused on server, but required on native
@@ -117,7 +92,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
 
       // Map database fields to response fields
       // Exclude: rootFolderId (not in response), moderatorIds, searchVector
-      // Map: defaultModel (ModelId -> string), defaultPersona -> persona (PersonaId -> string)
+      // Map: defaultModel (ModelId -> string), defaultCharacter -> character (CharacterId -> string)
       const response: ThreadGetResponseOutput = {
         thread: {
           id: thread.id,
@@ -126,7 +101,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           folderId: thread.folderId,
           status: thread.status,
           defaultModel: thread.defaultModel ?? null,
-          persona: thread.defaultPersona ?? null,
+          character: thread.defaultCharacter ?? null,
           systemPrompt: thread.systemPrompt,
           pinned: thread.pinned,
           archived: thread.archived,
@@ -151,7 +126,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
   /**
    * Update thread
    */
-  async updateThread(
+  static async updateThread(
     data: ThreadPatchRequestOutput,
     threadId: string,
     user: JwtPayloadType,
@@ -223,8 +198,8 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
       if (data.updates?.defaultModel !== undefined) {
         updateData.defaultModel = data.updates.defaultModel;
       }
-      if (data.updates?.persona !== undefined) {
-        updateData.defaultPersona = data.updates.persona ?? null;
+      if (data.updates?.character !== undefined) {
+        updateData.defaultCharacter = data.updates.character ?? null;
       }
       if (data.updates?.systemPrompt !== undefined) {
         updateData.systemPrompt = data.updates.systemPrompt;
@@ -255,7 +230,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
 
       // Map database fields to response fields
       // Exclude: rootFolderId (not in response), moderatorIds, searchVector
-      // Map: defaultModel (ModelId -> string), defaultPersona -> persona (PersonaId -> string)
+      // Map: defaultModel (ModelId -> string), defaultCharacter -> character (CharacterId -> string)
       const response: ThreadPatchResponseOutput = {
         thread: {
           id: updatedThread.id,
@@ -264,7 +239,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
           folderId: updatedThread.folderId,
           status: updatedThread.status,
           defaultModel: updatedThread.defaultModel ?? null,
-          persona: updatedThread.defaultPersona ?? null,
+          character: updatedThread.defaultCharacter ?? null,
           systemPrompt: updatedThread.systemPrompt,
           pinned: updatedThread.pinned,
           archived: updatedThread.archived,
@@ -291,7 +266,7 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
   /**
    * Delete thread
    */
-  async deleteThread(
+  static async deleteThread(
     threadId: string,
     user: JwtPayloadType,
     logger: EndpointLogger,
@@ -382,7 +357,8 @@ export class ThreadByIdRepositoryImpl implements ThreadByIdRepositoryInterface {
   }
 }
 
-/**
- * Default repository instance
- */
-export const threadByIdRepository = new ThreadByIdRepositoryImpl();
+// Type for native repository type checking
+export type ThreadByIdRepositoryType = Pick<
+  typeof ThreadByIdRepository,
+  keyof typeof ThreadByIdRepository
+>;

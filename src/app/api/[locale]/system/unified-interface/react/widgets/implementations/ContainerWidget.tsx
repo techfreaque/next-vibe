@@ -14,8 +14,9 @@ import {
   FormAlert,
   type FormAlertState,
 } from "next-vibe-ui/ui/form/form-alert";
-import { H1,P } from "next-vibe-ui/ui/typography";
+import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
+import { useWatch } from "react-hook-form";
 
 import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
@@ -23,12 +24,19 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { UnifiedField } from "../../../shared/types/endpoint";
-import { WidgetType, type WidgetType as WidgetTypeEnum } from "../../../shared/types/enums";
+import {
+  WidgetType,
+  type WidgetType as WidgetTypeEnum,
+} from "../../../shared/types/enums";
 import type {
   ReactWidgetProps,
   WidgetData,
 } from "../../../shared/widgets/types";
-import { isFormInputField,isResponseField } from "../../../shared/widgets/utils/field-helpers";
+import {
+  getTranslator,
+  isFormInputField,
+  isResponseField,
+} from "../../../shared/widgets/utils/field-helpers";
 import {
   getLayoutClassName,
   type LayoutConfig,
@@ -43,7 +51,7 @@ import { WidgetRenderer } from "../renderers/WidgetRenderer";
  * - showFormAlert: Shows FormAlert at top for error/success messages (default: true)
  * - showSubmitButton: Shows submit button at bottom when there are request fields (default: true)
  */
-export function ContainerWidget({
+export function ContainerWidget<TKey extends string>({
   value,
   field,
   context,
@@ -52,13 +60,15 @@ export function ContainerWidget({
   fieldName,
   onSubmit,
   isSubmitting,
-}: ReactWidgetProps<typeof WidgetTypeEnum.CONTAINER>): JSX.Element {
-  const { t } = simpleT(context.locale);
+}: ReactWidgetProps<typeof WidgetTypeEnum.CONTAINER, TKey>): JSX.Element {
+  const { t } = getTranslator(context);
+  const { t: globalT } = simpleT(context.locale);
 
   const {
     layoutType: layoutTypeRaw = "stacked",
     columns = 1,
     gap = "4",
+    paddingTop,
     title: titleKey,
     description: descriptionKey,
     noCard = false,
@@ -68,6 +78,28 @@ export function ContainerWidget({
     showFormAlert = true,
     showSubmitButton = true,
   } = field.ui;
+
+  // Get field type info for hook setup (must be before any hooks)
+  const fieldWithChildren = field as UnifiedField<string> & {
+    type?: string;
+    children?: Record<string, UnifiedField<string>>;
+    discriminator?: string;
+    variants?: readonly UnifiedField<string>[];
+  };
+  const isUnionField = fieldWithChildren.type === "object-union";
+  const discriminator = fieldWithChildren.discriminator;
+
+  // Call useWatch unconditionally to satisfy React hooks rules
+  // Disabled when not needed (non-union fields or missing form/fieldName)
+  const watchPath =
+    isUnionField && discriminator && fieldName
+      ? `${fieldName}.${discriminator}`
+      : discriminator || "";
+  const watchedDiscriminator = useWatch({
+    control: form?.control,
+    name: watchPath as never,
+    disabled: !isUnionField || !form || !fieldName || !discriminator,
+  });
 
   const layoutTypeStr = String(layoutTypeRaw);
 
@@ -103,7 +135,8 @@ export function ContainerWidget({
 
   // Calculate default column span for children based on conceptual columns
   // E.g., if parent wants 4 columns, each child by default takes 12/4 = 3 grid columns
-  const defaultChildSpan = layoutType === "grid" ? Math.floor(12 / conceptualColumns) : undefined;
+  const defaultChildSpan =
+    layoutType === "grid" ? Math.floor(12 / conceptualColumns) : undefined;
 
   let title = titleKey ? t(titleKey) : undefined;
   const description = descriptionKey ? t(descriptionKey) : undefined;
@@ -134,46 +167,142 @@ export function ContainerWidget({
 
   const buttonText = submitButtonConfig?.text
     ? t(submitButtonConfig.text)
-    : t(
+    : globalT(
         "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit",
       );
 
   const loadingText = submitButtonConfig?.loadingText
     ? t(submitButtonConfig.loadingText)
-    : t(
+    : globalT(
         "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
       );
 
-  // Get children from field definition
-  const fieldWithChildren = field as UnifiedField & {
-    children?: Record<string, UnifiedField>;
-  };
+  // Handle union fields - select variant based on discriminator value
+  let children: Array<[string, UnifiedField<string>]> = [];
 
-  if (!fieldWithChildren.children) {
-    if (noCard) {
+  if (isUnionField) {
+    // Union field - need to select the correct variant
+    const variants = fieldWithChildren.variants;
+
+    if (!discriminator || !variants || variants.length === 0) {
+      // Invalid union configuration
+      if (noCard) {
+        return (
+          <Div className={cn("text-muted-foreground italic", className)}>
+            {globalT(
+              "app.api.system.unifiedInterface.react.widgets.container.noContent",
+            )}
+          </Div>
+        );
+      }
       return (
-        <Div className={cn("text-muted-foreground italic", className)}>
-          {t(
-            "app.api.system.unifiedInterface.react.widgets.container.noContent",
-          )}
-        </Div>
+        <Card className={className}>
+          <CardContent>
+            <P className="italic text-muted-foreground">
+              {globalT(
+                "app.api.system.unifiedInterface.react.widgets.container.noContent",
+              )}
+            </P>
+          </CardContent>
+        </Card>
       );
     }
 
-    return (
-      <Card className={className}>
-        <CardContent>
-          <P className="italic text-muted-foreground">
-            {t(
+    // Get discriminator value from form watch or value prop
+    let discriminatorValue: string | undefined;
+    if (
+      watchedDiscriminator !== undefined &&
+      typeof watchedDiscriminator === "string"
+    ) {
+      discriminatorValue = watchedDiscriminator;
+    } else if (value && typeof value === "object" && discriminator in value) {
+      const valueObj = value as Record<string, string | undefined>;
+      discriminatorValue = valueObj[discriminator];
+    }
+
+    // Find matching variant based on discriminator value
+    const selectedVariant = variants.find((variant) => {
+      const variantField = variant as UnifiedField<string> & {
+        children?: Record<string, UnifiedField<string>>;
+      };
+      if (!variantField.children) {
+        return false;
+      }
+
+      // Check if this variant has the discriminator field with matching value
+      const variantDiscriminator = variantField.children[discriminator];
+      const variantDiscriminatorWithSchema =
+        variantDiscriminator as UnifiedField<string> & {
+          schema?: { _def?: { value?: string; values?: string[] } };
+        };
+
+      if (!variantDiscriminator || !variantDiscriminatorWithSchema.schema) {
+        return false;
+      }
+
+      // For z.literal discriminators, check if the literal value matches
+      const schema = variantDiscriminatorWithSchema.schema;
+      // Zod's z.literal() stores the value in _def.value (string) or _def.values (array with single element)
+      const literalValue = schema._def?.value ?? schema._def?.values?.[0];
+
+      const matches = literalValue === discriminatorValue;
+      return matches;
+    });
+
+    // Get discriminator field from first variant (they all have the same discriminator field)
+    const firstVariant = variants[0] as UnifiedField<string> & {
+      children?: Record<string, UnifiedField<string>>;
+    };
+    const discriminatorField = firstVariant.children?.[discriminator];
+
+    // Build children array: discriminator field + selected variant's other fields
+    if (selectedVariant) {
+      const selectedVariantField = selectedVariant as UnifiedField<string> & {
+        children?: Record<string, UnifiedField<string>>;
+      };
+      if (selectedVariantField.children) {
+        // Add discriminator first, then other fields (excluding the discriminator to avoid duplication)
+        const variantFields = Object.entries(
+          selectedVariantField.children,
+        ).filter(([key]) => key !== discriminator);
+        children = discriminatorField
+          ? [[discriminator, discriminatorField], ...variantFields]
+          : variantFields;
+      }
+    } else {
+      // No variant selected yet - just show discriminator field
+      if (discriminatorField) {
+        children = [[discriminator, discriminatorField]];
+      }
+    }
+  } else {
+    // Regular container field with children
+    if (!fieldWithChildren.children) {
+      if (noCard) {
+        return (
+          <Div className={cn("text-muted-foreground italic", className)}>
+            {globalT(
               "app.api.system.unifiedInterface.react.widgets.container.noContent",
             )}
-          </P>
-        </CardContent>
-      </Card>
-    );
-  }
+          </Div>
+        );
+      }
 
-  const children = Object.entries(fieldWithChildren.children);
+      return (
+        <Card className={className}>
+          <CardContent>
+            <P className="italic text-muted-foreground">
+              {globalT(
+                "app.api.system.unifiedInterface.react.widgets.container.noContent",
+              )}
+            </P>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    children = Object.entries(fieldWithChildren.children);
+  }
 
   // Check if there are any actual form input fields (FORM_FIELD widgets with request usage)
   // This determines if auto FormAlert and auto submit button should be shown
@@ -184,7 +313,7 @@ export function ContainerWidget({
 
   // Recursive function to check if any widget in the subtree is of a specific type
   const hasWidgetTypeInTree = (
-    fieldToCheck: UnifiedField,
+    fieldToCheck: UnifiedField<string>,
     widgetType: string,
   ): boolean => {
     // Check direct field
@@ -192,8 +321,8 @@ export function ContainerWidget({
       return true;
     }
     // Check nested children
-    const fieldWithNestedChildren = fieldToCheck as UnifiedField & {
-      children?: Record<string, UnifiedField>;
+    const fieldWithNestedChildren = fieldToCheck as UnifiedField<string> & {
+      children?: Record<string, UnifiedField<string>>;
     };
     if (fieldWithNestedChildren.children) {
       return Object.values(fieldWithNestedChildren.children).some((child) =>
@@ -213,10 +342,16 @@ export function ContainerWidget({
 
   // Determine if we should show auto-features
   // Auto FormAlert: only show if enabled AND has form input fields AND no explicit FormAlert anywhere in subtree
-  const shouldShowAutoFormAlert = showFormAlert && hasFormInputFields && !hasExplicitFormAlert;
+  const shouldShowAutoFormAlert =
+    showFormAlert && hasFormInputFields && !hasExplicitFormAlert;
   // Auto SubmitButton: only show if enabled AND has form input fields AND no explicit config AND no explicit widget in subtree AND form context exists
   const shouldShowAutoSubmitButton =
-    showSubmitButton && hasFormInputFields && !submitButtonConfig && !hasExplicitSubmitButton && onSubmit && form;
+    showSubmitButton &&
+    hasFormInputFields &&
+    !submitButtonConfig &&
+    !hasExplicitSubmitButton &&
+    onSubmit &&
+    form;
 
   // Build FormAlert state from context.response
   let formAlertState: FormAlertState | null = null;
@@ -242,7 +377,9 @@ export function ContainerWidget({
           message: data.message as TranslationKey,
           messageParams:
             "messageParams" in data
-              ? (data.messageParams as Record<string, string | number> | undefined)
+              ? (data.messageParams as
+                  | Record<string, string | number>
+                  | undefined)
               : undefined,
         },
       };
@@ -250,10 +387,10 @@ export function ContainerWidget({
   }
 
   // Auto submit button text
-  const autoSubmitText = t(
+  const autoSubmitText = globalT(
     "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit",
   );
-  const autoSubmitLoadingText = t(
+  const autoSubmitLoadingText = globalT(
     "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
   );
 
@@ -268,10 +405,20 @@ export function ContainerWidget({
   };
   const contentGap = gapClassMap[String(gap)] ?? "space-y-6";
 
+  const paddingTopClassMap: Record<string, string> = {
+    "0": "pt-0",
+    "2": "pt-2",
+    "3": "pt-3",
+    "4": "pt-4",
+    "6": "pt-6",
+    "8": "pt-8",
+  };
+  const topPadding = paddingTop ? paddingTopClassMap[paddingTop] : "";
+
   // If noCard is true, render without Card wrapper
   if (noCard) {
     return (
-      <Div className={cn("space-y-6", className)}>
+      <Div className={cn("space-y-6", topPadding, className)}>
         {(title || description) && (
           <Div className="text-center">
             {title && (
@@ -287,9 +434,7 @@ export function ContainerWidget({
           </Div>
         )}
         {/* Auto FormAlert at top */}
-        {shouldShowAutoFormAlert && (
-          <FormAlert alert={formAlertState} />
-        )}
+        {shouldShowAutoFormAlert && <FormAlert alert={formAlertState} />}
         <Div className={cn(layoutClass, contentGap)}>
           {children.map(([childName, childField]) => {
             // Get child data from value object
@@ -314,16 +459,21 @@ export function ContainerWidget({
             // Extract column span from child field if in grid layout
             // IMPORTANT: For CONTAINER widgets, `columns` means internal grid columns, NOT span
             // For other widgets (STAT, CHART, FORM_FIELD, etc.), `columns` means span in parent grid
-            const childUi = childField.ui as { columns?: number; type?: string } | undefined;
+            const childUi = childField.ui as
+              | { columns?: number; type?: string }
+              | undefined;
             const isChildContainer = childUi?.type === WidgetType.CONTAINER;
-            const childColumns = isChildContainer ? undefined : childUi?.columns;
+            const childColumns = isChildContainer
+              ? undefined
+              : childUi?.columns;
 
             // Calculate effective column span:
             // - For containers: always use default span (their `columns` is for internal grid)
             // - For other widgets: use explicit columns if set, otherwise default span
-            const effectiveSpan = layoutType === "grid"
-              ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12)
-              : undefined;
+            const effectiveSpan =
+              layoutType === "grid"
+                ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12)
+                : undefined;
 
             // Map column numbers to Tailwind classes (JIT-safe)
             const colSpanMap: Record<number, string> = {
@@ -408,7 +558,7 @@ export function ContainerWidget({
   }
 
   return (
-    <Card className={className}>
+    <Card className={cn(topPadding, className)}>
       {(title ?? description ?? showHeaderButton) && (
         <CardHeader>
           <Div className="flex items-center justify-between">
@@ -448,7 +598,14 @@ export function ContainerWidget({
         </CardContent>
       )}
       <CardContent
-        className={!title && !description && !showHeaderButton && !shouldShowAutoFormAlert ? "pt-6" : ""}
+        className={
+          !title &&
+          !description &&
+          !showHeaderButton &&
+          !shouldShowAutoFormAlert
+            ? "pt-6"
+            : ""
+        }
       >
         <Div className={cn(layoutClass, contentGap)}>
           {children.map(([childName, childField]) => {
@@ -474,16 +631,21 @@ export function ContainerWidget({
             // Extract column span from child field if in grid layout
             // IMPORTANT: For CONTAINER widgets, `columns` means internal grid columns, NOT span
             // For other widgets (STAT, CHART, FORM_FIELD, etc.), `columns` means span in parent grid
-            const childUi = childField.ui as { columns?: number; type?: string } | undefined;
+            const childUi = childField.ui as
+              | { columns?: number; type?: string }
+              | undefined;
             const isChildContainer = childUi?.type === WidgetType.CONTAINER;
-            const childColumns = isChildContainer ? undefined : childUi?.columns;
+            const childColumns = isChildContainer
+              ? undefined
+              : childUi?.columns;
 
             // Calculate effective column span:
             // - For containers: always use default span (their `columns` is for internal grid)
             // - For other widgets: use explicit columns if set, otherwise default span
-            const effectiveSpan = layoutType === "grid"
-              ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12)
-              : undefined;
+            const effectiveSpan =
+              layoutType === "grid"
+                ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12)
+                : undefined;
 
             // Map column numbers to Tailwind classes (JIT-safe)
             const colSpanMap: Record<number, string> = {

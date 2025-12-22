@@ -42,35 +42,20 @@ import type {
   SmtpSendResponseOutput,
   SmtpSendResult,
 } from "./types";
-/**
- * SMTP Sending Repository Interface
- */
-export interface SmtpSendingRepository {
-  sendEmail(
-    data: SmtpSendRequestOutput,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpSendResponseOutput>>;
 
-  getTotalSendingCapacity(
-    data: SmtpCapacityRequestOutput,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpCapacityResponseOutput>>;
-}
+const transportCache = new Map<
+  string,
+  Transporter<SMTPTransport.SentMessageInfo>
+>();
 
 /**
  * SMTP Sending Repository Implementation
  */
-export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
-  private transportCache = new Map<
-    string,
-    Transporter<SMTPTransport.SentMessageInfo>
-  >();
-
+export class SmtpSendingRepository {
   /**
    * Get SMTP account using enhanced selection criteria
    */
-  private async getSmtpAccountWithCriteria(
+  private static async getSmtpAccountWithCriteria(
     selectionCriteria: SmtpSelectionCriteria,
     logger: EndpointLogger,
   ): Promise<SmtpAccount | null> {
@@ -322,7 +307,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Get any available SMTP account as fallback
    */
-  private async getFallbackSmtpAccount(
+  private static async getFallbackSmtpAccount(
     logger: EndpointLogger,
   ): Promise<SmtpAccount | null> {
     try {
@@ -353,14 +338,14 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Create or get cached SMTP transport
    */
-  private async getTransport(
+  private static async getTransport(
     account: SmtpAccount,
     logger: EndpointLogger,
   ): Promise<Transporter<SMTPTransport.SentMessageInfo>> {
     const cacheKey = account.id;
 
-    if (this.transportCache.has(cacheKey)) {
-      const cachedTransport = this.transportCache.get(cacheKey);
+    if (transportCache.has(cacheKey)) {
+      const cachedTransport = transportCache.get(cacheKey);
       if (cachedTransport) {
         return cachedTransport;
       }
@@ -388,7 +373,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
       // Verify connection
       await transport.verify();
 
-      this.transportCache.set(cacheKey, transport);
+      transportCache.set(cacheKey, transport);
       return transport;
     } catch (error) {
       logger.error("Error creating SMTP transport", {
@@ -412,7 +397,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Send email using database-configured SMTP account with retry and fallback support
    */
-  async sendEmail(
+  static async sendEmail(
     data: SmtpSendRequestOutput,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpSendResponseOutput>> {
@@ -518,7 +503,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Attempt to send email with retry logic for connection issues
    */
-  private async attemptEmailSendWithRetry(
+  private static async attemptEmailSendWithRetry(
     params: SmtpSendParams,
     account: SmtpAccount,
     isFallback: boolean,
@@ -628,7 +613,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Check if an error is retryable (temporary connection issues)
    */
-  private isRetryableError(errorMessage: string): boolean {
+  private static isRetryableError(errorMessage: string): boolean {
     const retryablePatterns =
       /greeting|timeout|connect|refused|unreachable|reset|temporary/i;
     return retryablePatterns.test(errorMessage);
@@ -637,7 +622,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Perform the actual email sending with an account
    */
-  private async performEmailSend(
+  private static async performEmailSend(
     params: SmtpSendParams,
     account: SmtpAccount,
     logger: EndpointLogger,
@@ -811,7 +796,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
    * Check rate limits for account with database validation
    * Returns remaining capacity for better queue management
    */
-  private async checkRateLimit(
+  private static async checkRateLimit(
     account: SmtpAccount,
     logger: EndpointLogger,
   ): Promise<
@@ -902,7 +887,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Record email in database for tracking and rate limiting
    */
-  private async recordEmailInDatabase(
+  private static async recordEmailInDatabase(
     emailData: {
       subject: string;
       recipientEmail: string;
@@ -952,7 +937,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Get email type from campaign type
    */
-  private getEmailTypeFromCampaign(
+  private static getEmailTypeFromCampaign(
     campaignType: (typeof CampaignType)[keyof typeof CampaignType] | null,
   ): (typeof EmailType)[keyof typeof EmailType] {
     switch (campaignType) {
@@ -974,7 +959,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Update account usage statistics
    */
-  private async updateAccountUsage(
+  private static async updateAccountUsage(
     accountId: string,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -997,7 +982,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Update account health status
    */
-  private async updateAccountHealth(
+  private static async updateAccountHealth(
     accountId: string,
     success: boolean,
     logger: EndpointLogger,
@@ -1038,7 +1023,7 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
    * Get total sending capacity across all active SMTP accounts
    * Used for intelligent queue management
    */
-  async getTotalSendingCapacity(
+  static async getTotalSendingCapacity(
     data: SmtpCapacityRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
@@ -1112,8 +1097,8 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
   /**
    * Close all cached transports
    */
-  async closeAllTransports(logger: EndpointLogger): Promise<void> {
-    for (const [accountId, transport] of this.transportCache.entries()) {
+  static async closeAllTransports(logger: EndpointLogger): Promise<void> {
+    for (const [accountId, transport] of transportCache.entries()) {
       try {
         await new Promise<void>((resolve) => {
           transport.close();
@@ -1127,11 +1112,6 @@ export class SmtpSendingRepositoryImpl implements SmtpSendingRepository {
         );
       }
     }
-    this.transportCache.clear();
+    transportCache.clear();
   }
 }
-
-/**
- * Export singleton instance
- */
-export const smtpSendingRepository = new SmtpSendingRepositoryImpl();

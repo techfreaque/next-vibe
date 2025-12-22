@@ -1,10 +1,12 @@
 import type React from "react";
-import type { FieldValues,UseFormReturn } from "react-hook-form";
+import type { FieldValues, UseFormReturn } from "react-hook-form";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams } from "@/i18n/core/static-types";
 
 import type { UnifiedField } from "../types/endpoint";
 import type { Platform } from "../types/platform";
@@ -21,8 +23,8 @@ export type WidgetData =
   | WidgetData[]
   | { [key: string]: WidgetData };
 
-export interface WidgetInput {
-  field: UnifiedField;
+export interface WidgetInput<TKey extends string> {
+  field: UnifiedField<TKey>;
   value: WidgetData;
   context: WidgetRenderContext;
 }
@@ -75,13 +77,25 @@ export interface WidgetRenderContext {
   endpointFields?: Record<string, WidgetData>; // Original endpoint fields for nested path lookup
   disabled?: boolean; // Disable all form inputs
   response?: ResponseType<WidgetData>; // Full ResponseType from endpoint (includes success/error state)
+  /**
+   * Optional scoped translation function for this endpoint
+   * When provided, widgets should use this instead of the global translation function
+   * This enables module-specific translations with type safety
+   * Note: Uses method syntax for bivariance - accepts both narrow (scoped) and broad (string) key types
+   */
+  scopedT?: (locale: CountryLanguage) => {
+    t(key: string, params?: TParams): TranslatedKeyType;
+  };
 }
 
 /**
  * Base widget component props.
  */
-export interface WidgetComponentProps<TFieldValues extends FieldValues = FieldValues> {
-  field: UnifiedField;
+export interface WidgetComponentProps<
+  TKey extends string,
+  TFieldValues extends FieldValues = FieldValues,
+> {
+  field: UnifiedField<TKey>;
   fieldName?: string;
   value: WidgetData;
   context: WidgetRenderContext;
@@ -95,8 +109,11 @@ export interface WidgetComponentProps<TFieldValues extends FieldValues = FieldVa
 /**
  * Field type with narrowed widget config based on WidgetType discriminator.
  */
-export type NarrowedField<T extends WidgetType> = UnifiedField & {
-  ui: ExtractWidgetConfig<T>;
+export type NarrowedField<
+  TKey extends string,
+  T extends WidgetType,
+> = UnifiedField<TKey> & {
+  ui: ExtractWidgetConfig<T, TKey>;
 };
 
 // ============================================================================
@@ -107,9 +124,9 @@ export type NarrowedField<T extends WidgetType> = UnifiedField & {
  * Base widget props shared across all platforms.
  * The `widgetType` field acts as the discriminator for the union.
  */
-export interface BaseWidgetProps<T extends WidgetType> {
+export interface BaseWidgetProps<TKey extends string, T extends WidgetType> {
   widgetType: T;
-  field: NarrowedField<T>;
+  field: NarrowedField<TKey, T>;
   value: WidgetData;
 }
 
@@ -117,22 +134,24 @@ export interface BaseWidgetProps<T extends WidgetType> {
  * Maps each WidgetType to its base props.
  * Used to create discriminated unions that TypeScript can narrow automatically.
  */
-export type WidgetPropsMap = {
-  [T in WidgetType]: BaseWidgetProps<T>;
+export type WidgetPropsMap<TKey extends string> = {
+  [T in WidgetType]: BaseWidgetProps<TKey, T>;
 };
 
 /**
  * Union of all widget props - TypeScript narrows this in switch statements.
  */
-export type WidgetPropsUnion = WidgetPropsMap[WidgetType];
+export type WidgetPropsUnion<TKey extends string> =
+  WidgetPropsMap<TKey>[WidgetType];
 
 /**
  * React-specific widget props. Extends base props with React context and form handling.
  */
 export interface ReactWidgetProps<
   T extends WidgetType,
+  TKey extends string,
   TFieldValues extends FieldValues = FieldValues,
-> extends BaseWidgetProps<T> {
+> extends BaseWidgetProps<TKey, T> {
   context: WidgetRenderContext;
   fieldName?: string;
   onAction?: (action: WidgetAction) => void | Promise<void>;
@@ -156,25 +175,36 @@ export interface ValueOnlyReactWidgetProps<T extends WidgetType> {
 /**
  * Maps each WidgetType to React-specific props.
  */
-export type ReactWidgetPropsMap<TFieldValues extends FieldValues = FieldValues> = {
-  [T in WidgetType]: ReactWidgetProps<T, TFieldValues>;
+export type ReactWidgetPropsMap<
+  TKey extends string,
+  TFieldValues extends FieldValues = FieldValues,
+> = {
+  [T in WidgetType]: ReactWidgetProps<T, TKey, TFieldValues>;
 };
 
 /**
  * Union of all React widget props.
  */
-export type ReactWidgetPropsUnion<TFieldValues extends FieldValues = FieldValues> =
-  ReactWidgetPropsMap<TFieldValues>[WidgetType];
+export type ReactWidgetPropsUnion<
+  TKey extends string,
+  TFieldValues extends FieldValues = FieldValues,
+> = ReactWidgetPropsMap<TKey, TFieldValues>[WidgetType];
 
-export type WidgetRenderer<TFieldValues extends FieldValues = FieldValues> = (
-  props: WidgetComponentProps<TFieldValues>,
+export type WidgetRenderer<
+  TKey extends string,
+  TFieldValues extends FieldValues = FieldValues,
+> = (
+  props: WidgetComponentProps<TKey, TFieldValues>,
 ) => React.ReactElement | string | null;
 
-export interface WidgetRegistryEntry<TFieldValues extends FieldValues = FieldValues> {
+export interface WidgetRegistryEntry<
+  TKey extends string,
+  TFieldValues extends FieldValues = FieldValues,
+> {
   type: WidgetType;
   component:
-    | React.ComponentType<WidgetComponentProps<TFieldValues>>
-    | WidgetRenderer<TFieldValues>;
+    | React.ComponentType<WidgetComponentProps<TKey, TFieldValues>>
+    | WidgetRenderer<TKey, TFieldValues>;
   platforms?: Array<
     | typeof Platform.TRPC
     | typeof Platform.NEXT_PAGE

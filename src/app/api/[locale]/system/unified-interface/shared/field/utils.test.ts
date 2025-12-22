@@ -41,7 +41,7 @@ describe("extractSchemaDefaults", () => {
         ASC = "asc",
         DESC = "desc",
       }
-      const schema = z.nativeEnum(SortOrder).default(SortOrder.DESC);
+      const schema = z.enum(SortOrder).default(SortOrder.DESC);
       const result = extractSchemaDefaults(schema);
       expect(result).toBe(SortOrder.DESC);
     });
@@ -267,16 +267,36 @@ describe("extractSchemaDefaults", () => {
     });
 
     it("returns empty values for primitives when forFormInit is true", () => {
-      const stringResult = extractSchemaDefaults<string>(z.string(), undefined, "", true);
+      const stringResult = extractSchemaDefaults<string>(
+        z.string(),
+        undefined,
+        "",
+        true,
+      );
       expect(stringResult).toBe("");
 
-      const numberResult = extractSchemaDefaults<number>(z.coerce.number(), undefined, "", true);
+      const numberResult = extractSchemaDefaults<number>(
+        z.coerce.number(),
+        undefined,
+        "",
+        true,
+      );
       expect(numberResult).toBe(0);
 
-      const booleanResult = extractSchemaDefaults<boolean>(z.boolean(), undefined, "", true);
+      const booleanResult = extractSchemaDefaults<boolean>(
+        z.boolean(),
+        undefined,
+        "",
+        true,
+      );
       expect(booleanResult).toBe(false);
 
-      const arrayResult = extractSchemaDefaults<string[]>(z.array(z.string()), undefined, "", true);
+      const arrayResult = extractSchemaDefaults<string[]>(
+        z.array(z.string()),
+        undefined,
+        "",
+        true,
+      );
       expect(arrayResult).toEqual([]);
     });
 

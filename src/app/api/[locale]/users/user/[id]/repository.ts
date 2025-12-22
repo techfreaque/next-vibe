@@ -19,67 +19,46 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
 
+import { UserRolesRepository } from "../../../user/user-roles/repository";
 import type {
-  UserDeleteRequestOutput,
   UserDeleteResponseOutput,
+  UserDeleteUrlParamsTypeOutput,
   UserGetResponseOutput,
+  UserGetUrlParamsTypeOutput,
   UserPutRequestOutput,
   UserPutResponseOutput,
+  UserPutUrlParamsTypeOutput,
 } from "./definition";
 
-export interface UserByIdRepository {
-  getUserById(
-    data: { id: string },
-    user: JwtPrivatePayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<UserGetResponseOutput>>;
-
-  updateUser(
-    data: UserPutRequestOutput,
-    userId: string,
-    user: JwtPrivatePayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<UserPutResponseOutput>>;
-
-  deleteUser(
-    data: { id: string },
-    user: JwtPrivatePayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<UserDeleteResponseOutput>>;
-}
-
-export class UserByIdRepositoryImpl implements UserByIdRepository {
-  async getUserById(
-    data: { id: string },
+export class UserByIdRepository {
+  static async getUserById(
+    urlPathParams: UserGetUrlParamsTypeOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserGetResponseOutput>> {
     try {
       logger.debug("Getting user by ID", {
-        id: data.id,
+        id: urlPathParams.id,
         requestingUser: user.id,
       });
 
       const [foundUser] = await db
         .select()
         .from(users)
-        .where(eq(users.id, data.id))
+        .where(eq(users.id, urlPathParams.id))
         .limit(1);
 
       if (!foundUser) {
         return fail({
           message: "app.api.users.user.errors.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId: data.id },
+          messageParams: { userId: urlPathParams.id },
         });
       }
 
       logger.debug("User found successfully", { userId: foundUser.id });
 
-      // Fetch user roles from database
-      const { userRolesRepository } =
-        await import("@/app/api/[locale]/user/user-roles/repository");
-      const userRolesResponse = await userRolesRepository.findByUserId(
+      const userRolesResponse = await UserRolesRepository.findByUserId(
         foundUser.id,
         logger,
       );
@@ -135,27 +114,30 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
     }
   }
 
-  async updateUser(
+  static async updateUser(
     data: UserPutRequestOutput,
-    userId: string,
+    urlPathParams: UserPutUrlParamsTypeOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserPutResponseOutput>> {
     try {
-      logger.debug("Updating user", { id: userId, requestingUser: user.id });
+      logger.debug("Updating user", {
+        id: urlPathParams.id,
+        requestingUser: user.id,
+      });
 
       // Check if user exists
       const [existingUser] = await db
         .select()
         .from(users)
-        .where(eq(users.id, userId))
+        .where(eq(users.id, urlPathParams.id))
         .limit(1);
 
       if (!existingUser) {
         return fail({
           message: "app.api.users.user.errors.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId: userId },
+          messageParams: { userId: urlPathParams.id },
         });
       }
 
@@ -187,7 +169,7 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
       const [updatedUser] = await db
         .update(users)
         .set(updateData)
-        .where(eq(users.id, userId))
+        .where(eq(users.id, urlPathParams.id))
         .returning();
 
       if (!updatedUser) {
@@ -197,12 +179,9 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
         });
       }
 
-      logger.debug("User updated successfully", { userId });
+      logger.debug("User updated successfully", { userId: urlPathParams.id });
 
-      // Fetch user roles from database
-      const { userRolesRepository } =
-        await import("@/app/api/[locale]/user/user-roles/repository");
-      const userRolesResponse = await userRolesRepository.findByUserId(
+      const userRolesResponse = await UserRolesRepository.findByUserId(
         updatedUser.id,
         logger,
       );
@@ -241,14 +220,14 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
     }
   }
 
-  async deleteUser(
-    data: UserDeleteRequestOutput,
+  static async deleteUser(
+    urlPathParams: UserDeleteUrlParamsTypeOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserDeleteResponseOutput>> {
     try {
       logger.debug("Deleting user", {
-        id: data.id,
+        id: urlPathParams.id,
         requestingUser: user.id,
       });
 
@@ -256,21 +235,21 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
       const [existingUser] = await db
         .select()
         .from(users)
-        .where(eq(users.id, data.id))
+        .where(eq(users.id, urlPathParams.id))
         .limit(1);
 
       if (!existingUser) {
         return fail({
           message: "app.api.users.user.errors.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { userId: data.id },
+          messageParams: { userId: urlPathParams.id },
         });
       }
 
       // Delete user
-      await db.delete(users).where(eq(users.id, data.id));
+      await db.delete(users).where(eq(users.id, urlPathParams.id));
 
-      logger.debug("User deleted successfully", { userId: data.id });
+      logger.debug("User deleted successfully", { userId: urlPathParams.id });
 
       return success({
         success: true,
@@ -288,5 +267,3 @@ export class UserByIdRepositoryImpl implements UserByIdRepository {
     }
   }
 }
-
-export const userByIdRepository = new UserByIdRepositoryImpl();

@@ -24,14 +24,17 @@ import { simpleT } from "@/i18n/core/shared";
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import { WidgetType } from "../../../shared/types/enums";
 import { extractSectionData } from "../../../shared/widgets/logic/section";
-import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
+import type {
+  ReactWidgetProps,
+  WidgetData,
+} from "../../../shared/widgets/types";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**
  * Type guard to check if an object is a UnifiedField.
  */
 // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard: Must accept unknown to narrow any value to UnifiedField. This is the standard TypeScript pattern for type guards.
-function isUnifiedField(obj: unknown): obj is UnifiedField {
+function isUnifiedField(obj: unknown): obj is UnifiedField<string> {
   return (
     typeof obj === "object" &&
     obj !== null &&
@@ -43,26 +46,27 @@ function isUnifiedField(obj: unknown): obj is UnifiedField {
 /**
  * Displays titled content sections with optional collapsible behavior.
  */
-export function SectionWidget({
+export function SectionWidget<TKey extends string>({
   value,
   field,
   context,
   className,
   form,
-}: ReactWidgetProps<typeof WidgetType.SECTION>): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.SECTION, TKey>): JSX.Element {
   const { t } = simpleT(context.locale);
 
   // Extract data using shared logic
   const data = extractSectionData(value);
 
   // Extract values with defaults for hooks (hooks must be called unconditionally)
-  const { title, content, description, collapsible, defaultExpanded } = data ?? {
-    title: "",
-    content: null,
-    description: undefined,
-    collapsible: false,
-    defaultExpanded: true,
-  };
+  const { title, content, description, collapsible, defaultExpanded } =
+    data ?? {
+      title: "",
+      content: null,
+      description: undefined,
+      collapsible: false,
+      defaultExpanded: true,
+    };
 
   // State for collapsible sections - must be called before any early returns
   const [isExpanded, setIsExpanded] = useState(defaultExpanded ?? true);

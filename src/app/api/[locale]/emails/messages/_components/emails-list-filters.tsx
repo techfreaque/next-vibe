@@ -67,6 +67,7 @@ export function EmailsListFilters({
             style: "none",
             showAllRequired: false,
           }}
+          locale={locale}
         />
 
         {/* Status Filter */}
@@ -121,6 +122,7 @@ export function EmailsListFilters({
             style: "none",
             showAllRequired: false,
           }}
+          locale={locale}
         />
 
         {/* Type Filter */}
@@ -167,6 +169,7 @@ export function EmailsListFilters({
             style: "none",
             showAllRequired: false,
           }}
+          locale={locale}
         />
 
         {/* Sort By */}
@@ -209,6 +212,7 @@ export function EmailsListFilters({
             style: "none",
             showAllRequired: false,
           }}
+          locale={locale}
         />
       </Div>
 
@@ -238,6 +242,7 @@ export function EmailsListFilters({
             style: "none",
             showAllRequired: false,
           }}
+          locale={locale}
         />
 
         {/* Clear Filters Button */}

@@ -8,7 +8,10 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { formatDuration,formatTask } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+import {
+  formatDuration,
+  formatTask,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import {
   CronTaskPriority,
   TaskCategory,
@@ -66,7 +69,10 @@ const pulseTaskRunner: TaskRunner = {
           const duration = summary.totalExecutionTimeMs;
 
           logger.info(
-            formatTask(`Pulse #${pulseCount}: ${successCount} tasks succeeded, ${failureCount} tasks failed in ${formatDuration(duration)}`, "💓"),
+            formatTask(
+              `Pulse #${pulseCount}: ${successCount} tasks succeeded, ${failureCount} tasks failed in ${formatDuration(duration)}`,
+              "💓",
+            ),
           );
         } else {
           logger.error(

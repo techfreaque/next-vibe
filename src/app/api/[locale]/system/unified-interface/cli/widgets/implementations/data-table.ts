@@ -26,7 +26,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<
 > {
   readonly widgetType = WidgetType.DATA_TABLE;
 
-  render(props: CLIWidgetProps<typeof WidgetType.DATA_TABLE>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.DATA_TABLE, string>): string {
     const { field, value, context } = props;
     const t = context.t;
 
@@ -50,8 +50,8 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<
     return this.renderTableAutoColumns(data.rows, context);
   }
 
-  private getTableConfig(
-    field: UnifiedField,
+  private getTableConfig<TKey extends string>(
+    field: UnifiedField<TKey>,
     locale: CountryLanguage,
   ): TableRenderConfig {
     if (field.ui.type !== WidgetType.DATA_TABLE) {

@@ -1,13 +1,15 @@
 export const translations = {
   title: "List Network Requests",
-  description: "List all requests for the currently selected page since the last navigation",
+  description:
+    "List all requests for the currently selected page since the last navigation",
   form: {
     label: "List Network Requests",
     description: "Get all network requests from the browser page",
     fields: {
       includePreservedRequests: {
         label: "Include Preserved Requests",
-        description: "Set to true to return the preserved requests over the last 3 navigations",
+        description:
+          "Set to true to return the preserved requests over the last 3 navigations",
         placeholder: "false",
       },
       pageIdx: {
@@ -17,12 +19,14 @@ export const translations = {
       },
       pageSize: {
         label: "Page Size",
-        description: "Maximum number of requests to return (omit to return all requests)",
+        description:
+          "Maximum number of requests to return (omit to return all requests)",
         placeholder: "Enter page size",
       },
       resourceTypes: {
         label: "Resource Types",
-        description: "Filter requests to only return requests of the specified resource types (omit to return all)",
+        description:
+          "Filter requests to only return requests of the specified resource types (omit to return all)",
         placeholder: "Select resource types",
         options: {
           document: "Document",
@@ -55,15 +59,43 @@ export const translations = {
     executionId: "Execution ID for tracking",
   },
   errors: {
-    validation: { title: "Validation Error", description: "Please check your input and try again" },
-    network: { title: "Network Error", description: "A network error occurred while listing network requests" },
-    unauthorized: { title: "Unauthorized", description: "You are not authorized to list network requests" },
-    forbidden: { title: "Forbidden", description: "Listing network requests is forbidden" },
-    notFound: { title: "Not Found", description: "The requested resource was not found" },
-    serverError: { title: "Server Error", description: "An internal server error occurred while listing network requests" },
-    unknown: { title: "Unknown Error", description: "An unknown error occurred while listing network requests" },
-    unsavedChanges: { title: "Unsaved Changes", description: "You have unsaved changes that may be lost" },
-    conflict: { title: "Conflict", description: "A conflict occurred while listing network requests" },
+    validation: {
+      title: "Validation Error",
+      description: "Please check your input and try again",
+    },
+    network: {
+      title: "Network Error",
+      description: "A network error occurred while listing network requests",
+    },
+    unauthorized: {
+      title: "Unauthorized",
+      description: "You are not authorized to list network requests",
+    },
+    forbidden: {
+      title: "Forbidden",
+      description: "Listing network requests is forbidden",
+    },
+    notFound: {
+      title: "Not Found",
+      description: "The requested resource was not found",
+    },
+    serverError: {
+      title: "Server Error",
+      description:
+        "An internal server error occurred while listing network requests",
+    },
+    unknown: {
+      title: "Unknown Error",
+      description: "An unknown error occurred while listing network requests",
+    },
+    unsavedChanges: {
+      title: "Unsaved Changes",
+      description: "You have unsaved changes that may be lost",
+    },
+    conflict: {
+      title: "Conflict",
+      description: "A conflict occurred while listing network requests",
+    },
   },
   success: {
     title: "Network Requests Retrieved Successfully",

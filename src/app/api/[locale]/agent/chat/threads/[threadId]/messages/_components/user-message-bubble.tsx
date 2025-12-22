@@ -40,9 +40,9 @@ export function UserMessageBubble({
   rootFolderId,
   currentUserId,
 }: UserMessageBubbleProps): JSX.Element {
-  const persona =
+  const character =
     message.role === "user" || message.role === "assistant"
-      ? message.persona
+      ? message.character
       : undefined;
 
   return (
@@ -59,7 +59,7 @@ export function UserMessageBubble({
               model={message.model}
               timestamp={message.createdAt}
               edited={message.edited}
-              persona={persona}
+              character={character}
               locale={locale}
               compact
               rootFolderId={rootFolderId}

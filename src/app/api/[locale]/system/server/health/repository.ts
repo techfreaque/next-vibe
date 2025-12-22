@@ -35,7 +35,9 @@ export interface HealthCheckRepositoryInterface {
 /**
  * Health Check Repository Implementation
  */
-export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface {
+export class HealthCheckRepositoryImpl
+  implements HealthCheckRepositoryInterface
+{
   private startTime = Date.now();
 
   async checkHealth(
@@ -235,13 +237,12 @@ export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface
           duration: performance.now() - start,
         };
       }
-        return {
-          name: "database",
-          status: "fail",
-          message: "Database connection failed", // eslint-disable-line i18next/no-literal-string
-          duration: performance.now() - start,
-        };
-      
+      return {
+        name: "database",
+        status: "fail",
+        message: "Database connection failed", // eslint-disable-line i18next/no-literal-string
+        duration: performance.now() - start,
+      };
     } catch (error) {
       return {
         name: "database",
@@ -393,8 +394,7 @@ export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface
     } else if (checks.length > 0) {
       return "healthy";
     }
-      return "unknown";
-    
+    return "unknown";
   }
 }
 

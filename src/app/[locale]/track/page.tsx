@@ -35,7 +35,13 @@ export default function TrackPage(): React.ReactElement {
   // Single API call - handles both tracking (with id) and ref-only cases server-side
   useApiQuery({
     endpoint: trackingEndpoints.GET,
-    requestData: { id, url: url ?? `/${locale}`, source: LeadSource.EMAIL_CAMPAIGN, campaignId, ref },
+    requestData: {
+      id,
+      url: url ?? `/${locale}`,
+      source: LeadSource.EMAIL_CAMPAIGN,
+      campaignId,
+      ref,
+    },
     logger,
     options: {
       enabled: true,

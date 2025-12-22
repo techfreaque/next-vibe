@@ -5,10 +5,12 @@
 export const translations = {
   post: {
     title: "Text to Speech",
-    description: "Convert text to natural-sounding speech using AI (~0.00052 credits per character)",
+    description:
+      "Convert text to natural-sounding speech using AI (~0.00052 credits per character)",
     form: {
       title: "Text to Speech Conversion",
-      description: "Enter text to convert to speech (Amazon Polly: ~0.00052 credits per character)",
+      description:
+        "Enter text to convert to speech (Amazon Polly: ~0.00052 credits per character)",
     },
     text: {
       label: "Text",

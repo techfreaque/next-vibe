@@ -24,31 +24,21 @@ import { PaymentProvider } from "../../payment/enum";
 import { getPaymentProvider } from "../../payment/providers";
 import { ProductIds } from "../../products/repository-client";
 import { SubscriptionStatus } from "../../subscription/enum";
+import { UserDetailLevel } from "../../user/enum";
+import { UserRepository } from "../../user/repository";
 import type {
   CreditsPurchasePostRequestOutput,
   CreditsPurchasePostResponseOutput,
 } from "./definition";
 
 /**
- * Credit Purchase Repository Interface
+ * Credit Purchase Repository
  */
-export interface CreditPurchaseRepository {
-  createCheckoutSession(
-    data: CreditsPurchasePostRequestOutput,
-    userId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CreditsPurchasePostResponseOutput>>;
-}
-
-/**
- * Credit Purchase Repository Implementation
- */
-export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
+export class CreditPurchaseRepository {
   /**
    * Generate a secure callback token for payment redirects
    */
-  private generateCallbackToken(): string {
+  private static generateCallbackToken(): string {
     // Generate a secure random token (32 bytes = 64 hex characters)
     return randomBytes(32).toString("hex");
   }
@@ -56,7 +46,7 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
   /**
    * Create a payment provider checkout session for credit pack purchase
    */
-  async createCheckoutSession(
+  static async createCheckoutSession(
     data: CreditsPurchasePostRequestOutput,
     userId: string,
     locale: CountryLanguage,
@@ -69,12 +59,9 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
         locale,
       });
 
-      const { userRepository } = await import("../../user/repository");
-      const { UserDetailLevel } = await import("../../user/enum");
-
       logger.debug("About to get user by ID");
 
-      const userResult = await userRepository.getUserById(
+      const userResult = await UserRepository.getUserById(
         userId,
         UserDetailLevel.STANDARD,
         locale,
@@ -92,9 +79,10 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
       const user = userResult.data;
 
       // Check if user has an active subscription before allowing credit pack purchase
-      const { subscriptionRepository } =
-        await import("../../subscription/repository");
-      const subscriptionResult = await subscriptionRepository.getSubscription(
+      const { SubscriptionRepository } = await import(
+        "../../subscription/repository"
+      );
+      const subscriptionResult = await SubscriptionRepository.getSubscription(
         userId,
         logger,
         locale,
@@ -166,8 +154,9 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
       const country = getCountryFromLocale(locale);
 
       // Get product and calculate totals based on quantity
-      const { productsRepository } =
-        await import("../../products/repository-client");
+      const { productsRepository } = await import(
+        "../../products/repository-client"
+      );
       const product = productsRepository.getProduct(
         ProductIds.CREDIT_PACK,
         locale,
@@ -245,5 +234,3 @@ export class CreditPurchaseRepositoryImpl implements CreditPurchaseRepository {
     }
   }
 }
-
-export const creditPurchaseRepository = new CreditPurchaseRepositoryImpl();

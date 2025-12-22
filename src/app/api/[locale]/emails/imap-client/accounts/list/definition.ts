@@ -161,7 +161,7 @@ const { GET } = createEndpoint({
           options: SortOrderOptions,
           columns: 2,
         },
-        z.nativeEnum(SortOrder).default(SortOrder.DESC),
+        z.enum(SortOrder).default(SortOrder.DESC),
       ),
 
       // === RESPONSE FIELDS ===
@@ -239,7 +239,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.BADGE,
                 text: "app.api.emails.imapClient.accounts.list.response.accounts.item.authMethod",
               },
-              z.nativeEnum(ImapAuthMethod),
+              z.enum(ImapAuthMethod),
             ),
             connectionTimeout: responseField(
               {
@@ -300,7 +300,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.BADGE,
                 text: "app.api.emails.imapClient.accounts.list.response.accounts.item.syncStatus",
               },
-              z.nativeEnum(ImapSyncStatus),
+              z.enum(ImapSyncStatus),
             ),
             syncError: responseField(
               {

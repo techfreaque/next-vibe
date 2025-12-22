@@ -1,6 +1,6 @@
 /**
  * Favorites Database Schema
- * Database tables for user favorites (persona + model settings combos)
+ * Database tables for user favorites (character + model settings combos)
  */
 
 import { relations } from "drizzle-orm";
@@ -16,32 +16,35 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
+import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { users } from "@/app/api/[locale]/user/db";
 
 import type {
-  ContentLevelFilterType,
-  IntelligenceLevelFilterType,
-  ModelSelectionModeType,
-  PriceLevelFilterType,
+  ContentLevelFilterValue,
+  IntelligenceLevelFilterValue,
+  ModelSelectionModeValue,
+  PriceLevelFilterValue,
 } from "./enum";
 
 /**
- * Model settings filters structure
+ * Model settings filters structure (DB format - uses translation keys)
  * Supports "any" to disable specific filters
  */
 export interface FavoriteModelFilters {
-  intelligence: IntelligenceLevelFilterType;
-  maxPrice: PriceLevelFilterType;
-  content: ContentLevelFilterType;
+  intelligence: typeof IntelligenceLevelFilterValue;
+  maxPrice: typeof PriceLevelFilterValue;
+  content: typeof ContentLevelFilterValue;
 }
 
 /**
- * Model settings structure
+ * Model settings structure (DB format - uses translation keys)
  */
 export interface FavoriteModelSettings {
-  mode: ModelSelectionModeType;
+  mode: typeof ModelSelectionModeValue;
   filters: FavoriteModelFilters;
-  manualModelId?: string;
+  manualModelId?: ModelId;
 }
 
 /**
@@ -54,9 +57,9 @@ export interface FavoriteUISettings {
 
 /**
  * Favorites Table
- * Stores user favorites (persona + model settings combos)
- * Users can have multiple favorites for the same persona with different settings
- * personaId can be null for model-only setups
+ * Stores user favorites (character + model settings combos)
+ * Users can have multiple favorites for the same character with different settings
+ * characterId can be null for model-only setups
  */
 export const chatFavorites = pgTable("chat_favorites", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -66,12 +69,18 @@ export const chatFavorites = pgTable("chat_favorites", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 
-  // Character/persona reference
-  // Note: DB column is "character_id", mapped to personaId in code
-  personaId: text("character_id").notNull(),
+  // Character reference
+  // Note: DB column is "character_id", mapped to characterId in code
+  characterId: text("character_id").notNull(),
 
   // Custom display name (DB column is just "name")
   customName: text("name"),
+
+  // Custom icon (emoji or icon identifier)
+  customIcon: text("custom_icon").$type<IconKey>(),
+
+  // Custom TTS voice (overrides character voice)
+  voice: text("voice").$type<typeof TtsVoiceValue>(),
 
   // Model settings (mode, filters, manual model id)
   modelSettings: jsonb("model_settings")

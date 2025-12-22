@@ -1,9 +1,9 @@
 import { translations as creditsTranslations } from "../../../../credits/i18n/de";
 import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/de";
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/de";
+import { translations as charaktersTranslations } from "../../characters/i18n/de";
 import { translations as foldersTranslations } from "../../folders/i18n/de";
 import { translations as memoriesTranslations } from "../../memories/i18n/de";
-import { translations as personasTranslations } from "../../personas/i18n/de";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/de";
 import { translations as threadsTranslations } from "../../threads/i18n/de";
 import type { translations as enTranslations } from "../en";
@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     threads: "Threads",
     folders: "Ordner",
     messages: "Nachrichten",
-    personas: "Personas",
+    characters: "Charaktere",
     memories: "Erinnerungen",
     credits: "Credits",
     balance: "Guthaben",
@@ -51,6 +51,38 @@ export const translations: typeof enTranslations = {
       debug: "Debug",
     },
   },
+  favorites: {
+    enums: {
+      mode: {
+        auto: "Auto",
+        manual: "Manuell",
+      },
+      intelligence: {
+        any: "Beliebig",
+        quick: "Schnell",
+        smart: "Intelligent",
+        brilliant: "Brilliant",
+      },
+      price: {
+        any: "Beliebig",
+        cheap: "Günstig",
+        standard: "Standard",
+        premium: "Premium",
+      },
+      content: {
+        any: "Beliebig",
+        mainstream: "Mainstream",
+        open: "Offen",
+        uncensored: "Unzensiert",
+      },
+      speed: {
+        any: "Beliebig",
+        fast: "Schnell",
+        balanced: "Ausgewogen",
+        thorough: "Gründlich",
+      },
+    },
+  },
   components: {
     sidebar: {
       login: "Anmelden",
@@ -62,6 +94,47 @@ export const translations: typeof enTranslations = {
         buy: "Kaufen",
         freeCreditsLeft: "Kostenlose Credits",
       },
+    },
+  },
+  selector: {
+    loading: "Laden...",
+    best: "Beste Übereinstimmung",
+    free: "KOSTENLOS",
+    creditsSingle: "1 Credit",
+    creditsExact: "{{cost}} Credits",
+    modelOnly: "Nur Modell",
+    editModelSettings: "Modelleinstellungen bearbeiten",
+    editSettings: "Einstellungen bearbeiten",
+    switchPersona: "Persona wechseln",
+    editPersona: "Persona bearbeiten",
+    delete: "Löschen",
+    autoSelectedModel: "AUTO-AUSGEWÄHLT",
+    manualSelectedModel: "MANUELL AUSGEWÄHLT",
+    intelligence: "Intelligenz",
+    contentFilter: "Inhalt",
+    maxPrice: "Maximalpreis",
+    modelSelection: "Modellauswahl",
+    autoModeDescription:
+      "Bestes Modell wird basierend auf Ihren Filtern ausgewählt",
+    manualModeDescription: "Wählen Sie ein bestimmtes Modell manuell aus",
+    autoMode: "Auto",
+    manualMode: "Manuell",
+    allModelsCount: "Alle {{count}} Modelle",
+    filteredModelsCount: "{{count}} Modelle entsprechen den Filtern",
+    showFiltered: "Gefilterte anzeigen",
+    showAllModels: "Alle Modelle anzeigen",
+    showLess: "Weniger anzeigen",
+    showMore: "{{remaining}} weitere anzeigen",
+    noMatchingModels: "Keine passenden Modelle",
+    noModelsWarning: "Keine Modelle entsprechen Ihren Filtern",
+    applyOnce: "Einmal anwenden",
+    saveChanges: "Änderungen speichern",
+    requirements: {
+      personaConflict: "Persona-Anforderungskonflikte",
+      tooLow: "zu niedrig",
+      tooHigh: "zu hoch",
+      min: "min",
+      max: "max",
     },
   },
   common: {
@@ -100,15 +173,15 @@ export const translations: typeof enTranslations = {
       answerAsAI: "Als KI-Modell antworten",
       deleteMessage: "Nachricht löschen",
     },
-    personaSelector: {
-      placeholder: "Persona auswählen",
-      addNewLabel: "Benutzerdefinierte Persona erstellen",
+    characterSelector: {
+      placeholder: "Charakter auswählen",
+      addNewLabel: "Benutzerdefinierte Charakter erstellen",
       grouping: {
         bySource: "Nach Quelle",
         byCategory: "Nach Kategorie",
         sourceLabels: {
           builtIn: "Integriert",
-          my: "Meine Personas",
+          my: "Meine Charakters",
           community: "Community",
         },
         sourceIcons: {
@@ -118,11 +191,11 @@ export const translations: typeof enTranslations = {
         },
       },
       addDialog: {
-        title: "Benutzerdefinierte Persona erstellen",
+        title: "Benutzerdefinierte Charakter erstellen",
         fields: {
           name: {
             label: "Name",
-            placeholder: "Persona-Name eingeben",
+            placeholder: "Charakter-Name eingeben",
           },
           icon: {
             label: "Symbol (Emoji)",
@@ -130,11 +203,11 @@ export const translations: typeof enTranslations = {
           },
           description: {
             label: "Beschreibung",
-            placeholder: "Kurze Beschreibung der Persona",
+            placeholder: "Kurze Beschreibung der Charakter",
           },
           systemPrompt: {
             label: "System-Prompt",
-            placeholder: "Definieren Sie, wie sich die Persona verhält...",
+            placeholder: "Definieren Sie, wie sich die Charakter verhält...",
           },
           category: {
             label: "Kategorie",
@@ -148,7 +221,7 @@ export const translations: typeof enTranslations = {
         },
         createCategory: "Kategorie erstellen",
         cancel: "Abbrechen",
-        create: "Persona erstellen",
+        create: "Charakter erstellen",
       },
       addCategoryDialog: {
         title: "Kategorie erstellen",
@@ -176,7 +249,7 @@ export const translations: typeof enTranslations = {
     searchEnabled: "Suche aktiviert",
     searchDisabled: "Suche deaktiviert",
     answerAsAI: "Als KI-Modell antworten",
-    retry: "Mit anderem Modell/Persona wiederholen",
+    retry: "Mit anderem Modell/Charakter wiederholen",
     branch: "Konversation von hier abzweigen",
     editMessage: "Nachricht bearbeiten",
     stopAudio: "Audio-Wiedergabe stoppen",
@@ -245,7 +318,7 @@ export const translations: typeof enTranslations = {
   credits: creditsTranslations,
   folders: foldersTranslations,
   memories: memoriesTranslations,
-  personas: personasTranslations,
+  characters: charaktersTranslations,
   threads: {
     ...threadsTranslations,
     messages: messagesTranslations,

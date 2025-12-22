@@ -137,7 +137,9 @@ export interface MigrationTaskManagementRepository {
 /**
  * Database Migration Task Management Repository Implementation
  */
-export class MigrationTaskManagementRepositoryImpl implements MigrationTaskManagementRepository {
+export class MigrationTaskManagementRepositoryImpl
+  implements MigrationTaskManagementRepository
+{
   private migrationTasks: Map<string, MigrationTask> = new Map();
   private runningTasks: Map<string, AbortController> = new Map();
 

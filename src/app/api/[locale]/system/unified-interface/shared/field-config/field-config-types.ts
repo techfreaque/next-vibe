@@ -16,6 +16,7 @@ import type { UnifiedField } from "../types/endpoint";
 export interface EndpointFormFieldProps<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
+  TKey extends string,
 > {
   name: TName;
   config?: FieldConfig; // Optional - auto-inferred from endpointFields if not provided
@@ -23,7 +24,7 @@ export interface EndpointFormFieldProps<
   requiredFields?: string[]; // List of required field names
   theme?: RequiredFieldTheme;
   className?: string;
-  endpointFields?: UnifiedField; // Endpoint fields structure for auto-inference
+  endpointFields?: UnifiedField<TKey>; // Endpoint fields structure for auto-inference
   schema?: z.ZodTypeAny; // Zod schema for validation
 }
 
@@ -183,6 +184,10 @@ export interface YearPickerFieldConfig extends BaseFieldConfig {
   maxYear?: number;
 }
 
+export interface IconFieldConfig extends BaseFieldConfig {
+  type: "icon";
+}
+
 // Union type for all field configurations
 export type FieldConfig =
   | TextFieldConfig
@@ -200,7 +205,8 @@ export type FieldConfig =
   | SliderFieldConfig
   | MultiSelectFieldConfig
   | LocationFieldConfig
-  | YearPickerFieldConfig;
+  | YearPickerFieldConfig
+  | IconFieldConfig;
 
 // Required field styling options
 export type RequiredFieldStyle =

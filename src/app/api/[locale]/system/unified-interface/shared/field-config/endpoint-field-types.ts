@@ -15,6 +15,9 @@ import type { FieldConfig, PrefillDisplayConfig } from "./field-config-types";
 export interface EndpointFieldStructure {
   type?: string;
   children?: Record<string, EndpointFieldStructure>;
+  // Union-specific fields
+  discriminator?: string;
+  variants?: readonly EndpointFieldStructure[];
   ui?: {
     type: string;
     fieldType?: string;
@@ -168,6 +171,7 @@ export type InferFormValues<TFields> = TFields extends {
 
 /**
  * Runtime type guard to check if a field path is valid
+ * Supports object, object-optional, and object-union types
  */
 export function isValidFieldPath<TFields>(
   fields: TFields,
@@ -177,22 +181,59 @@ export function isValidFieldPath<TFields>(
   let current: EndpointFieldStructure | null = fields as EndpointFieldStructure;
 
   for (const part of parts) {
-    if (
-      !current ||
-      typeof current !== "object" ||
-      !("type" in current) ||
-      (current.type !== "object" && current.type !== "object-optional") ||
-      !("children" in current)
+    if (!current || typeof current !== "object" || !("type" in current)) {
+      return false;
+    }
+
+    // Handle union types
+    if (current.type === "object-union") {
+      const variants = (
+        current as EndpointFieldStructure & {
+          variants?: readonly EndpointFieldStructure[];
+        }
+      ).variants;
+      if (!variants || !Array.isArray(variants)) {
+        return false;
+      }
+
+      // Check if the field exists in any variant
+      let found = false;
+      for (const variant of variants) {
+        if (
+          (variant.type === "object" || variant.type === "object-optional") &&
+          variant.children
+        ) {
+          const variantChildren = variant.children as Record<
+            string,
+            EndpointFieldStructure
+          >;
+          if (part in variantChildren) {
+            current = variantChildren[part];
+            found = true;
+            break;
+          }
+        }
+      }
+      if (!found) {
+        return false;
+      }
+    }
+    // Handle regular object types
+    else if (
+      (current.type === "object" || current.type === "object-optional") &&
+      current.children
     ) {
+      const children = current.children as Record<
+        string,
+        EndpointFieldStructure
+      >;
+      if (!(part in children)) {
+        return false;
+      }
+      current = children[part];
+    } else {
       return false;
     }
-
-    const children = current.children as Record<string, EndpointFieldStructure>;
-    if (!(part in children)) {
-      return false;
-    }
-
-    current = children[part];
   }
 
   return true;
@@ -200,6 +241,7 @@ export function isValidFieldPath<TFields>(
 
 /**
  * Get runtime field structure by path
+ * Supports object, object-optional, and object-union types
  */
 export function getFieldStructureByPath(
   fields: EndpointFieldStructure,
@@ -213,8 +255,39 @@ export function getFieldStructureByPath(
       return null;
     }
 
+    // Handle object-union types
+    if (current.type === "object-union") {
+      const unionField = current as EndpointFieldStructure & {
+        variants?: readonly EndpointFieldStructure[];
+      };
+
+      // Look for the field in any variant (all variants should have the discriminator field)
+      // For other fields, we return the first match (assuming variants have consistent field definitions)
+      if (unionField.variants && Array.isArray(unionField.variants)) {
+        for (const variant of unionField.variants) {
+          if (variant.type === "object" || variant.type === "object-optional") {
+            const variantChildren = variant.children as
+              | Record<string, EndpointFieldStructure>
+              | undefined;
+            if (variantChildren && part in variantChildren) {
+              current = variantChildren[part];
+              break; // Found in this variant, continue with next part
+            }
+          }
+        }
+        // If not found in any variant, return null
+        if (!current || current === fields) {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }
     // Navigate through object children (both object and object-optional)
-    if ((current.type === "object" || current.type === "object-optional") && current.children) {
+    else if (
+      (current.type === "object" || current.type === "object-optional") &&
+      current.children
+    ) {
       current = current.children[part];
     } else {
       return null;

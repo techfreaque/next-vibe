@@ -14,7 +14,7 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 
-import { paymentRepository } from "../../../repository";
+import { PaymentRepository } from "../../../repository";
 
 // Constants
 const ERROR_MISSING_SIGNATURE = "Missing signature";
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // Process the webhook using the payment repository
-    const result = await paymentRepository.handleWebhook(
+    const result = await PaymentRepository.handleWebhook(
       body,
       signature,
       logger,

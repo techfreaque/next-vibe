@@ -9,7 +9,7 @@
 export const colors = {
   // Reset
   reset: "\u001B[0m",
-  
+
   // Text colors
   black: "\u001B[30m",
   red: "\u001B[31m",
@@ -20,7 +20,7 @@ export const colors = {
   cyan: "\u001B[36m",
   white: "\u001B[37m",
   gray: "\u001B[90m",
-  
+
   // Bright colors
   brightRed: "\u001B[91m",
   brightGreen: "\u001B[92m",
@@ -29,7 +29,7 @@ export const colors = {
   brightMagenta: "\u001B[95m",
   brightCyan: "\u001B[96m",
   brightWhite: "\u001B[97m",
-  
+
   // Text styles
   bold: "\u001B[1m",
   dim: "\u001B[2m",
@@ -96,12 +96,12 @@ export function shouldUseColors(): boolean {
   if (process.env.NO_COLOR) {
     return false;
   }
-  
+
   // Disable colors if not in a TTY
   if (!process.stdout.isTTY) {
     return false;
   }
-  
+
   // Enable colors by default in terminal
   return true;
 }
@@ -112,4 +112,3 @@ export function shouldUseColors(): boolean {
 export function maybeColorize(text: string, color: string): string {
   return shouldUseColors() ? colorize(text, color) : text;
 }
-

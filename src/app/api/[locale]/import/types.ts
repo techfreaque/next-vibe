@@ -70,16 +70,6 @@ export interface ImportRepository {
   ): Promise<ResponseType<{ success: boolean; message: string }>>;
 
   /**
-   * Perform actions on import jobs (stop, retry)
-   */
-  performJobAction(
-    userId: DbId,
-    jobId: string,
-    action: "stop" | "retry",
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ success: boolean; message: string }>>;
-
-  /**
    * Process a batch of a chunked import job
    */
   processBatch<T extends DomainRecord>(

@@ -5,6 +5,11 @@
 
 import { z } from "zod";
 
+import { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
+import {
+  TtsVoiceDB,
+  TtsVoiceOptions,
+} from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -22,18 +27,18 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
-  ContentLevel,
-  ContentLevelDB,
-  ContentLevelOptions,
-  IntelligenceLevel,
-  IntelligenceLevelDB,
-  IntelligenceLevelOptions,
+  ContentLevelFilter,
+  ContentLevelFilterDB,
+  ContentLevelFilterOptions,
+  IntelligenceLevelFilter,
+  IntelligenceLevelFilterDB,
+  IntelligenceLevelFilterOptions,
   ModelSelectionMode,
   ModelSelectionModeDB,
   ModelSelectionModeOptions,
-  PriceLevel,
-  PriceLevelDB,
-  PriceLevelOptions,
+  PriceLevelFilter,
+  PriceLevelFilterDB,
+  PriceLevelFilterOptions,
 } from "../enum";
 
 /**
@@ -69,11 +74,11 @@ const { GET } = createEndpoint({
       ),
 
       // === RESPONSE ===
-      personaId: responseField(
+      characterId: responseField(
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.agent.chat.favorites.id.get.response.personaId.content" as const,
+            "app.api.agent.chat.favorites.id.get.response.characterId.content" as const,
         },
         z.string(),
       ),
@@ -84,6 +89,14 @@ const { GET } = createEndpoint({
             "app.api.agent.chat.favorites.id.get.response.customName.content" as const,
         },
         z.string().nullable(),
+      ),
+      voice: responseField(
+        {
+          type: WidgetType.TEXT,
+          content:
+            "app.api.agent.chat.favorites.id.get.response.voice.content" as const,
+        },
+        z.enum(TtsVoiceDB).nullable(),
       ),
       mode: responseField(
         {
@@ -99,7 +112,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.agent.chat.favorites.id.get.response.intelligence.content" as const,
         },
-        z.enum(IntelligenceLevelDB),
+        z.enum(IntelligenceLevelFilterDB),
       ),
       maxPrice: responseField(
         {
@@ -107,7 +120,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.agent.chat.favorites.id.get.response.maxPrice.content" as const,
         },
-        z.enum(PriceLevelDB),
+        z.enum(PriceLevelFilterDB),
       ),
       content: responseField(
         {
@@ -115,7 +128,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.agent.chat.favorites.id.get.response.content.content" as const,
         },
-        z.enum(ContentLevelDB),
+        z.enum(ContentLevelFilterDB),
       ),
       manualModelId: responseField(
         {
@@ -123,7 +136,7 @@ const { GET } = createEndpoint({
           content:
             "app.api.agent.chat.favorites.id.get.response.manualModelId.content" as const,
         },
-        z.string().nullable(),
+        z.enum(ModelId).nullable(),
       ),
       position: responseField(
         {
@@ -192,8 +205,7 @@ const { GET } = createEndpoint({
         "app.api.agent.chat.favorites.id.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.favorites.id.get.errors.server.title" as const,
+      title: "app.api.agent.chat.favorites.id.get.errors.server.title" as const,
       description:
         "app.api.agent.chat.favorites.id.get.errors.server.description" as const,
     },
@@ -227,12 +239,13 @@ const { GET } = createEndpoint({
     requests: undefined,
     responses: {
       get: {
-        personaId: "thea",
+        characterId: "thea",
         customName: "Thea (Smart)",
+        voice: null,
         mode: ModelSelectionMode.AUTO,
-        intelligence: IntelligenceLevel.SMART,
-        maxPrice: PriceLevel.STANDARD,
-        content: ContentLevel.OPEN,
+        intelligence: IntelligenceLevelFilter.SMART,
+        maxPrice: PriceLevelFilter.STANDARD,
+        content: ContentLevelFilter.OPEN,
         manualModelId: null,
         position: 0,
         color: null,
@@ -279,12 +292,12 @@ const { PATCH } = createEndpoint({
       ),
 
       // === REQUEST (Data) ===
-      personaId: requestDataField(
+      characterId: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.agent.chat.favorites.id.patch.personaId.label" as const,
+            "app.api.agent.chat.favorites.id.patch.characterId.label" as const,
           columns: 6,
         },
         z.string().optional(),
@@ -298,6 +311,18 @@ const { PATCH } = createEndpoint({
           columns: 6,
         },
         z.string().nullable().optional(),
+      ),
+      voice: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.agent.chat.favorites.id.patch.voice.label" as const,
+          description:
+            "app.api.agent.chat.favorites.id.patch.voice.description" as const,
+          options: TtsVoiceOptions,
+          columns: 6,
+        },
+        z.enum(TtsVoiceDB).nullable().optional(),
       ),
       mode: requestDataField(
         {
@@ -315,10 +340,10 @@ const { PATCH } = createEndpoint({
           fieldType: FieldDataType.SELECT,
           label:
             "app.api.agent.chat.favorites.id.patch.intelligence.label" as const,
-          options: IntelligenceLevelOptions,
+          options: IntelligenceLevelFilterOptions,
           columns: 6,
         },
-        z.enum(IntelligenceLevelDB).optional(),
+        z.enum(IntelligenceLevelFilterDB).optional(),
       ),
       maxPrice: requestDataField(
         {
@@ -326,20 +351,20 @@ const { PATCH } = createEndpoint({
           fieldType: FieldDataType.SELECT,
           label:
             "app.api.agent.chat.favorites.id.patch.maxPrice.label" as const,
-          options: PriceLevelOptions,
+          options: PriceLevelFilterOptions,
           columns: 6,
         },
-        z.enum(PriceLevelDB).optional(),
+        z.enum(PriceLevelFilterDB).optional(),
       ),
       content: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.agent.chat.favorites.id.patch.content.label" as const,
-          options: ContentLevelOptions,
+          options: ContentLevelFilterOptions,
           columns: 6,
         },
-        z.enum(ContentLevelDB).optional(),
+        z.enum(ContentLevelFilterDB).optional(),
       ),
       manualModelId: requestDataField(
         {
@@ -349,7 +374,7 @@ const { PATCH } = createEndpoint({
             "app.api.agent.chat.favorites.id.patch.manualModelId.label" as const,
           columns: 6,
         },
-        z.string().nullable().optional(),
+        z.enum(ModelId).nullable().optional(),
       ),
       isActive: requestDataField(
         {
@@ -451,7 +476,7 @@ const { PATCH } = createEndpoint({
     requests: {
       update: {
         customName: "Thea (Brilliant)",
-        intelligence: IntelligenceLevel.BRILLIANT,
+        intelligence: IntelligenceLevelFilter.BRILLIANT,
       },
     },
     responses: {
@@ -588,16 +613,26 @@ const { DELETE } = createEndpoint({
 // Type exports
 export type FavoriteGetRequestInput = typeof GET.types.RequestInput;
 export type FavoriteGetRequestOutput = typeof GET.types.RequestOutput;
+export type FavoriteGetUrlVariablesInput = typeof GET.types.UrlVariablesInput;
+export type FavoriteGetUrlVariablesOutput = typeof GET.types.UrlVariablesOutput;
 export type FavoriteGetResponseInput = typeof GET.types.ResponseInput;
 export type FavoriteGetResponseOutput = typeof GET.types.ResponseOutput;
 
 export type FavoriteUpdateRequestInput = typeof PATCH.types.RequestInput;
 export type FavoriteUpdateRequestOutput = typeof PATCH.types.RequestOutput;
+export type FavoriteUpdateUrlVariablesInput =
+  typeof PATCH.types.UrlVariablesInput;
+export type FavoriteUpdateUrlVariablesOutput =
+  typeof PATCH.types.UrlVariablesOutput;
 export type FavoriteUpdateResponseInput = typeof PATCH.types.ResponseInput;
 export type FavoriteUpdateResponseOutput = typeof PATCH.types.ResponseOutput;
 
 export type FavoriteDeleteRequestInput = typeof DELETE.types.RequestInput;
 export type FavoriteDeleteRequestOutput = typeof DELETE.types.RequestOutput;
+export type FavoriteDeleteUrlVariablesInput =
+  typeof DELETE.types.UrlVariablesInput;
+export type FavoriteDeleteUrlVariablesOutput =
+  typeof DELETE.types.UrlVariablesOutput;
 export type FavoriteDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type FavoriteDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 

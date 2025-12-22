@@ -21,7 +21,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { EmailProvider, EmailStatus, EmailType } from "../../messages/enum";
 import { emailMetadataRepository } from "../email-metadata/repository";
-import { emailSendingRepository } from "../email-sending/repository";
+import { EmailSendingRepository } from "../email-sending/repository";
 import type {
   EmailHandleRequestOutput,
   EmailHandleResponseOutput,
@@ -79,7 +79,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
               const templateData = emailMessage.data;
 
               // Build comprehensive email data with all template information
-              const emailSendResult = await emailSendingRepository.sendEmail(
+              const emailSendResult = await EmailSendingRepository.sendEmail(
                 {
                   params: {
                     jsx: templateData.jsx,

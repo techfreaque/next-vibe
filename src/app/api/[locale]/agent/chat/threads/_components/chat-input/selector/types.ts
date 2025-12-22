@@ -1,19 +1,24 @@
 /**
- * Types for the unified persona-model selector (v16)
+ * Types for the unified character-model selector (v16)
  */
 
+import type { Character } from "@/app/api/[locale]/agent/chat/characters/config";
+import {
+  ContentLevel,
+  ContentLevelFilter,
+  type ContentLevelFilterValue,
+  IntelligenceLevel,
+  IntelligenceLevelFilter,
+  type IntelligenceLevelFilterValue,
+  PriceLevelFilter,
+  type PriceLevelFilterValue,
+  SpeedLevel,
+} from "@/app/api/[locale]/agent/chat/favorites/enum";
 import type {
   ModelId,
   ModelOption,
 } from "@/app/api/[locale]/agent/chat/model-access/models";
-import type { Persona } from "@/app/api/[locale]/agent/chat/personas/config";
-import type {
-  ContentLevel,
-  IntelligenceLevel,
-  ModelFeatures,
-  PriceLevel,
-  SpeedLevel,
-} from "@/app/api/[locale]/agent/chat/types";
+import type { ModelFeatures } from "@/app/api/[locale]/agent/chat/types";
 
 /**
  * Selector view modes
@@ -25,9 +30,9 @@ export type SelectorMode = "quick" | "personas" | "build";
  */
 export interface ModelSelectionAuto {
   type: "auto";
-  intelligence: IntelligenceLevel | "any";
-  maxPrice: PriceLevel | "any";
-  minContent: ContentLevel | "any";
+  intelligence: typeof IntelligenceLevelFilterValue;
+  maxPrice: typeof PriceLevelFilterValue;
+  minContent: typeof ContentLevelFilterValue;
 }
 
 export interface ModelSelectionSpecific {
@@ -41,7 +46,7 @@ export type ModelSelection = ModelSelectionAuto | ModelSelectionSpecific;
  * Selector state
  */
 export interface SelectorState {
-  personaId: string;
+  characterId: string;
   modelSelection: ModelSelection;
   mode: SelectorMode;
 }
@@ -62,11 +67,7 @@ export const STORAGE_KEYS = {
 /**
  * Default favorite personas
  */
-export const DEFAULT_FAVORITE_PERSONAS = [
-  "default",
-  "technical",
-  "creative",
-];
+export const DEFAULT_FAVORITE_PERSONAS = ["default", "technical", "creative"];
 
 /**
  * Default favorite models
@@ -74,20 +75,24 @@ export const DEFAULT_FAVORITE_PERSONAS = [
 export const DEFAULT_FAVORITE_MODELS: ModelId[] = [];
 
 /**
- * Check if a model meets persona requirements (hard filters)
+ * Check if a model meets character requirements (hard filters)
  */
 export function modelMeetsRequirements(
   model: ModelOption,
-  persona: Persona,
+  character: Character,
 ): boolean {
-  const { requirements } = persona;
+  const { requirements } = character;
   if (!requirements) {
     return true;
   }
 
   // Content level check
   if (requirements.minContent) {
-    const contentOrder: ContentLevel[] = ["mainstream", "open", "uncensored"];
+    const contentOrder = [
+      ContentLevel.MAINSTREAM,
+      ContentLevel.OPEN,
+      ContentLevel.UNCENSORED,
+    ];
     const modelIndex = contentOrder.indexOf(model.content);
     const requiredIndex = contentOrder.indexOf(requirements.minContent);
     if (modelIndex < requiredIndex) {
@@ -96,7 +101,11 @@ export function modelMeetsRequirements(
   }
 
   if (requirements.maxContent) {
-    const contentOrder: ContentLevel[] = ["mainstream", "open", "uncensored"];
+    const contentOrder = [
+      ContentLevel.MAINSTREAM,
+      ContentLevel.OPEN,
+      ContentLevel.UNCENSORED,
+    ];
     const modelIndex = contentOrder.indexOf(model.content);
     const maxIndex = contentOrder.indexOf(requirements.maxContent);
     if (modelIndex > maxIndex) {
@@ -106,10 +115,10 @@ export function modelMeetsRequirements(
 
   // Intelligence level check
   if (requirements.minIntelligence) {
-    const intelligenceOrder: IntelligenceLevel[] = [
-      "quick",
-      "smart",
-      "brilliant",
+    const intelligenceOrder = [
+      IntelligenceLevel.QUICK,
+      IntelligenceLevel.SMART,
+      IntelligenceLevel.BRILLIANT,
     ];
     const modelIndex = intelligenceOrder.indexOf(model.intelligence);
     const requiredIndex = intelligenceOrder.indexOf(
@@ -121,10 +130,10 @@ export function modelMeetsRequirements(
   }
 
   if (requirements.maxIntelligence) {
-    const intelligenceOrder: IntelligenceLevel[] = [
-      "quick",
-      "smart",
-      "brilliant",
+    const intelligenceOrder = [
+      IntelligenceLevel.QUICK,
+      IntelligenceLevel.SMART,
+      IntelligenceLevel.BRILLIANT,
     ];
     const modelIndex = intelligenceOrder.indexOf(model.intelligence);
     const maxIndex = intelligenceOrder.indexOf(requirements.maxIntelligence);
@@ -135,7 +144,11 @@ export function modelMeetsRequirements(
 
   // Speed level check
   if (requirements.minSpeed) {
-    const speedOrder: SpeedLevel[] = ["fast", "balanced", "thorough"];
+    const speedOrder = [
+      SpeedLevel.FAST,
+      SpeedLevel.BALANCED,
+      SpeedLevel.THOROUGH,
+    ];
     const modelIndex = speedOrder.indexOf(model.speed);
     const requiredIndex = speedOrder.indexOf(requirements.minSpeed);
     if (modelIndex < requiredIndex) {
@@ -144,7 +157,11 @@ export function modelMeetsRequirements(
   }
 
   if (requirements.maxSpeed) {
-    const speedOrder: SpeedLevel[] = ["fast", "balanced", "thorough"];
+    const speedOrder = [
+      SpeedLevel.FAST,
+      SpeedLevel.BALANCED,
+      SpeedLevel.THOROUGH,
+    ];
     const modelIndex = speedOrder.indexOf(model.speed);
     const maxIndex = speedOrder.indexOf(requirements.maxSpeed);
     if (modelIndex > maxIndex) {
@@ -165,15 +182,15 @@ export function modelMeetsRequirements(
 }
 
 /**
- * Score a model for a persona (soft preferences)
+ * Score a model for a character (soft preferences)
  * Higher score = better match
  */
-export function scoreModelForPersona(
+export function scoreModelForCharacter(
   model: ModelOption,
-  persona: Persona,
+  character: Character,
 ): number {
   let score = 0;
-  const { preferences } = persona;
+  const { preferences } = character;
 
   if (!preferences) {
     return 0;
@@ -204,28 +221,28 @@ export function scoreModelForPersona(
 }
 
 /**
- * Get compatible models for a persona
+ * Get compatible models for a character
  */
 export function getCompatibleModels(
   models: ModelOption[],
-  persona: Persona,
+  character: Character,
 ): ModelOption[] {
-  return models.filter((model) => modelMeetsRequirements(model, persona));
+  return models.filter((model) => modelMeetsRequirements(model, character));
 }
 
 /**
- * Get recommended models for a persona, sorted by score
+ * Get recommended models for a character, sorted by score
  */
 export function getRecommendedModels(
   models: ModelOption[],
-  persona: Persona,
+  character: Character,
   limit = 5,
 ): ModelOption[] {
   return models
-    .filter((model) => modelMeetsRequirements(model, persona))
+    .filter((model) => modelMeetsRequirements(model, character))
     .map((model) => ({
       model,
-      score: scoreModelForPersona(model, persona),
+      score: scoreModelForCharacter(model, character),
     }))
     .toSorted((a, b) => b.score - a.score)
     .slice(0, limit)
@@ -233,32 +250,43 @@ export function getRecommendedModels(
 }
 
 /**
- * Find the best model for a persona given constraints
+ * Find the best model for a character given constraints
  */
 export function findBestModel(
   models: ModelOption[],
-  persona: Persona,
+  character: Character,
   constraints: {
-    intelligence?: IntelligenceLevel | "any";
-    maxPrice?: PriceLevel | "any";
-    minContent?: ContentLevel | "any";
+    intelligence?: typeof IntelligenceLevelFilterValue;
+    maxPrice?: typeof PriceLevelFilterValue;
+    minContent?: typeof ContentLevelFilterValue;
   } = {},
 ): ModelOption | null {
-  const priceOrder: PriceLevel[] = ["cheap", "standard", "premium"];
-  const contentOrder: ContentLevel[] = ["mainstream", "open", "uncensored"];
-  const intelligenceOrder: IntelligenceLevel[] = [
-    "quick",
-    "smart",
-    "brilliant",
+  const priceOrder = [
+    PriceLevelFilter.CHEAP,
+    PriceLevelFilter.STANDARD,
+    PriceLevelFilter.PREMIUM,
+  ];
+  const contentOrder = [
+    ContentLevel.MAINSTREAM,
+    ContentLevel.OPEN,
+    ContentLevel.UNCENSORED,
+  ];
+  const intelligenceOrder = [
+    IntelligenceLevel.QUICK,
+    IntelligenceLevel.SMART,
+    IntelligenceLevel.BRILLIANT,
   ];
 
-  // Filter by persona requirements first
+  // Filter by character requirements first
   let candidates = models.filter((model) =>
-    modelMeetsRequirements(model, persona),
+    modelMeetsRequirements(model, character),
   );
 
   // Apply intelligence constraint
-  if (constraints.intelligence && constraints.intelligence !== "any") {
+  if (
+    constraints.intelligence &&
+    constraints.intelligence !== IntelligenceLevelFilter.ANY
+  ) {
     const targetIndex = intelligenceOrder.indexOf(constraints.intelligence);
     candidates = candidates.filter((model) => {
       const modelIndex = intelligenceOrder.indexOf(model.intelligence);
@@ -267,22 +295,25 @@ export function findBestModel(
   }
 
   // Apply price constraint
-  if (constraints.maxPrice && constraints.maxPrice !== "any") {
+  if (constraints.maxPrice && constraints.maxPrice !== PriceLevelFilter.ANY) {
     const maxIndex = priceOrder.indexOf(constraints.maxPrice);
     candidates = candidates.filter((model) => {
       const modelIndex = priceOrder.indexOf(
         model.creditCost <= 3
-          ? "cheap"
+          ? PriceLevelFilter.CHEAP
           : model.creditCost <= 9
-            ? "standard"
-            : "premium",
+            ? PriceLevelFilter.STANDARD
+            : PriceLevelFilter.PREMIUM,
       );
       return modelIndex <= maxIndex;
     });
   }
 
   // Apply content constraint
-  if (constraints.minContent && constraints.minContent !== "any") {
+  if (
+    constraints.minContent &&
+    constraints.minContent !== ContentLevelFilter.ANY
+  ) {
     const minIndex = contentOrder.indexOf(constraints.minContent);
     candidates = candidates.filter((model) => {
       const modelIndex = contentOrder.indexOf(model.content);
@@ -298,7 +329,7 @@ export function findBestModel(
   const scored = candidates
     .map((model) => ({
       model,
-      score: scoreModelForPersona(model, persona),
+      score: scoreModelForCharacter(model, character),
     }))
     .toSorted((a, b) => b.score - a.score);
 
@@ -318,21 +349,26 @@ export interface CategoryConfig {
  */
 export function resolveModelSelection(
   selection: ModelSelection,
-  persona: Persona,
+  character: Character,
   allModels: ModelOption[],
 ): ModelOption | null {
   if (selection.type === "specific") {
     const model = allModels.find((m) => m.id === selection.modelId);
-    if (model && modelMeetsRequirements(model, persona)) {
+    if (model && modelMeetsRequirements(model, character)) {
       return model;
     }
     // Fallback to auto if specific model doesn't meet requirements
   }
 
   // Auto selection
-  return findBestModel(allModels, persona, {
-    intelligence: selection.type === "auto" ? selection.intelligence : "any",
-    maxPrice: selection.type === "auto" ? selection.maxPrice : "any",
-    minContent: selection.type === "auto" ? selection.minContent : "any",
+  return findBestModel(allModels, character, {
+    intelligence:
+      selection.type === "auto"
+        ? selection.intelligence
+        : IntelligenceLevelFilter.ANY,
+    maxPrice:
+      selection.type === "auto" ? selection.maxPrice : PriceLevelFilter.ANY,
+    minContent:
+      selection.type === "auto" ? selection.minContent : ContentLevelFilter.ANY,
   });
 }

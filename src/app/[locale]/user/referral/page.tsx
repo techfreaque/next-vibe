@@ -35,7 +35,7 @@ import { ReferralCodesList } from "@/app/api/[locale]/referral/_components/refer
 import { ReferralStats } from "@/app/api/[locale]/referral/_components/referral-stats";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { authRepository } from "@/app/api/[locale]/user/auth/repository";
+import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -67,7 +67,7 @@ export default async function ReferralPage({
 
   // Check if user is authenticated (but don't redirect)
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const minimalUser = await authRepository.getAuthMinimalUser<[]>(
+  const minimalUser = await AuthRepository.getAuthMinimalUser<[]>(
     [],
     { platform: Platform.NEXT_PAGE, locale },
     logger,
@@ -99,7 +99,9 @@ export default async function ReferralPage({
             {t("app.user.referral.title", { appName: t("config.appName") })}
           </H1>
           <P className="text-muted-foreground text-lg max-w-2xl">
-            {t("app.user.referral.description", { appName: t("config.appName") })}
+            {t("app.user.referral.description", {
+              appName: t("config.appName"),
+            })}
           </P>
         </Div>
 
@@ -129,8 +131,12 @@ export default async function ReferralPage({
                   1
                 </Div>
                 <Div>
-                  <P className="font-medium">{t("app.user.referral.howItWorks.step1Title")}</P>
-                  <P className="text-sm text-muted-foreground">{t("app.user.referral.howItWorks.step1Body")}</P>
+                  <P className="font-medium">
+                    {t("app.user.referral.howItWorks.step1Title")}
+                  </P>
+                  <P className="text-sm text-muted-foreground">
+                    {t("app.user.referral.howItWorks.step1Body")}
+                  </P>
                 </Div>
               </Div>
               <Div className="flex gap-4">
@@ -138,8 +144,12 @@ export default async function ReferralPage({
                   2
                 </Div>
                 <Div>
-                  <P className="font-medium">{t("app.user.referral.howItWorks.step2Title")}</P>
-                  <P className="text-sm text-muted-foreground">{t("app.user.referral.howItWorks.step2Body")}</P>
+                  <P className="font-medium">
+                    {t("app.user.referral.howItWorks.step2Title")}
+                  </P>
+                  <P className="text-sm text-muted-foreground">
+                    {t("app.user.referral.howItWorks.step2Body")}
+                  </P>
                 </Div>
               </Div>
               <Div className="flex gap-4">
@@ -147,8 +157,12 @@ export default async function ReferralPage({
                   3
                 </Div>
                 <Div>
-                  <P className="font-medium">{t("app.user.referral.howItWorks.step3Title")}</P>
-                  <P className="text-sm text-muted-foreground">{t("app.user.referral.howItWorks.step3Body")}</P>
+                  <P className="font-medium">
+                    {t("app.user.referral.howItWorks.step3Title")}
+                  </P>
+                  <P className="text-sm text-muted-foreground">
+                    {t("app.user.referral.howItWorks.step3Body")}
+                  </P>
                 </Div>
               </Div>
             </CardContent>
@@ -169,15 +183,23 @@ export default async function ReferralPage({
               <Div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                 <Coins className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
                 <Div>
-                  <P className="font-medium text-sm">{t("app.user.referral.payout.useAsCredits")}</P>
-                  <P className="text-xs text-muted-foreground">{t("app.user.referral.payout.useAsCreditsDesc")}</P>
+                  <P className="font-medium text-sm">
+                    {t("app.user.referral.payout.useAsCredits")}
+                  </P>
+                  <P className="text-xs text-muted-foreground">
+                    {t("app.user.referral.payout.useAsCreditsDesc")}
+                  </P>
                 </Div>
               </Div>
               <Div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                 <Bitcoin className="h-5 w-5 text-orange-500 mt-0.5 shrink-0" />
                 <Div>
-                  <P className="font-medium text-sm">{t("app.user.referral.payout.cryptoPayout")}</P>
-                  <P className="text-xs text-muted-foreground">{t("app.user.referral.payout.cryptoPayoutDesc")}</P>
+                  <P className="font-medium text-sm">
+                    {t("app.user.referral.payout.cryptoPayout")}
+                  </P>
+                  <P className="text-xs text-muted-foreground">
+                    {t("app.user.referral.payout.cryptoPayoutDesc")}
+                  </P>
                 </Div>
               </Div>
               <Div className="pt-2 border-t">
@@ -252,7 +274,9 @@ export default async function ReferralPage({
                     </Link>
                   </Button>
                   <Button asChild variant="outline" size="lg" className="gap-2">
-                    <Link href={`/${locale}/user/login?callbackUrl=${encodeURIComponent(`/${locale}/user/referral`)}`}>
+                    <Link
+                      href={`/${locale}/user/login?callbackUrl=${encodeURIComponent(`/${locale}/user/referral`)}`}
+                    >
                       <LogIn className="h-4 w-4" />
                       {t("app.user.referral.cta.logIn")}
                     </Link>

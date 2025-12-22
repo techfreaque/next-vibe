@@ -162,6 +162,7 @@ export function UsersListClient({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 {/* Status Filter */}
@@ -199,6 +200,7 @@ export function UsersListClient({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 {/* Role Filter */}
@@ -240,6 +242,7 @@ export function UsersListClient({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 {/* Sort By */}
@@ -277,6 +280,7 @@ export function UsersListClient({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
               </Div>
 
@@ -305,6 +309,7 @@ export function UsersListClient({
                       style: "none",
                       showAllRequired: false,
                     }}
+                    locale={locale}
                   />
                 </Div>
 

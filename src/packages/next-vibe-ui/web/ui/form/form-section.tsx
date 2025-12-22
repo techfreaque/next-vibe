@@ -12,7 +12,6 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { StyleType } from "../../utils/style-type";
 
-
 /**
  * Form Field Group Component
  * Groups multiple form fields with consistent spacing

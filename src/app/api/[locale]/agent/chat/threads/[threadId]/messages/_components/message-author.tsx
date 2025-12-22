@@ -6,13 +6,13 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
+import { getCharacterById } from "@/app/api/[locale]/agent/chat/characters/config";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import {
   getModelById,
   type ModelId,
 } from "@/app/api/[locale]/agent/chat/model-access/models";
-import { getPersonaById } from "@/app/api/[locale]/agent/chat/personas/config";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -26,8 +26,8 @@ interface MessageAuthorProps {
   edited?: boolean;
   compact?: boolean;
   className?: string;
-  /** Persona used for this message */
-  persona?: string | null;
+  /** Character used for this message */
+  character?: string | null;
   locale: CountryLanguage;
   rootFolderId: DefaultFolderId;
 }
@@ -42,7 +42,7 @@ export function MessageAuthorInfo({
   edited = false,
   compact = false,
   className,
-  persona,
+  character,
   locale,
   rootFolderId = DefaultFolderId.PRIVATE,
 }: MessageAuthorProps): JSX.Element {
@@ -71,8 +71,10 @@ export function MessageAuthorInfo({
         : t("app.chat.messages.user");
   }
 
-  // Get persona name if persona is provided
-  const personaName = persona ? t(getPersonaById(persona)?.name) : null;
+  // Get character name if character is provided
+  const characterName = character
+    ? t(getCharacterById(character)?.name ?? "")
+    : null;
 
   return (
     <Div className={cn("flex items-center gap-2", className)}>
@@ -100,11 +102,11 @@ export function MessageAuthorInfo({
           {displayName}
         </Span>
 
-        {/* Show persona for both AI and user messages */}
-        {personaName && (
+        {/* Show character for both AI and user messages */}
+        {characterName && (
           <Span className="text-xs text-muted-foreground truncate">
             {/* eslint-disable-next-line i18next/no-literal-string -- Formatting characters */}
-            {`(${personaName})`}
+            {`(${characterName})`}
           </Span>
         )}
 

@@ -72,4 +72,4 @@ function AvatarFallback({
 }
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
-export { Avatar, AvatarFallback,AvatarImage };
+export { Avatar, AvatarFallback, AvatarImage };

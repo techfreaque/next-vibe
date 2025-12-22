@@ -22,6 +22,7 @@ import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useResetPasswordConfirm } from "@/app/api/[locale]/user/public/reset-password/confirm/hooks";
+import type { ResetPasswordValidateGetResponseOutput } from "@/app/api/[locale]/user/public/reset-password/validate/definition";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -30,7 +31,7 @@ import { PasswordStrengthIndicator } from "../../../signup/_components/password-
 interface ResetPasswordConfirmFormProps {
   locale: CountryLanguage;
   token: string;
-  tokenValidationResponse: ResponseType<string>;
+  tokenValidationResponse: ResponseType<ResetPasswordValidateGetResponseOutput>;
 }
 
 export default function ResetPasswordConfirmForm({
@@ -154,6 +155,7 @@ export default function ResetPasswordConfirmForm({
                 style: "none",
                 showAllRequired: false,
               }}
+              locale={locale}
             />
 
             <FormItem>
@@ -172,6 +174,7 @@ export default function ResetPasswordConfirmForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
               <PasswordStrengthIndicator
                 password={passwordValue}
@@ -194,6 +197,7 @@ export default function ResetPasswordConfirmForm({
                 style: "none",
                 showAllRequired: false,
               }}
+              locale={locale}
             />
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>

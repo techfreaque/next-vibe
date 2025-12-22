@@ -42,7 +42,8 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Verboten",
-        description: "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
+        description:
+          "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
       },
       notFound: {
         title: "Nicht gefunden",

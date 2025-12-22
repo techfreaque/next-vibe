@@ -65,7 +65,7 @@ const COMMON_ICONS = [
  * This component replaces all existing icon selectors:
  * - folder-icon-selector
  * - model icon picker
- * - persona icon picker
+ * - character icon picker
  */
 export function IconSelector({
   value,

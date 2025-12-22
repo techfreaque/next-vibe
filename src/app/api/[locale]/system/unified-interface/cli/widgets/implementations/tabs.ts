@@ -12,10 +12,12 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class TabsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TABS> {
+export class TabsWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.TABS
+> {
   readonly widgetType = WidgetType.TABS;
 
-  render(props: CLIWidgetProps<typeof WidgetType.TABS>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.TABS, string>): string {
     const { value, context } = props;
     const indent = this.createIndent(context.depth, context);
 

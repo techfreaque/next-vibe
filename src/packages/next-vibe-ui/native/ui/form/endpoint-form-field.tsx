@@ -17,6 +17,8 @@ import type {
 } from "react-hook-form";
 import { View } from "react-native";
 
+import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import type { EndpointFieldStructure } from "@/app/api/[locale]/system/unified-interface/shared/field-config/endpoint-field-types";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -24,20 +26,23 @@ import type {
   RequiredFieldTheme,
 } from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
 import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
-import { useTranslation } from "@/i18n/core/client";
-import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import { simpleT } from "@/i18n/core/shared";
+import type { TFunction } from "@/i18n/core/static-types";
 
 import type {
   EndpointFormFieldProps,
   EndpointFormFieldsProps,
   FormFieldError,
 } from "../../../web/ui/form/endpoint-form-field";
+import { convertCSSToViewStyle } from "../../utils/style-converter";
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
 import { Button } from "../button";
 import { Calendar as CalendarComponent } from "../calendar";
 import { Checkbox } from "../checkbox";
 import { Div } from "../div";
+import { IconPicker } from "../icon-picker";
+import { Info } from "../icons/Info";
 import { Input } from "../input";
 import { Label } from "../label";
 import { PhoneField } from "../phone-field";
@@ -50,9 +55,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../select";
+import { Span } from "../span";
 import { Switch } from "../switch";
 import { TagsField } from "../tags-field";
 import { Textarea } from "../textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../tooltip";
 import {
   FormControl,
   FormField,
@@ -61,17 +73,11 @@ import {
   FormMessage,
 } from "./form";
 
+// Re-export types for module compatibility with web version
+export type { EndpointFormFieldProps, EndpointFormFieldsProps, FormFieldError };
+
 // Styled View for proper NativeWind support
 const StyledView = styled(View, { className: "style" });
-import { convertCSSToViewStyle } from "../../utils/style-converter";
-import { Info } from "../icons/Info";
-import { Span } from "../span";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../tooltip";
 
 // Default theme for required fields
 const DEFAULT_THEME: RequiredFieldTheme = {
@@ -94,9 +100,9 @@ function getFieldValidationState<T>(
 ): FieldValidationState {
   const hasValue = Boolean(
     fieldValue !== undefined &&
-    fieldValue !== null &&
-    fieldValue !== "" &&
-    (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
+      fieldValue !== null &&
+      fieldValue !== "" &&
+      (Array.isArray(fieldValue) ? fieldValue.length > 0 : true),
   );
 
   return {
@@ -274,7 +280,8 @@ function renderLabel(
   isRequired: boolean,
   theme: RequiredFieldTheme,
   labelClassName: string,
-  t: TFunction,
+  t: TFunction, // Adapted translation for definition keys
+  globalT: TFunction, // Global translation for hardcoded framework keys
 ): JSX.Element | null {
   const { style } = theme;
 
@@ -305,7 +312,7 @@ function renderLabel(
           variant="secondary"
           className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
         >
-          {t("packages.nextVibeUi.web.common.required")}
+          {globalT("packages.nextVibeUi.web.common.required")}
         </Badge>
       )}
     </StyledView>
@@ -322,7 +329,8 @@ function renderFieldInput<
   config: FieldConfig,
   field: ControllerRenderProps<TFieldValues, TName>,
   inputClassName: string,
-  t: TFunction,
+  t: TFunction, // Adapted translation for definition keys (uses scopedT when available)
+  globalT: TFunction, // Global translation for hardcoded framework keys
   disabled?: boolean,
 ): JSX.Element {
   switch (config.type) {
@@ -514,7 +522,7 @@ function renderFieldInput<
                 <Span>
                   {config.placeholder
                     ? t(config.placeholder)
-                    : t("packages.nextVibeUi.web.common.selectDate")}
+                    : globalT("packages.nextVibeUi.web.common.selectDate")}
                 </Span>
               )}
             </Button>
@@ -579,13 +587,11 @@ function renderFieldInput<
         // eslint-disable-next-line i18next/no-literal-string -- Error handling for invalid config
         throw new Error("Invalid config type for phone field");
       }
-      // Extract placeholder to avoid complex union type error
-      let phonePlaceholder: TranslationKey;
-      if (config.placeholder !== undefined) {
-        phonePlaceholder = config.placeholder;
-      } else {
-        phonePlaceholder = "packages.nextVibeUi.web.common.enterPhoneNumber";
-      }
+      // Translate placeholder - use adapted t for definition keys, globalT for hardcoded default
+      const phonePlaceholder =
+        config.placeholder !== undefined
+          ? t(config.placeholder)
+          : globalT("packages.nextVibeUi.web.common.enterPhoneNumber");
       return (
         <PhoneField
           value={String(field.value ?? "")}
@@ -652,6 +658,16 @@ function renderFieldInput<
       );
     }
 
+    case "icon": {
+      return (
+        <IconPicker
+          value={field.value as IconKey | undefined}
+          onChange={(iconKey) => field.onChange(iconKey)}
+          className={inputClassName}
+        />
+      );
+    }
+
     default: {
       // Fallback for any unknown field types
       return (
@@ -661,7 +677,9 @@ function renderFieldInput<
           onBlur={field.onBlur}
           disabled={disabled || false}
           className={inputClassName}
-          placeholder={t("packages.nextVibeUi.web.common.unknownFieldType")}
+          placeholder={globalT(
+            "packages.nextVibeUi.web.common.unknownFieldType",
+          )}
         />
       );
     }
@@ -677,6 +695,7 @@ function renderFieldInput<
 export function EndpointFormField<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
+  TFields = EndpointFieldStructure,
 >({
   name,
   config: providedConfig,
@@ -686,10 +705,16 @@ export function EndpointFormField<
   className,
   style,
   endpointFields,
-}: EndpointFormFieldProps<TFieldValues, TName> & {
+  scopedT,
+  locale,
+}: EndpointFormFieldProps<TFieldValues, TName, TFields> & {
   style?: React.CSSProperties;
 }): JSX.Element {
-  const { t } = useTranslation();
+  // Use same pattern as getTranslator utility:
+  // - scopedT for definition keys when available (label, placeholder, description, option labels)
+  // - simpleT for fallback and hardcoded framework keys
+  const { t: globalT } = simpleT(locale ?? "en-GLOBAL");
+  const { t } = scopedT && locale ? scopedT(locale) : { t: globalT };
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Auto-infer config from endpoint fields if not provided
@@ -739,6 +764,7 @@ export function EndpointFormField<
                 theme,
                 styleClassName.labelClassName,
                 t,
+                globalT,
               )}
             </FormLabel>
 
@@ -748,6 +774,7 @@ export function EndpointFormField<
                 field,
                 styleClassName.inputClassName,
                 t,
+                globalT,
                 config.disabled,
               )}
             </FormControl>
@@ -769,7 +796,10 @@ export function EndpointFormField<
  * Convenience component for creating multiple form fields
  * Config is auto-inferred from endpointFields if not provided
  */
-export function EndpointFormFields<TFieldValues extends FieldValues>({
+export function EndpointFormFields<
+  TFieldValues extends FieldValues,
+  TFields = EndpointFieldStructure,
+>({
   fields,
   control,
   schema,
@@ -778,7 +808,9 @@ export function EndpointFormFields<TFieldValues extends FieldValues>({
   className,
   style,
   fieldClassName,
-}: EndpointFormFieldsProps<TFieldValues> & {
+  scopedT,
+  locale,
+}: EndpointFormFieldsProps<TFieldValues, TFields> & {
   style?: React.CSSProperties;
 }): JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -798,6 +830,8 @@ export function EndpointFormFields<TFieldValues extends FieldValues>({
           endpointFields={endpointFields}
           theme={theme}
           className={fieldClassName}
+          scopedT={scopedT}
+          locale={locale}
         />
       ))}
     </Div>

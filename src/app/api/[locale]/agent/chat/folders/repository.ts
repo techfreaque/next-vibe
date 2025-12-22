@@ -34,32 +34,13 @@ import type {
 } from "./definition";
 
 /**
- * Chat Folders Repository Interface
+ * Chat Folders Repository - Static class pattern
  */
-export interface ChatFoldersRepositoryInterface {
-  getFolders(
-    data: FolderListRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<FolderListResponseOutput>>;
-
-  createFolder(
-    data: FolderCreateRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<FolderCreateResponseOutput>>;
-}
-
-/**
- * Chat Folders Repository Implementation
- */
-export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface {
+export class ChatFoldersRepository {
   /**
    * Get all folders for the authenticated user or anonymous user (lead)
    */
-  async getFolders(
+  static async getFolders(
     data: FolderListRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -203,10 +184,11 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
         canCreateFolder: false,
       };
       if (rootFolderId) {
-        const { rootFolderPermissionsRepository } =
-          await import("./root-permissions/repository");
+        const { RootFolderPermissionsRepository } = await import(
+          "./root-permissions/repository"
+        );
         const permissionsResult =
-          await rootFolderPermissionsRepository.getRootFolderPermissions(
+          await RootFolderPermissionsRepository.getRootFolderPermissions(
             { rootFolderId },
             user,
             locale,
@@ -233,7 +215,7 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
   /**
    * Create a new folder
    */
-  async createFolder(
+  static async createFolder(
     data: FolderCreateRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -387,5 +369,3 @@ export class ChatFoldersRepositoryImpl implements ChatFoldersRepositoryInterface
     }
   }
 }
-
-export const chatFoldersRepository = new ChatFoldersRepositoryImpl();

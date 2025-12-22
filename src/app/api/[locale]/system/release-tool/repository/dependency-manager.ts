@@ -280,7 +280,9 @@ export class DependencyManager implements IDependencyManager {
           timeout: TIMEOUTS.DEFAULT,
         });
       } catch (err) {
-        const error = toCatchError(err as Error | { stdout?: string | Buffer; status?: number });
+        const error = toCatchError(
+          err as Error | { stdout?: string | Buffer; status?: number },
+        );
         if ("stdout" in error && error.stdout) {
           output = error.stdout.toString();
         } else {
@@ -308,7 +310,11 @@ export class DependencyManager implements IDependencyManager {
       const packages: OutdatedResult["packages"] = [];
 
       // ncu --jsonUpgraded returns { "package-name": "new-version" }
-      if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
+      if (
+        typeof parsed === "object" &&
+        parsed !== null &&
+        !Array.isArray(parsed)
+      ) {
         for (const [name, newVersion] of Object.entries(parsed)) {
           if (typeof newVersion === "string") {
             packages.push({
@@ -370,13 +376,18 @@ export class DependencyManager implements IDependencyManager {
         });
       } catch (err) {
         // Audit commands exit with non-zero if vulnerabilities found
-        const error = toCatchError(err as Error | { stdout?: string | Buffer; status?: number });
+        const error = toCatchError(
+          err as Error | { stdout?: string | Buffer; status?: number },
+        );
         if ("stdout" in error && error.stdout) {
           output = error.stdout.toString();
         } else {
           output = "{}";
         }
-        exitCode = ("status" in error && typeof error.status === "number") ? error.status : 1;
+        exitCode =
+          "status" in error && typeof error.status === "number"
+            ? error.status
+            : 1;
       }
 
       // Parse the audit results

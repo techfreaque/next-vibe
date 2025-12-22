@@ -14,7 +14,8 @@ export const translations: typeof enTranslations = {
       },
       args: {
         label: "Argumenty",
-        description: "Opcjonalna lista argumentów (UID elementów) do przekazania do funkcji",
+        description:
+          "Opcjonalna lista argumentów (UID elementów) do przekazania do funkcji",
         placeholder: '[{"uid": "element-uid"}]',
       },
     },
@@ -26,15 +27,42 @@ export const translations: typeof enTranslations = {
     executionId: "ID wykonania do śledzenia",
   },
   errors: {
-    validation: { title: "Błąd walidacji", description: "Sprawdź wprowadzone dane i spróbuj ponownie" },
-    network: { title: "Błąd sieci", description: "Wystąpił błąd sieci podczas oceny skryptu" },
-    unauthorized: { title: "Nieautoryzowany", description: "Nie masz uprawnień do oceny skryptów" },
-    forbidden: { title: "Zabronione", description: "Operacja oceny skryptu jest zabroniona" },
-    notFound: { title: "Nie znaleziono", description: "Żądany zasób nie został znaleziony" },
-    serverError: { title: "Błąd serwera", description: "Wystąpił wewnętrzny błąd serwera podczas oceny skryptu" },
-    unknown: { title: "Nieznany błąd", description: "Wystąpił nieznany błąd podczas oceny skryptu" },
-    unsavedChanges: { title: "Niezapisane zmiany", description: "Masz niezapisane zmiany, które mogą zostać utracone" },
-    conflict: { title: "Konflikt", description: "Wystąpił konflikt podczas oceny skryptu" },
+    validation: {
+      title: "Błąd walidacji",
+      description: "Sprawdź wprowadzone dane i spróbuj ponownie",
+    },
+    network: {
+      title: "Błąd sieci",
+      description: "Wystąpił błąd sieci podczas oceny skryptu",
+    },
+    unauthorized: {
+      title: "Nieautoryzowany",
+      description: "Nie masz uprawnień do oceny skryptów",
+    },
+    forbidden: {
+      title: "Zabronione",
+      description: "Operacja oceny skryptu jest zabroniona",
+    },
+    notFound: {
+      title: "Nie znaleziono",
+      description: "Żądany zasób nie został znaleziony",
+    },
+    serverError: {
+      title: "Błąd serwera",
+      description: "Wystąpił wewnętrzny błąd serwera podczas oceny skryptu",
+    },
+    unknown: {
+      title: "Nieznany błąd",
+      description: "Wystąpił nieznany błąd podczas oceny skryptu",
+    },
+    unsavedChanges: {
+      title: "Niezapisane zmiany",
+      description: "Masz niezapisane zmiany, które mogą zostać utracone",
+    },
+    conflict: {
+      title: "Konflikt",
+      description: "Wystąpił konflikt podczas oceny skryptu",
+    },
   },
   success: {
     title: "Skrypt pomyślnie oceniony",

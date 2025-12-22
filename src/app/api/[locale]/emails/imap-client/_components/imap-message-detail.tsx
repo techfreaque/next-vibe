@@ -211,6 +211,7 @@ export function ImapMessageDetail({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -224,6 +225,7 @@ export function ImapMessageDetail({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -237,6 +239,7 @@ export function ImapMessageDetail({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <Button

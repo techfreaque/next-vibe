@@ -565,7 +565,9 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     // Create default guard jail configuration
     const config = createDefaultGuardConfig(projectName);
 
-    logger.info(`🛡️ Guard jail configuration loaded for ${config.project.name}`);
+    logger.info(
+      `🛡️ Guard jail configuration loaded for ${config.project.name}`,
+    );
 
     // Setup guard jail environment
     const setupResult = setupGuardJailEnvironment(config, projectPath, logger);

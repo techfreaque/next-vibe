@@ -139,18 +139,22 @@ export const translations: typeof enTranslations = {
     },
   },
 
-  createPersona: {
+  createCharacter: {
     title: "Utwórz własną postać",
+    description:
+      "Zaprojektuj własną postać AI z niestandardową osobowością, wiedzą i zachowaniem.",
     icon: "Ikona",
     name: "Nazwa",
     namePlaceholder: "np. Recenzent kodu",
-    description: "Opis",
+    descriptionLabel: "Opis",
     descriptionPlaceholder: "Krótki opis tego, co robi ta postać",
     category: "Kategoria",
     selectCategory: "Wybierz kategorię",
     systemPrompt: "Prompt systemowy",
     systemPromptPlaceholder:
       "Określ, jak ta postać powinna się zachowywać. Bądź szczegółowy co do jej osobowości, ekspertyzy i sposobu odpowiadania.",
+    voice: "Głos",
+    voicePlaceholder: "Wybierz głos dla zamiany tekstu na mowę",
     create: "Utwórz postać",
     creating: "Tworzenie...",
     charCount: "{{current}} / {{max}}",
@@ -160,6 +164,37 @@ export const translations: typeof enTranslations = {
       systemPromptRequired: "Wprowadź prompt systemowy",
       createFailed: "Nie udało się utworzyć postaci. Spróbuj ponownie.",
     },
+  },
+
+  voice: {
+    male: "Męski",
+    female: "Żeński",
+  },
+
+  editCharacter: {
+    title: "Edytuj jako własną postać",
+    description:
+      "Utwórz własną postać na podstawie tej persony. Możesz zmodyfikować dowolne ustawienia.",
+    loginRequired:
+      "Zaloguj się, aby tworzyć i edytować własne postacie. Własne postacie są zapisywane na Twoim koncie.",
+    name: "Nazwa",
+    namePlaceholder: "Nazwa własnej postaci",
+    descriptionLabel: "Opis",
+    descriptionPlaceholder: "Co robi ta postać?",
+    category: "Kategoria",
+    icon: "Ikona",
+    voice: "Głos",
+    voicePlaceholder: "Wybierz głos",
+    preferredModel: "Preferowany model",
+    preferredModelPlaceholder: "Opcjonalny preferowany model",
+    systemPrompt: "Prompt systemowy",
+    systemPromptPlaceholder: "Określ zachowanie postaci...",
+    save: "Zapisz jako własną",
+    saveAsCopy: "Zapisz jako kopię",
+    saving: "Tworzenie...",
+    cancel: "Anuluj",
+    login: "Zaloguj się, aby edytować",
+    signup: "Zarejestruj się, aby edytować",
   },
 
   userProfile: {
@@ -337,7 +372,7 @@ export const translations: typeof enTranslations = {
       add: "Dodaj model",
     },
   },
-  personaSelector: {
+  characterSelector: {
     placeholder: "Wybierz personę",
     addNewLabel: "Utwórz niestandardową personę",
     defaultIcon: "✨",
@@ -418,28 +453,30 @@ export const translations: typeof enTranslations = {
   combinedSelector: {
     tabs: {
       quick: "Szybki",
-      persona: "Persona",
+      character: "Character",
       model: "Model",
     },
     current: "Aktualny",
-    favoritePersonas: "Ulubione persony",
+    favoriteCharacters: "Ulubione persony",
     favoriteModels: "Ulubione modele",
     showAll: "Pokaż wszystkie",
     selectModel: "Wybierz model",
-    forPersona: "dla {{persona}}",
+    forCharacter: "dla {{character}}",
     recommended: "Polecane",
     favorites: "Ulubione",
     all: "Wszystkie",
     noFavorites: "Brak ulubionych. Oznacz je gwiazdką.",
     noModels: "Brak dostępnych modeli",
-    filteredByPersona: "Pokazuję {{compatible}} z {{total}} modeli (filtrowane przez personę)",
-    selectPersona: "Wybierz personę",
-    allPersonas: "Wszystkie",
+    filteredByCharacter:
+      "Pokazuję {{compatible}} z {{total}} modeli (filtrowane przez personę)",
+    selectCharacter: "Wybierz personę",
+    allCharacters: "Wszystkie",
   },
   selector: {
+    loading: "Ładowanie...",
     tabs: {
       quick: "Szybki",
-      personas: "Persony",
+      characters: "Persony",
       build: "Utwórz",
     },
     tiers: {
@@ -462,12 +499,12 @@ export const translations: typeof enTranslations = {
     suggested: "Sugerowane",
     noFavorites: "Brak ulubionych",
     noFavoritesHint: "Zapisz ulubione persony dla szybkiego dostępu",
-    browseAllPersonas: "Przeglądaj wszystkie persony...",
+    browseAllCharacters: "Przeglądaj wszystkie persony...",
     customSetup: "Niestandardowa konfiguracja...",
-    selectPersona: "Wybierz personę",
+    selectCharacter: "Wybierz personę",
     all: "Wszystkie",
     buildMode: "Tryb budowania",
-    forPersona: "dla {{persona}}",
+    forCharacter: "dla {{character}}",
     intelligence: "Inteligencja",
     contentLevel: "Poziom treści",
     any: "Dowolny",
@@ -480,14 +517,14 @@ export const translations: typeof enTranslations = {
     currentConfig: "Aktualnie rozmawiasz z",
     switchModel: "Zmień model",
     keepsConversation: "(zachowuje rozmowę)",
-    switchPersona: "Zmień personę",
+    switchCharacter: "Zmień personę",
     startsNewChat: "(rozpoczyna nowy czat)",
     start: "Start",
     addFav: "Dodaj",
-    searchPersonas: "Szukaj person...",
-    noPersonasFound: "Nie znaleziono person",
+    searchCharacters: "Szukaj person...",
+    noCharactersFound: "Nie znaleziono person",
     createCustom: "Utwórz",
-    persona: "Persona",
+    character: "Character",
     savePreset: "Zapisz",
     perMessage: "za wiadomość",
     compatibleModels: "{{count}} kompatybilnych modeli",
@@ -513,14 +550,15 @@ export const translations: typeof enTranslations = {
     manualSelect: "Wybierz ręcznie...",
     best: "NAJLEPSZY",
     noMatchingModels: "Żadne modele nie pasują do filtrów",
-    noModelsWarning: "Żadne modele nie pasują do tych filtrów. Dostosuj ustawienia.",
+    noModelsWarning:
+      "Żadne modele nie pasują do tych filtrów. Dostosuj ustawienia.",
     allModelsCount: "{{count}} dostępnych modeli",
     filteredModelsCount: "{{count}} pasujących modeli",
     showAllModels: "Pokaż wszystkie",
     showFiltered: "Pokaż przefiltrowane",
     applyChanges: "Zastosuj zmiany",
     thisChatOnly: "Tylko ten czat (tymczasowo)",
-    saveToPreset: "Zapisz do \"{{name}}\"",
+    saveToPreset: 'Zapisz do "{{name}}"',
     saveAsNew: "Zapisz jako nowy ulubiony...",
     cancel: "Anuluj",
     apply: "Zastosuj",
@@ -528,7 +566,6 @@ export const translations: typeof enTranslations = {
     maxPrice: "Maks. cena",
     creditsExact: "{{cost}} kredytów",
     creditsSingle: "1 kredyt",
-    searchCharacters: "Szukaj...",
     searchResults: "{{count}} wyników",
     defaults: "Domyślne",
     customize: "Dostosuj",
@@ -542,6 +579,9 @@ export const translations: typeof enTranslations = {
     yourSetups: "Twoje zestawy",
     setup: "Zestaw",
     delete: "Usuń",
+    editCharacter: "Edytuj jako własną postać",
+    switchPersona: "Zmień personę",
+    editPersona: "Edytuj personę",
     autoSelectedModel: "Auto-wybrany:",
     manualSelectedModel: "Wybrany:",
     auto: "Auto",
@@ -567,20 +607,39 @@ export const translations: typeof enTranslations = {
     useNow: "Użyj teraz",
     browseAll: "Przeglądaj wszystkie postacie",
     add: "Dodaj",
-    noCharactersFound: "Nie znaleziono postaci",
     // v22 UX improvements
     quickSwitch: "Szybka zmiana",
     switchTo: "Przełącz na tę konfigurację",
     adjustSettings: "Dostosuj ustawienia",
     addAnotherSetup: "Dodaj kolejną konfigurację",
     comingSoon: "Wkrótce dostępne",
+    // Character requirements
+    requirements: {
+      intelligenceTooLow: "Inteligencja zbyt niska (min: {{min}})",
+      intelligenceTooHigh: "Inteligencja zbyt wysoka (max: {{max}})",
+      contentTooLow: "Poziom treści zbyt niski (min: {{min}})",
+      contentTooHigh: "Poziom treści zbyt wysoki (max: {{max}})",
+      allMet: "Spełnia wszystkie wymagania",
+      violations: "{{count}} naruszenia wymagań",
+    },
+    // Character switch modal
+    characterSwitchModal: {
+      title: "Zmień personę",
+      description: "Przełącz się na inną personę bez utraty ustawień",
+      searchPlaceholder: "Wyszukaj persony...",
+      noResults: "Nie znaleziono person",
+      keepSettings: "Zachowaj obecne ustawienia modelu",
+      keepSettingsDesc:
+        "Użyj obecnych filtrów inteligencji, ceny i treści z nową personą",
+      cancel: "Anuluj",
+      confirm: "Zmień personę",
+    },
   },
   onboarding: {
     // Screen 1: Story
     story: {
       title: "Pomyśl o nas jak o swoim zespole.",
-      line1:
-        "Większość zaczyna od towarzysza — kogoś do codziennych rozmów.",
+      line1: "Większość zaczyna od towarzysza — kogoś do codziennych rozmów.",
       line2: "Gdy potrzebujesz konkretnej pomocy, przełącz się na specjalistę.",
       line3: "To jak mieć ekspertów pod ręką.",
       continue: "Poznaj zespół",
@@ -593,7 +652,7 @@ export const translations: typeof enTranslations = {
       selectFirst: "Wybierz towarzysza, aby kontynuować",
       saving: "Zapisywanie...",
     },
-    // Companion personalities
+    // Companion characterlities
     thea: {
       tagline: "Ciepła & mądra",
       description: "Jak wspierająca przyjaciółka, która naprawdę cię rozumie.",
@@ -937,7 +996,7 @@ export const translations: typeof enTranslations = {
     imageGen: "Generowanie Obrazów",
     uncensored: "Niecenzurowany",
     legacy: "Modele Legacy",
-    // Persona categories
+    // Character categories
     technical: "Techniczne",
     education: "Edukacja",
     controversial: "Kontrowersyjne",
@@ -1112,7 +1171,7 @@ export const translations: typeof enTranslations = {
     incognitoDescription:
       "Przechowywane tylko w przeglądarce. Nigdy nie zapisywane na koncie ani synchronizowane.",
     more: "Więcej",
-    selectPersona: "Wybierz personę",
+    selectCharacter: "Wybierz personę",
     noPrompts: "Brak sugestii dla tej persony",
     showDetails: "Pokaż szczegóły",
     hideDetails: "Ukryj szczegóły",
@@ -1444,7 +1503,7 @@ export const translations: typeof enTranslations = {
         "Kliknij tutaj, aby poznać swoich AI towarzyszy. Każdy ma unikalną osobowość, a najlepszy model AI jest dla nich automatycznie wybierany. Zawsze możesz dostosować później.",
       tip: "👆 Kliknij, aby otworzyć i wybrać pierwszego towarzysza!",
     },
-    personaSelector: {
+    characterSelector: {
       title: "Dostosuj zachowanie AI",
       description:
         "Persony kształtują sposób odpowiedzi AI. Używaj wbudowanych stylów lub twórz własne persony z własnymi instrukcjami i preferowanymi modelami.",
@@ -1470,20 +1529,20 @@ export const translations: typeof enTranslations = {
       description:
         "Wyświetl modele pogrupowane według firmy (OpenAI, Anthropic) lub według przypadku użycia (Kodowanie, Bez cenzury, Kreatywność).",
     },
-    personaSelectorFavorites: {
+    characterSelectorFavorites: {
       title: "Oznacz swoje persony",
       description: "Zapisz swoje ulubione style rozmowy dla szybkiego dostępu.",
     },
-    personaSelectorShowAll: {
+    characterSelectorShowAll: {
       title: "Przeglądaj wszystkie persony",
       description:
         "Eksploruj pełną bibliotekę person. Twórz własne persony dostosowane do twojego przepływu pracy.",
     },
-    personaSelectorSearch: {
+    characterSelectorSearch: {
       title: "Znajdź persony",
       description: "Szukaj według nazwy, kategorii lub opisu.",
     },
-    personaSelectorGroup: {
+    characterSelectorGroup: {
       title: "Grupuj persony",
       description:
         "Wyświetl według źródła (Wbudowane vs. Twoje własne) lub według kategorii (Kreatywność, Techniczne, Professional).",

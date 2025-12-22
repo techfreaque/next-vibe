@@ -9,11 +9,7 @@ import { convertCSSToTextStyle } from "../utils/style-converter";
 
 const StyledText = styled(Text, { className: "style" });
 
-export function P({
-  className,
-  style,
-  children,
-}: PProps): React.JSX.Element {
+export function P({ className, style, children }: PProps): React.JSX.Element {
   const nativeStyle: TextStyle | undefined = style
     ? convertCSSToTextStyle(style)
     : undefined;

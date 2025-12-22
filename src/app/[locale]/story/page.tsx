@@ -2,17 +2,17 @@ import type { Metadata } from "next";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import { threadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
+import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
 import {
   ProductIds,
   productsRepository,
   TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/products/repository-client";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
-import { subscriptionRepository } from "@/app/api/[locale]/subscription/repository";
+import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import { languageConfig } from "@/i18n";
@@ -78,7 +78,7 @@ export default async function HomePage({
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Get user with proper error handling
-  const userResponse = await userRepository.getUserByAuth(
+  const userResponse = await UserRepository.getUserByAuth(
     {
       roles: [UserRole.PUBLIC, UserRole.CUSTOMER],
       detailLevel: UserDetailLevel.MINIMAL,
@@ -104,7 +104,7 @@ export default async function HomePage({
     "id" in userResponse.data &&
     userResponse.data.id
   ) {
-    const subscriptionResponse = await subscriptionRepository.getSubscription(
+    const subscriptionResponse = await SubscriptionRepository.getSubscription(
       userResponse.data.id,
       logger,
       locale,
@@ -116,9 +116,9 @@ export default async function HomePage({
 
   // Fetch stats for hero section (cached for 24h)
   const activeUserCountResponse =
-    await userRepository.getActiveUserCount(logger);
+    await UserRepository.getActiveUserCount(logger);
   const totalConversationsResponse =
-    await threadsRepository.getTotalConversationsCount(logger);
+    await ThreadsRepository.getTotalConversationsCount(logger);
 
   const activeUserCount = activeUserCountResponse.success
     ? activeUserCountResponse.data

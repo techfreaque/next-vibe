@@ -41,11 +41,13 @@ export const translations = {
     },
     network: {
       title: "Network Error",
-      description: "A network error occurred during the dialog handling operation",
+      description:
+        "A network error occurred during the dialog handling operation",
     },
     unauthorized: {
       title: "Unauthorized",
-      description: "You are not authorized to perform dialog handling operations",
+      description:
+        "You are not authorized to perform dialog handling operations",
     },
     forbidden: {
       title: "Forbidden",
@@ -57,11 +59,13 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred during the dialog handling operation",
+      description:
+        "An internal server error occurred during the dialog handling operation",
     },
     unknown: {
       title: "Unknown Error",
-      description: "An unknown error occurred during the dialog handling operation",
+      description:
+        "An unknown error occurred during the dialog handling operation",
     },
     unsavedChanges: {
       title: "Unsaved Changes",

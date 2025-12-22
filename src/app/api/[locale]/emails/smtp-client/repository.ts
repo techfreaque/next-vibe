@@ -45,35 +45,11 @@ import type {
 } from "./sending/types";
 
 /**
- * SMTP Repository Interface
- */
-export interface SmtpRepository {
-  sendEmail(
-    data: SmtpSendRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpSendResponseOutput>>;
-
-  getTotalSendingCapacity(
-    data: SmtpCapacityRequestOutput,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpCapacityResponseOutput>>;
-
-  testConnection(
-    data: { accountId: string },
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ success: boolean; message: string }>>;
-}
-
-/**
- * SMTP Repository Implementation
+ * SMTP Repository
  * Migrated from SmtpClientServiceImpl
  */
-class SmtpRepositoryImpl implements SmtpRepository {
-  private transportCache = new Map<
+export class SmtpRepository {
+  private static transportCache = new Map<
     string,
     Transporter<SMTPTransport.SentMessageInfo>
   >();
@@ -81,7 +57,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Send email using database-configured SMTP account with retry and fallback support
    */
-  async sendEmail(
+  static async sendEmail(
     data: SmtpSendRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -120,19 +96,17 @@ class SmtpRepositoryImpl implements SmtpRepository {
             },
           });
         }
-          return fail({
-            message:
-              "app.api.emails.smtpClient.sending.errors.no_account.title",
-            errorType: ErrorResponseTypes.NOT_FOUND,
-            messageParams: {
-              campaignType: data.selectionCriteria.campaignType,
-            },
-          });
-        
+        return fail({
+          message: "app.api.emails.smtpClient.sending.errors.no_account.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: {
+            campaignType: data.selectionCriteria.campaignType,
+          },
+        });
       }
 
       // Try primary account with retry logic
-      const primaryResult = await this.attemptEmailSendWithRetry(
+      const primaryResult = await SmtpRepository.attemptEmailSendWithRetry(
         data,
         primaryAccount,
         false,
@@ -158,7 +132,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
         return primaryResult;
       }
 
-      const fallbackResult = await this.attemptEmailSendWithRetry(
+      const fallbackResult = await SmtpRepository.attemptEmailSendWithRetry(
         data,
         fallbackAccount,
         true,
@@ -193,7 +167,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Get total sending capacity across all active SMTP accounts
    */
-  async getTotalSendingCapacity(
+  static async getTotalSendingCapacity(
     data: SmtpCapacityRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
@@ -222,7 +196,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
         const accountCapacity = account.rateLimitPerHour || 0;
         totalCapacity += accountCapacity;
 
-        const rateLimitCheck = await this.checkRateLimit(account, logger);
+        const rateLimitCheck = await SmtpRepository.checkRateLimit(
+          account,
+          logger,
+        );
         if (rateLimitCheck.success) {
           // Account is available, add remaining capacity
           totalRemainingCapacity += rateLimitCheck.data.remainingCapacity;
@@ -250,7 +227,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Test SMTP account connection
    */
-  async testConnection(
+  static async testConnection(
     data: { accountId: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
@@ -277,7 +254,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
         });
       }
 
-      const transportResult = await this.getTransport(account, logger);
+      const transportResult = await SmtpRepository.getTransport(
+        account,
+        logger,
+      );
       if (!transportResult.success) {
         return fail({
           message: transportResult.message,
@@ -290,14 +270,14 @@ class SmtpRepositoryImpl implements SmtpRepository {
 
       await transportResult.data.verify();
 
-      await this.updateAccountHealth(data.accountId, true, logger);
+      await SmtpRepository.updateAccountHealth(data.accountId, true, logger);
 
       return success({
         success: true,
         message: "app.api.emails.smtpClient.sending.success.connectionTest",
       });
     } catch (error) {
-      await this.updateAccountHealth(
+      await SmtpRepository.updateAccountHealth(
         data.accountId,
         false,
         logger,
@@ -317,7 +297,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Get SMTP account using enhanced selection criteria
    */
-  private async getSmtpAccountWithCriteria(
+  private static async getSmtpAccountWithCriteria(
     selectionCriteria: SmtpSelectionCriteria,
     logger: EndpointLogger,
   ): Promise<SmtpAccount | null> {
@@ -445,7 +425,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Get any available SMTP account as fallback
    */
-  private async getFallbackSmtpAccount(
+  private static async getFallbackSmtpAccount(
     logger: EndpointLogger,
   ): Promise<SmtpAccount | null> {
     try {
@@ -476,14 +456,14 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Create or get cached SMTP transport
    */
-  private async getTransport(
+  private static async getTransport(
     account: SmtpAccount,
     logger: EndpointLogger,
   ): Promise<ResponseType<Transporter<SMTPTransport.SentMessageInfo>>> {
     const cacheKey = account.id;
 
-    if (this.transportCache.has(cacheKey)) {
-      const cachedTransport = this.transportCache.get(cacheKey);
+    if (SmtpRepository.transportCache.has(cacheKey)) {
+      const cachedTransport = SmtpRepository.transportCache.get(cacheKey);
       if (cachedTransport) {
         return success(cachedTransport);
       }
@@ -511,7 +491,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
       // Verify connection
       await transport.verify();
 
-      this.transportCache.set(cacheKey, transport);
+      SmtpRepository.transportCache.set(cacheKey, transport);
       return success(transport);
     } catch (error) {
       logger.error("Error creating SMTP transport", {
@@ -521,7 +501,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
       });
 
       // Update account health status
-      await this.updateAccountHealth(
+      await SmtpRepository.updateAccountHealth(
         account.id,
         false,
         logger,
@@ -543,7 +523,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Attempt to send email with retry logic for connection issues
    */
-  private async attemptEmailSendWithRetry(
+  private static async attemptEmailSendWithRetry(
     params: SmtpSendRequestOutput,
     account: SmtpAccount,
     isFallback: boolean,
@@ -649,7 +629,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Check if an error is retryable (temporary connection issues)
    */
-  private isRetryableError(errorMessage: string): boolean {
+  private static isRetryableError(errorMessage: string): boolean {
     const retryablePatterns =
       /greeting|timeout|connect|refused|unreachable|reset|temporary/i;
     return retryablePatterns.test(errorMessage);
@@ -658,7 +638,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Perform the actual email sending with an account
    */
-  private async performEmailSend(
+  private static async performEmailSend(
     params: SmtpSendRequestOutput,
     account: SmtpAccount,
     logger: EndpointLogger,
@@ -666,7 +646,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
     try {
       // Check rate limits (skip if this is part of a pre-validated batch)
       if (!params.skipRateLimitCheck) {
-        const rateLimitCheck = await this.checkRateLimit(account, logger);
+        const rateLimitCheck = await SmtpRepository.checkRateLimit(
+          account,
+          logger,
+        );
         if (!rateLimitCheck.success) {
           // Convert rate limit error to proper SMTP send error
           return fail({
@@ -690,7 +673,10 @@ class SmtpRepositoryImpl implements SmtpRepository {
       }
 
       // Get transport
-      const transportResult = await this.getTransport(account, logger);
+      const transportResult = await SmtpRepository.getTransport(
+        account,
+        logger,
+      );
       if (!transportResult.success) {
         return fail({
           message: transportResult.message,
@@ -728,7 +714,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
             ? result.rejected[0]
             : SMTP_ERROR_MESSAGES.CLIENT_ERROR;
 
-        await this.updateAccountHealth(
+        await SmtpRepository.updateAccountHealth(
           account.id,
           false,
           logger,
@@ -747,7 +733,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
 
       // Check if no recipients were accepted
       if (!result.accepted || result.accepted.length === 0) {
-        await this.updateAccountHealth(
+        await SmtpRepository.updateAccountHealth(
           account.id,
           false,
           logger,
@@ -793,7 +779,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
 
       // Update account usage statistics
       await this.updateAccountUsage(account.id, logger);
-      await this.updateAccountHealth(account.id, true, logger);
+      await SmtpRepository.updateAccountHealth(account.id, true, logger);
 
       logger.info("Email sent successfully", {
         messageId: result.messageId,
@@ -821,7 +807,12 @@ class SmtpRepositoryImpl implements SmtpRepository {
       const isConnectionError =
         /greeting|timeout|connect|refused|unreachable/i.test(errorMessage);
       if (isConnectionError) {
-        await this.updateAccountHealth(account.id, false, logger, errorMessage);
+        await SmtpRepository.updateAccountHealth(
+          account.id,
+          false,
+          logger,
+          errorMessage,
+        );
       }
 
       return fail({
@@ -839,7 +830,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Check rate limits for account with database validation
    */
-  private async checkRateLimit(
+  private static async checkRateLimit(
     account: SmtpAccount,
     logger: EndpointLogger,
   ): Promise<
@@ -916,7 +907,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Record email in database for tracking and rate limiting
    */
-  private async recordEmailInDatabase(
+  private static async recordEmailInDatabase(
     emailData: {
       subject: string;
       recipientEmail: string;
@@ -943,7 +934,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
         senderName: emailData.senderName,
         smtpAccountId: emailData.smtpAccountId,
         externalId: emailData.messageId,
-        type: this.getEmailTypeFromCampaign(emailData.campaignType),
+        type: SmtpRepository.getEmailTypeFromCampaign(emailData.campaignType),
         status: EmailStatus.SENT,
         sentAt: new Date(),
         templateName:
@@ -966,7 +957,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Get email type from campaign type
    */
-  private getEmailTypeFromCampaign(
+  private static getEmailTypeFromCampaign(
     campaignType: (typeof CampaignType)[keyof typeof CampaignType] | null,
   ): (typeof EmailType)[keyof typeof EmailType] {
     switch (campaignType) {
@@ -988,7 +979,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Update account usage statistics
    */
-  private async updateAccountUsage(
+  private static async updateAccountUsage(
     accountId: string,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -1011,7 +1002,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
   /**
    * Update account health status
    */
-  private async updateAccountHealth(
+  private static async updateAccountHealth(
     accountId: string,
     success: boolean,
     logger: EndpointLogger,
@@ -1052,7 +1043,7 @@ class SmtpRepositoryImpl implements SmtpRepository {
    * Close all cached transports
    */
   async closeAllTransports(): Promise<void> {
-    for (const [, transport] of this.transportCache.entries()) {
+    for (const [, transport] of SmtpRepository.transportCache.entries()) {
       try {
         await new Promise<void>((resolve) => {
           transport.close();
@@ -1062,11 +1053,6 @@ class SmtpRepositoryImpl implements SmtpRepository {
         // Ignore transport close errors
       }
     }
-    this.transportCache.clear();
+    SmtpRepository.transportCache.clear();
   }
 }
-
-/**
- * Export singleton instance
- */
-export const smtpRepository = new SmtpRepositoryImpl();

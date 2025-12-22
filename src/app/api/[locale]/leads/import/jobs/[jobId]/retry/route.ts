@@ -1,5 +1,6 @@
 /**
  * Import Job Retry Action API Route
+ * POST /api/[locale]/leads/import/jobs/[jobId]/retry
  */
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
@@ -8,30 +9,10 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import { importRepository } from "../../../../../import/repository";
 import definitions from "./definition";
 
-/**
- * Export handlers using endpointsHandler
- */
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: async ({ user, urlPathParams, logger }) => {
-      const { jobId } = urlPathParams;
-
-      const response = await importRepository.performJobAction(
-        user.id,
-        jobId,
-        "retry",
-        logger,
-      );
-
-      // Wrap response in result object to match definition
-      if (response.success) {
-        return {
-          success: true,
-          data: { result: response.data },
-        };
-      }
-      return response;
-    },
+    handler: async ({ user, urlPathParams, logger }) =>
+      await importRepository.retryJob(user.id, urlPathParams.jobId, logger),
   },
 });

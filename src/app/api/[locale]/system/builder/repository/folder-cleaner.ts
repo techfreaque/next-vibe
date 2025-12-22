@@ -47,7 +47,9 @@ export class FolderCleaner implements IFolderCleaner {
     dryRun?: boolean,
   ): Promise<void> {
     output.push(
-      outputFormatter.formatSection(t("app.api.system.builder.messages.cleaningFolders")),
+      outputFormatter.formatSection(
+        t("app.api.system.builder.messages.cleaningFolders"),
+      ),
     );
 
     for (const folder of folders) {

@@ -92,15 +92,17 @@ export function useThreadOperations(
           { threadId },
         );
 
-        const { deleteThread: deleteIncognitoThread } =
-          await import("../../incognito/storage");
+        const { deleteThread: deleteIncognitoThread } = await import(
+          "../../incognito/storage"
+        );
 
         deleteIncognitoThread(threadId);
         chatStore.deleteThread(threadId);
 
         if (isActiveThread) {
-          const { buildFolderUrl } =
-            await import("@/app/[locale]/chat/lib/utils/navigation");
+          const { buildFolderUrl } = await import(
+            "@/app/[locale]/chat/lib/utils/navigation"
+          );
           const url = `${buildFolderUrl(locale, threadRootFolderId, threadSubFolderId)}/new`;
           logger.debug(
             "Thread operations: Navigating to new thread page after deletion",
@@ -142,8 +144,9 @@ export function useThreadOperations(
         }
 
         if (isActiveThread) {
-          const { buildFolderUrl } =
-            await import("@/app/[locale]/chat/lib/utils/navigation");
+          const { buildFolderUrl } = await import(
+            "@/app/[locale]/chat/lib/utils/navigation"
+          );
           const url = `${buildFolderUrl(locale, threadRootFolderId, threadSubFolderId)}/new`;
           logger.debug(
             "Thread operations: Navigating to new thread page after deletion",
@@ -175,8 +178,9 @@ export function useThreadOperations(
           { threadId },
         );
 
-        const { updateIncognitoThread } =
-          await import("../../incognito/storage");
+        const { updateIncognitoThread } = await import(
+          "../../incognito/storage"
+        );
 
         updateIncognitoThread(threadId, updates);
         chatStore.updateThread(threadId, updates);

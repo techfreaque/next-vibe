@@ -604,9 +604,9 @@ const { POST } = createEndpoint({
                 "app.api.agent.chat.threads.post.defaultModel.description" as const,
               columns: 6,
             },
-            z.nativeEnum(ModelId),
+            z.enum(ModelId),
           ),
-          persona: requestDataField(
+          character: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
@@ -774,7 +774,7 @@ const { POST } = createEndpoint({
           rootFolderId: DefaultFolderId.PRIVATE,
           subFolderId: null,
           model: ModelId.GPT_5_NANO,
-          persona: "default",
+          character: "default",
         },
       },
     },

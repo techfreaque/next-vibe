@@ -80,6 +80,7 @@ export function CampaignStarterForm({
                       "app.admin.leads.leads.admin.campaignStarter.form.dryRun.label",
                   }}
                   control={endpoint.create.form.control}
+                  locale={locale}
                 />
 
                 {/* Minimum Age Hours */}
@@ -96,6 +97,7 @@ export function CampaignStarterForm({
                     step: 1,
                   }}
                   control={endpoint.create.form.control}
+                  locale={locale}
                 />
               </FormFieldGroup>
 
@@ -179,6 +181,7 @@ export function CampaignStarterForm({
                     step: 1,
                   }}
                   control={endpoint.create.form.control}
+                  locale={locale}
                 />
 
                 {/* End Hour */}
@@ -195,6 +198,7 @@ export function CampaignStarterForm({
                     step: 1,
                   }}
                   control={endpoint.create.form.control}
+                  locale={locale}
                 />
               </FormFieldGroup>
 
@@ -260,6 +264,7 @@ export function CampaignStarterForm({
                       "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.schedule.placeholder",
                   }}
                   control={endpoint.create.form.control}
+                  locale={locale}
                 />
 
                 {/* Enabled */}
@@ -271,6 +276,7 @@ export function CampaignStarterForm({
                       "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.enabled.label",
                   }}
                   control={endpoint.create.form.control}
+                  locale={locale}
                 />
 
                 {/* Priority */}
@@ -304,6 +310,7 @@ export function CampaignStarterForm({
                     ],
                   }}
                   control={endpoint.create.form.control}
+                  locale={locale}
                 />
 
                 {/* Timeout */}
@@ -320,6 +327,7 @@ export function CampaignStarterForm({
                     step: 1000,
                   }}
                   control={endpoint.create.form.control}
+                  locale={locale}
                 />
 
                 {/* Retries */}
@@ -336,6 +344,7 @@ export function CampaignStarterForm({
                     step: 1,
                   }}
                   control={endpoint.create.form.control}
+                  locale={locale}
                 />
 
                 {/* Retry Delay */}
@@ -352,6 +361,7 @@ export function CampaignStarterForm({
                     step: 1000,
                   }}
                   control={endpoint.create.form.control}
+                  locale={locale}
                 />
               </FormFieldGroup>
 

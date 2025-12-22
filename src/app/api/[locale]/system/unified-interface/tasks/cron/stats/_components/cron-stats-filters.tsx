@@ -37,6 +37,7 @@ interface CronStatsFiltersContainerProps {
 
 interface CronStatsFiltersProps {
   control: EndpointReturn<typeof statsEndpoints>["read"]["form"]["control"];
+  locale: CountryLanguage;
 }
 
 // No-op submit handler for filter forms - changes are handled by form field onChange events
@@ -83,6 +84,7 @@ export function CronStatsFiltersContainer({
 
 export function CronStatsFilters({
   control,
+  locale,
 }: CronStatsFiltersProps): JSX.Element {
   return (
     <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -113,6 +115,7 @@ export function CronStatsFilters({
             },
           ],
         }}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -153,6 +156,7 @@ export function CronStatsFilters({
             },
           ],
         }}
+        locale={locale}
       />
 
       {/* Task Filters */}
@@ -164,6 +168,7 @@ export function CronStatsFilters({
           label: "app.admin.cron.stats.filters.taskName",
           placeholder: "app.admin.cron.stats.filters.enterTaskName",
         }}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -178,6 +183,7 @@ export function CronStatsFilters({
             label: status,
           })),
         }}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -192,6 +198,7 @@ export function CronStatsFilters({
             label: priority,
           })),
         }}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -206,6 +213,7 @@ export function CronStatsFilters({
             label: status,
           })),
         }}
+        locale={locale}
       />
 
       {/* Performance Filters */}
@@ -217,6 +225,7 @@ export function CronStatsFilters({
           label: "app.admin.cron.stats.filters.minDuration",
           placeholder: "app.admin.cron.stats.filters.enterMinDuration",
         }}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -227,6 +236,7 @@ export function CronStatsFilters({
           label: "app.admin.cron.stats.filters.maxDuration",
           placeholder: "app.admin.cron.stats.filters.enterMaxDuration",
         }}
+        locale={locale}
       />
 
       {/* Boolean Filters */}
@@ -237,6 +247,7 @@ export function CronStatsFilters({
           type: "checkbox",
           label: "app.admin.cron.stats.filters.includeDisabled",
         }}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -246,6 +257,7 @@ export function CronStatsFilters({
           type: "checkbox",
           label: "app.admin.cron.stats.filters.includeSystemTasks",
         }}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -255,6 +267,7 @@ export function CronStatsFilters({
           type: "checkbox",
           label: "app.admin.cron.stats.filters.hasRecentFailures",
         }}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -264,6 +277,7 @@ export function CronStatsFilters({
           type: "checkbox",
           label: "app.admin.cron.stats.filters.hasTimeout",
         }}
+        locale={locale}
       />
 
       {/* Search */}
@@ -276,6 +290,7 @@ export function CronStatsFilters({
             label: "app.admin.cron.stats.filters.search",
             placeholder: "app.admin.cron.stats.filters.searchPlaceholder",
           }}
+          locale={locale}
         />
       </Div>
     </Div>

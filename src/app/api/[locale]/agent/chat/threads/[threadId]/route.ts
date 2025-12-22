@@ -7,40 +7,33 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { threadByIdRepository } from "./repository";
+import { ThreadByIdRepository } from "./repository";
 
 export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ urlPathParams, user, locale, logger }) => {
-      return await threadByIdRepository.getThreadById(
+    handler: ({ urlPathParams, user, locale, logger }) =>
+      ThreadByIdRepository.getThreadById(
         urlPathParams.threadId,
         user,
         locale,
         logger,
-      );
-    },
+      ),
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: async ({ data, urlPathParams, user, logger }) => {
-      return await threadByIdRepository.updateThread(
+    handler: ({ data, urlPathParams, user, logger }) =>
+      ThreadByIdRepository.updateThread(
         data,
         urlPathParams.threadId,
         user,
         logger,
-      );
-    },
+      ),
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: async ({ urlPathParams, user, logger }) => {
-      return await threadByIdRepository.deleteThread(
-        urlPathParams.threadId,
-        user,
-        logger,
-      );
-    },
+    handler: ({ urlPathParams, user, logger }) =>
+      ThreadByIdRepository.deleteThread(urlPathParams.threadId, user, logger),
   },
 });

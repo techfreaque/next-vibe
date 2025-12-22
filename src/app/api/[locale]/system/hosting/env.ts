@@ -15,7 +15,10 @@ export const { env: hostingEnv } = defineEnv({
   VERCEL_URL: { schema: z.string().optional(), example: "your-app.vercel.app" },
 
   // AWS Lambda
-  AWS_LAMBDA_FUNCTION_NAME: { schema: z.string().optional(), example: "my-function" },
+  AWS_LAMBDA_FUNCTION_NAME: {
+    schema: z.string().optional(),
+    example: "my-function",
+  },
 
   // Netlify
   NETLIFY: { schema: z.string().optional(), example: "true" },

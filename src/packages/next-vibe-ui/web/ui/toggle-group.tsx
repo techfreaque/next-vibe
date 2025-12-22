@@ -5,7 +5,7 @@ import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
 import type { StyleType } from "../utils/style-type";
-import { type ToggleSize, type ToggleVariant,toggleVariants } from "./toggle";
+import { type ToggleSize, type ToggleVariant, toggleVariants } from "./toggle";
 
 const ToggleGroupContext = React.createContext<{
   size?: ToggleSize;

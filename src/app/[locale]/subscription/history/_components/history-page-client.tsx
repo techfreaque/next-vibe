@@ -7,7 +7,10 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
-import type { CreditBalance, CreditTransactionOutput } from "@/app/api/[locale]/credits/repository";
+import type {
+  CreditBalance,
+  CreditTransactionOutput,
+} from "@/app/api/[locale]/credits/repository";
 import { CreditBalanceCard } from "@/app/api/[locale]/subscription/_components/credit-balance-card";
 import { HistoryTab } from "@/app/api/[locale]/subscription/_components/history-tab";
 import { PaymentStatusAlert } from "@/app/api/[locale]/subscription/_components/payment-status-alert";

@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import vibeCheckEndpoints from "./definition";
-import { vibeCheckRepository } from "./repository";
+import { VibeCheckRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: vibeCheckEndpoints,
   [Methods.POST]: {
     handler: ({ data, logger }) => {
-      return vibeCheckRepository.execute(data, logger);
+      return VibeCheckRepository.execute(data, logger);
     },
   },
 });

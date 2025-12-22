@@ -62,7 +62,7 @@ export {
 } from "./breadcrumb";
 
 // button
-export { Button, buttonTextVariants,buttonVariants } from "./button";
+export { Button, buttonTextVariants, buttonVariants } from "./button";
 
 // calendar
 export { Calendar } from "./calendar";
@@ -451,7 +451,7 @@ export { Textarea, textareaVariants } from "./textarea";
 export { ThemeProvider } from "./theme-provider";
 
 // title
-export { sizeClasses,Title } from "./title";
+export { sizeClasses, Title } from "./title";
 
 // toast
 export {
@@ -468,7 +468,7 @@ export {
 export { Toaster } from "./toaster";
 
 // toggle
-export { Toggle, toggleTextVariants,toggleVariants } from "./toggle";
+export { Toggle, toggleTextVariants, toggleVariants } from "./toggle";
 
 // toggle-group
 export { ToggleGroup, ToggleGroupItem } from "./toggle-group";

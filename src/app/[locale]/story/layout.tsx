@@ -5,10 +5,10 @@ import type { JSX, ReactNode } from "react";
 import Footer from "@/app/[locale]/story/_components/footer";
 import { Navbar } from "@/app/[locale]/story/_components/nav/navbar";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
-import { subscriptionRepository } from "@/app/api/[locale]/subscription/repository";
+import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { navItems } from "../story/_components/nav/nav-constants";
@@ -27,7 +27,7 @@ export default async function SiteLayoutServer({
   // Create logger for server-side operations
   const logger = createEndpointLogger(false, Date.now(), locale);
 
-  const userResponse = await userRepository.getUserByAuth(
+  const userResponse = await UserRepository.getUserByAuth(
     {
       detailLevel: UserDetailLevel.STANDARD,
     },
@@ -38,7 +38,7 @@ export default async function SiteLayoutServer({
   // Get subscription status for authenticated users
   let hasSubscription = false;
   if (userResponse.success && userResponse.data?.id) {
-    const subscriptionResponse = await subscriptionRepository.getSubscription(
+    const subscriptionResponse = await SubscriptionRepository.getSubscription(
       userResponse.data.id,
       logger,
       locale,

@@ -9,11 +9,9 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import type { EnhancedMutationResult } from "./use-api-mutation";
 
 /**
@@ -25,91 +23,63 @@ import type { EnhancedMutationResult } from "./use-api-mutation";
  * Extract types from an CreateApiEndpoint for ApiFormReturn
  * Uses direct property access instead of infer for better type inference
  */
-export type InferApiFormReturn<T> =
-  T extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >
-    ? T extends {
-        types: {
-          RequestOutput: infer TRequestOutput extends FieldValues;
-          ResponseOutput: infer TResponseOutput;
-          UrlVariablesOutput: infer TUrlVariablesOutput;
-        };
-      }
-      ? ApiFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
-      : never
-    : never;
+export type InferApiFormReturn<T> = T extends CreateApiEndpointAny
+  ? T extends {
+      types: {
+        RequestOutput: infer TRequestOutput extends FieldValues;
+        ResponseOutput: infer TResponseOutput;
+        UrlVariablesOutput: infer TUrlVariablesOutput;
+      };
+    }
+    ? ApiFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
+    : never
+  : never;
 
 /**
  * Extract types from an CreateApiEndpoint for ApiQueryReturn
  * Uses direct property access instead of infer for better type inference
  */
-export type InferApiQueryReturn<T> =
-  T extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >
-    ? T extends { types: { ResponseOutput: infer TResponseOutput } }
-      ? ApiQueryReturn<TResponseOutput>
-      : never
-    : never;
+export type InferApiQueryReturn<T> = T extends CreateApiEndpointAny
+  ? T extends { types: { ResponseOutput: infer TResponseOutput } }
+    ? ApiQueryReturn<TResponseOutput>
+    : never
+  : never;
 
 /**
  * Extract types from an CreateApiEndpoint for ApiQueryFormReturn
  * Uses direct property access instead of infer for better type inference
  */
-export type InferApiQueryFormReturn<T> =
-  T extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >
-    ? T extends {
-        types: {
-          RequestOutput: infer TRequestOutput extends FieldValues;
-          ResponseOutput: infer TResponseOutput;
-          UrlVariablesOutput: infer TUrlVariablesOutput;
-        };
-      }
-      ? ApiQueryFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
-      : never
-    : never;
+export type InferApiQueryFormReturn<T> = T extends CreateApiEndpointAny
+  ? T extends {
+      types: {
+        RequestOutput: infer TRequestOutput extends FieldValues;
+        ResponseOutput: infer TResponseOutput;
+        UrlVariablesOutput: infer TUrlVariablesOutput;
+      };
+    }
+    ? ApiQueryFormReturn<TRequestOutput, TResponseOutput, TUrlVariablesOutput>
+    : never
+  : never;
 
 /**
  * Extract types from an CreateApiEndpoint for EnhancedMutationResult
  * Uses direct property access instead of infer for better type inference
  */
-export type InferEnhancedMutationResult<T> =
-  T extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >
-    ? T extends {
-        types: {
-          RequestOutput: infer TRequestOutput;
-          ResponseOutput: infer TResponseOutput;
-          UrlVariablesOutput: infer TUrlVariablesOutput;
-        };
-      }
-      ? EnhancedMutationResult<
-          TResponseOutput,
-          TRequestOutput,
-          TUrlVariablesOutput
-        >
-      : never
-    : never;
+export type InferEnhancedMutationResult<T> = T extends CreateApiEndpointAny
+  ? T extends {
+      types: {
+        RequestOutput: infer TRequestOutput;
+        ResponseOutput: infer TResponseOutput;
+        UrlVariablesOutput: infer TUrlVariablesOutput;
+      };
+    }
+    ? EnhancedMutationResult<
+        TResponseOutput,
+        TRequestOutput,
+        TUrlVariablesOutput
+      >
+    : never
+  : never;
 
 /**
  * Enhanced query result with additional loading state info
@@ -148,14 +118,11 @@ export interface ApiQueryReturn<TResponse> {
 /**
  * Type for the API query options
  */
-export interface ApiQueryOptions<
-  TRequest,
-  TResponse,
-  TUrlVariables,
-> extends Omit<
-  UseQueryOptions<TResponse, DefaultError, TResponse, QueryKey>,
-  "queryFn" | "initialData" | "queryKey"
-> {
+export interface ApiQueryOptions<TRequest, TResponse, TUrlVariables>
+  extends Omit<
+    UseQueryOptions<TResponse, DefaultError, TResponse, QueryKey>,
+    "queryFn" | "initialData" | "queryKey"
+  > {
   queryKey?: QueryKey;
   enabled?: boolean;
   staleTime?: number;
@@ -196,26 +163,18 @@ export interface ApiMutationOptions<TRequest, TResponse, TUrlVariables> {
   invalidateQueries?: string[]; // List of queries to invalidate after mutation
 }
 
-export type ApiInferMutationOptions<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
-> = ApiMutationOptions<
-  TEndpoint["types"]["RequestOutput"],
-  TEndpoint["types"]["ResponseOutput"],
-  TEndpoint["types"]["UrlVariablesOutput"]
->;
+export type ApiInferMutationOptions<TEndpoint extends CreateApiEndpointAny> =
+  ApiMutationOptions<
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"]
+  >;
 
 /**
  * Type for the API query form options
  */
-export interface ApiQueryFormOptions<
-  TRequest extends FieldValues,
-> extends ApiFormOptions<TRequest> {
+export interface ApiQueryFormOptions<TRequest extends FieldValues>
+  extends ApiFormOptions<TRequest> {
   autoSubmit?: boolean; // Whether to automatically submit the form when values change
   debounceMs?: number; // Debounce time in ms for auto-submission
 }

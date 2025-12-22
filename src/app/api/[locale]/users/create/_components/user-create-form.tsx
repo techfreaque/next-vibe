@@ -92,6 +92,7 @@ export function UserCreateForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -106,6 +107,7 @@ export function UserCreateForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -121,6 +123,7 @@ export function UserCreateForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -136,6 +139,7 @@ export function UserCreateForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -151,6 +155,7 @@ export function UserCreateForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -165,6 +170,7 @@ export function UserCreateForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -180,6 +186,7 @@ export function UserCreateForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               <EndpointFormField
@@ -194,6 +201,7 @@ export function UserCreateForm({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
             </FormFieldGroup>
 

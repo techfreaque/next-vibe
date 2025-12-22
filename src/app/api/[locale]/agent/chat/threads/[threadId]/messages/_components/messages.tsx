@@ -123,7 +123,7 @@ export function ChatMessages({
           parentId: streamMsg.parentId,
           depth: streamMsg.depth,
           model: streamMsg.model ?? null,
-          persona: streamMsg.persona ?? null,
+          character: streamMsg.character ?? null,
           createdAt: new Date(),
           updatedAt: new Date(),
           sequenceId: streamMsg.sequenceId ?? null,
@@ -383,10 +383,12 @@ export function ChatMessages({
           - Without branding (FLAT/THREADED/DEBUG views):
             - pt-15 to clear the top toolbar
         */}
-        <Div className={cn(
-          "max-w-3xl mx-auto px-4 sm:px-8 md:px-10 flex flex-col gap-5",
-          showBranding ? "pt-35 md:pt-15" : "pt-15"
-        )}>
+        <Div
+          className={cn(
+            "max-w-3xl mx-auto px-4 sm:px-8 md:px-10 flex flex-col gap-5",
+            showBranding ? "pt-35 md:pt-15" : "pt-15",
+          )}
+        >
           {mergedMessages.length === 0 && !isLoading ? (
             <Div style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}>
               <Div className="flex items-center justify-center h-full">

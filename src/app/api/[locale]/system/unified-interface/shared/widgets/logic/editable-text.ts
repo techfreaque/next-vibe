@@ -81,10 +81,7 @@ export function extractEditableTextData(
 /**
  * Validate text length
  */
-export function isValidTextLength(
-  text: string,
-  maxLength?: number,
-): boolean {
+export function isValidTextLength(text: string, maxLength?: number): boolean {
   if (!maxLength) {
     return true;
   }

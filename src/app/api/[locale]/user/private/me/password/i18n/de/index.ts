@@ -40,7 +40,8 @@ export const translations: typeof enTranslations = {
   },
   twoFactorCode: {
     label: "Zwei-Faktor-Code",
-    description: "Geben Sie Ihren Zwei-Faktor-Authentifizierungscode ein, falls aktiviert",
+    description:
+      "Geben Sie Ihren Zwei-Faktor-Authentifizierungscode ein, falls aktiviert",
     placeholder: "2FA-Code eingeben",
   },
   response: {

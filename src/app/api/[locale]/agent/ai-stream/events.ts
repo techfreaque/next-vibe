@@ -59,7 +59,7 @@ export interface MessageCreatedEventData {
   depth: number;
   content: string;
   model?: ModelId;
-  persona?: string;
+  character?: string;
   sequenceId?: string | null; // Links messages in the same AI response sequence
   toolCall?: ToolCall; // Tool call for TOOL role messages (singular - each TOOL message has exactly one tool call)
 }

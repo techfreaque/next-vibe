@@ -14,11 +14,7 @@ import { convertCSSToTextStyle } from "../utils/style-converter";
 
 const StyledText = styled(Text, { className: "style" });
 
-export function H1({
-  className,
-  style,
-  children,
-}: H1Props): React.JSX.Element {
+export function H1({ className, style, children }: H1Props): React.JSX.Element {
   const nativeStyle: TextStyle | undefined = style
     ? convertCSSToTextStyle(style)
     : undefined;
@@ -36,11 +32,7 @@ export function H1({
   );
 }
 
-export function H2({
-  className,
-  style,
-  children,
-}: H2Props): React.JSX.Element {
+export function H2({ className, style, children }: H2Props): React.JSX.Element {
   const nativeStyle: TextStyle | undefined = style
     ? convertCSSToTextStyle(style)
     : undefined;
@@ -58,11 +50,7 @@ export function H2({
   );
 }
 
-export function H3({
-  className,
-  style,
-  children,
-}: H3Props): React.JSX.Element {
+export function H3({ className, style, children }: H3Props): React.JSX.Element {
   const nativeStyle: TextStyle | undefined = style
     ? convertCSSToTextStyle(style)
     : undefined;
@@ -80,11 +68,7 @@ export function H3({
   );
 }
 
-export function H4({
-  className,
-  style,
-  children,
-}: H4Props): React.JSX.Element {
+export function H4({ className, style, children }: H4Props): React.JSX.Element {
   const nativeStyle: TextStyle | undefined = style
     ? convertCSSToTextStyle(style)
     : undefined;

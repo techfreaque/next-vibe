@@ -4,13 +4,9 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import type { z } from "zod";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 
 import { mergeFormData } from "./endpoint-utils";
 import type {
@@ -36,14 +32,7 @@ import { useApiForm } from "./use-api-mutation-form";
  * @param options - Form options including defaultValues and persistence options
  * @returns Form and mutation for API interaction with enhanced error handling
  */
-export function useEndpointCreate<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    UnifiedField<z.ZodTypeAny>
-  >,
->(
+export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   primaryEndpoint: TEndpoint | null,
   logger: EndpointLogger,
   options: {

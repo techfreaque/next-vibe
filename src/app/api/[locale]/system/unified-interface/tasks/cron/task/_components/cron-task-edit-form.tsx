@@ -150,6 +150,7 @@ export function CronTaskEditForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -167,6 +168,7 @@ export function CronTaskEditForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
               </Div>
             </FormFieldGroup>
@@ -221,6 +223,7 @@ export function CronTaskEditForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -238,6 +241,7 @@ export function CronTaskEditForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -254,6 +258,7 @@ export function CronTaskEditForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -270,6 +275,7 @@ export function CronTaskEditForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
               </Div>
             </FormFieldGroup>

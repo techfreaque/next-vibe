@@ -7,14 +7,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { rootFolderPermissionsRepository } from "./repository";
+import { RootFolderPermissionsRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: async ({ data, user, locale, logger }) => {
-      return await rootFolderPermissionsRepository.getRootFolderPermissions(
+      return await RootFolderPermissionsRepository.getRootFolderPermissions(
         data,
         user,
         locale,

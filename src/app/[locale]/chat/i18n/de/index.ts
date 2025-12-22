@@ -73,7 +73,7 @@ export const translations: typeof enTranslations = {
     // User Message Actions
     userMessageActions: {
       branch: "Konversation von hier verzweigen",
-      retry: "Mit anderem Modell/Persona wiederholen",
+      retry: "Mit anderem Modell/Character wiederholen",
       deleteMessage: "Nachricht löschen",
     },
 
@@ -139,18 +139,22 @@ export const translations: typeof enTranslations = {
     },
   },
 
-  createPersona: {
+  createCharacter: {
     title: "Benutzerdefinierten Charakter erstellen",
+    description:
+      "Gestalte deinen eigenen KI-Charakter mit individueller Persönlichkeit, Expertise und Verhalten.",
     icon: "Icon",
     name: "Name",
     namePlaceholder: "z.B. Code Reviewer",
-    description: "Beschreibung",
+    descriptionLabel: "Beschreibung",
     descriptionPlaceholder: "Kurze Beschreibung, was dieser Charakter tut",
     category: "Kategorie",
     selectCategory: "Kategorie auswählen",
     systemPrompt: "System-Prompt",
     systemPromptPlaceholder:
       "Definiere, wie sich dieser Charakter verhalten soll. Sei spezifisch über seine Persönlichkeit, Expertise und wie er antworten soll.",
+    voice: "Stimme",
+    voicePlaceholder: "Wähle eine Stimme für Text-to-Speech",
     create: "Charakter erstellen",
     creating: "Erstelle...",
     charCount: "{{current}} / {{max}}",
@@ -161,6 +165,37 @@ export const translations: typeof enTranslations = {
       createFailed:
         "Charakter konnte nicht erstellt werden. Bitte versuche es erneut.",
     },
+  },
+
+  voice: {
+    male: "Männlich",
+    female: "Weiblich",
+  },
+
+  editCharacter: {
+    title: "Als benutzerdefinierten Charakter bearbeiten",
+    description:
+      "Erstelle einen benutzerdefinierten Charakter basierend auf dieser Character. Du kannst alle Einstellungen ändern.",
+    loginRequired:
+      "Bitte melde dich an, um benutzerdefinierte Charaktere zu erstellen und zu bearbeiten. Benutzerdefinierte Charaktere werden in deinem Konto gespeichert.",
+    name: "Name",
+    namePlaceholder: "Name des benutzerdefinierten Charakters",
+    descriptionLabel: "Beschreibung",
+    descriptionPlaceholder: "Was macht dieser Charakter?",
+    category: "Kategorie",
+    icon: "Icon",
+    voice: "Stimme",
+    voicePlaceholder: "Stimme auswählen",
+    preferredModel: "Bevorzugtes Modell",
+    preferredModelPlaceholder: "Optionales bevorzugtes Modell",
+    systemPrompt: "System-Prompt",
+    systemPromptPlaceholder: "Definiere das Verhalten des Charakters...",
+    save: "Als benutzerdefiniert speichern",
+    saveAsCopy: "Als Kopie speichern",
+    saving: "Erstelle...",
+    cancel: "Abbrechen",
+    login: "Anmelden zum Bearbeiten",
+    signup: "Registrieren zum Bearbeiten",
   },
 
   userProfile: {
@@ -206,7 +241,7 @@ export const translations: typeof enTranslations = {
     searchEnabled: "Suche aktiviert",
     searchDisabled: "Suche deaktiviert",
     answerAsAI: "Als KI-Modell antworten",
-    retry: "Mit anderem Modell/Persona wiederholen",
+    retry: "Mit anderem Modell/Character wiederholen",
     branch: "Konversation von hier verzweigen",
     editMessage: "Nachricht bearbeiten",
     stopAudio: "Audio-Wiedergabe stoppen",
@@ -338,16 +373,16 @@ export const translations: typeof enTranslations = {
       add: "Modell hinzufügen",
     },
   },
-  personaSelector: {
-    placeholder: "Persona auswählen",
-    addNewLabel: "Persona erstellen",
+  characterSelector: {
+    placeholder: "Character auswählen",
+    addNewLabel: "Character erstellen",
     defaultIcon: "✨",
     grouping: {
       bySource: "Nach Quelle",
       byCategory: "Nach Kategorie",
       sourceLabels: {
         builtIn: "Eingebaut",
-        my: "Meine Personas",
+        my: "Meine Characters",
         community: "Community",
       },
       sourceIcons: {
@@ -374,7 +409,7 @@ export const translations: typeof enTranslations = {
       create: "Erstellen",
     },
     addDialog: {
-      title: "Benutzerdefinierte Persona erstellen",
+      title: "Benutzerdefinierte Character erstellen",
       createCategory: "+ Neue Kategorie",
       fields: {
         name: {
@@ -387,7 +422,7 @@ export const translations: typeof enTranslations = {
         },
         description: {
           label: "Beschreibung",
-          placeholder: "Kurze Beschreibung der Persona",
+          placeholder: "Kurze Beschreibung der Character",
         },
         systemPrompt: {
           label: "System-Prompt",
@@ -403,7 +438,7 @@ export const translations: typeof enTranslations = {
         },
       },
       cancel: "Abbrechen",
-      create: "Persona erstellen",
+      create: "Character erstellen",
     },
   },
   searchToggle: {
@@ -419,28 +454,30 @@ export const translations: typeof enTranslations = {
   combinedSelector: {
     tabs: {
       quick: "Schnell",
-      persona: "Persona",
+      character: "Character",
       model: "Modell",
     },
     current: "Aktuell",
-    favoritePersonas: "Lieblings-Personas",
+    favoriteCharacters: "Lieblings-Characters",
     favoriteModels: "Lieblings-Modelle",
     showAll: "Alle anzeigen",
     selectModel: "Modell auswählen",
-    forPersona: "für {{persona}}",
+    forCharacter: "für {{character}}",
     recommended: "Empfohlen",
     favorites: "Favoriten",
     all: "Alle",
     noFavorites: "Noch keine Favoriten. Markiere welche mit einem Stern.",
     noModels: "Keine Modelle verfügbar",
-    filteredByPersona: "Zeige {{compatible}} von {{total}} Modellen (nach Persona gefiltert)",
-    selectPersona: "Persona auswählen",
-    allPersonas: "Alle",
+    filteredByCharacter:
+      "Zeige {{compatible}} von {{total}} Modellen (nach Character gefiltert)",
+    selectCharacter: "Character auswählen",
+    allCharacters: "Alle",
   },
   selector: {
+    loading: "Laden...",
     tabs: {
       quick: "Schnell",
-      personas: "Personas",
+      characters: "Characters",
       build: "Erstellen",
     },
     tiers: {
@@ -462,13 +499,14 @@ export const translations: typeof enTranslations = {
     favorites: "Favoriten",
     suggested: "Vorgeschlagen",
     noFavorites: "Noch keine Favoriten",
-    noFavoritesHint: "Speichere deine Lieblings-Personas für schnellen Zugriff",
-    browseAllPersonas: "Alle Personas durchsuchen...",
+    noFavoritesHint:
+      "Speichere deine Lieblings-Characters für schnellen Zugriff",
+    browseAllCharacters: "Alle Characters durchsuchen...",
     customSetup: "Benutzerdefinierte Einrichtung...",
-    selectPersona: "Persona auswählen",
+    selectCharacter: "Character auswählen",
     all: "Alle",
     buildMode: "Erstellungsmodus",
-    forPersona: "für {{persona}}",
+    forCharacter: "für {{character}}",
     intelligence: "Intelligenz",
     contentLevel: "Inhaltsstufe",
     any: "Beliebig",
@@ -481,14 +519,14 @@ export const translations: typeof enTranslations = {
     currentConfig: "Aktuell im Gespräch mit",
     switchModel: "Modell wechseln",
     keepsConversation: "(behält Gespräch)",
-    switchPersona: "Persona wechseln",
+    switchCharacter: "Character wechseln",
     startsNewChat: "(startet neuen Chat)",
     start: "Starten",
     addFav: "Hinzufügen",
-    searchPersonas: "Personas suchen...",
-    noPersonasFound: "Keine Personas gefunden",
+    searchCharacters: "Characters suchen...",
+    noCharactersFound: "Keine Characters gefunden",
     createCustom: "Erstellen",
-    persona: "Persona",
+    character: "Character",
     savePreset: "Speichern",
     perMessage: "pro Nachricht",
     compatibleModels: "{{count}} kompatible Modelle",
@@ -514,14 +552,15 @@ export const translations: typeof enTranslations = {
     manualSelect: "Manuell auswählen...",
     best: "BESTE",
     noMatchingModels: "Keine Modelle entsprechen deinen Filtern",
-    noModelsWarning: "Keine Modelle entsprechen diesen Filtern. Passe deine Einstellungen an.",
+    noModelsWarning:
+      "Keine Modelle entsprechen diesen Filtern. Passe deine Einstellungen an.",
     allModelsCount: "{{count}} Modelle verfügbar",
     filteredModelsCount: "{{count}} passende Modelle",
     showAllModels: "Alle zeigen",
     showFiltered: "Gefiltert zeigen",
     applyChanges: "Änderungen anwenden",
     thisChatOnly: "Nur dieser Chat (temporär)",
-    saveToPreset: "Speichern unter \"{{name}}\"",
+    saveToPreset: 'Speichern unter "{{name}}"',
     saveAsNew: "Als neuen Favorit speichern...",
     cancel: "Abbrechen",
     apply: "Anwenden",
@@ -529,7 +568,6 @@ export const translations: typeof enTranslations = {
     maxPrice: "Max. Preis",
     creditsExact: "{{cost}} Credits",
     creditsSingle: "1 Credit",
-    searchCharacters: "Suchen...",
     searchResults: "{{count}} Ergebnisse",
     defaults: "Standard",
     customize: "Anpassen",
@@ -543,6 +581,9 @@ export const translations: typeof enTranslations = {
     yourSetups: "Deine Setups",
     setup: "Setup",
     delete: "Löschen",
+    editCharacter: "Als benutzerdefinierten Charakter bearbeiten",
+    switchPersona: "Persona wechseln",
+    editPersona: "Persona bearbeiten",
     autoSelectedModel: "Auto-ausgewählt:",
     manualSelectedModel: "Ausgewählt:",
     auto: "Auto",
@@ -562,19 +603,41 @@ export const translations: typeof enTranslations = {
     modelSelection: "Modellauswahl",
     autoMode: "Auto",
     manualMode: "Manuell",
-    autoModeDescription: "Das beste Modell wird basierend auf deinen Filtern ausgewählt",
+    autoModeDescription:
+      "Das beste Modell wird basierend auf deinen Filtern ausgewählt",
     manualModeDescription: "Wähle ein bestimmtes Modell aus",
     customizeSettings: "Einstellungen vor dem Hinzufügen anpassen",
     useNow: "Jetzt verwenden",
     browseAll: "Alle Charaktere durchsuchen",
     add: "Hinzufügen",
-    noCharactersFound: "Keine Charaktere gefunden",
     // v22 UX improvements
     quickSwitch: "Schnellwechsel",
     switchTo: "Zu diesem Setup wechseln",
     adjustSettings: "Einstellungen anpassen",
     addAnotherSetup: "Weiteres Setup hinzufügen",
     comingSoon: "Demnächst verfügbar",
+    // Character requirements
+    requirements: {
+      intelligenceTooLow: "Intelligenz zu niedrig (min: {{min}})",
+      intelligenceTooHigh: "Intelligenz zu hoch (max: {{max}})",
+      contentTooLow: "Inhaltsebene zu niedrig (min: {{min}})",
+      contentTooHigh: "Inhaltsebene zu hoch (max: {{max}})",
+      allMet: "Erfüllt alle Anforderungen",
+      violations: "{{count}} Anforderungsverletzungen",
+    },
+    // Character switch modal
+    characterSwitchModal: {
+      title: "Character wechseln",
+      description:
+        "Wechsle zu einer anderen Character ohne deine Einstellungen zu verlieren",
+      searchPlaceholder: "Characters durchsuchen...",
+      noResults: "Keine Characters gefunden",
+      keepSettings: "Aktuelle Modelleinstellungen beibehalten",
+      keepSettingsDesc:
+        "Verwende deine aktuellen Intelligenz-, Preis- und Inhaltsfilter mit der neuen Character",
+      cancel: "Abbrechen",
+      confirm: "Character wechseln",
+    },
   },
   onboarding: {
     // Screen 1: Story
@@ -594,7 +657,7 @@ export const translations: typeof enTranslations = {
       selectFirst: "Wähle einen Begleiter zum Fortfahren",
       saving: "Speichern...",
     },
-    // Companion personalities
+    // Companion characterlities
     thea: {
       tagline: "Warmherzig & weise",
       description: "Wie eine unterstützende Freundin, die dich versteht.",
@@ -944,7 +1007,7 @@ export const translations: typeof enTranslations = {
     imageGen: "Bildgenerierung",
     uncensored: "Unzensiert",
     legacy: "Legacy-Modelle",
-    // Persona categories
+    // Character categories
     technical: "Technisch",
     education: "Bildung",
     controversial: "Kontrovers",
@@ -1083,13 +1146,13 @@ export const translations: typeof enTranslations = {
     retryModal: {
       title: "Mit anderen Einstellungen wiederholen",
       description:
-        "Wählen Sie ein Modell und eine Persona, um die Antwort neu zu generieren",
+        "Wählen Sie ein Modell und eine Character, um die Antwort neu zu generieren",
       confirmLabel: "Wiederholen",
     },
     answerModal: {
       title: "Als KI-Modell antworten",
       description:
-        "Wählen Sie ein Modell und eine Persona, um eine KI-Antwort zu generieren",
+        "Wählen Sie ein Modell und eine Character, um eine KI-Antwort zu generieren",
       confirmLabel: "Generieren",
       inputPlaceholder:
         "Geben Sie eine Eingabeaufforderung für die KI ein (optional - leer lassen, damit die KI ihre eigene Antwort generiert)",
@@ -1107,13 +1170,13 @@ export const translations: typeof enTranslations = {
     retryModal: {
       title: "Mit anderen Einstellungen wiederholen",
       description:
-        "Wählen Sie ein Modell und eine Persona, um die Antwort neu zu generieren",
+        "Wählen Sie ein Modell und eine Character, um die Antwort neu zu generieren",
       confirmLabel: "Wiederholen",
     },
     answerModal: {
       title: "Als KI-Modell antworten",
       description:
-        "Wählen Sie ein Modell und eine Persona, um eine KI-Antwort zu generieren",
+        "Wählen Sie ein Modell und eine Character, um eine KI-Antwort zu generieren",
       confirmLabel: "Generieren",
       inputPlaceholder:
         "Geben Sie eine Eingabeaufforderung für die KI ein (optional - leer lassen, damit die KI ihre eigene Antwort generiert)",
@@ -1134,8 +1197,8 @@ export const translations: typeof enTranslations = {
     incognitoDescription:
       "Nur im Browser gespeichert. Niemals in Ihrem Konto gespeichert oder synchronisiert.",
     more: "Mehr",
-    selectPersona: "Persona auswählen",
-    noPrompts: "Keine Vorschläge für diese Persona",
+    selectCharacter: "Character auswählen",
+    noPrompts: "Keine Vorschläge für diese Character",
     showDetails: "Details anzeigen",
     hideDetails: "Details ausblenden",
     systemPromptLabel: "System-Prompt",
@@ -1308,13 +1371,13 @@ export const translations: typeof enTranslations = {
     retryModal: {
       title: "Mit anderen Einstellungen wiederholen",
       description:
-        "Wählen Sie ein Modell und eine Persona, um die Antwort neu zu generieren",
+        "Wählen Sie ein Modell und eine Character, um die Antwort neu zu generieren",
       confirmLabel: "Wiederholen",
     },
     answerModal: {
       title: "Als KI-Modell antworten",
       description:
-        "Wählen Sie ein Modell und eine Persona, um eine KI-Antwort zu generieren",
+        "Wählen Sie ein Modell und eine Character, um eine KI-Antwort zu generieren",
       confirmLabel: "Generieren",
       inputPlaceholder:
         "Geben Sie eine Eingabeaufforderung für die KI ein (optional - leer lassen, damit die KI ihre eigene Antwort generiert)",
@@ -1324,7 +1387,7 @@ export const translations: typeof enTranslations = {
       upvote: "Upvote",
       downvote: "Downvote",
       respondToAI:
-        "Auf diese KI-Nachricht mit einer anderen KI-Persona antworten",
+        "Auf diese KI-Nachricht mit einer anderen KI-Character antworten",
       loadingAudio: "Audio wird geladen...",
       stopAudio: "Audio stoppen",
       playAudio: "Audio abspielen",
@@ -1337,7 +1400,7 @@ export const translations: typeof enTranslations = {
       edit: "Bearbeiten",
       editMessage: "Diese Nachricht bearbeiten (erstellt einen Branch)",
       retry: "Wiederholen",
-      retryWithDifferent: "Mit anderem Modell/Persona wiederholen",
+      retryWithDifferent: "Mit anderem Modell/Character wiederholen",
       answerAsAI: "Als KI antworten",
       generateAIResponse: "KI-Antwort generieren",
       share: "Teilen",
@@ -1375,13 +1438,13 @@ export const translations: typeof enTranslations = {
     retryModal: {
       title: "Mit anderen Einstellungen wiederholen",
       description:
-        "Wählen Sie ein Modell und eine Persona, um die Antwort neu zu generieren",
+        "Wählen Sie ein Modell und eine Character, um die Antwort neu zu generieren",
       confirmLabel: "Wiederholen",
     },
     answerModal: {
       title: "Als KI-Modell antworten",
       description:
-        "Wählen Sie ein Modell und eine Persona, um eine KI-Antwort zu generieren",
+        "Wählen Sie ein Modell und eine Character, um eine KI-Antwort zu generieren",
       confirmLabel: "Generieren",
       inputPlaceholder:
         "Geben Sie eine Eingabeaufforderung für die KI ein (optional - leer lassen, damit die KI ihre eigene Antwort generiert)",
@@ -1398,7 +1461,7 @@ export const translations: typeof enTranslations = {
       edit: "Bearbeiten",
       editMessage: "Diese Nachricht bearbeiten (erstellt einen Branch)",
       retry: "Wiederholen",
-      retryWithDifferent: "Mit anderem Modell/Persona wiederholen",
+      retryWithDifferent: "Mit anderem Modell/Character wiederholen",
       answerAsAI: "Als KI antworten",
       generateAIResponse: "KI-Antwort generieren",
       insertQuote: "Zitatzeichen '>' einfügen",
@@ -1469,11 +1532,11 @@ export const translations: typeof enTranslations = {
         "Klicke hier, um deine KI-Begleiter kennenzulernen. Jeder hat eine einzigartige Persönlichkeit und das beste KI-Modell wird automatisch ausgewählt. Du kannst später alles anpassen.",
       tip: "👆 Klicke, um zu öffnen und deinen ersten Begleiter zu wählen!",
     },
-    personaSelector: {
+    characterSelector: {
       title: "Passe KI-Verhalten an",
       description:
-        "Personas formen, wie die KI antwortet. Nutze integrierte Stile oder erstelle eigene Personas mit deinen Anweisungen und bevorzugten Modellen.",
-      tip: "Kombiniere jede Persona mit jedem Modell für den perfekten Assistenten.",
+        "Characters formen, wie die KI antwortet. Nutze integrierte Stile oder erstelle eigene Characters mit deinen Anweisungen und bevorzugten Modellen.",
+      tip: "Kombiniere jede Character mit jedem Modell für den perfekten Assistenten.",
     },
     modelSelectorFavorites: {
       title: "Markiere deine Favoriten",
@@ -1495,22 +1558,22 @@ export const translations: typeof enTranslations = {
       description:
         "Zeige Modelle gruppiert nach Firma (OpenAI, Anthropic) oder nach Anwendungsfall (Coding, Unzensiert, Kreativ).",
     },
-    personaSelectorFavorites: {
-      title: "Markiere deine Personas",
+    characterSelectorFavorites: {
+      title: "Markiere deine Characters",
       description:
         "Speichere deine Lieblings-Gesprächsstile für schnellen Zugriff.",
     },
-    personaSelectorShowAll: {
-      title: "Durchsuche alle Personas",
+    characterSelectorShowAll: {
+      title: "Durchsuche alle Characters",
       description:
-        "Erkunde die vollständige Persona-Bibliothek. Erstelle eigene Personas für deinen Workflow.",
+        "Erkunde die vollständige Character-Bibliothek. Erstelle eigene Characters für deinen Workflow.",
     },
-    personaSelectorSearch: {
-      title: "Finde Personas",
+    characterSelectorSearch: {
+      title: "Finde Characters",
       description: "Suche nach Name, Kategorie oder Beschreibung.",
     },
-    personaSelectorGroup: {
-      title: "Gruppiere Personas",
+    characterSelectorGroup: {
+      title: "Gruppiere Characters",
       description:
         "Zeige nach Quelle (Integriert vs. Deine Eigenen) oder nach Kategorie (Kreativ, Technisch, Professional).",
     },
@@ -1576,7 +1639,7 @@ export const translations: typeof enTranslations = {
     sidebarLogin: {
       title: "Kostenloses Konto erstellen",
       description:
-        "Schalte Private und Geteilte Ordner frei, synchronisiere über alle Geräte, speichere Lieblings-Modelle und Personas. Inkognito und Öffentlich bleiben ohne Konto verfügbar.",
+        "Schalte Private und Geteilte Ordner frei, synchronisiere über alle Geräte, speichere Lieblings-Modelle und Characters. Inkognito und Öffentlich bleiben ohne Konto verfügbar.",
       tip: "Bleibe anonym oder synchronisiere alles. Deine Wahl.",
     },
     subscriptionButton: {

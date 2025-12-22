@@ -10,7 +10,7 @@ import { translations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserDetailLevel } from "../../user/enum";
-import { userRepository } from "../../user/repository";
+import { UserRepository } from "../../user/repository";
 import type { NewEmail } from "./db";
 import { EmailProvider, EmailStatus, EmailType } from "./enum";
 import { emailRepository } from "./repository";
@@ -50,14 +50,14 @@ export async function dev(
 
   try {
     // Get existing users for email associations
-    const adminUserResponse = await userRepository.getUserByEmail(
+    const adminUserResponse = await UserRepository.getUserByEmail(
       "admin@example.com",
       UserDetailLevel.STANDARD,
       locale,
       logger,
     );
 
-    const demoUserResponse = await userRepository.getUserByEmail(
+    const demoUserResponse = await UserRepository.getUserByEmail(
       "demo@example.com",
       UserDetailLevel.STANDARD,
       locale,
@@ -233,7 +233,7 @@ export async function test(
 
   try {
     // Get test user
-    const testUserResponse = await userRepository.getUserByEmail(
+    const testUserResponse = await UserRepository.getUserByEmail(
       "test1@example.com",
       UserDetailLevel.STANDARD,
       locale,

@@ -59,7 +59,9 @@ export interface ProcessedDataCards {
 /**
  * Get card configuration from field
  */
-export function getCardsConfig(field: UnifiedField): CardConfig {
+export function getCardsConfig<TKey extends string>(
+  field: UnifiedField<TKey>,
+): CardConfig {
   const defaultConfig: CardConfig = {
     layout: { columns: 2, spacing: "normal" },
     cardTemplate: "default",

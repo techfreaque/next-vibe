@@ -73,7 +73,9 @@ export interface DatabaseMigrationRepository {
  * Database Migration Repository Implementation
  * Extended with merged functionality from floating migration files
  */
-export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationRepository {
+export class DatabaseMigrationRepositoryImpl
+  implements DatabaseMigrationRepository
+{
   async runMigrations(
     data: MigrateRequestType,
     locale: CountryLanguage,

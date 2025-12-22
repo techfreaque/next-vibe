@@ -98,8 +98,7 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
                 }
                 return safeObject;
               }
-                return value;
-              
+              return value;
             }
             return value;
           },
@@ -153,8 +152,7 @@ export function buildQueryKey<TRequestData, TUrlPathParams>(
                 }
                 return safeObject;
               }
-                return value;
-              
+              return value;
             }
             return value;
           },

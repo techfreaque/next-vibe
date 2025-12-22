@@ -17,7 +17,8 @@ export const translations = {
       },
       timeout: {
         label: "Timeout",
-        description: "Maximum wait time in milliseconds. If set to 0, the default timeout will be used",
+        description:
+          "Maximum wait time in milliseconds. If set to 0, the default timeout will be used",
         placeholder: "Enter timeout (ms)",
       },
     },
@@ -53,7 +54,8 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred during the wait operation",
+      description:
+        "An internal server error occurred during the wait operation",
     },
     unknown: {
       title: "Unknown Error",

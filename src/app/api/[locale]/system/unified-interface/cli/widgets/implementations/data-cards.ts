@@ -51,10 +51,12 @@ interface CardItem {
   file?: string;
 }
 
-export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_CARDS> {
+export class DataCardsWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.DATA_CARDS
+> {
   readonly widgetType = WidgetType.DATA_CARDS;
 
-  render(props: CLIWidgetProps<typeof WidgetType.DATA_CARDS>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.DATA_CARDS, string>): string {
     const { field, value, context } = props;
     const t = context.t;
 
@@ -93,7 +95,9 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     }
   }
 
-  private getCardsConfig(field: UnifiedField): CardConfig {
+  private getCardsConfig<TKey extends string>(
+    field: UnifiedField<TKey>,
+  ): CardConfig {
     if (field.ui.type !== WidgetType.DATA_CARDS) {
       return {
         layout: { columns: 2, spacing: "normal" },

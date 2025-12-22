@@ -20,10 +20,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { JwtPayloadType,JwtPrivatePayloadType } from "../../auth/types";
+import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
 import { users } from "../../db";
 import { UserDetailLevel } from "../../enum";
-import { userRepository } from "../../repository";
+import { UserRepository } from "../../repository";
 import type {
   MeDeleteResponseOutput,
   MeGetResponseOutput,
@@ -32,10 +32,9 @@ import type {
 } from "./definition";
 
 /**
- * User Profile Repository Interface
- * Defines all user profile operations
+ * User Profile Repository - Static class pattern
  */
-export interface UserProfileRepository {
+export class UserProfileRepository {
   /**
    * Get current user profile or JWT payload
    * @param data - Request data (empty for GET)
@@ -44,55 +43,7 @@ export interface UserProfileRepository {
    * @param logger - Logger instance for debugging and monitoring
    * @returns User profile data (full for private, JWT payload for public)
    */
-  getProfile(
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MeGetResponseOutput>>;
-
-  /**
-   * Update a user's profile
-   * @param data - The user data to update
-   * @param user - User from JWT
-   * @param locale - User locale
-   * @param logger - Logger instance for debugging and monitoring
-   * @returns ResponseType with updated user information
-   */
-  updateProfile(
-    data: MePostRequestOutput,
-    user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MePostResponseOutput>>;
-
-  /**
-   * Delete a user account
-   * @param data - Request data (empty for DELETE)
-   * @param user - User from JWT
-   * @param locale - User locale
-   * @param logger - Logger instance for debugging and monitoring
-   * @returns ResponseType with deletion status
-   */
-  deleteAccount(
-    user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MeDeleteResponseOutput>>;
-}
-
-/**
- * User Profile Repository Implementation
- */
-export class UserProfileRepositoryImpl implements UserProfileRepository {
-  /**
-   * Get current user profile or JWT payload
-   * @param data - Request data (empty for GET)
-   * @param user - User from JWT (public or private)
-   * @param locale - User locale
-   * @param logger - Logger instance for debugging and monitoring
-   * @returns User profile data (full for private, JWT payload for public)
-   */
-  async getProfile(
+  static async getProfile(
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -120,7 +71,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       logger.debug("Getting user profile", { userId });
 
       // Get complete user data
-      const userResponse = await userRepository.getUserById(
+      const userResponse = await UserRepository.getUserById(
         userId,
         UserDetailLevel.COMPLETE,
         locale,
@@ -162,7 +113,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
    * @param logger - Logger instance for debugging and monitoring
    * @returns ResponseType with updated user information
    */
-  async updateProfile(
+  static async updateProfile(
     data: MePostRequestOutput,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
@@ -181,7 +132,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       logger.debug("Updating user profile", { userId, data });
 
       // Check if user exists
-      const userResponse = await userRepository.getUserById(
+      const userResponse = await UserRepository.getUserById(
         userId,
         UserDetailLevel.COMPLETE,
         locale,
@@ -200,7 +151,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
 
       // Verify email is not taken by another user
       if (data.basicInfo?.email && data.basicInfo.email !== currentUser.email) {
-        const emailExistsResponse = await userRepository.emailExistsByOtherUser(
+        const emailExistsResponse = await UserRepository.emailExistsByOtherUser(
           data.basicInfo.email,
           userId,
           logger,
@@ -254,7 +205,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       logger.debug("Successfully updated user profile", { userId });
 
       // Get the updated user data
-      const updatedUserResponse = await userRepository.getUserById(
+      const updatedUserResponse = await UserRepository.getUserById(
         userId,
         UserDetailLevel.COMPLETE,
         locale,
@@ -310,7 +261,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
    * @param logger - Logger instance for debugging and monitoring
    * @returns ResponseType with deletion status
    */
-  async deleteAccount(
+  static async deleteAccount(
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -326,7 +277,7 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
       logger.debug("Deleting user account", { userId });
 
       // Check if user exists
-      const userResponse = await userRepository.getUserById(
+      const userResponse = await UserRepository.getUserById(
         userId,
         UserDetailLevel.COMPLETE,
         locale,
@@ -363,8 +314,3 @@ export class UserProfileRepositoryImpl implements UserProfileRepository {
     }
   }
 }
-
-/**
- * User profile repository singleton instance
- */
-export const userProfileRepository = new UserProfileRepositoryImpl();

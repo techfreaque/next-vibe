@@ -1,15 +1,15 @@
 /**
  * Favorites Repository
- * Database operations for user favorites (persona + model settings combos)
+ * Database operations for user favorites (character + model settings combos)
  */
 
 import "server-only";
 
-import { and, asc, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
-  type ResponseType,
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -17,65 +17,31 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getPersonaById, PersonaCategory } from "../personas/config";
+import { CharacterCategory, getCharacterById } from "../characters/config";
 import { chatFavorites } from "./db";
 import type {
   FavoriteCreateRequestOutput,
   FavoriteCreateResponseOutput,
-  FavoritesListRequestOutput,
   FavoritesListResponseOutput,
 } from "./definition";
-import type {
-  ContentLevel,
-  IntelligenceLevel,
-  ModelSelectionMode,
-  PriceLevel,
-} from "./enum";
 
 /**
- * Chat Favorites Repository Interface
+ * Chat Favorites Repository
  */
-export interface ChatFavoritesRepositoryInterface {
-  getFavorites(
-    data: FavoritesListRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<FavoritesListResponseOutput>>;
-
-  createFavorite(
-    data: FavoriteCreateRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<FavoriteCreateResponseOutput>>;
-}
-
-/**
- * Chat Favorites Repository Implementation
- */
-export class ChatFavoritesRepositoryImpl
-  implements ChatFavoritesRepositoryInterface
-{
+export class ChatFavoritesRepository {
   /**
    * Get all favorites for the authenticated user
    */
-  async getFavorites(
-    _data: FavoritesListRequestOutput,
+  static async getFavorites(
     user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<FavoritesListResponseOutput>> {
     const userId = user.id;
 
     if (!userId) {
-      logger.error("Missing user identifier", { user });
-      return fail({
-        message: "app.api.agent.chat.favorites.get.errors.unauthorized.title",
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-      });
+      logger.debug("No user ID, returning empty favorites");
+      return success({ favorites: [], hasCompanion: false });
     }
 
     try {
@@ -90,50 +56,32 @@ export class ChatFavoritesRepositoryImpl
       // Check if user has at least one companion favorite
       let hasCompanion = false;
       for (const favorite of favorites) {
-        if (favorite.personaId) {
-          const persona = getPersonaById(favorite.personaId);
-          if (persona?.category === PersonaCategory.COMPANION) {
+        if (favorite.characterId) {
+          const character = getCharacterById(favorite.characterId);
+          if (character?.category === CharacterCategory.COMPANION) {
             hasCompanion = true;
             break;
           }
         }
       }
 
-      // Map favorites to response format
-      const mappedFavorites = favorites.map((f) => {
-        const modelSettings = f.modelSettings as {
-          mode: string;
-          filters: {
-            intelligence: string;
-            maxPrice: string;
-            content: string;
-          };
-          manualModelId?: string;
-        };
-        const uiSettings = f.uiSettings as {
-          position: number;
-          color?: string;
-        };
-
-        return {
+      return success({
+        favorites: favorites.map((f) => ({
           id: f.id,
-          personaId: f.personaId,
+          characterId: f.characterId,
           customName: f.customName,
-          mode: modelSettings.mode as typeof ModelSelectionMode.AUTO,
-          intelligence:
-            modelSettings.filters.intelligence as typeof IntelligenceLevel.ANY,
-          maxPrice: modelSettings.filters.maxPrice as typeof PriceLevel.ANY,
-          content: modelSettings.filters.content as typeof ContentLevel.ANY,
-          manualModelId: modelSettings.manualModelId ?? null,
-          position: uiSettings.position,
-          color: uiSettings.color ?? null,
+          customIcon: f.customIcon,
+          voice: f.voice,
+          mode: f.modelSettings.mode,
+          intelligence: f.modelSettings.filters.intelligence,
+          maxPrice: f.modelSettings.filters.maxPrice,
+          content: f.modelSettings.filters.content,
+          manualModelId: f.modelSettings.manualModelId ?? null,
+          position: f.uiSettings.position,
+          color: f.uiSettings.color ?? null,
           isActive: f.isActive,
           useCount: f.useCount,
-        };
-      });
-
-      return success({
-        favorites: mappedFavorites,
+        })),
         hasCompanion,
       });
     } catch (error) {
@@ -148,16 +96,14 @@ export class ChatFavoritesRepositoryImpl
   /**
    * Create a new favorite
    */
-  async createFavorite(
+  static async createFavorite(
     data: FavoriteCreateRequestOutput,
     user: JwtPayloadType,
-    _locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<FavoriteCreateResponseOutput>> {
     const userId = user.id;
 
     if (!userId) {
-      logger.error("Missing user identifier", { user });
       return fail({
         message: "app.api.agent.chat.favorites.post.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
@@ -165,12 +111,14 @@ export class ChatFavoritesRepositoryImpl
     }
 
     try {
-      logger.debug("Creating favorite", { userId, personaId: data.personaId });
+      logger.debug("Creating favorite", {
+        userId,
+        characterId: data.characterId,
+      });
 
-      // Verify persona exists
-      const persona = getPersonaById(data.personaId);
-      if (!persona) {
-        logger.error("Persona not found", { personaId: data.personaId });
+      // Verify character exists
+      const character = getCharacterById(data.characterId);
+      if (!character) {
         return fail({
           message: "app.api.agent.chat.favorites.post.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
@@ -191,45 +139,37 @@ export class ChatFavoritesRepositoryImpl
         }
       }
 
-      // Build model settings
-      const modelSettings = {
-        mode: data.mode,
-        filters: {
-          intelligence: data.intelligence,
-          maxPrice: data.maxPrice,
-          content: data.content,
-        },
-        manualModelId: data.manualModelId,
-      };
-
-      // Build UI settings
-      const uiSettings = {
-        position: maxPosition + 1,
-      };
-
       const [favorite] = await db
         .insert(chatFavorites)
         .values({
           userId,
-          personaId: data.personaId,
+          characterId: data.characterId,
           customName: data.customName ?? null,
-          modelSettings,
-          uiSettings,
+          voice: data.voice ?? null,
+          modelSettings: {
+            mode: data.mode,
+            filters: {
+              intelligence: data.intelligence,
+              maxPrice: data.maxPrice,
+              content: data.content,
+            },
+            manualModelId: data.manualModelId,
+          },
+          uiSettings: {
+            position: maxPosition + 1,
+          },
           isActive: false,
         })
         .returning();
 
       if (!favorite) {
-        logger.error("Failed to insert favorite into database");
         return fail({
           message: "app.api.agent.chat.favorites.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
 
-      return success({
-        id: favorite.id,
-      });
+      return success({ id: favorite.id });
     } catch (error) {
       logger.error("Failed to create favorite", parseError(error));
       return fail({
@@ -239,5 +179,3 @@ export class ChatFavoritesRepositoryImpl
     }
   }
 }
-
-export const chatFavoritesRepository = new ChatFavoritesRepositoryImpl();

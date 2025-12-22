@@ -15,6 +15,7 @@ import type {
   ReactWidgetProps,
   WidgetData,
 } from "../../../shared/widgets/types";
+import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
 
 // Color palette for charts
 const CHART_COLORS = [
@@ -31,15 +32,15 @@ const CHART_COLORS = [
 ];
 
 // Type for chart data
-interface ChartDataPoint {
+interface ChartDataPoint<TTranslationKey extends string> {
   x: string | number;
   y: number;
-  label?: string;
+  label?: TTranslationKey;
 }
 
-interface ChartSeries {
+interface ChartSeries<TTranslationKey extends string> {
   name: string;
-  data: ChartDataPoint[];
+  data: ChartDataPoint<TTranslationKey>[];
   color?: string;
 }
 
@@ -69,21 +70,30 @@ function looksLikeChartSeries(item: WidgetData): boolean {
 }
 
 // Convert validated WidgetData to ChartDataPoint
-function toChartDataPoint(item: WidgetData): ChartDataPoint {
+function toChartDataPoint<TTranslationKey extends string>(
+  item: WidgetData,
+): ChartDataPoint<TTranslationKey> {
   const obj = item as { x: WidgetData; y: number; label?: WidgetData };
   return {
     x: String(obj.x),
     y: obj.y,
-    label: obj.label !== undefined ? String(obj.label) : undefined,
+    label:
+      obj.label !== undefined
+        ? (String(obj.label) as TTranslationKey)
+        : undefined,
   };
 }
 
 // Convert validated WidgetData to ChartSeries
-function toChartSeries(item: WidgetData): ChartSeries {
+function toChartSeries<TTranslationKey extends string>(
+  item: WidgetData,
+): ChartSeries<TTranslationKey> {
   const obj = item as { name: string; data: WidgetData[]; color?: string };
   return {
     name: obj.name,
-    data: obj.data.filter(looksLikeChartDataPoint).map(toChartDataPoint),
+    data: obj.data
+      .filter(looksLikeChartDataPoint)
+      .map(toChartDataPoint<TTranslationKey>),
     color: obj.color,
   };
 }
@@ -92,9 +102,11 @@ function toChartSeries(item: WidgetData): ChartSeries {
  * Extract chart data from various value formats
  * Supports: array of points, object with series, raw numbers
  */
-function extractChartData(value: WidgetData): {
+function extractChartData<TTranslationKey extends string>(
+  value: WidgetData,
+): {
   type: "single" | "series" | "pie";
-  data: ChartSeries[];
+  data: ChartSeries<TTranslationKey>[];
 } | null {
   if (!value) {
     return null;
@@ -109,7 +121,9 @@ function extractChartData(value: WidgetData): {
     // Check if it's array of series: [{name: "Series1", data: [...]}, ...]
     if (value[0] && looksLikeChartSeries(value[0])) {
       // Filter and convert to ChartSeries
-      const validSeries = value.filter(looksLikeChartSeries).map(toChartSeries);
+      const validSeries = value
+        .filter(looksLikeChartSeries)
+        .map(toChartSeries<TTranslationKey>);
       return {
         type: "series",
         data: validSeries,
@@ -119,7 +133,7 @@ function extractChartData(value: WidgetData): {
     // Single series of points - filter and convert to ChartDataPoint
     const validPoints = value
       .filter(looksLikeChartDataPoint)
-      .map(toChartDataPoint);
+      .map(toChartDataPoint<TTranslationKey>);
     if (validPoints.length > 0) {
       return {
         type: "single",
@@ -131,14 +145,14 @@ function extractChartData(value: WidgetData): {
   // Object with named series: {series1: [...], series2: [...]}
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
     const obj = value as { [key: string]: WidgetData };
-    const series: ChartSeries[] = [];
+    const series: ChartSeries<TTranslationKey>[] = [];
 
     for (const [key, val] of Object.entries(obj)) {
       if (Array.isArray(val)) {
         // Filter and convert to ChartDataPoint
         const validPoints = val
           .filter(looksLikeChartDataPoint)
-          .map(toChartDataPoint);
+          .map(toChartDataPoint<TTranslationKey>);
         if (validPoints.length > 0) {
           series.push({
             name: key,
@@ -170,13 +184,14 @@ function extractChartData(value: WidgetData): {
  * - showGrid: Whether to show grid lines (default: true)
  * - animate: Whether to animate (default: true)
  */
-export function ChartWidget({
+export function ChartWidget<TKey extends string>({
   value,
   field,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.CHART>): JSX.Element {
-  const { t } = simpleT(context.locale);
+}: ReactWidgetProps<typeof WidgetType.CHART, TKey>): JSX.Element {
+  const { t } = getTranslator(context);
+  const { t: globalT } = simpleT(context.locale);
   const {
     chartType = "line",
     label: labelKey,
@@ -194,7 +209,7 @@ export function ChartWidget({
     : undefined;
 
   // Extract chart data
-  const chartData = extractChartData(value);
+  const chartData = extractChartData<TKey>(value);
 
   // No data - show empty state
   if (!chartData || chartData.data.length === 0) {
@@ -216,7 +231,7 @@ export function ChartWidget({
             }}
           >
             <Span className="text-muted-foreground">
-              {t(
+              {globalT(
                 "app.api.system.unifiedInterface.widgets.chart.noDataAvailable",
               )}
             </Span>
@@ -235,8 +250,8 @@ export function ChartWidget({
       const firstSeries = chartData.data[0];
       const pieData =
         firstSeries?.data
-          .filter((d: ChartDataPoint) => d.y > 0) // Filter out zero values for pie chart
-          .map((d: ChartDataPoint) => {
+          .filter((d: ChartDataPoint<TKey>) => d.y > 0) // Filter out zero values for pie chart
+          .map((d: ChartDataPoint<TKey>) => {
             // Translate labels - t() returns original string if key not found
             const rawLabel = String(d.label ?? d.x ?? "Unknown");
             return {
@@ -258,7 +273,7 @@ export function ChartWidget({
             }}
           >
             <Span className="text-muted-foreground">
-              {t(
+              {globalT(
                 "app.api.system.unifiedInterface.widgets.chart.noDataToDisplay",
               )}
             </Span>

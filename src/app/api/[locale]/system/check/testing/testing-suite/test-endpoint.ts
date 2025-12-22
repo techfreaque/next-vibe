@@ -45,39 +45,24 @@ type ExampleEntry<T> = [string, T];
  * });
  */
 export function testEndpoint<
-  TRequestInput,
-  TRequestOutput,
-  TResponseInput,
-  TResponseOutput,
-  TUrlVariablesInput,
-  TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
 >(
   endpoint: CreateApiEndpoint<
     TExampleKey,
     TMethod,
     TUserRoleValue,
-    TFields,
-    TRequestInput,
-    TRequestOutput,
-    TResponseInput,
-    TResponseOutput,
-    TUrlVariablesInput,
-    TUrlVariablesOutput
+    TScopedTranslationKey,
+    TFields
   >,
   options: TestEndpointOptions<
-    TRequestInput,
-    TRequestOutput,
-    TResponseInput,
-    TResponseOutput,
-    TUrlVariablesInput,
-    TUrlVariablesOutput,
     TExampleKey,
     TMethod,
     TUserRoleValue,
+    TScopedTranslationKey,
     TFields
   > = {},
 ): void {
@@ -86,30 +71,20 @@ export function testEndpoint<
   describe(`API: ${endpoint.method} ${endpoint.path.join("/")}`, () => {
     // Create a test runner that can be reused
     const testRunner: TestRunner<
-      TRequestInput,
-      TRequestOutput,
-      TResponseInput,
-      TResponseOutput,
-      TUrlVariablesInput,
-      TUrlVariablesOutput,
       TExampleKey,
       TMethod,
       TUserRoleValue,
+      TScopedTranslationKey,
       TFields
     > = {
       endpoint,
       executeWith: async ({ data, urlPathParams, user }) => {
         return await sendTestRequest<
-          TRequestOutput,
-          TResponseInput,
-          TResponseOutput,
-          TUrlVariablesOutput,
           TExampleKey,
           TMethod,
           TUserRoleValue,
-          TFields,
-          TRequestInput,
-          TUrlVariablesInput
+          TScopedTranslationKey,
+          TFields
         >({
           endpoint,
           data,
@@ -136,6 +111,8 @@ export function testEndpoint<
     // Group tests for payload examples
     const payloads = endpoint.examples.requests;
     const urlPathParams = endpoint.examples.urlPathParams;
+    type TRequestOutput = typeof endpoint.types.RequestOutput;
+    type TUrlVariablesOutput = typeof endpoint.types.UrlVariablesOutput;
     if (payloads) {
       describe("Payload Examples", () => {
         // Test each example payload

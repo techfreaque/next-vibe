@@ -98,8 +98,9 @@ export function useFolderOperations(
           { name, rootFolderId, parentId },
         );
 
-        const { generateIncognitoId, saveFolder } =
-          await import("../../incognito/storage");
+        const { generateIncognitoId, saveFolder } = await import(
+          "../../incognito/storage"
+        );
 
         const folder: ChatFolder = {
           id: generateIncognitoId("folder"),
@@ -275,8 +276,9 @@ export function useFolderOperations(
           { folderId },
         );
 
-        const { deleteFolder: deleteIncognitoFolder } =
-          await import("../../incognito/storage");
+        const { deleteFolder: deleteIncognitoFolder } = await import(
+          "../../incognito/storage"
+        );
 
         deleteIncognitoFolder(folderId);
         chatStore.deleteFolder(folderId);

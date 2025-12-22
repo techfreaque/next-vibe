@@ -59,7 +59,9 @@ interface RouteHandlersGeneratorRepository {
 /**
  * Route Handlers Generator Repository Implementation
  */
-class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepository {
+class RouteHandlersGeneratorRepositoryImpl
+  implements RouteHandlersGeneratorRepository
+{
   async generateRouteHandlers(
     data: RouteHandlersRequestType,
     logger: EndpointLogger,
@@ -91,7 +93,10 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       const duration = Date.now() - startTime;
 
       logger.info(
-        formatGenerator(`Generated route handlers file with ${formatCount(routeFiles.length, "route")} in ${formatDuration(duration)}`, "🔗"),
+        formatGenerator(
+          `Generated route handlers file with ${formatCount(routeFiles.length, "route")} in ${formatDuration(duration)}`,
+          "🔗",
+        ),
       );
 
       return success({

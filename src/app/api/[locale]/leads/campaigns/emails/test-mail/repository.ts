@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { CampaignType } from "@/app/api/[locale]/emails/smtp-client/enum";
-import { smtpSendingRepository } from "@/app/api/[locale]/emails/smtp-client/sending/repository";
+import { SmtpSendingRepository } from "@/app/api/[locale]/emails/smtp-client/sending/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
@@ -34,12 +34,12 @@ import type {
  * Test Email Repository Class
  * Handles all business logic for test email functionality
  */
-class TestEmailRepository {
+export class TestEmailRepository {
   /**
    * Create a mock lead object for test email rendering
    * Centralized to ensure consistency across test email functionality
    */
-  private createMockLead(
+  private static createMockLead(
     data: TestEmailRequestOutput,
     testEmail: string,
   ): LeadWithEmailType {
@@ -76,7 +76,7 @@ class TestEmailRepository {
    * Send a test email with custom lead data
    * Now uses the same email infrastructure as regular campaigns
    */
-  async sendTestEmail(
+  static async sendTestEmail(
     data: TestEmailRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
@@ -154,7 +154,7 @@ class TestEmailRepository {
         // Render JSX to HTML for SMTP service
         const html = await render(emailContent.jsx);
 
-        const emailResponse = await smtpSendingRepository.sendEmail(
+        const emailResponse = await SmtpSendingRepository.sendEmail(
           {
             to: data.testEmail,
             toName: data.testEmail,
@@ -238,8 +238,3 @@ class TestEmailRepository {
     }
   }
 }
-
-/**
- * Export singleton instance
- */
-export const testEmailRepository = new TestEmailRepository();

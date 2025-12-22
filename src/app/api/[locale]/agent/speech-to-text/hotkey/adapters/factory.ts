@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { Platform,type PlatformType } from "../enum";
+import { Platform, type PlatformType } from "../enum";
 import type {
   Recorder,
   RecorderFactoryOptions,

@@ -533,7 +533,7 @@ export function HelpInteractiveView({
                                       {ep.method}
                                     </Div>
                                     <Div className="font-medium truncate">
-                                      {toolName.replaceAll('_', "/")}
+                                      {toolName.replaceAll("_", "/")}
                                     </Div>
                                     {ep.aliases && ep.aliases.length > 0 && (
                                       <Div className="text-xs text-gray-500 dark:text-gray-400 mt-1">

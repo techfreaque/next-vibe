@@ -191,4 +191,3 @@ interface LintConfigObject {
 }
 
 type LintConfigElement = Record<string, LintConfigValue>;
-

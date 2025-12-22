@@ -7,24 +7,25 @@ import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/s
 
 /**
  * Contact Subject options
+ * Uses scoped translation keys from contact i18n _components
  */
 export const {
   enum: ContactSubject,
   options: ContactSubjectOptions,
   Value: ContactSubjectValue,
 } = createEnumOptions({
-  HELP_SUPPORT: "app.api.contact.subject.helpSupport",
-  GENERAL_INQUIRY: "app.api.contact.subject.generalInquiry",
-  TECHNICAL_SUPPORT: "app.api.contact.subject.technicalSupport",
-  ACCOUNT_QUESTION: "app.api.contact.subject.accountQuestion",
-  BILLING_QUESTION: "app.api.contact.subject.billingQuestion",
-  SALES_INQUIRY: "app.api.contact.subject.salesInquiry",
-  FEATURE_REQUEST: "app.api.contact.subject.featureRequest",
-  BUG_REPORT: "app.api.contact.subject.bugReport",
-  FEEDBACK: "app.api.contact.subject.feedback",
-  COMPLAINT: "app.api.contact.subject.complaint",
-  PARTNERSHIP: "app.api.contact.subject.partnership",
-  OTHER: "app.api.contact.subject.other",
+  HELP_SUPPORT: "_components.contact.subjects.HELP_SUPPORT",
+  GENERAL_INQUIRY: "_components.contact.subjects.GENERAL_INQUIRY",
+  TECHNICAL_SUPPORT: "_components.contact.subjects.TECHNICAL_SUPPORT",
+  ACCOUNT_QUESTION: "_components.contact.subjects.ACCOUNT_QUESTION",
+  BILLING_QUESTION: "_components.contact.subjects.BILLING_QUESTION",
+  SALES_INQUIRY: "_components.contact.subjects.SALES_INQUIRY",
+  FEATURE_REQUEST: "_components.contact.subjects.FEATURE_REQUEST",
+  BUG_REPORT: "_components.contact.subjects.BUG_REPORT",
+  FEEDBACK: "_components.contact.subjects.FEEDBACK",
+  COMPLAINT: "_components.contact.subjects.COMPLAINT",
+  PARTNERSHIP: "_components.contact.subjects.PARTNERSHIP",
+  OTHER: "_components.contact.subjects.OTHER",
 });
 
 // Create DB enum array for Drizzle
@@ -45,16 +46,17 @@ export const ContactSubjectDB = [
 
 /**
  * Contact Priority options
+ * Uses scoped translation keys from contact i18n
  */
 export const {
   enum: ContactPriority,
   options: ContactPriorityOptions,
   Value: ContactPriorityValue,
 } = createEnumOptions({
-  LOW: "app.api.contact.priority.low",
-  MEDIUM: "app.api.contact.priority.medium",
-  HIGH: "app.api.contact.priority.high",
-  URGENT: "app.api.contact.priority.urgent",
+  LOW: "priority.low",
+  MEDIUM: "priority.medium",
+  HIGH: "priority.high",
+  URGENT: "priority.urgent",
 });
 
 // Create DB enum array for Drizzle
@@ -67,16 +69,17 @@ export const ContactPriorityDB = [
 
 /**
  * Contact Status options
+ * Uses scoped translation keys from contact i18n
  */
 export const {
   enum: ContactStatus,
   options: ContactStatusOptions,
   Value: ContactStatusValue,
 } = createEnumOptions({
-  NEW: "app.api.contact.status.new",
-  IN_PROGRESS: "app.api.contact.status.inProgress",
-  RESOLVED: "app.api.contact.status.resolved",
-  CLOSED: "app.api.contact.status.closed",
+  NEW: "status.new",
+  IN_PROGRESS: "status.inProgress",
+  RESOLVED: "status.resolved",
+  CLOSED: "status.closed",
 });
 
 // Create DB enum array for Drizzle

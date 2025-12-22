@@ -5,7 +5,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { FolderPlus } from "next-vibe-ui/ui/icons/FolderPlus";
 import { MessageSquarePlus } from "next-vibe-ui/ui/icons/MessageSquarePlus";
 import { Search } from "next-vibe-ui/ui/icons/Search";
-import { Input,type InputRefObject } from "next-vibe-ui/ui/input";
+import { Input, type InputRefObject } from "next-vibe-ui/ui/input";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Tooltip } from "next-vibe-ui/ui/tooltip";
 import { TooltipContent } from "next-vibe-ui/ui/tooltip";

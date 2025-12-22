@@ -49,7 +49,7 @@ interface UseInputHandlersProps {
   ) => Promise<void>;
   setInput: (input: string) => void;
   setSelectedModel: (modelId: ModelId) => void;
-  setSelectedPersona: (personaId: string) => void;
+  setSelectedCharacter: (characterId: string) => void;
   setEnabledToolIds: (toolIds: string[]) => void;
   inputRef: React.RefObject<TextareaRefObject | null>;
   locale: CountryLanguage;
@@ -68,7 +68,7 @@ interface UseInputHandlersReturn {
   handleModelChange: (modelId: ModelId) => void;
   handleFillInputWithPrompt: (
     prompt: string,
-    personaId: string,
+    characterId: string,
     modelId?: ModelId,
   ) => void;
   handleScreenshot: () => Promise<void>;
@@ -81,7 +81,7 @@ export function useInputHandlers({
   sendMessage,
   setInput,
   setSelectedModel,
-  setSelectedPersona,
+  setSelectedCharacter,
   setEnabledToolIds,
   inputRef,
   locale,
@@ -235,11 +235,11 @@ export function useInputHandlers({
   );
 
   const handleFillInputWithPrompt = useCallback(
-    (prompt: string, personaId: string, modelId?: ModelId) => {
-      // Switch to the selected persona
-      setSelectedPersona(personaId);
+    (prompt: string, characterId: string, modelId?: ModelId) => {
+      // Switch to the selected character
+      setSelectedCharacter(characterId);
 
-      // Switch to the persona's preferred model if provided
+      // Switch to the character's preferred model if provided
       if (modelId) {
         handleModelChange(modelId);
       }
@@ -248,7 +248,7 @@ export function useInputHandlers({
       setInput(prompt);
       inputRef.current?.focus();
     },
-    [setInput, inputRef, handleModelChange, setSelectedPersona],
+    [setInput, inputRef, handleModelChange, setSelectedCharacter],
   );
 
   const handleScreenshot = useCallback(() => {

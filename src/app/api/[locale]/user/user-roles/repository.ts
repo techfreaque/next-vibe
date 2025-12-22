@@ -29,92 +29,15 @@ import {
 } from "./enum";
 
 /**
- * User Roles Repository Interface
+ * User Roles Repository
  */
-export interface UserRolesRepository {
-  /**
-   * Find user roles by user ID
-   */
-  findByUserId(
-    userId: DbId,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<UserRole[]>>;
-
-  /**
-   * Find user roles for multiple user IDs (batch operation)
-   * Returns a map of userId -> roles for efficient lookups
-   */
-  findByUserIds(
-    userIds: DbId[],
-    logger: EndpointLogger,
-  ): Promise<ResponseType<Map<DbId, UserRole[]>>>;
-
-  /**
-   * Delete user roles by user ID
-   */
-  deleteByUserId(
-    userId: DbId,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>>;
-
-  /**
-   * Find role by user ID and role value
-   */
-  findByUserIdAndRole(
-    userId: DbId,
-    role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
-    logger: EndpointLogger,
-  ): Promise<ResponseType<UserRole>>;
-
-  /**
-   * Add role to user
-   */
-  addRole(
-    data: NewUserRole,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<UserRole>>;
-
-  /**
-   * Remove role from user
-   */
-  removeRole(
-    userId: DbId,
-    role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
-    logger: EndpointLogger,
-  ): Promise<ResponseType<boolean>>;
-
-  /**
-   * Check if user has role
-   */
-  hasRole(
-    userId: DbId,
-    role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
-    logger: EndpointLogger,
-  ): Promise<ResponseType<boolean>>;
-
-  /**
-   * Get user role values as array of strings
-   */
-  /**
-   * Get user permission roles (typed as UserPermissionRoleValue)
-   * Returns only actual permission roles, never platform markers
-   */
-  getUserRoles(
-    userId: DbId,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<(typeof UserPermissionRoleValue)[]>>;
-}
-
-/**
- * User Roles Repository Implementation
- */
-export class UserRolesRepositoryImpl implements UserRolesRepository {
+export class UserRolesRepository {
   /**
    * Find user roles by user ID
    * @param userId - The user ID
    * @returns User roles or error response
    */
-  async findByUserId(
+  static async findByUserId(
     userId: DbId,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserRole[]>> {
@@ -177,7 +100,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
    * @param userIds - Array of user IDs to fetch roles for
    * @returns Map of userId -> roles for efficient lookups
    */
-  async findByUserIds(
+  static async findByUserIds(
     userIds: DbId[],
     logger: EndpointLogger,
   ): Promise<ResponseType<Map<DbId, UserRole[]>>> {
@@ -248,7 +171,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
    * @param role - The role value
    * @returns User role or error response
    */
-  async findByUserIdAndRole(
+  static async findByUserIdAndRole(
     userId: DbId,
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
@@ -306,7 +229,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
    * @param data - The user role data
    * @returns Created user role or error response
    */
-  async addRole(
+  static async addRole(
     data: NewUserRole,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserRole>> {
@@ -317,7 +240,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
       });
 
       // Check if the role already exists
-      const existingRoleResult = await this.findByUserIdAndRole(
+      const existingRoleResult = await UserRolesRepository.findByUserIdAndRole(
         data.userId,
         data.role,
         logger,
@@ -371,7 +294,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
    * @param role - The role value
    * @returns Success or error response
    */
-  async removeRole(
+  static async removeRole(
     userId: DbId,
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
@@ -406,7 +329,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
    * @param role - The role value
    * @returns Success or error response
    */
-  async hasRole(
+  static async hasRole(
     userId: DbId,
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
@@ -414,7 +337,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
     try {
       logger.debug("Checking if user has role", { userId, role });
 
-      const existingRoleResult = await this.findByUserIdAndRole(
+      const existingRoleResult = await UserRolesRepository.findByUserIdAndRole(
         userId,
         role,
         logger,
@@ -436,7 +359,7 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
    * @param userId - The user ID
    * @returns Success or error response
    */
-  async deleteByUserId(
+  static async deleteByUserId(
     userId: DbId,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
@@ -461,14 +384,17 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
    * @param userId - The user ID
    * @returns Array of role strings or error response
    */
-  async getUserRoles(
+  static async getUserRoles(
     userId: DbId,
     logger: EndpointLogger,
   ): Promise<ResponseType<(typeof UserPermissionRoleValue)[]>> {
     try {
       logger.debug("Getting user permission roles", { userId });
 
-      const rolesResult = await this.findByUserId(userId, logger);
+      const rolesResult = await UserRolesRepository.findByUserId(
+        userId,
+        logger,
+      );
 
       if (!rolesResult.success || !rolesResult.data) {
         return fail({
@@ -495,5 +421,8 @@ export class UserRolesRepositoryImpl implements UserRolesRepository {
   }
 }
 
-// Export singleton instance of the repository
-export const userRolesRepository = new UserRolesRepositoryImpl();
+// Type for native repository type checking
+export type UserRolesRepositoryType = Pick<
+  typeof UserRolesRepository,
+  keyof typeof UserRolesRepository
+>;

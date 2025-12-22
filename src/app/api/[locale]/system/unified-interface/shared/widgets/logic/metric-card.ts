@@ -146,7 +146,9 @@ export function formatTrendValue(trendValue: number): string {
 /**
  * Get metric configuration from field
  */
-export function getMetricConfig(field: UnifiedField): MetricConfig {
+export function getMetricConfig<TKey extends string>(
+  field: UnifiedField<TKey>,
+): MetricConfig {
   const defaultConfig: MetricConfig = {
     format: "number",
     precision: 2,

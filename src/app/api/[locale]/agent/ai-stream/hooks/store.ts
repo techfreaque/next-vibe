@@ -22,7 +22,7 @@ export interface StreamingMessage {
   parentId: string | null;
   depth: number;
   model?: ModelId | null;
-  persona?: string | null;
+  character?: string | null;
   totalTokens?: number;
   finishReason?: string | null;
   isStreaming: boolean;

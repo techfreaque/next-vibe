@@ -101,19 +101,29 @@ export interface EndpointRendererProps<
 /**
  * Extract ALL fields from endpoint definition
  * Recursively extracts fields from nested containers, preserving full paths
+ * Handles object, object-optional, and object-union types
  */
-function extractAllFields(
-  fields: UnifiedField,
+function extractAllFields<TKey extends string>(
+  fields: UnifiedField<TKey>,
   parentPath = "",
-): Array<[string, UnifiedField]> {
+): Array<[string, UnifiedField<TKey>]> {
   if (!fields || typeof fields !== "object") {
     return [];
   }
 
   const fieldsObj = fields as {
     type?: string;
-    children?: Record<string, UnifiedField>;
+    children?: Record<string, UnifiedField<TKey>>;
+    discriminator?: string;
+    variants?: readonly UnifiedField<TKey>[];
   };
+
+  // Handle object-union fields
+  if (fieldsObj.type === "object-union") {
+    // For unions, add the union field itself (widgets will handle variant switching)
+    const fullPath = parentPath ? `${parentPath}` : "";
+    return fullPath ? [[fullPath, fields]] : [];
+  }
 
   // Check if this is an object field with children
   if (
@@ -123,18 +133,25 @@ function extractAllFields(
     return [];
   }
 
-  const result: Array<[string, UnifiedField]> = [];
+  const result: Array<[string, UnifiedField<TKey>]> = [];
 
   for (const [fieldName, fieldDef] of Object.entries(fieldsObj.children)) {
     if (typeof fieldDef === "object" && fieldDef !== null) {
       // Check if this is a container with nested fields
       const fieldDefObj = fieldDef as {
         type?: string;
-        children?: Record<string, UnifiedField>;
+        children?: Record<string, UnifiedField<TKey>>;
+        discriminator?: string;
+        variants?: readonly UnifiedField<TKey>[];
         ui?: { type?: string };
       };
 
-      if (
+      // Handle union fields
+      if (fieldDefObj.type === "object-union") {
+        // Add the union field itself - union widget will handle variant rendering
+        const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
+        result.push([fullPath, fieldDef as UnifiedField<TKey>]);
+      } else if (
         (fieldDefObj.type === "object" ||
           fieldDefObj.type === "object-optional") &&
         fieldDefObj.children &&
@@ -143,18 +160,17 @@ function extractAllFields(
         // Add the container itself instead of flattening its children
         // ContainerWidget will handle rendering children with proper grid layout
         const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
-        result.push([fullPath, fieldDef as UnifiedField]);
+        result.push([fullPath, fieldDef as UnifiedField<TKey>]);
       } else {
         // Regular field, add it with full path
         const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
-        result.push([fullPath, fieldDef as UnifiedField]);
+        result.push([fullPath, fieldDef as UnifiedField<TKey>]);
       }
     }
   }
 
   return result;
 }
-
 
 /**
  * Endpoint Renderer Component
@@ -175,7 +191,6 @@ export function EndpointRenderer<
   disabled = false,
   response,
 }: EndpointRendererProps<TEndpoint, TFieldValues>): JSX.Element {
-
   // Check if endpoint.fields itself is a container widget
   const isRootContainer =
     endpoint.fields.type === "object" &&
@@ -205,6 +220,7 @@ export function EndpointRenderer<
     endpointFields: endpoint.fields, // Pass original fields for nested path lookup
     disabled, // Pass disabled state to widgets
     response, // Pass full ResponseType<T> to widgets (includes error state)
+    scopedT: endpoint.scopedTranslation?.scopedT, // Pass scoped translation function for module-specific translations
   };
 
   // Check if there are any request fields

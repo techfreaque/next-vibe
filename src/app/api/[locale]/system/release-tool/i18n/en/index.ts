@@ -1,6 +1,7 @@
 export const translations = {
   title: "Release Tool",
-  description: "Manage package releases with version bumping, git tagging, and CI/CD integration",
+  description:
+    "Manage package releases with version bumping, git tagging, and CI/CD integration",
   category: "Release Tool",
   tags: {
     release: "Release",
@@ -47,15 +48,18 @@ export const translations = {
   fields: {
     configPath: {
       title: "Config Path",
-      description: "Path to release.config.ts file (default: release.config.ts)",
+      description:
+        "Path to release.config.ts file (default: release.config.ts)",
     },
     ci: {
       title: "CI Mode",
-      description: "Run in CI mode (no interactive prompts, uses ciReleaseCommand)",
+      description:
+        "Run in CI mode (no interactive prompts, uses ciReleaseCommand)",
     },
     forceUpdate: {
       title: "Force Update Dependencies",
-      description: "Force update all dependencies without prompting (skip all other steps)",
+      description:
+        "Force update all dependencies without prompting (skip all other steps)",
     },
     dryRun: {
       title: "Dry Run",
@@ -91,19 +95,23 @@ export const translations = {
     },
     prereleaseId: {
       title: "Prerelease ID",
-      description: "Prerelease identifier (alpha, beta, rc) for version bumping",
+      description:
+        "Prerelease identifier (alpha, beta, rc) for version bumping",
     },
     versionIncrement: {
       title: "Version Increment",
-      description: "Version increment type (patch, minor, major) - only used in local mode",
+      description:
+        "Version increment type (patch, minor, major) - only used in local mode",
     },
     targetPackage: {
       title: "Target Package",
-      description: "Target specific package directory (optional, defaults to all packages)",
+      description:
+        "Target specific package directory (optional, defaults to all packages)",
     },
     inlineConfig: {
       title: "Inline Config",
-      description: "Provide release configuration inline instead of using config file",
+      description:
+        "Provide release configuration inline instead of using config file",
     },
     skipGitTag: {
       title: "Skip Git Tag",
@@ -127,12 +135,14 @@ export const translations = {
     },
     commitMessage: {
       title: "Commit Message",
-      // eslint-disable-next-line no-template-curly-in-string -- Intentional template placeholder documentation
-      description: "Custom commit message for version bump (supports ${version} placeholder)",
+      description:
+        // eslint-disable-next-line no-template-curly-in-string -- Intentional template placeholder documentation
+        "Custom commit message for version bump (supports ${version} placeholder)",
     },
     notifyWebhook: {
       title: "Notification Webhook",
-      description: "Webhook URL to send release notifications to (Slack, Discord, Teams, or custom)",
+      description:
+        "Webhook URL to send release notifications to (Slack, Discord, Teams, or custom)",
     },
     configObject: {
       title: "Configuration Object",
@@ -140,7 +150,8 @@ export const translations = {
     },
     packageManager: {
       title: "Package Manager",
-      description: "Package manager to use for releases (bun, npm, yarn, pnpm, deno)",
+      description:
+        "Package manager to use for releases (bun, npm, yarn, pnpm, deno)",
     },
     globalVersion: {
       title: "Global Version",
@@ -585,8 +596,10 @@ export const translations = {
     notFound: "Package.json not found: {{path}}",
     invalidFormat: "Invalid package.json format: {{path}}",
     errorReading: "Error reading package.json: {{error}}",
-    errorUpdatingDeps: "Error updating dependencies for {{directory}}: {{error}}",
-    errorUpdatingVersion: "Error updating package version for {{directory}}: {{error}}",
+    errorUpdatingDeps:
+      "Error updating dependencies for {{directory}}: {{error}}",
+    errorUpdatingVersion:
+      "Error updating package version for {{directory}}: {{error}}",
   },
   scripts: {
     invalidPackageJson: "Invalid package.json format in {{path}}",
@@ -625,8 +638,10 @@ export const translations = {
     commandRunning: "Running CI release command for {{package}}: {{command}}",
     commandSuccess: "CI release command completed for {{package}}",
     commandFailed: "CI release command failed for {{package}}: {{error}}",
-    commandRequired: "CI mode requires ciReleaseCommand configuration for {{package}}",
-    envVarMissing: "Required environment variable '{{variable}}' not set for {{package}}",
+    commandRequired:
+      "CI mode requires ciReleaseCommand configuration for {{package}}",
+    envVarMissing:
+      "Required environment variable '{{variable}}' not set for {{package}}",
   },
   zip: {
     starting: "Zipping folders...",
@@ -677,7 +692,8 @@ export const translations = {
     updated: "Dependencies updated for {{directory}}",
     failed: "Dependency update failed for {{directory}}: {{error}}",
     skipped: "Skipping dependency updates for {{directory}}",
-    dedupeFailed: "Failed to deduplicate dependencies for {{directory}}: {{error}}",
+    dedupeFailed:
+      "Failed to deduplicate dependencies for {{directory}}: {{error}}",
   },
   security: {
     auditFailed: "Security audit failed for {{directory}}: {{error}}",
@@ -703,7 +719,8 @@ export const translations = {
   },
   branch: {
     checking: "Checking branch status...",
-    notAllowed: "Releases from branch '{{branch}}' not allowed (main: {{main}})",
+    notAllowed:
+      "Releases from branch '{{branch}}' not allowed (main: {{main}})",
     isProtected: "Branch '{{branch}}' is protected",
   },
   gitRelease: {

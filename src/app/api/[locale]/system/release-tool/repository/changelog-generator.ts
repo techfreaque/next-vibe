@@ -79,7 +79,10 @@ export class ChangelogGenerator implements IChangelogGenerator {
       }
 
       // Parse commits by type
-      const grouped: Record<string, Array<{ hash: string; message: string; author: string }>> = {
+      const grouped: Record<
+        string,
+        Array<{ hash: string; message: string; author: string }>
+      > = {
         feat: [],
         fix: [],
         docs: [],
@@ -105,14 +108,20 @@ export class ChangelogGenerator implements IChangelogGenerator {
         const cleanMessage = message.replace(/^(\w+)(?:\([^)]+\))?!?:\s*/, "");
 
         const groupKey = type in grouped ? type : "other";
-        grouped[groupKey]?.push({ hash: hash ?? "", message: cleanMessage, author: author ?? "" });
+        grouped[groupKey]?.push({
+          hash: hash ?? "",
+          message: cleanMessage,
+          author: author ?? "",
+        });
       }
 
       // Build changelog content
       let content = "";
 
       // Add header
-      const header = changelogConfig.header ?? "# Changelog\n\nAll notable changes to this project will be documented in this file.\n";
+      const header =
+        changelogConfig.header ??
+        "# Changelog\n\nAll notable changes to this project will be documented in this file.\n";
       content += `${header}\n\n`;
 
       // Add version section
@@ -122,12 +131,13 @@ export class ChangelogGenerator implements IChangelogGenerator {
       // Add compare link if previous tag exists
       if (repo && versionInfo.lastTag !== "v0.0.0") {
         /* eslint-disable no-template-curly-in-string -- Intentional URL format templates */
-        const compareUrl = changelogConfig.compareUrlFormat
-          ?.replace("${baseUrl}", repo.url)
-          .replace("${prevTag}", versionInfo.lastTag)
-          .replace("${tag}", versionInfo.newTag)
+        const compareUrl =
+          changelogConfig.compareUrlFormat
+            ?.replace("${baseUrl}", repo.url)
+            .replace("${prevTag}", versionInfo.lastTag)
+            .replace("${tag}", versionInfo.newTag) ??
           /* eslint-enable no-template-curly-in-string */
-          ?? `${repo.url}/compare/${versionInfo.lastTag}...${versionInfo.newTag}`;
+          `${repo.url}/compare/${versionInfo.lastTag}...${versionInfo.newTag}`;
         content += `[Compare with previous release](${compareUrl})\n\n`;
       }
 
@@ -157,11 +167,12 @@ export class ChangelogGenerator implements IChangelogGenerator {
 
         for (const item of items) {
           /* eslint-disable no-template-curly-in-string -- Intentional URL format templates */
-          const commitUrl = changelogConfig.commitUrlFormat
-            ?.replace("${baseUrl}", repo?.url ?? "")
-            .replace("${hash}", item.hash)
+          const commitUrl =
+            changelogConfig.commitUrlFormat
+              ?.replace("${baseUrl}", repo?.url ?? "")
+              .replace("${hash}", item.hash) ??
             /* eslint-enable no-template-curly-in-string */
-            ?? (repo ? `${repo.url}/commit/${item.hash}` : "");
+            (repo ? `${repo.url}/commit/${item.hash}` : "");
 
           content += `* ${item.message} ([${item.hash}](${commitUrl}))\n`;
         }

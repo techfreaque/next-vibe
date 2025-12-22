@@ -18,10 +18,11 @@ import type {
   ObjectUnionField,
   PrimitiveField,
   UnifiedField,
+  WidgetField,
 } from "../types/endpoint";
 import type { CacheStrategy } from "../types/enums";
 import { FieldUsage } from "../types/enums";
-import type { TypedContainerWidgetConfig,WidgetConfig } from "../widgets/configs";
+import type { WidgetConfig } from "../widgets/configs";
 
 // ============================================================================
 // TYPE GUARDS
@@ -39,8 +40,10 @@ function isZodSchema(value: unknown): value is z.ZodTypeAny {
 // SCHEMA DEFAULT VALUE EXTRACTION
 // ============================================================================
 
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard for Zod internal structure requires unknown type
-interface ZodDefShape { _def: Record<string, unknown> }
+interface ZodDefShape {
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard for Zod internal structure requires unknown type
+  _def: Record<string, unknown>;
+}
 
 /**
  * Type guard to check if a value is a Zod schema (has _def property)
@@ -53,8 +56,11 @@ function hasZodDef(value: unknown): value is ZodDefShape {
 /**
  * Safely get a property from an object if it exists
  */
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic type parameter for flexible property extraction
-function getDefProperty<T>(def: Record<string, unknown>, key: string): T | undefined {
+function getDefProperty<T>(
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic type parameter for flexible property extraction
+  def: Record<string, unknown>,
+  key: string,
+): T | undefined {
   if (key in def) {
     return def[key] as T;
   }
@@ -103,16 +109,27 @@ export function extractSchemaDefaults<T>(
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Zod internal _def structure requires unknown type, no definition.ts type available
       const defaultValueOrFn = getDefProperty<unknown>(def, "defaultValue");
       // In Zod v4, defaultValue is the actual value; in older versions it may be a function
-      const defaultValue = typeof defaultValueOrFn === "function"
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Zod callback pattern requires unknown return type
-        ? (defaultValueOrFn as () => unknown)()
-        : defaultValueOrFn;
+      const defaultValue =
+        typeof defaultValueOrFn === "function"
+          ? // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Zod callback pattern requires unknown return type
+            (defaultValueOrFn as () => unknown)()
+          : defaultValueOrFn;
 
       // If the inner type is an object, merge with extracted defaults from children
       const innerType = getDefProperty<z.ZodTypeAny>(def, "innerType");
       if (innerType && hasZodDef(innerType)) {
-        const innerDefaults = extractSchemaDefaults<T>(innerType, logger, `${path}.inner`, forFormInit);
-        if (typeof defaultValue === "object" && defaultValue !== null && typeof innerDefaults === "object" && innerDefaults !== null) {
+        const innerDefaults = extractSchemaDefaults<T>(
+          innerType,
+          logger,
+          `${path}.inner`,
+          forFormInit,
+        );
+        if (
+          typeof defaultValue === "object" &&
+          defaultValue !== null &&
+          typeof innerDefaults === "object" &&
+          innerDefaults !== null
+        ) {
           return { ...innerDefaults, ...defaultValue } as Partial<T>;
         }
       }
@@ -121,11 +138,14 @@ export function extractSchemaDefaults<T>(
 
     // Handle ZodObject - recursively extract from all shape properties
     if (schema instanceof z.ZodObject) {
-      const shapeFnOrObj = getDefProperty<(() => Record<string, z.ZodTypeAny>) | Record<string, z.ZodTypeAny>>(def, "shape");
+      const shapeFnOrObj = getDefProperty<
+        (() => Record<string, z.ZodTypeAny>) | Record<string, z.ZodTypeAny>
+      >(def, "shape");
       if (!shapeFnOrObj) {
         return {} as Partial<T>;
       }
-      const shapeObj = typeof shapeFnOrObj === "function" ? shapeFnOrObj() : shapeFnOrObj;
+      const shapeObj =
+        typeof shapeFnOrObj === "function" ? shapeFnOrObj() : shapeFnOrObj;
       if (typeof shapeObj !== "object" || shapeObj === null) {
         return {} as Partial<T>;
       }
@@ -134,7 +154,12 @@ export function extractSchemaDefaults<T>(
       const result: Record<string, unknown> = {};
       for (const [key, fieldSchema] of Object.entries(shapeObj)) {
         if (hasZodDef(fieldSchema)) {
-          const fieldDefaults = extractSchemaDefaults(fieldSchema, logger, `${path}.${key}`, forFormInit);
+          const fieldDefaults = extractSchemaDefaults(
+            fieldSchema,
+            logger,
+            `${path}.${key}`,
+            forFormInit,
+          );
           if (fieldDefaults !== undefined) {
             result[key] = fieldDefaults;
           }
@@ -148,7 +173,12 @@ export function extractSchemaDefaults<T>(
     if (schema instanceof z.ZodOptional) {
       const innerType = getDefProperty<z.ZodTypeAny>(def, "innerType");
       if (innerType && hasZodDef(innerType)) {
-        return extractSchemaDefaults<T>(innerType, logger, `${path}.optional`, forFormInit);
+        return extractSchemaDefaults<T>(
+          innerType,
+          logger,
+          `${path}.optional`,
+          forFormInit,
+        );
       }
     }
 
@@ -156,7 +186,12 @@ export function extractSchemaDefaults<T>(
     if (schema instanceof z.ZodNullable) {
       const innerType = getDefProperty<z.ZodTypeAny>(def, "innerType");
       if (innerType && hasZodDef(innerType)) {
-        return extractSchemaDefaults<T>(innerType, logger, `${path}.nullable`, forFormInit);
+        return extractSchemaDefaults<T>(
+          innerType,
+          logger,
+          `${path}.nullable`,
+          forFormInit,
+        );
       }
     }
 
@@ -166,7 +201,12 @@ export function extractSchemaDefaults<T>(
     if (isZodEffects) {
       const innerSchema = getDefProperty<z.ZodTypeAny>(def, "schema");
       if (innerSchema && hasZodDef(innerSchema)) {
-        return extractSchemaDefaults<T>(innerSchema, logger, `${path}.effects`, forFormInit);
+        return extractSchemaDefaults<T>(
+          innerSchema,
+          logger,
+          `${path}.effects`,
+          forFormInit,
+        );
       }
     }
 
@@ -176,7 +216,12 @@ export function extractSchemaDefaults<T>(
     if (isZodPipeline) {
       const inSchema = getDefProperty<z.ZodTypeAny>(def, "in");
       if (inSchema && hasZodDef(inSchema)) {
-        return extractSchemaDefaults<T>(inSchema, logger, `${path}.pipeline`, forFormInit);
+        return extractSchemaDefaults<T>(
+          inSchema,
+          logger,
+          `${path}.pipeline`,
+          forFormInit,
+        );
       }
     }
 
@@ -186,7 +231,12 @@ export function extractSchemaDefaults<T>(
       if (typeof getter === "function") {
         const lazySchema = getter();
         if (hasZodDef(lazySchema)) {
-          return extractSchemaDefaults<T>(lazySchema, logger, `${path}.lazy`, forFormInit);
+          return extractSchemaDefaults<T>(
+            lazySchema,
+            logger,
+            `${path}.lazy`,
+            forFormInit,
+          );
         }
       }
     }
@@ -198,16 +248,32 @@ export function extractSchemaDefaults<T>(
       // Use both instanceof and def.type for Zod v4 compatibility
       // Note: Type assertions are necessary here because we're doing runtime schema introspection
       // and TypeScript can't verify at compile time that T matches the schema type
-      if (schema instanceof z.ZodArray || typeName === "ZodArray" || defType === "array") {
+      if (
+        schema instanceof z.ZodArray ||
+        typeName === "ZodArray" ||
+        defType === "array"
+      ) {
         return [] as T;
       }
-      if (schema instanceof z.ZodString || typeName === "ZodString" || defType === "string") {
+      if (
+        schema instanceof z.ZodString ||
+        typeName === "ZodString" ||
+        defType === "string"
+      ) {
         return "" as T;
       }
-      if (schema instanceof z.ZodNumber || typeName === "ZodNumber" || defType === "number") {
+      if (
+        schema instanceof z.ZodNumber ||
+        typeName === "ZodNumber" ||
+        defType === "number"
+      ) {
         return 0 as T;
       }
-      if (schema instanceof z.ZodBoolean || typeName === "ZodBoolean" || defType === "boolean") {
+      if (
+        schema instanceof z.ZodBoolean ||
+        typeName === "ZodBoolean" ||
+        defType === "boolean"
+      ) {
         return false as T;
       }
     }
@@ -216,7 +282,10 @@ export function extractSchemaDefaults<T>(
     return undefined;
   } catch (error) {
     if (logger) {
-      logger.error("Error extracting schema defaults", { path, error: String(error) });
+      logger.error("Error extracting schema defaults", {
+        path,
+        error: String(error),
+      });
     }
     return undefined;
   }
@@ -228,16 +297,18 @@ export function extractSchemaDefaults<T>(
 
 /**
  * Create a primitive field (string, number, boolean, etc.)
+ * TKey is extracted from widget config properties using ExtractWidgetKey
  */
 export function field<
   TSchema extends z.ZodTypeAny,
   TUsage extends FieldUsageConfig,
+  const TUIConfig extends WidgetConfig<string>,
 >(
   schema: TSchema,
   usage: TUsage,
-  ui: WidgetConfig,
+  ui: TUIConfig,
   cache?: CacheStrategy,
-): PrimitiveField<TSchema, TUsage> {
+): PrimitiveField<TSchema, TUsage, ExtractWidgetKey<TUIConfig>, TUIConfig> {
   return {
     type: "primitive" as const,
     schema,
@@ -249,9 +320,13 @@ export function field<
 
 /**
  * Create a field that can be both request and response
+ * TKey is extracted from widget config properties using ExtractWidgetKey
  */
-export function requestResponseField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+export function requestResponseField<
+  TSchema extends z.ZodTypeAny,
+  const TUIConfig extends WidgetConfig<string>,
+>(
+  ui: TUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: false,
@@ -260,11 +335,16 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
   {
     request: "data";
     response: true;
-  }
+  },
+  ExtractWidgetKey<TUIConfig>,
+  TUIConfig
 >;
 // eslint-disable-next-line no-redeclare
-export function requestResponseField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+export function requestResponseField<
+  TSchema extends z.ZodTypeAny,
+  const TUIConfig extends WidgetConfig<string>,
+>(
+  ui: TUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: true,
@@ -273,11 +353,16 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
   {
     request: "urlPathParams";
     response: true;
-  }
+  },
+  ExtractWidgetKey<TUIConfig>,
+  TUIConfig
 >;
 // eslint-disable-next-line no-redeclare
-export function requestResponseField<TSchema extends z.ZodTypeAny>(
-  ui: WidgetConfig,
+export function requestResponseField<
+  TSchema extends z.ZodTypeAny,
+  const TUIConfig extends WidgetConfig<string>,
+>(
+  ui: TUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: boolean,
@@ -286,7 +371,9 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
   {
     request: "data" | "urlPathParams";
     response: true;
-  }
+  },
+  ExtractWidgetKey<TUIConfig>,
+  TUIConfig
 > {
   const requestType = requestAsUrlParams ? "urlPathParams" : "data";
   return {
@@ -299,16 +386,34 @@ export function requestResponseField<TSchema extends z.ZodTypeAny>(
 }
 
 /**
+ * Extract ALL translation key types from widget config as a union
+ * Looks at label, description, placeholder, helpText, title, content, and options
+ * Returns never for properties that don't exist (filtered out in unions)
+ */
+export type ExtractWidgetKey<T> =
+  | (T extends { label: infer L extends string } ? L : never)
+  | (T extends { title: infer Ti extends string } ? Ti : never)
+  | (T extends { description: infer D extends string } ? D : never)
+  | (T extends { placeholder: infer P extends string } ? P : never)
+  | (T extends { helpText: infer H extends string } ? H : never)
+  | (T extends { content: infer C extends string } ? C : never)
+  | (T extends { options: Array<{ label: infer OL extends string }> }
+      ? OL
+      : never);
+
+/**
  * Create a request data field
+ * TKey is inferred from TUIConfig through the constraint
  */
 export function requestDataField<
   TSchema extends z.ZodTypeAny,
-  TUIConfig extends WidgetConfig = WidgetConfig,
+  TKey extends string,
+  const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
-): PrimitiveField<TSchema, { request: "data" }, TUIConfig> {
+): PrimitiveField<TSchema, { request: "data" }, TKey, TUIConfig> {
   return {
     type: "primitive" as const,
     schema,
@@ -320,19 +425,17 @@ export function requestDataField<
 
 /**
  * Create a request URL params field
+ * TKey is inferred from TUIConfig through the constraint
  */
 export function requestUrlPathParamsField<
   TSchema extends z.ZodTypeAny,
-  TUIConfig extends WidgetConfig = WidgetConfig,
+  TKey extends string,
+  const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
-): PrimitiveField<
-  TSchema,
-  { request: "urlPathParams"; response?: never },
-  TUIConfig
-> {
+): PrimitiveField<TSchema, { request: "urlPathParams"; response?: never }, TKey, TUIConfig> {
   return {
     type: "primitive" as const,
     schema,
@@ -344,15 +447,17 @@ export function requestUrlPathParamsField<
 
 /**
  * Create a response field
+ * TKey is inferred from TUIConfig through the constraint
  */
 export function responseField<
   TSchema extends z.ZodTypeAny,
-  TUIConfig extends WidgetConfig = WidgetConfig,
+  TKey extends string,
+  const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
-): PrimitiveField<TSchema, { response: true }, TUIConfig> {
+): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig> {
   return {
     type: "primitive" as const,
     schema,
@@ -365,20 +470,17 @@ export function responseField<
 /**
  * Create a widget-only field that has no schema validation
  * Use for interactive widgets like buttons, alerts, static content that don't process data
+ * TKey is inferred from TUIConfig through the constraint
  */
 export function widgetField<
   TUsage extends FieldUsageConfig,
-  TUIConfig extends WidgetConfig = WidgetConfig,
+  TKey extends string,
+  const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   usage: TUsage,
   cache?: CacheStrategy,
-): {
-  type: "widget";
-  usage: TUsage;
-  ui: TUIConfig;
-  cache?: CacheStrategy;
-} {
+): WidgetField<TUsage, TKey, TUIConfig> {
   return {
     type: "widget" as const,
     usage,
@@ -388,43 +490,58 @@ export function widgetField<
 }
 
 /**
+ * Extract translation key from any field type by looking at its ui property
+ * Returns never if no translation keys found
+ */
+type ExtractFieldKey<F> = F extends { ui: infer UI }
+  ? ExtractWidgetKey<UI>
+  : never;
+
+/**
+ * Extract all translation keys from children object using mapped type
+ */
+type ExtractChildrenKeys<TChildren> = {
+  [K in keyof TChildren]: ExtractFieldKey<TChildren[K]>;
+}[keyof TChildren];
+
+/**
  * Create an object field containing other fields
- * Accepts any object-like structure where all values are UnifiedFields
+ * TKey is inferred from TUI through the constraint
  */
 export function objectField<
-  const TUI extends WidgetConfig,
+  const TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
   const TUsage extends FieldUsageConfig,
-  const TChildren,
+  TKey extends string,
+  const TUI extends WidgetConfig<TKey>,
 >(
-  ui: TUI extends TypedContainerWidgetConfig<infer TExistingChildren, infer TExistingUsage>
-    ? TypedContainerWidgetConfig<TChildren, TUsage> & TUI & { _phantom?: TExistingChildren & TExistingUsage }
-    : TUI,
+  ui: TUI,
   usage: TUsage,
   children: TChildren,
   cache?: CacheStrategy,
-): ObjectField<TChildren, TUsage, TUI> {
+): ObjectField<TChildren, TUsage, TKey | ExtractChildrenKeys<TChildren>, TUI> {
   return {
     type: "object" as const,
     children,
     usage,
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Using unknown to break complex union type that TypeScript cannot represent
-    ui: ui as unknown as TUI,
+    ui,
     cache,
   };
 }
 
 /**
  * Create an array field containing repeated items
+ * TKey is inferred from TUIConfig through the constraint
  */
 export function arrayField<
   Child,
-  TUIConfig extends WidgetConfig = WidgetConfig,
+  TKey extends string,
+  const TUIConfig extends WidgetConfig<TKey>,
 >(
   usage: FieldUsageConfig,
   ui: TUIConfig,
   child: Child,
   cache?: CacheStrategy,
-): ArrayField<Child, FieldUsageConfig, TUIConfig> {
+): ArrayField<Child, FieldUsageConfig, TKey, TUIConfig> {
   return {
     type: "array" as const,
     child,
@@ -436,15 +553,17 @@ export function arrayField<
 
 /**
  * Create a request array field with specific request usage
+ * TKey is inferred from TUIConfig through the constraint
  */
 export function requestDataArrayField<
   Child,
-  TUIConfig extends WidgetConfig = WidgetConfig,
+  TKey extends string,
+  const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   child: Child,
   cache?: CacheStrategy,
-): ArrayField<Child, { request: "data" }, TUIConfig> {
+): ArrayField<Child, { request: "data" }, TKey, TUIConfig> {
   return {
     type: "array" as const,
     child,
@@ -456,15 +575,17 @@ export function requestDataArrayField<
 
 /**
  * Create a response array field with specific response usage
+ * TKey is inferred from TUIConfig through the constraint
  */
 export function responseArrayField<
   Child,
-  TUIConfig extends WidgetConfig = WidgetConfig,
+  TKey extends string,
+  const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   child: Child,
   cache?: CacheStrategy,
-): ArrayField<Child, { response: true }, TUIConfig> {
+): ArrayField<Child, { response: true }, TKey, TUIConfig> {
   return {
     type: "array" as const,
     child,
@@ -477,17 +598,19 @@ export function responseArrayField<
 /**
  * Create an optional object field containing other fields
  * Use when the entire object can be absent/null/undefined
+ * TKey is inferred from TUIConfig through the constraint
  */
 export function objectOptionalField<
   C,
   U extends FieldUsageConfig,
-  TUIConfig extends WidgetConfig = WidgetConfig,
+  TKey extends string,
+  const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   usage: U,
   children: C,
   cache?: CacheStrategy,
-): ObjectOptionalField<C, U, TUIConfig> {
+): ObjectOptionalField<C, U, TKey, TUIConfig> {
   return {
     type: "object-optional" as const,
     children,
@@ -500,6 +623,7 @@ export function objectOptionalField<
 /**
  * Create a discriminated union object field
  * Use for types that can be one of multiple shapes based on a discriminator field
+ * TKey is extracted from widget config properties using ExtractWidgetKey
  *
  * @example
  * ```typescript
@@ -532,18 +656,26 @@ export function objectOptionalField<
 export function objectUnionField<
   TDiscriminator extends string,
   TVariants extends readonly [
-    ObjectField<Record<string, UnifiedField<z.ZodTypeAny>>, FieldUsageConfig>,
-    ...ObjectField<Record<string, UnifiedField<z.ZodTypeAny>>, FieldUsageConfig>[],
+    ObjectField<
+      Record<string, UnifiedField<string, z.ZodTypeAny>>,
+      FieldUsageConfig,
+      string
+    >,
+    ...ObjectField<
+      Record<string, UnifiedField<string, z.ZodTypeAny>>,
+      FieldUsageConfig,
+      string
+    >[],
   ],
   TUsage extends FieldUsageConfig,
-  TUIConfig extends WidgetConfig = WidgetConfig,
+  const TUIConfig extends WidgetConfig<string>,
 >(
   ui: TUIConfig,
   usage: TUsage,
   discriminator: TDiscriminator,
   variants: TVariants,
   cache?: CacheStrategy,
-): ObjectUnionField<TDiscriminator, TVariants, TUsage, TUIConfig> {
+): ObjectUnionField<TDiscriminator, string, TVariants, TUsage, TUIConfig> {
   return {
     type: "object-union" as const,
     discriminator,
@@ -557,16 +689,22 @@ export function objectUnionField<
 /**
  * Create an optional array field containing repeated items
  * Use when the entire array can be absent/null/undefined
+ * TKey is extracted from widget config properties using ExtractWidgetKey
  */
 export function arrayOptionalField<
   Child,
-  TUIConfig extends WidgetConfig = WidgetConfig,
+  const TUIConfig extends WidgetConfig<string>,
 >(
   usage: FieldUsageConfig,
   ui: TUIConfig,
   child: Child,
   cache?: CacheStrategy,
-): ArrayOptionalField<Child, FieldUsageConfig, TUIConfig> {
+): ArrayOptionalField<
+  Child,
+  FieldUsageConfig,
+  ExtractWidgetKey<TUIConfig>,
+  TUIConfig
+> {
   return {
     type: "array-optional" as const,
     child,
@@ -578,15 +716,21 @@ export function arrayOptionalField<
 
 /**
  * Create an optional request array field with specific request usage
+ * TKey is extracted from widget config properties using ExtractWidgetKey
  */
 export function requestDataArrayOptionalField<
   Child,
-  TUIConfig extends WidgetConfig = WidgetConfig,
+  const TUIConfig extends WidgetConfig<string>,
 >(
   ui: TUIConfig,
   child: Child,
   cache?: CacheStrategy,
-): ArrayOptionalField<Child, { request: "data" }, TUIConfig> {
+): ArrayOptionalField<
+  Child,
+  { request: "data" },
+  ExtractWidgetKey<TUIConfig>,
+  TUIConfig
+> {
   return {
     type: "array-optional" as const,
     child,
@@ -598,19 +742,76 @@ export function requestDataArrayOptionalField<
 
 /**
  * Create an optional response array field with specific response usage
+ * TKey is extracted from widget config properties using ExtractWidgetKey
  */
 export function responseArrayOptionalField<
   Child,
-  TUIConfig extends WidgetConfig = WidgetConfig,
+  const TUIConfig extends WidgetConfig<string>,
 >(
   ui: TUIConfig,
   child: Child,
   cache?: CacheStrategy,
-): ArrayOptionalField<Child, { response: true }, TUIConfig> {
+): ArrayOptionalField<
+  Child,
+  { response: true },
+  ExtractWidgetKey<TUIConfig>,
+  WidgetConfig<ExtractWidgetKey<TUIConfig>>
+> {
   return {
     type: "array-optional" as const,
     child,
     usage: { response: true },
+    ui: ui as WidgetConfig<ExtractWidgetKey<TUIConfig>>,
+    cache,
+  };
+}
+
+// ============================================================================
+// SPECIALIZED FIELD HELPERS
+// ============================================================================
+
+/**
+ * Create a filter pills field for form input
+ * Provides a visual pill/chip radio button group for single-selection enums
+ * This is a specialized version of requestDataField with FilterPills widget type
+ *
+ * @param ui - FilterPills widget configuration (label, options with icons, layout)
+ * @param schema - Zod enum schema for validation
+ * @param cache - Optional cache strategy
+ * @returns A primitive field configured for FilterPills widget
+ *
+ * @example
+ * ```typescript
+ * intelligence: filterPillsField(
+ *   {
+ *     type: WidgetType.FILTER_PILLS,
+ *     label: "app.api.agent.chat.personas.post.intelligence.label",
+ *     options: [
+ *       { label: "app.filters.smart", value: "smart", icon: "brain" },
+ *       { label: "app.filters.genius", value: "genius", icon: "sparkles" },
+ *     ],
+ *   },
+ *   z.enum(["smart", "genius"]),
+ * )
+ * ```
+ */
+export function filterPillsField<
+  TSchema extends z.ZodTypeAny,
+  const TUIConfig extends WidgetConfig<string>,
+>(
+  ui: TUIConfig,
+  schema: TSchema,
+  cache?: CacheStrategy,
+): PrimitiveField<
+  TSchema,
+  { request: "data" },
+  ExtractWidgetKey<TUIConfig>,
+  TUIConfig
+> {
+  return {
+    type: "primitive" as const,
+    schema,
+    usage: { request: "data" },
     ui,
     cache,
   };
@@ -700,32 +901,36 @@ type MakeOptional<T, IsOptional extends boolean> = IsOptional extends true
  * Infer union type from ObjectUnionField variants
  */
 export type InferUnionType<
+  TTranslatedKey extends string,
   TVariants extends readonly ObjectField<
-    Record<string, UnifiedField<z.ZodTypeAny>>,
-    FieldUsageConfig
+    Record<string, UnifiedField<TTranslatedKey, z.ZodTypeAny>>,
+    FieldUsageConfig,
+    TTranslatedKey
   >[],
   Usage extends FieldUsage,
 > = TVariants extends readonly [infer Head, ...infer Tail]
   ? Head extends ObjectField<
-      Record<string, UnifiedField<z.ZodTypeAny>>,
-      FieldUsageConfig
+      Record<string, UnifiedField<TTranslatedKey, z.ZodTypeAny>>,
+      FieldUsageConfig,
+      TTranslatedKey
     >
     ? Tail extends ObjectField<
-        Record<string, UnifiedField<z.ZodTypeAny>>,
-        FieldUsageConfig
+        Record<string, UnifiedField<TTranslatedKey, z.ZodTypeAny>>,
+        FieldUsageConfig,
+        TTranslatedKey
       >[]
       ?
-          | InferFieldType<Head, Usage>
-          | InferUnionType<Tail, Usage>
-      : InferFieldType<Head, Usage>
+          | InferFieldType<Head, Usage, TTranslatedKey>
+          | InferUnionType<TTranslatedKey, Tail, Usage>
+      : InferFieldType<Head, Usage, TTranslatedKey>
     : never
   : never;
 
 /**
  * Infer field type based on usage
  */
-export type InferFieldType<F, Usage extends FieldUsage> =
-  F extends UnifiedField<infer TSchema>
+export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
+  F extends UnifiedField<TKey, infer TSchema>
     ? F extends {
         type: "primitive";
         usage: infer U;
@@ -751,21 +956,21 @@ export type InferFieldType<F, Usage extends FieldUsage> =
         ? Usage extends FieldUsage.Response
           ? HasResponseUsage<U> extends true
             ? MakeOptional<
-                Array<InferFieldType<Child, Usage>>,
+                Array<InferFieldType<Child, Usage, TKey>>,
                 IsOptionalField<F>
               >
             : never
           : Usage extends FieldUsage.RequestData
             ? HasRequestDataUsage<U> extends true
               ? MakeOptional<
-                  Array<InferFieldType<Child, Usage>>,
+                  Array<InferFieldType<Child, Usage, TKey>>,
                   IsOptionalField<F>
                 >
               : never
             : Usage extends FieldUsage.RequestUrlParams
               ? HasRequestUrlParamsUsage<U> extends true
                 ? MakeOptional<
-                    Array<InferFieldType<Child, Usage>>,
+                    Array<InferFieldType<Child, Usage, TKey>>,
                     IsOptionalField<F>
                   >
                 : never
@@ -776,20 +981,21 @@ export type InferFieldType<F, Usage extends FieldUsage> =
               usage: infer U;
             }
           ? TVariants extends readonly ObjectField<
-              Record<string, UnifiedField<z.ZodTypeAny>>,
-              FieldUsageConfig
+              Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+              FieldUsageConfig,
+              TKey
             >[]
             ? Usage extends FieldUsage.Response
               ? HasResponseUsage<U> extends true
-                ? InferUnionType<TVariants, Usage>
+                ? InferUnionType<TKey, TVariants, Usage>
                 : never
               : Usage extends FieldUsage.RequestData
                 ? HasRequestDataUsage<U> extends true
-                  ? InferUnionType<TVariants, Usage>
+                  ? InferUnionType<TKey, TVariants, Usage>
                   : never
                 : Usage extends FieldUsage.RequestUrlParams
                   ? HasRequestUrlParamsUsage<U> extends true
-                    ? InferUnionType<TVariants, Usage>
+                    ? InferUnionType<TKey, TVariants, Usage>
                     : never
                   : never
             : never
@@ -800,19 +1006,34 @@ export type InferFieldType<F, Usage extends FieldUsage> =
               }
             ? Usage extends FieldUsage.Response
               ? HasResponseUsage<U> extends true
-                ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
+                ? MakeOptional<
+                    InferObjectType<C, Usage, TKey>,
+                    IsOptionalField<F>
+                  >
                 : never
               : Usage extends FieldUsage.RequestData
                 ? HasRequestDataUsage<U> extends true
-                  ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
+                  ? MakeOptional<
+                      InferObjectType<C, Usage, TKey>,
+                      IsOptionalField<F>
+                    >
                   : never
                 : Usage extends FieldUsage.RequestUrlParams
                   ? HasRequestUrlParamsUsage<U> extends true
-                    ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
+                    ? MakeOptional<
+                        InferObjectType<C, Usage, TKey>,
+                        IsOptionalField<F>
+                      >
                     : never
                   : never
-            : F extends { type: "object" | "object-optional"; children: infer C }
-              ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
+            : F extends {
+                  type: "object" | "object-optional";
+                  children: infer C;
+                }
+              ? MakeOptional<
+                  InferObjectType<C, Usage, TKey>,
+                  IsOptionalField<F>
+                >
               : never
     : never;
 
@@ -821,20 +1042,28 @@ export type InferFieldType<F, Usage extends FieldUsage> =
  * Uses flexible constraint that accepts both readonly and mutable properties
  * Checks each field's optional flag to make properties optional in the resulting type
  */
-export type InferObjectType<C, Usage extends FieldUsage> =
-  C extends Record<string, UnifiedField<z.ZodTypeAny>>
+export type InferObjectType<C, Usage extends FieldUsage, TKey extends string> =
+  C extends Record<string, UnifiedField<TKey, z.ZodTypeAny>>
     ? {
-        -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
+        -readonly [K in keyof C as InferFieldType<
+          C[K],
+          Usage,
+          TKey
+        > extends never
           ? never
           : IsOptionalField<C[K]> extends true
             ? never
-            : K]: InferFieldType<C[K], Usage>;
+            : K]: InferFieldType<C[K], Usage, TKey>;
       } & {
-        -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
+        -readonly [K in keyof C as InferFieldType<
+          C[K],
+          Usage,
+          TKey
+        > extends never
           ? never
           : IsOptionalField<C[K]> extends true
             ? K
-            : never]?: InferFieldType<C[K], Usage>;
+            : never]?: InferFieldType<C[K], Usage, TKey>;
       }
     : never;
 
@@ -849,13 +1078,14 @@ export type InferObjectType<C, Usage extends FieldUsage> =
  *
  * We return the actual inferred schema type to preserve input/output differentiation.
  */
-export function generateSchemaForUsage<F, Usage extends FieldUsage>(
-  field: F,
-  targetUsage: Usage,
-): InferSchemaFromField<F, Usage> {
+export function generateSchemaForUsage<
+  F,
+  Usage extends FieldUsage,
+  TKey extends string,
+>(field: F, targetUsage: Usage): InferSchemaFromField<F, Usage, TKey> {
   // Defensive check: ensure field is defined
   if (!field || typeof field !== "object") {
-    return z.never() as InferSchemaFromField<F, Usage>;
+    return z.never() as InferSchemaFromField<F, Usage, TKey>;
   }
 
   const hasUsage = (usage: FieldUsageConfig | undefined): boolean => {
@@ -893,14 +1123,15 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       | "array-optional";
     usage?: FieldUsageConfig;
     schema?: z.ZodTypeAny;
-    children?: Record<string, UnifiedField<z.ZodTypeAny>>;
-    child?: UnifiedField<z.ZodTypeAny>;
+    children?: Record<string, UnifiedField<TKey, z.ZodTypeAny>>;
+    child?: UnifiedField<TKey, z.ZodTypeAny>;
     discriminator?: string;
     variants?: readonly ObjectField<
-      Record<string, UnifiedField<z.ZodTypeAny>>,
-      FieldUsageConfig
+      Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+      FieldUsageConfig,
+      TKey
     >[];
-    ui?: WidgetConfig;
+    ui?: WidgetConfig<TKey>;
   }
 
   const typedField = field as F & FieldWithType;
@@ -910,14 +1141,14 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
   // Widget-only fields have no schema and are skipped during schema generation
   if (typedField.type === "widget") {
-    return z.never() as InferSchemaFromField<F, Usage>;
+    return z.never() as InferSchemaFromField<F, Usage, TKey>;
   }
 
   if (typedField.type === "primitive") {
     if (hasUsage(typedField.usage)) {
-      return typedField.schema as InferSchemaFromField<F, Usage>;
+      return typedField.schema as InferSchemaFromField<F, Usage, TKey>;
     }
-    return z.never() as InferSchemaFromField<F, Usage>;
+    return z.never() as InferSchemaFromField<F, Usage, TKey>;
   }
 
   if (typedField.type === "object") {
@@ -930,9 +1161,9 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       // This is critical for OpenAI function calling which requires type: "object"
       if (targetUsage === FieldUsage.RequestData) {
         const emptySchema = z.object({});
-        return emptySchema as InferSchemaFromField<F, Usage>;
+        return emptySchema as InferSchemaFromField<F, Usage, TKey>;
       }
-      return z.never() as InferSchemaFromField<F, Usage>;
+      return z.never() as InferSchemaFromField<F, Usage, TKey>;
     }
 
     // Build shape object with proper typing to preserve schema types
@@ -943,7 +1174,8 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       for (const [key, childField] of Object.entries(typedField.children)) {
         // CRITICAL: Skip widget fields completely - they should NEVER be in validation schemas
         // Widget fields (formAlert, submitButton, etc.) are UI-only and don't send/receive data
-        const isWidgetField = 'type' in childField && childField.type === 'widget';
+        const isWidgetField =
+          "type" in childField && childField.type === "widget";
         if (isWidgetField) {
           continue;
         }
@@ -951,10 +1183,11 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         // CRITICAL: Skip objectFields that only contain widget children - they're UI-only containers
         // Examples: footerLinks container with only widget links inside
         const isObjectFieldWithOnlyWidgets =
-          childField.type === 'object' &&
+          childField.type === "object" &&
           childField.children &&
           Object.values(childField.children).every(
-            grandchild => 'type' in grandchild && grandchild.type === 'widget'
+            (grandchild) =>
+              "type" in grandchild && grandchild.type === "widget",
           );
         if (isObjectFieldWithOnlyWidgets) {
           continue;
@@ -983,7 +1216,11 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
           }
         }
 
-        const childSchema = generateSchemaForUsage(childField, targetUsage);
+        const childSchema = generateSchemaForUsage<
+          typeof childField,
+          Usage,
+          TKey
+        >(childField, targetUsage);
         // Check if schema is z.never() by comparing type to actual z.never() instance
         if (childSchema._def.type !== neverType) {
           shape[key] = childSchema;
@@ -995,7 +1232,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     // This handles cases like container fields with only widget children
     // These UI-only containers shouldn't be in validation schemas
     if (Object.keys(shape).length === 0) {
-      return z.never() as InferSchemaFromField<F, Usage>;
+      return z.never() as InferSchemaFromField<F, Usage, TKey>;
     }
 
     // Create the object schema and let TypeScript infer the exact type
@@ -1010,10 +1247,10 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     ) {
       const optionalSchema = objectSchema.nullable().optional();
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
-      return optionalSchema as unknown as InferSchemaFromField<F, Usage>;
+      return optionalSchema as unknown as InferSchemaFromField<F, Usage, TKey>;
     }
 
-    return objectSchema as InferSchemaFromField<F, Usage>;
+    return objectSchema as InferSchemaFromField<F, Usage, TKey>;
   }
 
   if (typedField.type === "object-optional") {
@@ -1021,7 +1258,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     const objectHasUsage = typedField.usage ? hasUsage(typedField.usage) : true;
 
     if (typedField.usage && !objectHasUsage) {
-      return z.never() as InferSchemaFromField<F, Usage>;
+      return z.never() as InferSchemaFromField<F, Usage, TKey>;
     }
 
     // Build shape object with proper typing to preserve schema types
@@ -1030,12 +1267,17 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     if (typedField.children) {
       for (const [key, childField] of Object.entries(typedField.children)) {
         // Skip widget fields - they're UI-only
-        const isWidgetField = 'type' in childField && childField.type === 'widget';
+        const isWidgetField =
+          "type" in childField && childField.type === "widget";
         if (isWidgetField) {
           continue;
         }
 
-        const childSchema = generateSchemaForUsage(childField, targetUsage);
+        const childSchema = generateSchemaForUsage<
+          typeof childField,
+          Usage,
+          TKey
+        >(childField, targetUsage);
         if (childSchema._def.type !== neverType) {
           shape[key] = childSchema;
         }
@@ -1044,12 +1286,12 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
     // If no children matched the usage, return z.never()
     if (Object.keys(shape).length === 0) {
-      return z.never() as InferSchemaFromField<F, Usage>;
+      return z.never() as InferSchemaFromField<F, Usage, TKey>;
     }
 
     // Create the object schema and wrap in nullable().optional() for object-optional
     const objectSchema = z.object(shape).nullable().optional();
-    return objectSchema as InferSchemaFromField<F, Usage>;
+    return objectSchema as InferSchemaFromField<F, Usage, TKey>;
   }
 
   if (typedField.type === "object-union") {
@@ -1057,12 +1299,12 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     const unionHasUsage = typedField.usage ? hasUsage(typedField.usage) : true;
 
     if (typedField.usage && !unionHasUsage) {
-      return z.never() as InferSchemaFromField<F, Usage>;
+      return z.never() as InferSchemaFromField<F, Usage, TKey>;
     }
 
     // Validate discriminator and variants exist
     if (!typedField.discriminator || !typedField.variants) {
-      return z.never() as InferSchemaFromField<F, Usage>;
+      return z.never() as InferSchemaFromField<F, Usage, TKey>;
     }
 
     // Generate schemas for each variant
@@ -1070,7 +1312,10 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
     for (const variant of typedField.variants) {
       // Generate schema for this variant using the same target usage
-      const variantSchema = generateSchemaForUsage(variant, targetUsage);
+      const variantSchema = generateSchemaForUsage<typeof variant, Usage, TKey>(
+        variant,
+        targetUsage,
+      );
 
       // Skip variants that don't match the usage
       if (variantSchema._def.type === neverType) {
@@ -1085,29 +1330,33 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
     // If no variants matched the usage, return z.never()
     if (variantSchemas.length === 0) {
-      return z.never() as InferSchemaFromField<F, Usage>;
+      return z.never() as InferSchemaFromField<F, Usage, TKey>;
     }
 
     // If only one variant, just return it (no need for union)
     if (variantSchemas.length === 1) {
-      return variantSchemas[0] as InferSchemaFromField<F, Usage>;
+      return variantSchemas[0] as InferSchemaFromField<F, Usage, TKey>;
     }
 
     // Create discriminated union with at least 2 variants
     const unionSchema = z.discriminatedUnion(
       typedField.discriminator,
-      variantSchemas as [z.ZodObject<z.ZodRawShape>, z.ZodObject<z.ZodRawShape>, ...z.ZodObject<z.ZodRawShape>[]],
+      variantSchemas as [
+        z.ZodObject<z.ZodRawShape>,
+        z.ZodObject<z.ZodRawShape>,
+        ...z.ZodObject<z.ZodRawShape>[],
+      ],
     );
 
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Schema generation requires type assertion for proper inference
-    return unionSchema as any as InferSchemaFromField<F, Usage>;
+    return unionSchema as any as InferSchemaFromField<F, Usage, TKey>;
   }
 
   if (typedField.type === "array") {
     if (hasUsage(typedField.usage)) {
       // Check if child exists
       if (!typedField.child) {
-        return z.never() as InferSchemaFromField<F, Usage>;
+        return z.never() as InferSchemaFromField<F, Usage, TKey>;
       }
 
       let childSchema: z.ZodTypeAny;
@@ -1116,10 +1365,14 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         childSchema = typedField.child;
       } else {
         // Child is a UnifiedField, generate schema from it
-        childSchema = generateSchemaForUsage(typedField.child, targetUsage);
+        childSchema = generateSchemaForUsage<
+          typeof typedField.child,
+          Usage,
+          TKey
+        >(typedField.child, targetUsage);
         // Check if schema is z.never() using _def.type check
         if (childSchema._def.type === neverType) {
-          return z.never() as InferSchemaFromField<F, Usage>;
+          return z.never() as InferSchemaFromField<F, Usage, TKey>;
         }
       }
 
@@ -1133,19 +1386,23 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       ) {
         const optionalArraySchema = arraySchema.nullable().optional();
         // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
-        return optionalArraySchema as unknown as InferSchemaFromField<F, Usage>;
+        return optionalArraySchema as unknown as InferSchemaFromField<
+          F,
+          Usage,
+          TKey
+        >;
       }
 
-      return arraySchema as InferSchemaFromField<F, Usage>;
+      return arraySchema as InferSchemaFromField<F, Usage, TKey>;
     }
-    return z.never() as InferSchemaFromField<F, Usage>;
+    return z.never() as InferSchemaFromField<F, Usage, TKey>;
   }
 
   if (typedField.type === "array-optional") {
     if (hasUsage(typedField.usage)) {
       // Check if child exists
       if (!typedField.child) {
-        return z.never() as InferSchemaFromField<F, Usage>;
+        return z.never() as InferSchemaFromField<F, Usage, TKey>;
       }
 
       let childSchema: z.ZodTypeAny;
@@ -1154,10 +1411,14 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         childSchema = typedField.child;
       } else {
         // Child is a UnifiedField, generate schema from it
-        childSchema = generateSchemaForUsage(typedField.child, targetUsage);
+        childSchema = generateSchemaForUsage<
+          typeof typedField.child,
+          Usage,
+          TKey
+        >(typedField.child, targetUsage);
         // Check if schema is z.never() using _def.type check
         if (childSchema._def.type === neverType) {
-          return z.never() as InferSchemaFromField<F, Usage>;
+          return z.never() as InferSchemaFromField<F, Usage, TKey>;
         }
       }
 
@@ -1165,34 +1426,45 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       const arrayOptionalSchema = z.array(childSchema).nullable().optional();
 
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
-      return arrayOptionalSchema as unknown as InferSchemaFromField<F, Usage>;
+      return arrayOptionalSchema as unknown as InferSchemaFromField<
+        F,
+        Usage,
+        TKey
+      >;
     }
-    return z.never() as InferSchemaFromField<F, Usage>;
+    return z.never() as InferSchemaFromField<F, Usage, TKey>;
   }
 
-  return z.never() as InferSchemaFromField<F, Usage>;
+  return z.never() as InferSchemaFromField<F, Usage, TKey>;
 }
 
 // Utility types that work with z.ZodType<Output, ZodTypeDef, Input> to properly infer types
 // These preserve the input/output type differentiation from Zod schemas
 
-export type InferFieldSchemaInputType<F, Usage extends FieldUsage> = z.input<
-  ReturnType<typeof generateSchemaForUsage<F, Usage>>
->;
+export type InferFieldSchemaInputType<
+  F,
+  Usage extends FieldUsage,
+  TKey extends string,
+> = z.input<ReturnType<typeof generateSchemaForUsage<F, Usage, TKey>>>;
 
-export type InferFieldSchemaOutputType<F, Usage extends FieldUsage> = z.output<
-  ReturnType<typeof generateSchemaForUsage<F, Usage>>
->;
+export type InferFieldSchemaOutputType<
+  F,
+  Usage extends FieldUsage,
+  TKey extends string,
+> = z.output<ReturnType<typeof generateSchemaForUsage<F, Usage, TKey>>>;
 
 /**
  * Generate request data schema with proper input/output type differentiation
  * CRITICAL: This function must preserve the actual schema types for z.input<>/z.output<>
  */
-export function generateRequestDataSchema<F>(
+export function generateRequestDataSchema<F, TKey extends string>(
   field: F,
-): InferSchemaFromField<F, FieldUsage.RequestData> {
+): InferSchemaFromField<F, FieldUsage.RequestData, TKey> {
   // Generate the base schema - the runtime schema preserves its actual type
-  const baseSchema = generateSchemaForUsage(field, FieldUsage.RequestData);
+  const baseSchema = generateSchemaForUsage<F, FieldUsage.RequestData, TKey>(
+    field,
+    FieldUsage.RequestData,
+  );
 
   // Return the schema with its actual runtime type preserved
   // This is critical for ExtractInput<> and ExtractOutput<> to work correctly
@@ -1203,11 +1475,15 @@ export function generateRequestDataSchema<F>(
  * Generate request URL params schema with proper input/output type differentiation
  * CRITICAL: This function must preserve the actual schema types for z.input<>/z.output<>
  */
-export function generateRequestUrlSchema<F>(
+export function generateRequestUrlSchema<F, TKey extends string>(
   field: F,
-): InferSchemaFromField<F, FieldUsage.RequestUrlParams> {
+): InferSchemaFromField<F, FieldUsage.RequestUrlParams, TKey> {
   // Generate the base schema - the runtime schema preserves its actual type
-  const baseSchema = generateSchemaForUsage(field, FieldUsage.RequestUrlParams);
+  const baseSchema = generateSchemaForUsage<
+    F,
+    FieldUsage.RequestUrlParams,
+    TKey
+  >(field, FieldUsage.RequestUrlParams);
 
   // Return the schema with its actual runtime type preserved
   return baseSchema;
@@ -1217,11 +1493,14 @@ export function generateRequestUrlSchema<F>(
  * Generate response schema with proper input/output type differentiation
  * CRITICAL: This function must preserve the actual schema types for z.input<>/z.output<>
  */
-export function generateResponseSchema<F>(
+export function generateResponseSchema<F, TKey extends string>(
   field: F,
-): InferSchemaFromField<F, FieldUsage.Response> {
+): InferSchemaFromField<F, FieldUsage.Response, TKey> {
   // Generate the base schema - the runtime schema preserves its actual type
-  const baseSchema = generateSchemaForUsage(field, FieldUsage.Response);
+  const baseSchema = generateSchemaForUsage<F, FieldUsage.Response, TKey>(
+    field,
+    FieldUsage.Response,
+  );
 
   // Return the schema with its actual runtime type preserved
   return baseSchema;

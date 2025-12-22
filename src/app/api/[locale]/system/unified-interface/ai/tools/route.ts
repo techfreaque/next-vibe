@@ -1,3 +1,8 @@
+/**
+ * AI Tools Route Handler
+ * Handles GET requests for available AI tools
+ */
+
 import { success } from "next-vibe/shared/types/response.schema";
 
 import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
@@ -11,7 +16,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: toolsDefinition,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, logger, locale }) => {
+    handler: ({ user, logger, locale }) => {
       const tools = definitionsRegistry.getSerializedToolsForUser(
         Platform.AI,
         user,

@@ -1,9 +1,9 @@
 import { translations as creditsTranslations } from "../../../../credits/i18n/en";
 import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/en";
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/en";
+import { translations as charactersTranslations } from "../../characters/i18n/en";
 import { translations as foldersTranslations } from "../../folders/i18n/en";
 import { translations as memoriesTranslations } from "../../memories/i18n/en";
-import { translations as personasTranslations } from "../../personas/i18n/en";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/en";
 import { translations as threadsTranslations } from "../../threads/i18n/en";
 
@@ -13,7 +13,7 @@ export const translations = {
     threads: "Threads",
     folders: "Folders",
     messages: "Messages",
-    personas: "Personas",
+    characters: "Characters",
     memories: "Memories",
     credits: "Credits",
     balance: "Balance",
@@ -50,6 +50,38 @@ export const translations = {
       debug: "Debug",
     },
   },
+  favorites: {
+    enums: {
+      mode: {
+        auto: "Auto",
+        manual: "Manual",
+      },
+      intelligence: {
+        any: "Any",
+        quick: "Quick",
+        smart: "Smart",
+        brilliant: "Brilliant",
+      },
+      price: {
+        any: "Any",
+        cheap: "Cheap",
+        standard: "Standard",
+        premium: "Premium",
+      },
+      content: {
+        any: "Any",
+        mainstream: "Mainstream",
+        open: "Open",
+        uncensored: "Uncensored",
+      },
+      speed: {
+        any: "Any",
+        fast: "Fast",
+        balanced: "Balanced",
+        thorough: "Thorough",
+      },
+    },
+  },
   components: {
     sidebar: {
       login: "Login",
@@ -61,6 +93,46 @@ export const translations = {
         buy: "Buy",
         freeCreditsLeft: "Free credits",
       },
+    },
+  },
+  selector: {
+    loading: "Loading...",
+    best: "Best Match",
+    free: "FREE",
+    creditsSingle: "1 credit",
+    creditsExact: "{{cost}} credits",
+    modelOnly: "Model Only",
+    editModelSettings: "Edit model settings",
+    editSettings: "Edit settings",
+    switchPersona: "Switch Persona",
+    editPersona: "Edit Persona",
+    delete: "Delete",
+    autoSelectedModel: "AUTO-SELECTED",
+    manualSelectedModel: "MANUALLY SELECTED",
+    intelligence: "Intelligence",
+    contentFilter: "Content",
+    maxPrice: "Max Price",
+    modelSelection: "Model Selection",
+    autoModeDescription: "Best model is selected based on your filters",
+    manualModeDescription: "Choose a specific model manually",
+    autoMode: "Auto",
+    manualMode: "Manual",
+    allModelsCount: "All {{count}} models",
+    filteredModelsCount: "{{count}} models match filters",
+    showFiltered: "Show filtered",
+    showAllModels: "Show all models",
+    showLess: "Show less",
+    showMore: "Show {{remaining}} more",
+    noMatchingModels: "No matching models",
+    noModelsWarning: "No models match your filters",
+    applyOnce: "Apply once",
+    saveChanges: "Save Changes",
+    requirements: {
+      personaConflict: "Persona requirement conflicts",
+      tooLow: "too low",
+      tooHigh: "too high",
+      min: "min",
+      max: "max",
     },
   },
   common: {
@@ -99,15 +171,15 @@ export const translations = {
       answerAsAI: "Answer as AI model",
       deleteMessage: "Delete message",
     },
-    personaSelector: {
-      placeholder: "Select persona",
-      addNewLabel: "Create custom persona",
+    characterSelector: {
+      placeholder: "Select character",
+      addNewLabel: "Create custom character",
       grouping: {
         bySource: "By Source",
         byCategory: "By Category",
         sourceLabels: {
           builtIn: "Built-in",
-          my: "My Personas",
+          my: "My Characters",
           community: "Community",
         },
         sourceIcons: {
@@ -117,11 +189,11 @@ export const translations = {
         },
       },
       addDialog: {
-        title: "Create Custom Persona",
+        title: "Create Custom Character",
         fields: {
           name: {
             label: "Name",
-            placeholder: "Enter persona name",
+            placeholder: "Enter character name",
           },
           icon: {
             label: "Icon (emoji)",
@@ -129,11 +201,11 @@ export const translations = {
           },
           description: {
             label: "Description",
-            placeholder: "Brief description of the persona",
+            placeholder: "Brief description of the character",
           },
           systemPrompt: {
             label: "System Prompt",
-            placeholder: "Define how the persona behaves...",
+            placeholder: "Define how the character behaves...",
           },
           category: {
             label: "Category",
@@ -147,7 +219,7 @@ export const translations = {
         },
         createCategory: "Create Category",
         cancel: "Cancel",
-        create: "Create Persona",
+        create: "Create Character",
       },
       addCategoryDialog: {
         title: "Create Category",
@@ -175,7 +247,7 @@ export const translations = {
     searchEnabled: "Search enabled",
     searchDisabled: "Search disabled",
     answerAsAI: "Answer as AI model",
-    retry: "Retry with different model/persona",
+    retry: "Retry with different model/character",
     branch: "Branch conversation from here",
     editMessage: "Edit message",
     stopAudio: "Stop audio playback",
@@ -242,7 +314,7 @@ export const translations = {
   credits: creditsTranslations,
   folders: foldersTranslations,
   memories: memoriesTranslations,
-  personas: personasTranslations,
+  characters: charactersTranslations,
   threads: {
     ...threadsTranslations,
     messages: messagesTranslations,

@@ -93,14 +93,13 @@ async function executeImapSync(
       logger.info("tasks.imap_sync.completed", syncResult.data.result.summary);
       return success(syncResult.data.result);
     }
-      logger.error("tasks.imap_sync.failed", {
-        error: syncResult.message,
-      });
-      return fail({
-        message: "app.api.emails.error.default",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    
+    logger.error("tasks.imap_sync.failed", {
+      error: syncResult.message,
+    });
+    return fail({
+      message: "app.api.emails.error.default",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   } catch (error) {
     logger.error("tasks.imap_sync.failed", {
       error:
@@ -127,11 +126,10 @@ function validateImapSync(logger: EndpointLogger): ResponseType<boolean> {
     if (validationResult.success && validationResult.data) {
       return success(validationResult.data.isValid);
     }
-      return fail({
-        message: "app.api.emails.error.default",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    
+    return fail({
+      message: "app.api.emails.error.default",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   } catch {
     return fail({
       message: "app.api.emails.error.default",

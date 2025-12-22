@@ -18,6 +18,7 @@ import type {
 import { useApiForm } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation-form";
 import { useTranslation } from "@/i18n/core/client";
 
+import type { ResetPasswordValidateGetResponseOutput } from "../validate/definition";
 import type {
   ResetPasswordConfirmPostRequestOutput,
   ResetPasswordConfirmPostResponseOutput,
@@ -44,7 +45,7 @@ import resetPasswordConfirmEndpoints from "./definition";
  */
 export function useResetPasswordConfirm(
   token: string,
-  tokenValidationResponse: ResponseType<string>,
+  tokenValidationResponse: ResponseType<ResetPasswordValidateGetResponseOutput>,
   logger: EndpointLogger,
 ): {
   form: ApiFormReturn<

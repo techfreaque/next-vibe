@@ -4,10 +4,13 @@
  */
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
-import { Pressable,View } from "react-native";
+import { Pressable, View } from "react-native";
 
 // Import ALL types from web (source of truth)
-import type { MultiSelectOption,MultiSelectProps } from "@/packages/next-vibe-ui/web/ui/multi-select";
+import type {
+  MultiSelectOption,
+  MultiSelectProps,
+} from "@/packages/next-vibe-ui/web/ui/multi-select";
 
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Badge } from "./badge";
@@ -20,7 +23,7 @@ import {
   CommandItem,
   CommandList,
 } from "./command";
-import { Check, ChevronDown,X } from "./icons";
+import { Check, ChevronDown, X } from "./icons";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 export function MultiSelect({
@@ -53,7 +56,9 @@ export function MultiSelect({
     onChange(value.filter((v) => v !== removeValue));
   };
 
-  const selectedOptions = options.filter((option) => value.includes(option.value));
+  const selectedOptions = options.filter((option) =>
+    value.includes(option.value),
+  );
 
   // Note: style prop is not passed to Button due to StyleType discriminated union
   // Button uses className for styling via NativeWind (either style OR className, not both)
@@ -70,24 +75,26 @@ export function MultiSelect({
           disabled={disabled}
         >
           <View className="flex flex-row flex-wrap gap-1">
-            {selectedOptions.length > 0 ? (
-              selectedOptions.map((option) => (
-                <Badge key={option.value} variant="secondary" className="mr-1">
-                  {option.label}
-                  <Pressable
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      handleRemove(option.value);
-                    }}
-                    className="ml-1"
+            {selectedOptions.length > 0
+              ? selectedOptions.map((option) => (
+                  <Badge
+                    key={option.value}
+                    variant="secondary"
+                    className="mr-1"
                   >
-                    <X className="h-3 w-3" />
-                  </Pressable>
-                </Badge>
-              ))
-            ) : (
-              placeholder || "Select options..."
-            )}
+                    {option.label}
+                    <Pressable
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        handleRemove(option.value);
+                      }}
+                      className="ml-1"
+                    >
+                      <X className="h-3 w-3" />
+                    </Pressable>
+                  </Badge>
+                ))
+              : placeholder || "Select options..."}
           </View>
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>

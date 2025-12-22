@@ -11,16 +11,11 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
  * Options for testing an API endpoint
  */
 export interface TestEndpointOptions<
-  TRequestInput,
-  TRequestOutput,
-  TResponseInput,
-  TResponseOutput,
-  TUrlVariablesInput,
-  TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
 > {
   /**
    * Custom test cases to run in addition to (or instead of) example tests
@@ -28,15 +23,10 @@ export interface TestEndpointOptions<
   customTests?: {
     [testName: string]: (
       test: TestRunner<
-        TRequestInput,
-        TRequestOutput,
-        TResponseInput,
-        TResponseOutput,
-        TUrlVariablesInput,
-        TUrlVariablesOutput,
         TExampleKey,
         TMethod,
         TUserRoleValue,
+        TScopedTranslationKey,
         TFields
       >,
     ) => Promise<void> | void;
@@ -53,26 +43,43 @@ export interface TestEndpointOptions<
  * Test runner for executing API endpoint tests
  */
 export interface TestRunner<
-  TRequestInput,
-  TRequestOutput,
-  TResponseInput,
-  TResponseOutput,
-  TUrlVariablesInput,
-  TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
 > {
   /**
    * Execute the endpoint with the given data and URL params
    * User is optional - if not provided, creates default user based on endpoint roles
    */
   executeWith: (options: {
-    data: TRequestOutput;
-    urlPathParams: TUrlVariablesOutput;
+    data: CreateApiEndpoint<
+      TExampleKey,
+      TMethod,
+      TUserRoleValue,
+      TScopedTranslationKey,
+      TFields
+    >["types"]["RequestOutput"];
+    urlPathParams: CreateApiEndpoint<
+      TExampleKey,
+      TMethod,
+      TUserRoleValue,
+      TScopedTranslationKey,
+      TFields
+    >["types"]["UrlVariablesOutput"];
     user: JwtPayloadType;
-  }) => Promise<ResponseType<TResponseOutput>>;
+  }) => Promise<
+    ResponseType<
+      CreateApiEndpoint<
+        TExampleKey,
+        TMethod,
+        TUserRoleValue,
+        TScopedTranslationKey,
+        TFields
+      >["types"]["ResponseOutput"]
+    >
+  >;
 
   /**
    * The endpoint being tested
@@ -81,12 +88,7 @@ export interface TestRunner<
     TExampleKey,
     TMethod,
     TUserRoleValue,
-    TFields,
-    TRequestInput,
-    TRequestOutput,
-    TResponseInput,
-    TResponseOutput,
-    TUrlVariablesInput,
-    TUrlVariablesOutput
+    TScopedTranslationKey,
+    TFields
   >;
 }

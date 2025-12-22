@@ -45,7 +45,9 @@ export interface NewsletterSubscribeSmsService {
 /**
  * SMS Service Repository Implementation for Newsletter Subscriptions
  */
-export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSmsService {
+export class NewsletterSubscribeSmsServiceImpl
+  implements NewsletterSubscribeSmsService
+{
   /**
    * Send welcome SMS to new newsletter subscriber
    */

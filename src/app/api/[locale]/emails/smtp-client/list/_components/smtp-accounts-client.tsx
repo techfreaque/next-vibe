@@ -158,6 +158,7 @@ export function SmtpAccountsClient({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 {/* Purpose Filter */}
@@ -206,6 +207,7 @@ export function SmtpAccountsClient({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 {/* Status Filter */}
@@ -244,6 +246,7 @@ export function SmtpAccountsClient({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 {/* Health Status Filter */}
@@ -282,6 +285,7 @@ export function SmtpAccountsClient({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
               </Div>
 

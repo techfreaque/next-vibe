@@ -100,7 +100,9 @@ export function getAwsSnsProvider(): SmsProvider {
           .toISOString()
           .replaceAll(/[:-]|\.\d{3}/g, "")
           .slice(0, 8);
-        const amzDate = new Date().toISOString().replaceAll(/[:-]|\.\d{3}/g, "");
+        const amzDate = new Date()
+          .toISOString()
+          .replaceAll(/[:-]|\.\d{3}/g, "");
 
         // Create the canonical request
         const method = "POST";

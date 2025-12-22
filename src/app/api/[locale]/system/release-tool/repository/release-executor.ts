@@ -94,7 +94,10 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
     // Timings tracking
     const timings: Timings = { total: 0 };
-    const trackTime = (phase: keyof Omit<Timings, "total">, start: number): void => {
+    const trackTime = (
+      phase: keyof Omit<Timings, "total">,
+      start: number,
+    ): void => {
       timings[phase] = Date.now() - start;
     };
 
@@ -114,7 +117,9 @@ export class ReleaseExecutor implements IReleaseExecutor {
       } else {
         // Lazy-load configLoader to avoid Turbopack warning about dynamic imports
         // The config module uses dynamic imports that can't be statically analyzed
-        const { configLoader } = await import("./config") as { configLoader: IConfigLoader };
+        const { configLoader } = (await import("./config")) as {
+          configLoader: IConfigLoader;
+        };
         const configResult = await configLoader.load(logger, data.configPath);
         if (!configResult.success) {
           return fail({
@@ -152,15 +157,21 @@ export class ReleaseExecutor implements IReleaseExecutor {
       logger.vibe(formatStartup("Release Tool", "📦"));
       logger.vibe("");
       logger.vibe(`  ${formatConfig("Package Manager", packageManager)}`);
-      logger.vibe(`  ${formatConfig("Dry Run", dryRun ? "YES" : "NO")}  ${formatHint(dryRun ? "(changes won't be applied)" : "")}`);
+      logger.vibe(
+        `  ${formatConfig("Dry Run", dryRun ? "YES" : "NO")}  ${formatHint(dryRun ? "(changes won't be applied)" : "")}`,
+      );
       if (ciEnv.isCI) {
-        logger.vibe(`  ${formatConfig("CI Environment", ciEnv.provider ?? "detected")}`);
+        logger.vibe(
+          `  ${formatConfig("CI Environment", ciEnv.provider ?? "detected")}`,
+        );
       }
       logger.vibe("");
 
       // Show what will be checked/skipped
       logger.vibe(`  ${formatConfig("Lint", skipLint ? "SKIP" : "ON")}`);
-      logger.vibe(`  ${formatConfig("Typecheck", skipTypecheck ? "SKIP" : "ON")}`);
+      logger.vibe(
+        `  ${formatConfig("Typecheck", skipTypecheck ? "SKIP" : "ON")}`,
+      );
       logger.vibe(`  ${formatConfig("Build", skipBuild ? "SKIP" : "ON")}`);
       logger.vibe(`  ${formatConfig("Tests", skipTests ? "SKIP" : "ON")}`);
       logger.vibe(`  ${formatConfig("Publish", skipPublish ? "SKIP" : "ON")}`);
@@ -211,7 +222,10 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
         if (shouldUpdate) {
           logger.vibe(formatProgress("Updating dependencies..."));
-          const pkgJsonResult = packageService.getPackageJson(originalCwd, logger);
+          const pkgJsonResult = packageService.getPackageJson(
+            originalCwd,
+            logger,
+          );
           if (pkgJsonResult.success) {
             const updateResult = dependencyManager.updateDependencies(
               originalCwd,
@@ -223,7 +237,9 @@ export class ReleaseExecutor implements IReleaseExecutor {
             if (updateResult.success) {
               logger.vibe(formatSuccess("Dependencies updated"));
             } else {
-              logger.vibe(formatWarning("Failed to update dependencies, continuing..."));
+              logger.vibe(
+                formatWarning("Failed to update dependencies, continuing..."),
+              );
             }
           }
         } else {
@@ -233,7 +249,9 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
       // Handle force update mode - just update deps and return
       if (forceUpdate) {
-        logger.vibe(formatProgress("Force update mode: updating dependencies..."));
+        logger.vibe(
+          formatProgress("Force update mode: updating dependencies..."),
+        );
         const packages = config.packages ?? [];
         for (const pkg of packages) {
           if (pkg.updateDeps === true || pkg.updateDeps === "force") {
@@ -248,7 +266,9 @@ export class ReleaseExecutor implements IReleaseExecutor {
                 dryRun,
               );
               if (!updateResult.success) {
-                errors.push(`Failed to update ${pkgJsonResult.data.name}: ${updateResult.message}`);
+                errors.push(
+                  `Failed to update ${pkgJsonResult.data.name}: ${updateResult.message}`,
+                );
               }
             }
           }
@@ -347,7 +367,10 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
         // Helper to handle quality check failures
         let packageFailed = false;
-        const handleFailure = (result: { success: boolean; message?: string }, step: string): boolean => {
+        const handleFailure = (
+          result: { success: boolean; message?: string },
+          step: string,
+        ): boolean => {
           if (!result.success) {
             const errorMsg = result.message ?? `${step} failed`;
             errors.push(`[${packageJson.name}] ${errorMsg}`);
@@ -367,24 +390,46 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
         // Helper to handle hook failures (same behavior as quality failures)
         const handleHookFailure = (hookName: string): boolean => {
-          return handleFailure({ success: false, message: `Hook ${hookName} failed` }, "Hook");
+          return handleFailure(
+            { success: false, message: `Hook ${hookName} failed` },
+            "Hook",
+          );
         };
 
         // Install dependencies if configured
         if (pkg.install && !packageFailed) {
           if (pkg.hooks?.preInstall) {
-            const hookResult = hookRunner.runHook(pkg.hooks.preInstall, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.preInstall,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success && handleHookFailure("preInstall")) {
               continue;
             }
           }
-          const installCommand = typeof pkg.install === "string" ? pkg.install : undefined;
-          const installResult = qualityRunner.runInstall(cwd, packageManager, logger, dryRun, installCommand);
+          const installCommand =
+            typeof pkg.install === "string" ? pkg.install : undefined;
+          const installResult = qualityRunner.runInstall(
+            cwd,
+            packageManager,
+            logger,
+            dryRun,
+            installCommand,
+          );
           if (handleFailure(installResult, "Install")) {
             continue;
           }
           if (pkg.hooks?.postInstall) {
-            const hookResult = hookRunner.runHook(pkg.hooks.postInstall, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.postInstall,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success && handleHookFailure("postInstall")) {
               continue;
             }
@@ -394,18 +439,37 @@ export class ReleaseExecutor implements IReleaseExecutor {
         // Clean if configured
         if (pkg.clean && !packageFailed) {
           if (pkg.hooks?.preClean) {
-            const hookResult = hookRunner.runHook(pkg.hooks.preClean, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.preClean,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success && handleHookFailure("preClean")) {
               continue;
             }
           }
-          const cleanCommand = typeof pkg.clean === "string" ? pkg.clean : undefined;
-          const cleanResult = qualityRunner.runClean(cwd, packageManager, logger, dryRun, cleanCommand);
+          const cleanCommand =
+            typeof pkg.clean === "string" ? pkg.clean : undefined;
+          const cleanResult = qualityRunner.runClean(
+            cwd,
+            packageManager,
+            logger,
+            dryRun,
+            cleanCommand,
+          );
           if (handleFailure(cleanResult, "Clean")) {
             continue;
           }
           if (pkg.hooks?.postClean) {
-            const hookResult = hookRunner.runHook(pkg.hooks.postClean, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.postClean,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success && handleHookFailure("postClean")) {
               continue;
             }
@@ -418,18 +482,37 @@ export class ReleaseExecutor implements IReleaseExecutor {
         // Lint
         if (pkg.lint && !skipLint && !packageFailed) {
           if (pkg.hooks?.preLint) {
-            const hookResult = hookRunner.runHook(pkg.hooks.preLint, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.preLint,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success && handleHookFailure("preLint")) {
               continue;
             }
           }
-          const lintCommand = typeof pkg.lint === "string" ? pkg.lint : undefined;
-          const lintResult = qualityRunner.runLint(cwd, packageManager, logger, dryRun, lintCommand);
+          const lintCommand =
+            typeof pkg.lint === "string" ? pkg.lint : undefined;
+          const lintResult = qualityRunner.runLint(
+            cwd,
+            packageManager,
+            logger,
+            dryRun,
+            lintCommand,
+          );
           if (handleFailure(lintResult, "Lint")) {
             continue;
           }
           if (pkg.hooks?.postLint) {
-            const hookResult = hookRunner.runHook(pkg.hooks.postLint, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.postLint,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success && handleHookFailure("postLint")) {
               continue;
             }
@@ -438,8 +521,15 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
         // Typecheck
         if (pkg.typecheck && !skipTypecheck && !packageFailed) {
-          const typecheckCommand = typeof pkg.typecheck === "string" ? pkg.typecheck : undefined;
-          const typecheckResult = qualityRunner.runTypecheck(cwd, packageManager, logger, dryRun, typecheckCommand);
+          const typecheckCommand =
+            typeof pkg.typecheck === "string" ? pkg.typecheck : undefined;
+          const typecheckResult = qualityRunner.runTypecheck(
+            cwd,
+            packageManager,
+            logger,
+            dryRun,
+            typecheckCommand,
+          );
           if (handleFailure(typecheckResult, "Typecheck")) {
             continue;
           }
@@ -448,18 +538,37 @@ export class ReleaseExecutor implements IReleaseExecutor {
         // Build
         if (pkg.build && !skipBuild && !packageFailed) {
           if (pkg.hooks?.preBuild) {
-            const hookResult = hookRunner.runHook(pkg.hooks.preBuild, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.preBuild,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success && handleHookFailure("preBuild")) {
               continue;
             }
           }
-          const buildCommand = typeof pkg.build === "string" ? pkg.build : undefined;
-          const buildResult = qualityRunner.runBuild(cwd, packageManager, logger, dryRun, buildCommand);
+          const buildCommand =
+            typeof pkg.build === "string" ? pkg.build : undefined;
+          const buildResult = qualityRunner.runBuild(
+            cwd,
+            packageManager,
+            logger,
+            dryRun,
+            buildCommand,
+          );
           if (handleFailure(buildResult, "Build")) {
             continue;
           }
           if (pkg.hooks?.postBuild) {
-            const hookResult = hookRunner.runHook(pkg.hooks.postBuild, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.postBuild,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success && handleHookFailure("postBuild")) {
               continue;
             }
@@ -469,18 +578,37 @@ export class ReleaseExecutor implements IReleaseExecutor {
         // Tests
         if (pkg.test && !skipTests && !packageFailed) {
           if (pkg.hooks?.preTest) {
-            const hookResult = hookRunner.runHook(pkg.hooks.preTest, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.preTest,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success && handleHookFailure("preTest")) {
               continue;
             }
           }
-          const testCommand = typeof pkg.test === "string" ? pkg.test : undefined;
-          const testResult = qualityRunner.runTests(cwd, packageManager, logger, dryRun, testCommand);
+          const testCommand =
+            typeof pkg.test === "string" ? pkg.test : undefined;
+          const testResult = qualityRunner.runTests(
+            cwd,
+            packageManager,
+            logger,
+            dryRun,
+            testCommand,
+          );
           if (handleFailure(testResult, "Tests")) {
             continue;
           }
           if (pkg.hooks?.postTest) {
-            const hookResult = hookRunner.runHook(pkg.hooks.postTest, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.postTest,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success && handleHookFailure("postTest")) {
               continue;
             }
@@ -520,7 +648,10 @@ export class ReleaseExecutor implements IReleaseExecutor {
           );
 
           // Check if tag exists
-          const tagExists = await gitService.checkTagExists(versionInfo.newTag, logger);
+          const tagExists = await gitService.checkTagExists(
+            versionInfo.newTag,
+            logger,
+          );
           if (tagExists) {
             packagesProcessed.push({
               name: packageJson.name,
@@ -534,7 +665,9 @@ export class ReleaseExecutor implements IReleaseExecutor {
           }
 
           // Check for new commits
-          if (!gitService.hasNewCommitsSinceTag(versionInfo.lastTag, cwd, logger)) {
+          if (
+            !gitService.hasNewCommitsSinceTag(versionInfo.lastTag, cwd, logger)
+          ) {
             packagesProcessed.push({
               name: packageJson.name,
               directory: pkg.directory,
@@ -548,7 +681,13 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
           // Run pre-release hook
           if (pkg.hooks?.preRelease) {
-            const hookResult = hookRunner.runHook(pkg.hooks.preRelease, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.preRelease,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success && handleHookFailure("preRelease")) {
               continue;
             }
@@ -567,7 +706,11 @@ export class ReleaseExecutor implements IReleaseExecutor {
           }
 
           // Update version in other files
-          versionService.updateVariableStringValue(logger, versionInfo.newVersion, releaseConfig);
+          versionService.updateVariableStringValue(
+            logger,
+            versionInfo.newVersion,
+            releaseConfig,
+          );
 
           // Zip folders
           if (releaseConfig.foldersToZip) {
@@ -582,7 +725,13 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
           // Run pre-publish hook
           if (pkg.hooks?.prePublish) {
-            const hookResult = hookRunner.runHook(pkg.hooks.prePublish, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.prePublish,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success && handleHookFailure("prePublish")) {
               continue;
             }
@@ -605,11 +754,26 @@ export class ReleaseExecutor implements IReleaseExecutor {
           // Create git tag and publish
           if (!skipPublish && !packageFailed) {
             // Branch check RIGHT BEFORE git operations (last chance to warn)
-            const currentBranch = globalGitInfo?.currentBranch ?? gitService.getCurrentBranch();
-            if (currentBranch && currentBranch !== mainBranch && !config.branch?.allowNonMain) {
-              logger.vibe(formatWarning(`Releasing from '${currentBranch}' branch (not '${mainBranch}')`));
-              logger.vibe(formatHint("Set branch.allowNonMain: true in config to suppress this warning"));
-              warnings.push(`Released from ${currentBranch} instead of ${mainBranch}`);
+            const currentBranch =
+              globalGitInfo?.currentBranch ?? gitService.getCurrentBranch();
+            if (
+              currentBranch &&
+              currentBranch !== mainBranch &&
+              !config.branch?.allowNonMain
+            ) {
+              logger.vibe(
+                formatWarning(
+                  `Releasing from '${currentBranch}' branch (not '${mainBranch}')`,
+                ),
+              );
+              logger.vibe(
+                formatHint(
+                  "Set branch.allowNonMain: true in config to suppress this warning",
+                ),
+              );
+              warnings.push(
+                `Released from ${currentBranch} instead of ${mainBranch}`,
+              );
             }
 
             logger.vibe(formatProgress(`Releasing ${packageJson.name}...`));
@@ -711,17 +875,33 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
           // Run post-publish hook (errors logged but don't fail release since package already published)
           if (pkg.hooks?.postPublish && !packageFailed) {
-            const hookResult = hookRunner.runHook(pkg.hooks.postPublish, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.postPublish,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success) {
-              warnings.push(`[${packageJson.name}] postPublish hook failed: ${hookResult.message}`);
+              warnings.push(
+                `[${packageJson.name}] postPublish hook failed: ${hookResult.message}`,
+              );
             }
           }
 
           // Run post-release hook (errors logged but don't fail release since package already published)
           if (pkg.hooks?.postRelease && !packageFailed) {
-            const hookResult = hookRunner.runHook(pkg.hooks.postRelease, cwd, logger, dryRun, hookContext);
+            const hookResult = hookRunner.runHook(
+              pkg.hooks.postRelease,
+              cwd,
+              logger,
+              dryRun,
+              hookContext,
+            );
             if (!hookResult.success) {
-              warnings.push(`[${packageJson.name}] postRelease hook failed: ${hookResult.message}`);
+              warnings.push(
+                `[${packageJson.name}] postRelease hook failed: ${hookResult.message}`,
+              );
             }
           }
 
@@ -732,7 +912,9 @@ export class ReleaseExecutor implements IReleaseExecutor {
               version: versionInfo.newVersion,
               tag: versionInfo.newTag,
               status: "success",
-              message: dryRun ? "Would have been released" : "Released successfully",
+              message: dryRun
+                ? "Would have been released"
+                : "Released successfully",
             });
           }
         } else {
@@ -747,8 +929,14 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
       // Run global post-release hook only if no errors occurred
       // (errors logged but don't fail release since it's post-processing)
-      const hasFailedPackages = packagesProcessed.some((p) => p.status === "failed");
-      if (config.hooks?.postRelease && !hasFailedPackages && errors.length === 0) {
+      const hasFailedPackages = packagesProcessed.some(
+        (p) => p.status === "failed",
+      );
+      if (
+        config.hooks?.postRelease &&
+        !hasFailedPackages &&
+        errors.length === 0
+      ) {
         const hookResult = hookRunner.runHook(
           config.hooks.postRelease,
           originalCwd,
@@ -757,9 +945,14 @@ export class ReleaseExecutor implements IReleaseExecutor {
           { packageManager },
         );
         if (!hookResult.success) {
-          warnings.push(`Global postRelease hook failed: ${hookResult.message}`);
+          warnings.push(
+            `Global postRelease hook failed: ${hookResult.message}`,
+          );
         }
-      } else if (config.hooks?.postRelease && (hasFailedPackages || errors.length > 0)) {
+      } else if (
+        config.hooks?.postRelease &&
+        (hasFailedPackages || errors.length > 0)
+      ) {
         logger.vibe(formatSkip("Skipping postRelease hook due to errors"));
       }
 
@@ -769,9 +962,15 @@ export class ReleaseExecutor implements IReleaseExecutor {
       timings.total = Date.now() - startTime;
 
       // Add summary
-      const successCount = packagesProcessed.filter((p) => p.status === "success").length;
-      const skipCount = packagesProcessed.filter((p) => p.status === "skipped").length;
-      const failCount = packagesProcessed.filter((p) => p.status === "failed").length;
+      const successCount = packagesProcessed.filter(
+        (p) => p.status === "success",
+      ).length;
+      const skipCount = packagesProcessed.filter(
+        (p) => p.status === "skipped",
+      ).length;
+      const failCount = packagesProcessed.filter(
+        (p) => p.status === "failed",
+      ).length;
 
       // Show summary
       logger.vibe("");
@@ -796,12 +995,16 @@ export class ReleaseExecutor implements IReleaseExecutor {
       logger.debug(MESSAGES.TIMING_REPORT, { ...timings });
 
       // Send notifications if configured
-      const notifyConfig = config.notifications || (notifyWebhook ? {
-        enabled: true,
-        webhookUrl: notifyWebhook,
-        onSuccess: true,
-        onFailure: true,
-      } : undefined);
+      const notifyConfig =
+        config.notifications ||
+        (notifyWebhook
+          ? {
+              enabled: true,
+              webhookUrl: notifyWebhook,
+              onSuccess: true,
+              onFailure: true,
+            }
+          : undefined);
 
       if (notifyConfig?.enabled) {
         const notifyResult = await notificationService.sendNotification(
@@ -841,14 +1044,17 @@ export class ReleaseExecutor implements IReleaseExecutor {
           errors: hasErrors ? errors : null,
           warnings: warnings.length > 0 ? warnings : null,
           gitInfo: globalGitInfo,
-          publishedPackages: publishedPackages.length > 0 ? publishedPackages : null,
+          publishedPackages:
+            publishedPackages.length > 0 ? publishedPackages : null,
           timings,
-          notificationsSent: notificationsSent.length > 0 ? notificationsSent : null,
+          notificationsSent:
+            notificationsSent.length > 0 ? notificationsSent : null,
         } satisfies ReleaseResponseType,
         hasErrors ? { isErrorResponse: true } : undefined,
       );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       errors.push(errorMessage);
       output.push(MESSAGES.RELEASE_FAILED);
 
@@ -856,12 +1062,16 @@ export class ReleaseExecutor implements IReleaseExecutor {
       timings.total = Date.now() - startTime;
 
       // Send failure notification if configured
-      const notifyConfig = config?.notifications || (data.notifyWebhook ? {
-        enabled: true,
-        webhookUrl: data.notifyWebhook,
-        onSuccess: true,
-        onFailure: true,
-      } : undefined);
+      const notifyConfig =
+        config?.notifications ||
+        (data.notifyWebhook
+          ? {
+              enabled: true,
+              webhookUrl: data.notifyWebhook,
+              onSuccess: true,
+              onFailure: true,
+            }
+          : undefined);
 
       if (notifyConfig?.enabled) {
         const notifyResult = await notificationService.sendNotification(
@@ -887,9 +1097,11 @@ export class ReleaseExecutor implements IReleaseExecutor {
           errors,
           warnings: warnings.length > 0 ? warnings : null,
           gitInfo: globalGitInfo,
-          publishedPackages: publishedPackages.length > 0 ? publishedPackages : null,
+          publishedPackages:
+            publishedPackages.length > 0 ? publishedPackages : null,
           timings,
-          notificationsSent: notificationsSent.length > 0 ? notificationsSent : null,
+          notificationsSent:
+            notificationsSent.length > 0 ? notificationsSent : null,
         } satisfies ReleaseResponseType,
         { isErrorResponse: true },
       );

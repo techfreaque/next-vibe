@@ -10,13 +10,7 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Calendar,
-  Coins,
-  Gift,
-  Sparkles,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { Calendar, Coins, Gift, Sparkles, Zap } from "next-vibe-ui/ui/icons";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 import { useMemo } from "react";

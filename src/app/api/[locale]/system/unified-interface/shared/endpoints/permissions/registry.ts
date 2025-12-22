@@ -148,7 +148,8 @@ class PermissionsRegistry implements IPermissionsRegistry {
         if (!platformMarkers.includes(PlatformMarker.CLI_AUTH_BYPASS)) {
           return {
             allowed: false,
-            reason: "Endpoint requires authentication which is not available in CLI_PACKAGE mode",
+            reason:
+              "Endpoint requires authentication which is not available in CLI_PACKAGE mode",
             blockedByRole: PlatformMarker.CLI_AUTH_BYPASS,
           };
         }

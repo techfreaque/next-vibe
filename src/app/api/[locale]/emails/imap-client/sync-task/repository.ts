@@ -57,9 +57,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
     try {
       // For now, we'll execute a simplified sync all accounts operation
       // In a real implementation, this would get specific accounts based on config
-      const syncResult = await imapSyncRepository.syncAllAccounts(
-        logger,
-      );
+      const syncResult = await imapSyncRepository.syncAllAccounts(logger);
 
       if (syncResult.success) {
         const result: TaskResultType = {
@@ -88,15 +86,14 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
         logger.info("tasks.imap_sync.completed", result.summary);
         return success({ result });
       }
-        logger.error("tasks.imap_sync.failed", {
-          error: syncResult.message,
-        });
-        return fail({
-          message: "app.api.emails.error.default",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          cause: syncResult,
-        });
-      
+      logger.error("tasks.imap_sync.failed", {
+        error: syncResult.message,
+      });
+      return fail({
+        message: "app.api.emails.error.default",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        cause: syncResult,
+      });
     } catch (error) {
       logger.error("tasks.imap_sync.failed", {
         error:

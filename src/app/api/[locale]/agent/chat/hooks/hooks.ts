@@ -15,6 +15,7 @@ import {
   useState,
 } from "react";
 
+import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -26,6 +27,8 @@ import { type CreditsGetResponseOutput } from "../../../credits/definition";
 import { useCredits } from "../../../credits/hooks";
 import { useAIStreamStore } from "../../ai-stream/hooks/store";
 import { useAIStream } from "../../ai-stream/hooks/use-ai-stream";
+import type { CharacterListResponseOutput } from "../characters/definition";
+import { useCharactersList } from "../characters/hooks";
 import type { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { NEW_MESSAGE_ID } from "../enum";
@@ -33,8 +36,6 @@ import type { FolderUpdate } from "../folders/hooks/use-operations";
 import { useFolderOperations } from "../folders/hooks/use-operations";
 import type { IconValue } from "../model-access/icons";
 import type { ModelId } from "../model-access/models";
-import type { PersonaListResponseOutput } from "../personas/definition";
-import { usePersonasList } from "../personas/hooks";
 import { useMessageOperations } from "../threads/[threadId]/messages/hooks/use-operations";
 import type { ThreadUpdate } from "../threads/hooks/use-operations";
 import { useThreadOperations } from "../threads/hooks/use-operations";
@@ -68,9 +69,15 @@ export interface UseChatReturn {
   messages: Record<string, ChatMessage>;
   folders: Record<string, ChatFolder>;
   rootFolderPermissions: RootFolderPermissions; // Server-computed permissions for current root folder
-  personas: Record<
+  characters: Record<
     string,
-    { id: string; name: string; icon: string; systemPrompt: string }
+    {
+      id: string;
+      name: string;
+      icon: string;
+      systemPrompt: string;
+      voice?: typeof TtsVoiceValue;
+    }
   >;
   activeThread: ChatThread | null;
   activeThreadMessages: ChatMessage[];
@@ -88,7 +95,7 @@ export interface UseChatReturn {
   setInput: (input: string) => void;
 
   // Settings
-  selectedPersona: string;
+  selectedCharacter: string;
   selectedModel: ModelId;
   temperature: number;
   maxTokens: number;
@@ -96,7 +103,7 @@ export interface UseChatReturn {
   sidebarCollapsed: boolean;
   viewMode: ChatSettings["viewMode"];
   enabledToolIds: string[];
-  setSelectedPersona: (persona: string) => void;
+  setSelectedCharacter: (persona: string) => void;
   setSelectedModel: (model: ModelId) => void;
   setTemperature: (temp: number) => void;
   setMaxTokens: (tokens: number) => void;
@@ -315,7 +322,7 @@ export function useChat(
   const aiStream = useAIStream(locale, logger, t);
 
   // Fetch personas
-  const personasEndpoint = usePersonasList(logger);
+  const personasEndpoint = useCharactersList(logger);
 
   // Local state
   const [input, setInput] = useState("");
@@ -507,7 +514,7 @@ export function useChat(
     sendMessage: messageOps.sendMessage,
     setInput: setInputAndSaveDraft,
     setSelectedModel: settingsOps.setSelectedModel,
-    setSelectedPersona: settingsOps.setSelectedPersona,
+    setSelectedCharacter: settingsOps.setSelectedCharacter,
     setEnabledToolIds: settingsOps.setEnabledToolIds,
     inputRef,
     locale,
@@ -534,21 +541,28 @@ export function useChat(
   // Compute personas map
   const personas = useMemo(() => {
     const response = personasEndpoint.read?.response as
-      | PersonaListResponseOutput
+      | CharacterListResponseOutput
       | undefined;
-    const personasList = response?.personas;
+    const charactersList = response?.characters;
     const personasMap: Record<
       string,
-      { id: string; name: string; icon: string; systemPrompt: string }
+      {
+        id: string;
+        name: string;
+        icon: string;
+        systemPrompt: string;
+        voice?: typeof TtsVoiceValue;
+      }
     > = {};
 
-    if (personasList && Array.isArray(personasList)) {
-      personasList.forEach((p) => {
+    if (charactersList && Array.isArray(charactersList)) {
+      charactersList.forEach((p) => {
         personasMap[p.id] = {
           id: p.id,
           name: p.name,
           icon: p.icon,
           systemPrompt: p.systemPrompt,
+          voice: p.voice,
         };
       });
     }
@@ -589,7 +603,7 @@ export function useChat(
     messages,
     folders,
     rootFolderPermissions, // Server-computed permissions passed as prop
-    personas,
+    characters: personas,
     activeThread,
     activeThreadMessages,
     isLoading,
@@ -606,7 +620,7 @@ export function useChat(
     setInput: setInputAndSaveDraft,
 
     // Settings
-    selectedPersona: settingsOps.settings.selectedPersona,
+    selectedCharacter: settingsOps.settings.selectedCharacter,
     selectedModel: settingsOps.settings.selectedModel,
     temperature: settingsOps.settings.temperature,
     maxTokens: settingsOps.settings.maxTokens,
@@ -614,7 +628,7 @@ export function useChat(
     sidebarCollapsed,
     viewMode: settingsOps.settings.viewMode,
     enabledToolIds: settingsOps.settings.enabledToolIds,
-    setSelectedPersona: settingsOps.setSelectedPersona,
+    setSelectedCharacter: settingsOps.setSelectedCharacter,
     setSelectedModel: settingsOps.setSelectedModel,
     setTemperature: settingsOps.setTemperature,
     setMaxTokens: settingsOps.setMaxTokens,

@@ -13,7 +13,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import { z } from "zod";
+import type { z } from "zod";
 
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -709,14 +709,12 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     return false;
   }
 
-  private async getCreateApiEndpoint(route: CreateApiEndpointAny): Promise<{
-    title?: string;
-    description?: string;
-    requestSchema?: z.ZodTypeAny;
-    requestUrlPathParamsSchema?: z.ZodTypeAny;
-  } | null> {
-    const { definitionLoader } =
-      await import("../../unified-interface/shared/endpoints/definition/loader");
+  private async getCreateApiEndpoint(
+    route: CreateApiEndpointAny,
+  ): Promise<CreateApiEndpointAny | null> {
+    const { definitionLoader } = await import(
+      "../../unified-interface/shared/endpoints/definition/loader"
+    );
 
     const routePath = route.path.join("/");
     const alias =
@@ -736,32 +734,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       return null;
     }
 
-    const definition = result.data;
-    if (!definition || typeof definition !== "object") {
-      return null;
-    }
-
-    return {
-      title:
-        "title" in definition && typeof definition.title === "string"
-          ? definition.title
-          : undefined,
-      description:
-        "description" in definition &&
-        typeof definition.description === "string"
-          ? definition.description
-          : undefined,
-      requestSchema:
-        "requestSchema" in definition &&
-        definition.requestSchema instanceof z.ZodType
-          ? definition.requestSchema
-          : undefined,
-      requestUrlPathParamsSchema:
-        "requestUrlPathParamsSchema" in definition &&
-        definition.requestUrlPathParamsSchema instanceof z.ZodType
-          ? definition.requestUrlPathParamsSchema
-          : undefined,
-    };
+    return result.data;
   }
 
   private async executeRouteWithData(

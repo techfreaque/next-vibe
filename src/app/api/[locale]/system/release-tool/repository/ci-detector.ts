@@ -120,26 +120,29 @@ export class CIDetector implements ICIDetector {
         commit: env.GITHUB_SHA ?? null,
         pr:
           env.GITHUB_EVENT_NAME === "pull_request"
-            ? env.GITHUB_PR_NUMBER ?? env.GITHUB_REF?.match(/refs\/pull\/(\d+)/)?.[1] ?? null
+            ? (env.GITHUB_PR_NUMBER ??
+              env.GITHUB_REF?.match(/refs\/pull\/(\d+)/)?.[1] ??
+              null)
             : null,
         tag: env.GITHUB_REF?.startsWith("refs/tags/")
           ? env.GITHUB_REF.replace("refs/tags/", "")
           : null,
         buildId: env.GITHUB_RUN_ID ?? null,
         buildNumber: env.GITHUB_RUN_NUMBER ?? null,
-        buildUrl: env.GITHUB_SERVER_URL && env.GITHUB_REPOSITORY && env.GITHUB_RUN_ID
-          ? `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`
-          : null,
-        repoUrl: env.GITHUB_SERVER_URL && env.GITHUB_REPOSITORY
-          ? `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}`
-          : null,
+        buildUrl:
+          env.GITHUB_SERVER_URL && env.GITHUB_REPOSITORY && env.GITHUB_RUN_ID
+            ? `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`
+            : null,
+        repoUrl:
+          env.GITHUB_SERVER_URL && env.GITHUB_REPOSITORY
+            ? `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}`
+            : null,
         actor: env.GITHUB_ACTOR ?? null,
         event: env.GITHUB_EVENT_NAME ?? null,
         runner: env.RUNNER_NAME ?? null,
         trusted: env.GITHUB_REF_PROTECTED === "true",
       };
     }
-
 
     // GitLab CI
     if (!this.cachedEnvironment && env.GITLAB_CI === "true") {
@@ -161,7 +164,6 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // Jenkins
     if (!this.cachedEnvironment && env.JENKINS_URL) {
       this.cachedEnvironment = {
@@ -181,7 +183,6 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // CircleCI
     if (!this.cachedEnvironment && env.CIRCLECI === "true") {
       this.cachedEnvironment = {
@@ -190,7 +191,9 @@ export class CIDetector implements ICIDetector {
         branch: env.CIRCLE_BRANCH ?? null,
         commit: env.CIRCLE_SHA1 ?? null,
         pr: env.CIRCLE_PULL_REQUEST
-          ? env.CIRCLE_PR_NUMBER ?? env.CIRCLE_PULL_REQUEST.split("/").pop() ?? null
+          ? (env.CIRCLE_PR_NUMBER ??
+            env.CIRCLE_PULL_REQUEST.split("/").pop() ??
+            null)
           : null,
         tag: env.CIRCLE_TAG ?? null,
         buildId: env.CIRCLE_WORKFLOW_ID ?? null,
@@ -201,7 +204,6 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // Travis CI
     if (!this.cachedEnvironment && env.TRAVIS === "true") {
       this.cachedEnvironment = {
@@ -211,7 +213,7 @@ export class CIDetector implements ICIDetector {
         commit: env.TRAVIS_COMMIT ?? null,
         pr:
           env.TRAVIS_PULL_REQUEST !== "false"
-            ? env.TRAVIS_PULL_REQUEST ?? null
+            ? (env.TRAVIS_PULL_REQUEST ?? null)
             : null,
         tag: env.TRAVIS_TAG ?? null,
         buildId: env.TRAVIS_BUILD_ID ?? null,
@@ -220,7 +222,6 @@ export class CIDetector implements ICIDetector {
         repoUrl: `https://github.com/${env.TRAVIS_REPO_SLUG}`,
       };
     }
-
 
     // Azure Pipelines
     if (!this.cachedEnvironment && env.TF_BUILD === "True") {
@@ -236,16 +237,18 @@ export class CIDetector implements ICIDetector {
           : null,
         buildId: env.BUILD_BUILDID ?? null,
         buildNumber: env.BUILD_BUILDNUMBER ?? null,
-        buildUrl: env.SYSTEM_TEAMFOUNDATIONSERVERURI && env.SYSTEM_TEAMPROJECT && env.BUILD_BUILDID
-          ? `${env.SYSTEM_TEAMFOUNDATIONSERVERURI}${env.SYSTEM_TEAMPROJECT}/_build/results?buildId=${env.BUILD_BUILDID}`
-          : null,
+        buildUrl:
+          env.SYSTEM_TEAMFOUNDATIONSERVERURI &&
+          env.SYSTEM_TEAMPROJECT &&
+          env.BUILD_BUILDID
+            ? `${env.SYSTEM_TEAMFOUNDATIONSERVERURI}${env.SYSTEM_TEAMPROJECT}/_build/results?buildId=${env.BUILD_BUILDID}`
+            : null,
         repoUrl: env.BUILD_REPOSITORY_URI ?? null,
         actor: env.BUILD_REQUESTEDFOR ?? null,
         event: env.BUILD_REASON ?? null,
         runner: env.AGENT_NAME ?? null,
       };
     }
-
 
     // Bitbucket Pipelines
     if (!this.cachedEnvironment && env.BITBUCKET_BUILD_NUMBER) {
@@ -262,7 +265,6 @@ export class CIDetector implements ICIDetector {
         actor: env.BITBUCKET_STEP_TRIGGERER_UUID ?? null,
       };
     }
-
 
     // Drone CI
     if (!this.cachedEnvironment && env.DRONE === "true") {
@@ -283,7 +285,6 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // Buildkite
     if (!this.cachedEnvironment && env.BUILDKITE === "true") {
       this.cachedEnvironment = {
@@ -291,9 +292,10 @@ export class CIDetector implements ICIDetector {
         provider: "buildkite",
         branch: env.BUILDKITE_BRANCH ?? null,
         commit: env.BUILDKITE_COMMIT ?? null,
-        pr: env.BUILDKITE_PULL_REQUEST !== "false"
-          ? env.BUILDKITE_PULL_REQUEST ?? null
-          : null,
+        pr:
+          env.BUILDKITE_PULL_REQUEST !== "false"
+            ? (env.BUILDKITE_PULL_REQUEST ?? null)
+            : null,
         tag: env.BUILDKITE_TAG ?? null,
         buildId: env.BUILDKITE_BUILD_ID ?? null,
         buildNumber: env.BUILDKITE_BUILD_NUMBER ?? null,
@@ -304,9 +306,11 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // Woodpecker CI (Drone fork)
-    if (!this.cachedEnvironment && (env.CI === "woodpecker" || env.WOODPECKER === "true")) {
+    if (
+      !this.cachedEnvironment &&
+      (env.CI === "woodpecker" || env.WOODPECKER === "true")
+    ) {
       this.cachedEnvironment = {
         isCI: true,
         provider: "woodpecker",
@@ -323,7 +327,6 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // TeamCity
     if (!this.cachedEnvironment && env.TEAMCITY_VERSION) {
       this.cachedEnvironment = {
@@ -337,7 +340,6 @@ export class CIDetector implements ICIDetector {
         buildNumber: env.BUILD_NUMBER ?? null,
       };
     }
-
 
     // Codeship
     if (!this.cachedEnvironment && env.CI_NAME === "codeship") {
@@ -356,9 +358,11 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // AppVeyor
-    if (!this.cachedEnvironment && (env.APPVEYOR === "True" || env.APPVEYOR === "true")) {
+    if (
+      !this.cachedEnvironment &&
+      (env.APPVEYOR === "True" || env.APPVEYOR === "true")
+    ) {
       this.cachedEnvironment = {
         isCI: true,
         provider: "appveyor",
@@ -373,13 +377,13 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // AWS CodeBuild
     if (!this.cachedEnvironment && env.CODEBUILD_BUILD_ID) {
       this.cachedEnvironment = {
         isCI: true,
         provider: "codebuild",
-        branch: env.CODEBUILD_WEBHOOK_HEAD_REF?.replace("refs/heads/", "") ?? null,
+        branch:
+          env.CODEBUILD_WEBHOOK_HEAD_REF?.replace("refs/heads/", "") ?? null,
         commit: env.CODEBUILD_RESOLVED_SOURCE_VERSION ?? null,
         pr: env.CODEBUILD_WEBHOOK_TRIGGER?.startsWith("pr/")
           ? env.CODEBUILD_WEBHOOK_TRIGGER.replace("pr/", "")
@@ -394,7 +398,6 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // Google Cloud Build
     if (!this.cachedEnvironment && (env.BUILDER_OUTPUT || env.PROJECT_ID)) {
       this.cachedEnvironment = {
@@ -408,7 +411,6 @@ export class CIDetector implements ICIDetector {
         repoUrl: env.REPO_NAME ?? null,
       };
     }
-
 
     // Semaphore
     if (!this.cachedEnvironment && env.SEMAPHORE === "true") {
@@ -426,7 +428,6 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // Buddy
     if (!this.cachedEnvironment && env.BUDDY === "true") {
       this.cachedEnvironment = {
@@ -442,7 +443,6 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // Render
     if (!this.cachedEnvironment && env.RENDER === "true") {
       this.cachedEnvironment = {
@@ -456,9 +456,11 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // Vercel
-    if (!this.cachedEnvironment && (env.VERCEL === "1" || env.NOW_BUILDER === "1")) {
+    if (
+      !this.cachedEnvironment &&
+      (env.VERCEL === "1" || env.NOW_BUILDER === "1")
+    ) {
       this.cachedEnvironment = {
         isCI: true,
         provider: "vercel",
@@ -471,7 +473,6 @@ export class CIDetector implements ICIDetector {
       };
     }
 
-
     // Netlify
     if (!this.cachedEnvironment && env.NETLIFY === "true") {
       this.cachedEnvironment = {
@@ -479,13 +480,12 @@ export class CIDetector implements ICIDetector {
         provider: "netlify",
         branch: env.BRANCH ?? null,
         commit: env.COMMIT_REF ?? null,
-        pr: env.PULL_REQUEST === "true" ? env.REVIEW_ID ?? null : null,
+        pr: env.PULL_REQUEST === "true" ? (env.REVIEW_ID ?? null) : null,
         tag: null,
         buildId: env.BUILD_ID ?? null,
         repoUrl: env.REPOSITORY_URL ?? null,
       };
     }
-
 
     // Generic CI detection
     if (

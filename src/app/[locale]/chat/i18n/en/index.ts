@@ -71,7 +71,7 @@ export const translations = {
     // User Message Actions
     userMessageActions: {
       branch: "Branch conversation from here",
-      retry: "Retry with different model/persona",
+      retry: "Retry with different model/character",
       deleteMessage: "Delete message",
     },
 
@@ -136,18 +136,22 @@ export const translations = {
     },
   },
 
-  createPersona: {
+  createCharacter: {
     title: "Create Custom Character",
+    description:
+      "Design your own AI character with custom characterlity, expertise, and behavior.",
     icon: "Icon",
     name: "Name",
     namePlaceholder: "e.g. Code Reviewer",
-    description: "Description",
+    descriptionLabel: "Description",
     descriptionPlaceholder: "Brief description of what this character does",
     category: "Category",
     selectCategory: "Select a category",
     systemPrompt: "System Prompt",
     systemPromptPlaceholder:
-      "Define how this character should behave. Be specific about its personality, expertise, and how it should respond.",
+      "Define how this character should behave. Be specific about its characterlity, expertise, and how it should respond.",
+    voice: "Voice",
+    voicePlaceholder: "Select a voice for text-to-speech",
     create: "Create Character",
     creating: "Creating...",
     charCount: "{{current}} / {{max}}",
@@ -157,6 +161,37 @@ export const translations = {
       systemPromptRequired: "Please enter a system prompt",
       createFailed: "Failed to create character. Please try again.",
     },
+  },
+
+  voice: {
+    male: "Male",
+    female: "Female",
+  },
+
+  editCharacter: {
+    title: "Edit as Custom Character",
+    description:
+      "Create a custom character based on this character. You can modify any settings.",
+    loginRequired:
+      "Please log in to create and edit custom characters. Custom characters are saved to your account.",
+    name: "Name",
+    namePlaceholder: "Custom character name",
+    descriptionLabel: "Description",
+    descriptionPlaceholder: "What does this character do?",
+    category: "Category",
+    icon: "Icon",
+    voice: "Voice",
+    voicePlaceholder: "Select voice",
+    preferredModel: "Preferred Model",
+    preferredModelPlaceholder: "Optional preferred model",
+    systemPrompt: "System Prompt",
+    systemPromptPlaceholder: "Define the character's behavior...",
+    save: "Save as Custom",
+    saveAsCopy: "Save as Copy",
+    saving: "Creating...",
+    cancel: "Cancel",
+    login: "Login to Edit",
+    signup: "Sign Up to Edit",
   },
 
   userProfile: {
@@ -202,7 +237,7 @@ export const translations = {
     searchEnabled: "Search enabled",
     searchDisabled: "Search disabled",
     answerAsAI: "Answer as AI model",
-    retry: "Retry with different model/persona",
+    retry: "Retry with different model/character",
     branch: "Branch conversation from here",
     editMessage: "Edit message",
     stopAudio: "Stop audio playback",
@@ -334,16 +369,16 @@ export const translations = {
       add: "Add Model",
     },
   },
-  personaSelector: {
-    placeholder: "Select Persona",
-    addNewLabel: "Create Custom Persona",
+  characterSelector: {
+    placeholder: "Select Character",
+    addNewLabel: "Create Custom Character",
     defaultIcon: "✨",
     grouping: {
       bySource: "By Source",
       byCategory: "By Category",
       sourceLabels: {
         builtIn: "Built-in",
-        my: "My Personas",
+        my: "My Characters",
         community: "Community",
       },
       sourceIcons: {
@@ -370,7 +405,7 @@ export const translations = {
       create: "Create",
     },
     addDialog: {
-      title: "Create Custom Persona",
+      title: "Create Custom Character",
       createCategory: "+ New Category",
       fields: {
         name: {
@@ -383,7 +418,7 @@ export const translations = {
         },
         description: {
           label: "Description",
-          placeholder: "Brief description of the persona",
+          placeholder: "Brief description of the character",
         },
         systemPrompt: {
           label: "System Prompt",
@@ -394,12 +429,12 @@ export const translations = {
         },
         suggestedPrompts: {
           label: "Suggested Prompts (Optional)",
-          description: "Add up to 4 suggested prompts for this persona",
+          description: "Add up to 4 suggested prompts for this character",
           placeholder: "Prompt {{number}}",
         },
       },
       cancel: "Cancel",
-      create: "Create Persona",
+      create: "Create Character",
     },
   },
   searchToggle: {
@@ -415,28 +450,30 @@ export const translations = {
   combinedSelector: {
     tabs: {
       quick: "Quick",
-      persona: "Persona",
+      character: "Character",
       model: "Model",
     },
     current: "Current",
-    favoritePersonas: "Favorite Personas",
+    favoriteCharacters: "Favorite Characters",
     favoriteModels: "Favorite Models",
     showAll: "Show all",
     selectModel: "Select Model",
-    forPersona: "for {{persona}}",
+    forCharacter: "for {{character}}",
     recommended: "Recommended",
     favorites: "Favorites",
     all: "All",
     noFavorites: "No favorites yet. Star some to add them here.",
     noModels: "No models available",
-    filteredByPersona: "Showing {{compatible}} of {{total}} models (filtered by persona)",
-    selectPersona: "Select Persona",
-    allPersonas: "All",
+    filteredByCharacter:
+      "Showing {{compatible}} of {{total}} models (filtered by character)",
+    selectCharacter: "Select Character",
+    allCharacters: "All",
   },
   selector: {
+    loading: "Loading...",
     tabs: {
       quick: "Quick",
-      personas: "Personas",
+      characters: "Characters",
       build: "Build",
     },
     tiers: {
@@ -458,13 +495,13 @@ export const translations = {
     favorites: "Favorites",
     suggested: "Suggested",
     noFavorites: "No favorites yet",
-    noFavoritesHint: "Save your go-to personas for quick access",
-    browseAllPersonas: "Browse all personas...",
+    noFavoritesHint: "Save your go-to characters for quick access",
+    browseAllCharacters: "Browse all characters...",
     customSetup: "Custom setup...",
-    selectPersona: "Select Persona",
+    selectCharacter: "Select Character",
     all: "All",
     buildMode: "Build Mode",
-    forPersona: "for {{persona}}",
+    forCharacter: "for {{character}}",
     intelligence: "Intelligence",
     contentLevel: "Content Level",
     any: "Any",
@@ -477,14 +514,14 @@ export const translations = {
     currentConfig: "Currently chatting with",
     switchModel: "Switch Model",
     keepsConversation: "(keeps conversation)",
-    switchPersona: "Switch Persona",
+    switchCharacter: "Switch Character",
     startsNewChat: "(starts new chat)",
     start: "Start",
     addFav: "Add",
-    searchPersonas: "Search personas...",
-    noPersonasFound: "No personas found",
+    searchCharacters: "Search characters...",
+    noCharactersFound: "No characters found",
     createCustom: "Create custom character",
-    persona: "Persona",
+    character: "Character",
     savePreset: "Save",
     perMessage: "per message",
     compatibleModels: "{{count}} compatible models",
@@ -510,14 +547,15 @@ export const translations = {
     manualSelect: "Pick manually...",
     best: "BEST",
     noMatchingModels: "No models match your filters",
-    noModelsWarning: "No models match these filters. Adjust your settings to continue.",
+    noModelsWarning:
+      "No models match these filters. Adjust your settings to continue.",
     allModelsCount: "{{count}} models available",
     filteredModelsCount: "{{count}} matching models",
     showAllModels: "Show all",
     showFiltered: "Show filtered",
     applyChanges: "Apply Changes",
     thisChatOnly: "This chat only (temporary)",
-    saveToPreset: "Save to \"{{name}}\"",
+    saveToPreset: 'Save to "{{name}}"',
     saveAsNew: "Save as new favorite...",
     cancel: "Cancel",
     apply: "Apply",
@@ -525,7 +563,6 @@ export const translations = {
     maxPrice: "Max Price",
     creditsExact: "{{cost}} credits",
     creditsSingle: "1 credit",
-    searchCharacters: "Search...",
     searchResults: "{{count}} results",
     defaults: "Defaults",
     customize: "Customize",
@@ -539,6 +576,9 @@ export const translations = {
     yourSetups: "Your Setups",
     setup: "Setup",
     delete: "Delete",
+    editCharacter: "Edit as custom character",
+    switchPersona: "Switch Persona",
+    editPersona: "Edit Persona",
     autoSelectedModel: "Auto-selected:",
     manualSelectedModel: "Selected:",
     auto: "Auto",
@@ -564,13 +604,34 @@ export const translations = {
     useNow: "Use Now",
     browseAll: "Browse all characters",
     add: "Add",
-    noCharactersFound: "No characters found",
     // v22 UX improvements
     quickSwitch: "Quick Switch",
     switchTo: "Switch to this setup",
     adjustSettings: "Adjust Settings",
     addAnotherSetup: "Add another setup",
     comingSoon: "Coming soon",
+    // Character requirements
+    requirements: {
+      intelligenceTooLow: "Intelligence too low (min: {{min}})",
+      intelligenceTooHigh: "Intelligence too high (max: {{max}})",
+      contentTooLow: "Content level too low (min: {{min}})",
+      contentTooHigh: "Content level too high (max: {{max}})",
+      allMet: "Meets all requirements",
+      violations: "{{count}} requirement violations",
+    },
+    // Character switch modal
+    characterSwitchModal: {
+      title: "Switch Character",
+      description:
+        "Switch to a different character without losing your settings",
+      searchPlaceholder: "Search characters...",
+      noResults: "No characters found",
+      keepSettings: "Keep current model settings",
+      keepSettingsDesc:
+        "Use your current intelligence, price, and content filters with the new character",
+      cancel: "Cancel",
+      confirm: "Switch Character",
+    },
   },
   onboarding: {
     // Screen 1: Story
@@ -589,7 +650,7 @@ export const translations = {
       selectFirst: "Pick a companion to continue",
       saving: "Saving...",
     },
-    // Companion personalities
+    // Companion characterlities
     thea: {
       tagline: "Warm & wise",
       description: "Like a supportive friend who really gets you.",
@@ -718,7 +779,7 @@ export const translations = {
       publicTitle: "Public Forum",
       incognitoTitle: "Incognito Mode",
       privateExplanation:
-        "Private threads are your personal space for conversations with AI. All your chats are securely stored on our servers and automatically synchronized across all your devices.",
+        "Private threads are your characterl space for conversations with AI. All your chats are securely stored on our servers and automatically synchronized across all your devices.",
       sharedExplanation:
         "Shared threads allow you to create conversations and share them with others via secure links. Perfect for collaboration and sharing insights with your team or friends.",
       publicExplanation:
@@ -970,7 +1031,7 @@ export const translations = {
     imageGen: "Image Generation",
     uncensored: "Uncensored",
     legacy: "Legacy Models",
-    // Persona categories
+    // Character categories
     technical: "Technical",
     education: "Education",
     controversial: "Controversial",
@@ -1094,12 +1155,12 @@ export const translations = {
   linearMessageView: {
     retryModal: {
       title: "Retry with Different Settings",
-      description: "Choose a model and persona to regenerate the response",
+      description: "Choose a model and character to regenerate the response",
       confirmLabel: "Retry",
     },
     answerModal: {
       title: "Answer as AI Model",
-      description: "Choose a model and persona to generate an AI response",
+      description: "Choose a model and character to generate an AI response",
       confirmLabel: "Generate",
       inputPlaceholder:
         "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
@@ -1116,12 +1177,12 @@ export const translations = {
     copied: "Copied!",
     retryModal: {
       title: "Retry with Different Settings",
-      description: "Choose a model and persona to regenerate the response",
+      description: "Choose a model and character to regenerate the response",
       confirmLabel: "Retry",
     },
     answerModal: {
       title: "Answer as AI Model",
-      description: "Choose a model and persona to generate an AI response",
+      description: "Choose a model and character to generate an AI response",
       confirmLabel: "Generate",
       inputPlaceholder:
         "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
@@ -1142,8 +1203,8 @@ export const translations = {
     incognitoDescription:
       "Stored only in your browser. Never saved to your account or synced.",
     more: "More",
-    selectPersona: "Select a Persona",
-    noPrompts: "No suggested prompts for this persona",
+    selectCharacter: "Select a Character",
+    noPrompts: "No suggested prompts for this character",
     showDetails: "Show details",
     hideDetails: "Hide details",
     systemPromptLabel: "System Prompt",
@@ -1320,12 +1381,12 @@ export const translations = {
     replies: "replies",
     retryModal: {
       title: "Retry with Different Settings",
-      description: "Choose a model and persona to regenerate the response",
+      description: "Choose a model and character to regenerate the response",
       confirmLabel: "Retry",
     },
     answerModal: {
       title: "Answer as AI Model",
-      description: "Choose a model and persona to generate an AI response",
+      description: "Choose a model and character to generate an AI response",
       confirmLabel: "Generate",
       inputPlaceholder:
         "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
@@ -1334,7 +1395,7 @@ export const translations = {
       vote: "Vote",
       upvote: "Upvote",
       downvote: "Downvote",
-      respondToAI: "Respond to this AI message with a different AI persona",
+      respondToAI: "Respond to this AI message with a different AI character",
       loadingAudio: "Loading audio...",
       stopAudio: "Stop audio",
       playAudio: "Play audio",
@@ -1347,7 +1408,7 @@ export const translations = {
       edit: "Edit",
       editMessage: "Edit this message (creates a branch)",
       retry: "Retry",
-      retryWithDifferent: "Retry with different model/persona",
+      retryWithDifferent: "Retry with different model/character",
       answerAsAI: "Answer as AI",
       generateAIResponse: "Generate AI response",
       share: "Share",
@@ -1384,12 +1445,12 @@ export const translations = {
     },
     retryModal: {
       title: "Retry with Different Settings",
-      description: "Choose a model and persona to regenerate the response",
+      description: "Choose a model and character to regenerate the response",
       confirmLabel: "Retry",
     },
     answerModal: {
       title: "Answer as AI Model",
-      description: "Choose a model and persona to generate an AI response",
+      description: "Choose a model and character to generate an AI response",
       confirmLabel: "Generate",
       inputPlaceholder:
         "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
@@ -1406,7 +1467,7 @@ export const translations = {
       edit: "Edit",
       editMessage: "Edit this message (creates a branch)",
       retry: "Retry",
-      retryWithDifferent: "Retry with different model/persona",
+      retryWithDifferent: "Retry with different model/character",
       answerAsAI: "Answer as AI",
       generateAIResponse: "Generate AI response",
       insertQuote: "Insert quote character '>'",
@@ -1438,13 +1499,13 @@ export const translations = {
     aiCompanion: {
       title: "Choose Your AI Companion",
       description:
-        "Click here to meet your AI companions. Each has a unique personality and the best AI model is automatically selected for them. You can always customize later.",
+        "Click here to meet your AI companions. Each has a unique characterlity and the best AI model is automatically selected for them. You can always customize later.",
       tip: "👆 Click to open and pick your first companion!",
     },
     modelSelectorFavorites: {
       title: "Star Your Favorites",
       description:
-        "Build your personal AI toolkit. Star mainstream models for safe queries and uncensored models for unrestricted conversations. Quick access to what matters.",
+        "Build your characterl AI toolkit. Star mainstream models for safe queries and uncensored models for unrestricted conversations. Quick access to what matters.",
     },
     modelSelectorShowAll: {
       title: "Expand to See All Models",
@@ -1461,28 +1522,28 @@ export const translations = {
       description:
         "Browse models grouped by company (OpenAI, Anthropic, Gab) or purpose (Uncensored, Coding, Creative). See what each provider offers.",
     },
-    personaSelector: {
-      title: "Customize AI Personality",
+    characterSelector: {
+      title: "Customize AI Characterlity",
       description:
-        "Personas control how AI responds. Choose from built-in styles or create custom personas with specific instructions, tone, and preferred models. Make AI work your way.",
-      tip: "Pair any persona with any model. Professional tone with uncensored model? Done.",
+        "Characters control how AI responds. Choose from built-in styles or create custom characters with specific instructions, tone, and preferred models. Make AI work your way.",
+      tip: "Pair any character with any model. Professional tone with uncensored model? Done.",
     },
-    personaSelectorFavorites: {
-      title: "Star Your Personas",
+    characterSelectorFavorites: {
+      title: "Star Your Characters",
       description:
-        "Quick access to your go-to conversation styles. Star the personas you use most.",
+        "Quick access to your go-to conversation styles. Star the characters you use most.",
     },
-    personaSelectorShowAll: {
-      title: "Expand to See All Personas",
+    characterSelectorShowAll: {
+      title: "Expand to See All Characters",
       description:
-        "Browse the complete persona library. Create unlimited custom personas for different tasks and workflows.",
+        "Browse the complete character library. Create unlimited custom characters for different tasks and workflows.",
     },
-    personaSelectorSearch: {
-      title: "Search Personas",
+    characterSelectorSearch: {
+      title: "Search Characters",
       description:
         "Find the right style fast. Search by name, category, or description.",
     },
-    personaSelectorGroup: {
+    characterSelectorGroup: {
       title: "Organized by Source & Category",
       description:
         "View by source (Built-in, Your Custom, Community) or category (Creative, Technical, Professional). Find what fits your needs.",
@@ -1525,7 +1586,7 @@ export const translations = {
       name: "Private",
       suffix: "Folder",
       description:
-        "Your personal AI workspace. Synced across all devices, organized with subfolders. Build long-term projects, save research, access anywhere.",
+        "Your characterl AI workspace. Synced across all devices, organized with subfolders. Build long-term projects, save research, access anywhere.",
       authPrompt: "Requires account:",
       login: "Login",
       signUp: "Sign Up",
@@ -1548,7 +1609,7 @@ export const translations = {
     sidebarLogin: {
       title: "Create Free Account",
       description:
-        "Unlock Private and Shared folders, sync across all devices, save favorite models and personas. Incognito and Public stay available without account.",
+        "Unlock Private and Shared folders, sync across all devices, save favorite models and characters. Incognito and Public stay available without account.",
       tip: "Stay anonymous or sync everything. Your choice.",
     },
     subscriptionButton: {
@@ -1590,7 +1651,7 @@ export const translations = {
       unlocked: "Folder Unlocked!",
       privateDescription:
         "Your Private folder is now active. All chats sync across devices and stay organized in subfolders.",
-      privateNote: "Perfect for ongoing projects and personal research.",
+      privateNote: "Perfect for ongoing projects and characterl research.",
       sharedDescription:
         "Shared folder unlocked! Create conversations and share via link with granular permission control.",
       sharedNote: "Ideal for team collaboration and getting expert feedback.",

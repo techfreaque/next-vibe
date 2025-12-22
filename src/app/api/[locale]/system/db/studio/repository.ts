@@ -30,8 +30,8 @@ export interface StudioRepositoryInterface {
 /**
  * Open database studio Repository Implementation
  */
-export class StudioRepositoryImpl implements StudioRepositoryInterface {
-  async execute(
+export class StudioRepository {
+  static async execute(
     data: StudioRequestOutput,
     logger: EndpointLogger,
   ): Promise<ResponseType<StudioResponseOutput>> {
@@ -161,4 +161,3 @@ export class StudioRepositoryImpl implements StudioRepositoryInterface {
 /**
  * Default repository instance
  */
-export const studioRepository = new StudioRepositoryImpl();

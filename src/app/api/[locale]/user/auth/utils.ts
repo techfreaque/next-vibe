@@ -12,10 +12,10 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserDetailLevel } from "../enum";
-import { userRepository } from "../repository";
+import { UserRepository } from "../repository";
 import type { CompleteUserType } from "../types";
 import { UserRole } from "../user-roles/enum";
-import { authRepository } from "./repository";
+import { AuthRepository } from "./repository";
 import type { JwtPrivatePayloadType } from "./types";
 
 /**
@@ -30,7 +30,7 @@ export async function requireAdminUser(
 
   try {
     // Check authentication and role
-    const minimalUser = await authRepository.getAuthMinimalUser<
+    const minimalUser = await AuthRepository.getAuthMinimalUser<
       [typeof UserRole.ADMIN]
     >([UserRole.ADMIN], { platform: Platform.NEXT_PAGE, locale }, logger);
 
@@ -62,7 +62,7 @@ export async function requireUser(
 
   try {
     // Check authentication (any authenticated user)
-    const minimalUser = await authRepository.getAuthMinimalUser<[]>(
+    const minimalUser = await AuthRepository.getAuthMinimalUser<[]>(
       [],
       { platform: Platform.NEXT_PAGE, locale },
       logger,
@@ -76,7 +76,7 @@ export async function requireUser(
     }
 
     // Fetch complete user details
-    const userResult = await userRepository.getUserById(
+    const userResult = await UserRepository.getUserById(
       minimalUser.id ?? "",
       UserDetailLevel.COMPLETE,
       locale,

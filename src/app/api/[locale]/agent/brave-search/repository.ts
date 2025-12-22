@@ -400,7 +400,12 @@ function getBraveSearchService(): BraveSearchService {
 /**
  * Freshness options for Brave Search (readable values)
  */
-const FRESHNESS_OPTIONS = ["past_day", "past_week", "past_month", "past_year"] as const;
+const FRESHNESS_OPTIONS = [
+  "past_day",
+  "past_week",
+  "past_month",
+  "past_year",
+] as const;
 
 /**
  * AI SDK Tool for Brave Search
@@ -540,8 +545,9 @@ class BraveSearchRepository implements IBraveSearchRepository {
     },
     logger: EndpointLogger,
   ): Promise<ResponseType<BraveSearchGetResponseOutput>> {
-    const { fail, success, ErrorResponseTypes } =
-      await import("next-vibe/shared/types/response.schema");
+    const { fail, success, ErrorResponseTypes } = await import(
+      "next-vibe/shared/types/response.schema"
+    );
 
     try {
       if (!query || typeof query !== "string" || query.trim() === "") {

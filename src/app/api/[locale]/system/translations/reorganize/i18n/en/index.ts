@@ -71,7 +71,8 @@ export const translations = {
       completed: "Completed",
       noKeysInUse: "No keys in use",
       writingFilteredTranslations: "Writing filtered translations",
-      removeUnusedRequiresRegenerate: "removeUnused requires regenerateStructure to be enabled",
+      removeUnusedRequiresRegenerate:
+        "removeUnused requires regenerateStructure to be enabled",
     },
     response: {
       title: "Reorganization Result",

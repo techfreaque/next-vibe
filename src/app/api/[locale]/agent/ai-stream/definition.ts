@@ -124,7 +124,7 @@ const { POST } = createEndpoint({
             },
           ],
         },
-        z.nativeEnum(DefaultFolderId),
+        z.enum(DefaultFolderId),
       ),
       subFolderId: requestDataField(
         {
@@ -192,7 +192,7 @@ const { POST } = createEndpoint({
           columns: 4,
           options: ChatMessageRoleOptions,
         },
-        z.nativeEnum(ChatMessageRole).default(ChatMessageRole.USER),
+        z.enum(ChatMessageRole).default(ChatMessageRole.USER),
       ),
 
       // === AI CONFIGURATION ===
@@ -205,14 +205,14 @@ const { POST } = createEndpoint({
           options: ModelIdOptions,
           columns: 4,
         },
-        z.nativeEnum(ModelId),
+        z.enum(ModelId),
       ),
-      persona: requestDataField(
+      character: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.aiStream.post.persona.label",
-          description: "app.api.agent.chat.aiStream.post.persona.description",
+          label: "app.api.agent.chat.aiStream.post.character.label",
+          description: "app.api.agent.chat.aiStream.post.character.description",
           columns: 4,
         },
         z.string(),
@@ -343,7 +343,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.agent.chat.aiStream.post.audioInput.title",
-          description: "app.api.agent.chat.aiStream.post.audioInput.description",
+          description:
+            "app.api.agent.chat.aiStream.post.audioInput.description",
           layoutType: LayoutType.GRID,
           columns: 12,
           optional: true,
@@ -479,7 +480,7 @@ const { POST } = createEndpoint({
         content: "Hello, can you help me write a professional email?",
         role: ChatMessageRole.USER,
         model: ModelId.GPT_5_MINI,
-        persona: "default",
+        character: "default",
         temperature: 0.7,
         maxTokens: 1000,
         messageHistory: [],
@@ -495,7 +496,7 @@ const { POST } = createEndpoint({
         content: "Write a marketing email for our new product launch",
         role: ChatMessageRole.USER,
         model: ModelId.GPT_5,
-        persona: "professional",
+        character: "professional",
         temperature: 0.8,
         maxTokens: 1500,
         messageHistory: [],
@@ -511,7 +512,7 @@ const { POST } = createEndpoint({
         content: "Can you try that again with more detail?",
         role: ChatMessageRole.USER,
         model: ModelId.CLAUDE_SONNET_4_5,
-        persona: "default",
+        character: "default",
         temperature: 0.7,
         maxTokens: 1200,
         messageHistory: [],

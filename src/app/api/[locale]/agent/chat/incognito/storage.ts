@@ -300,7 +300,7 @@ export async function createIncognitoThread(
     folderId: subFolderId,
     status: ThreadStatus.ACTIVE,
     defaultModel: null,
-    defaultPersona: null,
+    defaultCharacter: null,
     systemPrompt: null,
     pinned: false,
     archived: false,
@@ -336,7 +336,7 @@ export async function createIncognitoMessage(
   content: string,
   parentId: string | null = null,
   model: ChatMessage["model"] = null,
-  persona: string | null = null,
+  character: string | null = null,
 ): Promise<ChatMessage> {
   const message: ChatMessage = {
     id: generateIncognitoId("msg"),
@@ -352,7 +352,7 @@ export async function createIncognitoMessage(
     authorColor: null,
     isAI: role === "assistant",
     model,
-    persona,
+    character,
     errorType: null,
     errorMessage: null,
     errorCode: null,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSafeAreaInsets } from "next-vibe-ui/hooks/use-safe-area-insets";
-import { Div,type DivRefObject } from "next-vibe-ui/ui/div";
+import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
 import { KeyboardAvoidingView } from "next-vibe-ui/ui/keyboard-avoiding-view";
 import type { JSX } from "react";
 import React, { useRef } from "react";
@@ -27,11 +27,7 @@ interface ChatAreaProps {
   user: JwtPayloadType;
 }
 
-export function ChatArea({
-  locale,
-  logger,
-  user,
-}: ChatAreaProps): JSX.Element {
+export function ChatArea({ locale, logger, user }: ChatAreaProps): JSX.Element {
   const chat = useChatContext();
   const {
     activeThread: thread,
@@ -89,7 +85,9 @@ export function ChatArea({
                   locale={locale}
                   logger={logger}
                   currentUserId={user?.id}
-                  showBranding={viewMode === ViewMode.LINEAR && messages.length > 0}
+                  showBranding={
+                    viewMode === ViewMode.LINEAR && messages.length > 0
+                  }
                 />
               ) : rootFolderId === "public" && !chat.currentSubFolderId ? (
                 // Public folder root (no subfolder) - show feed view

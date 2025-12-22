@@ -115,8 +115,9 @@ async function executeCsvProcessor(
         });
 
         // Process the import job using the import repository
-        const { importRepository } =
-          await import("@/app/api/[locale]/import/repository");
+        const { importRepository } = await import(
+          "@/app/api/[locale]/import/repository"
+        );
         const { leadsImportRepository } = await import("./repository");
 
         // Process one batch of the job

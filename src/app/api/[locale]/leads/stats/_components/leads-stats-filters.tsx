@@ -39,10 +39,12 @@ interface LeadsStatsFiltersContainerProps {
 
 interface LeadsStatsFiltersProps {
   control: Control<LeadsStatsRequestOutput>;
+  locale: CountryLanguage;
 }
 
 export function LeadsStatsFilters({
   control,
+  locale,
 }: LeadsStatsFiltersProps): JSX.Element {
   return (
     <Div className="flex flex-col gap-4">
@@ -83,6 +85,7 @@ export function LeadsStatsFilters({
               },
             ],
           }}
+          locale={locale}
         />
 
         {/* Date Range Preset */}
@@ -149,6 +152,7 @@ export function LeadsStatsFilters({
               },
             ],
           }}
+          locale={locale}
         />
 
         {/* Chart Type */}
@@ -173,6 +177,7 @@ export function LeadsStatsFilters({
               },
             ],
           }}
+          locale={locale}
         />
 
         {/* Status Filter */}
@@ -235,6 +240,7 @@ export function LeadsStatsFilters({
               },
             ],
           }}
+          locale={locale}
         />
 
         {/* Country Filter */}
@@ -246,6 +252,7 @@ export function LeadsStatsFilters({
             label: "app.admin.leads.leads.admin.filters.countries.title",
             options: CountryFilterOptions,
           }}
+          locale={locale}
         />
 
         {/* Source Filter */}
@@ -284,6 +291,7 @@ export function LeadsStatsFilters({
               },
             ],
           }}
+          locale={locale}
         />
       </Div>
     </Div>

@@ -131,124 +131,17 @@ export interface CreditTransactionOutput {
 /**
  * Credit Repository Interface
  */
-export interface CreditRepositoryInterface {
-  getBalance(
-    identifier: CreditIdentifier,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CreditBalance>>;
-
-  deductCredits(
-    identifier: CreditIdentifier,
-    amount: number,
-    modelId: string,
-    messageId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>>;
-
-  addCredits(
-    identifier: CreditIdentifier,
-    amount: number,
-    type: "subscription" | "permanent" | "bonus",
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>>;
-
-  getLeadBalance(
-    leadId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<number>>;
-
-  getCreditBalanceForUser(
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CreditBalance>>;
-
-  getOrCreateLeadByIp(
-    ipAddress: string,
-    locale: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ leadId: string; credits: number }>>;
-
-  addUserCredits(
-    userId: string,
-    amount: number,
-    type: "subscription" | "permanent" | "free",
-    logger: EndpointLogger,
-    expiresAt?: Date,
-    sessionId?: string,
-  ): Promise<ResponseType<void>>;
-
-  getTransactions(
-    userId: string,
-    leadId: string,
-    limit: number,
-    offset: number,
-    logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      transactions: CreditTransactionOutput[];
-      totalCount: number;
-    }>
-  >;
-
-  expireCredits(logger: EndpointLogger): Promise<ResponseType<number>>;
-
-  handleCreditPackPurchase(
-    session: CreditPackCheckoutSession,
-    logger: EndpointLogger,
-  ): Promise<void>;
-
-  getCreditIdentifierBySubscription(
-    userId: string,
-    leadId: string,
-    logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      userId?: string;
-      leadId?: string;
-      creditType: CreditTypeIdentifierValue;
-    }>
-  >;
-
-  deductCreditsForFeature(
-    user: { id?: string; leadId?: string; isPublic: boolean },
-    cost: number,
-    feature: string,
-    logger: EndpointLogger,
-  ): Promise<{ success: boolean; messageId?: string }>;
-
-  mergePendingLeadWallets(
-    userId: string,
-    leadIds: string[],
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>>;
-
-  hasSufficientCredits(
-    identifier: CreditIdentifier,
-    required: number,
-    logger: EndpointLogger,
-  ): Promise<boolean>;
-
-  deductCreditsWithValidation(
-    identifier: CreditIdentifier,
-    amount: number,
-    modelId: string,
-    logger: EndpointLogger,
-  ): Promise<{ success: boolean; messageId?: string; error?: string }>;
-
-  generateMessageId(): string;
-}
 
 /**
  * Credit Repository Implementation
  * Uses simplified wallet-based architecture
  */
-class CreditRepository implements CreditRepositoryInterface {
+export class CreditRepository {
   /**
    * Initial free credits for new wallets
    * Uses the FREE_TIER product definition as single source of truth
    */
-  private getInitialFreeCredits(): number {
+  private static getInitialFreeCredits(): number {
     return productsRepository.getProduct(ProductIds.FREE_TIER, "en-GLOBAL")
       .credits;
   }
@@ -256,7 +149,7 @@ class CreditRepository implements CreditRepositoryInterface {
   /**
    * Get pool for a user: user wallet + all linked lead wallets
    */
-  async getUserPool(
+  static async getUserPool(
     userId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditPool>> {
@@ -301,7 +194,7 @@ class CreditRepository implements CreditRepositoryInterface {
   /**
    * Get pool for a lead: only lead wallets, no user wallet
    */
-  async getLeadPoolOnly(
+  static async getLeadPoolOnly(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditPool>> {
@@ -342,7 +235,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * This is used for internal operations where we want full pool behavior
    * NEW ARCHITECTURE: Creates wallet for primary lead if needed, but not for connected leads
    */
-  async getLeadPool(
+  static async getLeadPool(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditPool>> {
@@ -403,7 +296,9 @@ class CreditRepository implements CreditRepositoryInterface {
   /**
    * Find all leads connected via lead_lead_links table using graph traversal
    */
-  private async findConnectedLeads(startLeadId: string): Promise<string[]> {
+  private static async findConnectedLeads(
+    startLeadId: string,
+  ): Promise<string[]> {
     const visited = new Set<string>();
     const queue = [startLeadId];
 
@@ -444,7 +339,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Enforces pool limit: max 20 free credits available per period
    * Refetches wallets to get current balances after any deductions
    */
-  private async calculatePoolBalance(
+  private static async calculatePoolBalance(
     pool: CreditPool,
     logger: EndpointLogger,
   ): Promise<CreditBalance> {
@@ -573,7 +468,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Free credits come from lead wallets during redistribution
    * ATOMIC: Wallet creation wrapped in database transaction
    */
-  private async getOrCreateUserWallet(
+  private static async getOrCreateUserWallet(
     userId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditWallet>> {
@@ -700,7 +595,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * @param leadId - The lead ID to get/create wallet for
    * @param logger - Logger instance
    */
-  private async getOrCreateLeadWallet(
+  private static async getOrCreateLeadWallet(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditWallet>> {
@@ -816,7 +711,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * CRITICAL: Only reset when moving to a NEW period (future month), not when syncing old periods
    * This prevents resetting credits that were already spent in the current period
    */
-  private async ensureMonthlyFreeCreditsForPool(
+  private static async ensureMonthlyFreeCreditsForPool(
     pool: CreditPool,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -947,7 +842,7 @@ class CreditRepository implements CreditRepositoryInterface {
   /**
    * Get balance for identifier
    */
-  async getBalance(
+  static async getBalance(
     identifier: CreditIdentifier,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditBalance>> {
@@ -986,7 +881,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Get lead's credit balance (pool-based)
    * Sums all wallets in the lead's pool
    */
-  async getLeadBalance(
+  static async getLeadBalance(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<number>> {
@@ -1017,7 +912,7 @@ class CreditRepository implements CreditRepositoryInterface {
   /**
    * Get credit balance for user by summing all wallets in their pool
    */
-  async getCreditBalanceForUser(
+  static async getCreditBalanceForUser(
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -1075,7 +970,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Get or create lead by IP address
    * Pool-based: Returns total credits across lead's pool
    */
-  async getOrCreateLeadByIp(
+  static async getOrCreateLeadByIp(
     ipAddress: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -1160,7 +1055,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Add credits to identifier
    * Validates input and creates typed transaction metadata
    */
-  async addCredits(
+  static async addCredits(
     identifier: CreditIdentifier,
     amount: number,
     type: "subscription" | "permanent" | "bonus",
@@ -1307,7 +1202,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Add credits to user account (specific method)
    * Optional sessionId for idempotency checking
    */
-  async addUserCredits(
+  static async addUserCredits(
     userId: string,
     amount: number,
     type: "subscription" | "permanent" | "free",
@@ -1397,7 +1292,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Max 20 free credits can be spent per pool per period
    * Uses database transaction with row locking to prevent race conditions
    */
-  async deductCredits(
+  static async deductCredits(
     identifier: CreditIdentifier,
     amount: number,
     modelId: string,
@@ -1847,7 +1742,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * - User wallet's paid transactions
    * - Aggregated usage from other linked leads (summed as "usage from other devices")
    */
-  async getTransactions(
+  static async getTransactions(
     userId: string,
     leadId: string,
     limit: number,
@@ -1965,7 +1860,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Get transactions by lead ID
    * Shows only current lead wallet's transactions + summary of other devices' spending
    */
-  async getTransactionsByLeadId(
+  static async getTransactionsByLeadId(
     leadId: string,
     limit: number,
     offset: number,
@@ -2078,7 +1973,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Get transactions by user ID
    * Shows user wallet's transactions + summary of linked leads' spending
    */
-  async getTransactionsByUserId(
+  static async getTransactionsByUserId(
     userId: string,
     limit: number,
     offset: number,
@@ -2185,7 +2080,9 @@ class CreditRepository implements CreditRepositoryInterface {
    * Creates EXPIRY transaction before deleting packs
    * Each pack expiration is wrapped in a transaction for atomicity
    */
-  async expireCredits(logger: EndpointLogger): Promise<ResponseType<number>> {
+  static async expireCredits(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<number>> {
     try {
       const expiredPacks = await db
         .select()
@@ -2274,7 +2171,7 @@ class CreditRepository implements CreditRepositoryInterface {
   /**
    * Get credit identifier based on subscription status
    */
-  async getCreditIdentifierBySubscription(
+  static async getCreditIdentifierBySubscription(
     userId: string,
     leadId: string,
     logger: EndpointLogger,
@@ -2328,7 +2225,7 @@ class CreditRepository implements CreditRepositoryInterface {
   /**
    * Deduct credits for a feature (high-level wrapper)
    */
-  async deductCreditsForFeature(
+  static async deductCreditsForFeature(
     user: JwtPayloadType,
     cost: number,
     feature: string,
@@ -2396,7 +2293,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Handle credit pack purchase from webhook
    * CRITICAL: Includes idempotency check to prevent duplicate credit additions
    */
-  async handleCreditPackPurchase(
+  static async handleCreditPackPurchase(
     session: CreditPackCheckoutSession,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -2463,7 +2360,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * NEW ARCHITECTURE: No credit redistribution - wallets stay separate
    * Each wallet keeps its own balance, pool limit enforced at deduction time
    */
-  async mergePendingLeadWallets(
+  static async mergePendingLeadWallets(
     userId: string,
     leadIds: string[],
     logger: EndpointLogger,
@@ -2514,7 +2411,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Check if identifier has sufficient credits (repository-level business logic)
    * Moved from BaseCreditHandler to enforce repository-first architecture
    */
-  async hasSufficientCredits(
+  static async hasSufficientCredits(
     identifier: CreditIdentifier,
     required: number,
     logger: EndpointLogger,
@@ -2534,7 +2431,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Deduct credits with validation (repository-level business logic)
    * Moved from BaseCreditHandler to enforce repository-first architecture
    */
-  async deductCreditsWithValidation(
+  static async deductCreditsWithValidation(
     identifier: CreditIdentifier,
     amount: number,
     modelId: string,
@@ -2581,7 +2478,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Generate unique message ID for credit transactions
    * Moved from BaseCreditHandler to enforce repository-first architecture
    */
-  generateMessageId(): string {
+  static generateMessageId(): string {
     return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 15)}`;
   }
 
@@ -2589,7 +2486,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Add earned credits from referral commission
    * Creates an "earned" credit pack with REFERRAL_EARNING transaction
    */
-  async addEarnedCredits(
+  static async addEarnedCredits(
     userId: string,
     amountCents: number,
     sourceUserId: string,
@@ -2681,7 +2578,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Get earned credits balance for a user
    * Returns total earned, available (not locked), and locked amounts
    */
-  async getEarnedCreditsBalance(
+  static async getEarnedCreditsBalance(
     userId: string,
     logger: EndpointLogger,
   ): Promise<
@@ -2750,7 +2647,7 @@ class CreditRepository implements CreditRepositoryInterface {
    * Deduct earned credits for payout
    * Creates REFERRAL_PAYOUT transaction
    */
-  async deductEarnedCredits(
+  static async deductEarnedCredits(
     userId: string,
     amountCents: number,
     payoutRequestId: string,
@@ -2853,7 +2750,7 @@ class CreditRepository implements CreditRepositoryInterface {
   /**
    * Get referral transactions for a user (earnings and payouts)
    */
-  async getReferralTransactions(
+  static async getReferralTransactions(
     userId: string,
     limit: number,
     offset: number,
@@ -2928,4 +2825,8 @@ class CreditRepository implements CreditRepositoryInterface {
   }
 }
 
-export const creditRepository = new CreditRepository();
+// Type for native repository type checking
+export type CreditRepositoryType = Pick<
+  typeof CreditRepository,
+  keyof typeof CreditRepository
+>;

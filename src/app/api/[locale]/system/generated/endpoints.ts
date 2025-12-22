@@ -9,36 +9,36 @@
 import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { setNestedPath } from "next-vibe/shared/utils/object-path";
 
-import { default as endpointDefinition_GET_0 } from "../../agent/chat/personas/definition";
-import { default as endpointDefinition_POST_1 } from "../../agent/chat/personas/definition";
-import { default as endpointDefinition_GET_2 } from "../../agent/chat/personas/[id]/definition";
-import { default as endpointDefinition_PATCH_3 } from "../../agent/chat/personas/[id]/definition";
-import { default as endpointDefinition_GET_4 } from "../../agent/chat/threads/definition";
-import { default as endpointDefinition_POST_5 } from "../../agent/chat/threads/definition";
-import { default as endpointDefinition_GET_6 } from "../../agent/chat/threads/search/definition";
-import { default as endpointDefinition_GET_7 } from "../../agent/chat/threads/[threadId]/definition";
-import { default as endpointDefinition_PATCH_8 } from "../../agent/chat/threads/[threadId]/definition";
-import { default as endpointDefinition_DELETE_9 } from "../../agent/chat/threads/[threadId]/definition";
-import { default as endpointDefinition_GET_10 } from "../../agent/chat/threads/[threadId]/messages/definition";
-import { default as endpointDefinition_POST_11 } from "../../agent/chat/threads/[threadId]/messages/definition";
-import { default as endpointDefinition_GET_12 } from "../../agent/chat/threads/[threadId]/messages/search/definition";
-import { default as endpointDefinition_GET_13 } from "../../agent/chat/threads/[threadId]/messages/path/definition";
-import { default as endpointDefinition_POST_14 } from "../../agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
-import { default as endpointDefinition_GET_15 } from "../../agent/chat/threads/[threadId]/messages/[messageId]/definition";
-import { default as endpointDefinition_PATCH_16 } from "../../agent/chat/threads/[threadId]/messages/[messageId]/definition";
-import { default as endpointDefinition_DELETE_17 } from "../../agent/chat/threads/[threadId]/messages/[messageId]/definition";
-import { default as endpointDefinition_POST_18 } from "../../agent/chat/threads/[threadId]/messages/[messageId]/branch/definition";
-import { default as endpointDefinition_GET_19 } from "../../agent/chat/threads/[threadId]/permissions/definition";
-import { default as endpointDefinition_PATCH_20 } from "../../agent/chat/threads/[threadId]/permissions/definition";
-import { default as endpointDefinition_GET_21 } from "../../agent/chat/memories/definition";
-import { default as endpointDefinition_POST_22 } from "../../agent/chat/memories/definition";
-import { default as endpointDefinition_PATCH_23 } from "../../agent/chat/memories/[id]/definition";
-import { default as endpointDefinition_DELETE_24 } from "../../agent/chat/memories/[id]/definition";
-import { default as endpointDefinition_GET_25 } from "../../agent/chat/favorites/definition";
-import { default as endpointDefinition_POST_26 } from "../../agent/chat/favorites/definition";
-import { default as endpointDefinition_GET_27 } from "../../agent/chat/favorites/[id]/definition";
-import { default as endpointDefinition_PATCH_28 } from "../../agent/chat/favorites/[id]/definition";
-import { default as endpointDefinition_DELETE_29 } from "../../agent/chat/favorites/[id]/definition";
+import { default as endpointDefinition_GET_0 } from "../../agent/chat/threads/definition";
+import { default as endpointDefinition_POST_1 } from "../../agent/chat/threads/definition";
+import { default as endpointDefinition_GET_2 } from "../../agent/chat/threads/search/definition";
+import { default as endpointDefinition_GET_3 } from "../../agent/chat/threads/[threadId]/definition";
+import { default as endpointDefinition_PATCH_4 } from "../../agent/chat/threads/[threadId]/definition";
+import { default as endpointDefinition_DELETE_5 } from "../../agent/chat/threads/[threadId]/definition";
+import { default as endpointDefinition_GET_6 } from "../../agent/chat/threads/[threadId]/messages/definition";
+import { default as endpointDefinition_POST_7 } from "../../agent/chat/threads/[threadId]/messages/definition";
+import { default as endpointDefinition_GET_8 } from "../../agent/chat/threads/[threadId]/messages/search/definition";
+import { default as endpointDefinition_GET_9 } from "../../agent/chat/threads/[threadId]/messages/path/definition";
+import { default as endpointDefinition_POST_10 } from "../../agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
+import { default as endpointDefinition_GET_11 } from "../../agent/chat/threads/[threadId]/messages/[messageId]/definition";
+import { default as endpointDefinition_PATCH_12 } from "../../agent/chat/threads/[threadId]/messages/[messageId]/definition";
+import { default as endpointDefinition_DELETE_13 } from "../../agent/chat/threads/[threadId]/messages/[messageId]/definition";
+import { default as endpointDefinition_POST_14 } from "../../agent/chat/threads/[threadId]/messages/[messageId]/branch/definition";
+import { default as endpointDefinition_GET_15 } from "../../agent/chat/threads/[threadId]/permissions/definition";
+import { default as endpointDefinition_PATCH_16 } from "../../agent/chat/threads/[threadId]/permissions/definition";
+import { default as endpointDefinition_GET_17 } from "../../agent/chat/memories/definition";
+import { default as endpointDefinition_POST_18 } from "../../agent/chat/memories/definition";
+import { default as endpointDefinition_PATCH_19 } from "../../agent/chat/memories/[id]/definition";
+import { default as endpointDefinition_DELETE_20 } from "../../agent/chat/memories/[id]/definition";
+import { default as endpointDefinition_GET_21 } from "../../agent/chat/favorites/definition";
+import { default as endpointDefinition_POST_22 } from "../../agent/chat/favorites/definition";
+import { default as endpointDefinition_GET_23 } from "../../agent/chat/favorites/[id]/definition";
+import { default as endpointDefinition_PATCH_24 } from "../../agent/chat/favorites/[id]/definition";
+import { default as endpointDefinition_DELETE_25 } from "../../agent/chat/favorites/[id]/definition";
+import { default as endpointDefinition_GET_26 } from "../../agent/chat/characters/definition";
+import { default as endpointDefinition_GET_27 } from "../../agent/chat/characters/[id]/definition";
+import { default as endpointDefinition_PATCH_28 } from "../../agent/chat/characters/[id]/definition";
+import { default as endpointDefinition_POST_29 } from "../../agent/chat/characters/create/definition";
 import { default as endpointDefinition_GET_30 } from "../../agent/chat/folders/definition";
 import { default as endpointDefinition_POST_31 } from "../../agent/chat/folders/definition";
 import { default as endpointDefinition_GET_32 } from "../../agent/chat/folders/[id]/definition";
@@ -257,73 +257,53 @@ function initializeEndpoints(): Record<string, ApiSection> {
   const endpoints: Record<string, ApiSection> = {};
   setNestedPath(
     endpoints,
-    ["agent", "chat", "personas", "GET"],
+    ["agent", "chat", "threads", "GET"],
     endpointDefinition_GET_0.GET,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "personas", "POST"],
+    ["agent", "chat", "threads", "POST"],
     endpointDefinition_POST_1.POST,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "personas", "[id]", "GET"],
+    ["agent", "chat", "threads", "search", "GET"],
     endpointDefinition_GET_2.GET,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "personas", "[id]", "PATCH"],
-    endpointDefinition_PATCH_3.PATCH,
-  );
-  setNestedPath(
-    endpoints,
-    ["agent", "chat", "threads", "GET"],
-    endpointDefinition_GET_4.GET,
-  );
-  setNestedPath(
-    endpoints,
-    ["agent", "chat", "threads", "POST"],
-    endpointDefinition_POST_5.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["agent", "chat", "threads", "search", "GET"],
-    endpointDefinition_GET_6.GET,
-  );
-  setNestedPath(
-    endpoints,
     ["agent", "chat", "threads", "[threadId]", "GET"],
-    endpointDefinition_GET_7.GET,
+    endpointDefinition_GET_3.GET,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "threads", "[threadId]", "PATCH"],
-    endpointDefinition_PATCH_8.PATCH,
+    endpointDefinition_PATCH_4.PATCH,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "threads", "[threadId]", "DELETE"],
-    endpointDefinition_DELETE_9.DELETE,
+    endpointDefinition_DELETE_5.DELETE,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "threads", "[threadId]", "messages", "GET"],
-    endpointDefinition_GET_10.GET,
+    endpointDefinition_GET_6.GET,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "threads", "[threadId]", "messages", "POST"],
-    endpointDefinition_POST_11.POST,
+    endpointDefinition_POST_7.POST,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "threads", "[threadId]", "messages", "search", "GET"],
-    endpointDefinition_GET_12.GET,
+    endpointDefinition_GET_8.GET,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "threads", "[threadId]", "messages", "path", "GET"],
-    endpointDefinition_GET_13.GET,
+    endpointDefinition_GET_9.GET,
   );
   setNestedPath(
     endpoints,
@@ -337,7 +317,7 @@ function initializeEndpoints(): Record<string, ApiSection> {
       "vote",
       "POST",
     ],
-    endpointDefinition_POST_14.POST,
+    endpointDefinition_POST_10.POST,
   );
   setNestedPath(
     endpoints,
@@ -350,7 +330,7 @@ function initializeEndpoints(): Record<string, ApiSection> {
       "[messageId]",
       "GET",
     ],
-    endpointDefinition_GET_15.GET,
+    endpointDefinition_GET_11.GET,
   );
   setNestedPath(
     endpoints,
@@ -363,7 +343,7 @@ function initializeEndpoints(): Record<string, ApiSection> {
       "[messageId]",
       "PATCH",
     ],
-    endpointDefinition_PATCH_16.PATCH,
+    endpointDefinition_PATCH_12.PATCH,
   );
   setNestedPath(
     endpoints,
@@ -376,7 +356,7 @@ function initializeEndpoints(): Record<string, ApiSection> {
       "[messageId]",
       "DELETE",
     ],
-    endpointDefinition_DELETE_17.DELETE,
+    endpointDefinition_DELETE_13.DELETE,
   );
   setNestedPath(
     endpoints,
@@ -390,62 +370,82 @@ function initializeEndpoints(): Record<string, ApiSection> {
       "branch",
       "POST",
     ],
-    endpointDefinition_POST_18.POST,
+    endpointDefinition_POST_14.POST,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "threads", "[threadId]", "permissions", "GET"],
-    endpointDefinition_GET_19.GET,
+    endpointDefinition_GET_15.GET,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "threads", "[threadId]", "permissions", "PATCH"],
-    endpointDefinition_PATCH_20.PATCH,
+    endpointDefinition_PATCH_16.PATCH,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "memories", "GET"],
-    endpointDefinition_GET_21.GET,
+    endpointDefinition_GET_17.GET,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "memories", "POST"],
-    endpointDefinition_POST_22.POST,
+    endpointDefinition_POST_18.POST,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "memories", "[id]", "PATCH"],
-    endpointDefinition_PATCH_23.PATCH,
+    endpointDefinition_PATCH_19.PATCH,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "memories", "[id]", "DELETE"],
-    endpointDefinition_DELETE_24.DELETE,
+    endpointDefinition_DELETE_20.DELETE,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "favorites", "GET"],
-    endpointDefinition_GET_25.GET,
+    endpointDefinition_GET_21.GET,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "favorites", "POST"],
-    endpointDefinition_POST_26.POST,
+    endpointDefinition_POST_22.POST,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "favorites", "[id]", "GET"],
-    endpointDefinition_GET_27.GET,
+    endpointDefinition_GET_23.GET,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "favorites", "[id]", "PATCH"],
-    endpointDefinition_PATCH_28.PATCH,
+    endpointDefinition_PATCH_24.PATCH,
   );
   setNestedPath(
     endpoints,
     ["agent", "chat", "favorites", "[id]", "DELETE"],
-    endpointDefinition_DELETE_29.DELETE,
+    endpointDefinition_DELETE_25.DELETE,
+  );
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "characters", "GET"],
+    endpointDefinition_GET_26.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "characters", "[id]", "GET"],
+    endpointDefinition_GET_27.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "characters", "[id]", "PATCH"],
+    endpointDefinition_PATCH_28.PATCH,
+  );
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "characters", "create", "POST"],
+    endpointDefinition_POST_29.POST,
   );
   setNestedPath(
     endpoints,
@@ -684,15 +684,7 @@ function initializeEndpoints(): Record<string, ApiSection> {
   );
   setNestedPath(
     endpoints,
-    [
-      "system",
-      "unified-interface",
-      "tasks",
-      "cron",
-      "task",
-      "[id]",
-      "DELETE",
-    ],
+    ["system", "unified-interface", "tasks", "cron", "task", "[id]", "DELETE"],
     endpointDefinition_DELETE_77.DELETE,
   );
   setNestedPath(

@@ -467,10 +467,9 @@ export async function EmailImage({
         // Already a full URL
         return imageSrc;
       }
-        // Local path - construct URL using envClient.NEXT_PUBLIC_APP_URL
-        const cleanPath = imageSrc.startsWith("/") ? imageSrc : `/${imageSrc}`;
-        return `${envClient.NEXT_PUBLIC_APP_URL}${cleanPath}`;
-      
+      // Local path - construct URL using envClient.NEXT_PUBLIC_APP_URL
+      const cleanPath = imageSrc.startsWith("/") ? imageSrc : `/${imageSrc}`;
+      return `${envClient.NEXT_PUBLIC_APP_URL}${cleanPath}`;
     };
 
     const imageUrl = getImageUrl(src);

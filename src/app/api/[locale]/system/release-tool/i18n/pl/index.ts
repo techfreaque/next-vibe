@@ -2,7 +2,8 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Narzędzie do wydań",
-  description: "Zarządzaj wydaniami pakietów z wersjonowaniem, tagowaniem Git i integracją CI/CD",
+  description:
+    "Zarządzaj wydaniami pakietów z wersjonowaniem, tagowaniem Git i integracją CI/CD",
   category: "Narzędzie do wydań",
   tags: {
     release: "Wydanie",
@@ -49,15 +50,18 @@ export const translations: typeof enTranslations = {
   fields: {
     configPath: {
       title: "Ścieżka konfiguracji",
-      description: "Ścieżka do pliku release.config.ts (domyślnie: release.config.ts)",
+      description:
+        "Ścieżka do pliku release.config.ts (domyślnie: release.config.ts)",
     },
     ci: {
       title: "Tryb CI",
-      description: "Uruchom w trybie CI (bez interaktywnych promptów, używa ciReleaseCommand)",
+      description:
+        "Uruchom w trybie CI (bez interaktywnych promptów, używa ciReleaseCommand)",
     },
     forceUpdate: {
       title: "Wymuś aktualizację zależności",
-      description: "Wymuś aktualizację wszystkich zależności bez pytania (pomija pozostałe kroki)",
+      description:
+        "Wymuś aktualizację wszystkich zależności bez pytania (pomija pozostałe kroki)",
     },
     dryRun: {
       title: "Testowe uruchomienie",
@@ -93,19 +97,23 @@ export const translations: typeof enTranslations = {
     },
     prereleaseId: {
       title: "ID Prerelease",
-      description: "Identyfikator prerelease (alpha, beta, rc) dla wersjonowania",
+      description:
+        "Identyfikator prerelease (alpha, beta, rc) dla wersjonowania",
     },
     versionIncrement: {
       title: "Inkrementacja wersji",
-      description: "Typ inkrementacji wersji (patch, minor, major) - tylko w trybie lokalnym",
+      description:
+        "Typ inkrementacji wersji (patch, minor, major) - tylko w trybie lokalnym",
     },
     targetPackage: {
       title: "Pakiet docelowy",
-      description: "Określ katalog pakietu docelowego (opcjonalnie, domyślnie wszystkie pakiety)",
+      description:
+        "Określ katalog pakietu docelowego (opcjonalnie, domyślnie wszystkie pakiety)",
     },
     inlineConfig: {
       title: "Konfiguracja inline",
-      description: "Podaj konfigurację wydania inline zamiast używać pliku konfiguracyjnego",
+      description:
+        "Podaj konfigurację wydania inline zamiast używać pliku konfiguracyjnego",
     },
     skipGitTag: {
       title: "Pomiń tag Git",
@@ -129,12 +137,14 @@ export const translations: typeof enTranslations = {
     },
     commitMessage: {
       title: "Wiadomość commita",
-      // eslint-disable-next-line no-template-curly-in-string -- Intentional template placeholder documentation
-      description: "Własna wiadomość commita dla zmiany wersji (obsługuje placeholder ${version})",
+      description:
+        // eslint-disable-next-line no-template-curly-in-string -- Intentional template placeholder documentation
+        "Własna wiadomość commita dla zmiany wersji (obsługuje placeholder ${version})",
     },
     notifyWebhook: {
       title: "Webhook powiadomień",
-      description: "URL webhooka do wysyłania powiadomień o wydaniu (Slack, Discord, Teams lub własny)",
+      description:
+        "URL webhooka do wysyłania powiadomień o wydaniu (Slack, Discord, Teams lub własny)",
     },
     configObject: {
       title: "Obiekt konfiguracji",
@@ -158,7 +168,8 @@ export const translations: typeof enTranslations = {
     },
     continueOnError: {
       title: "Kontynuuj przy błędzie",
-      description: "Kontynuuj przetwarzanie pozostałych pakietów, jeśli jeden się nie powiedzie",
+      description:
+        "Kontynuuj przetwarzanie pozostałych pakietów, jeśli jeden się nie powiedzie",
     },
     verifyGitStatus: {
       title: "Weryfikuj status Git",
@@ -453,7 +464,8 @@ export const translations: typeof enTranslations = {
     },
     versionBumper: {
       title: "Zwiększacz wersji",
-      description: "Konfiguracja zwiększania wersji dla plików innych niż package.json",
+      description:
+        "Konfiguracja zwiększania wersji dla plików innych niż package.json",
     },
     hooks: {
       title: "Hooki cyklu życia",
@@ -568,7 +580,8 @@ export const translations: typeof enTranslations = {
     },
     unsavedChanges: {
       title: "Niezapisane zmiany",
-      description: "Istnieją niezapisane zmiany, które muszą zostać najpierw zatwierdzone",
+      description:
+        "Istnieją niezapisane zmiany, które muszą zostać najpierw zatwierdzone",
     },
     packageNotFound: "Pakiet '{{targetPackage}}' nie znaleziony w konfiguracji",
     gitOperationFailed: "Operacja git nie powiodła się: {{error}}",
@@ -587,8 +600,10 @@ export const translations: typeof enTranslations = {
     notFound: "Nie znaleziono package.json: {{path}}",
     invalidFormat: "Nieprawidłowy format package.json: {{path}}",
     errorReading: "Błąd odczytu package.json: {{error}}",
-    errorUpdatingDeps: "Błąd aktualizacji zależności dla {{directory}}: {{error}}",
-    errorUpdatingVersion: "Błąd aktualizacji wersji pakietu dla {{directory}}: {{error}}",
+    errorUpdatingDeps:
+      "Błąd aktualizacji zależności dla {{directory}}: {{error}}",
+    errorUpdatingVersion:
+      "Błąd aktualizacji wersji pakietu dla {{directory}}: {{error}}",
   },
   scripts: {
     invalidPackageJson: "Nieprawidłowy format package.json w {{path}}",
@@ -599,13 +614,16 @@ export const translations: typeof enTranslations = {
     packageJsonNotFound: "Nie znaleziono package.json w {{path}}",
   },
   snyk: {
-    cliNotFound: "Nie znaleziono Snyk CLI. Zainstaluj za pomocą: npm install -g snyk",
-    testFailed: "Test podatności Snyk nie powiódł się dla {{packageName}}: {{error}}",
+    cliNotFound:
+      "Nie znaleziono Snyk CLI. Zainstaluj za pomocą: npm install -g snyk",
+    testFailed:
+      "Test podatności Snyk nie powiódł się dla {{packageName}}: {{error}}",
     tokenRequired:
       "Zmienna środowiskowa SNYK_TOKEN wymagana dla {{packageName}}",
     orgKeyRequired:
       "Zmienna środowiskowa SNYK_ORG_KEY wymagana dla {{packageName}}",
-    monitorFailed: "Monitor Snyk nie powiódł się dla {{packageName}}: {{error}}",
+    monitorFailed:
+      "Monitor Snyk nie powiódł się dla {{packageName}}: {{error}}",
   },
   git: {
     tagCreated: "Tag Git '{{tag}}' utworzony pomyślnie",
@@ -624,11 +642,15 @@ export const translations: typeof enTranslations = {
     invalidFormat: "Nieprawidłowy format wersji: {{version}}",
   },
   ci: {
-    commandRunning: "Uruchamianie polecenia wydania CI dla {{package}}: {{command}}",
+    commandRunning:
+      "Uruchamianie polecenia wydania CI dla {{package}}: {{command}}",
     commandSuccess: "Polecenie wydania CI zakończone dla {{package}}",
-    commandFailed: "Polecenie wydania CI nie powiodło się dla {{package}}: {{error}}",
-    commandRequired: "Tryb CI wymaga konfiguracji ciReleaseCommand dla {{package}}",
-    envVarMissing: "Wymagana zmienna środowiskowa '{{variable}}' nie ustawiona dla {{package}}",
+    commandFailed:
+      "Polecenie wydania CI nie powiodło się dla {{package}}: {{error}}",
+    commandRequired:
+      "Tryb CI wymaga konfiguracji ciReleaseCommand dla {{package}}",
+    envVarMissing:
+      "Wymagana zmienna środowiskowa '{{variable}}' nie ustawiona dla {{package}}",
   },
   zip: {
     starting: "Pakowanie folderów...",
@@ -652,7 +674,8 @@ export const translations: typeof enTranslations = {
     packageSkipped: "Pakiet '{{name}}' pominięty: {{reason}}",
     packageComplete: "Pakiet '{{name}}' zakończony",
     packageFailed: "Pakiet '{{name}}' nie powiódł się: {{error}}",
-    firstRelease: "Nie znaleziono poprzednich tagów. To będzie pierwsze wydanie.",
+    firstRelease:
+      "Nie znaleziono poprzednich tagów. To będzie pierwsze wydanie.",
   },
   qualityChecks: {
     linting: "Uruchamianie lintingu dla {{package}}...",
@@ -677,12 +700,15 @@ export const translations: typeof enTranslations = {
   dependencies: {
     updating: "Aktualizowanie zależności dla {{directory}}...",
     updated: "Zależności zaktualizowane dla {{directory}}",
-    failed: "Aktualizacja zależności nie powiodła się dla {{directory}}: {{error}}",
+    failed:
+      "Aktualizacja zależności nie powiodła się dla {{directory}}: {{error}}",
     skipped: "Pomijanie aktualizacji zależności dla {{directory}}",
-    dedupeFailed: "Deduplikacja zależności nie powiodła się dla {{directory}}: {{error}}",
+    dedupeFailed:
+      "Deduplikacja zależności nie powiodła się dla {{directory}}: {{error}}",
   },
   security: {
-    auditFailed: "Audyt bezpieczeństwa nie powiódł się dla {{directory}}: {{error}}",
+    auditFailed:
+      "Audyt bezpieczeństwa nie powiódł się dla {{directory}}: {{error}}",
   },
   hooks: {
     running: "Uruchamianie hooka {{hook}} dla {{package}}...",
@@ -700,7 +726,8 @@ export const translations: typeof enTranslations = {
   changelog: {
     generating: "Generowanie changelogu dla {{package}}...",
     generated: "Changelog wygenerowany dla {{package}}",
-    failed: "Generowanie changelogu nie powiodło się dla {{package}}: {{error}}",
+    failed:
+      "Generowanie changelogu nie powiodło się dla {{package}}: {{error}}",
     noChanges: "Brak zmian do dodania do changelogu dla {{package}}",
   },
   branch: {
@@ -740,7 +767,8 @@ export const translations: typeof enTranslations = {
   lockfile: {
     checking: "Sprawdzanie integralności pliku blokady...",
     valid: "Plik blokady jest prawidłowy",
-    invalid: "Sprawdzanie integralności pliku blokady nie powiodło się: {{error}}",
+    invalid:
+      "Sprawdzanie integralności pliku blokady nie powiodło się: {{error}}",
     missing: "Nie znaleziono pliku blokady (oczekiwano: {{expected}})",
   },
   notifications: {

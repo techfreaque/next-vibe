@@ -6,7 +6,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { Area, Axis,Bar, Chart, Line, Pie } from "next-vibe-ui/ui/chart";
+import { Area, Axis, Bar, Chart, Line, Pie } from "next-vibe-ui/ui/chart";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 

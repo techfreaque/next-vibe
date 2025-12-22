@@ -8,23 +8,24 @@ import {
   type IconValue,
 } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
+import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
 
 /**
  * Renders a submit button for forms with loading state support.
  */
-export function SubmitButtonWidget({
+export function SubmitButtonWidget<TKey extends string>({
   field,
   context,
   className,
   form,
   onSubmit,
   isSubmitting,
-}: ReactWidgetProps<typeof WidgetType.SUBMIT_BUTTON>): JSX.Element {
-  const { t } = simpleT(context.locale);
+}: ReactWidgetProps<typeof WidgetType.SUBMIT_BUTTON, TKey>): JSX.Element {
+  const { t } = getTranslator(context);
+  const { t: globalT } = simpleT(context.locale);
   const {
     text: textKey,
     loadingText: loadingTextKey,
@@ -36,14 +37,14 @@ export function SubmitButtonWidget({
   const ButtonIcon = icon ? getIconComponent(icon as IconValue) : undefined;
 
   const buttonText = textKey
-    ? t(textKey as TranslationKey)
-    : t(
+    ? t(textKey)
+    : globalT(
         "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit",
       );
 
   const loadingText = loadingTextKey
-    ? t(loadingTextKey as TranslationKey)
-    : t(
+    ? t(loadingTextKey)
+    : globalT(
         "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
       );
 

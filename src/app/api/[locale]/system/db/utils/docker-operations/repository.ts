@@ -79,7 +79,9 @@ export interface DockerOperationsRepository {
 /**
  * Docker Operations Repository Implementation
  */
-export class DockerOperationsRepositoryImpl implements DockerOperationsRepository {
+export class DockerOperationsRepositoryImpl
+  implements DockerOperationsRepository
+{
   /**
    * Execute a Docker command with timeout and log filtering
    */

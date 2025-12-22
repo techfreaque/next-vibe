@@ -12,11 +12,11 @@ import { MetricCardWidget } from "./MetricCardWidget";
 /**
  * Displays a grid of metric cards for statistical overviews.
  */
-export function StatsGridWidget({
+export function StatsGridWidget<TKey extends string>({
   value,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.STATS_GRID>): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.STATS_GRID, TKey>): JSX.Element {
   // Extract data using shared logic
   const data = extractStatsGridData(value);
 

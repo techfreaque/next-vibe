@@ -20,7 +20,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { imapAccounts } from "../db";
 import { ImapSyncStatus } from "../enum";
-import { imapSyncRepository as imapSyncServiceRepository } from "../sync-service/repository";
+import { imapSyncRepository } from "../sync-service/repository";
 import type {
   ImapSyncGetResponseOutput,
   ImapSyncPostRequestOutput,
@@ -28,29 +28,13 @@ import type {
 } from "./definition";
 
 /**
- * IMAP Sync Repository Interface
+ * IMAP Sync Repository
  */
-export interface ImapSyncRepository {
-  startSync(
-    data: ImapSyncPostRequestOutput,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ImapSyncPostResponseOutput>>;
-
-  getSyncStatus(
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): ResponseType<ImapSyncGetResponseOutput>;
-}
-
-/**
- * IMAP Sync Repository Implementation
- */
-class ImapSyncRepositoryImpl implements ImapSyncRepository {
+export class ImapSyncRepository {
   /**
    * Start IMAP sync operation
    */
-  async startSync(
+  static async startSync(
     data: ImapSyncPostRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
@@ -125,7 +109,7 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
             })
             .where(eq(imapAccounts.id, account.id));
 
-          const syncResult = await imapSyncServiceRepository.syncAccount(
+          const syncResult = await imapSyncRepository.syncAccount(
             { account },
             logger,
           );
@@ -222,7 +206,7 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
    * Get sync status for all accounts
    * Note: Returns same format as POST to match type definition
    */
-  getSyncStatus(
+  static getSyncStatus(
     user: JwtPayloadType,
     logger: EndpointLogger,
   ): ResponseType<ImapSyncGetResponseOutput> {
@@ -252,8 +236,3 @@ class ImapSyncRepositoryImpl implements ImapSyncRepository {
     }
   }
 }
-
-/**
- * Export singleton instance
- */
-export const imapSyncRepository = new ImapSyncRepositoryImpl();

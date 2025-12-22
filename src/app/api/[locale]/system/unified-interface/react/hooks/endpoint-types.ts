@@ -390,6 +390,7 @@ export type DeleteOperationReturn<T> = T extends {
     infer _TMethod,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     infer _TUserRoleValue,
+    infer TTranslationKey,
     infer TFields
   >;
 }
@@ -397,7 +398,13 @@ export type DeleteOperationReturn<T> = T extends {
       /** The complete response including success/error state */
       response:
         | ResponseType<
-            ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
+            ExtractOutput<
+              InferSchemaFromField<
+                TFields,
+                FieldUsage.Response,
+                TTranslationKey
+              >
+            >
           >
         | undefined;
 
@@ -409,7 +416,7 @@ export type DeleteOperationReturn<T> = T extends {
 
       submit: (
         data?: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
+          InferSchemaFromField<TFields, FieldUsage.RequestData, TTranslationKey>
         >,
       ) => Promise<void>;
       isSubmitting: boolean;
@@ -511,6 +518,7 @@ export type EndpointReturn<T> = Prettify<{
       infer _TMethod,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       infer _TUserRoleValue,
+      infer TTranslationKey,
       infer TFields
     >;
   }
@@ -518,7 +526,13 @@ export type EndpointReturn<T> = Prettify<{
         /** The complete response including success/error state */
         response:
           | ResponseType<
-              ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
+              ExtractOutput<
+                InferSchemaFromField<
+                  TFields,
+                  FieldUsage.Response,
+                  TTranslationKey
+                >
+              >
             >
           | undefined;
 
@@ -530,7 +544,11 @@ export type EndpointReturn<T> = Prettify<{
 
         submit: (
           data?: ExtractOutput<
-            InferSchemaFromField<TFields, FieldUsage.RequestData>
+            InferSchemaFromField<
+              TFields,
+              FieldUsage.RequestData,
+              TTranslationKey
+            >
           >,
         ) => Promise<void>;
         isSubmitting: boolean;

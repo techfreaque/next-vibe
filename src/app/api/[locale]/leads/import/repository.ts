@@ -402,12 +402,11 @@ export class LeadsImportRepository implements ILeadsImportRepository {
             duplicate: false,
           });
         }
-          return success({
-            created: false,
-            updated: false,
-            duplicate: true,
-          });
-        
+        return success({
+          created: false,
+          updated: false,
+          duplicate: true,
+        });
       }
 
       // Create new lead
@@ -522,9 +521,8 @@ export class LeadsImportRepository implements ILeadsImportRepository {
           jobId: result.data.jobId,
         });
       }
-        logger.error("CSV import failed", result.message);
-        return result;
-      
+      logger.error("CSV import failed", result.message);
+      return result;
     } catch (error) {
       logger.error("Error importing leads from CSV", parseError(error));
       return fail({

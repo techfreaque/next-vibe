@@ -4,7 +4,6 @@
  */
 /// <reference types="bun-types" />
 
-
 import "server-only";
 
 import type { Subprocess } from "bun";
@@ -69,9 +68,15 @@ export class WindowsRecorder extends BaseRecorder {
         process.stdin &&
         typeof process.stdin !== "number" &&
         "getWriter" in process.stdin &&
-        typeof (process.stdin as { getWriter?: () => WritableStreamDefaultWriter<Uint8Array> }).getWriter === "function"
+        typeof (
+          process.stdin as {
+            getWriter?: () => WritableStreamDefaultWriter<Uint8Array>;
+          }
+        ).getWriter === "function"
       ) {
-        const stdinStream = process.stdin as { getWriter: () => WritableStreamDefaultWriter<Uint8Array> };
+        const stdinStream = process.stdin as {
+          getWriter: () => WritableStreamDefaultWriter<Uint8Array>;
+        };
         const writer = stdinStream.getWriter();
         await writer.write(new TextEncoder().encode("q"));
         writer.releaseLock();
@@ -83,7 +88,10 @@ export class WindowsRecorder extends BaseRecorder {
   }
 
   protected override handleStderrLine(line: string): void {
-    if (line.toLowerCase().includes("error") || line.toLowerCase().includes("fatal")) {
+    if (
+      line.toLowerCase().includes("error") ||
+      line.toLowerCase().includes("fatal")
+    ) {
       // Error will be handled by the session/repository logger
       // Storing for potential error reporting
     }

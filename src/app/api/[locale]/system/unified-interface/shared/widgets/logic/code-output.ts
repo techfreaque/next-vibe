@@ -48,7 +48,9 @@ export interface ProcessedCodeOutput {
 /**
  * Extract code output configuration from field
  */
-export function getCodeOutputConfig(field: UnifiedField): CodeOutputConfig {
+export function getCodeOutputConfig<TKey extends string>(
+  field: UnifiedField<TKey>,
+): CodeOutputConfig {
   const defaultConfig: CodeOutputConfig = {
     format: "generic",
     showSummary: true,

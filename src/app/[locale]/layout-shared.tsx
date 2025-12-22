@@ -29,9 +29,7 @@ export function RootProviders({
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <TranslationProvider currentLocale={locale}>
           <LeadTrackingProvider />
-          <ErrorBoundary locale={locale}>
-            {children}
-          </ErrorBoundary>
+          <ErrorBoundary locale={locale}>{children}</ErrorBoundary>
           <Toaster />
         </TranslationProvider>
       </ThemeProvider>

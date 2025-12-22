@@ -11,7 +11,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { JwtPrivatePayloadType } from "../user/auth/types";
 import { UserDetailLevel } from "../user/enum";
-import { userRepository } from "../user/repository";
+import { UserRepository } from "../user/repository";
 import { UserPermissionRole, UserRole } from "../user/user-roles/enum";
 import type { UserCreateRequestOutput } from "./create/definition";
 import { userCreateRepository } from "./create/repository";
@@ -40,7 +40,7 @@ export async function dev(
 
   try {
     // Get admin user to act as creator
-    const adminUserResponse = await userRepository.getUserByEmail(
+    const adminUserResponse = await UserRepository.getUserByEmail(
       "admin@example.com",
       UserDetailLevel.STANDARD,
       locale,
@@ -128,7 +128,7 @@ export async function dev(
     for (const userData of sampleUsers) {
       try {
         // Check if user already exists using emailExists (doesn't fetch full user)
-        const emailExistsResponse = await userRepository.emailExists(
+        const emailExistsResponse = await UserRepository.emailExists(
           userData.basicInfo.email,
           logger,
         );
@@ -187,7 +187,7 @@ export async function test(
 
   try {
     // Get admin user to act as creator
-    const adminUserResponse = await userRepository.getUserByEmail(
+    const adminUserResponse = await UserRepository.getUserByEmail(
       "admin@example.com",
       UserDetailLevel.STANDARD,
       locale,
@@ -237,7 +237,7 @@ export async function test(
     });
 
     // Check if test user already exists using emailExists (doesn't fetch full user)
-    const emailExistsResponse = await userRepository.emailExists(
+    const emailExistsResponse = await UserRepository.emailExists(
       testUserData.basicInfo.email,
       logger,
     );

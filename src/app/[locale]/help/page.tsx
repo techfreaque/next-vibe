@@ -15,7 +15,7 @@ import {
 } from "@/app/api/[locale]/products/repository-client";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
@@ -58,7 +58,7 @@ export default async function ContactPage({
   const { locale } = await params;
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const userResponse = await userRepository.getUserByAuth(
+  const userResponse = await UserRepository.getUserByAuth(
     {
       detailLevel: UserDetailLevel.STANDARD,
     },
@@ -159,6 +159,7 @@ export default async function ContactPage({
                     subscription.price,
                     subscription.currency,
                   ),
+                  subCredits: subscription.credits,
                   packPrice: formatPrice(creditPack.price, creditPack.currency),
                   packCredits: creditPack.credits,
                   modelCount: TOTAL_MODEL_COUNT,

@@ -2,7 +2,7 @@
 
 import { cn } from "next-vibe/shared/utils";
 import * as React from "react";
-import { Text,View } from "react-native";
+import { Text, View } from "react-native";
 
 import type {
   AreaProps,

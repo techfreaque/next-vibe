@@ -61,8 +61,16 @@ const { POST } = createEndpoint({
             "app.api.browser.handle-dialog.form.fields.action.placeholder",
           columns: 6,
           options: [
-            { label: "app.api.browser.handle-dialog.form.fields.action.options.accept" as const, value: "accept" },
-            { label: "app.api.browser.handle-dialog.form.fields.action.options.dismiss" as const, value: "dismiss" },
+            {
+              label:
+                "app.api.browser.handle-dialog.form.fields.action.options.accept" as const,
+              value: "accept",
+            },
+            {
+              label:
+                "app.api.browser.handle-dialog.form.fields.action.options.dismiss" as const,
+              value: "dismiss",
+            },
           ],
         },
         z

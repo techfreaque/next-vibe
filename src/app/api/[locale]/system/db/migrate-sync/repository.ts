@@ -57,7 +57,9 @@ export interface DatabaseMigrateSyncRepository {
 /**
  * Database Migration Sync Repository Implementation
  */
-export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRepository {
+export class DatabaseMigrateSyncRepositoryImpl
+  implements DatabaseMigrateSyncRepository
+{
   async syncMigrations(
     data: MigrateSyncRequestType,
     locale: CountryLanguage,

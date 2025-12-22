@@ -4,7 +4,8 @@ export const translations = {
   interactive: {
     post: {
       title: "Interactive Mode",
-      description: "Start interactive file explorer mode for navigating and executing routes",
+      description:
+        "Start interactive file explorer mode for navigating and executing routes",
       category: "System Help",
       tags: {
         system: "system",

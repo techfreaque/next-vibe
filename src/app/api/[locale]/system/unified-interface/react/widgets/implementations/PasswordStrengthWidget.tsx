@@ -14,12 +14,15 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
  * Displays a visual indicator of password strength.
  * Watches the password form field and updates in real-time.
  */
-export function PasswordStrengthWidget({
+export function PasswordStrengthWidget<TKey extends string>({
   field,
   context,
   className,
   form,
-}: ReactWidgetProps<typeof WidgetType.PASSWORD_STRENGTH>): JSX.Element | null {
+}: ReactWidgetProps<
+  typeof WidgetType.PASSWORD_STRENGTH,
+  TKey
+>): JSX.Element | null {
   const { t } = simpleT(context.locale);
   const { watchField = "password" } = field.ui;
 

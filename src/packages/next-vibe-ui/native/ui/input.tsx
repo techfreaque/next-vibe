@@ -156,13 +156,9 @@ function InputInner<
   const nativeRef = React.useRef<TextInput>(null);
 
   // Handle ref forwarding
-  React.useImperativeHandle(
-    ref,
-    (): InputRefObject => {
-      return createInputRefObject(nativeRef.current, stringValue);
-    },
-    [stringValue],
-  );
+  React.useImperativeHandle(ref, (): InputRefObject => {
+    return createInputRefObject(nativeRef.current, stringValue);
+  }, [stringValue]);
 
   // Map web input type to React Native keyboard type
   const resolvedKeyboardType = React.useMemo(():

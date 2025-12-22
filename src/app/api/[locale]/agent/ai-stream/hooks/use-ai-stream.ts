@@ -96,7 +96,7 @@ function handleMessageCreatedEvent(params: {
     parentId: eventData.parentId,
     depth: eventData.depth,
     model: eventData.model,
-    persona: eventData.persona,
+    character: eventData.character,
     isStreaming: eventData.role === ChatMessageRole.ASSISTANT,
     sequenceId: eventData.sequenceId,
     toolCall,
@@ -135,7 +135,7 @@ function handleMessageCreatedEvent(params: {
             eventData.role === ChatMessageRole.ASSISTANT ||
             eventData.role === ChatMessageRole.TOOL,
           model: eventData.model ?? null,
-          persona: eventData.persona ?? null,
+          character: eventData.character ?? null,
           errorType:
             eventData.role === ChatMessageRole.ERROR ? "STREAM_ERROR" : null,
           errorMessage:
@@ -176,7 +176,7 @@ function handleMessageCreatedEvent(params: {
                 eventData.role === ChatMessageRole.ASSISTANT ||
                 eventData.role === ChatMessageRole.TOOL,
               model: eventData.model ?? null,
-              persona: eventData.persona ?? null,
+              character: eventData.character ?? null,
               errorType:
                 eventData.role === ChatMessageRole.ERROR
                   ? "STREAM_ERROR"
@@ -269,11 +269,18 @@ export function useAIStream(
 
           // Add all non-file fields as JSON in a 'data' field
           const { audioInput, ...restData } = data;
-          formData.append("data", JSON.stringify({ ...restData, audioInput: { file: null } }));
+          formData.append(
+            "data",
+            JSON.stringify({ ...restData, audioInput: { file: null } }),
+          );
 
           // Add the audio file
           if (audioInput?.file) {
-            formData.append("audioInput.file", audioInput.file, audioInput.file.name);
+            formData.append(
+              "audioInput.file",
+              audioInput.file,
+              audioInput.file.name,
+            );
           }
 
           requestBody = formData;
@@ -442,7 +449,7 @@ export function useAIStream(
                         folderId: eventData.subFolderId,
                         status: ThreadStatus.ACTIVE,
                         defaultModel: null,
-                        defaultPersona: null,
+                        defaultCharacter: null,
                         systemPrompt: null,
                         pinned: false,
                         archived: false,
@@ -506,7 +513,7 @@ export function useAIStream(
                     parentId: null,
                     depth: 0,
                     model: null,
-                    persona: null,
+                    character: null,
                     isStreaming: true,
                     sequenceId: null,
                   });
@@ -528,8 +535,9 @@ export function useAIStream(
                   // Save to localStorage incrementally for incognito mode
                   void (async (): Promise<void> => {
                     try {
-                      const { useChatStore } =
-                        await import("../../chat/hooks/store");
+                      const { useChatStore } = await import(
+                        "../../chat/hooks/store"
+                      );
                       const chatThread =
                         useChatStore.getState().threads[
                           currentMessage.threadId
@@ -538,8 +546,9 @@ export function useAIStream(
                         chatThread?.rootFolderId === "incognito";
 
                       if (isIncognito) {
-                        const { saveMessage } =
-                          await import("../../chat/incognito/storage");
+                        const { saveMessage } = await import(
+                          "../../chat/incognito/storage"
+                        );
                         saveMessage({
                           id: eventData.messageId,
                           threadId: currentMessage.threadId,
@@ -555,7 +564,7 @@ export function useAIStream(
                           isAI:
                             currentMessage.role === ChatMessageRole.ASSISTANT,
                           model: currentMessage.model ?? null,
-                          persona: currentMessage.persona ?? null,
+                          character: currentMessage.character ?? null,
                           errorType: null,
                           errorMessage: null,
                           errorCode: null,
@@ -611,8 +620,9 @@ export function useAIStream(
                   // Also update chat store and localStorage for incognito mode
                   void (async (): Promise<void> => {
                     try {
-                      const { useChatStore } =
-                        await import("../../chat/hooks/store");
+                      const { useChatStore } = await import(
+                        "../../chat/hooks/store"
+                      );
                       const chatMessage =
                         useChatStore.getState().messages[eventData.messageId];
 
@@ -632,8 +642,9 @@ export function useAIStream(
                           chatThread?.rootFolderId === "incognito";
 
                         if (isIncognito) {
-                          const { saveMessage } =
-                            await import("../../chat/incognito/storage");
+                          const { saveMessage } = await import(
+                            "../../chat/incognito/storage"
+                          );
                           saveMessage({
                             id: eventData.messageId,
                             threadId: currentMessage.threadId,
@@ -649,7 +660,7 @@ export function useAIStream(
                             isAI:
                               currentMessage.role === ChatMessageRole.ASSISTANT,
                             model: currentMessage.model ?? null,
-                            persona: currentMessage.persona ?? null,
+                            character: currentMessage.character ?? null,
                             errorType: null,
                             errorMessage: null,
                             errorCode: null,
@@ -697,8 +708,9 @@ export function useAIStream(
                   // Also update chat store so reasoning content is persisted
                   void (async (): Promise<void> => {
                     try {
-                      const { useChatStore } =
-                        await import("../../chat/hooks/store");
+                      const { useChatStore } = await import(
+                        "../../chat/hooks/store"
+                      );
                       const chatMessage =
                         useChatStore.getState().messages[eventData.messageId];
 
@@ -865,8 +877,9 @@ export function useAIStream(
                 if (message) {
                   void (async (): Promise<void> => {
                     try {
-                      const { useChatStore } =
-                        await import("../../chat/hooks/store");
+                      const { useChatStore } = await import(
+                        "../../chat/hooks/store"
+                      );
                       const chatThread =
                         useChatStore.getState().threads[message.threadId];
                       const isIncognito =
@@ -876,8 +889,9 @@ export function useAIStream(
                       if (isIncognito) {
                         // Save to localStorage
                         try {
-                          const { saveMessage } =
-                            await import("../../chat/incognito/storage");
+                          const { saveMessage } = await import(
+                            "../../chat/incognito/storage"
+                          );
                           const savedMessage = {
                             id: message.messageId,
                             threadId: message.threadId,
@@ -891,7 +905,7 @@ export function useAIStream(
                             authorColor: null,
                             isAI: message.role === ChatMessageRole.ASSISTANT,
                             model: message.model ?? null,
-                            persona: message.persona ?? null,
+                            character: message.character ?? null,
                             errorType: null,
                             errorMessage: null,
                             errorCode: null,
@@ -955,12 +969,19 @@ export function useAIStream(
 
                 // Only queue audio for auto-playback if call mode is enabled
                 // Otherwise TTS is generated but not played (user can manually play)
-                if (eventData.audioData && !eventData.isFinal && data.voiceMode?.callMode) {
+                if (
+                  eventData.audioData &&
+                  !eventData.isFinal &&
+                  data.voiceMode?.callMode
+                ) {
                   const audioQueue = getAudioQueue();
                   audioQueue.enqueue(eventData.audioData, eventData.chunkIndex);
-                  logger.debug("[AUDIO_CHUNK] Queued for playback (call mode)", {
-                    chunkIndex: eventData.chunkIndex,
-                  });
+                  logger.debug(
+                    "[AUDIO_CHUNK] Queued for playback (call mode)",
+                    {
+                      chunkIndex: eventData.chunkIndex,
+                    },
+                  );
                 }
                 break;
               }
@@ -995,7 +1016,7 @@ export function useAIStream(
                         authorColor: null,
                         isAI: false,
                         model: null,
-                        persona: null,
+                        character: null,
                         errorType: eventData.code ?? "STREAM_ERROR",
                         errorMessage: eventData.message,
                         errorCode: eventData.code ?? null,
@@ -1057,7 +1078,6 @@ export function useAIStream(
         }
         store.stopStream();
       } finally {
-         
         abortControllerRef.current = null;
       }
     },

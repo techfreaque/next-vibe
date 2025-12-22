@@ -39,52 +39,68 @@ export interface CLIWidgetRenderContext extends SharedWidgetRenderContext {
   options: CLIRenderingOptions;
   depth: number;
   t: TFunction;
-  formatValue: (field: UnifiedField, value: WidgetData) => string;
+  formatValue: <TKey extends string>(
+    field: UnifiedField<TKey>,
+    value: WidgetData,
+  ) => string;
   getFieldIcon: (type: FieldDataType) => string;
   renderEmptyState: (message: string) => string;
-  getRenderer: (widgetType: WidgetType) => WidgetRenderer;
+  getRenderer: (widgetType: WidgetType) => AnyWidgetRenderer;
+  /**
+   * Render a widget with proper type dispatch.
+   * Use this instead of getRenderer().render() to avoid union type issues.
+   */
+  renderWidget: <TKey extends string>(
+    widgetType: WidgetType,
+    field: UnifiedField<TKey>,
+    value: WidgetData,
+  ) => string;
 }
 
 // Alias for backwards compatibility
 export type WidgetRenderContext = CLIWidgetRenderContext;
 
 /**
- * Widget renderer interface.
- * Each renderer handles a specific widget type.
- * The generic T enables type-safe props within implementations.
- * Registry uses WidgetRenderer (without T) for storage, with runtime type checking.
- */
-export interface WidgetRenderer<T extends WidgetType = WidgetType> {
-  readonly widgetType: T;
-  render(props: CLIWidgetProps<T>): string;
-}
-
-/**
- * Type for storing renderers in arrays - allows any widget type.
- */
-export type AnyWidgetRenderer = WidgetRenderer<WidgetType>;
-
-/**
  * CLI-specific widget props. Extends base props with CLI context.
- * Uses the same discriminated union pattern as React for type safety.
+ * Uses the same pattern as ReactWidgetProps for type safety.
  */
 export interface CLIWidgetProps<
   T extends WidgetType,
-> extends BaseWidgetProps<T> {
+  TKey extends string = string,
+> extends BaseWidgetProps<TKey, T> {
   context: CLIWidgetRenderContext;
 }
 
 /**
+ * Widget renderer interface.
+ * Each renderer handles a specific widget type.
+ * TWidget is the specific widget type this renderer handles.
+ */
+export interface WidgetRenderer<TWidget extends WidgetType = WidgetType> {
+  readonly widgetType: TWidget;
+  render(props: CLIWidgetProps<TWidget, string>): string;
+}
+
+/**
+ * Widget renderer type for registry storage.
+ * Uses `any` for widget type like React's WidgetComponent pattern.
+ * Each implementation still has strict types.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyWidgetRenderer = WidgetRenderer<any>;
+
+/**
  * Maps each WidgetType to CLI-specific props.
  */
-export type CLIWidgetPropsMap = {
-  [T in WidgetType]: CLIWidgetProps<T>;
+export type CLIWidgetPropsMap<TKey extends string> = {
+  [T in WidgetType]: CLIWidgetProps<T, TKey>;
 };
 
 /**
  * Union of all CLI widget props - TypeScript narrows this in switch statements.
  */
-export type CLIWidgetPropsUnion = CLIWidgetPropsMap[WidgetType];
+export type CLIWidgetPropsUnion<TKey extends string> =
+  CLIWidgetPropsMap<TKey>[WidgetType];
 
 /**
  * Data formatting utilities for CLI output

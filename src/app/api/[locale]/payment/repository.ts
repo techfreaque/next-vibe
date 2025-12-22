@@ -48,52 +48,8 @@ import type {
   PaymentRefundResponseOutput,
 } from "./refund/definition";
 
-export interface PaymentRepository {
-  createPaymentSession(
-    data: PaymentPostRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PaymentPostResponseOutput>>;
-
-  getPaymentInfo(
-    data: PaymentGetRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PaymentGetResponseOutput>>;
-
-  createInvoice(
-    userId: string,
-    data: PaymentInvoiceRequestOutput,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PaymentInvoiceResponseOutput>>;
-
-  createCustomerPortal(
-    userId: string,
-    data: PaymentPortalRequestOutput,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PaymentPortalResponseOutput>>;
-
-  createRefund(
-    userId: string,
-    data: PaymentRefundRequestOutput,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PaymentRefundResponseOutput>>;
-
-  handleWebhook(
-    body: string,
-    signature: string,
-    logger: EndpointLogger,
-    provider?: "stripe" | "nowpayments",
-  ): Promise<ResponseType<{ received: boolean }>>;
-}
-
-export class PaymentRepositoryImpl implements PaymentRepository {
-  async createPaymentSession(
+export class PaymentRepository {
+  static async createPaymentSession(
     data: PaymentPostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -160,14 +116,18 @@ export class PaymentRepositoryImpl implements PaymentRepository {
           return "";
         }
         // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
-        return value.replaceAll(/([A-Z])/g, (match) => `_${match}`).toLowerCase();
+        return value
+          .replaceAll(/([A-Z])/g, (match) => `_${match}`)
+          .toLowerCase();
       }) || [
         "card",
       ]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
 
       // Extract mode value from translation key
       const modeParts = data.mode.split(".");
-      const modeValue = modeParts.at(-1) as Stripe.Checkout.SessionCreateParams.Mode;
+      const modeValue = modeParts.at(
+        -1,
+      ) as Stripe.Checkout.SessionCreateParams.Mode;
 
       const sessionConfig: Stripe.Checkout.SessionCreateParams = {
         customer: stripeCustomerId,
@@ -254,7 +214,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     }
   }
 
-  async getPaymentInfo(
+  static async getPaymentInfo(
     data: PaymentGetRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -324,7 +284,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     }
   }
 
-  async createInvoice(
+  static async createInvoice(
     userId: string,
     data: PaymentInvoiceRequestOutput,
     locale: CountryLanguage,
@@ -333,7 +293,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     return stripeAdminTools.createInvoice(userId, data, locale, logger);
   }
 
-  async createCustomerPortal(
+  static async createCustomerPortal(
     userId: string,
     data: PaymentPortalRequestOutput,
     locale: CountryLanguage,
@@ -370,7 +330,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     return stripeAdminTools.createCustomerPortal(userId, data, locale, logger);
   }
 
-  async createRefund(
+  static async createRefund(
     userId: string,
     data: PaymentRefundRequestOutput,
     locale: CountryLanguage,
@@ -379,7 +339,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     return stripeAdminTools.createRefund(userId, data, locale, logger);
   }
 
-  async handleWebhook(
+  static async handleWebhook(
     body: string,
     signature: string,
     logger: EndpointLogger,
@@ -498,7 +458,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     }
   }
 
-  private async handlePaymentSucceeded(
+  private static async handlePaymentSucceeded(
     data: WebhookData,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -526,7 +486,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     }
   }
 
-  private async handlePaymentFailed(
+  private static async handlePaymentFailed(
     data: WebhookData,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -554,7 +514,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     }
   }
 
-  private async handleInvoicePaymentSucceeded(
+  private static async handleInvoicePaymentSucceeded(
     data: WebhookData,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -605,9 +565,10 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       }
 
       // Subscription module handles its own business logic
-      const { subscriptionRepository } =
-        await import("../subscription/repository");
-      await subscriptionRepository.handleInvoicePaymentSucceeded(
+      const { SubscriptionRepository } = await import(
+        "../subscription/repository"
+      );
+      await SubscriptionRepository.handleInvoicePaymentSucceeded(
         data,
         subscriptionId,
         logger,
@@ -626,7 +587,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     }
   }
 
-  private async handleCheckoutSessionCompleted(
+  private static async handleCheckoutSessionCompleted(
     data: WebhookData,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -651,7 +612,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
       // Route to appropriate module based on purchase type
       if (type === "credit_pack") {
-        const { creditRepository } = await import("../credits/repository");
+        const { CreditRepository } = await import("../credits/repository");
         // Convert to provider-agnostic format
         const creditPackSession: CreditPackCheckoutSession = {
           id: sessionId,
@@ -662,14 +623,15 @@ export class PaymentRepositoryImpl implements PaymentRepository {
                 )
               : undefined,
         };
-        await creditRepository.handleCreditPackPurchase(
+        await CreditRepository.handleCreditPackPurchase(
           creditPackSession,
           logger,
         );
       } else if (type === "subscription") {
-        const { subscriptionRepository } =
-          await import("../subscription/repository");
-        await subscriptionRepository.handleSubscriptionCheckout(data, logger);
+        const { SubscriptionRepository } = await import(
+          "../subscription/repository"
+        );
+        await SubscriptionRepository.handleSubscriptionCheckout(data, logger);
       } else {
         logger.debug("Unhandled checkout session type", {
           sessionId,
@@ -702,10 +664,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
         // Apply referral payout using credits (currency-independent)
         // Credits are determined from product type, not payment amount
-        const {
-          productsRepository,
-          ProductIds,
-        } = await import("../products/repository-client");
+        const { productsRepository, ProductIds } = await import(
+          "../products/repository-client"
+        );
 
         let creditsAmount = 0;
         if (type === "subscription") {
@@ -719,9 +680,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         } else if (type === "credit_pack") {
           // Credit pack: quantity * credits per pack
           const quantity =
-            metadata &&
-            typeof metadata === "object" &&
-            "quantity" in metadata
+            metadata && typeof metadata === "object" && "quantity" in metadata
               ? Number(metadata.quantity) || 1
               : 1;
           const creditPackProduct = productsRepository.getProduct(
@@ -759,7 +718,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     }
   }
 
-  private async handleSubscriptionDeleted(
+  private static async handleSubscriptionDeleted(
     data: WebhookData,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -770,9 +729,10 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         subscriptionId,
       });
 
-      const { subscriptionRepository } =
-        await import("../subscription/repository");
-      await subscriptionRepository.handleSubscriptionCanceled(
+      const { SubscriptionRepository } = await import(
+        "../subscription/repository"
+      );
+      await SubscriptionRepository.handleSubscriptionCanceled(
         subscriptionId,
         logger,
       );
@@ -790,7 +750,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     }
   }
 
-  private async handleSubscriptionUpdated(
+  private static async handleSubscriptionUpdated(
     data: WebhookData,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -799,10 +759,11 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         subscriptionId: data.id,
       });
 
-      const { subscriptionRepository } =
-        await import("../subscription/repository");
+      const { SubscriptionRepository } = await import(
+        "../subscription/repository"
+      );
       // The webhook data is actually a Stripe.Subscription object from the event
-      await subscriptionRepository.handleSubscriptionUpdated(
+      await SubscriptionRepository.handleSubscriptionUpdated(
         data as Stripe.Subscription,
         logger,
       );
@@ -820,5 +781,3 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     }
   }
 }
-
-export const paymentRepository = new PaymentRepositoryImpl();

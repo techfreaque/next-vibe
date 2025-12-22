@@ -26,15 +26,43 @@ export const translations: typeof enTranslations = {
     executionId: "ID wykonania do śledzenia",
   },
   errors: {
-    validation: { title: "Błąd walidacji", description: "Sprawdź wprowadzone dane i spróbuj ponownie" },
-    network: { title: "Błąd sieci", description: "Wystąpił błąd sieci podczas zmiany rozmiaru strony" },
-    unauthorized: { title: "Nieautoryzowany", description: "Nie masz uprawnień do zmiany rozmiaru stron" },
-    forbidden: { title: "Zabronione", description: "Operacja zmiany rozmiaru strony jest zabroniona" },
-    notFound: { title: "Nie znaleziono", description: "Żądany zasób nie został znaleziony" },
-    serverError: { title: "Błąd serwera", description: "Wystąpił wewnętrzny błąd serwera podczas zmiany rozmiaru strony" },
-    unknown: { title: "Nieznany błąd", description: "Wystąpił nieznany błąd podczas zmiany rozmiaru strony" },
-    unsavedChanges: { title: "Niezapisane zmiany", description: "Masz niezapisane zmiany, które mogą zostać utracone" },
-    conflict: { title: "Konflikt", description: "Wystąpił konflikt podczas zmiany rozmiaru strony" },
+    validation: {
+      title: "Błąd walidacji",
+      description: "Sprawdź wprowadzone dane i spróbuj ponownie",
+    },
+    network: {
+      title: "Błąd sieci",
+      description: "Wystąpił błąd sieci podczas zmiany rozmiaru strony",
+    },
+    unauthorized: {
+      title: "Nieautoryzowany",
+      description: "Nie masz uprawnień do zmiany rozmiaru stron",
+    },
+    forbidden: {
+      title: "Zabronione",
+      description: "Operacja zmiany rozmiaru strony jest zabroniona",
+    },
+    notFound: {
+      title: "Nie znaleziono",
+      description: "Żądany zasób nie został znaleziony",
+    },
+    serverError: {
+      title: "Błąd serwera",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas zmiany rozmiaru strony",
+    },
+    unknown: {
+      title: "Nieznany błąd",
+      description: "Wystąpił nieznany błąd podczas zmiany rozmiaru strony",
+    },
+    unsavedChanges: {
+      title: "Niezapisane zmiany",
+      description: "Masz niezapisane zmiany, które mogą zostać utracone",
+    },
+    conflict: {
+      title: "Konflikt",
+      description: "Wystąpił konflikt podczas zmiany rozmiaru strony",
+    },
   },
   success: {
     title: "Rozmiar strony pomyślnie zmieniony",

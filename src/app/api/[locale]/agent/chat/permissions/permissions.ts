@@ -33,7 +33,7 @@ import {
   type UserPermissionRoleValue,
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import { userRolesRepository } from "@/app/api/[locale]/user/user-roles/repository";
+import { UserRolesRepository } from "@/app/api/[locale]/user/user-roles/repository";
 
 import { type DefaultFolderConfig, getDefaultFolderConfig } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
@@ -49,7 +49,7 @@ export async function isAdmin(
   userId: string,
   logger: EndpointLogger,
 ): Promise<boolean> {
-  const hasAdminRole = await userRolesRepository.hasRole(
+  const hasAdminRole = await UserRolesRepository.hasRole(
     userId,
     UserRole.ADMIN,
     logger,
@@ -214,7 +214,7 @@ export async function hasRolePermission(
 
   // Authenticated users - check their roles
   if (user.id) {
-    const userRoles = await userRolesRepository.getUserRoles(user.id, logger);
+    const userRoles = await UserRolesRepository.getUserRoles(user.id, logger);
     if (userRoles.success && userRoles.data) {
       return effectiveRoles.some((role) => userRoles.data!.includes(role));
     }

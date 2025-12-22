@@ -6,7 +6,6 @@
 
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import type z from "zod";
 
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import { type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
@@ -19,14 +18,15 @@ import type {
 } from "@/i18n/core/static-types";
 
 import { isEmptySchema } from "../../../../shared/utils/validation";
-import type { CreateApiEndpoint } from "../../shared/endpoints/definition/create";
 import { definitionLoader } from "../../shared/endpoints/definition/loader";
 import type { BaseExecutionContext } from "../../shared/endpoints/route/executor";
 import { routeExecutionExecutor } from "../../shared/endpoints/route/executor";
 import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
-import type { UnifiedField } from "../../shared/types/endpoint";
-import type { Methods } from "../../shared/types/enums";
+import type {
+  CreateApiEndpointAny,
+  UnifiedField,
+} from "../../shared/types/endpoint";
 import type { Platform } from "../../shared/types/platform";
 import { getCliUser } from "../auth/cli-user";
 import { modularCLIResponseRenderer } from "../widgets/renderers/response-renderer";
@@ -92,10 +92,8 @@ export type CliCompatiblePlatform =
  * Route execution context
  * Extends BaseExecutionContext with CLI-specific fields
  */
-export interface RouteExecutionContext extends Omit<
-  BaseExecutionContext<InputData>,
-  "user"
-> {
+export interface RouteExecutionContext
+  extends Omit<BaseExecutionContext<InputData>, "user"> {
   /** URL path parameters */
   urlPathParams?: CliUrlParams;
 
@@ -191,14 +189,7 @@ export class RouteDelegationHandler {
       }
 
       // 2. Get endpoint definition for CLI-specific features (interactive forms, arg parsing)
-      const endpointResult = await definitionLoader.load<
-        CreateApiEndpoint<
-          string,
-          Methods,
-          readonly UserRoleValue[],
-          UnifiedField<z.ZodTypeAny>
-        >
-      >({
+      const endpointResult = await definitionLoader.load<CreateApiEndpointAny>({
         identifier: resolvedCommand,
         platform: context.platform,
         user: cliUser,
@@ -329,12 +320,7 @@ export class RouteDelegationHandler {
    * Now delegates validation to registry
    */
   private async collectInputData(
-    endpoint: CreateApiEndpoint<
-      string,
-      Methods,
-      readonly UserRoleValue[],
-      UnifiedField<z.ZodTypeAny>
-    > | null,
+    endpoint: CreateApiEndpointAny | null,
     context: RouteExecutionContext,
     logger: EndpointLogger,
   ): Promise<CollectedInputData> {
@@ -409,12 +395,7 @@ export class RouteDelegationHandler {
    * Generate form from endpoint using schema UI handler
    */
   private async generateFormFromEndpoint(
-    endpoint: CreateApiEndpoint<
-      string,
-      Methods,
-      readonly UserRoleValue[],
-      UnifiedField<z.ZodTypeAny>
-    >,
+    endpoint: CreateApiEndpointAny,
     formType: "request" | "urlPathParams" = "request",
   ): Promise<InputData> {
     const schema =
@@ -443,8 +424,7 @@ export class RouteDelegationHandler {
   formatResult(
     result: RouteExecutionResult,
     outputFormat = "pretty",
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Route handler execution requires 'unknown' for flexible handler types
-    endpointDefinition: unknown | null,
+    endpointDefinition: CreateApiEndpointAny | null,
     locale: CountryLanguage,
     verbose = false,
     logger: EndpointLogger,
@@ -652,10 +632,9 @@ export class RouteDelegationHandler {
   /**
    * Extract response fields from endpoint definition
    */
-  private extractResponseFields(
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response transformation requires 'unknown' for flexible response types
-    endpointDefinition: unknown,
-  ): Array<[string, UnifiedField]> {
+  private extractResponseFields<TKey extends string>(
+    endpointDefinition: CreateApiEndpointAny,
+  ): Array<[string, UnifiedField<TKey>]> {
     // Type guard: check if it's a valid endpoint with fields
     if (
       !endpointDefinition ||
@@ -678,8 +657,8 @@ export class RouteDelegationHandler {
       return [];
     }
 
-    const children = fields.children as Record<string, UnifiedField>;
-    const responseFields: Array<[string, UnifiedField]> = [];
+    const children = fields.children as Record<string, UnifiedField<TKey>>;
+    const responseFields: Array<[string, UnifiedField<TKey>]> = [];
 
     // Extract fields that have usage.response = true
     for (const [fieldName, fieldDef] of Object.entries(children)) {
@@ -719,8 +698,7 @@ export class RouteDelegationHandler {
    */
   private formatWithEnhancedRenderer(
     data: CliResponseData,
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Response transformation requires 'unknown' for flexible response types
-    endpointDefinition: unknown,
+    endpointDefinition: CreateApiEndpointAny,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): string {
@@ -768,12 +746,7 @@ export class RouteDelegationHandler {
    * Build data object from CLI arguments
    */
   private buildDataFromCliArgs(
-    endpoint: CreateApiEndpoint<
-      string,
-      Methods,
-      readonly UserRoleValue[],
-      UnifiedField<z.ZodTypeAny>
-    > | null,
+    endpoint: CreateApiEndpointAny | null,
     context: RouteExecutionContext,
   ): InputData | null {
     if (!context.cliArgs) {

@@ -33,7 +33,6 @@ const { POST } = createEndpoint({
   ],
   icon: "book",
   allowedRoles: [
-    UserRole.ADMIN,
     UserRole.PRODUCTION_OFF,
     UserRole.AI_TOOL_OFF,
     UserRole.CLI_AUTH_BYPASS,

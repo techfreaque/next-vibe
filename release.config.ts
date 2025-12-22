@@ -91,7 +91,6 @@ const releaseConfig: ReleaseFileConfig = {
         // Folders to zip for release assets
         foldersToZip: [],
       },
-
     },
   ],
 };

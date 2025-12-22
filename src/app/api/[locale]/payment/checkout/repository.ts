@@ -21,6 +21,8 @@ import { simpleT } from "@/i18n/core/shared";
 import { ProductIds } from "../../products/repository-client";
 import { BillingInterval } from "../../subscription/enum";
 import type { JwtPrivatePayloadType } from "../../user/auth/types";
+import { UserDetailLevel } from "../../user/enum";
+import { UserRepository } from "../../user/repository";
 import { PaymentProvider } from "../enum";
 import { getPaymentProvider } from "../providers";
 import type {
@@ -43,7 +45,9 @@ export interface SubscriptionCheckoutRepository {
 /**
  * Subscription Checkout Repository Implementation
  */
-export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutRepository {
+export class SubscriptionCheckoutRepositoryImpl
+  implements SubscriptionCheckoutRepository
+{
   /**
    * Create a subscription checkout session
    */
@@ -84,9 +88,10 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
 
       // Check if user already has an active subscription
       logger.debug("Step 5: Checking for existing subscription");
-      const { subscriptionRepository } =
-        await import("../../subscription/repository");
-      const existingSubscription = await subscriptionRepository.getSubscription(
+      const { SubscriptionRepository } = await import(
+        "../../subscription/repository"
+      );
+      const existingSubscription = await SubscriptionRepository.getSubscription(
         user.id,
         logger,
         locale,
@@ -110,10 +115,9 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
 
       // Get user details from database for customer creation
       logger.debug("Step 6: Importing user repository");
-      const { userRepository } = await import("../../user/repository");
-      const { UserDetailLevel } = await import("../../user/enum");
+
       logger.debug("Step 7: Getting user by ID");
-      const userResult = await userRepository.getUserById(
+      const userResult = await UserRepository.getUserById(
         user.id,
         UserDetailLevel.STANDARD,
         locale,

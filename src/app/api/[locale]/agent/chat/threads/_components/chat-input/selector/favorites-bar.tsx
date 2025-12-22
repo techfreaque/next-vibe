@@ -7,12 +7,21 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Bot } from "next-vibe-ui/ui/icons/Bot";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
+import { getCharacterById } from "@/app/api/[locale]/agent/chat/characters/config";
+import {
+  ContentLevelFilter,
+  type ContentLevelFilterValue,
+  IntelligenceLevelFilter,
+  type IntelligenceLevelFilterValue,
+  ModelSelectionMode,
+  type ModelSelectionModeValue,
+  type PriceLevelFilterValue,
+} from "@/app/api/[locale]/agent/chat/favorites/enum";
 import {
   getIconComponent,
   type IconKey,
@@ -23,34 +32,30 @@ import {
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/agent/chat/model-access/models";
-import { getPersonaById } from "@/app/api/[locale]/agent/chat/personas/config";
-import {
-  type ContentLevel,
-  type IntelligenceLevel,
-  type PriceLevel,
-} from "@/app/api/[locale]/agent/chat/types";
+import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { findBestModel } from "./types";
 
 /**
- * Favorite/Setup item - unified persona + model configuration
+ * Favorite/Setup item - unified character + model configuration
  */
 export interface FavoriteItem {
   id: string;
-  // Persona ID - null means model-only setup
-  personaId: string | null;
+  // Character ID - null means model-only setup
+  characterId: string | null;
   // Display overrides
   customName?: string;
   customIcon?: IconKey;
+  voice?: typeof TtsVoiceValue;
   // Model selection
   modelSettings: {
-    mode: "auto" | "manual";
+    mode: typeof ModelSelectionModeValue;
     filters: {
-      intelligence: IntelligenceLevel | "any";
-      maxPrice: PriceLevel | "any";
-      content: ContentLevel | "any";
+      intelligence: typeof IntelligenceLevelFilterValue;
+      maxPrice: typeof PriceLevelFilterValue;
+      content: typeof ContentLevelFilterValue;
     };
     manualModelId?: ModelId;
   };
@@ -70,24 +75,28 @@ interface FavoritesBarProps {
  * Get display info for a favorite
  */
 interface FavoriteDisplay {
-  persona: ReturnType<typeof getPersonaById> | null;
+  character: ReturnType<typeof getCharacterById> | null;
   resolvedModel: ModelOption | null;
   displayName: string;
   displayIcon: React.ComponentType<{ className?: string }>;
 }
 
-function useFavoriteDisplay(favorite: FavoriteItem, locale: CountryLanguage): FavoriteDisplay {
+function useFavoriteDisplay(
+  favorite: FavoriteItem,
+  locale: CountryLanguage,
+): FavoriteDisplay {
   const { t } = simpleT(locale);
   const allModels = useMemo(() => Object.values(modelOptions), []);
 
-  const persona = useMemo(
-    () => (favorite.personaId ? getPersonaById(favorite.personaId) : null),
-    [favorite.personaId],
+  const character = useMemo(
+    () =>
+      favorite.characterId ? getCharacterById(favorite.characterId) : null,
+    [favorite.characterId],
   );
 
   const resolvedModel = useMemo(() => {
     if (
-      favorite.modelSettings.mode === "manual" &&
+      favorite.modelSettings.mode === ModelSelectionMode.MANUAL &&
       favorite.modelSettings.manualModelId
     ) {
       return (
@@ -95,9 +104,9 @@ function useFavoriteDisplay(favorite: FavoriteItem, locale: CountryLanguage): Fa
         null
       );
     }
-    // For auto mode, find best model (with or without persona)
-    if (persona) {
-      return findBestModel(allModels, persona, {
+    // For auto mode, find best model (with or without character)
+    if (character) {
+      return findBestModel(allModels, character, {
         intelligence: favorite.modelSettings.filters.intelligence,
         maxPrice: favorite.modelSettings.filters.maxPrice,
         minContent: favorite.modelSettings.filters.content,
@@ -108,48 +117,51 @@ function useFavoriteDisplay(favorite: FavoriteItem, locale: CountryLanguage): Fa
       allModels.find((m) => {
         const { filters } = favorite.modelSettings;
         if (
-          filters.intelligence !== "any" &&
+          filters.intelligence !== IntelligenceLevelFilter.ANY &&
           m.intelligence !== filters.intelligence
         ) {
           return false;
         }
-        if (filters.content !== "any" && m.content !== filters.content) {
+        if (
+          filters.content !== ContentLevelFilter.ANY &&
+          m.content !== filters.content
+        ) {
           return false;
         }
         return true;
       }) ?? allModels[0]
     );
-  }, [persona, favorite.modelSettings, allModels]);
+  }, [character, favorite.modelSettings, allModels]);
 
-  // Display name: custom > persona name > model name
+  // Display name: custom > character name > model name
   const displayName = useMemo(() => {
     if (favorite.customName) {
       return favorite.customName;
     }
-    if (persona) {
-      return t(persona.name);
+    if (character) {
+      return t(character.name);
     }
     if (resolvedModel) {
       return resolvedModel.name;
     }
     return t("app.chat.selector.setup");
-  }, [favorite.customName, persona, resolvedModel, t]);
+  }, [favorite.customName, character, resolvedModel, t]);
 
-  // Display icon: custom > persona icon > model icon
+  // Display icon: custom > character icon > model icon
   const displayIcon = useMemo(() => {
     if (favorite.customIcon) {
       return getIconComponent(favorite.customIcon);
     }
-    if (persona) {
-      return getIconComponent(persona.icon);
+    if (character) {
+      return getIconComponent(character.icon);
     }
     if (resolvedModel) {
       return getIconComponent(resolvedModel.icon);
     }
     return Bot;
-  }, [favorite.customIcon, persona, resolvedModel]);
+  }, [favorite.customIcon, character, resolvedModel]);
 
-  return { persona, resolvedModel, displayName, displayIcon };
+  return { character, resolvedModel, displayName, displayIcon };
 }
 
 /**
@@ -167,15 +179,19 @@ function FavoriteRow({
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const { persona, resolvedModel, displayName, displayIcon: Icon } =
-    useFavoriteDisplay(favorite, locale);
+  const {
+    character,
+    resolvedModel,
+    displayName,
+    displayIcon: Icon,
+  } = useFavoriteDisplay(favorite, locale);
 
   const ModelIcon = resolvedModel ? getIconComponent(resolvedModel.icon) : null;
   const providerName = resolvedModel
     ? (modelProviders[resolvedModel.provider]?.name ?? resolvedModel.provider)
     : null;
 
-  const isModelOnly = !persona;
+  const isModelOnly = !character;
 
   return (
     <Div
@@ -277,21 +293,6 @@ function FavoriteRow({
             <Zap className="h-4 w-4" />
           </Button>
         )}
-        {favorite.isActive && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit();
-            }}
-            title={t("app.chat.selector.settings")}
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
-        )}
       </Div>
     </Div>
   );
@@ -321,7 +322,7 @@ export function FavoritesBar({
           <Span className="text-base font-medium mb-1">
             {t("app.chat.selector.noSetupsTitle")}
           </Span>
-          <Span className="text-sm text-muted-foreground mb-5 max-w-[280px]">
+          <Span className="text-sm text-muted-foreground mb-5 max-w-70">
             {t("app.chat.selector.noSetupsDescription")}
           </Span>
           <Button
@@ -359,7 +360,7 @@ export function FavoritesBar({
       </Div>
 
       {/* Favorites list */}
-      <Div className="flex flex-col gap-2 max-h-[400px] overflow-y-auto">
+      <Div className="flex flex-col gap-2 max-h-100 overflow-y-auto">
         {favorites.map((favorite) => (
           <FavoriteRow
             key={favorite.id}

@@ -74,10 +74,7 @@ export function getSpinnerFrame(frameIndex: number): string {
 /**
  * Format progress bar for CLI display
  */
-export function formatProgressBar(
-  progress: number,
-  width = 20,
-): string {
+export function formatProgressBar(progress: number, width = 20): string {
   const filled = Math.round((progress / 100) * width);
   const empty = width - filled;
   return `[${"=".repeat(filled)}${" ".repeat(empty)}] ${progress}%`;

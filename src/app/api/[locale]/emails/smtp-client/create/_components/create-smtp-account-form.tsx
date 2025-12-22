@@ -81,6 +81,7 @@ export function CreateSmtpAccountForm({
                     showAllRequired: true,
                     requiredColor: "red",
                   }}
+                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -91,6 +92,7 @@ export function CreateSmtpAccountForm({
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
               </FormFieldGroup>
 
@@ -109,6 +111,7 @@ export function CreateSmtpAccountForm({
                       showAllRequired: true,
                       requiredColor: "red",
                     }}
+                    locale={locale}
                   />
 
                   <EndpointFormField
@@ -120,6 +123,7 @@ export function CreateSmtpAccountForm({
                       showAllRequired: true,
                       requiredColor: "red",
                     }}
+                    locale={locale}
                   />
 
                   <EndpointFormField
@@ -131,6 +135,7 @@ export function CreateSmtpAccountForm({
                       showAllRequired: true,
                       requiredColor: "red",
                     }}
+                    locale={locale}
                   />
                 </Div>
               </FormFieldGroup>
@@ -150,6 +155,7 @@ export function CreateSmtpAccountForm({
                       showAllRequired: true,
                       requiredColor: "red",
                     }}
+                    locale={locale}
                   />
 
                   <EndpointFormField
@@ -161,6 +167,7 @@ export function CreateSmtpAccountForm({
                       showAllRequired: true,
                       requiredColor: "red",
                     }}
+                    locale={locale}
                   />
                 </Div>
               </FormFieldGroup>
@@ -179,6 +186,7 @@ export function CreateSmtpAccountForm({
                     showAllRequired: true,
                     requiredColor: "red",
                   }}
+                  locale={locale}
                 />
 
                 <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -190,6 +198,7 @@ export function CreateSmtpAccountForm({
                       style: "none",
                       showAllRequired: false,
                     }}
+                    locale={locale}
                   />
 
                   <EndpointFormField
@@ -200,6 +209,7 @@ export function CreateSmtpAccountForm({
                       style: "none",
                       showAllRequired: false,
                     }}
+                    locale={locale}
                   />
 
                   <EndpointFormField
@@ -210,6 +220,7 @@ export function CreateSmtpAccountForm({
                       style: "none",
                       showAllRequired: false,
                     }}
+                    locale={locale}
                   />
 
                   <EndpointFormField
@@ -220,6 +231,7 @@ export function CreateSmtpAccountForm({
                       style: "none",
                       showAllRequired: false,
                     }}
+                    locale={locale}
                   />
 
                   <EndpointFormField
@@ -230,6 +242,7 @@ export function CreateSmtpAccountForm({
                       style: "none",
                       showAllRequired: false,
                     }}
+                    locale={locale}
                   />
                 </Div>
               </FormFieldGroup>

@@ -59,7 +59,11 @@ export function LeadsImportClient({
             form={importEndpoint.create.form}
             onSubmit={handleImportSubmit}
             locale={locale}
-            data={importEndpoint.create.response?.success ? importEndpoint.create.response.data : undefined}
+            data={
+              importEndpoint.create.response?.success
+                ? importEndpoint.create.response.data
+                : undefined
+            }
             submitButtonText="app.admin.leads.leads.admin.import.actions.import"
           />
         </CardContent>
@@ -78,7 +82,11 @@ export function LeadsImportClient({
             form={statusEndpoint.read.form}
             onSubmit={handleStatusRefresh}
             locale={locale}
-            data={statusEndpoint.read.response?.success ? statusEndpoint.read.response.data : undefined}
+            data={
+              statusEndpoint.read.response?.success
+                ? statusEndpoint.read.response.data
+                : undefined
+            }
             submitButtonText="app.admin.common.actions.reset"
           />
         </CardContent>

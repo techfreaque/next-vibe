@@ -55,7 +55,9 @@ export interface ICampaignStarterConfigRepository {
 /**
  * Campaign Starter Configuration Repository Implementation
  */
-class CampaignStarterConfigRepositoryImpl implements ICampaignStarterConfigRepository {
+class CampaignStarterConfigRepositoryImpl
+  implements ICampaignStarterConfigRepository
+{
   /**
    * Get current environment
    */

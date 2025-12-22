@@ -2,4 +2,6 @@
 import { Sparkles as SiGooglegeminiIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const SiGooglegemini = styled(SiGooglegeminiIcon, { className: "style" });
+export const SiGooglegemini = styled(SiGooglegeminiIcon, {
+  className: "style",
+});

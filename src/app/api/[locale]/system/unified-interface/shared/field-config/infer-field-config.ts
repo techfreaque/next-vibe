@@ -16,9 +16,7 @@ import type { FieldConfig } from "./field-config-types";
  * Extract FieldConfig from a UnifiedField's WidgetConfig
  * Converts FieldDataType to the appropriate FieldConfig type
  */
-function extractFieldConfig(
-  field: EndpointFieldStructure,
-): FieldConfig | null {
+function extractFieldConfig(field: EndpointFieldStructure): FieldConfig | null {
   if (!field?.ui) {
     return null;
   }
@@ -143,6 +141,9 @@ function extractFieldConfig(
         type: "tags" as const,
         maxTags: widget.maxTags,
       };
+
+    case FieldDataType.ICON:
+      return { ...baseConfig, type: "icon" as const };
 
     default:
       // Fallback to text field

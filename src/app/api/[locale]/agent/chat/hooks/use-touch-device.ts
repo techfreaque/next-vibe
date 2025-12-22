@@ -65,8 +65,7 @@ export function getTouchAwareClasses(alwaysVisibleOnTouch = true): string {
     // eslint-disable-next-line i18next/no-literal-string -- CSS class names, not user-facing text
     return "opacity-70 active:opacity-100";
   }
-    // On pointer devices: hidden until hover
-    // eslint-disable-next-line i18next/no-literal-string -- CSS class names, not user-facing text
-    return "opacity-0 group-hover:opacity-100 focus-within:opacity-100";
-  
+  // On pointer devices: hidden until hover
+  // eslint-disable-next-line i18next/no-literal-string -- CSS class names, not user-facing text
+  return "opacity-0 group-hover:opacity-100 focus-within:opacity-100";
 }

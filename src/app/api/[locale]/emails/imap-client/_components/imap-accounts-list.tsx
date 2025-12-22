@@ -30,7 +30,7 @@ import imapAccountsListDefinitions, {
   type ImapAccountsListResponseOutput,
 } from "../accounts/list/definition";
 import imapAccountTestDefinition from "../accounts/test/definition";
-import { ImapSyncStatus,type ImapSyncStatusValue } from "../enum";
+import { ImapSyncStatus, type ImapSyncStatusValue } from "../enum";
 
 interface ImapAccountsListProps {
   locale: CountryLanguage;

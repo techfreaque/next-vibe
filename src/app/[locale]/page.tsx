@@ -3,7 +3,7 @@ import { redirect } from "next-vibe-ui/lib/redirect";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -24,7 +24,7 @@ export default async function ChatPage({
   const { locale } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
 
-  const userResponse = await userRepository.getUserByAuth(
+  const userResponse = await UserRepository.getUserByAuth(
     {
       detailLevel: UserDetailLevel.MINIMAL,
       roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],

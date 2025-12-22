@@ -125,7 +125,7 @@ export default async function HomePage({
               </Link>
               <Link href={`/${locale}/design-test`}>
                 {/* <Button> */}
-                  {t("app.native.page.links.designTest")}
+                {t("app.native.page.links.designTest")}
                 {/* </Button> */}
               </Link>
             </Div>

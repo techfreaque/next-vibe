@@ -26,23 +26,15 @@ import type {
   SmtpAccountsListGETResponseOutput,
 } from "./definition";
 
-interface SmtpAccountsListRepository {
-  listSmtpAccounts(
-    data: SmtpAccountsListGETRequestOutput,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpAccountsListGETResponseOutput>>;
-}
-
 /**
- * SMTP Accounts List Repository Class
+ * SMTP Accounts List Repository
  * Handles all business logic for listing SMTP accounts
  */
-class SmtpAccountsListRepositoryImpl implements SmtpAccountsListRepository {
+export class SmtpAccountsListRepository {
   /**
    * Get list of SMTP accounts with filtering and pagination
    */
-  async listSmtpAccounts(
+  static async listSmtpAccounts(
     data: SmtpAccountsListGETRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
@@ -158,8 +150,3 @@ class SmtpAccountsListRepositoryImpl implements SmtpAccountsListRepository {
     }
   }
 }
-
-/**
- * Export singleton instance
- */
-export const smtpAccountsListRepository = new SmtpAccountsListRepositoryImpl();

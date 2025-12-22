@@ -246,13 +246,12 @@ export class FileGenerator {
         const valueStr = this.objectToString(value, indent + 1);
         return `${nextIndentStr}${keyStr}: ${valueStr}`;
       }
-        const escapedValue =
-          typeof value === "string"
-            ? // eslint-disable-next-line i18next/no-literal-string
-              JSON.stringify(value.replaceAll('\n', "\\n"))
-            : JSON.stringify(value);
-        return `${nextIndentStr}${keyStr}: ${escapedValue}`;
-      
+      const escapedValue =
+        typeof value === "string"
+          ? // eslint-disable-next-line i18next/no-literal-string
+            JSON.stringify(value.replaceAll("\n", "\\n"))
+          : JSON.stringify(value);
+      return `${nextIndentStr}${keyStr}: ${escapedValue}`;
     });
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -389,22 +388,25 @@ export class FileGenerator {
     let key = normalizedLocation.replace(/^src(\/|$)/, "");
 
     // Remove [locale] segments
-    key = key.replaceAll('/[locale]', "");
+    key = key.replaceAll("/[locale]", "");
 
     // Convert kebab-case folder names to camelCase
     // e.g., unified-interface -> unifiedInterface, react-native -> reactNative
-    key = key.replaceAll(/\/([a-z0-9-]+)/g, (fullMatch: string, segment: string) => {
-      // Convert kebab-case to camelCase (use fullMatch to verify it starts with /)
-      const camelCased = segment.replaceAll(
-        /-([a-z0-9])/g,
-        (hyphenAndChar: string, letter: string) =>
-          hyphenAndChar.length > 1 ? letter.toUpperCase() : hyphenAndChar,
-      );
-      return fullMatch.startsWith("/") ? `/${camelCased}` : camelCased;
-    });
+    key = key.replaceAll(
+      /\/([a-z0-9-]+)/g,
+      (fullMatch: string, segment: string) => {
+        // Convert kebab-case to camelCase (use fullMatch to verify it starts with /)
+        const camelCased = segment.replaceAll(
+          /-([a-z0-9])/g,
+          (hyphenAndChar: string, letter: string) =>
+            hyphenAndChar.length > 1 ? letter.toUpperCase() : hyphenAndChar,
+        );
+        return fullMatch.startsWith("/") ? `/${camelCased}` : camelCased;
+      },
+    );
 
     // Convert to dot notation
-    key = key.replaceAll('/', ".");
+    key = key.replaceAll("/", ".");
 
     return key;
   }
@@ -772,7 +774,7 @@ export class FileGenerator {
       // Check if the section index file exists or will be created
       const relativePath = path
         .relative(path.dirname(mainIndexPath), sectionIndexPath)
-        .replaceAll('\\', "/")
+        .replaceAll("\\", "/")
         .replace(/\.ts$/, "")
         .replace(/\/index$/, ""); // Remove /index from the end
 

@@ -53,6 +53,7 @@ const TsConfigSchema = z.object({
       rootDir: z.string().optional(),
       paths: z.record(z.string(), z.array(z.string())).optional(),
       baseUrl: z.string().optional(),
+      typeRoots: z.array(z.string()).optional(),
     })
     .passthrough()
     .optional(),
@@ -270,23 +271,38 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   // --------------------------------------------------------
 
   /**
-   * Adjust file paths to be relative to temp config location.
-   * Since temp config is in .tmp/, we need to go up one level.
+   * Adjust a single path to be relative to temp config location.
+   * @param path - The path to adjust
+   * @param prefix - The relative prefix (e.g., "../../")
    */
-  private static adjustFilePaths(files: string[]): string[] {
-    return files.map((file) => {
-      if (!file.startsWith("/")) {
-        return `../${file}`;
-      }
-      return file;
-    });
+  private static adjustPath(path: string, prefix: string): string {
+    if (path.startsWith("/")) {
+      return path; // Absolute paths don't need adjustment
+    }
+    if (path.startsWith("./")) {
+      return `${prefix}${path.slice(2)}`;
+    }
+    if (path.startsWith("../")) {
+      return path; // Already relative, don't double-adjust
+    }
+    return `${prefix}${path}`;
   }
 
   /**
-   * Adjust path mappings to account for temp config being in .tmp/ directory.
+   * Adjust file paths to be relative to temp config location.
+   */
+  private static adjustFilePaths(files: string[], prefix: string): string[] {
+    return files.map((file) =>
+      TypecheckRepositoryImpl.adjustPath(file, prefix),
+    );
+  }
+
+  /**
+   * Adjust path mappings to account for temp config location.
    */
   private static adjustPathMappings(
     paths: Record<string, string[]> | undefined,
+    prefix: string,
   ): Record<string, string[]> {
     const adjustedPaths: Record<string, string[]> = {};
     if (!paths) {
@@ -294,18 +310,51 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     }
 
     for (const [key, pathArray] of Object.entries(paths)) {
-      adjustedPaths[key] = pathArray.map((path) => {
-        if (path.startsWith("./")) {
-          return `../${path.slice(2)}`;
-        }
-        if (!path.startsWith("../") && !path.startsWith("/")) {
-          return `../${path}`;
-        }
-        return path;
-      });
+      adjustedPaths[key] = pathArray.map((path) =>
+        TypecheckRepositoryImpl.adjustPath(path, prefix),
+      );
     }
 
     return adjustedPaths;
+  }
+
+  /**
+   * Adjust typeRoots to account for temp config location.
+   */
+  private static adjustTypeRoots(
+    typeRoots: string[] | undefined,
+    prefix: string,
+  ): string[] | undefined {
+    if (!typeRoots) {
+      return undefined;
+    }
+
+    return typeRoots.map((root) =>
+      TypecheckRepositoryImpl.adjustPath(root, prefix),
+    );
+  }
+
+  /**
+   * Adjust general include patterns to account for temp config location.
+   */
+  private static adjustIncludePatterns(
+    patterns: string[],
+    prefix: string,
+  ): string[] {
+    return patterns.map((pattern) =>
+      TypecheckRepositoryImpl.adjustPath(pattern, prefix),
+    );
+  }
+
+  /**
+   * Calculate the relative path prefix needed to reach project root from the cache directory.
+   * e.g., ".tmp/typecheck-cache" -> "../../"
+   */
+  private static getRelativePrefix(cachePath: string): string {
+    // Count directory depth by splitting on path separator
+    const depth = cachePath.split("/").filter((p) => p && p !== ".").length;
+    // eslint-disable-next-line i18next/no-literal-string
+    return "../".repeat(depth);
   }
 
   /**
@@ -313,23 +362,15 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
    */
   private static adjustExcludePatterns(
     excludes: string[] | undefined,
+    prefix: string,
   ): string[] {
     if (!excludes) {
       return [];
     }
 
-    return excludes.map((excludePattern) => {
-      if (excludePattern.startsWith("./")) {
-        return `../${excludePattern.slice(2)}`;
-      }
-      if (
-        !excludePattern.startsWith("../") &&
-        !excludePattern.startsWith("/")
-      ) {
-        return `../${excludePattern}`;
-      }
-      return excludePattern;
-    });
+    return excludes.map((excludePattern) =>
+      TypecheckRepositoryImpl.adjustPath(excludePattern, prefix),
+    );
   }
 
   /**
@@ -340,7 +381,11 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   private static createTempTsConfig(
     filesToCheck: string[],
     tempConfigPath: string,
+    cachePath: string,
   ): void {
+    // Calculate the relative prefix based on cache directory depth
+    const prefix = TypecheckRepositoryImpl.getRelativePrefix(cachePath);
+
     // Read and validate the main tsconfig.json
     let mainTsConfig: TsConfig;
     try {
@@ -360,21 +405,35 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       /* eslint-enable oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string */
     }
 
-    // Filter out wildcard patterns
+    // Filter out wildcard patterns and adjust paths for temp config location
     const generalFilesToInclude = (mainTsConfig.include || []).filter(
       (includePattern) =>
         WILDCARD_INCLUDE_PATTERNS.includes(includePattern)
           ? undefined
           : includePattern,
     );
+    const adjustedGeneralIncludes =
+      TypecheckRepositoryImpl.adjustIncludePatterns(
+        generalFilesToInclude,
+        prefix,
+      );
 
     // Adjust paths for temp config location
-    const adjustedFiles = TypecheckRepositoryImpl.adjustFilePaths(filesToCheck);
+    const adjustedFiles = TypecheckRepositoryImpl.adjustFilePaths(
+      filesToCheck,
+      prefix,
+    );
     const adjustedPaths = TypecheckRepositoryImpl.adjustPathMappings(
       mainTsConfig.compilerOptions?.paths,
+      prefix,
     );
     const adjustedExcludes = TypecheckRepositoryImpl.adjustExcludePatterns(
       mainTsConfig.exclude,
+      prefix,
+    );
+    const adjustedTypeRoots = TypecheckRepositoryImpl.adjustTypeRoots(
+      mainTsConfig.compilerOptions?.typeRoots,
+      prefix,
     );
 
     // Create temporary tsconfig
@@ -382,15 +441,16 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       ...mainTsConfig,
       compilerOptions: {
         ...mainTsConfig.compilerOptions,
-        // eslint-disable-next-line i18next/no-literal-string
-        rootDir: "..", // Adjust rootDir to point to project root from .tmp/
+        rootDir: prefix.slice(0, -1), // Remove trailing slash for rootDir (e.g., "../..")
         baseUrl: undefined, // Remove baseUrl as tsgo doesn't support it
+        typeRoots: adjustedTypeRoots,
         paths: {
           ...adjustedPaths,
-          "*": ["./*"], // Replace baseUrl functionality for tsgo compatibility
+          // eslint-disable-next-line i18next/no-literal-string
+          "*": [`${prefix}*`], // Replace baseUrl functionality for tsgo compatibility (resolve from project root)
         },
       },
-      include: [...generalFilesToInclude, ...adjustedFiles],
+      include: [...adjustedGeneralIncludes, ...adjustedFiles],
       exclude: adjustedExcludes,
     };
 
@@ -452,7 +512,12 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       config = createTypecheckConfig(data.path, typecheckConfig.cachePath);
 
       // Build the command based on path type
-      const command = this.buildCommand(baseCommand, config, logger);
+      const command = this.buildCommand(
+        baseCommand,
+        config,
+        typecheckConfig.cachePath,
+        logger,
+      );
 
       if (!command) {
         return fail({
@@ -525,6 +590,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   private buildCommand(
     baseCommand: string,
     config: TypecheckConfig,
+    cachePath: string,
     logger: EndpointLogger,
   ): string | null {
     if (config.pathType === PathType.NO_PATH) {
@@ -546,6 +612,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       TypecheckRepositoryImpl.createTempTsConfig(
         [config.targetPath!],
         config.tempConfigFile,
+        cachePath,
       );
     } else {
       // Folder - create temporary tsconfig with folder glob pattern
@@ -554,6 +621,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       TypecheckRepositoryImpl.createTempTsConfig(
         [`${folderPath}/**/*`],
         config.tempConfigFile,
+        cachePath,
       );
     }
 

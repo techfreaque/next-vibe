@@ -87,7 +87,10 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       const duration = Date.now() - startTime;
 
       logger.info(
-        formatGenerator(`Generated endpoint file with ${formatCount(definitionFiles.length, "endpoint")} in ${formatDuration(duration)}`, "📄"),
+        formatGenerator(
+          `Generated endpoint file with ${formatCount(definitionFiles.length, "endpoint")} in ${formatDuration(duration)}`,
+          "📄",
+        ),
       );
 
       return success({

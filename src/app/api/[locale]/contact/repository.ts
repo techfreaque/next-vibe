@@ -16,29 +16,34 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { contacts, type NewContact } from "./db";
 import type { ContactRequestOutput, ContactResponseOutput } from "./definition";
 import { ContactStatus } from "./enum";
+import { contactScopedT } from "./i18n";
+import { sendAdminNotificationSms, sendConfirmationSms } from "./sms";
 
 /**
  * Contact Repository Implementation
  * Handles contact form submissions
  */
-export class contactRepository {
+export class ContactRepository {
   /**
    * Submit contact form
    */
   static async submitContactForm(
     data: ContactRequestOutput,
     user: JwtPayloadType,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ContactResponseOutput>> {
+    const { t } = contactScopedT(locale);
     try {
       // Get leadId from user prop (JWT payload) - always present
       const leadId = user.leadId;
 
-      logger.debug("app.api.contact.repository.create.start", {
+      logger.debug(t("repository.create.start"), {
         email: data.email,
         subject: data.subject,
         userId: user && !user.isPublic ? user.id : null,
@@ -47,7 +52,7 @@ export class contactRepository {
 
       // Handle lead conversion using leadId from JWT
       try {
-        logger.debug("app.api.contact.repository.lead.conversion.start", {
+        logger.debug(t("repository.lead.conversion.start"), {
           leadId,
           email: data.email,
           name: data.name,
@@ -56,19 +61,15 @@ export class contactRepository {
 
         // Note: Lead conversion logic would go here if needed
         // For now, we'll just log that we have a lead ID
-        logger.debug("app.api.contact.repository.lead.provided", {
+        logger.debug(t("repository.lead.provided"), {
           leadId,
         });
       } catch (error) {
         // Log error but don't fail the contact form submission
-        logger.error(
-          "app.api.contact.repository.lead.conversion.error",
-          parseError(error),
-          {
-            leadId,
-            email: data.email,
-          },
-        );
+        logger.error(t("repository.lead.conversion.error"), parseError(error), {
+          leadId,
+          email: data.email,
+        });
       }
 
       // Create contact record
@@ -91,16 +92,34 @@ export class contactRepository {
 
       if (!contact) {
         return fail({
-          message: "app.api.contact.errors.repositoryCreateFailed",
+          message: t("errors.repositoryCreateFailed"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
           messageParams: { email: data.email },
         });
       }
 
-      logger.debug("app.api.contact.repository.create.success", {
+      logger.debug(t("repository.create.success"), {
         contactId: contact.id,
         email: data.email,
         leadId,
+      });
+
+      // Send optional SMS notifications (non-blocking)
+      sendAdminNotificationSms(data, user, locale, logger).catch((smsError) => {
+        logger.warn(t("route.sms.admin.failed"), {
+          error:
+            smsError instanceof Error ? smsError.message : String(smsError),
+          contactEmail: data.email,
+        });
+      });
+
+      sendConfirmationSms(data, user, locale, logger).catch((smsError) => {
+        logger.warn(t("route.sms.confirmation.failed"), {
+          error:
+            smsError instanceof Error ? smsError.message : String(smsError),
+          contactEmail: data.email,
+          userId: user?.id,
+        });
       });
 
       return success({
@@ -110,14 +129,14 @@ export class contactRepository {
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("app.api.contact.repository.create.error", parsedError);
+      logger.error(t("repository.create.error"), parsedError);
       return fail({
-        message: "app.api.contact.errors.repositoryCreateFailed",
+        message: t("errors.repositoryCreateFailed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: {
           email: data.email,
           error: parsedError.message,
-          details: "app.api.contact.errors.repositoryCreateDetails",
+          details: t("errors.repositoryCreateDetails"),
         },
       });
     }
@@ -128,10 +147,12 @@ export class contactRepository {
    */
   static async create(
     data: NewContact,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ContactResponseOutput>> {
+    const { t } = contactScopedT(locale);
     try {
-      logger.debug("app.api.contact.repository.seed.create.start", {
+      logger.debug(t("repository.seed.create.start"), {
         email: data.email,
       });
 
@@ -154,11 +175,11 @@ export class contactRepository {
 
       if (!contact) {
         return fail({
-          message: "app.api.contact.errors.repositoryCreateFailed",
+          message: t("errors.repositoryCreateFailed"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
           messageParams: {
             email: data.email,
-            error: "app.api.contact.errors.noContactReturned",
+            error: t("errors.noContactReturned"),
           },
         });
       }
@@ -170,9 +191,9 @@ export class contactRepository {
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("app.api.contact.repository.seed.create.error", parsedError);
+      logger.error(t("repository.seed.create.error"), parsedError);
       return fail({
-        message: "app.api.contact.errors.repositoryCreateFailed",
+        message: t("errors.repositoryCreateFailed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: {
           email: data.email,

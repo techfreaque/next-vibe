@@ -462,7 +462,9 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
 
       if (routeFile.warnings.length > 0) {
         lines.push("**Warnings:**");
-        routeFile.warnings.forEach((warning) => lines.push(`  - ⚠️ ${warning}`));
+        routeFile.warnings.forEach((warning) =>
+          lines.push(`  - ⚠️ ${warning}`),
+        );
       }
 
       lines.push("");

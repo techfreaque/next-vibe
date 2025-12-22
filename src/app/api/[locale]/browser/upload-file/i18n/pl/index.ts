@@ -9,7 +9,8 @@ export const translations: typeof enTranslations = {
     fields: {
       uid: {
         label: "UID elementu",
-        description: "UID elementu wejścia pliku lub elementu, który otworzy wybór pliku",
+        description:
+          "UID elementu wejścia pliku lub elementu, który otworzy wybór pliku",
         placeholder: "Wprowadź UID elementu",
       },
       filePath: {
@@ -26,15 +27,44 @@ export const translations: typeof enTranslations = {
     executionId: "ID wykonania do śledzenia",
   },
   errors: {
-    validation: { title: "Błąd walidacji", description: "Sprawdź wprowadzone dane i spróbuj ponownie" },
-    network: { title: "Błąd sieci", description: "Wystąpił błąd sieci podczas operacji przesyłania pliku" },
-    unauthorized: { title: "Nieautoryzowany", description: "Nie masz uprawnień do wykonywania operacji przesyłania pliku" },
-    forbidden: { title: "Zabronione", description: "Operacja przesyłania pliku jest zabroniona" },
-    notFound: { title: "Nie znaleziono", description: "Żądany zasób nie został znaleziony" },
-    serverError: { title: "Błąd serwera", description: "Wystąpił wewnętrzny błąd serwera podczas operacji przesyłania pliku" },
-    unknown: { title: "Nieznany błąd", description: "Wystąpił nieznany błąd podczas operacji przesyłania pliku" },
-    unsavedChanges: { title: "Niezapisane zmiany", description: "Masz niezapisane zmiany, które mogą zostać utracone" },
-    conflict: { title: "Konflikt", description: "Wystąpił konflikt podczas operacji przesyłania pliku" },
+    validation: {
+      title: "Błąd walidacji",
+      description: "Sprawdź wprowadzone dane i spróbuj ponownie",
+    },
+    network: {
+      title: "Błąd sieci",
+      description: "Wystąpił błąd sieci podczas operacji przesyłania pliku",
+    },
+    unauthorized: {
+      title: "Nieautoryzowany",
+      description:
+        "Nie masz uprawnień do wykonywania operacji przesyłania pliku",
+    },
+    forbidden: {
+      title: "Zabronione",
+      description: "Operacja przesyłania pliku jest zabroniona",
+    },
+    notFound: {
+      title: "Nie znaleziono",
+      description: "Żądany zasób nie został znaleziony",
+    },
+    serverError: {
+      title: "Błąd serwera",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas operacji przesyłania pliku",
+    },
+    unknown: {
+      title: "Nieznany błąd",
+      description: "Wystąpił nieznany błąd podczas operacji przesyłania pliku",
+    },
+    unsavedChanges: {
+      title: "Niezapisane zmiany",
+      description: "Masz niezapisane zmiany, które mogą zostać utracone",
+    },
+    conflict: {
+      title: "Konflikt",
+      description: "Wystąpił konflikt podczas operacji przesyłania pliku",
+    },
   },
   success: {
     title: "Operacja przesyłania pliku pomyślna",

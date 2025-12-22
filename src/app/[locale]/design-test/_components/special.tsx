@@ -26,17 +26,23 @@ const columns = [
   {
     accessorKey: "name",
     header: (): React.ReactElement => <P className="font-medium">Name</P>,
-    cell: ({ getValue }: { getValue: () => string }): React.ReactElement => <P>{getValue()}</P>,
+    cell: ({ getValue }: { getValue: () => string }): React.ReactElement => (
+      <P>{getValue()}</P>
+    ),
   },
   {
     accessorKey: "email",
     header: (): React.ReactElement => <P className="font-medium">Email</P>,
-    cell: ({ getValue }: { getValue: () => string }): React.ReactElement => <P>{getValue()}</P>,
+    cell: ({ getValue }: { getValue: () => string }): React.ReactElement => (
+      <P>{getValue()}</P>
+    ),
   },
   {
     accessorKey: "role",
     header: (): React.ReactElement => <P className="font-medium">Role</P>,
-    cell: ({ getValue }: { getValue: () => string }): React.ReactElement => <P>{getValue()}</P>,
+    cell: ({ getValue }: { getValue: () => string }): React.ReactElement => (
+      <P>{getValue()}</P>
+    ),
   },
 ];
 

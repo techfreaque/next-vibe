@@ -7,8 +7,8 @@ import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { LoginForm } from "@/app/api/[locale]/user/public/login/_components/login-form";
-import { loginRepository } from "@/app/api/[locale]/user/public/login/repository";
-import { userRepository } from "@/app/api/[locale]/user/repository";
+import { LoginRepository } from "@/app/api/[locale]/user/public/login/repository";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -75,7 +75,7 @@ export default async function LoginPage({
 
   // Check if user is already logged in using repository-first pattern
   // Allow both PUBLIC and CUSTOMER roles for login page
-  const verifiedUserResponse = await userRepository.getUserByAuth(
+  const verifiedUserResponse = await UserRepository.getUserByAuth(
     { roles: [UserRole.PUBLIC, UserRole.CUSTOMER] },
     locale,
     logger,
@@ -97,7 +97,7 @@ export default async function LoginPage({
   }
 
   // Get login options
-  const loginOptionsResponse = await loginRepository.getLoginOptions(
+  const loginOptionsResponse = await LoginRepository.getLoginOptions(
     logger,
     locale,
   );

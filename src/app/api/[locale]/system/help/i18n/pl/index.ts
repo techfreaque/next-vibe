@@ -4,7 +4,8 @@ export const translations = {
   interactive: {
     post: {
       title: "Tryb interaktywny",
-      description: "Uruchom interaktywny tryb eksploratora plików do nawigacji i wykonywania tras",
+      description:
+        "Uruchom interaktywny tryb eksploratora plików do nawigacji i wykonywania tras",
       category: "Pomoc systemowa",
       tags: {
         system: "system",

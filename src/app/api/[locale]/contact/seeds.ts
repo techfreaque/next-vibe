@@ -6,10 +6,11 @@
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { defaultLocale } from "@/i18n/core/config";
 
 import type { NewContact } from "./db";
 import { ContactStatus } from "./enum";
-import { contactRepository } from "./repository";
+import { ContactRepository } from "./repository";
 
 /**
  * Helper function to create contact seed data
@@ -67,7 +68,11 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     // Create contact submissions
     for (const contact of contactSubmissions) {
       try {
-        const result = await contactRepository.create(contact, logger);
+        const result = await ContactRepository.create(
+          contact,
+          defaultLocale,
+          logger,
+        );
         if (result.success) {
           logger.debug("app.api.contact.seeds.dev.submission.created", {
             email: contact.email,
@@ -110,7 +115,11 @@ export async function test(logger: EndpointLogger): Promise<void> {
       status: ContactStatus.NEW,
     });
 
-    const result = await contactRepository.create(testContact, logger);
+    const result = await ContactRepository.create(
+      testContact,
+      defaultLocale,
+      logger,
+    );
     if (result.success) {
       logger.debug("app.api.contact.seeds.test.submission.created");
     } else {

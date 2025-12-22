@@ -121,8 +121,12 @@ const TextareaInner = (
             id: idAttr,
           },
           currentTarget: {
-            addEventListener: () => {/* no-op stub for web interface */},
-            removeEventListener: () => {/* no-op stub for web interface */},
+            addEventListener: () => {
+              /* no-op stub for web interface */
+            },
+            removeEventListener: () => {
+              /* no-op stub for web interface */
+            },
             dispatchEvent: () => false,
             getBoundingClientRect: () => ({
               left: 0,
@@ -136,8 +140,12 @@ const TextareaInner = (
             }),
             value: text,
           },
-          preventDefault: () => {/* no-op stub for web interface */},
-          stopPropagation: () => {/* no-op stub for web interface */},
+          preventDefault: () => {
+            /* no-op stub for web interface */
+          },
+          stopPropagation: () => {
+            /* no-op stub for web interface */
+          },
           bubbles: true,
           cancelable: true,
           defaultPrevented: false,
@@ -146,7 +154,7 @@ const TextareaInner = (
           timeStamp: Date.now(),
           type: "change",
         };
-         
+
         onChange(changeEvent);
       }
     },

@@ -134,9 +134,10 @@ export async function getCliUser(
       });
 
       // Verify the token is still valid
-      const { authRepository } =
-        await import("@/app/api/[locale]/user/auth/repository");
-      const verifyResult = await authRepository.verifyJwt(
+      const { AuthRepository } = await import(
+        "@/app/api/[locale]/user/auth/repository"
+      );
+      const verifyResult = await AuthRepository.verifyJwt(
         sessionResult.data.token,
         logger,
       );
@@ -155,14 +156,13 @@ export async function getCliUser(
           ),
         };
       }
-        logger.debug(
-          "[CLI AUTH] Session token is invalid or expired, falling back to email auth",
-          {
-            verifySuccess: verifyResult.success,
-            verifyMessage: verifyResult.message,
-          },
-        );
-      
+      logger.debug(
+        "[CLI AUTH] Session token is invalid or expired, falling back to email auth",
+        {
+          verifySuccess: verifyResult.success,
+          verifyMessage: verifyResult.message,
+        },
+      );
     } else {
       logger.debug("[CLI AUTH] No session data found in session file");
     }
@@ -199,13 +199,15 @@ export async function getCliUser(
     // Create a public user with a new lead directly from database
     // We can't use getLeadIdFromDb() here because it tries to access cookies
     try {
-      const { getLanguageAndCountryFromLocale } =
-        await import("@/i18n/core/language-utils");
+      const { getLanguageAndCountryFromLocale } = await import(
+        "@/i18n/core/language-utils"
+      );
       const { language, country } = getLanguageAndCountryFromLocale(locale);
       const { db } = await import("@/app/api/[locale]/system/db");
       const { leads } = await import("@/app/api/[locale]/leads/db");
-      const { LeadStatus, LeadSource } =
-        await import("@/app/api/[locale]/leads/enum");
+      const { LeadStatus, LeadSource } = await import(
+        "@/app/api/[locale]/leads/enum"
+      );
 
       const [newLead] = await db
         .insert(leads)
@@ -251,10 +253,11 @@ export async function getCliUser(
   });
 
   try {
-    const { authRepository } =
-      await import("@/app/api/[locale]/user/auth/repository");
+    const { AuthRepository } = await import(
+      "@/app/api/[locale]/user/auth/repository"
+    );
 
-    const authResult = await authRepository.authenticateUserByEmail(
+    const authResult = await AuthRepository.authenticateUserByEmail(
       cliUserEmail,
       locale,
       logger,

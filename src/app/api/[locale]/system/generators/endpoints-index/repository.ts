@@ -58,7 +58,9 @@ interface EndpointsIndexGeneratorRepository {
 /**
  * Endpoints Index Generator Repository Implementation
  */
-class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRepository {
+class EndpointsIndexGeneratorRepositoryImpl
+  implements EndpointsIndexGeneratorRepository
+{
   async generateEndpointsIndex(
     data: EndpointsRequestType,
     logger: EndpointLogger,
@@ -88,7 +90,10 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
       const duration = Date.now() - startTime;
 
       logger.info(
-        formatGenerator(`Generated endpoints index with ${formatCount(definitionFiles.length, "endpoint")} in ${formatDuration(duration)}`, "📋"),
+        formatGenerator(
+          `Generated endpoints index with ${formatCount(definitionFiles.length, "endpoint")} in ${formatDuration(duration)}`,
+          "📋",
+        ),
       );
 
       return success({

@@ -17,41 +17,17 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserDetailLevel } from "../../../enum";
-import { userRepository } from "../../../repository";
+import { UserRepository } from "../../../repository";
 import type {
   AvatarDeleteResponseOutput,
   AvatarPostResponseOutput,
 } from "./definition";
 
 /**
- * Avatar Repository Interface
- */
-export interface AvatarRepository {
-  /**
-   * Upload a user's avatar
-   */
-  uploadAvatar(
-    userId: DbId,
-    file: File,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<AvatarPostResponseOutput>>;
-
-  /**
-   * Delete a user's avatar
-   */
-  deleteAvatar(
-    userId: DbId,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<AvatarDeleteResponseOutput>>;
-}
-
-/**
- * Avatar Repository Implementation
+ * Avatar Repository - Static class pattern
  * Handles user avatar operations
  */
-export class AvatarRepositoryImpl implements AvatarRepository {
+export class AvatarRepository {
   /**
    * Upload a user's avatar
    * @param userId - The user ID
@@ -59,7 +35,7 @@ export class AvatarRepositoryImpl implements AvatarRepository {
    * @param logger - Logger instance for debugging and monitoring
    * @returns ResponseType with avatar URL
    */
-  async uploadAvatar(
+  static async uploadAvatar(
     userId: DbId,
     file: File,
     locale: CountryLanguage,
@@ -74,7 +50,7 @@ export class AvatarRepositoryImpl implements AvatarRepository {
       });
 
       // Check if user exists
-      const userResponse = await userRepository.getUserById(
+      const userResponse = await UserRepository.getUserById(
         userId,
         UserDetailLevel.STANDARD,
         locale,
@@ -183,7 +159,7 @@ export class AvatarRepositoryImpl implements AvatarRepository {
    * @param logger - Logger instance for debugging and monitoring
    * @returns ResponseType with boolean result
    */
-  async deleteAvatar(
+  static async deleteAvatar(
     userId: DbId,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -194,7 +170,7 @@ export class AvatarRepositoryImpl implements AvatarRepository {
       });
 
       // Check if user exists
-      const userResponse = await userRepository.getUserById(
+      const userResponse = await UserRepository.getUserById(
         userId,
         UserDetailLevel.STANDARD,
         locale,
@@ -250,8 +226,3 @@ export class AvatarRepositoryImpl implements AvatarRepository {
     }
   }
 }
-
-/**
- * Avatar repository singleton instance
- */
-export const avatarRepository = new AvatarRepositoryImpl();

@@ -20,7 +20,7 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
-import { smtpRepository } from "../../../emails/smtp-client/repository";
+import { SmtpRepository } from "../../../emails/smtp-client/repository";
 import { leads } from "../../db";
 import {
   EmailCampaignStage,
@@ -61,8 +61,8 @@ export interface ICampaignStarterRepository {
 /**
  * Campaign Starter Repository Implementation
  */
-export class CampaignStarterRepositoryImpl implements ICampaignStarterRepository {
-  async processLocaleLeads(
+export class CampaignStarterRepository {
+  static async processLocaleLeads(
     locale: CountryLanguage,
     leadsPerRun: number | undefined,
     minAgeDate: Date,
@@ -83,7 +83,7 @@ export class CampaignStarterRepositoryImpl implements ICampaignStarterRepository
       // Get current SMTP sending capacity to determine optimal queue size
       // Use system/public user context for cron job
       const SYSTEM_LEAD_ID = "00000000-0000-0000-0000-000000000000";
-      const capacityResult = await smtpRepository.getTotalSendingCapacity(
+      const capacityResult = await SmtpRepository.getTotalSendingCapacity(
         {},
         {
           isPublic: true,
@@ -248,7 +248,7 @@ export class CampaignStarterRepositoryImpl implements ICampaignStarterRepository
     }
   }
 
-  async getFailedLeadsCount(
+  static async getFailedLeadsCount(
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<number>> {
@@ -314,7 +314,7 @@ export class CampaignStarterRepositoryImpl implements ICampaignStarterRepository
     }
   }
 
-  async markFailedLeadsAsProcessed(
+  static async markFailedLeadsAsProcessed(
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
@@ -383,4 +383,3 @@ export class CampaignStarterRepositoryImpl implements ICampaignStarterRepository
 /**
  * Default repository instance
  */
-export const campaignStarterRepository = new CampaignStarterRepositoryImpl();

@@ -48,20 +48,17 @@ export async function createTRPCContext<TUrlParams>(opts: {
 /**
  * Initialize tRPC
  */
-const t = initTRPC
-  .context<TRPCContext<Record<string, string>>>()
-  .create({
-    errorFormatter({ shape, error }) {
-      return {
-        ...shape,
-        data: {
-          ...shape.data,
-          zodError:
-            error.cause instanceof ZodError ? error.cause.format() : null,
-        },
-      };
-    },
-  });
+const t = initTRPC.context<TRPCContext<Record<string, string>>>().create({
+  errorFormatter({ shape, error }) {
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        zodError: error.cause instanceof ZodError ? error.cause.format() : null,
+      },
+    };
+  },
+});
 
 export const router = t.router;
 export const publicProcedure = t.procedure;

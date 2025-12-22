@@ -19,7 +19,7 @@ import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Re-export types for consistency
-export type { ProgressIndicatorProps,ProgressRootProps };
+export type { ProgressIndicatorProps, ProgressRootProps };
 
 const StyledProgressRoot = ProgressPrimitive.Root;
 const StyledProgressIndicator = ProgressPrimitive.Indicator;

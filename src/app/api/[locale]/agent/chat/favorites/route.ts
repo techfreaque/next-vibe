@@ -7,18 +7,18 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { chatFavoritesRepository } from "./repository";
+import { ChatFavoritesRepository } from "./repository";
 
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, user, locale, logger }) =>
-      chatFavoritesRepository.getFavorites(data, user, locale, logger),
+    handler: ({ user, logger }) =>
+      ChatFavoritesRepository.getFavorites(user, logger),
   },
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, locale, logger }) =>
-      chatFavoritesRepository.createFavorite(data, user, locale, logger),
+    handler: ({ data, user, logger }) =>
+      ChatFavoritesRepository.createFavorite(data, user, logger),
   },
 });

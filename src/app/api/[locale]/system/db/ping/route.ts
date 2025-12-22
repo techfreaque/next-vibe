@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import pingEndpoints from "./definition";
-import { databasePingRepository } from "./repository";
+import { DatabasePingRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: pingEndpoints,
   [Methods.POST]: {
     handler: ({ data, logger }) => {
-      return databasePingRepository.pingDatabase(data, logger);
+      return DatabasePingRepository.pingDatabase(data, logger);
     },
   },
 });

@@ -15,7 +15,7 @@ import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { creditRepository } from "./repository";
+import { CreditRepository } from "./repository";
 
 /**
  * Validation Result Interface
@@ -79,7 +79,7 @@ class CreditValidator implements CreditValidatorInterface {
 
       // In wallet-based system, we get the user's wallet balance directly
       // No need for canonical lead resolution - each user has their own wallet
-      const balanceResult = await creditRepository.getBalance(
+      const balanceResult = await CreditRepository.getBalance(
         { userId },
         logger,
       );
@@ -133,7 +133,7 @@ class CreditValidator implements CreditValidatorInterface {
       const cost = getModelCost(modelId);
 
       // Get lead's balance (with monthly rotation)
-      const balanceResult = await creditRepository.getLeadBalance(
+      const balanceResult = await CreditRepository.getLeadBalance(
         leadId,
         logger,
       );
@@ -190,7 +190,7 @@ class CreditValidator implements CreditValidatorInterface {
   > {
     try {
       // Get or create lead
-      const leadResult = await creditRepository.getOrCreateLeadByIp(
+      const leadResult = await CreditRepository.getOrCreateLeadByIp(
         ipAddress,
         locale,
         logger,

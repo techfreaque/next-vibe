@@ -43,6 +43,7 @@ import type {
   EmailCampaignStageValues,
   EngagementTypesValues,
   LeadSortFieldValues,
+  LeadSource,
   LeadSourceFilterValues,
   LeadSourceValues,
   LeadStatusFilterValues,
@@ -93,227 +94,6 @@ type LeadSourceFilterType = typeof LeadSourceFilterValues;
 const INVALID_STATUS_TRANSITION_ERROR = "Invalid status transition";
 
 /**
- * Leads Repository Interface
- */
-export interface LeadsRepository {
-  createLead(
-    data: LeadCreateRequestTypeOutput,
-    logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      lead: {
-        summary: {
-          id: string;
-          businessName: string;
-          email: string | null;
-          status: LeadStatusType;
-        };
-        contactDetails: {
-          phone: string | null;
-          website: string | null;
-          country: string;
-          language: string;
-        };
-        trackingInfo: {
-          source: LeadSourceType | null;
-          emailsSent: number;
-          currentCampaignStage: string | null;
-        };
-        metadata: {
-          notes: string | null;
-          createdAt: string;
-          updatedAt: string;
-        };
-      };
-    }>
-  >;
-
-  getLeadById(
-    id: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadDetailResponse>>;
-
-  getLeadByTrackingId(
-    leadId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadResponseType>>;
-
-  getLeadByEmail(
-    email: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadResponseType>>;
-
-  updateLead(
-    id: string,
-    data: Partial<LeadUpdateType>,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadDetailResponse>>;
-
-  listLeads(
-    query: LeadListGetRequestTypeOutput,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadListResponseType>>;
-
-  convertLead(
-    leadId: string,
-    options: {
-      userId: DbId;
-      email: string;
-      additionalData?: {
-        businessName?: string;
-        contactName?: string;
-        phone?: string;
-        website?: string;
-      };
-    },
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadResponseType>>;
-
-  unsubscribeLead(
-    data: UnsubscribeType,
-    logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{ success: boolean; message?: string; unsubscribedAt?: Date }>
-  >;
-
-  recordEngagement(
-    data: {
-      leadId: string;
-      engagementType: EngagementTypesType;
-      campaignId?: string;
-      metadata?: Record<string, string | number | boolean>;
-      ipAddress?: string;
-      userAgent?: string;
-    },
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadEngagementResponseOutput>>;
-
-  // Internal methods (no auth required) for use by other services
-  getLeadByIdInternal(
-    id: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadDetailResponse>>;
-
-  updateLeadInternal(
-    id: string,
-    data: Partial<LeadUpdateType>,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadDetailResponse>>;
-
-  convertLeadInternal(
-    leadId: string,
-    options: {
-      userId: DbId;
-      email: string;
-      additionalData?: {
-        businessName?: string;
-        contactName?: string;
-        phone?: string;
-        website?: string;
-      };
-    },
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadResponseType>>;
-
-  recordEngagementInternal(
-    data: {
-      leadId: string;
-      engagementType: EngagementTypesType;
-      campaignId?: string;
-      metadata?: Record<string, string | number | boolean>;
-      ipAddress?: string;
-      userAgent?: string;
-    },
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadEngagementResponseOutput>>;
-
-  exportLeads(
-    query: ExportQueryType,
-    logger: EndpointLogger,
-    t: TFunction,
-  ): Promise<ResponseType<ExportResponseType>>;
-
-  batchUpdateLeads(
-    data: {
-      search?: string;
-      status?: LeadStatusFilterType | LeadStatusFilterType[];
-      currentCampaignStage?:
-        | EmailCampaignStageFilterType
-        | EmailCampaignStageFilterType[];
-      country?: CountryFilter | CountryFilter[];
-      language?: LanguageFilter | LanguageFilter[];
-      source?: LeadSourceFilterType | LeadSourceFilterType[];
-      sortBy?: LeadSortFieldType[];
-      sortOrder?: SortOrderType[];
-      scope?: BatchOperationScopeType;
-      page?: number;
-      pageSize?: number;
-      updates: {
-        status?: LeadStatusType;
-        currentCampaignStage?: EmailCampaignStageType;
-        source?: LeadSourceType;
-        notes?: string;
-      };
-      dryRun?: boolean;
-      maxRecords?: number;
-    },
-    logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      success: boolean;
-      totalMatched: number;
-      totalProcessed: number;
-      totalUpdated: number;
-      errors: Array<{ leadId: string; error: string }>;
-      preview: Array<{
-        id: string;
-        email: string | null;
-        businessName: string;
-        currentStatus: LeadStatusType;
-        currentCampaignStage: EmailCampaignStageType | null;
-      }> | null;
-    }>
-  >;
-
-  batchDeleteLeads(
-    data: {
-      search?: string;
-      status?: LeadStatusFilterType | LeadStatusFilterType[];
-      currentCampaignStage?:
-        | EmailCampaignStageFilterType
-        | EmailCampaignStageFilterType[];
-      country?: CountryFilter | CountryFilter[];
-      language?: LanguageFilter | LanguageFilter[];
-      source?: LeadSourceFilterType | LeadSourceFilterType[];
-      sortBy?: LeadSortFieldType[];
-      sortOrder?: SortOrderType[];
-      scope?: BatchOperationScopeType;
-      page?: number;
-      pageSize?: number;
-      confirmDelete: boolean;
-      dryRun?: boolean;
-      maxRecords?: number;
-    },
-    logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      success: boolean;
-      totalMatched: number;
-      totalProcessed: number;
-      totalDeleted: number;
-      errors: Array<{ leadId: string; error: string }>;
-      preview: Array<{
-        id: string;
-        email: string | null;
-        businessName: string;
-        currentStatus: LeadStatusType;
-        currentCampaignStage: EmailCampaignStageType | null;
-      }> | null;
-    }>
-  >;
-}
-
-/**
  * Utility function to ensure a lead has an email
  * Returns the lead if it has an email, otherwise returns null
  * @deprecated Use leadHasEmail type guard instead and handle null case
@@ -347,13 +127,13 @@ export function filterLeadsWithEmail(
 }
 
 /**
- * Leads Repository Implementation
+ * Leads Repository - Static class pattern
  */
-class LeadsRepositoryImpl implements LeadsRepository {
+export class LeadsRepository {
   /**
    * Create a new lead with business logic
    */
-  async createLead(
+  static async createLead(
     data: LeadCreateRequestTypeOutput,
     logger: EndpointLogger,
   ): Promise<
@@ -483,18 +263,18 @@ class LeadsRepositoryImpl implements LeadsRepository {
   /**
    * Get lead by ID with business logic (public API with auth)
    */
-  async getLeadById(
+  static async getLeadById(
     id: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadDetailResponse>> {
     logger.debug("Getting lead by ID", { id });
-    return await this.getLeadByIdInternal(id, logger);
+    return await LeadsRepository.getLeadByIdInternal(id, logger);
   }
 
   /**
    * Get lead by tracking ID
    */
-  async getLeadByTrackingId(
+  static async getLeadByTrackingId(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadResponseType>> {
@@ -514,7 +294,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         });
       }
 
-      return success(this.formatLeadResponse(lead));
+      return success(LeadsRepository.formatLeadResponse(lead));
     } catch (error) {
       logger.error("Error fetching lead by tracking ID", parseError(error));
       return fail({
@@ -527,7 +307,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
   /**
    * Get lead by email
    */
-  async getLeadByEmail(
+  static async getLeadByEmail(
     email: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadResponseType>> {
@@ -547,7 +327,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         });
       }
 
-      return success(this.formatLeadResponse(lead));
+      return success(LeadsRepository.formatLeadResponse(lead));
     } catch (error) {
       logger.error("Error fetching lead by email", parseError(error));
       return fail({
@@ -561,21 +341,73 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * Update lead with business logic (public API with auth)
    * Includes status transition validation
    */
-  async updateLead(
+  static async updateLead(
     id: string,
-    data: Partial<LeadUpdateType>,
+    data: {
+      updates: {
+        basicInfo: {
+          email?: string;
+          businessName?: string;
+          contactName?: string | null;
+          status?: (typeof LeadStatus)[keyof typeof LeadStatus];
+        };
+        contactDetails: {
+          phone?: string | null;
+          website?: string | null;
+          country?: string;
+          language?: string;
+        };
+        campaignManagement: {
+          currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+          source?: (typeof LeadSource)[keyof typeof LeadSource];
+        };
+        additionalDetails: {
+          notes?: string;
+          consultationBookedAt?: Date | null;
+          subscriptionConfirmedAt?: Date | null;
+          metadata?: Record<string, string | number | boolean | null>;
+        };
+      };
+    },
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadDetailResponse>> {
     try {
       logger.debug("Updating lead", {
         id,
-        updates: Object.keys(data),
+        updates: Object.keys(data.updates),
       });
 
+      // Flatten nested update structure to match internal repository format
+      const {
+        basicInfo,
+        contactDetails,
+        campaignManagement,
+        additionalDetails,
+      } = data.updates;
+      const flattenedData: Partial<LeadUpdateType> = {
+        email: basicInfo.email,
+        businessName: basicInfo.businessName,
+        contactName: basicInfo.contactName,
+        status: basicInfo.status,
+        phone: contactDetails.phone,
+        website: contactDetails.website,
+        country: contactDetails.country,
+        language: contactDetails.language,
+        currentCampaignStage: campaignManagement.currentCampaignStage,
+        source: campaignManagement.source,
+        notes: additionalDetails.notes,
+        consultationBookedAt: additionalDetails.consultationBookedAt,
+        subscriptionConfirmedAt: additionalDetails.subscriptionConfirmedAt,
+        metadata: additionalDetails.metadata,
+      };
+
       // If status is being updated, validate the transition
-      if (data.status) {
+      if (flattenedData.status) {
         // Get current lead to check current status
-        const currentLeadResult = await this.getLeadByIdInternal(id, logger);
+        const currentLeadResult = await LeadsRepository.getLeadByIdInternal(
+          id,
+          logger,
+        );
         if (!currentLeadResult.success) {
           return fail({
             message:
@@ -586,7 +418,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         }
 
         const currentStatus = currentLeadResult.data.lead.basicInfo.status;
-        const newStatus = data.status;
+        const newStatus = flattenedData.status;
 
         // Validate status transition
         if (!isStatusTransitionAllowed(currentStatus, newStatus)) {
@@ -609,7 +441,11 @@ class LeadsRepositoryImpl implements LeadsRepository {
       }
 
       // Delegate to internal method
-      return await this.updateLeadInternal(id, data, logger);
+      return await LeadsRepository.updateLeadInternal(
+        id,
+        flattenedData,
+        logger,
+      );
     } catch (error) {
       logger.error("Error updating lead", parseError(error));
       return fail({
@@ -622,7 +458,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
   /**
    * List leads with filtering and pagination with business logic
    */
-  async listLeads(
+  static async listLeads(
     query: LeadListGetRequestTypeOutput,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadListResponseType>> {
@@ -788,7 +624,9 @@ class LeadsRepositoryImpl implements LeadsRepository {
 
       return success({
         response: {
-          leads: leadsList.map((lead) => this.formatLeadResponse(lead)),
+          leads: leadsList.map((lead) =>
+            LeadsRepository.formatLeadResponse(lead),
+          ),
         },
         paginationInfo: {
           page,
@@ -809,7 +647,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
   /**
    * Convert lead - handles both anonymous lead conversion and user-lead relationship establishment (public API with auth)
    */
-  async convertLead(
+  static async convertLead(
     leadId: string,
     options: {
       userId: DbId;
@@ -823,13 +661,13 @@ class LeadsRepositoryImpl implements LeadsRepository {
     },
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadResponseType>> {
-    return await this.convertLeadInternal(leadId, options, logger);
+    return await LeadsRepository.convertLeadInternal(leadId, options, logger);
   }
 
   /**
    * Private helper methods
    */
-  private formatLeadResponse(lead: Lead): LeadResponseType {
+  private static formatLeadResponse(lead: Lead): LeadResponseType {
     return {
       id: lead.id,
       email: lead.email,
@@ -860,7 +698,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
     };
   }
 
-  private formatLeadDetailResponse(lead: Lead): LeadDetailResponse {
+  private static formatLeadDetailResponse(lead: Lead): LeadDetailResponse {
     return {
       lead: {
         basicInfo: {
@@ -911,7 +749,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * This method handles both leads and newsletter unsubscription to ensure
    * the user is completely opted out from all email communications
    */
-  async unsubscribeLead(
+  static async unsubscribeLead(
     data: UnsubscribeType,
     logger: EndpointLogger,
   ): Promise<
@@ -972,7 +810,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
       }
 
       // 2. Also unsubscribe from newsletter
-      await this.unsubscribeFromNewsletterInternal(email, logger);
+      await LeadsRepository.unsubscribeFromNewsletterInternal(email, logger);
 
       logger.debug("Lead and newsletter unsubscribed successfully", {
         leadId: updatedLead.id,
@@ -1002,7 +840,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * Internal method to unsubscribe from newsletter
    * Handles newsletter opt-out as part of lead unsubscribe process
    */
-  private async unsubscribeFromNewsletterInternal(
+  private static async unsubscribeFromNewsletterInternal(
     email: string,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -1062,7 +900,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * Update lead status to unsubscribed when unsubscribing from newsletter
    * This method is called from newsletter unsubscribe to ensure lead status is updated
    */
-  async updateLeadStatusOnNewsletterUnsubscribe(
+  static async updateLeadStatusOnNewsletterUnsubscribe(
     email: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean; leadFound: boolean }>> {
@@ -1128,7 +966,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * Internal: Get lead by ID (no auth required)
    * Used by internal services like tracking
    */
-  async getLeadByIdInternal(
+  static async getLeadByIdInternal(
     id: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadDetailResponse>> {
@@ -1148,7 +986,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         });
       }
 
-      return success(this.formatLeadDetailResponse(lead));
+      return success(LeadsRepository.formatLeadDetailResponse(lead));
     } catch (error) {
       logger.error("Error fetching lead by ID (internal)", parseError(error));
       return fail({
@@ -1163,7 +1001,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * Internal: Update lead (no auth required, no status transition validation)
    * Used by internal services like tracking
    */
-  async updateLeadInternal(
+  static async updateLeadInternal(
     id: string,
     data: Partial<LeadUpdateType>,
     logger: EndpointLogger,
@@ -1224,7 +1062,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * Internal: Convert lead (no auth required)
    * Used by internal services like tracking
    */
-  async convertLeadInternal(
+  static async convertLeadInternal(
     leadId: string,
     options: {
       userId: DbId;
@@ -1272,7 +1110,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
               existingUserId: existingLead.convertedUserId,
               newUserId: options.userId,
             });
-            return success(this.formatLeadResponse(existingLead));
+            return success(LeadsRepository.formatLeadResponse(existingLead));
           }
 
           // Prepare update data
@@ -1381,7 +1219,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
             .where(eq(leads.id, existingLead.id))
             .returning();
 
-          return success(this.formatLeadResponse(updatedLead));
+          return success(LeadsRepository.formatLeadResponse(updatedLead));
         },
       );
 
@@ -1407,7 +1245,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * Internal: Record engagement event for a lead (no auth required)
    * Used by internal services like tracking
    */
-  async recordEngagementInternal(
+  static async recordEngagementInternal(
     data: {
       leadId: string;
       engagementType: EngagementTypesType;
@@ -1535,7 +1373,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
   /**
    * Record engagement event for a lead (public API with auth)
    */
-  async recordEngagement(
+  static async recordEngagement(
     data: {
       leadId: string;
       engagementType: EngagementTypesType;
@@ -1546,13 +1384,13 @@ class LeadsRepositoryImpl implements LeadsRepository {
     },
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
-    return await this.recordEngagementInternal(data, logger);
+    return await LeadsRepository.recordEngagementInternal(data, logger);
   }
 
   /**
    * Export leads to CSV or Excel
    */
-  async exportLeads(
+  static async exportLeads(
     query: ExportQueryType,
     logger: EndpointLogger,
     t: TFunction,
@@ -1615,7 +1453,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
         .orderBy(desc(leads.createdAt));
 
       // Generate CSV content
-      const csvContent = this.generateCsvContent(
+      const csvContent = LeadsRepository.generateCsvContent(
         leadsData,
         query.includeMetadata,
         query.includeEngagementData,
@@ -1659,7 +1497,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
   /**
    * Generate CSV content from leads data
    */
-  private generateCsvContent(
+  private static generateCsvContent(
     leadsData: Lead[],
     includeMetadata: boolean,
     includeEngagementData: boolean,
@@ -1761,7 +1599,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
   /**
    * Batch update leads based on filter criteria
    */
-  async batchUpdateLeads(
+  static async batchUpdateLeads(
     data: {
       search?: string;
       status?: LeadStatusFilterType;
@@ -2113,7 +1951,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
   /**
    * Batch delete leads based on filter criteria
    */
-  async batchDeleteLeads(
+  static async batchDeleteLeads(
     data: {
       search?: string;
       status?: LeadStatusFilterType;
@@ -2467,7 +2305,7 @@ class LeadsRepositoryImpl implements LeadsRepository {
    * Link two leads together (for credit pool sharing)
    * Creates a bidirectional link in the lead_lead_links table
    */
-  async linkLeadToLead(
+  static async linkLeadToLead(
     leadId1: string,
     leadId2: string,
     linkReason: "track_page" | "referral" | "manual" | "test",
@@ -2516,5 +2354,3 @@ class LeadsRepositoryImpl implements LeadsRepository {
     }
   }
 }
-
-export const leadsRepository = new LeadsRepositoryImpl();

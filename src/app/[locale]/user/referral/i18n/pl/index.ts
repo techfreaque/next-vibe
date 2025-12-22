@@ -6,24 +6,30 @@ export const translations = {
   howItWorks: {
     title: "Jak to działa",
     step1Title: "Twórz kody polecające",
-    step1Body: "Generuj unikalne kody dla różnych odbiorców — znajomych, social media czy kampanii.",
+    step1Body:
+      "Generuj unikalne kody dla różnych odbiorców — znajomych, social media czy kampanii.",
     step2Title: "Udostępnij link",
-    step2Body: "Gdy ktoś zarejestruje się przez Twój link i subskrybuje, zarabiasz prowizję.",
+    step2Body:
+      "Gdy ktoś zarejestruje się przez Twój link i subskrybuje, zarabiasz prowizję.",
     step3Title: "Odbierz wypłatę",
-    step3Body: "Zarobki są natychmiastowe. Użyj ich jako kredytów czatu lub wypłać w kryptowalucie.",
+    step3Body:
+      "Zarobki są natychmiastowe. Użyj ich jako kredytów czatu lub wypłać w kryptowalucie.",
   },
   overview: {
     title: "Twoje zarobki",
-    subtitle: "Statystyki w czasie rzeczywistym, aktualizowane przy każdym zakupie.",
+    subtitle:
+      "Statystyki w czasie rzeczywistym, aktualizowane przy każdym zakupie.",
   },
   payout: {
     title: "Wypłać zarobki",
     description: "Wiele sposobów wykorzystania zarobków z poleceń",
     useAsCredits: "Użyj jako kredyty czatu",
-    useAsCreditsDesc: "Natychmiast zamień zarobki na kredyty czatu do rozmów z AI.",
+    useAsCreditsDesc:
+      "Natychmiast zamień zarobki na kredyty czatu do rozmów z AI.",
     cryptoPayout: "Wypłata w kryptowalucie",
     cryptoPayoutDesc: "Poproś o wypłatę w BTC lub USDC na swój portfel.",
-    minimumNote: "Minimalna wypłata: $40. Wypłaty krypto są przetwarzane w ciągu 48 godzin od zatwierdzenia.",
+    minimumNote:
+      "Minimalna wypłata: $40. Wypłaty krypto są przetwarzane w ciągu 48 godzin od zatwierdzenia.",
   },
   manage: {
     createSubtitle: "Twórz kody dla konkretnych kampanii lub odbiorców.",
@@ -61,7 +67,8 @@ export const translations = {
   },
   cta: {
     title: "Zacznij zarabiać już dziś",
-    description: "Utwórz konto lub zaloguj się, aby wygenerować swoje kody polecające i zarabiać prowizję od każdej subskrypcji.",
+    description:
+      "Utwórz konto lub zaloguj się, aby wygenerować swoje kody polecające i zarabiać prowizję od każdej subskrypcji.",
     signUp: "Utwórz konto",
     logIn: "Zaloguj się",
   },

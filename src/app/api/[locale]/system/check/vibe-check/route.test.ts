@@ -149,7 +149,6 @@ const EXPECTED_COUNTS = {
     "oxc(bad-comparison-sequence)": 1,
     "oxc(const-comparisons)": 1,
   },
-
 };
 
 // ============================================================
@@ -1027,24 +1026,32 @@ describe("Compiled Runtime Tests", () => {
   });
 
   it("should detect errors when using compiled runtime", () => {
-    if (compiledOutput.includes("SKIP:")) {return;}
+    if (compiledOutput.includes("SKIP:")) {
+      return;
+    }
     expect(compiledOutput).toContain("error");
   });
 
   it("should detect custom plugin errors with compiled runtime", () => {
-    if (compiledOutput.includes("SKIP:")) {return;}
+    if (compiledOutput.includes("SKIP:")) {
+      return;
+    }
     expect(compiledOutput).toContain("oxlint-plugin-jsx-capitalization");
     expect(compiledOutput).toContain("oxlint-plugin-i18n");
     expect(compiledOutput).toContain("oxlint-plugin-restricted");
   });
 
   it("should complete TypeScript check with compiled runtime", () => {
-    if (compiledOutput.includes("SKIP:")) {return;}
+    if (compiledOutput.includes("SKIP:")) {
+      return;
+    }
     expect(compiledOutput).toContain("TypeScript check completed");
   });
 
   it("should produce similar summary to bun runtime", () => {
-    if (compiledOutput.includes("SKIP:")) {return;}
+    if (compiledOutput.includes("SKIP:")) {
+      return;
+    }
     const summary = extractSummary(compiledOutput);
     // Allow some variance - compiled runtime may detect fewer TypeScript errors
     // Bun runtime: 319 issues, compiled runtime: ~309 issues (10 fewer due to tsc differences)

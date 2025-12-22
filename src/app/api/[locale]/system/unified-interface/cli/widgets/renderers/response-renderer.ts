@@ -56,9 +56,9 @@ export class ModularCLIResponseRenderer {
   /**
    * Render response data using endpoint definition metadata
    */
-  render(
+  render<TKey extends string>(
     data: DataRecord,
-    fields: Array<[string, UnifiedField]>,
+    fields: Array<[string, UnifiedField<TKey>]>,
     locale: CountryLanguage,
   ): string {
     this.options.locale = locale;
@@ -72,6 +72,8 @@ export class ModularCLIResponseRenderer {
       getFieldIcon: (type) => this.getFieldIcon(type),
       renderEmptyState: (message) => this.renderEmptyState(message),
       getRenderer: (widgetType) => this.widgetRegistry.getRenderer(widgetType),
+      renderWidget: (widgetType, field, value) =>
+        this.widgetRegistry.renderWidget(widgetType, field, value, context),
       locale,
       isInteractive: false,
       permissions: [],
@@ -83,9 +85,9 @@ export class ModularCLIResponseRenderer {
   /**
    * Render multiple fields
    */
-  private renderFields(
+  private renderFields<TKey extends string>(
     data: DataRecord,
-    fields: Array<[string, UnifiedField]>,
+    fields: Array<[string, UnifiedField<TKey>]>,
     context: WidgetRenderContext,
   ): string {
     const result: string[] = [];
@@ -187,7 +189,10 @@ export class ModularCLIResponseRenderer {
   /**
    * Format field value based on type and configuration
    */
-  private formatFieldValue(field: UnifiedField, value: WidgetData): string {
+  private formatFieldValue<TKey extends string>(
+    field: UnifiedField<TKey>,
+    value: WidgetData,
+  ): string {
     if (value === null || value === undefined) {
       // eslint-disable-next-line i18next/no-literal-string
       return this.styleText("(not set)", "dim", {

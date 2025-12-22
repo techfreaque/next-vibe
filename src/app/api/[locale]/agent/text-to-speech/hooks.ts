@@ -16,12 +16,15 @@ import { simpleT } from "@/i18n/core/shared";
 import { TTS_COST_PER_CHARACTER } from "../../products/repository-client";
 import { chunkTextForTTS } from "./chunking";
 import textToSpeechDefinitions from "./definition";
+import type { TtsVoiceValue } from "./enum";
+import { TtsVoice } from "./enum";
 
 interface UseTTSAudioOptions {
   text: string;
   enabled: boolean;
   isStreaming?: boolean; // If true, wait for streaming to complete before auto-playing
   locale: CountryLanguage;
+  voice?: typeof TtsVoiceValue; // Voice to use for TTS (defaults to MALE if not provided)
   onError?: (error: string) => void;
   logger: EndpointLogger;
   deductCredits: (creditCost: number, feature: string) => void;
@@ -41,6 +44,7 @@ interface UseTTSAudioReturn {
 export function useTTSAudio({
   text,
   locale,
+  voice,
   onError,
   logger,
   deductCredits,
@@ -159,7 +163,7 @@ export function useTTSAudio({
       return new Promise((resolve) => {
         // Set form values for this chunk
         endpoint.create!.form.setValue("text", chunkText);
-        endpoint.create!.form.setValue("voice", "MALE");
+        endpoint.create!.form.setValue("voice", voice ?? TtsVoice.FEMALE);
 
         // Submit form
         void endpoint.create!.submitForm({
@@ -202,7 +206,7 @@ export function useTTSAudio({
         });
       });
     },
-    [endpoint, logger, t, onError, deductCredits],
+    [endpoint, logger, t, onError, deductCredits, voice],
   );
 
   // Play next chunk in the queue

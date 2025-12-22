@@ -29,10 +29,7 @@ const getInitialCollapsedState = (): boolean => {
  * - Initial loaded state: collapsed for mobile, open for desktop
  * - Only saves when user explicitly changes it (not on initial load)
  */
-export function useSidebarCollapsed(): [
-  boolean,
-  (collapsed: boolean) => void,
-] {
+export function useSidebarCollapsed(): [boolean, (collapsed: boolean) => void] {
   // Initialize state based on screen size (client-side only)
   const [collapsed, setCollapsed] = useState<boolean>(getInitialCollapsedState);
 

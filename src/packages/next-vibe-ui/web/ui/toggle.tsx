@@ -83,4 +83,4 @@ export function Toggle({
   );
 }
 
-export { toggleTextVariants,toggleVariants };
+export { toggleTextVariants, toggleVariants };

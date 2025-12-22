@@ -98,7 +98,9 @@ export interface ResetTaskManagementRepository {
 /**
  * Database Reset Task Management Repository Implementation
  */
-export class ResetTaskManagementRepositoryImpl implements ResetTaskManagementRepository {
+export class ResetTaskManagementRepositoryImpl
+  implements ResetTaskManagementRepository
+{
   private tasks: Map<string, Task> = new Map();
   private runningTasks: Map<string, AbortController> = new Map();
 
@@ -223,13 +225,12 @@ export class ResetTaskManagementRepositoryImpl implements ResetTaskManagementRep
           },
         };
       }
-        logger.info("Safety check skipped (not in production)");
-        return {
-          success: true,
-          message: "Safety check skipped - not in production environment",
-          data: { environment: nodeEnv },
-        };
-      
+      logger.info("Safety check skipped (not in production)");
+      return {
+        success: true,
+        message: "Safety check skipped - not in production environment",
+        data: { environment: nodeEnv },
+      };
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Database reset safety check failed", parsedError);

@@ -9,7 +9,9 @@ import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
+import { Edit2 } from "next-vibe-ui/ui/icons/Edit2";
 import { Filter } from "next-vibe-ui/ui/icons/Filter";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Label } from "next-vibe-ui/ui/label";
 import { Separator } from "next-vibe-ui/ui/separator";
@@ -17,6 +19,18 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
+import { getCharacterById } from "@/app/api/[locale]/agent/chat/characters/config";
+import type { CharacterListResponseOutput } from "@/app/api/[locale]/agent/chat/characters/definition";
+import {
+  ContentLevelFilter,
+  type ContentLevelFilterValue,
+  IntelligenceLevelFilter,
+  type IntelligenceLevelFilterValue,
+  ModelSelectionMode,
+  type ModelSelectionModeValue,
+  PriceLevelFilter,
+  type PriceLevelFilterValue,
+} from "@/app/api/[locale]/agent/chat/favorites/enum";
 import {
   getIconComponent,
   type IconKey,
@@ -27,14 +41,10 @@ import {
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/agent/chat/model-access/models";
-import { getPersonaById } from "@/app/api/[locale]/agent/chat/personas/config";
 import {
   CONTENT_DISPLAY,
-  type ContentLevel,
   INTELLIGENCE_DISPLAY,
-  type IntelligenceLevel,
   PRICE_DISPLAY,
-  type PriceLevel,
 } from "@/app/api/[locale]/agent/chat/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -42,11 +52,18 @@ import { simpleT } from "@/i18n/core/shared";
 import type { FavoriteItem } from "./favorites-bar";
 import { findBestModel, getCompatibleModels } from "./types";
 
+type CharacterData = CharacterListResponseOutput["characters"][number];
+
 interface QuickSettingsPanelProps {
   favorite: FavoriteItem;
   onSave: (settings: FavoriteItem["modelSettings"], saveMode: SaveMode) => void;
   onCancel: () => void;
   onDelete?: () => void;
+  onEditCharacter?: (characterData: CharacterData) => void;
+  onSwitchCharacterView?: () => void;
+  onCharacterSwitch?: (characterId: string, keepSettings: boolean) => void;
+  characters?: Record<string, CharacterData>;
+  isAuthenticated?: boolean;
   locale: CountryLanguage;
 }
 
@@ -175,28 +192,36 @@ export function QuickSettingsPanel({
   onSave,
   onCancel,
   onDelete,
+  onEditCharacter,
+  onSwitchCharacterView,
+  characters,
+  isAuthenticated,
   locale,
 }: QuickSettingsPanelProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  const character = useMemo(
-    () => (favorite.personaId ? getPersonaById(favorite.personaId) : null),
-    [favorite.personaId],
-  );
+  const character = useMemo(() => {
+    if (!favorite.characterId) {
+      return null;
+    }
+    // Always use getCharacterById for built-in characters (required for model filtering)
+    // Custom characters are not supported for model filtering yet
+    return getCharacterById(favorite.characterId);
+  }, [favorite.characterId]);
 
   const isModelOnly = !character;
 
   // Local state for editing
-  const [intelligence, setIntelligence] = useState<IntelligenceLevel | "any">(
-    favorite.modelSettings.filters.intelligence,
-  );
-  const [maxPrice, setMaxPrice] = useState<PriceLevel | "any">(
+  const [intelligence, setIntelligence] = useState<
+    typeof IntelligenceLevelFilterValue
+  >(favorite.modelSettings.filters.intelligence);
+  const [maxPrice, setMaxPrice] = useState<typeof PriceLevelFilterValue>(
     favorite.modelSettings.filters.maxPrice,
   );
-  const [content, setContent] = useState<ContentLevel | "any">(
+  const [content, setContent] = useState<typeof ContentLevelFilterValue>(
     favorite.modelSettings.filters.content,
   );
-  const [mode, setMode] = useState<"auto" | "manual">(
+  const [mode, setMode] = useState<typeof ModelSelectionModeValue>(
     favorite.modelSettings.mode,
   );
   const [manualModelId, setManualModelId] = useState<ModelId | undefined>(
@@ -229,11 +254,11 @@ export function QuickSettingsPanel({
   const filteredModels = useMemo(() => {
     return compatibleModels.filter((m) => {
       // Filter by intelligence (skip if "any")
-      if (intelligence !== "any") {
-        const intelligenceOrder: IntelligenceLevel[] = [
-          "quick",
-          "smart",
-          "brilliant",
+      if (intelligence !== IntelligenceLevelFilter.ANY) {
+        const intelligenceOrder = [
+          IntelligenceLevelFilter.QUICK,
+          IntelligenceLevelFilter.SMART,
+          IntelligenceLevelFilter.BRILLIANT,
         ];
         const modelIndex = intelligenceOrder.indexOf(m.intelligence);
         const targetIndex = intelligenceOrder.indexOf(intelligence);
@@ -243,11 +268,11 @@ export function QuickSettingsPanel({
       }
 
       // Filter by content (skip if "any")
-      if (content !== "any") {
-        const contentOrder: ContentLevel[] = [
-          "mainstream",
-          "open",
-          "uncensored",
+      if (content !== ContentLevelFilter.ANY) {
+        const contentOrder = [
+          ContentLevelFilter.MAINSTREAM,
+          ContentLevelFilter.OPEN,
+          ContentLevelFilter.UNCENSORED,
         ];
         const modelContentIndex = contentOrder.indexOf(m.content);
         const targetContentIndex = contentOrder.indexOf(content);
@@ -257,14 +282,18 @@ export function QuickSettingsPanel({
       }
 
       // Filter by price (skip if "any")
-      if (maxPrice !== "any") {
-        const priceOrder: PriceLevel[] = ["cheap", "standard", "premium"];
+      if (maxPrice !== PriceLevelFilter.ANY) {
+        const priceOrder = [
+          PriceLevelFilter.CHEAP,
+          PriceLevelFilter.STANDARD,
+          PriceLevelFilter.PREMIUM,
+        ];
         const modelPrice =
           m.creditCost <= 3
-            ? "cheap"
+            ? PriceLevelFilter.CHEAP
             : m.creditCost <= 9
-              ? "standard"
-              : "premium";
+              ? PriceLevelFilter.STANDARD
+              : PriceLevelFilter.PREMIUM;
         const modelPriceIndex = priceOrder.indexOf(modelPrice);
         const maxPriceIndex = priceOrder.indexOf(maxPrice);
         if (modelPriceIndex > maxPriceIndex) {
@@ -282,7 +311,7 @@ export function QuickSettingsPanel({
 
   // Check if current selection is valid for saving
   const canSave = useMemo(() => {
-    if (mode === "auto") {
+    if (mode === ModelSelectionMode.AUTO) {
       // In auto mode, need at least one matching model
       return filteredModels.length > 0;
     }
@@ -295,7 +324,8 @@ export function QuickSettingsPanel({
       {
         mode,
         filters: { intelligence, maxPrice, content },
-        manualModelId: mode === "manual" ? manualModelId : undefined,
+        manualModelId:
+          mode === ModelSelectionMode.MANUAL ? manualModelId : undefined,
       },
       "update",
     );
@@ -306,18 +336,19 @@ export function QuickSettingsPanel({
       {
         mode,
         filters: { intelligence, maxPrice, content },
-        manualModelId: mode === "manual" ? manualModelId : undefined,
+        manualModelId:
+          mode === ModelSelectionMode.MANUAL ? manualModelId : undefined,
       },
       "temporary",
     );
   }, [onSave, mode, intelligence, maxPrice, content, manualModelId]);
 
   const resolvedModel =
-    mode === "manual" && manualModelId
+    mode === ModelSelectionMode.MANUAL && manualModelId
       ? (allModels.find((m) => m.id === manualModelId) ?? bestModel)
       : bestModel;
 
-  // Get display info - works for both persona and model-only favorites
+  // Get display info - works for both character and model-only favorites
   const DisplayIcon = character
     ? getIconComponent(character.icon)
     : resolvedModel
@@ -327,7 +358,7 @@ export function QuickSettingsPanel({
     ? favorite.customName
     : character
       ? t(character.name)
-      : resolvedModel?.name ?? t("app.chat.selector.modelOnly");
+      : (resolvedModel?.name ?? t("app.chat.selector.modelOnly"));
 
   return (
     <Div className="flex flex-col max-h-[70vh] overflow-hidden">
@@ -357,18 +388,48 @@ export function QuickSettingsPanel({
           </Div>
         </Div>
 
-        {onDelete && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-destructive hover:text-destructive shrink-0"
-            onClick={onDelete}
-            title={t("app.chat.selector.delete")}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        )}
+        <Div className="flex items-center gap-2">
+          {/* Switch Character button - only for users with a character and characters available */}
+          {!isModelOnly && onSwitchCharacterView && characters && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-primary shrink-0"
+              onClick={onSwitchCharacterView}
+              title={t("app.chat.selector.switchPersona")}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          )}
+
+          {/* Edit Character button - only for authenticated users with a character */}
+          {isAuthenticated && !isModelOnly && onEditCharacter && character && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-primary shrink-0"
+              onClick={() => onEditCharacter(character)}
+              title={t("app.chat.selector.editPersona")}
+            >
+              <Edit2 className="h-4 w-4" />
+            </Button>
+          )}
+
+          {onDelete && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-destructive hover:text-destructive shrink-0"
+              onClick={onDelete}
+              title={t("app.chat.selector.delete")}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
+        </Div>
       </Div>
 
       {/* Scrollable content */}
@@ -385,7 +446,7 @@ export function QuickSettingsPanel({
               </Div>
               <Div className="flex-1 min-w-0">
                 <Span className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">
-                  {mode === "auto"
+                  {mode === ModelSelectionMode.AUTO
                     ? t("app.chat.selector.autoSelectedModel")
                     : t("app.chat.selector.manualSelectedModel")}
                 </Span>
@@ -479,7 +540,7 @@ export function QuickSettingsPanel({
                 {t("app.chat.selector.modelSelection")}
               </Label>
               <Span className="text-xs text-muted-foreground/70">
-                {mode === "auto"
+                {mode === ModelSelectionMode.AUTO
                   ? t("app.chat.selector.autoModeDescription")
                   : t("app.chat.selector.manualModeDescription")}
               </Span>
@@ -487,26 +548,30 @@ export function QuickSettingsPanel({
             <Div className="flex items-center gap-2">
               <Button
                 type="button"
-                variant={mode === "auto" ? "default" : "outline"}
+                variant={
+                  mode === ModelSelectionMode.AUTO ? "default" : "outline"
+                }
                 size="sm"
                 className="flex-1 h-9"
-                onClick={() => setMode("auto")}
+                onClick={() => setMode(ModelSelectionMode.AUTO)}
               >
                 {t("app.chat.selector.autoMode")}
               </Button>
               <Button
                 type="button"
-                variant={mode === "manual" ? "default" : "outline"}
+                variant={
+                  mode === ModelSelectionMode.MANUAL ? "default" : "outline"
+                }
                 size="sm"
                 className="flex-1 h-9"
-                onClick={() => setMode("manual")}
+                onClick={() => setMode(ModelSelectionMode.MANUAL)}
               >
                 {t("app.chat.selector.manualMode")}
               </Button>
             </Div>
 
             {/* Model list (visible in manual mode or when expanded) */}
-            {mode === "manual" && (
+            {mode === ModelSelectionMode.MANUAL && (
               <Div className="flex flex-col gap-2">
                 {/* Toggle to show all models vs filtered */}
                 <Div className="flex items-center justify-between">
@@ -587,14 +652,103 @@ export function QuickSettingsPanel({
             )}
 
             {/* Warning when no models match in auto mode */}
-            {mode === "auto" && filteredModels.length === 0 && (
-              <Div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
-                <AlertTriangle className="h-4 w-4 shrink-0" />
-                <Span className="text-sm">
-                  {t("app.chat.selector.noModelsWarning")}
-                </Span>
-              </Div>
-            )}
+            {mode === ModelSelectionMode.AUTO &&
+              filteredModels.length === 0 && (
+                <Div className="flex flex-col gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
+                  <Div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 shrink-0" />
+                    <Span className="text-sm font-medium">
+                      {t("app.chat.selector.noModelsWarning")}
+                    </Span>
+                  </Div>
+                  {!isModelOnly && character?.requirements && (
+                    <Div className="flex flex-col gap-1 text-xs pl-6">
+                      {(() => {
+                        if (!character) {
+                          return null;
+                        }
+                        const violations: string[] = [];
+                        const intelligenceOrder = [
+                          IntelligenceLevelFilter.ANY,
+                          IntelligenceLevelFilter.QUICK,
+                          IntelligenceLevelFilter.SMART,
+                          IntelligenceLevelFilter.BRILLIANT,
+                        ];
+                        const contentOrder = [
+                          ContentLevelFilter.ANY,
+                          ContentLevelFilter.MAINSTREAM,
+                          ContentLevelFilter.OPEN,
+                          ContentLevelFilter.UNCENSORED,
+                        ];
+
+                        // Check intelligence requirements
+                        if (
+                          character.requirements?.minIntelligence &&
+                          intelligenceOrder.indexOf(intelligence) <
+                            intelligenceOrder.indexOf(
+                              character.requirements.minIntelligence,
+                            )
+                        ) {
+                          violations.push(
+                            `${t("app.chat.selector.intelligence")}: ${t("app.chat.selector.requirements.tooLow")} (${t("app.chat.selector.requirements.min")}: ${t(character.requirements.minIntelligence)})`,
+                          );
+                        }
+
+                        if (
+                          character.requirements?.maxIntelligence &&
+                          intelligenceOrder.indexOf(intelligence) >
+                            intelligenceOrder.indexOf(
+                              character.requirements.maxIntelligence,
+                            )
+                        ) {
+                          violations.push(
+                            `${t("app.chat.selector.intelligence")}: ${t("app.chat.selector.requirements.tooHigh")} (${t("app.chat.selector.requirements.max")}: ${t(character.requirements.maxIntelligence)})`,
+                          );
+                        }
+
+                        // Check content requirements
+                        if (
+                          character.requirements?.minContent &&
+                          contentOrder.indexOf(content) <
+                            contentOrder.indexOf(
+                              character.requirements.minContent,
+                            )
+                        ) {
+                          violations.push(
+                            `${t("app.chat.selector.content")}: ${t("app.chat.selector.requirements.tooLow")} (${t("app.chat.selector.requirements.min")}: ${t(character.requirements.minContent)})`,
+                          );
+                        }
+
+                        if (
+                          character.requirements?.maxContent &&
+                          contentOrder.indexOf(content) >
+                            contentOrder.indexOf(
+                              character.requirements.maxContent,
+                            )
+                        ) {
+                          violations.push(
+                            `${t("app.chat.selector.content")}: ${t("app.chat.selector.requirements.tooHigh")} (${t("app.chat.selector.requirements.max")}: ${t(character.requirements.maxContent)})`,
+                          );
+                        }
+
+                        return violations.length > 0 ? (
+                          <>
+                            <Span className="font-medium">
+                              {t(
+                                "app.chat.selector.requirements.personaConflict",
+                              )}
+                              :
+                            </Span>
+                            {violations.map((v, i) => (
+                              <Span key={i}>• {v}</Span>
+                            ))}
+                          </>
+                        ) : null;
+                      })()}
+                    </Div>
+                  )}
+                </Div>
+              )}
           </Div>
         </Div>
       </Div>

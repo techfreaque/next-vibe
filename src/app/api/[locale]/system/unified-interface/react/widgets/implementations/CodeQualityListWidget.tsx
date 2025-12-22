@@ -29,11 +29,11 @@ import { getSeverityVariant } from "../../../shared/widgets/utils/widget-helpers
 /**
  * Displays code quality issues with grouping by file/severity/rule.
  */
-export function CodeQualityListWidget({
+export function CodeQualityListWidget<TKey extends string>({
   value,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.CODE_QUALITY_LIST>): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.CODE_QUALITY_LIST, TKey>): JSX.Element {
   const { t } = simpleT(context.locale);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 

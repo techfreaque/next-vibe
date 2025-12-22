@@ -16,11 +16,11 @@ import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import {
-  getPersonaById,
-  type Persona,
-} from "@/app/api/[locale]/agent/chat/personas/config";
+  type Character,
+  getCharacterById,
+} from "@/app/api/[locale]/agent/chat/characters/config";
+import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -37,26 +37,24 @@ type OnboardingStep = "story" | "pick" | "specialists";
 const FEATURED_PERSONA_IDS = ["thea", "hermes"] as const;
 
 // Companion descriptions (personality-focused, not model-focused)
-const COMPANION_INFO: Record<
-  string,
-  { tagline: string; description: string }
-> = {
-  thea: {
-    tagline: "app.chat.onboarding.thea.tagline",
-    description: "app.chat.onboarding.thea.description",
-  },
-  hermes: {
-    tagline: "app.chat.onboarding.hermes.tagline",
-    description: "app.chat.onboarding.hermes.description",
-  },
-};
+const COMPANION_INFO: Record<string, { tagline: string; description: string }> =
+  {
+    thea: {
+      tagline: "app.chat.onboarding.thea.tagline",
+      description: "app.chat.onboarding.thea.description",
+    },
+    hermes: {
+      tagline: "app.chat.onboarding.hermes.tagline",
+      description: "app.chat.onboarding.hermes.description",
+    },
+  };
 
 /**
- * Get featured personas for onboarding
+ * Get featured characters for onboarding
  */
-function getFeaturedPersonas(): Persona[] {
-  return FEATURED_PERSONA_IDS.map(getPersonaById).filter(
-    (p): p is Persona => p !== null,
+function getFeaturedCharacters(): Character[] {
+  return FEATURED_PERSONA_IDS.map(getCharacterById).filter(
+    (p): p is Character => p !== null,
   );
 }
 
@@ -111,19 +109,19 @@ function StepIndicator({
  * Companion card for selection - personality focused
  */
 function CompanionCard({
-  persona,
+  character,
   onSelect,
   isSelected,
   locale,
 }: {
-  persona: Persona;
+  character: Character;
   onSelect: () => void;
   isSelected: boolean;
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const Icon = getIconComponent(persona.icon);
-  const info = COMPANION_INFO[persona.id];
+  const Icon = getIconComponent(character.icon);
+  const info = COMPANION_INFO[character.id];
 
   return (
     <Div
@@ -148,10 +146,10 @@ function CompanionCard({
               : "ring-transparent group-hover:ring-primary/40",
           )}
         >
-          {persona.avatar ? (
+          {character.avatar ? (
             <Image
-              src={persona.avatar}
-              alt={t(persona.name)}
+              src={character.avatar}
+              alt={t(character.name)}
               width={64}
               height={64}
               className="w-full h-full object-cover"
@@ -169,7 +167,7 @@ function CompanionCard({
 
       {/* Name */}
       <Span className="text-lg font-bold text-center mb-1">
-        {t(persona.name)}
+        {t(character.name)}
       </Span>
 
       {/* Tagline */}
@@ -255,7 +253,7 @@ function PickStep({
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const featuredPersonas = useMemo(() => getFeaturedPersonas(), []);
+  const featuredCharacters = useMemo(() => getFeaturedCharacters(), []);
 
   return (
     <Div className="flex flex-col p-5 overflow-y-auto">
@@ -271,12 +269,12 @@ function PickStep({
 
       {/* Companion cards */}
       <Div className="grid grid-cols-2 gap-3 mb-5">
-        {featuredPersonas.map((persona) => (
+        {featuredCharacters.map((character) => (
           <CompanionCard
-            key={persona.id}
-            persona={persona}
-            onSelect={() => setSelectedId(persona.id)}
-            isSelected={selectedId === persona.id}
+            key={character.id}
+            character={character}
+            onSelect={() => setSelectedId(character.id)}
+            isSelected={selectedId === character.id}
             locale={locale}
           />
         ))}
@@ -305,19 +303,19 @@ function PickStep({
  * Screen 3: Specialist peek - show they exist
  */
 function SpecialistStep({
-  selectedPersonaId,
+  selectedCharacterId,
   onStartChatting,
   onBrowseAll,
   locale,
 }: {
-  selectedPersonaId: string;
+  selectedCharacterId: string;
   onStartChatting: () => void;
   onBrowseAll: () => void;
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const persona = getPersonaById(selectedPersonaId);
-  const personaName = persona ? t(persona.name) : "";
+  const character = getCharacterById(selectedCharacterId);
+  const characterName = character ? t(character.name) : "";
 
   const specialists = [
     {
@@ -348,7 +346,7 @@ function SpecialistStep({
       <Div className="text-center mb-4 shrink-0">
         <Div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full text-sm font-medium mb-3">
           <Check className="h-4 w-4" />
-          {t("app.chat.onboarding.specialists.chosen", { name: personaName })}
+          {t("app.chat.onboarding.specialists.chosen", { name: characterName })}
         </Div>
         <P className="text-sm text-muted-foreground">
           {t("app.chat.onboarding.specialists.intro")}
@@ -420,8 +418,7 @@ export function SelectorOnboarding({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  const stepIndex =
-    step === "story" ? 0 : step === "pick" ? 1 : 2;
+  const stepIndex = step === "story" ? 0 : step === "pick" ? 1 : 2;
 
   const handleContinueToTeam = useCallback(() => {
     setStep("pick");
@@ -489,7 +486,7 @@ export function SelectorOnboarding({
 
       {step === "specialists" && selectedId && (
         <SpecialistStep
-          selectedPersonaId={selectedId}
+          selectedCharacterId={selectedId}
           onStartChatting={handleStartChatting}
           onBrowseAll={handleBrowseAll}
           locale={locale}

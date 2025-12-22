@@ -11,9 +11,7 @@ export const translations = {
       noContent: "No content",
     },
     dataTable: {
-      showing: "Showing",
-      of: "of",
-      results: "results",
+      showingResults: "Showing {{count}} of {{total}} results",
       noData: "No data available",
     },
     dataList: {
@@ -41,6 +39,10 @@ export const translations = {
       requiresContext:
         "Form field requires form context and field configuration",
     },
+    filterPills: {
+      requiresContext:
+        "Filter pills widget requires form context and field name",
+    },
     toolCall: {
       status: {
         error: "Error",
@@ -59,7 +61,8 @@ export const translations = {
         noResult: "No result",
         metadataNotAvailable:
           "Widget metadata not available. Showing raw result.",
-        confirmationRequired: "Review and edit parameters, then confirm to execute.",
+        confirmationRequired:
+          "Review and edit parameters, then confirm to execute.",
       },
       actions: {
         confirm: "Confirm",

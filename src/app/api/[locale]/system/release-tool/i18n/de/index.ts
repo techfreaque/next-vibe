@@ -2,7 +2,8 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Release-Tool",
-  description: "Verwalte Paket-Releases mit Versionierung, Git-Tagging und CI/CD-Integration",
+  description:
+    "Verwalte Paket-Releases mit Versionierung, Git-Tagging und CI/CD-Integration",
   category: "Release Tool",
   tags: {
     release: "Release",
@@ -49,15 +50,18 @@ export const translations: typeof enTranslations = {
   fields: {
     configPath: {
       title: "Konfigurationspfad",
-      description: "Pfad zur release.config.ts Datei (Standard: release.config.ts)",
+      description:
+        "Pfad zur release.config.ts Datei (Standard: release.config.ts)",
     },
     ci: {
       title: "CI-Modus",
-      description: "Im CI-Modus ausführen (keine interaktiven Prompts, verwendet ciReleaseCommand)",
+      description:
+        "Im CI-Modus ausführen (keine interaktiven Prompts, verwendet ciReleaseCommand)",
     },
     forceUpdate: {
       title: "Abhängigkeiten erzwingen",
-      description: "Alle Abhängigkeiten ohne Nachfrage aktualisieren (überspringt alle anderen Schritte)",
+      description:
+        "Alle Abhängigkeiten ohne Nachfrage aktualisieren (überspringt alle anderen Schritte)",
     },
     dryRun: {
       title: "Testlauf",
@@ -97,15 +101,18 @@ export const translations: typeof enTranslations = {
     },
     versionIncrement: {
       title: "Versionsinkrement",
-      description: "Versionsinkrement-Typ (patch, minor, major) - nur im lokalen Modus verwendet",
+      description:
+        "Versionsinkrement-Typ (patch, minor, major) - nur im lokalen Modus verwendet",
     },
     targetPackage: {
       title: "Zielpaket",
-      description: "Bestimmtes Paketverzeichnis anvisieren (optional, Standard ist alle Pakete)",
+      description:
+        "Bestimmtes Paketverzeichnis anvisieren (optional, Standard ist alle Pakete)",
     },
     inlineConfig: {
       title: "Inline-Konfiguration",
-      description: "Release-Konfiguration inline angeben anstatt Konfigurationsdatei zu verwenden",
+      description:
+        "Release-Konfiguration inline angeben anstatt Konfigurationsdatei zu verwenden",
     },
     skipGitTag: {
       title: "Git-Tag überspringen",
@@ -129,12 +136,14 @@ export const translations: typeof enTranslations = {
     },
     commitMessage: {
       title: "Commit-Nachricht",
-      // eslint-disable-next-line no-template-curly-in-string -- Intentional template placeholder documentation
-      description: "Benutzerdefinierte Commit-Nachricht für Versionserhöhung (unterstützt ${version} Platzhalter)",
+      description:
+        // eslint-disable-next-line no-template-curly-in-string -- Intentional template placeholder documentation
+        "Benutzerdefinierte Commit-Nachricht für Versionserhöhung (unterstützt ${version} Platzhalter)",
     },
     notifyWebhook: {
       title: "Benachrichtigungs-Webhook",
-      description: "Webhook-URL für Release-Benachrichtigungen (Slack, Discord, Teams oder benutzerdefiniert)",
+      description:
+        "Webhook-URL für Release-Benachrichtigungen (Slack, Discord, Teams oder benutzerdefiniert)",
     },
     configObject: {
       title: "Konfigurationsobjekt",
@@ -158,7 +167,8 @@ export const translations: typeof enTranslations = {
     },
     continueOnError: {
       title: "Bei Fehler fortfahren",
-      description: "Verarbeitung verbleibender Pakete fortsetzen, wenn eines fehlschlägt",
+      description:
+        "Verarbeitung verbleibender Pakete fortsetzen, wenn eines fehlschlägt",
     },
     verifyGitStatus: {
       title: "Git-Status prüfen",
@@ -218,7 +228,8 @@ export const translations: typeof enTranslations = {
     },
     messageTemplate: {
       title: "Nachrichtenvorlage",
-      description: "Benutzerdefinierte Nachrichtenvorlage für Benachrichtigungen",
+      description:
+        "Benutzerdefinierte Nachrichtenvorlage für Benachrichtigungen",
     },
     includeTimings: {
       title: "Zeitinformationen einschließen",
@@ -234,7 +245,8 @@ export const translations: typeof enTranslations = {
     },
     delayMs: {
       title: "Wiederholungsverzögerung",
-      description: "Anfängliche Verzögerung zwischen Wiederholungen in Millisekunden",
+      description:
+        "Anfängliche Verzögerung zwischen Wiederholungen in Millisekunden",
     },
     backoffMultiplier: {
       title: "Backoff-Multiplikator",
@@ -242,7 +254,8 @@ export const translations: typeof enTranslations = {
     },
     maxDelayMs: {
       title: "Max. Verzögerung",
-      description: "Maximale Verzögerung zwischen Wiederholungen in Millisekunden",
+      description:
+        "Maximale Verzögerung zwischen Wiederholungen in Millisekunden",
     },
     rollback: {
       title: "Rollback-Konfiguration",
@@ -564,13 +577,16 @@ export const translations: typeof enTranslations = {
     },
     conflict: {
       title: "Konflikt",
-      description: "Release-Konflikt erkannt (Tag existiert möglicherweise bereits)",
+      description:
+        "Release-Konflikt erkannt (Tag existiert möglicherweise bereits)",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description: "Es gibt nicht gespeicherte Änderungen, die zuerst committet werden müssen",
+      description:
+        "Es gibt nicht gespeicherte Änderungen, die zuerst committet werden müssen",
     },
-    packageNotFound: "Paket '{{targetPackage}}' nicht in Konfiguration gefunden",
+    packageNotFound:
+      "Paket '{{targetPackage}}' nicht in Konfiguration gefunden",
     gitOperationFailed: "Git-Operation fehlgeschlagen: {{error}}",
   },
   success: {
@@ -587,8 +603,10 @@ export const translations: typeof enTranslations = {
     notFound: "Package.json nicht gefunden: {{path}}",
     invalidFormat: "Ungültiges package.json-Format: {{path}}",
     errorReading: "Fehler beim Lesen der package.json: {{error}}",
-    errorUpdatingDeps: "Fehler beim Aktualisieren der Abhängigkeiten für {{directory}}: {{error}}",
-    errorUpdatingVersion: "Fehler beim Aktualisieren der Paketversion für {{directory}}: {{error}}",
+    errorUpdatingDeps:
+      "Fehler beim Aktualisieren der Abhängigkeiten für {{directory}}: {{error}}",
+    errorUpdatingVersion:
+      "Fehler beim Aktualisieren der Paketversion für {{directory}}: {{error}}",
   },
   scripts: {
     invalidPackageJson: "Ungültiges package.json-Format in {{path}}",
@@ -599,8 +617,10 @@ export const translations: typeof enTranslations = {
     packageJsonNotFound: "Package.json nicht gefunden in {{path}}",
   },
   snyk: {
-    cliNotFound: "Snyk CLI nicht gefunden. Installiere mit: npm install -g snyk",
-    testFailed: "Snyk-Schwachstellentest fehlgeschlagen für {{packageName}}: {{error}}",
+    cliNotFound:
+      "Snyk CLI nicht gefunden. Installiere mit: npm install -g snyk",
+    testFailed:
+      "Snyk-Schwachstellentest fehlgeschlagen für {{packageName}}: {{error}}",
     tokenRequired:
       "SNYK_TOKEN Umgebungsvariable erforderlich für {{packageName}}",
     orgKeyRequired:
@@ -626,9 +646,12 @@ export const translations: typeof enTranslations = {
   ci: {
     commandRunning: "Führe CI-Release-Befehl für {{package}} aus: {{command}}",
     commandSuccess: "CI-Release-Befehl abgeschlossen für {{package}}",
-    commandFailed: "CI-Release-Befehl fehlgeschlagen für {{package}}: {{error}}",
-    commandRequired: "CI-Modus erfordert ciReleaseCommand-Konfiguration für {{package}}",
-    envVarMissing: "Erforderliche Umgebungsvariable '{{variable}}' nicht gesetzt für {{package}}",
+    commandFailed:
+      "CI-Release-Befehl fehlgeschlagen für {{package}}: {{error}}",
+    commandRequired:
+      "CI-Modus erfordert ciReleaseCommand-Konfiguration für {{package}}",
+    envVarMissing:
+      "Erforderliche Umgebungsvariable '{{variable}}' nicht gesetzt für {{package}}",
   },
   zip: {
     starting: "Zippe Ordner...",
@@ -652,7 +675,8 @@ export const translations: typeof enTranslations = {
     packageSkipped: "Paket '{{name}}' übersprungen: {{reason}}",
     packageComplete: "Paket '{{name}}' abgeschlossen",
     packageFailed: "Paket '{{name}}' fehlgeschlagen: {{error}}",
-    firstRelease: "Keine vorherigen Tags gefunden. Dies wird das erste Release.",
+    firstRelease:
+      "Keine vorherigen Tags gefunden. Dies wird das erste Release.",
   },
   qualityChecks: {
     linting: "Führe Linting für {{package}} aus...",
@@ -677,12 +701,15 @@ export const translations: typeof enTranslations = {
   dependencies: {
     updating: "Aktualisiere Abhängigkeiten für {{directory}}...",
     updated: "Abhängigkeiten aktualisiert für {{directory}}",
-    failed: "Abhängigkeitsaktualisierung fehlgeschlagen für {{directory}}: {{error}}",
+    failed:
+      "Abhängigkeitsaktualisierung fehlgeschlagen für {{directory}}: {{error}}",
     skipped: "Überspringe Abhängigkeitsaktualisierung für {{directory}}",
-    dedupeFailed: "Deduplizierung der Abhängigkeiten fehlgeschlagen für {{directory}}: {{error}}",
+    dedupeFailed:
+      "Deduplizierung der Abhängigkeiten fehlgeschlagen für {{directory}}: {{error}}",
   },
   security: {
-    auditFailed: "Sicherheitsüberprüfung fehlgeschlagen für {{directory}}: {{error}}",
+    auditFailed:
+      "Sicherheitsüberprüfung fehlgeschlagen für {{directory}}: {{error}}",
   },
   hooks: {
     running: "Führe {{hook}}-Hook für {{package}} aus...",
@@ -693,7 +720,8 @@ export const translations: typeof enTranslations = {
   npm: {
     publishing: "Veröffentliche {{package}} zu npm...",
     published: "{{package}}@{{version}} erfolgreich zu npm veröffentlicht",
-    publishFailed: "Veröffentlichung von {{package}} zu npm fehlgeschlagen: {{error}}",
+    publishFailed:
+      "Veröffentlichung von {{package}} zu npm fehlgeschlagen: {{error}}",
     registry: "Verwende npm-Registry: {{registry}}",
     dryRun: "[TESTLAUF] Würde {{package}}@{{version}} zu npm veröffentlichen",
   },
@@ -705,7 +733,8 @@ export const translations: typeof enTranslations = {
   },
   branch: {
     checking: "Prüfe Branch-Status...",
-    notAllowed: "Releases von Branch '{{branch}}' nicht erlaubt (main: {{main}})",
+    notAllowed:
+      "Releases von Branch '{{branch}}' nicht erlaubt (main: {{main}})",
     isProtected: "Branch '{{branch}}' ist geschützt",
   },
   gitRelease: {
@@ -735,7 +764,8 @@ export const translations: typeof enTranslations = {
     creating: "Erstelle GitLab-Release für {{tag}}...",
     created: "GitLab-Release erfolgreich erstellt: {{url}}",
     failed: "GitLab-Release-Erstellung fehlgeschlagen: {{error}}",
-    glabNotFound: "GitLab CLI (glab) nicht gefunden - überspringe GitLab-Release",
+    glabNotFound:
+      "GitLab CLI (glab) nicht gefunden - überspringe GitLab-Release",
   },
   lockfile: {
     checking: "Prüfe Lockfile-Integrität...",
@@ -750,7 +780,8 @@ export const translations: typeof enTranslations = {
     disabled: "Benachrichtigungen deaktiviert",
   },
   retry: {
-    attempt: "Wiederholungsversuch {{attempt}} von {{maxAttempts}} für {{operation}}",
+    attempt:
+      "Wiederholungsversuch {{attempt}} von {{maxAttempts}} für {{operation}}",
     failed: "Alle Wiederholungsversuche fehlgeschlagen für {{operation}}",
     success: "Operation {{operation}} erfolgreich nach Wiederholung",
   },

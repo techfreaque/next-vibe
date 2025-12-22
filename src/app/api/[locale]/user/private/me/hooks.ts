@@ -138,7 +138,6 @@ export function useUpdateProfile(
         description: t("app.api.user.notifications.profileUpdated.description"),
         variant: "default",
       });
-
     },
     onError: ({ error }) => {
       toast({

@@ -30,11 +30,10 @@ export function extractLinkData(value: WidgetData): ProcessedLink | null {
 
   // Handle object value with link properties
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const url = "url" in value && typeof value.url === "string" ? value.url : "";
+    const url =
+      "url" in value && typeof value.url === "string" ? value.url : "";
     const text =
-      "text" in value && typeof value.text === "string"
-        ? value.text
-        : url;
+      "text" in value && typeof value.text === "string" ? value.text : url;
     const openInNewTab =
       "openInNewTab" in value && typeof value.openInNewTab === "boolean"
         ? value.openInNewTab

@@ -18,7 +18,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
-import { creditRepository } from "../../credits/repository";
+import { CreditRepository } from "../../credits/repository";
 import { STT_COST_PER_SECOND } from "../../products/repository-client";
 import type { JwtPayloadType } from "../../user/auth/types";
 import type { SpeechToTextPostResponseOutput } from "./definition";
@@ -38,34 +38,13 @@ const MAX_POLLING_ATTEMPTS = 30;
 const POLLING_INTERVAL_MS = 1000;
 
 /**
- * Speech-to-Text Repository Interface
+ * Speech-to-Text Repository
  */
-export interface SpeechToTextRepository {
-  /**
-   * Transcribe audio to text
-   * @param file - Audio file to transcribe
-   * @param data - Transcription request data
-   * @param user - User information
-   * @param locale - User locale
-   * @param logger - Logger instance
-   * @returns Transcription response
-   */
-  transcribeAudio(
-    file: File,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SpeechToTextPostResponseOutput>>;
-}
-
-/**
- * Speech-to-Text Repository Implementation
- */
-export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
+export class SpeechToTextRepository {
   /**
    * Transcribe audio to text
    */
-  async transcribeAudio(
+  static async transcribeAudio(
     file: File,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -157,7 +136,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
       logger.debug("Starting polling for transcription results", { publicId });
 
       // Poll for results
-      const pollResult = await this.pollForResults(
+      const pollResult = await SpeechToTextRepository.pollForResults(
         publicId,
         STT_PROVIDER_KEY, // Use provider/model format to match Eden AI response
         logger,
@@ -182,7 +161,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
 
       // Deduct credits AFTER successful completion based on actual duration
       try {
-        await creditRepository.deductCreditsForFeature(
+        await CreditRepository.deductCreditsForFeature(
           user,
           creditsNeeded,
           "stt",
@@ -233,7 +212,7 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
   /**
    * Poll for transcription results from Eden AI
    */
-  private async pollForResults(
+  private static async pollForResults(
     publicId: string,
     provider: string,
     logger: EndpointLogger,
@@ -411,6 +390,3 @@ export class SpeechToTextRepositoryImpl implements SpeechToTextRepository {
     });
   }
 }
-
-// Export singleton instance
-export const speechToTextRepository = new SpeechToTextRepositoryImpl();

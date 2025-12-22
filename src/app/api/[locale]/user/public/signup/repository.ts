@@ -14,19 +14,19 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { creditRepository } from "@/app/api/[locale]/credits/repository";
-import { leadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
-import { leadsRepository } from "@/app/api/[locale]/leads/repository";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
+import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { authRepository } from "../../auth/repository";
+import { AuthRepository } from "../../auth/repository";
 import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
 import { UserDetailLevel } from "../../enum";
-import { sessionRepository } from "../../private/session/repository";
-import { userRepository } from "../../repository";
+import { SessionRepository } from "../../private/session/repository";
+import { UserRepository } from "../../repository";
 import type { StandardUserType } from "../../types";
 import {
   UserPermissionRole,
@@ -34,7 +34,7 @@ import {
   type UserRoleValue,
   isUserPermissionRole,
 } from "../../user-roles/enum";
-import { userRolesRepository } from "../../user-roles/repository";
+import { UserRolesRepository } from "../../user-roles/repository";
 import type {
   SignupPostRequestOutput,
   SignupPostResponseOutput,
@@ -162,7 +162,7 @@ export class SignupRepositoryImpl implements SignupRepository {
 
       // Auto-login: Create session and store auth token
       // Link leadId to user
-      await leadAuthRepository.linkLeadToUser(user.leadId, userData.id, logger);
+      await LeadAuthRepository.linkLeadToUser(user.leadId, userData.id, logger);
 
       // Link referral code if provided manually in form
       const { referralRepository } =
@@ -188,7 +188,7 @@ export class SignupRepositoryImpl implements SignupRepository {
 
       // Merge lead wallet into user wallet immediately (not lazy)
       // This ensures user gets their pre-signup credits right away
-      const mergeResult = await creditRepository.mergePendingLeadWallets(
+      const mergeResult = await CreditRepository.mergePendingLeadWallets(
         userData.id,
         [user.leadId],
         logger,
@@ -208,7 +208,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       }
 
       // Get primary leadId for user
-      const leadIdResult = await leadAuthRepository.getAuthenticatedUserLeadId(
+      const leadIdResult = await LeadAuthRepository.getAuthenticatedUserLeadId(
         userData.id,
         user.leadId,
         locale,
@@ -216,7 +216,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       );
 
       // Fetch user roles from DB to include in JWT
-      const rolesResult = await userRolesRepository.getUserRoles(
+      const rolesResult = await UserRolesRepository.getUserRoles(
         userData.id,
         logger,
       );
@@ -243,7 +243,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       };
 
       // Sign JWT token
-      const tokenResponse = await authRepository.signJwt(tokenPayload, logger);
+      const tokenResponse = await AuthRepository.signJwt(tokenPayload, logger);
       if (!tokenResponse.success) {
         logger.error("Failed to sign JWT token after signup", {
           userId: userData.id,
@@ -258,10 +258,10 @@ export class SignupRepositoryImpl implements SignupRepository {
           token: tokenResponse.data,
           expiresAt,
         };
-        await sessionRepository.create(sessionData);
+        await SessionRepository.create(sessionData);
 
         // Store auth token using platform-specific handler
-        const storeResult = await authRepository.storeAuthTokenForPlatform(
+        const storeResult = await AuthRepository.storeAuthTokenForPlatform(
           tokenResponse.data,
           userData.id,
           leadIdResult.leadId,
@@ -345,7 +345,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       // Create new user with generated ID
       logger.debug("Creating new user", { email });
 
-      const userResponse = await userRepository.createWithHashedPassword(
+      const userResponse = await UserRepository.createWithHashedPassword(
         userData,
         logger,
       );
@@ -356,7 +356,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       // Only assign permission roles to users, never platform markers
       // Platform markers (CLI_OFF, CLI_AUTH_BYPASS, etc.) are config-only markers
       if (isUserPermissionRole(role)) {
-        await userRolesRepository.addRole(
+        await UserRolesRepository.addRole(
           {
             userId: userResponse.data.id,
             role,
@@ -381,7 +381,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       });
 
       // Fetch user roles for lead conversion tracking
-      const userRolesResult = await userRolesRepository.getUserRoles(
+      const userRolesResult = await UserRolesRepository.getUserRoles(
         userResponse.data.id,
         logger,
       );
@@ -434,7 +434,7 @@ export class SignupRepositoryImpl implements SignupRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
     try {
-      const existingUserResponse = await userRepository.getUserByEmail(
+      const existingUserResponse = await UserRepository.getUserByEmail(
         email,
         UserDetailLevel.STANDARD,
         locale,
@@ -474,7 +474,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       });
 
       // Convert lead with both email (for anonymous leads) and userId (for user relationship)
-      const convertResult = await leadsRepository.convertLead(
+      const convertResult = await LeadsRepository.convertLead(
         leadId,
         { email, userId },
         logger,

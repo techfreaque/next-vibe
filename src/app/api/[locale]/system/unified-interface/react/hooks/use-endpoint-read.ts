@@ -5,11 +5,9 @@
 
 import { useMemo } from "react";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import type { AutoPrefillConfig, FormDataSources } from "./endpoint-types";
 import { determineFormDataPriority } from "./endpoint-utils";
 import type {
@@ -35,15 +33,7 @@ import { useApiQueryForm } from "./use-api-query-form";
  * @param options - Form and query options
  * @returns Query form for API interaction with enhanced error handling
  */
-export function useEndpointRead<
-  TEndpoint extends CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
-  >,
->(
+export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
   primaryEndpoint: TEndpoint | null,
   logger: EndpointLogger,
   options: {

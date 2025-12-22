@@ -9,7 +9,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { smtpAccountsListRepository } from "./repository";
+import { SmtpAccountsListRepository } from "./repository";
 
 /**
  * Export handlers using endpointsHandlerr
@@ -19,6 +19,6 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
     handler: ({ data, user, logger }) =>
-      smtpAccountsListRepository.listSmtpAccounts(data, user, logger),
+      SmtpAccountsListRepository.listSmtpAccounts(data, user, logger),
   },
 });

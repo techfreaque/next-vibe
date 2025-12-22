@@ -6,68 +6,76 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { leadsRepository } from "../repository";
+import { LeadsRepository } from "../repository";
 import type {
   BatchDeleteRequestOutput,
-  BatchDeleteResponseData,
+  BatchDeleteResponseOutput,
   BatchUpdateRequestOutput,
-  BatchUpdateResponseData,
+  BatchUpdateResponseOutput,
 } from "./definition";
 
 /**
- * Batch Operations Repository Interface
+ * Batch Operations Repository - Static class pattern
+ * All methods return ResponseType for consistent error handling
  */
-export interface BatchRepository {
-  batchUpdateLeads(
-    data: BatchUpdateRequestOutput,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<BatchUpdateResponseData>>;
-
-  batchDeleteLeads(
-    data: BatchDeleteRequestOutput,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<BatchDeleteResponseData>>;
-}
-
-/**
- * Batch Operations Repository Implementation
- */
-class BatchRepositoryImpl implements BatchRepository {
+export class BatchRepository {
   /**
    * Batch update leads - delegates to main leads repository
+   * Wraps response in expected format
    */
-  async batchUpdateLeads(
+  static async batchUpdateLeads(
     data: BatchUpdateRequestOutput,
     logger: EndpointLogger,
-  ): Promise<ResponseType<BatchUpdateResponseData>> {
+  ): Promise<ResponseType<BatchUpdateResponseOutput>> {
     logger.debug("Batch update leads operation", {
       dataKeys: Object.keys(data),
     });
 
-    // Delegate to main leads repository
-    return await leadsRepository.batchUpdateLeads(data, logger);
+    const result = await LeadsRepository.batchUpdateLeads(data, logger);
+
+    if (result.success && result.data) {
+      return success({
+        response: result.data,
+      });
+    }
+
+    return fail({
+      message: "app.api.leads.error.general.internal_server_error",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 
   /**
    * Batch delete leads - delegates to main leads repository
+   * Wraps response in expected format
    */
-  async batchDeleteLeads(
+  static async batchDeleteLeads(
     data: BatchDeleteRequestOutput,
     logger: EndpointLogger,
-  ): Promise<ResponseType<BatchDeleteResponseData>> {
+  ): Promise<ResponseType<BatchDeleteResponseOutput>> {
     logger.debug("Batch delete leads operation", {
       dataKeys: Object.keys(data),
     });
 
-    // Delegate to main leads repository
-    return await leadsRepository.batchDeleteLeads(data, logger);
+    const result = await LeadsRepository.batchDeleteLeads(data, logger);
+
+    if (result.success && result.data) {
+      return success({
+        response: result.data,
+      });
+    }
+
+    return fail({
+      message: "app.api.leads.error.general.internal_server_error",
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
   }
 }
-
-/**
- * Default repository instance
- */
-export const batchRepository = new BatchRepositoryImpl();

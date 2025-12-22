@@ -1,4 +1,6 @@
 import { ChevronsUpDown as ChevronsUpDownIcon } from "lucide-react-native";
 import { styled } from "nativewind";
 
-export const ChevronsUpDown = styled(ChevronsUpDownIcon, { className: "style" });
+export const ChevronsUpDown = styled(ChevronsUpDownIcon, {
+  className: "style",
+});

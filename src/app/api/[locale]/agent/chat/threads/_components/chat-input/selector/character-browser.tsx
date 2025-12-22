@@ -15,19 +15,22 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
+import {
+  type Character,
+  CharacterCategory,
+  DEFAULT_CHARACTERS,
+  getCharactersByCategory,
+} from "@/app/api/[locale]/agent/chat/characters/config";
+import { CATEGORY_CONFIG } from "@/app/api/[locale]/agent/chat/characters/utils";
+import {
+  ContentLevelFilter,
+  type ContentLevelFilterValue,
+  IntelligenceLevelFilter,
+  type IntelligenceLevelFilterValue,
+  PriceLevelFilter,
+} from "@/app/api/[locale]/agent/chat/favorites/enum";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { modelOptions } from "@/app/api/[locale]/agent/chat/model-access/models";
-import {
-  DEFAULT_PERSONAS,
-  getPersonasByCategory,
-  type Persona,
-  PersonaCategory,
-} from "@/app/api/[locale]/agent/chat/personas/config";
-import { CATEGORY_CONFIG } from "@/app/api/[locale]/agent/chat/personas/utils";
-import {
-  type ContentLevel,
-  type IntelligenceLevel,
-} from "@/app/api/[locale]/agent/chat/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -42,60 +45,64 @@ interface CharacterBrowserProps {
 }
 
 /**
- * Get default intelligence from persona preferences
+ * Get default intelligence from character preferences
  */
-function getDefaultIntelligence(persona: Persona): IntelligenceLevel {
-  if (persona.preferences?.preferredStrengths) {
+function getDefaultIntelligence(
+  character: Character,
+): typeof IntelligenceLevelFilterValue {
+  if (character.preferences?.preferredStrengths) {
     const { ModelUtility } = require("@/app/api/[locale]/agent/chat/types");
-    if (persona.preferences.preferredStrengths.includes(ModelUtility.SMART)) {
-      return "brilliant";
+    if (character.preferences.preferredStrengths.includes(ModelUtility.SMART)) {
+      return IntelligenceLevelFilter.BRILLIANT;
     }
-    if (persona.preferences.preferredStrengths.includes(ModelUtility.FAST)) {
-      return "quick";
+    if (character.preferences.preferredStrengths.includes(ModelUtility.FAST)) {
+      return IntelligenceLevelFilter.QUICK;
     }
   }
-  return "smart";
+  return IntelligenceLevelFilter.SMART;
 }
 
 /**
- * Get default content from persona requirements
+ * Get default content from character requirements
  */
-function getDefaultContent(persona: Persona): ContentLevel {
-  if (persona.requirements?.minContent) {
-    return persona.requirements.minContent;
+function getDefaultContent(
+  character: Character,
+): typeof ContentLevelFilterValue {
+  if (character.requirements?.minContent) {
+    return character.requirements.minContent;
   }
-  return "open";
+  return ContentLevelFilter.OPEN;
 }
 
 /**
- * Character list item component - shows persona info with description and model
+ * Character list item component - shows character info with description and model
  */
 function CharacterListItem({
-  persona,
+  character,
   onAdd,
   onCustomize,
   locale,
 }: {
-  persona: Persona;
+  character: Character;
   onAdd: () => void;
   onCustomize: () => void;
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const Icon = getIconComponent(persona.icon);
+  const Icon = getIconComponent(character.icon);
 
-  const defaultIntelligence = getDefaultIntelligence(persona);
-  const defaultContent = getDefaultContent(persona);
+  const defaultIntelligence = getDefaultIntelligence(character);
+  const defaultContent = getDefaultContent(character);
 
   const allModels = useMemo(() => Object.values(modelOptions), []);
   const bestModel = useMemo(
     () =>
-      findBestModel(allModels, persona, {
+      findBestModel(allModels, character, {
         intelligence: defaultIntelligence,
-        maxPrice: "standard",
+        maxPrice: PriceLevelFilter.STANDARD,
         minContent: defaultContent,
       }),
-    [allModels, persona, defaultIntelligence, defaultContent],
+    [allModels, character, defaultIntelligence, defaultContent],
   );
 
   const ModelIcon = bestModel ? getIconComponent(bestModel.icon) : null;
@@ -115,9 +122,9 @@ function CharacterListItem({
 
       {/* Main Info */}
       <Div className="flex-1 min-w-0">
-        <Span className="font-medium text-sm">{t(persona.name)}</Span>
+        <Span className="font-medium text-sm">{t(character.name)}</Span>
         <Div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-          {t(persona.description)}
+          {t(character.description)}
         </Div>
         {/* Model info row */}
         <Div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 mt-1.5">
@@ -131,7 +138,9 @@ function CharacterListItem({
                   ? t("app.chat.selector.free")
                   : bestModel.creditCost === 1
                     ? t("app.chat.selector.creditsSingle")
-                    : t("app.chat.selector.creditsExact", { cost: bestModel.creditCost })}
+                    : t("app.chat.selector.creditsExact", {
+                        cost: bestModel.creditCost,
+                      })}
               </Span>
             </>
           )}
@@ -176,15 +185,15 @@ function CharacterListItem({
  */
 function CategorySection({
   category,
-  personas,
+  characters,
   onAdd,
   onCustomize,
   onExpand,
   expanded,
   locale,
 }: {
-  category: typeof PersonaCategory[keyof typeof PersonaCategory];
-  personas: readonly Persona[];
+  category: (typeof CharacterCategory)[keyof typeof CharacterCategory];
+  characters: readonly Character[];
   onAdd: (characterId: string) => void;
   onCustomize: (characterId: string) => void;
   onExpand?: () => void;
@@ -195,8 +204,8 @@ function CategorySection({
   const config = CATEGORY_CONFIG[category];
   const CategoryIcon = getIconComponent(config.icon);
 
-  const displayPersonas = expanded ? personas : personas.slice(0, 3);
-  const hasMore = !expanded && personas.length > 3;
+  const displayCharacters = expanded ? characters : characters.slice(0, 3);
+  const hasMore = !expanded && characters.length > 3;
 
   return (
     <Div className="flex flex-col gap-2">
@@ -206,7 +215,7 @@ function CategorySection({
           <CategoryIcon className="h-4 w-4 text-muted-foreground" />
           <Span className="font-medium text-sm">{t(config.label)}</Span>
           <Badge variant="outline" className="text-[10px] h-5">
-            {personas.length}
+            {characters.length}
           </Badge>
         </Div>
         {hasMore && onExpand && (
@@ -225,12 +234,12 @@ function CategorySection({
 
       {/* Character list */}
       <Div className="flex flex-col gap-1">
-        {displayPersonas.map((persona) => (
+        {displayCharacters.map((character) => (
           <CharacterListItem
-            key={persona.id}
-            persona={persona}
-            onAdd={() => onAdd(persona.id)}
-            onCustomize={() => onCustomize(persona.id)}
+            key={character.id}
+            character={character}
+            onAdd={() => onAdd(character.id)}
+            onCustomize={() => onCustomize(character.id)}
             locale={locale}
           />
         ))}
@@ -252,25 +261,43 @@ export function CharacterBrowser({
   const { t } = simpleT(locale);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCategory, setExpandedCategory] = useState<
-    typeof PersonaCategory[keyof typeof PersonaCategory] | null
+    (typeof CharacterCategory)[keyof typeof CharacterCategory] | null
   >(null);
 
-  // Get personas by category
-  const companionPersonas = useMemo(() => getPersonasByCategory(PersonaCategory.COMPANION), []);
-  const codingPersonas = useMemo(() => getPersonasByCategory(PersonaCategory.CODING), []);
-  const writingPersonas = useMemo(() => getPersonasByCategory(PersonaCategory.WRITING), []);
-  const analysisPersonas = useMemo(() => getPersonasByCategory(PersonaCategory.ANALYSIS), []);
-  const roleplayPersonas = useMemo(() => getPersonasByCategory(PersonaCategory.ROLEPLAY), []);
-  const controversialPersonas = useMemo(() => getPersonasByCategory(PersonaCategory.CONTROVERSIAL), []);
+  // Get characters by category
+  const companionCharacters = useMemo(
+    () => getCharactersByCategory(CharacterCategory.COMPANION),
+    [],
+  );
+  const codingCharacters = useMemo(
+    () => getCharactersByCategory(CharacterCategory.CODING),
+    [],
+  );
+  const writingCharacters = useMemo(
+    () => getCharactersByCategory(CharacterCategory.WRITING),
+    [],
+  );
+  const analysisCharacters = useMemo(
+    () => getCharactersByCategory(CharacterCategory.ANALYSIS),
+    [],
+  );
+  const roleplayCharacters = useMemo(
+    () => getCharactersByCategory(CharacterCategory.ROLEPLAY),
+    [],
+  );
+  const controversialCharacters = useMemo(
+    () => getCharactersByCategory(CharacterCategory.CONTROVERSIAL),
+    [],
+  );
 
   // Filter by search
-  const filteredPersonas = useMemo(() => {
+  const filteredCharacters = useMemo(() => {
     if (!searchQuery.trim()) {
       return null;
     }
 
     const query = searchQuery.toLowerCase();
-    return [...DEFAULT_PERSONAS].filter(
+    return [...DEFAULT_CHARACTERS].filter(
       (p) =>
         t(p.name).toLowerCase().includes(query) ||
         t(p.description).toLowerCase().includes(query),
@@ -278,7 +305,7 @@ export function CharacterBrowser({
   }, [searchQuery, t]);
 
   const handleCategoryExpand = useCallback(
-    (category: typeof PersonaCategory[keyof typeof PersonaCategory]) => {
+    (category: (typeof CharacterCategory)[keyof typeof CharacterCategory]) => {
       setExpandedCategory(expandedCategory === category ? null : category);
     },
     [expandedCategory],
@@ -286,7 +313,7 @@ export function CharacterBrowser({
 
   // If a category is expanded, show only that category
   if (expandedCategory) {
-    const personas = getPersonasByCategory(expandedCategory);
+    const characters = getCharactersByCategory(expandedCategory);
     const config = CATEGORY_CONFIG[expandedCategory];
     const CategoryIcon = getIconComponent(config.icon);
 
@@ -307,7 +334,7 @@ export function CharacterBrowser({
             <CategoryIcon className="h-5 w-5" />
             <Span className="font-medium">{t(config.label)}</Span>
             <Badge variant="outline" className="text-[10px] h-5">
-              {personas.length}
+              {characters.length}
             </Badge>
           </Div>
         </Div>
@@ -315,12 +342,12 @@ export function CharacterBrowser({
         {/* List */}
         <Div className="flex-1 overflow-y-auto p-4">
           <Div className="flex flex-col gap-1">
-            {personas.map((persona) => (
+            {characters.map((character) => (
               <CharacterListItem
-                key={persona.id}
-                persona={persona}
-                onAdd={() => onAddWithDefaults(persona.id)}
-                onCustomize={() => onCustomize(persona.id)}
+                key={character.id}
+                character={character}
+                onAdd={() => onAddWithDefaults(character.id)}
+                onCustomize={() => onCustomize(character.id)}
                 locale={locale}
               />
             ))}
@@ -364,27 +391,31 @@ export function CharacterBrowser({
             className="h-9 gap-1.5 shrink-0"
           >
             <Plus className="h-4 w-4" />
-            <Span className="hidden sm:inline">{t("app.chat.selector.createCustom")}</Span>
+            <Span className="hidden sm:inline">
+              {t("app.chat.selector.createCustom")}
+            </Span>
           </Button>
         </Div>
       </Div>
 
       {/* Scrollable content */}
       <Div className="flex-1 overflow-y-auto p-4">
-        {filteredPersonas ? (
+        {filteredCharacters ? (
           // Search results
           <Div className="flex flex-col gap-3">
             <Span className="text-xs text-muted-foreground px-1">
-              {t("app.chat.selector.searchResults", { count: filteredPersonas.length })}
+              {t("app.chat.selector.searchResults", {
+                count: filteredCharacters.length,
+              })}
             </Span>
-            {filteredPersonas.length > 0 ? (
+            {filteredCharacters.length > 0 ? (
               <Div className="flex flex-col gap-1">
-                {filteredPersonas.map((persona) => (
+                {filteredCharacters.map((character) => (
                   <CharacterListItem
-                    key={persona.id}
-                    persona={persona}
-                    onAdd={() => onAddWithDefaults(persona.id)}
-                    onCustomize={() => onCustomize(persona.id)}
+                    key={character.id}
+                    character={character}
+                    onAdd={() => onAddWithDefaults(character.id)}
+                    onCustomize={() => onCustomize(character.id)}
                     locale={locale}
                   />
                 ))}
@@ -401,13 +432,15 @@ export function CharacterBrowser({
           // Category browser
           <Div className="flex flex-col gap-5">
             {/* Companions - primary */}
-            {companionPersonas.length > 0 && (
+            {companionCharacters.length > 0 && (
               <CategorySection
-                category={PersonaCategory.COMPANION}
-                personas={companionPersonas}
+                category={CharacterCategory.COMPANION}
+                characters={companionCharacters}
                 onAdd={onAddWithDefaults}
                 onCustomize={onCustomize}
-                onExpand={() => handleCategoryExpand(PersonaCategory.COMPANION)}
+                onExpand={() =>
+                  handleCategoryExpand(CharacterCategory.COMPANION)
+                }
                 expanded={false}
                 locale={locale}
               />
@@ -416,52 +449,56 @@ export function CharacterBrowser({
             <Separator />
 
             {/* Expert categories */}
-            {codingPersonas.length > 0 && (
+            {codingCharacters.length > 0 && (
               <CategorySection
-                category={PersonaCategory.CODING}
-                personas={codingPersonas}
+                category={CharacterCategory.CODING}
+                characters={codingCharacters}
                 onAdd={onAddWithDefaults}
                 onCustomize={onCustomize}
-                onExpand={() => handleCategoryExpand(PersonaCategory.CODING)}
+                onExpand={() => handleCategoryExpand(CharacterCategory.CODING)}
                 expanded={false}
                 locale={locale}
               />
             )}
 
-            {writingPersonas.length > 0 && (
+            {writingCharacters.length > 0 && (
               <CategorySection
-                category={PersonaCategory.WRITING}
-                personas={writingPersonas}
+                category={CharacterCategory.WRITING}
+                characters={writingCharacters}
                 onAdd={onAddWithDefaults}
                 onCustomize={onCustomize}
-                onExpand={() => handleCategoryExpand(PersonaCategory.WRITING)}
+                onExpand={() => handleCategoryExpand(CharacterCategory.WRITING)}
                 expanded={false}
                 locale={locale}
               />
             )}
 
-            {analysisPersonas.length > 0 && (
+            {analysisCharacters.length > 0 && (
               <CategorySection
-                category={PersonaCategory.ANALYSIS}
-                personas={analysisPersonas}
+                category={CharacterCategory.ANALYSIS}
+                characters={analysisCharacters}
                 onAdd={onAddWithDefaults}
                 onCustomize={onCustomize}
-                onExpand={() => handleCategoryExpand(PersonaCategory.ANALYSIS)}
+                onExpand={() =>
+                  handleCategoryExpand(CharacterCategory.ANALYSIS)
+                }
                 expanded={false}
                 locale={locale}
               />
             )}
 
             {/* Roleplay section */}
-            {roleplayPersonas.length > 0 && (
+            {roleplayCharacters.length > 0 && (
               <>
                 <Separator />
                 <CategorySection
-                  category={PersonaCategory.ROLEPLAY}
-                  personas={roleplayPersonas}
+                  category={CharacterCategory.ROLEPLAY}
+                  characters={roleplayCharacters}
                   onAdd={onAddWithDefaults}
                   onCustomize={onCustomize}
-                  onExpand={() => handleCategoryExpand(PersonaCategory.ROLEPLAY)}
+                  onExpand={() =>
+                    handleCategoryExpand(CharacterCategory.ROLEPLAY)
+                  }
                   expanded={false}
                   locale={locale}
                 />
@@ -469,13 +506,15 @@ export function CharacterBrowser({
             )}
 
             {/* Controversial section */}
-            {controversialPersonas.length > 0 && (
+            {controversialCharacters.length > 0 && (
               <CategorySection
-                category={PersonaCategory.CONTROVERSIAL}
-                personas={controversialPersonas}
+                category={CharacterCategory.CONTROVERSIAL}
+                characters={controversialCharacters}
                 onAdd={onAddWithDefaults}
                 onCustomize={onCustomize}
-                onExpand={() => handleCategoryExpand(PersonaCategory.CONTROVERSIAL)}
+                onExpand={() =>
+                  handleCategoryExpand(CharacterCategory.CONTROVERSIAL)
+                }
                 expanded={false}
                 locale={locale}
               />

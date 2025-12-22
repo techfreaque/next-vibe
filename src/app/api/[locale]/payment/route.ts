@@ -9,16 +9,16 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { paymentRepository as repository } from "./repository";
+import { PaymentRepository } from "./repository";
 
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, user, locale, logger }) =>
-      repository.createPaymentSession(data, user, locale, logger),
+      PaymentRepository.createPaymentSession(data, user, locale, logger),
   },
   [Methods.GET]: {
     handler: ({ data, user, locale, logger }) =>
-      repository.getPaymentInfo(data, user, locale, logger),
+      PaymentRepository.getPaymentInfo(data, user, locale, logger),
   },
 });

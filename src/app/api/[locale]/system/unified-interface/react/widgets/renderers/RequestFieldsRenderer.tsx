@@ -115,7 +115,11 @@ function getTypeColor(value: ToolCallResult): string {
 /**
  * Render a single field
  */
-function renderField(key: string, value: ToolCallResult, depth = 0): JSX.Element {
+function renderField(
+  key: string,
+  value: ToolCallResult,
+  depth = 0,
+): JSX.Element {
   const isComplex = typeof value === "object" && value !== null;
   const indent = depth * 16; // 16px per level
 

@@ -8,7 +8,6 @@ import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
-import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { FieldDataType, type WidgetType } from "../../../shared/types/enums";
@@ -17,6 +16,7 @@ import {
   formatText,
 } from "../../../shared/widgets/logic/text";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
+import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
 import { getTextFormatClassName } from "../../../shared/widgets/utils/widget-helpers";
 
 function formatDate(value: string | Date, locale: string): string {
@@ -40,13 +40,13 @@ function formatDate(value: string | Date, locale: string): string {
 /**
  * Displays text data with optional label, formatting, and link support.
  */
-export function TextWidget({
+export function TextWidget<TKey extends string>({
   value,
   field,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.TEXT>): JSX.Element {
-  const { t } = simpleT(context.locale);
+}: ReactWidgetProps<typeof WidgetType.TEXT, TKey>): JSX.Element {
+  const { t } = getTranslator(context);
   const {
     fieldType,
     label: labelKey,
@@ -140,7 +140,9 @@ export function TextWidget({
     );
   }
 
-  return <Div className={cn(alignmentClass, className)}>{renderTextValue()}</Div>;
+  return (
+    <Div className={cn(alignmentClass, className)}>{renderTextValue()}</Div>
+  );
 }
 
 TextWidget.displayName = "TextWidget";

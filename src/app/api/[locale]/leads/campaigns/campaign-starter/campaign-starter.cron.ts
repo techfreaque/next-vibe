@@ -23,7 +23,7 @@ import {
   getDefaultCronSettings,
 } from "./campaign-starter-config/default-config";
 import { campaignStarterConfigRepository } from "./campaign-starter-config/repository";
-import { campaignStarterRepository } from "./repository";
+import { CampaignStarterRepository } from "./repository";
 import {
   campaignStarterConfigSchema,
   type CampaignStarterConfigType,
@@ -202,7 +202,7 @@ export async function execute(
       localeInfo.adjustedLeadsPerRun = adjustedLeadsPerRun;
 
       // TODO: Update process locale leads to use repository
-      await campaignStarterRepository.processLocaleLeads(
+      await CampaignStarterRepository.processLocaleLeads(
         locale,
         adjustedLeadsPerRun,
         minAgeDate,

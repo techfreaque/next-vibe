@@ -9,10 +9,12 @@ import { extractAccordionData } from "@/app/api/[locale]/system/unified-interfac
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class AccordionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.ACCORDION> {
+export class AccordionWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.ACCORDION
+> {
   readonly widgetType = WidgetType.ACCORDION;
 
-  render(props: CLIWidgetProps<typeof WidgetType.ACCORDION>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.ACCORDION, string>): string {
     const { value, context } = props;
     const indent = this.createIndent(context.depth, context);
 

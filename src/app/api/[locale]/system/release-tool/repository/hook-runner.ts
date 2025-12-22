@@ -58,11 +58,11 @@ export class HookRunner implements IHookRunner {
     // Replace placeholders in command
     /* eslint-disable no-template-curly-in-string -- Intentional placeholder syntax for command templates */
     const command = hook.command
-      .replaceAll('${packageManager}', context.packageManager)
-      .replaceAll('${PM}', context.packageManager)
-      .replaceAll('${version}', context.version ?? "")
-      .replaceAll('${name}', context.packageName ?? "")
-      .replaceAll('${directory}', context.directory ?? "");
+      .replaceAll("${packageManager}", context.packageManager)
+      .replaceAll("${PM}", context.packageManager)
+      .replaceAll("${version}", context.version ?? "")
+      .replaceAll("${name}", context.packageName ?? "")
+      .replaceAll("${directory}", context.directory ?? "");
     /* eslint-enable no-template-curly-in-string */
 
     if (dryRun) {

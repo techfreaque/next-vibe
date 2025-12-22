@@ -19,7 +19,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { CampaignType } from "../smtp-client/enum";
-import { smtpRepository } from "../smtp-client/repository";
+import { SmtpRepository } from "../smtp-client/repository";
 import type {
   SmtpSelectionCriteria,
   SmtpSendParams,
@@ -30,23 +30,11 @@ import type {
 } from "./definition";
 
 /**
- * Email Service Repository Interface
- */
-export interface EmailServiceRepository {
-  sendEmail(
-    data: EmailServiceSendPostRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<EmailServiceSendPostResponseOutput>>;
-}
-
-/**
- * Email Service Repository Implementation
+ * Email Service Repository
  * Integrates with existing SMTP repository for actual email sending
  */
-export class EmailServiceRepositoryImpl implements EmailServiceRepository {
-  async sendEmail(
+export class EmailServiceRepository {
+  static async sendEmail(
     data: EmailServiceSendPostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -87,7 +75,7 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
         campaignId: data.campaignSettings.campaignId,
       };
 
-      const result = await smtpRepository.sendEmail(
+      const result = await SmtpRepository.sendEmail(
         smtpSendData,
         user,
         locale,
@@ -144,8 +132,3 @@ export class EmailServiceRepositoryImpl implements EmailServiceRepository {
     }
   }
 }
-
-/**
- * Email Service Repository Singleton Instance
- */
-export const emailServiceRepository = new EmailServiceRepositoryImpl();

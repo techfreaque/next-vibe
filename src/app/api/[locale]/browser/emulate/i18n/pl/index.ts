@@ -34,15 +34,42 @@ export const translations: typeof enTranslations = {
     executionId: "ID wykonania do śledzenia",
   },
   errors: {
-    validation: { title: "Błąd walidacji", description: "Sprawdź wprowadzone dane i spróbuj ponownie" },
-    network: { title: "Błąd sieci", description: "Wystąpił błąd sieci podczas emulacji" },
-    unauthorized: { title: "Nieautoryzowany", description: "Nie masz uprawnień do emulacji funkcji urządzenia" },
-    forbidden: { title: "Zabronione", description: "Operacja emulacji urządzenia jest zabroniona" },
-    notFound: { title: "Nie znaleziono", description: "Żądany zasób nie został znaleziony" },
-    serverError: { title: "Błąd serwera", description: "Wystąpił wewnętrzny błąd serwera podczas emulacji" },
-    unknown: { title: "Nieznany błąd", description: "Wystąpił nieznany błąd podczas emulacji" },
-    unsavedChanges: { title: "Niezapisane zmiany", description: "Masz niezapisane zmiany, które mogą zostać utracone" },
-    conflict: { title: "Konflikt", description: "Wystąpił konflikt podczas emulacji" },
+    validation: {
+      title: "Błąd walidacji",
+      description: "Sprawdź wprowadzone dane i spróbuj ponownie",
+    },
+    network: {
+      title: "Błąd sieci",
+      description: "Wystąpił błąd sieci podczas emulacji",
+    },
+    unauthorized: {
+      title: "Nieautoryzowany",
+      description: "Nie masz uprawnień do emulacji funkcji urządzenia",
+    },
+    forbidden: {
+      title: "Zabronione",
+      description: "Operacja emulacji urządzenia jest zabroniona",
+    },
+    notFound: {
+      title: "Nie znaleziono",
+      description: "Żądany zasób nie został znaleziony",
+    },
+    serverError: {
+      title: "Błąd serwera",
+      description: "Wystąpił wewnętrzny błąd serwera podczas emulacji",
+    },
+    unknown: {
+      title: "Nieznany błąd",
+      description: "Wystąpił nieznany błąd podczas emulacji",
+    },
+    unsavedChanges: {
+      title: "Niezapisane zmiany",
+      description: "Masz niezapisane zmiany, które mogą zostać utracone",
+    },
+    conflict: {
+      title: "Konflikt",
+      description: "Wystąpił konflikt podczas emulacji",
+    },
   },
   success: {
     title: "Emulacja pomyślna",

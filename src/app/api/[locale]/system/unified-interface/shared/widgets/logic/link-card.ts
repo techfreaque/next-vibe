@@ -51,9 +51,7 @@ export function extractLinkCardData(
       ? value.description
       : undefined;
   const icon =
-    "icon" in value && typeof value.icon === "string"
-      ? value.icon
-      : undefined;
+    "icon" in value && typeof value.icon === "string" ? value.icon : undefined;
   const favicon =
     "favicon" in value && typeof value.favicon === "string"
       ? value.favicon

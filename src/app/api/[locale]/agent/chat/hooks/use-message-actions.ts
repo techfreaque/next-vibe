@@ -7,7 +7,6 @@ import { useCallback, useState } from "react";
 
 import type { ChatMessage } from "../db";
 
-
 interface UseMessageActionsProps {
   messagesRecord: Record<string, ChatMessage>;
   deleteMessage: (messageId: string) => Promise<void>;

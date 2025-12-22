@@ -159,7 +159,9 @@ export function getCellValue(row: TableRow, columnKey: string): WidgetData {
 /**
  * Get table configuration from field
  */
-export function getTableConfig(field: UnifiedField): TableRenderConfig {
+export function getTableConfig<TKey extends string>(
+  field: UnifiedField<TKey>,
+): TableRenderConfig {
   const defaultConfig: TableRenderConfig = {
     columns: [],
     pagination: { enabled: false, pageSize: 50 },

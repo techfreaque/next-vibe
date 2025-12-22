@@ -18,7 +18,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 
 import { CampaignType } from "../enum";
-import { smtpSendingRepository } from "../sending/repository";
+import { SmtpSendingRepository } from "../sending/repository";
 import type { SmtpSelectionCriteria } from "../sending/types";
 import type {
   SendEmailRequestTypeOutput,
@@ -69,24 +69,14 @@ function mapLocaleToSelectionCriteria(locale: CountryLanguage): {
 }
 
 /**
- * Email Sending Repository Interface
+ * Email Sending Repository
  */
-export interface EmailSendingRepository {
-  sendEmail(
-    data: SendEmailRequestTypeOutput,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SendEmailResponseTypeOutput>>;
-}
-
-/**
- * Email Sending Repository Implementation
- */
-export class EmailSendingRepositoryImpl implements EmailSendingRepository {
+export class EmailSendingRepository {
   /**
    * Comprehensive email sending function with automatic SMTP account selection
    * This is the single place where all email rendering happens
    */
-  async sendEmail(
+  static async sendEmail(
     data: SendEmailRequestTypeOutput,
     logger: EndpointLogger,
   ): Promise<ResponseType<SendEmailResponseTypeOutput>> {
@@ -133,7 +123,7 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
       };
 
       // 4) Send email using enhanced SMTP client service with selection criteria
-      const emailResponse = await smtpSendingRepository.sendEmail(
+      const emailResponse = await SmtpSendingRepository.sendEmail(
         {
           to: data.params.toEmail,
           toName: data.params.toName,
@@ -204,5 +194,3 @@ export class EmailSendingRepositoryImpl implements EmailSendingRepository {
     }
   }
 }
-
-export const emailSendingRepository = new EmailSendingRepositoryImpl();

@@ -19,11 +19,11 @@ import { formatDisplayValue } from "../../../shared/widgets/utils/formatting";
 /**
  * Displays items grouped by a field with expandable sections.
  */
-export function GroupedListWidget({
+export function GroupedListWidget<TKey extends string>({
   value,
   field,
   className = "",
-}: ReactWidgetProps<typeof WidgetType.GROUPED_LIST>): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.GROUPED_LIST, TKey>): JSX.Element {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
   const { groupBy, sortBy } = field.ui;

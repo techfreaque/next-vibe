@@ -51,12 +51,14 @@ export interface FormMethodConfig {
  * Examples configuration for form endpoints
  */
 export interface FormExamples<
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TExampleKey extends string,
 > {
   readonly GET?: {
     requests?: ExtractInput<
       InferSchemaFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.GET,
         FieldUsage.RequestData
@@ -66,6 +68,7 @@ export interface FormExamples<
       : ExamplesList<
           ExtractInput<
             InferSchemaFromFieldForMethod<
+              TScopedTranslationKey,
               TFields,
               Methods.GET,
               FieldUsage.RequestData
@@ -75,12 +78,18 @@ export interface FormExamples<
         >;
     responses: ExamplesList<
       ExtractOutput<
-        InferSchemaFromFieldForMethod<TFields, Methods.GET, FieldUsage.Response>
+        InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.GET,
+          FieldUsage.Response
+        >
       >,
       TExampleKey
     >;
     urlPathParams?: ExtractInput<
       InferSchemaFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.GET,
         FieldUsage.RequestUrlParams
@@ -90,6 +99,7 @@ export interface FormExamples<
       : ExamplesList<
           ExtractInput<
             InferSchemaFromFieldForMethod<
+              TScopedTranslationKey,
               TFields,
               Methods.GET,
               FieldUsage.RequestUrlParams
@@ -101,6 +111,7 @@ export interface FormExamples<
   readonly POST?: {
     requests?: ExtractInput<
       InferSchemaFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.POST,
         FieldUsage.RequestData
@@ -110,6 +121,7 @@ export interface FormExamples<
       : ExamplesList<
           ExtractInput<
             InferSchemaFromFieldForMethod<
+              TScopedTranslationKey,
               TFields,
               Methods.POST,
               FieldUsage.RequestData
@@ -120,6 +132,7 @@ export interface FormExamples<
     responses: ExamplesList<
       ExtractOutput<
         InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
           TFields,
           Methods.POST,
           FieldUsage.Response
@@ -129,6 +142,7 @@ export interface FormExamples<
     >;
     urlPathParams?: ExtractInput<
       InferSchemaFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.POST,
         FieldUsage.RequestUrlParams
@@ -138,6 +152,7 @@ export interface FormExamples<
       : ExamplesList<
           ExtractInput<
             InferSchemaFromFieldForMethod<
+              TScopedTranslationKey,
               TFields,
               Methods.POST,
               FieldUsage.RequestUrlParams
@@ -152,9 +167,10 @@ export interface FormExamples<
  * Configuration for creating a form endpoint with GET and POST methods
  */
 export interface CreateFormEndpointConfig<
+  TScopedTranslationKey extends string,
   TExampleKey extends string,
   TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
 > {
   // Shared configuration
   readonly path: readonly string[];
@@ -186,7 +202,7 @@ export interface CreateFormEndpointConfig<
   };
 
   // Method-specific examples
-  readonly examples: FormExamples<TFields, TExampleKey>;
+  readonly examples: FormExamples<TScopedTranslationKey, TFields, TExampleKey>;
 }
 
 // ============================================================================
@@ -239,11 +255,16 @@ type SupportsMethodAndUsage<
  * Filter schema for a specific method and usage type
  */
 export type FilterSchemaForMethod<
+  TScopedTranslationKey extends string,
   TFields,
   TTargetUsage extends FieldUsage,
   TMethod extends Methods,
 > =
-  TFields extends PrimitiveField<infer TSchema, FieldUsageConfig>
+  TFields extends PrimitiveField<
+    infer TSchema,
+    FieldUsageConfig,
+    TScopedTranslationKey
+  >
     ? SupportsMethodAndUsage<
         TFields["usage"],
         TMethod,
@@ -251,7 +272,11 @@ export type FilterSchemaForMethod<
       > extends true
       ? TSchema
       : z.ZodNever
-    : TFields extends ObjectField<infer TChildren, FieldUsageConfig>
+    : TFields extends ObjectField<
+          infer TChildren,
+          FieldUsageConfig,
+          TScopedTranslationKey
+        >
       ? SupportsMethodAndUsage<
           TFields["usage"],
           TMethod,
@@ -259,12 +284,18 @@ export type FilterSchemaForMethod<
         > extends true
         ? z.ZodObject<{
             [K in keyof TChildren as FilterSchemaForMethod<
+              TScopedTranslationKey,
               TChildren[K],
               TTargetUsage,
               TMethod
             > extends z.ZodNever
               ? never
-              : K]: FilterSchemaForMethod<TChildren[K], TTargetUsage, TMethod>;
+              : K]: FilterSchemaForMethod<
+              TScopedTranslationKey,
+              TChildren[K],
+              TTargetUsage,
+              TMethod
+            >;
           }>
         : z.ZodNever
       : z.ZodNever;
@@ -274,21 +305,17 @@ export type FilterSchemaForMethod<
  * This ensures perfect type inference for each HTTP method and compatibility with hooks
  */
 export type MethodSpecificEndpoint<
-  TFields extends UnifiedField<z.ZodTypeAny>,
-  TMethod extends Methods,
   TExampleKey extends string,
+  TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
 > = CreateApiEndpoint<
   TExampleKey,
   TMethod,
   TUserRoleValue,
-  TFields,
-  InferInputFromFieldForMethod<TFields, TMethod, FieldUsage.RequestData>,
-  InferOutputFromFieldForMethod<TFields, TMethod, FieldUsage.RequestData>,
-  InferInputFromFieldForMethod<TFields, TMethod, FieldUsage.Response>,
-  InferOutputFromFieldForMethod<TFields, TMethod, FieldUsage.Response>,
-  InferInputFromFieldForMethod<TFields, TMethod, FieldUsage.RequestUrlParams>,
-  InferOutputFromFieldForMethod<TFields, TMethod, FieldUsage.RequestUrlParams>
+  TScopedTranslationKey,
+  TFields
 >;
 
 /**
@@ -296,21 +323,24 @@ export type MethodSpecificEndpoint<
  * Uses method-specific type inference for perfect type safety
  */
 export interface CreateFormEndpointReturn<
-  TFields extends UnifiedField<z.ZodTypeAny>,
   TExampleKey extends string,
   TUserRoleValue extends readonly UserRoleValue[],
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
 > {
   readonly GET: MethodSpecificEndpoint<
-    TFields,
-    Methods.GET,
     TExampleKey,
-    TUserRoleValue
+    Methods.GET,
+    TUserRoleValue,
+    TScopedTranslationKey,
+    TFields
   >;
   readonly POST: MethodSpecificEndpoint<
-    TFields,
-    Methods.POST,
     TExampleKey,
-    TUserRoleValue
+    Methods.POST,
+    TUserRoleValue,
+    TScopedTranslationKey,
+    TFields
   >;
 }
 
@@ -329,8 +359,8 @@ function transformFieldForMethod<F>(field: F, method: Methods): F {
   interface FieldWithType {
     type: "primitive" | "object" | "array";
     usage?: FieldUsageConfig;
-    children?: Record<string, UnifiedField<z.ZodTypeAny>>;
-    child?: UnifiedField<z.ZodTypeAny>;
+    children?: Record<string, UnifiedField<string, z.ZodTypeAny>>;
+    child?: UnifiedField<string, z.ZodTypeAny>;
   }
 
   const typedField = field as F & FieldWithType;
@@ -383,7 +413,10 @@ function transformFieldForMethod<F>(field: F, method: Methods): F {
     }
 
     // Transform all children recursively
-    const transformedChildren: Record<string, UnifiedField<z.ZodTypeAny>> = {};
+    const transformedChildren: Record<
+      string,
+      UnifiedField<string, z.ZodTypeAny>
+    > = {};
     if (typedField.children) {
       for (const [key, childField] of Object.entries(typedField.children)) {
         transformedChildren[key] = transformFieldForMethod(childField, method);
@@ -446,8 +479,8 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
     type: "primitive" | "object" | "array";
     usage?: FieldUsageConfig;
     schema?: z.ZodTypeAny;
-    children?: Record<string, UnifiedField<z.ZodTypeAny>>;
-    child?: UnifiedField<z.ZodTypeAny>;
+    children?: Record<string, UnifiedField<string, z.ZodTypeAny>>;
+    child?: UnifiedField<string, z.ZodTypeAny>;
   }
 
   const typedField = field as F & FieldWithType;
@@ -660,12 +693,23 @@ export function generateRequestUrlSchemaForMethod<F>(
  * @returns Object with GET and POST endpoint definitions
  */
 export function createFormEndpoint<
-  const TFields extends UnifiedField<z.ZodTypeAny>,
+  TScopedTranslationKey extends string,
+  const TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TExampleKey extends string,
   TUserRoleValue extends readonly UserRoleValue[],
 >(
-  config: CreateFormEndpointConfig<TExampleKey, TUserRoleValue, TFields>,
-): CreateFormEndpointReturn<TFields, TExampleKey, TUserRoleValue> {
+  config: CreateFormEndpointConfig<
+    TScopedTranslationKey,
+    TExampleKey,
+    TUserRoleValue,
+    TFields
+  >,
+): CreateFormEndpointReturn<
+  TExampleKey,
+  TUserRoleValue,
+  TScopedTranslationKey,
+  TFields
+> {
   // Generate schemas directly from the original fields with method-specific filtering
   const getRequestSchema = generateRequestDataSchemaForMethod(
     config.fields,
@@ -711,62 +755,74 @@ export function createFormEndpoint<
     requiresAuthentication,
     types: {
       RequestInput: null as InferInputFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.GET,
         FieldUsage.RequestData
       >,
       RequestOutput: null as InferOutputFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.GET,
         FieldUsage.RequestData
       >,
       ResponseInput: null as InferInputFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.GET,
         FieldUsage.Response
       >,
       ResponseOutput: null as InferOutputFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.GET,
         FieldUsage.Response
       >,
       UrlVariablesInput: null as InferInputFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.GET,
         FieldUsage.RequestUrlParams
       >,
       UrlVariablesOutput: null as InferOutputFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.GET,
         FieldUsage.RequestUrlParams
       >,
     },
     TRequestInput: null as InferInputFromFieldForMethod<
+      TScopedTranslationKey,
       TFields,
       Methods.GET,
       FieldUsage.RequestData
     >,
     TRequestOutput: null as InferOutputFromFieldForMethod<
+      TScopedTranslationKey,
       TFields,
       Methods.GET,
       FieldUsage.RequestData
     >,
     TResponseInput: null as InferInputFromFieldForMethod<
+      TScopedTranslationKey,
       TFields,
       Methods.GET,
       FieldUsage.Response
     >,
     TResponseOutput: null as InferOutputFromFieldForMethod<
+      TScopedTranslationKey,
       TFields,
       Methods.GET,
       FieldUsage.Response
     >,
     TUrlVariablesInput: null as InferInputFromFieldForMethod<
+      TScopedTranslationKey,
       TFields,
       Methods.GET,
       FieldUsage.RequestUrlParams
     >,
     TUrlVariablesOutput: null as InferOutputFromFieldForMethod<
+      TScopedTranslationKey,
       TFields,
       Methods.GET,
       FieldUsage.RequestUrlParams
@@ -813,62 +869,74 @@ export function createFormEndpoint<
     requiresAuthentication,
     types: {
       RequestInput: null as InferInputFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.POST,
         FieldUsage.RequestData
       >,
       RequestOutput: null as InferOutputFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.POST,
         FieldUsage.RequestData
       >,
       ResponseInput: null as InferInputFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.POST,
         FieldUsage.Response
       >,
       ResponseOutput: null as InferOutputFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.POST,
         FieldUsage.Response
       >,
       UrlVariablesInput: null as InferInputFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.POST,
         FieldUsage.RequestUrlParams
       >,
       UrlVariablesOutput: null as InferOutputFromFieldForMethod<
+        TScopedTranslationKey,
         TFields,
         Methods.POST,
         FieldUsage.RequestUrlParams
       >,
     },
     TRequestInput: null as InferInputFromFieldForMethod<
+      TScopedTranslationKey,
       TFields,
       Methods.POST,
       FieldUsage.RequestData
     >,
     TRequestOutput: null as InferOutputFromFieldForMethod<
+      TScopedTranslationKey,
       TFields,
       Methods.POST,
       FieldUsage.RequestData
     >,
     TResponseInput: null as InferInputFromFieldForMethod<
+      TScopedTranslationKey,
       TFields,
       Methods.POST,
       FieldUsage.Response
     >,
     TResponseOutput: null as InferOutputFromFieldForMethod<
+      TScopedTranslationKey,
       TFields,
       Methods.POST,
       FieldUsage.Response
     >,
     TUrlVariablesInput: null as InferInputFromFieldForMethod<
+      TScopedTranslationKey,
       TFields,
       Methods.POST,
       FieldUsage.RequestUrlParams
     >,
     TUrlVariablesOutput: null as InferOutputFromFieldForMethod<
+      TScopedTranslationKey,
       TFields,
       Methods.POST,
       FieldUsage.RequestUrlParams
@@ -879,17 +947,19 @@ export function createFormEndpoint<
   return {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex generic types require unknown as intermediate step for type safety between incompatible generic structures.
     GET: getEndpoint as unknown as MethodSpecificEndpoint<
-      TFields,
-      Methods.GET,
       TExampleKey,
-      TUserRoleValue
+      Methods.GET,
+      TUserRoleValue,
+      TScopedTranslationKey,
+      TFields
     >,
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex generic types require unknown as intermediate step for type safety between incompatible generic structures.
     POST: postEndpoint as unknown as MethodSpecificEndpoint<
-      TFields,
-      Methods.POST,
       TExampleKey,
-      TUserRoleValue
+      Methods.POST,
+      TUserRoleValue,
+      TScopedTranslationKey,
+      TFields
     >,
   };
 }

@@ -21,7 +21,7 @@ import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { getUserPublicName } from "@/app/api/[locale]/user/repository";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
@@ -44,7 +44,7 @@ import {
   handleRetryOperation,
 } from "../../chat/threads/[threadId]/messages/repository";
 import { ensureThread } from "../../chat/threads/repository";
-import { speechToTextRepository } from "../../speech-to-text/repository";
+import { SpeechToTextRepository } from "../../speech-to-text/repository";
 import type { AiStreamPostRequestOutput } from "../definition";
 import { createMetadataSystemMessage } from "../message-metadata-generator";
 import { CONTINUE_CONVERSATION_PROMPT } from "../system-prompt";
@@ -269,7 +269,7 @@ export async function setupAiStream(params: {
         });
 
         const transcriptionResult =
-          await speechToTextRepository.transcribeAudio(
+          await SpeechToTextRepository.transcribeAudio(
             data.audioInput.file,
             user,
             locale,
@@ -460,7 +460,7 @@ export async function setupAiStream(params: {
         operation: data.operation,
       });
     } else {
-      const authorName = await getUserPublicName(userId, logger);
+      const authorName = await UserRepository.getUserPublicName(userId, logger);
 
       await createUserMessage({
         messageId: userMessageId,
@@ -492,9 +492,9 @@ export async function setupAiStream(params: {
     });
   }
 
-  // Build complete system prompt from persona and formatting instructions
+  // Build complete system prompt from character and formatting instructions
   const systemPrompt = await buildSystemPrompt({
-    personaId: data.persona,
+    personaId: data.character,
     userId,
     logger,
     t,
@@ -506,7 +506,7 @@ export async function setupAiStream(params: {
 
   logger.debug("System prompt built", {
     systemPromptLength: systemPrompt.length,
-    hasPersona: !!data.persona,
+    hasPersona: !!data.character,
   });
 
   const messages = await buildMessageContext({
@@ -520,7 +520,7 @@ export async function setupAiStream(params: {
     rootFolderId: data.rootFolderId,
     messageHistory: data.messageHistory ?? null,
     logger,
-    upcomingResponseContext: { model: data.model, persona: data.persona },
+    upcomingResponseContext: { model: data.model, persona: data.character },
   });
 
   if (

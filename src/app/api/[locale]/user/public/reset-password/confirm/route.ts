@@ -5,17 +5,10 @@
  * It connects the API endpoint definition with its implementation and email template.
  */
 
-import {
-  fail,
-  success,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
-
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { simpleT } from "@/i18n/core/shared";
 
-import { passwordRepository } from "../repository";
+import { PasswordRepository } from "../repository";
 import resetPasswordConfirmEndpoints from "./definition";
 import { renderResetPasswordConfirmMail } from "./email";
 
@@ -30,48 +23,29 @@ export const { POST, tools } = endpointsHandler({
       },
     ],
     handler: async ({ data, logger, locale }) => {
-      const { t } = simpleT(locale);
-
-      logger.debug("Password reset confirmation received", {
-        email: data.verification.email,
-      });
-
-      // Validate passwords match
-      if (data.newPassword.password !== data.newPassword.confirmPassword) {
-        return fail({
-          message:
-            "app.api.user.public.resetPassword.confirm.errors.validation.passwordsDoNotMatch",
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        });
-      }
-
-      // Reset the password
-      const response = await passwordRepository.confirmPasswordReset(
+      const result = await PasswordRepository.confirmPasswordReset(
         data.verification.token,
         data.verification.email,
         data.newPassword.password,
         locale,
         logger,
       );
-      if (!response.success) {
-        return response;
-      }
-
-      // Return structured response matching definition
-      return success({
-        response: {
+      // Transform the string response to match the definition's expected structure
+      if (result.success) {
+        return {
           success: true,
-          message: "app.api.user.auth.resetPassword.success.password_reset",
-          securityTip: t(
-            "app.api.user.public.resetPassword.confirm.response.securityTip",
-          ),
-          nextSteps: [
-            t("app.api.user.public.resetPassword.confirm.response.nextSteps.0"),
-            t("app.api.user.public.resetPassword.confirm.response.nextSteps.1"),
-            t("app.api.user.public.resetPassword.confirm.response.nextSteps.2"),
-          ],
-        },
-      });
+          data: {
+            response: {
+              success: true,
+              message: result.data,
+              nextSteps: [
+                "app.api.user.public.resetPassword.confirm.nextSteps.login",
+              ],
+            },
+          },
+        };
+      }
+      return result;
     },
   },
 });

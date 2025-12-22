@@ -12,10 +12,12 @@ import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 /**
  * Renders TEXT widgets with formatting options.
  */
-export class TextWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TEXT> {
+export class TextWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.TEXT
+> {
   readonly widgetType = WidgetType.TEXT;
 
-  render(props: CLIWidgetProps<typeof WidgetType.TEXT>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.TEXT, string>): string {
     const { field, value, context } = props;
     const indent = this.createIndent(context.depth, context);
     const label = this.formatLabel(field, context);
@@ -35,11 +37,7 @@ export class TextWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TEX
     }
 
     if (emphasis) {
-      const styledValue = this.styleText(
-        formattedValue,
-        emphasis,
-        context,
-      );
+      const styledValue = this.styleText(formattedValue, emphasis, context);
       return `${indent}${label}: ${styledValue}`;
     }
 

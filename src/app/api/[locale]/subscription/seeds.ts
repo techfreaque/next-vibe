@@ -8,17 +8,17 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
-import { userRepository } from "@/app/api/[locale]/user/repository";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { translations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { creditRepository } from "../credits/repository";
+import { CreditRepository } from "../credits/repository";
 import { PaymentProvider } from "../payment/enum";
 import type { NewSubscription } from "./db";
 import { subscriptions } from "./db";
 import type { SubscriptionGetResponseOutput } from "./definition";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
-import { subscriptionRepository } from "./repository";
+import { SubscriptionRepository } from "./repository";
 
 /**
  * Helper function to create local subscription record
@@ -74,7 +74,7 @@ export async function dev(
 
     /*
     // Get demo user for subscription testing
-    const demoUserResponse = await userRepository.getUserByEmail(
+    const demoUserResponse = await UserRepository.getUserByEmail(
       "demo@example.com",
       UserDetailLevel.STANDARD,
       locale,
@@ -90,7 +90,7 @@ export async function dev(
     logger.debug(`Found demo user for subscription seeds: ${demoUser.id}`);
 
     // Check if demo user already has a subscription
-    const existingSubscription = await subscriptionRepository.getSubscription(
+    const existingSubscription = await SubscriptionRepository.getSubscription(
       demoUser.id,
       logger,
     );
@@ -140,7 +140,7 @@ export async function dev(
         return;
       }
 
-      const balanceResult = await creditRepository.getBalance(
+      const balanceResult = await CreditRepository.getBalance(
         { leadId: userLead.leadId, userId: demoUser.id },
         logger,
       );
@@ -157,7 +157,7 @@ export async function dev(
         const subscriptionProduct = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
         const subscriptionCredits = subscriptionProduct.credits;
 
-        const creditsResult = await creditRepository.addUserCredits(
+        const creditsResult = await CreditRepository.addUserCredits(
           demoUser.id,
           subscriptionCredits,
           "subscription",
@@ -183,7 +183,7 @@ export async function dev(
     */
 
     // Get admin user for subscription testing
-    const adminUserResponse = await userRepository.getUserByEmail(
+    const adminUserResponse = await UserRepository.getUserByEmail(
       "admin@example.com",
       UserDetailLevel.STANDARD,
       locale,
@@ -194,7 +194,7 @@ export async function dev(
       const adminUser = adminUserResponse.data;
 
       // Check if admin user already has a subscription
-      const adminSubscription = await subscriptionRepository.getSubscription(
+      const adminSubscription = await SubscriptionRepository.getSubscription(
         adminUser.id,
         logger,
         locale,
@@ -258,7 +258,7 @@ export async function dev(
           return;
         }
 
-        const balanceResult = await creditRepository.getBalance(
+        const balanceResult = await CreditRepository.getBalance(
           { leadId: userLead.leadId, userId: adminUser.id },
           logger,
         );
@@ -272,15 +272,16 @@ export async function dev(
             : undefined;
 
           // Get subscription credits from products repository
-          const { productsRepository, ProductIds } =
-            await import("../products/repository-client");
+          const { productsRepository, ProductIds } = await import(
+            "../products/repository-client"
+          );
           const subscription = productsRepository.getProduct(
             ProductIds.SUBSCRIPTION,
             locale,
           );
           const subscriptionCredits = subscription.credits;
 
-          const creditsResult = await creditRepository.addUserCredits(
+          const creditsResult = await CreditRepository.addUserCredits(
             adminUser.id,
             subscriptionCredits,
             "subscription",
@@ -319,7 +320,7 @@ export async function dev(
 
   // Create low credits user for testing insufficient credits error
   try {
-    const lowCreditsUserResponse = await userRepository.getUserByEmail(
+    const lowCreditsUserResponse = await UserRepository.getUserByEmail(
       "lowcredits@example.com",
       UserDetailLevel.STANDARD,
       locale,
@@ -331,7 +332,7 @@ export async function dev(
       logger.debug(`Found low credits user for testing: ${lowCreditsUser.id}`);
 
       // Check if user already has a subscription
-      const existingSubscription = await subscriptionRepository.getSubscription(
+      const existingSubscription = await SubscriptionRepository.getSubscription(
         lowCreditsUser.id,
         logger,
         locale,
@@ -396,7 +397,7 @@ export async function dev(
           return;
         }
 
-        const balanceResult = await creditRepository.getBalance(
+        const balanceResult = await CreditRepository.getBalance(
           { leadId: userLead.leadId, userId: lowCreditsUser.id },
           logger,
         );
@@ -410,7 +411,7 @@ export async function dev(
             : undefined;
 
           // Add only 3 subscription credits (not enough for DeepSeek V3.1 which costs 5)
-          const creditsResult = await creditRepository.addUserCredits(
+          const creditsResult = await CreditRepository.addUserCredits(
             lowCreditsUser.id,
             3,
             "subscription",
@@ -457,14 +458,14 @@ export async function test(
 
   try {
     // Get test users for subscription testing
-    const testUser1Response = await userRepository.getUserByEmail(
+    const testUser1Response = await UserRepository.getUserByEmail(
       "test1@example.com",
       UserDetailLevel.STANDARD,
       locale,
       logger,
     );
 
-    const testUser2Response = await userRepository.getUserByEmail(
+    const testUser2Response = await UserRepository.getUserByEmail(
       "test2@example.com",
       UserDetailLevel.STANDARD,
       locale,
@@ -502,7 +503,7 @@ export async function test(
       try {
         // Check if subscription already exists
         const existingSubscription =
-          await subscriptionRepository.getSubscription(
+          await SubscriptionRepository.getSubscription(
             subscriptionData.userId,
             logger,
             locale,
@@ -554,7 +555,7 @@ export async function prod(
     logger.debug("Subscription production setup - verifying integration");
 
     // Get admin user for subscription management
-    const adminUserResponse = await userRepository.getUserByEmail(
+    const adminUserResponse = await UserRepository.getUserByEmail(
       translations.emails.admin,
       UserDetailLevel.STANDARD,
       locale,
@@ -568,7 +569,7 @@ export async function prod(
       );
 
       // Check if admin already has a subscription
-      const adminSubscription = await subscriptionRepository.getSubscription(
+      const adminSubscription = await SubscriptionRepository.getSubscription(
         adminUser.id,
         logger,
         locale,

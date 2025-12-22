@@ -154,7 +154,8 @@ export const translations: typeof enTranslations = {
       description: "Abonnement nicht gefunden",
     },
     not_found: "Abonnement nicht gefunden",
-    not_found_description: "Das angeforderte Abonnement konnte nicht gefunden werden",
+    not_found_description:
+      "Das angeforderte Abonnement konnte nicht gefunden werden",
     server: {
       title: "Serverfehler",
       description: "Interner Serverfehler aufgetreten",

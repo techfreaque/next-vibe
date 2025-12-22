@@ -92,9 +92,9 @@ function transformDataForWidget(
 /**
  * Render a single response field using WidgetRenderer
  */
-function renderResponseField(
+function renderResponseField<TKey extends string>(
   fieldKey: string,
-  field: UnifiedField,
+  field: UnifiedField<TKey>,
   result: ToolCallResult | null,
   context: WidgetRenderContext,
 ): JSX.Element | null {
@@ -189,13 +189,17 @@ export function ResponseFieldsRenderer({
     );
   }
 
-  const responseFields: Array<{ key: string; field: UnifiedField }> = [];
+  const responseFields: Array<{ key: string; field: UnifiedField<string> }> =
+    [];
   if (
     definition?.fields &&
     typeof definition.fields === "object" &&
     "children" in definition.fields
   ) {
-    const children = definition.fields.children as Record<string, UnifiedField>;
+    const children = definition.fields.children as Record<
+      string,
+      UnifiedField<string>
+    >;
 
     for (const [fieldKey, fieldDef] of Object.entries(children)) {
       if (

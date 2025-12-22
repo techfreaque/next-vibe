@@ -72,7 +72,7 @@ export function getRelativeImportPath(
   let relativePath = relative(outputDir, sourceFile);
 
   // Remove .ts extension and normalize path separators
-  relativePath = relativePath.replace(/\.ts$/, "").replaceAll('\\', "/");
+  relativePath = relativePath.replace(/\.ts$/, "").replaceAll("\\", "/");
 
   // Ensure it starts with ./ or ../
   if (!relativePath.startsWith(".")) {

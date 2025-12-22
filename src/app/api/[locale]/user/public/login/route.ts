@@ -9,12 +9,12 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 
 import endpoints from "./definition";
-import { loginRepository } from "./repository";
+import { LoginRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, user, request, logger, platform, locale }) =>
-      loginRepository.login(data, user, locale, request, logger, platform),
+      LoginRepository.login(data, user, locale, request, logger, platform),
   },
 });

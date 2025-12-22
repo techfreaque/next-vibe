@@ -212,6 +212,7 @@ export function ExecutionHistory({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               {/* Status Filter */}
@@ -228,6 +229,7 @@ export function ExecutionHistory({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               {/* Start Date */}
@@ -244,6 +246,7 @@ export function ExecutionHistory({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
 
               {/* End Date */}
@@ -260,6 +263,7 @@ export function ExecutionHistory({
                   style: "none",
                   showAllRequired: false,
                 }}
+                locale={locale}
               />
             </Div>
 

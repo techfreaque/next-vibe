@@ -3,7 +3,7 @@
  * Manages UI-specific state like modals, dialogs, etc.
  */
 
-import { useCallback,useState } from "react";
+import { useCallback, useState } from "react";
 
 export interface UseUIStateReturn {
   // Tools Modal

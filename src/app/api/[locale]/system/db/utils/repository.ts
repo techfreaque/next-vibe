@@ -284,18 +284,17 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
           logger.info(`Database ${operation.toLowerCase()} completed`);
           return success(true);
         }
-          const { t } = simpleT(locale);
-          const errorMessage = t(
-            "app.api.system.db.utils.errors.reset_operation_failed",
-          );
-          logger.error("Failed to reset database:", errorMessage);
-          return fail({
-            message: "app.api.system.db.utils.errors.reset_failed",
-            errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { error: errorMessage },
-            cause: resetResult,
-          });
-        
+        const { t } = simpleT(locale);
+        const errorMessage = t(
+          "app.api.system.db.utils.errors.reset_operation_failed",
+        );
+        logger.error("Failed to reset database:", errorMessage);
+        return fail({
+          message: "app.api.system.db.utils.errors.reset_failed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { error: errorMessage },
+          cause: resetResult,
+        });
       } catch (error) {
         logger.error("Failed to reset database:", parseError(error));
         return fail({

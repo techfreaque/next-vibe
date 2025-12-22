@@ -14,8 +14,9 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { leadsRepository } from "@/app/api/[locale]/leads/repository";
+import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -27,17 +28,10 @@ import type {
   UnsubscribePostResponseOutput,
 } from "./definition";
 
-export interface NewsletterUnsubscribeRepository {
-  unsubscribe(
+export class NewsletterUnsubscribeRepository {
+  static async unsubscribe(
     data: UnsubscribePostRequestOutput,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<UnsubscribePostResponseOutput>>;
-}
-
-export class NewsletterUnsubscribeRepositoryImpl implements NewsletterUnsubscribeRepository {
-  async unsubscribe(
-    data: UnsubscribePostRequestOutput,
+    user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UnsubscribePostResponseOutput>> {
@@ -50,7 +44,7 @@ export class NewsletterUnsubscribeRepositoryImpl implements NewsletterUnsubscrib
 
       // Update lead status to unsubscribed if lead exists
       const leadUpdateResult =
-        await leadsRepository.updateLeadStatusOnNewsletterUnsubscribe(
+        await LeadsRepository.updateLeadStatusOnNewsletterUnsubscribe(
           data.email,
           logger,
         );
@@ -130,6 +124,20 @@ export class NewsletterUnsubscribeRepositoryImpl implements NewsletterUnsubscrib
         subscriptionId: subscription.id,
       });
 
+      // Send SMS notifications after successful unsubscription (fire-and-forget)
+      const { sendConfirmationSms, sendAdminNotificationSms } = await import(
+        "./sms"
+      );
+      sendConfirmationSms(data, user, locale, logger).catch((smsError: Error) =>
+        logger.debug("Confirmation SMS failed but continuing", {
+          smsError,
+        }),
+      );
+      sendAdminNotificationSms(data, user, locale, logger).catch(
+        (smsError: Error) =>
+          logger.debug("Admin SMS failed but continuing", { smsError }),
+      );
+
       return success({
         success: true,
         message: t("app.api.newsletter.unsubscribe.response.success"),
@@ -149,6 +157,3 @@ export class NewsletterUnsubscribeRepositoryImpl implements NewsletterUnsubscrib
     }
   }
 }
-
-export const newsletterUnsubscribeRepository =
-  new NewsletterUnsubscribeRepositoryImpl();

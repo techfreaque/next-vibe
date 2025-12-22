@@ -21,13 +21,11 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/breadcrumb";
 
 import { applyStyleType } from "../../web/utils/style-type";
+import { styledNative } from "../utils/style-converter";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledView = styled(View, { className: "style" });
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- nativewind styled() produces complex union types
-const StyledPressable = styled(Pressable as any, { className: "style" }) as React.ComponentType<
-  React.ComponentProps<typeof Pressable> & { className?: string }
->;
+const StyledPressable = styledNative(Pressable);
 
 export function Breadcrumb({
   className,

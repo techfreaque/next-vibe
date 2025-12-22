@@ -20,7 +20,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { TtsVoiceOptions } from "./enum";
+import { DEFAULT_TTS_VOICE, TtsVoiceOptions } from "./enum";
 
 /**
  * Text-to-Speech Endpoint (POST)
@@ -77,7 +77,7 @@ const { POST } = createEndpoint({
           columns: 12,
           options: TtsVoiceOptions,
         },
-        z.string().default("MALE"),
+        z.string().default(DEFAULT_TTS_VOICE),
       ),
 
       // === RESPONSE FIELDS ===

@@ -26,16 +26,11 @@ import type { UserRoleValue } from "../../../../user/user-roles/enum";
  * Uses routeExecutionExecutor which is the same infrastructure used by CLI, MCP, and AI tools
  */
 export async function sendTestRequest<
-  TRequestOutput,
-  TResponseInput,
-  TResponseOutput,
-  TUrlVariablesOutput,
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<z.ZodTypeAny>,
-  TRequestInput = Record<string, string | number | boolean | null>,
-  TUrlVariablesInput = Record<string, string | number | boolean | null>,
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
 >({
   endpoint,
   data,
@@ -46,18 +41,35 @@ export async function sendTestRequest<
     TExampleKey,
     TMethod,
     TUserRoleValue,
-    TFields,
-    TRequestInput,
-    TRequestOutput,
-    TResponseInput,
-    TResponseOutput,
-    TUrlVariablesInput,
-    TUrlVariablesOutput
+    TScopedTranslationKey,
+    TFields
   >;
-  data: TRequestOutput;
-  urlPathParams: TUrlVariablesOutput;
+  data: CreateApiEndpoint<
+    TExampleKey,
+    TMethod,
+    TUserRoleValue,
+    TScopedTranslationKey,
+    TFields
+  >["types"]["RequestOutput"];
+  urlPathParams: CreateApiEndpoint<
+    TExampleKey,
+    TMethod,
+    TUserRoleValue,
+    TScopedTranslationKey,
+    TFields
+  >["types"]["UrlVariablesOutput"];
   user: JwtPayloadType;
-}): Promise<ResponseType<TResponseOutput>> {
+}): Promise<
+  ResponseType<
+    CreateApiEndpoint<
+      TExampleKey,
+      TMethod,
+      TUserRoleValue,
+      TScopedTranslationKey,
+      TFields
+    >["types"]["ResponseOutput"]
+  >
+> {
   // Create default user based on endpoint configuration if not provided
   const testUser: JwtPayloadType =
     user ??
@@ -83,9 +95,9 @@ export async function sendTestRequest<
     // Execute using the shared route execution executor
     // This is the same infrastructure used by CLI, MCP, and AI tools
     const result = await routeExecutionExecutor.executeGenericHandler<
-      TRequestOutput,
-      TUrlVariablesOutput,
-      TResponseOutput
+      typeof endpoint.types.RequestOutput,
+      typeof endpoint.types.UrlVariablesOutput,
+      typeof endpoint.types.ResponseOutput
     >({
       toolName,
       data,

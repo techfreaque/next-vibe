@@ -9,10 +9,12 @@ import { extractAvatarData } from "@/app/api/[locale]/system/unified-interface/s
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class AvatarWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.AVATAR> {
+export class AvatarWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.AVATAR
+> {
   readonly widgetType = WidgetType.AVATAR;
 
-  render(props: CLIWidgetProps<typeof WidgetType.AVATAR>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.AVATAR, string>): string {
     const { field, value, context } = props;
     const indent = this.createIndent(context.depth, context);
     const label = this.formatLabel(field, context);

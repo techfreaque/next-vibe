@@ -559,9 +559,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         setTimeout(() => {
           child.kill("SIGKILL");
         }, 5000);
-        reject(
-          new Error(createWorkerTimeoutMessage(task.id, task.timeout)),
-        );
+        reject(new Error(createWorkerTimeoutMessage(task.id, task.timeout)));
       }, task.timeout * 1000);
 
       // Clear timeout when process completes
@@ -727,7 +725,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   }
 
   /**
-   * Check if files need prettier formatting (like ESLint does)
+   * Check if files need prettier formatting using --list-different
    */
   private async checkPrettierNeeded(
     files: string[],
@@ -740,28 +738,26 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
 
     return await new Promise((resolve) => {
       /* eslint-disable i18next/no-literal-string */
-      const configArgs = Object.entries(prettierConfig).flatMap(
-        ([key, value]) => {
+      const configArgs = Object.entries(prettierConfig)
+        .filter(
+          ([key]) =>
+            key !== "enabled" &&
+            key !== "configPath" &&
+            key !== "jsxBracketSameLine",
+        )
+        .flatMap(([key, value]) => {
           // Convert camelCase to kebab-case for CLI flags
           const flagName = key.replaceAll(/([A-Z])/g, "-$1").toLowerCase();
           if (typeof value === "boolean") {
             return value ? [`--${flagName}`] : [`--no-${flagName}`];
           }
           return [`--${flagName}`, String(value)];
-        },
-      );
+        });
       /* eslint-enable i18next/no-literal-string */
 
       const child = spawn(
         "bunx",
-        [
-          "prettier",
-          "--check",
-          "--log-level",
-          "error",
-          ...configArgs,
-          ...files,
-        ],
+        ["prettier", "--list-different", ...configArgs, ...files],
         {
           cwd: process.cwd(),
           stdio: ["ignore", "pipe", "pipe"],
@@ -770,23 +766,21 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       );
 
       let stdout = "";
-      let stderr = "";
 
       child.stdout?.on("data", (data: Buffer) => {
         stdout += data.toString();
       });
 
-      child.stderr?.on("data", (data: Buffer) => {
-        stderr += data.toString();
+      child.stderr?.on("data", () => {
+        // Ignore stderr
       });
 
-      child.on("close", (code) => {
-        // Prettier --check returns non-zero if files need formatting
-        // Parse output to get list of files that need formatting
-        const needsFormatting = files.filter((file) => {
-          // If prettier check failed, these files need formatting
-          return code !== 0 && (stdout.includes(file) || stderr.includes(file));
-        });
+      child.on("close", () => {
+        // Parse list of files that need formatting from stdout
+        const needsFormatting = stdout
+          .trim()
+          .split("\n")
+          .filter((line) => line.length > 0);
 
         logger.debug(
           `${needsFormatting.length} files need prettier formatting`,
@@ -813,6 +807,11 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     // Get prettier config from check.config.ts
     const prettierConfig = this.getPrettierConfig();
 
+    if (!prettierConfig.enabled) {
+      logger.debug("Prettier is disabled, skipping formatting");
+      return;
+    }
+
     // First check which files actually need formatting
     const filesToFormat = await this.checkPrettierNeeded(
       files,
@@ -829,31 +828,29 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
 
     const { spawn } = await import("node:child_process");
 
-    // Convert prettier config to CLI flags
+    // Convert prettier config to CLI flags (exclude internal config properties)
     /* eslint-disable i18next/no-literal-string */
-    const configArgs = Object.entries(prettierConfig).flatMap(
-      ([key, value]) => {
+    const configArgs = Object.entries(prettierConfig)
+      .filter(
+        ([key]) =>
+          key !== "enabled" &&
+          key !== "configPath" &&
+          key !== "jsxBracketSameLine",
+      )
+      .flatMap(([key, value]) => {
         // Convert camelCase to kebab-case for CLI flags
         const flagName = key.replaceAll(/([A-Z])/g, "-$1").toLowerCase();
         if (typeof value === "boolean") {
           return value ? [`--${flagName}`] : [`--no-${flagName}`];
         }
         return [`--${flagName}`, String(value)];
-      },
-    );
+      });
     /* eslint-enable i18next/no-literal-string */
 
     return await new Promise((resolve, reject) => {
       const child = spawn(
         "bunx",
-        [
-          "prettier",
-          "--write",
-          "--log-level",
-          "warn",
-          ...configArgs,
-          ...filesToFormat,
-        ],
+        ["prettier", "--write", ...configArgs, ...filesToFormat],
         {
           cwd: process.cwd(),
           stdio: ["ignore", "pipe", "pipe"],
@@ -884,7 +881,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       });
     });
   }
-
 }
 
 /**

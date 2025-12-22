@@ -121,7 +121,8 @@ export const translations: typeof enTranslations = {
           "{{subPrice}}/miesiąc - {{subCredits}} kredytów miesięcznie ze wszystkimi {{modelCount}} modelami AI",
         perMonth: "/miesiąc",
         perYear: "/rok",
-        yearlyEquivalent: "Tylko {{monthlyPrice}}/miesiąc przy rozliczeniu rocznym",
+        yearlyEquivalent:
+          "Tylko {{monthlyPrice}}/miesiąc przy rozliczeniu rocznym",
         features: {
           credits: "{{count}} kredytów miesięcznie",
           expiry: "Dostęp do wszystkich {{modelCount}} modeli AI",

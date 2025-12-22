@@ -86,7 +86,11 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailStatsGetResponseTypeOutput>> {
-    logger.debug("Getting email stats", { userId: user.isPublic ? "public" : user.id, timePeriod: data.timePeriod, dateRangePreset: data.dateRangePreset });
+    logger.debug("Getting email stats", {
+      userId: user.isPublic ? "public" : user.id,
+      timePeriod: data.timePeriod,
+      dateRangePreset: data.dateRangePreset,
+    });
     const timePeriod = (data.timePeriod ?? TimePeriod.DAY) as TimePeriod;
     const dateRangePreset = (data.dateRangePreset ??
       DateRangePreset.LAST_30_DAYS) as DateRangePreset;

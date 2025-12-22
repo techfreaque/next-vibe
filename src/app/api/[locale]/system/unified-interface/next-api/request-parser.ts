@@ -211,10 +211,7 @@ interface MergedObject {
  * Deep merge two objects, with source values overwriting target values
  * Used to merge file fields into JSON data
  */
-function deepMerge(
-  target: MergedObject,
-  source: MergedObject,
-): MergedObject {
+function deepMerge(target: MergedObject, source: MergedObject): MergedObject {
   const result: MergedObject = { ...target };
 
   for (const key of Object.keys(source)) {

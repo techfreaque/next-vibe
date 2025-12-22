@@ -14,10 +14,10 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
 /**
  * Displays form validation and API errors from context.response.
  */
-export function FormAlertWidget({
+export function FormAlertWidget<TKey extends string>({
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.FORM_ALERT>): JSX.Element | null {
+}: ReactWidgetProps<typeof WidgetType.FORM_ALERT, TKey>): JSX.Element | null {
   const response = context.response;
   let alert: FormAlertState | null = null;
 

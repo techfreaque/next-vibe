@@ -27,7 +27,7 @@ import {
 import { emails } from "../../emails/messages/db";
 import { referralRepository } from "../../referral/repository";
 import type { JwtPayloadType } from "../../user/auth/types";
-import { leadAuthRepository } from "../auth/repository";
+import { LeadAuthRepository } from "../auth/repository";
 import { leads } from "../db";
 import {
   EmailCampaignStage,
@@ -36,7 +36,7 @@ import {
   LeadSource,
   LeadStatus,
 } from "../enum";
-import { leadsRepository } from "../repository";
+import { LeadsRepository } from "../repository";
 import type {
   ClickTrackingRequestOutput,
   ClickTrackingResponseOutput,
@@ -302,7 +302,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
         referer: clientInfo?.referer,
       });
 
-      const result = await leadsRepository.recordEngagementInternal(
+      const result = await LeadsRepository.recordEngagementInternal(
         {
           leadId: data.leadId,
           engagementType: data.engagementType,
@@ -478,7 +478,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       });
 
       // Update lead status to CONSULTATION_BOOKED and set timestamp
-      await leadsRepository.updateLeadInternal(
+      await LeadsRepository.updateLeadInternal(
         leadId,
         {
           status: LeadStatus.CONSULTATION_BOOKED,
@@ -519,7 +519,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       });
 
       // Update lead status to SUBSCRIPTION_CONFIRMED and set timestamp
-      await leadsRepository.updateLeadInternal(
+      await LeadsRepository.updateLeadInternal(
         leadId,
         {
           status: LeadStatus.SUBSCRIPTION_CONFIRMED,
@@ -704,7 +704,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       });
 
       // Get current lead
-      const leadResult = await leadsRepository.getLeadByIdInternal(
+      const leadResult = await LeadsRepository.getLeadByIdInternal(
         leadId,
         logger,
       );
@@ -785,7 +785,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
             }
 
             // Update lead status
-            const updateResult = await leadsRepository.updateLeadInternal(
+            const updateResult = await LeadsRepository.updateLeadInternal(
               leadId,
               {
                 status: newStatus,
@@ -884,7 +884,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
 
       // Validate existing lead ID if provided
       if (leadId) {
-        const leadResult = await leadsRepository.getLeadByIdInternal(
+        const leadResult = await LeadsRepository.getLeadByIdInternal(
           leadId,
           logger,
         );
@@ -934,7 +934,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       if (currentUserId && !user.isPublic) {
         try {
           // First check if lead is already converted to avoid unnecessary conversion attempts
-          const leadResult = await leadsRepository.getLeadByIdInternal(
+          const leadResult = await LeadsRepository.getLeadByIdInternal(
             leadId,
             logger,
           );
@@ -948,7 +948,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
             // No need to log - relationship already exists
           } else {
             // Attempt conversion
-            const convertResult = await leadsRepository.convertLeadInternal(
+            const convertResult = await LeadsRepository.convertLeadInternal(
               leadId,
               {
                 userId: currentUserId,
@@ -1192,7 +1192,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       if (trackingLeadId !== currentLeadId && currentLeadId) {
         try {
           if (isLoggedIn && user.id) {
-            await leadAuthRepository.linkLeadToUser(
+            await LeadAuthRepository.linkLeadToUser(
               trackingLeadId,
               user.id,
               logger,
@@ -1204,7 +1204,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
               currentLeadId,
             });
           } else {
-            await leadsRepository.linkLeadToLead(
+            await LeadsRepository.linkLeadToLead(
               trackingLeadId,
               currentLeadId,
               "track_page",
@@ -1250,12 +1250,12 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       // Update lead status if user is logged in
       if (isLoggedIn) {
         try {
-          const leadResult = await leadsRepository.getLeadByIdInternal(
+          const leadResult = await LeadsRepository.getLeadByIdInternal(
             trackingLeadId,
             logger,
           );
           if (leadResult.success) {
-            await leadsRepository.updateLeadInternal(
+            await LeadsRepository.updateLeadInternal(
               trackingLeadId,
               { status: LeadStatus.SIGNED_UP },
               logger,

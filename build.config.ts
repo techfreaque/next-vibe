@@ -9,7 +9,11 @@
  *   vibe builder --configPath="build.config.ts"  # Explicit config
  */
 
-import { BunBuildTypeEnum, BunTargetEnum, SourcemapModeEnum } from "@/app/api/[locale]/system/builder/enum";
+import {
+  BunBuildTypeEnum,
+  BunTargetEnum,
+  SourcemapModeEnum,
+} from "@/app/api/[locale]/system/builder/enum";
 import type { BuildConfig } from "@/app/api/[locale]/system/builder/repository";
 
 const config: BuildConfig = {
@@ -19,7 +23,8 @@ const config: BuildConfig = {
   // Build the CLI as an executable using Bun
   filesToCompile: [
     {
-      input: "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
+      input:
+        "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
       output: ".dist/bin/vibe-runtime.js",
       type: BunBuildTypeEnum.EXECUTABLE,
       modulesToExternalize: [

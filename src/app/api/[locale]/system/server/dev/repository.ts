@@ -627,8 +627,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   ): Promise<void> {
     try {
       // Load the task registry
-      const { taskRegistry } =
-        await import("@/app/api/[locale]/system/generated/tasks-index");
+      const { taskRegistry } = await import(
+        "@/app/api/[locale]/system/generated/tasks-index"
+      );
 
       // Filter tasks for development environment
       const devTasks = this.filterTasksForDevelopment(

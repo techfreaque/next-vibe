@@ -17,13 +17,13 @@ import {
   XCircle,
 } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
-import type { ComponentType,JSX } from "react";
+import type { ComponentType, JSX } from "react";
 
-import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
+import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
 
 // Icon mapping for common stat types
 const iconMap: Record<string, ComponentType<{ className?: string }>> = {
@@ -51,7 +51,13 @@ const iconMap: Record<string, ComponentType<{ className?: string }>> = {
 };
 
 // Color variants for different stat types
-type StatVariant = "default" | "success" | "warning" | "danger" | "info" | "muted";
+type StatVariant =
+  | "default"
+  | "success"
+  | "warning"
+  | "danger"
+  | "info"
+  | "muted";
 
 const variantClasses: Record<StatVariant, string> = {
   default: "text-foreground",
@@ -133,13 +139,13 @@ function getIconComponent(
  * - trendValue: Number to show as trend percentage
  * - size: "sm" | "md" | "lg" (default: "md")
  */
-export function StatWidget({
+export function StatWidget<TKey extends string>({
   value,
   field,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.STAT>): JSX.Element {
-  const { t } = simpleT(context.locale);
+}: ReactWidgetProps<typeof WidgetType.STAT, TKey>): JSX.Element {
+  const { t } = getTranslator(context);
   const {
     label: labelKey,
     format,
@@ -172,43 +178,90 @@ export function StatWidget({
   const IconComponent = getIconComponent(icon, labelKey || "");
 
   // Get variant class
-  const variantClass = variantClasses[variant as StatVariant] || variantClasses.default;
+  const variantClass =
+    variantClasses[variant as StatVariant] || variantClasses.default;
 
   // Size classes
   const sizeClasses = {
     sm: { value: "text-lg", label: "text-xs", icon: "h-4 w-4", padding: "p-3" },
-    md: { value: "text-2xl", label: "text-xs", icon: "h-5 w-5", padding: "p-4" },
-    lg: { value: "text-3xl", label: "text-sm", icon: "h-6 w-6", padding: "p-5" },
+    md: {
+      value: "text-2xl",
+      label: "text-xs",
+      icon: "h-5 w-5",
+      padding: "p-4",
+    },
+    lg: {
+      value: "text-3xl",
+      label: "text-sm",
+      icon: "h-6 w-6",
+      padding: "p-5",
+    },
   };
-  const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
+  const sizeClass =
+    sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
 
   // Trend icon and color
-  const TrendIcon = trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : trend === "neutral" ? Minus : null;
-  const trendColorClass = trend === "up" ? "text-green-500" : trend === "down" ? "text-red-500" : "text-muted-foreground";
+  const TrendIcon =
+    trend === "up"
+      ? TrendingUp
+      : trend === "down"
+        ? TrendingDown
+        : trend === "neutral"
+          ? Minus
+          : null;
+  const trendColorClass =
+    trend === "up"
+      ? "text-green-500"
+      : trend === "down"
+        ? "text-red-500"
+        : "text-muted-foreground";
 
   return (
     <Card className={cn("h-full hover:shadow-md transition-shadow", className)}>
-      <CardContent className={cn("flex flex-col items-center justify-center text-center min-h-[100px]", sizeClass.padding)}>
+      <CardContent
+        className={cn(
+          "flex flex-col items-center justify-center text-center min-h-[100px]",
+          sizeClass.padding,
+        )}
+      >
         {/* Icon (optional) */}
         {IconComponent && (
-          <IconComponent className={cn(sizeClass.icon, "text-muted-foreground mb-2")} />
+          <IconComponent
+            className={cn(sizeClass.icon, "text-muted-foreground mb-2")}
+          />
         )}
 
         {/* Value */}
-        <Span className={cn(sizeClass.value, "font-bold tabular-nums", variantClass)}>
+        <Span
+          className={cn(
+            sizeClass.value,
+            "font-bold tabular-nums",
+            variantClass,
+          )}
+        >
           {formattedValue}
         </Span>
 
         {/* Trend indicator (optional) */}
         {TrendIcon && trendValue !== undefined && (
-          <Span className={cn("flex items-center gap-0.5 text-xs mt-1", trendColorClass)}>
+          <Span
+            className={cn(
+              "flex items-center gap-0.5 text-xs mt-1",
+              trendColorClass,
+            )}
+          >
             <TrendIcon className="h-3 w-3" />
             {Math.abs(trendValue)}%
           </Span>
         )}
 
         {/* Label */}
-        <Span className={cn(sizeClass.label, "text-muted-foreground mt-1.5 leading-tight")}>
+        <Span
+          className={cn(
+            sizeClass.label,
+            "text-muted-foreground mt-1.5 leading-tight",
+          )}
+        >
           {label}
         </Span>
       </CardContent>

@@ -9,12 +9,14 @@ export const translations: typeof enTranslations = {
     fields: {
       uid: {
         label: "UID elementu",
-        description: "UID elementu do zrzutu ekranu (pomiń, aby zrobić zrzut ekranu całej strony)",
+        description:
+          "UID elementu do zrzutu ekranu (pomiń, aby zrobić zrzut ekranu całej strony)",
         placeholder: "Wprowadź UID elementu",
       },
       fullPage: {
         label: "Cała strona",
-        description: "Jeśli ustawiono na true, zrobi zrzut ekranu całej strony zamiast aktualnie widocznego obszaru (niekompatybilne z uid)",
+        description:
+          "Jeśli ustawiono na true, zrobi zrzut ekranu całej strony zamiast aktualnie widocznego obszaru (niekompatybilne z uid)",
         placeholder: "false",
       },
       format: {
@@ -29,12 +31,14 @@ export const translations: typeof enTranslations = {
       },
       quality: {
         label: "Jakość",
-        description: "Jakość kompresji dla formatów JPEG i WebP (0-100). Wyższe wartości oznaczają lepszą jakość, ale większe rozmiary plików. Ignorowane dla formatu PNG.",
+        description:
+          "Jakość kompresji dla formatów JPEG i WebP (0-100). Wyższe wartości oznaczają lepszą jakość, ale większe rozmiary plików. Ignorowane dla formatu PNG.",
         placeholder: "80",
       },
       filePath: {
         label: "Ścieżka pliku",
-        description: "Ścieżka bezwzględna lub względna do bieżącego katalogu roboczego, aby zapisać zrzut ekranu zamiast dołączać go do odpowiedzi",
+        description:
+          "Ścieżka bezwzględna lub względna do bieżącego katalogu roboczego, aby zapisać zrzut ekranu zamiast dołączać go do odpowiedzi",
         placeholder: "/ścieżka/do/zrzutu-ekranu.png",
       },
     },
@@ -46,15 +50,44 @@ export const translations: typeof enTranslations = {
     executionId: "ID wykonania do śledzenia",
   },
   errors: {
-    validation: { title: "Błąd walidacji", description: "Sprawdź wprowadzone dane i spróbuj ponownie" },
-    network: { title: "Błąd sieci", description: "Wystąpił błąd sieci podczas przechwytywania zrzutu ekranu" },
-    unauthorized: { title: "Nieautoryzowany", description: "Nie masz uprawnień do przechwytywania zrzutów ekranu" },
-    forbidden: { title: "Zabronione", description: "Przechwytywanie zrzutów ekranu jest zabronione" },
-    notFound: { title: "Nie znaleziono", description: "Żądany zasób nie został znaleziony" },
-    serverError: { title: "Błąd serwera", description: "Wystąpił wewnętrzny błąd serwera podczas przechwytywania zrzutu ekranu" },
-    unknown: { title: "Nieznany błąd", description: "Wystąpił nieznany błąd podczas przechwytywania zrzutu ekranu" },
-    unsavedChanges: { title: "Niezapisane zmiany", description: "Masz niezapisane zmiany, które mogą zostać utracone" },
-    conflict: { title: "Konflikt", description: "Wystąpił konflikt podczas przechwytywania zrzutu ekranu" },
+    validation: {
+      title: "Błąd walidacji",
+      description: "Sprawdź wprowadzone dane i spróbuj ponownie",
+    },
+    network: {
+      title: "Błąd sieci",
+      description: "Wystąpił błąd sieci podczas przechwytywania zrzutu ekranu",
+    },
+    unauthorized: {
+      title: "Nieautoryzowany",
+      description: "Nie masz uprawnień do przechwytywania zrzutów ekranu",
+    },
+    forbidden: {
+      title: "Zabronione",
+      description: "Przechwytywanie zrzutów ekranu jest zabronione",
+    },
+    notFound: {
+      title: "Nie znaleziono",
+      description: "Żądany zasób nie został znaleziony",
+    },
+    serverError: {
+      title: "Błąd serwera",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas przechwytywania zrzutu ekranu",
+    },
+    unknown: {
+      title: "Nieznany błąd",
+      description:
+        "Wystąpił nieznany błąd podczas przechwytywania zrzutu ekranu",
+    },
+    unsavedChanges: {
+      title: "Niezapisane zmiany",
+      description: "Masz niezapisane zmiany, które mogą zostać utracone",
+    },
+    conflict: {
+      title: "Konflikt",
+      description: "Wystąpił konflikt podczas przechwytywania zrzutu ekranu",
+    },
   },
   success: {
     title: "Zrzut ekranu przechwycony pomyślnie",

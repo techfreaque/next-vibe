@@ -90,7 +90,9 @@ export function extractContainerData(
 /**
  * Get container configuration from field
  */
-export function getContainerConfig(field: UnifiedField): ContainerConfig {
+export function getContainerConfig<TKey extends string>(
+  field: UnifiedField<TKey>,
+): ContainerConfig {
   const defaultConfig: ContainerConfig = {
     spacing: "normal",
   };

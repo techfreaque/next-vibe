@@ -63,7 +63,9 @@ export interface UnifiedTaskRunnerRepository extends TaskRunnerManager {
  * Unified Task Runner Repository Implementation
  * Implements the complete unified task runner as per spec.md
  */
-export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerRepository {
+export class UnifiedTaskRunnerRepositoryImpl
+  implements UnifiedTaskRunnerRepository
+{
   name = "unified-task-runner" as const;
   description =
     "app.api.system.unifiedInterface.tasks.unifiedRunner.description" as const;

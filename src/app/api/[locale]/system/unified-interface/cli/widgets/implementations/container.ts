@@ -22,7 +22,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
 > {
   readonly widgetType = WidgetType.CONTAINER;
 
-  render(props: CLIWidgetProps<typeof WidgetType.CONTAINER>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.CONTAINER, string>): string {
     const { field, value, context } = props;
 
     // Extract data using shared logic
@@ -45,9 +45,9 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
     return `${label}: ${valueStr}`;
   }
 
-  private renderContainerObject(
+  private renderContainerObject<TKey extends string>(
     value: { [key: string]: WidgetData },
-    field: UnifiedField,
+    field: UnifiedField<TKey>,
     context: WidgetRenderContext,
   ): string {
     // Use shared config extraction
@@ -75,11 +75,11 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
     return result.join("\n");
   }
 
-  private renderFields(
+  private renderFields<TKey extends string>(
     data: { [key: string]: WidgetData },
     config: ContainerConfig,
     context: WidgetRenderContext,
-    field?: UnifiedField,
+    field?: UnifiedField<TKey>,
   ): string {
     const result: string[] = [];
     const layout = config.layout || { type: "vertical" as const, columns: 1 };
@@ -95,17 +95,13 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
 
       if (field?.type === "object" && field.children?.[key]) {
         const childField = field.children[key];
-        const renderer = context.getRenderer(childField.ui.type);
-        if (renderer) {
-          const rendered = renderer.render({
-            widgetType: childField.ui.type,
-            field: childField,
-            value,
-            context,
-          });
-          if (rendered) {
-            result.push(rendered);
-          }
+        const rendered = context.renderWidget(
+          childField.ui.type,
+          childField,
+          value,
+        );
+        if (rendered) {
+          result.push(rendered);
         }
       } else {
         const formattedValue = this.formatContainerValue(key, value, context);
@@ -116,11 +112,11 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
     return result.join("\n");
   }
 
-  private renderGridLayout(
+  private renderGridLayout<TKey extends string>(
     data: { [key: string]: WidgetData },
     columns: number,
     context: WidgetRenderContext,
-    field?: UnifiedField,
+    field?: UnifiedField<TKey>,
   ): string {
     const entries = Object.entries(data);
     const result: string[] = [];
@@ -131,15 +127,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
         .map(([key, value]) => {
           if (field?.type === "object" && field.children?.[key]) {
             const childField = field.children[key];
-            const renderer = context.getRenderer(childField.ui.type);
-            if (renderer) {
-              return renderer.render({
-                widgetType: childField.ui.type,
-                field: childField,
-                value,
-                context,
-              });
-            }
+            return context.renderWidget(childField.ui.type, childField, value);
           }
           return this.formatContainerValue(key, value, context);
         })

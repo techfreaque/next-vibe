@@ -42,42 +42,10 @@ import type {
 import { SubscriptionPlan, SubscriptionStatus } from "./enum";
 
 /**
- * Subscription Repository Interface
+ * Subscription Repository - Static class pattern
  */
-export interface SubscriptionRepository {
-  getSubscription(
-    userId: string,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<SubscriptionGetResponseOutput>>;
-
-  createSubscription(
-    data: SubscriptionPostRequestOutput,
-    userId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPostResponseOutput>>;
-
-  updateSubscription(
-    data: SubscriptionPutRequestOutput,
-    userId: string,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SubscriptionPutResponseOutput>>;
-
-  cancelSubscription(
-    data: SubscriptionDeleteRequestOutput,
-    userId: string,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<{ success: boolean; message: string }>>;
-}
-
-/**
- * Subscription Repository Implementation
- */
-export class SubscriptionRepositoryImpl implements SubscriptionRepository {
-  async getSubscription(
+export class SubscriptionRepository {
+  static async getSubscription(
     userId: string,
     logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars - locale is unused on server, but required on native
@@ -129,7 +97,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     }
   }
 
-  async createSubscription(
+  static async createSubscription(
     data: SubscriptionPostRequestOutput,
     userId: string,
     locale: CountryLanguage,
@@ -150,7 +118,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     });
   }
 
-  async updateSubscription(
+  static async updateSubscription(
     data: SubscriptionPutRequestOutput,
     userId: string,
     locale: CountryLanguage,
@@ -229,7 +197,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
     }
   }
 
-  async cancelSubscription(
+  static async cancelSubscription(
     data: SubscriptionDeleteRequestOutput,
     userId: string,
     logger: EndpointLogger,
@@ -311,7 +279,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
    * Handle subscription checkout webhook from payment provider
    * Called by payment repository when checkout.session.completed webhook received
    */
-  async handleSubscriptionCheckout(
+  static async handleSubscriptionCheckout(
     session: WebhookData,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -390,9 +358,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         });
 
       // Add subscription credits with expiration date
-      const { creditRepository } = await import("../credits/repository");
-      const { productsRepository, ProductIds } =
-        await import("../products/repository-client");
+      const { CreditRepository } = await import("../credits/repository");
+      const { productsRepository, ProductIds } = await import(
+        "../products/repository-client"
+      );
 
       // Map subscription plan to product ID
       const productId =
@@ -424,7 +393,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
           return; // Idempotent - already processed
         }
 
-        await creditRepository.addUserCredits(
+        await CreditRepository.addUserCredits(
           userId as string,
           product.credits,
           "subscription",
@@ -456,7 +425,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
    * Handle invoice payment succeeded webhook from payment provider
    * Called by payment repository when invoice.payment_succeeded webhook received
    */
-  async handleInvoicePaymentSucceeded(
+  static async handleInvoicePaymentSucceeded(
     invoice: WebhookData,
     subscriptionId: string,
     logger: EndpointLogger,
@@ -516,9 +485,10 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
         billingReason === "subscription_update"
       ) {
         // This is a renewal - add monthly credits with expiration
-        const { creditRepository } = await import("../credits/repository");
-        const { productsRepository, ProductIds } =
-          await import("../products/repository-client");
+        const { CreditRepository } = await import("../credits/repository");
+        const { productsRepository, ProductIds } = await import(
+          "../products/repository-client"
+        );
 
         const productId =
           subscription.planId === SubscriptionPlan.SUBSCRIPTION
@@ -553,7 +523,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
             }
           }
 
-          await creditRepository.addUserCredits(
+          await CreditRepository.addUserCredits(
             subscription.userId,
             product.credits,
             "subscription",
@@ -587,7 +557,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
    * Handle subscription cancellation
    * Called when customer.subscription.deleted webhook is received
    */
-  async handleSubscriptionCanceled(
+  static async handleSubscriptionCanceled(
     subscriptionId: string,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -630,7 +600,7 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
    * Handle subscription update
    * Called when customer.subscription.updated webhook is received
    */
-  async handleSubscriptionUpdated(
+  static async handleSubscriptionUpdated(
     stripeSubscription: Stripe.Subscription,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -707,4 +677,8 @@ export class SubscriptionRepositoryImpl implements SubscriptionRepository {
   }
 }
 
-export const subscriptionRepository = new SubscriptionRepositoryImpl();
+// Type for native repository type checking
+export type SubscriptionRepositoryType = Pick<
+  typeof SubscriptionRepository,
+  keyof typeof SubscriptionRepository
+>;

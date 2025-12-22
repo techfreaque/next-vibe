@@ -9,7 +9,7 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { LeadEditForm } from "@/app/api/[locale]/leads/_components/lead-edit-form";
-import { leadsRepository } from "@/app/api/[locale]/leads/repository";
+import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -33,7 +33,7 @@ export default async function LeadEditPage({
   await requireAdminUser(locale, `/${locale}/admin/leads/${id}/edit`);
 
   // Fetch lead data
-  const leadResponse = await leadsRepository.getLeadByIdInternal(id, logger);
+  const leadResponse = await LeadsRepository.getLeadByIdInternal(id, logger);
 
   // Handle lead not found
   if (!leadResponse.success) {

@@ -11,9 +11,11 @@ import type { JSX } from "react";
 import type { Control } from "react-hook-form";
 
 import type { ImapConfigPostRequestOutput } from "@/app/api/[locale]/emails/imap-client/config/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ImapServerConfigFormProps {
   control: Control<ImapConfigPostRequestOutput>;
+  locale: CountryLanguage;
 }
 
 /**
@@ -21,6 +23,7 @@ interface ImapServerConfigFormProps {
  */
 export function ImapServerConfigForm({
   control,
+  locale,
 }: ImapServerConfigFormProps): JSX.Element {
   return (
     <Div className="flex flex-col gap-4">
@@ -31,6 +34,7 @@ export function ImapServerConfigForm({
           label: "app.admin.emails.imap.config.server.enabled",
         }}
         control={control}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -41,6 +45,7 @@ export function ImapServerConfigForm({
           placeholder: undefined,
         }}
         control={control}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -51,6 +56,7 @@ export function ImapServerConfigForm({
           placeholder: undefined,
         }}
         control={control}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -61,6 +67,7 @@ export function ImapServerConfigForm({
           placeholder: undefined,
         }}
         control={control}
+        locale={locale}
       />
 
       <EndpointFormField
@@ -70,6 +77,7 @@ export function ImapServerConfigForm({
           label: "app.admin.emails.imap.config.server.keepAlive",
         }}
         control={control}
+        locale={locale}
       />
     </Div>
   );

@@ -158,7 +158,7 @@ export function EmailsListTable({
               </TableCell>
               <TableCell>
                 <Badge variant={getTypeBadgeVariant(email.emailMetadata.type)}>
-                  {email.emailMetadata.type.replaceAll('_', " ")}
+                  {email.emailMetadata.type.replaceAll("_", " ")}
                 </Badge>
               </TableCell>
               <TableCell>

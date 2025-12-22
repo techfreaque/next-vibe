@@ -5,10 +5,12 @@
 export const translations = {
   post: {
     title: "Text zu Sprache",
-    description: "Konvertieren Sie Text in natürlich klingende Sprache mit KI (~0,00052 Credits pro Zeichen)",
+    description:
+      "Konvertieren Sie Text in natürlich klingende Sprache mit KI (~0,00052 Credits pro Zeichen)",
     form: {
       title: "Text-zu-Sprache-Konvertierung",
-      description: "Geben Sie Text ein, um ihn in Sprache umzuwandeln (Amazon Polly: ~0,00052 Credits pro Zeichen)",
+      description:
+        "Geben Sie Text ein, um ihn in Sprache umzuwandeln (Amazon Polly: ~0,00052 Credits pro Zeichen)",
     },
     text: {
       label: "Text",

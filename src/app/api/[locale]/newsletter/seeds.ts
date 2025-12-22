@@ -9,7 +9,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserDetailLevel } from "../user/enum";
-import { userRepository } from "../user/repository";
+import { UserRepository } from "../user/repository";
 import type { NewNewsletterSubscription } from "./db";
 import { NewsletterSubscriptionStatus } from "./enum";
 
@@ -42,14 +42,14 @@ export async function dev(
 
   try {
     // Get existing users for newsletter subscriptions
-    const demoUserResponse = await userRepository.getUserByEmail(
+    const demoUserResponse = await UserRepository.getUserByEmail(
       "demo@example.com",
       UserDetailLevel.STANDARD,
       locale,
       logger,
     );
 
-    const adminUserResponse = await userRepository.getUserByEmail(
+    const adminUserResponse = await UserRepository.getUserByEmail(
       "admin@example.com",
       UserDetailLevel.STANDARD,
       locale,

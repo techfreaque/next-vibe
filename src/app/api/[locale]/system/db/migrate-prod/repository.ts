@@ -40,7 +40,9 @@ export interface DatabaseMigrateProdRepository {
 /**
  * Database Production Migration Repository Implementation
  */
-export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRepository {
+export class DatabaseMigrateProdRepositoryImpl
+  implements DatabaseMigrateProdRepository
+{
   async runProductionMigrations(
     data: MigrateProdRequestType,
     locale: CountryLanguage,

@@ -15,11 +15,11 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
 /**
  * Renders H1-H6 headings with optional subtitle and alignment.
  */
-export function TitleWidget({
+export function TitleWidget<TKey extends string>({
   value,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.TITLE>): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.TITLE, TKey>): JSX.Element {
   const { t } = simpleT(context.locale);
   const data = extractTitleData(value);
 

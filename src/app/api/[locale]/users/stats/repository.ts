@@ -14,7 +14,10 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { userLeadLinks } from "@/app/api/[locale]/leads/db";
-import { paymentRefunds, paymentTransactions } from "@/app/api/[locale]/payment/db";
+import {
+  paymentRefunds,
+  paymentTransactions,
+} from "@/app/api/[locale]/payment/db";
 import { PaymentStatus } from "@/app/api/[locale]/payment/enum";
 import {
   DateRangePreset,
@@ -46,7 +49,9 @@ export interface UsersStatsRepository {
 }
 
 class UsersStatsRepositoryImpl implements UsersStatsRepository {
-  private getDateTruncFormat(timePeriod: typeof TimePeriod[keyof typeof TimePeriod]): string {
+  private getDateTruncFormat(
+    timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
+  ): string {
     switch (timePeriod) {
       case TimePeriod.DAY:
         return "day";
@@ -63,15 +68,24 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
     }
   }
 
-  private formatPeriodLabel(period: string, timePeriod: typeof TimePeriod[keyof typeof TimePeriod]): string {
+  private formatPeriodLabel(
+    period: string,
+    timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
+  ): string {
     const date = new Date(period);
     switch (timePeriod) {
       case TimePeriod.DAY:
-        return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        return date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        });
       case TimePeriod.WEEK:
         return `Week ${this.getWeekNumber(date)}`;
       case TimePeriod.MONTH:
-        return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+        return date.toLocaleDateString("en-US", {
+          month: "short",
+          year: "numeric",
+        });
       case TimePeriod.QUARTER:
         return `Q${Math.floor(date.getMonth() / 3) + 1} ${date.getFullYear()}`;
       case TimePeriod.YEAR:
@@ -85,7 +99,9 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
     const startOfYear = new Date(date.getFullYear(), 0, 1);
     const diff = date.getTime() - startOfYear.getTime();
     const oneWeek = 7 * 24 * 60 * 60 * 1000;
-    return Math.ceil((diff + startOfYear.getDay() * 24 * 60 * 60 * 1000) / oneWeek);
+    return Math.ceil(
+      (diff + startOfYear.getDay() * 24 * 60 * 60 * 1000) / oneWeek,
+    );
   }
 
   async getUserStats(
@@ -212,7 +228,11 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
       const timePeriod = timePeriodOptions?.timePeriod ?? TimePeriod.DAY;
-      const response = await this.buildResponse(whereClause, dateRange, timePeriod);
+      const response = await this.buildResponse(
+        whereClause,
+        dateRange,
+        timePeriod,
+      );
       return success(response);
     } catch (error) {
       logger.error("Error fetching user statistics", parseError(error));
@@ -227,7 +247,7 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
   private async buildResponse(
     whereClause: SQL | undefined,
     dateRange: { from: Date; to: Date },
-    timePeriod: typeof TimePeriod[keyof typeof TimePeriod],
+    timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
   ): Promise<UserStatsResponseOutput> {
     const [basicCounts] = await db
       .select({
@@ -261,15 +281,19 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         totalWithSubscription: sql<number>`count(*)::int`,
       })
       .from(subscriptions)
-      .where(and(
-        gte(subscriptions.createdAt, dateRange.from),
-        lte(subscriptions.createdAt, dateRange.to),
-      ));
+      .where(
+        and(
+          gte(subscriptions.createdAt, dateRange.from),
+          lte(subscriptions.createdAt, dateRange.to),
+        ),
+      );
 
     const activeSubscriptions = subscriptionCounts?.activeSubscriptions ?? 0;
-    const canceledSubscriptions = subscriptionCounts?.canceledSubscriptions ?? 0;
+    const canceledSubscriptions =
+      subscriptionCounts?.canceledSubscriptions ?? 0;
     const expiredSubscriptions = subscriptionCounts?.expiredSubscriptions ?? 0;
-    const totalWithSubscription = subscriptionCounts?.totalWithSubscription ?? 0;
+    const totalWithSubscription =
+      subscriptionCounts?.totalWithSubscription ?? 0;
     const noSubscription = totalUsers - totalWithSubscription;
 
     // Payment stats - filter by transaction createdAt
@@ -279,10 +303,12 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         transactionCount: sql<number>`count(*) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED})::int`,
       })
       .from(paymentTransactions)
-      .where(and(
-        gte(paymentTransactions.createdAt, dateRange.from),
-        lte(paymentTransactions.createdAt, dateRange.to),
-      ));
+      .where(
+        and(
+          gte(paymentTransactions.createdAt, dateRange.from),
+          lte(paymentTransactions.createdAt, dateRange.to),
+        ),
+      );
 
     const [refundCounts] = await db
       .select({
@@ -290,16 +316,20 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         refundCount: sql<number>`count(*)::int`,
       })
       .from(paymentRefunds)
-      .where(and(
-        gte(paymentRefunds.createdAt, dateRange.from),
-        lte(paymentRefunds.createdAt, dateRange.to),
-      ));
+      .where(
+        and(
+          gte(paymentRefunds.createdAt, dateRange.from),
+          lte(paymentRefunds.createdAt, dateRange.to),
+        ),
+      );
 
     const totalRevenue = paymentCounts?.totalRevenue ?? 0;
     const transactionCount = paymentCounts?.transactionCount ?? 0;
     const refundCount = refundCounts?.refundCount ?? 0;
-    const averageOrderValue = transactionCount > 0 ? Math.round(totalRevenue / transactionCount) : 0;
-    const refundRate = transactionCount > 0 ? refundCount / transactionCount : 0;
+    const averageOrderValue =
+      transactionCount > 0 ? Math.round(totalRevenue / transactionCount) : 0;
+    const refundRate =
+      transactionCount > 0 ? refundCount / transactionCount : 0;
 
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -326,10 +356,12 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         count: sql<number>`count(*)::int`,
       })
       .from(users)
-      .where(and(
-        gte(users.createdAt, dateRange.from),
-        lte(users.createdAt, dateRange.to),
-      ))
+      .where(
+        and(
+          gte(users.createdAt, dateRange.from),
+          lte(users.createdAt, dateRange.to),
+        ),
+      )
       .groupBy(sql`date_trunc(${dateTruncFormat}, ${users.createdAt})`)
       .orderBy(sql`date_trunc(${dateTruncFormat}, ${users.createdAt})`);
 
@@ -421,22 +453,26 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
           {
             x: "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
             y: activeSubscriptions,
-            label: "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
+            label:
+              "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
           },
           {
             x: "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
             y: canceledSubscriptions,
-            label: "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
+            label:
+              "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
           },
           {
             x: "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
             y: expiredSubscriptions,
-            label: "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
+            label:
+              "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
           },
           {
             x: "app.api.users.stats.response.subscriptionStats.noSubscription.label",
             y: noSubscription,
-            label: "app.api.users.stats.response.subscriptionStats.noSubscription.label",
+            label:
+              "app.api.users.stats.response.subscriptionStats.noSubscription.label",
           },
         ],
       },

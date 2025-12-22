@@ -9,18 +9,17 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { speechToTextRepository } from "./repository";
+import { SpeechToTextRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, user, locale, logger }) => {
-      return await speechToTextRepository.transcribeAudio(
+    handler: ({ data, user, locale, logger }) =>
+      SpeechToTextRepository.transcribeAudio(
         data.fileUpload.file,
         user,
         locale,
         logger,
-      );
-    },
+      ),
   },
 });

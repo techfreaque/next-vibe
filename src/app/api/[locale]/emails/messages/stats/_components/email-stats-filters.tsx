@@ -41,6 +41,7 @@ interface EmailStatsFiltersContainerProps {
 
 interface EmailStatsFiltersProps {
   control: Control<EmailStatsGetRequestTypeOutput>;
+  locale: CountryLanguage;
 }
 
 /**
@@ -87,6 +88,7 @@ export function EmailStatsFiltersContainer({
  */
 export function EmailStatsFilters({
   control,
+  locale,
 }: EmailStatsFiltersProps): JSX.Element {
   return (
     <Div className="flex flex-col gap-4">
@@ -96,6 +98,7 @@ export function EmailStatsFilters({
         <EndpointFormField
           control={control}
           name="timePeriod"
+          locale={locale}
           config={{
             type: "select",
             label: "app.admin.emails.stats.admin.stats.filters.timePeriod",
@@ -138,6 +141,7 @@ export function EmailStatsFilters({
         <EndpointFormField
           control={control}
           name="dateRangePreset"
+          locale={locale}
           config={{
             type: "select",
             label: "app.admin.emails.stats.admin.stats.filters.dateRange",
@@ -205,6 +209,7 @@ export function EmailStatsFilters({
         <EndpointFormField
           control={control}
           name="chartType"
+          locale={locale}
           config={{
             type: "select",
             label: "app.admin.emails.stats.admin.stats.filters.chartType",
@@ -235,6 +240,7 @@ export function EmailStatsFilters({
         <EndpointFormField
           control={control}
           name="status"
+          locale={locale}
           config={{
             type: "select",
             label: "app.admin.emails.stats.admin.stats.filters.statuses.title",
@@ -287,6 +293,7 @@ export function EmailStatsFilters({
         <EndpointFormField
           control={control}
           name="type"
+          locale={locale}
           config={{
             type: "select",
             label: "app.admin.emails.stats.admin.stats.filters.types.title",
@@ -328,6 +335,7 @@ export function EmailStatsFilters({
         <EndpointFormField
           control={control}
           name="sortBy"
+          locale={locale}
           config={{
             type: "select",
             label: "app.admin.emails.stats.admin.stats.filters.sortBy.title",
@@ -362,6 +370,7 @@ export function EmailStatsFilters({
         <EndpointFormField
           control={control}
           name="sortOrder"
+          locale={locale}
           config={{
             type: "select",
             label: "app.admin.emails.stats.admin.stats.filters.sortOrder.title",
@@ -384,6 +393,7 @@ export function EmailStatsFilters({
         <EndpointFormField
           control={control}
           name="includeComparison"
+          locale={locale}
           config={{
             type: "checkbox",
             label:
@@ -398,6 +408,7 @@ export function EmailStatsFilters({
       <EndpointFormField
         control={control}
         name="search"
+        locale={locale}
         config={{
           type: "text",
           label: "app.admin.emails.stats.admin.stats.filters.search",

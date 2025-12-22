@@ -8,7 +8,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
+import {
+  ContentLevelFilter,
+  IntelligenceLevelFilter,
+  ModelSelectionMode,
+  PriceLevelFilter,
+} from "@/app/api/[locale]/agent/chat/favorites/enum";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -36,17 +41,17 @@ function loadLocalFavorites(): FavoriteItem[] {
 
   try {
     const parsed = JSON.parse(stored);
-    // Handle legacy format (array of persona IDs)
+    // Handle legacy format (array of character IDs)
     if (Array.isArray(parsed) && typeof parsed[0] === "string") {
-      return parsed.map((personaId: string, index: number) => ({
-        id: `local-${personaId}`,
-        personaId,
+      return parsed.map((characterId: string, index: number) => ({
+        id: `local-${characterId}`,
+        characterId,
         modelSettings: {
-          mode: "auto" as const,
+          mode: ModelSelectionMode.AUTO,
           filters: {
-            intelligence: "smart" as const,
-            maxPrice: "standard" as const,
-            content: "open" as const,
+            intelligence: IntelligenceLevelFilter.SMART,
+            maxPrice: PriceLevelFilter.STANDARD,
+            content: ContentLevelFilter.OPEN,
           },
         },
         isActive: index === 0,
@@ -143,10 +148,19 @@ export function useChatFavorites({
         const serverFavorites = endpoint.read.response.data.favorites.map(
           (serverFav): FavoriteItem => ({
             id: serverFav.id,
-            personaId: serverFav.personaId,
+            characterId: serverFav.characterId,
             customName: serverFav.customName ?? undefined,
-            customIcon: serverFav.customIcon as FavoriteItem["customIcon"],
-            modelSettings: serverFav.modelSettings,
+            customIcon: serverFav.customIcon ?? undefined,
+            voice: serverFav.voice ?? undefined,
+            modelSettings: {
+              mode: serverFav.mode,
+              filters: {
+                intelligence: serverFav.intelligence,
+                maxPrice: serverFav.maxPrice,
+                content: serverFav.content,
+              },
+              manualModelId: serverFav.manualModelId ?? undefined,
+            },
             isActive: serverFav.isActive,
           }),
         );
@@ -179,9 +193,15 @@ export function useChatFavorites({
     async (favorite: Omit<FavoriteItem, "id">): Promise<FavoriteItem> => {
       if (useServerStorage && endpoint.create) {
         // Set form values for server creation
-        endpoint.create.form.setValue("personaId", favorite.personaId);
+        endpoint.create.form.setValue(
+          "characterId",
+          favorite.characterId ?? "",
+        );
         if (favorite.customName) {
           endpoint.create.form.setValue("customName", favorite.customName);
+        }
+        if (favorite.voice) {
+          endpoint.create.form.setValue("voice", favorite.voice);
         }
         endpoint.create.form.setValue("mode", favorite.modelSettings.mode);
         endpoint.create.form.setValue(
@@ -199,7 +219,7 @@ export function useChatFavorites({
         if (favorite.modelSettings.manualModelId) {
           endpoint.create.form.setValue(
             "manualModelId",
-            favorite.modelSettings.manualModelId as ModelId,
+            favorite.modelSettings.manualModelId,
           );
         }
 
@@ -248,13 +268,16 @@ export function useChatFavorites({
       setFavoritesState(newFavorites);
 
       if (useServerStorage && !id.startsWith("local-")) {
-        // Build PATCH request data with proper types
+        // Build PATCH request data
         const requestData: Partial<FavoriteUpdateRequestInput> = {};
-        if (updates.personaId !== undefined) {
-          requestData.personaId = updates.personaId;
+        if (updates.characterId !== undefined) {
+          requestData.characterId = updates.characterId ?? undefined;
         }
         if (updates.customName !== undefined) {
           requestData.customName = updates.customName;
+        }
+        if (updates.voice !== undefined) {
+          requestData.voice = updates.voice;
         }
         if (updates.isActive !== undefined) {
           requestData.isActive = updates.isActive;
@@ -264,9 +287,9 @@ export function useChatFavorites({
           requestData.intelligence = updates.modelSettings.filters.intelligence;
           requestData.maxPrice = updates.modelSettings.filters.maxPrice;
           requestData.content = updates.modelSettings.filters.content;
-          if (updates.modelSettings.manualModelId) {
+          if (updates.modelSettings.manualModelId !== undefined) {
             requestData.manualModelId =
-              updates.modelSettings.manualModelId ;
+              updates.modelSettings.manualModelId ?? null;
           }
         }
 
@@ -289,25 +312,43 @@ export function useChatFavorites({
   // Delete a favorite
   const deleteFavorite = useCallback(
     async (id: string): Promise<void> => {
+      logger.debug("deleteFavorite called", {
+        id,
+        useServerStorage,
+        favoritesCount: favorites.length,
+      });
+
       // Update local state immediately
       const newFavorites = favorites.filter((f) => f.id !== id);
       setFavoritesState(newFavorites);
 
+      logger.debug("deleteFavorite: state updated", {
+        newCount: newFavorites.length,
+      });
+
       if (useServerStorage && !id.startsWith("local-")) {
-        // DELETE endpoint has no requestData fields, cast needed per framework pattern
+        // Server storage for authenticated users
+        logger.debug("deleteFavorite: using server storage");
         const response = await deleteMutation.mutateAsync({
           urlPathParams: { id },
         });
 
         if (response.success) {
           endpoint.read?.refetch?.();
+          logger.debug("deleteFavorite: server delete successful");
+        } else {
+          logger.error("deleteFavorite: server delete failed", { response });
         }
       } else {
         // Local storage for non-authenticated users
+        logger.debug("deleteFavorite: using local storage", {
+          newCount: newFavorites.length,
+        });
         saveLocalFavorites(newFavorites);
+        logger.debug("deleteFavorite: saved to localStorage");
       }
     },
-    [favorites, useServerStorage, endpoint.read, deleteMutation],
+    [favorites, useServerStorage, endpoint.read, deleteMutation, logger],
   );
 
   // Set a favorite as active

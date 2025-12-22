@@ -54,7 +54,7 @@ export interface UseIncognitoChatReturn {
     content: string,
     parentId?: string | null,
     model?: ModelId | null,
-    persona?: string | null,
+    character?: string | null,
   ) => ChatMessage;
   updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void;
   deleteMessage: (messageId: string) => void;
@@ -151,7 +151,7 @@ export function useIncognitoChat(
         folderId: currentSubFolderId,
         status: ThreadStatus.ACTIVE,
         defaultModel: null,
-        defaultPersona: null,
+        defaultCharacter: null,
         systemPrompt: null,
         pinned: false,
         archived: false,
@@ -239,7 +239,7 @@ export function useIncognitoChat(
       content: string,
       parentId: string | null = null,
       model: ModelId | null = null,
-      persona: string | null = null,
+      character: string | null = null,
     ): ChatMessage => {
       logger.debug("Incognito: Adding message", {
         threadId,
@@ -263,7 +263,7 @@ export function useIncognitoChat(
         authorColor: null,
         isAI: role === "assistant",
         model,
-        persona,
+        character,
         errorType: null,
         errorMessage: null,
         errorCode: null,
@@ -285,7 +285,7 @@ export function useIncognitoChat(
           content,
           parentId,
           model,
-          persona,
+          character,
         );
 
         setState((prev: IncognitoState) => ({

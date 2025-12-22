@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
                 "app.api.user.public.login.fields.rememberMe.description",
               order: 3,
             },
-            z.boolean().optional().default(false),
+            z.boolean().optional().default(true), // Default to true (30 days)
           ),
 
           // === FORM ALERT (shows validation and API errors) ===

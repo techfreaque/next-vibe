@@ -182,10 +182,7 @@ export class BaseDataFormatter {
   /**
    * Format array with separator and truncation
    */
-  formatArray(
-    value: WidgetData[],
-    options: ArrayFormatOptions = {},
-  ): string {
+  formatArray(value: WidgetData[], options: ArrayFormatOptions = {}): string {
     const { separator = ", ", maxItems = 10, showCount = true } = options;
 
     const items = value.slice(0, maxItems);
@@ -287,7 +284,9 @@ export class BaseDataFormatter {
       value: WidgetData,
     ): WidgetData {
       if (depth > maxDepth) {
-        return propertyKey ? `[Max Depth: ${propertyKey}]` : "[Max Depth Reached]";
+        return propertyKey
+          ? `[Max Depth: ${propertyKey}]`
+          : "[Max Depth Reached]";
       }
 
       if (typeof value === "object" && value !== null) {

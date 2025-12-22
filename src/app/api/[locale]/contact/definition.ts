@@ -28,23 +28,34 @@ import {
   ContactSubject,
   ContactSubjectOptions,
 } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /**
- * Contact form endpoint
+ * Contact form endpoint with scoped translations
+ * Translation keys are type-safe and validated against the ContactTranslationKey type
+ *
+ * Type safety is enforced through:
+ * 1. Using 'satisfies' to validate translation keys against ContactTranslationKey
+ * 2. Widget configs are generic with TKey parameter
+ * 3. Field helpers (requestDataField, objectField) preserve the TUIConfig generic
+ * 4. TypeScript validates all translation keys at compile time
+ *
+ * Example: If you try to use an invalid key like "invalid.key", TypeScript will error
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["contact"],
-  title: "app.api.contact.title",
-  description: "app.api.contact.description",
-  category: "app.api.contact.category",
+  title: "title",
+  description: "description",
+  category: "category",
   icon: "mail",
   tags: [
-    "app.api.contact.tags.contactForm",
-    "app.api.contact.tags.contactUs",
-    "app.api.contact.tags.contactSubmission",
-    "app.api.contact.tags.helpSupport",
-  ],
+    "tags.contactForm",
+    "tags.contactUs",
+    "tags.contactSubmission",
+    "tags.helpSupport",
+  ] as const,
 
   allowedRoles: [
     UserRole.PUBLIC,
@@ -57,8 +68,8 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.contact.form.label",
-      description: "app.api.contact.form.description",
+      title: "form.label",
+      description: "form.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -68,9 +79,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.contact.form.fields.name.label",
-          description: "app.api.contact.form.fields.name.description",
-          placeholder: "app.api.contact.form.fields.name.placeholder",
+          label: "form.fields.name.label",
+          description: "form.fields.name.description",
+          placeholder: "form.fields.name.placeholder",
           columns: 6,
         },
         z.string().min(2),
@@ -79,9 +90,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.EMAIL,
-          label: "app.api.contact.form.fields.email.label",
-          description: "app.api.contact.form.fields.email.description",
-          placeholder: "app.api.contact.form.fields.email.placeholder",
+          label: "form.fields.email.label",
+          description: "form.fields.email.description",
+          placeholder: "form.fields.email.placeholder",
           columns: 6,
         },
         z.string().email(),
@@ -90,9 +101,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.contact.form.fields.company.label",
-          description: "app.api.contact.form.fields.company.description",
-          placeholder: "app.api.contact.form.fields.company.placeholder",
+          label: "form.fields.company.label",
+          description: "form.fields.company.description",
+          placeholder: "form.fields.company.placeholder",
           columns: 12,
         },
         z.string().optional(),
@@ -101,9 +112,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.contact.form.fields.subject.label",
-          description: "app.api.contact.form.fields.subject.description",
-          placeholder: "app.api.contact.form.fields.subject.placeholder",
+          label: "form.fields.subject.label",
+          description: "form.fields.subject.description",
+          placeholder: "form.fields.subject.placeholder",
           options: ContactSubjectOptions,
           columns: 12,
         },
@@ -113,9 +124,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
-          label: "app.api.contact.form.fields.message.label",
-          description: "app.api.contact.form.fields.message.description",
-          placeholder: "app.api.contact.form.fields.message.placeholder",
+          label: "form.fields.message.label",
+          description: "form.fields.message.description",
+          placeholder: "form.fields.message.placeholder",
           columns: 12,
         },
         z.string().min(10),
@@ -124,9 +135,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.contact.form.fields.priority.label",
-          description: "app.api.contact.form.fields.priority.description",
-          placeholder: "app.api.contact.form.fields.priority.placeholder",
+          label: "form.fields.priority.label",
+          description: "form.fields.priority.description",
+          placeholder: "form.fields.priority.placeholder",
           options: ContactPriorityOptions,
           columns: 12,
         },
@@ -138,27 +149,27 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.contact.response.success",
+          content: "response.success",
         },
         z.boolean(),
       ),
       messageId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.contact.response.messageId",
+          content: "response.messageId",
         },
         z.string().optional(),
       ),
       status: responseArrayOptionalField(
         {
           type: WidgetType.DATA_LIST,
-          title: "app.api.contact.response.status",
-          description: "app.api.contact.response.description",
+          title: "response.status",
+          description: "response.description",
         },
         responseField(
           {
             type: WidgetType.TEXT,
-            content: "app.api.contact.response.status",
+            content: "response.status",
           },
           z.string(),
         ),
@@ -213,45 +224,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.contact.errors.validation.title",
-      description: "app.api.contact.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.contact.errors.network.title",
-      description: "app.api.contact.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.contact.errors.unauthorized.title",
-      description: "app.api.contact.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.contact.errors.forbidden.title",
-      description: "app.api.contact.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.contact.errors.notFound.title",
-      description: "app.api.contact.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.contact.errors.serverError.title",
-      description: "app.api.contact.errors.serverError.description",
+      title: "errors.serverError.title",
+      description: "errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.contact.errors.unknown.title",
-      description: "app.api.contact.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.contact.errors.unsavedChanges.title",
-      description: "app.api.contact.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.contact.errors.conflict.title",
-      description: "app.api.contact.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.contact.success.title",
-    description: "app.api.contact.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 });
 

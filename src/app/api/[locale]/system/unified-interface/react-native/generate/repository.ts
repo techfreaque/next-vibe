@@ -43,7 +43,9 @@ export interface GenerateExpoIndexesRepository {
 /**
  * Generate Expo Indexes Repository Implementation
  */
-class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository {
+class GenerateExpoIndexesRepositoryImpl
+  implements GenerateExpoIndexesRepository
+{
   private readonly PROJECT_ROOT: string;
   private readonly SOURCE_DIR: string;
   private readonly TARGET_DIR: string;

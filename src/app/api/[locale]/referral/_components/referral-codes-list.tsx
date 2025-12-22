@@ -8,7 +8,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Card } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { Check,Copy } from "next-vibe-ui/ui/icons";
+import { Check, Copy } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import React from "react";

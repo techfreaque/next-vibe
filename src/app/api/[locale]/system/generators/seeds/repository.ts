@@ -89,7 +89,10 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
       const duration = Date.now() - startTime;
 
       logger.info(
-        formatGenerator(`Generated seeds file with ${formatCount(seedFiles.length, "seed")} in ${formatDuration(duration)}`, "🌱"),
+        formatGenerator(
+          `Generated seeds file with ${formatCount(seedFiles.length, "seed")} in ${formatDuration(duration)}`,
+          "🌱",
+        ),
       );
 
       return success({

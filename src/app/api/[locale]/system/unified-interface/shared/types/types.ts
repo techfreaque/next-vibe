@@ -7,7 +7,7 @@
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { LayoutConfig,WidgetConfig } from "../widgets/configs";
+import type { LayoutConfig, WidgetConfig } from "../widgets/configs";
 import type {
   FieldActions,
   InteractiveActions,
@@ -22,9 +22,9 @@ import type { FieldDataType, InterfaceContext } from "./enums";
 /**
  * Context-specific UI configuration
  */
-export interface ContextSpecificConfig {
+export interface ContextSpecificConfig<TKey extends string> {
   // Widget configuration for this context
-  widget?: WidgetConfig;
+  widget?: WidgetConfig<TKey>;
 
   // Field-specific overrides
   field?: {
@@ -62,12 +62,12 @@ export interface ContextSpecificConfig {
 /**
  * Complete UI configuration that can be attached to any field
  */
-export interface UIConfig {
+export interface UIConfig<TKey extends string> {
   // Context-specific configurations
-  contexts?: Partial<Record<InterfaceContext, ContextSpecificConfig>>;
+  contexts?: Partial<Record<InterfaceContext, ContextSpecificConfig<TKey>>>;
 
   // Default configuration (applies to all contexts unless overridden)
-  default?: ContextSpecificConfig;
+  default?: ContextSpecificConfig<TKey>;
 
   // Global actions that apply across all contexts
   globalActions?: LifecycleActions;

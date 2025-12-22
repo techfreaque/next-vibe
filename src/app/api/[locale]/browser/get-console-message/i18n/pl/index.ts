@@ -21,15 +21,44 @@ export const translations: typeof enTranslations = {
     executionId: "ID wykonania do śledzenia",
   },
   errors: {
-    validation: { title: "Błąd walidacji", description: "Sprawdź wprowadzone dane i spróbuj ponownie" },
-    network: { title: "Błąd sieci", description: "Wystąpił błąd sieci podczas pobierania wiadomości konsoli" },
-    unauthorized: { title: "Nieautoryzowany", description: "Nie masz uprawnień do pobierania wiadomości konsoli" },
-    forbidden: { title: "Zabronione", description: "Operacja pobierania wiadomości konsoli jest zabroniona" },
-    notFound: { title: "Nie znaleziono", description: "Żądany zasób nie został znaleziony" },
-    serverError: { title: "Błąd serwera", description: "Wystąpił wewnętrzny błąd serwera podczas pobierania wiadomości konsoli" },
-    unknown: { title: "Nieznany błąd", description: "Wystąpił nieznany błąd podczas pobierania wiadomości konsoli" },
-    unsavedChanges: { title: "Niezapisane zmiany", description: "Masz niezapisane zmiany, które mogą zostać utracone" },
-    conflict: { title: "Konflikt", description: "Wystąpił konflikt podczas pobierania wiadomości konsoli" },
+    validation: {
+      title: "Błąd walidacji",
+      description: "Sprawdź wprowadzone dane i spróbuj ponownie",
+    },
+    network: {
+      title: "Błąd sieci",
+      description: "Wystąpił błąd sieci podczas pobierania wiadomości konsoli",
+    },
+    unauthorized: {
+      title: "Nieautoryzowany",
+      description: "Nie masz uprawnień do pobierania wiadomości konsoli",
+    },
+    forbidden: {
+      title: "Zabronione",
+      description: "Operacja pobierania wiadomości konsoli jest zabroniona",
+    },
+    notFound: {
+      title: "Nie znaleziono",
+      description: "Żądany zasób nie został znaleziony",
+    },
+    serverError: {
+      title: "Błąd serwera",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas pobierania wiadomości konsoli",
+    },
+    unknown: {
+      title: "Nieznany błąd",
+      description:
+        "Wystąpił nieznany błąd podczas pobierania wiadomości konsoli",
+    },
+    unsavedChanges: {
+      title: "Niezapisane zmiany",
+      description: "Masz niezapisane zmiany, które mogą zostać utracone",
+    },
+    conflict: {
+      title: "Konflikt",
+      description: "Wystąpił konflikt podczas pobierania wiadomości konsoli",
+    },
   },
   success: {
     title: "Wiadomość konsoli pomyślnie pobrana",

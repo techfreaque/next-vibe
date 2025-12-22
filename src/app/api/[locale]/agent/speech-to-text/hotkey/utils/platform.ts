@@ -5,7 +5,11 @@
 
 import "server-only";
 
-import type { PlatformType,RecorderBackendType,TyperBackendType } from "../enum";
+import type {
+  PlatformType,
+  RecorderBackendType,
+  TyperBackendType,
+} from "../enum";
 import { Platform, RecorderBackend, TyperBackend } from "../enum";
 import type {
   PlatformCapabilities,

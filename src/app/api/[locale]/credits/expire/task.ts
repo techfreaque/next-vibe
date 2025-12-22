@@ -22,7 +22,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/types/repository";
 
-import { creditRepository } from "../repository";
+import { CreditRepository } from "../repository";
 
 /**
  * Execute credit expiration task
@@ -34,7 +34,7 @@ async function executeTask(
     logger.info("Starting credit expiration task");
 
     // Expire old subscription credits
-    const result = await creditRepository.expireCredits(logger);
+    const result = await CreditRepository.expireCredits(logger);
 
     if (!result.success) {
       logger.error("Failed to expire credits", {

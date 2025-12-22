@@ -27,21 +27,9 @@ import type {
 } from "./definition";
 
 /**
- * Root Folder Permissions Repository Interface
+ * Root Folder Permissions Repository - Static class pattern
  */
-export interface RootFolderPermissionsRepositoryInterface {
-  getRootFolderPermissions(
-    data: RootPermissionsGetRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<RootPermissionsGetResponseOutput>>;
-}
-
-/**
- * Root Folder Permissions Repository Implementation
- */
-export class RootFolderPermissionsRepositoryImpl implements RootFolderPermissionsRepositoryInterface {
+export class RootFolderPermissionsRepository {
   /**
    * Compute permissions for a root folder
    * Root folders don't exist in the database, so we compute permissions based on DEFAULT_FOLDER_CONFIGS
@@ -49,7 +37,7 @@ export class RootFolderPermissionsRepositoryImpl implements RootFolderPermission
    * For non-public root folders (private, shared, incognito), permissions are always true
    * For public root folder, permissions are based on user role and folder config
    */
-  async getRootFolderPermissions(
+  static async getRootFolderPermissions(
     data: RootPermissionsGetRequestOutput,
     user: JwtPayloadType,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
@@ -129,5 +117,8 @@ export class RootFolderPermissionsRepositoryImpl implements RootFolderPermission
   }
 }
 
-export const rootFolderPermissionsRepository =
-  new RootFolderPermissionsRepositoryImpl();
+// Type for native repository type checking
+export type RootFolderPermissionsRepositoryType = Pick<
+  typeof RootFolderPermissionsRepository,
+  keyof typeof RootFolderPermissionsRepository
+>;

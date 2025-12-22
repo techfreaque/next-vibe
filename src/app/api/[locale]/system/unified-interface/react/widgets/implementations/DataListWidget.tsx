@@ -27,18 +27,20 @@ import {
   type ListItem,
 } from "../../../shared/widgets/logic/data-list";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
+import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**
  * Displays data in either list view (table) or grid view with toggle.
  */
-export function DataListWidget({
+export function DataListWidget<TKey extends string>({
   value,
   field,
   context,
   className,
-}: ReactWidgetProps<typeof WidgetType.DATA_LIST>): JSX.Element {
-  const { t } = simpleT(context.locale);
+}: ReactWidgetProps<typeof WidgetType.DATA_LIST, TKey>): JSX.Element {
+  const { t } = getTranslator(context);
+  const { t: globalT } = simpleT(context.locale);
   const [showAll, setShowAll] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
@@ -47,20 +49,22 @@ export function DataListWidget({
   if (!data) {
     return (
       <Div className={cn("text-muted-foreground italic", className)}>
-        {t("app.api.system.unifiedInterface.react.widgets.dataList.noData")}
+        {globalT(
+          "app.api.system.unifiedInterface.react.widgets.dataList.noData",
+        )}
       </Div>
     );
   }
 
   const { items, title, maxItems } = data;
 
-  let fieldDefinitions: Record<string, UnifiedField> = {};
+  let fieldDefinitions: Record<string, UnifiedField<string>> = {};
   if (
     "type" in field &&
     (field.type === "array" || field.type === "array-optional")
   ) {
     if ("child" in field && field.child) {
-      const childField = field.child as UnifiedField;
+      const childField = field.child as UnifiedField<string>;
       if (
         "type" in childField &&
         (childField.type === "object" || childField.type === "object-optional")
@@ -68,7 +72,7 @@ export function DataListWidget({
         if ("children" in childField && childField.children) {
           fieldDefinitions = childField.children as Record<
             string,
-            UnifiedField
+            UnifiedField<string>
           >;
         }
       }
@@ -94,7 +98,7 @@ export function DataListWidget({
             onClick={() => setViewMode("list")}
             className="h-8 px-3"
           >
-            {t(
+            {globalT(
               "app.api.system.unifiedInterface.react.widgets.dataList.viewList",
             )}
           </Button>
@@ -104,7 +108,7 @@ export function DataListWidget({
             onClick={() => setViewMode("grid")}
             className="h-8 px-3"
           >
-            {t(
+            {globalT(
               "app.api.system.unifiedInterface.react.widgets.dataList.viewGrid",
             )}
           </Button>
@@ -276,7 +280,7 @@ export function DataListWidget({
           onClick={() => setShowAll(true)}
           className="mt-2 text-sm font-medium text-blue-600 hover:bg-gray-50 dark:text-blue-400 dark:hover:bg-gray-800"
         >
-          {t(
+          {globalT(
             "app.api.system.unifiedInterface.react.widgets.dataList.showMore",
             { count: remainingCount },
           )}
@@ -289,7 +293,9 @@ export function DataListWidget({
           onClick={() => setShowAll(false)}
           className="mt-2 text-sm font-medium text-blue-600 hover:bg-gray-50 dark:text-blue-400 dark:hover:bg-gray-800"
         >
-          {t("app.api.system.unifiedInterface.react.widgets.dataList.showLess")}
+          {globalT(
+            "app.api.system.unifiedInterface.react.widgets.dataList.showLess",
+          )}
         </Button>
       )}
     </Div>

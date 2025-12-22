@@ -19,7 +19,9 @@ import {
   styledNativeRef,
 } from "../utils/style-converter";
 
-const StyledScrollView = styledNativeRef<typeof ScrollView, RNScrollView>(ScrollView);
+const StyledScrollView = styledNativeRef<typeof ScrollView, RNScrollView>(
+  ScrollView,
+);
 const StyledView = styledNative(View);
 const StyledPressable = styledNative(Pressable);
 const StyledText = styledNative(RNText);

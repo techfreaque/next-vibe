@@ -14,7 +14,7 @@ import type { ChatSettings } from "./store";
  */
 export interface SettingsOperations {
   settings: ChatSettings;
-  setSelectedPersona: (persona: string) => void;
+  setSelectedCharacter: (character: string) => void;
   setSelectedModel: (model: ModelId) => void;
   setTemperature: (temp: number) => void;
   setMaxTokens: (tokens: number) => void;
@@ -47,9 +47,9 @@ export function useSettings(deps: {
   }, [hydrateSettings]);
 
   // Zustand store methods are stable, so we only depend on the specific method
-  const setSelectedPersona = useCallback(
-    (persona: string) => {
-      updateSettings({ selectedPersona: persona });
+  const setSelectedCharacter = useCallback(
+    (character: string) => {
+      updateSettings({ selectedCharacter: character });
     },
     [updateSettings],
   );
@@ -106,7 +106,7 @@ export function useSettings(deps: {
 
   return {
     settings: chatStore.settings,
-    setSelectedPersona,
+    setSelectedCharacter,
     setSelectedModel,
     setTemperature,
     setMaxTokens,

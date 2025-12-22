@@ -35,8 +35,16 @@ export interface LintConfigObject {
 export type LintConfigElement = Record<string, LintConfigValue>;
 
 /** JSON-compatible value type for settings files */
-export type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-export interface JsonObject { [key: string]: JsonValue }
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonObject
+  | JsonArray;
+export interface JsonObject {
+  [key: string]: JsonValue;
+}
 export type JsonArray = JsonValue[];
 
 // Forward declaration for circular reference
@@ -83,7 +91,11 @@ export interface OxlintJsPlugin {
   /** Path to the JS plugin file (e.g., "next-vibe/src/.../plugin/src/index.ts") */
   path: string;
   /** Plugin options - will be used when oxlint supports options natively */
-  options?: I18nPluginConfig | RestrictedSyntaxPluginConfig | JsxCapitalizationPluginConfig | LintConfigElement;
+  options?:
+    | I18nPluginConfig
+    | RestrictedSyntaxPluginConfig
+    | JsxCapitalizationPluginConfig
+    | LintConfigElement;
 }
 
 /** Optional oxlint settings (shared between enabled/disabled) */
@@ -267,7 +279,11 @@ export interface EslintParser {
 export interface EslintParserOptions {
   ecmaVersion?: number | "latest";
   sourceType?: "module" | "script" | "commonjs";
-  ecmaFeatures?: { jsx?: boolean; globalReturn?: boolean; impliedStrict?: boolean };
+  ecmaFeatures?: {
+    jsx?: boolean;
+    globalReturn?: boolean;
+    impliedStrict?: boolean;
+  };
   project?: string | string[];
   tsconfigRootDir?: string;
   [key: string]: LintConfigValue | undefined;
@@ -305,8 +321,14 @@ export interface EslintPluginConfig {
 
 /** ESLint processor interface */
 export interface EslintProcessor {
-  preprocess?: (text: string, filename: string) => Array<string | { text: string; filename: string }>;
-  postprocess?: (messages: LintConfigElement[][], filename: string) => LintConfigElement[];
+  preprocess?: (
+    text: string,
+    filename: string,
+  ) => Array<string | { text: string; filename: string }>;
+  postprocess?: (
+    messages: LintConfigElement[][],
+    filename: string,
+  ) => LintConfigElement[];
   supportsAutofix?: boolean;
 }
 
@@ -314,7 +336,9 @@ export interface EslintProcessor {
 export type EslintRule = EslintRuleFunction | EslintRuleModule;
 
 /** ESLint rule as a function */
-export type EslintRuleFunction = (context: EslintRuleContext) => EslintRuleListener;
+export type EslintRuleFunction = (
+  context: EslintRuleContext,
+) => EslintRuleListener;
 
 /** ESLint rule as a module with create function */
 export interface EslintRuleModule {

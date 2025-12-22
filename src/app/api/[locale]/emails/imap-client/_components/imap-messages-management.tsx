@@ -144,6 +144,7 @@ export function ImapMessagesManagement(): JSX.Element {
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 {/* Status Filter */}
@@ -180,6 +181,7 @@ export function ImapMessagesManagement(): JSX.Element {
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 {/* Sort By */}
@@ -212,6 +214,7 @@ export function ImapMessagesManagement(): JSX.Element {
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 {/* Sort Order */}
@@ -236,6 +239,7 @@ export function ImapMessagesManagement(): JSX.Element {
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
               </Div>
 
@@ -253,6 +257,7 @@ export function ImapMessagesManagement(): JSX.Element {
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -267,11 +272,12 @@ export function ImapMessagesManagement(): JSX.Element {
                     style: "none",
                     showAllRequired: false,
                   }}
+                  locale={locale}
                 />
               </Div>
 
               {/* Search Bar */}
-              <Div className="flex items-center flex flex-row gap-4">
+              <Div className="flex items-center flex-row gap-4">
                 <Div className="flex-1">
                   <EndpointFormField
                     name="search"
@@ -286,6 +292,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       style: "none",
                       showAllRequired: false,
                     }}
+                    locale={locale}
                   />
                 </Div>
               </Div>
@@ -332,7 +339,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       "app.admin.emails.imap.admin.messages.title",
                     ).toLowerCase()}
                   </Div>
-                  <Div className="flex items-center flex flex-row gap-2">
+                  <Div className="flex items-center flex-row gap-2">
                     <Button
                       variant="outline"
                       size="sm"

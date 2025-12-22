@@ -9,10 +9,12 @@ import { extractErrorData } from "@/app/api/[locale]/system/unified-interface/sh
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class ErrorWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.ERROR> {
+export class ErrorWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.ERROR
+> {
   readonly widgetType = WidgetType.ERROR;
 
-  render(props: CLIWidgetProps<typeof WidgetType.ERROR>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.ERROR, string>): string {
     const { value, context } = props;
     const indent = this.createIndent(context.depth, context);
 

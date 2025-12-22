@@ -290,7 +290,7 @@ export const chatThreads = pgTable(
 
     // Settings
     defaultModel: text("default_model").$type<ModelId | null>(), // ModelId
-    defaultPersona: text("default_tone"), // Persona ID (can be default persona or custom UUID)
+    defaultCharacter: text("default_tone"), // Character ID (can be default character or custom UUID)
     systemPrompt: text("system_prompt"),
 
     // Metadata
@@ -408,7 +408,7 @@ export const chatMessages = pgTable(
 
     // AI-specific fields
     model: text("model").$type<ModelId | null>(), // ModelId if AI message
-    persona: text("tone"),
+    character: text("tone"),
 
     // Error information (for error messages)
     errorType: text("error_type"),

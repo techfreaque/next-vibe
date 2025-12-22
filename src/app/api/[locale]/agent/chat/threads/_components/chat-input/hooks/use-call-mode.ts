@@ -1,6 +1,6 @@
 /**
  * Call Mode Hook
- * Manages call mode state per model+persona combination
+ * Manages call mode state per model+character combination
  */
 
 import { useCallback } from "react";
@@ -11,14 +11,14 @@ import { getCallModeKey } from "@/app/api/[locale]/agent/chat/voice-mode/types";
 interface UseCallModeOptions {
   /** Current model ID */
   modelId: string;
-  /** Current persona ID */
-  personaId: string;
+  /** Current character ID */
+  characterId: string;
 }
 
 export interface UseCallModeReturn {
-  /** Whether call mode is enabled for current model+persona */
+  /** Whether call mode is enabled for current model+character */
   isCallMode: boolean;
-  /** Toggle call mode for current model+persona */
+  /** Toggle call mode for current model+character */
   toggleCallMode: () => void;
   /** Set call mode to specific value */
   setCallMode: (enabled: boolean) => void;
@@ -26,27 +26,27 @@ export interface UseCallModeReturn {
 
 /**
  * Hook for managing call mode state
- * Call mode is stored per model+persona combination
+ * Call mode is stored per model+character combination
  */
 export function useCallMode({
   modelId,
-  personaId,
+  characterId,
 }: UseCallModeOptions): UseCallModeReturn {
-  const callModeKey = getCallModeKey(modelId, personaId);
+  const callModeKey = getCallModeKey(modelId, characterId);
   const isCallMode = useVoiceModeStore(
     (s) => s.settings.callModeByConfig?.[callModeKey] ?? false,
   );
   const setCallModeStore = useVoiceModeStore((s) => s.setCallMode);
 
   const toggleCallMode = useCallback((): void => {
-    setCallModeStore(modelId, personaId, !isCallMode);
-  }, [setCallModeStore, modelId, personaId, isCallMode]);
+    setCallModeStore(modelId, characterId, !isCallMode);
+  }, [setCallModeStore, modelId, characterId, isCallMode]);
 
   const setCallMode = useCallback(
     (enabled: boolean): void => {
-      setCallModeStore(modelId, personaId, enabled);
+      setCallModeStore(modelId, characterId, enabled);
     },
-    [setCallModeStore, modelId, personaId],
+    [setCallModeStore, modelId, characterId],
   );
 
   return {

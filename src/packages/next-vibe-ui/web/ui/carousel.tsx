@@ -208,7 +208,13 @@ function CarouselItem({
 }
 
 export interface CarouselButtonProps {
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  variant?:
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link";
   size?: "default" | "sm" | "lg" | "icon" | "unset";
   className?: string;
   suppressHydrationWarning?: boolean;
@@ -249,9 +255,7 @@ function CarouselPrevious(props: CarouselButtonProps): React.JSX.Element {
     >
       <ArrowLeftIcon className="h-4 w-4" />
       <span className="sr-only">
-        {t(
-          "packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide",
-        )}
+        {t("packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide")}
       </span>
     </Button>
   );

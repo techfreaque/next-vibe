@@ -23,7 +23,6 @@ export function shouldSkipPath(path: string): boolean {
   );
 }
 
-
 /**
  * Extract locale from path
  * Handles both regular paths (/en-GLOBAL/...) and API paths (/api/en-GLOBAL/...)

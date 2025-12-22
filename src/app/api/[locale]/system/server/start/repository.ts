@@ -89,8 +89,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
         try {
           // Import and start the unified task runner
-          const { unifiedTaskRunnerRepository } =
-            await import("../../unified-interface/tasks/unified-runner/repository");
+          const { unifiedTaskRunnerRepository } = await import(
+            "../../unified-interface/tasks/unified-runner/repository"
+          );
 
           // Set environment to production
           unifiedTaskRunnerRepository.environment = "production";
@@ -214,8 +215,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
           try {
             // Import task registry (this will auto-generate if needed)
-            const { taskRegistry } =
-              await import("../../generated/tasks-index");
+            const { taskRegistry } = await import(
+              "../../generated/tasks-index"
+            );
 
             logger.info("Task registry loaded successfully", {
               cronTasks: taskRegistry.cronTasks.length,
@@ -232,8 +234,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             );
 
             // Get task runner status
-            const { unifiedTaskRunnerRepository } =
-              await import("../../unified-interface/tasks/unified-runner/repository");
+            const { unifiedTaskRunnerRepository } = await import(
+              "../../unified-interface/tasks/unified-runner/repository"
+            );
             const status = unifiedTaskRunnerRepository.getStatus();
 
             logger.info("Task runner system operational", {

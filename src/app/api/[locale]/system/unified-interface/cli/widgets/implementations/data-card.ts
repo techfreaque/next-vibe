@@ -9,10 +9,12 @@ import { extractDataCardData } from "@/app/api/[locale]/system/unified-interface
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class DataCardWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_CARD> {
+export class DataCardWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.DATA_CARD
+> {
   readonly widgetType = WidgetType.DATA_CARD;
 
-  render(props: CLIWidgetProps<typeof WidgetType.DATA_CARD>): string {
+  render(props: CLIWidgetProps<typeof WidgetType.DATA_CARD, string>): string {
     const { value, context } = props;
     const indent = this.createIndent(context.depth, context);
 

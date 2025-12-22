@@ -18,20 +18,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { PingRequestOutput, PingResponseOutput } from "./definition";
 
 /**
- * Database Ping Repository Interface
- */
-export interface DatabasePingRepository {
-  pingDatabase(
-    data: PingRequestOutput,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PingResponseOutput>>;
-}
-
-/**
  * Database Ping Repository Implementation
  */
-export class DatabasePingRepositoryImpl implements DatabasePingRepository {
-  async pingDatabase(
+export class DatabasePingRepository {
+  static async pingDatabase(
     data: PingRequestOutput,
     logger: EndpointLogger,
   ): Promise<ResponseType<PingResponseOutput>> {
@@ -67,7 +57,7 @@ export class DatabasePingRepositoryImpl implements DatabasePingRepository {
   /**
    * Execute database ping using the original logic from ping.ts
    */
-  private async executePing(
+  private static async executePing(
     data: PingRequestOutput,
     logger: EndpointLogger,
   ): Promise<{
@@ -130,8 +120,3 @@ export class DatabasePingRepositoryImpl implements DatabasePingRepository {
     }
   }
 }
-
-/**
- * Export repository instance
- */
-export const databasePingRepository = new DatabasePingRepositoryImpl();

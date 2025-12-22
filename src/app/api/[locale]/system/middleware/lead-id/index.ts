@@ -12,7 +12,7 @@ import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { leadAuthRepository } from "../../../leads/auth/repository";
+import { LeadAuthRepository } from "../../../leads/auth/repository";
 import { createEndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import { shouldSkipPath } from "../utils";
 
@@ -63,7 +63,7 @@ export async function createLeadId(
       undefined,
   };
 
-  const result = await leadAuthRepository.ensurePublicLeadId(
+  const result = await LeadAuthRepository.ensurePublicLeadId(
     undefined,
     clientInfo,
     locale,
@@ -78,6 +78,7 @@ export async function createLeadId(
   }
 
   // Set lead ID cookie
+  // IMPORTANT: Lead ID cookie NEVER expires - it persists across all sessions
   response.cookies.set({
     name: LEAD_ID_COOKIE_NAME,
     value: result.leadId,
@@ -85,7 +86,7 @@ export async function createLeadId(
     path: "/",
     secure: env.NODE_ENV === Environment.PRODUCTION,
     sameSite: "lax",
-    // No maxAge - cookie persists indefinitely
+    maxAge: 365 * 24 * 60 * 60 * 10, // 10 years (effectively permanent)
   });
 
   logger.debug("Lead ID cookie set in middleware", {

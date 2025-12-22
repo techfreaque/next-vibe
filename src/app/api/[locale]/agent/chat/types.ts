@@ -1,21 +1,22 @@
 /**
  * Shared types for the chat system
- * Contains tier levels, model utilities, persona categories, and related interfaces
+ * Contains tier levels, model utilities, character categories, and related interfaces
  */
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import {
+  ContentLevelFilter,
+  type ContentLevelFilterValue,
+  type ContentLevelValue,
+  IntelligenceLevelFilter,
+  type IntelligenceLevelFilterValue,
+  type IntelligenceLevelValue,
+  PriceLevelFilter,
+  type PriceLevelFilterValue,
+  type SpeedLevelValue,
+} from "./favorites/enum";
 import type { IconKey } from "./model-access/icons";
-
-// ============================================
-// TIER LEVELS
-// ============================================
-
-export type IntelligenceLevel = "quick" | "smart" | "brilliant";
-export type SpeedLevel = "fast" | "balanced" | "thorough";
-export type PriceLevel = "cheap" | "standard" | "premium";
-export type ContentLevel = "mainstream" | "open" | "uncensored";
-
 
 // ============================================
 // MODEL UTILITY - What models are good at
@@ -56,9 +57,9 @@ export enum ModelUtility {
 }
 
 // ============================================
-// PERSONA CATEGORY - User-facing task types
+// CHARACTER CATEGORY - User-facing task types
 // ============================================
-// NOTE: PersonaCategory enum is now defined in personas/enum.ts
+// NOTE: CharacterCategory enum is now defined in personas/enum.ts
 // using the localized enum pattern with createEnumOptions()
 
 // ============================================
@@ -74,33 +75,33 @@ export interface ModelFeatures {
 }
 
 // ============================================
-// PERSONA REQUIREMENTS - Hard filters
+// CHARACTER REQUIREMENTS - Hard filters
 // ============================================
 
-export interface PersonaRequirements {
-  minContent?: ContentLevel;
-  maxContent?: ContentLevel;
-  minIntelligence?: IntelligenceLevel;
-  maxIntelligence?: IntelligenceLevel;
-  minSpeed?: SpeedLevel;
-  maxSpeed?: SpeedLevel;
+export interface CharacterRequirements {
+  minContent?: typeof ContentLevelValue;
+  maxContent?: typeof ContentLevelValue;
+  minIntelligence?: typeof IntelligenceLevelValue;
+  maxIntelligence?: typeof IntelligenceLevelValue;
+  minSpeed?: typeof SpeedLevelValue;
+  maxSpeed?: typeof SpeedLevelValue;
   requiredFeatures?: (keyof ModelFeatures)[];
 }
 
 // ============================================
-// PERSONA PREFERENCES - Soft scoring
+// CHARACTER PREFERENCES - Soft scoring
 // ============================================
 
-export interface PersonaPreferences {
+export interface CharacterPreferences {
   preferredStrengths?: ModelUtility[];
   ignoredWeaknesses?: ModelUtility[];
 }
 
 // ============================================
-// PERSONA OWNERSHIP
+// CHARACTER OWNERSHIP
 // ============================================
 
-export interface PersonaOwnership {
+export interface CharacterOwnership {
   type: "system" | "user" | "public";
   userId?: string;
   isDefault?: boolean; // Show in onboarding
@@ -108,21 +109,20 @@ export interface PersonaOwnership {
 }
 
 // ============================================
-// PERSONA DISPLAY INFO
+// CHARACTER DISPLAY INFO
 // ============================================
 
-export interface PersonaDisplay {
+export interface CharacterDisplay {
   shortDescription: TranslationKey;
   suggestedModels?: string[];
   tags?: TranslationKey[];
 }
 
-
 // ============================================
 // TIER DISPLAY CONFIGS
 // ============================================
 
-  interface TierDisplayConfig<T extends string> {
+interface TierDisplayConfig<T extends string> {
   value: T;
   label: TranslationKey;
   icon: IconKey;
@@ -130,83 +130,85 @@ export interface PersonaDisplay {
 }
 
 export const INTELLIGENCE_DISPLAY: TierDisplayConfig<
-  IntelligenceLevel | "any"
+  typeof IntelligenceLevelFilterValue
 >[] = [
   {
-    value: "any",
+    value: IntelligenceLevelFilter.ANY,
     label: "app.chat.tiers.any",
     icon: "circle-dashed",
     description: "app.chat.tiers.anyDesc",
   },
   {
-    value: "quick",
+    value: IntelligenceLevelFilter.QUICK,
     label: "app.chat.tiers.intelligence.quick",
     icon: "zap",
     description: "app.chat.tiers.intelligence.quickDesc",
   },
   {
-    value: "smart",
+    value: IntelligenceLevelFilter.SMART,
     label: "app.chat.tiers.intelligence.smart",
     icon: "lightbulb",
     description: "app.chat.tiers.intelligence.smartDesc",
   },
   {
-    value: "brilliant",
+    value: IntelligenceLevelFilter.BRILLIANT,
     label: "app.chat.tiers.intelligence.brilliant",
     icon: "sparkles",
     description: "app.chat.tiers.intelligence.brilliantDesc",
   },
 ];
 
+export const PRICE_DISPLAY: TierDisplayConfig<typeof PriceLevelFilterValue>[] =
+  [
+    {
+      value: PriceLevelFilter.ANY,
+      label: "app.chat.tiers.any",
+      icon: "circle-dashed",
+      description: "app.chat.tiers.anyDesc",
+    },
+    {
+      value: PriceLevelFilter.CHEAP,
+      label: "app.chat.tiers.price.cheap",
+      icon: "coins",
+      description: "app.chat.tiers.price.cheapDesc",
+    },
+    {
+      value: PriceLevelFilter.STANDARD,
+      label: "app.chat.tiers.price.standard",
+      icon: "coins",
+      description: "app.chat.tiers.price.standardDesc",
+    },
+    {
+      value: PriceLevelFilter.PREMIUM,
+      label: "app.chat.tiers.price.premium",
+      icon: "crown",
+      description: "app.chat.tiers.price.premiumDesc",
+    },
+  ];
 
-export const PRICE_DISPLAY: TierDisplayConfig<PriceLevel | "any">[] = [
+export const CONTENT_DISPLAY: TierDisplayConfig<
+  typeof ContentLevelFilterValue
+>[] = [
   {
-    value: "any",
+    value: ContentLevelFilter.ANY,
     label: "app.chat.tiers.any",
     icon: "circle-dashed",
     description: "app.chat.tiers.anyDesc",
   },
   {
-    value: "cheap",
-    label: "app.chat.tiers.price.cheap",
-    icon: "coins",
-    description: "app.chat.tiers.price.cheapDesc",
-  },
-  {
-    value: "standard",
-    label: "app.chat.tiers.price.standard",
-    icon: "coins",
-    description: "app.chat.tiers.price.standardDesc",
-  },
-  {
-    value: "premium",
-    label: "app.chat.tiers.price.premium",
-    icon: "crown",
-    description: "app.chat.tiers.price.premiumDesc",
-  },
-];
-
-export const CONTENT_DISPLAY: TierDisplayConfig<ContentLevel | "any">[] = [
-  {
-    value: "any",
-    label: "app.chat.tiers.any",
-    icon: "circle-dashed",
-    description: "app.chat.tiers.anyDesc",
-  },
-  {
-    value: "mainstream",
+    value: ContentLevelFilter.MAINSTREAM,
     label: "app.chat.tiers.content.mainstream",
     icon: "home",
     description: "app.chat.tiers.content.mainstreamDesc",
   },
   {
-    value: "open",
+    value: ContentLevelFilter.OPEN,
     label: "app.chat.tiers.content.open",
     icon: "log-out",
     description: "app.chat.tiers.content.openDesc",
   },
   {
-    value: "uncensored",
+    value: ContentLevelFilter.UNCENSORED,
     label: "app.chat.tiers.content.uncensored",
     icon: "shield-off",
     description: "app.chat.tiers.content.uncensoredDesc",

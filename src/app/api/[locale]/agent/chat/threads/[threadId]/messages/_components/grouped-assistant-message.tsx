@@ -69,10 +69,10 @@ export function GroupedAssistantMessage({
   const { t } = simpleT(locale);
   const { primary, continuations } = group;
 
-  // Get persona for assistant messages
-  const persona =
+  // Get character for assistant messages
+  const character =
     primary.role === "assistant" || primary.role === "user"
-      ? primary.persona
+      ? primary.character
       : null;
 
   // Get display name for assistant
@@ -135,7 +135,7 @@ export function GroupedAssistantMessage({
               model={primary.model}
               timestamp={primary.createdAt}
               edited={primary.edited}
-              persona={persona}
+              character={character}
               locale={locale}
               rootFolderId={rootFolderId}
               compact

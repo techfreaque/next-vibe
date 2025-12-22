@@ -15,13 +15,13 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { speechToTextRepository } from "@/app/api/[locale]/agent/speech-to-text/repository";
+import { SpeechToTextRepository } from "@/app/api/[locale]/agent/speech-to-text/repository";
 import { STT_COST_PER_SECOND } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { creditRepository } from "../../../credits/repository";
+import { CreditRepository } from "../../../credits/repository";
 import { createAdapters } from "./adapters/factory";
 import type {
   SttHotkeyPostRequestOutput,
@@ -45,28 +45,13 @@ function getSessionKey(user: JwtPayloadType): string {
 }
 
 /**
- * Speech-to-Text Hotkey Repository Interface
+ * Speech-to-Text Hotkey Repository
  */
-export interface SttHotkeyRepository {
-  /**
-   * Handle hotkey action (start/stop/toggle)
-   */
-  handleHotkeyAction(
-    data: SttHotkeyPostRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SttHotkeyPostResponseOutput>>;
-}
-
-/**
- * Speech-to-Text Hotkey Repository Implementation
- */
-export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
+export class SttHotkeyRepository {
   /**
    * Handle hotkey action
    */
-  async handleHotkeyAction(
+  static async handleHotkeyAction(
     data: SttHotkeyPostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -103,23 +88,28 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
       let session = sessions.get(sessionKey);
 
       if (!session) {
-        session = await this.createNewSession(data, user, locale, logger);
+        session = await SttHotkeyRepository.createNewSession(
+          data,
+          user,
+          locale,
+          logger,
+        );
         sessions.set(sessionKey, session);
       }
 
       // Handle action
       switch (data.action) {
         case HotkeyAction.START:
-          return await this.handleStart(session, logger);
+          return await SttHotkeyRepository.handleStart(session, logger);
 
         case HotkeyAction.STOP:
-          return await this.handleStop(session, user, logger);
+          return await SttHotkeyRepository.handleStop(session, user, logger);
 
         case HotkeyAction.TOGGLE:
-          return await this.handleToggle(session, user, logger);
+          return await SttHotkeyRepository.handleToggle(session, user, logger);
 
         case HotkeyAction.STATUS:
-          return this.handleStatus(session, logger);
+          return SttHotkeyRepository.handleStatus(session, logger);
 
         default:
           // No action provided - should not happen from CLI daemon mode
@@ -167,7 +157,7 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
   /**
    * Create new session
    */
-  private createNewSession(
+  private static async createNewSession(
     data: SttHotkeyPostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
@@ -191,7 +181,7 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
       });
 
       // Call existing STT repository
-      const result = await speechToTextRepository.transcribeAudio(
+      const result = await SpeechToTextRepository.transcribeAudio(
         audioFile,
         user,
         locale,
@@ -222,7 +212,7 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
   /**
    * Handle START action
    */
-  private async handleStart(
+  private static async handleStart(
     session: SpeechHotkeySession,
     logger: EndpointLogger,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
@@ -250,7 +240,7 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
   /**
    * Handle STOP action
    */
-  private async handleStop(
+  private static async handleStop(
     session: SpeechHotkeySession,
     user: JwtPayloadType,
     logger: EndpointLogger,
@@ -279,7 +269,7 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
     });
 
     // Deduct credits AFTER successful completion based on recording duration
-    await creditRepository.deductCreditsForFeature(
+    await CreditRepository.deductCreditsForFeature(
       user,
       cost,
       "stt-hotkey",
@@ -300,21 +290,21 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
   /**
    * Handle TOGGLE action
    */
-  private async handleToggle(
+  private static async handleToggle(
     session: SpeechHotkeySession,
     user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (session.isRecording) {
-      return await this.handleStop(session, user, logger);
+      return await SttHotkeyRepository.handleStop(session, user, logger);
     }
-    return await this.handleStart(session, logger);
+    return await SttHotkeyRepository.handleStart(session, logger);
   }
 
   /**
    * Handle STATUS action
    */
-  private handleStatus(
+  private static handleStatus(
     session: SpeechHotkeySession,
     logger: EndpointLogger,
   ): ResponseType<SttHotkeyPostResponseOutput> {
@@ -334,8 +324,3 @@ export class SttHotkeyRepositoryImpl implements SttHotkeyRepository {
     });
   }
 }
-
-/**
- * Singleton instance
- */
-export const sttHotkeyRepository = new SttHotkeyRepositoryImpl();

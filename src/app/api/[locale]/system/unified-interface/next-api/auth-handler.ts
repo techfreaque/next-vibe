@@ -25,7 +25,7 @@ import {
 /**
  * Web Authentication Handler
  * Handles platform-specific storage for web (HTTP cookies)
- * All authentication business logic is in authRepository
+ * All authentication business logic is in AuthRepository
  */
 export class WebAuthHandler extends BaseAuthHandler {
   /**
@@ -57,33 +57,54 @@ export class WebAuthHandler extends BaseAuthHandler {
 
   /**
    * Store authentication token in HTTP-only cookies
+   * @param rememberMe - If true, session cookie lasts 30 days; if false, session-only (browser session)
    */
   async storeAuthToken(
     token: string,
     userId: string,
     leadId: string,
     logger: EndpointLogger,
+    rememberMe = true, // Default to true (30 days)
   ): Promise<ResponseType<void>> {
     try {
-      logger.debug("Storing auth token in cookies", { userId, leadId });
+      logger.debug("Storing auth token in cookies", {
+        userId,
+        leadId,
+        rememberMe,
+      });
 
       const cookieStore = await cookies();
 
-      const cookieOptions = {
+      // Session cookie: 30 days if rememberMe, otherwise session-only (no maxAge)
+      const cookieOptions: {
+        name: string;
+        value: string;
+        httpOnly: boolean;
+        path: string;
+        secure: boolean;
+        sameSite: "lax";
+        maxAge?: number;
+      } = {
         name: AUTH_TOKEN_COOKIE_NAME,
         value: token,
         httpOnly: true,
         path: "/",
         secure: env.NODE_ENV === Environment.PRODUCTION,
         sameSite: "lax" as const,
-        maxAge: AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
       };
+
+      // Only set maxAge if rememberMe is true (30 days)
+      // If false, cookie is session-only (deleted when browser closes)
+      if (rememberMe) {
+        cookieOptions.maxAge = AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS; // 30 days
+      }
 
       cookieStore.set(cookieOptions);
 
       // Set lead ID cookie for client-side tracking
       // This cookie is readable by client (httpOnly: false) for analytics/tracking
-      // No maxAge - cookie never expires (persists indefinitely for tracking)
+      // IMPORTANT: Lead ID cookie NEVER expires - it persists across all sessions
+      // This is critical for tracking user behavior across sessions and after DB resets
       cookieStore.set({
         name: LEAD_ID_COOKIE_NAME,
         value: leadId,
@@ -91,10 +112,12 @@ export class WebAuthHandler extends BaseAuthHandler {
         path: "/",
         secure: env.NODE_ENV === Environment.PRODUCTION,
         sameSite: "lax" as const,
-        // No maxAge - cookie persists indefinitely
+        maxAge: 365 * 24 * 60 * 60 * 10, // 10 years (effectively permanent)
       });
 
-      logger.debug("Auth token and lead ID stored in cookies");
+      logger.debug("Auth token and lead ID stored in cookies", {
+        sessionType: rememberMe ? "persistent (30 days)" : "session-only",
+      });
       return success();
     } catch (error) {
       logger.error("Error storing auth token", parseError(error));
@@ -108,15 +131,19 @@ export class WebAuthHandler extends BaseAuthHandler {
 
   /**
    * Clear authentication token by deleting cookies
+   * IMPORTANT: This should ONLY be called on explicit logout, NOT on session validation failures
+   * Lead ID cookie is NEVER deleted - it persists across all sessions
    */
   async clearAuthToken(logger: EndpointLogger): Promise<ResponseType<void>> {
     try {
-      logger.debug("Clearing auth token from cookies");
+      logger.debug("Clearing auth token from cookies (logout)");
       try {
         const cookieStore = await cookies();
         cookieStore.delete(AUTH_TOKEN_COOKIE_NAME);
-        // Note: We don't delete LEAD_ID_COOKIE_NAME on logout
+        // CRITICAL: We NEVER delete LEAD_ID_COOKIE_NAME
         // Lead ID persists across sessions for tracking purposes
+        // Even after logout, the lead ID should remain for analytics
+        logger.debug("Auth token cleared, lead ID preserved");
       } catch (error) {
         // fails on page.tsx
         logger.debug("Error clearing auth token", parseError(error));

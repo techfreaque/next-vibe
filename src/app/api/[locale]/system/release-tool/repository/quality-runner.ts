@@ -23,7 +23,12 @@ import {
   formatSuccess,
 } from "../../unified-interface/shared/logger/formatters";
 import { MESSAGES } from "./constants";
-import { hasStdout, parsePackageJson, safeJsonParse, toCatchError } from "./utils";
+import {
+  hasStdout,
+  parsePackageJson,
+  safeJsonParse,
+  toCatchError,
+} from "./utils";
 
 // ============================================================================
 // Interface
@@ -130,7 +135,9 @@ export class QualityRunner implements IQualityRunner {
 
       // Default: prefer package.json script as it may use custom linting setup
       const pkgPath = join(cwd, "package.json");
-      const parsedPkg = existsSync(pkgPath) ? parsePackageJson(safeJsonParse(readFileSync(pkgPath, "utf8"))) : undefined;
+      const parsedPkg = existsSync(pkgPath)
+        ? parsePackageJson(safeJsonParse(readFileSync(pkgPath, "utf8")))
+        : undefined;
       const hasLintScript = parsedPkg?.scripts?.lint;
 
       if (hasLintScript) {
@@ -157,7 +164,9 @@ export class QualityRunner implements IQualityRunner {
       return success();
     } catch (err) {
       const error = toCatchError(err as Error | { stdout?: string | Buffer });
-      const output = hasStdout(error) ? error.stdout.toString() : parseError(err).message;
+      const output = hasStdout(error)
+        ? error.stdout.toString()
+        : parseError(err).message;
       logger.vibe(formatError("Lint failed"));
       logger.debug(MESSAGES.LINT_FAILED, { output });
       return fail({
@@ -268,7 +277,9 @@ export class QualityRunner implements IQualityRunner {
         return success();
       }
 
-      const parsedPkg = parsePackageJson(safeJsonParse(readFileSync(pkgPath, "utf8")));
+      const parsedPkg = parsePackageJson(
+        safeJsonParse(readFileSync(pkgPath, "utf8")),
+      );
       if (!parsedPkg?.scripts?.["test"]) {
         logger.vibe(formatSkip("No test script found"));
         return success();
@@ -372,7 +383,9 @@ export class QualityRunner implements IQualityRunner {
     // Check if clean script exists in package.json
     const pkgPath = join(cwd, "package.json");
     if (existsSync(pkgPath)) {
-      const parsedPkg = parsePackageJson(safeJsonParse(readFileSync(pkgPath, "utf8")));
+      const parsedPkg = parsePackageJson(
+        safeJsonParse(readFileSync(pkgPath, "utf8")),
+      );
       if (parsedPkg?.scripts?.["clean"]) {
         try {
           execSync(`${packageManager} run clean`, {

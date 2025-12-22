@@ -4,15 +4,15 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
-import { Span,type SpanMouseEvent } from "next-vibe-ui/ui/span";
+import { Span, type SpanMouseEvent } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
+import { getCharacterName } from "@/app/api/[locale]/agent/chat/characters/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
-import { getPersonaName } from "@/app/api/[locale]/agent/chat/personas/config";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -117,12 +117,12 @@ export function ThreadedMessageContent({
             </Button>
           </Span>
 
-          {/* Persona - only for AI messages */}
-          {message.role === "assistant" && message.persona && (
+          {/* Character - only for AI messages */}
+          {message.role === "assistant" && message.character && (
             <>
               <Span>•</Span>
               <Span className="text-muted-foreground/80">
-                {getPersonaName(message.persona)}
+                {getCharacterName(message.character)}
               </Span>
             </>
           )}

@@ -43,29 +43,18 @@ const MANIFEST_CONSTANTS = {
   },
   ICON_TYPE: "image/png",
   ICON_PURPOSE: IconPurpose.MASKABLE_ANY,
+  CACHE_CONTROL: "public, max-age=3600",
+  CONTENT_TYPE: "application/manifest+json",
 } as const;
 
 /**
- * Manifest Repository Interface
+ * Manifest Repository
  */
-export interface ManifestRepository {
+export class ManifestRepository {
   /**
    * Generate localized web app manifest
    */
-  generateManifest(
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): ResponseType<ManifestResponseOutput>;
-}
-
-/**
- * Manifest Repository Implementation
- */
-export class ManifestRepositoryImpl implements ManifestRepository {
-  /**
-   * Generate localized web app manifest
-   */
-  generateManifest(
+  static generateManifest(
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): ResponseType<ManifestResponseOutput> {
@@ -125,7 +114,12 @@ export class ManifestRepositoryImpl implements ManifestRepository {
         language: manifestLang,
       });
 
-      return success(manifest);
+      return success(manifest, {
+        headers: {
+          "Content-Type": MANIFEST_CONSTANTS.CONTENT_TYPE,
+          "Cache-Control": MANIFEST_CONSTANTS.CACHE_CONTROL,
+        },
+      });
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to generate manifest", {
@@ -141,6 +135,3 @@ export class ManifestRepositoryImpl implements ManifestRepository {
     }
   }
 }
-
-// Export singleton instance of the repository
-export const manifestRepository = new ManifestRepositoryImpl();

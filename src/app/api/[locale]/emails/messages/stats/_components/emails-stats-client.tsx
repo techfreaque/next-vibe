@@ -145,7 +145,7 @@ export function EmailsStatsClient({
         form={form}
       >
         <FormAlert alert={alert} />
-        <EmailStatsFilters control={form.control} />
+        <EmailStatsFilters locale={locale} control={form.control} />
       </EmailStatsFiltersContainer>
 
       {/* Key Metrics Overview */}

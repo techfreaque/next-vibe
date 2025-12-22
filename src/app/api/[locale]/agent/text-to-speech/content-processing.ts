@@ -152,10 +152,12 @@ export async function extractToolCallText(
   // Load the definition using the same loader as ToolCallRenderer
   // This ensures we get the exact same title that's displayed in the UI
   try {
-    const { createPublicUser } =
-      await import("@/app/api/[locale]/user/auth/helpers");
-    const { createEndpointLogger } =
-      await import("@/app/api/[locale]/system/unified-interface/shared/logger/endpoint");
+    const { createPublicUser } = await import(
+      "@/app/api/[locale]/user/auth/helpers"
+    );
+    const { createEndpointLogger } = await import(
+      "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint"
+    );
 
     const user = createPublicUser(crypto.randomUUID());
     const logger = createEndpointLogger(true, Date.now(), locale);
@@ -174,7 +176,6 @@ export async function extractToolCallText(
       return title;
     }
   } catch (error) {
-     
     logger.warn(
       "[TTS Content] Failed to load tool definition",
       parseError(error),
