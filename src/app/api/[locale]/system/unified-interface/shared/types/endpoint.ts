@@ -24,16 +24,6 @@ import type {
 import type { FieldUsage } from "./enums";
 
 // ============================================================================
-// TYPE UTILITIES
-// ============================================================================
-
-/**
- * NoInfer utility type - prevents TypeScript from inferring type from this position
- * Used to ensure scoped translation keys are validated at property level
- */
-type NoInfer<T> = [T][T extends T ? 0 : never];
-
-// ============================================================================
 // ENDPOINT REGISTRY TYPES
 // ============================================================================
 
@@ -224,37 +214,39 @@ type InferVariantSchemas<
   TVariants extends readonly ObjectField<
     Record<string, UnifiedField<string, z.ZodTypeAny>>,
     FieldUsageConfig,
-    string
+    string,
+    WidgetConfig<string>
   >[],
   Usage extends FieldUsage,
 > = TVariants extends readonly [infer Head, ...infer Tail]
   ? Head extends ObjectField<
       Record<string, UnifiedField<string, z.ZodTypeAny>>,
       FieldUsageConfig,
-      string
+      string,
+      WidgetConfig<string>
     >
     ? Tail extends readonly ObjectField<
         Record<string, UnifiedField<string, z.ZodTypeAny>>,
         FieldUsageConfig,
-        string
+        string,
+        WidgetConfig<string>
       >[]
       ? [
-          InferSchemaFromField<Head, Usage, string>,
+          InferSchemaFromField<Head, Usage>,
           ...InferVariantSchemas<string, Tail, Usage>,
         ]
-      : [InferSchemaFromField<Head, Usage, string>]
+      : [InferSchemaFromField<Head, Usage>]
     : []
   : [];
 
-// TTranslationKey is kept for API compatibility but pattern matching uses `string`
-// because fields have TKey=string (widened from field helpers)
-export type InferSchemaFromField<
-  F,
-  Usage extends FieldUsage,
-  TTranslationKey extends string,
-> =
+export type InferSchemaFromField<F, Usage extends FieldUsage> =
   // Handle PrimitiveField - use string for pattern matching
-  F extends PrimitiveField<infer TSchemaInferred, FieldUsageConfig, string>
+  F extends PrimitiveField<
+    infer TSchemaInferred,
+    FieldUsageConfig,
+    string,
+    WidgetConfig<string>
+  >
     ? F extends { usage: infer TUsage }
       ? MatchesUsage<TUsage, Usage> extends true
         ? TSchemaInferred
@@ -265,7 +257,8 @@ export type InferSchemaFromField<
           infer TDiscriminator extends string,
           string,
           infer TVariants,
-          FieldUsageConfig
+          FieldUsageConfig,
+          WidgetConfig<string>
         >
       ? F extends { usage: infer TUsage }
         ? MatchesUsage<TUsage, Usage> extends true
@@ -273,17 +266,20 @@ export type InferSchemaFromField<
               ObjectField<
                 Record<string, UnifiedField<string, z.ZodTypeAny>>,
                 FieldUsageConfig,
-                string
+                string,
+                WidgetConfig<string>
               >,
               ObjectField<
                 Record<string, UnifiedField<string, z.ZodTypeAny>>,
                 FieldUsageConfig,
-                string
+                string,
+                WidgetConfig<string>
               >,
               ...ObjectField<
                 Record<string, UnifiedField<string, z.ZodTypeAny>>,
                 FieldUsageConfig,
-                string
+                string,
+                WidgetConfig<string>
               >[],
             ]
             ? z.ZodDiscriminatedUnion<
@@ -308,17 +304,21 @@ export type InferSchemaFromField<
           : z.ZodNever
         : z.ZodNever
       : // Handle ObjectField - use string for pattern matching
-        F extends ObjectField<infer TChildren, FieldUsageConfig, string>
+        F extends ObjectField<
+            infer TChildren,
+            FieldUsageConfig,
+            string,
+            WidgetConfig<string>
+          >
         ? F extends { usage: infer TUsage }
           ? MatchesUsage<TUsage, Usage> extends true
             ? z.ZodObject<{
                 [K in keyof TChildren as InferSchemaFromField<
                   TChildren[K],
-                  Usage,
-                  string
+                  Usage
                 > extends z.ZodNever
                   ? never
-                  : K]: InferSchemaFromField<TChildren[K], Usage, string>;
+                  : K]: InferSchemaFromField<TChildren[K], Usage>;
               }>
             : z.ZodNever
           : z.ZodNever
@@ -326,7 +326,8 @@ export type InferSchemaFromField<
           F extends ObjectOptionalField<
               infer TChildren,
               FieldUsageConfig,
-              string
+              string,
+              WidgetConfig<string>
             >
           ? F extends { usage: infer TUsage }
             ? MatchesUsage<TUsage, Usage> extends true
@@ -335,23 +336,27 @@ export type InferSchemaFromField<
                     z.ZodObject<{
                       [K in keyof TChildren as InferSchemaFromField<
                         TChildren[K],
-                        Usage,
-                        string
+                        Usage
                       > extends z.ZodNever
                         ? never
-                        : K]: InferSchemaFromField<TChildren[K], Usage, string>;
+                        : K]: InferSchemaFromField<TChildren[K], Usage>;
                     }>
                   >
                 >
               : z.ZodNever
             : z.ZodNever
           : // Handle ArrayField - use string for pattern matching
-            F extends ArrayField<infer TChild, FieldUsageConfig, string>
+            F extends ArrayField<
+                infer TChild,
+                FieldUsageConfig,
+                string,
+                WidgetConfig<string>
+              >
             ? F extends { usage: infer TUsage }
               ? MatchesUsage<TUsage, Usage> extends true
                 ? z.ZodArray<
                     TChild extends UnifiedField<string, z.ZodTypeAny>
-                      ? InferSchemaFromField<TChild, Usage, string>
+                      ? InferSchemaFromField<TChild, Usage>
                       : TChild extends z.ZodTypeAny
                         ? TChild
                         : z.ZodNever
@@ -362,14 +367,15 @@ export type InferSchemaFromField<
               F extends ArrayOptionalField<
                   infer TChild,
                   FieldUsageConfig,
-                  string
+                  string,
+                  WidgetConfig<string>
                 >
               ? F extends { usage: infer TUsage }
                 ? MatchesUsage<TUsage, Usage> extends true
                   ? z.ZodNullable<
                       z.ZodArray<
                         TChild extends UnifiedField<string, z.ZodTypeAny>
-                          ? InferSchemaFromField<TChild, Usage, string>
+                          ? InferSchemaFromField<TChild, Usage>
                           : TChild extends z.ZodTypeAny
                             ? TChild
                             : z.ZodNever
@@ -384,25 +390,23 @@ export type InferSchemaFromField<
 
 /**
  * Infer the exact input type from a field structure for a specific usage
- * This back-propagates the input types through the entire field tree
  */
 export type InferInputFromField<
   TTranslationKey extends string,
   F extends UnifiedField<TTranslationKey, TSchema>,
   Usage extends FieldUsage,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-> = ExtractInput<InferSchemaFromField<F, Usage, TTranslationKey>>;
+> = ExtractInput<InferSchemaFromField<F, Usage>>;
 
 /**
  * Infer the exact output type from a field structure for a specific usage
- * This back-propagates the output types through the entire field tree
  */
 export type InferOutputFromField<
   TTranslationKey extends string,
   F extends UnifiedField<TTranslationKey, TSchema>,
   Usage extends FieldUsage,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-> = ExtractOutput<InferSchemaFromField<F, Usage, TTranslationKey>>;
+> = ExtractOutput<InferSchemaFromField<F, Usage>>;
 
 /**
  * METHOD-SPECIFIC USAGE MATCHING: Check if usage matches for a specific method
@@ -462,7 +466,8 @@ export type InferSchemaFromFieldForMethod<
   F extends PrimitiveField<
     infer TFieldSchema,
     FieldUsageConfig,
-    TTranslationKey
+    TTranslationKey,
+    WidgetConfig<TTranslationKey>
   >
     ? F extends { usage: infer TUsage }
       ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
@@ -470,7 +475,12 @@ export type InferSchemaFromFieldForMethod<
         : z.ZodNever
       : z.ZodNever
     : // Handle ObjectField
-      F extends ObjectField<infer TChildren, FieldUsageConfig, TTranslationKey>
+      F extends ObjectField<
+          infer TChildren,
+          FieldUsageConfig,
+          TTranslationKey,
+          WidgetConfig<TTranslationKey>
+        >
       ? F extends { usage: infer TUsage }
         ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
           ? z.ZodObject<{
@@ -506,7 +516,8 @@ export type InferSchemaFromFieldForMethod<
         F extends ObjectOptionalField<
             infer TChildren,
             FieldUsageConfig,
-            TTranslationKey
+            TTranslationKey,
+            WidgetConfig<TTranslationKey>
           >
         ? F extends { usage: infer TUsage }
           ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
@@ -544,7 +555,12 @@ export type InferSchemaFromFieldForMethod<
             : z.ZodNever
           : z.ZodNever
         : // Handle ArrayField
-          F extends ArrayField<infer TChild, FieldUsageConfig, TTranslationKey>
+          F extends ArrayField<
+              infer TChild,
+              FieldUsageConfig,
+              TTranslationKey,
+              WidgetConfig<TTranslationKey>
+            >
           ? F extends { usage: infer TUsage }
             ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
               ? z.ZodArray<
@@ -566,7 +582,8 @@ export type InferSchemaFromFieldForMethod<
             F extends ArrayOptionalField<
                 infer TChild,
                 FieldUsageConfig,
-                TTranslationKey
+                TTranslationKey,
+                WidgetConfig<TTranslationKey>
               >
             ? F extends { usage: infer TUsage }
               ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
@@ -937,16 +954,13 @@ export interface BulkAction {
 // ============================================================================
 
 /**
- * Primitive field type with complete schema type preservation
- * Uses ExtractInputOutput to preserve Input, Output, and ZodType information
- * TKey allows using either global TranslationKey or scoped translation keys
- * TUIConfig preserves the exact UI configuration type passed in
+ * Primitive field type
  */
 export interface PrimitiveField<
   out TSchema extends z.ZodTypeAny,
   out TUsage extends FieldUsageConfig,
   out TKey extends string,
-  out TUIConfig extends WidgetConfig<NoInfer<TKey>>,
+  out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "primitive";
   schema: TSchema;
@@ -958,18 +972,13 @@ export interface PrimitiveField<
 }
 
 /**
- * Object field type with children preservation
- * TChildren can be any object-like structure where all values are UnifiedFields
- * The constraint is checked at the value level, not the type level
- * TKey allows using either global TranslationKey or scoped translation keys
- * TUIConfig preserves the exact UI configuration type passed in
- * Note: TUIConfig constraint uses WidgetConfig<TKey> to enable property-level error reporting
+ * Object field type with children
  */
 export interface ObjectField<
   out TChildren,
   out TUsage extends FieldUsageConfig,
   out TKey extends string,
-  out TUIConfig extends WidgetConfig<NoInfer<TKey>>,
+  out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "object";
   usage: TUsage;
@@ -979,16 +988,13 @@ export interface ObjectField<
 }
 
 /**
- * Optional object field type - same as ObjectField but marked as optional
- * TKey allows using either global TranslationKey or scoped translation keys
- * TUIConfig preserves the exact UI configuration type passed in
- * TUIConfig constraint uses WidgetConfig<TKey> to enable property-level error reporting
+ * Optional object field type
  */
 export interface ObjectOptionalField<
   out TChildren,
   out TUsage extends FieldUsageConfig,
   out TKey extends string,
-  out TUIConfig extends WidgetConfig<NoInfer<TKey>>,
+  out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "object-optional";
   usage: TUsage;
@@ -999,11 +1005,6 @@ export interface ObjectOptionalField<
 
 /**
  * Object union field type for discriminated unions
- * TDiscriminator is the name of the discriminator field (e.g., "isPublic")
- * TVariants is an array of object variants (each must have a discriminator field)
- * TKey allows using either global TranslationKey or scoped translation keys
- * TUIConfig preserves the exact UI configuration type passed in
- * TUIConfig constraint uses WidgetConfig<TKey> to enable property-level error reporting
  */
 export interface ObjectUnionField<
   out TDiscriminator extends string,
@@ -1012,16 +1013,18 @@ export interface ObjectUnionField<
     ObjectField<
       Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
       FieldUsageConfig,
-      TKey
+      TKey,
+      WidgetConfig<TKey>
     >,
     ...ObjectField<
       Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
       FieldUsageConfig,
-      TKey
+      TKey,
+      WidgetConfig<TKey>
     >[],
   ],
   out TUsage extends FieldUsageConfig,
-  out TUIConfig extends WidgetConfig<NoInfer<TKey>>,
+  out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "object-union";
   discriminator: TDiscriminator;
@@ -1032,16 +1035,13 @@ export interface ObjectUnionField<
 }
 
 /**
- * Array field type with child preservation
- * TKey allows using either global TranslationKey or scoped translation keys
- * TUIConfig preserves the exact UI configuration type passed in
- * TUIConfig constraint uses WidgetConfig<TKey> to enable property-level error reporting
+ * Array field type
  */
 export interface ArrayField<
   out TChild,
   out TUsage extends FieldUsageConfig,
   out TKey extends string,
-  out TUIConfig extends WidgetConfig<NoInfer<TKey>>,
+  out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "array";
   usage: TUsage;
@@ -1051,16 +1051,13 @@ export interface ArrayField<
 }
 
 /**
- * Optional array field type - same as ArrayField but marked as optional
- * TKey allows using either global TranslationKey or scoped translation keys
- * TUIConfig preserves the exact UI configuration type passed in
- * TUIConfig constraint uses WidgetConfig<TKey> to enable property-level error reporting
+ * Optional array field type
  */
 export interface ArrayOptionalField<
   out TChild,
   out TUsage extends FieldUsageConfig,
   out TKey extends string,
-  out TUIConfig extends WidgetConfig<NoInfer<TKey>>,
+  out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "array-optional";
   usage: TUsage;
@@ -1070,15 +1067,12 @@ export interface ArrayOptionalField<
 }
 
 /**
- * Widget Field
- * UI-only field with no schema (buttons, alerts, static content)
- * TKey allows using either global TranslationKey or scoped translation keys
- * TUIConfig constraint uses WidgetConfig<TKey> to enable property-level error reporting
+ * Widget field (UI-only, no schema)
  */
 export interface WidgetField<
   out TUsage extends FieldUsageConfig,
   out TKey extends string,
-  out TUIConfig extends WidgetConfig<NoInfer<TKey>>,
+  out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "widget";
   usage: TUsage;
@@ -1102,16 +1096,18 @@ export type UnifiedField<
   TKey extends string,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
 > =
-  | PrimitiveField<TSchema, FieldUsageConfig, TKey>
+  | PrimitiveField<TSchema, FieldUsageConfig, TKey, WidgetConfig<TKey>>
   | ObjectField<
       Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
       FieldUsageConfig,
-      TKey
+      TKey,
+      WidgetConfig<TKey>
     >
   | ObjectOptionalField<
       Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
       FieldUsageConfig,
-      TKey
+      TKey,
+      WidgetConfig<TKey>
     >
   | ObjectUnionField<
       string,
@@ -1120,24 +1116,29 @@ export type UnifiedField<
         ObjectField<
           Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
           FieldUsageConfig,
-          TKey
+          TKey,
+          WidgetConfig<TKey>
         >,
         ...ObjectField<
           Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
           FieldUsageConfig,
-          TKey
+          TKey,
+          WidgetConfig<TKey>
         >[],
       ],
-      FieldUsageConfig
+      FieldUsageConfig,
+      WidgetConfig<TKey>
     >
   | ArrayField<
       UnifiedField<TKey, z.ZodTypeAny> | z.ZodTypeAny,
       FieldUsageConfig,
-      TKey
+      TKey,
+      WidgetConfig<TKey>
     >
   | ArrayOptionalField<
       UnifiedField<TKey, z.ZodTypeAny> | z.ZodTypeAny,
       FieldUsageConfig,
-      TKey
+      TKey,
+      WidgetConfig<TKey>
     >
-  | WidgetField<FieldUsageConfig, TKey>;
+  | WidgetField<FieldUsageConfig, TKey, WidgetConfig<TKey>>;

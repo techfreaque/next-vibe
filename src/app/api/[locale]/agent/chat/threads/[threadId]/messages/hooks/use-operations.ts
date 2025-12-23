@@ -267,7 +267,7 @@ export function useMessageOperations(
         }
 
         // Get voice mode settings for streaming TTS
-        // Call mode is stored per model+persona combination
+        // Call mode is stored per model+character combination
         const voiceModeSettings = useVoiceModeStore.getState().settings;
         const callModeKey = getCallModeKey(
           settings.selectedModel,

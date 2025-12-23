@@ -34,7 +34,7 @@ function loadLocalFavorites(): FavoriteItem[] {
     return [];
   }
 
-  const stored = localStorage.getItem(STORAGE_KEYS.FAVORITE_PERSONAS);
+  const stored = localStorage.getItem(STORAGE_KEYS.FAVORITE_CHARACTERS);
   if (!stored) {
     return [];
   }
@@ -72,7 +72,7 @@ function saveLocalFavorites(favorites: FavoriteItem[]): void {
     return;
   }
   localStorage.setItem(
-    STORAGE_KEYS.FAVORITE_PERSONAS,
+    STORAGE_KEYS.FAVORITE_CHARACTERS,
     JSON.stringify(favorites),
   );
 }

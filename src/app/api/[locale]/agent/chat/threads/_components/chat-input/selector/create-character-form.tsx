@@ -10,27 +10,27 @@ import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
-import { POST as createPersonaEndpoint } from "@/app/api/[locale]/agent/chat/characters/create/definition";
+import createCharacterEndpoint from "@/app/api/[locale]/agent/chat/characters/create/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-interface CreatePersonaFormProps {
+interface CreateCharacterFormProps {
   onBack: () => void;
-  onSave: (personaId: string) => void;
+  onSave: (characterId: string) => void;
   isAuthenticated: boolean;
   locale: CountryLanguage;
 }
 
 /**
- * Form for creating custom personas using EndpointsPage pattern
+ * Form for creating custom characters using EndpointsPage pattern
  */
-export function CreatePersonaForm({
+export function CreateCharacterForm({
   onBack,
   onSave,
   isAuthenticated,
   locale,
-}: CreatePersonaFormProps): JSX.Element {
+}: CreateCharacterFormProps): JSX.Element {
   const { t } = simpleT(locale);
 
   return (
@@ -49,7 +49,7 @@ export function CreatePersonaForm({
         <Div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5" />
           <Span className="font-medium">
-            {t("app.chat.createPersona.title")}
+            {t("app.chat.createCharacter.title")}
           </Span>
         </Div>
       </Div>
@@ -59,26 +59,26 @@ export function CreatePersonaForm({
         {!isAuthenticated ? (
           <Div className="flex flex-col items-center justify-center gap-4 p-8">
             <Div className="text-center text-muted-foreground">
-              {t("app.chat.editPersona.loginRequired")}
+              {t("app.chat.editCharacter.loginRequired")}
             </Div>
             <Div className="flex items-center gap-2">
               <Button type="button" variant="outline" asChild>
                 <Link href={`/${locale}/user/login`}>
                   <LogIn className="h-4 w-4 mr-2" />
-                  {t("app.chat.editPersona.login")}
+                  {t("app.chat.editCharacter.login")}
                 </Link>
               </Button>
               <Button type="button" asChild>
                 <Link href={`/${locale}/user/signup`}>
                   <UserPlus className="h-4 w-4 mr-2" />
-                  {t("app.chat.editPersona.signup")}
+                  {t("app.chat.editCharacter.signup")}
                 </Link>
               </Button>
             </Div>
           </Div>
         ) : (
           <EndpointsPage
-            endpoint={{ POST: createPersonaEndpoint }}
+            endpoint={createCharacterEndpoint}
             locale={locale}
             endpointOptions={{
               queryOptions: { enabled: false },

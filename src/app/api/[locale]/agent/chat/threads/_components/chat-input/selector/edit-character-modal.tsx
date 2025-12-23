@@ -8,9 +8,12 @@ import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Span } from "next-vibe-ui/ui/span";
-import type { JSX } from "react";
+import React, { type JSX } from "react";
 
-import { POST as createCharacterEndpoint } from "@/app/api/[locale]/agent/chat/characters/create/definition";
+import {
+  type CharacterUpdateRequestOutput,
+  PATCH as updateCharacterEndpoint,
+} from "@/app/api/[locale]/agent/chat/characters/[id]/definition";
 import type { CharacterListResponseOutput } from "@/app/api/[locale]/agent/chat/characters/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -22,16 +25,7 @@ interface EditCharacterModalProps {
   onBack: () => void;
   onCharacterCreated: (characterId: string) => void;
   // Pre-fill data from existing character
-  initialData: Pick<
-    CharacterFromResponse,
-    | "name"
-    | "description"
-    | "icon"
-    | "systemPrompt"
-    | "category"
-    | "preferredModel"
-    | "voice"
-  >;
+  initialData: CharacterFromResponse;
   isAuthenticated: boolean;
   locale: CountryLanguage;
 }
@@ -44,6 +38,59 @@ export function EditCharacterModal({
   locale,
 }: EditCharacterModalProps): JSX.Element {
   const { t } = simpleT(locale);
+
+  const defaultValues = React.useMemo<
+    Partial<CharacterUpdateRequestOutput>
+  >(() => {
+    // For PATCH (partial update), only include fields that we want to pre-fill
+    // All fields are optional in PATCH endpoint
+    const result: Partial<CharacterUpdateRequestOutput> = {};
+
+    if (initialData.name) {
+      result.name = initialData.name;
+    }
+    if (initialData.description) {
+      result.description = initialData.description;
+    }
+    if (initialData.icon) {
+      result.icon = initialData.icon;
+    }
+    if (initialData.systemPrompt) {
+      result.systemPrompt = initialData.systemPrompt;
+    }
+    if (initialData.category) {
+      result.category = initialData.category;
+    }
+    if (initialData.voice) {
+      result.voice = initialData.voice;
+    }
+    if (initialData.suggestedPrompts) {
+      result.suggestedPrompts = initialData.suggestedPrompts;
+    }
+
+    // Determine modelSelection based on available data
+    if (initialData.preferredModel) {
+      // Manual selection variant
+      result.modelSelection = {
+        selectionType: "manual",
+        preferredModel: initialData.preferredModel,
+      };
+    } else if (
+      initialData.requirements?.minIntelligence &&
+      initialData.requirements?.maxPrice &&
+      initialData.requirements?.minContent
+    ) {
+      // Filters variant - only if all required fields exist
+      result.modelSelection = {
+        selectionType: "filters",
+        intelligence: initialData.requirements.minIntelligence,
+        maxPrice: initialData.requirements.maxPrice,
+        contentLevel: initialData.requirements.minContent,
+      };
+    }
+
+    return result;
+  }, [initialData]);
 
   return (
     <Div className="flex flex-col max-h-[70vh] overflow-hidden">
@@ -90,33 +137,18 @@ export function EditCharacterModal({
           </Div>
         ) : (
           <EndpointsPage
-            endpoint={{ POST: createCharacterEndpoint }}
+            endpoint={{ PATCH: updateCharacterEndpoint }}
             locale={locale}
             endpointOptions={{
-              queryOptions: { enabled: false },
+              urlPathParams: { id: initialData.id },
               create: {
                 formOptions: {
-                  defaultValues: {
-                    name: initialData.name,
-                    description: initialData.description,
-                    icon: initialData.icon,
-                    systemPrompt: initialData.systemPrompt,
-                    category: initialData.category,
-                    modelSelection: initialData.preferredModel
-                      ? {
-                          selectionType: "manual" as const,
-                          preferredModel: initialData.preferredModel,
-                        }
-                      : undefined,
-                    voice: initialData.voice,
-                  },
+                  defaultValues,
                 },
                 mutationOptions: {
-                  onSuccess: ({ responseData }) => {
-                    if (responseData && "id" in responseData) {
-                      onCharacterCreated(responseData.id as string);
-                      onBack();
-                    }
+                  onSuccess: () => {
+                    onCharacterCreated(initialData.id);
+                    onBack();
                   },
                 },
               },

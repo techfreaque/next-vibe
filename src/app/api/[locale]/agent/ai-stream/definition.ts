@@ -487,7 +487,7 @@ const { POST } = createEndpoint({
         voiceMode: null,
         audioInput: { file: null },
       },
-      withPersona: {
+      withCharacter: {
         operation: "send",
         rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
@@ -527,7 +527,7 @@ const { POST } = createEndpoint({
         totalTokens: 245,
         finishReason: "stop",
       },
-      withPersona: {
+      withCharacter: {
         success: true,
         messageId: "msg_456e7890-e89b-12d3-a456-426614174001",
         totalTokens: 387,

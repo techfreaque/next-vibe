@@ -77,7 +77,6 @@ export enum WidgetType {
   FORM_FIELD = "form_field",
   FORM_GROUP = "form_group",
   FORM_SECTION = "form_section",
-  FILTER_PILLS = "filter_pills",
 
   // Data display widgets
   DATA_TABLE = "data_table",
@@ -184,6 +183,7 @@ export enum FieldDataType {
   SLIDER = "slider",
   TAGS = "tags",
   TEXT_ARRAY = "text_array",
+  FILTER_PILLS = "filter_pills",
 
   // Complex data types
   ARRAY = "array",

@@ -18,7 +18,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-interface ModelPersonaSelectorModalProps {
+interface ModelCharacterSelectorModalProps {
   titleKey: TranslationKey;
   descriptionKey: TranslationKey;
   onModelChange: (model: ModelId) => void;
@@ -35,7 +35,7 @@ interface ModelPersonaSelectorModalProps {
   logger: EndpointLogger;
 }
 
-export function ModelPersonaSelectorModal({
+export function ModelCharacterSelectorModal({
   titleKey,
   descriptionKey,
   onModelChange,
@@ -50,7 +50,7 @@ export function ModelPersonaSelectorModal({
   inputPlaceholderKey,
   locale,
   logger,
-}: ModelPersonaSelectorModalProps): JSX.Element {
+}: ModelCharacterSelectorModalProps): JSX.Element {
   // Get selectedModel and selectedCharacter from context
   const { selectedModel, selectedCharacter } = useChatContext();
 
@@ -106,7 +106,7 @@ export function ModelPersonaSelectorModal({
 
         {/* Selectors & Actions - ALL IN ONE LINE */}
         <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 flex-nowrap">
-          {/* Left side: Combined Persona + Model Selector */}
+          {/* Left side: Combined Character + Model Selector */}
           <Div className="flex flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 flex-1 min-w-0">
             <Selector
               characterId={selectedCharacter}

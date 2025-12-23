@@ -15,7 +15,11 @@ import type {
   ExtractOutput,
   InferSchemaFromField,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
-import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type {
+  FieldUsage,
+  Methods,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type {
   ApiFormOptions,
@@ -384,13 +388,10 @@ export type ReadOperationReturn<T> =
 // Delete operation return type
 export type DeleteOperationReturn<T> = T extends {
   DELETE: CreateApiEndpoint<
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer _TExampleKey,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer _TMethod,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    infer _TUserRoleValue,
-    infer TTranslationKey,
+    string,
+    Methods,
+    readonly UserRoleValue[],
+    string,
     infer TFields
   >;
 }
@@ -398,13 +399,7 @@ export type DeleteOperationReturn<T> = T extends {
       /** The complete response including success/error state */
       response:
         | ResponseType<
-            ExtractOutput<
-              InferSchemaFromField<
-                TFields,
-                FieldUsage.Response,
-                TTranslationKey
-              >
-            >
+            ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
           >
         | undefined;
 
@@ -416,7 +411,7 @@ export type DeleteOperationReturn<T> = T extends {
 
       submit: (
         data?: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData, TTranslationKey>
+          InferSchemaFromField<TFields, FieldUsage.RequestData>
         >,
       ) => Promise<void>;
       isSubmitting: boolean;
@@ -512,13 +507,10 @@ export type EndpointReturn<T> = Prettify<{
 
   delete: T extends {
     DELETE: CreateApiEndpoint<
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      infer _TExampleKey,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      infer _TMethod,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      infer _TUserRoleValue,
-      infer TTranslationKey,
+      string,
+      Methods,
+      readonly UserRoleValue[],
+      string,
       infer TFields
     >;
   }
@@ -526,13 +518,7 @@ export type EndpointReturn<T> = Prettify<{
         /** The complete response including success/error state */
         response:
           | ResponseType<
-              ExtractOutput<
-                InferSchemaFromField<
-                  TFields,
-                  FieldUsage.Response,
-                  TTranslationKey
-                >
-              >
+              ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
             >
           | undefined;
 
@@ -544,11 +530,7 @@ export type EndpointReturn<T> = Prettify<{
 
         submit: (
           data?: ExtractOutput<
-            InferSchemaFromField<
-              TFields,
-              FieldUsage.RequestData,
-              TTranslationKey
-            >
+            InferSchemaFromField<TFields, FieldUsage.RequestData>
           >,
         ) => Promise<void>;
         isSubmitting: boolean;

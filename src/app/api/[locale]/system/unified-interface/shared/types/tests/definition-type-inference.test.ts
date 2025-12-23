@@ -290,13 +290,15 @@ type Test10a_ExtractTKey =
 type Test10b_SimplePrimitive = PrimitiveField<
   z.ZodString,
   { response: true },
-  string
+  string,
+  WidgetConfig<string>
 >;
 type Test10b_MatchesWithString =
   Test10b_SimplePrimitive extends PrimitiveField<
     infer _TSchema,
     FieldUsageConfig,
-    string
+    string,
+    WidgetConfig<string>
   >
     ? true
     : false;
@@ -306,13 +308,15 @@ type Test10b_Verify = Expect<Equal<Test10b_MatchesWithString, true>>;
 type Test10c_NarrowPrimitive = PrimitiveField<
   z.ZodString,
   { response: true },
-  "app.common.test"
+  "app.common.test",
+  WidgetConfig<"app.common.test">
 >;
 type Test10c_MatchesWithString =
   Test10c_NarrowPrimitive extends PrimitiveField<
     infer _TSchema,
     FieldUsageConfig,
-    string
+    string,
+    WidgetConfig<string>
   >
     ? true
     : false;
@@ -323,13 +327,15 @@ type WideUnion = "app.common.test" | "app.common.other";
 type Test10d_WidePrimitive = PrimitiveField<
   z.ZodString,
   { response: true },
-  string
+  string,
+  WidgetConfig<string>
 >;
 type Test10d_MatchesWithNarrow =
   Test10d_WidePrimitive extends PrimitiveField<
     infer _TSchema,
     FieldUsageConfig,
-    WideUnion
+    WideUnion,
+    WidgetConfig<WideUnion>
   >
     ? true
     : false;
@@ -339,13 +345,15 @@ type Test10d_MatchesWithNarrow =
 type Test10e_NarrowField = PrimitiveField<
   z.ZodString,
   { response: true },
-  "app.common.test"
+  "app.common.test",
+  WidgetConfig<"app.common.test">
 >;
 type Test10e_MatchesWithWide =
   Test10e_NarrowField extends PrimitiveField<
     infer _TSchema,
     FieldUsageConfig,
-    WideUnion
+    WideUnion,
+    WidgetConfig<WideUnion>
   >
     ? true
     : false;
@@ -357,7 +365,8 @@ type Test10f_MatchesObjectFieldString =
   Test10f_ImapFields extends ObjectField<
     infer _TChildren,
     FieldUsageConfig,
-    string
+    string,
+    WidgetConfig<string>
   >
     ? true
     : false;
@@ -370,7 +379,8 @@ type Test10g_MatchesWithScopedKey =
   Test10f_ImapFields extends ObjectField<
     infer _TChildren,
     FieldUsageConfig,
-    Test10g_ScopedKey
+    Test10g_ScopedKey,
+    WidgetConfig<string>
   >
     ? true
     : false;
@@ -404,12 +414,12 @@ type Test10j_ScopedKeyAssignable =
 type Test11a_SimpleField = PrimitiveField<
   z.ZodString,
   { response: true },
-  "test.key"
+  "test.key",
+  WidgetConfig<"test.key">
 >;
 type Test11a_InferredSchema = InferSchemaFromField<
   Test11a_SimpleField,
-  FieldUsage.Response,
-  "test.key"
+  FieldUsage.Response
 >;
 type Test11a_IsNotNever = Test11a_InferredSchema extends z.ZodNever
   ? false
@@ -419,8 +429,7 @@ type Test11a_IsNotNever = Test11a_InferredSchema extends z.ZodNever
 // Test 11b: InferSchemaFromField with string TKey (widest)
 type Test11b_InferredSchemaString = InferSchemaFromField<
   Test11a_SimpleField,
-  FieldUsage.Response,
-  string
+  FieldUsage.Response
 >;
 type Test11b_IsNotNever = Test11b_InferredSchemaString extends z.ZodNever
   ? false
@@ -431,8 +440,7 @@ type Test11b_IsNotNever = Test11b_InferredSchemaString extends z.ZodNever
 type Test11c_UnionKey = "test.key" | "other.key";
 type Test11c_InferredSchema = InferSchemaFromField<
   Test11a_SimpleField,
-  FieldUsage.Response,
-  Test11c_UnionKey
+  FieldUsage.Response
 >;
 type Test11c_IsNotNever = Test11c_InferredSchema extends z.ZodNever
   ? false
@@ -443,8 +451,7 @@ type Test11c_IsNotNever = Test11c_InferredSchema extends z.ZodNever
 type Test11d_UnionKey = "other.key" | "another.key";
 type Test11d_InferredSchema = InferSchemaFromField<
   Test11a_SimpleField,
-  FieldUsage.Response,
-  Test11d_UnionKey
+  FieldUsage.Response
 >;
 type Test11d_IsNotNever = Test11d_InferredSchema extends z.ZodNever
   ? false
@@ -457,8 +464,7 @@ type Test11e_ScopedKey =
   typeof imapAccountsListDefinition.GET.types.ScopedTranslationKey;
 type Test11e_InferredSchema = InferSchemaFromField<
   Test11e_ImapFields,
-  FieldUsage.Response,
-  Test11e_ScopedKey
+  FieldUsage.Response
 >;
 type Test11e_IsNotNever = Test11e_InferredSchema extends z.ZodNever
   ? false
@@ -467,8 +473,7 @@ type Test11e_IsNotNever = Test11e_InferredSchema extends z.ZodNever
 // Test 11f: Try with string as TTranslationKey
 type Test11f_InferredSchema = InferSchemaFromField<
   Test11e_ImapFields,
-  FieldUsage.Response,
-  string
+  FieldUsage.Response
 >;
 type Test11f_IsNotNever = Test11f_InferredSchema extends z.ZodNever
   ? false
@@ -520,8 +525,7 @@ type Test12b_ExtractTKey =
 // Test 12c: Check if InferSchemaFromField works on this simple field
 type Test12c_InferredSchema = InferSchemaFromField<
   Test12b_ContainerField,
-  FieldUsage.Response,
-  string
+  FieldUsage.Response
 >;
 type Test12c_IsNotNever = Test12c_InferredSchema extends z.ZodNever
   ? false
@@ -530,8 +534,7 @@ type Test12c_IsNotNever = Test12c_InferredSchema extends z.ZodNever
 // Test 12d: Check with the extracted TKey
 type Test12d_InferredSchema = InferSchemaFromField<
   Test12b_ContainerField,
-  FieldUsage.Response,
-  Test12b_ExtractTKey
+  FieldUsage.Response
 >;
 type Test12d_IsNotNever = Test12d_InferredSchema extends z.ZodNever
   ? false
@@ -548,10 +551,16 @@ type Test12d_IsNotNever = Test12d_InferredSchema extends z.ZodNever
 // Test 13b: Check if ObjectField with TKey=string matches ObjectField with TKey=narrow
 type EmptyChildren = Record<string, never>;
 type Test13b_StringToNarrow =
-  ObjectField<EmptyChildren, { response: true }, string> extends ObjectField<
+  ObjectField<
     EmptyChildren,
     { response: true },
-    "narrow"
+    string,
+    WidgetConfig<string>
+  > extends ObjectField<
+    EmptyChildren,
+    { response: true },
+    "narrow",
+    WidgetConfig<"narrow">
   >
     ? true
     : false;
@@ -559,10 +568,16 @@ type Test13b_StringToNarrow =
 
 // Test 13c: Check if ObjectField with TKey=narrow matches ObjectField with TKey=string
 type Test13c_NarrowToString =
-  ObjectField<EmptyChildren, { response: true }, "narrow"> extends ObjectField<
+  ObjectField<
     EmptyChildren,
     { response: true },
-    string
+    "narrow",
+    WidgetConfig<"narrow">
+  > extends ObjectField<
+    EmptyChildren,
+    { response: true },
+    string,
+    WidgetConfig<string>
   >
     ? true
     : false;
@@ -599,12 +614,25 @@ type Test13h_ChildrenAreUnifiedFields =
 
 // Test 13i: Create a minimal ObjectField and test pattern matching
 type Test13i_MinimalField = ObjectField<
-  { name: PrimitiveField<z.ZodString, { response: true }, string> },
+  {
+    name: PrimitiveField<
+      z.ZodString,
+      { response: true },
+      string,
+      WidgetConfig<string>
+    >;
+  },
   { response: true },
-  string
+  string,
+  WidgetConfig<string>
 >;
 type Test13i_MatchesString =
-  Test13i_MinimalField extends ObjectField<infer _C, FieldUsageConfig, string>
+  Test13i_MinimalField extends ObjectField<
+    infer _C,
+    FieldUsageConfig,
+    string,
+    WidgetConfig<string>
+  >
     ? true
     : false;
 type Test13i_Verify = Expect<Equal<Test13i_MatchesString, true>>;

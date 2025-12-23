@@ -24,6 +24,7 @@ import { TtsVoiceDB } from "../../text-to-speech/enum";
 import {
   ContentLevelFilterDB,
   IntelligenceLevelFilterDB,
+  PriceLevelFilterDB,
 } from "../favorites/enum";
 import { ModelId } from "../model-access/models";
 import { CharacterCategory } from "./config";
@@ -165,6 +166,7 @@ const { GET } = createEndpoint({
                   minContent: z.enum(ContentLevelFilterDB).optional(),
                   minIntelligence: z.enum(IntelligenceLevelFilterDB).optional(),
                   maxIntelligence: z.enum(IntelligenceLevelFilterDB).optional(),
+                  maxPrice: z.enum(PriceLevelFilterDB).optional(),
                 })
                 .optional(),
             ),
@@ -252,8 +254,8 @@ const { GET } = createEndpoint({
           },
           {
             id: "550e8400-e29b-41d4-a716-446655440000",
-            name: "My Custom Persona",
-            description: "A custom persona I created",
+            name: "My Custom Character",
+            description: "A custom character I created",
             icon: "direct-hit",
             systemPrompt: "You are a helpful assistant specialized in...",
             category: CharacterCategory.CODING,

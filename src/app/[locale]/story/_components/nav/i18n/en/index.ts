@@ -45,9 +45,9 @@ export const translations = {
       title: "Privacy Levels",
       description: "Private, Incognito, Shared, Public",
     },
-    personas: {
-      title: "AI Personas",
-      description: "Custom & community personas",
+    characters: {
+      title: "AI Characters",
+      description: "Custom & community characters",
     },
   },
   post: {

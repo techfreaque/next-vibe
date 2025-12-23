@@ -8,7 +8,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { type Methods } from "../../../shared/enums";
+import type { Methods } from "../../shared/types/enums";
 
 type SerializableValue =
   | string

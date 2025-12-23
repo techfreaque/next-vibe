@@ -85,8 +85,8 @@ chat/
 ├── db.ts              # Chat tables (folders, threads, messages)
 ├── enum.ts            # Chat enums
 ├── repository.ts
-├── personas/
-│   ├── db.ts          # Custom personas table (separate concern)
+├── characters/
+│   ├── db.ts          # Custom characters table (separate concern)
 │   ├── definition.ts
 │   ├── repository.ts
 │   └── route.ts

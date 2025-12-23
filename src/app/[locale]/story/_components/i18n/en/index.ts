@@ -78,9 +78,9 @@ export const translations = {
           "GPT-4, Claude, Gemini, Llama, Mistral, and more. No filters, no restrictions. Switch models mid-conversation.",
       },
       audience: {
-        title: "Custom AI Personas",
+        title: "Custom AI Characters",
         description:
-          "Create AI characters with unique personalities. Use community personas or build your own. Share with others.",
+          "Create AI characters with unique personalities. Use community characters or build your own. Share with others.",
       },
       global: {
         title: "Smart Organization",
@@ -139,7 +139,7 @@ export const translations = {
           credits: "{{credits}} credits to start",
           models: "Access to all {{modelCount}} AI models",
           folders: "All folder types (private, incognito, shared, public)",
-          personas: "Use community personas",
+          characters: "Use community characters",
           support: "Community support",
         },
         cta: "Start Free",
@@ -153,7 +153,7 @@ export const translations = {
           unlimited: "Unlimited AI conversations",
           models: "All {{modelCount}} AI models",
           folders: "All folder types",
-          personas: "Create unlimited personas",
+          characters: "Create unlimited characters",
           priority: "Priority support",
           analytics: "Advanced analytics",
         },
@@ -242,7 +242,7 @@ export const translations = {
         publishingManagement: {
           title: "3. Chat with AI or Community",
           description:
-            "Have private AI conversations, collaborate with friends, or join public forum discussions. Use custom personas and switch AI models mid-chat.",
+            "Have private AI conversations, collaborate with friends, or join public forum discussions. Use custom characters and switch AI models mid-chat.",
           tags: {
             optimalTiming: "{{modelCount}} AI Models",
             communityBuilding: "Community Forum",
@@ -295,7 +295,7 @@ export const translations = {
         collaboration: {
           title: "Community Driven",
           description:
-            "Built with feedback from our users. Share personas, tips, and help shape the platform.",
+            "Built with feedback from our users. Share characters, tips, and help shape the platform.",
         },
       },
       team: {
@@ -856,7 +856,7 @@ export const translations = {
       features: "Features",
       subscription: "Subscription",
       aiModels: "AI Models",
-      personas: "Personas",
+      characters: "Characters",
     },
     product: {
       title: "Product",

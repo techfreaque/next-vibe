@@ -106,9 +106,9 @@ export const translations = {
       label: "Model",
       description: "AI model to use for generation",
     },
-    persona: {
-      label: "Persona",
-      description: "Optional persona to use for the AI",
+    character: {
+      label: "Character",
+      description: "Optional character to use for the AI",
     },
     temperature: {
       label: "Temperature",

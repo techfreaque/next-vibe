@@ -38,7 +38,7 @@ import { GroupedAssistantMessage } from "../grouped-assistant-message";
 import { MessageAuthorInfo } from "../message-author";
 import { MessageEditor } from "../message-editor";
 import { groupMessagesBySequence } from "../message-grouping";
-import { ModelPersonaSelectorModal } from "../model-character-selector-modal";
+import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
 import { UserMessageBubble } from "../user-message-bubble";
 
 interface LinearMessageViewProps {
@@ -105,7 +105,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     locale,
     rootFolderId,
     subFolderId,
-    personaPrompt: characterPrompt,
+    characterPrompt: characterPrompt,
   });
 
   // Debug: Log final system prompt
@@ -306,7 +306,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   </Div>
                 ) : isRetrying ? (
                   <Div className="flex justify-end">
-                    <ModelPersonaSelectorModal
+                    <ModelCharacterSelectorModal
                       titleKey="app.chat.linearMessageView.retryModal.title"
                       descriptionKey="app.chat.linearMessageView.retryModal.description"
                       onModelChange={
@@ -415,7 +415,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
             {/* Show Answer-as-AI dialog below the message */}
             {isAnswering && (
               <Div className="my-3">
-                <ModelPersonaSelectorModal
+                <ModelCharacterSelectorModal
                   titleKey="app.chat.linearMessageView.answerModal.title"
                   descriptionKey="app.chat.linearMessageView.answerModal.description"
                   onModelChange={

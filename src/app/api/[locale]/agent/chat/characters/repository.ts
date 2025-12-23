@@ -103,7 +103,7 @@ export class CharactersRepository {
     } catch (error) {
       logger.error("Failed to get characters", parseError(error));
       return fail({
-        message: "app.api.agent.chat.personas.get.errors.server.title",
+        message: "app.api.agent.chat.characters.get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -139,7 +139,7 @@ export class CharactersRepository {
       // Check custom characters (requires authenticated user)
       if (!userId) {
         return fail({
-          message: "app.api.agent.chat.personas.id.get.errors.notFound.title",
+          message: "app.api.agent.chat.characters.id.get.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -157,7 +157,7 @@ export class CharactersRepository {
 
       if (!customCharacter) {
         return fail({
-          message: "app.api.agent.chat.personas.id.get.errors.notFound.title",
+          message: "app.api.agent.chat.characters.id.get.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -171,7 +171,7 @@ export class CharactersRepository {
     } catch (error) {
       logger.error("Failed to get character by ID", parseError(error));
       return fail({
-        message: "app.api.agent.chat.personas.id.get.errors.server.title",
+        message: "app.api.agent.chat.characters.id.get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -190,7 +190,8 @@ export class CharactersRepository {
 
       if (!userId) {
         return fail({
-          message: "app.api.agent.chat.personas.post.errors.unauthorized.title",
+          message:
+            "app.api.agent.chat.characters.post.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -270,7 +271,7 @@ export class CharactersRepository {
     } catch (error) {
       logger.error("Failed to create character", parseError(error));
       return fail({
-        message: "app.api.agent.chat.personas.post.errors.server.title",
+        message: "app.api.agent.chat.characters.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -292,7 +293,7 @@ export class CharactersRepository {
       if (!userId) {
         return fail({
           message:
-            "app.api.agent.chat.personas.id.patch.errors.unauthorized.title",
+            "app.api.agent.chat.characters.id.patch.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -367,7 +368,8 @@ export class CharactersRepository {
 
       if (!updated) {
         return fail({
-          message: "app.api.agent.chat.personas.id.patch.errors.notFound.title",
+          message:
+            "app.api.agent.chat.characters.id.patch.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -376,7 +378,7 @@ export class CharactersRepository {
     } catch (error) {
       logger.error("Failed to update character", parseError(error));
       return fail({
-        message: "app.api.agent.chat.personas.id.patch.errors.server.title",
+        message: "app.api.agent.chat.characters.id.patch.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -397,7 +399,7 @@ export class CharactersRepository {
       if (!userId) {
         return fail({
           message:
-            "app.api.agent.chat.personas.id.delete.errors.unauthorized.title",
+            "app.api.agent.chat.characters.id.delete.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -417,7 +419,7 @@ export class CharactersRepository {
       if (result.length === 0) {
         return fail({
           message:
-            "app.api.agent.chat.personas.id.delete.errors.notFound.title",
+            "app.api.agent.chat.characters.id.delete.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -426,7 +428,7 @@ export class CharactersRepository {
     } catch (error) {
       logger.error("Failed to delete character", parseError(error));
       return fail({
-        message: "app.api.agent.chat.personas.id.delete.errors.server.title",
+        message: "app.api.agent.chat.characters.id.delete.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

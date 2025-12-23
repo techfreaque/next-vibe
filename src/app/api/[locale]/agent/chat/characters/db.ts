@@ -34,7 +34,7 @@ import type { CharacterCategoryValue, CharacterSourceValue } from "./enum";
  * Stores user-created characters (system prompts, preferences)
  * Default characters are defined in config file and not stored in DB
  */
-export const customCharacters = pgTable("custom_personas", {
+export const customCharacters = pgTable("custom_characters", {
   id: uuid("id").primaryKey().defaultRandom(),
 
   // Owner

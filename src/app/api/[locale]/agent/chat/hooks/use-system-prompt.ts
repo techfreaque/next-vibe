@@ -16,9 +16,9 @@ export function useSystemPrompt(params: {
   locale: CountryLanguage;
   rootFolderId?: DefaultFolderId;
   subFolderId?: string | null;
-  personaPrompt?: string;
+  characterPrompt?: string;
 }): string {
-  const { locale, rootFolderId, subFolderId, personaPrompt } = params;
+  const { locale, rootFolderId, subFolderId, characterPrompt } = params;
   const { t } = simpleT(locale);
 
   return useMemo(() => {
@@ -29,7 +29,7 @@ export function useSystemPrompt(params: {
       locale,
       rootFolderId,
       subFolderId,
-      personaPrompt,
+      characterPrompt,
     });
-  }, [t, locale, rootFolderId, subFolderId, personaPrompt]);
+  }, [t, locale, rootFolderId, subFolderId, characterPrompt]);
 }

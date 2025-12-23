@@ -47,7 +47,7 @@ export const translations: typeof enTranslations = {
       title: "Poziomy prywatności",
       description: "Prywatne, Incognito, Współdzielone, Publiczne",
     },
-    personas: {
+    characters: {
       title: "Persony AI",
       description: "Własne i społecznościowe persony",
     },

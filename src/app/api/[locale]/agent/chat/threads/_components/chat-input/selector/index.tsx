@@ -19,7 +19,7 @@ import {
   type Character,
   getCharacterById,
 } from "@/app/api/[locale]/agent/chat/characters/config";
-import personasDefinition, {
+import charactersDefinition, {
   type CharacterListResponseOutput,
 } from "@/app/api/[locale]/agent/chat/characters/definition";
 import {
@@ -46,7 +46,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { CharacterBrowser } from "./character-browser";
-import { CreatePersonaForm } from "./create-character-form";
+import { CreateCharacterForm } from "./create-character-form";
 import { EditCharacterModal } from "./edit-character-modal";
 import { type FavoriteItem, FavoritesBar } from "./favorites-bar";
 import { QuickSettingsPanel } from "./quick-settings-panel";
@@ -210,7 +210,7 @@ export function Selector({
   });
 
   // Fetch characters list (for edit character feature)
-  const charactersEndpoint = useEndpoint(personasDefinition, {}, logger);
+  const charactersEndpoint = useEndpoint(charactersDefinition, {}, logger);
   const characters = useMemo(() => {
     const response = charactersEndpoint.read?.response;
     if (
@@ -930,7 +930,7 @@ export function Selector({
 
           {/* Create character view */}
           {view === "create" && (
-            <CreatePersonaForm
+            <CreateCharacterForm
               onBack={() => setView("browser")}
               onSave={handleCharacterCreated}
               isAuthenticated={!!(user && !user.isPublic)}

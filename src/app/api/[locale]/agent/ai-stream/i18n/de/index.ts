@@ -88,9 +88,9 @@ export const translations: typeof enTranslations = {
       label: "Modell",
       description: "KI-Modell für die Generierung verwenden",
     },
-    persona: {
-      label: "Persona",
-      description: "Optionale Persona für die KI",
+    character: {
+      label: "Charakter",
+      description: "Optionaler Charakter für die KI",
     },
     temperature: {
       label: "Temperatur",

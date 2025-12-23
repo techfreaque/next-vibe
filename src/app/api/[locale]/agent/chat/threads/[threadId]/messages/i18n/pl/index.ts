@@ -49,8 +49,8 @@ export const translations: typeof enTranslations = {
           model: {
             content: "Model",
           },
-          persona: {
-            content: "Persona",
+          character: {
+            content: "Postać",
           },
           tokens: {
             content: "Tokens",

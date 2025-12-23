@@ -7,7 +7,6 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  filterPillsField,
   objectField,
   objectUnionField,
   requestDataField,
@@ -42,19 +41,19 @@ import { CategoryOptions, CharacterCategory } from "../config";
 import { CharacterCategoryDB } from "../enum";
 
 /**
- * Create Persona Endpoint (POST)
- * Creates a new custom persona
+ * Create Character Endpoint (POST)
+ * Creates a new custom character
  */
 const { POST } = createEndpoint({
   method: Methods.POST,
-  path: ["agent", "chat", "personas", "create"],
+  path: ["agent", "chat", "characters", "create"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title: "app.api.agent.chat.personas.post.title" as const,
-  description: "app.api.agent.chat.personas.post.description" as const,
+  title: "app.api.agent.chat.characters.post.title" as const,
+  description: "app.api.agent.chat.characters.post.description" as const,
   icon: "sparkle" as const,
   category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.personas" as const],
+  tags: ["app.api.agent.chat.tags.characters" as const],
 
   fields: objectField(
     {
@@ -70,9 +69,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.personas.post.name.label" as const,
+          label: "app.api.agent.chat.characters.post.name.label" as const,
           description:
-            "app.api.agent.chat.personas.post.name.description" as const,
+            "app.api.agent.chat.characters.post.name.description" as const,
           columns: 6,
         },
         z.string().min(1).max(100),
@@ -82,9 +81,9 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label:
-            "app.api.agent.chat.personas.post.personaDescription.label" as const,
+            "app.api.agent.chat.characters.post.characterDescription.label" as const,
           description:
-            "app.api.agent.chat.personas.post.personaDescription.description" as const,
+            "app.api.agent.chat.characters.post.characterDescription.description" as const,
           columns: 6,
         },
         z.string().min(1).max(500),
@@ -93,9 +92,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.ICON,
-          label: "app.api.agent.chat.personas.post.icon.label" as const,
+          label: "app.api.agent.chat.characters.post.icon.label" as const,
           description:
-            "app.api.agent.chat.personas.post.icon.description" as const,
+            "app.api.agent.chat.characters.post.icon.description" as const,
           columns: 6,
         },
         iconSchema,
@@ -104,9 +103,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
-          label: "app.api.agent.chat.personas.post.systemPrompt.label" as const,
+          label:
+            "app.api.agent.chat.characters.post.systemPrompt.label" as const,
           description:
-            "app.api.agent.chat.personas.post.systemPrompt.description" as const,
+            "app.api.agent.chat.characters.post.systemPrompt.description" as const,
           columns: 12,
         },
         z.string().min(1).max(5000),
@@ -115,9 +115,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.personas.post.category.label" as const,
+          label: "app.api.agent.chat.characters.post.category.label" as const,
           description:
-            "app.api.agent.chat.personas.post.category.description" as const,
+            "app.api.agent.chat.characters.post.category.description" as const,
           options: CategoryOptions,
           columns: 6,
         },
@@ -128,9 +128,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title:
-            "app.api.agent.chat.personas.post.modelSelection.title" as const,
+            "app.api.agent.chat.characters.post.modelSelection.title" as const,
           description:
-            "app.api.agent.chat.personas.post.modelSelection.description" as const,
+            "app.api.agent.chat.characters.post.modelSelection.description" as const,
           layoutType: LayoutType.STACKED,
           border: false,
           showSubmitButton: false,
@@ -151,17 +151,17 @@ const { POST } = createEndpoint({
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.SELECT,
                   label:
-                    "app.api.agent.chat.personas.post.selectionType.label" as const,
+                    "app.api.agent.chat.characters.post.selectionType.label" as const,
                   options: [
                     {
                       value: "manual",
                       label:
-                        "app.api.agent.chat.personas.post.selectionType.manual" as const,
+                        "app.api.agent.chat.characters.post.selectionType.manual" as const,
                     },
                     {
                       value: "filters",
                       label:
-                        "app.api.agent.chat.personas.post.selectionType.filters" as const,
+                        "app.api.agent.chat.characters.post.selectionType.filters" as const,
                     },
                   ],
                   columns: 12,
@@ -173,9 +173,9 @@ const { POST } = createEndpoint({
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.SELECT,
                   label:
-                    "app.api.agent.chat.personas.post.preferredModel.label" as const,
+                    "app.api.agent.chat.characters.post.preferredModel.label" as const,
                   description:
-                    "app.api.agent.chat.personas.post.preferredModel.description" as const,
+                    "app.api.agent.chat.characters.post.preferredModel.description" as const,
                   options: ModelIdOptions,
                   columns: 12,
                 },
@@ -196,74 +196,74 @@ const { POST } = createEndpoint({
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.SELECT,
                   label:
-                    "app.api.agent.chat.personas.post.selectionType.label" as const,
+                    "app.api.agent.chat.characters.post.selectionType.label" as const,
                   options: [
                     {
                       value: "manual",
                       label:
-                        "app.api.agent.chat.personas.post.selectionType.manual" as const,
+                        "app.api.agent.chat.characters.post.selectionType.manual" as const,
                     },
                     {
                       value: "filters",
                       label:
-                        "app.api.agent.chat.personas.post.selectionType.filters" as const,
+                        "app.api.agent.chat.characters.post.selectionType.filters" as const,
                     },
                   ],
                   columns: 12,
                 },
                 z.literal("filters"),
               ),
-              intelligence: filterPillsField(
+              intelligence: requestDataField(
                 {
-                  type: WidgetType.FILTER_PILLS,
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.FILTER_PILLS,
                   label:
-                    "app.api.agent.chat.personas.post.intelligence.label" as const,
+                    "app.api.agent.chat.characters.post.intelligence.label" as const,
                   description:
-                    "app.api.agent.chat.personas.post.intelligence.description" as const,
+                    "app.api.agent.chat.characters.post.intelligence.description" as const,
                   options: INTELLIGENCE_DISPLAY.map((tier) => ({
                     label: tier.label,
                     value: tier.value,
                     icon: tier.icon,
                     description: tier.description,
                   })),
-                  showIcon: true,
-                  showLabel: true,
+                  columns: 12,
                 },
                 z.enum(IntelligenceLevelFilterDB),
               ),
-              maxPrice: filterPillsField(
+              maxPrice: requestDataField(
                 {
-                  type: WidgetType.FILTER_PILLS,
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.FILTER_PILLS,
                   label:
-                    "app.api.agent.chat.personas.post.maxPrice.label" as const,
+                    "app.api.agent.chat.characters.post.maxPrice.label" as const,
                   description:
-                    "app.api.agent.chat.personas.post.maxPrice.description" as const,
+                    "app.api.agent.chat.characters.post.maxPrice.description" as const,
                   options: PRICE_DISPLAY.map((tier) => ({
                     label: tier.label,
                     value: tier.value,
                     icon: tier.icon,
                     description: tier.description,
                   })),
-                  showIcon: true,
-                  showLabel: true,
+                  columns: 12,
                 },
                 z.enum(PriceLevelFilterDB),
               ),
-              contentLevel: filterPillsField(
+              contentLevel: requestDataField(
                 {
-                  type: WidgetType.FILTER_PILLS,
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.FILTER_PILLS,
                   label:
-                    "app.api.agent.chat.personas.post.contentLevel.label" as const,
+                    "app.api.agent.chat.characters.post.contentLevel.label" as const,
                   description:
-                    "app.api.agent.chat.personas.post.contentLevel.description" as const,
+                    "app.api.agent.chat.characters.post.contentLevel.description" as const,
                   options: CONTENT_DISPLAY.map((tier) => ({
                     label: tier.label,
                     value: tier.value,
                     icon: tier.icon,
                     description: tier.description,
                   })),
-                  showIcon: true,
-                  showLabel: true,
+                  columns: 12,
                 },
                 z.enum(ContentLevelFilterDB),
               ),
@@ -275,9 +275,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.personas.post.voice.label" as const,
+          label: "app.api.agent.chat.characters.post.voice.label" as const,
           description:
-            "app.api.agent.chat.personas.post.voice.description" as const,
+            "app.api.agent.chat.characters.post.voice.description" as const,
           options: TtsVoiceOptions,
           columns: 6,
         },
@@ -288,11 +288,11 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TAGS,
           label:
-            "app.api.agent.chat.personas.post.suggestedPrompts.label" as const,
+            "app.api.agent.chat.characters.post.suggestedPrompts.label" as const,
           description:
-            "app.api.agent.chat.personas.post.suggestedPrompts.description" as const,
+            "app.api.agent.chat.characters.post.suggestedPrompts.description" as const,
           placeholder:
-            "app.api.agent.chat.personas.post.suggestedPrompts.placeholder" as const,
+            "app.api.agent.chat.characters.post.suggestedPrompts.placeholder" as const,
           columns: 12,
           maxTags: 4,
         },
@@ -304,7 +304,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.TEXT,
           content:
-            "app.api.agent.chat.personas.post.response.id.content" as const,
+            "app.api.agent.chat.characters.post.response.id.content" as const,
         },
         z.string(),
       ),
@@ -314,58 +314,61 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
-        "app.api.agent.chat.personas.post.errors.validation.title" as const,
+        "app.api.agent.chat.characters.post.errors.validation.title" as const,
       description:
-        "app.api.agent.chat.personas.post.errors.validation.description" as const,
+        "app.api.agent.chat.characters.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.personas.post.errors.network.title" as const,
+      title: "app.api.agent.chat.characters.post.errors.network.title" as const,
       description:
-        "app.api.agent.chat.personas.post.errors.network.description" as const,
+        "app.api.agent.chat.characters.post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title:
-        "app.api.agent.chat.personas.post.errors.unauthorized.title" as const,
+        "app.api.agent.chat.characters.post.errors.unauthorized.title" as const,
       description:
-        "app.api.agent.chat.personas.post.errors.unauthorized.description" as const,
+        "app.api.agent.chat.characters.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.personas.post.errors.forbidden.title" as const,
+      title:
+        "app.api.agent.chat.characters.post.errors.forbidden.title" as const,
       description:
-        "app.api.agent.chat.personas.post.errors.forbidden.description" as const,
+        "app.api.agent.chat.characters.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.personas.post.errors.notFound.title" as const,
+      title:
+        "app.api.agent.chat.characters.post.errors.notFound.title" as const,
       description:
-        "app.api.agent.chat.personas.post.errors.notFound.description" as const,
+        "app.api.agent.chat.characters.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.personas.post.errors.server.title" as const,
+      title: "app.api.agent.chat.characters.post.errors.server.title" as const,
       description:
-        "app.api.agent.chat.personas.post.errors.server.description" as const,
+        "app.api.agent.chat.characters.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.personas.post.errors.unknown.title" as const,
+      title: "app.api.agent.chat.characters.post.errors.unknown.title" as const,
       description:
-        "app.api.agent.chat.personas.post.errors.unknown.description" as const,
+        "app.api.agent.chat.characters.post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title:
-        "app.api.agent.chat.personas.post.errors.unsavedChanges.title" as const,
+        "app.api.agent.chat.characters.post.errors.unsavedChanges.title" as const,
       description:
-        "app.api.agent.chat.personas.post.errors.unsavedChanges.description" as const,
+        "app.api.agent.chat.characters.post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.personas.post.errors.conflict.title" as const,
+      title:
+        "app.api.agent.chat.characters.post.errors.conflict.title" as const,
       description:
-        "app.api.agent.chat.personas.post.errors.conflict.description" as const,
+        "app.api.agent.chat.characters.post.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.personas.post.success.title" as const,
+    title: "app.api.agent.chat.characters.post.success.title" as const,
     description:
-      "app.api.agent.chat.personas.post.success.description" as const,
+      "app.api.agent.chat.characters.post.success.description" as const,
   },
 
   examples: {

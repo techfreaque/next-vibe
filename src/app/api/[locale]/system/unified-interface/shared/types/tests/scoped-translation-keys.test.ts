@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-empty-function */
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type test file requires unknown for testing various type patterns
 /**
  * Comprehensive Scoped Translation Keys Type Tests
  *
@@ -13,6 +15,23 @@
  */
 
 import { z } from "zod";
+
+import {
+  type ContactTranslationKey,
+  scopedTranslation,
+} from "@/app/api/[locale]/contact/i18n";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { ExtractScopedKeyType } from "@/i18n/core/static-types";
+
+import { createEndpoint } from "../../endpoints/definition/create";
+import { objectField, requestDataField } from "../../field/utils";
+import {
+  EndpointErrorTypes,
+  FieldDataType,
+  LayoutType,
+  Methods,
+  WidgetType,
+} from "../../types/enums";
 
 // ============================================================================
 // PROGRESSIVE TYPE TESTS - Isolating where property-level errors break
@@ -101,7 +120,7 @@ interface BaseType<T> {
 interface UIConstraint<TKey extends string> {
   ui: { label: NoInfer<TKey> };
 }
-function testE_fn<TKey extends string, T extends BaseType<unknown>>(
+function testE_fn<TKey extends string, T extends BaseType<string>>(
   obj: T & UIConstraint<TKey>,
 ): T {
   return obj;
@@ -135,7 +154,7 @@ function testF_fn<TKey extends string>(
 ): void {}
 
 const testF_scoped: ScopedTranslationType<ValidKeys> = {
-  ScopedTranslationKey: undefined as unknown as ValidKeys,
+  ScopedTranslationKey: "valid.key.one",
 };
 testF_fn(testF_scoped, {
   title: "valid.key.one",
@@ -160,7 +179,7 @@ testF_fn(testF_scoped, {
 // TEST G: Adding a generic TConfig that gets intersected (closer to real pattern)
 // ---------------------------------------------------------------------------
 interface FieldType<TKey extends string> {
-  ui: { label: string };
+  ui: { label: TKey };
   key: TKey;
 }
 interface FieldConstraint<TKey extends string> {
@@ -253,7 +272,7 @@ testI_fn(testF_scoped, {
 interface SimpleField<TKey extends string> {
   type: "field";
   ui: { label: NoInfer<TKey> };
-  schema: unknown;
+  schema: z.ZodTypeAny;
 }
 
 type SimpleUnifiedField<TKey extends string> = SimpleField<TKey>;
@@ -266,7 +285,7 @@ function testJ_fn<
 }
 
 testJ_fn(testF_scoped, {
-  fields: { type: "field", ui: { label: "valid.key.one" }, schema: {} },
+  fields: { type: "field", ui: { label: "valid.key.one" }, schema: z.string() },
 });
 testJ_fn(testF_scoped, {
   fields: {
@@ -275,7 +294,7 @@ testJ_fn(testF_scoped, {
       // @ts-expect-error - J: Full pattern with fields property - where does error appear?
       label: "invalid.label.j",
     },
-    schema: {},
+    schema: z.string(),
   },
 });
 
@@ -288,7 +307,7 @@ function testK_fn<TKey extends string>(
 ): void {}
 
 testK_fn(testF_scoped, {
-  fields: { type: "field", ui: { label: "valid.key.one" }, schema: {} },
+  fields: { type: "field", ui: { label: "valid.key.one" }, schema: z.string() },
 });
 testK_fn(testF_scoped, {
   fields: {
@@ -297,30 +316,215 @@ testK_fn(testF_scoped, {
       // @ts-expect-error - K: No TFields generic, direct constraint - where does error appear?
       label: "invalid.label.k",
     },
-    schema: {},
+    schema: z.string(),
   },
+});
+
+// ---------------------------------------------------------------------------
+// TEST L: Function utility that returns a value with captured type
+// This simulates how field utilities work - they capture the ui config type
+// ---------------------------------------------------------------------------
+interface FieldLike<TKey extends string, TUIConfig extends { label?: TKey }> {
+  type: "field";
+  ui: TUIConfig;
+}
+
+function createFieldL<
+  TKey extends string,
+  const TUIConfig extends { label?: TKey },
+>(ui: TUIConfig): FieldLike<TKey, TUIConfig> {
+  return { type: "field", ui };
+}
+
+function testL_fn<TKey extends string>(
+  scoped: ScopedTranslationType<TKey>,
+  config: { fields: FieldLike<TKey, { label?: TKey }> },
+): void {}
+
+// This should work - but where does error appear?
+testL_fn(testF_scoped, {
+  fields: createFieldL({ label: "valid.key.one" }),
+});
+
+testL_fn(testF_scoped, {
+  fields: createFieldL({
+    // @ts-expect-error - L: Function utility with captured type - where does error appear?
+    label: "invalid.label.l",
+  }),
+});
+
+// ---------------------------------------------------------------------------
+// TEST M: Function utility returning type with NoInfer on property
+// ---------------------------------------------------------------------------
+interface FieldWithNoInfer<TKey extends string> {
+  type: "field";
+  ui: { label?: NoInfer<TKey> };
+}
+
+function createFieldM<TKey extends string>(ui: {
+  label?: TKey;
+}): FieldWithNoInfer<TKey> {
+  return { type: "field", ui };
+}
+
+function testM_fn<TKey extends string>(
+  scoped: ScopedTranslationType<TKey>,
+  config: { fields: FieldWithNoInfer<TKey> },
+): void {}
+
+testM_fn(testF_scoped, {
+  fields: createFieldM({ label: "valid.key.one" }),
+});
+
+testM_fn(testF_scoped, {
+  fields: createFieldM({
+    // @ts-expect-error - M: NoInfer in return type - where does error appear?
+    label: "invalid.label.m",
+  }),
+});
+
+// ---------------------------------------------------------------------------
+// TEST N: What if ui is typed as { label?: NoInfer<TKey> } directly in the field interface?
+// This is similar to SimpleField but with a function utility
+// ---------------------------------------------------------------------------
+interface FieldDirectUI<TKey extends string> {
+  type: "field";
+  // UI is directly typed with NoInfer, not captured as TUIConfig
+  ui: { label?: NoInfer<TKey>; extra?: string };
+}
+
+// Function returns FieldDirectUI<string> - TKey is just string
+function createFieldN(ui: {
+  label?: string;
+  extra?: string;
+}): FieldDirectUI<string> {
+  return { type: "field", ui };
+}
+
+function testN_fn<TKey extends string>(
+  scoped: ScopedTranslationType<TKey>,
+  config: { fields: FieldDirectUI<TKey> },
+): void {}
+
+testN_fn(testF_scoped, {
+  fields: createFieldN({ label: "valid.key.one" }),
+});
+
+testN_fn(testF_scoped, {
+  fields: createFieldN({
+    // @ts-expect-error - N: Field utility returns FieldDirectUI<string>, but expected FieldDirectUI<ValidKeys>
+    label: "invalid.label.n",
+  }),
+});
+
+// ---------------------------------------------------------------------------
+// TEST O: Inline object without function utility - baseline for comparison
+// ---------------------------------------------------------------------------
+function testO_fn<TKey extends string>(
+  scoped: ScopedTranslationType<TKey>,
+  config: { fields: FieldDirectUI<TKey> },
+): void {}
+
+testO_fn(testF_scoped, {
+  fields: { type: "field", ui: { label: "valid.key.one" } },
+});
+
+testO_fn(testF_scoped, {
+  fields: {
+    type: "field",
+    ui: {
+      // @ts-expect-error - O: Inline object - error should be at property level
+      label: "invalid.label.o",
+    },
+  },
+});
+
+// ---------------------------------------------------------------------------
+// TEST P: What if we use `as const` with function utility?
+// ---------------------------------------------------------------------------
+testN_fn(testF_scoped, {
+  fields: createFieldN({
+    // @ts-expect-error - P: With as const - where does error appear?
+    label: "invalid.label.p" as const,
+  }),
+});
+
+// ---------------------------------------------------------------------------
+// TEST Q: What if the function utility is generic in TKey and we pass it explicitly?
+// ---------------------------------------------------------------------------
+function createFieldQ<TKey extends string>(ui: {
+  label?: NoInfer<TKey>;
+}): FieldDirectUI<TKey> {
+  return { type: "field", ui };
+}
+
+testN_fn(testF_scoped, {
+  fields: createFieldQ<ValidKeys>({ label: "valid.key.one" }),
+});
+
+testN_fn(testF_scoped, {
+  fields: createFieldQ<ValidKeys>({
+    // @ts-expect-error - Q: Explicit TKey - error should be at property level!
+    label: "invalid.label.q",
+  }),
+});
+
+// ---------------------------------------------------------------------------
+// TEST R: Can contextual typing from the caller provide TKey?
+// This tests if TKey can flow from outer context to inner function
+// ---------------------------------------------------------------------------
+interface ContextualField<TKey extends string> {
+  type: "field";
+  ui: { label?: NoInfer<TKey> };
+}
+
+// The key: TKey is NOT constrained by ui, just extends string
+// NoInfer prevents inference from ui, so TKey must come from context
+function createContextualField<TKey extends string>(ui: {
+  label?: NoInfer<TKey>;
+}): ContextualField<TKey> {
+  return { type: "field", ui };
+}
+
+// testR_fn expects ContextualField<TKey> where TKey is from scoped
+function testR_fn<TKey extends string>(
+  scoped: ScopedTranslationType<TKey>,
+  config: { fields: ContextualField<TKey> },
+): void {}
+
+// Question: When createContextualField is called inside testR_fn's argument,
+// does TKey get inferred from the outer context (ValidKeys from testF_scoped)?
+testR_fn(testF_scoped, {
+  fields: createContextualField({ label: "valid.key.one" }),
+});
+
+testR_fn(testF_scoped, {
+  fields: createContextualField({
+    // @ts-expect-error - R: Contextual TKey inference - where does error appear?
+    label: "invalid.label.r",
+  }),
+});
+
+// ---------------------------------------------------------------------------
+// TEST S: What if we use a satisfies-like pattern?
+// ---------------------------------------------------------------------------
+function createFieldS<TKey extends string>(ui: {
+  label?: NoInfer<TKey>;
+}): ContextualField<TKey> {
+  return { type: "field", ui };
+}
+
+// Explicitly narrow the return type by assigning to a constrained variable
+testR_fn(testF_scoped, {
+  fields: createFieldS({
+    // @ts-expect-error - S: With assignment - where does error appear?
+    label: "invalid.label.s",
+  }) as ContextualField<ValidKeys>,
 });
 
 // ============================================================================
 // END PROGRESSIVE TESTS - Run bun check to see where errors appear
 // ============================================================================
-
-import {
-  type ContactTranslationKey,
-  scopedTranslation,
-} from "@/app/api/[locale]/contact/i18n";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { ExtractScopedKeyType } from "@/i18n/core/static-types";
-
-import { createEndpoint } from "../../endpoints/definition/create";
-import { objectField, requestDataField } from "../../field/utils";
-import {
-  EndpointErrorTypes,
-  FieldDataType,
-  LayoutType,
-  Methods,
-  WidgetType,
-} from "../../types/enums";
 
 // ============================================================================
 // HELPER: All error types for test endpoints

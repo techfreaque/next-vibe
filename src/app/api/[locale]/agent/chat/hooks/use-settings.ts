@@ -1,6 +1,6 @@
 /**
  * Settings Management Hook
- * Handles all chat settings (model, persona, theme, etc.)
+ * Handles all chat settings (model, character, theme, etc.)
  */
 
 import { useTheme } from "next-themes";

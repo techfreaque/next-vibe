@@ -1,6 +1,6 @@
 /**
  * System Prompt Builder
- * Server-side wrapper that loads persona and memories, then delegates to
+ * Server-side wrapper that loads character and memories, then delegates to
  * the centralized system-prompt-generator for actual prompt construction
  */
 
@@ -20,15 +20,15 @@ import {
 } from "./system-prompt-generator";
 
 /**
- * Build complete system prompt from persona ID
+ * Build complete system prompt from character ID
  *
  * This is a server-side function that:
- * 1. Loads persona from database
+ * 1. Loads character from database
  * 2. Loads user memories from database
  * 3. Delegates to generateSystemPrompt for actual prompt construction
  *
- * @param personaId - Optional persona ID (can be default persona ID or custom persona UUID)
- * @param userId - Optional user ID (required for custom personas and memories)
+ * @param characterId - Optional character ID (can be default character ID or custom character UUID)
+ * @param userId - Optional user ID (required for custom characters and memories)
  * @param logger - Logger instance
  * @param t - Translation function for appName
  * @param locale - User's locale (language-country)
@@ -38,7 +38,7 @@ import {
  * @returns Complete system prompt
  */
 export async function buildSystemPrompt(params: {
-  personaId: string | null | undefined;
+  characterId: string | null | undefined;
   userId: string | undefined;
   logger: EndpointLogger;
   t: TFunction;
@@ -48,7 +48,7 @@ export async function buildSystemPrompt(params: {
   callMode: boolean | null | undefined;
 }): Promise<string> {
   const {
-    personaId,
+    characterId,
     userId,
     logger,
     t,
@@ -59,14 +59,14 @@ export async function buildSystemPrompt(params: {
   } = params;
 
   logger.debug("Building system prompt", {
-    hasCharacterId: !!personaId,
+    hasCharacterId: !!characterId,
     hasUserId: !!userId,
     rootFolderId,
     subFolderId,
     callMode,
   });
 
-  let personaPrompt = "";
+  let characterPrompt = "";
   let memorySummary = "";
 
   // Load user memories for persistent context (only for authenticated users)
@@ -92,31 +92,31 @@ export async function buildSystemPrompt(params: {
     }
   }
 
-  // Get persona system prompt if provided
-  if (personaId) {
+  // Get character system prompt if provided
+  if (characterId) {
     try {
-      const persona = await getCharacterById(personaId, userId);
+      const character = await getCharacterById(characterId, userId);
 
-      if (persona) {
-        logger.debug("Using persona system prompt", {
-          personaId: persona.id,
-          personaName: persona.name,
-          hasSystemPrompt: !!persona.systemPrompt,
+      if (character) {
+        logger.debug("Using character system prompt", {
+          characterId: character.id,
+          characterName: character.name,
+          hasSystemPrompt: !!character.systemPrompt,
         });
 
-        if (persona.systemPrompt && persona.systemPrompt.trim()) {
-          personaPrompt = persona.systemPrompt.trim();
+        if (character.systemPrompt && character.systemPrompt.trim()) {
+          characterPrompt = character.systemPrompt.trim();
         } else {
           logger.debug(
             "Character has empty system prompt, using default behavior",
           );
         }
       } else {
-        logger.warn("Character not found, using default", { personaId });
+        logger.warn("Character not found, using default", { characterId });
       }
     } catch (error) {
-      logger.error("Failed to load persona, using default", {
-        personaId,
+      logger.error("Failed to load character, using default", {
+        characterId,
         error: error instanceof Error ? error.message : String(error),
       });
     }
@@ -131,14 +131,14 @@ export async function buildSystemPrompt(params: {
     locale,
     rootFolderId,
     subFolderId,
-    personaPrompt,
+    characterPrompt,
     memorySummary,
     callMode: callMode ?? false,
   });
 
   logger.debug("Built complete system prompt", {
     systemPromptLength: systemPrompt.length,
-    hasCharacterPrompt: !!personaPrompt,
+    hasCharacterPrompt: !!characterPrompt,
     hasMemories: !!memorySummary,
     callMode: callMode ?? false,
   });

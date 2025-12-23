@@ -145,6 +145,19 @@ function extractFieldConfig(field: EndpointFieldStructure): FieldConfig | null {
     case FieldDataType.ICON:
       return { ...baseConfig, type: "icon" as const };
 
+    case FieldDataType.FILTER_PILLS:
+      return {
+        ...baseConfig,
+        type: "filter_pills" as const,
+        options:
+          widget.options?.map((opt) => ({
+            value: String(opt.value),
+            label: opt.label,
+            icon: opt.icon,
+            disabled: opt.disabled,
+          })) || [],
+      };
+
     default:
       // Fallback to text field
       return { ...baseConfig, type: "text" as const };

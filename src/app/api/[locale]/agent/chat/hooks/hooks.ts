@@ -103,7 +103,7 @@ export interface UseChatReturn {
   sidebarCollapsed: boolean;
   viewMode: ChatSettings["viewMode"];
   enabledToolIds: string[];
-  setSelectedCharacter: (persona: string) => void;
+  setSelectedCharacter: (character: string) => void;
   setSelectedModel: (model: ModelId) => void;
   setTemperature: (temp: number) => void;
   setMaxTokens: (tokens: number) => void;
@@ -230,7 +230,7 @@ export interface UseChatReturn {
   handleModelChange: (modelId: ModelId) => void;
   handleFillInputWithPrompt: (
     prompt: string,
-    personaId: string,
+    characterId: string,
     modelId?: ModelId,
   ) => void;
   handleScreenshot: () => Promise<void>;
@@ -321,8 +321,8 @@ export function useChat(
   // Get AI stream hook
   const aiStream = useAIStream(locale, logger, t);
 
-  // Fetch personas
-  const personasEndpoint = useCharactersList(logger);
+  // Fetch characters
+  const charactersEndpoint = useCharactersList(logger);
 
   // Local state
   const [input, setInput] = useState("");
@@ -538,13 +538,13 @@ export function useChat(
     threadNavigation.handleCreateThread,
   );
 
-  // Compute personas map
-  const personas = useMemo(() => {
-    const response = personasEndpoint.read?.response as
+  // Compute characters map
+  const characters = useMemo(() => {
+    const response = charactersEndpoint.read?.response as
       | CharacterListResponseOutput
       | undefined;
     const charactersList = response?.characters;
-    const personasMap: Record<
+    const charactersMap: Record<
       string,
       {
         id: string;
@@ -557,7 +557,7 @@ export function useChat(
 
     if (charactersList && Array.isArray(charactersList)) {
       charactersList.forEach((p) => {
-        personasMap[p.id] = {
+        charactersMap[p.id] = {
           id: p.id,
           name: p.name,
           icon: p.icon,
@@ -567,8 +567,8 @@ export function useChat(
       });
     }
 
-    return personasMap;
-  }, [personasEndpoint.read?.response]);
+    return charactersMap;
+  }, [charactersEndpoint.read?.response]);
 
   // Get active thread
   const activeThread = activeThreadId ? threads[activeThreadId] || null : null;
@@ -603,7 +603,7 @@ export function useChat(
     messages,
     folders,
     rootFolderPermissions, // Server-computed permissions passed as prop
-    characters: personas,
+    characters: characters,
     activeThread,
     activeThreadMessages,
     isLoading,

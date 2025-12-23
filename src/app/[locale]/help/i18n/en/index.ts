@@ -30,7 +30,7 @@ export const translations = {
           q1: {
             question: "What is {{appName}}?",
             answer:
-              "{{appName}} is an uncensored AI chat platform with access to {{modelCount}} AI models. We combine honest AI conversations with advanced features like folder management, custom personas, and multi-model support.",
+              "{{appName}} is an uncensored AI chat platform with access to {{modelCount}} AI models. We combine honest AI conversations with advanced features like folder management, custom characters, and multi-model support.",
           },
           q2: {
             question: "What payment methods do you accept?",

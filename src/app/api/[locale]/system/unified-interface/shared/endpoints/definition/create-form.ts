@@ -28,6 +28,7 @@ import {
   FieldUsage,
   Methods,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetConfig } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
 import {
   UserRole,
   type UserRoleValue,
@@ -263,7 +264,8 @@ export type FilterSchemaForMethod<
   TFields extends PrimitiveField<
     infer TSchema,
     FieldUsageConfig,
-    TScopedTranslationKey
+    TScopedTranslationKey,
+    WidgetConfig<TScopedTranslationKey>
   >
     ? SupportsMethodAndUsage<
         TFields["usage"],
@@ -275,7 +277,8 @@ export type FilterSchemaForMethod<
     : TFields extends ObjectField<
           infer TChildren,
           FieldUsageConfig,
-          TScopedTranslationKey
+          TScopedTranslationKey,
+          WidgetConfig<TScopedTranslationKey>
         >
       ? SupportsMethodAndUsage<
           TFields["usage"],

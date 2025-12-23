@@ -47,9 +47,9 @@ export const translations: typeof enTranslations = {
       title: "Privatsphäre-Level",
       description: "Privat, Inkognito, Geteilt, Öffentlich",
     },
-    personas: {
-      title: "KI-Personas",
-      description: "Benutzerdefinierte & Community-Personas",
+    characters: {
+      title: "KI-Characters",
+      description: "Benutzerdefinierte & Community-Characters",
     },
   },
   post: {

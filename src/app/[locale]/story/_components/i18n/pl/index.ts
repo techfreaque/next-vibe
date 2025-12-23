@@ -142,7 +142,7 @@ export const translations: typeof enTranslations = {
           models: "Dostęp do wszystkich {{modelCount}} modeli AI",
           folders:
             "Wszystkie typy folderów (prywatne, incognito, współdzielone, publiczne)",
-          personas: "Korzystanie z person społeczności",
+          characters: "Korzystanie z person społeczności",
           support: "Wsparcie społeczności",
         },
         cta: "Zacznij za darmo",
@@ -156,7 +156,7 @@ export const translations: typeof enTranslations = {
           unlimited: "Nielimitowane rozmowy z AI",
           models: "Wszystkie {{modelCount}} modele AI",
           folders: "Wszystkie typy folderów",
-          personas: "Twórz nielimitowane persony",
+          characters: "Twórz nielimitowane persony",
           priority: "Wsparcie priorytetowe",
           analytics: "Zaawansowana analityka",
         },
@@ -299,7 +299,7 @@ export const translations: typeof enTranslations = {
         collaboration: {
           title: "Napędzane przez społeczność",
           description:
-            "Zbudowane z opiniami naszych użytkowników. Dziel się personami, wskazówkami i pomóż kształtować platformę.",
+            "Zbudowane z opiniami naszych użytkowników. Dziel się postaciami, wskazówkami i pomóż kształtować platformę.",
         },
       },
       team: {
@@ -863,7 +863,7 @@ export const translations: typeof enTranslations = {
       features: "Funkcje",
       subscription: "Subskrypcja",
       aiModels: "Modele AI",
-      personas: "Persony",
+      characters: "Persony",
     },
     product: {
       title: "Produkt",

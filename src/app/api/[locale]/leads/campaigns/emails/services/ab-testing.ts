@@ -19,7 +19,7 @@ import type { ABTestConfig } from "../types";
  * A/B Test Constants
  */
 const AB_TEST_CONSTANTS = {
-  PERSONAS: {
+  CHARACTERS: {
     SARAH: {
       name: "Sarah",
       title: "Social Media Strategist",

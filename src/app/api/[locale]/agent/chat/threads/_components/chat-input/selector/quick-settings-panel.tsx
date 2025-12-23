@@ -397,7 +397,7 @@ export function QuickSettingsPanel({
               size="icon"
               className="h-8 w-8 text-muted-foreground hover:text-primary shrink-0"
               onClick={onSwitchCharacterView}
-              title={t("app.chat.selector.switchPersona")}
+              title={t("app.chat.selector.switchCharacter")}
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
@@ -411,7 +411,7 @@ export function QuickSettingsPanel({
               size="icon"
               className="h-8 w-8 text-muted-foreground hover:text-primary shrink-0"
               onClick={() => onEditCharacter(character)}
-              title={t("app.chat.selector.editPersona")}
+              title={t("app.chat.selector.editCharacter")}
             >
               <Edit2 className="h-4 w-4" />
             </Button>
@@ -735,7 +735,7 @@ export function QuickSettingsPanel({
                           <>
                             <Span className="font-medium">
                               {t(
-                                "app.chat.selector.requirements.personaConflict",
+                                "app.chat.selector.requirements.characterConflict",
                               )}
                               :
                             </Span>

@@ -3,9 +3,9 @@ import { create } from "zustand";
 interface TourState {
   isActive: boolean;
   modelSelectorOpen: boolean;
-  personaSelectorOpen: boolean;
+  characterSelectorOpen: boolean;
   modelSelectorShowAll: boolean;
-  personaSelectorShowAll: boolean;
+  characterSelectorShowAll: boolean;
   // Pause tour while selector is open (hides tooltip)
   isPaused: boolean;
   // Current tour step index (for coordination)
@@ -16,9 +16,9 @@ interface TourState {
   advanceTour: (() => void) | null;
   setTourActive: (active: boolean) => void;
   setModelSelectorOpen: (open: boolean) => void;
-  setPersonaSelectorOpen: (open: boolean) => void;
+  setCharacterSelectorOpen: (open: boolean) => void;
   setModelSelectorShowAll: (showAll: boolean) => void;
-  setPersonaSelectorShowAll: (showAll: boolean) => void;
+  setCharacterSelectorShowAll: (showAll: boolean) => void;
   setIsPaused: (paused: boolean) => void;
   setCurrentStepIndex: (index: number) => void;
   setBottomSheetExpanded: (expanded: boolean) => void;
@@ -28,9 +28,9 @@ interface TourState {
 export const useTourState = create<TourState>((set) => ({
   isActive: false,
   modelSelectorOpen: false,
-  personaSelectorOpen: false,
+  characterSelectorOpen: false,
   modelSelectorShowAll: false,
-  personaSelectorShowAll: false,
+  characterSelectorShowAll: false,
   isPaused: false,
   currentStepIndex: 0,
   bottomSheetExpanded: false,
@@ -41,14 +41,14 @@ export const useTourState = create<TourState>((set) => ({
   setModelSelectorOpen: (open): void => {
     set({ modelSelectorOpen: open });
   },
-  setPersonaSelectorOpen: (open): void => {
-    set({ personaSelectorOpen: open });
+  setCharacterSelectorOpen: (open): void => {
+    set({ characterSelectorOpen: open });
   },
   setModelSelectorShowAll: (showAll): void => {
     set({ modelSelectorShowAll: showAll });
   },
-  setPersonaSelectorShowAll: (showAll): void => {
-    set({ personaSelectorShowAll: showAll });
+  setCharacterSelectorShowAll: (showAll): void => {
+    set({ characterSelectorShowAll: showAll });
   },
   setIsPaused: (paused): void => {
     set({ isPaused: paused });

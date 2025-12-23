@@ -48,8 +48,8 @@ export const translations = {
           model: {
             content: "Model",
           },
-          persona: {
-            content: "Persona",
+          character: {
+            content: "Character",
           },
           tokens: {
             content: "Tokens",

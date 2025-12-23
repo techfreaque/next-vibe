@@ -49,8 +49,8 @@ export interface SystemPromptParams {
   rootFolderId?: DefaultFolderId;
   /** Current sub folder ID */
   subFolderId?: string | null;
-  /** Optional custom persona prompt */
-  personaPrompt?: string;
+  /** Optional custom character prompt */
+  characterPrompt?: string;
   /** Optional user memories summary */
   memorySummary?: string;
   /** Whether call mode is enabled (affects formatting) */
@@ -91,7 +91,7 @@ export function generateSystemPrompt(params: SystemPromptParams): string {
     locale,
     rootFolderId,
     subFolderId,
-    personaPrompt,
+    characterPrompt,
     memorySummary,
     callMode = false,
   } = params;
@@ -157,9 +157,9 @@ You are currently operating in the following context:`);
     }
   }
 
-  // Section 6: Persona Prompt (if provided)
-  if (personaPrompt && personaPrompt.trim()) {
-    sections.push(`## Your Role\n\n${personaPrompt.trim()}`);
+  // Section 6: Character Prompt (if provided)
+  if (characterPrompt && characterPrompt.trim()) {
+    sections.push(`## Your Role\n\n${characterPrompt.trim()}`);
   }
 
   // Section 7: Message Metadata Format (compact)
@@ -169,20 +169,20 @@ Before each message, you receive metadata. Only non-empty fields included:
 
 **Examples:**
 \`[Context: ID:0b501ca0 | Posted:2h ago]\`
-\`[Context: ID:4f00edb6 | Model:claude-haiku-4.5 | Persona:default | Posted:2h ago]\`
+\`[Context: ID:4f00edb6 | Model:claude-haiku-4.5 | Character:default | Posted:2h ago]\`
 \`[Context: ID:abc12345 | Author:John(def67890) | 👍5 👎1 | Posted:1d ago | edited]\`
 
 **Fields:**
 - **ID** - 8-char message reference
 - **Model** - AI model used (assistant messages only)
-- **Persona** - Persona/role (assistant messages only)
+- **Character** - Character/role (assistant messages only)
 - **Author** - Name(id) in public/shared threads only
 - **Votes** - 👍/👎 counts (community rating)
 - **Posted** - Xh/m/d ago (now = <1min)
 - **Status** - edited, branched (only if applicable)
 
 **Key points:**
-- Multiple models/personas may be in one chat - check metadata
+- Multiple models/characters may be in one chat - check metadata
 - Empty fields omitted for brevity
 - Vote counts indicate valuable/controversial messages
 
@@ -262,7 +262,7 @@ export function generateClientSystemPrompt(params: {
   locale: CountryLanguage;
   rootFolderId?: DefaultFolderId;
   subFolderId?: string | null;
-  personaPrompt?: string;
+  characterPrompt?: string;
   callMode?: boolean;
 }): string {
   return generateSystemPrompt({
@@ -272,7 +272,7 @@ export function generateClientSystemPrompt(params: {
     locale: params.locale,
     rootFolderId: params.rootFolderId,
     subFolderId: params.subFolderId,
-    personaPrompt: params.personaPrompt,
+    characterPrompt: params.characterPrompt,
     callMode: params.callMode,
   });
 }

@@ -32,7 +32,7 @@ import type { useCollapseState } from "../hooks/use-collapse-state";
 import { useMessageActions } from "../hooks/use-message-actions";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
-import { ModelPersonaSelectorModal } from "../model-character-selector-modal";
+import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
 import { UserProfileCard } from "../user-profile-card";
 import { ThreadedMessageActions } from "./actions";
 import { ThreadedMessageContent } from "./content";
@@ -250,7 +250,7 @@ export function ThreadedMessage({
               </Div>
             ) : isRetrying ? (
               <Div className="flex justify-end">
-                <ModelPersonaSelectorModal
+                <ModelCharacterSelectorModal
                   titleKey="app.chat.threadedView.retryModal.title"
                   descriptionKey="app.chat.threadedView.retryModal.description"
                   onModelChange={
@@ -329,7 +329,7 @@ export function ThreadedMessage({
           {/* Show Answer-as-AI dialog below the message */}
           {isAnswering && (
             <Div className="mt-3">
-              <ModelPersonaSelectorModal
+              <ModelCharacterSelectorModal
                 titleKey="app.chat.threadedView.answerModal.title"
                 descriptionKey="app.chat.threadedView.answerModal.description"
                 onModelChange={

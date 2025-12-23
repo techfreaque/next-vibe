@@ -18,7 +18,10 @@ import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-int
 export const aliasToPathMap = {
   "agent_ai-stream_POST": "agent_ai-stream_POST",
   "agent_brave-search_GET": "agent_brave-search_GET",
+  agent_chat_characters_create_POST: "agent_chat_characters_create_POST",
   agent_chat_characters_GET: "agent_chat_characters_GET",
+  agent_chat_characters_id_GET: "agent_chat_characters_id_GET",
+  agent_chat_characters_id_PATCH: "agent_chat_characters_id_PATCH",
   agent_chat_favorites_GET: "agent_chat_favorites_GET",
   agent_chat_favorites_id_DELETE: "agent_chat_favorites_id_DELETE",
   agent_chat_favorites_id_GET: "agent_chat_favorites_id_GET",
@@ -39,9 +42,6 @@ export const aliasToPathMap = {
   agent_chat_memories_id_DELETE: "agent_chat_memories_id_DELETE",
   agent_chat_memories_id_PATCH: "agent_chat_memories_id_PATCH",
   agent_chat_memories_POST: "agent_chat_memories_POST",
-  agent_chat_personas_create_POST: "agent_chat_personas_create_POST",
-  agent_chat_personas_id_GET: "agent_chat_personas_id_GET",
-  agent_chat_personas_id_PATCH: "agent_chat_personas_id_PATCH",
   agent_chat_threads_GET: "agent_chat_threads_GET",
   agent_chat_threads_POST: "agent_chat_threads_POST",
   agent_chat_threads_search_GET: "agent_chat_threads_search_GET",
@@ -458,6 +458,20 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/agent/chat/characters/definition")
       ).default.GET;
+    case "agent_chat_characters_create_POST":
+      return (
+        await import(
+          "@/app/api/[locale]/agent/chat/characters/create/definition"
+        )
+      ).default.POST;
+    case "agent_chat_characters_id_GET":
+      return (
+        await import("@/app/api/[locale]/agent/chat/characters/[id]/definition")
+      ).default.GET;
+    case "agent_chat_characters_id_PATCH":
+      return (
+        await import("@/app/api/[locale]/agent/chat/characters/[id]/definition")
+      ).default.PATCH;
     case "agent_chat_favorites_GET":
       return (
         await import("@/app/api/[locale]/agent/chat/favorites/definition")
@@ -527,20 +541,6 @@ export async function getEndpoint(
     case "agent_chat_memories_id_PATCH":
       return (
         await import("@/app/api/[locale]/agent/chat/memories/[id]/definition")
-      ).default.PATCH;
-    case "agent_chat_personas_create_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/agent/chat/characters/create/definition"
-        )
-      ).default.POST;
-    case "agent_chat_personas_id_GET":
-      return (
-        await import("@/app/api/[locale]/agent/chat/characters/[id]/definition")
-      ).default.GET;
-    case "agent_chat_personas_id_PATCH":
-      return (
-        await import("@/app/api/[locale]/agent/chat/characters/[id]/definition")
       ).default.PATCH;
     case "agent_chat_threads_GET":
       return (await import("@/app/api/[locale]/agent/chat/threads/definition"))

@@ -77,7 +77,7 @@ preferredModel: requestDataField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
-    label: "app.api.agent.chat.personas.post.preferredModel.label",
+    label: "app.api.agent.chat.characters.post.preferredModel.label",
     options: ModelIdOptions,
     columns: 6,
   },
@@ -387,8 +387,8 @@ requestDataField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
-    label: "app.api.agent.chat.personas.post.name.label",
-    description: "app.api.agent.chat.personas.post.name.description",
+    label: "app.api.agent.chat.characters.post.name.label",
+    description: "app.api.agent.chat.characters.post.name.description",
     columns: 6,  // Grid width (1-12)
   },
   z.string().min(1).max(100)  // Validation in Zod schema
@@ -399,8 +399,8 @@ requestDataField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXTAREA,
-    label: "app.api.agent.chat.personas.post.systemPrompt.label",
-    description: "app.api.agent.chat.personas.post.systemPrompt.description",
+    label: "app.api.agent.chat.characters.post.systemPrompt.label",
+    description: "app.api.agent.chat.characters.post.systemPrompt.description",
     columns: 12,  // Full width
   },
   z.string().min(1).max(5000)
@@ -411,8 +411,8 @@ requestDataField(
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
-    label: "app.api.agent.chat.personas.post.category.label",
-    description: "app.api.agent.chat.personas.post.category.description",
+    label: "app.api.agent.chat.characters.post.category.label",
+    description: "app.api.agent.chat.characters.post.category.description",
     options: CategoryOptions,  // From enum or config
     columns: 6,
   },
@@ -440,7 +440,7 @@ Response fields display data (not for user input):
 responseField(
   {
     type: WidgetType.TEXT,
-    content: "app.api.agent.chat.personas.get.response.personas.persona.name.content",
+    content: "app.api.agent.chat.characters.get.response.characters.persona.name.content",
   },
   z.string()
 )
@@ -453,7 +453,7 @@ responseArrayField(
   objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.personas.get.response.personas.persona.title",
+      title: "app.api.agent.chat.characters.get.response.characters.persona.title",
       layoutType: LayoutType.GRID,
       columns: 2,
     },
@@ -664,41 +664,41 @@ app.api.{domain}.{subdomain}.{action}.{field}.{property}
 {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.TEXT,
-  label: "app.api.agent.chat.personas.post.name.label",
-  description: "app.api.agent.chat.personas.post.name.description",
+  label: "app.api.agent.chat.characters.post.name.label",
+  description: "app.api.agent.chat.characters.post.name.description",
   columns: 6
 }
 
 // TEXT (response) - Uses content
 {
   type: WidgetType.TEXT,
-  content: "app.api.agent.chat.personas.get.response.personas.persona.name.content"
+  content: "app.api.agent.chat.characters.get.response.characters.persona.name.content"
 }
 
 // CONTAINER - Uses title, description
 {
   type: WidgetType.CONTAINER,
-  title: "app.api.agent.chat.personas.get.container.title",
-  description: "app.api.agent.chat.personas.get.container.description",
+  title: "app.api.agent.chat.characters.get.container.title",
+  description: "app.api.agent.chat.characters.get.container.description",
   layoutType: LayoutType.STACKED
 }
 
 // Endpoint metadata - Uses title, description, category, tags
 {
-  title: "app.api.agent.chat.personas.get.title",
-  description: "app.api.agent.chat.personas.get.description",
+  title: "app.api.agent.chat.characters.get.title",
+  description: "app.api.agent.chat.characters.get.description",
   category: "app.api.agent.chat.category",
-  tags: ["app.api.agent.chat.tags.personas"]
+  tags: ["app.api.agent.chat.tags.characters"]
 }
 ```
 
 ### Dynamic Routes
 
 ```typescript
-// Path: src/app/api/[locale]/agent/chat/personas/[id]/definition.ts
-// Pattern: app.api.agent.chat.personas.id.{method}.{field}
-title: "app.api.agent.chat.personas.id.get.title";
-description: "app.api.agent.chat.personas.id.get.description";
+// Path: src/app/api/[locale]/agent/chat/characters/[id]/definition.ts
+// Pattern: app.api.agent.chat.characters.id.{method}.{field}
+title: "app.api.agent.chat.characters.id.get.title";
+description: "app.api.agent.chat.characters.id.get.description";
 ```
 
 ### Enum Translation Keys
@@ -920,7 +920,7 @@ verbose: requestDataField({...}, z.boolean().default(false))
 
 **Clean definition files with no errors:**
 
-- `src/app/api/[locale]/agent/chat/personas/definition.ts` - GET and POST endpoints with forms, arrays, optional fields
+- `src/app/api/[locale]/agent/chat/characters/definition.ts` - GET and POST endpoints with forms, arrays, optional fields
 - `src/app/api/[locale]/agent/brave-search/definition.ts` - POST endpoint with search functionality
 
 ---

@@ -8,6 +8,7 @@
 import type { Control, FieldPath, FieldValues } from "react-hook-form";
 import type { z } from "zod";
 
+import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type { Countries } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -188,6 +189,16 @@ export interface IconFieldConfig extends BaseFieldConfig {
   type: "icon";
 }
 
+export interface FilterPillsFieldConfig extends BaseFieldConfig {
+  type: "filter_pills";
+  options: Array<{
+    value: string;
+    label: TranslationKey;
+    icon?: IconKey;
+    disabled?: boolean;
+  }>;
+}
+
 // Union type for all field configurations
 export type FieldConfig =
   | TextFieldConfig
@@ -206,7 +217,8 @@ export type FieldConfig =
   | MultiSelectFieldConfig
   | LocationFieldConfig
   | YearPickerFieldConfig
-  | IconFieldConfig;
+  | IconFieldConfig
+  | FilterPillsFieldConfig;
 
 // Required field styling options
 export type RequiredFieldStyle =

@@ -79,9 +79,9 @@ export const translations: typeof enTranslations = {
           "GPT-4, Claude, Gemini, Llama, Mistral und mehr. Keine Filter, keine Einschränkungen. Wechseln Sie Modelle mitten im Gespräch.",
       },
       audience: {
-        title: "Benutzerdefinierte KI-Personas",
+        title: "Benutzerdefinierte KI-Characters",
         description:
-          "Erstellen Sie KI-Charaktere mit einzigartigen Persönlichkeiten. Nutzen Sie Community-Personas oder erstellen Sie eigene. Teilen Sie mit anderen.",
+          "Erstellen Sie KI-Charaktere mit einzigartigen Persönlichkeiten. Nutzen Sie Community-Characters oder erstellen Sie eigene. Teilen Sie mit anderen.",
       },
       global: {
         title: "Intelligente Organisation",
@@ -140,7 +140,7 @@ export const translations: typeof enTranslations = {
           credits: "{{credits}} Credits zum Start",
           models: "Zugriff auf alle {{modelCount}} KI-Modelle",
           folders: "Alle Ordnertypen (privat, inkognito, geteilt, öffentlich)",
-          personas: "Community-Personas verwenden",
+          characters: "Community-Characters verwenden",
           support: "Community-Support",
         },
         cta: "Kostenlos starten",
@@ -154,7 +154,7 @@ export const translations: typeof enTranslations = {
           unlimited: "Unbegrenzte KI-Gespräche",
           models: "Alle {{modelCount}} KI-Modelle",
           folders: "Alle Ordnertypen",
-          personas: "Unbegrenzte Personas erstellen",
+          characters: "Unbegrenzte Characters erstellen",
           priority: "Prioritäts-Support",
           analytics: "Erweiterte Analysen",
         },
@@ -242,9 +242,9 @@ export const translations: typeof enTranslations = {
         publishingManagement: {
           title: "Beginnen Sie zu chatten",
           description:
-            "Führen Sie ehrliche, uneingeschränkte Gespräche. Erstellen Sie Personas, organisieren Sie in Ordnern oder gehen Sie inkognito.",
+            "Führen Sie ehrliche, uneingeschränkte Gespräche. Erstellen Sie Characters, organisieren Sie in Ordnern oder gehen Sie inkognito.",
           tags: {
-            optimalTiming: "Benutzerdefinierte Personas",
+            optimalTiming: "Benutzerdefinierte Characters",
             communityBuilding: "Ordnerverwaltung",
           },
         },
@@ -295,7 +295,7 @@ export const translations: typeof enTranslations = {
         collaboration: {
           title: "Community-getrieben",
           description:
-            "Gebaut mit Feedback unserer Nutzer. Teilen Sie Personas, Tipps und helfen Sie, die Plattform zu gestalten.",
+            "Gebaut mit Feedback unserer Nutzer. Teilen Sie Characters, Tipps und helfen Sie, die Plattform zu gestalten.",
         },
       },
       team: {
@@ -866,7 +866,7 @@ export const translations: typeof enTranslations = {
       features: "Funktionen",
       subscription: "Abonnement",
       aiModels: "KI-Modelle",
-      personas: "Personas",
+      characters: "Characters",
     },
     product: {
       title: "Produkt",

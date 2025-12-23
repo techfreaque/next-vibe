@@ -89,9 +89,9 @@ export const translations: typeof enTranslations = {
       label: "Model",
       description: "Model AI do użycia podczas generowania",
     },
-    persona: {
-      label: "Persona",
-      description: "Opcjonalna persona dla AI",
+    character: {
+      label: "Postać",
+      description: "Opcjonalna postać dla AI",
     },
     temperature: {
       label: "Temperatura",

@@ -119,7 +119,7 @@ export function SuggestedPrompts({
         </P>
       </Div>
 
-      {/* Persona Tabs */}
+      {/* Character Tabs */}
       <Div className="flex flex-row gap-2 justify-center flex-wrap">
         {FEATURED_CHARACTERS.map((character) => (
           <Button
@@ -159,7 +159,7 @@ export function SuggestedPrompts({
           <DialogContent className="max-w-3xl max-h-[85vh]">
             <DialogHeader>
               <DialogTitle>
-                {t("app.chat.suggestedPrompts.selectPersona")}
+                {t("app.chat.suggestedPrompts.selectCharacter")}
               </DialogTitle>
             </DialogHeader>
             <ScrollArea className="h-[70vh] pr-4">

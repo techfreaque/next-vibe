@@ -121,16 +121,14 @@ function generateInputSchema(
     // Combine request data and URL params
     const requestDataSchema = generateSchemaForUsage<
       typeof endpoint.fields,
-      FieldUsage.RequestData,
-      string
+      FieldUsage.RequestData
     >(endpoint.fields, FieldUsage.RequestData) as
       | z.ZodObject<Record<string, z.ZodTypeAny>>
       | z.ZodNever;
 
     const urlPathParamsSchema = generateSchemaForUsage<
       typeof endpoint.fields,
-      FieldUsage.RequestUrlParams,
-      string
+      FieldUsage.RequestUrlParams
     >(endpoint.fields, FieldUsage.RequestUrlParams) as
       | z.ZodObject<Record<string, z.ZodTypeAny>>
       | z.ZodNever;

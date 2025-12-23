@@ -26,7 +26,7 @@ import type { useCollapseState } from "../hooks/use-collapse-state";
 import type { useMessageActions } from "../hooks/use-message-actions";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
-import { ModelPersonaSelectorModal } from "../model-character-selector-modal";
+import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
 import { ToolDisplay } from "../tool-display";
 import { countPostsByUserId, countReplies, getDirectReplies } from "./helpers";
 
@@ -315,7 +315,7 @@ export function FlatMessage({
         </Div>
       ) : messageActions.retryingMessageId === message.id ? (
         <Div className="my-2">
-          <ModelPersonaSelectorModal
+          <ModelCharacterSelectorModal
             titleKey="app.chat.flatView.retryModal.title"
             descriptionKey="app.chat.flatView.retryModal.description"
             onModelChange={
@@ -459,7 +459,7 @@ export function FlatMessage({
       {/* Show Answer-as-AI dialog below the message */}
       {messageActions.answeringMessageId === message.id && (
         <Div className="my-3">
-          <ModelPersonaSelectorModal
+          <ModelCharacterSelectorModal
             titleKey="app.chat.flatView.answerModal.title"
             descriptionKey="app.chat.flatView.answerModal.description"
             onModelChange={

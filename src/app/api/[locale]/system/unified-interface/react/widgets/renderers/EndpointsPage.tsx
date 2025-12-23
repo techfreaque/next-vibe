@@ -26,10 +26,12 @@ export interface EndpointsPageProps<
   T extends {
     GET?: CreateApiEndpointAny;
     POST?: CreateApiEndpointAny;
+    PUT?: CreateApiEndpointAny;
+    PATCH?: CreateApiEndpointAny;
     DELETE?: CreateApiEndpointAny;
   },
 > {
-  /** Endpoint definitions (supports GET, POST, DELETE) */
+  /** Endpoint definitions (supports GET, POST, PUT, PATCH, DELETE) */
   endpoint: T;
   /** Locale for translations */
   locale: CountryLanguage;
@@ -82,6 +84,8 @@ export function EndpointsPage<
   T extends {
     GET?: CreateApiEndpointAny;
     POST?: CreateApiEndpointAny;
+    PUT?: CreateApiEndpointAny;
+    PATCH?: CreateApiEndpointAny;
     DELETE?: CreateApiEndpointAny;
   },
 >({
@@ -95,11 +99,22 @@ export function EndpointsPage<
 }: EndpointsPageProps<T>): React.JSX.Element {
   // Determine which endpoint to use
   const isGetEndpoint = !!endpoint.GET;
-  const isPostEndpoint = !!endpoint.POST && !endpoint.GET;
-  const isDeleteEndpoint = !!endpoint.DELETE && !endpoint.GET && !endpoint.POST;
+  const isMutationEndpoint =
+    !!(endpoint.POST ?? endpoint.PUT ?? endpoint.PATCH) && !endpoint.GET;
+  const isDeleteEndpoint =
+    !!endpoint.DELETE &&
+    !endpoint.GET &&
+    !endpoint.POST &&
+    !endpoint.PUT &&
+    !endpoint.PATCH;
 
   // Get the active endpoint definition
-  const activeEndpoint = endpoint.GET ?? endpoint.POST ?? endpoint.DELETE;
+  const activeEndpoint =
+    endpoint.GET ??
+    endpoint.POST ??
+    endpoint.PUT ??
+    endpoint.PATCH ??
+    endpoint.DELETE;
 
   // Read configuration from endpoint definition with fallbacks
   const finalDebug = debug ?? activeEndpoint?.debug ?? false;
@@ -121,7 +136,7 @@ export function EndpointsPage<
         ? (read.response.data as Record<string, WidgetData>)
         : undefined;
     isLoading = read.isLoading;
-  } else if (isPostEndpoint && endpointState.create) {
+  } else if (isMutationEndpoint && endpointState.create) {
     const create = endpointState.create;
     response = create.response;
     responseData =
@@ -163,7 +178,7 @@ export function EndpointsPage<
               response={response}
             />
           )}
-          {isPostEndpoint && endpointState.create && (
+          {isMutationEndpoint && endpointState.create && (
             <EndpointRenderer
               endpoint={activeEndpoint}
               form={endpointState.create.form}

@@ -23,7 +23,7 @@ import type { ModelFeatures } from "@/app/api/[locale]/agent/chat/types";
 /**
  * Selector view modes
  */
-export type SelectorMode = "quick" | "personas" | "build";
+export type SelectorMode = "quick" | "characters" | "build";
 
 /**
  * Model selection strategy
@@ -55,7 +55,7 @@ export interface SelectorState {
  * Storage keys for persistence
  */
 export const STORAGE_KEYS = {
-  FAVORITE_PERSONAS: "chat-favorites-v2",
+  FAVORITE_CHARACTERS: "chat-favorites-v2",
   FAVORITE_MODELS: "chat-favorite-models",
   RECENT_SELECTIONS: "chat-recent-selections",
   DEFAULT_BUDGET: "chat-default-budget",
@@ -65,9 +65,9 @@ export const STORAGE_KEYS = {
 } as const;
 
 /**
- * Default favorite personas
+ * Default favorite characters
  */
-export const DEFAULT_FAVORITE_PERSONAS = ["default", "technical", "creative"];
+export const DEFAULT_FAVORITE_CHARACTERS = ["default", "technical", "creative"];
 
 /**
  * Default favorite models

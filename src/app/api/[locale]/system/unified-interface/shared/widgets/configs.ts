@@ -8,6 +8,8 @@
 import type { Route } from "next";
 import type { z } from "zod";
 
+import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
+
 import type {
   FieldUsageConfig,
   InferSchemaFromField,
@@ -146,6 +148,18 @@ export interface MultiSelectFieldWidgetConfig<TKey extends string>
   options: Array<{ label: NoInfer<TKey>; value: string | number }>;
 }
 
+// Filter pills (like select but displayed as pills)
+export interface FilterPillsFieldWidgetConfig<TKey extends string>
+  extends BaseFormFieldWidgetConfig<TKey> {
+  fieldType: FieldDataType.FILTER_PILLS;
+  options: Array<{
+    label: NoInfer<TKey>;
+    value: string | number;
+    icon?: IconKey;
+    description?: NoInfer<TKey>;
+  }>;
+}
+
 // Textarea
 export interface TextareaFieldWidgetConfig<TKey extends string>
   extends BaseFormFieldWidgetConfig<TKey> {
@@ -281,6 +295,7 @@ export type FormFieldWidgetConfig<TKey extends string> =
   | BooleanFieldWidgetConfig<TKey>
   | SelectFieldWidgetConfig<TKey>
   | MultiSelectFieldWidgetConfig<TKey>
+  | FilterPillsFieldWidgetConfig<TKey>
   | TextareaFieldWidgetConfig<TKey>
   | PhoneFieldWidgetConfig<TKey>
   | UrlFieldWidgetConfig<TKey>
@@ -316,35 +331,6 @@ export interface FormSectionWidgetConfig<TKey extends string>
   type: WidgetType.FORM_SECTION;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
-}
-
-/**
- * Filter Pills Widget Config
- * Visual pill/chip radio button group for single-selection enums
- * Renders as horizontal pill buttons with icons, similar to SELECT but with better UX
- */
-export interface FilterPillsWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
-  type: WidgetType.FILTER_PILLS;
-  label?: NoInfer<TKey>;
-  description?: NoInfer<TKey>;
-  placeholder?: NoInfer<TKey>;
-  helpText?: NoInfer<TKey>;
-  required?: boolean;
-  disabled?: boolean;
-  readonly?: boolean;
-  options: Array<{
-    label: NoInfer<TKey>;
-    value: string | number;
-    icon?: string;
-    description?: NoInfer<TKey>;
-  }>;
-  layout?: {
-    wrap?: boolean;
-    gap?: "sm" | "md" | "lg";
-  };
-  showIcon?: boolean;
-  showLabel?: boolean;
 }
 
 // ============================================================================
@@ -473,8 +459,7 @@ interface InferSchemasFromChildren<
         TTranslationKey,
         ContainerWidgetConfig<TTranslationKey>
       >,
-      FieldUsage.RequestData,
-      TTranslationKey
+      FieldUsage.RequestData
     >
   >;
   response: z.output<
@@ -485,8 +470,7 @@ interface InferSchemasFromChildren<
         TTranslationKey,
         ContainerWidgetConfig<TTranslationKey>
       >,
-      FieldUsage.Response,
-      TTranslationKey
+      FieldUsage.Response
     >
   >;
 }
@@ -531,9 +515,9 @@ interface ContainerWidgetConfigBase<TKey extends string>
    */
   submitButton?: {
     /** Submit button text translation key */
-    text?: TKey;
+    text?: NoInfer<TKey>;
     /** Submit button loading text translation key */
-    loadingText?: TKey;
+    loadingText?: NoInfer<TKey>;
     /** Submit button position - 'bottom' (default) or 'header' */
     position?: "bottom" | "header";
     /** Icon identifier (e.g., "refresh-cw", "save", "send") */
@@ -647,7 +631,7 @@ export interface AccordionWidgetConfig<TKey extends string>
 export interface TitleWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.TITLE;
-  content: TKey;
+  content: NoInfer<TKey>;
   level?: 1 | 2 | 3 | 4 | 5 | 6;
   fieldType?: FieldDataType;
 }
@@ -655,7 +639,7 @@ export interface TitleWidgetConfig<TKey extends string>
 export interface TextWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.TEXT;
-  content: TKey;
+  content: NoInfer<TKey>;
   fieldType?: FieldDataType;
   label?: NoInfer<TKey>;
   variant?: "default" | "error" | "info" | "success" | "warning";
@@ -670,7 +654,7 @@ export interface TextWidgetConfig<TKey extends string>
 export interface BadgeWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.BADGE;
-  text?: TKey; // Static text - use when displaying a fixed label
+  text?: NoInfer<TKey>; // Static text - use when displaying a fixed label
   enumOptions?: Array<{ label: NoInfer<TKey>; value: string | number }>; // Dynamic enum mapping - use when displaying enum values
   variant?: "default" | "success" | "warning" | "error" | "info";
 }
@@ -679,14 +663,14 @@ export interface AvatarWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.AVATAR;
   src?: string; // Field name containing avatar URL (e.g., "avatarUrl", "imageUrl") or literal URL
-  alt?: TKey;
+  alt?: NoInfer<TKey>;
   fallback?: string; // Fallback text/initials to display if image fails (e.g., "JD", "?")
 }
 
 export interface MarkdownWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.MARKDOWN;
-  content: TKey;
+  content: NoInfer<TKey>;
 }
 
 export interface MarkdownEditorWidgetConfig<TKey extends string>
@@ -700,7 +684,7 @@ export interface LinkWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.LINK;
   href: Route | string; // URL path or route
-  text?: TKey; // Link text to display
+  text?: NoInfer<TKey>; // Link text to display
   label?: NoInfer<TKey>; // Accessible label (aria-label) - use if text is not descriptive
   external?: boolean; // Opens in new tab if true
 }
@@ -709,7 +693,7 @@ export interface LinkCardWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.LINK_CARD;
   href: Route | string;
-  title: TKey;
+  title: NoInfer<TKey>;
   description?: NoInfer<TKey>;
   external?: boolean;
 }
@@ -720,7 +704,7 @@ export interface LinkListWidgetConfig<TKey extends string>
   title?: NoInfer<TKey>;
   links?: Array<{
     href: Route | string;
-    text: TKey;
+    text: NoInfer<TKey>;
     external?: boolean;
   }>;
   layoutType?: LayoutType;
@@ -793,13 +777,13 @@ export interface SeverityBadgeWidgetConfig<TKey extends string>
 export interface MessageTextWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.MESSAGE_TEXT;
-  message: TKey; // Message to display
+  message: NoInfer<TKey>; // Message to display
 }
 
 export interface IssueCardWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.ISSUE_CARD;
-  title: TKey;
+  title: NoInfer<TKey>;
   description?: NoInfer<TKey>;
 }
 
@@ -810,7 +794,7 @@ export interface IssueCardWidgetConfig<TKey extends string>
 export interface ButtonWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.BUTTON;
-  text: TKey;
+  text: NoInfer<TKey>;
   variant?:
     | "default"
     | "primary"
@@ -825,7 +809,7 @@ export interface ButtonGroupWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.BUTTON_GROUP;
   buttons?: Array<{
-    text: TKey;
+    text: NoInfer<TKey>;
     onClick?: string;
   }>;
 }
@@ -834,7 +818,7 @@ export interface ActionBarWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.ACTION_BAR;
   actions?: Array<{
-    text: TKey;
+    text: NoInfer<TKey>;
     onClick?: string;
   }>;
 }
@@ -851,7 +835,7 @@ export interface ActionListWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.ACTION_LIST;
   actions?: Array<{
-    text: TKey;
+    text: NoInfer<TKey>;
     onClick?: string;
   }>;
 }
@@ -863,7 +847,7 @@ export interface ActionListWidgetConfig<TKey extends string>
 export interface MetricCardWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.METRIC_CARD;
-  title: TKey;
+  title: NoInfer<TKey>;
   value: string | number;
   change?: number;
   trend?: "up" | "down" | "neutral";
@@ -933,23 +917,23 @@ export interface ProgressWidgetConfig<TKey extends string>
 export interface LoadingWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.LOADING;
-  message?: TKey;
+  message?: NoInfer<TKey>;
 }
 
 export interface ErrorWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.ERROR;
-  title: TKey;
-  message?: TKey;
+  title: NoInfer<TKey>;
+  message?: NoInfer<TKey>;
 }
 
 export interface EmptyStateWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.EMPTY_STATE;
-  title: TKey;
-  message?: TKey;
+  title: NoInfer<TKey>;
+  message?: NoInfer<TKey>;
   action?: {
-    text: TKey;
+    text: NoInfer<TKey>;
     onClick?: string;
   };
 }
@@ -975,8 +959,8 @@ export interface FormAlertWidgetConfig<TKey extends string>
 export interface SubmitButtonWidgetConfig<TKey extends string>
   extends BaseWidgetConfig<TKey> {
   type: WidgetType.SUBMIT_BUTTON;
-  text?: TKey;
-  loadingText?: TKey;
+  text?: NoInfer<TKey>;
+  loadingText?: NoInfer<TKey>;
   icon?: string;
   variant?:
     | "default"
@@ -1022,7 +1006,6 @@ export type WidgetConfig<TKey extends string> =
   | FormFieldWidgetConfig<TKey>
   | FormGroupWidgetConfig<TKey>
   | FormSectionWidgetConfig<TKey>
-  | FilterPillsWidgetConfig<TKey>
   // Data display widgets
   | DataTableWidgetConfig<TKey>
   | DataCardWidgetConfig<TKey>

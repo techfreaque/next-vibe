@@ -33,8 +33,8 @@ interface SelectorOnboardingProps {
 
 type OnboardingStep = "story" | "pick" | "specialists";
 
-// Featured personas for quick onboarding
-const FEATURED_PERSONA_IDS = ["thea", "hermes"] as const;
+// Featured characters for quick onboarding
+const FEATURED_CHARACTER_IDS = ["thea", "hermes"] as const;
 
 // Companion descriptions (personality-focused, not model-focused)
 const COMPANION_INFO: Record<string, { tagline: string; description: string }> =
@@ -53,7 +53,7 @@ const COMPANION_INFO: Record<string, { tagline: string; description: string }> =
  * Get featured characters for onboarding
  */
 function getFeaturedCharacters(): Character[] {
-  return FEATURED_PERSONA_IDS.map(getCharacterById).filter(
+  return FEATURED_CHARACTER_IDS.map(getCharacterById).filter(
     (p): p is Character => p !== null,
   );
 }

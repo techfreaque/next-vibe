@@ -6,7 +6,7 @@
  * 2. Icon keys from ICON_REGISTRY (type-safe, e.g., "lock", "users")
  * 3. React components with className prop
  *
- * All icon props (model, persona, folder) use the same IconValue type.
+ * All icon props (model, character, folder) use the same IconValue type.
  */
 
 import * as Icons from "next-vibe-ui/ui/icons";
@@ -648,7 +648,7 @@ export const ICON_REGISTRY = {
   // Special: 1A icon (custom component)
   "1a": OneAIcon,
 
-  // Emoji Icons (AI Model Providers & Personas)
+  // Emoji Icons (AI Model Providers & Characters)
   whale: createEmojiIcon("🐋"),
   ocean: createEmojiIcon("🌊"),
   "robot-face": createEmojiIcon("🤖"),

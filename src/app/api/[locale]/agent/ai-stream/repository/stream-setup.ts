@@ -494,7 +494,7 @@ export async function setupAiStream(params: {
 
   // Build complete system prompt from character and formatting instructions
   const systemPrompt = await buildSystemPrompt({
-    personaId: data.character,
+    characterId: data.character,
     userId,
     logger,
     t,
@@ -506,7 +506,7 @@ export async function setupAiStream(params: {
 
   logger.debug("System prompt built", {
     systemPromptLength: systemPrompt.length,
-    hasPersona: !!data.character,
+    hasCharacter: !!data.character,
   });
 
   const messages = await buildMessageContext({
@@ -520,7 +520,7 @@ export async function setupAiStream(params: {
     rootFolderId: data.rootFolderId,
     messageHistory: data.messageHistory ?? null,
     logger,
-    upcomingResponseContext: { model: data.model, persona: data.character },
+    upcomingResponseContext: { model: data.model, character: data.character },
   });
 
   if (
@@ -668,7 +668,7 @@ async function buildMessageContext(params: {
   rootFolderId?: DefaultFolderId;
   messageHistory?: Array<z.infer<typeof messageHistorySchema>> | null;
   logger: EndpointLogger;
-  upcomingResponseContext?: { model: string; persona: string | null };
+  upcomingResponseContext?: { model: string; character: string | null };
 }): Promise<CoreMessage[]> {
   // SECURITY: Reject messageHistory for non-incognito threads
   // Non-incognito threads must fetch history from database to prevent manipulation
@@ -1087,7 +1087,7 @@ async function handleToolConfirmationInSetup(params: {
 function toAiSdkMessages(
   messages: Array<ChatMessage | { role: ChatMessageRole; content: string }>,
   rootFolderId?: DefaultFolderId,
-  upcomingResponseContext?: { model: string; persona: string | null },
+  upcomingResponseContext?: { model: string; character: string | null },
 ): CoreMessage[] {
   const result: CoreMessage[] = [];
 
@@ -1119,8 +1119,8 @@ function toAiSdkMessages(
   if (upcomingResponseContext) {
     const parts: string[] = [];
     parts.push(`Model:${upcomingResponseContext.model}`);
-    if (upcomingResponseContext.persona) {
-      parts.push(`Persona:${upcomingResponseContext.persona}`);
+    if (upcomingResponseContext.character) {
+      parts.push(`Character:${upcomingResponseContext.character}`);
     }
     result.push({
       role: "system",

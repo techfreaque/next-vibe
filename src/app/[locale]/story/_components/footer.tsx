@@ -94,7 +94,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <Users className="h-4 w-4" />
-                  {t("app.story._components.footer.platform.personas")}
+                  {t("app.story._components.footer.platform.characters")}
                 </Link>
               </Div>
             </Div>

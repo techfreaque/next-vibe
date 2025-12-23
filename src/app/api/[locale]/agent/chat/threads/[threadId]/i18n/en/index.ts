@@ -43,7 +43,7 @@ export const translations = {
           content: "Default Model",
         },
         defaultTone: {
-          content: "Default Persona",
+          content: "Default Character",
         },
         systemPrompt: {
           content: "System Prompt",
@@ -153,8 +153,8 @@ export const translations = {
       description: "Default AI model for this thread",
     },
     defaultTone: {
-      label: "Default Persona",
-      description: "Default persona for this thread",
+      label: "Default Character",
+      description: "Default character for this thread",
     },
     systemPrompt: {
       label: "System Prompt",
@@ -200,7 +200,7 @@ export const translations = {
           content: "Default Model",
         },
         defaultTone: {
-          content: "Default Persona",
+          content: "Default Character",
         },
         systemPrompt: {
           content: "System Prompt",

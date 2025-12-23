@@ -4,10 +4,10 @@
  */
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
-import { Methods } from "@/app/api/[locale]/system/shared/enums";
 
 import { LoginRepository } from "../repository";
 import loginOptionsDefinitions from "./definition";
+import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: loginOptionsDefinitions,

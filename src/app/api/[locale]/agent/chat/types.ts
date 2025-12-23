@@ -59,7 +59,7 @@ export enum ModelUtility {
 // ============================================
 // CHARACTER CATEGORY - User-facing task types
 // ============================================
-// NOTE: CharacterCategory enum is now defined in personas/enum.ts
+// NOTE: CharacterCategory enum is now defined in characters/enum.ts
 // using the localized enum pattern with createEnumOptions()
 
 // ============================================

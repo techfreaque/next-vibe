@@ -21,7 +21,10 @@ import type {
 } from "react-hook-form";
 import type { z } from "zod";
 
-import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import {
+  getIconComponent,
+  type IconKey,
+} from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type { EndpointFieldStructure } from "@/app/api/[locale]/system/unified-interface/shared/field-config/endpoint-field-types";
 import type {
   FieldConfig,
@@ -61,6 +64,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../select";
+import { Span } from "../span";
 import { Switch } from "../switch";
 import { TagsField } from "../tags-field";
 import { Textarea } from "../textarea";
@@ -640,6 +644,46 @@ function renderFieldInput<
           className={inputClassName}
           size="default"
         />
+      );
+    }
+
+    case "filter_pills": {
+      return (
+        <div className="flex flex-wrap items-center gap-2">
+          {config.options.map((option) => {
+            const Icon = option.icon ? getIconComponent(option.icon) : null;
+            const isSelected = field.value === option.value;
+
+            return (
+              <Button
+                key={`${option.value}`}
+                type="button"
+                variant={isSelected ? "default" : "outline"}
+                onClick={() => {
+                  if (!disabled && !config.disabled) {
+                    field.onChange(option.value);
+                  }
+                }}
+                disabled={disabled || config.disabled}
+                size="sm"
+                className={cn(
+                  "flex items-center gap-1.5 h-9 px-3 transition-all",
+                  !isSelected && "hover:border-primary/50 hover:bg-primary/5",
+                )}
+              >
+                {Icon && (
+                  <Icon
+                    className={cn(
+                      "h-4 w-4",
+                      isSelected && "text-primary-foreground",
+                    )}
+                  />
+                )}
+                <Span className="text-xs font-medium">{t(option.label)}</Span>
+              </Button>
+            );
+          })}
+        </div>
       );
     }
 
