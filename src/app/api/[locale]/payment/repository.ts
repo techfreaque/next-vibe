@@ -92,19 +92,22 @@ export class PaymentRepository {
         });
       }
 
-      // Create or get Stripe customer
-      let stripeCustomerId: string = userRecord.stripeCustomerId || "";
+      // Get or create Stripe customer (handles invalid test IDs)
+      const { getPaymentProvider } = await import("./providers/index");
+      const paymentProvider = getPaymentProvider("stripe");
 
-      if (!stripeCustomerId) {
-        logger.error("payment.create.error.stripeCustomerNotFound");
-        return fail({
-          message: "app.api.payment.create.errors.server.title",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            error: t("app.api.payment.errors.customerNotFound"),
-          },
-        });
+      const customerResult = await paymentProvider.ensureCustomer(
+        user.id,
+        userRecord.email,
+        userRecord.publicName,
+        logger,
+      );
+
+      if (!customerResult.success) {
+        return customerResult;
       }
+
+      const stripeCustomerId = customerResult.data.customerId;
 
       // Create Stripe checkout session
       // Map enum translation keys to Stripe API values

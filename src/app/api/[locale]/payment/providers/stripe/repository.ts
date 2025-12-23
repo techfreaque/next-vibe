@@ -64,11 +64,41 @@ export class StripeProvider implements PaymentProvider {
       }
 
       if (user.stripeCustomerId) {
-        return success<CustomerResult>({
-          customerId: user.stripeCustomerId,
-        });
+        // Verify the customer exists in Stripe (handles test->prod migration)
+        try {
+          await stripe.customers.retrieve(user.stripeCustomerId);
+          return success<CustomerResult>({
+            customerId: user.stripeCustomerId,
+          });
+        } catch (retrieveError) {
+          const error = parseError(retrieveError);
+          // If customer doesn't exist (e.g., test ID in production), clear it and create new one
+          if (
+            error.message.includes("No such customer") ||
+            error.message.includes("resource_missing")
+          ) {
+            logger.warn(
+              "Invalid Stripe customer ID detected, creating new one",
+              {
+                userId,
+                oldCustomerId: user.stripeCustomerId,
+                error: error.message,
+              },
+            );
+
+            // Clear invalid customer ID
+            await db
+              .update(users)
+              .set({ stripeCustomerId: null })
+              .where(eq(users.id, userId));
+          } else {
+            // Other errors (network, etc.) should be thrown
+            throw retrieveError;
+          }
+        }
       }
 
+      // Create new customer (either no customer ID or invalid one was cleared)
       const customer = await stripe.customers.create({
         email,
         name: name || undefined,

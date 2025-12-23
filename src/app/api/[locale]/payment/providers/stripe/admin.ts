@@ -78,7 +78,34 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         return null;
       }
 
-      return user.stripeCustomerId;
+      // Verify the customer exists in Stripe (handles test->prod migration)
+      try {
+        await stripe.customers.retrieve(user.stripeCustomerId);
+        return user.stripeCustomerId;
+      } catch (retrieveError) {
+        const error = parseError(retrieveError);
+        // If customer doesn't exist (e.g., test ID in production), clear it
+        if (
+          error.message.includes("No such customer") ||
+          error.message.includes("resource_missing")
+        ) {
+          logger.warn("Invalid Stripe customer ID detected, clearing it", {
+            userId,
+            oldCustomerId: user.stripeCustomerId,
+            error: error.message,
+          });
+
+          // Clear invalid customer ID
+          await db
+            .update(users)
+            .set({ stripeCustomerId: null })
+            .where(eq(users.id, userId));
+
+          return null;
+        }
+        // Other errors should be thrown
+        throw retrieveError;
+      }
     } catch (error) {
       logger.error("Error finding Stripe customer", {
         error: parseError(error),

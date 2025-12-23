@@ -1561,8 +1561,11 @@ const scopedEndpointInvalidMultiselectFieldOptionLabel = createEndpoint({
           fieldType: FieldDataType.MULTISELECT,
           label: "form.fields.name.label",
           options: [
-            // @ts-expect-error - Invalid multiselect option label key
-            { label: "invalid.multiselect.option.label.key", value: "admin" },
+            {
+              // @ts-expect-error - Invalid multiselect option label key
+              label: "invalid.multiselect.option.label.key",
+              value: "admin",
+            },
           ],
           columns: 12,
         },
