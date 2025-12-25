@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import type { JSX } from "react";
 
+import { type CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
 import {
   type CreditBalance,
   CreditRepository,
-  type CreditTransactionOutput,
 } from "@/app/api/[locale]/credits/repository";
 import {
   ProductIds,
@@ -70,10 +70,7 @@ export default async function HistoryPage({
 
   // Fetch data
   let credits: CreditBalance | null = null;
-  let history: {
-    transactions: CreditTransactionOutput[];
-    totalCount: number;
-  } | null = null;
+  let history: CreditsHistoryGetResponseOutput | null = null;
   let subscription: SubscriptionGetResponseOutput | null = null;
 
   if (userResponse.success && userResponse.data && userResponse.data.leadId) {
@@ -87,26 +84,12 @@ export default async function HistoryPage({
 
   // Fetch transaction history
   if (userResponse.success && userResponse.data && userResponse.data.leadId) {
-    if (isAuthenticated && "id" in userResponse.data && userResponse.data.id) {
-      // Authenticated users: fetch by userId and leadId
-      const historyResponse = await CreditRepository.getTransactions(
-        userResponse.data.id,
-        userResponse.data.leadId,
-        50, // limit
-        0, // offset
-        logger,
-      );
-      history = historyResponse.success ? historyResponse.data : null;
-    } else {
-      // Public users: fetch by leadId
-      const historyResponse = await CreditRepository.getTransactionsByLeadId(
-        userResponse.data.leadId,
-        50, // limit
-        0, // offset
-        logger,
-      );
-      history = historyResponse.success ? historyResponse.data : null;
-    }
+    const historyResponse = await CreditRepository.getTransactionHistory(
+      { paginationInfo: { page: 1, limit: 50 } },
+      userResponse.data,
+      logger,
+    );
+    history = historyResponse.success ? historyResponse.data : null;
   }
 
   if (

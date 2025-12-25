@@ -158,7 +158,7 @@ const { GET } = createEndpoint({
         },
         z
           .enum(Object.values(EmailStatusFilter) as [string, ...string[]])
-          .default(EmailStatusFilter.ALL),
+          .default(EmailStatusFilter.ANY),
       ),
 
       type: requestDataField(
@@ -172,7 +172,7 @@ const { GET } = createEndpoint({
         },
         z
           .enum(Object.values(EmailTypeFilter) as [string, ...string[]])
-          .default(EmailTypeFilter.ALL),
+          .default(EmailTypeFilter.ANY),
       ),
 
       search: requestDataField(

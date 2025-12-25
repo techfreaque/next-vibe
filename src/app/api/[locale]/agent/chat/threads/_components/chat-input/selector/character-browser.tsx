@@ -17,7 +17,6 @@ import { useCallback, useMemo, useState } from "react";
 
 import {
   type Character,
-  CharacterCategory,
   DEFAULT_CHARACTERS,
   getCharactersByCategory,
 } from "@/app/api/[locale]/agent/chat/characters/config";
@@ -31,10 +30,12 @@ import {
 } from "@/app/api/[locale]/agent/chat/favorites/enum";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { modelOptions } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { useIsMobile } from "@/hooks/use-media-query";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { findBestModel } from "./types";
+import { CharacterCategory } from "../../../../characters/enum";
+import { selectModelForCharacter } from "./types";
 
 interface CharacterBrowserProps {
   onAddWithDefaults: (characterId: string) => void;
@@ -90,70 +91,49 @@ function CharacterListItem({
 }): JSX.Element {
   const { t } = simpleT(locale);
   const Icon = getIconComponent(character.icon);
+  const isTouchDevice = useIsMobile();
 
   const defaultIntelligence = getDefaultIntelligence(character);
   const defaultContent = getDefaultContent(character);
 
   const allModels = useMemo(() => Object.values(modelOptions), []);
-  const bestModel = useMemo(
-    () =>
-      findBestModel(allModels, character, {
+  const bestModel = useMemo(() => {
+    // Use new priority logic: preferredModel > auto
+    const selectedModelId = selectModelForCharacter(allModels, character, {
+      mode: "auto",
+      filters: {
         intelligence: defaultIntelligence,
         maxPrice: PriceLevelFilter.STANDARD,
-        minContent: defaultContent,
-      }),
-    [allModels, character, defaultIntelligence, defaultContent],
-  );
+        content: defaultContent,
+      },
+    });
+    return selectedModelId
+      ? (allModels.find((m) => m.id === selectedModelId) ?? null)
+      : null;
+  }, [allModels, character, defaultIntelligence, defaultContent]);
 
   const ModelIcon = bestModel ? getIconComponent(bestModel.icon) : null;
 
   return (
     <Div
       className={cn(
-        "flex items-start gap-3 p-3 rounded-xl border transition-all",
+        "relative flex items-start gap-3 p-3 rounded-xl border transition-all",
         "hover:bg-muted/50 hover:border-primary/20 cursor-pointer group",
       )}
       onClick={onAdd}
     >
-      {/* Character Icon */}
-      <Div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
-        <Icon className="h-5 w-5" />
-      </Div>
-
-      {/* Main Info */}
-      <Div className="flex-1 min-w-0">
-        <Span className="font-medium text-sm">{t(character.name)}</Span>
-        <Div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-          {t(character.description)}
-        </Div>
-        {/* Model info row */}
-        <Div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 mt-1.5">
-          {bestModel && (
-            <>
-              {ModelIcon && <ModelIcon className="h-3 w-3" />}
-              <Span className="truncate">{bestModel.name}</Span>
-              <Span className="text-muted-foreground/40">•</Span>
-              <Span className="shrink-0">
-                {bestModel.creditCost === 0
-                  ? t("app.chat.selector.free")
-                  : bestModel.creditCost === 1
-                    ? t("app.chat.selector.creditsSingle")
-                    : t("app.chat.selector.creditsExact", {
-                        cost: bestModel.creditCost,
-                      })}
-              </Span>
-            </>
-          )}
-        </Div>
-      </Div>
-
-      {/* Quick Actions - always visible on mobile, hover on desktop */}
-      <Div className="flex items-center gap-1.5 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+      {/* Quick Actions floating on top - always visible on touch devices, hover on desktop */}
+      <Div
+        className={cn(
+          "absolute top-2 right-2 z-10 flex items-center gap-1.5 transition-opacity",
+          isTouchDevice ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+        )}
+      >
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
+          className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-background"
           onClick={(e) => {
             e.stopPropagation();
             onCustomize();
@@ -175,6 +155,38 @@ function CharacterListItem({
           <Plus className="h-3.5 w-3.5 mr-1" />
           {t("app.chat.selector.add")}
         </Button>
+      </Div>
+
+      {/* Character Icon */}
+      <Div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
+        <Icon className="h-5 w-5" />
+      </Div>
+
+      {/* Main Info - Full Width */}
+      <Div className="flex-1 min-w-0">
+        <Div className="font-medium text-base pr-2">{t(character.name)}</Div>
+        <Div className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
+          {t(character.description)}
+        </Div>
+        {/* Model info row */}
+        <Div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 mt-1.5">
+          {bestModel && (
+            <>
+              {ModelIcon && <ModelIcon className="h-3 w-3" />}
+              <Span className="truncate">{bestModel.name}</Span>
+              <Span className="text-muted-foreground/40">•</Span>
+              <Span className="shrink-0">
+                {bestModel.creditCost === 0
+                  ? t("app.chat.selector.free")
+                  : bestModel.creditCost === 1
+                    ? t("app.chat.selector.creditsSingle")
+                    : t("app.chat.selector.creditsExact", {
+                        cost: bestModel.creditCost,
+                      })}
+              </Span>
+            </>
+          )}
+        </Div>
       </Div>
     </Div>
   );

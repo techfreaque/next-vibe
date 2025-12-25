@@ -18,7 +18,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
-import { PUT as editDefinition } from "@/app/api/[locale]/emails/smtp-client/edit/[id]/definition";
+import editDefinition from "@/app/api/[locale]/emails/smtp-client/edit/[id]/definition";
 import { useSmtpAccountById } from "@/app/api/[locale]/emails/smtp-client/edit/[id]/hooks";
 import { SmtpSecurityType } from "@/app/api/[locale]/emails/smtp-client/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -119,8 +119,7 @@ export function EditSmtpAccountForm({
       <Card>
         <CardHeader>
           <CardTitle>
-            {t("app.admin.emails.smtp.admin.edit.title")}:{" "}
-            {account?.account.name}
+            {t("app.admin.emails.smtp.admin.edit.title")}: {account?.name}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -135,7 +134,7 @@ export function EditSmtpAccountForm({
               description="app.admin.emails.smtp.admin.form.basicInfoDescription"
             >
               <EndpointFormField
-                name="updates.name"
+                name="name"
                 config={{
                   type: "text",
                   label: "app.admin.emails.smtp.admin.fields.name",
@@ -151,7 +150,7 @@ export function EditSmtpAccountForm({
               />
 
               <EndpointFormField
-                name="updates.description"
+                name="description"
                 config={{
                   type: "textarea",
                   label: "app.admin.emails.smtp.admin.fields.description",
@@ -177,7 +176,7 @@ export function EditSmtpAccountForm({
             >
               <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <EndpointFormField
-                  name="updates.host"
+                  name="host"
                   config={{
                     type: "text",
                     label: "app.admin.emails.smtp.admin.fields.host",
@@ -193,7 +192,7 @@ export function EditSmtpAccountForm({
                 />
 
                 <EndpointFormField
-                  name="updates.port"
+                  name="port"
                   config={{
                     type: "number",
                     label: "app.admin.emails.smtp.admin.fields.port",
@@ -209,7 +208,7 @@ export function EditSmtpAccountForm({
                 />
 
                 <EndpointFormField
-                  name="updates.securityType"
+                  name="securityType"
                   config={{
                     type: "select",
                     label: "app.admin.emails.smtp.admin.fields.securityType",
@@ -237,7 +236,7 @@ export function EditSmtpAccountForm({
               }
             >
               <EndpointFormField
-                name="updates.username"
+                name="username"
                 config={{
                   type: "text",
                   label: "app.admin.emails.smtp.admin.fields.username" as const,
@@ -261,7 +260,7 @@ export function EditSmtpAccountForm({
               }
             >
               <EndpointFormField
-                name="updates.fromEmail"
+                name="fromEmail"
                 config={{
                   type: "email",
                   label: "app.admin.emails.smtp.admin.fields.fromEmail",
@@ -278,8 +277,8 @@ export function EditSmtpAccountForm({
 
               <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <EndpointFormField
-                  name="updates.campaignTypes"
-                  endpointFields={editDefinition.fields}
+                  name="campaignTypes"
+                  endpointFields={editDefinition.PUT.fields}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -289,8 +288,8 @@ export function EditSmtpAccountForm({
                 />
 
                 <EndpointFormField
-                  name="updates.emailJourneyVariants"
-                  endpointFields={editDefinition.fields}
+                  name="emailJourneyVariants"
+                  endpointFields={editDefinition.PUT.fields}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -300,8 +299,8 @@ export function EditSmtpAccountForm({
                 />
 
                 <EndpointFormField
-                  name="updates.emailCampaignStages"
-                  endpointFields={editDefinition.fields}
+                  name="emailCampaignStages"
+                  endpointFields={editDefinition.PUT.fields}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -311,8 +310,8 @@ export function EditSmtpAccountForm({
                 />
 
                 <EndpointFormField
-                  name="updates.countries"
-                  endpointFields={editDefinition.fields}
+                  name="countries"
+                  endpointFields={editDefinition.PUT.fields}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -322,8 +321,8 @@ export function EditSmtpAccountForm({
                 />
 
                 <EndpointFormField
-                  name="updates.languages"
-                  endpointFields={editDefinition.fields}
+                  name="languages"
+                  endpointFields={editDefinition.PUT.fields}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -343,7 +342,7 @@ export function EditSmtpAccountForm({
                 {/* connectionTimeout, maxConnections, rateLimitPerHour, isDefault removed - not in definition.ts */}
 
                 <EndpointFormField
-                  name="updates.priority"
+                  name="priority"
                   config={{
                     type: "number",
                     label: "app.admin.emails.smtp.admin.fields.priority",
@@ -364,7 +363,7 @@ export function EditSmtpAccountForm({
             <FormAlert alert={endpoint.alert} />
 
             {/* Submit Button */}
-            <Div className="flex justify-end flex flex-row gap-2">
+            <Div className="flex justify-end flex-row gap-2">
               <Button
                 type="button"
                 variant="outline"

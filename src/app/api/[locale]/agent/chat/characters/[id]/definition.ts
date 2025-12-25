@@ -37,8 +37,9 @@ import {
   INTELLIGENCE_DISPLAY,
   PRICE_DISPLAY,
 } from "../../types";
-import { CategoryOptions, CharacterCategory } from "../config";
+import { CategoryOptions } from "../config";
 import {
+  CharacterCategory,
   CharacterCategoryDB,
   CharacterSource,
   CharacterSourceDB,

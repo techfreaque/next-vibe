@@ -38,8 +38,8 @@ export function EmailsListFilters({
     form.reset({
       filters: {
         search: undefined,
-        status: EmailStatusFilter.ALL,
-        type: EmailTypeFilter.ALL,
+        status: EmailStatusFilter.ANY,
+        type: EmailTypeFilter.ANY,
       },
       displayOptions: {
         page: 1,
@@ -79,7 +79,7 @@ export function EmailsListFilters({
             placeholder: "app.admin.emails.list.admin.filters.status",
             options: [
               {
-                value: EmailStatusFilter.ALL,
+                value: EmailStatusFilter.ANY,
                 label: "app.admin.emails.list.admin.status.all",
               },
               {
@@ -134,7 +134,7 @@ export function EmailsListFilters({
             placeholder: "app.admin.emails.list.admin.filters.type",
             options: [
               {
-                value: EmailTypeFilter.ALL,
+                value: EmailTypeFilter.ANY,
                 label: "app.admin.emails.list.admin.type.all",
               },
               {

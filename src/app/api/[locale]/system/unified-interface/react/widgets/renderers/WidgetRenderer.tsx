@@ -18,6 +18,8 @@ import { ChartWidget } from "../implementations/ChartWidget";
 import { CodeOutputWidget } from "../implementations/CodeOutputWidget";
 import { CodeQualityListWidget } from "../implementations/CodeQualityListWidget";
 import { ContainerWidget } from "../implementations/ContainerWidget";
+import { CreditTransactionCardWidget } from "../implementations/CreditTransactionCardWidget";
+import { CreditTransactionListWidget } from "../implementations/CreditTransactionListWidget";
 import { DataCardsWidget } from "../implementations/DataCardsWidget";
 import { DataListWidget } from "../implementations/DataListWidget";
 import { DataTableWidget } from "../implementations/DataTableWidget";
@@ -30,6 +32,7 @@ import { LinkListWidget } from "../implementations/LinkListWidget";
 import { LinkWidget } from "../implementations/LinkWidget";
 import { MarkdownWidget } from "../implementations/MarkdownWidget";
 import { MetricCardWidget } from "../implementations/MetricCardWidget";
+import { PaginationWidget } from "../implementations/PaginationWidget";
 import { PasswordStrengthWidget } from "../implementations/PasswordStrengthWidget";
 import { SectionWidget } from "../implementations/SectionWidget";
 import { StatsGridWidget } from "../implementations/StatsGridWidget";
@@ -219,6 +222,36 @@ function renderWidget<TKey extends string>(
         <CodeQualityListWidget
           {...(baseProps as ReactWidgetProps<
             typeof WidgetType.CODE_QUALITY_LIST,
+            TKey
+          >)}
+        />
+      );
+
+    case WidgetType.CREDIT_TRANSACTION_CARD:
+      return (
+        <CreditTransactionCardWidget
+          {...(baseProps as ReactWidgetProps<
+            typeof WidgetType.CREDIT_TRANSACTION_CARD,
+            TKey
+          >)}
+        />
+      );
+
+    case WidgetType.CREDIT_TRANSACTION_LIST:
+      return (
+        <CreditTransactionListWidget
+          {...(baseProps as ReactWidgetProps<
+            typeof WidgetType.CREDIT_TRANSACTION_LIST,
+            TKey
+          >)}
+        />
+      );
+
+    case WidgetType.PAGINATION:
+      return (
+        <PaginationWidget
+          {...(baseProps as ReactWidgetProps<
+            typeof WidgetType.PAGINATION,
             TKey
           >)}
         />

@@ -50,7 +50,7 @@ export function SubmitButtonWidget<TKey extends string>({
 
   return (
     <Button
-      type="button"
+      type="submit"
       onClick={(): void => {
         if (form && onSubmit) {
           void form.handleSubmit(onSubmit)();

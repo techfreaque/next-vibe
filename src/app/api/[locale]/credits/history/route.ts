@@ -12,14 +12,7 @@ import definitions from "./definition";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: async ({ data, user, logger }) => {
-      return await CreditRepository.getTransactions(
-        user.id,
-        user.leadId,
-        data.limit,
-        data.offset,
-        logger,
-      );
-    },
+    handler: ({ data, user, logger }) =>
+      CreditRepository.getTransactionHistory(data, user, logger),
   },
 });

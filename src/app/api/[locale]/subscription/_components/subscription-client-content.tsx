@@ -183,7 +183,7 @@ export function SubscriptionClientContent({
 
         {/* Usage History Tab */}
         <TabsContent value="history" className="flex flex-col gap-6">
-          <HistoryTab locale={locale} initialHistory={initialHistory} />
+          <HistoryTab locale={locale} initialData={initialHistory} />
         </TabsContent>
       </Tabs>
     </Container>

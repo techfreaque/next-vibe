@@ -9,10 +9,17 @@ export const translations: typeof enTranslations = {
     currentPeriodStart: "Początek bieżącego okresu",
     nextBillingDate: "Następna data rozliczenia",
     endsOn: "Subskrypcja kończy się",
+    canceledOn: "Anulowano",
+    endedOn: "Zakończono",
     cancellation: {
       title: "Subskrypcja zaplanowana do anulowania",
       description:
         "Twoja subskrypcja zakończy się {{date}}. Zachowasz dostęp do tego czasu.",
+    },
+    canceled: {
+      title: "Subskrypcja anulowana",
+      description:
+        "Twoja subskrypcja została anulowana. Możesz w każdej chwili ponownie zasubskrybować, aby odzyskać dostęp do miesięcznych kredytów.",
     },
     manage: {
       stripe: {

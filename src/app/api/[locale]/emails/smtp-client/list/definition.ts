@@ -66,7 +66,7 @@ const { GET } = createEndpoint({
           columns: 3,
           options: CampaignTypeFilterOptions,
         },
-        z.enum(CampaignTypeFilter).optional(),
+        z.enum(CampaignTypeFilter).default(CampaignTypeFilter.ANY),
       ),
 
       status: requestDataField(
@@ -79,7 +79,7 @@ const { GET } = createEndpoint({
           columns: 3,
           options: SmtpAccountStatusFilterOptions,
         },
-        z.enum(SmtpAccountStatusFilter).optional(),
+        z.enum(SmtpAccountStatusFilter).default(SmtpAccountStatusFilter.ANY),
       ),
 
       healthStatus: requestDataField(
@@ -92,7 +92,7 @@ const { GET } = createEndpoint({
           columns: 3,
           options: SmtpHealthStatusFilterOptions,
         },
-        z.enum(SmtpHealthStatusFilter).optional(),
+        z.enum(SmtpHealthStatusFilter).default(SmtpHealthStatusFilter.ANY),
       ),
 
       search: requestDataField(
@@ -143,7 +143,7 @@ const { GET } = createEndpoint({
           description: "app.api.emails.smtpClient.list.fields.page.description",
           columns: 3,
         },
-        z.coerce.number().int().min(1).optional(),
+        z.coerce.number().int().min(1).default(1),
       ),
 
       limit: requestDataField(
@@ -155,7 +155,7 @@ const { GET } = createEndpoint({
             "app.api.emails.smtpClient.list.fields.limit.description",
           columns: 3,
         },
-        z.coerce.number().int().min(1).max(100).optional(),
+        z.coerce.number().int().min(1).max(100).default(10),
       ),
 
       // === RESPONSE FIELDS ===

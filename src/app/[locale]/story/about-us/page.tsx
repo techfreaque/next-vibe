@@ -16,6 +16,7 @@ import { Separator } from "next-vibe-ui/ui/separator";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
@@ -244,7 +245,9 @@ export default async function AboutUsPage({
             <Div className="absolute bottom-8 left-8 right-8 text-white">
               <H3 className="text-2xl font-bold mb-2">{t("config.appName")}</H3>
               <P className="text-lg opacity-90">
-                {t("app.story._components.home.hero.subtitle")}
+                {t("app.story._components.home.hero.subtitle", {
+                  modelCount: TOTAL_MODEL_COUNT,
+                })}
               </P>
             </Div>
           </Div>

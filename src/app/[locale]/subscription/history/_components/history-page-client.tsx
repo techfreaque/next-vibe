@@ -7,10 +7,8 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
-import type {
-  CreditBalance,
-  CreditTransactionOutput,
-} from "@/app/api/[locale]/credits/repository";
+import type { CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
+import type { CreditBalance } from "@/app/api/[locale]/credits/repository";
 import { CreditBalanceCard } from "@/app/api/[locale]/subscription/_components/credit-balance-card";
 import { HistoryTab } from "@/app/api/[locale]/subscription/_components/history-tab";
 import { PaymentStatusAlert } from "@/app/api/[locale]/subscription/_components/payment-status-alert";
@@ -25,10 +23,7 @@ interface HistoryPageClientProps {
   locale: CountryLanguage;
   isAuthenticated: boolean;
   initialCredits: CreditBalance | null;
-  initialHistory: {
-    transactions: CreditTransactionOutput[];
-    totalCount: number;
-  } | null;
+  initialHistory: CreditsHistoryGetResponseOutput | null;
   initialSubscription: SubscriptionGetResponseOutput | null;
   freeCredits: number;
 }
@@ -133,7 +128,7 @@ export function HistoryPageClient({
       <SubscriptionTabsNav locale={locale} />
 
       {/* History Tab Content */}
-      <HistoryTab locale={locale} initialHistory={initialHistory} />
+      <HistoryTab locale={locale} initialData={initialHistory} />
     </Container>
   );
 }

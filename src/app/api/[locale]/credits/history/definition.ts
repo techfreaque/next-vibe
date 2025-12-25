@@ -5,18 +5,16 @@
 
 import { z } from "zod";
 
-import {
-  CreditTransactionType,
-  CreditTransactionTypeDB,
-} from "@/app/api/[locale]/credits/enum";
+import { CreditTransactionType } from "@/app/api/[locale]/credits/enum";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
-  requestDataField,
+  requestResponseField,
   responseArrayField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
+  ActionType,
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
@@ -24,6 +22,8 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { dateSchema } from "../../shared/types/common.schema";
 
 /**
  * Get Credit History Endpoint (GET)
@@ -37,7 +37,7 @@ const { GET } = createEndpoint({
   category: "app.api.agent.chat.category",
   tags: ["app.api.agent.chat.tags.credits", "app.api.agent.chat.tags.balance"],
   icon: "wallet",
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   fields: objectField(
     {
@@ -46,116 +46,129 @@ const { GET } = createEndpoint({
       description:
         "app.api.agent.chat.credits.history.get.container.description",
       layoutType: LayoutType.STACKED,
+      getCount: (data) => data.response?.paginationInfo?.total,
+      submitButton: {
+        text: "app.api.leads.list.get.actions.refresh",
+        loadingText: "app.api.leads.list.get.actions.refreshing",
+        position: "header",
+        icon: "refresh-cw",
+        variant: "ghost",
+        size: "sm",
+      },
+      showSubmitButton: false,
     },
     { request: "data", response: true },
     {
-      // === REQUEST FIELDS (Query Parameters) ===
-      limit: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.INT,
-          label: "app.api.agent.chat.credits.history.get.limit.label",
-          description:
-            "app.api.agent.chat.credits.history.get.limit.description",
-        },
-        z.coerce.number().int().min(1).max(100).default(50),
-      ),
-
-      offset: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.INT,
-          label: "app.api.agent.chat.credits.history.get.offset.label",
-          description:
-            "app.api.agent.chat.credits.history.get.offset.description",
-        },
-        z.coerce.number().int().min(0).default(0),
-      ),
-
       // === RESPONSE FIELDS ===
       transactions: responseArrayField(
         {
-          type: WidgetType.DATA_LIST,
+          type: WidgetType.CREDIT_TRANSACTION_LIST,
         },
         objectField(
           {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.STACKED,
+            type: WidgetType.CREDIT_TRANSACTION_CARD,
+            leftFields: ["type", "createdAt"],
+            rightFields: ["amount", "balanceAfter"],
           },
           { response: true },
           {
             id: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.credits.history.get.transaction.id.content",
+                content: "app.api.agent.chat.credits.history.get.id" as const,
               },
-              z.uuid(),
+              z.string(),
             ),
-
             amount: responseField(
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.agent.chat.credits.history.get.transaction.amount.content",
+                  "app.api.agent.chat.credits.history.get.amount" as const,
               },
-              z.coerce.number().int(),
+              z.coerce.number(),
             ),
-
             balanceAfter: responseField(
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.agent.chat.credits.history.get.transaction.balanceAfter.content",
+                  "app.subscription.subscription.history.balance" as const,
               },
-              z.coerce.number().int(),
+              z.coerce.number(),
             ),
-
             type: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.credits.history.get.transaction.type.content",
+                content: "app.api.agent.chat.credits.history.get.type" as const,
               },
-              z.enum(CreditTransactionTypeDB),
+              z.string().optional(),
             ),
-
             modelId: responseField(
               {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.credits.history.get.transaction.modelId.content",
+                type: WidgetType.BADGE,
+                text: "app.api.agent.chat.credits.history.get.modelId" as const,
               },
               z.string().nullable(),
             ),
-
             messageId: responseField(
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.agent.chat.credits.history.get.transaction.messageId.content",
+                  "app.api.agent.chat.credits.history.get.messageId" as const,
               },
-              z.uuid().nullable(),
+              z.string().nullable(),
             ),
-
             createdAt: responseField(
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.agent.chat.credits.history.get.transaction.createdAt.content",
+                  "app.api.agent.chat.credits.history.get.createdAt" as const,
               },
-              z.string().datetime(),
+              dateSchema,
             ),
           },
         ),
       ),
 
-      totalCount: responseField(
+      paginationInfo: objectField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.credits.history.get.totalCount.content",
+          type: WidgetType.PAGINATION,
+          order: 2,
         },
-        z.coerce.number().int(),
+        { request: "data", response: true },
+        {
+          page: requestResponseField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.NUMBER,
+              onChange: [{ type: ActionType.REFETCH }],
+            },
+            z.coerce.number().optional().default(1),
+          ),
+          limit: requestResponseField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.NUMBER,
+              onChange: [{ type: ActionType.REFETCH }],
+            },
+            z.coerce.number().optional().default(50),
+          ),
+          total: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.credits.history.get.paginationInfo.total" as const,
+            },
+            z.coerce.number(),
+          ),
+          totalPages: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.credits.history.get.paginationInfo.totalPages" as const,
+            },
+            z.coerce.number(),
+          ),
+        },
       ),
     },
   ),
@@ -220,8 +233,10 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
-        limit: 50,
-        offset: 0,
+        paginationInfo: {
+          page: 1,
+          limit: 50,
+        },
       },
     },
     responses: {
@@ -246,7 +261,12 @@ const { GET } = createEndpoint({
             createdAt: "2025-10-15T10:00:00.000Z",
           },
         ],
-        totalCount: 2,
+        paginationInfo: {
+          page: 1,
+          limit: 50,
+          total: 2,
+          totalPages: 1,
+        },
       },
     },
   },

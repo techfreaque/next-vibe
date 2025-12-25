@@ -116,6 +116,16 @@ export class SubscriptionRepository {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("handleSubscriptionUpdated is not implemented on native");
   }
+
+  static async syncSubscriptionWithStripe(
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<ResponseType<{ message: string; changes: string[] }>> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("syncSubscriptionWithStripe is not implemented on native");
+  }
 }
 
 // Compile-time type check

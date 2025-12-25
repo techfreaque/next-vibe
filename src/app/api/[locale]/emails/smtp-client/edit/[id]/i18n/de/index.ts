@@ -58,8 +58,9 @@ export const translations: typeof enTranslations = {
     },
     password: {
       label: "Passwort",
-      description: "Das SMTP-Authentifizierungspasswort",
-      placeholder: "Passwort eingeben",
+      description:
+        "Leer lassen, um das aktuelle Passwort zu behalten, oder neues Passwort eingeben",
+      placeholder: "Neues Passwort eingeben (optional)",
     },
     fromEmail: {
       label: "Absender-E-Mail",

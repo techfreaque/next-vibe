@@ -77,14 +77,14 @@ export const {
 });
 
 /**
- * Email Status Filter Enum (includes "all" option)
+ * Email Status Filter Enum (includes "any" option)
  */
 export const {
   enum: EmailStatusFilter,
   options: EmailStatusFilterOptions,
   Value: EmailStatusFilterValue,
 } = createEnumOptions({
-  ALL: "app.api.emails.enums.emailStatusFilter.all",
+  ANY: "app.api.emails.enums.emailStatusFilter.any",
   PENDING: "app.api.emails.enums.emailStatus.pending",
   SENT: "app.api.emails.enums.emailStatus.sent",
   DELIVERED: "app.api.emails.enums.emailStatus.delivered",
@@ -96,14 +96,14 @@ export const {
 });
 
 /**
- * Email Type Filter Enum (includes "all" option)
+ * Email Type Filter Enum (includes "any" option)
  */
 export const {
   enum: EmailTypeFilter,
   options: EmailTypeFilterOptions,
   Value: EmailTypeFilterValue,
 } = createEnumOptions({
-  ALL: "app.api.emails.enums.emailTypeFilter.all",
+  ANY: "app.api.emails.enums.emailTypeFilter.any",
   TRANSACTIONAL: "app.api.emails.enums.emailType.transactional",
   MARKETING: "app.api.emails.enums.emailType.marketing",
   NOTIFICATION: "app.api.emails.enums.emailType.notification",
@@ -211,7 +211,7 @@ export const EmailTypeDB = [
 ] as const;
 
 export const EmailTypeFilterDB = [
-  EmailTypeFilter.ALL,
+  EmailTypeFilter.ANY,
   EmailTypeFilter.TRANSACTIONAL,
   EmailTypeFilter.MARKETING,
   EmailTypeFilter.NOTIFICATION,

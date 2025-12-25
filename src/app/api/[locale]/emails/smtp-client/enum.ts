@@ -53,14 +53,14 @@ export const SmtpSecurityTypeDB = [
 
 /**
  * SMTP Account Status Filter
- * For filtering SMTP accounts by status (includes ALL option)
+ * For filtering SMTP accounts by status (includes ANY option)
  */
 export const {
   enum: SmtpAccountStatusFilter,
   options: SmtpAccountStatusFilterOptions,
   Value: SmtpAccountStatusFilterValue,
 } = createEnumOptions({
-  ALL: "app.api.emails.enums.smtpStatusFilter.all",
+  ANY: "app.api.emails.enums.smtpStatusFilter.any",
   ACTIVE: "app.api.emails.enums.smtpAccountStatus.active",
   INACTIVE: "app.api.emails.enums.smtpAccountStatus.inactive",
   ERROR: "app.api.emails.enums.smtpAccountStatus.error",
@@ -69,7 +69,7 @@ export const {
 
 // Create DB enum array for Drizzle
 export const SmtpAccountStatusFilterDB = [
-  SmtpAccountStatusFilter.ALL,
+  SmtpAccountStatusFilter.ANY,
   SmtpAccountStatusFilter.ACTIVE,
   SmtpAccountStatusFilter.INACTIVE,
   SmtpAccountStatusFilter.ERROR,
@@ -101,14 +101,14 @@ export const SmtpHealthStatusDB = [
 
 /**
  * SMTP Health Status Filter
- * For filtering SMTP accounts by health status (includes ALL option)
+ * For filtering SMTP accounts by health status (includes ANY option)
  */
 export const {
   enum: SmtpHealthStatusFilter,
   options: SmtpHealthStatusFilterOptions,
   Value: SmtpHealthStatusFilterValue,
 } = createEnumOptions({
-  ALL: "app.api.emails.enums.smtpHealthStatusFilter.all",
+  ANY: "app.api.emails.enums.smtpHealthStatusFilter.any",
   HEALTHY: "app.api.emails.enums.smtpHealthStatus.healthy",
   DEGRADED: "app.api.emails.enums.smtpHealthStatus.degraded",
   UNHEALTHY: "app.api.emails.enums.smtpHealthStatus.unhealthy",
@@ -117,7 +117,7 @@ export const {
 
 // Create DB enum array for Drizzle
 export const SmtpHealthStatusFilterDB = [
-  SmtpHealthStatusFilter.ALL,
+  SmtpHealthStatusFilter.ANY,
   SmtpHealthStatusFilter.HEALTHY,
   SmtpHealthStatusFilter.DEGRADED,
   SmtpHealthStatusFilter.UNHEALTHY,
@@ -160,14 +160,14 @@ export const {
 
 /**
  * Campaign Type Filter
- * Includes all campaign types plus an "all" option for filtering
+ * Includes all campaign types plus an "any" option for filtering
  */
 export const {
   enum: CampaignTypeFilter,
   options: CampaignTypeFilterOptions,
   Value: CampaignTypeFilterValue,
 } = createEnumOptions({
-  ALL: "app.api.emails.enums.smtpCampaignTypeFilter.all",
+  ANY: "app.api.emails.enums.smtpCampaignTypeFilter.any",
   LEAD_CAMPAIGN: "app.api.emails.enums.smtpCampaignType.leadCampaign",
   NEWSLETTER: "app.api.emails.enums.smtpCampaignType.newsletter",
   TRANSACTIONAL: "app.api.emails.enums.smtpCampaignType.transactional",
@@ -207,7 +207,7 @@ export const {
   options: SmtpSelectionRuleStatusFilterOptions,
   Value: SmtpSelectionRuleStatusFilterValue,
 } = createEnumOptions({
-  ALL: "app.api.emails.enums.selectionRuleStatusFilter.all",
+  ANY: "app.api.emails.enums.selectionRuleStatusFilter.any",
   ACTIVE: "app.api.emails.enums.selectionRuleStatusFilter.active",
   INACTIVE: "app.api.emails.enums.selectionRuleStatusFilter.inactive",
   DEFAULT: "app.api.emails.enums.selectionRuleStatusFilter.default",
@@ -233,7 +233,7 @@ export function mapCampaignTypeFilter(
       return CampaignType.NOTIFICATION;
     case CampaignTypeFilter.SYSTEM:
       return CampaignType.SYSTEM;
-    case CampaignTypeFilter.ALL:
+    case CampaignTypeFilter.ANY:
     case undefined:
       return null;
     default:
@@ -289,7 +289,7 @@ export function mapStatusFilter(
       return SmtpAccountStatus.ERROR;
     case SmtpAccountStatusFilter.TESTING:
       return SmtpAccountStatus.TESTING;
-    case SmtpAccountStatusFilter.ALL:
+    case SmtpAccountStatusFilter.ANY:
     default:
       return null;
   }
@@ -315,7 +315,7 @@ export const CampaignTypeDB = [
 ] as const;
 
 export const CampaignTypeFilterDB = [
-  CampaignTypeFilter.ALL,
+  CampaignTypeFilter.ANY,
   CampaignTypeFilter.LEAD_CAMPAIGN,
   CampaignTypeFilter.NEWSLETTER,
   CampaignTypeFilter.TRANSACTIONAL,
@@ -339,7 +339,7 @@ export const SmtpSelectionRuleSortFieldDB = [
 ] as const;
 
 export const SmtpSelectionRuleStatusFilterDB = [
-  SmtpSelectionRuleStatusFilter.ALL,
+  SmtpSelectionRuleStatusFilter.ANY,
   SmtpSelectionRuleStatusFilter.ACTIVE,
   SmtpSelectionRuleStatusFilter.INACTIVE,
   SmtpSelectionRuleStatusFilter.DEFAULT,

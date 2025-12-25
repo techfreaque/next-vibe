@@ -105,29 +105,29 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
       }
 
       // Transform to response format - match endpoint definition exactly
+      // NOTE: Password is intentionally omitted for security reasons
       const response: SmtpAccountEditGETResponseOutput = {
-        account: {
-          id: account.id,
-          name: account.name,
-          description: account.description || undefined,
-          host: account.host,
-          port: account.port,
-          securityType: account.securityType,
-          username: account.username,
-          fromEmail: account.fromEmail,
-          status: account.status,
-          healthCheckStatus: account.healthCheckStatus,
-          priority: account.priority || undefined,
-          totalEmailsSent: account.totalEmailsSent || 0,
-          lastUsedAt: account.lastUsedAt?.toISOString() || null,
-          createdAt: account.createdAt.toISOString(),
-          updatedAt: account.updatedAt.toISOString(),
-          campaignTypes: account.campaignTypes || undefined,
-          emailJourneyVariants: account.emailJourneyVariants || undefined,
-          emailCampaignStages: account.emailCampaignStages || undefined,
-          countries: account.countries || undefined,
-          languages: account.languages || undefined,
-        },
+        id: account.id,
+        name: account.name,
+        description: account.description || undefined,
+        host: account.host,
+        port: account.port,
+        securityType: account.securityType,
+        username: account.username,
+        // Password is never returned for security
+        fromEmail: account.fromEmail,
+        status: account.status,
+        healthCheckStatus: account.healthCheckStatus,
+        priority: account.priority || undefined,
+        totalEmailsSent: account.totalEmailsSent || 0,
+        lastUsedAt: account.lastUsedAt?.toISOString() || null,
+        createdAt: account.createdAt.toISOString(),
+        updatedAt: account.updatedAt.toISOString(),
+        campaignTypes: account.campaignTypes || undefined,
+        emailJourneyVariants: account.emailJourneyVariants || undefined,
+        emailCampaignStages: account.emailCampaignStages || undefined,
+        countries: account.countries || undefined,
+        languages: account.languages || undefined,
       };
 
       logger.info("SMTP account retrieved successfully", {
@@ -209,26 +209,34 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id: _id, ...updateFields } = data;
 
+      // Build update object conditionally
+      // Only update password if a new one is provided (not empty/undefined)
+      const updateData = {
+        updatedAt: new Date(),
+        name: updateFields.name,
+        description: updateFields.description,
+        host: updateFields.host,
+        port: updateFields.port,
+        securityType: updateFields.securityType,
+        username: updateFields.username,
+        fromEmail: updateFields.fromEmail,
+        priority: updateFields.priority,
+        campaignTypes: updateFields.campaignTypes,
+        emailJourneyVariants: updateFields.emailJourneyVariants,
+        emailCampaignStages: updateFields.emailCampaignStages,
+        countries: updateFields.countries,
+        languages: updateFields.languages,
+      };
+
+      // Only include password in update if it's provided and not empty
+      if (updateFields.password && updateFields.password.trim() !== "") {
+        (updateData as typeof updateData & { password?: string }).password =
+          updateFields.password;
+      }
+
       const [updatedAccount] = await db
         .update(smtpAccounts)
-        .set({
-          updatedAt: new Date(),
-          name: updateFields.name,
-          description: updateFields.description,
-          host: updateFields.host,
-          port: updateFields.port,
-          securityType: updateFields.securityType,
-          username: updateFields.username,
-          password: updateFields.password,
-          fromEmail: updateFields.fromEmail,
-          priority: updateFields.priority,
-          isDefault: updateFields.isDefault,
-          campaignTypes: updateFields.campaignTypes,
-          emailJourneyVariants: updateFields.emailJourneyVariants,
-          emailCampaignStages: updateFields.emailCampaignStages,
-          countries: updateFields.countries,
-          languages: updateFields.languages,
-        })
+        .set(updateData)
         .where(eq(smtpAccounts.id, data.id))
         .returning();
 
@@ -245,29 +253,20 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       // Transform to response format - match endpoint definition exactly
       const response: SmtpAccountEditPUTResponseOutput = {
-        account: {
-          id: updatedAccount.id,
-          name: updatedAccount.name,
-          description: updatedAccount.description || undefined,
-          host: updatedAccount.host,
-          port: updatedAccount.port,
-          securityType: updatedAccount.securityType,
-          username: updatedAccount.username,
-          fromEmail: updatedAccount.fromEmail,
-          status: updatedAccount.status,
-          healthCheckStatus: updatedAccount.healthCheckStatus,
-          priority: updatedAccount.priority || undefined,
-          totalEmailsSent: updatedAccount.totalEmailsSent || 0,
-          lastUsedAt: updatedAccount.lastUsedAt?.toISOString() || null,
-          createdAt: updatedAccount.createdAt.toISOString(),
-          updatedAt: updatedAccount.updatedAt.toISOString(),
-          campaignTypes: updatedAccount.campaignTypes || undefined,
-          emailJourneyVariants:
-            updatedAccount.emailJourneyVariants || undefined,
-          emailCampaignStages: updatedAccount.emailCampaignStages || undefined,
-          countries: updatedAccount.countries || undefined,
-          languages: updatedAccount.languages || undefined,
-        },
+        id: updatedAccount.id,
+        name: updatedAccount.name,
+        description: updatedAccount.description || undefined,
+        host: updatedAccount.host,
+        port: updatedAccount.port,
+        securityType: updatedAccount.securityType,
+        username: updatedAccount.username,
+        fromEmail: updatedAccount.fromEmail,
+        priority: updatedAccount.priority || undefined,
+        campaignTypes: updatedAccount.campaignTypes || undefined,
+        emailJourneyVariants: updatedAccount.emailJourneyVariants || undefined,
+        emailCampaignStages: updatedAccount.emailCampaignStages || undefined,
+        countries: updatedAccount.countries || undefined,
+        languages: updatedAccount.languages || undefined,
       };
 
       logger.info("SMTP account updated successfully", {

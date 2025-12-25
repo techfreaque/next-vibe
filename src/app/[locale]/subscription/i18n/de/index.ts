@@ -9,10 +9,17 @@ export const translations: typeof enTranslations = {
     currentPeriodStart: "Aktueller Zeitraum Start",
     nextBillingDate: "Nächstes Abrechnungsdatum",
     endsOn: "Abonnement endet am",
+    canceledOn: "Gekündigt am",
+    endedOn: "Beendet am",
     cancellation: {
       title: "Abonnement zur Kündigung vorgemerkt",
       description:
         "Ihr Abonnement endet am {{date}}. Sie behalten bis dahin den Zugriff.",
+    },
+    canceled: {
+      title: "Abonnement gekündigt",
+      description:
+        "Ihr Abonnement wurde gekündigt. Sie können jederzeit erneut abonnieren, um wieder Zugriff auf monatliche Credits zu erhalten.",
     },
     manage: {
       stripe: {

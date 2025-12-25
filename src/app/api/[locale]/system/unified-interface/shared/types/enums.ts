@@ -114,6 +114,9 @@ export enum WidgetType {
   SEVERITY_BADGE = "severity_badge",
   MESSAGE_TEXT = "message_text",
   ISSUE_CARD = "issue_card",
+  CREDIT_TRANSACTION_CARD = "credit_transaction_card",
+  CREDIT_TRANSACTION_LIST = "credit_transaction_list",
+  PAGINATION = "pagination",
 
   // Interactive widgets
   BUTTON = "button",

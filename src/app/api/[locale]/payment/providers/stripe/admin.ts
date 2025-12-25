@@ -103,8 +103,12 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
 
           return null;
         }
-        // Other errors should be thrown
-        throw retrieveError;
+        // Other errors will be caught by outer catch
+        logger.error("Error retrieving Stripe customer", {
+          userId,
+          error: error.message,
+        });
+        return null;
       }
     } catch (error) {
       logger.error("Error finding Stripe customer", {

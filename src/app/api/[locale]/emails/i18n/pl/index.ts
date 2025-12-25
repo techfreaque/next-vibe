@@ -70,13 +70,13 @@ export const translations: typeof enTranslations = {
       unknownError: "Nieznany błąd",
     },
     smtpStatusFilter: {
-      all: "Wszystkie",
+      any: "Wszystkie",
     },
     smtpHealthStatusFilter: {
-      all: "Wszystkie",
+      any: "Wszystkie",
     },
     smtpCampaignTypeFilter: {
-      all: "Wszystkie",
+      any: "Wszystkie",
     },
     smtpSelectionRuleSortField: {
       name: "Nazwa",
@@ -107,14 +107,14 @@ export const translations: typeof enTranslations = {
       lastUsedAt: "Ostatnio używany",
     },
     smtpSelectionRuleStatusFilter: {
-      all: "Wszystkie",
+      any: "Wszystkie",
       active: "Aktywny",
       inactive: "Nieaktywny",
       default: "Domyślny",
       failover: "Failover",
     },
     selectionRuleStatusFilter: {
-      all: "Wszystkie",
+      any: "Wszystkie",
       active: "Aktywny",
       inactive: "Nieaktywny",
       default: "Domyślny",
@@ -159,10 +159,10 @@ export const translations: typeof enTranslations = {
       createdAt: "Utworzono",
     },
     emailStatusFilter: {
-      all: "Wszystkie",
+      any: "Wszystkie",
     },
     emailTypeFilter: {
-      all: "Wszystkie",
+      any: "Wszystkie",
     },
     emailRetryRange: {
       noRetries: "Bez powtórzeń",

@@ -27,7 +27,7 @@ import {
   PriceLevelFilterDB,
 } from "../favorites/enum";
 import { ModelId } from "../model-access/models";
-import { CharacterCategory } from "./config";
+import { CharacterCategory } from "./enum";
 import {
   CharacterCategoryDB,
   CharacterSource,

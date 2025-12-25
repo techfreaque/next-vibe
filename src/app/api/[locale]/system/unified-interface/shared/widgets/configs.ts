@@ -787,6 +787,23 @@ export interface IssueCardWidgetConfig<TKey extends string>
   description?: NoInfer<TKey>;
 }
 
+export interface CreditTransactionCardWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
+  type: WidgetType.CREDIT_TRANSACTION_CARD;
+  leftFields?: string[]; // Fields to show on left side
+  rightFields?: string[]; // Fields to show on right side
+}
+
+export interface CreditTransactionListWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
+  type: WidgetType.CREDIT_TRANSACTION_LIST;
+}
+
+export interface PaginationWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig<TKey> {
+  type: WidgetType.PAGINATION;
+}
+
 // ============================================================================
 // INTERACTIVE WIDGETS
 // ============================================================================
@@ -1039,6 +1056,9 @@ export type WidgetConfig<TKey extends string> =
   | SeverityBadgeWidgetConfig<TKey>
   | MessageTextWidgetConfig<TKey>
   | IssueCardWidgetConfig<TKey>
+  | CreditTransactionCardWidgetConfig<TKey>
+  | CreditTransactionListWidgetConfig<TKey>
+  | PaginationWidgetConfig<TKey>
   // Interactive widgets
   | ButtonWidgetConfig<TKey>
   | ButtonGroupWidgetConfig<TKey>

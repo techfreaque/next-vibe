@@ -95,9 +95,9 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     const dateRangePreset = (data.dateRangePreset ??
       DateRangePreset.LAST_30_DAYS) as DateRangePreset;
     const type = (data.type ??
-      EmailTypeFilter.ALL) as (typeof EmailTypeFilter)[keyof typeof EmailTypeFilter];
+      EmailTypeFilter.ANY) as (typeof EmailTypeFilter)[keyof typeof EmailTypeFilter];
     const status = (data.status ??
-      EmailStatusFilter.ALL) as (typeof EmailStatusFilter)[keyof typeof EmailStatusFilter];
+      EmailStatusFilter.ANY) as (typeof EmailStatusFilter)[keyof typeof EmailStatusFilter];
     const search = data.search;
     const dateFrom = data.dateFrom;
     const dateTo = data.dateTo;
@@ -124,7 +124,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       }
 
       // Status filtering
-      if (status && status !== EmailStatusFilter.ALL) {
+      if (status && status !== EmailStatusFilter.ANY) {
         const mappedStatus = mapEmailStatusFilter(status);
         if (mappedStatus) {
           whereConditions.push(eq(emails.status, mappedStatus));
@@ -132,7 +132,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       }
 
       // Type filtering
-      if (type && type !== EmailTypeFilter.ALL) {
+      if (type && type !== EmailTypeFilter.ANY) {
         const mappedType = mapEmailTypeFilter(type);
         if (mappedType) {
           whereConditions.push(eq(emails.type, mappedType));

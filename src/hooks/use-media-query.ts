@@ -54,12 +54,25 @@ export function useMediaQuery(
 }
 
 /**
- * Predefined hook for mobile devices
- * @returns Boolean indicating if the current viewport is mobile-sized
+ * Predefined hook for touch devices
+ * Detects actual touch capability rather than screen width
+ * Works on touch PCs, tablets, and mobile devices
+ * @returns Boolean indicating if the device supports touch
  */
 export function useIsMobile(): boolean {
-  // eslint-disable-next-line i18next/no-literal-string
-  return useMediaQuery("(max-width: 767px)");
+  const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Check for touch support using modern API
+    const hasTouchPoints = navigator.maxTouchPoints > 0;
+
+    // Fallback for older browsers
+    const hasTouchStart = "ontouchstart" in window;
+
+    setIsTouchDevice(hasTouchPoints || hasTouchStart);
+  }, []);
+
+  return isTouchDevice;
 }
 
 /**

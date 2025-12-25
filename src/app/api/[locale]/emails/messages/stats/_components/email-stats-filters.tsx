@@ -246,7 +246,7 @@ export function EmailStatsFilters({
             label: "app.admin.emails.stats.admin.stats.filters.statuses.title",
             options: [
               {
-                value: EmailStatusFilter.ALL,
+                value: EmailStatusFilter.ANY,
                 label:
                   "app.admin.emails.stats.admin.stats.filters.statuses.all",
               },
@@ -299,7 +299,7 @@ export function EmailStatsFilters({
             label: "app.admin.emails.stats.admin.stats.filters.types.title",
             options: [
               {
-                value: EmailTypeFilter.ALL,
+                value: EmailTypeFilter.ANY,
                 label: "app.admin.emails.stats.admin.stats.filters.types.all",
               },
               {

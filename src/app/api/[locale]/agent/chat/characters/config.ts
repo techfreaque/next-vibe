@@ -27,9 +27,6 @@ import {
 } from "./enum";
 import { CATEGORY_CONFIG } from "./utils";
 
-// Re-export for convenience
-export { CharacterCategory, CharacterSource };
-
 /**
  * Category options with icons for UI
  * Generated from centralized category configuration
@@ -91,9 +88,7 @@ export const DEFAULT_CHARACTERS: readonly Character[] = [
       "app.api.agent.chat.characters.characters.default.suggestedPrompts.3" as const,
     ],
     requirements: {},
-    preferences: {
-      preferredStrengths: [ModelUtility.SMART, ModelUtility.CHAT],
-    },
+    preferences: {},
     ownership: {
       type: "system",
       isDefault: true,

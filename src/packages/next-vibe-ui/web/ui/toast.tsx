@@ -6,6 +6,8 @@ import { X } from "lucide-react";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
+import { useIsMobile } from "@/hooks/use-media-query";
+
 import type { StyleType } from "../utils/style-type";
 
 export interface ToastProviderProps {
@@ -150,10 +152,13 @@ export function ToastClose({
   style,
   children,
 }: ToastCloseProps): React.JSX.Element {
+  const isTouchDevice = useIsMobile();
+
   return (
     <ToastPrimitives.Close
       className={cn(
-        "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
+        "absolute right-2 top-2 rounded-md p-1 text-foreground/50 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
+        isTouchDevice ? "opacity-100" : "opacity-0 group-hover:opacity-100",
         className,
       )}
       style={style}

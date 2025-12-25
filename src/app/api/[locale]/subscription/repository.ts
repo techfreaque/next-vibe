@@ -42,6 +42,45 @@ import type {
 import { SubscriptionPlan, SubscriptionStatus } from "./enum";
 
 /**
+ * Calculate current period dates from Stripe subscription
+ * Stripe API 2025-12-15.clover removed current_period_start/end from response
+ */
+function calculateSubscriptionPeriod(subscription: Stripe.Subscription): {
+  currentPeriodStart: number;
+  currentPeriodEnd: number;
+} {
+  const currentPeriodStart = subscription.start_date || subscription.created;
+
+  const billingInterval = subscription.items.data[0]?.plan.interval || "month";
+  const intervalCount = subscription.items.data[0]?.plan.interval_count || 1;
+
+  const periodStartDate = new Date(currentPeriodStart * 1000);
+  let periodEndDate: Date;
+
+  if (billingInterval === "month") {
+    periodEndDate = new Date(periodStartDate);
+    periodEndDate.setMonth(periodEndDate.getMonth() + intervalCount);
+  } else if (billingInterval === "year") {
+    periodEndDate = new Date(periodStartDate);
+    periodEndDate.setFullYear(periodEndDate.getFullYear() + intervalCount);
+  } else if (billingInterval === "week") {
+    periodEndDate = new Date(periodStartDate);
+    periodEndDate.setDate(periodEndDate.getDate() + 7 * intervalCount);
+  } else if (billingInterval === "day") {
+    periodEndDate = new Date(periodStartDate);
+    periodEndDate.setDate(periodEndDate.getDate() + intervalCount);
+  } else {
+    periodEndDate = new Date(periodStartDate);
+    periodEndDate.setMonth(periodEndDate.getMonth() + 1);
+  }
+
+  return {
+    currentPeriodStart,
+    currentPeriodEnd: Math.floor(periodEndDate.getTime() / 1000),
+  };
+}
+
+/**
  * Subscription Repository - Static class pattern
  */
 export class SubscriptionRepository {
@@ -66,7 +105,113 @@ export class SubscriptionRepository {
         });
       }
 
-      const subscription = results[0];
+      let subscription = results[0];
+
+      // AUTOMATIC SYNC: Verify subscription with Stripe if it has a provider ID
+      // This handles cases where webhooks were missed or subscription changed in Stripe
+      if (subscription.providerSubscriptionId) {
+        const needsSync =
+          subscription.status === SubscriptionStatus.ACTIVE ||
+          (subscription.currentPeriodEnd &&
+            new Date(subscription.currentPeriodEnd) < new Date());
+
+        if (needsSync) {
+          try {
+            const stripeResponse = await getStripe.subscriptions.retrieve(
+              subscription.providerSubscriptionId,
+            );
+
+            const { currentPeriodStart, currentPeriodEnd } =
+              calculateSubscriptionPeriod(stripeResponse);
+
+            // Map Stripe status to our status
+            let newStatus: typeof SubscriptionStatusValue;
+            switch (stripeResponse.status) {
+              case "active":
+                newStatus = SubscriptionStatus.ACTIVE;
+                break;
+              case "canceled":
+                newStatus = SubscriptionStatus.CANCELED;
+                break;
+              case "past_due":
+              case "unpaid":
+                newStatus = SubscriptionStatus.PAST_DUE;
+                break;
+              default:
+                newStatus = subscription.status;
+                break;
+            }
+
+            // Update if status or period changed
+            const periodChanged =
+              subscription.currentPeriodEnd &&
+              currentPeriodEnd * 1000 !==
+                subscription.currentPeriodEnd.getTime();
+
+            if (newStatus !== subscription.status || periodChanged) {
+              logger.info("Auto-syncing subscription from Stripe", {
+                userId,
+                oldStatus: subscription.status,
+                newStatus,
+                periodChanged,
+              });
+
+              const [updated] = await db
+                .update(subscriptions)
+                .set({
+                  status: newStatus,
+                  currentPeriodStart: new Date(currentPeriodStart * 1000),
+                  currentPeriodEnd: new Date(currentPeriodEnd * 1000),
+                  cancelAtPeriodEnd: stripeResponse.cancel_at_period_end,
+                  cancelAt: stripeResponse.cancel_at
+                    ? new Date(stripeResponse.cancel_at * 1000)
+                    : null,
+                  updatedAt: new Date(),
+                })
+                .where(eq(subscriptions.id, subscription.id))
+                .returning();
+
+              if (updated) {
+                subscription = updated;
+              }
+            }
+          } catch (error) {
+            const stripeError = error as { code?: string };
+            // If subscription not found in Stripe, mark as canceled
+            if (stripeError.code === "resource_missing") {
+              logger.warn(
+                "Subscription not found in Stripe - marking as canceled",
+                {
+                  userId,
+                  subscriptionId: subscription.providerSubscriptionId,
+                },
+              );
+
+              const [updated] = await db
+                .update(subscriptions)
+                .set({
+                  status: SubscriptionStatus.CANCELED,
+                  canceledAt: new Date(),
+                  endedAt: subscription.currentPeriodEnd || new Date(),
+                  updatedAt: new Date(),
+                })
+                .where(eq(subscriptions.id, subscription.id))
+                .returning();
+
+              if (updated) {
+                subscription = updated;
+              }
+            } else {
+              // Log error but don't fail - return cached subscription
+              logger.error("Failed to verify subscription with Stripe", {
+                error: parseError(error),
+                userId,
+              });
+            }
+          }
+        }
+      }
+
       return success({
         id: subscription.id,
         userId: subscription.userId,
@@ -81,6 +226,8 @@ export class SubscriptionRepository {
           new Date().toISOString(),
         cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
         cancelAt: subscription.cancelAt?.toISOString(),
+        canceledAt: subscription.canceledAt?.toISOString(),
+        endedAt: subscription.endedAt?.toISOString(),
         provider: subscription.provider,
         providerSubscriptionId:
           subscription.providerSubscriptionId || undefined,
@@ -645,33 +792,254 @@ export class SubscriptionRepository {
           break;
       }
 
-      // Update subscription
+      // Check if period changed (renewal detected)
+      const { currentPeriodStart, currentPeriodEnd } =
+        calculateSubscriptionPeriod(fullSubscription);
+
+      const oldPeriodEnd = subscription.currentPeriodEnd;
+      const newPeriodEnd = new Date(currentPeriodEnd * 1000);
+      const periodRenewed =
+        oldPeriodEnd && newPeriodEnd.getTime() > oldPeriodEnd.getTime();
+
+      // Update subscription with proper period information
       await db
         .update(subscriptions)
         .set({
           status,
+          currentPeriodStart: new Date(currentPeriodStart * 1000),
+          currentPeriodEnd: newPeriodEnd,
           cancelAtPeriodEnd: fullSubscription.cancel_at_period_end,
           cancelAt: fullSubscription.cancel_at
             ? new Date(fullSubscription.cancel_at * 1000)
             : null,
-          // Note: Stripe.Subscription doesn't have current_period_start/end in the type definition
-          // These would need to be retrieved from the latest invoice or billing cycle
-          currentPeriodStart: undefined,
-          currentPeriodEnd: undefined,
           updatedAt: new Date(),
         })
         .where(eq(subscriptions.providerSubscriptionId, fullSubscription.id));
+
+      // If period renewed, grant new monthly credits
+      if (periodRenewed && status === SubscriptionStatus.ACTIVE) {
+        logger.info("Subscription period renewed - granting credits", {
+          userId: subscription.userId,
+          oldPeriodEnd: oldPeriodEnd.toISOString(),
+          newPeriodEnd: newPeriodEnd.toISOString(),
+        });
+
+        const { CreditRepository } = await import("../credits/repository");
+        const { productsRepository, ProductIds } = await import(
+          "../products/repository-client"
+        );
+
+        const productId =
+          subscription.planId === SubscriptionPlan.SUBSCRIPTION
+            ? ProductIds.SUBSCRIPTION
+            : null;
+
+        if (productId) {
+          const product = productsRepository.getProduct(productId, "en-GLOBAL");
+
+          // Use subscription update event ID for idempotency
+          const eventId = `sub_update_${fullSubscription.id}_${newPeriodEnd.getTime()}`;
+
+          // Check if credits already granted for this period
+          const { creditPacks } = await import("../credits/db");
+          const { sql } = await import("drizzle-orm");
+          const [existingPack] = await db
+            .select()
+            .from(creditPacks)
+            .where(sql`${creditPacks.metadata}->>'sessionId' = ${eventId}`)
+            .limit(1);
+
+          if (!existingPack) {
+            await CreditRepository.addUserCredits(
+              subscription.userId,
+              product.credits,
+              "subscription",
+              logger,
+              newPeriodEnd,
+              eventId,
+            );
+
+            logger.info("Granted renewal credits", {
+              userId: subscription.userId,
+              credits: product.credits,
+              expiresAt: newPeriodEnd.toISOString(),
+            });
+          } else {
+            logger.debug("Renewal credits already granted for this period", {
+              userId: subscription.userId,
+              eventId,
+            });
+          }
+        }
+      }
 
       logger.debug("Subscription updated successfully", {
         subscriptionId: fullSubscription.id,
         status,
         cancelAtPeriodEnd: fullSubscription.cancel_at_period_end,
         cancelAt: fullSubscription.cancel_at,
+        periodRenewed,
       });
     } catch (error) {
       logger.error("Failed to process subscription update", {
         error: parseError(error),
         subscriptionId: stripeSubscription.id,
+      });
+    }
+  }
+
+  /**
+   * Sync subscription with Stripe and expire old credits
+   * Use this to fix subscription state mismatches
+   */
+  static async syncSubscriptionWithStripe(
+    userId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ message: string; changes: string[] }>> {
+    try {
+      const changes: string[] = [];
+
+      // Get local subscription
+      const [localSubscription] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.userId, userId))
+        .limit(1);
+
+      if (!localSubscription) {
+        return fail({
+          message: "app.api.subscription.errors.not_found",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      if (!localSubscription.providerSubscriptionId) {
+        return fail({
+          message: "app.api.subscription.errors.no_provider_id",
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      logger.info("Syncing subscription with Stripe", {
+        userId,
+        subscriptionId: localSubscription.providerSubscriptionId,
+      });
+
+      // Try to fetch subscription from Stripe
+      let stripeSubscription: Stripe.Subscription | null = null;
+      try {
+        stripeSubscription = await getStripe.subscriptions.retrieve(
+          localSubscription.providerSubscriptionId,
+        );
+      } catch (error) {
+        const stripeError = error as { code?: string };
+        if (stripeError.code === "resource_missing") {
+          logger.warn(
+            "Subscription not found in Stripe - marking as canceled",
+            {
+              subscriptionId: localSubscription.providerSubscriptionId,
+            },
+          );
+
+          // Subscription doesn't exist in Stripe - mark as canceled
+          await db
+            .update(subscriptions)
+            .set({
+              status: SubscriptionStatus.CANCELED,
+              canceledAt: new Date(),
+              endedAt: localSubscription.currentPeriodEnd || new Date(),
+              updatedAt: new Date(),
+            })
+            .where(eq(subscriptions.id, localSubscription.id));
+
+          changes.push("Marked subscription as canceled (not found in Stripe)");
+        } else {
+          // Other Stripe errors
+          logger.error("Failed to retrieve subscription from Stripe", {
+            error: parseError(error),
+            subscriptionId: localSubscription.providerSubscriptionId,
+          });
+          return fail({
+            message: "app.api.subscription.sync.stripe_error",
+            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+            messageParams: { error: parseError(error).message },
+          });
+        }
+      }
+
+      // Sync status if subscription exists in Stripe
+      if (stripeSubscription) {
+        const { currentPeriodStart, currentPeriodEnd } =
+          calculateSubscriptionPeriod(stripeSubscription);
+
+        let newStatus: typeof SubscriptionStatusValue;
+        switch (stripeSubscription.status) {
+          case "active":
+            newStatus = SubscriptionStatus.ACTIVE;
+            break;
+          case "canceled":
+            newStatus = SubscriptionStatus.CANCELED;
+            break;
+          case "past_due":
+          case "unpaid":
+            newStatus = SubscriptionStatus.PAST_DUE;
+            break;
+          default:
+            newStatus = SubscriptionStatus.ACTIVE;
+            break;
+        }
+
+        if (newStatus !== localSubscription.status) {
+          await db
+            .update(subscriptions)
+            .set({
+              status: newStatus,
+              currentPeriodStart: new Date(currentPeriodStart * 1000),
+              currentPeriodEnd: new Date(currentPeriodEnd * 1000),
+              cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+              cancelAt: stripeSubscription.cancel_at
+                ? new Date(stripeSubscription.cancel_at * 1000)
+                : null,
+              canceledAt:
+                stripeSubscription.canceled_at && !localSubscription.canceledAt
+                  ? new Date(stripeSubscription.canceled_at * 1000)
+                  : localSubscription.canceledAt,
+              updatedAt: new Date(),
+            })
+            .where(eq(subscriptions.id, localSubscription.id));
+
+          changes.push(
+            `Updated subscription status from ${localSubscription.status} to ${newStatus}`,
+          );
+        }
+      }
+
+      // Expire old credit packs
+      const { CreditRepository } = await import("../credits/repository");
+      const expiryResult = await CreditRepository.expireCredits(logger);
+
+      if (expiryResult.success && expiryResult.data > 0) {
+        changes.push(`Expired ${expiryResult.data} credit pack(s)`);
+      }
+
+      logger.info("Subscription sync completed", {
+        userId,
+        changes,
+      });
+
+      return success({
+        message: "app.api.subscription.sync.success",
+        changes,
+      });
+    } catch (error) {
+      logger.error("Failed to sync subscription with Stripe", {
+        error: parseError(error),
+        userId,
+      });
+      return fail({
+        message: "app.api.subscription.sync.failed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
       });
     }
   }

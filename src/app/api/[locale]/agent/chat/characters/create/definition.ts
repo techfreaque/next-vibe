@@ -37,8 +37,8 @@ import {
   INTELLIGENCE_DISPLAY,
   PRICE_DISPLAY,
 } from "../../types";
-import { CategoryOptions, CharacterCategory } from "../config";
-import { CharacterCategoryDB } from "../enum";
+import { CategoryOptions } from "../config";
+import { CharacterCategory, CharacterCategoryDB } from "../enum";
 
 /**
  * Create Character Endpoint (POST)

@@ -33,10 +33,11 @@ import {
   modelProviders,
 } from "@/app/api/[locale]/agent/chat/model-access/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import { useIsMobile } from "@/hooks/use-media-query";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { findBestModel } from "./types";
+import { selectModelForCharacter } from "./types";
 
 /**
  * Favorite/Setup item - unified character + model configuration
@@ -95,24 +96,25 @@ function useFavoriteDisplay(
   );
 
   const resolvedModel = useMemo(() => {
-    if (
-      favorite.modelSettings.mode === ModelSelectionMode.MANUAL &&
-      favorite.modelSettings.manualModelId
-    ) {
-      return (
-        allModels.find((m) => m.id === favorite.modelSettings.manualModelId) ??
-        null
-      );
+    // Use new priority logic: manual > preferredModel > auto
+    const selectedModelId = selectModelForCharacter(
+      allModels,
+      character ?? null,
+      {
+        mode:
+          favorite.modelSettings.mode === ModelSelectionMode.MANUAL
+            ? "manual"
+            : "auto",
+        manualModelId: favorite.modelSettings.manualModelId,
+        filters: favorite.modelSettings.filters,
+      },
+    );
+
+    if (selectedModelId) {
+      return allModels.find((m) => m.id === selectedModelId) ?? null;
     }
-    // For auto mode, find best model (with or without character)
-    if (character) {
-      return findBestModel(allModels, character, {
-        intelligence: favorite.modelSettings.filters.intelligence,
-        maxPrice: favorite.modelSettings.filters.maxPrice,
-        minContent: favorite.modelSettings.filters.content,
-      });
-    }
-    // Model-only: just filter by settings
+
+    // Model-only fallback: filter by settings
     return (
       allModels.find((m) => {
         const { filters } = favorite.modelSettings;
@@ -179,6 +181,7 @@ function FavoriteRow({
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
+  const isTouchDevice = useIsMobile();
   const {
     character,
     resolvedModel,
@@ -196,12 +199,49 @@ function FavoriteRow({
   return (
     <Div
       className={cn(
-        "flex items-center gap-3 p-3 rounded-xl border transition-all",
+        "relative flex items-start gap-3 p-3 rounded-xl border transition-all",
         "hover:bg-muted/50 hover:border-primary/20 cursor-pointer group",
         favorite.isActive && "bg-primary/5 border-primary/20",
       )}
       onClick={onSelect}
     >
+      {/* Actions floating on top - always visible on touch devices, hover on desktop */}
+      <Div
+        className={cn(
+          "absolute top-2 right-2 z-10 flex items-center gap-1 transition-opacity",
+          isTouchDevice ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+        )}
+      >
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-background"
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
+          title={t("app.chat.selector.settings")}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+        {!favorite.isActive && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-primary bg-background/80 backdrop-blur-sm hover:bg-background"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect();
+            }}
+            title={t("app.chat.selector.switchTo")}
+          >
+            <Zap className="h-4 w-4" />
+          </Button>
+        )}
+      </Div>
+
       {/* Icon */}
       <Div
         className={cn(
@@ -214,17 +254,17 @@ function FavoriteRow({
         <Icon className="h-5 w-5" />
       </Div>
 
-      {/* Info */}
+      {/* Info - Full Width */}
       <Div className="flex-1 min-w-0">
-        <Div className="flex items-center gap-2">
-          <Span
+        <Div className="flex items-center gap-2 pr-2">
+          <Div
             className={cn(
-              "font-medium text-sm truncate",
+              "font-medium text-base flex-1",
               favorite.isActive && "text-primary",
             )}
           >
             {displayName}
-          </Span>
+          </Div>
           {favorite.isActive && (
             <Badge variant="default" className="text-[9px] h-4 px-1.5 shrink-0">
               {t("app.chat.selector.active")}
@@ -240,7 +280,7 @@ function FavoriteRow({
           )}
         </Div>
         {resolvedModel && (
-          <Div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
+          <Div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
             {ModelIcon && <ModelIcon className="h-3 w-3" />}
             <Span className="truncate">{resolvedModel.name}</Span>
             {providerName && (
@@ -260,38 +300,6 @@ function FavoriteRow({
                     })}
             </Span>
           </Div>
-        )}
-      </Div>
-
-      {/* Actions */}
-      <Div className="flex items-center gap-1 shrink-0">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit();
-          }}
-          title={t("app.chat.selector.settings")}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
-        {!favorite.isActive && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-primary"
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelect();
-            }}
-            title={t("app.chat.selector.switchTo")}
-          >
-            <Zap className="h-4 w-4" />
-          </Button>
         )}
       </Div>
     </Div>

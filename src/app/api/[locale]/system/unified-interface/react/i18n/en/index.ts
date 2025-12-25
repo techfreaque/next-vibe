@@ -83,5 +83,10 @@ export const translations = {
       noDataAvailable: "No data available",
       noDataToDisplay: "No data to display",
     },
+    pagination: {
+      showing: "Showing {{start}}-{{end}} of {{total}} items",
+      itemsPerPage: "Items per page",
+      page: "Page {{current}} of {{total}}",
+    },
   },
 };

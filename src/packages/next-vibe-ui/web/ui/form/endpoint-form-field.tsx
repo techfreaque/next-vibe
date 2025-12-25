@@ -355,7 +355,7 @@ function renderFieldInput<
       return (
         <Input
           name={field.name}
-          value={t(field.value as TranslationKey)}
+          value={field.value ? t(field.value as TranslationKey) : ""}
           onChange={(e) => field.onChange(e.target.value)}
           onBlur={field.onBlur}
           type={config.type}
@@ -384,7 +384,7 @@ function renderFieldInput<
       return (
         <Textarea
           name={field.name}
-          value={t(field.value as TranslationKey)}
+          value={field.value ? t(field.value as TranslationKey) : ""}
           onChange={(e) => field.onChange(e.target.value)}
           onBlur={field.onBlur}
           className={cn(inputClassName, "min-h-20 resize-none")}
@@ -401,7 +401,11 @@ function renderFieldInput<
           // Force re-render when value changes
           key={`${field.name}-${String(field.value) || "empty"}`}
           onValueChange={(value) => field.onChange(value)}
-          value={String(field.value || "")}
+          value={
+            field.value !== undefined && field.value !== null
+              ? String(field.value)
+              : undefined
+          }
           disabled={disabled || config.disabled}
         >
           <SelectTrigger className={cn(inputClassName, "h-10")}>
@@ -412,15 +416,22 @@ function renderFieldInput<
             />
           </SelectTrigger>
           <SelectContent>
-            {config.options.map((option, index) => (
-              <SelectItem
-                key={option.value ?? `${OPTION_KEY_PREFIX}${index}`}
-                value={option.value ?? ""}
-                disabled={option.disabled}
-              >
-                {t(option.label, option.labelParams)}
-              </SelectItem>
-            ))}
+            {config.options
+              .filter(
+                (option) =>
+                  option.value !== undefined &&
+                  option.value !== null &&
+                  option.value !== "",
+              )
+              .map((option, index) => (
+                <SelectItem
+                  key={option.value ?? `${OPTION_KEY_PREFIX}${index}`}
+                  value={option.value!}
+                  disabled={option.disabled}
+                >
+                  {t(option.label, option.labelParams)}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       );

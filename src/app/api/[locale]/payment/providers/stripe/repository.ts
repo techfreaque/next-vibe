@@ -92,8 +92,13 @@ export class StripeProvider implements PaymentProvider {
               .set({ stripeCustomerId: null })
               .where(eq(users.id, userId));
           } else {
-            // Other errors (network, etc.) should be thrown
-            throw retrieveError;
+            // Other errors (network, etc.) should be returned as failure
+            return fail({
+              message:
+                "app.api.payment.providers.stripe.errors.customerRetrievalFailed.title",
+              errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+              messageParams: { error: error.message, userId },
+            });
           }
         }
       }

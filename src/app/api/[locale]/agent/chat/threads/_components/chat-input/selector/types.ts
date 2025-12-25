@@ -345,30 +345,43 @@ export interface CategoryConfig {
 }
 
 /**
- * Resolve model selection to an actual model
+ * Select model for a character with priority:
+ * 1. Manual override from favorite settings (highest priority)
+ * 2. Character's preferredModel (medium priority)
+ * 3. Auto-selection with filters (fallback)
  */
-export function resolveModelSelection(
-  selection: ModelSelection,
-  character: Character,
+export function selectModelForCharacter(
   allModels: ModelOption[],
-): ModelOption | null {
-  if (selection.type === "specific") {
-    const model = allModels.find((m) => m.id === selection.modelId);
-    if (model && modelMeetsRequirements(model, character)) {
-      return model;
-    }
-    // Fallback to auto if specific model doesn't meet requirements
+  character: Character | null,
+  settings: {
+    mode: "auto" | "manual";
+    manualModelId?: ModelId;
+    filters: {
+      intelligence: typeof IntelligenceLevelFilterValue;
+      maxPrice: typeof PriceLevelFilterValue;
+      content: typeof ContentLevelFilterValue;
+    };
+  },
+): ModelId | null {
+  // Priority 1: Manual override from favorite config
+  if (settings.mode === "manual" && settings.manualModelId) {
+    return settings.manualModelId;
   }
 
-  // Auto selection
-  return findBestModel(allModels, character, {
-    intelligence:
-      selection.type === "auto"
-        ? selection.intelligence
-        : IntelligenceLevelFilter.ANY,
-    maxPrice:
-      selection.type === "auto" ? selection.maxPrice : PriceLevelFilter.ANY,
-    minContent:
-      selection.type === "auto" ? selection.minContent : ContentLevelFilter.ANY,
-  });
+  // Priority 2: Character's preferredModel
+  if (character?.preferredModel) {
+    return character.preferredModel;
+  }
+
+  // Priority 3: Auto-selection with filters
+  if (character) {
+    const bestModel = findBestModel(allModels, character, {
+      intelligence: settings.filters.intelligence,
+      maxPrice: settings.filters.maxPrice,
+      minContent: settings.filters.content,
+    });
+    return bestModel?.id ?? null;
+  }
+
+  return null;
 }

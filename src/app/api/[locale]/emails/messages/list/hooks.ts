@@ -36,8 +36,8 @@ export function useEmailMessagesList(
         initialFilters: {
           filters: {
             search: undefined,
-            status: EmailStatusFilter.ALL,
-            type: EmailTypeFilter.ALL,
+            status: EmailStatusFilter.ANY,
+            type: EmailTypeFilter.ANY,
           },
           displayOptions: {
             sortBy: EmailSortField.CREATED_AT,

@@ -84,5 +84,10 @@ export const translations: typeof enTranslations = {
       noDataAvailable: "Keine Daten verfügbar",
       noDataToDisplay: "Keine Daten anzuzeigen",
     },
+    pagination: {
+      showing: "Zeige {{start}}-{{end}} von {{total}} Einträgen",
+      itemsPerPage: "Einträge pro Seite",
+      page: "Seite {{current}} von {{total}}",
+    },
   },
 };

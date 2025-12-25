@@ -121,7 +121,21 @@ const { GET } = createEndpoint({
       cancelAt: responseField(
         {
           type: WidgetType.TEXT,
+          content: "app.api.subscription.response.cancelAt" as const,
+        },
+        z.string().optional(),
+      ),
+      canceledAt: responseField(
+        {
+          type: WidgetType.TEXT,
           content: "app.api.subscription.response.canceledAt" as const,
+        },
+        z.string().optional(),
+      ),
+      endedAt: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.subscription.response.endedAt" as const,
         },
         z.string().optional(),
       ),

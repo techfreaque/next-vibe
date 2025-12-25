@@ -9,25 +9,16 @@ import type { NextRequest, NextResponse } from "next/server";
 // we have to use relative paths as vercel cant resolve import aliases from here
 import { middleware } from "./app/api/[locale]/system/middleware";
 import type { languageDefaults } from "./i18n";
-import type { Countries, CountryLanguage, Languages } from "./i18n/core/config";
+import type { CountryLanguage } from "./i18n/core/config";
 
-const availableCountries: Countries[] = ["DE", "PL", "GLOBAL", "US"];
-const availableLanguages: Languages[] = ["de", "pl", "en"];
 const defaultLocale: `${typeof languageDefaults.language}-${typeof languageDefaults.country}` =
   "en-GLOBAL";
-const allSupportedLocales: CountryLanguage[] = [
+
+const supportedLocales: CountryLanguage[] = [
   "de-DE",
   "pl-PL",
   "en-GLOBAL",
-  "de-PL",
-  "pl-DE",
-  "pl-GLOBAL",
-  "de-GLOBAL",
-  "en-DE",
-  "en-PL",
   "en-US",
-  "de-US",
-  "pl-US",
 ];
 
 /**
@@ -35,10 +26,8 @@ const allSupportedLocales: CountryLanguage[] = [
  */
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   return await middleware(request, {
-    supportedLocales: allSupportedLocales,
+    supportedLocales,
     defaultLocale,
-    supportedLanguages: availableLanguages,
-    supportedCountries: availableCountries,
     allowMixedLocales: true,
   });
 }

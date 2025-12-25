@@ -70,13 +70,13 @@ export const translations: typeof enTranslations = {
       unknownError: "Unbekannter Fehler",
     },
     smtpStatusFilter: {
-      all: "Alle",
+      any: "Alle",
     },
     smtpHealthStatusFilter: {
-      all: "Alle",
+      any: "Alle",
     },
     smtpCampaignTypeFilter: {
-      all: "Alle",
+      any: "Alle",
     },
     smtpSelectionRuleSortField: {
       name: "Name",
@@ -107,14 +107,14 @@ export const translations: typeof enTranslations = {
       lastUsedAt: "Zuletzt verwendet",
     },
     smtpSelectionRuleStatusFilter: {
-      all: "Alle",
+      any: "Alle",
       active: "Aktiv",
       inactive: "Inaktiv",
       default: "Standard",
       failover: "Failover",
     },
     selectionRuleStatusFilter: {
-      all: "Alle",
+      any: "Alle",
       active: "Aktiv",
       inactive: "Inaktiv",
       default: "Standard",
@@ -159,10 +159,10 @@ export const translations: typeof enTranslations = {
       createdAt: "Erstellt am",
     },
     emailStatusFilter: {
-      all: "Alle",
+      any: "Alle",
     },
     emailTypeFilter: {
-      all: "Alle",
+      any: "Alle",
     },
     emailRetryRange: {
       noRetries: "Keine Wiederholungen",

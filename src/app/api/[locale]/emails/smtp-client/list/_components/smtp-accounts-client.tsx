@@ -69,9 +69,9 @@ export function SmtpAccountsClient({
   const handleClearFilters = (): void => {
     smtpAccountsEndpoint.read.form.reset({
       search: undefined,
-      campaignType: CampaignTypeFilter.ALL,
-      status: SmtpAccountStatusFilter.ALL,
-      healthStatus: SmtpHealthStatusFilter.ALL,
+      campaignType: CampaignTypeFilter.ANY,
+      status: SmtpAccountStatusFilter.ANY,
+      healthStatus: SmtpHealthStatusFilter.ANY,
       page: 1,
       limit: 20,
       sortBy: SmtpAccountSortField.CREATED_AT,
@@ -171,7 +171,7 @@ export function SmtpAccountsClient({
                       "app.admin.emails.smtp.admin.fields.campaignTypes" as const,
                     options: [
                       {
-                        value: CampaignTypeFilter.ALL,
+                        value: CampaignTypeFilter.ANY,
                         label:
                           "app.admin.emails.smtp.filter.purpose.all" as const,
                       },
@@ -220,7 +220,7 @@ export function SmtpAccountsClient({
                       "app.admin.emails.smtp.filter.status.placeholder",
                     options: [
                       {
-                        value: SmtpAccountStatusFilter.ALL,
+                        value: SmtpAccountStatusFilter.ANY,
                         label: "app.admin.emails.smtp.filter.status.all",
                       },
                       {
@@ -259,7 +259,7 @@ export function SmtpAccountsClient({
                       "app.admin.emails.smtp.filter.health.placeholder",
                     options: [
                       {
-                        value: SmtpHealthStatusFilter.ALL,
+                        value: SmtpHealthStatusFilter.ANY,
                         label: "app.admin.emails.smtp.filter.health.all",
                       },
                       {

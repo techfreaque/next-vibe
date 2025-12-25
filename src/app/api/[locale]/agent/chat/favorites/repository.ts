@@ -18,7 +18,8 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { CharacterCategory, getCharacterById } from "../characters/config";
+import { getCharacterById } from "../characters/config";
+import { CharacterCategory } from "../characters/enum";
 import { chatFavorites } from "./db";
 import type {
   FavoriteCreateRequestOutput,

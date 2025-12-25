@@ -94,7 +94,7 @@ const { GET } = createEndpoint({
                 "app.api.emails.messages.list.fields.status.placeholder",
               options: EmailStatusFilterOptions,
             },
-            z.enum(EmailStatusFilter).default(EmailStatusFilter.ALL),
+            z.enum(EmailStatusFilter).default(EmailStatusFilter.ANY),
           ),
 
           type: requestDataField(
@@ -108,7 +108,7 @@ const { GET } = createEndpoint({
                 "app.api.emails.messages.list.fields.type.placeholder",
               options: EmailTypeFilterOptions,
             },
-            z.enum(EmailTypeFilter).default(EmailTypeFilter.ALL),
+            z.enum(EmailTypeFilter).default(EmailTypeFilter.ANY),
           ),
 
           dateRange: objectOptionalField(
@@ -606,8 +606,8 @@ const { GET } = createEndpoint({
       default: {
         filters: {
           search: "",
-          status: EmailStatusFilter.ALL,
-          type: EmailTypeFilter.ALL,
+          status: EmailStatusFilter.ANY,
+          type: EmailTypeFilter.ANY,
         },
         displayOptions: {
           sortBy: EmailSortField.CREATED_AT,

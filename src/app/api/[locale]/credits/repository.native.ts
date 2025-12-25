@@ -292,6 +292,28 @@ export class CreditRepository {
     throw new Error("getTransactionsByLeadId is not implemented on native");
   }
 
+  static async getTransactionHistory(
+    // oxlint-disable-next-line no-unused-vars
+    _data: { paginationInfo: { page: number; limit: number } },
+    // oxlint-disable-next-line no-unused-vars
+    _user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<
+    ResponseType<{
+      transactions: CreditTransactionOutput[];
+      paginationInfo: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+      };
+    }>
+  > {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("getTransactionHistory is not implemented on native");
+  }
+
   static async getTransactionsByUserId(
     // oxlint-disable-next-line no-unused-vars
     _userId: string,

@@ -99,7 +99,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
       const whereConditions = [];
 
       // Status filter
-      if (status && status !== EmailStatusFilter.ALL) {
+      if (status && status !== EmailStatusFilter.ANY) {
         const emailStatus = mapEmailStatusFilter(status);
         if (emailStatus) {
           whereConditions.push(eq(emails.status, emailStatus));
@@ -107,7 +107,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
       }
 
       // Type filter
-      if (type && type !== EmailTypeFilter.ALL) {
+      if (type && type !== EmailTypeFilter.ANY) {
         const emailType = mapEmailTypeFilter(type);
         if (emailType) {
           whereConditions.push(eq(emails.type, emailType));
@@ -239,8 +239,8 @@ class EmailsRepositoryImpl implements EmailsRepository {
           totalPages,
         },
         filters: {
-          status: status || EmailStatusFilter.ALL,
-          type: type || EmailTypeFilter.ALL,
+          status: status || EmailStatusFilter.ANY,
+          type: type || EmailTypeFilter.ANY,
           search,
           dateFrom,
           dateTo,

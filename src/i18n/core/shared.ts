@@ -21,7 +21,13 @@ export function _simpleT<K extends TranslationKey>(
 ): string {
   // Extract language from locale with safety check
   if (!locale || typeof locale !== "string") {
-    // console.error("Invalid locale provided to translation function:", locale);
+    // oxlint-disable-next-line no-console
+    console.error("Invalid locale provided to translation function:", locale);
+    return key; // Return the key as fallback
+  }
+  if (!key || typeof key !== "string") {
+    // oxlint-disable-next-line no-console
+    console.error("Invalid key provided to translation function:", key);
     return key; // Return the key as fallback
   }
 

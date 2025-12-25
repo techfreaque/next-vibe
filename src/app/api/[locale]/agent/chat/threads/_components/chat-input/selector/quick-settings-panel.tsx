@@ -50,7 +50,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { FavoriteItem } from "./favorites-bar";
-import { findBestModel, getCompatibleModels } from "./types";
+import { getCompatibleModels, selectModelForCharacter } from "./types";
 
 type CharacterData = CharacterListResponseOutput["characters"][number];
 
@@ -244,12 +244,28 @@ export function QuickSettingsPanel({
     if (!character) {
       return null;
     }
-    return findBestModel(allModels, character, {
-      intelligence,
-      maxPrice,
-      minContent: content,
+    // Use priority logic: manual > preferredModel > auto
+    const selectedModelId = selectModelForCharacter(allModels, character, {
+      mode: mode === ModelSelectionMode.MANUAL ? "manual" : "auto",
+      manualModelId,
+      filters: {
+        intelligence,
+        maxPrice,
+        content,
+      },
     });
-  }, [allModels, character, intelligence, maxPrice, content]);
+    return selectedModelId
+      ? (allModels.find((m) => m.id === selectedModelId) ?? null)
+      : null;
+  }, [
+    allModels,
+    character,
+    mode,
+    manualModelId,
+    intelligence,
+    maxPrice,
+    content,
+  ]);
 
   const filteredModels = useMemo(() => {
     return compatibleModels.filter((m) => {

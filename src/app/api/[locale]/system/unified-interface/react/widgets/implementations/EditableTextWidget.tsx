@@ -9,6 +9,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { useIsMobile } from "@/hooks/use-media-query";
 import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import type { WidgetType } from "../../../shared/types/enums";
@@ -37,6 +38,7 @@ export function EditableTextWidget<TKey extends string>({
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
   const { handleAction, isProcessing } = useWidgetActions(onAction);
+  const isTouchDevice = useIsMobile();
 
   if (!extractedData) {
     return <Span className={cn("text-foreground", className)}>—</Span>;
@@ -122,7 +124,10 @@ export function EditableTextWidget<TKey extends string>({
         size="sm"
         variant="ghost"
         onClick={handleEdit}
-        className="h-6 w-6 p-0 opacity-0 transition-opacity group-hover:opacity-100"
+        className={cn(
+          "h-6 w-6 p-0 transition-opacity",
+          isTouchDevice ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+        )}
       >
         <Edit2 className="h-3 w-3" />
       </Button>

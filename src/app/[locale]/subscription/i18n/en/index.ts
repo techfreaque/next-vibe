@@ -7,10 +7,17 @@ export const translations = {
     currentPeriodStart: "Current Period Start",
     nextBillingDate: "Next Billing Date",
     endsOn: "Subscription Ends On",
+    canceledOn: "Canceled On",
+    endedOn: "Ended On",
     cancellation: {
       title: "Subscription Scheduled for Cancellation",
       description:
         "Your subscription will end on {{date}}. You will retain access until then.",
+    },
+    canceled: {
+      title: "Subscription Canceled",
+      description:
+        "Your subscription has been canceled. You can resubscribe at any time to regain access to monthly credits.",
     },
     manage: {
       stripe: {

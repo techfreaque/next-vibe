@@ -34,27 +34,27 @@ export function validateData<TSchema extends z.ZodType>(
 
     if (!result.success) {
       const formattedErrors = formatZodErrors(result.error);
-      const error = {
-        errorCount: result.error.issues?.length || 0,
+      const errorCount = result.error.issues?.length || 0;
+      logger.error("Validation error details", {
+        errorCount,
         errors: result.error.issues?.slice(0, 3).map((e: ZodIssue) => ({
           path: e.path.join("."),
           message: e.message,
           code: e.code,
         })),
-        allErrors: result.error.issues,
+        allErrors: JSON.stringify(result.error.issues),
         formattedErrors,
         errorType: typeof result.error,
         errorConstructor: result.error?.constructor?.name,
         hasIssues: "issues" in result.error,
         fullError: JSON.stringify(result.error, null, 2),
-      };
-      logger.error("Validation error details", parseError(error));
+      });
       return fail({
         message: "app.api.shared.errorTypes.validation_error",
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: {
           error: formattedErrors.join(", "),
-          errorCount: error.errorCount,
+          errorCount: errorCount,
         },
       });
     }

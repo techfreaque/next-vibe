@@ -21,16 +21,6 @@ export interface LanguageMiddlewareOptions {
   defaultLocale: CountryLanguage;
 
   /**
-   * Supported languages (e.g., ['en', 'de', 'fr'])
-   */
-  supportedLanguages?: string[];
-
-  /**
-   * Supported countries (e.g., ['us', 'de', 'fr'])
-   */
-  supportedCountries?: string[];
-
-  /**
    * Allow mixed locale combinations like 'de-PL'
    */
   allowMixedLocales?: boolean;
@@ -39,6 +29,27 @@ export interface LanguageMiddlewareOptions {
    * Cookie name for storing the preferred locale
    */
   cookieName?: string;
+}
+
+/**
+ * Normalize locale format to: en-US (lowercase language, uppercase country)
+ * Handles: "en-us", "EN-US", "en_US" -> "en-US"
+ */
+function normalizeLocaleFormat(locale: string): string {
+  if (!locale) {
+    return "";
+  }
+
+  const normalized = locale.trim().replace(/_/g, "-");
+  const parts = normalized.split("-");
+  const lang = parts[0]?.toLowerCase();
+  const country = parts[1]?.toUpperCase();
+
+  if (!lang) {
+    return "";
+  }
+
+  return country ? `${lang}-${country}` : lang;
 }
 
 /**
@@ -51,13 +62,26 @@ export function detectLocale(
   options: LanguageMiddlewareOptions,
 ): CountryLanguage | null {
   const {
-    supportedLocales,
+    supportedLocales: baseLocales,
     defaultLocale,
-    supportedLanguages = [],
-    supportedCountries = [],
-    allowMixedLocales = false,
     cookieName = LOCALE_COOKIE_NAME,
+    allowMixedLocales = false,
   } = options;
+
+  // Generate all possible locale combinations if mixed locales are allowed
+  const supportedLocales = allowMixedLocales
+    ? ((): CountryLanguage[] => {
+        const languages = [
+          ...new Set(baseLocales.map((locale) => locale.split("-")[0])),
+        ];
+        const countries = [
+          ...new Set(baseLocales.map((locale) => locale.split("-")[1])),
+        ];
+        return languages.flatMap((lang) =>
+          countries.map((country) => `${lang}-${country}` as CountryLanguage),
+        );
+      })()
+    : baseLocales;
 
   const path = request.nextUrl.pathname;
 
@@ -89,76 +113,49 @@ export function detectLocale(
     | CountryLanguage
     | undefined;
 
-  // Check if cookie locale is valid
-  let validCookieLocale = false;
-  if (cookieLocale) {
-    if (supportedLocales.includes(cookieLocale)) {
-      validCookieLocale = true;
-    } else if (allowMixedLocales) {
-      const [lang, country] = cookieLocale.split("-");
-      if (
-        lang &&
-        country &&
-        supportedLanguages.includes(lang) &&
-        supportedCountries.includes(country)
-      ) {
-        validCookieLocale = true;
-      }
-    }
-  }
-
-  // Use cookie locale if available and valid
-  if (cookieLocale && validCookieLocale) {
+  if (cookieLocale && supportedLocales.includes(cookieLocale)) {
     return cookieLocale;
   }
 
   // Fallback to Accept-Language header
   const acceptLanguage = request.headers.get("accept-language") || "";
-  let detectedLocale = defaultLocale;
 
-  // Try to find a matching locale from Accept-Language header
+  // Parse Accept-Language header and try to match supported locales
   for (const lang of acceptLanguage.split(",")) {
-    const headerLocale = lang.split(";")[0].trim();
-
-    // Try exact match
-    if (supportedLocales.includes(headerLocale as CountryLanguage)) {
-      detectedLocale = headerLocale as CountryLanguage;
-      break;
+    const headerLocale = lang.split(";")[0]?.trim();
+    if (!headerLocale) {
+      continue;
     }
 
-    // If mixed locales are allowed, validate the header locale
-    if (allowMixedLocales) {
-      const [langPart, countryPart] = headerLocale.split("-");
-      if (
-        langPart &&
-        countryPart &&
-        supportedLanguages.includes(langPart) &&
-        supportedCountries.includes(countryPart.toLowerCase())
-      ) {
-        detectedLocale =
-          `${langPart}-${countryPart.toLowerCase()}` as CountryLanguage;
-        break;
-      }
+    // Normalize to format: en-US (lowercase lang, uppercase country)
+    const normalized = normalizeLocaleFormat(headerLocale);
+    if (!normalized) {
+      continue;
     }
 
-    // Try to match just the language part
-    const langPart = headerLocale.split("-")[0];
-
-    // Special handling for "en" language - prefer "en-GLOBAL" if available
-    if (langPart === "en" && supportedLocales.includes("en-GLOBAL")) {
-      detectedLocale = "en-GLOBAL";
-      break;
+    // Try exact match first
+    if (supportedLocales.includes(normalized as CountryLanguage)) {
+      return normalized as CountryLanguage;
     }
 
-    const matchingLocale = supportedLocales.find((locale) =>
-      locale.startsWith(`${langPart}-`),
-    );
+    // Try language-only match
+    const langCode = normalized.split("-")[0];
 
+    // Prefer GLOBAL variant for the language if available
+    const globalLocale = `${langCode}-GLOBAL` as CountryLanguage;
+    if (supportedLocales.includes(globalLocale)) {
+      return globalLocale;
+    }
+
+    // Find any locale with matching language
+    const matchingLocale = supportedLocales.find((locale) => {
+      const [localeLang] = locale.split("-");
+      return localeLang.toLowerCase() === langCode;
+    });
     if (matchingLocale) {
-      detectedLocale = matchingLocale;
-      break;
+      return matchingLocale;
     }
   }
 
-  return detectedLocale;
+  return defaultLocale;
 }

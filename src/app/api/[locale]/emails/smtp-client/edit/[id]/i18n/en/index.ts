@@ -56,8 +56,9 @@ export const translations = {
     },
     password: {
       label: "Password",
-      description: "The SMTP authentication password",
-      placeholder: "Enter password",
+      description:
+        "Leave empty to keep current password, or enter new password to change it",
+      placeholder: "Enter new password (optional)",
     },
     fromEmail: {
       label: "From Email",

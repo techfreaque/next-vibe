@@ -45,13 +45,14 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { ModelUtility } from "../../../../types";
 import { CharacterBrowser } from "./character-browser";
 import { CreateCharacterForm } from "./create-character-form";
 import { EditCharacterModal } from "./edit-character-modal";
 import { type FavoriteItem, FavoritesBar } from "./favorites-bar";
 import { QuickSettingsPanel } from "./quick-settings-panel";
 import { SelectorOnboarding } from "./selector-onboarding";
-import { findBestModel } from "./types";
+import { selectModelForCharacter } from "./types";
 import { useChatFavorites } from "./use-chat-favorites";
 
 interface SelectorProps {
@@ -77,37 +78,49 @@ type SelectorView =
   | "character-switch";
 
 /**
+ * Get default intelligence from character preferences
+ */
+function getDefaultIntelligence(
+  character: Character | null,
+): typeof IntelligenceLevelFilterValue {
+  if (character?.preferences?.preferredStrengths) {
+    if (character.preferences.preferredStrengths.includes(ModelUtility.SMART)) {
+      return IntelligenceLevelFilter.BRILLIANT;
+    }
+    if (character.preferences.preferredStrengths.includes(ModelUtility.FAST)) {
+      return IntelligenceLevelFilter.QUICK;
+    }
+  }
+  return IntelligenceLevelFilter.SMART;
+}
+
+/**
+ * Get default content from character requirements
+ */
+function getDefaultContent(
+  character: Character | null,
+): typeof ContentLevelFilterValue {
+  if (character?.requirements?.minContent) {
+    return character.requirements.minContent;
+  }
+  return ContentLevelFilter.OPEN;
+}
+
+/**
  * Create a new favorite from character
  */
 function createFavoriteFromCharacter(
   characterId: string | null,
-  intelligence: typeof IntelligenceLevelFilterValue = IntelligenceLevelFilter.SMART,
+  intelligence?: typeof IntelligenceLevelFilterValue,
   maxPrice: typeof PriceLevelFilterValue = PriceLevelFilter.STANDARD,
-  content: typeof ContentLevelFilterValue = ContentLevelFilter.OPEN,
+  content?: typeof ContentLevelFilterValue,
 ): FavoriteItem {
   const character = characterId ? getCharacterById(characterId) : null;
 
-  // Use character requirements to set defaults
-  let defaultContent = content;
-  if (character?.requirements?.minContent) {
-    const contentOrder = [
-      ContentLevelFilter.MAINSTREAM,
-      ContentLevelFilter.OPEN,
-      ContentLevelFilter.UNCENSORED,
-    ];
-    const requiredIndex = contentOrder.indexOf(
-      character.requirements.minContent,
-    );
-    // If content is ANY, use the character's minimum requirement
-    if (content === ContentLevelFilter.ANY) {
-      defaultContent = character.requirements.minContent;
-    } else {
-      const currentIndex = contentOrder.indexOf(content);
-      if (currentIndex < requiredIndex) {
-        defaultContent = character.requirements.minContent;
-      }
-    }
-  }
+  // Use character-specific defaults if not provided
+  const defaultIntelligence =
+    intelligence ?? getDefaultIntelligence(character ?? null);
+  const defaultContent = content ?? getDefaultContent(character ?? null);
 
   return {
     id: `local-${Date.now()}-${characterId ?? "model"}`,
@@ -116,7 +129,7 @@ function createFavoriteFromCharacter(
     modelSettings: {
       mode: ModelSelectionMode.AUTO,
       filters: {
-        intelligence,
+        intelligence: defaultIntelligence,
         maxPrice,
         content: defaultContent,
       },
@@ -132,34 +145,14 @@ function createFavoriteFromCharacter(
  */
 function createFavoriteFromCharacterObject(
   character: CharacterListResponseOutput["characters"][number],
-  intelligence: typeof IntelligenceLevelFilterValue = IntelligenceLevelFilter.SMART,
+  intelligence?: typeof IntelligenceLevelFilterValue,
   maxPrice: typeof PriceLevelFilterValue = PriceLevelFilter.STANDARD,
-  content: typeof ContentLevelFilterValue = ContentLevelFilter.OPEN,
+  content?: typeof ContentLevelFilterValue,
 ): FavoriteItem {
-  // Use character requirements to set defaults
-  let defaultContent = content;
-  if (
-    character.requirements?.minContent &&
-    character.requirements.minContent !== ContentLevelFilter.ANY
-  ) {
-    const contentOrder = [
-      ContentLevelFilter.MAINSTREAM,
-      ContentLevelFilter.OPEN,
-      ContentLevelFilter.UNCENSORED,
-    ] as const;
-    const requiredIndex = contentOrder.indexOf(
-      character.requirements.minContent,
-    );
-    // If content is ANY, use the character's minimum requirement
-    if (content === ContentLevelFilter.ANY) {
-      defaultContent = character.requirements.minContent;
-    } else {
-      const currentIndex = contentOrder.indexOf(content);
-      if (currentIndex >= 0 && currentIndex < requiredIndex) {
-        defaultContent = character.requirements.minContent;
-      }
-    }
-  }
+  // Use character-specific defaults if not provided
+  const defaultIntelligence =
+    intelligence ?? getDefaultIntelligence(character as Character);
+  const defaultContent = content ?? getDefaultContent(character as Character);
 
   return {
     id: `local-${Date.now()}-${character.id}`,
@@ -168,7 +161,7 @@ function createFavoriteFromCharacterObject(
     modelSettings: {
       mode: ModelSelectionMode.AUTO,
       filters: {
-        intelligence,
+        intelligence: defaultIntelligence,
         maxPrice,
         content: defaultContent,
       },
@@ -334,29 +327,29 @@ export function Selector({
           onCharacterChange(selected.characterId);
         }
 
-        // Resolve model
+        // Resolve model with priority: manual override > preferredModel > auto
         const allModels = Object.values(modelOptions);
         const character = selected.characterId
           ? getCharacterById(selected.characterId)
           : null;
-        if (
-          selected.modelSettings.mode === ModelSelectionMode.MANUAL &&
-          selected.modelSettings.manualModelId
-        ) {
-          // Manual mode - use selected model
-          onModelChange(selected.modelSettings.manualModelId as ModelId);
-        } else if (character) {
-          // Auto mode with character - find best matching model
-          const bestModel = findBestModel(allModels, character, {
-            intelligence: selected.modelSettings.filters.intelligence,
-            maxPrice: selected.modelSettings.filters.maxPrice,
-            minContent: selected.modelSettings.filters.content,
-          });
-          if (bestModel) {
-            onModelChange(bestModel.id);
-          }
-        } else {
-          // Model-only: use first model matching filters
+
+        const selectedModelId = selectModelForCharacter(
+          allModels,
+          character ?? null,
+          {
+            mode:
+              selected.modelSettings.mode === ModelSelectionMode.MANUAL
+                ? "manual"
+                : "auto",
+            manualModelId: selected.modelSettings.manualModelId,
+            filters: selected.modelSettings.filters,
+          },
+        );
+
+        if (selectedModelId) {
+          onModelChange(selectedModelId);
+        } else if (!character) {
+          // Model-only fallback: use first model matching filters
           const matchingModel = allModels.find((m) => {
             const { filters } = selected.modelSettings;
             if (
@@ -404,28 +397,26 @@ export function Selector({
         return;
       }
 
-      // Helper to apply model changes
+      // Helper to apply model changes with priority: manual > preferredModel > auto
       const applyModelChange = (): void => {
         const allModels = Object.values(modelOptions);
-        if (
-          settings.mode === ModelSelectionMode.MANUAL &&
-          settings.manualModelId
-        ) {
-          onModelChange(settings.manualModelId);
-        } else {
-          const character = editingFavorite.characterId
-            ? getCharacterById(editingFavorite.characterId)
-            : null;
-          if (character) {
-            const bestModel = findBestModel(allModels, character, {
-              intelligence: settings.filters.intelligence,
-              maxPrice: settings.filters.maxPrice,
-              minContent: settings.filters.content,
-            });
-            if (bestModel) {
-              onModelChange(bestModel.id);
-            }
-          }
+        const character = editingFavorite.characterId
+          ? getCharacterById(editingFavorite.characterId)
+          : null;
+
+        const selectedModelId = selectModelForCharacter(
+          allModels,
+          character ?? null,
+          {
+            mode:
+              settings.mode === ModelSelectionMode.MANUAL ? "manual" : "auto",
+            manualModelId: settings.manualModelId,
+            filters: settings.filters,
+          },
+        );
+
+        if (selectedModelId) {
+          onModelChange(selectedModelId);
         }
       };
 
@@ -492,18 +483,21 @@ export function Selector({
         isActive: true,
       });
 
-      // Apply selection
+      // Apply selection with priority: manual > preferredModel > auto
       onCharacterChange(newCharacterId);
       const character = getCharacterById(newCharacterId);
       if (character) {
         const allModels = Object.values(modelOptions);
-        const bestModel = findBestModel(allModels, character, {
-          intelligence: favoriteData.modelSettings.filters.intelligence,
-          maxPrice: favoriteData.modelSettings.filters.maxPrice,
-          minContent: favoriteData.modelSettings.filters.content,
+        const selectedModelId = selectModelForCharacter(allModels, character, {
+          mode:
+            favoriteData.modelSettings.mode === ModelSelectionMode.MANUAL
+              ? "manual"
+              : "auto",
+          manualModelId: favoriteData.modelSettings.manualModelId,
+          filters: favoriteData.modelSettings.filters,
         });
-        if (bestModel) {
-          onModelChange(bestModel.id);
+        if (selectedModelId) {
+          onModelChange(selectedModelId);
         }
       }
 
@@ -603,20 +597,26 @@ export function Selector({
         isActive: true,
       });
 
-      // Apply selection
+      // Apply selection with priority: manual > preferredModel > auto
       onCharacterChange(characterId);
 
-      // Find best model using the character from API (now has requirements)
       // Try getCharacterById first for full character with all fields, fallback to API character
       const fullCharacter = getCharacterById(characterId) || character;
       const allModels = Object.values(modelOptions);
-      const bestModel = findBestModel(allModels, fullCharacter as Character, {
-        intelligence: favoriteData.modelSettings.filters.intelligence,
-        maxPrice: favoriteData.modelSettings.filters.maxPrice,
-        minContent: favoriteData.modelSettings.filters.content,
-      });
-      if (bestModel) {
-        onModelChange(bestModel.id);
+      const selectedModelId = selectModelForCharacter(
+        allModels,
+        fullCharacter as Character,
+        {
+          mode:
+            favoriteData.modelSettings.mode === ModelSelectionMode.MANUAL
+              ? "manual"
+              : "auto",
+          manualModelId: favoriteData.modelSettings.manualModelId,
+          filters: favoriteData.modelSettings.filters,
+        },
+      );
+      if (selectedModelId) {
+        onModelChange(selectedModelId);
       }
 
       setView("favorites");
@@ -672,19 +672,24 @@ export function Selector({
       if (editingFavorite.isActive) {
         onCharacterChange(newCharacterId);
 
-        // Update model if needed
+        // Update model with priority: manual > preferredModel > auto
         const character = getCharacterById(newCharacterId);
         if (character) {
           const allModels = Object.values(modelOptions);
           const settings =
             updates.modelSettings || editingFavorite.modelSettings;
-          const bestModel = findBestModel(allModels, character, {
-            intelligence: settings.filters.intelligence,
-            maxPrice: settings.filters.maxPrice,
-            minContent: settings.filters.content,
-          });
-          if (bestModel) {
-            onModelChange(bestModel.id);
+          const selectedModelId = selectModelForCharacter(
+            allModels,
+            character,
+            {
+              mode:
+                settings.mode === ModelSelectionMode.MANUAL ? "manual" : "auto",
+              manualModelId: settings.manualModelId,
+              filters: settings.filters,
+            },
+          );
+          if (selectedModelId) {
+            onModelChange(selectedModelId);
           }
         }
       }
@@ -717,18 +722,21 @@ export function Selector({
       // Track that we saved this character's favorite
       savedOnboardingCharacterRef.current = selectedCharacterId;
 
-      // Apply selection immediately
+      // Apply selection immediately with priority: manual > preferredModel > auto
       onCharacterChange(selectedCharacterId);
       const character = getCharacterById(selectedCharacterId);
       if (character) {
         const allModels = Object.values(modelOptions);
-        const bestModel = findBestModel(allModels, character, {
-          intelligence: favoriteData.modelSettings.filters.intelligence,
-          maxPrice: favoriteData.modelSettings.filters.maxPrice,
-          minContent: favoriteData.modelSettings.filters.content,
+        const selectedModelId = selectModelForCharacter(allModels, character, {
+          mode:
+            favoriteData.modelSettings.mode === ModelSelectionMode.MANUAL
+              ? "manual"
+              : "auto",
+          manualModelId: favoriteData.modelSettings.manualModelId,
+          filters: favoriteData.modelSettings.filters,
         });
-        if (bestModel) {
-          onModelChange(bestModel.id);
+        if (selectedModelId) {
+          onModelChange(selectedModelId);
         }
       }
     },
@@ -758,18 +766,21 @@ export function Selector({
         isActive: true,
       });
 
-      // Apply selection
+      // Apply selection with priority: manual > preferredModel > auto
       onCharacterChange(selectedCharacterId);
       const character = getCharacterById(selectedCharacterId);
       if (character) {
         const allModels = Object.values(modelOptions);
-        const bestModel = findBestModel(allModels, character, {
-          intelligence: favoriteData.modelSettings.filters.intelligence,
-          maxPrice: favoriteData.modelSettings.filters.maxPrice,
-          minContent: favoriteData.modelSettings.filters.content,
+        const selectedModelId = selectModelForCharacter(allModels, character, {
+          mode:
+            favoriteData.modelSettings.mode === ModelSelectionMode.MANUAL
+              ? "manual"
+              : "auto",
+          manualModelId: favoriteData.modelSettings.manualModelId,
+          filters: favoriteData.modelSettings.filters,
         });
-        if (bestModel) {
-          onModelChange(bestModel.id);
+        if (selectedModelId) {
+          onModelChange(selectedModelId);
         }
       }
     },

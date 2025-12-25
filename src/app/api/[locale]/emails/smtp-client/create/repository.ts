@@ -129,10 +129,19 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
       logger.error("Error creating SMTP account", parseError(error));
 
       // Check for unique constraint violations
-      if (
+      // PostgreSQL error code 23505 = unique_violation
+      const isUniqueViolation =
         errorMessage.includes("unique") ||
-        errorMessage.includes("duplicate")
-      ) {
+        errorMessage.includes("duplicate") ||
+        (typeof error === "object" &&
+          error !== null &&
+          "cause" in error &&
+          typeof error.cause === "object" &&
+          error.cause !== null &&
+          "code" in error.cause &&
+          error.cause.code === "23505");
+
+      if (isUniqueViolation) {
         return fail({
           message: "app.api.emails.smtpClient.create.errors.conflict.title",
           errorType: ErrorResponseTypes.CONFLICT,
