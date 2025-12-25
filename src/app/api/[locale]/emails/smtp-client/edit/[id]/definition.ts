@@ -9,6 +9,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   field,
   objectField,
+  requestDataField,
   requestResponseField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -437,7 +438,7 @@ const { PUT } = createEndpoint({
         z.string().min(1).optional(),
       ),
 
-      password: requestResponseField(
+      password: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.PASSWORD,

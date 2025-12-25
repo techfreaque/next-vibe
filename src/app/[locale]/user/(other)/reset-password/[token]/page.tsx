@@ -83,7 +83,7 @@ export default async function ResetPasswordConfirmPage({
     verifiedUserResponse.data &&
     !verifiedUserResponse.data.isPublic
   ) {
-    redirect(`/${locale}/dashboard`);
+    redirect(`/${locale}`);
   }
 
   // Validate token on the server side
@@ -92,21 +92,20 @@ export default async function ResetPasswordConfirmPage({
     logger,
   );
 
+  const errorFallback = (
+    <Alert variant="destructive" className="mb-8">
+      <AlertCircle className="h-4 w-4" />
+      <AlertTitle>{t("app.user.common.error.title")}</AlertTitle>
+      <AlertDescription>
+        {t(
+          "app.user.other.resetPassword.auth.resetPassword.errors.loadingError",
+        )}
+      </AlertDescription>
+    </Alert>
+  );
+
   return (
-    <ErrorBoundary
-      fallback={() => (
-        <Alert variant="destructive" className="mb-8">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>{t("app.user.common.error.title")}</AlertTitle>
-          <AlertDescription>
-            {t(
-              "app.user.other.resetPassword.auth.resetPassword.errors.loadingError",
-            )}
-          </AlertDescription>
-        </Alert>
-      )}
-      locale={locale}
-    >
+    <ErrorBoundary fallback={errorFallback} locale={locale}>
       <Suspense fallback={<Div>{t("app.user.common.loading")}</Div>}>
         <Div className="max-w-md mx-auto">
           <ResetPasswordConfirmForm

@@ -250,6 +250,23 @@ export function EditSmtpAccountForm({
                 }}
                 locale={locale}
               />
+
+              <EndpointFormField
+                name="password"
+                config={{
+                  type: "password",
+                  label: "app.api.emails.smtpClient.edit.id.fields.password.label" as const,
+                  description: "app.api.emails.smtpClient.edit.id.fields.password.description" as const,
+                  placeholder:
+                    "app.api.emails.smtpClient.edit.id.fields.password.placeholder" as const,
+                }}
+                control={endpoint.create.form.control}
+                theme={{
+                  style: "none",
+                  showAllRequired: false,
+                }}
+                locale={locale}
+              />
             </FormFieldGroup>
 
             {/* Email Settings */}

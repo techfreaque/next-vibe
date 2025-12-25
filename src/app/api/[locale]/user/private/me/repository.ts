@@ -198,10 +198,6 @@ export class UserProfileRepository {
       // Update user in database
       await db.update(users).set(updateData).where(eq(users.id, userId));
 
-      // Revalidate relevant paths
-      revalidatePath(`/${locale}/dashboard/profile`);
-      revalidatePath(`/${locale}/profile`);
-
       logger.debug("Successfully updated user profile", { userId });
 
       // Get the updated user data

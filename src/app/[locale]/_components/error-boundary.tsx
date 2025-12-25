@@ -24,11 +24,13 @@ import { simpleT } from "@/i18n/core/shared";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
-  fallback?: (
-    error: Error,
-    errorInfo: ErrorInfo | null,
-    reset: () => void,
-  ) => ReactNode;
+  fallback?:
+    | ReactNode
+    | ((
+        error: Error,
+        errorInfo: ErrorInfo | null,
+        reset: () => void,
+      ) => ReactNode);
   locale: CountryLanguage;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
@@ -204,11 +206,16 @@ export class ErrorBoundary extends Component<
     if (this.state.hasError && this.state.error) {
       // Use custom fallback if provided
       if (this.props.fallback) {
-        return this.props.fallback(
-          this.state.error,
-          this.state.errorInfo,
-          this.reset,
-        );
+        // Check if fallback is a function or ReactNode
+        if (typeof this.props.fallback === "function") {
+          return this.props.fallback(
+            this.state.error,
+            this.state.errorInfo,
+            this.reset,
+          );
+        }
+        // If it's a ReactNode, just return it
+        return this.props.fallback;
       }
 
       // Default error UI with detailed information

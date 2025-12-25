@@ -123,10 +123,6 @@ export class AvatarRepository {
         fileSize: file.size,
       });
 
-      // Revalidate relevant paths
-      revalidatePath(`/dashboard/profile`);
-      revalidatePath(`/profile`);
-
       return success<AvatarPostResponseOutput>({
         response: {
           success: true,
@@ -199,10 +195,6 @@ export class AvatarRepository {
         .where(eq(users.id, userId));
 
       logger.info("Avatar deleted successfully", { userId });
-
-      // Revalidate relevant paths
-      revalidatePath(`/dashboard/profile`);
-      revalidatePath(`/profile`);
 
       return success<AvatarDeleteResponseOutput>({
         success: true,
