@@ -7,7 +7,6 @@
 import { dateSchema } from "next-vibe/shared/types/common.schema";
 import { z } from "zod";
 
-import { leadId } from "@/app/api/[locale]/leads/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "./auth/types";
@@ -45,7 +44,7 @@ export type MinimalUserType = JwtPayloadType;
  */
 export const standardUserSchema = z.object({
   id: z.uuid(),
-  leadId,
+  leadId: z.uuid(),
   isPublic: z.literal(false),
   email: z.email({ message: "validationErrors.user.profile.email_invalid" }),
   privateName: z.string(),
