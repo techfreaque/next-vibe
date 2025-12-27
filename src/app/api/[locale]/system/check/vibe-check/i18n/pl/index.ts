@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Vibe Check",
   description:
-    "Przeprowadź kompleksowe sprawdzenia jakości kodu, w tym linting, sprawdzanie typów i walidację tras",
+    "Przeprowadź kompleksowe sprawdzenia jakości kodu, w tym linting i sprawdzanie typów",
   category: "Narzędzia Deweloperskie",
   tag: "jakość",
 
@@ -46,11 +46,20 @@ export const translations: typeof enTranslations = {
   fields: {
     fix: {
       label: "Automatyczne Naprawianie Problemów",
-      description: "Automatycznie napraw problemy, które można rozwiązać",
+      description:
+        "Automatycznie napraw problemy lintingu, które można rozwiązać automatycznie",
     },
     skipLint: {
-      label: "Pomiń Linting",
-      description: "Pomiń sprawdzenia ESLint podczas Vibe Check",
+      label: "Pomiń Wszystkie Lintingi",
+      description: "Pomiń sprawdzenia ESLint i Oxlint",
+    },
+    skipEslint: {
+      label: "Pomiń ESLint",
+      description: "Pomiń sprawdzenia ESLint (Oxlint będzie nadal działać)",
+    },
+    skipOxlint: {
+      label: "Pomiń Oxlint",
+      description: "Pomiń sprawdzenia Oxlint (ESLint będzie nadal działać)",
     },
     skipTypecheck: {
       label: "Pomiń Sprawdzanie Typów",
@@ -58,11 +67,12 @@ export const translations: typeof enTranslations = {
     },
     createConfig: {
       label: "Utwórz Konfigurację",
-      description: "Utwórz domyślny check.config.ts jeśli brakuje",
+      description:
+        "Utwórz domyślny plik konfiguracyjny check.config.ts jeśli brakuje",
     },
     timeoutSeconds: {
       label: "Limit czasu (sekundy)",
-      description: "Maksymalny czas wykonania",
+      description: "Maksymalny czas wykonania w sekundach (1-3600)",
     },
     skipTrpcCheck: {
       label: "Pomiń Sprawdzanie tRPC",
@@ -75,9 +85,8 @@ export const translations: typeof enTranslations = {
     paths: {
       label: "Ścieżki Docelowe",
       description:
-        "Konkretne ścieżki do sprawdzenia (zostaw puste dla wszystkich)",
-      placeholder:
-        "Wybierz ścieżki do sprawdzenia lub zostaw puste dla wszystkich",
+        'Konkretne ścieżki plików lub katalogi do sprawdzenia (string lub tablica stringów, zostaw puste aby sprawdzić wszystkie pliki). Przykłady: "src/app" lub ["src/components", "src/utils"]',
+      placeholder: "np. src/app lub src/components/Button.tsx",
       options: {
         src: "Katalog Źródłowy (src/)",
         components: "Komponenty (src/components)",
@@ -85,6 +94,14 @@ export const translations: typeof enTranslations = {
         pages: "Strony (src/pages)",
         app: "Katalog App (src/app)",
       },
+    },
+    maxIssues: {
+      label: "Maksymalna Liczba Problemów",
+      description: "Maksymalna liczba problemów do wyświetlenia (1-10000)",
+    },
+    maxFiles: {
+      label: "Maksymalna Liczba Plików",
+      description: "Maksymalna liczba plików w podsumowaniu (1-1000)",
     },
   },
 
@@ -95,6 +112,16 @@ export const translations: typeof enTranslations = {
       emptyState: {
         description: "Nie znaleziono problemów - Twój kod ma dobre vibes!",
       },
+    },
+    summary: {
+      title: "Podsumowanie Sprawdzenia",
+      description: "Przegląd wyników sprawdzenia jakości kodu",
+      totalIssues: "Wszystkie Problemy",
+      totalFiles: "Wszystkie Pliki z Problemami",
+      totalErrors: "Wszystkie Błędy",
+      displayedIssues: "Pokazane Problemy",
+      displayedFiles: "Pokazane Pliki",
+      truncatedMessage: "Wynik skrócony do limitów",
     },
   },
 

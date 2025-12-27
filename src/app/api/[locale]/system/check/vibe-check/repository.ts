@@ -13,6 +13,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { env } from "@/config/env";
 
 import { ensureConfigReady } from "../config/repository";
 import { lintRepository } from "../lint/repository";
@@ -45,6 +46,13 @@ export class VibeCheckRepository {
                 type: "oxlint" as const,
               },
             ],
+            summary: {
+              totalIssues: 1,
+              totalFiles: 1,
+              totalErrors: 1,
+              displayedIssues: 1,
+              displayedFiles: 1,
+            },
           },
           { isErrorResponse: true },
         );
@@ -66,19 +74,26 @@ export class VibeCheckRepository {
         pathsToCheck = [undefined]; // Default to no path (entire project with regular tsconfig) if no paths specified
       }
 
+      // Get base directory from PROJECT_ROOT env var (used by MCP) or default to current directory
+      const baseDir = env.PROJECT_ROOT || "./";
+
       // Run oxlint, eslint, and typecheck in parallel for each path
       const allResults = await Promise.allSettled(
         pathsToCheck.map(async (path) => {
           const promises = [];
 
           // Run oxlint if not skipped (fast Rust linter)
-          if (!data.skipLint && configResult.config.oxlint.enabled) {
+          if (
+            !data.skipLint &&
+            !data.skipOxlint &&
+            configResult.config.oxlint.enabled
+          ) {
             logger.info("Starting Oxlint check...");
             promises.push(
               oxlintRepository
                 .execute(
                   {
-                    path: path || "./",
+                    path: path || baseDir,
                     verbose: logger.isDebugEnabled,
                     fix: data.fix || false,
                     timeout: data.timeout,
@@ -94,13 +109,17 @@ export class VibeCheckRepository {
           }
 
           // Run ESLint if not skipped (i18n + custom AST rules)
-          if (!data.skipLint && configResult.config.eslint.enabled) {
+          if (
+            !data.skipLint &&
+            !data.skipEslint &&
+            configResult.config.eslint.enabled
+          ) {
             logger.info("Starting ESLint check...");
             promises.push(
               lintRepository
                 .execute(
                   {
-                    path: path || "./",
+                    path: path || baseDir,
                     verbose: logger.isDebugEnabled,
                     fix: data.fix || false,
                     timeout: data.timeout,
@@ -123,7 +142,7 @@ export class VibeCheckRepository {
               typecheckRepository
                 .execute(
                   {
-                    path, // This can be undefined for full project check
+                    path: path || baseDir, // Use baseDir when no specific path provided
                     disableFilter: false,
                     createConfig: false, // Config handled at vibe-check level
                     timeout: data.timeout, // Pass timeout from vibe-check
@@ -167,19 +186,129 @@ export class VibeCheckRepository {
               const result = checkResult.value.data;
               if (result.issues) {
                 allIssues.push(...result.issues);
-                if (result.issues.some((issue) => issue.severity === "error")) {
+                if (
+                  result.issues.some(
+                    (issue: { severity: string }) => issue.severity === "error",
+                  )
+                ) {
                   hasErrors = true;
                 }
               }
+            } else if (
+              checkResult.status === "fulfilled" &&
+              !checkResult.value.success
+            ) {
+              // Check failed - still process issues if available
+              hasErrors = true;
+              const failedResult = checkResult.value;
+              if (
+                failedResult.success === false &&
+                "data" in failedResult &&
+                failedResult.data &&
+                typeof failedResult.data === "object" &&
+                "issues" in failedResult.data &&
+                Array.isArray(failedResult.data.issues)
+              ) {
+                allIssues.push(...failedResult.data.issues);
+              }
+            } else if (checkResult.status === "rejected") {
+              // Handle rejected promises (unexpected failures)
+              hasErrors = true;
+              allIssues.push({
+                file: "check-error",
+                severity: "error" as const,
+                message: String(checkResult.reason),
+                type: "oxlint" as const,
+              });
             }
           }
         }
       }
 
+      // Calculate totals before limiting
+      const totalIssues = allIssues.length;
+      const totalFiles = new Set(allIssues.map((issue) => issue.file)).size;
+      const totalErrors = allIssues.filter(
+        (issue) => issue.severity === "error",
+      ).length;
+
+      // Apply limits for MCP-friendly output
+      let limitedIssues = allIssues;
+
+      // Limit by maxFiles - group by file and limit number of files
+      if (data.maxFiles && data.maxFiles > 0) {
+        const issuesByFile = new Map<
+          string,
+          Array<(typeof allIssues)[number]>
+        >();
+        for (const issue of allIssues) {
+          const fileIssues = issuesByFile.get(issue.file) || [];
+          fileIssues.push(issue);
+          issuesByFile.set(issue.file, fileIssues);
+        }
+
+        // Take only first maxFiles files
+        const limitedFilesList = [...issuesByFile.entries()].slice(
+          0,
+          data.maxFiles,
+        );
+        limitedIssues = limitedFilesList.flatMap(([, issues]) => issues);
+      }
+
+      // Limit by maxIssues - limit total number of issues
+      if (data.maxIssues && data.maxIssues > 0) {
+        limitedIssues = limitedIssues.slice(0, data.maxIssues);
+      }
+
+      const displayedIssues = limitedIssues.length;
+      const displayedFiles = new Set(limitedIssues.map((issue) => issue.file))
+        .size;
+
+      // Generate truncation message and add summary issue entry
+      const isTruncated =
+        displayedIssues < totalIssues || displayedFiles < totalFiles;
+      const truncatedMessage = isTruncated
+        ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
+        : "";
+
+      // Add a summary issue entry when truncated
+      const issuesWithSummary = [...limitedIssues];
+      if (isTruncated) {
+        const hiddenIssues = totalIssues - displayedIssues;
+        const hiddenFiles = totalFiles - displayedFiles;
+        const hiddenErrors =
+          totalErrors -
+          limitedIssues.filter((issue) => issue.severity === "error").length;
+
+        issuesWithSummary.push({
+          file: "... (truncated)",
+          severity: "info" as const,
+          message: `... and ${hiddenIssues} more issue${hiddenIssues === 1 ? "" : "s"} from ${hiddenFiles} more file${hiddenFiles === 1 ? "" : "s"} (${hiddenErrors} error${hiddenErrors === 1 ? "" : "s"}) hidden to fit display limits`,
+          type: "lint" as const,
+        });
+      }
+
       const response: VibeCheckResponseOutput = {
         success: !hasErrors,
-        issues: allIssues,
+        issues: issuesWithSummary,
+        summary: {
+          totalIssues,
+          totalFiles,
+          totalErrors,
+          displayedIssues,
+          displayedFiles,
+          truncatedMessage,
+        },
       };
+
+      logger.debug("[Vibe Check] Response summary", {
+        totalIssues,
+        totalFiles,
+        totalErrors,
+        displayedIssues,
+        displayedFiles,
+        isTruncated,
+      });
 
       // Return with isErrorResponse: true if there are errors so CLI exits with non-zero code
       return success(

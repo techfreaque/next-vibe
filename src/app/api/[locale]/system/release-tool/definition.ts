@@ -108,6 +108,7 @@ const { POST } = createEndpoint({
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,
+    UserRole.MCP_OFF,
     UserRole.WEB_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],

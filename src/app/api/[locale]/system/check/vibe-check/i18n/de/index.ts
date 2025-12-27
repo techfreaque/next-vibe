@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Vibe Check",
   description:
-    "Umfassende Code-Qualitätsprüfungen durchführen einschließlich Linting, Typprüfung und Route-Validierung",
+    "Umfassende Code-Qualitätsprüfungen durchführen einschließlich Linting und Typprüfung",
   category: "Entwicklungstools",
   tag: "qualität",
 
@@ -45,11 +45,19 @@ export const translations: typeof enTranslations = {
   fields: {
     fix: {
       label: "Probleme automatisch beheben",
-      description: "Probleme automatisch beheben, die gelöst werden können",
+      description: "Linting-Probleme automatisch beheben, die auto-fixbar sind",
     },
     skipLint: {
-      label: "Linting überspringen",
-      description: "ESLint-Prüfungen während Vibe Check überspringen",
+      label: "Alle Linting überspringen",
+      description: "Sowohl ESLint als auch Oxlint Prüfungen überspringen",
+    },
+    skipEslint: {
+      label: "ESLint überspringen",
+      description: "ESLint-Prüfungen überspringen (Oxlint läuft weiter)",
+    },
+    skipOxlint: {
+      label: "Oxlint überspringen",
+      description: "Oxlint-Prüfungen überspringen (ESLint läuft weiter)",
     },
     skipTypecheck: {
       label: "Typprüfung überspringen",
@@ -57,11 +65,12 @@ export const translations: typeof enTranslations = {
     },
     createConfig: {
       label: "Konfiguration erstellen",
-      description: "Standard check.config.ts erstellen falls nicht vorhanden",
+      description:
+        "Standard check.config.ts Konfigurationsdatei erstellen falls nicht vorhanden",
     },
     timeoutSeconds: {
       label: "Timeout (Sekunden)",
-      description: "Maximale Ausführungszeit",
+      description: "Maximale Ausführungszeit in Sekunden (1-3600)",
     },
     skipTrpcCheck: {
       label: "tRPC Check überspringen",
@@ -73,8 +82,9 @@ export const translations: typeof enTranslations = {
     },
     paths: {
       label: "Zielpfade",
-      description: "Spezifische Pfade zum Prüfen (leer lassen für alle)",
-      placeholder: "Pfade zum Prüfen auswählen oder leer lassen für alle",
+      description:
+        'Spezifische Dateipfade oder Verzeichnisse zum Prüfen (String oder Array von Strings, leer lassen um alle Dateien zu prüfen). Beispiele: "src/app" oder ["src/components", "src/utils"]',
+      placeholder: "z.B. src/app oder src/components/Button.tsx",
       options: {
         src: "Quellverzeichnis (src/)",
         components: "Komponenten (src/components)",
@@ -82,6 +92,15 @@ export const translations: typeof enTranslations = {
         pages: "Seiten (src/pages)",
         app: "App-Verzeichnis (src/app)",
       },
+    },
+    maxIssues: {
+      label: "Maximale Probleme",
+      description: "Maximale Anzahl von Problemen in der Ausgabe (1-10000)",
+    },
+    maxFiles: {
+      label: "Maximale Dateien",
+      description:
+        "Maximale Anzahl von Dateien in der Zusammenfassung (1-1000)",
     },
   },
 
@@ -92,6 +111,16 @@ export const translations: typeof enTranslations = {
       emptyState: {
         description: "Keine Probleme gefunden - Ihr Code hat gute Vibes!",
       },
+    },
+    summary: {
+      title: "Prüfzusammenfassung",
+      description: "Übersicht der Code-Qualitätsprüfungsergebnisse",
+      totalIssues: "Gesamtzahl Probleme",
+      totalFiles: "Gesamtzahl Dateien mit Problemen",
+      totalErrors: "Gesamtzahl Fehler",
+      displayedIssues: "Angezeigte Probleme",
+      displayedFiles: "Angezeigte Dateien",
+      truncatedMessage: "Ausgabe gekürzt um Grenzwerte einzuhalten",
     },
   },
 

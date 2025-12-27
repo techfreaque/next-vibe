@@ -19,6 +19,10 @@ export const { env } = defineEnv({
     ),
     example: "development",
   },
+  PROJECT_ROOT: {
+    schema: z.string().optional(),
+    example: "/path/to/your/project",
+  },
   NEXT_PUBLIC_APP_URL: {
     schema: createSchema(z.string().url(), z.string().url().optional()),
     example: "http://localhost:3000",

@@ -712,10 +712,48 @@ export default checkConfig.eslint?.flatConfig || [];
     const resolvedJsPlugins = ConfigRepositoryImpl.resolveJsPlugins(
       oxlintConfig.jsPlugins,
     );
-    const oxlintConfigForFile = {
-      ...oxlintConfig,
-      jsPlugins: resolvedJsPlugins.length > 0 ? resolvedJsPlugins : undefined,
-    };
+
+    // Only include valid oxlint schema fields (not CheckConfig metadata like enabled, configPath, cachePath, lintableExtensions)
+    const oxlintConfigForFile: {
+      $schema?: string;
+      ignorePatterns?: string[];
+      plugins?: string[];
+      jsPlugins?: string[];
+      categories?: typeof oxlintConfig.categories;
+      rules?: typeof oxlintConfig.rules;
+      settings?: typeof oxlintConfig.settings;
+      env?: typeof oxlintConfig.env;
+      globals?: typeof oxlintConfig.globals;
+    } = {};
+
+    if (oxlintConfig.$schema !== undefined) {
+      oxlintConfigForFile.$schema = oxlintConfig.$schema;
+    }
+    if (oxlintConfig.ignorePatterns !== undefined) {
+      oxlintConfigForFile.ignorePatterns = oxlintConfig.ignorePatterns;
+    }
+    if (oxlintConfig.plugins !== undefined) {
+      oxlintConfigForFile.plugins = oxlintConfig.plugins;
+    }
+    if (resolvedJsPlugins.length > 0) {
+      oxlintConfigForFile.jsPlugins = resolvedJsPlugins;
+    }
+    if (oxlintConfig.categories !== undefined) {
+      oxlintConfigForFile.categories = oxlintConfig.categories;
+    }
+    if (oxlintConfig.rules !== undefined) {
+      oxlintConfigForFile.rules = oxlintConfig.rules;
+    }
+    if (oxlintConfig.settings !== undefined) {
+      oxlintConfigForFile.settings = oxlintConfig.settings;
+    }
+    if (oxlintConfig.env !== undefined) {
+      oxlintConfigForFile.env = oxlintConfig.env;
+    }
+    if (oxlintConfig.globals !== undefined) {
+      oxlintConfigForFile.globals = oxlintConfig.globals;
+    }
+
     if (resolvedJsPlugins.length > 0) {
       logger.debug("Resolved jsPlugins paths", {
         isLocalDev: ConfigRepositoryImpl.isLocalDev(),

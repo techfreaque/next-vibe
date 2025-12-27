@@ -77,6 +77,30 @@ const { POST } = createEndpoint({
         z.boolean().optional().default(false),
       ),
 
+      skipEslint: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.check.vibeCheck.fields.skipEslint.label",
+          description:
+            "app.api.system.check.vibeCheck.fields.skipEslint.description",
+          columns: 3,
+        },
+        z.boolean().optional().default(false),
+      ),
+
+      skipOxlint: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.check.vibeCheck.fields.skipOxlint.label",
+          description:
+            "app.api.system.check.vibeCheck.fields.skipOxlint.description",
+          columns: 3,
+        },
+        z.boolean().optional().default(false),
+      ),
+
       skipTypecheck: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -150,6 +174,30 @@ const { POST } = createEndpoint({
           ],
         },
         z.union([z.string(), z.array(z.string())]).optional(),
+      ),
+
+      maxIssues: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.system.check.vibeCheck.fields.maxIssues.label",
+          description:
+            "app.api.system.check.vibeCheck.fields.maxIssues.description",
+          columns: 4,
+        },
+        z.coerce.number().min(1).max(10000).optional().default(100),
+      ),
+
+      maxFiles: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.system.check.vibeCheck.fields.maxFiles.label",
+          description:
+            "app.api.system.check.vibeCheck.fields.maxFiles.description",
+          columns: 4,
+        },
+        z.coerce.number().min(1).max(1000).optional().default(50),
       ),
 
       // === RESPONSE FIELDS ===
@@ -241,7 +289,79 @@ const { POST } = createEndpoint({
         ),
       ),
 
-      // Summary is now handled by the grouped list widget - no separate container needed
+      // === SUMMARY STATS ===
+      summary: objectField(
+        {
+          type: WidgetType.CONTAINER,
+          title: "app.api.system.check.vibeCheck.response.summary.title",
+          description:
+            "app.api.system.check.vibeCheck.response.summary.description",
+          layoutType: LayoutType.GRID,
+          columns: 12,
+        },
+        { response: true },
+        {
+          totalIssues: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.check.vibeCheck.response.summary.totalIssues",
+              columns: 3,
+            },
+            z.number(),
+          ),
+
+          totalFiles: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.check.vibeCheck.response.summary.totalFiles",
+              columns: 3,
+            },
+            z.number(),
+          ),
+
+          totalErrors: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.check.vibeCheck.response.summary.totalErrors",
+              columns: 3,
+            },
+            z.number(),
+          ),
+
+          displayedIssues: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.check.vibeCheck.response.summary.displayedIssues",
+              columns: 3,
+            },
+            z.number(),
+          ),
+
+          displayedFiles: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.check.vibeCheck.response.summary.displayedFiles",
+              columns: 3,
+            },
+            z.number(),
+          ),
+
+          truncatedMessage: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.system.check.vibeCheck.response.summary.truncatedMessage",
+              columns: 12,
+            },
+            z.string(),
+          ),
+        },
+      ),
     },
   ),
 
@@ -300,38 +420,74 @@ const { POST } = createEndpoint({
       default: {
         fix: true,
         skipLint: false,
+        skipEslint: false,
+        skipOxlint: false,
         skipTypecheck: false,
+        maxIssues: 100,
+        maxFiles: 50,
       },
       success: {
         fix: false,
         skipLint: false,
+        skipEslint: false,
+        skipOxlint: false,
         skipTypecheck: false,
+        maxIssues: 100,
+        maxFiles: 50,
       },
       withErrors: {
         fix: true,
         skipLint: false,
+        skipEslint: false,
+        skipOxlint: false,
         skipTypecheck: false,
+        maxIssues: 100,
+        maxFiles: 50,
       },
       quickCheck: {
         fix: false,
         skipLint: false,
+        skipEslint: false,
+        skipOxlint: false,
         skipTypecheck: false,
+        maxIssues: 100,
+        maxFiles: 50,
       },
       specificPaths: {
         fix: true,
         skipLint: false,
+        skipEslint: false,
+        skipOxlint: false,
         skipTypecheck: false,
         paths: ["src/components", "src/utils"],
+        maxIssues: 100,
+        maxFiles: 50,
       },
     },
     responses: {
       default: {
         success: true,
         issues: [],
+        summary: {
+          totalIssues: 0,
+          totalFiles: 0,
+          totalErrors: 0,
+          displayedIssues: 0,
+          displayedFiles: 0,
+          truncatedMessage: "",
+        },
       },
       success: {
         success: true,
         issues: [],
+        summary: {
+          totalIssues: 0,
+          totalFiles: 0,
+          totalErrors: 0,
+          displayedIssues: 0,
+          displayedFiles: 0,
+          truncatedMessage: "",
+        },
       },
       withErrors: {
         success: false,
@@ -347,14 +503,38 @@ const { POST } = createEndpoint({
             type: "lint" as const,
           },
         ],
+        summary: {
+          totalIssues: 1,
+          totalFiles: 1,
+          totalErrors: 1,
+          displayedIssues: 1,
+          displayedFiles: 1,
+          truncatedMessage: "",
+        },
       },
       quickCheck: {
         success: true,
         issues: [],
+        summary: {
+          totalIssues: 0,
+          totalFiles: 0,
+          totalErrors: 0,
+          displayedIssues: 0,
+          displayedFiles: 0,
+          truncatedMessage: "",
+        },
       },
       specificPaths: {
         success: true,
         issues: [],
+        summary: {
+          totalIssues: 0,
+          totalFiles: 0,
+          totalErrors: 0,
+          displayedIssues: 0,
+          displayedFiles: 0,
+          truncatedMessage: "",
+        },
       },
     },
   },

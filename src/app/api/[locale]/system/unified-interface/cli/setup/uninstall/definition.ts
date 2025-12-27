@@ -32,7 +32,12 @@ const { POST } = createEndpoint({
   icon: "package",
   category: "app.api.system.unifiedInterface.cli.setup.uninstall.post.title",
   tags: ["app.api.system.unifiedInterface.cli.setup.uninstall.post.title"],
-  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.MCP_OFF,
+  ],
   aliases: ["uninstall", "setup:uninstall"],
   method: Methods.POST,
   path: ["system", "setup", "uninstall"],

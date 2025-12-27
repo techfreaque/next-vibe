@@ -1,7 +1,7 @@
 export const translations = {
   title: "Vibe Check",
   description:
-    "Run comprehensive code quality checks including linting, type checking, and route validation",
+    "Run comprehensive code quality checks including linting and type checking",
   category: "Development Tools",
   tag: "quality",
 
@@ -43,11 +43,19 @@ export const translations = {
   fields: {
     fix: {
       label: "Auto Fix Issues",
-      description: "Automatically fix issues that can be resolved",
+      description: "Automatically fix linting issues that can be auto-fixed",
     },
     skipLint: {
-      label: "Skip Linting",
-      description: "Skip ESLint checks during vibe check",
+      label: "Skip All Linting",
+      description: "Skip both ESLint and Oxlint checks",
+    },
+    skipEslint: {
+      label: "Skip ESLint",
+      description: "Skip ESLint checks (Oxlint will still run)",
+    },
+    skipOxlint: {
+      label: "Skip Oxlint",
+      description: "Skip Oxlint checks (ESLint will still run)",
     },
     skipTypecheck: {
       label: "Skip Type Check",
@@ -55,11 +63,12 @@ export const translations = {
     },
     createConfig: {
       label: "Create Config",
-      description: "Create default check.config.ts if missing",
+      description:
+        "Create default check.config.ts configuration file if missing",
     },
     timeoutSeconds: {
       label: "Timeout (seconds)",
-      description: "Maximum execution time",
+      description: "Maximum execution time in seconds (1-3600)",
     },
     skipTrpcCheck: {
       label: "Skip tRPC Check",
@@ -71,8 +80,9 @@ export const translations = {
     },
     paths: {
       label: "Target Paths",
-      description: "Specific paths to check (leave empty for all)",
-      placeholder: "Select paths to check or leave empty for all",
+      description:
+        'Specific file paths or directories to check (string or array of strings, leave empty to check all files). Examples: "src/app" or ["src/components", "src/utils"]',
+      placeholder: "e.g., src/app or src/components/Button.tsx",
       options: {
         src: "Source Directory (src/)",
         components: "Components (src/components)",
@@ -80,6 +90,15 @@ export const translations = {
         pages: "Pages (src/pages)",
         app: "App Directory (src/app)",
       },
+    },
+    maxIssues: {
+      label: "Max Issues",
+      description:
+        "Maximum number of issues to display in the output (1-10000)",
+    },
+    maxFiles: {
+      label: "Max Files",
+      description: "Maximum number of files to show in summary (1-1000)",
     },
   },
 
@@ -90,6 +109,16 @@ export const translations = {
       emptyState: {
         description: "No issues found - your code has good vibes!",
       },
+    },
+    summary: {
+      title: "Check Summary",
+      description: "Overview of code quality check results",
+      totalIssues: "Total Issues",
+      totalFiles: "Total Files with Issues",
+      totalErrors: "Total Errors",
+      displayedIssues: "Showing Issues",
+      displayedFiles: "Showing Files",
+      truncatedMessage: "Output truncated to fit limits",
     },
   },
 

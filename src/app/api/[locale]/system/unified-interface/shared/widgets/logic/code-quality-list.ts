@@ -20,12 +20,25 @@ export interface CodeQualityItem {
 }
 
 /**
+ * Summary statistics for code quality checks
+ */
+export interface CodeQualitySummary {
+  totalIssues: number;
+  totalFiles: number;
+  totalErrors: number;
+  displayedIssues: number;
+  displayedFiles: number;
+  truncatedMessage?: string;
+}
+
+/**
  * Processed code quality list structure
  */
 export interface ProcessedCodeQualityList {
   items: CodeQualityItem[];
   groupBy?: "file" | "severity" | "rule";
   showSummary: boolean;
+  summary?: CodeQualitySummary;
 }
 
 /**
@@ -67,6 +80,15 @@ export function extractCodeQualityListData(
         ? value.showSummary
         : true;
 
+    // Extract summary object if present
+    const summary =
+      "summary" in value &&
+      typeof value.summary === "object" &&
+      value.summary !== null &&
+      !Array.isArray(value.summary)
+        ? validateSummary(value.summary)
+        : undefined;
+
     const validItems = items
       .map((item: WidgetData) => validateCodeQualityItem(item))
       .filter((item): item is CodeQualityItem => item !== null);
@@ -82,10 +104,59 @@ export function extractCodeQualityListData(
           ? groupBy
           : undefined,
       showSummary,
+      summary,
     };
   }
 
   return null;
+}
+
+/**
+ * Validate summary object
+ */
+function validateSummary(summary: WidgetData): CodeQualitySummary | undefined {
+  if (
+    typeof summary !== "object" ||
+    summary === null ||
+    Array.isArray(summary)
+  ) {
+    return undefined;
+  }
+
+  const totalIssues =
+    "totalIssues" in summary && typeof summary.totalIssues === "number"
+      ? summary.totalIssues
+      : 0;
+  const totalFiles =
+    "totalFiles" in summary && typeof summary.totalFiles === "number"
+      ? summary.totalFiles
+      : 0;
+  const totalErrors =
+    "totalErrors" in summary && typeof summary.totalErrors === "number"
+      ? summary.totalErrors
+      : 0;
+  const displayedIssues =
+    "displayedIssues" in summary && typeof summary.displayedIssues === "number"
+      ? summary.displayedIssues
+      : 0;
+  const displayedFiles =
+    "displayedFiles" in summary && typeof summary.displayedFiles === "number"
+      ? summary.displayedFiles
+      : 0;
+  const truncatedMessage =
+    "truncatedMessage" in summary &&
+    typeof summary.truncatedMessage === "string"
+      ? summary.truncatedMessage
+      : undefined;
+
+  return {
+    totalIssues,
+    totalFiles,
+    totalErrors,
+    displayedIssues,
+    displayedFiles,
+    truncatedMessage,
+  };
 }
 
 /**

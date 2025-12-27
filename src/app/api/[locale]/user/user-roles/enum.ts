@@ -30,6 +30,7 @@ export const {
   CLI_AUTH_BYPASS: "app.api.user.userRoles.enums.userRole.cliAuthBypass",
   AI_TOOL_OFF: "app.api.user.userRoles.enums.userRole.aiToolOff",
   WEB_OFF: "app.api.user.userRoles.enums.userRole.webOff",
+  MCP_OFF: "app.api.user.userRoles.enums.userRole.mcpOff",
   PRODUCTION_OFF: "app.api.user.userRoles.enums.userRole.productionOff",
 });
 
@@ -74,6 +75,7 @@ export function isPlatformMarker(
     role === PlatformMarker.CLI_OFF ||
     role === PlatformMarker.WEB_OFF ||
     role === PlatformMarker.AI_TOOL_OFF ||
+    role === PlatformMarker.MCP_OFF ||
     role === PlatformMarker.PRODUCTION_OFF ||
     role === PlatformMarker.CLI_AUTH_BYPASS
   );

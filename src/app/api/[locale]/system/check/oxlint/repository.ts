@@ -149,7 +149,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       for (const targetPath of targetPaths) {
         const pathFiles = await discoverFiles(targetPath, logger, {
           extensions: this.config.oxlint.lintableExtensions,
-          ignores: this.config.oxlint.ignores || [],
+          ignores: this.config.oxlint.ignorePatterns || [],
         });
         filesToLint.push(...pathFiles);
       }
@@ -529,13 +529,14 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       });
 
       let output = "";
+      let stderrOutput = "";
 
       child.stdout?.on("data", (data: Buffer) => {
         output += data.toString();
       });
 
-      child.stderr?.on("data", () => {
-        // Ignore stderr for oxlint output
+      child.stderr?.on("data", (data: Buffer) => {
+        stderrOutput += data.toString();
       });
 
       child.on("close", (code) => {
@@ -543,7 +544,9 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         // Unlike ESLint, oxlint doesn't output valid results on fatal errors
         // So we only accept 0 and 1, reject on code >= 2
         if (code !== null && code >= 2) {
-          reject(new Error(createWorkerExitCodeMessage(task.id, code)));
+          const errorMsg =
+            stderrOutput.trim() || createWorkerExitCodeMessage(task.id, code);
+          reject(new Error(errorMsg));
         } else {
           resolve(output);
         }

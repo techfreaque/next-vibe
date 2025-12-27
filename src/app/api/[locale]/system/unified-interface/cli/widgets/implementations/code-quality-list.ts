@@ -7,6 +7,7 @@
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   type CodeQualityItem,
+  type CodeQualitySummary,
   countCodeQualityBySeverity,
   extractCodeQualityListData,
   groupCodeQualityItems,
@@ -75,9 +76,33 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
       output += "\n";
     }
 
+    // Add truncation notice if issues were limited
+    if (data.summary) {
+      const isTruncated =
+        data.summary.displayedIssues < data.summary.totalIssues ||
+        data.summary.displayedFiles < data.summary.totalFiles;
+      if (isTruncated) {
+        const hiddenIssues =
+          data.summary.totalIssues - data.summary.displayedIssues;
+        const hiddenFiles =
+          data.summary.totalFiles - data.summary.displayedFiles;
+        const hiddenErrors =
+          data.summary.totalErrors -
+          data.items.filter((item) => item.severity === "error").length;
+
+        const infoIcon = context.options.useEmojis ? "ℹ️ " : "";
+        const truncationMsg = this.styleText(
+          `${infoIcon}+ ${hiddenIssues} more issue${hiddenIssues !== 1 ? "s" : ""} from ${hiddenFiles} more file${hiddenFiles !== 1 ? "s" : ""} (${hiddenErrors} error${hiddenErrors !== 1 ? "s" : ""})`,
+          "dim",
+          context,
+        );
+        output += `${truncationMsg}\n\n`;
+      }
+    }
+
     // Add summary statistics
     if (config.showSummary) {
-      output += this.renderSummary(data.items, groups, context);
+      output += this.renderSummary(data.items, groups, context, data.summary);
     }
 
     return output.trim();
@@ -208,11 +233,12 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
     data: CodeQualityItem[],
     groups: Map<string, CodeQualityItem[]>,
     context: WidgetRenderContext,
+    summary?: CodeQualitySummary,
   ): string {
     let output = "\n";
 
     // Affected Files List
-    output += this.renderAffectedFilesList(groups, context);
+    output += this.renderAffectedFilesList(groups, context, summary);
     output += "\n\n";
 
     // Summary Header
@@ -224,16 +250,47 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
     const separator = "─".repeat(50);
     output += `${this.styleText(separator, "dim", context)}\n`;
 
-    // Calculate stats using shared logic
-    const totalFiles = groups.size;
-    const totalIssues = data.length;
-    const severityCounts = countCodeQualityBySeverity(data);
-    const errors = severityCounts.error;
-    const warnings = severityCounts.warning;
+    // Use summary object if available, otherwise calculate from displayed data
+    let totalFiles: number;
+    let totalIssues: number;
+    let displayedFiles: number;
+    let displayedIssues: number;
+    let errors: number;
+    let warnings: number;
+    let isTruncated = false;
 
-    // Display stats
-    output += `   ${this.styleText("Files:", "dim", context).padEnd(12)} ${totalFiles}\n`;
-    output += `   ${this.styleText("Issues:", "dim", context).padEnd(12)} ${totalIssues}\n`;
+    if (summary) {
+      // Use the summary object from the response
+      totalFiles = summary.totalFiles;
+      totalIssues = summary.totalIssues;
+      displayedFiles = summary.displayedFiles;
+      displayedIssues = summary.displayedIssues;
+      errors = summary.totalErrors;
+      isTruncated =
+        displayedIssues < totalIssues || displayedFiles < totalFiles;
+
+      // Calculate warnings from total - errors
+      const severityCounts = countCodeQualityBySeverity(data);
+      warnings = severityCounts.warning;
+    } else {
+      // Fallback: calculate from displayed data
+      totalFiles = groups.size;
+      totalIssues = data.length;
+      displayedFiles = totalFiles;
+      displayedIssues = totalIssues;
+      const severityCounts = countCodeQualityBySeverity(data);
+      errors = severityCounts.error;
+      warnings = severityCounts.warning;
+    }
+
+    // Display stats with truncation info if applicable
+    if (isTruncated) {
+      output += `   ${this.styleText("Files:", "dim", context).padEnd(12)} ${displayedFiles} of ${totalFiles}\n`;
+      output += `   ${this.styleText("Issues:", "dim", context).padEnd(12)} ${displayedIssues} of ${totalIssues}\n`;
+    } else {
+      output += `   ${this.styleText("Files:", "dim", context).padEnd(12)} ${totalFiles}\n`;
+      output += `   ${this.styleText("Issues:", "dim", context).padEnd(12)} ${totalIssues}\n`;
+    }
 
     // Error count with color and icon
     if (errors > 0) {
@@ -257,6 +314,11 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
       output += `   ${warnIcon}${warnText}\n`;
     }
 
+    // Show truncation message if applicable
+    if (isTruncated && summary?.truncatedMessage) {
+      output += `\n   ${this.styleText(summary.truncatedMessage, "dim", context)}\n`;
+    }
+
     return output;
   }
 
@@ -266,6 +328,7 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
   private renderAffectedFilesList(
     groups: Map<string, CodeQualityItem[]>,
     context: WidgetRenderContext,
+    summary?: CodeQualitySummary,
   ): string {
     let output = "";
 
@@ -313,6 +376,20 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
       const countText =
         countParts.length > 0 ? countParts.join(", ") : "0 issues";
       output += `   ${displayPath} (${countText})\n`;
+    }
+
+    // Add truncation info if files were limited
+    if (summary) {
+      const isTruncated = summary.displayedFiles < summary.totalFiles;
+      if (isTruncated) {
+        const hiddenFiles = summary.totalFiles - summary.displayedFiles;
+        const truncationText = this.styleText(
+          `   + ${hiddenFiles} more file${hiddenFiles !== 1 ? "s" : ""} not shown`,
+          "dim",
+          context,
+        );
+        output += `${truncationText}\n`;
+      }
     }
 
     return output;

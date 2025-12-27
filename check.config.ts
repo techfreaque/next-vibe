@@ -98,8 +98,8 @@ const config = (): CheckConfig => {
     configPath: ".tmp/.oxlintrc.json",
     cachePath: ".tmp/oxlint-cache",
     lintableExtensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
-    $schema: "https://docs.rs/oxc_linter/latest/oxc_linter/schema.json",
-    ignores: oxlintIgnores,
+    $schema: "./node_modules/oxlint/configuration_schema.json",
+    ignorePatterns: oxlintIgnores,
     plugins: [
       "typescript",
       "oxc",

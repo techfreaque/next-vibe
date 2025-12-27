@@ -101,8 +101,8 @@ export interface OxlintJsPlugin {
 /** Optional oxlint settings (shared between enabled/disabled) */
 interface OxlintConfigOptions {
   $schema?: string;
-  /** Patterns to ignore */
-  ignores?: string[];
+  /** File patterns to ignore (globs) - resolves relative to config file */
+  ignorePatterns?: string[];
   /** Built-in oxlint plugins (e.g., "react", "typescript", "jsx-a11y") */
   plugins?: string[];
   /** Custom JS plugins - string paths or objects with path+options for future oxlint native support */

@@ -189,8 +189,10 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     // Get full endpoints with field information for proper schema generation
     const endpoints = mcpRegistry.getEndpoints(this.user, this.logger);
 
-    // Convert to MCP tool format with proper JSON Schema
-    const tools = endpoints.map((endpoint) => endpointToMCPTool(endpoint));
+    // Convert to MCP tool format with proper JSON Schema and translated descriptions
+    const tools = endpoints.map((endpoint) =>
+      endpointToMCPTool(endpoint, this.locale),
+    );
 
     this.logger.info("[MCP Protocol] Tools listed", {
       count: tools.length,

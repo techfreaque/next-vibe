@@ -215,9 +215,13 @@ export class VersionService implements IVersionService {
     let finalVersion: string;
 
     if (requestedIncrement) {
-      // User specified an increment
+      // User specified an increment - bump from whichever is newer: git tag or configured version
+      const baseVersion =
+        this.compareVersions(currentVersion, currentGitVersion) > 0
+          ? currentVersion
+          : currentGitVersion;
       finalVersion = this.bumpVersion(
-        currentGitVersion,
+        baseVersion,
         requestedIncrement,
         prereleaseId ?? releaseConfig.prereleaseId,
       );

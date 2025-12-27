@@ -125,12 +125,24 @@ class PermissionsRegistry implements IPermissionsRegistry {
 
     switch (platformStr) {
       case "cli":
-      case "mcp":
         if (platformMarkers.includes(PlatformMarker.CLI_OFF)) {
           return {
             allowed: false,
             reason: `Endpoint is not accessible via ${platformStr.toUpperCase()} platform`,
             blockedByRole: PlatformMarker.CLI_OFF,
+          };
+        }
+        break;
+
+      case "mcp":
+        if (
+          platformMarkers.includes(PlatformMarker.MCP_OFF) ||
+          platformMarkers.includes(PlatformMarker.CLI_OFF)
+        ) {
+          return {
+            allowed: false,
+            reason: `Endpoint is not accessible via ${platformStr.toUpperCase()} platform`,
+            blockedByRole: PlatformMarker.MCP_OFF,
           };
         }
         break;

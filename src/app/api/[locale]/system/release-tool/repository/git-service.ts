@@ -263,82 +263,139 @@ export class GitService implements IGitService {
     const signTag = config?.signTag ?? false;
     const signCommit = config?.signCommit ?? false;
 
-    try {
-      // Stage all changes (package.json version bump, etc.)
-      if (dryRun) {
-        logger.info(MESSAGES.DRY_RUN_MODE, { action: "git add ." });
-      } else {
-        execSync("git add .", { cwd, stdio: "pipe" });
-      }
-
-      // Create commit with version
-      const finalMessage = commitMessage.replace(
-        // eslint-disable-next-line no-template-curly-in-string -- Intentional commit message template
-        "${version}",
-        tag.replace(/^v/, ""),
-      );
-
-      if (dryRun) {
-        logger.info(MESSAGES.DRY_RUN_MODE, {
-          action: `git commit -m "${finalMessage}"`,
+    // Stage all changes (package.json version bump, etc.)
+    if (dryRun) {
+      logger.info(MESSAGES.DRY_RUN_MODE, { action: "git add ." });
+    } else {
+      try {
+        execSync("git add .", { cwd, encoding: "utf8" });
+        logger.debug("git add successful", { cwd });
+      } catch (err) {
+        const error = err as { stderr?: Buffer | string; message?: string };
+        const stderr = error.stderr
+          ? error.stderr.toString()
+          : error.message || String(err);
+        logger.error("git add failed", { stderr, cwd });
+        return fail({
+          message: "app.api.system.releaseTool.errors.gitAddFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { error: stderr },
         });
-      } else {
-        const commitFlags = signCommit ? "-S" : "";
-        try {
-          execSync(
-            `git commit ${commitFlags} -m "${finalMessage}" --allow-empty`,
-            {
-              cwd,
-              stdio: "pipe",
-            },
-          );
-        } catch {
-          // May fail if nothing to commit - that's OK
-        }
       }
+    }
 
-      // Create tag
-      if (!skipTag) {
-        if (dryRun) {
-          logger.info(MESSAGES.DRY_RUN_MODE, { action: `git tag ${tag}` });
-        } else {
-          const tagFlags = signTag ? "-s" : "-a";
+    // Create commit with version
+    const finalMessage = commitMessage.replace(
+      // eslint-disable-next-line no-template-curly-in-string -- Intentional commit message template
+      "${version}",
+      tag,
+    );
+
+    if (dryRun) {
+      logger.info(MESSAGES.DRY_RUN_MODE, {
+        action: `git commit -m "${finalMessage}"`,
+      });
+    } else {
+      const commitFlags = signCommit ? "-S" : "";
+      try {
+        execSync(
+          `git commit ${commitFlags} -m "${finalMessage}" --allow-empty`,
+          {
+            cwd,
+            encoding: "utf8",
+          },
+        );
+        logger.debug("git commit successful", { message: finalMessage });
+      } catch (err) {
+        // May fail if nothing to commit - that's OK
+        const error = err as { stderr?: Buffer | string; message?: string };
+        const stderr = error.stderr
+          ? error.stderr.toString()
+          : error.message || String(err);
+        logger.debug("git commit had no changes or failed (continuing)", {
+          stderr,
+        });
+      }
+    }
+
+    // Create tag
+    if (!skipTag) {
+      if (dryRun) {
+        logger.info(MESSAGES.DRY_RUN_MODE, { action: `git tag ${tag}` });
+      } else {
+        const tagFlags = signTag ? "-s" : "-a";
+        try {
           execSync(`git tag ${tagFlags} ${tag} -m "Release ${tag}"`, {
             cwd,
-            stdio: "pipe",
+            encoding: "utf8",
           });
           logger.info(MESSAGES.GIT_TAG_CREATED, { tag });
-        }
-      }
-
-      // Push to remote
-      if (!skipPush) {
-        if (dryRun) {
-          logger.info(MESSAGES.DRY_RUN_MODE, {
-            action: `git push ${remote} && git push ${remote} ${tag}`,
+        } catch (err) {
+          const error = err as { stderr?: Buffer | string; message?: string };
+          const stderr = error.stderr
+            ? error.stderr.toString()
+            : error.message || String(err);
+          logger.error("git tag failed", { stderr, tag, cwd });
+          return fail({
+            message: "app.api.system.releaseTool.errors.gitTagFailed",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: { tag, error: stderr },
           });
-        } else {
-          // Push commits
-          execSync(`git push ${remote}`, { cwd, stdio: "pipe" });
-
-          // Push tag if created
-          if (!skipTag) {
-            execSync(`git push ${remote} ${tag}`, { cwd, stdio: "pipe" });
-          }
-
-          logger.info(MESSAGES.GIT_PUSH_SUCCESS, { remote });
         }
       }
-
-      return success();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      return fail({
-        message: "app.api.system.releaseTool.errors.gitOperationFailed",
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: message },
-      });
     }
+
+    // Push to remote
+    if (!skipPush) {
+      if (dryRun) {
+        logger.info(MESSAGES.DRY_RUN_MODE, {
+          action: `git push ${remote} && git push ${remote} ${tag}`,
+        });
+      } else {
+        // Push commits
+        try {
+          execSync(`git push ${remote}`, { cwd, encoding: "utf8" });
+          logger.debug("git push successful", { remote });
+        } catch (err) {
+          const error = err as { stderr?: Buffer | string; message?: string };
+          const stderr = error.stderr
+            ? error.stderr.toString()
+            : error.message || String(err);
+          logger.error("git push failed", { stderr, remote, cwd });
+          return fail({
+            message: "app.api.system.releaseTool.errors.gitPushFailed",
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: { remote, error: stderr },
+          });
+        }
+
+        // Push tag if created
+        if (!skipTag) {
+          try {
+            execSync(`git push ${remote} ${tag}`, { cwd, encoding: "utf8" });
+            logger.debug("git push tag successful", { remote, tag });
+          } catch (err) {
+            const error = err as {
+              stderr?: Buffer | string;
+              message?: string;
+            };
+            const stderr = error.stderr
+              ? error.stderr.toString()
+              : error.message || String(err);
+            logger.error("git push tag failed", { stderr, remote, tag, cwd });
+            return fail({
+              message: "app.api.system.releaseTool.errors.gitPushTagFailed",
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              messageParams: { tag, remote, error: stderr },
+            });
+          }
+        }
+
+        logger.info(MESSAGES.GIT_PUSH_SUCCESS, { remote });
+      }
+    }
+
+    return success();
   }
 }
 

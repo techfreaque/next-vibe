@@ -5,7 +5,7 @@
 
 import { join } from "node:path";
 
-import { confirm } from "@inquirer/prompts";
+import { confirm, select } from "@inquirer/prompts";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -148,7 +148,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
       const skipGitTag = data.skipGitTag ?? false;
       const skipGitPush = data.skipGitPush ?? false;
       const targetPackage = data.targetPackage;
-      const versionIncrement = data.versionIncrement;
+      let versionIncrement = data.versionIncrement;
       const prereleaseId = data.prereleaseId;
       const notifyWebhook = data.notifyWebhook;
       const packageManager = config.packageManager ?? "bun";
@@ -217,7 +217,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
       if (!forceUpdateExplicitlySet && !isCI) {
         const shouldUpdate = await confirm({
           message: "Update dependencies before release?",
-          default: true,
+          default: false,
         });
 
         if (shouldUpdate) {
@@ -633,6 +633,19 @@ export class ReleaseExecutor implements IReleaseExecutor {
         // Handle release
         const releaseConfig = pkg.release;
         if (releaseConfig) {
+          // Ask for version increment if not provided and not in CI
+          if (!versionIncrement && !isCI) {
+            versionIncrement = await select({
+              message: "Select version increment:",
+              choices: [
+                { name: "Patch (0.0.X)", value: "patch" },
+                { name: "Minor (0.X.0)", value: "minor" },
+                { name: "Major (X.0.0)", value: "major" },
+              ],
+              default: "patch",
+            });
+          }
+
           const versionInfo = versionService.getVersionInfo(
             logger,
             pkg,
@@ -779,22 +792,74 @@ export class ReleaseExecutor implements IReleaseExecutor {
             logger.vibe(formatProgress(`Releasing ${packageJson.name}...`));
 
             // Build effective git config with request overrides
-            const effectiveGitConfig: GitOpsConfig = {
+            let effectiveGitConfig: GitOpsConfig = {
               ...releaseConfig.git,
               skipTag: skipGitTag || releaseConfig.git?.skipTag,
               skipPush: skipGitPush || releaseConfig.git?.skipPush,
             };
 
-            // Use git service for tag creation
-            const tagResult = gitService.createTag(
-              versionInfo.newTag,
-              cwd,
-              logger,
-              dryRun,
-              effectiveGitConfig,
-            );
-            if (handleFailure(tagResult, "Git tag creation")) {
-              continue;
+            // Interactive git prompts (only if not CI and not explicitly skipped)
+            if (!isCI && !dryRun) {
+              // Check if there are uncommitted changes
+              const hasChanges = globalGitInfo?.hasUncommittedChanges ?? false;
+
+              // Ask about git commit only if there are changes
+              if (!effectiveGitConfig.skipTag && hasChanges) {
+                const shouldCommit = await confirm({
+                  message: `Version updated to ${versionInfo.newVersion} in package.json and release.config.ts. Commit these changes?`,
+                  default: true,
+                });
+
+                if (!shouldCommit) {
+                  logger.vibe(
+                    formatWarning(
+                      "Continuing without committing version changes",
+                    ),
+                  );
+                  // User chose not to commit, but we continue
+                }
+              }
+
+              // Ask about creating git tag
+              if (!effectiveGitConfig.skipTag) {
+                const shouldTag = await confirm({
+                  message: `Create git tag ${versionInfo.newTag}?`,
+                  default: true,
+                });
+
+                if (!shouldTag) {
+                  logger.vibe(formatSkip("Skipping git tag creation"));
+                  effectiveGitConfig.skipTag = true;
+                  effectiveGitConfig.skipPush = true;
+                }
+              }
+
+              // Ask about pushing to remote
+              if (!effectiveGitConfig.skipPush && !effectiveGitConfig.skipTag) {
+                const shouldPush = await confirm({
+                  message: `Push tag ${versionInfo.newTag} to ${effectiveGitConfig.remote || "origin"}?`,
+                  default: true,
+                });
+
+                if (!shouldPush) {
+                  logger.vibe(formatSkip("Skipping git push"));
+                  effectiveGitConfig.skipPush = true;
+                }
+              }
+            }
+
+            // Use git service for tag creation (if not skipped)
+            if (!effectiveGitConfig.skipTag) {
+              const tagResult = gitService.createTag(
+                versionInfo.newTag,
+                cwd,
+                logger,
+                dryRun,
+                effectiveGitConfig,
+              );
+              if (handleFailure(tagResult, "Git tag creation")) {
+                continue;
+              }
             }
 
             // Update global git info with new tag
@@ -802,8 +867,26 @@ export class ReleaseExecutor implements IReleaseExecutor {
               globalGitInfo.newTag = versionInfo.newTag;
             }
 
+            // Ask about npm publish in interactive mode
+            let shouldPublish = true;
+            if (
+              !isCI &&
+              !skipPublish &&
+              !dryRun &&
+              releaseConfig.npm?.enabled !== false
+            ) {
+              shouldPublish = await confirm({
+                message: `Publish ${packageJson.name}@${versionInfo.newVersion} to npm?`,
+                default: true,
+              });
+
+              if (!shouldPublish) {
+                logger.vibe(formatSkip("Skipping npm publish"));
+              }
+            }
+
             // Run CI release command or npm publish
-            if (isCI && releaseConfig.ciReleaseCommand) {
+            if (isCI && releaseConfig.ciReleaseCommand && shouldPublish) {
               const ciResult = publisher.runCiReleaseCommand(
                 releaseConfig,
                 packageJson.name,
@@ -813,7 +896,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               if (handleFailure(ciResult, "CI release command")) {
                 continue;
               }
-            } else if (releaseConfig.npm?.enabled !== false) {
+            } else if (releaseConfig.npm?.enabled !== false && shouldPublish) {
               const npmResult = publisher.publishToNpm(
                 cwd,
                 packageJson,

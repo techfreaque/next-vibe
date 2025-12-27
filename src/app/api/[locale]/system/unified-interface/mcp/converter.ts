@@ -6,6 +6,8 @@ import { zodSchemaToJsonSchema } from "@/app/api/[locale]/system/unified-interfa
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import type { MCPTool } from "./types";
 
@@ -18,11 +20,12 @@ function toolNameToApiPath(toolName: string): string {
 }
 
 /**
- * Generate input schema from endpoint fields
+ * Generate input schema from endpoint fields with descriptions
  * Combines RequestData and RequestUrlParams for MCP tools
  */
 function generateInputSchema(
   endpoint: CreateApiEndpointAny,
+  locale: CountryLanguage,
 ): z.ZodObject<Record<string, z.ZodTypeAny>> {
   if (!endpoint.fields) {
     return z.object({});
@@ -54,26 +57,84 @@ function generateInputSchema(
       return z.object({});
     }
 
-    return z.object(combinedShape);
+    // Add descriptions from field metadata
+    const shapeWithDescriptions = addFieldDescriptions(
+      combinedShape,
+      endpoint.fields,
+      locale,
+    );
+
+    return z.object(shapeWithDescriptions);
   } catch {
     return z.object({});
   }
 }
 
 /**
+ * Add descriptions to schema fields from endpoint field metadata
+ */
+function addFieldDescriptions(
+  shape: Record<string, z.ZodTypeAny>,
+  fields: CreateApiEndpointAny["fields"],
+  locale: CountryLanguage,
+): Record<string, z.ZodTypeAny> {
+  if (!fields || fields.type !== "object" || !fields.children) {
+    return shape;
+  }
+
+  const { t } = simpleT(locale);
+  const enhancedShape: Record<string, z.ZodTypeAny> = {};
+
+  for (const [key, schema] of Object.entries(shape)) {
+    const fieldDef = fields.children[key];
+    if (!fieldDef || fieldDef.type === "widget") {
+      enhancedShape[key] = schema;
+      continue;
+    }
+
+    // Get description from field UI config
+    let description: string | undefined;
+    if (
+      fieldDef.ui &&
+      "description" in fieldDef.ui &&
+      fieldDef.ui.description
+    ) {
+      const descKey = fieldDef.ui.description as string;
+      description = t(descKey);
+    }
+
+    // Add description to schema
+    enhancedShape[key] = description ? schema.describe(description) : schema;
+  }
+
+  return enhancedShape;
+}
+
+/**
  * Convert endpoint to MCP tool format
  * Uses shared zodSchemaToJsonSchema for consistent schema conversion
  */
-export function endpointToMCPTool(endpoint: CreateApiEndpointAny): MCPTool {
+export function endpointToMCPTool(
+  endpoint: CreateApiEndpointAny,
+  locale: CountryLanguage,
+): MCPTool {
   const toolName = `${endpoint.path.join("_")}_${endpoint.method.toUpperCase()}`;
   const apiPath = toolNameToApiPath(toolName);
-  const description = `${String(endpoint.description || endpoint.title)}\n📁 ${apiPath}`;
 
-  // Generate Zod schema from endpoint fields
-  const zodSchema = generateInputSchema(endpoint);
+  // Translate description and title keys
+  const { t } = simpleT(locale);
+  const descriptionKey = endpoint.description || endpoint.title;
+  const translatedDescription = descriptionKey ? t(descriptionKey) : "";
+
+  const description = translatedDescription
+    ? `${translatedDescription}\n📁 ${apiPath}`
+    : apiPath;
+
+  // Generate Zod schema from endpoint fields with translated descriptions
+  const zodSchema = generateInputSchema(endpoint, locale);
 
   // Convert to JSON Schema using shared utility
-  // z.toJSONSchema automatically handles transforms
+  // z.toJSONSchema automatically handles transforms and includes descriptions
   const jsonSchema = zodSchemaToJsonSchema(zodSchema);
 
   return {

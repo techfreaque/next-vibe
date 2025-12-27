@@ -11,6 +11,7 @@
   "oxc.enable": true,
   "oxc.lint.run": "onSave",
   "oxc.configPath": ".tmp/.oxlintrc.json",
+  "oxc.fmt.experimental": true,
   "oxc.fmt.configPath": ".tmp/.oxfmtrc.json",
   "oxc.typeAware": true,
   "oxc.fixKind": "safe_fix",
