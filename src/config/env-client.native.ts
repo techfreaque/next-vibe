@@ -12,6 +12,8 @@ const isServer = false;
 const isReactNative = true;
 const isBrowser = false;
 
+export const requireEnvs = true;
+
 export const platform = {
   isServer,
   isReactNative,

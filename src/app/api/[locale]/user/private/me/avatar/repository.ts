@@ -3,7 +3,6 @@
  * Handles user avatar operations
  */
 
-import { revalidatePath } from "next/cache";
 import {
   ErrorResponseTypes,
   fail,

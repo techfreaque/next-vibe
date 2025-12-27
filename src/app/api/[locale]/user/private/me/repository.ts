@@ -6,7 +6,6 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import {
   ErrorResponseTypes,
   fail,

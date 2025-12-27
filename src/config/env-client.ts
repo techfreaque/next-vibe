@@ -12,24 +12,34 @@ const isBrowser = !isServer && typeof document !== "undefined";
 
 export const platform = { isServer, isReactNative: false, isBrowser };
 
+export const requireEnvs = true;
+
 export const { envClient } = defineEnvClient({
   NODE_ENV: {
-    schema: z.enum(Environment),
+    schema: requireEnvs
+      ? z.enum(Environment)
+      : z.enum(Environment).default(Environment.DEVELOPMENT),
     value: process.env.NODE_ENV,
     example: "development",
   },
   NEXT_PUBLIC_APP_URL: {
-    schema: z.string(),
+    schema: requireEnvs ? z.string() : z.string().optional(),
     value: process.env.NEXT_PUBLIC_APP_URL,
     example: "http://localhost:3000",
   },
   NEXT_PUBLIC_TEST_SERVER_URL: {
-    schema: z.string(),
+    schema: requireEnvs ? z.string() : z.string().optional(),
     value: process.env.NEXT_PUBLIC_TEST_SERVER_URL,
     example: "http://localhost:4000",
   },
   NEXT_PUBLIC_DEBUG_PRODUCTION: {
-    schema: z.string().transform((v) => v === "true"),
+    schema: requireEnvs
+      ? z.string().transform((v) => v === "true")
+      : z
+          .string()
+          .optional()
+          .default("false")
+          .transform((v) => v === "true"),
     value: process.env.NEXT_PUBLIC_DEBUG_PRODUCTION,
     example: "false",
   },
