@@ -255,8 +255,10 @@ export function EditSmtpAccountForm({
                 name="password"
                 config={{
                   type: "password",
-                  label: "app.api.emails.smtpClient.edit.id.fields.password.label" as const,
-                  description: "app.api.emails.smtpClient.edit.id.fields.password.description" as const,
+                  label:
+                    "app.api.emails.smtpClient.edit.id.fields.password.label" as const,
+                  description:
+                    "app.api.emails.smtpClient.edit.id.fields.password.description" as const,
                   placeholder:
                     "app.api.emails.smtpClient.edit.id.fields.password.placeholder" as const,
                 }}
