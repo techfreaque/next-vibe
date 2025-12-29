@@ -168,9 +168,9 @@ const test2_1: Test2_1_Result = "✓ PASS";
 // Test 3.1: Can we create an ApiEndpoint with specific ObjectField?
 type Test3_1_Endpoint = ApiEndpoint<
   TranslationKey,
-  "test",
   Methods.POST,
   readonly UserRoleValue[],
+  "test",
   ObjectField<
     {
       name: PrimitiveField<
@@ -189,9 +189,9 @@ type Test3_1_Endpoint = ApiEndpoint<
 type Test3_1_Result =
   Test3_1_Endpoint extends ApiEndpoint<
     TranslationKey,
-    string,
     Methods,
     readonly UserRoleValue[],
+    string,
     any
   >
     ? "✓ PASS"
@@ -201,17 +201,17 @@ const test3_1: Test3_1_Result = "✓ PASS";
 // Test 3.2: Can we create an ApiEndpoint with nested ObjectField?
 type Test3_2_Endpoint = ApiEndpoint<
   TranslationKey,
-  "test",
   Methods.POST,
   readonly UserRoleValue[],
+  "test",
   Test2_1_NestedObjectField
 >;
 type Test3_2_Result =
   Test3_2_Endpoint extends ApiEndpoint<
     TranslationKey,
-    string,
     Methods,
     readonly UserRoleValue[],
+    string,
     any
   >
     ? "✓ PASS"

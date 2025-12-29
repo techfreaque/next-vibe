@@ -128,11 +128,14 @@ export interface EndpointDeleteOptions<TUrlVariables> {
  *
  */
 export interface ApiEndpoint<
-  TScopedTranslationKey extends string,
   TExampleKey extends string,
   TMethod extends Methods,
   TUserRoleValue extends readonly UserRoleValue[],
-  TFields extends UnifiedField<string, z.ZodTypeAny>,
+  TScopedTranslationKey extends string = TranslationKey,
+  TFields extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<
+    TScopedTranslationKey,
+    z.ZodTypeAny
+  >,
 > {
   // Core endpoint metadata - all required for type safety
   readonly method: TMethod;
@@ -403,10 +406,10 @@ export type CreateApiEndpoint<
     InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
   >,
 > = ApiEndpoint<
-  TScopedTranslationKey,
   TExampleKey,
   TMethod,
   TUserRoleValue,
+  TScopedTranslationKey,
   TFields
 > & {
   readonly scopedTranslation: {
@@ -461,28 +464,28 @@ export type CreateEndpointReturnInMethod<
  * Create an endpoint definition with perfect type inference from unified fields
  * Returns both legacy format and new destructured format for maximum compatibility
  *
- * Translation keys are automatically inferred:
- * - If scopedTranslation is provided: keys are constrained to scoped keys
- * - If no scopedTranslation: keys must be valid global TranslationKey
+ * Translation key inference:
+ * - TScopedTranslationKey is inferred from scopedTranslation.ScopedTranslationKey when provided
+ * - Defaults to TranslationKey (global keys) when scopedTranslation is not provided
+ * - NoInfer on title/description/category/tags ensures errors appear at property level
  *
  * Errors appear on the specific property with the invalid key, not as generic "no overload matches"
  */
-
 export function createEndpoint<
   const TExampleKey extends string,
   const TMethod extends Methods,
   const TUserRoleValue extends readonly UserRoleValue[],
-  TScopedTranslationKey extends string = TranslationKey,
+  const TScopedTranslationKey extends string = TranslationKey,
   TFields extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<
     TScopedTranslationKey,
     z.ZodTypeAny
   >,
 >(
   config: ApiEndpoint<
-    TScopedTranslationKey,
     TExampleKey,
     TMethod,
     TUserRoleValue,
+    TScopedTranslationKey,
     TFields
   >,
 ): CreateEndpointReturnInMethod<

@@ -7,7 +7,6 @@ import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interf
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { MCPTool } from "./types";
 
@@ -56,12 +55,12 @@ function generateInputSchema(
     if (Object.keys(combinedShape).length === 0) {
       return z.object({});
     }
-
     // Add descriptions from field metadata
     const shapeWithDescriptions = addFieldDescriptions(
       combinedShape,
       endpoint.fields,
       locale,
+      endpoint,
     );
 
     return z.object(shapeWithDescriptions);
@@ -77,12 +76,12 @@ function addFieldDescriptions(
   shape: Record<string, z.ZodTypeAny>,
   fields: CreateApiEndpointAny["fields"],
   locale: CountryLanguage,
+  endpoint: CreateApiEndpointAny,
 ): Record<string, z.ZodTypeAny> {
   if (!fields || fields.type !== "object" || !fields.children) {
     return shape;
   }
 
-  const { t } = simpleT(locale);
   const enhancedShape: Record<string, z.ZodTypeAny> = {};
 
   for (const [key, schema] of Object.entries(shape)) {
@@ -100,6 +99,8 @@ function addFieldDescriptions(
       fieldDef.ui.description
     ) {
       const descKey = fieldDef.ui.description as string;
+      const { t } = endpoint.scopedTranslation.scopedT(locale);
+
       description = t(descKey);
     }
 
@@ -122,7 +123,7 @@ export function endpointToMCPTool(
   const apiPath = toolNameToApiPath(toolName);
 
   // Translate description and title keys
-  const { t } = simpleT(locale);
+  const { t } = endpoint.scopedTranslation.scopedT(locale);
   const descriptionKey = endpoint.description || endpoint.title;
   const translatedDescription = descriptionKey ? t(descriptionKey) : "";
 

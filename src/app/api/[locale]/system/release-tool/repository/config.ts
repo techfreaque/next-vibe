@@ -67,7 +67,9 @@ export class ConfigLoader implements IConfigLoader {
     }
 
     try {
-      const importedModule = await import(`file://${resolvedConfigPath}`);
+      // Use dynamic path to avoid static analysis - this is intentionally a runtime config load
+      const configUrl = `file://${resolvedConfigPath}`;
+      const importedModule = await import(/* webpackIgnore: true */ configUrl);
 
       if (!isReleaseConfigModule(importedModule)) {
         logger.error(MESSAGES.CONFIG_INVALID, { path: resolvedConfigPath });
