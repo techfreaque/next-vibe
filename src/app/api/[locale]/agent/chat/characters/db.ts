@@ -45,6 +45,7 @@ export const customCharacters = pgTable("custom_characters", {
   // Character details
   name: text("name").notNull(),
   description: text("description").notNull(),
+  tagline: text("tagline").notNull(),
   icon: text("icon").$type<IconKey>().notNull(),
   avatar: text("avatar"), // Optional avatar URL
   systemPrompt: text("system_prompt").notNull(),

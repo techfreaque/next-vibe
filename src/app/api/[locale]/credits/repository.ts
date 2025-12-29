@@ -79,6 +79,8 @@ import {
   creditWallets,
 } from "./db";
 import {
+  CreditPackType,
+  type CreditPackTypeValue,
   CreditTransactionType,
   type CreditTransactionTypeValue,
   CreditTypeIdentifier,
@@ -159,7 +161,10 @@ export class CreditRepository {
   ): Promise<ResponseType<CreditPool>> {
     try {
       // Get user wallet
-      const userWalletResult = await this.getOrCreateUserWallet(userId, logger);
+      const userWalletResult = await CreditRepository.getOrCreateUserWallet(
+        userId,
+        logger,
+      );
       if (!userWalletResult.success) {
         return userWalletResult;
       }
@@ -203,7 +208,8 @@ export class CreditRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditPool>> {
     try {
-      const connectedLeadIds = await this.findConnectedLeads(leadId);
+      const connectedLeadIds =
+        await CreditRepository.findConnectedLeads(leadId);
 
       let leadWallets = await db
         .select()
@@ -211,7 +217,10 @@ export class CreditRepository {
         .where(inArray(creditWallets.leadId, connectedLeadIds));
 
       if (leadWallets.length === 0) {
-        const walletResult = await this.getOrCreateLeadWallet(leadId, logger);
+        const walletResult = await CreditRepository.getOrCreateLeadWallet(
+          leadId,
+          logger,
+        );
         if (!walletResult.success) {
           return walletResult;
         }
@@ -253,11 +262,12 @@ export class CreditRepository {
 
       if (userLink) {
         // Lead is linked to user -> return user's pool
-        return this.getUserPool(userLink.userId, logger);
+        return CreditRepository.getUserPool(userLink.userId, logger);
       }
 
       // Lead is not linked to user -> find lead-to-lead pool
-      const connectedLeadIds = await this.findConnectedLeads(leadId);
+      const connectedLeadIds =
+        await CreditRepository.findConnectedLeads(leadId);
 
       // Get EXISTING wallets for all connected leads
       let leadWallets = await db
@@ -267,7 +277,10 @@ export class CreditRepository {
 
       // If no wallets exist, create wallet for the PRIMARY lead only
       if (leadWallets.length === 0) {
-        const walletResult = await this.getOrCreateLeadWallet(leadId, logger);
+        const walletResult = await CreditRepository.getOrCreateLeadWallet(
+          leadId,
+          logger,
+        );
         if (!walletResult.success) {
           return walletResult;
         }
@@ -359,7 +372,7 @@ export class CreditRepository {
       .where(
         and(
           inArray(creditPacks.walletId, walletIds),
-          eq(creditPacks.type, "subscription"),
+          eq(creditPacks.type, CreditPackType.SUBSCRIPTION),
           not(isNull(creditPacks.expiresAt)),
           lt(creditPacks.expiresAt, now),
           not(eq(creditPacks.remaining, 0)), // Only expire packs with remaining credits
@@ -467,7 +480,7 @@ export class CreditRepository {
     ].filter((id): id is string => id !== undefined);
 
     // AUTOMATIC EXPIRATION: Expire old credits before calculating balance
-    await this.expireExpiredCreditsForWallets(walletIds, logger);
+    await CreditRepository.expireExpiredCreditsForWallets(walletIds, logger);
 
     const currentWallets =
       walletIds.length > 0
@@ -504,12 +517,12 @@ export class CreditRepository {
         );
 
       for (const pack of packs) {
-        if (pack.type === "subscription" && pack.expiresAt) {
+        if (pack.type === CreditPackType.SUBSCRIPTION && pack.expiresAt) {
           totalExpiring += pack.remaining;
           if (!earliestExpiry || pack.expiresAt < earliestExpiry) {
             earliestExpiry = pack.expiresAt;
           }
-        } else if (pack.type === "earned") {
+        } else if (pack.type === CreditPackType.EARNED) {
           totalEarned += pack.remaining;
         } else {
           totalPermanent += pack.remaining;
@@ -767,7 +780,7 @@ export class CreditRepository {
 
     // Create new wallet for lead - ATOMIC operation
     // Always grant 20 free credits for new lead wallets
-    const initialCredits = this.getInitialFreeCredits();
+    const initialCredits = CreditRepository.getInitialFreeCredits();
     const now = new Date();
     const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
@@ -1009,9 +1022,15 @@ export class CreditRepository {
       let poolResult: ResponseType<CreditPool>;
 
       if (identifier.userId) {
-        poolResult = await this.getUserPool(identifier.userId, logger);
+        poolResult = await CreditRepository.getUserPool(
+          identifier.userId,
+          logger,
+        );
       } else if (identifier.leadId) {
-        poolResult = await this.getLeadPool(identifier.leadId, logger);
+        poolResult = await CreditRepository.getLeadPool(
+          identifier.leadId,
+          logger,
+        );
       } else {
         return fail({
           message: "app.api.credits.errors.invalidIdentifier",
@@ -1023,7 +1042,10 @@ export class CreditRepository {
         return poolResult;
       }
 
-      const balance = await this.calculatePoolBalance(poolResult.data, logger);
+      const balance = await CreditRepository.calculatePoolBalance(
+        poolResult.data,
+        logger,
+      );
       return success(balance);
     } catch (error) {
       logger.error("Failed to get balance", parseError(error), {
@@ -1046,7 +1068,7 @@ export class CreditRepository {
   ): Promise<ResponseType<number>> {
     try {
       // Get pool for this lead
-      const poolResult = await this.getLeadPool(leadId, logger);
+      const poolResult = await CreditRepository.getLeadPool(leadId, logger);
       if (!poolResult.success) {
         return poolResult;
       }
@@ -1054,10 +1076,10 @@ export class CreditRepository {
       const pool = poolResult.data;
 
       // Check and reset monthly free credits for entire pool if needed
-      await this.ensureMonthlyFreeCreditsForPool(pool, logger);
+      await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
 
       // Calculate balance across all wallets in pool
-      const balance = await this.calculatePoolBalance(pool, logger);
+      const balance = await CreditRepository.calculatePoolBalance(pool, logger);
       return success(balance.total);
     } catch (error) {
       logger.error("Failed to get lead balance", parseError(error), { leadId });
@@ -1080,9 +1102,12 @@ export class CreditRepository {
       logger.debug("Getting credit balance", { userId: user.id, locale });
       let poolResult: ResponseType<CreditPool>;
       if (user.isPublic) {
-        poolResult = await this.getLeadPoolOnly(user.leadId, logger);
+        poolResult = await CreditRepository.getLeadPoolOnly(
+          user.leadId,
+          logger,
+        );
       } else {
-        poolResult = await this.getUserPool(user.id, logger);
+        poolResult = await CreditRepository.getUserPool(user.id, logger);
       }
 
       if (!poolResult.success) {
@@ -1100,10 +1125,10 @@ export class CreditRepository {
       });
 
       // Check and reset monthly free credits for entire pool if needed
-      await this.ensureMonthlyFreeCreditsForPool(pool, logger);
+      await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
 
       // Calculate balance across all wallets in pool
-      const balance = await this.calculatePoolBalance(pool, logger);
+      const balance = await CreditRepository.calculatePoolBalance(pool, logger);
 
       logger.debug("Calculated balance", {
         total: balance.total,
@@ -1144,16 +1169,22 @@ export class CreditRepository {
 
       if (existingLead) {
         // Get pool for this lead
-        const poolResult = await this.getLeadPool(existingLead.id, logger);
+        const poolResult = await CreditRepository.getLeadPool(
+          existingLead.id,
+          logger,
+        );
         if (!poolResult.success) {
           return poolResult;
         }
 
         // Ensure monthly credits are current for pool
-        await this.ensureMonthlyFreeCreditsForPool(poolResult.data, logger);
+        await CreditRepository.ensureMonthlyFreeCreditsForPool(
+          poolResult.data,
+          logger,
+        );
 
         // Calculate total credits across pool
-        const balance = await this.calculatePoolBalance(
+        const balance = await CreditRepository.calculatePoolBalance(
           poolResult.data,
           logger,
         );
@@ -1180,7 +1211,10 @@ export class CreditRepository {
         .returning();
 
       // Create wallet for new lead
-      const walletResult = await this.getOrCreateLeadWallet(newLead.id, logger);
+      const walletResult = await CreditRepository.getOrCreateLeadWallet(
+        newLead.id,
+        logger,
+      );
       if (!walletResult.success) {
         return walletResult;
       }
@@ -1240,7 +1274,7 @@ export class CreditRepository {
 
       if (identifier.userId) {
         // Add to user wallet (credits are pooled across user + linked leads)
-        walletResult = await this.getOrCreateUserWallet(
+        walletResult = await CreditRepository.getOrCreateUserWallet(
           identifier.userId,
           logger,
         );
@@ -1258,13 +1292,13 @@ export class CreditRepository {
             leadId: identifier.leadId,
             userId: leadLink.userId,
           });
-          walletResult = await this.getOrCreateUserWallet(
+          walletResult = await CreditRepository.getOrCreateUserWallet(
             leadLink.userId,
             logger,
           );
         } else {
           // Lead is not linked - use lead wallet
-          walletResult = await this.getOrCreateLeadWallet(
+          walletResult = await CreditRepository.getOrCreateLeadWallet(
             identifier.leadId!,
             logger,
           );
@@ -1278,18 +1312,18 @@ export class CreditRepository {
       const wallet = walletResult.data;
 
       // Determine pack type and expiration
-      let packType: "subscription" | "permanent" | "bonus";
+      let packType: CreditPackTypeValue;
       let expiresAt: Date | null = null;
 
       if (type === "subscription") {
-        packType = "subscription";
+        packType = CreditPackType.SUBSCRIPTION;
         // Subscription credits expire in 30 days
         expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + 30);
       } else if (type === "permanent") {
-        packType = "permanent";
+        packType = CreditPackType.PERMANENT;
       } else {
-        packType = "bonus";
+        packType = CreditPackType.BONUS;
       }
 
       // Create credit pack
@@ -1315,7 +1349,7 @@ export class CreditRepository {
 
       // Create transaction with typed metadata
       const transactionMetadata =
-        packType === "subscription"
+        packType === CreditPackType.SUBSCRIPTION
           ? {
               subscriptionId: `system_add_${Date.now()}`,
               periodStart: new Date().toISOString(),
@@ -1328,7 +1362,7 @@ export class CreditRepository {
         amount,
         balanceAfter: newBalance,
         type:
-          packType === "subscription"
+          packType === CreditPackType.SUBSCRIPTION
             ? CreditTransactionType.SUBSCRIPTION
             : CreditTransactionType.PURCHASE,
         packId: newPack.id,
@@ -1371,24 +1405,27 @@ export class CreditRepository {
   ): Promise<ResponseType<void>> {
     try {
       // Add to user wallet (credits are pooled across user + linked leads)
-      const walletResult = await this.getOrCreateUserWallet(userId, logger);
+      const walletResult = await CreditRepository.getOrCreateUserWallet(
+        userId,
+        logger,
+      );
       if (!walletResult.success) {
         return walletResult;
       }
 
       const wallet = walletResult.data;
 
-      let packType: "subscription" | "permanent" | "bonus";
+      let packType: CreditPackTypeValue;
       let finalExpiresAt: Date | null = null;
 
       if (type === "subscription") {
-        packType = "subscription";
+        packType = CreditPackType.SUBSCRIPTION;
         finalExpiresAt =
           expiresAt ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
       } else if (type === "permanent") {
-        packType = "permanent";
+        packType = CreditPackType.PERMANENT;
       } else {
-        packType = "bonus";
+        packType = CreditPackType.BONUS;
       }
 
       // Create credit pack with optional session tracking for idempotency
@@ -1479,7 +1516,10 @@ export class CreditRepository {
       let currentLeadId: string | undefined;
 
       if (identifier.userId) {
-        poolResult = await this.getUserPool(identifier.userId, logger);
+        poolResult = await CreditRepository.getUserPool(
+          identifier.userId,
+          logger,
+        );
         // For authenticated users, we need to know which lead is current
         // Get the leadId from identifier or fetch primary lead
         currentLeadId = identifier.leadId;
@@ -1492,7 +1532,10 @@ export class CreditRepository {
           currentLeadId = userLeadLink?.leadId;
         }
       } else {
-        poolResult = await this.getLeadPool(identifier.leadId!, logger);
+        poolResult = await CreditRepository.getLeadPool(
+          identifier.leadId!,
+          logger,
+        );
         currentLeadId = identifier.leadId;
       }
 
@@ -1507,10 +1550,10 @@ export class CreditRepository {
         pool.userWallet?.id,
         ...pool.leadWallets.map((w) => w.id),
       ].filter((id): id is string => id !== undefined);
-      await this.expireExpiredCreditsForWallets(walletIds, logger);
+      await CreditRepository.expireExpiredCreditsForWallets(walletIds, logger);
 
       // Ensure monthly credits are current for ENTIRE pool (pool-aware reset)
-      await this.ensureMonthlyFreeCreditsForPool(pool, logger);
+      await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
 
       // Determine which wallets to deduct from based on user type
       let walletsForDeduction: CreditWallet[];
@@ -1794,7 +1837,7 @@ export class CreditRepository {
             .where(
               and(
                 inArray(creditPacks.walletId, walletIds),
-                eq(creditPacks.type, "earned"),
+                eq(creditPacks.type, CreditPackType.EARNED),
               ),
             )
             .orderBy(creditPacks.createdAt); // FIFO for earned credits
@@ -1922,7 +1965,7 @@ export class CreditRepository {
   > {
     try {
       // Get user pool
-      const poolResult = await this.getUserPool(userId, logger);
+      const poolResult = await CreditRepository.getUserPool(userId, logger);
       if (!poolResult.success) {
         return poolResult;
       }
@@ -1936,10 +1979,13 @@ export class CreditRepository {
       }
 
       // Ensure monthly free credits are reset if needed (new period)
-      await this.ensureMonthlyFreeCreditsForPool(pool, logger);
+      await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
 
       // Refetch pool to get updated period IDs after potential reset
-      const updatedPoolResult = await this.getUserPool(userId, logger);
+      const updatedPoolResult = await CreditRepository.getUserPool(
+        userId,
+        logger,
+      );
       if (!updatedPoolResult.success) {
         return updatedPoolResult;
       }
@@ -2081,8 +2127,19 @@ export class CreditRepository {
     const offset = (page - 1) * limit;
 
     const result = user.id
-      ? await this.getTransactions(user.id, user.leadId, limit, offset, logger)
-      : await this.getTransactionsByLeadId(user.leadId, limit, offset, logger);
+      ? await CreditRepository.getTransactions(
+          user.id,
+          user.leadId,
+          limit,
+          offset,
+          logger,
+        )
+      : await CreditRepository.getTransactionsByLeadId(
+          user.leadId,
+          limit,
+          offset,
+          logger,
+        );
 
     if (!result.success) {
       return result;
@@ -2122,7 +2179,7 @@ export class CreditRepository {
   > {
     try {
       // Get lead pool (lead wallets only, no user wallet)
-      const poolResult = await this.getLeadPoolOnly(leadId, logger);
+      const poolResult = await CreditRepository.getLeadPoolOnly(leadId, logger);
       if (!poolResult.success) {
         return poolResult;
       }
@@ -2130,10 +2187,13 @@ export class CreditRepository {
       const pool = poolResult.data;
 
       // Ensure monthly free credits are reset if needed (new period)
-      await this.ensureMonthlyFreeCreditsForPool(pool, logger);
+      await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
 
       // Refetch pool to get updated period IDs after potential reset
-      const updatedPoolResult = await this.getLeadPoolOnly(leadId, logger);
+      const updatedPoolResult = await CreditRepository.getLeadPoolOnly(
+        leadId,
+        logger,
+      );
       if (!updatedPoolResult.success) {
         return updatedPoolResult;
       }
@@ -2278,7 +2338,7 @@ export class CreditRepository {
   > {
     try {
       // Get user pool (user wallet + all linked lead wallets)
-      const poolResult = await this.getUserPool(userId, logger);
+      const poolResult = await CreditRepository.getUserPool(userId, logger);
       if (!poolResult.success) {
         return poolResult;
       }
@@ -2381,7 +2441,7 @@ export class CreditRepository {
         .from(creditPacks)
         .where(
           and(
-            eq(creditPacks.type, "subscription"),
+            eq(creditPacks.type, CreditPackType.SUBSCRIPTION),
             lt(creditPacks.expiresAt, new Date()),
           ),
         );
@@ -2549,7 +2609,7 @@ export class CreditRepository {
         return { success: false };
       }
 
-      const result = await this.deductCredits(
+      const result = await CreditRepository.deductCredits(
         identifier,
         cost,
         feature,
@@ -2617,7 +2677,7 @@ export class CreditRepository {
         return; // Idempotent - already processed
       }
 
-      const result = await this.addUserCredits(
+      const result = await CreditRepository.addUserCredits(
         userId,
         totalCredits,
         "permanent",
@@ -2664,7 +2724,7 @@ export class CreditRepository {
       });
 
       // Get user pool (this will create user wallet if it doesn't exist)
-      const poolResult = await this.getUserPool(userId, logger);
+      const poolResult = await CreditRepository.getUserPool(userId, logger);
       if (!poolResult.success) {
         logger.error("Failed to get user pool during signup", {
           userId,
@@ -2712,7 +2772,7 @@ export class CreditRepository {
       logger.error("Credit check requires leadId or userId");
       return false;
     }
-    const balanceResult = await this.getBalance(identifier, logger);
+    const balanceResult = await CreditRepository.getBalance(identifier, logger);
     if (!balanceResult.success) {
       return false;
     }
@@ -2737,7 +2797,7 @@ export class CreditRepository {
       };
     }
 
-    const hasSufficient = await this.hasSufficientCredits(
+    const hasSufficient = await CreditRepository.hasSufficientCredits(
       identifier,
       amount,
       logger,
@@ -2749,8 +2809,8 @@ export class CreditRepository {
       };
     }
 
-    const messageId = this.generateMessageId();
-    const result = await this.deductCredits(
+    const messageId = CreditRepository.generateMessageId();
+    const result = await CreditRepository.deductCredits(
       identifier,
       amount,
       modelId,
@@ -2790,7 +2850,10 @@ export class CreditRepository {
   ): Promise<ResponseType<{ packId: string; transactionId: string }>> {
     try {
       // Get or create user wallet
-      const walletResult = await this.getOrCreateUserWallet(userId, logger);
+      const walletResult = await CreditRepository.getOrCreateUserWallet(
+        userId,
+        logger,
+      );
       if (!walletResult.success) {
         return walletResult;
       }
@@ -2804,7 +2867,7 @@ export class CreditRepository {
           walletId: wallet.id,
           originalAmount: amountCents,
           remaining: amountCents,
-          type: "earned",
+          type: CreditPackType.EARNED,
           expiresAt: null,
           source: "referral_earning",
           metadata: {
@@ -2881,7 +2944,10 @@ export class CreditRepository {
     }>
   > {
     try {
-      const walletResult = await this.getOrCreateUserWallet(userId, logger);
+      const walletResult = await CreditRepository.getOrCreateUserWallet(
+        userId,
+        logger,
+      );
       if (!walletResult.success) {
         return walletResult;
       }
@@ -2895,7 +2961,7 @@ export class CreditRepository {
         .where(
           and(
             eq(creditPacks.walletId, wallet.id),
-            eq(creditPacks.type, "earned"),
+            eq(creditPacks.type, CreditPackType.EARNED),
           ),
         );
 
@@ -2947,7 +3013,10 @@ export class CreditRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
-      const walletResult = await this.getOrCreateUserWallet(userId, logger);
+      const walletResult = await CreditRepository.getOrCreateUserWallet(
+        userId,
+        logger,
+      );
       if (!walletResult.success) {
         return walletResult;
       }
@@ -2961,7 +3030,7 @@ export class CreditRepository {
         .where(
           and(
             eq(creditPacks.walletId, wallet.id),
-            eq(creditPacks.type, "earned"),
+            eq(creditPacks.type, CreditPackType.EARNED),
           ),
         )
         .orderBy(creditPacks.createdAt);
@@ -3054,7 +3123,10 @@ export class CreditRepository {
     }>
   > {
     try {
-      const walletResult = await this.getOrCreateUserWallet(userId, logger);
+      const walletResult = await CreditRepository.getOrCreateUserWallet(
+        userId,
+        logger,
+      );
       if (!walletResult.success) {
         return walletResult;
       }

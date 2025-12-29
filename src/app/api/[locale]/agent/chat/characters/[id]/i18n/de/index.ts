@@ -163,4 +163,34 @@ export const translations: typeof enTranslations = {
         "Ihre benutzerdefinierte Charakter wurde erfolgreich aktualisiert",
     },
   },
+  delete: {
+    title: "Charakter löschen",
+    description: "Einen benutzerdefinierten Charakter löschen",
+    container: {
+      title: "Charakter löschen",
+      description: "Diesen benutzerdefinierten Charakter dauerhaft entfernen",
+    },
+    id: {
+      label: "Charakter-ID",
+      description: "Die eindeutige Kennung des zu löschenden Charakters",
+    },
+    errors: {
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Sie sind nicht berechtigt, diesen Charakter zu löschen",
+      },
+      notFound: {
+        title: "Charakter nicht gefunden",
+        description: "Der Charakter, den Sie löschen möchten, existiert nicht",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Ein Fehler ist beim Löschen des Charakters aufgetreten",
+      },
+    },
+    success: {
+      title: "Charakter gelöscht",
+      description: "Der Charakter wurde erfolgreich gelöscht",
+    },
+  },
 };

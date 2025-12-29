@@ -42,4 +42,10 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  widgets: {
+    chart: {
+      noDataAvailable: "Brak dostępnych danych",
+      noDataToDisplay: "Brak danych do wyświetlenia",
+    },
+  },
 };

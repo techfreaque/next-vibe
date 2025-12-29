@@ -31,7 +31,7 @@ function mapVariant(variant: SemanticVariant): BadgeVariant {
 /**
  * Displays a badge for enum values with translation support.
  */
-export function BadgeWidget<TKey extends string>({
+export function BadgeWidget<const TKey extends string>({
   value,
   field,
   context,

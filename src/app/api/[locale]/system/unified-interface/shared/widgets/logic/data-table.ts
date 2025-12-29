@@ -5,7 +5,6 @@
  */
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { UnifiedField } from "../../types/endpoint";
 import { FieldDataType, WidgetType } from "../../types/enums";
@@ -21,9 +20,9 @@ export interface TableRow {
 /**
  * Table column definition
  */
-export interface TableColumn {
+export interface TableColumn<TKey extends string> {
   key: string;
-  label: TranslationKey;
+  label: NoInfer<TKey>;
   type?: FieldDataType;
   width?: string;
   align?: "left" | "center" | "right";
@@ -33,8 +32,8 @@ export interface TableColumn {
 /**
  * Table rendering configuration
  */
-export interface TableRenderConfig {
-  columns: TableColumn[];
+export interface TableRenderConfig<TKey extends string> {
+  columns: TableColumn<TKey>[];
   pagination: { enabled: boolean; pageSize: number };
   sorting: {
     enabled: boolean;
@@ -46,17 +45,17 @@ export interface TableRenderConfig {
 /**
  * Processed data table structure
  */
-export interface ProcessedDataTable {
+export interface ProcessedDataTable<TKey extends string> {
   rows: TableRow[];
-  columns: TableColumn[];
+  columns: TableColumn<TKey>[];
 }
 
 /**
  * Extract and validate data table from WidgetData
  */
-export function extractDataTableData(
+export function extractDataTableData<TKey extends string>(
   value: WidgetData,
-): ProcessedDataTable | null {
+): ProcessedDataTable<TKey> | null {
   // Handle array of objects (auto-detect columns)
   if (Array.isArray(value)) {
     if (value.length === 0) {
@@ -70,9 +69,9 @@ export function extractDataTableData(
       firstRow !== null &&
       !Array.isArray(firstRow)
     ) {
-      const columns = Object.keys(firstRow).map((key) => ({
+      const columns: TableColumn<TKey>[] = Object.keys(firstRow).map((key) => ({
         key,
-        label: key as TranslationKey,
+        label: key as TKey,
       }));
 
       const rows = value.filter(
@@ -121,7 +120,7 @@ export function extractDataTableData(
 
         return { key, label };
       })
-      .filter((col): col is TableColumn => col !== null);
+      .filter((col): col is TableColumn<TKey> => col !== null);
 
     if (validRows.length === 0) {
       return null;
@@ -130,10 +129,12 @@ export function extractDataTableData(
     // If no columns provided, auto-detect from first row
     if (validColumns.length === 0 && validRows.length > 0) {
       const firstRow = validRows[0];
-      const autoColumns = Object.keys(firstRow).map((key) => ({
-        key,
-        label: key as TranslationKey,
-      }));
+      const autoColumns: TableColumn<TKey>[] = Object.keys(firstRow).map(
+        (key) => ({
+          key,
+          label: key as TKey,
+        }),
+      );
       return {
         rows: validRows,
         columns: autoColumns,
@@ -161,8 +162,8 @@ export function getCellValue(row: TableRow, columnKey: string): WidgetData {
  */
 export function getTableConfig<TKey extends string>(
   field: UnifiedField<TKey>,
-): TableRenderConfig {
-  const defaultConfig: TableRenderConfig = {
+): TableRenderConfig<TKey> {
+  const defaultConfig: TableRenderConfig<TKey> = {
     columns: [],
     pagination: { enabled: false, pageSize: 50 },
     sorting: { enabled: false },
@@ -175,7 +176,7 @@ export function getTableConfig<TKey extends string>(
 
   const config = field.ui;
 
-  const columns =
+  const columns: TableColumn<TKey>[] =
     config.columns?.map((col) => ({
       key: col.key,
       label: col.label,
@@ -277,14 +278,14 @@ export function detectFieldType(value: WidgetData): FieldDataType {
 /**
  * Calculate column widths based on content
  */
-export function calculateColumnWidths(
+export function calculateColumnWidths<TKey extends string>(
   data: TableRow[],
-  config: TableRenderConfig,
+  config: TableRenderConfig<TKey>,
   maxWidth: number,
 ): number[] {
   const availableWidth = maxWidth - (config.columns.length - 1) * 3; // Account for separators
 
-  return config.columns.map((col) => {
+  return config.columns.map((col: TableColumn<TKey>) => {
     if (col.width?.endsWith("%")) {
       const percentage = parseInt(col.width.replace("%", ""), 10) / 100;
       return Math.floor(availableWidth * percentage);

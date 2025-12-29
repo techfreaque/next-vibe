@@ -58,7 +58,17 @@ export const translations: typeof enTranslations = {
   },
   response: {
     success: "Konsolen-Nachrichten erfolgreich abgerufen",
-    result: "Ergebnis der Konsolen-Nachrichten-Liste",
+    result: {
+      title: "Ergebnis",
+      description: "Ergebnis der Konsolen-Nachrichten-Liste",
+      messages: {
+        msgid: "Nachrichten-ID",
+        type: "Typ",
+        text: "Nachricht",
+        timestamp: "Zeitstempel",
+      },
+      totalCount: "Gesamtanzahl",
+    },
     error: "Fehlermeldung",
     executionId: "Ausführungs-ID zur Verfolgung",
   },

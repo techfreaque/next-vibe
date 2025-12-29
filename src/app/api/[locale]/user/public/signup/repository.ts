@@ -165,14 +165,14 @@ export class SignupRepositoryImpl implements SignupRepository {
       await LeadAuthRepository.linkLeadToUser(user.leadId, userData.id, logger);
 
       // Link referral code if provided manually in form
-      const { referralRepository } =
+      const { ReferralRepository } =
         await import("../../../referral/repository");
       if (referralCode) {
         logger.debug("Linking manual referral code to lead", {
           referralCode,
           leadId: user.leadId,
         });
-        await referralRepository.linkReferralToLead(
+        await ReferralRepository.linkReferralToLead(
           user.leadId,
           referralCode,
           logger,
@@ -180,7 +180,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       }
 
       // Convert lead referral to user referral (Phase 2: make referral permanent)
-      await referralRepository.convertLeadReferralToUser(
+      await ReferralRepository.convertLeadReferralToUser(
         userData.id,
         user.leadId,
         logger,

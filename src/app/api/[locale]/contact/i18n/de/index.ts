@@ -96,7 +96,7 @@ export const translations: typeof enTranslations = {
 
   response: {
     label: "Kontakt-Einreichung Antwort",
-    description: "Ergebnis der Kontaktformular-Einreichung",
+    description: "Status-Updates für Ihre Kontakt-Einreichung",
     success: "Kontaktformular erfolgreich eingereicht",
     messageId: "Nachrichten-ID zur Verfolgung",
     status: "Aktueller Status des Kontakts",

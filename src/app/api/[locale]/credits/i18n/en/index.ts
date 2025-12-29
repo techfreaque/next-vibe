@@ -172,9 +172,19 @@ export const translations = {
         label: "Offset",
         description: "Number of transactions to skip for pagination",
       },
+      id: "Transaction ID",
+      amount: "Amount",
+      type: "Type",
+      modelId: "Model",
+      messageId: "Message ID",
+      createdAt: "Date",
       transactions: {
         title: "Transactions",
         description: "List of credit transactions",
+      },
+      paginationInfo: {
+        total: "Total Transactions",
+        totalPages: "Total Pages",
       },
       totalCount: {
         content: "Total Count",

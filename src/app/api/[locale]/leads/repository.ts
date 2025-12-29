@@ -1048,7 +1048,7 @@ export class LeadsRepository {
 
       logger.debug("Lead updated successfully (internal)", { id });
 
-      return success(this.formatLeadDetailResponse(updatedLead));
+      return success(LeadsRepository.formatLeadDetailResponse(updatedLead));
     } catch (error) {
       logger.error("Error updating lead (internal)", parseError(error));
       return fail({

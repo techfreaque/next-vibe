@@ -96,6 +96,8 @@ export interface EndpointRendererProps<
   disabled?: boolean;
   /** Full ResponseType<T> from endpoint (includes success/error state) */
   response?: ResponseType<WidgetData>;
+  /** Endpoint mutations for widgets to trigger directly */
+  endpointMutations?: WidgetRenderContext["endpointMutations"];
 }
 
 /**
@@ -103,7 +105,7 @@ export interface EndpointRendererProps<
  * Recursively extracts fields from nested containers, preserving full paths
  * Handles object, object-optional, and object-union types
  */
-function extractAllFields<TKey extends string>(
+function extractAllFields<const TKey extends string>(
   fields: UnifiedField<TKey>,
   parentPath = "",
 ): Array<[string, UnifiedField<TKey>]> {
@@ -190,6 +192,7 @@ export function EndpointRenderer<
   className,
   disabled = false,
   response,
+  endpointMutations,
 }: EndpointRendererProps<TEndpoint, TFieldValues>): JSX.Element {
   // Check if endpoint.fields itself is a container widget
   const isRootContainer =
@@ -220,7 +223,8 @@ export function EndpointRenderer<
     endpointFields: endpoint.fields, // Pass original fields for nested path lookup
     disabled, // Pass disabled state to widgets
     response, // Pass full ResponseType<T> to widgets (includes error state)
-    scopedT: endpoint.scopedTranslation?.scopedT, // Pass scoped translation function for module-specific translations
+    scopedT: endpoint.scopedTranslation.scopedT, // Pass scoped translation function for module-specific translations
+    endpointMutations, // Pass endpoint mutations for widgets to call directly
   };
 
   // Check if there are any request fields

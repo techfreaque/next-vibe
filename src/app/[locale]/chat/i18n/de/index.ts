@@ -44,6 +44,7 @@ export const translations: typeof enTranslations = {
     enableTTSAutoplay: "TTS-Automatische Wiedergabe aktivieren",
     disableTTSAutoplay: "TTS-Automatische Wiedergabe deaktivieren",
     closeSidebar: "Seitenleiste schließen",
+    close: "Schließen",
     showMore: "Mehr anzeigen",
     showLess: "Weniger anzeigen",
     viewFullThread: "Vollständigen Thread anzeigen",
@@ -257,6 +258,8 @@ export const translations: typeof enTranslations = {
     noFoldersAvailable: "Keine Ordner verfügbar",
     stopGeneration: "Generierung stoppen",
     sendMessage: "Nachricht senden",
+    shareThread: "Thread teilen",
+    manageSharing: "Freigabe verwalten",
   },
   chatInterface: {
     chatPrefix: "chat",
@@ -475,6 +478,7 @@ export const translations: typeof enTranslations = {
   },
   selector: {
     loading: "Laden...",
+    noResults: "Keine Ergebnisse gefunden",
     tabs: {
       quick: "Schnell",
       characters: "Characters",
@@ -490,7 +494,8 @@ export const translations: typeof enTranslations = {
       smart: "3-8cr",
       best: "10-20cr",
     },
-    content: {
+    content: "Inhalt",
+    contentLevels: {
       safe: "Sicher",
       open: "Offen",
       unlim: "Unlim",
@@ -592,6 +597,10 @@ export const translations: typeof enTranslations = {
     showMore: "{{count}} weitere anzeigen",
     applyOnce: "Einmal anwenden",
     saveChanges: "Änderungen speichern",
+    useOnce: "Einmal verwenden",
+    saveAsDefault: "Zu Favoriten hinzufügen",
+    deleteSetup: "Setup löschen",
+    characterSetup: "Charakter-Setup",
     separator: " • ",
     // UX improvements v21
     mySetups: "Meine Setups",
@@ -618,6 +627,11 @@ export const translations: typeof enTranslations = {
     comingSoon: "Demnächst verfügbar",
     // Character requirements
     requirements: {
+      characterConflict: "Character-Konflikt",
+      max: "Maximum",
+      min: "Minimum",
+      tooHigh: "Zu hoch",
+      tooLow: "Zu niedrig",
       intelligenceTooLow: "Intelligenz zu niedrig (min: {{min}})",
       intelligenceTooHigh: "Intelligenz zu hoch (max: {{max}})",
       contentTooLow: "Inhaltsebene zu niedrig (min: {{min}})",
@@ -640,6 +654,7 @@ export const translations: typeof enTranslations = {
     },
   },
   onboarding: {
+    back: "Zurück",
     // Screen 1: Story
     story: {
       title: "Sieh uns als dein Team.",
@@ -666,21 +681,16 @@ export const translations: typeof enTranslations = {
       tagline: "Mutig & direkt",
       description: "Wie ein Coach, der dich zu deinem Besten antreibt.",
     },
-    // Screen 3: Specialists peek
+    // Screen 3: Specialists - add to team
     specialists: {
-      title: "Dein Team hat auch Spezialisten",
+      title: "Füge Spezialisten für bestimmte Aufgaben hinzu",
+      subtitle:
+        "Jeder Experte ist für sein Spezialgebiet optimiert. Füge so viele hinzu, wie du möchtest.",
       chosen: "{{name}} ist bereit",
-      intro: "Sie ist bereit zum Chatten. Aber zuerst...",
-      technical: "Techniker",
-      technicalDesc: "Code & Debugging",
-      creative: "Kreativ",
-      creativeDesc: "Schreiben & Ideen",
-      teacher: "Lehrer",
-      teacherDesc: "Lerne alles",
-      challenger: "Herausforderer",
-      challengerDesc: "Teste deine Ideen",
+      add: "Hinzufügen",
+      added: "Hinzugefügt",
       switchTip:
-        "Wechsle jederzeit über den Selektor. Du kannst auch später die Einstellungen anpassen.",
+        "Wechsle jederzeit zwischen deinen Teammitgliedern. Du kannst später mehr anpassen oder hinzufügen.",
       start: "Chat starten",
       browseAll: "Alle Charaktere durchsuchen",
     },
@@ -1012,6 +1022,20 @@ export const translations: typeof enTranslations = {
     education: "Bildung",
     controversial: "Kontrovers",
     lifestyle: "Lebensstil",
+    // Model capabilities/utilities
+    reasoning: "Erweitertes Denkvermögen",
+    roleplay: "Rollenspiel",
+    roleplayDark: "Dunkles Rollenspiel",
+    adultImplied: "Erwachsene/Angedeutete Inhalte",
+    adultExplicit: "Erwachsene/Explizite Inhalte",
+    violence: "Gewalt",
+    harmful: "Potenziell schädliche Inhalte",
+    illegalInfo: "Illegale Informationen",
+    medicalAdvice: "Medizinische Beratung",
+    offensiveLanguage: "Anstößige Sprache",
+    politicalLeft: "Linke politische Ansichten",
+    politicalRight: "Rechte politische Ansichten",
+    conspiracy: "Verschwörungstheorien",
   },
   models: {
     descriptions: {
@@ -1073,6 +1097,12 @@ export const translations: typeof enTranslations = {
         "GPT 5.2 - Modell der neuesten Generation mit verbesserter Leistung und Effizienz",
       gpt52_chat:
         "GPT 5.2 Chat - Konversationsvariante optimiert für Dialog und Interaktionen",
+      veniceUncensored:
+        "Venice Uncensored - Unzensiertes KI-Modell für uneingeschränkte Gespräche",
+      dolphinLlama3_70B:
+        "Dolphin Llama 3 70B - Unzensiertes großes Sprachmodell basierend auf Llama 3",
+      dolphin3_0_r1_mistral_24b:
+        "Dolphin 3.0 R1 Mistral 24B - Unzensiertes großes Sprachmodell basierend auf Mistral",
     },
   },
   tones: {
@@ -1268,6 +1298,8 @@ export const translations: typeof enTranslations = {
     newSubfolder: "Neuer Unterordner",
     deleteFolder: "Ordner löschen",
     managePermissions: "Berechtigungen verwalten",
+    manageSharing: "Freigabe verwalten",
+    shareThread: "Thread teilen",
     deleteDialog: {
       title: "Ordner löschen",
       description: 'Möchten Sie "{{folderName}}" wirklich löschen?',
@@ -1504,6 +1536,58 @@ export const translations: typeof enTranslations = {
       title: "Thread löschen",
       description:
         'Möchten Sie "{{title}}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden und alle Nachrichten in diesem Thread werden dauerhaft gelöscht.',
+    },
+  },
+  shareDialog: {
+    title: "Thread teilen",
+    description: "Teilen-Links für diesen Thread erstellen und verwalten",
+    createLink: "Teilen-Link erstellen",
+    linkCreated: "Teilen-Link erfolgreich erstellt!",
+    linkCopied: "Link in Zwischenablage kopiert!",
+    copyLink: "Link kopieren",
+    shareViaEmail: "Per E-Mail teilen",
+    revokeLink: "Widerrufen",
+    revoke: "Widerrufen",
+    linkRevoked: "Teilen-Link widerrufen",
+    revoked: "Widerrufen",
+    noLinksYet: "Noch keine Teilen-Links. Erstellen Sie einen, um zu teilen.",
+    activeLinks: "Aktive Teilen-Links",
+    existingLinks: "Bestehende Links",
+    linkSettings: "Link-Einstellungen",
+    newLinkSettings: "Neue Link-Einstellungen",
+    linkLabel: "Link-Beschriftung (optional)",
+    linkLabelPlaceholder: "z.B. Mit Team teilen",
+    allowPosting: "Posten erlauben",
+    allowPostingDescription:
+      "Empfänger können antworten und im Thread interagieren",
+    requireAuth: "Anmeldung erforderlich",
+    requireAuthDescription:
+      "Nur authentifizierte Benutzer können auf diesen Link zugreifen",
+    viewOnly: "Nur ansehen",
+    accessCount: "{{count}} Zugriff",
+    accessCount_other: "{{count}} Zugriffe",
+    createdAt: "Erstellt {{date}}",
+    lastAccessed: "Zuletzt aufgerufen {{date}}",
+    neverAccessed: "Nie aufgerufen",
+    emailSubject: "Schauen Sie sich diesen Thread an: {{title}}",
+    emailBody:
+      "Ich dachte, diese Konversation könnte Sie interessieren: {{url}}\n\nThread: {{title}}",
+    emailPlaceholder: "E-Mail-Adressen eingeben (durch Komma getrennt)",
+    sendEmail: "E-Mail",
+    emailSent: "E-Mail erfolgreich gesendet!",
+    create: "Erstellen",
+    creating: "Erstellen...",
+    copied: "Kopiert!",
+    close: "Schließen",
+    shareThread: "Thread teilen",
+  },
+  shared: {
+    error: {
+      title: "Teilen-Link-Fehler",
+      userError:
+        "Ihre Sitzung konnte nicht verifiziert werden. Bitte versuchen Sie es erneut.",
+      invalidToken:
+        "Dieser Teilen-Link ist ungültig oder wurde widerrufen. Bitte kontaktieren Sie die Person, die diesen Link mit Ihnen geteilt hat.",
     },
   },
   welcomeTour: {

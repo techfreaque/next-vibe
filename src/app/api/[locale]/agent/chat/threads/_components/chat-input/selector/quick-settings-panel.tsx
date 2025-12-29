@@ -48,6 +48,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { FavoriteItem } from "./favorites-bar";
 import { getCompatibleModels, selectModelForCharacter } from "./types";
@@ -80,7 +81,7 @@ function FilterPill<T extends string>({
   locale,
 }: {
   value: T;
-  label: string;
+  label: TranslationKey;
   icon: IconKey;
   selected: boolean;
   onClick: () => void;
@@ -378,79 +379,84 @@ export function QuickSettingsPanel({
 
   return (
     <Div className="flex flex-col max-h-[70vh] overflow-hidden">
-      {/* Header - sticky */}
-      <Div className="flex items-center gap-3 p-4 border-b bg-card shrink-0">
+      {/* Header with back and delete */}
+      <Div className="flex items-center justify-between p-3 border-b shrink-0">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="h-8 w-8 shrink-0"
+          className="h-8 w-8"
           onClick={onCancel}
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
 
-        <Div className="flex items-center gap-2 flex-1 min-w-0">
-          <Div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-            <DisplayIcon className="h-5 w-5" />
-          </Div>
-          <Div className="flex flex-col min-w-0">
-            <Span className="font-medium truncate">{displayName}</Span>
-            <Span className="text-xs text-muted-foreground">
-              {isModelOnly
-                ? t("app.chat.selector.editModelSettings")
-                : t("app.chat.selector.editSettings")}
-            </Span>
-          </Div>
-        </Div>
-
-        <Div className="flex items-center gap-2">
-          {/* Switch Character button - only for users with a character and characters available */}
-          {!isModelOnly && onSwitchCharacterView && characters && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-primary shrink-0"
-              onClick={onSwitchCharacterView}
-              title={t("app.chat.selector.switchCharacter")}
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          )}
-
-          {/* Edit Character button - only for authenticated users with a character */}
-          {isAuthenticated && !isModelOnly && onEditCharacter && character && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-primary shrink-0"
-              onClick={() => onEditCharacter(character)}
-              title={t("app.chat.selector.editCharacter")}
-            >
-              <Edit2 className="h-4 w-4" />
-            </Button>
-          )}
-
-          {onDelete && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-destructive hover:text-destructive shrink-0"
-              onClick={onDelete}
-              title={t("app.chat.selector.delete")}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
-        </Div>
+        {onDelete && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-8 text-destructive hover:bg-destructive/10"
+            onClick={onDelete}
+          >
+            <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+            {t("app.chat.selector.deleteSetup")}
+          </Button>
+        )}
       </Div>
 
       {/* Scrollable content */}
       <Div className="flex-1 overflow-y-auto p-4">
         <Div className="flex flex-col gap-5">
+          {/* Character info card - first thing in content */}
+          <Div className="flex flex-col gap-3 p-4 border-2 rounded-xl bg-card">
+            <Div className="flex items-center gap-3">
+              <Div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <DisplayIcon className="h-6 w-6 text-primary" />
+              </Div>
+              <Div className="flex-1 min-w-0">
+                <Span className="font-semibold text-lg block">
+                  {displayName}
+                </Span>
+                <Span className="text-xs text-muted-foreground">
+                  {isModelOnly
+                    ? t("app.chat.selector.modelOnly")
+                    : t("app.chat.selector.characterSetup")}
+                </Span>
+              </Div>
+            </Div>
+
+            {/* Character actions - only switch and edit */}
+            {!isModelOnly && (onSwitchCharacterView || onEditCharacter) && (
+              <Div className="flex gap-2 pt-3 border-t">
+                {onSwitchCharacterView && characters && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 h-9"
+                    onClick={onSwitchCharacterView}
+                  >
+                    <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                    {t("app.chat.selector.switchCharacter")}
+                  </Button>
+                )}
+
+                {isAuthenticated && onEditCharacter && character && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 h-9"
+                    onClick={() => onEditCharacter(character)}
+                  >
+                    <Edit2 className="h-3.5 w-3.5 mr-1.5" />
+                    {t("app.chat.selector.editCharacter")}
+                  </Button>
+                )}
+              </Div>
+            )}
+          </Div>
           {/* Current selection preview - improved visual design */}
           {resolvedModel && (
             <Div className="flex items-center gap-3 p-3 bg-linear-to-r from-primary/10 to-primary/5 border border-primary/25 rounded-xl">
@@ -607,7 +613,6 @@ export function QuickSettingsPanel({
                     className="h-7 text-xs gap-1"
                     onClick={() => {
                       setShowUnfilteredModels(!showUnfilteredModels);
-                      setShowAllModels(false);
                     }}
                   >
                     <Filter className="h-3 w-3" />
@@ -770,25 +775,23 @@ export function QuickSettingsPanel({
       </Div>
 
       {/* Footer actions - sticky */}
-      <Div className="flex items-center gap-2 p-4 border-t bg-card shrink-0">
+      <Div className="flex gap-3 p-4 border-t bg-card shrink-0">
         <Button
           type="button"
           variant="outline"
-          size="sm"
           onClick={handleApplyOnce}
           className="flex-1 h-10"
           disabled={!canSave}
         >
-          {t("app.chat.selector.applyOnce")}
+          {t("app.chat.selector.useOnce")}
         </Button>
         <Button
           type="button"
-          size="sm"
           onClick={handleSave}
           disabled={!canSave}
           className="flex-1 h-10"
         >
-          {t("app.chat.selector.saveChanges")}
+          {t("app.chat.selector.saveAsDefault")}
         </Button>
       </Div>
     </Div>

@@ -8,7 +8,17 @@ export const translations = {
   },
   response: {
     success: "Pages listing operation successful",
-    result: "Result of pages listing",
+    result: {
+      title: "Result",
+      description: "Result of pages listing",
+      pages: {
+        idx: "Index",
+        title: "Title",
+        url: "URL",
+        active: "Active",
+      },
+      totalCount: "Total Count",
+    },
     error: "Error message",
     executionId: "Execution ID for tracking",
   },

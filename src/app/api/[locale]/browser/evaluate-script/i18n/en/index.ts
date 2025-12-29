@@ -16,12 +16,21 @@ export const translations = {
         description:
           "Optional list of arguments (element UIDs) to pass to the function",
         placeholder: '[{"uid": "element-uid"}]',
+        uid: {
+          label: "Element UID",
+          description: "The unique identifier of an element on the page",
+        },
       },
     },
   },
   response: {
     success: "Script evaluation operation successful",
-    result: "Result of the script evaluation",
+    result: {
+      title: "Result",
+      description: "Result of the script evaluation",
+      executed: "Executed",
+      result: "Return Value",
+    },
     error: "Error message",
     executionId: "Execution ID for tracking",
   },

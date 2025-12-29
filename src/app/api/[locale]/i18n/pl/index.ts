@@ -1,5 +1,7 @@
 import { translations as agentTranslations } from "../../agent/i18n/pl";
+import { translations as browserTranslations } from "../../browser/i18n/pl";
 import { translations as contactTranslations } from "../../contact/i18n/pl";
+import { translations as creditsTranslations } from "../../credits/i18n/pl";
 import { translations as emailsTranslations } from "../../emails/i18n/pl";
 import { translations as importTranslations } from "../../import/i18n/pl";
 import { translations as leadsTranslations } from "../../leads/i18n/pl";
@@ -16,10 +18,13 @@ import { translations as subscriptionTranslations } from "../../subscription/i18
 import { translations as systemTranslations } from "../../system/i18n/pl";
 import { translations as userTranslations } from "../../user/i18n/pl";
 import { translations as usersTranslations } from "../../users/i18n/pl";
+import type { translations as enTranslations } from "../en";
 
-export const translations = {
+export const translations: typeof enTranslations = {
   agent: agentTranslations,
+  browser: browserTranslations,
   contact: contactTranslations,
+  credits: creditsTranslations,
   emails: emailsTranslations,
   import: importTranslations,
   leads: leadsTranslations,

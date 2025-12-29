@@ -128,4 +128,4 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-} as const;
+};

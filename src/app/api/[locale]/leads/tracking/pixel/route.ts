@@ -10,7 +10,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { pixelTrackingRepository } from "./repository";
+import { PixelTrackingRepository } from "./repository";
 
 /**
  * GET Handler
@@ -35,5 +35,5 @@ export const GET = (request: NextRequest): Response => {
     localeSegment,
   );
 
-  return pixelTrackingRepository.handlePixelRequest(request, logger);
+  return PixelTrackingRepository.handlePixelRequest(request, logger);
 };

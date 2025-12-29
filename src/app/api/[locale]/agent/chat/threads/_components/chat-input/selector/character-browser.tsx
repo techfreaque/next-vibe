@@ -35,14 +35,17 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { CharacterCategory } from "../../../../characters/enum";
+import type { FavoriteItem } from "./favorites-bar";
 import { selectModelForCharacter } from "./types";
 
 interface CharacterBrowserProps {
   onAddWithDefaults: (characterId: string) => void;
   onCustomize: (characterId: string) => void;
-  onCreateCustom: () => void;
+  onCreateCustom?: () => void;
   onBack?: () => void;
   locale: CountryLanguage;
+  /** Favorites list to track which characters are already added */
+  favorites?: FavoriteItem[];
 }
 
 /**
@@ -78,16 +81,18 @@ function getDefaultContent(
 /**
  * Character list item component - shows character info with description and model
  */
-function CharacterListItem({
+export function CharacterListItem({
   character,
   onAdd,
   onCustomize,
   locale,
+  isAdded = false,
 }: {
   character: Character;
   onAdd: () => void;
-  onCustomize: () => void;
+  onCustomize?: () => void;
   locale: CountryLanguage;
+  isAdded?: boolean;
 }): JSX.Element {
   const { t } = simpleT(locale);
   const Icon = getIconComponent(character.icon);
@@ -119,8 +124,9 @@ function CharacterListItem({
       className={cn(
         "relative flex items-start gap-3 p-3 rounded-xl border transition-all",
         "hover:bg-muted/50 hover:border-primary/20 cursor-pointer group",
+        isAdded && "border-primary bg-primary/5",
       )}
-      onClick={onAdd}
+      onClick={onCustomize ?? onAdd}
     >
       {/* Quick Actions floating on top - always visible on touch devices, hover on desktop */}
       <Div
@@ -129,31 +135,36 @@ function CharacterListItem({
           isTouchDevice ? "opacity-100" : "opacity-0 group-hover:opacity-100",
         )}
       >
+        {onCustomize && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-background"
+            onClick={(e) => {
+              e.stopPropagation();
+              onCustomize();
+            }}
+            title={t("app.chat.selector.customizeSettings")}
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
+        )}
         <Button
           type="button"
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-background"
-          onClick={(e) => {
-            e.stopPropagation();
-            onCustomize();
-          }}
-          title={t("app.chat.selector.customizeSettings")}
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="default"
+          variant={isAdded ? "secondary" : "default"}
           size="sm"
           className="h-8 px-3"
           onClick={(e) => {
             e.stopPropagation();
             onAdd();
           }}
+          disabled={isAdded}
         >
           <Plus className="h-3.5 w-3.5 mr-1" />
-          {t("app.chat.selector.add")}
+          {isAdded
+            ? t("app.api.agent.chat.selector.added")
+            : t("app.api.agent.chat.selector.add")}
         </Button>
       </Div>
 
@@ -195,7 +206,7 @@ function CharacterListItem({
 /**
  * Category section component
  */
-function CategorySection({
+export function CategorySection({
   category,
   characters,
   onAdd,
@@ -203,6 +214,7 @@ function CategorySection({
   onExpand,
   expanded,
   locale,
+  addedCharacterIds,
 }: {
   category: (typeof CharacterCategory)[keyof typeof CharacterCategory];
   characters: readonly Character[];
@@ -211,6 +223,7 @@ function CategorySection({
   onExpand?: () => void;
   expanded: boolean;
   locale: CountryLanguage;
+  addedCharacterIds?: Set<string>;
 }): JSX.Element {
   const { t } = simpleT(locale);
   const config = CATEGORY_CONFIG[category];
@@ -222,26 +235,12 @@ function CategorySection({
   return (
     <Div className="flex flex-col gap-2">
       {/* Category header */}
-      <Div className="flex items-center justify-between px-1">
-        <Div className="flex items-center gap-2">
-          <CategoryIcon className="h-4 w-4 text-muted-foreground" />
-          <Span className="font-medium text-sm">{t(config.label)}</Span>
-          <Badge variant="outline" className="text-[10px] h-5">
-            {characters.length}
-          </Badge>
-        </Div>
-        {hasMore && onExpand && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onExpand}
-            className="h-7 text-xs"
-          >
-            {t("app.chat.selector.seeAll")}
-            <ChevronRight className="h-3 w-3 ml-1" />
-          </Button>
-        )}
+      <Div className="flex items-center gap-2 px-1">
+        <CategoryIcon className="h-4 w-4 text-muted-foreground" />
+        <Span className="font-medium text-sm">{t(config.label)}</Span>
+        <Badge variant="outline" className="text-[10px] h-5">
+          {characters.length}
+        </Badge>
       </Div>
 
       {/* Character list */}
@@ -253,57 +252,82 @@ function CategorySection({
             onAdd={() => onAdd(character.id)}
             onCustomize={() => onCustomize(character.id)}
             locale={locale}
+            isAdded={addedCharacterIds?.has(character.id) ?? false}
           />
         ))}
+
+        {/* Show more card */}
+        {hasMore && onExpand && (
+          <Div
+            onClick={onExpand}
+            className={cn(
+              "flex items-center justify-center gap-2 p-3 rounded-xl border-2 border-dashed",
+              "cursor-pointer transition-all hover:bg-muted/50 hover:border-primary/30",
+              "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <ChevronRight className="h-4 w-4" />
+            <Span className="text-sm font-medium">
+              {t("app.chat.selector.showMore", {
+                count: characters.length - 3,
+              })}
+            </Span>
+          </Div>
+        )}
       </Div>
     </Div>
   );
 }
 
-/**
- * Character browser component - modal for adding new favorites
- */
-export function CharacterBrowser({
-  onAddWithDefaults,
-  onCustomize,
-  onCreateCustom,
-  onBack,
-  locale,
-}: CharacterBrowserProps): JSX.Element {
-  const { t } = simpleT(locale);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [expandedCategory, setExpandedCategory] = useState<
-    (typeof CharacterCategory)[keyof typeof CharacterCategory] | null
-  >(null);
+interface CharacterBrowserCoreProps {
+  onAdd: (characterId: string) => void;
+  onCustomize: (characterId: string) => void;
+  favorites: FavoriteItem[];
+  locale: CountryLanguage;
+  searchQuery?: string;
+  hideCompanions?: boolean;
+}
 
-  // Get characters by category
-  const companionCharacters = useMemo(
-    () => getCharactersByCategory(CharacterCategory.COMPANION),
-    [],
+/**
+ * Core character browser logic and rendering - shared between full browser and onboarding
+ */
+export function CharacterBrowserCore({
+  onAdd,
+  onCustomize,
+  favorites,
+  locale,
+  searchQuery = "",
+  hideCompanions = false,
+}: CharacterBrowserCoreProps): JSX.Element {
+  const { t } = simpleT(locale);
+  const [expandedCategories, setExpandedCategories] = useState<
+    Set<(typeof CharacterCategory)[keyof typeof CharacterCategory]>
+  >(new Set());
+
+  // Calculate which characters are already added to favorites (non-customized)
+  const addedCharacterIds = useMemo(
+    () =>
+      new Set(
+        favorites
+          .filter((f) => f.characterId && !f.customName && !f.customIcon)
+          .map((f) => f.characterId!),
+      ),
+    [favorites],
   );
-  const codingCharacters = useMemo(
-    () => getCharactersByCategory(CharacterCategory.CODING),
-    [],
-  );
-  const writingCharacters = useMemo(
-    () => getCharactersByCategory(CharacterCategory.WRITING),
-    [],
-  );
-  const analysisCharacters = useMemo(
-    () => getCharactersByCategory(CharacterCategory.ANALYSIS),
-    [],
-  );
-  const roleplayCharacters = useMemo(
-    () => getCharactersByCategory(CharacterCategory.ROLEPLAY),
-    [],
-  );
-  const controversialCharacters = useMemo(
-    () => getCharactersByCategory(CharacterCategory.CONTROVERSIAL),
-    [],
-  );
+
+  // Get all categories with their characters
+  const categoriesWithCharacters = useMemo(() => {
+    const categories = Object.values(CharacterCategory);
+    return categories
+      .map((category) => ({
+        category,
+        characters: getCharactersByCategory(category),
+      }))
+      .filter((item) => item.characters.length > 0);
+  }, []);
 
   // Filter by search
-  const filteredCharacters = useMemo(() => {
+  const searchFilteredCharacters = useMemo(() => {
     if (!searchQuery.trim()) {
       return null;
     }
@@ -318,56 +342,106 @@ export function CharacterBrowser({
 
   const handleCategoryExpand = useCallback(
     (category: (typeof CharacterCategory)[keyof typeof CharacterCategory]) => {
-      setExpandedCategory(expandedCategory === category ? null : category);
+      setExpandedCategories((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(category)) {
+          newSet.delete(category);
+        } else {
+          newSet.add(category);
+        }
+        return newSet;
+      });
     },
-    [expandedCategory],
+    [],
   );
 
-  // If a category is expanded, show only that category
-  if (expandedCategory) {
-    const characters = getCharactersByCategory(expandedCategory);
-    const config = CATEGORY_CONFIG[expandedCategory];
-    const CategoryIcon = getIconComponent(config.icon);
-
-    return (
-      <Div className="flex flex-col max-h-[70vh] overflow-hidden">
-        {/* Header */}
-        <Div className="flex items-center gap-3 p-4 border-b bg-card shrink-0">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 shrink-0"
-            onClick={() => setExpandedCategory(null)}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <Div className="flex items-center gap-2">
-            <CategoryIcon className="h-5 w-5" />
-            <Span className="font-medium">{t(config.label)}</Span>
-            <Badge variant="outline" className="text-[10px] h-5">
-              {characters.length}
-            </Badge>
-          </Div>
-        </Div>
-
-        {/* List */}
-        <Div className="flex-1 overflow-y-auto p-4">
+  return searchFilteredCharacters ? (
+    // Search results
+    <>
+      <Div className="flex flex-col gap-3 p-4">
+        <Span className="text-xs text-muted-foreground px-1">
+          {t("app.chat.selector.searchResults", {
+            count: searchFilteredCharacters.length,
+          })}
+        </Span>
+        {searchFilteredCharacters.length > 0 ? (
           <Div className="flex flex-col gap-1">
-            {characters.map((character) => (
+            {searchFilteredCharacters.map((character) => (
               <CharacterListItem
                 key={character.id}
                 character={character}
-                onAdd={() => onAddWithDefaults(character.id)}
+                onAdd={() => onAdd(character.id)}
                 onCustomize={() => onCustomize(character.id)}
                 locale={locale}
+                isAdded={addedCharacterIds?.has(character.id) ?? false}
               />
             ))}
           </Div>
-        </Div>
+        ) : (
+          <Div className="flex flex-col items-center justify-center py-8 text-center">
+            <Span className="text-sm text-muted-foreground">
+              {t("app.chat.selector.noResults")}
+            </Span>
+          </Div>
+        )}
       </Div>
-    );
-  }
+    </>
+  ) : (
+    // Category browser
+    <Div className="flex flex-col gap-5 p-4">
+      {categoriesWithCharacters
+        .filter((item) => {
+          // Filter out companions if hideCompanions is true
+          if (hideCompanions && item.category === CharacterCategory.COMPANION) {
+            return false;
+          }
+          return true;
+        })
+        .map((item, index) => {
+          // Add separator before roleplay and controversial sections
+          const needsSeparatorBefore =
+            item.category === CharacterCategory.ROLEPLAY ||
+            (item.category === CharacterCategory.CONTROVERSIAL &&
+              !categoriesWithCharacters.some(
+                (c) => c.category === CharacterCategory.ROLEPLAY,
+              ));
+
+          return (
+            <Div key={item.category} className="flex flex-col gap-5">
+              {needsSeparatorBefore && index > 0 && <Separator />}
+              <CategorySection
+                category={item.category}
+                characters={item.characters}
+                onAdd={onAdd}
+                onCustomize={onCustomize}
+                onExpand={() => handleCategoryExpand(item.category)}
+                expanded={expandedCategories.has(item.category)}
+                locale={locale}
+                addedCharacterIds={addedCharacterIds}
+              />
+              {/* Separator after companions */}
+              {item.category === CharacterCategory.COMPANION &&
+                index < categoriesWithCharacters.length - 1 && <Separator />}
+            </Div>
+          );
+        })}
+    </Div>
+  );
+}
+
+/**
+ * Character browser component - modal for adding new favorites
+ */
+export function CharacterBrowser({
+  onAddWithDefaults,
+  onCustomize,
+  onCreateCustom,
+  onBack,
+  locale,
+  favorites = [],
+}: CharacterBrowserProps): JSX.Element {
+  const { t } = simpleT(locale);
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <Div className="flex flex-col max-h-[70vh] overflow-hidden">
@@ -395,144 +469,32 @@ export function CharacterBrowser({
               className="pl-9 h-9"
             />
           </Div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={onCreateCustom}
-            className="h-9 gap-1.5 shrink-0"
-          >
-            <Plus className="h-4 w-4" />
-            <Span className="hidden sm:inline">
-              {t("app.chat.selector.createCustom")}
-            </Span>
-          </Button>
+          {onCreateCustom && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onCreateCustom}
+              className="h-9 gap-1.5 shrink-0"
+            >
+              <Plus className="h-4 w-4" />
+              <Span className="hidden sm:inline">
+                {t("app.chat.selector.createCustom")}
+              </Span>
+            </Button>
+          )}
         </Div>
       </Div>
 
-      {/* Scrollable content */}
-      <Div className="flex-1 overflow-y-auto p-4">
-        {filteredCharacters ? (
-          // Search results
-          <Div className="flex flex-col gap-3">
-            <Span className="text-xs text-muted-foreground px-1">
-              {t("app.chat.selector.searchResults", {
-                count: filteredCharacters.length,
-              })}
-            </Span>
-            {filteredCharacters.length > 0 ? (
-              <Div className="flex flex-col gap-1">
-                {filteredCharacters.map((character) => (
-                  <CharacterListItem
-                    key={character.id}
-                    character={character}
-                    onAdd={() => onAddWithDefaults(character.id)}
-                    onCustomize={() => onCustomize(character.id)}
-                    locale={locale}
-                  />
-                ))}
-              </Div>
-            ) : (
-              <Div className="flex flex-col items-center justify-center py-8 text-center">
-                <Span className="text-sm text-muted-foreground">
-                  {t("app.chat.selector.noResults")}
-                </Span>
-              </Div>
-            )}
-          </Div>
-        ) : (
-          // Category browser
-          <Div className="flex flex-col gap-5">
-            {/* Companions - primary */}
-            {companionCharacters.length > 0 && (
-              <CategorySection
-                category={CharacterCategory.COMPANION}
-                characters={companionCharacters}
-                onAdd={onAddWithDefaults}
-                onCustomize={onCustomize}
-                onExpand={() =>
-                  handleCategoryExpand(CharacterCategory.COMPANION)
-                }
-                expanded={false}
-                locale={locale}
-              />
-            )}
-
-            <Separator />
-
-            {/* Expert categories */}
-            {codingCharacters.length > 0 && (
-              <CategorySection
-                category={CharacterCategory.CODING}
-                characters={codingCharacters}
-                onAdd={onAddWithDefaults}
-                onCustomize={onCustomize}
-                onExpand={() => handleCategoryExpand(CharacterCategory.CODING)}
-                expanded={false}
-                locale={locale}
-              />
-            )}
-
-            {writingCharacters.length > 0 && (
-              <CategorySection
-                category={CharacterCategory.WRITING}
-                characters={writingCharacters}
-                onAdd={onAddWithDefaults}
-                onCustomize={onCustomize}
-                onExpand={() => handleCategoryExpand(CharacterCategory.WRITING)}
-                expanded={false}
-                locale={locale}
-              />
-            )}
-
-            {analysisCharacters.length > 0 && (
-              <CategorySection
-                category={CharacterCategory.ANALYSIS}
-                characters={analysisCharacters}
-                onAdd={onAddWithDefaults}
-                onCustomize={onCustomize}
-                onExpand={() =>
-                  handleCategoryExpand(CharacterCategory.ANALYSIS)
-                }
-                expanded={false}
-                locale={locale}
-              />
-            )}
-
-            {/* Roleplay section */}
-            {roleplayCharacters.length > 0 && (
-              <>
-                <Separator />
-                <CategorySection
-                  category={CharacterCategory.ROLEPLAY}
-                  characters={roleplayCharacters}
-                  onAdd={onAddWithDefaults}
-                  onCustomize={onCustomize}
-                  onExpand={() =>
-                    handleCategoryExpand(CharacterCategory.ROLEPLAY)
-                  }
-                  expanded={false}
-                  locale={locale}
-                />
-              </>
-            )}
-
-            {/* Controversial section */}
-            {controversialCharacters.length > 0 && (
-              <CategorySection
-                category={CharacterCategory.CONTROVERSIAL}
-                characters={controversialCharacters}
-                onAdd={onAddWithDefaults}
-                onCustomize={onCustomize}
-                onExpand={() =>
-                  handleCategoryExpand(CharacterCategory.CONTROVERSIAL)
-                }
-                expanded={false}
-                locale={locale}
-              />
-            )}
-          </Div>
-        )}
+      {/* Scrollable content with core */}
+      <Div className="flex-1 overflow-y-auto min-h-0">
+        <CharacterBrowserCore
+          onAdd={onAddWithDefaults}
+          onCustomize={onCustomize}
+          favorites={favorites}
+          locale={locale}
+          searchQuery={searchQuery}
+        />
       </Div>
     </Div>
   );

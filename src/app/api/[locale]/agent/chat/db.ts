@@ -447,6 +447,60 @@ export const chatMessages = pgTable(
 );
 
 /**
+ * Thread Share Links Table
+ * Share links for threads in SHARED folders
+ * Allows controlled access to threads via unique tokens
+ */
+export const threadShareLinks = pgTable(
+  "thread_share_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    // Thread being shared
+    threadId: uuid("thread_id")
+      .notNull()
+      .references(() => chatThreads.id, { onDelete: "cascade" }),
+
+    // User who created the share link
+    createdBy: uuid("created_by")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+
+    // Unique share token (used in URL)
+    token: text("token").notNull().unique(),
+
+    // Optional label/description for the link
+    label: text("label"),
+
+    // Permission settings
+    // View only (default) or allow posting
+    allowPosting: boolean("allow_posting").default(false).notNull(),
+
+    // Allow unauthenticated users (public link) or require sign-in
+    requireAuth: boolean("require_auth").default(false).notNull(),
+
+    // Link status
+    active: boolean("active").default(true).notNull(),
+
+    // Usage tracking
+    accessCount: integer("access_count").default(0).notNull(),
+    lastAccessedAt: timestamp("last_accessed_at"),
+
+    // Timestamps
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    threadIdIdx: index("thread_share_links_thread_id_idx").on(table.threadId),
+    tokenIdx: index("thread_share_links_token_idx").on(table.token),
+    createdByIdx: index("thread_share_links_created_by_idx").on(
+      table.createdBy,
+    ),
+    activeIdx: index("thread_share_links_active_idx").on(table.active),
+  }),
+);
+
+/**
  * Relations
  */
 export const chatFoldersRelations = relations(chatFolders, ({ one, many }) => ({
@@ -475,7 +529,22 @@ export const chatThreadsRelations = relations(chatThreads, ({ one, many }) => ({
     references: [chatFolders.id],
   }),
   messages: many(chatMessages),
+  shareLinks: many(threadShareLinks),
 }));
+
+export const threadShareLinksRelations = relations(
+  threadShareLinks,
+  ({ one }) => ({
+    thread: one(chatThreads, {
+      fields: [threadShareLinks.threadId],
+      references: [chatThreads.id],
+    }),
+    creator: one(users, {
+      fields: [threadShareLinks.createdBy],
+      references: [users.id],
+    }),
+  }),
+);
 
 export const chatMessagesRelations = relations(
   chatMessages,
@@ -507,6 +576,9 @@ export const insertChatThreadSchema = createInsertSchema(chatThreads);
 export const selectChatMessageSchema = createSelectSchema(chatMessages);
 export const insertChatMessageSchema = createInsertSchema(chatMessages);
 
+export const selectThreadShareLinkSchema = createSelectSchema(threadShareLinks);
+export const insertThreadShareLinkSchema = createInsertSchema(threadShareLinks);
+
 /**
  * Types
  */
@@ -533,3 +605,6 @@ export type NewChatThread = z.infer<typeof insertChatThreadSchema>;
 
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type NewChatMessage = z.infer<typeof insertChatMessageSchema>;
+
+export type ThreadShareLink = z.infer<typeof selectThreadShareLinkSchema>;
+export type NewThreadShareLink = z.infer<typeof insertThreadShareLinkSchema>;

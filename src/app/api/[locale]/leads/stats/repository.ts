@@ -31,6 +31,7 @@ import {
 } from "next-vibe/shared/types/stats-filtering.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { emailCampaigns, leads } from "@/app/api/[locale]/leads/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
@@ -40,11 +41,10 @@ import {
   LanguageFilter,
 } from "@/i18n/core/config";
 
-import { emailCampaigns, leads } from "../db";
-import type { LeadSource } from "../enum";
 import {
   ActivityType,
   EmailCampaignStageFilter,
+  type LeadSource,
   LeadSourceFilter,
   LeadStatus,
   LeadStatusFilter,
@@ -119,18 +119,11 @@ const mapLeadStatusToActivityType = (
   }
 };
 
-export interface LeadsStatsRepository {
-  getLeadsStats(
-    data: LeadsStatsRequestOutput,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadsStatsResponseOutput>>;
-}
-
-export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
+export class LeadStatsRepository {
   /**
    * Get comprehensive leads statistics
    */
-  async getLeadsStats(
+  static async getLeadsStats(
     data: LeadsStatsRequestOutput,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadsStatsResponseOutput>> {
@@ -147,7 +140,11 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       dateTo = dateRange.to;
 
       // Build where conditions
-      const whereConditions = this.buildWhereConditions(data, dateFrom, dateTo);
+      const whereConditions = LeadStatsRepository.buildWhereConditions(
+        data,
+        dateFrom,
+        dateTo,
+      );
 
       // Get all metrics in parallel
       const [
@@ -158,8 +155,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         topPerformingCampaigns,
         topPerformingSources,
       ] = await Promise.all([
-        this.getCurrentPeriodMetrics(whereConditions),
-        this.generateHistoricalData(
+        LeadStatsRepository.getCurrentPeriodMetrics(whereConditions),
+        LeadStatsRepository.generateHistoricalData(
           whereConditions,
           dateFrom,
           dateTo,
@@ -167,10 +164,10 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           data,
           logger,
         ),
-        this.generateGroupedStats(whereConditions),
-        this.generateRecentActivity(whereConditions),
-        this.generateTopPerformingCampaigns(whereConditions),
-        this.generateTopPerformingSources(whereConditions),
+        LeadStatsRepository.generateGroupedStats(whereConditions),
+        LeadStatsRepository.generateRecentActivity(whereConditions),
+        LeadStatsRepository.generateTopPerformingCampaigns(whereConditions),
+        LeadStatsRepository.generateTopPerformingSources(whereConditions),
       ]);
 
       const response: LeadsStatsResponseOutput = {
@@ -208,7 +205,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Build where conditions for database queries
    */
-  private buildWhereConditions(
+  private static buildWhereConditions(
     query: LeadsStatsRequestOutput,
     dateFrom: Date,
     dateTo: Date,
@@ -267,7 +264,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get current period metrics with real database queries
    */
-  private async getCurrentPeriodMetrics(
+  private static async getCurrentPeriodMetrics(
     whereConditions: SQL | undefined,
   ): Promise<
     Omit<
@@ -512,63 +509,82 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       signupRate,
       consultationBookingRate,
       subscriptionConfirmationRate,
-      leadsByCampaignStage: await this.getLeadsByCampaignStage(whereConditions),
+      leadsByCampaignStage:
+        await LeadStatsRepository.getLeadsByCampaignStage(whereConditions),
       leadsInActiveCampaigns:
-        await this.getLeadsInActiveCampaigns(whereConditions),
-      leadsNotInCampaigns: await this.getLeadsNotInCampaigns(whereConditions),
+        await LeadStatsRepository.getLeadsInActiveCampaigns(whereConditions),
+      leadsNotInCampaigns:
+        await LeadStatsRepository.getLeadsNotInCampaigns(whereConditions),
       leadsByJourneyVariant:
-        await this.getLeadsByJourneyVariant(whereConditions),
-      leadsByCountry: await this.getLeadsByCountry(whereConditions),
-      leadsByLanguage: await this.getLeadsByLanguage(whereConditions),
-      leadsBySource: await this.getLeadsBySource(whereConditions),
-      leadsByStatus: await this.getLeadsByStatus(whereConditions),
-      leadsWithBusinessName: await this.getLeadsWithField(
+        await LeadStatsRepository.getLeadsByJourneyVariant(whereConditions),
+      leadsByCountry:
+        await LeadStatsRepository.getLeadsByCountry(whereConditions),
+      leadsByLanguage:
+        await LeadStatsRepository.getLeadsByLanguage(whereConditions),
+      leadsBySource:
+        await LeadStatsRepository.getLeadsBySource(whereConditions),
+      leadsByStatus:
+        await LeadStatsRepository.getLeadsByStatus(whereConditions),
+      leadsWithBusinessName: await LeadStatsRepository.getLeadsWithField(
         whereConditions,
         "businessName",
       ),
-      leadsWithContactName: await this.getLeadsWithField(
+      leadsWithContactName: await LeadStatsRepository.getLeadsWithField(
         whereConditions,
         "contactName",
       ),
-      leadsWithPhone: await this.getLeadsWithField(whereConditions, "phone"),
-      leadsWithWebsite: await this.getLeadsWithField(
+      leadsWithPhone: await LeadStatsRepository.getLeadsWithField(
+        whereConditions,
+        "phone",
+      ),
+      leadsWithWebsite: await LeadStatsRepository.getLeadsWithField(
         whereConditions,
         "website",
       ),
-      leadsWithNotes: await this.getLeadsWithField(whereConditions, "notes"),
+      leadsWithNotes: await LeadStatsRepository.getLeadsWithField(
+        whereConditions,
+        "notes",
+      ),
       dataCompletenessRate:
-        await this.calculateDataCompletenessRate(whereConditions),
-      leadsCreatedToday: await this.getLeadsCreatedInPeriod(
+        await LeadStatsRepository.calculateDataCompletenessRate(
+          whereConditions,
+        ),
+      leadsCreatedToday: await LeadStatsRepository.getLeadsCreatedInPeriod(
         whereConditions,
         "today",
       ),
-      leadsCreatedThisWeek: await this.getLeadsCreatedInPeriod(
+      leadsCreatedThisWeek: await LeadStatsRepository.getLeadsCreatedInPeriod(
         whereConditions,
         "week",
       ),
-      leadsCreatedThisMonth: await this.getLeadsCreatedInPeriod(
+      leadsCreatedThisMonth: await LeadStatsRepository.getLeadsCreatedInPeriod(
         whereConditions,
         "month",
       ),
-      leadsUpdatedToday: await this.getLeadsUpdatedInPeriod(
+      leadsUpdatedToday: await LeadStatsRepository.getLeadsUpdatedInPeriod(
         whereConditions,
         "today",
       ),
-      leadsUpdatedThisWeek: await this.getLeadsUpdatedInPeriod(
+      leadsUpdatedThisWeek: await LeadStatsRepository.getLeadsUpdatedInPeriod(
         whereConditions,
         "week",
       ),
-      leadsUpdatedThisMonth: await this.getLeadsUpdatedInPeriod(
+      leadsUpdatedThisMonth: await LeadStatsRepository.getLeadsUpdatedInPeriod(
         whereConditions,
         "month",
       ),
       averageTimeToConversion:
-        await this.calculateAverageTimeToConversion(whereConditions),
+        await LeadStatsRepository.calculateAverageTimeToConversion(
+          whereConditions,
+        ),
       averageTimeToSignup:
-        await this.calculateAverageTimeToSignup(whereConditions),
+        await LeadStatsRepository.calculateAverageTimeToSignup(whereConditions),
       averageTimeToConsultation:
-        await this.calculateAverageTimeToConsultation(whereConditions),
-      leadVelocity: await this.calculateCurrentLeadVelocity(whereConditions),
+        await LeadStatsRepository.calculateAverageTimeToConsultation(
+          whereConditions,
+        ),
+      leadVelocity:
+        await LeadStatsRepository.calculateCurrentLeadVelocity(whereConditions),
     };
   }
 
@@ -576,7 +592,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * Generate historical data for all metrics with comprehensive error handling
    * Ensures all metrics are generated safely with proper fallbacks
    */
-  private async generateHistoricalData(
+  private static async generateHistoricalData(
     whereConditions: SQL | undefined,
     dateFrom: Date,
     dateTo: Date,
@@ -592,7 +608,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       });
 
       // Generate date intervals based on time period with error handling
-      const intervals = this.generateDateIntervals(
+      const intervals = LeadStatsRepository.generateDateIntervals(
         dateFrom,
         dateTo,
         timePeriod,
@@ -605,7 +621,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           dateTo: dateTo.toISOString(),
           timePeriod,
         });
-        return this.createEmptyHistoricalDataStructure();
+        return LeadStatsRepository.createEmptyHistoricalDataStructure();
       }
 
       // Get historical data for each metric with individual error handling
@@ -628,14 +644,14 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         emailsClickedData,
       ] = await Promise.allSettled([
         // Use specialized method for cumulative total leads
-        this.getCumulativeTotalLeads(
+        LeadStatsRepository.getCumulativeTotalLeads(
           intervals,
           whereConditions,
           timePeriod,
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.NEW,
@@ -643,7 +659,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.ACTIVE,
@@ -651,7 +667,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.CAMPAIGN_RUNNING,
@@ -659,7 +675,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.WEBSITE_USER,
@@ -667,7 +683,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.NEWSLETTER_SUBSCRIBER,
@@ -675,7 +691,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.CONVERTED,
@@ -683,7 +699,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.SIGNED_UP,
@@ -691,7 +707,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.CONSULTATION_BOOKED,
@@ -699,7 +715,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.SUBSCRIPTION_CONFIRMED,
@@ -707,7 +723,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.UNSUBSCRIBED,
@@ -715,7 +731,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.BOUNCED,
@@ -723,7 +739,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.INVALID,
@@ -731,7 +747,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.EMAILS_SENT,
@@ -739,7 +755,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.EMAILS_OPENED,
@@ -747,7 +763,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           filters,
           logger,
         ),
-        this.getHistoricalMetric(
+        LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
           METRIC_TYPES.EMAILS_CLICKED,
@@ -797,36 +813,37 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       });
 
       // Calculate rates from the raw data
-      const openRateData = this.calculateRateData(
+      const openRateData = LeadStatsRepository.calculateRateData(
         emailsOpenedData,
         emailsSentData,
         logger,
       );
-      const clickRateData = this.calculateRateData(
+      const clickRateData = LeadStatsRepository.calculateRateData(
         emailsClickedData,
         emailsSentData,
         logger,
       );
-      const conversionRateData = this.calculateRateData(
+      const conversionRateData = LeadStatsRepository.calculateRateData(
         convertedLeadsData,
         totalLeadsData,
         logger,
       );
-      const signupRateData = this.calculateRateData(
+      const signupRateData = LeadStatsRepository.calculateRateData(
         signedUpLeadsData,
         totalLeadsData,
         logger,
       );
-      const consultationBookingRateData = this.calculateRateData(
+      const consultationBookingRateData = LeadStatsRepository.calculateRateData(
         consultationBookedLeadsData,
         totalLeadsData,
         logger,
       );
-      const subscriptionConfirmationRateData = this.calculateRateData(
-        subscriptionConfirmedLeadsData,
-        totalLeadsData,
-        logger,
-      );
+      const subscriptionConfirmationRateData =
+        LeadStatsRepository.calculateRateData(
+          subscriptionConfirmedLeadsData,
+          totalLeadsData,
+          logger,
+        );
 
       return {
         totalLeads: {
@@ -964,7 +981,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         averageEmailEngagementScore: {
           name: "app.api.leads.admin.stats.metrics.average_email_engagement_score" as const,
           type: "line" as ChartType,
-          data: await this.calculateEngagementScore(
+          data: await LeadStatsRepository.calculateEngagementScore(
             intervals,
             timePeriod,
             filters,
@@ -975,7 +992,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         leadVelocity: {
           name: "app.api.leads.admin.stats.metrics.lead_velocity" as const,
           type: "line" as ChartType,
-          data: await this.calculateLeadVelocity(
+          data: await LeadStatsRepository.calculateLeadVelocity(
             intervals,
             timePeriod,
             filters,
@@ -986,7 +1003,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         dataCompletenessRate: {
           name: "app.api.leads.admin.stats.metrics.data_completeness_rate" as const,
           type: "line" as ChartType,
-          data: await this.calculateDataCompleteness(
+          data: await LeadStatsRepository.calculateDataCompleteness(
             intervals,
             timePeriod,
             filters,
@@ -1044,7 +1061,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Generate grouped statistics
    */
-  private async generateGroupedStats(
+  private static async generateGroupedStats(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]> {
     // Get grouped statistics from database
@@ -1058,14 +1075,14 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       byEngagementLevelData,
       byConversionFunnelData,
     ] = await Promise.all([
-      this.getGroupedByStatus(whereConditions),
-      this.getGroupedBySource(whereConditions),
-      this.getGroupedByCountry(whereConditions),
-      this.getGroupedByLanguage(whereConditions),
-      this.getGroupedByCampaignStage(whereConditions),
-      this.getGroupedByJourneyVariant(whereConditions),
-      this.getGroupedByEngagementLevel(whereConditions),
-      this.getGroupedByConversionFunnel(whereConditions),
+      LeadStatsRepository.getGroupedByStatus(whereConditions),
+      LeadStatsRepository.getGroupedBySource(whereConditions),
+      LeadStatsRepository.getGroupedByCountry(whereConditions),
+      LeadStatsRepository.getGroupedByLanguage(whereConditions),
+      LeadStatsRepository.getGroupedByCampaignStage(whereConditions),
+      LeadStatsRepository.getGroupedByJourneyVariant(whereConditions),
+      LeadStatsRepository.getGroupedByEngagementLevel(whereConditions),
+      LeadStatsRepository.getGroupedByConversionFunnel(whereConditions),
     ]);
 
     return {
@@ -1083,7 +1100,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Generate recent activity
    */
-  private async generateRecentActivity(
+  private static async generateRecentActivity(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["recentActivity"]> {
     // Get recent leads activity (last 10 activities)
@@ -1132,7 +1149,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Generate top performing campaigns
    */
-  private async generateTopPerformingCampaigns(
+  private static async generateTopPerformingCampaigns(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["topPerformingCampaigns"]> {
     // Get top performing campaigns based on conversion rates
@@ -1174,7 +1191,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Generate top performing sources
    */
-  private async generateTopPerformingSources(
+  private static async generateTopPerformingSources(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["topPerformingSources"]> {
     // Get top performing sources based on conversion rates
@@ -1214,7 +1231,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * Generate date intervals for historical data with proper calendar alignment
    * Ensures intervals align to natural boundaries (start of hour, day, week, month, etc.)
    */
-  private generateDateIntervals(
+  private static generateDateIntervals(
     dateFrom: Date,
     dateTo: Date,
     timePeriod: TimePeriod,
@@ -1224,7 +1241,10 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       const intervals: Array<{ start: Date; end: Date; label: string }> = [];
 
       // Align the start date to the appropriate boundary for the time period
-      const alignedStart = this.alignDateToPeriodStart(dateFrom, timePeriod);
+      const alignedStart = LeadStatsRepository.alignDateToPeriodStart(
+        dateFrom,
+        timePeriod,
+      );
       const current = new Date(alignedStart);
 
       while (current < dateTo) {
@@ -1328,7 +1348,10 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Align a date to the start of the specified time period
    */
-  private alignDateToPeriodStart(date: Date, timePeriod: TimePeriod): Date {
+  private static alignDateToPeriodStart(
+    date: Date,
+    timePeriod: TimePeriod,
+  ): Date {
     const aligned = new Date(date);
 
     switch (timePeriod) {
@@ -1371,7 +1394,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get historical metric data for specific intervals using efficient SQL
    */
-  private async getHistoricalMetric(
+  private static async getHistoricalMetric(
     intervals: Array<{ start: Date; end: Date; label: string }>,
     whereConditions: SQL | undefined,
     metricType: string,
@@ -1391,7 +1414,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       const dateTo = intervals[intervals.length - 1].end;
 
       // Use explicit time period for date truncation
-      const dateTrunc = this.getDateTruncString(timePeriod);
+      const dateTrunc = LeadStatsRepository.getDateTruncString(timePeriod);
 
       logger.debug("Getting historical metric", {
         metricType,
@@ -1463,7 +1486,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           activeConditions.push(gte(timestampField, dateFrom));
           activeConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions = this.buildNonDateConditions(filters);
+          const nonDateConditions =
+            LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             activeConditions.push(...nonDateConditions);
           }
@@ -1490,7 +1514,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           campaignRunningConditions.push(gte(timestampField, dateFrom));
           campaignRunningConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions = this.buildNonDateConditions(filters);
+          const nonDateConditions =
+            LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             campaignRunningConditions.push(...nonDateConditions);
           }
@@ -1517,7 +1542,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           ];
 
           // Apply other filters but not the original date range filters
-          const nonDateConditions = this.buildNonDateConditions(filters);
+          const nonDateConditions =
+            LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             convertedConditions.push(...nonDateConditions);
           }
@@ -1549,7 +1575,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           signedUpConditions.push(gte(timestampField, dateFrom));
           signedUpConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions = this.buildNonDateConditions(filters);
+          const nonDateConditions =
+            LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             signedUpConditions.push(...nonDateConditions);
           }
@@ -1576,7 +1603,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           consultationConditions.push(gte(timestampField, dateFrom));
           consultationConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions = this.buildNonDateConditions(filters);
+          const nonDateConditions =
+            LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             consultationConditions.push(...nonDateConditions);
           }
@@ -1603,7 +1631,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           subscriptionConditions.push(gte(timestampField, dateFrom));
           subscriptionConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions = this.buildNonDateConditions(filters);
+          const nonDateConditions =
+            LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             subscriptionConditions.push(...nonDateConditions);
           }
@@ -1630,7 +1659,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           unsubscribedConditions.push(gte(timestampField, dateFrom));
           unsubscribedConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions = this.buildNonDateConditions(filters);
+          const nonDateConditions =
+            LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             unsubscribedConditions.push(...nonDateConditions);
           }
@@ -1657,7 +1687,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           bouncedConditions.push(gte(timestampField, dateFrom));
           bouncedConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions = this.buildNonDateConditions(filters);
+          const nonDateConditions =
+            LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             bouncedConditions.push(...nonDateConditions);
           }
@@ -1684,7 +1715,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           invalidConditions.push(gte(timestampField, dateFrom));
           invalidConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions = this.buildNonDateConditions(filters);
+          const nonDateConditions =
+            LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             invalidConditions.push(...nonDateConditions);
           }
@@ -1711,7 +1743,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           emailsSentConditions.push(lte(timestampField, dateTo));
           emailsSentConditions.push(sql`${leads.emailsSent} > 0`); // Only include leads that have sent emails
 
-          const nonDateConditions = this.buildNonDateConditions(filters);
+          const nonDateConditions =
+            LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             emailsSentConditions.push(...nonDateConditions);
           }
@@ -1738,7 +1771,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           emailsOpenedConditions.push(lte(timestampField, dateTo));
           emailsOpenedConditions.push(sql`${leads.emailsOpened} > 0`); // Only include leads that have opened emails
 
-          const nonDateConditions = this.buildNonDateConditions(filters);
+          const nonDateConditions =
+            LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             emailsOpenedConditions.push(...nonDateConditions);
           }
@@ -1765,7 +1799,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           emailsClickedConditions.push(lte(timestampField, dateTo));
           emailsClickedConditions.push(sql`${leads.emailsClicked} > 0`); // Only include leads that have clicked emails
 
-          const nonDateConditions = this.buildNonDateConditions(filters);
+          const nonDateConditions =
+            LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             emailsClickedConditions.push(...nonDateConditions);
           }
@@ -1827,7 +1862,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * Convert period-specific data to cumulative totals
    * This method takes period-specific counts and converts them to running totals
    */
-  private convertToCumulativeData(
+  private static convertToCumulativeData(
     data: Array<{ date: string; value: number }>,
   ): Array<{ date: string; value: number }> {
     let cumulativeTotal = 0;
@@ -1844,7 +1879,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * Get cumulative total leads data using efficient SQL window functions
    * This provides true cumulative totals by counting all leads created up to each time period
    */
-  private async getCumulativeTotalLeads(
+  private static async getCumulativeTotalLeads(
     intervals: Array<{ start: Date; end: Date; label: string }>,
     whereConditions: SQL | undefined,
     timePeriod: TimePeriod,
@@ -1857,13 +1892,14 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       }
 
       const dateTo = intervals[intervals.length - 1].end;
-      const dateTrunc = this.getDateTruncString(timePeriod);
+      const dateTrunc = LeadStatsRepository.getDateTruncString(timePeriod);
 
       // Build conditions excluding the date range filter for cumulative calculation
       const nonDateConditions: SQL[] = [];
 
       // Extract non-date conditions from whereConditions
-      const extractedConditions = this.buildNonDateConditions(filters);
+      const extractedConditions =
+        LeadStatsRepository.buildNonDateConditions(filters);
       if (extractedConditions.length > 0) {
         nonDateConditions.push(...extractedConditions);
       }
@@ -1911,7 +1947,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       });
 
       // Fall back to the original method
-      const periodData = await this.getHistoricalMetric(
+      const periodData = await LeadStatsRepository.getHistoricalMetric(
         intervals,
         whereConditions,
         METRIC_TYPES.NEW,
@@ -1919,7 +1955,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         filters,
         logger,
       );
-      return this.convertToCumulativeData(periodData);
+      return LeadStatsRepository.convertToCumulativeData(periodData);
     }
   }
 
@@ -1928,7 +1964,9 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * This is needed when we use different timestamp fields for filtering
    * We need to rebuild the conditions without the date range filters
    */
-  private buildNonDateConditions(filters: LeadsStatsRequestOutput): SQL[] {
+  private static buildNonDateConditions(
+    filters: LeadsStatsRequestOutput,
+  ): SQL[] {
     const conditions: SQL[] = [];
 
     // Add status filter if specified (single value, not array)
@@ -2008,7 +2046,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get PostgreSQL date truncation string for time period
    */
-  private getDateTruncString(timePeriod: TimePeriod): string {
+  private static getDateTruncString(timePeriod: TimePeriod): string {
     switch (timePeriod) {
       case TimePeriod.HOUR:
         return DATE_TRUNC.HOUR;
@@ -2031,7 +2069,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * Calculate rate data from two metric arrays with proper handling of zero denominators
    * Ensures rates are calculated correctly for each individual TimePeriod bucket
    */
-  private calculateRateData(
+  private static calculateRateData(
     numeratorData: Array<{ date: string; value: number }>,
     denominatorData: Array<{ date: string; value: number }>,
     logger: EndpointLogger,
@@ -2117,7 +2155,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get historical metric data for a specific status
    */
-  private async getHistoricalMetricForStatus(
+  private static async getHistoricalMetricForStatus(
     intervals: Array<{ start: Date; end: Date; label: string }>,
     whereConditions: SQL | undefined,
     status: (typeof LeadStatus)[keyof typeof LeadStatus],
@@ -2129,7 +2167,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
     const dateFrom = intervals[0].start;
     const dateTo = intervals[intervals.length - 1].end;
-    const dateTrunc = this.getDateTruncString(timePeriod);
+    const dateTrunc = LeadStatsRepository.getDateTruncString(timePeriod);
 
     const baseConditions: SQL[] = [
       gte(leads.createdAt, dateFrom),
@@ -2171,7 +2209,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get color for lead status
    */
-  private getStatusColor(
+  private static getStatusColor(
     status: (typeof LeadStatus)[keyof typeof LeadStatus],
   ): string {
     switch (status) {
@@ -2205,7 +2243,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get grouped statistics by status
    */
-  private async getGroupedByStatus(
+  private static async getGroupedByStatus(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byStatus"]> {
     // Get total count for percentage calculation
@@ -2230,14 +2268,14 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       label: group.status,
       value: Number(group.count),
       percentage: totalCount > 0 ? Number(group.count) / totalCount : 0,
-      color: this.getStatusColor(group.status),
+      color: LeadStatsRepository.getStatusColor(group.status),
     }));
   }
 
   /**
    * Get grouped statistics by source
    */
-  private async getGroupedBySource(
+  private static async getGroupedBySource(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["bySource"]> {
     // Get total count for percentage calculation
@@ -2270,7 +2308,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get grouped statistics by country
    */
-  private async getGroupedByCountry(
+  private static async getGroupedByCountry(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byCountry"]> {
     // Get total count for percentage calculation
@@ -2303,7 +2341,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get grouped statistics by language
    */
-  private async getGroupedByLanguage(
+  private static async getGroupedByLanguage(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byLanguage"]> {
     // Get total count for percentage calculation
@@ -2336,7 +2374,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get grouped statistics by campaign stage
    */
-  private async getGroupedByCampaignStage(
+  private static async getGroupedByCampaignStage(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byCampaignStage"]> {
     // Get total count for percentage calculation
@@ -2370,7 +2408,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * Calculate average email engagement score over time using efficient SQL
    * Uses engagement timestamps for more accurate historical representation
    */
-  private async calculateEngagementScore(
+  private static async calculateEngagementScore(
     intervals: Array<{ start: Date; end: Date; label: string }>,
     timePeriod: TimePeriod,
     filters: LeadsStatsRequestOutput,
@@ -2383,7 +2421,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
       const dateFrom = intervals[0].start;
       const dateTo = intervals[intervals.length - 1].end;
-      const dateTrunc = this.getDateTruncString(timePeriod);
+      const dateTrunc = LeadStatsRepository.getDateTruncString(timePeriod);
 
       // Use engagement timestamp for better historical accuracy
       const engagementConditions: SQL[] = [];
@@ -2393,7 +2431,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       engagementConditions.push(lte(timestampField, dateTo));
       engagementConditions.push(sql`${leads.emailsSent} > 0`); // Only include leads with email activity
 
-      const nonDateConditions = this.buildNonDateConditions(filters);
+      const nonDateConditions =
+        LeadStatsRepository.buildNonDateConditions(filters);
       if (nonDateConditions.length > 0) {
         engagementConditions.push(...nonDateConditions);
       }
@@ -2455,7 +2494,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * Calculate lead velocity (leads moving through stages) over time using efficient SQL
    * Tracks leads progressing through advanced stages to measure conversion momentum
    */
-  private async calculateLeadVelocity(
+  private static async calculateLeadVelocity(
     intervals: Array<{ start: Date; end: Date; label: string }>,
     timePeriod: TimePeriod,
     filters: LeadsStatsRequestOutput,
@@ -2468,7 +2507,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
       const dateFrom = intervals[0].start;
       const dateTo = intervals[intervals.length - 1].end;
-      const dateTrunc = this.getDateTruncString(timePeriod);
+      const dateTrunc = LeadStatsRepository.getDateTruncString(timePeriod);
 
       // Use the most appropriate timestamp for each status
       // This provides better accuracy for when leads actually progressed
@@ -2481,7 +2520,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
         )`,
       ];
 
-      const nonDateConditions = this.buildNonDateConditions(filters);
+      const nonDateConditions =
+        LeadStatsRepository.buildNonDateConditions(filters);
       if (nonDateConditions.length > 0) {
         velocityConditions.push(...nonDateConditions);
       }
@@ -2556,7 +2596,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
    * Calculate data completeness rate over time using efficient SQL
    * Measures how complete lead data is over time (email + at least one contact method)
    */
-  private async calculateDataCompleteness(
+  private static async calculateDataCompleteness(
     intervals: Array<{ start: Date; end: Date; label: string }>,
     timePeriod: TimePeriod,
     filters: LeadsStatsRequestOutput,
@@ -2569,7 +2609,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
 
       const dateFrom = intervals[0].start;
       const dateTo = intervals[intervals.length - 1].end;
-      const dateTrunc = this.getDateTruncString(timePeriod);
+      const dateTrunc = LeadStatsRepository.getDateTruncString(timePeriod);
 
       const baseConditions: SQL[] = [
         gte(leads.createdAt, dateFrom),
@@ -2577,7 +2617,8 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
       ];
 
       // Add non-date conditions from filters
-      const nonDateConditions = this.buildNonDateConditions(filters);
+      const nonDateConditions =
+        LeadStatsRepository.buildNonDateConditions(filters);
       if (nonDateConditions.length > 0) {
         baseConditions.push(...nonDateConditions);
       }
@@ -2645,7 +2686,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get count of leads with a specific field populated
    */
-  private async getLeadsWithField(
+  private static async getLeadsWithField(
     whereConditions: SQL | undefined,
     fieldName: keyof typeof leads,
   ): Promise<number> {
@@ -2666,7 +2707,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Calculate overall data completeness rate
    */
-  private async calculateDataCompletenessRate(
+  private static async calculateDataCompletenessRate(
     whereConditions: SQL | undefined,
   ): Promise<number> {
     const result = await db
@@ -2687,7 +2728,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get count of leads created in a specific period
    */
-  private async getLeadsCreatedInPeriod(
+  private static async getLeadsCreatedInPeriod(
     whereConditions: SQL | undefined,
     period: "today" | "week" | "month",
   ): Promise<number> {
@@ -2723,7 +2764,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get count of leads updated in a specific period
    */
-  private async getLeadsUpdatedInPeriod(
+  private static async getLeadsUpdatedInPeriod(
     whereConditions: SQL | undefined,
     period: "today" | "week" | "month",
   ): Promise<number> {
@@ -2759,7 +2800,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Calculate current lead velocity (leads moving through stages in the last week)
    */
-  private async calculateCurrentLeadVelocity(
+  private static async calculateCurrentLeadVelocity(
     whereConditions: SQL | undefined,
   ): Promise<number> {
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -2798,7 +2839,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get count of leads in active campaigns
    */
-  private async getLeadsInActiveCampaigns(
+  private static async getLeadsInActiveCampaigns(
     whereConditions: SQL | undefined,
   ): Promise<number> {
     const result = await db
@@ -2818,7 +2859,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get count of leads not in campaigns
    */
-  private async getLeadsNotInCampaigns(
+  private static async getLeadsNotInCampaigns(
     whereConditions: SQL | undefined,
   ): Promise<number> {
     const result = await db
@@ -2838,7 +2879,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get leads grouped by campaign stage for summary
    */
-  private async getLeadsByCampaignStage(
+  private static async getLeadsByCampaignStage(
     whereConditions: SQL | undefined,
   ): Promise<Record<string, number>> {
     const result = await db
@@ -2862,7 +2903,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get leads grouped by journey variant for summary
    */
-  private async getLeadsByJourneyVariant(
+  private static async getLeadsByJourneyVariant(
     whereConditions: SQL | undefined,
   ): Promise<Record<string, number>> {
     // Journey variants are stored in email campaigns, so we need to join
@@ -2888,7 +2929,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get leads grouped by country for summary
    */
-  private async getLeadsByCountry(
+  private static async getLeadsByCountry(
     whereConditions: SQL | undefined,
   ): Promise<Record<string, number>> {
     const result = await db
@@ -2910,7 +2951,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get leads grouped by language for summary
    */
-  private async getLeadsByLanguage(
+  private static async getLeadsByLanguage(
     whereConditions: SQL | undefined,
   ): Promise<Record<string, number>> {
     const result = await db
@@ -2932,7 +2973,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get leads grouped by source for summary
    */
-  private async getLeadsBySource(
+  private static async getLeadsBySource(
     whereConditions: SQL | undefined,
   ): Promise<Record<string, number>> {
     const result = await db
@@ -2956,7 +2997,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get leads grouped by status for summary
    */
-  private async getLeadsByStatus(
+  private static async getLeadsByStatus(
     whereConditions: SQL | undefined,
   ): Promise<Record<string, number>> {
     const result = await db
@@ -2978,7 +3019,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Calculate average time to conversion in days
    */
-  private async calculateAverageTimeToConversion(
+  private static async calculateAverageTimeToConversion(
     whereConditions: SQL | undefined,
   ): Promise<number> {
     const result = await db
@@ -2998,7 +3039,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Calculate average time to signup in days
    */
-  private async calculateAverageTimeToSignup(
+  private static async calculateAverageTimeToSignup(
     whereConditions: SQL | undefined,
   ): Promise<number> {
     const result = await db
@@ -3018,7 +3059,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Calculate average time to consultation in days
    */
-  private async calculateAverageTimeToConsultation(
+  private static async calculateAverageTimeToConsultation(
     whereConditions: SQL | undefined,
   ): Promise<number> {
     const result = await db
@@ -3038,7 +3079,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get grouped statistics by journey variant
    */
-  private async getGroupedByJourneyVariant(
+  private static async getGroupedByJourneyVariant(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byJourneyVariant"]> {
     // Get total count for percentage calculation
@@ -3073,7 +3114,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get grouped statistics by engagement level
    */
-  private async getGroupedByEngagementLevel(
+  private static async getGroupedByEngagementLevel(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byEngagementLevel"]> {
     // Get total count for percentage calculation
@@ -3118,7 +3159,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Get grouped statistics by conversion funnel
    */
-  private async getGroupedByConversionFunnel(
+  private static async getGroupedByConversionFunnel(
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byConversionFunnel"]> {
     // Get total count for percentage calculation
@@ -3158,7 +3199,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
           label: status,
           value: count,
           percentage: totalCount > 0 ? count / totalCount : 0,
-          color: this.getStatusColor(status),
+          color: LeadStatsRepository.getStatusColor(status),
         };
       })
       .filter((stage) => stage.value > 0); // Only return stages with actual data
@@ -3167,7 +3208,7 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
   /**
    * Create an empty historical data structure for error fallback
    */
-  private createEmptyHistoricalDataStructure(): LeadsStatsResponseOutput["historicalData"] {
+  private static createEmptyHistoricalDataStructure(): LeadsStatsResponseOutput["historicalData"] {
     const emptyData = {
       name: "app.api.leads.admin.stats.error" as const,
       type: "line" as ChartType,
@@ -3204,6 +3245,3 @@ export class LeadsStatsRepositoryImpl implements LeadsStatsRepository {
     };
   }
 }
-
-export const leadsStatsRepository: LeadsStatsRepository =
-  new LeadsStatsRepositoryImpl();

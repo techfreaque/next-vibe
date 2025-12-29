@@ -14,7 +14,7 @@ import { isExternalUrl } from "../../../shared/widgets/utils/widget-helpers";
 /**
  * Renders a clickable link with optional external link indicator.
  */
-export function LinkWidget<TKey extends string>({
+export function LinkWidget<const TKey extends string>({
   value,
   context,
   className,

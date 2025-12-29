@@ -10,8 +10,8 @@ import type {
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { getTranslatorFromEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { parseError } from "../../shared/utils";
 
@@ -147,8 +147,6 @@ export async function extractToolCallText(
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<string> {
-  const { t } = simpleT(locale);
-
   // Load the definition using the same loader as ToolCallRenderer
   // This ensures we get the exact same title that's displayed in the UI
   try {
@@ -169,11 +167,9 @@ export async function extractToolCallText(
       logger,
     });
 
-    if (result.success && result.data?.title) {
-      // Use the same translation logic as ToolCallRenderer
-      const title = t(result.data.title);
-
-      return title;
+    if (result.success && result.data) {
+      const { t } = getTranslatorFromEndpoint(result.data)(locale);
+      return t(result.data.title);
     }
   } catch (error) {
     logger.warn(

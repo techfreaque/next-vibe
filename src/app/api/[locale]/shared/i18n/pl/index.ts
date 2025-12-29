@@ -73,5 +73,13 @@ export const translations: typeof enTranslations = {
   errors: {
     invalid_request_data: "Nieprawidłowe dane żądania",
     invalid_url_parameters: "Nieprawidłowe parametry URL",
+    validationFailed: {
+      title: "Walidacja nie powiodła się",
+      description: "Dane żądania nie przeszły walidacji",
+    },
+    serverError: {
+      title: "Błąd serwera",
+      description: "Wystąpił wewnętrzny błąd serwera",
+    },
   },
 };

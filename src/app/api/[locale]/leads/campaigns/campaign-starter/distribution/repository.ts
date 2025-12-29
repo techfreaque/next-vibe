@@ -29,25 +29,10 @@ import type {
 } from "./types";
 
 /**
- * Distribution Repository Interface
- */
-export interface DistributionRepository {
-  calculateDistribution(
-    data: DistributionCalculationInputType,
-    logger: EndpointLogger,
-  ): ResponseType<DistributionCalculationOutputType>;
-
-  calculateLocaleQuota(
-    data: LocaleQuotaCalculationInputType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LocaleProcessingInfoOutputType>>;
-}
-
-/**
  * Distribution Repository Implementation
  */
-export class DistributionRepositoryImpl implements DistributionRepository {
-  calculateDistribution(
+export class DistributionRepository {
+  static calculateDistribution(
     data: DistributionCalculationInputType,
     logger: EndpointLogger,
   ): ResponseType<DistributionCalculationOutputType> {
@@ -93,7 +78,7 @@ export class DistributionRepositoryImpl implements DistributionRepository {
     }
   }
 
-  async calculateLocaleQuota(
+  static async calculateLocaleQuota(
     data: LocaleQuotaCalculationInputType,
     logger: EndpointLogger,
   ): Promise<ResponseType<LocaleProcessingInfoOutputType>> {
@@ -130,10 +115,11 @@ export class DistributionRepositoryImpl implements DistributionRepository {
       );
 
       // Count how many leads we've already processed today for this locale
-      const processedCount = await this.getProcessedLeadsToday(
-        targetLocale as CountryLanguage,
-        now,
-      );
+      const processedCount =
+        await DistributionRepository.getProcessedLeadsToday(
+          targetLocale as CountryLanguage,
+          now,
+        );
 
       // Calculate how many more leads we need to process to catch up
       let rawLeadsPerRun = Math.max(
@@ -180,7 +166,7 @@ export class DistributionRepositoryImpl implements DistributionRepository {
   /**
    * Count how many leads were already processed today for a locale
    */
-  private async getProcessedLeadsToday(
+  private static async getProcessedLeadsToday(
     locale: CountryLanguage,
     now: Date,
   ): Promise<number> {
@@ -202,5 +188,3 @@ export class DistributionRepositoryImpl implements DistributionRepository {
     return Number(alreadyProcessedToday[0]?.count || 0);
   }
 }
-
-export const distributionRepository = new DistributionRepositoryImpl();

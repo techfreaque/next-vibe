@@ -8,7 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
+  objectOptionalField,
   requestDataField,
+  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -162,28 +164,80 @@ const { POST } = createEndpoint({
           .boolean()
           .describe("Whether the network requests listing operation succeeded"),
       ),
-      result: responseField(
+      result: objectOptionalField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.list-network-requests.response.result",
+          type: WidgetType.CONTAINER,
+          title: "app.api.browser.list-network-requests.response.result.title",
+          description:
+            "app.api.browser.list-network-requests.response.result.description",
+          layoutType: LayoutType.STACKED,
         },
-        z
-          .object({
-            requests: z
-              .array(
-                z.object({
-                  reqid: z.coerce.number(),
-                  url: z.string(),
-                  method: z.string(),
-                  status: z.coerce.number().optional(),
-                  type: z.string(),
-                }),
-              )
-              .describe("List of network requests"),
-            totalCount: z.coerce.number().describe("Total number of requests"),
-          })
-          .optional()
-          .describe("Result of network requests listing"),
+        { response: true },
+        {
+          requests: responseArrayField(
+            {
+              type: WidgetType.DATA_TABLE,
+            },
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+                layoutType: LayoutType.GRID,
+                columns: 12,
+              },
+              { response: true },
+              {
+                reqid: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-network-requests.response.result.requests.reqid",
+                  },
+                  z.coerce.number(),
+                ),
+                url: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-network-requests.response.result.requests.url",
+                  },
+                  z.string(),
+                ),
+                method: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-network-requests.response.result.requests.method",
+                  },
+                  z.string(),
+                ),
+                status: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-network-requests.response.result.requests.status",
+                  },
+                  z.coerce.number().optional(),
+                ),
+                type: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-network-requests.response.result.requests.type",
+                  },
+                  z.string(),
+                ),
+              },
+            ),
+          ),
+          totalCount: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.browser.list-network-requests.response.result.totalCount",
+            },
+            z.coerce.number().describe("Total number of requests"),
+          ),
+        },
       ),
       error: responseField(
         {

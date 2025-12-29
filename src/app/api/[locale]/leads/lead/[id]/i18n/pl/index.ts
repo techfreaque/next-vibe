@@ -1,4 +1,6 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   get: {
     title: "Get Lead Details",
     description: "Retrieve detailed information about a specific lead",

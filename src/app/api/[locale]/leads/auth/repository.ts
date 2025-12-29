@@ -23,7 +23,6 @@ import { leads, userLeadLinks } from "../db";
 import { LeadSource, LeadStatus } from "../enum";
 
 /**
- * Client information for lead creation
  */
 export interface ClientInfo {
   userAgent?: string;

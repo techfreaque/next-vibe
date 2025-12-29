@@ -78,6 +78,19 @@ export const translations = {
           title: "Your Referral Codes",
           description: "View and manage your referral codes",
         },
+        response: {
+          codes: {
+            id: "ID",
+            code: "Code",
+            label: "Label",
+            currentUses: "Current Uses",
+            isActive: "Active",
+            createdAt: "Created At",
+            totalSignups: "Total Signups",
+            totalRevenueCents: "Total Revenue (Cents)",
+            totalEarningsCents: "Total Earnings (Cents)",
+          },
+        },
       },
       success: {
         title: "Codes Retrieved",
@@ -118,6 +131,19 @@ export const translations = {
         form: {
           title: "Your Referral Earnings",
           description: "View your earnings from referrals",
+        },
+        response: {
+          earnings: {
+            id: "ID",
+            earnerUserId: "Earner User ID",
+            sourceUserId: "Source User ID",
+            transactionId: "Transaction ID",
+            level: "Level",
+            amountCents: "Amount (Cents)",
+            currency: "Currency",
+            status: "Status",
+            createdAt: "Created At",
+          },
         },
       },
       success: {
@@ -260,6 +286,19 @@ export const translations = {
       pending: "Pending",
       confirmed: "Confirmed",
       canceled: "Canceled",
+    },
+    payoutCurrency: {
+      usdc: "USDC",
+      btc: "Bitcoin",
+      credits: "Credits",
+    },
+    payoutStatus: {
+      pending: "Pending",
+      processing: "Processing",
+      completed: "Completed",
+      failed: "Failed",
+      rejected: "Rejected",
+      approved: "Approved",
     },
   },
 };

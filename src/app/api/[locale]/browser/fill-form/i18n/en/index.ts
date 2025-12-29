@@ -14,13 +14,30 @@ export const translations = {
         label: "Form Elements",
         description: "Array of elements from snapshot to fill out",
         placeholder: "Enter form elements (JSON array)",
+        uid: {
+          label: "Element UID",
+          description: "The unique identifier of the element to fill",
+        },
+        value: {
+          label: "Value",
+          description: "The value to enter into the element",
+        },
       },
     },
   },
 
   response: {
     success: "Form fill operation successful",
-    result: "Form fill operation result",
+    result: {
+      title: "Result",
+      description: "Form fill operation result",
+      filled: "All Filled",
+      filledCount: "Filled Count",
+      elements: {
+        uid: "Element UID",
+        filled: "Filled Successfully",
+      },
+    },
     error: "Error message",
     executionId: "Execution ID for tracking",
   },

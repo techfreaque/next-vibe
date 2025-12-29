@@ -13,7 +13,7 @@ import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
  * Displays alert messages with configurable variants.
  * Value should be a translation key string.
  */
-export function AlertWidget<TKey extends string>({
+export function AlertWidget<const TKey extends string>({
   value,
   field,
   context,

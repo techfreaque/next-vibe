@@ -16,7 +16,7 @@ import { LinkCardWidget } from "./LinkCardWidget";
 /**
  * Renders a list or grid of link cards.
  */
-export function LinkListWidget<TKey extends string>({
+export function LinkListWidget<const TKey extends string>({
   value,
   context,
   className,

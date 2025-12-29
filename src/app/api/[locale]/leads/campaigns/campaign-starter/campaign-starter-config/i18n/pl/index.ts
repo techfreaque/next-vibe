@@ -1,4 +1,6 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   get: {
     title: "Get Campaign Starter Config",
     description: "Retrieve campaign starter configuration",

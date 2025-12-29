@@ -46,7 +46,7 @@ export class PasswordUpdateRepository {
 
     if (!userId) {
       return fail({
-        message: "app.api.user.private.me.password.errors.unauthorized",
+        message: "app.api.user.private.me.password.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }

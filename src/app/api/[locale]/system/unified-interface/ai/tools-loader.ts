@@ -15,13 +15,13 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
 import { routeExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint";
 import { Platform } from "../shared/types/platform";
 import { endpointToToolName } from "../shared/utils/path";
+import { getTranslatorFromEndpoint } from "../shared/widgets/utils/field-helpers";
 
 /**
  * CoreTool type from AI SDK
@@ -44,7 +44,7 @@ function createToolFromEndpoint(
     logger: EndpointLogger;
   },
 ): CoreTool {
-  const { t } = simpleT(context.locale);
+  const { t } = getTranslatorFromEndpoint(endpoint)(context.locale);
   // Generate description
   const description = t(endpoint.description || endpoint.title);
 

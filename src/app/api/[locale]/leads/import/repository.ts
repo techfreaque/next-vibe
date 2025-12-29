@@ -245,21 +245,9 @@ export interface CsvImportJobStatusType {
 }
 
 /**
- * Leads Import Repository Interface
- */
-export interface ILeadsImportRepository
-  extends DomainImportRepository<LeadRecord> {
-  importLeadsFromCsv(
-    data: LeadsImportRequestOutput,
-    user: JwtPrivatePayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadsImportResponseOutput>>;
-}
-
-/**
  * Leads Domain Import Repository
  */
-export class LeadsImportRepository implements ILeadsImportRepository {
+export class LeadsImportRepository {
   /**
    * Get domain name for tracking
    */

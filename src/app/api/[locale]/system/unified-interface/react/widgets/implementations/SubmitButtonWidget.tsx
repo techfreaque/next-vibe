@@ -16,7 +16,7 @@ import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
 /**
  * Renders a submit button for forms with loading state support.
  */
-export function SubmitButtonWidget<TKey extends string>({
+export function SubmitButtonWidget<const TKey extends string>({
   field,
   context,
   className,

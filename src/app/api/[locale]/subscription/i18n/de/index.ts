@@ -192,6 +192,12 @@ export const translations: typeof enTranslations = {
       "Stripe-Kunde konnte nicht erstellt werden",
     not_implemented_on_native:
       "{{method}} ist auf der nativen Plattform nicht implementiert. Bitte verwenden Sie die Web-Version für diesen Vorgang.",
+    no_provider_id: "Keine Zahlungsanbieter-ID gefunden",
+  },
+
+  sync: {
+    failed: "Synchronisierung des Abonnements fehlgeschlagen",
+    stripe_error: "Stripe-Synchronisierungsfehler",
   },
 
   // Cancel operation

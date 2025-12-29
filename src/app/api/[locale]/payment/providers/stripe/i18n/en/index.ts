@@ -107,6 +107,10 @@ export const translations = {
       title: "Unknown Error",
       description: "An unexpected error occurred with Stripe CLI",
     },
+    customerRetrievalFailed: {
+      title: "Customer Retrieval Failed",
+      description: "Failed to retrieve Stripe customer information",
+    },
     unsavedChanges: {
       title: "Unsaved Changes",
       description: "You have unsaved configuration changes",

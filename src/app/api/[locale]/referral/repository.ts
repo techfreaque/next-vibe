@@ -61,70 +61,13 @@ const REFERRAL_CONFIG = {
 } as const;
 
 /**
- * Referral Repository Interface
- */
-export interface ReferralRepository {
-  createReferralCode(
-    userId: string,
-    data: ReferralPostRequestOutput,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ReferralPostResponseOutput>>;
-
-  getUserReferralCodes(
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CodesListGetResponseOutput>>;
-
-  validateReferralCode(
-    code: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ id: string; ownerUserId: string }>>;
-
-  linkReferralToLead(
-    leadId: string,
-    referralCode: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LinkToLeadPostResponseOutput>>;
-
-  getLatestLeadReferralCode(
-    leadId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ referralCode: string | null }>>;
-
-  convertLeadReferralToUser(
-    userId: string,
-    leadId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>>;
-
-  getReferralStats(
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<StatsGetResponseOutput>>;
-
-  getReferralEarnings(
-    userId: string,
-    limit: number,
-    offset: number,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<EarningsListGetResponseOutput>>;
-
-  applyReferralPayoutOnPayment(
-    transactionId: string,
-    userId: string,
-    creditsAmount: number,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>>;
-}
-
-/**
  * Referral Repository Implementation
  */
-export class ReferralRepositoryImpl implements ReferralRepository {
+export class ReferralRepository {
   /**
    * Create a new referral code
    */
-  async createReferralCode(
+  static async createReferralCode(
     userId: string,
     data: ReferralPostRequestOutput,
     logger: EndpointLogger,
@@ -187,7 +130,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Get user's referral codes with stats
    */
-  async getUserReferralCodes(
+  static async getUserReferralCodes(
     userId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<CodesListGetResponseOutput>> {
@@ -264,7 +207,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Validate referral code
    */
-  async validateReferralCode(
+  static async validateReferralCode(
     code: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ id: string; ownerUserId: string }>> {
@@ -311,7 +254,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
    * Called when user clicks referral link or enters code on signup form
    * Multiple referral codes can be linked to a lead - on signup, the latest is used
    */
-  async linkReferralToLead(
+  static async linkReferralToLead(
     leadId: string,
     referralCode: string,
     logger: EndpointLogger,
@@ -375,7 +318,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
    * Get the latest referral code for a lead
    * Returns the most recently linked referral code
    */
-  async getLatestLeadReferralCode(
+  static async getLatestLeadReferralCode(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ referralCode: string | null }>> {
@@ -414,7 +357,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
    * Called after user account is created to make referral permanent
    * Uses the LATEST referral code linked to the lead (most recent by createdAt)
    */
-  async convertLeadReferralToUser(
+  static async convertLeadReferralToUser(
     userId: string,
     leadId: string,
     logger: EndpointLogger,
@@ -511,7 +454,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
    * Get referral stats for a user
    * Returns: signups, revenue generated, earned credits, paid out, available
    */
-  async getReferralStats(
+  static async getReferralStats(
     userId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<StatsGetResponseOutput>> {
@@ -577,7 +520,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Get referral earnings for a user
    */
-  async getReferralEarnings(
+  static async getReferralEarnings(
     userId: string,
     limit: number,
     offset: number,
@@ -628,7 +571,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
    * Uses credits as the base for commission calculation (currency-independent)
    * 1 credit = 1 cent in commission value
    */
-  async applyReferralPayoutOnPayment(
+  static async applyReferralPayoutOnPayment(
     transactionId: string,
     userId: string,
     creditsAmount: number,
@@ -642,7 +585,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
       });
 
       // Get referral chain for the user
-      const chain = await this.getReferralChain(userId, logger);
+      const chain = await ReferralRepository.getReferralChain(userId, logger);
 
       if (chain.length === 0) {
         logger.debug("No referral chain found for user", { userId });
@@ -650,7 +593,10 @@ export class ReferralRepositoryImpl implements ReferralRepository {
       }
 
       // Calculate commission shares based on credits (1 credit = 1 cent for commission)
-      const shares = this.calculateCommissionShares(creditsAmount, chain);
+      const shares = ReferralRepository.calculateCommissionShares(
+        creditsAmount,
+        chain,
+      );
 
       // Get source user email for transaction metadata
       const [sourceUser] = await db
@@ -713,7 +659,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Get referral chain for a user (private helper)
    */
-  private async getReferralChain(
+  private static async getReferralChain(
     userId: string,
     logger: EndpointLogger,
   ): Promise<string[]> {
@@ -746,7 +692,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Calculate commission shares using geometric decay (private helper)
    */
-  private calculateCommissionShares(
+  private static calculateCommissionShares(
     amountCents: number,
     chain: string[],
   ): CommissionShare[] {
@@ -796,7 +742,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Get user's earned credits balance and payout history
    */
-  async getEarnedBalance(
+  static async getEarnedBalance(
     userId: string,
     logger: EndpointLogger,
   ): Promise<
@@ -809,8 +755,8 @@ export class ReferralRepositoryImpl implements ReferralRepository {
       payoutHistory: Array<{
         id: string;
         amountCents: number;
-        currency: PayoutCurrencyValue;
-        status: PayoutStatusValue;
+        currency: typeof PayoutCurrencyValue;
+        status: typeof PayoutStatusValue;
         walletAddress: string | null;
         rejectionReason: string | null;
         createdAt: string;
@@ -841,8 +787,8 @@ export class ReferralRepositoryImpl implements ReferralRepository {
         payoutHistory: history.map((p) => ({
           id: p.id,
           amountCents: p.amountCents,
-          currency: p.currency as PayoutCurrencyValue,
-          status: p.status as PayoutStatusValue,
+          currency: p.currency,
+          status: p.status,
           walletAddress: p.walletAddress,
           rejectionReason: p.rejectionReason,
           createdAt: p.createdAt.toISOString(),
@@ -861,16 +807,16 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Request a payout (BTC/USDC)
    */
-  async requestPayout(
+  static async requestPayout(
     userId: string,
     amountCents: number,
-    currency: PayoutCurrencyValue,
+    currency: typeof PayoutCurrencyValue,
     walletAddress: string | null,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ payoutRequestId: string }>> {
     try {
       // Validate minimum amount
-      if (amountCents < ReferralRepositoryImpl.MIN_PAYOUT_CENTS) {
+      if (amountCents < ReferralRepository.MIN_PAYOUT_CENTS) {
         return fail({
           message: "app.api.referral.payout.errors.minimumAmount",
           errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -916,7 +862,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
 
       // If converting to credits, process immediately
       if (currency === PayoutCurrency.CREDITS) {
-        await this.processCreditsConversion(
+        await ReferralRepository.processCreditsConversion(
           request.id,
           userId,
           amountCents,
@@ -944,7 +890,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Process credits conversion (instant)
    */
-  private async processCreditsConversion(
+  private static async processCreditsConversion(
     requestId: string,
     userId: string,
     amountCents: number,
@@ -1000,8 +946,8 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Admin: List all payout requests
    */
-  async listPayoutRequests(
-    status: PayoutStatusValue | null,
+  static async listPayoutRequests(
+    status: typeof PayoutStatusValue | null,
     limit: number,
     offset: number,
     logger: EndpointLogger,
@@ -1012,8 +958,8 @@ export class ReferralRepositoryImpl implements ReferralRepository {
         userId: string;
         userEmail: string;
         amountCents: number;
-        currency: PayoutCurrencyValue;
-        status: PayoutStatusValue;
+        currency: typeof PayoutCurrencyValue;
+        status: typeof PayoutStatusValue;
         walletAddress: string | null;
         adminNotes: string | null;
         rejectionReason: string | null;
@@ -1060,8 +1006,8 @@ export class ReferralRepositoryImpl implements ReferralRepository {
           userId: r.userId,
           userEmail: r.userEmail,
           amountCents: r.amountCents,
-          currency: r.currency as PayoutCurrencyValue,
-          status: r.status as PayoutStatusValue,
+          currency: r.currency,
+          status: r.status,
           walletAddress: r.walletAddress,
           adminNotes: r.adminNotes,
           rejectionReason: r.rejectionReason,
@@ -1082,7 +1028,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Admin: Approve payout request
    */
-  async approvePayoutRequest(
+  static async approvePayoutRequest(
     requestId: string,
     adminUserId: string,
     adminNotes: string | null,
@@ -1133,7 +1079,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Admin: Reject payout request
    */
-  async rejectPayoutRequest(
+  static async rejectPayoutRequest(
     requestId: string,
     adminUserId: string,
     rejectionReason: string,
@@ -1189,7 +1135,7 @@ export class ReferralRepositoryImpl implements ReferralRepository {
   /**
    * Admin: Complete payout request (after external transfer)
    */
-  async completePayoutRequest(
+  static async completePayoutRequest(
     requestId: string,
     adminUserId: string,
     adminNotes: string | null,
@@ -1259,8 +1205,3 @@ export class ReferralRepositoryImpl implements ReferralRepository {
     }
   }
 }
-
-/**
- * Default repository instance
- */
-export const referralRepository = new ReferralRepositoryImpl();

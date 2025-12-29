@@ -122,6 +122,10 @@ export const translations: typeof enTranslations = {
       title: "Tworzenie klienta nie powiodło się",
       description: "Nie udało się utworzyć klienta Stripe",
     },
+    customerRetrievalFailed: {
+      title: "Pobieranie klienta nie powiodło się",
+      description: "Nie udało się pobrać informacji o kliencie Stripe",
+    },
     checkoutCreationFailed: {
       title: "Tworzenie checkout nie powiodło się",
       description: "Nie udało się utworzyć sesji checkout Stripe",

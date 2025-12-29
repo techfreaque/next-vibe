@@ -8,7 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
+  objectOptionalField,
   requestDataField,
+  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -163,27 +165,72 @@ const { POST } = createEndpoint({
           .boolean()
           .describe("Whether the console messages listing operation succeeded"),
       ),
-      result: responseField(
+      result: objectOptionalField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.list-console-messages.response.result",
+          type: WidgetType.CONTAINER,
+          title: "app.api.browser.list-console-messages.response.result.title",
+          description:
+            "app.api.browser.list-console-messages.response.result.description",
+          layoutType: LayoutType.STACKED,
         },
-        z
-          .object({
-            messages: z
-              .array(
-                z.object({
-                  msgid: z.coerce.number(),
-                  type: z.string(),
-                  text: z.string(),
-                  timestamp: z.string().optional(),
-                }),
-              )
-              .describe("List of console messages"),
-            totalCount: z.coerce.number().describe("Total number of messages"),
-          })
-          .optional()
-          .describe("Result of console messages listing"),
+        { response: true },
+        {
+          messages: responseArrayField(
+            {
+              type: WidgetType.DATA_TABLE,
+            },
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+                layoutType: LayoutType.GRID,
+                columns: 12,
+              },
+              { response: true },
+              {
+                msgid: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-console-messages.response.result.messages.msgid",
+                  },
+                  z.coerce.number(),
+                ),
+                type: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-console-messages.response.result.messages.type",
+                  },
+                  z.string(),
+                ),
+                text: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-console-messages.response.result.messages.text",
+                  },
+                  z.string(),
+                ),
+                timestamp: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-console-messages.response.result.messages.timestamp",
+                  },
+                  z.string().optional(),
+                ),
+              },
+            ),
+          ),
+          totalCount: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.browser.list-console-messages.response.result.totalCount",
+            },
+            z.coerce.number().describe("Total number of messages"),
+          ),
+        },
       ),
       error: responseField(
         {

@@ -24,16 +24,9 @@ import type {
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
 } from "@/app/api/[locale]/user/auth/types";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type {
-  ApiHandlerProps,
-  InferJwtPayloadTypeFromRoles,
-  MethodHandlerConfig,
-} from "../../endpoints/route/handler";
-import type { EndpointHandlerConfig } from "../../endpoints/route/multi";
+import type { InferJwtPayloadTypeFromRoles } from "../../endpoints/route/handler";
 
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;

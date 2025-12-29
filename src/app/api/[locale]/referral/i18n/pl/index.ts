@@ -1,4 +1,6 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   // Main referral domain
   category: "Polecenie",
 
@@ -78,6 +80,19 @@ export const translations = {
           title: "Twoje kody polecające",
           description: "Wyświetl i zarządzaj swoimi kodami polecającymi",
         },
+        response: {
+          codes: {
+            id: "ID",
+            code: "Kod",
+            label: "Etykieta",
+            currentUses: "Aktualna liczba użyć",
+            isActive: "Aktywny",
+            createdAt: "Utworzono",
+            totalSignups: "Łączne rejestracje",
+            totalRevenueCents: "Łączny przychód (Centy)",
+            totalEarningsCents: "Łączne zarobki (Centy)",
+          },
+        },
       },
       success: {
         title: "Kody pobrane",
@@ -118,6 +133,19 @@ export const translations = {
         form: {
           title: "Twoje zarobki z poleceń",
           description: "Wyświetl swoje zarobki z poleceń",
+        },
+        response: {
+          earnings: {
+            id: "ID",
+            earnerUserId: "ID zarabiającego użytkownika",
+            sourceUserId: "ID źródłowego użytkownika",
+            transactionId: "ID transakcji",
+            level: "Poziom",
+            amountCents: "Kwota (Centy)",
+            currency: "Waluta",
+            status: "Status",
+            createdAt: "Utworzono",
+          },
         },
       },
       success: {
@@ -260,6 +288,19 @@ export const translations = {
       pending: "Oczekujące",
       confirmed: "Potwierdzone",
       canceled: "Anulowane",
+    },
+    payoutCurrency: {
+      usdc: "USDC",
+      btc: "Bitcoin",
+      credits: "Kredyty",
+    },
+    payoutStatus: {
+      pending: "Oczekujące",
+      processing: "Przetwarzanie",
+      completed: "Zakończone",
+      failed: "Niepowodzenie",
+      rejected: "Odrzucone",
+      approved: "Zatwierdzone",
     },
   },
 };

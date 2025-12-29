@@ -14,7 +14,7 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
 /**
  * Renders markdown content with optional sanitization.
  */
-export function MarkdownWidget<TKey extends string>({
+export function MarkdownWidget<const TKey extends string>({
   value,
   context,
   className,

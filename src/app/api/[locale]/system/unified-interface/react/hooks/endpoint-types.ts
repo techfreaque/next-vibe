@@ -198,6 +198,43 @@ export interface UseEndpointOptions<T> {
   };
 
   /**
+   * Options for update (PATCH) operations
+   * Alias for PATCH endpoints with semantic naming
+   */
+  update?: {
+    /** Form options for mutation forms */
+    formOptions?: ApiFormOptions<
+      PatchEndpointTypes<T> extends never
+        ? never
+        : PatchEndpointTypes<T>["request"]
+    >;
+    /** Mutation options for update operations */
+    mutationOptions?: ApiMutationOptions<
+      PatchEndpointTypes<T> extends never
+        ? never
+        : PatchEndpointTypes<T>["request"],
+      PatchEndpointTypes<T> extends never
+        ? never
+        : PatchEndpointTypes<T>["response"],
+      PatchEndpointTypes<T> extends never
+        ? never
+        : PatchEndpointTypes<T>["urlPathParams"]
+    >;
+    /** URL path parameters for the update endpoint */
+    urlPathParams?: PatchEndpointTypes<T> extends never
+      ? undefined
+      : PatchEndpointTypes<T>["urlPathParams"];
+    /** Data to auto-prefill the form with (supports nested partial data) */
+    autoPrefillData?: PatchEndpointTypes<T> extends never
+      ? undefined
+      : DeepPartial<PatchEndpointTypes<T>["request"]>;
+    /** Initial state for the form (supports nested partial data) */
+    initialState?: PatchEndpointTypes<T> extends never
+      ? undefined
+      : DeepPartial<PatchEndpointTypes<T>["request"]>;
+  };
+
+  /**
    * Options for delete (DELETE) operations
    * Supports all options from useEndpointDelete hook
    */
@@ -500,6 +537,40 @@ export type EndpointReturn<T> = Prettify<{
           PrimaryMutationTypes<T>["response"],
           PrimaryMutationTypes<T>["urlPathParams"]
         >;
+        clearSavedForm: () => void;
+        /** @deprecated Use response property instead */
+        setErrorType: (error: ErrorResponseType | null) => void;
+      };
+
+  update: PatchEndpointTypes<T> extends never
+    ? undefined
+    : {
+        form: UseFormReturn<
+          PatchEndpointTypes<T>["request"],
+          ZodType<
+            PatchEndpointTypes<T>["request"],
+            ZodTypeDef,
+            PatchEndpointTypes<T>["request"]
+          >
+        >;
+        /** The complete response including success/error state */
+        response: ResponseType<PatchEndpointTypes<T>["response"]> | undefined;
+
+        // Backward compatibility properties
+        /** @deprecated Use response?.success === true instead */
+        isSuccess: boolean;
+        /** @deprecated Use response?.success === false ? response : null instead */
+        error: ErrorResponseType | null;
+
+        values: Partial<PatchEndpointTypes<T>["request"]>;
+        setValue: <K extends keyof PatchEndpointTypes<T>["request"]>(
+          key: K,
+          value: PatchEndpointTypes<T>["request"][K],
+        ) => void;
+        submit: (data: PatchEndpointTypes<T>["request"]) => Promise<void>;
+        reset: () => void;
+        isSubmitting: boolean;
+        isDirty: boolean;
         clearSavedForm: () => void;
         /** @deprecated Use response property instead */
         setErrorType: (error: ErrorResponseType | null) => void;

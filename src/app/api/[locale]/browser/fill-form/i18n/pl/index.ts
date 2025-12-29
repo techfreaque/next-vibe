@@ -12,13 +12,30 @@ export const translations: typeof enTranslations = {
         label: "Elementy formularza",
         description: "Tablica elementów z migawki do wypełnienia",
         placeholder: "Wprowadź elementy formularza (tablica JSON)",
+        uid: {
+          label: "UID elementu",
+          description: "Unikalny identyfikator elementu do wypełnienia",
+        },
+        value: {
+          label: "Wartość",
+          description: "Wartość do wprowadzenia do elementu",
+        },
       },
     },
   },
 
   response: {
     success: "Operacja wypełniania formularza pomyślna",
-    result: "Wynik operacji wypełniania formularza",
+    result: {
+      title: "Wynik",
+      description: "Wynik operacji wypełniania formularza",
+      filled: "Wszystko wypełnione",
+      filledCount: "Liczba wypełnionych",
+      elements: {
+        uid: "UID elementu",
+        filled: "Pomyślnie wypełniono",
+      },
+    },
     error: "Komunikat błędu",
     executionId: "ID wykonania do śledzenia",
   },

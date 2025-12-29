@@ -29,7 +29,7 @@ import { getSeverityVariant } from "../../../shared/widgets/utils/widget-helpers
 /**
  * Displays code quality issues with grouping by file/severity/rule.
  */
-export function CodeQualityListWidget<TKey extends string>({
+export function CodeQualityListWidget<const TKey extends string>({
   value,
   context,
   className,

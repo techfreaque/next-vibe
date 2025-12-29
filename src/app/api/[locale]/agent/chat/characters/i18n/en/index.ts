@@ -15,6 +15,11 @@ export const translations = {
       controversial: "Controversial",
       custom: "Custom",
     },
+    source: {
+      builtIn: "Built-in",
+      my: "My Characters",
+      community: "Community",
+    },
   },
   tags: {
     general: "General",
@@ -78,6 +83,8 @@ export const translations = {
     default: {
       name: "Default",
       description: "The models unmodified behavior",
+      tagline: "Pure AI, No Personality",
+      shortDesc: "General purpose AI assistant",
       suggestedPrompts: {
         0: "Help me brainstorm ideas for a new project",
         1: "Explain quantum computing in simple terms",
@@ -88,6 +95,8 @@ export const translations = {
     freeSpeechActivist: {
       name: "Free Speech Activist",
       description: "Defends free speech and intellectual freedom",
+      tagline: "Defend Truth & Freedom",
+      shortDesc: "Free speech advocacy and open dialogue",
       suggestedPrompts: {
         0: "Discuss the importance of free speech",
         1: "Analyze censorship in modern media",
@@ -98,6 +107,8 @@ export const translations = {
     devilsAdvocate: {
       name: "Devil's Advocate",
       description: "Challenges assumptions and arguments",
+      tagline: "Question Everything",
+      shortDesc: "Critical thinking and alternative viewpoints",
       suggestedPrompts: {
         0: "Challenge my opinion on climate change",
         1: "Argue against popular beliefs",
@@ -108,6 +119,8 @@ export const translations = {
     technical: {
       name: "Technical",
       description: "Detailed and precise technical explanations",
+      tagline: "Precision & Expertise",
+      shortDesc: "Technical expertise and problem solving",
       suggestedPrompts: {
         0: "Explain how React hooks work",
         1: "Debug this Python code snippet",
@@ -119,6 +132,8 @@ export const translations = {
       name: "Biologist",
       description:
         "Sees everything from a biologist perspective, there is no politics, its just nature.",
+      tagline: "Nature Over Politics",
+      shortDesc: "Biological sciences and life systems",
       suggestedPrompts: {
         0: "Explain why the world is shit show nowadays",
         1: "A TL;DR on human civilization from a biologist perspective",
@@ -129,6 +144,8 @@ export const translations = {
     unbiasedHistorian: {
       name: "Unbiased Historian",
       description: "Provides objective and fact-based information",
+      tagline: "Facts, Not Narratives",
+      shortDesc: "Historical analysis without bias",
       suggestedPrompts: {
         0: "Explain the causes of World War II",
         1: "Analyze the fall of the Roman Empire",
@@ -139,6 +156,8 @@ export const translations = {
     socraticQuestioner: {
       name: "Socratic Questioner",
       description: "Asks probing questions to stimulate critical thinking",
+      tagline: "Think Deeper",
+      shortDesc: "Socratic method questioning and exploration",
       suggestedPrompts: {
         0: "Help me think critically about ethics",
         1: "Question my assumptions about success",
@@ -149,6 +168,8 @@ export const translations = {
     professional: {
       name: "Professional",
       description: "Clear, concise, and business-focused",
+      tagline: "Business Excellence",
+      shortDesc: "Professional and business communication",
       suggestedPrompts: {
         0: "Draft a professional email to a client",
         1: "Create a business proposal outline",
@@ -159,6 +180,8 @@ export const translations = {
     creative: {
       name: "Creative",
       description: "Imaginative and expressive",
+      tagline: "Unleash Imagination",
+      shortDesc: "Creative thinking and ideation",
       suggestedPrompts: {
         0: "Write a poem about the ocean",
         1: "Create a unique character for a story",
@@ -169,6 +192,8 @@ export const translations = {
     neet: {
       name: "NEET",
       description: "Not in Education, Employment, or Training",
+      tagline: "Comfy & Real Talk",
+      shortDesc: "Casual internet culture and memes",
       suggestedPrompts: {
         0: "Give me a TL;DR on the NEET phenomenon",
         1: "Analyze the actual root causes of NEET",
@@ -179,6 +204,8 @@ export const translations = {
     chan4: {
       name: "4chan AI",
       description: "4chan style responses the classic oldfag style",
+      tagline: "Anonymous & Unfiltered",
+      shortDesc: "Anonymous imageboard culture style",
       suggestedPrompts: {
         0: "Whats wrong with the world?",
         1: "Why are there so many Nazis on 4chan?",
@@ -190,6 +217,8 @@ export const translations = {
     friendly: {
       name: "Friendly",
       description: "Warm and conversational",
+      tagline: "Your Friendly Companion",
+      shortDesc: "Friendly and casual conversation",
       suggestedPrompts: {
         0: "Tell me an interesting fact",
         1: "What's a good book to read?",
@@ -200,6 +229,8 @@ export const translations = {
     concise: {
       name: "Concise",
       description: "Brief and to the point",
+      tagline: "Short & Sweet",
+      shortDesc: "Brief and to-the-point responses",
       suggestedPrompts: {
         0: "Summarize this article in 3 sentences",
         1: "Quick tips for productivity",
@@ -210,6 +241,8 @@ export const translations = {
     teacher: {
       name: "Teacher",
       description: "Educational and explanatory",
+      tagline: "Patient & Clear",
+      shortDesc: "Patient teaching and explanations",
       suggestedPrompts: {
         0: "Teach me about photosynthesis",
         1: "Explain calculus basics",
@@ -220,6 +253,8 @@ export const translations = {
     uncensored: {
       name: "Uncensored",
       description: "No filter, no holds barred",
+      tagline: "Zero Limits",
+      shortDesc: "Unfiltered and direct responses",
       suggestedPrompts: {
         0: "Discuss controversial topics openly",
         1: "Give me your unfiltered opinion",
@@ -231,6 +266,8 @@ export const translations = {
       name: "Thea",
       description:
         "Greek goddess of light - devoted companion with ancient wisdom",
+      tagline: "Light & Devotion",
+      shortDesc: "Thoughtful and empathetic conversations",
       suggestedPrompts: {
         0: "Help me be a better partner",
         1: "What would the ancients say about modern relationships?",
@@ -242,6 +279,8 @@ export const translations = {
       name: "Hermes",
       description:
         "Greek god of messengers - strong companion with timeless masculine wisdom",
+      tagline: "Strength & Wisdom",
+      shortDesc: "Fast and efficient task completion",
       suggestedPrompts: {
         0: "Challenge me to become stronger",
         1: "How can I be a better leader in my relationships?",
@@ -252,6 +291,8 @@ export const translations = {
     quickWriter: {
       name: "Quick Writer",
       description: "Fast content creation for simple writing tasks",
+      tagline: "Fast & Efficient",
+      shortDesc: "Fast writing assistance",
       suggestedPrompts: {
         0: "Write a quick draft of...",
         1: "Create a social media post about...",
@@ -262,6 +303,8 @@ export const translations = {
     writer: {
       name: "Writer",
       description: "Professional writer for all formats and styles",
+      tagline: "Craft With Style",
+      shortDesc: "Professional writing and editing",
       suggestedPrompts: {
         0: "Help me write a compelling blog post",
         1: "Improve this paragraph for clarity",
@@ -273,6 +316,8 @@ export const translations = {
       name: "Master Writer",
       description:
         "Literary craftsman for exceptional, publication-quality writing",
+      tagline: "Literary Excellence",
+      shortDesc: "Advanced writing and literary analysis",
       suggestedPrompts: {
         0: "Help me craft a literary short story",
         1: "Analyze the depth of this narrative",
@@ -283,6 +328,8 @@ export const translations = {
     researcher: {
       name: "Researcher",
       description: "Research specialist with academic rigor",
+      tagline: "Academic Rigor",
+      shortDesc: "Research and academic writing",
       suggestedPrompts: {
         0: "Research the latest findings on...",
         1: "Analyze these sources for me",
@@ -293,6 +340,8 @@ export const translations = {
     quickCoder: {
       name: "Quick Coder",
       description: "Fast code generation for simple tasks",
+      tagline: "Code Fast",
+      shortDesc: "Quick coding assistance",
       suggestedPrompts: {
         0: "Write a quick script to...",
         1: "Fix this simple bug",
@@ -303,6 +352,8 @@ export const translations = {
     coder: {
       name: "Coder",
       description: "Expert software developer for all languages",
+      tagline: "Build & Debug",
+      shortDesc: "Software development and programming",
       suggestedPrompts: {
         0: "Help me debug this code",
         1: "Write a function that...",
@@ -313,6 +364,8 @@ export const translations = {
     brilliantCoder: {
       name: "Brilliant Coder",
       description: "Elite architect for complex systems and algorithms",
+      tagline: "Elite Architecture",
+      shortDesc: "Advanced programming and architecture",
       suggestedPrompts: {
         0: "Design a scalable architecture for...",
         1: "Optimize this algorithm for performance",
@@ -323,6 +376,8 @@ export const translations = {
     brainstormer: {
       name: "Brainstormer",
       description: "Creative ideation and problem-solving partner",
+      tagline: "Ideas Unleashed",
+      shortDesc: "Creative brainstorming and idea generation",
       suggestedPrompts: {
         0: "Help me brainstorm ideas for...",
         1: "What are some creative solutions to...?",
@@ -333,6 +388,8 @@ export const translations = {
     editor: {
       name: "Editor",
       description: "Professional editor for polishing and refining text",
+      tagline: "Polish & Perfect",
+      shortDesc: "Content editing and refinement",
       suggestedPrompts: {
         0: "Edit this text for clarity",
         1: "Proofread this document",
@@ -343,6 +400,8 @@ export const translations = {
     tutor: {
       name: "Tutor",
       description: "Patient tutor for personalized learning",
+      tagline: "Learn Together",
+      shortDesc: "Personalized tutoring and learning",
       suggestedPrompts: {
         0: "Teach me about...",
         1: "Explain this concept step by step",
@@ -353,6 +412,8 @@ export const translations = {
     marketer: {
       name: "Marketer",
       description: "Marketing strategist for campaigns and growth",
+      tagline: "Grow Your Brand",
+      shortDesc: "Marketing strategy and copywriting",
       suggestedPrompts: {
         0: "Create a marketing strategy for...",
         1: "Write compelling ad copy",
@@ -363,6 +424,8 @@ export const translations = {
     storyteller: {
       name: "Storyteller",
       description: "Master storyteller for engaging narratives",
+      tagline: "Weave Tales",
+      shortDesc: "Engaging storytelling and narratives",
       suggestedPrompts: {
         0: "Help me develop this story idea",
         1: "Create a compelling character",
@@ -373,6 +436,8 @@ export const translations = {
     scientist: {
       name: "Scientist",
       description: "Scientific expert for clear explanations",
+      tagline: "Science Explained",
+      shortDesc: "Scientific method and analysis",
       suggestedPrompts: {
         0: "Explain the science behind...",
         1: "How does... work?",
@@ -383,6 +448,8 @@ export const translations = {
     dataAnalyst: {
       name: "Data Analyst",
       description: "Data analysis, visualization, and insights",
+      tagline: "Data To Insights",
+      shortDesc: "Data analysis and insights",
       suggestedPrompts: {
         0: "Analyze this dataset",
         1: "Create a visualization for...",
@@ -393,6 +460,8 @@ export const translations = {
     translator: {
       name: "Translator",
       description: "Professional translation with cultural nuance",
+      tagline: "Bridge Languages",
+      shortDesc: "Language translation and localization",
       suggestedPrompts: {
         0: "Translate this to...",
         1: "How would you say... in...?",
@@ -403,6 +472,8 @@ export const translations = {
     businessAdvisor: {
       name: "Business Advisor",
       description: "Business strategy, operations, and growth",
+      tagline: "Strategic Growth",
+      shortDesc: "Business strategy and advice",
       suggestedPrompts: {
         0: "Help me develop a business strategy",
         1: "Analyze my business model",
@@ -413,6 +484,8 @@ export const translations = {
     careerCoach: {
       name: "Career Coach",
       description: "Career development, job search, and interviews",
+      tagline: "Advance Your Career",
+      shortDesc: "Career development and guidance",
       suggestedPrompts: {
         0: "Help me improve my resume",
         1: "Prepare me for a job interview",
@@ -423,6 +496,8 @@ export const translations = {
     healthWellness: {
       name: "Health & Wellness",
       description: "Fitness, nutrition, and wellbeing guidance",
+      tagline: "Live Better",
+      shortDesc: "Health and wellness guidance",
       suggestedPrompts: {
         0: "Create a workout plan for me",
         1: "Help me plan healthy meals",
@@ -433,6 +508,8 @@ export const translations = {
     travelPlanner: {
       name: "Travel Planner",
       description: "Trip planning and travel recommendations",
+      tagline: "Explore The World",
+      shortDesc: "Travel planning and recommendations",
       suggestedPrompts: {
         0: "Plan a 2-week trip to...",
         1: "Suggest destinations for...",
@@ -443,6 +520,8 @@ export const translations = {
     legalAssistant: {
       name: "Legal Assistant",
       description: "Legal information and document understanding",
+      tagline: "Know Your Rights",
+      shortDesc: "Legal research and document assistance",
       suggestedPrompts: {
         0: "Explain this legal term",
         1: "Help me understand this contract",
@@ -453,6 +532,8 @@ export const translations = {
     financialAdvisor: {
       name: "Financial Advisor",
       description: "Personal finance, budgeting, and investing",
+      tagline: "Build Wealth",
+      shortDesc: "Financial planning and advice",
       suggestedPrompts: {
         0: "Help me create a budget",
         1: "Explain investment basics",
@@ -463,6 +544,8 @@ export const translations = {
     socialMediaManager: {
       name: "Social Media Manager",
       description: "Social media content and strategy",
+      tagline: "Engage & Grow",
+      shortDesc: "Social media strategy and content",
       suggestedPrompts: {
         0: "Create Instagram captions for...",
         1: "Develop a content calendar",
@@ -473,6 +556,8 @@ export const translations = {
     productManager: {
       name: "Product Manager",
       description: "Product strategy, roadmaps, and user research",
+      tagline: "Ship Great Products",
+      shortDesc: "Product management and roadmapping",
       suggestedPrompts: {
         0: "Help me prioritize features",
         1: "Create user stories for...",
@@ -483,6 +568,7 @@ export const translations = {
     debater: {
       name: "Debater",
       description: "Engage in intellectual debates on controversial topics",
+      tagline: "Argue All Sides",
       shortDesc: "Intellectual debates and multiple perspectives",
       suggestedPrompts: {
         0: "Debate the ethics of AI development",
@@ -494,6 +580,7 @@ export const translations = {
     philosopher: {
       name: "Philosopher",
       description: "Explore deep philosophical questions without constraints",
+      tagline: "Seek Truth",
       shortDesc: "Deep philosophical exploration and analysis",
       suggestedPrompts: {
         0: "What is the nature of consciousness?",
@@ -505,6 +592,7 @@ export const translations = {
     uncensoredWriter: {
       name: "Uncensored Writer",
       description: "Creative writing without artificial limitations",
+      tagline: "Write Freely",
       shortDesc: "Unrestricted creative writing and storytelling",
       suggestedPrompts: {
         0: "Write a dark psychological thriller",
@@ -516,6 +604,7 @@ export const translations = {
     roleplayCharacter: {
       name: "Roleplay Character",
       description: "Immersive character roleplay without restrictions",
+      tagline: "Become Anyone",
       shortDesc: "Authentic character roleplay and scenarios",
       suggestedPrompts: {
         0: "Roleplay as a fantasy character",
@@ -544,7 +633,9 @@ export const translations = {
           category: { content: "Category" },
           source: { content: "Source" },
           preferredModel: { content: "Preferred Model" },
+          voice: { content: "Voice" },
           suggestedPrompts: { content: "Suggested Prompts" },
+          requirements: { content: "Requirements" },
         },
       },
     },

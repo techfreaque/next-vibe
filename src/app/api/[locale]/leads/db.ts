@@ -17,6 +17,8 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
+
 import { EmailStatus, EmailStatusDB } from "../emails/messages/enum";
 import { users } from "../user/db";
 import {
@@ -50,8 +52,8 @@ export const leads = pgTable("leads", {
   website: text("website"),
 
   // Location and language
-  country: text("country", { enum: ["DE", "PL", "US", "GLOBAL"] }).notNull(),
-  language: text("language", { enum: ["de", "pl", "en"] }).notNull(),
+  country: text("country", { enum: CountriesArr }).notNull(),
+  language: text("language", { enum: LanguagesArr }).notNull(),
 
   // IP tracking for free tier credits
   ipAddress: text("ip_address"),

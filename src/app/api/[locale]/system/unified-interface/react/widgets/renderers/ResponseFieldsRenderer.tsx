@@ -92,7 +92,7 @@ function transformDataForWidget(
 /**
  * Render a single response field using WidgetRenderer
  */
-function renderResponseField<TKey extends string>(
+function renderResponseField<const TKey extends string>(
   fieldKey: string,
   field: UnifiedField<TKey>,
   result: ToolCallResult | null,

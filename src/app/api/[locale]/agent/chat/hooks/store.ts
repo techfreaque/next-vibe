@@ -7,6 +7,10 @@ import { storage } from "next-vibe-ui/lib/storage";
 import { create } from "zustand";
 
 import { aliasToPathMap } from "../../../system/generated/endpoint";
+import {
+  DEFAULT_TTS_VOICE,
+  type TtsVoiceValue,
+} from "../../text-to-speech/enum";
 import { DEFAULT_TOOL_IDS } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { ViewMode, type ViewModeValue } from "../enum";
@@ -27,6 +31,7 @@ export interface ChatSettings {
   temperature: number;
   maxTokens: number;
   ttsAutoplay: boolean;
+  ttsVoice: typeof TtsVoiceValue;
   theme: "light" | "dark";
   viewMode: typeof ViewModeValue;
   enabledToolIds: string[];
@@ -99,6 +104,7 @@ const getDefaultSettings = (): ChatSettings => ({
   temperature: 0.7,
   maxTokens: 2000,
   ttsAutoplay: false,
+  ttsVoice: DEFAULT_TTS_VOICE,
   theme: "dark",
   viewMode: ViewMode.LINEAR,
   enabledToolIds: [...DEFAULT_TOOL_IDS],

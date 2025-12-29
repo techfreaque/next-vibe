@@ -14,7 +14,7 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
  * Renders form fields based on fieldType (TEXT, SELECT, BOOLEAN, etc.).
  * Always renders as editable input - no "readonly" mode.
  */
-export function FormFieldWidget<TKey extends string>({
+export function FormFieldWidget<const TKey extends string>({
   field,
   fieldName = "field",
   className,

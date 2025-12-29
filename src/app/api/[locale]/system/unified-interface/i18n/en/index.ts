@@ -39,4 +39,10 @@ export const translations = {
       },
     },
   },
+  widgets: {
+    chart: {
+      noDataAvailable: "No data available",
+      noDataToDisplay: "No data to display",
+    },
+  },
 };

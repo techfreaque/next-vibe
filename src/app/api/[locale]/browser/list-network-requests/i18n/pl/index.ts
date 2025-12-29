@@ -57,7 +57,18 @@ export const translations: typeof enTranslations = {
   },
   response: {
     success: "Żądania sieciowe pobrane pomyślnie",
-    result: "Wynik listy żądań sieciowych",
+    result: {
+      title: "Wynik",
+      description: "Wynik listy żądań sieciowych",
+      requests: {
+        reqid: "ID żądania",
+        url: "URL",
+        method: "Metoda",
+        status: "Status",
+        type: "Typ",
+      },
+      totalCount: "Łączna liczba",
+    },
     error: "Komunikat błędu",
     executionId: "ID wykonania do śledzenia",
   },

@@ -14,6 +14,7 @@ import type {
 import { WidgetErrorBoundary } from "../core/ErrorBoundary";
 import { AlertWidget } from "../implementations/AlertWidget";
 import { BadgeWidget } from "../implementations/BadgeWidget";
+import { ButtonWidget } from "../implementations/ButtonWidget";
 import { ChartWidget } from "../implementations/ChartWidget";
 import { CodeOutputWidget } from "../implementations/CodeOutputWidget";
 import { CodeQualityListWidget } from "../implementations/CodeQualityListWidget";
@@ -93,7 +94,7 @@ export interface WidgetRendererProps<TKey extends string> {
  * @param props - Widget renderer props
  * @returns Rendered widget wrapped in error boundary
  */
-export function WidgetRenderer<TKey extends string>({
+export function WidgetRenderer<const TKey extends string>({
   widgetType,
   fieldName,
   data,
@@ -133,7 +134,7 @@ export function WidgetRenderer<TKey extends string>({
  * @param baseProps - Base props (field, value, context, className, style, form, onSubmit, isSubmitting)
  * @returns Rendered widget component
  */
-function renderWidget<TKey extends string>(
+function renderWidget<const TKey extends string>(
   widgetType: WidgetType,
   baseProps: {
     field: UnifiedField<TKey>;
@@ -374,6 +375,13 @@ function renderWidget<TKey extends string>(
       );
 
     // Interactive widgets
+    case WidgetType.BUTTON:
+      return (
+        <ButtonWidget
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.BUTTON, TKey>)}
+        />
+      );
+
     case WidgetType.SUBMIT_BUTTON:
       return (
         <SubmitButtonWidget

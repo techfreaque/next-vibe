@@ -2,7 +2,9 @@
  * Polish translations for Email Send endpoint
  */
 
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   title: "Wyślij e-mail",
   description: "Wysyłaj e-maile z opcjonalnymi powiadomieniami SMS",
   category: "Komunikacja e-mail",

@@ -114,10 +114,45 @@ export const translations: typeof enTranslations = {
     tools: {
       label: "Narzędzia AI",
       description: "Lista ID narzędzi AI do włączenia dla tej konwersacji",
+      toolId: {
+        label: "ID narzędzia",
+        description: "Unikalny identyfikator narzędzia AI",
+      },
+      requiresConfirmation: {
+        label: "Wymaga potwierdzenia",
+        description:
+          "Czy to narzędzie wymaga potwierdzenia użytkownika przed wykonaniem",
+      },
     },
     resumeToken: {
       label: "Token wznowienia",
       description: "Token do wznowienia przerwanych strumieni",
+    },
+    voiceMode: {
+      label: "Tryb głosowy",
+      description: "Konfiguracja interakcji głosowej",
+      streamTTS: {
+        label: "Strumieniowy TTS",
+        description: "Włącz strumieniową syntezę mowy dla odpowiedzi",
+      },
+      callMode: {
+        label: "Tryb połączenia",
+        description: "Włącz tryb połączenia głosowego w czasie rzeczywistym",
+      },
+      voice: {
+        label: "Głos",
+        description: "Wybierz typ głosu dla syntezy mowy",
+        male: "Głos męski",
+        female: "Głos żeński",
+      },
+    },
+    audioInput: {
+      title: "Wejście audio",
+      description: "Prześlij plik audio dla trybu głos-do-głosu",
+      file: {
+        label: "Plik audio",
+        description: "Plik audio do transkrypcji i przetwarzania",
+      },
     },
     enabledToolIds: {
       label: "ID włączonych narzędzi",
@@ -127,6 +162,19 @@ export const translations: typeof enTranslations = {
       label: "Potwierdzenie narzędzia",
       description: "Odpowiedź potwierdzająca narzędzie od użytkownika",
       success: "Potwierdzenie narzędzia zostało pomyślnie przetworzone",
+      messageId: {
+        label: "ID wiadomości",
+        description: "ID wiadomości zawierającej wywołanie narzędzia",
+      },
+      confirmed: {
+        label: "Potwierdzone",
+        description: "Czy użytkownik potwierdził wykonanie narzędzia",
+      },
+      updatedArgs: {
+        label: "Zaktualizowane argumenty",
+        description:
+          "Opcjonalne zaktualizowane argumenty dla wywołania narzędzia",
+      },
       errors: {
         messageNotFound: "Wiadomość narzędzia nie została znaleziona",
         toolCallMissing: "Brak metadanych ToolCall",

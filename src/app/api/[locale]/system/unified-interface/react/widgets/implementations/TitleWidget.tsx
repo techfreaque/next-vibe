@@ -15,7 +15,7 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
 /**
  * Renders H1-H6 headings with optional subtitle and alignment.
  */
-export function TitleWidget<TKey extends string>({
+export function TitleWidget<const TKey extends string>({
   value,
   context,
   className,

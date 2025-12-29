@@ -77,17 +77,88 @@ export const { GET } = createEndpoint({
       // Response fields
       earnings: responseArrayField(
         { type: WidgetType.DATA_TABLE },
-        z.object({
-          id: z.string(),
-          earnerUserId: z.string(),
-          sourceUserId: z.string(),
-          transactionId: z.string(),
-          level: z.coerce.number(),
-          amountCents: z.coerce.number(),
-          currency: z.string(),
-          status: z.string(),
-          createdAt: z.string(),
-        }),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 12,
+          },
+          { response: true },
+          {
+            id: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.earnings.list.get.response.earnings.id",
+              },
+              z.string(),
+            ),
+            earnerUserId: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.earnings.list.get.response.earnings.earnerUserId",
+              },
+              z.string(),
+            ),
+            sourceUserId: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.earnings.list.get.response.earnings.sourceUserId",
+              },
+              z.string(),
+            ),
+            transactionId: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.earnings.list.get.response.earnings.transactionId",
+              },
+              z.string(),
+            ),
+            level: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.earnings.list.get.response.earnings.level",
+              },
+              z.coerce.number(),
+            ),
+            amountCents: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.earnings.list.get.response.earnings.amountCents",
+              },
+              z.coerce.number(),
+            ),
+            currency: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.earnings.list.get.response.earnings.currency",
+              },
+              z.string(),
+            ),
+            status: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.earnings.list.get.response.earnings.status",
+              },
+              z.string(),
+            ),
+            createdAt: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.earnings.list.get.response.earnings.createdAt",
+              },
+              z.string(),
+            ),
+          },
+        ),
       ),
       totalCount: responseField(
         {

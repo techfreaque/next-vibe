@@ -12,6 +12,7 @@ import {
   getContainerConfig,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/container";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import { getTranslator } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
 import { formatCamelCaseLabel } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
@@ -45,7 +46,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
     return `${label}: ${valueStr}`;
   }
 
-  private renderContainerObject<TKey extends string>(
+  private renderContainerObject<const TKey extends string>(
     value: { [key: string]: WidgetData },
     field: UnifiedField<TKey>,
     context: WidgetRenderContext,
@@ -53,9 +54,10 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
     // Use shared config extraction
     const config = getContainerConfig(field);
     const result: string[] = [];
+    const { t } = getTranslator(context);
 
     if ("label" in field.ui && field.ui.label) {
-      const title = context.t(field.ui.label);
+      const title = t(field.ui.label);
       const defaultIcon = context.options.useEmojis ? "📊 " : "";
       const titleIcon = config.icon || defaultIcon;
       const titleWithIcon = titleIcon + title;
@@ -64,7 +66,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
     }
 
     if ("description" in field.ui && field.ui.description) {
-      const description = context.t(field.ui.description);
+      const description = t(field.ui.description);
       result.push(`   ${description}`);
       result.push("");
     }
@@ -75,7 +77,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
     return result.join("\n");
   }
 
-  private renderFields<TKey extends string>(
+  private renderFields<const TKey extends string>(
     data: { [key: string]: WidgetData },
     config: ContainerConfig,
     context: WidgetRenderContext,
@@ -112,7 +114,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
     return result.join("\n");
   }
 
-  private renderGridLayout<TKey extends string>(
+  private renderGridLayout<const TKey extends string>(
     data: { [key: string]: WidgetData },
     columns: number,
     context: WidgetRenderContext,

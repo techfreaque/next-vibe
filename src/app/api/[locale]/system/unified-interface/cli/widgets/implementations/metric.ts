@@ -48,7 +48,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<
     return `${indent}${icon}${label}: ${formattedValue}`;
   }
 
-  private renderMetricObject<TKey extends string>(
+  private renderMetricObject<const TKey extends string>(
     value: { [key: string]: WidgetData },
     config: Pick<
       MetricCardWidgetConfig<TKey>,
@@ -145,7 +145,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<
     return parts.join("\n");
   }
 
-  private getMetricConfig<TKey extends string>(
+  private getMetricConfig<const TKey extends string>(
     field: UnifiedField<TKey>,
   ): Pick<
     MetricCardWidgetConfig<TKey>,
@@ -180,7 +180,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<
     };
   }
 
-  private formatMetricValueLocal<TKey extends string>(
+  private formatMetricValueLocal<const TKey extends string>(
     value: WidgetData,
     config: Pick<
       MetricCardWidgetConfig<TKey>,
@@ -238,7 +238,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<
     return formatted;
   }
 
-  private getMetricIcon<TKey extends string>(
+  private getMetricIcon<const TKey extends string>(
     config: Pick<MetricCardWidgetConfig<TKey>, "icon" | "threshold">,
     value: WidgetData,
     context: WidgetRenderContext,

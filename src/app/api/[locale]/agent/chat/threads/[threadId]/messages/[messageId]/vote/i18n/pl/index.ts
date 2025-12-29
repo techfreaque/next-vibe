@@ -1,4 +1,6 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   post: {
     title: "Głosuj na wiadomość",
     description: "Zagłosuj za lub przeciw wiadomości",

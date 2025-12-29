@@ -17,12 +17,21 @@ export const translations: typeof enTranslations = {
         description:
           "Opcjonalna lista argumentów (UID elementów) do przekazania do funkcji",
         placeholder: '[{"uid": "element-uid"}]',
+        uid: {
+          label: "UID elementu",
+          description: "Unikalny identyfikator elementu na stronie",
+        },
       },
     },
   },
   response: {
     success: "Operacja oceny skryptu pomyślna",
-    result: "Wynik oceny skryptu",
+    result: {
+      title: "Wynik",
+      description: "Wynik oceny skryptu",
+      executed: "Wykonano",
+      result: "Wartość zwracana",
+    },
     error: "Komunikat błędu",
     executionId: "ID wykonania do śledzenia",
   },

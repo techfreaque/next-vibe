@@ -285,7 +285,8 @@ const { PATCH } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "app.api.agent.chat.characters.id.patch.title" as const,
-  description: "app.api.agent.chat.characters.id.patch.description" as const,
+  description:
+    "app.api.agent.chat.characters.id.patch.container.description" as const,
   icon: "sparkles" as const,
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.characters" as const],

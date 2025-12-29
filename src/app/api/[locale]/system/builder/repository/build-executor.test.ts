@@ -5,7 +5,11 @@
 
 import { resolve } from "node:path";
 
-import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
+import { afterEach, describe, expect, it, mock } from "bun:test";
+
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { defaultLocale } from "@/i18n/core/config";
 
 // Mock the i18n module before importing build-executor
 mock.module("@/i18n/core/shared", () => ({
@@ -14,30 +18,17 @@ mock.module("@/i18n/core/shared", () => ({
   }),
 }));
 
-import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import { BuildProfileEnum, ViteBuildTypeEnum } from "../enum";
 import { buildExecutor } from "./build-executor";
 
 const TEST_PROJECT_PATH = resolve(__dirname, "../test-files/test-project");
 
-// Create a properly typed mock logger that satisfies EndpointLogger interface
-// eslint-disable-next-line @typescript-eslint/no-empty-function -- Mock functions intentionally empty
-const noop = (): void => {};
-const createMockLogger = (): EndpointLogger => ({
-  info: mock(noop),
-  warn: mock(noop),
-  error: mock(noop),
-  debug: mock(noop),
-  vibe: mock(noop),
-  isDebugEnabled: false,
-});
-
 describe("BuildExecutor", () => {
-  let mockLogger: ReturnType<typeof createMockLogger>;
-
-  beforeEach(() => {
-    mockLogger = createMockLogger();
-  });
+  const mockLogger: EndpointLogger = createEndpointLogger(
+    true,
+    Date.now(),
+    defaultLocale,
+  );
 
   afterEach(() => {
     // Bun test automatically cleans up mocks

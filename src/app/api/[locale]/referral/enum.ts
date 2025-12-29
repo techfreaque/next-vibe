@@ -1,37 +1,66 @@
 /**
  * Referral API Enums
- * Defines referral-related enumerations
- *
- * NOTE: Using plain constants instead of createEnumOptions since these are
- * internal database values, not user-facing translations
+ * Defines referral-related enumerations using createEnumOptions
  */
+
+import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
 /**
  * Referral source type - where the referral earning came from
  */
-export const ReferralSourceType = {
-  SUBSCRIPTION: "SUBSCRIPTION",
-  CREDIT_PACK: "CREDIT_PACK",
-} as const;
-
-export type ReferralSourceTypeValue =
-  (typeof ReferralSourceType)[keyof typeof ReferralSourceType];
+export const {
+  enum: ReferralSourceType,
+  options: ReferralSourceTypeOptions,
+  Value: ReferralSourceTypeValue,
+} = createEnumOptions({
+  SUBSCRIPTION: "app.api.referral.enums.sourceType.subscription",
+  CREDIT_PACK: "app.api.referral.enums.sourceType.creditPack",
+});
 
 /**
  * Referral earning status
  */
-export const ReferralEarningStatus = {
-  PENDING: "PENDING",
-  CONFIRMED: "CONFIRMED",
-  CANCELED: "CANCELED",
-} as const;
+export const {
+  enum: ReferralEarningStatus,
+  options: ReferralEarningStatusOptions,
+  Value: ReferralEarningStatusValue,
+} = createEnumOptions({
+  PENDING: "app.api.referral.enums.earningStatus.pending",
+  CONFIRMED: "app.api.referral.enums.earningStatus.confirmed",
+  CANCELED: "app.api.referral.enums.earningStatus.canceled",
+});
 
-export type ReferralEarningStatusValue =
-  (typeof ReferralEarningStatus)[keyof typeof ReferralEarningStatus];
+/**
+ * Payout request status
+ */
+export const {
+  enum: PayoutStatus,
+  options: PayoutStatusOptions,
+  Value: PayoutStatusValue,
+} = createEnumOptions({
+  PENDING: "app.api.referral.enums.payoutStatus.pending",
+  APPROVED: "app.api.referral.enums.payoutStatus.approved",
+  REJECTED: "app.api.referral.enums.payoutStatus.rejected",
+  PROCESSING: "app.api.referral.enums.payoutStatus.processing",
+  COMPLETED: "app.api.referral.enums.payoutStatus.completed",
+  FAILED: "app.api.referral.enums.payoutStatus.failed",
+});
+
+/**
+ * Payout currency options
+ */
+export const {
+  enum: PayoutCurrency,
+  options: PayoutCurrencyOptions,
+  Value: PayoutCurrencyValue,
+} = createEnumOptions({
+  BTC: "app.api.referral.enums.payoutCurrency.btc",
+  USDC: "app.api.referral.enums.payoutCurrency.usdc",
+  CREDITS: "app.api.referral.enums.payoutCurrency.credits",
+});
 
 /**
  * Database enum arrays for Drizzle ORM
- * Use the same const arrays everywhere - no separate Value types
  */
 export const ReferralSourceTypeDB = [
   ReferralSourceType.SUBSCRIPTION,
@@ -44,21 +73,6 @@ export const ReferralEarningStatusDB = [
   ReferralEarningStatus.CANCELED,
 ] as const;
 
-/**
- * Payout request status
- */
-export const PayoutStatus = {
-  PENDING: "PENDING",
-  APPROVED: "APPROVED",
-  REJECTED: "REJECTED",
-  PROCESSING: "PROCESSING",
-  COMPLETED: "COMPLETED",
-  FAILED: "FAILED",
-} as const;
-
-export type PayoutStatusValue =
-  (typeof PayoutStatus)[keyof typeof PayoutStatus];
-
 export const PayoutStatusDB = [
   PayoutStatus.PENDING,
   PayoutStatus.APPROVED,
@@ -67,18 +81,6 @@ export const PayoutStatusDB = [
   PayoutStatus.COMPLETED,
   PayoutStatus.FAILED,
 ] as const;
-
-/**
- * Payout currency options
- */
-export const PayoutCurrency = {
-  BTC: "BTC",
-  USDC: "USDC",
-  CREDITS: "CREDITS",
-} as const;
-
-export type PayoutCurrencyValue =
-  (typeof PayoutCurrency)[keyof typeof PayoutCurrency];
 
 export const PayoutCurrencyDB = [
   PayoutCurrency.BTC,

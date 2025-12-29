@@ -46,16 +46,16 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["contact"],
-  title: "title",
-  description: "description",
-  category: "category",
+  title: "title" as const,
+  description: "description" as const,
+  category: "category" as const,
   icon: "mail",
   tags: [
-    "tags.contactForm",
-    "tags.contactUs",
-    "tags.contactSubmission",
-    "tags.helpSupport",
-  ] as const,
+    "tags.contactForm" as const,
+    "tags.contactUs" as const,
+    "tags.contactSubmission" as const,
+    "tags.helpSupport" as const,
+  ],
 
   allowedRoles: [
     UserRole.PUBLIC,
@@ -68,8 +68,8 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "form.label",
-      description: "form.description",
+      title: "form.label" as const,
+      description: "form.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -79,9 +79,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "form.fields.name.label",
-          description: "form.fields.name.description",
-          placeholder: "form.fields.name.placeholder",
+          label: "form.fields.name.label" as const,
+          description: "form.fields.name.description" as const,
+          placeholder: "form.fields.name.placeholder" as const,
           columns: 6,
         },
         z.string().min(2),
@@ -90,9 +90,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.EMAIL,
-          label: "form.fields.email.label",
-          description: "form.fields.email.description",
-          placeholder: "form.fields.email.placeholder",
+          label: "form.fields.email.label" as const,
+          description: "form.fields.email.description" as const,
+          placeholder: "form.fields.email.placeholder" as const,
           columns: 6,
         },
         z.string().email(),
@@ -101,9 +101,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "form.fields.company.label",
-          description: "form.fields.company.description",
-          placeholder: "form.fields.company.placeholder",
+          label: "form.fields.company.label" as const,
+          description: "form.fields.company.description" as const,
+          placeholder: "form.fields.company.placeholder" as const,
           columns: 12,
         },
         z.string().optional(),
@@ -112,9 +112,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "form.fields.subject.label",
-          description: "form.fields.subject.description",
-          placeholder: "form.fields.subject.placeholder",
+          label: "form.fields.subject.label" as const,
+          description: "form.fields.subject.description" as const,
+          placeholder: "form.fields.subject.placeholder" as const,
           options: ContactSubjectOptions,
           columns: 12,
         },
@@ -124,9 +124,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
-          label: "form.fields.message.label",
-          description: "form.fields.message.description",
-          placeholder: "form.fields.message.placeholder",
+          label: "form.fields.message.label" as const,
+          description: "form.fields.message.description" as const,
+          placeholder: "form.fields.message.placeholder" as const,
           columns: 12,
         },
         z.string().min(10),
@@ -135,9 +135,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "form.fields.priority.label",
-          description: "form.fields.priority.description",
-          placeholder: "form.fields.priority.placeholder",
+          label: "form.fields.priority.label" as const,
+          description: "form.fields.priority.description" as const,
+          placeholder: "form.fields.priority.placeholder" as const,
           options: ContactPriorityOptions,
           columns: 12,
         },
@@ -149,27 +149,27 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "response.success",
+          content: "response.success" as const,
         },
         z.boolean(),
       ),
       messageId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "response.messageId",
+          content: "response.messageId" as const,
         },
         z.string().optional(),
       ),
       status: responseArrayOptionalField(
         {
           type: WidgetType.DATA_LIST,
-          title: "response.status",
-          description: "response.description",
+          title: "response.status" as const,
+          description: "response.description" as const,
         },
         responseField(
           {
             type: WidgetType.TEXT,
-            content: "response.status",
+            content: "response.status" as const,
           },
           z.string(),
         ),
@@ -224,45 +224,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "errors.network.title",
-      description: "errors.network.description",
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "errors.unauthorized.title",
-      description: "errors.unauthorized.description",
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "errors.forbidden.title",
-      description: "errors.forbidden.description",
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "errors.notFound.title",
-      description: "errors.notFound.description",
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "errors.serverError.title",
-      description: "errors.serverError.description",
+      title: "errors.serverError.title" as const,
+      description: "errors.serverError.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "errors.unknown.title",
-      description: "errors.unknown.description",
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "errors.unsavedChanges.title",
-      description: "errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "errors.conflict.title",
-      description: "errors.conflict.description",
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
   },
   successTypes: {
-    title: "success.title",
-    description: "success.description",
+    title: "success.title" as const,
+    description: "success.description" as const,
   },
 });
 

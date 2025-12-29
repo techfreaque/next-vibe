@@ -100,6 +100,7 @@ export interface UseChatReturn {
   temperature: number;
   maxTokens: number;
   ttsAutoplay: boolean;
+  ttsVoice: typeof TtsVoiceValue;
   sidebarCollapsed: boolean;
   viewMode: ChatSettings["viewMode"];
   enabledToolIds: string[];
@@ -108,6 +109,7 @@ export interface UseChatReturn {
   setTemperature: (temp: number) => void;
   setMaxTokens: (tokens: number) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
+  setTTSVoice: (voice: typeof TtsVoiceValue) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   setViewMode: (mode: ChatSettings["viewMode"]) => void;
   setEnabledToolIds: (toolIds: string[]) => void;
@@ -385,12 +387,45 @@ export function useChat(
     isDataLoaded,
   );
 
+  // Compute characters map
+  const characters = useMemo(() => {
+    const response = charactersEndpoint.read?.response as
+      | CharacterListResponseOutput
+      | undefined;
+    const charactersList = response?.characters;
+    const charactersMap: Record<
+      string,
+      {
+        id: string;
+        name: string;
+        icon: string;
+        systemPrompt: string;
+        voice?: typeof TtsVoiceValue;
+      }
+    > = {};
+
+    if (charactersList && Array.isArray(charactersList)) {
+      charactersList.forEach((p) => {
+        charactersMap[p.id] = {
+          id: p.id,
+          name: p.name,
+          icon: p.icon,
+          systemPrompt: p.systemPrompt,
+          voice: p.voice,
+        };
+      });
+    }
+
+    return charactersMap;
+  }, [charactersEndpoint.read?.response]);
+
   const settingsOps = useSettings({
     chatStore: {
       settings,
       updateSettings,
       hydrateSettings,
     },
+    characters,
   });
 
   useStreamSync({
@@ -538,38 +573,6 @@ export function useChat(
     threadNavigation.handleCreateThread,
   );
 
-  // Compute characters map
-  const characters = useMemo(() => {
-    const response = charactersEndpoint.read?.response as
-      | CharacterListResponseOutput
-      | undefined;
-    const charactersList = response?.characters;
-    const charactersMap: Record<
-      string,
-      {
-        id: string;
-        name: string;
-        icon: string;
-        systemPrompt: string;
-        voice?: typeof TtsVoiceValue;
-      }
-    > = {};
-
-    if (charactersList && Array.isArray(charactersList)) {
-      charactersList.forEach((p) => {
-        charactersMap[p.id] = {
-          id: p.id,
-          name: p.name,
-          icon: p.icon,
-          systemPrompt: p.systemPrompt,
-          voice: p.voice,
-        };
-      });
-    }
-
-    return charactersMap;
-  }, [charactersEndpoint.read?.response]);
-
   // Get active thread
   const activeThread = activeThreadId ? threads[activeThreadId] || null : null;
 
@@ -625,6 +628,7 @@ export function useChat(
     temperature: settingsOps.settings.temperature,
     maxTokens: settingsOps.settings.maxTokens,
     ttsAutoplay: settingsOps.settings.ttsAutoplay,
+    ttsVoice: settingsOps.settings.ttsVoice,
     sidebarCollapsed,
     viewMode: settingsOps.settings.viewMode,
     enabledToolIds: settingsOps.settings.enabledToolIds,
@@ -633,6 +637,7 @@ export function useChat(
     setTemperature: settingsOps.setTemperature,
     setMaxTokens: settingsOps.setMaxTokens,
     setTTSAutoplay: settingsOps.setTTSAutoplay,
+    setTTSVoice: settingsOps.setTTSVoice,
     setSidebarCollapsed,
     setViewMode: settingsOps.setViewMode,
     setEnabledToolIds: settingsOps.setEnabledToolIds,

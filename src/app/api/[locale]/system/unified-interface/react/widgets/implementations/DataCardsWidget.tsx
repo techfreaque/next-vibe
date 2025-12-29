@@ -18,7 +18,7 @@ import { WidgetRenderer } from "../renderers/WidgetRenderer";
 /**
  * Renders data as a grid of cards with nested field widgets.
  */
-export const DataCardsWidget = <TKey extends string>({
+export const DataCardsWidget = <const TKey extends string>({
   value,
   field,
   context,

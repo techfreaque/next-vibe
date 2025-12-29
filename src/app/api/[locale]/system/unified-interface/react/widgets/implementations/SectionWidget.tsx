@@ -46,7 +46,7 @@ function isUnifiedField(obj: unknown): obj is UnifiedField<string> {
 /**
  * Displays titled content sections with optional collapsible behavior.
  */
-export function SectionWidget<TKey extends string>({
+export function SectionWidget<const TKey extends string>({
   value,
   field,
   context,

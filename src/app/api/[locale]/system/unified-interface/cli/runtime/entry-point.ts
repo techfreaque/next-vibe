@@ -116,7 +116,11 @@ class CliEntryPoint {
       });
       return {
         success: false,
-        error: parseError(error).message,
+        error:
+          "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+        errorParams: {
+          error: parseError(error).message,
+        },
       };
     }
   }

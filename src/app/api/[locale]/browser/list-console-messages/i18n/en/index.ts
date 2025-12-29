@@ -55,7 +55,17 @@ export const translations = {
   },
   response: {
     success: "Console messages retrieved successfully",
-    result: "Console messages list result",
+    result: {
+      title: "Result",
+      description: "Console messages list result",
+      messages: {
+        msgid: "Message ID",
+        type: "Type",
+        text: "Message",
+        timestamp: "Timestamp",
+      },
+      totalCount: "Total Count",
+    },
     error: "Error message",
     executionId: "Execution ID for tracking",
   },

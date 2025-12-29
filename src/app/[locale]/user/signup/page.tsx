@@ -4,7 +4,7 @@ import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
-import { referralRepository } from "@/app/api/[locale]/referral/repository";
+import { ReferralRepository } from "@/app/api/[locale]/referral/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import SignUpForm from "@/app/api/[locale]/user/public/signup/_components/sign-up-form";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
@@ -79,7 +79,7 @@ export default async function SignUpPage({
   // Get the latest referral code for the lead (if any)
   let initialReferralCode: string | undefined;
   if (user.success && user.data.leadId) {
-    const referralResult = await referralRepository.getLatestLeadReferralCode(
+    const referralResult = await ReferralRepository.getLatestLeadReferralCode(
       user.data.leadId,
       logger,
     );

@@ -14,8 +14,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import type { FolderListResponseOutput } from "../folders/definition";
 import { GET as foldersGetEndpoint } from "../folders/definition";
-import {
-  GET as threadsGetEndpoint,
+import threadsDefinition, {
   type ThreadListResponseOutput,
 } from "../threads/definition";
 
@@ -111,7 +110,7 @@ async function loadThreadsFromServer(
 ): Promise<void> {
   try {
     const threadsResponse = await apiClient.fetch(
-      threadsGetEndpoint,
+      threadsDefinition.GET,
       logger,
       {
         page: 1,

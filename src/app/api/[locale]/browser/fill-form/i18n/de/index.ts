@@ -12,13 +12,30 @@ export const translations: typeof enTranslations = {
         label: "Formularelemente",
         description: "Array von Elementen aus dem Snapshot zum Ausfüllen",
         placeholder: "Formularelemente eingeben (JSON-Array)",
+        uid: {
+          label: "Element-UID",
+          description: "Die eindeutige Kennung des auszufüllenden Elements",
+        },
+        value: {
+          label: "Wert",
+          description: "Der in das Element einzutragende Wert",
+        },
       },
     },
   },
 
   response: {
     success: "Formularausfüllen erfolgreich",
-    result: "Ergebnis des Formularausfüllens",
+    result: {
+      title: "Ergebnis",
+      description: "Ergebnis des Formularausfüllens",
+      filled: "Alle ausgefüllt",
+      filledCount: "Anzahl ausgefüllt",
+      elements: {
+        uid: "Element-UID",
+        filled: "Erfolgreich ausgefüllt",
+      },
+    },
     error: "Fehlermeldung",
     executionId: "Ausführungs-ID zur Verfolgung",
   },

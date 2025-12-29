@@ -22,7 +22,7 @@ import {
   getDefaultConfig,
   getDefaultCronSettings,
 } from "./campaign-starter-config/default-config";
-import { campaignStarterConfigRepository } from "./campaign-starter-config/repository";
+import { CampaignStarterConfigRepository } from "./campaign-starter-config/repository";
 import { CampaignStarterRepository } from "./repository";
 import {
   campaignStarterConfigSchema,
@@ -113,7 +113,7 @@ export async function execute(
   try {
     // Ensure config exists in database and get current config
     const configResult =
-      await campaignStarterConfigRepository.ensureConfigExists(
+      await CampaignStarterConfigRepository.ensureConfigExists(
         SYSTEM_USER,
         "en-GLOBAL",
         logger,

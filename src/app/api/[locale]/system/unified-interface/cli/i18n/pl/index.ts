@@ -1,6 +1,7 @@
 import { translations as setupTranslations } from "../../setup/i18n/pl";
+import type { translations as enTranslations } from "../en";
 
-export const translations = {
+export const translations: typeof enTranslations = {
   setup: setupTranslations,
   auth: {
     errors: {

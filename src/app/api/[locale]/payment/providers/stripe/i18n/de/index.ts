@@ -126,6 +126,10 @@ export const translations: typeof enTranslations = {
       title: "Kundenerstellung fehlgeschlagen",
       description: "Stripe-Kunde konnte nicht erstellt werden",
     },
+    customerRetrievalFailed: {
+      title: "Kundenabruf fehlgeschlagen",
+      description: "Stripe-Kundeninformationen konnten nicht abgerufen werden",
+    },
     checkoutCreationFailed: {
       title: "Checkout-Erstellung fehlgeschlagen",
       description: "Stripe-Checkout-Sitzung konnte nicht erstellt werden",

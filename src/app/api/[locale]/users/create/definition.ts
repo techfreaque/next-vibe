@@ -10,6 +10,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   requestDataField,
+  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -355,16 +356,35 @@ const { POST } = createEndpoint({
         },
         z.string().nullable(),
       ),
-      responseUserRoles: responseField(
+      responseUserRoles: responseArrayField(
         {
-          type: WidgetType.BADGE,
-          text: "app.api.users.create.post.response.userRoles.content" as const,
+          type: WidgetType.DATA_TABLE,
         },
-        z.array(
-          z.object({
-            id: z.uuid(),
-            role: z.string(),
-          }),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 2,
+          },
+          { response: true },
+          {
+            id: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.users.create.post.response.userRoles.id.content" as const,
+              },
+              z.uuid(),
+            ),
+            role: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.users.create.post.response.userRoles.role.content" as const,
+              },
+              z.string(),
+            ),
+          },
         ),
       ),
       responseCreatedAt: responseField(

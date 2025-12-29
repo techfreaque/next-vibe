@@ -11,12 +11,13 @@ import {
 import {
   extractDataTableData,
   formatCellValue,
+  type TableColumn,
   type TableRenderConfig,
   type TableRow,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/data-table";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import { getTranslator } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
@@ -50,10 +51,10 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<
     return this.renderTableAutoColumns(data.rows, context);
   }
 
-  private getTableConfig<TKey extends string>(
+  private getTableConfig<const TKey extends string>(
     field: UnifiedField<TKey>,
     locale: CountryLanguage,
-  ): TableRenderConfig {
+  ): TableRenderConfig<TKey> {
     if (field.ui.type !== WidgetType.DATA_TABLE) {
       return {
         columns: [],
@@ -65,7 +66,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<
 
     const config = field.ui;
 
-    const columns =
+    const columns: TableColumn<TKey>[] =
       config.columns?.map((col) => ({
         key: col.key,
         label: col.label,
@@ -198,9 +199,9 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<
     }
   }
 
-  private renderTableWithColumns(
+  private renderTableWithColumns<TKey extends string>(
     data: WidgetData[],
-    config: TableRenderConfig,
+    config: TableRenderConfig<TKey>,
     context: WidgetRenderContext,
   ): string {
     const indent = this.createIndent(context.depth, context);
@@ -230,12 +231,12 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<
     return result.map((line) => indent + line).join("\n");
   }
 
-  private calculateColumnWidths(
+  private calculateColumnWidths<TKey extends string>(
     data: TableRow[],
-    config: TableRenderConfig,
+    config: TableRenderConfig<TKey>,
     context: WidgetRenderContext,
   ): number[] {
-    const t = context.t;
+    const { t } = getTranslator(context);
     const maxWidth =
       context.options.maxWidth - context.depth * context.options.indentSize;
     const availableWidth = maxWidth - (config.columns.length - 1) * 3; // Account for separators
@@ -263,12 +264,12 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<
     });
   }
 
-  private renderTableHeader(
-    config: TableRenderConfig,
+  private renderTableHeader<TKey extends string>(
+    config: TableRenderConfig<TKey>,
     columnWidths: number[],
     context: WidgetRenderContext,
   ): string {
-    const t = context.t;
+    const { t } = getTranslator(context);
     const cells = config.columns.map((col, index) => {
       // Always translate column labels
       const translatedLabel = t(col.label);
@@ -289,18 +290,17 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<
     /* eslint-enable i18next/no-literal-string */
   }
 
-  private renderTableRow(
+  private renderTableRow<TKey extends string>(
     row: TableRow,
-    config: TableRenderConfig,
+    config: TableRenderConfig<TKey>,
     columnWidths: number[],
     context: WidgetRenderContext,
   ): string {
-    const t = context.t;
+    const { t } = getTranslator(context);
     const cells = config.columns.map((col, index) => {
       const value = row[col.key];
       // Translate string values (handles translation keys in data)
-      const translatedValue =
-        typeof value === "string" ? t(value as TranslationKey) : value;
+      const translatedValue = typeof value === "string" ? t(value) : value;
       const formatted = col.formatter
         ? col.formatter(translatedValue)
         : formatCellValue(translatedValue);
@@ -314,7 +314,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<
     return cells.join(" │ ");
   }
 
-  private renderTableAutoColumns(
+  private renderTableAutoColumns<TKey extends string>(
     data: WidgetData[],
     context: WidgetRenderContext,
   ): string {
@@ -347,14 +347,14 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<
       const fieldType = this.detectFieldType(firstRowObj[key]);
       return {
         key,
-        label: key as TranslationKey,
+        label: key,
         type: fieldType,
         align: "left" as const,
         formatter: this.getColumnFormatter(fieldType, context.options.locale),
       };
     });
 
-    const config: TableRenderConfig = {
+    const config: TableRenderConfig<TKey> = {
       columns,
       pagination: { enabled: false, pageSize: 50 },
       sorting: { enabled: false },

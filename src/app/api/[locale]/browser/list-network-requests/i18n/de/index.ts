@@ -57,7 +57,18 @@ export const translations: typeof enTranslations = {
   },
   response: {
     success: "Netzwerk-Anfragen erfolgreich abgerufen",
-    result: "Ergebnis der Netzwerk-Anfragen-Liste",
+    result: {
+      title: "Ergebnis",
+      description: "Ergebnis der Netzwerk-Anfragen-Liste",
+      requests: {
+        reqid: "Anfrage-ID",
+        url: "URL",
+        method: "Methode",
+        status: "Status",
+        type: "Typ",
+      },
+      totalCount: "Gesamtanzahl",
+    },
     error: "Fehlermeldung",
     executionId: "Ausführungs-ID zur Verfolgung",
   },

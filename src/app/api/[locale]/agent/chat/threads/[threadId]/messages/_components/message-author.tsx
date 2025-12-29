@@ -72,9 +72,8 @@ export function MessageAuthorInfo({
   }
 
   // Get character name if character is provided
-  const characterName = character
-    ? t(getCharacterById(character)?.name ?? "")
-    : null;
+  const characterData = character ? getCharacterById(character) : null;
+  const characterName = characterData?.name ? t(characterData.name) : null;
 
   return (
     <Div className={cn("flex items-center gap-2", className)}>

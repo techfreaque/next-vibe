@@ -21,7 +21,7 @@ export const { POST, tools } = endpointsHandler({
           toolName: "evaluate-script",
           args: filterUndefinedArgs({
             function: data.function,
-            args: data.args,
+            args: data.args ?? undefined,
           }),
         },
         logger,

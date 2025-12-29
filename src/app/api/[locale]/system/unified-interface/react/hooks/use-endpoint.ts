@@ -7,6 +7,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import { useTranslation } from "@/i18n/core/client";
 
 /**
  * Options record type for endpoint configuration
@@ -53,6 +54,7 @@ export function useEndpoint<
   options: UseEndpointOptions<T> = {},
   logger: EndpointLogger,
 ): EndpointReturn<T> {
+  const { locale } = useTranslation();
   // Detect available methods and determine primary mutation method
   const availableMethods = useAvailableMethods(endpoints);
   const primaryMutationMethod = usePrimaryMutationMethod(availableMethods);
@@ -254,23 +256,29 @@ export function useEndpoint<
 
   // Generate alert state from success/error states and endpoint types
   const alert = useMemo((): FormAlertState | null => {
+    if (!primaryEndpoint) {
+      return null;
+    }
+
+    const { t: scopedT } = primaryEndpoint.scopedTranslation.scopedT(locale);
+
     // Check for success state
 
-    if (create?.isSuccess && primaryEndpoint?.successTypes) {
+    if (create?.isSuccess && primaryEndpoint.successTypes) {
       return {
         variant: "success",
         title: {
-          message: primaryEndpoint.successTypes.title,
+          message: scopedT(primaryEndpoint.successTypes.title),
         },
         message: {
-          message: primaryEndpoint.successTypes.description,
+          message: scopedT(primaryEndpoint.successTypes.description),
         },
       };
     }
 
     // Check for error state
 
-    if (error && primaryEndpoint?.errorTypes) {
+    if (error && primaryEndpoint.errorTypes) {
       // Try to find matching error type from endpoint by checking the errorKey
 
       const errorTypeEntries = Object.entries(primaryEndpoint.errorTypes);
@@ -284,10 +292,10 @@ export function useEndpoint<
         return {
           variant: "destructive",
           title: {
-            message: errorConfig.title,
+            message: scopedT(errorConfig.title),
           },
           message: {
-            message: errorConfig.description,
+            message: scopedT(errorConfig.description),
           },
         };
       }
@@ -306,12 +314,91 @@ export function useEndpoint<
     }
 
     return null;
-  }, [create?.isSuccess, error, primaryEndpoint]);
+  }, [create?.isSuccess, error, primaryEndpoint, locale]);
+
+  // Handle PATCH endpoint as update operation
+  const patchEndpoint = endpoints.PATCH ?? null;
+
+  // Merge endpoint patch options with hook options (hook options take priority)
+  const mergedPatchOptions = useMemo(() => {
+    const endpointPatchOptions = patchEndpoint?.options as
+      | OptionsRecord
+      | undefined;
+    return mergeCreateOptions(
+      endpointPatchOptions,
+      options.update as OptionsRecord | undefined,
+    );
+  }, [patchEndpoint?.options, options.update]);
+
+  const patchUrlPathParams =
+    mergedPatchOptions.urlPathParams ??
+    options.urlPathParams ??
+    readUrlPathParams;
+
+  const patchFormOptions = {
+    persistForm:
+      (mergedPatchOptions.formOptions?.persistForm as boolean | undefined) ??
+      false,
+    persistenceKey: mergedPatchOptions.formOptions?.persistenceKey as
+      | string
+      | undefined,
+    defaultValues:
+      mergedPatchOptions.formOptions?.defaultValues ??
+      options.defaultValues ??
+      options.formOptions?.defaultValues,
+  };
+
+  type PatchEndpoint = T[keyof T & "PATCH"] extends infer E
+    ? E extends CreateApiEndpointAny
+      ? E
+      : never
+    : never;
+
+  const updateOperation = useEndpointCreate<PatchEndpoint>(
+    patchEndpoint as PatchEndpoint | null,
+    logger,
+    {
+      formOptions: patchFormOptions,
+      mutationOptions: mergedPatchOptions.mutationOptions,
+      urlPathParams: patchUrlPathParams,
+      autoPrefillData:
+        autoPrefillData ??
+        mergedPatchOptions.autoPrefillData ??
+        options.update?.autoPrefillData,
+      initialState: mergedPatchOptions.initialState,
+    } as Parameters<typeof useEndpointCreate<PatchEndpoint>>[2],
+  );
+
+  const updateValues = updateOperation?.form.watch();
+  const update = updateOperation
+    ? {
+        form: updateOperation.form,
+        response: updateOperation.response,
+        isSuccess: updateOperation.isSubmitSuccessful,
+        error:
+          updateOperation.submitError &&
+          Object.keys(updateOperation.submitError).length > 0
+            ? updateOperation.submitError
+            : null,
+        values: updateValues,
+        setValue: updateOperation.form.setValue.bind(updateOperation.form),
+        submit: async (data): Promise<void> => {
+          updateOperation.form.reset(data);
+          await updateOperation.submitForm();
+        },
+        reset: (): void => updateOperation.form.reset(resetData || {}),
+        isSubmitting: updateOperation.isSubmitting,
+        isDirty: updateOperation.form.formState.isDirty,
+        clearSavedForm: updateOperation.clearSavedForm,
+        setErrorType: updateOperation.setErrorType,
+      }
+    : undefined;
 
   return {
     alert,
     read: read ?? undefined,
     create: create ?? undefined,
+    update: update ?? undefined,
     delete: deleteOperation ?? undefined,
     isLoading,
     error,

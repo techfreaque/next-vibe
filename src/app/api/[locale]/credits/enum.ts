@@ -23,7 +23,7 @@ export const {
 export const {
   enum: CreditTransactionType,
   options: CreditTransactionTypeOptions,
-  Value: CreditTransactionTypeValues,
+  Value: CreditTransactionTypeValue,
 } = createEnumOptions({
   FREE_GRANT: "app.api.credits.enums.transactionType.freeGrant",
   PURCHASE: "app.api.credits.enums.transactionType.purchase",
@@ -43,7 +43,7 @@ export const {
 export const {
   enum: CreditPackType,
   options: CreditPackTypeOptions,
-  Value: CreditPackTypeValues,
+  Value: CreditPackTypeValue,
 } = createEnumOptions({
   SUBSCRIPTION: "app.api.credits.enums.packType.subscription",
   PERMANENT: "app.api.credits.enums.packType.permanent",

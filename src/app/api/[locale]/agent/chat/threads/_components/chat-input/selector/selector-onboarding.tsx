@@ -6,10 +6,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Check } from "next-vibe-ui/ui/icons/Check";
-import { Code } from "next-vibe-ui/ui/icons/Code";
-import { GraduationCap } from "next-vibe-ui/ui/icons/GraduationCap";
-import { MessageCircle } from "next-vibe-ui/ui/icons/MessageCircle";
-import { PenTool } from "next-vibe-ui/ui/icons/PenTool";
 import { Image } from "next-vibe-ui/ui/image";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
@@ -24,30 +20,25 @@ import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/ico
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { CharacterBrowserCore } from "./character-browser";
+import type { FavoriteItem } from "./favorites-bar";
+
 interface SelectorOnboardingProps {
   onSelect: (characterId: string) => void;
   onSaveFavorite?: (characterId: string) => Promise<void>;
-  onBrowseAll: () => void;
+  onCustomize: (characterId: string) => void;
+  favorites: FavoriteItem[];
   locale: CountryLanguage;
+  initialStep?: OnboardingStep;
+  onStepChange?: (step: OnboardingStep) => void;
+  initialSelectedId?: string | null;
+  onSelectedIdChange?: (id: string | null) => void;
 }
 
 type OnboardingStep = "story" | "pick" | "specialists";
 
 // Featured characters for quick onboarding
 const FEATURED_CHARACTER_IDS = ["thea", "hermes"] as const;
-
-// Companion descriptions (personality-focused, not model-focused)
-const COMPANION_INFO: Record<string, { tagline: string; description: string }> =
-  {
-    thea: {
-      tagline: "app.chat.onboarding.thea.tagline",
-      description: "app.chat.onboarding.thea.description",
-    },
-    hermes: {
-      tagline: "app.chat.onboarding.hermes.tagline",
-      description: "app.chat.onboarding.hermes.description",
-    },
-  };
 
 /**
  * Get featured characters for onboarding
@@ -121,7 +112,6 @@ function CompanionCard({
 }): JSX.Element {
   const { t } = simpleT(locale);
   const Icon = getIconComponent(character.icon);
-  const info = COMPANION_INFO[character.id];
 
   return (
     <Div
@@ -171,18 +161,14 @@ function CompanionCard({
       </Span>
 
       {/* Tagline */}
-      {info && (
-        <Span className="text-sm font-medium text-primary text-center mb-2">
-          {t(info.tagline)}
-        </Span>
-      )}
+      <Span className="text-sm font-medium text-primary text-center mb-2">
+        {t(character.tagline)}
+      </Span>
 
       {/* Description */}
-      {info && (
-        <P className="text-xs text-muted-foreground text-center leading-relaxed">
-          {t(info.description)}
-        </P>
-      )}
+      <P className="text-xs text-muted-foreground text-center leading-relaxed">
+        {t(character.description)}
+      </P>
     </Div>
   );
 }
@@ -300,105 +286,65 @@ function PickStep({
 }
 
 /**
- * Screen 3: Specialist peek - show they exist
+ * Screen 3: Add specialists to your team
  */
 function SpecialistStep({
   selectedCharacterId,
+  onAddSpecialist,
+  onCustomize,
   onStartChatting,
-  onBrowseAll,
+  favorites,
   locale,
 }: {
   selectedCharacterId: string;
+  onAddSpecialist: (characterId: string) => Promise<void>;
+  onCustomize: (characterId: string) => void;
   onStartChatting: () => void;
-  onBrowseAll: () => void;
+  favorites: FavoriteItem[];
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
   const character = getCharacterById(selectedCharacterId);
   const characterName = character ? t(character.name) : "";
 
-  const specialists = [
-    {
-      icon: Code,
-      name: t("app.chat.onboarding.specialists.technical"),
-      desc: t("app.chat.onboarding.specialists.technicalDesc"),
-    },
-    {
-      icon: PenTool,
-      name: t("app.chat.onboarding.specialists.creative"),
-      desc: t("app.chat.onboarding.specialists.creativeDesc"),
-    },
-    {
-      icon: GraduationCap,
-      name: t("app.chat.onboarding.specialists.teacher"),
-      desc: t("app.chat.onboarding.specialists.teacherDesc"),
-    },
-    {
-      icon: MessageCircle,
-      name: t("app.chat.onboarding.specialists.challenger"),
-      desc: t("app.chat.onboarding.specialists.challengerDesc"),
-    },
-  ];
-
   return (
-    <Div className="flex flex-col p-5 overflow-y-auto">
-      {/* Success header */}
-      <Div className="text-center mb-4 shrink-0">
-        <Div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full text-sm font-medium mb-3">
-          <Check className="h-4 w-4" />
-          {t("app.chat.onboarding.specialists.chosen", { name: characterName })}
+    <Div className="flex flex-col flex-1 overflow-hidden">
+      {/* Scrollable content - includes header and character browser */}
+      <Div className="flex-1 overflow-y-auto min-h-0">
+        {/* Success indicator */}
+        <Div className="flex justify-center p-3 border-b bg-card">
+          <Div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full text-sm font-medium">
+            <Check className="h-4 w-4" />
+            {t("app.chat.onboarding.specialists.chosen", {
+              name: characterName,
+            })}
+          </Div>
         </Div>
-        <P className="text-sm text-muted-foreground">
-          {t("app.chat.onboarding.specialists.intro")}
-        </P>
-      </Div>
 
-      {/* Specialists list */}
-      <Div className="bg-muted/50 rounded-xl p-4 mb-4 shrink-0">
-        <Div className="flex items-center gap-2 mb-3">
-          <Span className="text-sm font-medium">
+        {/* Title + Description - inside scroll */}
+        <Div className="p-4 pb-2 border-b bg-card">
+          <H3 className="text-base font-semibold mb-1 text-center">
             {t("app.chat.onboarding.specialists.title")}
-          </Span>
+          </H3>
+          <P className="text-xs text-muted-foreground text-center">
+            {t("app.chat.onboarding.specialists.subtitle")}
+          </P>
         </Div>
-        <Div className="space-y-2.5">
-          {specialists.map((spec, i) => (
-            <Div key={i} className="flex items-center gap-3">
-              <Div className="w-8 h-8 rounded-lg bg-background flex items-center justify-center shrink-0">
-                <spec.icon className="h-4 w-4 text-primary" />
-              </Div>
-              <Div className="min-w-0">
-                <Span className="text-sm font-medium">{spec.name}</Span>
-                <Span className="text-xs text-muted-foreground ml-2">
-                  {spec.desc}
-                </Span>
-              </Div>
-            </Div>
-          ))}
-        </Div>
+
+        {/* Character browser core - NO internal scroll */}
+        <CharacterBrowserCore
+          onAdd={onAddSpecialist}
+          onCustomize={onCustomize}
+          favorites={favorites}
+          locale={locale}
+          hideCompanions={true}
+        />
       </Div>
 
-      {/* Tip about switching */}
-      <P className="text-xs text-muted-foreground text-center mb-4 shrink-0">
-        {t("app.chat.onboarding.specialists.switchTip")}
-      </P>
-
-      {/* Actions */}
-      <Div className="flex flex-col gap-2 shrink-0">
-        <Button
-          type="button"
-          className="w-full h-11 text-base"
-          onClick={onStartChatting}
-        >
+      {/* Sticky footer at bottom */}
+      <Div className="p-4 border-t bg-card shrink-0">
+        <Button type="button" className="w-full h-10" onClick={onStartChatting}>
           {t("app.chat.onboarding.specialists.start")}
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="w-full text-muted-foreground"
-          onClick={onBrowseAll}
-        >
-          {t("app.chat.onboarding.specialists.browseAll")}
         </Button>
       </Div>
     </Div>
@@ -411,18 +357,43 @@ function SpecialistStep({
 export function SelectorOnboarding({
   onSelect,
   onSaveFavorite,
-  onBrowseAll,
+  onCustomize,
+  favorites,
   locale,
+  initialStep = "story",
+  onStepChange,
+  initialSelectedId = null,
+  onSelectedIdChange,
 }: SelectorOnboardingProps): JSX.Element {
-  const [step, setStep] = useState<OnboardingStep>("story");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [step, setStep] = useState<OnboardingStep>(initialStep);
+  const [selectedId, setSelectedId] = useState<string | null>(
+    initialSelectedId,
+  );
   const [isSaving, setIsSaving] = useState(false);
 
   const stepIndex = step === "story" ? 0 : step === "pick" ? 1 : 2;
 
+  // Notify parent when step changes
+  const changeStep = useCallback(
+    (newStep: OnboardingStep) => {
+      setStep(newStep);
+      onStepChange?.(newStep);
+    },
+    [onStepChange],
+  );
+
+  // Notify parent when selected ID changes
+  const changeSelectedId = useCallback(
+    (newId: string | null) => {
+      setSelectedId(newId);
+      onSelectedIdChange?.(newId);
+    },
+    [onSelectedIdChange],
+  );
+
   const handleContinueToTeam = useCallback(() => {
-    setStep("pick");
-  }, []);
+    changeStep("pick");
+  }, [changeStep]);
 
   const handleContinueToSpecialists = useCallback(async () => {
     if (!selectedId) {
@@ -439,16 +410,25 @@ export function SelectorOnboarding({
       }
     }
 
-    setStep("specialists");
-  }, [selectedId, onSaveFavorite]);
+    changeStep("specialists");
+  }, [selectedId, onSaveFavorite, changeStep]);
+
+  const handleAddSpecialist = useCallback(
+    async (characterId: string) => {
+      if (onSaveFavorite) {
+        await onSaveFavorite(characterId);
+      }
+    },
+    [onSaveFavorite],
+  );
 
   const handleBack = useCallback(() => {
     if (step === "pick") {
-      setStep("story");
+      changeStep("story");
     } else if (step === "specialists") {
-      setStep("pick");
+      changeStep("pick");
     }
-  }, [step]);
+  }, [step, changeStep]);
 
   const handleStartChatting = useCallback(() => {
     if (selectedId) {
@@ -456,13 +436,14 @@ export function SelectorOnboarding({
     }
   }, [selectedId, onSelect]);
 
-  const handleBrowseAll = useCallback(() => {
-    // Just go to browser - don't close the modal
-    onBrowseAll();
-  }, [onBrowseAll]);
-
   return (
-    <Div className="flex flex-col max-h-[75vh]">
+    <Div
+      className={cn(
+        "flex flex-col overflow-hidden",
+        // Only specialists step needs fixed height for scrolling
+        step === "specialists" ? "h-[75vh]" : "",
+      )}
+    >
       <StepIndicator
         currentStep={stepIndex}
         totalSteps={3}
@@ -478,7 +459,7 @@ export function SelectorOnboarding({
         <PickStep
           onSelect={handleContinueToSpecialists}
           selectedId={selectedId}
-          setSelectedId={setSelectedId}
+          setSelectedId={changeSelectedId}
           isSaving={isSaving}
           locale={locale}
         />
@@ -487,8 +468,10 @@ export function SelectorOnboarding({
       {step === "specialists" && selectedId && (
         <SpecialistStep
           selectedCharacterId={selectedId}
+          onAddSpecialist={handleAddSpecialist}
+          onCustomize={onCustomize}
           onStartChatting={handleStartChatting}
-          onBrowseAll={handleBrowseAll}
+          favorites={favorites}
           locale={locale}
         />
       )}

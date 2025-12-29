@@ -153,4 +153,34 @@ export const translations = {
       description: "Your custom character has been updated successfully",
     },
   },
+  delete: {
+    title: "Delete Character",
+    description: "Delete a custom character",
+    container: {
+      title: "Delete Character",
+      description: "Permanently remove this custom character",
+    },
+    id: {
+      label: "Character ID",
+      description: "The unique identifier of the character to delete",
+    },
+    errors: {
+      unauthorized: {
+        title: "Unauthorized",
+        description: "You are not authorized to delete this character",
+      },
+      notFound: {
+        title: "Character Not Found",
+        description: "The character you are trying to delete does not exist",
+      },
+      server: {
+        title: "Server Error",
+        description: "An error occurred while deleting the character",
+      },
+    },
+    success: {
+      title: "Character Deleted",
+      description: "The character has been successfully deleted",
+    },
+  },
 };

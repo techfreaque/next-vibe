@@ -455,6 +455,39 @@ type MatchesUsageForMethod<
  * METHOD-SPECIFIC SCHEMA INFERENCE: Infer schema for a specific HTTP method and usage
  * This is the key missing piece that enables proper method-specific type inference
  */
+/**
+ * Helper type to compute schemas for children once
+ * Avoids double evaluation that causes deep recursion
+ */
+type ComputeChildSchemas<
+  TTranslationKey extends string,
+  TChildren,
+  Method extends Methods,
+  Usage extends FieldUsage,
+> = {
+  [K in keyof TChildren]: TChildren[K] extends UnifiedField<
+    TTranslationKey,
+    z.ZodTypeAny
+  >
+    ? InferSchemaFromFieldForMethod<
+        TTranslationKey,
+        TChildren[K],
+        Method,
+        Usage,
+        z.ZodTypeAny
+      >
+    : never;
+};
+
+/**
+ * Filter out never schemas from computed children
+ */
+type FilterNeverSchemas<TSchemas> = {
+  [K in keyof TSchemas as TSchemas[K] extends z.ZodNever
+    ? never
+    : K]: TSchemas[K];
+};
+
 export type InferSchemaFromFieldForMethod<
   TTranslationKey extends string,
   F extends UnifiedField<TTranslationKey, TSchema>,
@@ -472,88 +505,40 @@ export type InferSchemaFromFieldForMethod<
     ? F extends { usage: infer TUsage }
       ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
         ? TFieldSchema
+        : Usage extends FieldUsage.RequestData
+          ? z.ZodUndefined
+          : z.ZodNever
+      : Usage extends FieldUsage.RequestData
+        ? z.ZodUndefined
         : z.ZodNever
-      : z.ZodNever
-    : // Handle ObjectField
+    : // Handle ObjectField - process children based on their own usage
       F extends ObjectField<
           infer TChildren,
           FieldUsageConfig,
           TTranslationKey,
           WidgetConfig<TTranslationKey>
         >
-      ? F extends { usage: infer TUsage }
-        ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
-          ? z.ZodObject<{
-              [K in keyof TChildren as TChildren[K] extends UnifiedField<
-                TTranslationKey,
-                z.ZodTypeAny
-              >
-                ? InferSchemaFromFieldForMethod<
-                    TTranslationKey,
-                    TChildren[K],
-                    Method,
-                    Usage,
-                    z.ZodTypeAny
-                  > extends z.ZodNever
-                  ? never
-                  : K
-                : never]: TChildren[K] extends UnifiedField<
-                TTranslationKey,
-                z.ZodTypeAny
-              >
-                ? InferSchemaFromFieldForMethod<
-                    TTranslationKey,
-                    TChildren[K],
-                    Method,
-                    Usage,
-                    z.ZodTypeAny
-                  >
-                : never;
-            }>
-          : z.ZodNever
-        : z.ZodNever
-      : // Handle ObjectOptionalField
+      ? z.ZodObject<
+          FilterNeverSchemas<
+            ComputeChildSchemas<TTranslationKey, TChildren, Method, Usage>
+          >
+        >
+      : // Handle ObjectOptionalField - process children based on their own usage
         F extends ObjectOptionalField<
             infer TChildren,
             FieldUsageConfig,
             TTranslationKey,
             WidgetConfig<TTranslationKey>
           >
-        ? F extends { usage: infer TUsage }
-          ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
-            ? z.ZodOptional<
-                z.ZodNullable<
-                  z.ZodObject<{
-                    [K in keyof TChildren as TChildren[K] extends UnifiedField<
-                      TTranslationKey,
-                      z.ZodTypeAny
-                    >
-                      ? InferSchemaFromFieldForMethod<
-                          TTranslationKey,
-                          TChildren[K],
-                          Method,
-                          Usage,
-                          z.ZodTypeAny
-                        > extends z.ZodNever
-                        ? never
-                        : K
-                      : never]: TChildren[K] extends UnifiedField<
-                      TTranslationKey,
-                      z.ZodTypeAny
-                    >
-                      ? InferSchemaFromFieldForMethod<
-                          TTranslationKey,
-                          TChildren[K],
-                          Method,
-                          Usage,
-                          z.ZodTypeAny
-                        >
-                      : never;
-                  }>
+        ? z.ZodOptional<
+            z.ZodNullable<
+              z.ZodObject<
+                FilterNeverSchemas<
+                  ComputeChildSchemas<TTranslationKey, TChildren, Method, Usage>
                 >
               >
-            : z.ZodNever
-          : z.ZodNever
+            >
+          >
         : // Handle ArrayField
           F extends ArrayField<
               infer TChild,
@@ -576,8 +561,12 @@ export type InferSchemaFromFieldForMethod<
                       ? TChild
                       : z.ZodNever
                 >
+              : Usage extends FieldUsage.RequestData
+                ? z.ZodUndefined
+                : z.ZodNever
+            : Usage extends FieldUsage.RequestData
+              ? z.ZodUndefined
               : z.ZodNever
-            : z.ZodNever
           : // Handle ArrayOptionalField
             F extends ArrayOptionalField<
                 infer TChild,
@@ -602,8 +591,12 @@ export type InferSchemaFromFieldForMethod<
                           : z.ZodNever
                     >
                   >
+                : Usage extends FieldUsage.RequestData
+                  ? z.ZodUndefined
+                  : z.ZodNever
+              : Usage extends FieldUsage.RequestData
+                ? z.ZodUndefined
                 : z.ZodNever
-              : z.ZodNever
             : z.ZodNever;
 
 /**
@@ -656,20 +649,50 @@ export type FieldUsageConfig =
   | { request: "data&urlPathParams"; response: true }
   // method-specific format
   | {
-      [Methods.GET]?: { request?: "data"; response?: true };
-      [Methods.POST]?: { request?: "data"; response?: true };
-      [Methods.PUT]?: { request?: "data"; response?: true };
-      [Methods.PATCH]?: { request?: "data"; response?: true };
-      [Methods.DELETE]?: { request?: "data"; response?: true };
+      [Methods.GET]?: {
+        request?: "data" | "urlPathParams" | "data&urlPathParams";
+        response?: true;
+      };
+      [Methods.POST]?: {
+        request?: "data" | "urlPathParams" | "data&urlPathParams";
+        response?: true;
+      };
+      [Methods.PUT]?: {
+        request?: "data" | "urlPathParams" | "data&urlPathParams";
+        response?: true;
+      };
+      [Methods.PATCH]?: {
+        request?: "data" | "urlPathParams" | "data&urlPathParams";
+        response?: true;
+      };
+      [Methods.DELETE]?: {
+        request?: "data" | "urlPathParams" | "data&urlPathParams";
+        response?: true;
+      };
       request?: never;
       response?: never;
     }
   | {
-      [Methods.GET]?: { request?: "data"; response?: never };
-      [Methods.POST]?: { request?: "data"; response?: never };
-      [Methods.PUT]?: { request?: "data"; response?: never };
-      [Methods.PATCH]?: { request?: "data"; response?: never };
-      [Methods.DELETE]?: { request?: "data"; response?: never };
+      [Methods.GET]?: {
+        request?: "data" | "urlPathParams" | "data&urlPathParams";
+        response?: never;
+      };
+      [Methods.POST]?: {
+        request?: "data" | "urlPathParams" | "data&urlPathParams";
+        response?: never;
+      };
+      [Methods.PUT]?: {
+        request?: "data" | "urlPathParams" | "data&urlPathParams";
+        response?: never;
+      };
+      [Methods.PATCH]?: {
+        request?: "data" | "urlPathParams" | "data&urlPathParams";
+        response?: never;
+      };
+      [Methods.DELETE]?: {
+        request?: "data" | "urlPathParams" | "data&urlPathParams";
+        response?: never;
+      };
       request?: never;
       response?: never;
     }
@@ -959,7 +982,7 @@ export interface BulkAction {
 export interface PrimitiveField<
   out TSchema extends z.ZodTypeAny,
   out TUsage extends FieldUsageConfig,
-  out TKey extends string,
+  TKey extends string,
   out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "primitive";
@@ -977,7 +1000,7 @@ export interface PrimitiveField<
 export interface ObjectField<
   out TChildren,
   out TUsage extends FieldUsageConfig,
-  out TKey extends string,
+  TKey extends string,
   out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "object";
@@ -993,7 +1016,7 @@ export interface ObjectField<
 export interface ObjectOptionalField<
   out TChildren,
   out TUsage extends FieldUsageConfig,
-  out TKey extends string,
+  TKey extends string,
   out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "object-optional";
@@ -1008,7 +1031,7 @@ export interface ObjectOptionalField<
  */
 export interface ObjectUnionField<
   out TDiscriminator extends string,
-  out TKey extends string,
+  TKey extends string,
   out TVariants extends readonly [
     ObjectField<
       Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
@@ -1040,7 +1063,7 @@ export interface ObjectUnionField<
 export interface ArrayField<
   out TChild,
   out TUsage extends FieldUsageConfig,
-  out TKey extends string,
+  TKey extends string,
   out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "array";
@@ -1056,7 +1079,7 @@ export interface ArrayField<
 export interface ArrayOptionalField<
   out TChild,
   out TUsage extends FieldUsageConfig,
-  out TKey extends string,
+  TKey extends string,
   out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "array-optional";
@@ -1071,7 +1094,7 @@ export interface ArrayOptionalField<
  */
 export interface WidgetField<
   out TUsage extends FieldUsageConfig,
-  out TKey extends string,
+  TKey extends string,
   out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "widget";

@@ -130,6 +130,15 @@ export const translations = {
     tools: {
       label: "AI Tools",
       description: "List of AI tool IDs to enable for this conversation",
+      toolId: {
+        label: "Tool ID",
+        description: "Unique identifier for the AI tool",
+      },
+      requiresConfirmation: {
+        label: "Requires Confirmation",
+        description:
+          "Whether this tool requires user confirmation before execution",
+      },
     },
     enabledToolIds: {
       label: "Enabled Tool IDs",
@@ -139,6 +148,18 @@ export const translations = {
       label: "Tool Confirmation",
       description: "Tool confirmation response from user",
       success: "Tool confirmation processed successfully",
+      messageId: {
+        label: "Message ID",
+        description: "ID of the message containing the tool call",
+      },
+      confirmed: {
+        label: "Confirmed",
+        description: "Whether the user confirmed the tool execution",
+      },
+      updatedArgs: {
+        label: "Updated Arguments",
+        description: "Optional updated arguments for the tool call",
+      },
       errors: {
         messageNotFound: "Tool message not found",
         toolCallMissing: "ToolCall metadata missing",
@@ -148,6 +169,32 @@ export const translations = {
     resumeToken: {
       label: "Resume Token",
       description: "Token for resuming interrupted streams",
+    },
+    voiceMode: {
+      label: "Voice Mode",
+      description: "Configuration for voice-based interaction",
+      streamTTS: {
+        label: "Stream TTS",
+        description: "Enable streaming text-to-speech for responses",
+      },
+      callMode: {
+        label: "Call Mode",
+        description: "Enable real-time voice call mode",
+      },
+      voice: {
+        label: "Voice",
+        description: "Select voice type for text-to-speech",
+        male: "Male Voice",
+        female: "Female Voice",
+      },
+    },
+    audioInput: {
+      title: "Audio Input",
+      description: "Upload audio file for voice-to-voice mode",
+      file: {
+        label: "Audio File",
+        description: "Audio file to transcribe and process",
+      },
     },
     response: {
       title: "Stream Response",

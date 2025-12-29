@@ -2,7 +2,9 @@
  * Polish translations for Email Service endpoint
  */
 
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   category: "Zarządzanie E-mailami",
   tag: "Usługa E-mail",
 
@@ -116,7 +118,6 @@ export const translations = {
     response: {
       accountInfo: {
         title: "Informacje o Koncie",
-        description: "Szczegóły na temat używanego konta e-mail",
       },
       deliveryStatus: {
         title: "Status Dostawy",

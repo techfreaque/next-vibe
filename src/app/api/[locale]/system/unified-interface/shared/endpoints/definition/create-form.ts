@@ -10,7 +10,7 @@
 
 import { z } from "zod";
 
-import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type {
   ExamplesList,
   ExtractInput,
@@ -33,158 +33,337 @@ import {
   UserRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { type CreateApiEndpoint } from "./create";
 
 /**
  * Configuration for a single method in a form endpoint
  */
-export interface FormMethodConfig {
-  readonly title: TranslationKey;
-  readonly description: TranslationKey;
-  readonly tags: TranslationKey[];
-  readonly icon: IconValue;
+export interface FormMethodConfig<TScopedTranslationKey extends string> {
+  readonly title: TScopedTranslationKey;
+  readonly description: TScopedTranslationKey;
+  readonly tags: TScopedTranslationKey[];
+  readonly icon: IconKey;
   readonly aliases?: string[];
 }
 
 /**
  * Examples configuration for form endpoints
  */
-export interface FormExamples<
+/**
+ * Cache schemas for a method to avoid repeated evaluation
+ */
+export interface CachedMethodSchemas<
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
-  TExampleKey extends string,
+  TMethod extends Methods,
 > {
-  readonly GET?: {
-    requests?: ExtractInput<
-      InferSchemaFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.GET,
-        FieldUsage.RequestData
-      >
-    > extends never
-      ? undefined
-      : ExamplesList<
-          ExtractInput<
-            InferSchemaFromFieldForMethod<
-              TScopedTranslationKey,
-              TFields,
-              Methods.GET,
-              FieldUsage.RequestData
-            >
-          >,
-          TExampleKey
-        >;
-    responses: ExamplesList<
-      ExtractOutput<
-        InferSchemaFromFieldForMethod<
-          TScopedTranslationKey,
-          TFields,
-          Methods.GET,
-          FieldUsage.Response
-        >
-      >,
-      TExampleKey
-    >;
-    urlPathParams?: ExtractInput<
-      InferSchemaFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.GET,
-        FieldUsage.RequestUrlParams
-      >
-    > extends never
-      ? undefined
-      : ExamplesList<
-          ExtractInput<
-            InferSchemaFromFieldForMethod<
-              TScopedTranslationKey,
-              TFields,
-              Methods.GET,
-              FieldUsage.RequestUrlParams
-            >
-          >,
-          TExampleKey
-        >;
-  };
-  readonly POST?: {
-    requests?: ExtractInput<
-      InferSchemaFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.POST,
-        FieldUsage.RequestData
-      >
-    > extends never
-      ? undefined
-      : ExamplesList<
-          ExtractInput<
-            InferSchemaFromFieldForMethod<
-              TScopedTranslationKey,
-              TFields,
-              Methods.POST,
-              FieldUsage.RequestData
-            >
-          >,
-          TExampleKey
-        >;
-    responses: ExamplesList<
-      ExtractOutput<
-        InferSchemaFromFieldForMethod<
-          TScopedTranslationKey,
-          TFields,
-          Methods.POST,
-          FieldUsage.Response
-        >
-      >,
-      TExampleKey
-    >;
-    urlPathParams?: ExtractInput<
-      InferSchemaFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.POST,
-        FieldUsage.RequestUrlParams
-      >
-    > extends never
-      ? undefined
-      : ExamplesList<
-          ExtractInput<
-            InferSchemaFromFieldForMethod<
-              TScopedTranslationKey,
-              TFields,
-              Methods.POST,
-              FieldUsage.RequestUrlParams
-            >
-          >,
-          TExampleKey
-        >;
-  };
+  requestData: InferSchemaFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.RequestData
+  >;
+  response: InferSchemaFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.Response
+  >;
+  urlParams: InferSchemaFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.RequestUrlParams
+  >;
 }
 
 /**
- * Configuration for creating a form endpoint with GET and POST methods
+ * Build examples structure from cached schemas
+ */
+export interface MethodExamples<
+  TSchemas extends CachedMethodSchemas<
+    string,
+    UnifiedField<string, z.ZodTypeAny>,
+    Methods
+  >,
+  TExampleKey extends string,
+> {
+  requests?: ExtractInput<TSchemas["requestData"]> extends never
+    ? undefined
+    : ExamplesList<ExtractInput<TSchemas["requestData"]>, TExampleKey>;
+  responses: ExamplesList<ExtractOutput<TSchemas["response"]>, TExampleKey>;
+  urlPathParams?: ExtractInput<TSchemas["urlParams"]> extends never
+    ? undefined
+    : ExamplesList<ExtractInput<TSchemas["urlParams"]>, TExampleKey>;
+}
+
+/**
+ * FormExamples - inlines the full structure to avoid intermediate type depth
+ */
+// oxlint-disable-next-line consistent-type-definitions
+export type FormExamples<
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TExampleKey extends string,
+  TMethods extends {
+    GET?: FormMethodConfig<TScopedTranslationKey>;
+    POST?: FormMethodConfig<TScopedTranslationKey>;
+    PATCH?: FormMethodConfig<TScopedTranslationKey>;
+    DELETE?: FormMethodConfig<TScopedTranslationKey>;
+  } = {
+    GET?: FormMethodConfig<TScopedTranslationKey>;
+    POST?: FormMethodConfig<TScopedTranslationKey>;
+    PATCH?: FormMethodConfig<TScopedTranslationKey>;
+    DELETE?: FormMethodConfig<TScopedTranslationKey>;
+  },
+> = {
+  GET?: "GET" extends keyof TMethods
+    ? {
+        requests?: ExtractInput<
+          InferSchemaFromFieldForMethod<
+            TScopedTranslationKey,
+            TFields,
+            Methods.GET,
+            FieldUsage.RequestData
+          >
+        > extends never
+          ? undefined
+          : ExamplesList<
+              ExtractInput<
+                InferSchemaFromFieldForMethod<
+                  TScopedTranslationKey,
+                  TFields,
+                  Methods.GET,
+                  FieldUsage.RequestData
+                >
+              >,
+              TExampleKey
+            >;
+        responses: ExamplesList<
+          ExtractOutput<
+            InferSchemaFromFieldForMethod<
+              TScopedTranslationKey,
+              TFields,
+              Methods.GET,
+              FieldUsage.Response
+            >
+          >,
+          TExampleKey
+        >;
+        urlPathParams?: ExtractInput<
+          InferSchemaFromFieldForMethod<
+            TScopedTranslationKey,
+            TFields,
+            Methods.GET,
+            FieldUsage.RequestUrlParams
+          >
+        > extends never
+          ? undefined
+          : ExamplesList<
+              ExtractInput<
+                InferSchemaFromFieldForMethod<
+                  TScopedTranslationKey,
+                  TFields,
+                  Methods.GET,
+                  FieldUsage.RequestUrlParams
+                >
+              >,
+              TExampleKey
+            >;
+      }
+    : never;
+  POST?: "POST" extends keyof TMethods
+    ? {
+        requests?: ExtractInput<
+          InferSchemaFromFieldForMethod<
+            TScopedTranslationKey,
+            TFields,
+            Methods.POST,
+            FieldUsage.RequestData
+          >
+        > extends never
+          ? undefined
+          : ExamplesList<
+              ExtractInput<
+                InferSchemaFromFieldForMethod<
+                  TScopedTranslationKey,
+                  TFields,
+                  Methods.POST,
+                  FieldUsage.RequestData
+                >
+              >,
+              TExampleKey
+            >;
+        responses: ExamplesList<
+          ExtractOutput<
+            InferSchemaFromFieldForMethod<
+              TScopedTranslationKey,
+              TFields,
+              Methods.POST,
+              FieldUsage.Response
+            >
+          >,
+          TExampleKey
+        >;
+        urlPathParams?: ExtractInput<
+          InferSchemaFromFieldForMethod<
+            TScopedTranslationKey,
+            TFields,
+            Methods.POST,
+            FieldUsage.RequestUrlParams
+          >
+        > extends never
+          ? undefined
+          : ExamplesList<
+              ExtractInput<
+                InferSchemaFromFieldForMethod<
+                  TScopedTranslationKey,
+                  TFields,
+                  Methods.POST,
+                  FieldUsage.RequestUrlParams
+                >
+              >,
+              TExampleKey
+            >;
+      }
+    : never;
+  PATCH?: "PATCH" extends keyof TMethods
+    ? {
+        requests?: ExtractInput<
+          InferSchemaFromFieldForMethod<
+            TScopedTranslationKey,
+            TFields,
+            Methods.PATCH,
+            FieldUsage.RequestData
+          >
+        > extends never
+          ? undefined
+          : ExamplesList<
+              ExtractInput<
+                InferSchemaFromFieldForMethod<
+                  TScopedTranslationKey,
+                  TFields,
+                  Methods.PATCH,
+                  FieldUsage.RequestData
+                >
+              >,
+              TExampleKey
+            >;
+        responses: ExamplesList<
+          ExtractOutput<
+            InferSchemaFromFieldForMethod<
+              TScopedTranslationKey,
+              TFields,
+              Methods.PATCH,
+              FieldUsage.Response
+            >
+          >,
+          TExampleKey
+        >;
+        urlPathParams?: ExtractInput<
+          InferSchemaFromFieldForMethod<
+            TScopedTranslationKey,
+            TFields,
+            Methods.PATCH,
+            FieldUsage.RequestUrlParams
+          >
+        > extends never
+          ? undefined
+          : ExamplesList<
+              ExtractInput<
+                InferSchemaFromFieldForMethod<
+                  TScopedTranslationKey,
+                  TFields,
+                  Methods.PATCH,
+                  FieldUsage.RequestUrlParams
+                >
+              >,
+              TExampleKey
+            >;
+      }
+    : never;
+  DELETE?: "DELETE" extends keyof TMethods
+    ? {
+        requests?: ExtractInput<
+          InferSchemaFromFieldForMethod<
+            TScopedTranslationKey,
+            TFields,
+            Methods.DELETE,
+            FieldUsage.RequestData
+          >
+        > extends never
+          ? undefined
+          : ExamplesList<
+              ExtractInput<
+                InferSchemaFromFieldForMethod<
+                  TScopedTranslationKey,
+                  TFields,
+                  Methods.DELETE,
+                  FieldUsage.RequestData
+                >
+              >,
+              TExampleKey
+            >;
+        responses: ExamplesList<
+          ExtractOutput<
+            InferSchemaFromFieldForMethod<
+              TScopedTranslationKey,
+              TFields,
+              Methods.DELETE,
+              FieldUsage.Response
+            >
+          >,
+          TExampleKey
+        >;
+        urlPathParams?: ExtractInput<
+          InferSchemaFromFieldForMethod<
+            TScopedTranslationKey,
+            TFields,
+            Methods.DELETE,
+            FieldUsage.RequestUrlParams
+          >
+        > extends never
+          ? undefined
+          : ExamplesList<
+              ExtractInput<
+                InferSchemaFromFieldForMethod<
+                  TScopedTranslationKey,
+                  TFields,
+                  Methods.DELETE,
+                  FieldUsage.RequestUrlParams
+                >
+              >,
+              TExampleKey
+            >;
+      }
+    : never;
+};
+
+/**
+ * Configuration for creating a form endpoint with GET, POST, PATCH, and DELETE methods
  */
 export interface CreateFormEndpointConfig<
   TScopedTranslationKey extends string,
   TExampleKey extends string,
   TUserRoleValue extends readonly UserRoleValue[],
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TMethods extends {
+    GET?: FormMethodConfig<TScopedTranslationKey>;
+    POST?: FormMethodConfig<TScopedTranslationKey>;
+    PATCH?: FormMethodConfig<TScopedTranslationKey>;
+    DELETE?: FormMethodConfig<TScopedTranslationKey>;
+  },
 > {
   // Shared configuration
   readonly path: readonly string[];
-  readonly category: TranslationKey;
+  readonly category: NoInfer<TScopedTranslationKey>;
   readonly allowedRoles: TUserRoleValue;
 
   readonly debug?: boolean;
 
   // Method-specific configuration
-  readonly methods: {
-    readonly GET: FormMethodConfig;
-    readonly POST: FormMethodConfig;
-  };
+  readonly methods: TMethods;
 
   // Shared field definitions - will be automatically adapted for each method
   readonly fields: TFields;
@@ -193,17 +372,19 @@ export interface CreateFormEndpointConfig<
   readonly errorTypes: Record<
     EndpointErrorTypes,
     {
-      title: TranslationKey;
-      description: TranslationKey;
+      title: NoInfer<TScopedTranslationKey>;
+      description: NoInfer<TScopedTranslationKey>;
     }
   >;
   readonly successTypes: {
-    title: TranslationKey;
-    description: TranslationKey;
+    title: NoInfer<TScopedTranslationKey>;
+    description: NoInfer<TScopedTranslationKey>;
   };
 
   // Method-specific examples
-  readonly examples: FormExamples<TScopedTranslationKey, TFields, TExampleKey>;
+  readonly examples: NoInfer<
+    FormExamples<TScopedTranslationKey, TFields, TExampleKey, TMethods>
+  >;
 }
 
 // ============================================================================
@@ -318,34 +499,273 @@ export type MethodSpecificEndpoint<
   TMethod,
   TUserRoleValue,
   TScopedTranslationKey,
-  TFields
+  TFields,
+  // Override type parameters with method-specific inference
+  InferInputFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.RequestData
+  >,
+  InferOutputFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.RequestData
+  >,
+  InferInputFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.Response
+  >,
+  InferOutputFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.Response
+  >,
+  InferInputFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.RequestUrlParams
+  >,
+  InferOutputFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.RequestUrlParams
+  >
 >;
 
 /**
- * Return type for createFormEndpoint - provides both GET and POST endpoints
- * Uses method-specific type inference for perfect type safety
+ * Type Helper: Extract Request Schema from Fields for a specific Method
+ * Combines data fields + URL path params for a specific HTTP method
+ * Used for testing the request schema generation chain
  */
-export interface CreateFormEndpointReturn<
+export type GetRequestSchemaFromFields<
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TMethod extends Methods,
+> = z.ZodObject<{
+  data: InferSchemaFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.RequestData
+  >;
+  urlPathParams: InferSchemaFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.RequestUrlParams
+  >;
+}>;
+
+/**
+ * Type Helper: Extract Response Schema from Fields for a specific Method
+ * Gets response-only fields for a specific HTTP method
+ * Used for testing the response schema generation chain
+ */
+export type GetResponseSchemaFromFields<
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TMethod extends Methods,
+> = InferSchemaFromFieldForMethod<
+  TScopedTranslationKey,
+  TFields,
+  TMethod,
+  FieldUsage.Response
+>;
+
+/**
+ * Return type for createFormEndpoint - provides GET, POST, PATCH, and DELETE endpoints
+ * Uses method-specific type inference for perfect type safety
+ * Only includes methods that are actually defined in the config
+ */
+export type CreateFormEndpointReturn<
   TExampleKey extends string,
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
-> {
-  readonly GET: MethodSpecificEndpoint<
-    TExampleKey,
-    Methods.GET,
-    TUserRoleValue,
-    TScopedTranslationKey,
-    TFields
-  >;
-  readonly POST: MethodSpecificEndpoint<
-    TExampleKey,
-    Methods.POST,
-    TUserRoleValue,
-    TScopedTranslationKey,
-    TFields
-  >;
-}
+  TMethods extends {
+    GET?: FormMethodConfig<TScopedTranslationKey>;
+    POST?: FormMethodConfig<TScopedTranslationKey>;
+    PATCH?: FormMethodConfig<TScopedTranslationKey>;
+    DELETE?: FormMethodConfig<TScopedTranslationKey>;
+  },
+> = (TMethods["GET"] extends FormMethodConfig<string>
+  ? {
+      GET: MethodSpecificEndpoint<
+        TExampleKey,
+        Methods.GET,
+        TUserRoleValue,
+        TScopedTranslationKey,
+        TFields
+      >;
+    }
+  : Record<string, never>) &
+  (TMethods["POST"] extends FormMethodConfig<string>
+    ? {
+        POST: MethodSpecificEndpoint<
+          TExampleKey,
+          Methods.POST,
+          TUserRoleValue,
+          TScopedTranslationKey,
+          TFields
+        >;
+      }
+    : Record<string, never>) &
+  (TMethods["PATCH"] extends FormMethodConfig<string>
+    ? {
+        PATCH: MethodSpecificEndpoint<
+          TExampleKey,
+          Methods.PATCH,
+          TUserRoleValue,
+          TScopedTranslationKey,
+          TFields
+        >;
+      }
+    : Record<string, never>) &
+  (TMethods["DELETE"] extends FormMethodConfig<string>
+    ? {
+        DELETE: MethodSpecificEndpoint<
+          TExampleKey,
+          Methods.DELETE,
+          TUserRoleValue,
+          TScopedTranslationKey,
+          TFields
+        >;
+      }
+    : Record<string, never>);
+
+/**
+ * ============================================================================
+ * TYPE EXTRACTION UTILITIES
+ * ============================================================================
+ *
+ * These utilities extract types from createFormEndpoint CONFIG (not return value).
+ * They work around TypeScript's cross-module typeof limitation by inferring types
+ * from the input config parameters instead of from the return value.
+ *
+ * Usage in definition files:
+ * ```typescript
+ * const config = { ... } as const;
+ * export const { GET, POST } = createFormEndpoint(config);
+ *
+ * // Extract types from CONFIG, not return value
+ * export type GetRequest = ExtractMethodRequestOutput<typeof config, "GET">;
+ * export type PostResponse = ExtractMethodResponseOutput<typeof config, "POST">;
+ * ```
+ */
+
+/**
+ * Extract the Config type from a createFormEndpoint call
+ */
+export type ExtractConfig<T> =
+  T extends CreateFormEndpointConfig<
+    infer TScopedTranslationKey,
+    infer TExampleKey,
+    infer TUserRoleValue,
+    infer TFields,
+    infer TMethods
+  >
+    ? CreateFormEndpointConfig<
+        TScopedTranslationKey,
+        TExampleKey,
+        TUserRoleValue,
+        TFields,
+        TMethods
+      >
+    : never;
+
+/**
+ * Extract RequestOutput type for a specific method from config
+ */
+export type ExtractMethodRequestOutput<
+  TConfig extends {
+    fields: UnifiedField<string, z.ZodTypeAny>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    methods: Record<string, any>;
+  },
+  TMethodKey extends "GET" | "POST" | "PATCH" | "DELETE",
+> = TConfig extends { fields: infer TFields; methods: infer TMethods }
+  ? TFields extends UnifiedField<infer TScopedTranslationKey, z.ZodTypeAny>
+    ? TMethodKey extends keyof TMethods
+      ? InferOutputFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          TMethodKey extends "GET"
+            ? Methods.GET
+            : TMethodKey extends "POST"
+              ? Methods.POST
+              : TMethodKey extends "PATCH"
+                ? Methods.PATCH
+                : Methods.DELETE,
+          FieldUsage.RequestData
+        >
+      : never
+    : never
+  : never;
+
+/**
+ * Extract ResponseOutput type for a specific method from config
+ */
+export type ExtractMethodResponseOutput<
+  TConfig extends {
+    fields: UnifiedField<string, z.ZodTypeAny>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    methods: Record<string, any>;
+  },
+  TMethodKey extends "GET" | "POST" | "PATCH" | "DELETE",
+> = TConfig extends { fields: infer TFields; methods: infer TMethods }
+  ? TFields extends UnifiedField<infer TScopedTranslationKey, z.ZodTypeAny>
+    ? TMethodKey extends keyof TMethods
+      ? InferOutputFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          TMethodKey extends "GET"
+            ? Methods.GET
+            : TMethodKey extends "POST"
+              ? Methods.POST
+              : TMethodKey extends "PATCH"
+                ? Methods.PATCH
+                : Methods.DELETE,
+          FieldUsage.Response
+        >
+      : never
+    : never
+  : never;
+
+/**
+ * Extract UrlVariablesOutput type for a specific method from config
+ */
+export type ExtractMethodUrlVariablesOutput<
+  TConfig extends {
+    fields: UnifiedField<string, z.ZodTypeAny>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    methods: Record<string, any>;
+  },
+  TMethodKey extends "GET" | "POST" | "PATCH" | "DELETE",
+> = TConfig extends { fields: infer TFields; methods: infer TMethods }
+  ? TFields extends UnifiedField<infer TScopedTranslationKey, z.ZodTypeAny>
+    ? TMethodKey extends keyof TMethods
+      ? InferOutputFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          TMethodKey extends "GET"
+            ? Methods.GET
+            : TMethodKey extends "POST"
+              ? Methods.POST
+              : TMethodKey extends "PATCH"
+                ? Methods.PATCH
+                : Methods.DELETE,
+          FieldUsage.RequestUrlParams
+        >
+      : never
+    : never
+  : never;
 
 // ============================================================================
 // METHOD-SPECIFIC SCHEMA GENERATORS
@@ -601,13 +1021,8 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
   }
 
   if (typedField.type === "object") {
-    // Check if the object itself should be included for this method and usage
-    const objectMethodUsage = getUsageForMethod(typedField.usage, method);
-    if (!objectMethodUsage || !hasTargetUsage(objectMethodUsage)) {
-      return targetUsage === FieldUsage.RequestData ? z.undefined() : z.never();
-    }
-
-    // Build shape object by recursively processing children
+    // Build shape object by processing children FIRST
+    // Children can have different usage than container (e.g., URL params even if container doesn't declare them)
     const shape: Record<string, z.ZodTypeAny> = {};
 
     if (typedField.children) {
@@ -623,12 +1038,19 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
       }
     }
 
-    // If no children match this usage, return z.undefined() for request data, z.never() for others
-    if (Object.keys(shape).length === 0) {
+    // If we have matching children, return the object
+    if (Object.keys(shape).length > 0) {
+      return z.object(shape);
+    }
+
+    // No matching children - check if container itself should be included
+    const objectMethodUsage = getUsageForMethod(typedField.usage, method);
+    if (!objectMethodUsage || !hasTargetUsage(objectMethodUsage)) {
       return targetUsage === FieldUsage.RequestData ? z.undefined() : z.never();
     }
 
-    return z.object(shape);
+    // Container matches but no children - return empty object
+    return z.object({});
   }
 
   if (typedField.type === "array") {
@@ -686,285 +1108,388 @@ export function generateRequestUrlSchemaForMethod<F>(
 }
 
 /**
- * Create a form endpoint with both GET and POST methods
+ * Create a form endpoint with GET, POST, PATCH, and/or DELETE methods
  *
- * This utility creates two endpoints that share field definitions:
- * - GET: Uses fields as response-only (for fetching current data)
- * - POST: Uses fields as request+response (for updating data)
+ * This utility creates multiple endpoints that share field definitions using method-specific usage patterns.
+ * Each method can have different field usage (request/response) defined in the field's usage configuration.
  *
- * @param config Configuration for the form endpoint
- * @returns Object with GET and POST endpoint definitions
+ * @param config Configuration for the form endpoint with method-specific settings
+ * @returns Object with endpoint definitions for the specified HTTP methods
  */
 export function createFormEndpoint<
-  TScopedTranslationKey extends string,
+  const TScopedTranslationKey extends string,
   const TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
-  TExampleKey extends string,
-  TUserRoleValue extends readonly UserRoleValue[],
+  const TExampleKey extends string,
+  const TUserRoleValue extends readonly UserRoleValue[],
+  const TMethods extends {
+    GET?: FormMethodConfig<TScopedTranslationKey>;
+    POST?: FormMethodConfig<TScopedTranslationKey>;
+    PATCH?: FormMethodConfig<TScopedTranslationKey>;
+    DELETE?: FormMethodConfig<TScopedTranslationKey>;
+  },
 >(
   config: CreateFormEndpointConfig<
     TScopedTranslationKey,
     TExampleKey,
     TUserRoleValue,
-    TFields
+    TFields,
+    TMethods
   >,
 ): CreateFormEndpointReturn<
   TExampleKey,
   TUserRoleValue,
   TScopedTranslationKey,
-  TFields
+  TFields,
+  TMethods
 > {
   // Generate schemas directly from the original fields with method-specific filtering
-  const getRequestSchema = generateRequestDataSchemaForMethod(
-    config.fields,
-    Methods.GET,
-  );
-  const getResponseSchema = generateResponseSchemaForMethod(
-    config.fields,
-    Methods.GET,
-  );
-  const getUrlSchema = generateRequestUrlSchemaForMethod(
-    config.fields,
-    Methods.GET,
-  );
 
   // Helper function for authentication check
   const requiresAuthentication = (): boolean => {
     return !config.allowedRoles.includes(UserRole.PUBLIC);
   };
 
-  // Create GET endpoint with method-specific type inference
-  const getEndpoint = {
-    method: Methods.GET,
-    path: config.path,
-    title: config.methods.GET.title,
-    description: config.methods.GET.description,
-    category: config.category,
-    tags: config.methods.GET.tags,
-    allowedRoles: config.allowedRoles,
-    debug: config.debug,
-    aliases: config.methods.GET.aliases,
-    icon: config.methods.GET.icon,
-    fields: config.fields,
-    errorTypes: config.errorTypes,
-    successTypes: config.successTypes,
-    examples: config.examples.GET || {
-      requests: undefined,
-      responses: undefined,
-      urlPathParams: undefined,
-    },
-    requestSchema: getRequestSchema,
-    responseSchema: getResponseSchema,
-    requestUrlPathParamsSchema: getUrlSchema,
-    requiresAuthentication,
-    types: {
-      RequestInput: null as InferInputFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.GET,
-        FieldUsage.RequestData
-      >,
-      RequestOutput: null as InferOutputFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.GET,
-        FieldUsage.RequestData
-      >,
-      ResponseInput: null as InferInputFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.GET,
-        FieldUsage.Response
-      >,
-      ResponseOutput: null as InferOutputFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.GET,
-        FieldUsage.Response
-      >,
-      UrlVariablesInput: null as InferInputFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.GET,
-        FieldUsage.RequestUrlParams
-      >,
-      UrlVariablesOutput: null as InferOutputFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.GET,
-        FieldUsage.RequestUrlParams
-      >,
-    },
-    TRequestInput: null as InferInputFromFieldForMethod<
+  // Helper to create properly typed endpoint
+  const createMethodEndpoint = <TMethod extends Methods>(
+    method: TMethod,
+    methodConfig: FormMethodConfig<TScopedTranslationKey>,
+    requestSchema: InferSchemaFromFieldForMethod<
       TScopedTranslationKey,
       TFields,
-      Methods.GET,
+      TMethod,
       FieldUsage.RequestData
     >,
-    TRequestOutput: null as InferOutputFromFieldForMethod<
+    responseSchema: InferSchemaFromFieldForMethod<
       TScopedTranslationKey,
       TFields,
-      Methods.GET,
-      FieldUsage.RequestData
-    >,
-    TResponseInput: null as InferInputFromFieldForMethod<
-      TScopedTranslationKey,
-      TFields,
-      Methods.GET,
+      TMethod,
       FieldUsage.Response
     >,
-    TResponseOutput: null as InferOutputFromFieldForMethod<
+    urlSchema: InferSchemaFromFieldForMethod<
       TScopedTranslationKey,
       TFields,
-      Methods.GET,
-      FieldUsage.Response
-    >,
-    TUrlVariablesInput: null as InferInputFromFieldForMethod<
-      TScopedTranslationKey,
-      TFields,
-      Methods.GET,
+      TMethod,
       FieldUsage.RequestUrlParams
     >,
-    TUrlVariablesOutput: null as InferOutputFromFieldForMethod<
-      TScopedTranslationKey,
-      TFields,
-      Methods.GET,
-      FieldUsage.RequestUrlParams
-    >,
+    examples: (ExtractInput<
+      InferSchemaFromFieldForMethod<
+        TScopedTranslationKey,
+        TFields,
+        TMethod,
+        FieldUsage.RequestData
+      >
+    > extends undefined
+      ? { requests?: undefined }
+      : ExtractInput<
+            InferSchemaFromFieldForMethod<
+              TScopedTranslationKey,
+              TFields,
+              TMethod,
+              FieldUsage.RequestData
+            >
+          > extends never
+        ? { requests?: undefined }
+        : {
+            requests: ExamplesList<
+              ExtractInput<
+                InferSchemaFromFieldForMethod<
+                  TScopedTranslationKey,
+                  TFields,
+                  TMethod,
+                  FieldUsage.RequestData
+                >
+              >,
+              TExampleKey
+            >;
+          }) &
+      (ExtractInput<
+        InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          TMethod,
+          FieldUsage.RequestUrlParams
+        >
+      > extends undefined
+        ? { urlPathParams?: undefined }
+        : ExtractInput<
+              InferSchemaFromFieldForMethod<
+                TScopedTranslationKey,
+                TFields,
+                TMethod,
+                FieldUsage.RequestUrlParams
+              >
+            > extends never
+          ? { urlPathParams?: undefined }
+          : {
+              urlPathParams: ExamplesList<
+                ExtractInput<
+                  InferSchemaFromFieldForMethod<
+                    TScopedTranslationKey,
+                    TFields,
+                    TMethod,
+                    FieldUsage.RequestUrlParams
+                  >
+                >,
+                TExampleKey
+              >;
+            }) & {
+        responses: ExamplesList<
+          ExtractOutput<
+            InferSchemaFromFieldForMethod<
+              TScopedTranslationKey,
+              TFields,
+              TMethod,
+              FieldUsage.Response
+            >
+          >,
+          TExampleKey
+        >;
+      },
+  ): MethodSpecificEndpoint<
+    TExampleKey,
+    TMethod,
+    TUserRoleValue,
+    TScopedTranslationKey,
+    TFields
+  > => {
+    return {
+      method,
+      path: config.path,
+      title: methodConfig.title,
+      description: methodConfig.description,
+      category: config.category,
+      tags: methodConfig.tags,
+      allowedRoles: config.allowedRoles,
+      debug: config.debug,
+      aliases: methodConfig.aliases,
+      icon: methodConfig.icon,
+      fields: config.fields,
+      errorTypes: config.errorTypes,
+      successTypes: config.successTypes,
+      examples: examples as never,
+      requestSchema: requestSchema as never,
+      responseSchema: responseSchema as never,
+      requestUrlPathParamsSchema: urlSchema as never,
+      requiresAuthentication,
+      types: {
+        RequestInput: undefined! as InferInputFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          TMethod,
+          FieldUsage.RequestData
+        >,
+        RequestOutput: undefined! as InferOutputFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          TMethod,
+          FieldUsage.RequestData
+        >,
+        ResponseInput: undefined! as InferInputFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          TMethod,
+          FieldUsage.Response
+        >,
+        ResponseOutput: undefined! as InferOutputFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          TMethod,
+          FieldUsage.Response
+        >,
+        UrlVariablesInput: undefined! as InferInputFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          TMethod,
+          FieldUsage.RequestUrlParams
+        >,
+        UrlVariablesOutput: undefined! as InferOutputFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          TMethod,
+          FieldUsage.RequestUrlParams
+        >,
+        Fields: undefined! as TFields,
+        ExampleKey: undefined! as TExampleKey,
+        Method: undefined! as TMethod,
+        UserRoleValue: undefined! as TUserRoleValue,
+        ScopedTranslationKey: undefined! as TScopedTranslationKey,
+      },
+    };
   };
 
-  // Generate schemas for POST method using original fields
-  const postRequestSchema = generateRequestDataSchemaForMethod(
-    config.fields,
-    Methods.POST,
-  );
-  const postResponseSchema = generateResponseSchemaForMethod(
-    config.fields,
-    Methods.POST,
-  );
-  const postRequestUrlSchema = generateRequestUrlSchemaForMethod(
-    config.fields,
-    Methods.POST,
-  );
+  // Cast fields to TFields since the conditional type is for validation only
+  const fields = config.fields as TFields;
 
-  // Create POST endpoint with method-specific type inference
-  const postEndpoint = {
-    method: Methods.POST,
-    path: config.path,
-    title: config.methods.POST.title,
-    description: config.methods.POST.description,
-    category: config.category,
-    tags: config.methods.POST.tags,
-    icon: config.methods.POST.icon,
-    allowedRoles: config.allowedRoles,
-    debug: config.debug,
-    aliases: config.methods.POST.aliases,
-    fields: config.fields,
-    errorTypes: config.errorTypes,
-    successTypes: config.successTypes,
-    examples: config.examples.POST || {
-      requests: {},
-      responses: {},
-      urlPathParams: undefined,
-    },
-    requestSchema: postRequestSchema,
-    responseSchema: postResponseSchema,
-    requestUrlPathParamsSchema: postRequestUrlSchema,
-    requiresAuthentication,
-    types: {
-      RequestInput: null as InferInputFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.POST,
-        FieldUsage.RequestData
-      >,
-      RequestOutput: null as InferOutputFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.POST,
-        FieldUsage.RequestData
-      >,
-      ResponseInput: null as InferInputFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.POST,
-        FieldUsage.Response
-      >,
-      ResponseOutput: null as InferOutputFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.POST,
-        FieldUsage.Response
-      >,
-      UrlVariablesInput: null as InferInputFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.POST,
-        FieldUsage.RequestUrlParams
-      >,
-      UrlVariablesOutput: null as InferOutputFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        Methods.POST,
-        FieldUsage.RequestUrlParams
-      >,
-    },
-    TRequestInput: null as InferInputFromFieldForMethod<
-      TScopedTranslationKey,
-      TFields,
-      Methods.POST,
-      FieldUsage.RequestData
-    >,
-    TRequestOutput: null as InferOutputFromFieldForMethod<
-      TScopedTranslationKey,
-      TFields,
-      Methods.POST,
-      FieldUsage.RequestData
-    >,
-    TResponseInput: null as InferInputFromFieldForMethod<
-      TScopedTranslationKey,
-      TFields,
-      Methods.POST,
-      FieldUsage.Response
-    >,
-    TResponseOutput: null as InferOutputFromFieldForMethod<
-      TScopedTranslationKey,
-      TFields,
-      Methods.POST,
-      FieldUsage.Response
-    >,
-    TUrlVariablesInput: null as InferInputFromFieldForMethod<
-      TScopedTranslationKey,
-      TFields,
-      Methods.POST,
-      FieldUsage.RequestUrlParams
-    >,
-    TUrlVariablesOutput: null as InferOutputFromFieldForMethod<
-      TScopedTranslationKey,
-      TFields,
-      Methods.POST,
-      FieldUsage.RequestUrlParams
-    >,
-  };
+  // Create endpoints using the helper function with proper type assertions
+  const getEndpoint = config.methods.GET
+    ? createMethodEndpoint(
+        Methods.GET,
+        config.methods.GET as FormMethodConfig<TScopedTranslationKey>,
+        generateRequestDataSchemaForMethod(
+          fields,
+          Methods.GET,
+        ) as InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.GET,
+          FieldUsage.RequestData
+        >,
+        generateResponseSchemaForMethod(
+          fields,
+          Methods.GET,
+        ) as InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.GET,
+          FieldUsage.Response
+        >,
+        generateRequestUrlSchemaForMethod(
+          fields,
+          Methods.GET,
+        ) as InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.GET,
+          FieldUsage.RequestUrlParams
+        >,
+        (config.examples.GET || {
+          requests: undefined,
+          responses: undefined as never,
+          urlPathParams: undefined,
+        }) as never,
+      )
+    : undefined;
 
-  // Return the form endpoints with proper typing
+  const postEndpoint = config.methods.POST
+    ? createMethodEndpoint(
+        Methods.POST,
+        config.methods.POST as FormMethodConfig<TScopedTranslationKey>,
+        generateRequestDataSchemaForMethod(
+          fields,
+          Methods.POST,
+        ) as InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.POST,
+          FieldUsage.RequestData
+        >,
+        generateResponseSchemaForMethod(
+          fields,
+          Methods.POST,
+        ) as InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.POST,
+          FieldUsage.Response
+        >,
+        generateRequestUrlSchemaForMethod(
+          fields,
+          Methods.POST,
+        ) as InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.POST,
+          FieldUsage.RequestUrlParams
+        >,
+        (config.examples.POST || {
+          requests: {} as never,
+          responses: {} as never,
+          urlPathParams: undefined,
+        }) as never,
+      )
+    : undefined;
+
+  const patchEndpoint = config.methods.PATCH
+    ? createMethodEndpoint(
+        Methods.PATCH,
+        config.methods.PATCH as FormMethodConfig<TScopedTranslationKey>,
+        generateRequestDataSchemaForMethod(
+          fields,
+          Methods.PATCH,
+        ) as InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.PATCH,
+          FieldUsage.RequestData
+        >,
+        generateResponseSchemaForMethod(
+          fields,
+          Methods.PATCH,
+        ) as InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.PATCH,
+          FieldUsage.Response
+        >,
+        generateRequestUrlSchemaForMethod(
+          fields,
+          Methods.PATCH,
+        ) as InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.PATCH,
+          FieldUsage.RequestUrlParams
+        >,
+        (config.examples.PATCH || {
+          requests: {} as never,
+          responses: {} as never,
+          urlPathParams: undefined,
+        }) as never,
+      )
+    : undefined;
+
+  const deleteEndpoint = config.methods.DELETE
+    ? createMethodEndpoint(
+        Methods.DELETE,
+        config.methods.DELETE as FormMethodConfig<TScopedTranslationKey>,
+        generateRequestDataSchemaForMethod(
+          fields,
+          Methods.DELETE,
+        ) as InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.DELETE,
+          FieldUsage.RequestData
+        >,
+        generateResponseSchemaForMethod(
+          fields,
+          Methods.DELETE,
+        ) as InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.DELETE,
+          FieldUsage.Response
+        >,
+        generateRequestUrlSchemaForMethod(
+          fields,
+          Methods.DELETE,
+        ) as InferSchemaFromFieldForMethod<
+          TScopedTranslationKey,
+          TFields,
+          Methods.DELETE,
+          FieldUsage.RequestUrlParams
+        >,
+        (config.examples.DELETE || {
+          requests: {} as never,
+          responses: {} as never,
+          urlPathParams: undefined,
+        }) as never,
+      )
+    : undefined;
+
+  // Return object - let overload signatures provide the type
   return {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex generic types require unknown as intermediate step for type safety between incompatible generic structures.
-    GET: getEndpoint as unknown as MethodSpecificEndpoint<
-      TExampleKey,
-      Methods.GET,
-      TUserRoleValue,
-      TScopedTranslationKey,
-      TFields
-    >,
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex generic types require unknown as intermediate step for type safety between incompatible generic structures.
-    POST: postEndpoint as unknown as MethodSpecificEndpoint<
-      TExampleKey,
-      Methods.POST,
-      TUserRoleValue,
-      TScopedTranslationKey,
-      TFields
-    >,
-  };
+    ...(getEndpoint && { GET: getEndpoint }),
+    ...(postEndpoint && { POST: postEndpoint }),
+    ...(patchEndpoint && { PATCH: patchEndpoint }),
+    ...(deleteEndpoint && { DELETE: deleteEndpoint }),
+  } as CreateFormEndpointReturn<
+    TExampleKey,
+    TUserRoleValue,
+    TScopedTranslationKey,
+    TFields,
+    TMethods
+  >;
 }
 
 // ============================================================================

@@ -186,6 +186,12 @@ export const translations = {
     stripe_customer_creation_failed: "Failed to create Stripe customer",
     not_implemented_on_native:
       "{{method}} is not implemented on native platform. Please use the web version for this operation.",
+    no_provider_id: "No payment provider ID found",
+  },
+
+  sync: {
+    failed: "Failed to synchronize subscription",
+    stripe_error: "Stripe synchronization error",
   },
 
   // Cancel operation

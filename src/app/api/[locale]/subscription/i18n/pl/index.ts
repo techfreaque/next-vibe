@@ -187,6 +187,12 @@ export const translations: typeof enTranslations = {
     stripe_customer_creation_failed: "Nie udało się utworzyć klienta Stripe",
     not_implemented_on_native:
       "{{method}} nie jest zaimplementowana na platformie natywnej. Użyj wersji webowej dla tej operacji.",
+    no_provider_id: "Nie znaleziono identyfikatora dostawcy płatności",
+  },
+
+  sync: {
+    failed: "Nie udało się zsynchronizować subskrypcji",
+    stripe_error: "Błąd synchronizacji Stripe",
   },
 
   // Cancel operation

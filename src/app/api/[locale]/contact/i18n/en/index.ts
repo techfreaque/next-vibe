@@ -90,7 +90,7 @@ export const translations = {
 
   response: {
     label: "Contact Submission Response",
-    description: "Result of contact form submission",
+    description: "Status updates for your contact submission",
     success: "Contact form submitted successfully",
     messageId: "Message ID for tracking",
     status: "Current status of the contact",

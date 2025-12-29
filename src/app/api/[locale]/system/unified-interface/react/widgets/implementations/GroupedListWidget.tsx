@@ -19,7 +19,7 @@ import { formatDisplayValue } from "../../../shared/widgets/utils/formatting";
 /**
  * Displays items grouped by a field with expandable sections.
  */
-export function GroupedListWidget<TKey extends string>({
+export function GroupedListWidget<const TKey extends string>({
   value,
   field,
   className = "",

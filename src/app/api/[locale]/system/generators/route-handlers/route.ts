@@ -7,7 +7,6 @@ import { routeHandlersGeneratorRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    email: undefined,
     handler: async (props) => {
       return await routeHandlersGeneratorRepository.generateRouteHandlers(
         props.data,

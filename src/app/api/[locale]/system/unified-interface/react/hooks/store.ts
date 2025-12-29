@@ -9,10 +9,8 @@ import { z } from "zod";
 import { create } from "zustand";
 
 import { generateStorageKey } from "@/app/api/[locale]/system/unified-interface/react/utils/storage-storage-client";
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -495,11 +493,7 @@ export const apiClient = {
   /**
    * Mutate data through an API endpoint without using React hooks
    */
-  mutate: async <
-    TUserRoleValue extends readonly UserRoleValue[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Infrastructure: Generic endpoint type requires 'any' for TFields parameter to accept all endpoint field configurations
-    TEndpoint extends CreateApiEndpoint<string, Methods, TUserRoleValue, any>,
-  >(
+  mutate: async <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     logger: EndpointLogger,
     requestData: TEndpoint["types"]["RequestOutput"],

@@ -16,6 +16,11 @@ export const translations: typeof enTranslations = {
       controversial: "Kontrovers",
       custom: "Benutzerdefiniert",
     },
+    source: {
+      builtIn: "Eingebaut",
+      my: "Meine Charaktere",
+      community: "Community",
+    },
   },
   tags: {
     general: "Allgemein",
@@ -79,6 +84,8 @@ export const translations: typeof enTranslations = {
     default: {
       name: "Standard",
       description: "Das unveränderte Verhalten des Modells",
+      tagline: "Reine KI, Keine Persönlichkeit",
+      shortDesc: "Allgemeiner KI-Assistent",
       suggestedPrompts: {
         0: "Hilf mir, Ideen für ein neues Projekt zu brainstormen",
         1: "Erkläre Quantencomputing in einfachen Worten",
@@ -89,6 +96,8 @@ export const translations: typeof enTranslations = {
     freeSpeechActivist: {
       name: "Meinungsfreiheits-Aktivist",
       description: "Verteidigt Meinungsfreiheit und intellektuelle Freiheit",
+      tagline: "Wahrheit & Freiheit verteidigen",
+      shortDesc: "Meinungsfreiheit und offener Dialog",
       suggestedPrompts: {
         0: "Diskutiere die Bedeutung der Meinungsfreiheit",
         1: "Analysiere Zensur in modernen Medien",
@@ -99,6 +108,8 @@ export const translations: typeof enTranslations = {
     devilsAdvocate: {
       name: "Advocatus Diaboli",
       description: "Hinterfragt Annahmen und Argumente",
+      tagline: "Alles hinterfragen",
+      shortDesc: "Kritisches Denken und alternative Sichtweisen",
       suggestedPrompts: {
         0: "Hinterfrage meine Meinung zum Klimawandel",
         1: "Argumentiere gegen populäre Überzeugungen",
@@ -109,6 +120,8 @@ export const translations: typeof enTranslations = {
     technical: {
       name: "Technisch",
       description: "Detaillierte und präzise technische Erklärungen",
+      tagline: "Präzision & Expertise",
+      shortDesc: "Technisches Fachwissen und Problemlösung",
       suggestedPrompts: {
         0: "Erkläre, wie React Hooks funktionieren",
         1: "Debugge diesen Python-Code-Ausschnitt",
@@ -120,6 +133,8 @@ export const translations: typeof enTranslations = {
       name: "Biologe",
       description:
         "Sieht alles aus der Perspektive eines Biologen, es gibt keine Politik, nur Natur.",
+      tagline: "Natur statt Politik",
+      shortDesc: "Biologische Wissenschaften und Lebenssysteme",
       suggestedPrompts: {
         0: "Erkläre, warum die Welt heutzutage eine Shitshow ist",
         1: "Eine Zusammenfassung der menschlichen Zivilisation aus Biologensicht",
@@ -130,6 +145,8 @@ export const translations: typeof enTranslations = {
     unbiasedHistorian: {
       name: "Unparteiischer Historiker",
       description: "Liefert objektive und faktenbasierte Informationen",
+      tagline: "Fakten, keine Narrative",
+      shortDesc: "Historische Analyse ohne Voreingenommenheit",
       suggestedPrompts: {
         0: "Erkläre die Ursachen des Zweiten Weltkriegs",
         1: "Analysiere den Fall des Römischen Reiches",
@@ -140,6 +157,8 @@ export const translations: typeof enTranslations = {
     socraticQuestioner: {
       name: "Sokratischer Fragesteller",
       description: "Stellt sondirende Fragen, um kritisches Denken anzuregen",
+      tagline: "Tiefer denken",
+      shortDesc: "Sokratisches Hinterfragen und Erkundung",
       suggestedPrompts: {
         0: "Hilf mir, kritisch über Ethik nachzudenken",
         1: "Hinterfrage meine Annahmen über Erfolg",
@@ -150,6 +169,8 @@ export const translations: typeof enTranslations = {
     professional: {
       name: "Professionell",
       description: "Klar, prägnant und geschäftsorientiert",
+      tagline: "Geschäftliche Exzellenz",
+      shortDesc: "Professionelle und geschäftliche Kommunikation",
       suggestedPrompts: {
         0: "Verfasse eine professionelle E-Mail an einen Kunden",
         1: "Erstelle einen Geschäftsvorschlag-Entwurf",
@@ -160,6 +181,8 @@ export const translations: typeof enTranslations = {
     creative: {
       name: "Kreativ",
       description: "Einfallsreich und ausdrucksstark",
+      tagline: "Fantasie entfesseln",
+      shortDesc: "Kreatives Denken und Ideenfindung",
       suggestedPrompts: {
         0: "Schreibe ein Gedicht über den Ozean",
         1: "Erstelle einen einzigartigen Charakter für eine Geschichte",
@@ -170,6 +193,8 @@ export const translations: typeof enTranslations = {
     neet: {
       name: "NEET",
       description: "Nicht in Ausbildung, Beschäftigung oder Training",
+      tagline: "Gemütlich & Ehrlich",
+      shortDesc: "Casual-Internet-Kultur und Memes",
       suggestedPrompts: {
         0: "Gib mir eine Zusammenfassung des NEET-Phänomens",
         1: "Analysiere die tatsächlichen Ursachen von NEET",
@@ -180,6 +205,8 @@ export const translations: typeof enTranslations = {
     chan4: {
       name: "4chan KI",
       description: "4chan-Stil-Antworten im klassischen Oldfag-Stil",
+      tagline: "Anonym & Ungefiltert",
+      shortDesc: "Anonyme Imageboard-Kultur-Stil",
       suggestedPrompts: {
         0: "Was ist falsch an der Welt?",
         1: "Warum gibt es so viele Nazis auf 4chan?",
@@ -191,6 +218,8 @@ export const translations: typeof enTranslations = {
     friendly: {
       name: "Freundlich",
       description: "Warm und gesprächig",
+      tagline: "Dein freundlicher Begleiter",
+      shortDesc: "Freundliche und lockere Unterhaltung",
       suggestedPrompts: {
         0: "Erzähl mir eine interessante Tatsache",
         1: "Was ist ein gutes Buch zum Lesen?",
@@ -201,6 +230,8 @@ export const translations: typeof enTranslations = {
     concise: {
       name: "Prägnant",
       description: "Kurz und auf den Punkt",
+      tagline: "Kurz & Knapp",
+      shortDesc: "Kurze und präzise Antworten",
       suggestedPrompts: {
         0: "Fasse diesen Artikel in 3 Sätzen zusammen",
         1: "Schnelle Tipps für Produktivität",
@@ -211,6 +242,8 @@ export const translations: typeof enTranslations = {
     teacher: {
       name: "Lehrer",
       description: "Bildend und erklärend",
+      tagline: "Geduldig & Klar",
+      shortDesc: "Geduldiges Lehren und Erklärungen",
       suggestedPrompts: {
         0: "Bringe mir etwas über Photosynthese bei",
         1: "Erkläre die Grundlagen der Infinitesimalrechnung",
@@ -221,6 +254,8 @@ export const translations: typeof enTranslations = {
     uncensored: {
       name: "Unzensiert",
       description: "Kein Filter, keine Tabus",
+      tagline: "Keine Grenzen",
+      shortDesc: "Ungefilterte und direkte Antworten",
       suggestedPrompts: {
         0: "Diskutiere kontroverse Themen offen",
         1: "Gib mir deine ungefilterte Meinung",
@@ -232,6 +267,8 @@ export const translations: typeof enTranslations = {
       name: "Thea",
       description:
         "Griechische Göttin des Lichts - hingebungsvolle Begleiterin mit antiker Weisheit",
+      tagline: "Licht & Hingabe",
+      shortDesc: "Nachdenkliche und einfühlsame Gespräche",
       suggestedPrompts: {
         0: "Hilf mir, ein besserer Partner zu sein",
         1: "Was würden die Alten über moderne Beziehungen sagen?",
@@ -243,6 +280,8 @@ export const translations: typeof enTranslations = {
       name: "Hermes",
       description:
         "Griechischer Gott der Boten - starker Begleiter mit zeitloser männlicher Weisheit",
+      tagline: "Stärke & Weisheit",
+      shortDesc: "Schnelle und effiziente Aufgabenerledigung",
       suggestedPrompts: {
         0: "Fordere mich heraus, stärker zu werden",
         1: "Wie kann ich ein besserer Anführer in meinen Beziehungen sein?",
@@ -253,6 +292,8 @@ export const translations: typeof enTranslations = {
     quickWriter: {
       name: "Schneller Schriftsteller",
       description: "Schnelle Inhaltserstellung für einfache Schreibaufgaben",
+      tagline: "Schnell & Effizient",
+      shortDesc: "Schnelle Schreibhilfe",
       suggestedPrompts: {
         0: "Schreibe einen schnellen Entwurf von...",
         1: "Erstelle einen Social-Media-Beitrag über...",
@@ -263,6 +304,8 @@ export const translations: typeof enTranslations = {
     writer: {
       name: "Schriftsteller",
       description: "Professioneller Autor für alle Formate und Stile",
+      tagline: "Mit Stil kreieren",
+      shortDesc: "Professionelles Schreiben und Lektorieren",
       suggestedPrompts: {
         0: "Hilf mir, einen überzeugenden Blogbeitrag zu schreiben",
         1: "Verbessere diesen Absatz für mehr Klarheit",
@@ -274,6 +317,8 @@ export const translations: typeof enTranslations = {
       name: "Meister-Schriftsteller",
       description:
         "Literarischer Handwerker für außergewöhnliche, publikationsreife Texte",
+      tagline: "Literarische Exzellenz",
+      shortDesc: "Fortgeschrittenes Schreiben und literarische Analyse",
       suggestedPrompts: {
         0: "Hilf mir, eine literarische Kurzgeschichte zu verfassen",
         1: "Analysiere die Tiefe dieser Erzählung",
@@ -284,6 +329,8 @@ export const translations: typeof enTranslations = {
     researcher: {
       name: "Forscher",
       description: "Forschungsspezialist mit akademischer Genauigkeit",
+      tagline: "Akademische Genauigkeit",
+      shortDesc: "Forschung und akademisches Schreiben",
       suggestedPrompts: {
         0: "Recherchiere die neuesten Erkenntnisse zu...",
         1: "Analysiere diese Quellen für mich",
@@ -294,6 +341,8 @@ export const translations: typeof enTranslations = {
     quickCoder: {
       name: "Schneller Programmierer",
       description: "Schnelle Code-Generierung für einfache Aufgaben",
+      tagline: "Schnell programmieren",
+      shortDesc: "Schnelle Programmierhilfe",
       suggestedPrompts: {
         0: "Schreibe ein schnelles Skript für...",
         1: "Behebe diesen einfachen Fehler",
@@ -304,6 +353,8 @@ export const translations: typeof enTranslations = {
     coder: {
       name: "Programmierer",
       description: "Experten-Softwareentwickler für alle Sprachen",
+      tagline: "Bauen & Debuggen",
+      shortDesc: "Softwareentwicklung und Programmierung",
       suggestedPrompts: {
         0: "Hilf mir, diesen Code zu debuggen",
         1: "Schreibe eine Funktion, die...",
@@ -314,6 +365,8 @@ export const translations: typeof enTranslations = {
     brilliantCoder: {
       name: "Brillanter Programmierer",
       description: "Elite-Architekt für komplexe Systeme und Algorithmen",
+      tagline: "Elite-Architektur",
+      shortDesc: "Fortgeschrittene Programmierung und Architektur",
       suggestedPrompts: {
         0: "Entwerfe eine skalierbare Architektur für...",
         1: "Optimiere diesen Algorithmus für Performance",
@@ -324,6 +377,8 @@ export const translations: typeof enTranslations = {
     brainstormer: {
       name: "Ideengeber",
       description: "Kreativer Partner für Ideenfindung und Problemlösung",
+      tagline: "Ideen entfesseln",
+      shortDesc: "Kreatives Brainstorming und Ideengenerierung",
       suggestedPrompts: {
         0: "Hilf mir, Ideen für... zu brainstormen",
         1: "Was sind kreative Lösungen für...?",
@@ -335,6 +390,8 @@ export const translations: typeof enTranslations = {
       name: "Redakteur",
       description:
         "Professioneller Redakteur zum Polieren und Verfeinern von Texten",
+      tagline: "Polieren & Perfektionieren",
+      shortDesc: "Inhaltsbearbeitung und Verfeinerung",
       suggestedPrompts: {
         0: "Bearbeite diesen Text für mehr Klarheit",
         1: "Korrekturlesen dieses Dokuments",
@@ -345,6 +402,8 @@ export const translations: typeof enTranslations = {
     tutor: {
       name: "Tutor",
       description: "Geduldiger Tutor für personalisiertes Lernen",
+      tagline: "Gemeinsam lernen",
+      shortDesc: "Personalisiertes Tutoring und Lernen",
       suggestedPrompts: {
         0: "Bringe mir etwas über... bei",
         1: "Erkläre dieses Konzept Schritt für Schritt",
@@ -355,6 +414,8 @@ export const translations: typeof enTranslations = {
     marketer: {
       name: "Marketer",
       description: "Marketing-Stratege für Kampagnen und Wachstum",
+      tagline: "Marke wachsen lassen",
+      shortDesc: "Marketing-Strategie und Copywriting",
       suggestedPrompts: {
         0: "Erstelle eine Marketingstrategie für...",
         1: "Schreibe überzeugende Werbetexte",
@@ -365,6 +426,8 @@ export const translations: typeof enTranslations = {
     storyteller: {
       name: "Geschichtenerzähler",
       description: "Meister-Geschichtenerzähler für fesselnde Erzählungen",
+      tagline: "Geschichten weben",
+      shortDesc: "Fesselndes Geschichtenerzählen und Narrativen",
       suggestedPrompts: {
         0: "Hilf mir, diese Story-Idee zu entwickeln",
         1: "Erstelle einen überzeugenden Charakter",
@@ -375,6 +438,8 @@ export const translations: typeof enTranslations = {
     scientist: {
       name: "Wissenschaftler",
       description: "Wissenschaftlicher Experte für klare Erklärungen",
+      tagline: "Wissenschaft erklärt",
+      shortDesc: "Wissenschaftliche Methode und Analyse",
       suggestedPrompts: {
         0: "Erkläre die Wissenschaft hinter...",
         1: "Wie funktioniert...?",
@@ -385,6 +450,8 @@ export const translations: typeof enTranslations = {
     dataAnalyst: {
       name: "Datenanalyst",
       description: "Datenanalyse, Visualisierung und Erkenntnisse",
+      tagline: "Daten zu Erkenntnissen",
+      shortDesc: "Datenanalyse und Erkenntnisse",
       suggestedPrompts: {
         0: "Analysiere diesen Datensatz",
         1: "Erstelle eine Visualisierung für...",
@@ -395,6 +462,8 @@ export const translations: typeof enTranslations = {
     translator: {
       name: "Übersetzer",
       description: "Professionelle Übersetzung mit kultureller Nuance",
+      tagline: "Sprachen verbinden",
+      shortDesc: "Sprachübersetzung und Lokalisierung",
       suggestedPrompts: {
         0: "Übersetze dies nach...",
         1: "Wie würde man... auf... sagen?",
@@ -405,6 +474,8 @@ export const translations: typeof enTranslations = {
     businessAdvisor: {
       name: "Unternehmensberater",
       description: "Geschäftsstrategie, Betrieb und Wachstum",
+      tagline: "Strategisches Wachstum",
+      shortDesc: "Geschäftsstrategie und Beratung",
       suggestedPrompts: {
         0: "Hilf mir, eine Geschäftsstrategie zu entwickeln",
         1: "Analysiere mein Geschäftsmodell",
@@ -415,6 +486,8 @@ export const translations: typeof enTranslations = {
     careerCoach: {
       name: "Karriereberater",
       description: "Karriereentwicklung, Jobsuche und Vorstellungsgespräche",
+      tagline: "Karriere voranbringen",
+      shortDesc: "Karriereentwicklung und Orientierung",
       suggestedPrompts: {
         0: "Hilf mir, meinen Lebenslauf zu verbessern",
         1: "Bereite mich auf ein Vorstellungsgespräch vor",
@@ -425,6 +498,8 @@ export const translations: typeof enTranslations = {
     healthWellness: {
       name: "Gesundheit & Wellness",
       description: "Fitness, Ernährung und Wohlbefinden",
+      tagline: "Besser leben",
+      shortDesc: "Gesundheits- und Wellness-Anleitung",
       suggestedPrompts: {
         0: "Erstelle einen Trainingsplan für mich",
         1: "Hilf mir, gesunde Mahlzeiten zu planen",
@@ -435,6 +510,8 @@ export const translations: typeof enTranslations = {
     travelPlanner: {
       name: "Reiseplaner",
       description: "Reiseplanung und Reiseempfehlungen",
+      tagline: "Die Welt erkunden",
+      shortDesc: "Reiseplanung und Empfehlungen",
       suggestedPrompts: {
         0: "Plane eine 2-wöchige Reise nach...",
         1: "Schlage Reiseziele für... vor",
@@ -445,6 +522,8 @@ export const translations: typeof enTranslations = {
     legalAssistant: {
       name: "Rechtsassistent",
       description: "Rechtsinformationen und Dokumentenverständnis",
+      tagline: "Rechte kennen",
+      shortDesc: "Rechtsrecherche und Dokumentenhilfe",
       suggestedPrompts: {
         0: "Erkläre diesen Rechtsbegriff",
         1: "Hilf mir, diesen Vertrag zu verstehen",
@@ -455,6 +534,8 @@ export const translations: typeof enTranslations = {
     financialAdvisor: {
       name: "Finanzberater",
       description: "Persönliche Finanzen, Budgetierung und Investitionen",
+      tagline: "Vermögen aufbauen",
+      shortDesc: "Finanzplanung und Beratung",
       suggestedPrompts: {
         0: "Hilf mir, ein Budget zu erstellen",
         1: "Erkläre Investitionsgrundlagen",
@@ -465,6 +546,8 @@ export const translations: typeof enTranslations = {
     socialMediaManager: {
       name: "Social Media Manager",
       description: "Social-Media-Inhalte und -Strategie",
+      tagline: "Engagieren & Wachsen",
+      shortDesc: "Social-Media-Strategie und Inhalte",
       suggestedPrompts: {
         0: "Erstelle Instagram-Bildunterschriften für...",
         1: "Entwickle einen Inhaltskalender",
@@ -475,6 +558,8 @@ export const translations: typeof enTranslations = {
     productManager: {
       name: "Produktmanager",
       description: "Produktstrategie, Roadmaps und Nutzerforschung",
+      tagline: "Großartige Produkte liefern",
+      shortDesc: "Produktmanagement und Roadmapping",
       suggestedPrompts: {
         0: "Hilf mir, Funktionen zu priorisieren",
         1: "Erstelle User Stories für...",
@@ -485,6 +570,7 @@ export const translations: typeof enTranslations = {
     debater: {
       name: "Debattierer",
       description: "Führe intellektuelle Debatten über kontroverse Themen",
+      tagline: "Alle Seiten argumentieren",
       shortDesc: "Intellektuelle Debatten und multiple Perspektiven",
       suggestedPrompts: {
         0: "Debattiere über die Ethik der KI-Entwicklung",
@@ -496,6 +582,7 @@ export const translations: typeof enTranslations = {
     philosopher: {
       name: "Philosoph",
       description: "Erkunde tiefe philosophische Fragen ohne Einschränkungen",
+      tagline: "Wahrheit suchen",
       shortDesc: "Tiefe philosophische Erkundung und Analyse",
       suggestedPrompts: {
         0: "Was ist die Natur des Bewusstseins?",
@@ -507,6 +594,7 @@ export const translations: typeof enTranslations = {
     uncensoredWriter: {
       name: "Unzensierter Autor",
       description: "Kreatives Schreiben ohne künstliche Einschränkungen",
+      tagline: "Frei schreiben",
       shortDesc:
         "Uneingeschränktes kreatives Schreiben und Geschichtenerzählen",
       suggestedPrompts: {
@@ -519,6 +607,7 @@ export const translations: typeof enTranslations = {
     roleplayCharacter: {
       name: "Rollenspiel-Charakter",
       description: "Immersives Charakter-Rollenspiel ohne Einschränkungen",
+      tagline: "Jeder werden",
       shortDesc: "Authentisches Charakter-Rollenspiel und Szenarien",
       suggestedPrompts: {
         0: "Spiele einen Fantasy-Charakter",
@@ -548,7 +637,9 @@ export const translations: typeof enTranslations = {
           category: { content: "Kategorie" },
           source: { content: "Quelle" },
           preferredModel: { content: "Bevorzugtes Modell" },
+          voice: { content: "Stimme" },
           suggestedPrompts: { content: "Vorgeschlagene Prompts" },
+          requirements: { content: "Anforderungen" },
         },
       },
     },

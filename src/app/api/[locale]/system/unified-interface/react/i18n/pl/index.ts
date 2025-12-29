@@ -84,6 +84,10 @@ export const translations: typeof enTranslations = {
       noDataAvailable: "Brak dostępnych danych",
       noDataToDisplay: "Brak danych do wyświetlenia",
     },
+    creditTransactionList: {
+      invalidConfig: "Nieprawidłowa konfiguracja listy transakcji kredytowych",
+      noTransactions: "Nie znaleziono transakcji",
+    },
     pagination: {
       showing: "Pokazywanie {{start}}-{{end}} z {{total}} wpisów",
       itemsPerPage: "Wpisów na stronę",

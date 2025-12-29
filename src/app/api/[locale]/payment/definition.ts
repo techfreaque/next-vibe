@@ -344,36 +344,6 @@ export type PaymentPostRequestOutput = typeof POST.types.RequestOutput;
 export type PaymentPostResponseInput = typeof POST.types.ResponseInput;
 export type PaymentPostResponseOutput = typeof POST.types.ResponseOutput;
 
-// Additional type aliases for compatibility
-export type PaymentCreateRequestOutput = PaymentPostRequestOutput;
-export type PaymentUpdateType = PaymentPostRequestOutput;
-export interface PaymentDeleteType {
-  paymentMethodId: string;
-}
-
-// Additional type exports for cross-domain usage
-export interface PaymentResponseType {
-  success: boolean;
-  message?: string;
-  invoices?: Array<{
-    id: string;
-    userId: string;
-    stripeInvoiceId: string;
-    invoiceNumber: string;
-    amount: number;
-    currency: string;
-    status: string;
-    invoiceUrl?: string;
-    invoicePdf?: string;
-    dueDate: string;
-    paidAt: string | null;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-}
-
-// Schema types and schemas removed - use EndpointDefinition types from above instead
-
 /**
  * Export definitions
  */
@@ -382,5 +352,4 @@ const paymentDefinition = {
   POST,
 };
 
-export { GET, POST };
 export default paymentDefinition;

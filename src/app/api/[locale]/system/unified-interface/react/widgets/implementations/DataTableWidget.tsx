@@ -30,7 +30,7 @@ import {
 /**
  * Renders sortable data table with column headers.
  */
-export const DataTableWidget = <TKey extends string>({
+export const DataTableWidget = <const TKey extends string>({
   value,
   field,
   context,

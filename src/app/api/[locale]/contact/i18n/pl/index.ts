@@ -94,7 +94,7 @@ export const translations: typeof enTranslations = {
 
   response: {
     label: "Odpowiedź na przesłanie kontaktu",
-    description: "Wynik przesłania formularza kontaktowego",
+    description: "Aktualizacje statusu dla Twojego przesłania kontaktu",
     success: "Formularz kontaktowy przesłany pomyślnie",
     messageId: "ID wiadomości do śledzenia",
     status: "Aktualny status kontaktu",

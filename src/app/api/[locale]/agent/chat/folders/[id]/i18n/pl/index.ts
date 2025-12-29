@@ -316,4 +316,4 @@ export const translations: typeof enTranslations = {
       description: "Folder usunięty pomyślnie",
     },
   },
-} as const;
+};

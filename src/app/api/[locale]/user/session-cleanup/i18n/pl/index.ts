@@ -1,4 +1,6 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   task: {
     description:
       "Oczyszczanie wygasłych sesji użytkowników w celu utrzymania bezpieczeństwa systemu",

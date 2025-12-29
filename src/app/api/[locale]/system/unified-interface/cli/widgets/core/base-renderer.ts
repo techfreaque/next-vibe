@@ -8,6 +8,7 @@ import chalk from "chalk";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import { getTranslator } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
 import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -98,13 +99,14 @@ export abstract class BaseWidgetRenderer<
     return `${icon} ${text}`;
   }
 
-  protected formatLabel<TKey extends string>(
+  protected formatLabel<const TKey extends string>(
     field: UnifiedField<TKey>,
     context: WidgetRenderContext,
   ): string {
     // Check if ui config has a label property
     if ("label" in field.ui && field.ui.label) {
-      return this.styleText(context.t(field.ui.label), "bold", context);
+      const { t } = getTranslator(context);
+      return this.styleText(t(field.ui.label), "bold", context);
     }
     return "";
   }

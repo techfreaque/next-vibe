@@ -7,14 +7,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { referralRepository } from "./repository";
+import { ReferralRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
     handler: async ({ data, user, logger }) => {
-      return await referralRepository.createReferralCode(user.id, data, logger);
+      return await ReferralRepository.createReferralCode(user.id, data, logger);
     },
   },
 });

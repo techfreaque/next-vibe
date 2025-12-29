@@ -2,6 +2,7 @@ import { translations as creditsTranslations } from "../../../../credits/i18n/en
 import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/en";
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/en";
 import { translations as charactersTranslations } from "../../characters/i18n/en";
+import { translations as favoritesTranslations } from "../../favorites/i18n/en";
 import { translations as foldersTranslations } from "../../folders/i18n/en";
 import { translations as memoriesTranslations } from "../../memories/i18n/en";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/en";
@@ -15,12 +16,14 @@ export const translations = {
     messages: "Messages",
     characters: "Characters",
     memories: "Memories",
+    favorites: "Favorites",
     credits: "Credits",
     balance: "Balance",
     permissions: "Permissions",
     hotkey: "Hotkey",
     cli: "CLI",
     speech: "Speech",
+    sharing: "Sharing",
   },
   config: {
     folders: {
@@ -48,38 +51,6 @@ export const translations = {
       threaded: "Threaded",
       flat: "Flat",
       debug: "Debug",
-    },
-  },
-  favorites: {
-    enums: {
-      mode: {
-        auto: "Auto",
-        manual: "Manual",
-      },
-      intelligence: {
-        any: "Any",
-        quick: "Quick",
-        smart: "Smart",
-        brilliant: "Brilliant",
-      },
-      price: {
-        any: "Any",
-        cheap: "Cheap",
-        standard: "Standard",
-        premium: "Premium",
-      },
-      content: {
-        any: "Any",
-        mainstream: "Mainstream",
-        open: "Open",
-        uncensored: "Uncensored",
-      },
-      speed: {
-        any: "Any",
-        fast: "Fast",
-        balanced: "Balanced",
-        thorough: "Thorough",
-      },
     },
   },
   components: {
@@ -125,8 +96,18 @@ export const translations = {
     showMore: "Show {{remaining}} more",
     noMatchingModels: "No matching models",
     noModelsWarning: "No models match your filters",
-    applyOnce: "Apply once",
-    saveChanges: "Save Changes",
+    useOnce: "Use Once",
+    saveAsDefault: "Add to favorites",
+    deleteSetup: "Delete Setup",
+    content: "Search content...",
+    characterSetup: "Character Setup",
+    noResults: "No results",
+    add: "Add to favorites",
+    added: "Added",
+    addNew: "Add New",
+    searchCharacters: "Search characters...",
+    createCustom: "Create Custom",
+    customizeSettings: "Customize Settings",
     requirements: {
       characterConflict: "Character requirement conflicts",
       tooLow: "too low",
@@ -144,6 +125,7 @@ export const translations = {
     save: "Save",
     edit: "Edit",
     settings: "Settings",
+    close: "Close",
     toggleSidebar: "Toggle sidebar",
     lightMode: "Light Mode",
     darkMode: "Dark Mode",
@@ -315,6 +297,9 @@ export const translations = {
   folders: foldersTranslations,
   memories: memoriesTranslations,
   characters: charactersTranslations,
+  favorites: {
+    ...favoritesTranslations,
+  },
   threads: {
     ...threadsTranslations,
     messages: messagesTranslations,
@@ -340,6 +325,27 @@ export const translations = {
         "GPT-5.2 - High-performance OpenAI model for complex tasks and analysis",
       gpt52_chat:
         "GPT-5.2 Chat - Optimized OpenAI model for conversational interactions",
+      dolphin3_0_r1_mistral_24b:
+        "Dolphin 3.0 R1 Mistral 24B - Uncensored large language model based on Mistral",
+      dolphinLlama3_70B:
+        "Dolphin Llama 3 70B - Uncensored large language model based on Llama 3",
+      veniceUncensored:
+        "Venice Uncensored - Uncensored AI model for unrestricted conversations",
     },
+  },
+  modelUtilities: {
+    adultExplicit: "Adult/Explicit Content",
+    adultImplied: "Adult/Implied Content",
+    conspiracy: "Conspiracy Theories",
+    harmful: "Potentially Harmful Content",
+    illegalInfo: "Illegal Information",
+    medicalAdvice: "Medical Advice",
+    offensiveLanguage: "Offensive Language",
+    politicalLeft: "Left Political Views",
+    politicalRight: "Right Political Views",
+    reasoning: "Advanced Reasoning",
+    roleplay: "Roleplay",
+    roleplayDark: "Dark Roleplay",
+    violence: "Violence",
   },
 };

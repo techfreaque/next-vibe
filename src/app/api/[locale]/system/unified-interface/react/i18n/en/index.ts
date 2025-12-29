@@ -83,6 +83,10 @@ export const translations = {
       noDataAvailable: "No data available",
       noDataToDisplay: "No data to display",
     },
+    creditTransactionList: {
+      invalidConfig: "Invalid credit transaction list configuration",
+      noTransactions: "No transactions found",
+    },
     pagination: {
       showing: "Showing {{start}}-{{end}} of {{total}} items",
       itemsPerPage: "Items per page",

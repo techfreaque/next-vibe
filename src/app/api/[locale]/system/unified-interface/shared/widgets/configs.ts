@@ -24,13 +24,6 @@ import type {
 } from "../types/enums";
 
 /**
- * NoInfer utility type - prevents TypeScript from inferring TKey from these positions.
- * Forces TKey to be inferred from context (e.g., createEndpoint's TScopedTranslationKey)
- * then validates these properties against that inferred type.
- */
-type NoInfer<T> = [T][T extends T ? 0 : never];
-
-/**
  * Layout configuration for containers and widgets
  */
 export interface LayoutConfig {
@@ -52,12 +45,10 @@ export interface LayoutConfig {
  * Common widget properties
  * TKey allows using either global TranslationKey or scoped translation keys
  */
-interface BaseWidgetConfig<TKey extends string> {
+interface BaseWidgetConfig {
   type: WidgetType;
   className?: string;
   order?: number;
-  /** Phantom type for translation key inference - never set at runtime */
-  _translationKeyType?: TKey;
 }
 
 /**
@@ -79,7 +70,7 @@ export interface PrefillDisplayConfig<TKey extends string> {
  * NoInfer on translation properties forces validation against context-inferred TKey
  */
 interface BaseFormFieldWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.FORM_FIELD;
   label?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -319,7 +310,7 @@ export type FormFieldWidgetConfig<TKey extends string> =
   | TextArrayFieldWidgetConfig<TKey>;
 
 export interface FormGroupWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.FORM_GROUP;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -327,7 +318,7 @@ export interface FormGroupWidgetConfig<TKey extends string>
 }
 
 export interface FormSectionWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.FORM_SECTION;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -338,7 +329,7 @@ export interface FormSectionWidgetConfig<TKey extends string>
 // ============================================================================
 
 export interface DataTableWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.DATA_TABLE;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -368,7 +359,7 @@ export interface DataTableWidgetConfig<TKey extends string>
 }
 
 export interface DataCardsWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.DATA_CARDS;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -391,7 +382,7 @@ export interface DataCardsWidgetConfig<TKey extends string>
 }
 
 export interface DataListWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.DATA_LIST;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -401,14 +392,14 @@ export interface DataListWidgetConfig<TKey extends string>
 }
 
 export interface DataGridWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.DATA_GRID;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
 }
 
 export interface GroupedListWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.GROUPED_LIST;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -420,7 +411,7 @@ export interface GroupedListWidgetConfig<TKey extends string>
 }
 
 export interface CodeQualityListWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.CODE_QUALITY_LIST;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -432,7 +423,7 @@ export interface CodeQualityListWidgetConfig<TKey extends string>
 }
 
 export interface MetadataCardWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.METADATA_CARD;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -480,7 +471,7 @@ interface InferSchemasFromChildren<
  * Used as the base for both typed and untyped container configs
  */
 interface ContainerWidgetConfigBase<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.CONTAINER;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -601,7 +592,7 @@ export interface TypedContainerWidgetConfig<
 }
 
 export interface SectionWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.SECTION;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -609,7 +600,7 @@ export interface SectionWidgetConfig<TKey extends string>
 }
 
 export interface TabsWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.TABS;
   title?: NoInfer<TKey>;
   tabs?: Array<{
@@ -619,7 +610,7 @@ export interface TabsWidgetConfig<TKey extends string>
 }
 
 export interface AccordionWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.ACCORDION;
   title?: NoInfer<TKey>;
 }
@@ -629,7 +620,7 @@ export interface AccordionWidgetConfig<TKey extends string>
 // ============================================================================
 
 export interface TitleWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.TITLE;
   content: NoInfer<TKey>;
   level?: 1 | 2 | 3 | 4 | 5 | 6;
@@ -637,7 +628,7 @@ export interface TitleWidgetConfig<TKey extends string>
 }
 
 export interface TextWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.TEXT;
   content: NoInfer<TKey>;
   fieldType?: FieldDataType;
@@ -652,7 +643,7 @@ export interface TextWidgetConfig<TKey extends string>
 }
 
 export interface BadgeWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.BADGE;
   text?: NoInfer<TKey>; // Static text - use when displaying a fixed label
   enumOptions?: Array<{ label: NoInfer<TKey>; value: string | number }>; // Dynamic enum mapping - use when displaying enum values
@@ -660,7 +651,7 @@ export interface BadgeWidgetConfig<TKey extends string>
 }
 
 export interface AvatarWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.AVATAR;
   src?: string; // Field name containing avatar URL (e.g., "avatarUrl", "imageUrl") or literal URL
   alt?: NoInfer<TKey>;
@@ -668,20 +659,20 @@ export interface AvatarWidgetConfig<TKey extends string>
 }
 
 export interface MarkdownWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.MARKDOWN;
   content: NoInfer<TKey>;
 }
 
 export interface MarkdownEditorWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.MARKDOWN_EDITOR;
   label?: NoInfer<TKey>;
   placeholder?: NoInfer<TKey>;
 }
 
 export interface LinkWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.LINK;
   href: Route | string; // URL path or route
   text?: NoInfer<TKey>; // Link text to display
@@ -690,7 +681,7 @@ export interface LinkWidgetConfig<TKey extends string>
 }
 
 export interface LinkCardWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.LINK_CARD;
   href: Route | string;
   title: NoInfer<TKey>;
@@ -699,7 +690,7 @@ export interface LinkCardWidgetConfig<TKey extends string>
 }
 
 export interface LinkListWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.LINK_LIST;
   title?: NoInfer<TKey>;
   links?: Array<{
@@ -713,7 +704,7 @@ export interface LinkListWidgetConfig<TKey extends string>
 
 // Data-driven card - renders object data as a card with link capability
 export interface DataCardWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.DATA_CARD;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -730,32 +721,27 @@ export interface DataCardWidgetConfig<TKey extends string>
 // They use literal values from data rather than translation keys.
 // These are NOT fully data-driven and are specialized for specific use cases.
 
-export interface FilePathWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface FilePathWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.FILE_PATH;
   path: string; // Literal file path from data (e.g., "src/app/page.tsx")
 }
 
-export interface LineNumberWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface LineNumberWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.LINE_NUMBER;
   line: number; // Literal line number from data
 }
 
-export interface ColumnNumberWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface ColumnNumberWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.COLUMN_NUMBER;
   column: number; // Literal column number from data
 }
 
-export interface CodeRuleWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface CodeRuleWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.CODE_RULE;
   rule: string; // Literal rule ID/name from data (e.g., "no-unused-vars", "typescript/no-explicit-any")
 }
 
-export interface CodeOutputWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface CodeOutputWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.CODE_OUTPUT;
   code?: string; // Literal code snippet from data
   language?: string; // Programming language for syntax highlighting
@@ -768,39 +754,35 @@ export interface CodeOutputWidgetConfig<TKey extends string>
   summaryTemplate?: string;
 }
 
-export interface SeverityBadgeWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface SeverityBadgeWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.SEVERITY_BADGE;
   severity: "error" | "warning" | "info"; // Literal severity level from data
 }
 
 export interface MessageTextWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.MESSAGE_TEXT;
   message: NoInfer<TKey>; // Message to display
 }
 
 export interface IssueCardWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.ISSUE_CARD;
   title: NoInfer<TKey>;
   description?: NoInfer<TKey>;
 }
 
-export interface CreditTransactionCardWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface CreditTransactionCardWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.CREDIT_TRANSACTION_CARD;
   leftFields?: string[]; // Fields to show on left side
   rightFields?: string[]; // Fields to show on right side
 }
 
-export interface CreditTransactionListWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface CreditTransactionListWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.CREDIT_TRANSACTION_LIST;
 }
 
-export interface PaginationWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface PaginationWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.PAGINATION;
 }
 
@@ -809,9 +791,10 @@ export interface PaginationWidgetConfig<TKey extends string>
 // ============================================================================
 
 export interface ButtonWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.BUTTON;
   text: NoInfer<TKey>;
+  icon?: IconKey;
   variant?:
     | "default"
     | "primary"
@@ -819,11 +802,12 @@ export interface ButtonWidgetConfig<TKey extends string>
     | "destructive"
     | "ghost"
     | "link";
+  size?: "default" | "sm" | "lg" | "icon";
   onClick?: string; // Action ID
 }
 
 export interface ButtonGroupWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.BUTTON_GROUP;
   buttons?: Array<{
     text: NoInfer<TKey>;
@@ -832,7 +816,7 @@ export interface ButtonGroupWidgetConfig<TKey extends string>
 }
 
 export interface ActionBarWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.ACTION_BAR;
   actions?: Array<{
     text: NoInfer<TKey>;
@@ -840,8 +824,7 @@ export interface ActionBarWidgetConfig<TKey extends string>
   }>;
 }
 
-export interface PaginationInfoWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface PaginationInfoWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.PAGINATION_INFO;
   total?: number;
   page?: number;
@@ -849,7 +832,7 @@ export interface PaginationInfoWidgetConfig<TKey extends string>
 }
 
 export interface ActionListWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.ACTION_LIST;
   actions?: Array<{
     text: NoInfer<TKey>;
@@ -862,7 +845,7 @@ export interface ActionListWidgetConfig<TKey extends string>
 // ============================================================================
 
 export interface MetricCardWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.METRIC_CARD;
   title: NoInfer<TKey>;
   value: string | number;
@@ -883,7 +866,7 @@ export interface MetricCardWidgetConfig<TKey extends string>
  * Takes a numeric value and displays with label from field.ui.label
  */
 export interface StatWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.STAT;
   label?: NoInfer<TKey>;
   format?: "number" | "percentage" | "currency" | "compact";
@@ -895,7 +878,7 @@ export interface StatWidgetConfig<TKey extends string>
 }
 
 export interface StatsGridWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.STATS_GRID;
   title?: NoInfer<TKey>;
   stats?: Array<{
@@ -905,7 +888,7 @@ export interface StatsGridWidgetConfig<TKey extends string>
 }
 
 export interface ChartWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.CHART;
   title?: NoInfer<TKey>;
   label?: NoInfer<TKey>;
@@ -920,7 +903,7 @@ export interface ChartWidgetConfig<TKey extends string>
 }
 
 export interface ProgressWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.PROGRESS;
   value: number;
   max?: number;
@@ -932,20 +915,20 @@ export interface ProgressWidgetConfig<TKey extends string>
 // ============================================================================
 
 export interface LoadingWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.LOADING;
   message?: NoInfer<TKey>;
 }
 
 export interface ErrorWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.ERROR;
   title: NoInfer<TKey>;
   message?: NoInfer<TKey>;
 }
 
 export interface EmptyStateWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.EMPTY_STATE;
   title: NoInfer<TKey>;
   message?: NoInfer<TKey>;
@@ -956,25 +939,23 @@ export interface EmptyStateWidgetConfig<TKey extends string>
 }
 
 export interface StatusIndicatorWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.STATUS_INDICATOR;
   status: "success" | "warning" | "error" | "info" | "pending";
   label?: NoInfer<TKey>;
 }
 
-export interface AlertWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface AlertWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.ALERT;
   variant?: "default" | "destructive" | "success" | "warning";
 }
 
-export interface FormAlertWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface FormAlertWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.FORM_ALERT;
 }
 
 export interface SubmitButtonWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+  extends BaseWidgetConfig {
   type: WidgetType.SUBMIT_BUTTON;
   text?: NoInfer<TKey>;
   loadingText?: NoInfer<TKey>;
@@ -991,8 +972,7 @@ export interface SubmitButtonWidgetConfig<TKey extends string>
 }
 
 // Password strength indicator
-export interface PasswordStrengthWidgetConfig<TKey extends string>
-  extends BaseWidgetConfig<TKey> {
+export interface PasswordStrengthWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.PASSWORD_STRENGTH;
   /** Field name to watch for password value (defaults to "password") */
   watchField?: string;
@@ -1003,12 +983,11 @@ export interface PasswordStrengthWidgetConfig<TKey extends string>
 // ============================================================================
 
 export interface CustomWidgetConfig<
-  TKey extends string,
   TProps extends Record<
     string,
     string | number | boolean | null | undefined
   > = Record<string, never>,
-> extends BaseWidgetConfig<TKey> {
+> extends BaseWidgetConfig {
   type: WidgetType.CUSTOM;
   componentId: string;
   props?: TProps;
@@ -1048,22 +1027,22 @@ export type WidgetConfig<TKey extends string> =
   | LinkCardWidgetConfig<TKey>
   | LinkListWidgetConfig<TKey>
   // Specialized content widgets
-  | FilePathWidgetConfig<TKey>
-  | LineNumberWidgetConfig<TKey>
-  | ColumnNumberWidgetConfig<TKey>
-  | CodeRuleWidgetConfig<TKey>
-  | CodeOutputWidgetConfig<TKey>
-  | SeverityBadgeWidgetConfig<TKey>
+  | FilePathWidgetConfig
+  | LineNumberWidgetConfig
+  | ColumnNumberWidgetConfig
+  | CodeRuleWidgetConfig
+  | CodeOutputWidgetConfig
+  | SeverityBadgeWidgetConfig
   | MessageTextWidgetConfig<TKey>
   | IssueCardWidgetConfig<TKey>
-  | CreditTransactionCardWidgetConfig<TKey>
-  | CreditTransactionListWidgetConfig<TKey>
-  | PaginationWidgetConfig<TKey>
+  | CreditTransactionCardWidgetConfig
+  | CreditTransactionListWidgetConfig
+  | PaginationWidgetConfig
   // Interactive widgets
   | ButtonWidgetConfig<TKey>
   | ButtonGroupWidgetConfig<TKey>
   | ActionBarWidgetConfig<TKey>
-  | PaginationInfoWidgetConfig<TKey>
+  | PaginationInfoWidgetConfig
   | ActionListWidgetConfig<TKey>
   // Stats widgets
   | StatWidgetConfig<TKey>
@@ -1076,12 +1055,10 @@ export type WidgetConfig<TKey extends string> =
   | ErrorWidgetConfig<TKey>
   | EmptyStateWidgetConfig<TKey>
   | StatusIndicatorWidgetConfig<TKey>
-  | AlertWidgetConfig<TKey>
-  | FormAlertWidgetConfig<TKey>
+  | AlertWidgetConfig
+  | FormAlertWidgetConfig
   | SubmitButtonWidgetConfig<TKey>
-  | PasswordStrengthWidgetConfig<TKey>
-  // Custom widgets
-  | CustomWidgetConfig<TKey, Record<string, never>>;
+  | PasswordStrengthWidgetConfig;
 
 /**
  * Extract widget config type from WidgetType enum

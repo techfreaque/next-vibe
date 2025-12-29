@@ -22,55 +22,55 @@ import { requestDataField } from "./utils";
 export const CURRENCY_OPTIONS = [
   {
     value: "USD",
-    label: "currency.usd" as const,
+    label: "app.currency.usd" as const,
     symbol: "$",
   },
   {
     value: "EUR",
-    label: "currency.eur" as const,
+    label: "app.currency.eur" as const,
     symbol: "€",
   },
   {
     value: "GBP",
-    label: "currency.gbp" as const,
+    label: "app.currency.gbp" as const,
     symbol: "£",
   },
   {
     value: "JPY",
-    label: "currency.jpy" as const,
+    label: "app.currency.jpy" as const,
     symbol: "¥",
   },
   {
     value: "CHF",
-    label: "currency.chf" as const,
+    label: "app.currency.chf" as const,
     symbol: "CHF",
   },
   {
     value: "CAD",
-    label: "currency.cad" as const,
+    label: "app.currency.cad" as const,
     symbol: "C$",
   },
   {
     value: "AUD",
-    label: "currency.aud" as const,
+    label: "app.currency.aud" as const,
     symbol: "A$",
   },
   {
     value: "CNY",
-    label: "currency.cny" as const,
+    label: "app.currency.cny" as const,
     symbol: "¥",
   },
   {
     value: "INR",
-    label: "currency.inr" as const,
+    label: "app.currency.inr" as const,
     symbol: "₹",
   },
   {
     value: "BRL",
-    label: "currency.brl" as const,
+    label: "app.currency.brl" as const,
     symbol: "R$",
   },
-] as const;
+];
 
 // Separate options for form fields (without symbol)
 const CURRENCY_FORM_OPTIONS: Array<{ value: string; label: TranslationKey }> =

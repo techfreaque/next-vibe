@@ -20,7 +20,7 @@ import { useWidgetActions } from "../renderers/ToolActionHandler";
 /**
  * Text display with inline editing capability.
  */
-export function EditableTextWidget<TKey extends string>({
+export function EditableTextWidget<const TKey extends string>({
   value: data,
   context,
   onAction,

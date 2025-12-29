@@ -233,10 +233,7 @@ export class CharactersRepository {
         });
       }
 
-      const characterData: Omit<
-        NewCustomCharacter,
-        "id" | "createdAt" | "updatedAt"
-      > = {
+      const characterData = {
         userId,
         name: data.name,
         description: data.description,

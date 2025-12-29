@@ -27,6 +27,7 @@ import { FolderInput } from "next-vibe-ui/ui/icons/FolderInput";
 import { MoreVertical } from "next-vibe-ui/ui/icons/MoreVertical";
 import { Pin } from "next-vibe-ui/ui/icons/Pin";
 import { PinOff } from "next-vibe-ui/ui/icons/PinOff";
+import { Share2 } from "next-vibe-ui/ui/icons/Share2";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Input } from "next-vibe-ui/ui/input";
@@ -54,6 +55,7 @@ import type { DivMouseEvent } from "@/packages/next-vibe-ui/web/ui/div";
 import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import { ThreadPermissionsDialog } from "./thread-permissions-dialog";
+import { ThreadShareDialog } from "./thread-share-dialog";
 
 export interface ThreadItemProps {
   thread: ChatThread;
@@ -93,6 +95,7 @@ export function ThreadItem({
   const [isTouched, setIsTouched] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   // Get model icon (fallback to default model if not set)
   // Model config removed - icons no longer shown in thread list for clean design
@@ -156,6 +159,11 @@ export function ThreadItem({
   const handleManagePermissions = (): void => {
     setDropdownOpen(false);
     setPermissionsDialogOpen(true);
+  };
+
+  const handleManageSharing = (): void => {
+    setDropdownOpen(false);
+    setShareDialogOpen(true);
   };
 
   // Get all folders for the move menu - only folders from the same root folder
@@ -357,6 +365,17 @@ export function ThreadItem({
                     </DropdownMenuItem>
                   )}
 
+                  {/* Only show Manage Sharing for threads in SHARED folder */}
+                  {thread.rootFolderId === "shared" && thread.canEdit && (
+                    <DropdownMenuItem
+                      onSelect={handleManageSharing}
+                      className="cursor-pointer"
+                    >
+                      <Share2 className="h-4 w-4 mr-2" />
+                      {t("app.chat.actions.manageSharing")}
+                    </DropdownMenuItem>
+                  )}
+
                   {/* Only show Move to Folder if user has permission (computed server-side) */}
                   {onMoveThread && chat && thread.canEdit && (
                     <>
@@ -473,6 +492,15 @@ export function ThreadItem({
         threadTitle={thread.title}
         locale={locale}
         logger={logger}
+      />
+
+      {/* Share Dialog */}
+      <ThreadShareDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        threadId={thread.id}
+        threadTitle={thread.title}
+        locale={locale}
       />
     </Div>
   );

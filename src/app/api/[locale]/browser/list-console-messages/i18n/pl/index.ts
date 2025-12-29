@@ -58,7 +58,17 @@ export const translations: typeof enTranslations = {
   },
   response: {
     success: "Wiadomości konsoli pobrane pomyślnie",
-    result: "Wynik listy wiadomości konsoli",
+    result: {
+      title: "Wynik",
+      description: "Wynik listy wiadomości konsoli",
+      messages: {
+        msgid: "ID wiadomości",
+        type: "Typ",
+        text: "Wiadomość",
+        timestamp: "Znacznik czasu",
+      },
+      totalCount: "Łączna liczba",
+    },
     error: "Komunikat błędu",
     executionId: "ID wykonania do śledzenia",
   },

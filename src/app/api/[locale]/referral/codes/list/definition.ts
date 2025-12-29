@@ -8,6 +8,7 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   objectField,
   responseArrayField,
+  responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -54,17 +55,85 @@ export const { GET } = createEndpoint({
         {
           type: WidgetType.DATA_TABLE,
         },
-        z.object({
-          id: z.string(),
-          code: z.string(),
-          label: z.string().nullable(),
-          currentUses: z.coerce.number(),
-          isActive: z.boolean(),
-          createdAt: z.string(),
-          totalSignups: z.coerce.number(),
-          totalRevenueCents: z.coerce.number(),
-          totalEarningsCents: z.coerce.number(),
-        }),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 12,
+          },
+          { response: true },
+          {
+            id: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.referral.codes.list.get.response.codes.id",
+              },
+              z.string(),
+            ),
+            code: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.referral.codes.list.get.response.codes.code",
+              },
+              z.string(),
+            ),
+            label: responseField(
+              {
+                type: WidgetType.TEXT,
+                content: "app.api.referral.codes.list.get.response.codes.label",
+              },
+              z.string().nullable(),
+            ),
+            currentUses: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.codes.list.get.response.codes.currentUses",
+              },
+              z.coerce.number(),
+            ),
+            isActive: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.codes.list.get.response.codes.isActive",
+              },
+              z.boolean(),
+            ),
+            createdAt: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.codes.list.get.response.codes.createdAt",
+              },
+              z.string(),
+            ),
+            totalSignups: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.codes.list.get.response.codes.totalSignups",
+              },
+              z.coerce.number(),
+            ),
+            totalRevenueCents: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.codes.list.get.response.codes.totalRevenueCents",
+              },
+              z.coerce.number(),
+            ),
+            totalEarningsCents: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.referral.codes.list.get.response.codes.totalEarningsCents",
+              },
+              z.coerce.number(),
+            ),
+          },
+        ),
       ),
     },
   ),

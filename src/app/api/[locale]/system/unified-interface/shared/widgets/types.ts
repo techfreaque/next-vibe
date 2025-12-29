@@ -66,7 +66,6 @@ export interface WidgetRenderContext {
   isInteractive: boolean;
   permissions: readonly UserRoleValue[];
   onNavigate?: (url: string) => void;
-  onAction?: (action: WidgetAction) => void | Promise<void>;
   platform?:
     | typeof Platform.TRPC
     | typeof Platform.NEXT_PAGE
@@ -83,8 +82,31 @@ export interface WidgetRenderContext {
    * This enables module-specific translations with type safety
    * Note: Uses method syntax for bivariance - accepts both narrow (scoped) and broad (string) key types
    */
-  scopedT?: (locale: CountryLanguage) => {
+  scopedT: (locale: CountryLanguage) => {
     t(key: string, params?: TParams): TranslatedKeyType;
+  };
+  /**
+   * Endpoint mutations available for widgets to trigger directly
+   * Widgets can call these methods to perform CRUD operations
+   * This enables definition-driven interactions without custom handlers
+   */
+  endpointMutations?: {
+    create?: {
+      submit: (data: Record<string, WidgetData>) => Promise<void>;
+      isSubmitting?: boolean;
+    };
+    update?: {
+      submit: (data: Record<string, WidgetData>) => Promise<void>;
+      isSubmitting?: boolean;
+    };
+    delete?: {
+      submit: (data: Record<string, WidgetData>) => Promise<void>;
+      isSubmitting?: boolean;
+    };
+    read?: {
+      refetch: () => Promise<void>;
+      isLoading?: boolean;
+    };
   };
 }
 
@@ -99,7 +121,6 @@ export interface WidgetComponentProps<
   fieldName?: string;
   value: WidgetData;
   context: WidgetRenderContext;
-  onAction?: (action: WidgetAction) => void | Promise<void>;
   className?: string;
   form?: UseFormReturn<TFieldValues>;
   onSubmit?: () => void;

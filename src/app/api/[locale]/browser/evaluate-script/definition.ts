@@ -8,6 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
+  objectOptionalField,
+  requestDataArrayOptionalField,
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -67,7 +69,7 @@ const { POST } = createEndpoint({
             "A JavaScript function declaration to be executed by the tool in the currently selected page",
           ),
       ),
-      args: requestDataField(
+      args: requestDataArrayOptionalField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -78,18 +80,32 @@ const { POST } = createEndpoint({
             "app.api.browser.evaluate-script.form.fields.args.placeholder",
           columns: 12,
         },
-        z
-          .array(
-            z.object({
-              uid: z
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 1,
+          },
+          { request: "data" },
+          {
+            uid: requestDataField(
+              {
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.TEXT,
+                label:
+                  "app.api.browser.evaluate-script.form.fields.args.uid.label",
+                description:
+                  "app.api.browser.evaluate-script.form.fields.args.uid.description",
+                columns: 12,
+              },
+              z
                 .string()
                 .describe(
                   "The uid of an element on the page from the page content snapshot",
                 ),
-            }),
-          )
-          .optional()
-          .describe("An optional list of arguments to pass to the function"),
+            ),
+          },
+        ),
       ),
 
       // Response fields
@@ -102,15 +118,30 @@ const { POST } = createEndpoint({
           .boolean()
           .describe("Whether the script evaluation operation succeeded"),
       ),
-      result: responseField(
+      result: objectOptionalField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.evaluate-script.response.result",
+          type: WidgetType.CONTAINER,
+          title: "app.api.browser.evaluate-script.response.result.title",
+          description:
+            "app.api.browser.evaluate-script.response.result.description",
+          layoutType: LayoutType.STACKED,
         },
-        z
-          .object({
-            executed: z.boolean().describe("Whether the script was executed"),
-            result: z
+        { response: true },
+        {
+          executed: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.browser.evaluate-script.response.result.executed",
+            },
+            z.boolean().describe("Whether the script was executed"),
+          ),
+          result: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.browser.evaluate-script.response.result.result",
+            },
+            z
               .union([
                 z.string(),
                 z.coerce.number(),
@@ -120,9 +151,8 @@ const { POST } = createEndpoint({
               ])
               .optional()
               .describe("The result returned by the script"),
-          })
-          .optional()
-          .describe("Result of the script evaluation"),
+          ),
+        },
       ),
       error: responseField(
         {
@@ -142,7 +172,7 @@ const { POST } = createEndpoint({
   ),
   examples: {
     requests: {
-      default: { function: "() => { return document.title; }" },
+      default: { function: "() => { return document.title; }", args: null },
     },
     responses: {
       default: {

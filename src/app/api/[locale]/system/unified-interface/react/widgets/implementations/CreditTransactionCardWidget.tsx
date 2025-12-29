@@ -18,7 +18,7 @@ import type {
  * Displays a credit transaction as a card with conditional red/green styling
  * Fully data-driven - field definitions control what fields are shown and how
  */
-export function CreditTransactionCardWidget<TKey extends string>({
+export function CreditTransactionCardWidget<const TKey extends string>({
   value,
   field,
   context,
@@ -27,7 +27,8 @@ export function CreditTransactionCardWidget<TKey extends string>({
   typeof WidgetType.CREDIT_TRANSACTION_CARD,
   TKey
 >): JSX.Element {
-  const { t } = simpleT(context.locale);
+  const { t } = context.scopedT(context.locale);
+  const { t: globalT } = simpleT(context.locale);
 
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return <Div className={className}>—</Div>;
@@ -104,9 +105,12 @@ export function CreditTransactionCardWidget<TKey extends string>({
             displayValue = (val > 0 ? "+" : "") + val;
           } else if (key === "balanceAfter" && typeof val === "number") {
             // Format balance with label
-            displayValue = t("app.subscription.subscription.history.balance", {
-              count: val,
-            });
+            displayValue = globalT(
+              "app.subscription.subscription.history.balance",
+              {
+                count: val,
+              },
+            );
           } else {
             displayValue = String(val);
           }

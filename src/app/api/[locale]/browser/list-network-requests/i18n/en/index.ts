@@ -54,7 +54,18 @@ export const translations = {
   },
   response: {
     success: "Network requests retrieved successfully",
-    result: "Network requests list result",
+    result: {
+      title: "Result",
+      description: "Network requests list result",
+      requests: {
+        reqid: "Request ID",
+        url: "URL",
+        method: "Method",
+        status: "Status",
+        type: "Type",
+      },
+      totalCount: "Total Count",
+    },
     error: "Error message",
     executionId: "Execution ID for tracking",
   },

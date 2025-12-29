@@ -8,7 +8,7 @@ import { type CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { EmailCampaignStage, EmailJourneyVariant } from "../../enum";
-import { leadTrackingRepository } from "../../tracking/repository";
+import { LeadTrackingRepository } from "../../tracking/repository";
 import type { LeadWithEmailType } from "../../types";
 import { abTestingService } from "./services/ab-testing";
 import { emailRendererService } from "./services/renderer";
@@ -43,7 +43,7 @@ export class EmailService {
     logger: EndpointLogger,
   ): Promise<EmailTemplateResult | null> {
     try {
-      const trackingUrl = leadTrackingRepository.generateCampaignTrackingUrl(
+      const trackingUrl = LeadTrackingRepository.generateCampaignTrackingUrl(
         context.baseUrl,
         lead.id,
         context.campaignId,

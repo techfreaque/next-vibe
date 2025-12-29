@@ -2,7 +2,9 @@
  * Text-to-Speech Polish translations
  */
 
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   post: {
     title: "Tekst na mowę",
     description:
@@ -80,6 +82,7 @@ export const translations = {
       audioFetchFailed: "Nie udało się pobrać pliku audio",
       providerError: "Błąd dostawcy: {error}",
       internalError: "Wewnętrzny błąd serwera",
+      creditsFailed: "Nie udało się odjąć kredytów: {{error}}",
     },
     success: {
       title: "Sukces",

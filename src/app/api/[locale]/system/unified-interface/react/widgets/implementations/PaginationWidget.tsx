@@ -23,7 +23,7 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
  * Pagination widget with page navigation and items per page selector
  * Flexible and generic for reuse across the application
  */
-export function PaginationWidget<TKey extends string>({
+export function PaginationWidget<const TKey extends string>({
   value,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   field: _field,

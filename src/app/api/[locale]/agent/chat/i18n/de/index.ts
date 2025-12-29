@@ -2,6 +2,7 @@ import { translations as creditsTranslations } from "../../../../credits/i18n/de
 import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/de";
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/de";
 import { translations as charaktersTranslations } from "../../characters/i18n/de";
+import { translations as favoritesTranslations } from "../../favorites/i18n/de";
 import { translations as foldersTranslations } from "../../folders/i18n/de";
 import { translations as memoriesTranslations } from "../../memories/i18n/de";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/de";
@@ -16,12 +17,14 @@ export const translations: typeof enTranslations = {
     messages: "Nachrichten",
     characters: "Charaktere",
     memories: "Erinnerungen",
+    favorites: "Favoriten",
     credits: "Credits",
     balance: "Guthaben",
     permissions: "Berechtigungen",
     hotkey: "Hotkey",
     cli: "CLI",
     speech: "Sprache",
+    sharing: "Teilen",
   },
   config: {
     folders: {
@@ -52,36 +55,7 @@ export const translations: typeof enTranslations = {
     },
   },
   favorites: {
-    enums: {
-      mode: {
-        auto: "Auto",
-        manual: "Manuell",
-      },
-      intelligence: {
-        any: "Beliebig",
-        quick: "Schnell",
-        smart: "Intelligent",
-        brilliant: "Brilliant",
-      },
-      price: {
-        any: "Beliebig",
-        cheap: "Günstig",
-        standard: "Standard",
-        premium: "Premium",
-      },
-      content: {
-        any: "Beliebig",
-        mainstream: "Mainstream",
-        open: "Offen",
-        uncensored: "Unzensiert",
-      },
-      speed: {
-        any: "Beliebig",
-        fast: "Schnell",
-        balanced: "Ausgewogen",
-        thorough: "Gründlich",
-      },
-    },
+    ...favoritesTranslations,
   },
   components: {
     sidebar: {
@@ -127,8 +101,18 @@ export const translations: typeof enTranslations = {
     showMore: "{{remaining}} weitere anzeigen",
     noMatchingModels: "Keine passenden Modelle",
     noModelsWarning: "Keine Modelle entsprechen Ihren Filtern",
-    applyOnce: "Einmal anwenden",
-    saveChanges: "Änderungen speichern",
+    useOnce: "Einmal verwenden",
+    saveAsDefault: "Zu Favoriten hinzufügen",
+    deleteSetup: "Setup löschen",
+    content: "Inhalte durchsuchen...",
+    characterSetup: "Charakter-Setup",
+    noResults: "Keine Ergebnisse",
+    add: "Zu Favoriten hinzufügen",
+    added: "Hinzugefügt",
+    addNew: "Neu hinzufügen",
+    searchCharacters: "Charaktere suchen...",
+    createCustom: "Benutzerdefiniert erstellen",
+    customizeSettings: "Einstellungen anpassen",
     requirements: {
       characterConflict: "Charakter-Anforderungskonflikte",
       tooLow: "zu niedrig",
@@ -146,6 +130,7 @@ export const translations: typeof enTranslations = {
     save: "Speichern",
     edit: "Bearbeiten",
     settings: "Einstellungen",
+    close: "Schließen",
     toggleSidebar: "Seitenleiste umschalten",
     lightMode: "Heller Modus",
     darkMode: "Dunkler Modus",
@@ -344,6 +329,27 @@ export const translations: typeof enTranslations = {
         "GPT-5.2 - Hochleistungs-OpenAI-Modell für komplexe Aufgaben und Analyse",
       gpt52_chat:
         "GPT-5.2 Chat - Optimiertes OpenAI-Modell für Konversationsinteraktionen",
+      dolphin3_0_r1_mistral_24b:
+        "Dolphin 3.0 R1 Mistral 24B - Unzensiertes großes Sprachmodell basierend auf Mistral",
+      dolphinLlama3_70B:
+        "Dolphin Llama 3 70B - Unzensiertes großes Sprachmodell basierend auf Llama 3",
+      veniceUncensored:
+        "Venice Uncensored - Unzensiertes KI-Modell für uneingeschränkte Konversationen",
     },
+  },
+  modelUtilities: {
+    adultExplicit: "Explizite Erwachseneninhalte",
+    adultImplied: "Angedeutete Erwachseneninhalte",
+    conspiracy: "Verschwörungstheorien",
+    harmful: "Potenziell schädliche Inhalte",
+    illegalInfo: "Illegale Informationen",
+    medicalAdvice: "Medizinische Beratung",
+    offensiveLanguage: "Beleidigende Sprache",
+    politicalLeft: "Linke politische Ansichten",
+    politicalRight: "Rechte politische Ansichten",
+    reasoning: "Fortgeschrittenes Denkvermögen",
+    roleplay: "Rollenspiel",
+    roleplayDark: "Dunkles Rollenspiel",
+    violence: "Gewalt",
   },
 };

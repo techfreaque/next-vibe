@@ -7,7 +7,6 @@ import { mcpServeRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: serveDefinition,
   [Methods.POST]: {
-    email: undefined,
     handler: async ({ logger, locale }) => {
       return await mcpServeRepository.startServer(logger, locale);
     },

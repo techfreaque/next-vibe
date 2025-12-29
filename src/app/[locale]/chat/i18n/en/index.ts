@@ -42,6 +42,7 @@ export const translations = {
     enableTTSAutoplay: "Enable TTS autoplay",
     disableTTSAutoplay: "Disable TTS autoplay",
     closeSidebar: "Close sidebar",
+    close: "Close",
     showMore: "Show more",
     showLess: "Show less",
     viewFullThread: "View full thread",
@@ -253,6 +254,8 @@ export const translations = {
     noFoldersAvailable: "No folders available",
     stopGeneration: "Stop generation",
     sendMessage: "Send message",
+    shareThread: "Share Thread",
+    manageSharing: "Manage Sharing",
   },
   chatInterface: {
     chatPrefix: "chat",
@@ -471,6 +474,7 @@ export const translations = {
   },
   selector: {
     loading: "Loading...",
+    noResults: "No results found",
     tabs: {
       quick: "Quick",
       characters: "Characters",
@@ -486,7 +490,8 @@ export const translations = {
       smart: "3-8cr",
       best: "10-20cr",
     },
-    content: {
+    content: "Content",
+    contentLevels: {
       safe: "Safe",
       open: "Open",
       unlim: "Unlim",
@@ -587,6 +592,10 @@ export const translations = {
     showMore: "Show {{count}} more",
     applyOnce: "Apply once",
     saveChanges: "Save Changes",
+    useOnce: "Use Once",
+    saveAsDefault: "Add to favorites",
+    deleteSetup: "Delete Setup",
+    characterSetup: "Character Setup",
     separator: " • ",
     // UX improvements v21
     mySetups: "My Setups",
@@ -612,6 +621,11 @@ export const translations = {
     comingSoon: "Coming soon",
     // Character requirements
     requirements: {
+      characterConflict: "Character conflict",
+      max: "Maximum",
+      min: "Minimum",
+      tooHigh: "Too high",
+      tooLow: "Too low",
       intelligenceTooLow: "Intelligence too low (min: {{min}})",
       intelligenceTooHigh: "Intelligence too high (max: {{max}})",
       contentTooLow: "Content level too low (min: {{min}})",
@@ -634,6 +648,7 @@ export const translations = {
     },
   },
   onboarding: {
+    back: "Back",
     // Screen 1: Story
     story: {
       title: "Think of us as your team.",
@@ -659,21 +674,16 @@ export const translations = {
       tagline: "Bold & direct",
       description: "Like a coach who pushes you to be your best.",
     },
-    // Screen 3: Specialists peek
+    // Screen 3: Specialists - add to team
     specialists: {
-      title: "Your team has specialists too",
+      title: "Add specialists for specific tasks",
+      subtitle:
+        "Each expert is optimized for their specialty. Add as many as you like.",
       chosen: "{{name}} is ready",
-      intro: "She's ready to chat. But first...",
-      technical: "Technical",
-      technicalDesc: "Code & debugging",
-      creative: "Creative",
-      creativeDesc: "Writing & ideas",
-      teacher: "Teacher",
-      teacherDesc: "Learn anything",
-      challenger: "Challenger",
-      challengerDesc: "Test your ideas",
+      add: "Add",
+      added: "Added",
       switchTip:
-        "Switch anytime from the selector. You can also customize settings later.",
+        "Switch between your team members anytime. You can customize or add more later.",
       start: "Start Chatting",
       browseAll: "Browse All Characters",
     },
@@ -1036,6 +1046,20 @@ export const translations = {
     education: "Education",
     controversial: "Controversial",
     lifestyle: "Lifestyle",
+    // Model capabilities/utilities
+    reasoning: "Advanced Reasoning",
+    roleplay: "Roleplay",
+    roleplayDark: "Dark Roleplay",
+    adultImplied: "Adult/Implied Content",
+    adultExplicit: "Adult/Explicit Content",
+    violence: "Violence",
+    harmful: "Potentially Harmful Content",
+    illegalInfo: "Illegal Information",
+    medicalAdvice: "Medical Advice",
+    offensiveLanguage: "Offensive Language",
+    politicalLeft: "Left Political Views",
+    politicalRight: "Right Political Views",
+    conspiracy: "Conspiracy Theories",
   },
   models: {
     descriptions: {
@@ -1089,6 +1113,12 @@ export const translations = {
         "GPT 5.2 - latest generation model with improved performance and efficiency",
       gpt52_chat:
         "GPT 5.2 Chat - conversational variant optimized for dialogue and interactions",
+      veniceUncensored:
+        "Venice Uncensored - Uncensored AI model for unrestricted conversations",
+      dolphinLlama3_70B:
+        "Dolphin Llama 3 70B - Uncensored large language model based on Llama 3",
+      dolphin3_0_r1_mistral_24b:
+        "Dolphin 3.0 R1 Mistral 24B - Uncensored large language model based on Mistral",
     },
   },
   tones: {
@@ -1273,6 +1303,8 @@ export const translations = {
     newSubfolder: "New Subfolder",
     deleteFolder: "Delete Folder",
     managePermissions: "Manage Permissions",
+    manageSharing: "Manage Sharing",
+    shareThread: "Share Thread",
     today: "Today",
     lastWeek: "Last 7 Days",
     lastMonth: "Last 30 Days",
@@ -1371,6 +1403,55 @@ export const translations = {
       title: "Delete Thread",
       description:
         'Are you sure you want to delete "{{title}}"? This action cannot be undone and all messages in this thread will be permanently deleted.',
+    },
+  },
+  shareDialog: {
+    title: "Share Thread",
+    description: "Create and manage share links for this thread",
+    createLink: "Create Share Link",
+    linkCreated: "Share link created successfully!",
+    linkCopied: "Link copied to clipboard!",
+    copyLink: "Copy Link",
+    shareViaEmail: "Share via Email",
+    revokeLink: "Revoke",
+    revoke: "Revoke",
+    linkRevoked: "Share link revoked",
+    revoked: "Revoked",
+    noLinksYet: "No share links yet. Create one to start sharing.",
+    activeLinks: "Active Share Links",
+    existingLinks: "Existing Links",
+    linkSettings: "Link Settings",
+    newLinkSettings: "New Link Settings",
+    linkLabel: "Link Label (optional)",
+    linkLabelPlaceholder: "e.g., Share with team",
+    allowPosting: "Allow Posting",
+    allowPostingDescription: "Recipients can reply and interact in the thread",
+    requireAuth: "Require sign-in",
+    requireAuthDescription: "Only authenticated users can access this link",
+    viewOnly: "View only",
+    accessCount: "{{count}} access",
+    accessCount_other: "{{count}} accesses",
+    createdAt: "Created {{date}}",
+    lastAccessed: "Last accessed {{date}}",
+    neverAccessed: "Never accessed",
+    emailSubject: "Check out this thread: {{title}}",
+    emailBody:
+      "I thought you might be interested in this conversation: {{url}}\n\nThread: {{title}}",
+    emailPlaceholder: "Enter email addresses (comma separated)",
+    sendEmail: "Email",
+    emailSent: "Email sent successfully!",
+    create: "Create",
+    creating: "Creating...",
+    copied: "Copied!",
+    close: "Close",
+    shareThread: "Share Thread",
+  },
+  shared: {
+    error: {
+      title: "Share Link Error",
+      userError: "Unable to verify your session. Please try again.",
+      invalidToken:
+        "This share link is invalid or has been revoked. Please contact the person who shared this link with you.",
     },
   },
   threadedView: {

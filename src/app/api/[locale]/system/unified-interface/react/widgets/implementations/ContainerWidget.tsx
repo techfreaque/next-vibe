@@ -51,7 +51,7 @@ import { WidgetRenderer } from "../renderers/WidgetRenderer";
  * - showFormAlert: Shows FormAlert at top for error/success messages (default: true)
  * - showSubmitButton: Shows submit button at bottom when there are request fields (default: true)
  */
-export function ContainerWidget<TKey extends string>({
+export function ContainerWidget<const TKey extends string>({
   value,
   field,
   context,

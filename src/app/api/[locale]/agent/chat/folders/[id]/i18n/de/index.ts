@@ -319,4 +319,4 @@ export const translations: typeof enTranslations = {
       description: "Ordner erfolgreich gelöscht",
     },
   },
-} as const;
+};

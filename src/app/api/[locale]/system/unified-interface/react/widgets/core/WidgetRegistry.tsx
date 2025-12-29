@@ -26,7 +26,7 @@ export type WidgetComponent = FC<WidgetComponentProps<string>>;
  */
 type RegisterableComponent<T extends WidgetType> =
   | FC<WidgetComponentProps<string>>
-  | (<TKey extends string>(
+  | (<const TKey extends string>(
       props: ReactWidgetProps<T, TKey, FieldValues>,
     ) => JSX.Element)
   | FC<ValueOnlyReactWidgetProps<T>>;

@@ -16,6 +16,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 import { callApi, containsFile, objectToFormData } from "./api-utils";
@@ -148,10 +149,15 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       // Use endpoint's VALIDATION_FAILED error type if available
       const validationErrorConfig =
         endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
-      const errorMessage = validationErrorConfig?.description;
+
+      const message = validationErrorConfig?.description
+        ? endpoint.scopedTranslation
+            .scopedT(locale)
+            .t(validationErrorConfig.description)
+        : ("app.api.shared.errors.validationFailed.description" satisfies TranslationKey);
 
       const errorResponse = fail({
-        message: errorMessage,
+        message,
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: {
           endpoint: endpoint.path.join("/"),
@@ -196,10 +202,15 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
           // Use endpoint's VALIDATION_FAILED error type if available
           const validationErrorConfig =
             endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
-          const errorMessage = validationErrorConfig?.description;
+
+          const message = validationErrorConfig?.description
+            ? endpoint.scopedTranslation
+                .scopedT(locale)
+                .t(validationErrorConfig.description)
+            : ("app.api.shared.errors.validationFailed.description" satisfies TranslationKey);
 
           const errorResponse = fail({
-            message: errorMessage,
+            message,
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: {
               paramName,
@@ -353,10 +364,13 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       parsedError.message.toLowerCase().includes("network") ||
       parsedError.message.toLowerCase().includes("fetch");
     const errorConfig = isNetworkError ? networkErrorConfig : serverErrorConfig;
-    const errorMessage = errorConfig?.description;
+
+    const message = errorConfig?.description
+      ? endpoint.scopedTranslation.scopedT(locale).t(errorConfig.description)
+      : ("app.api.shared.errors.serverError.description" satisfies TranslationKey);
 
     const errorResponse = fail({
-      message: errorMessage,
+      message,
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: parsedError.message,

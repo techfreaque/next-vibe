@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import braveSearchDefinition from "./definition";
-import { braveSearchRepository } from "./repository";
+import { BraveSearchRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: braveSearchDefinition,
   [Methods.GET]: {
     handler: ({ data, logger }) => {
-      return braveSearchRepository.search(
+      return BraveSearchRepository.search(
         data.query,
         {
           maxResults: data.maxResults,

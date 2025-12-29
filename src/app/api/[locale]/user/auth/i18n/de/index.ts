@@ -48,6 +48,8 @@ export const translations: typeof enTranslations = {
     },
     not_implemented_native:
       "Diese Funktion ist noch nicht für React Native implementiert",
+    unknownError:
+      "Ein unbekannter Fehler ist während der Authentifizierung aufgetreten",
   },
   post: {
     title: "Titel",

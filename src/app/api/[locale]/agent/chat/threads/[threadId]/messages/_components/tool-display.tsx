@@ -5,8 +5,6 @@ import type { JSX } from "react";
 
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import { ToolCallRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/ToolCallRenderer";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { WidgetRenderContext } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
@@ -74,15 +72,6 @@ export function ToolDisplay({
     return null;
   }
 
-  // Create widget render context
-  // Use NEXT_PAGE as the default for web UI components
-  const context: WidgetRenderContext = {
-    locale,
-    isInteractive: true,
-    permissions: [],
-    platform: Platform.NEXT_PAGE,
-  };
-
   // Tool calls should always start collapsed
   const defaultOpen = false;
 
@@ -91,7 +80,6 @@ export function ToolDisplay({
       <ToolCallRenderer
         toolCall={toolCall}
         locale={locale}
-        context={context}
         defaultOpen={defaultOpen}
         threadId={threadId}
         messageId={messageId}

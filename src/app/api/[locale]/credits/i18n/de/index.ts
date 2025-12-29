@@ -179,9 +179,19 @@ export const translations: typeof enTranslations = {
         description:
           "Anzahl der zu überspringenden Transaktionen für Paginierung",
       },
+      id: "Transaktions-ID",
+      amount: "Betrag",
+      type: "Typ",
+      modelId: "Modell",
+      messageId: "Nachrichten-ID",
+      createdAt: "Datum",
       transactions: {
         title: "Transaktionen",
         description: "Liste der Credit-Transaktionen",
+      },
+      paginationInfo: {
+        total: "Gesamt-Transaktionen",
+        totalPages: "Gesamt-Seiten",
       },
       totalCount: {
         content: "Gesamtanzahl",

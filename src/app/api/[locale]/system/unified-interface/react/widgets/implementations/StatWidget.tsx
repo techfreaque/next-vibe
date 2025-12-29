@@ -139,7 +139,7 @@ function getIconComponent(
  * - trendValue: Number to show as trend percentage
  * - size: "sm" | "md" | "lg" (default: "md")
  */
-export function StatWidget<TKey extends string>({
+export function StatWidget<const TKey extends string>({
   value,
   field,
   context,

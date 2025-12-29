@@ -10,6 +10,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import { type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";
 import type {
   TFunction,
@@ -288,9 +289,13 @@ export class RouteDelegationHandler {
         formattedOutput,
       };
     } catch (error) {
-      const errorResult = {
+      const errorResult: RouteExecutionResult = {
         success: false,
-        error: parseError(error).message,
+        error:
+          "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+        errorParams: {
+          error: parseError(error).message,
+        },
         metadata: {
           executionTime: Date.now() - startTime,
           endpointPath: resolvedCommand,
@@ -509,8 +514,12 @@ export class RouteDelegationHandler {
               logger,
             );
           } else {
-            // Use enhanced renderer even without endpoint definition
-            output += this.formatPretty(result.data, locale);
+            // Fallback to JSON without endpoint definition
+            if (typeof result.data === "object") {
+              output += JSON.stringify(result.data, null, 2);
+            } else {
+              output += String(result.data);
+            }
           }
           break;
       }
@@ -632,7 +641,7 @@ export class RouteDelegationHandler {
   /**
    * Extract response fields from endpoint definition
    */
-  private extractResponseFields<TKey extends string>(
+  private extractResponseFields<const TKey extends string>(
     endpointDefinition: CreateApiEndpointAny,
   ): Array<[string, UnifiedField<TKey>]> {
     // Type guard: check if it's a valid endpoint with fields
@@ -711,6 +720,7 @@ export class RouteDelegationHandler {
         this.sanitizeDataForRenderer(data),
         fields,
         locale,
+        endpointDefinition.scopedTranslation.scopedT,
       );
     } catch (error) {
       // Fallback to basic formatting
@@ -718,20 +728,27 @@ export class RouteDelegationHandler {
         error: parseError(error),
       });
       // eslint-disable-next-line i18next/no-literal-string
-      return `📊 Result:\n${this.formatPretty(data, locale)}`;
+      return `📊 Result:\n${this.formatPretty(data, locale, endpointDefinition.scopedTranslation.scopedT)}`;
     }
   }
 
   /**
    * Format data in pretty format using enhanced renderer
    */
-  private formatPretty(data: CliResponseData, locale: CountryLanguage): string {
+  private formatPretty(
+    data: CliResponseData,
+    locale: CountryLanguage,
+    scopedT: (locale: CountryLanguage) => {
+      t: (key: string, params?: TParams) => TranslatedKeyType;
+    },
+  ): string {
     // Use the enhanced modular CLI response renderer for pretty formatting
     try {
       return modularCLIResponseRenderer.render(
         this.sanitizeDataForRenderer(data),
         [],
         locale,
+        scopedT,
       );
     } catch {
       // Fallback to JSON if enhanced rendering fails

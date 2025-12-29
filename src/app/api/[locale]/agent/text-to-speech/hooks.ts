@@ -17,7 +17,7 @@ import { TTS_COST_PER_CHARACTER } from "../../products/repository-client";
 import { chunkTextForTTS } from "./chunking";
 import textToSpeechDefinitions from "./definition";
 import type { TtsVoiceValue } from "./enum";
-import { TtsVoice } from "./enum";
+import { DEFAULT_TTS_VOICE } from "./enum";
 
 interface UseTTSAudioOptions {
   text: string;
@@ -54,6 +54,9 @@ export function useTTSAudio({
   const [error, setError] = useState<string | null>(null);
   const [currentChunk, setCurrentChunk] = useState(0);
   const [totalChunks, setTotalChunks] = useState(0);
+
+  // Use voice from props (set by chat settings)
+  const voicePreference = voice ?? DEFAULT_TTS_VOICE;
 
   // Refs for audio management
   const audioQueueRef = useRef<(HTMLAudioElement | null)[]>([]);
@@ -163,7 +166,7 @@ export function useTTSAudio({
       return new Promise((resolve) => {
         // Set form values for this chunk
         endpoint.create!.form.setValue("text", chunkText);
-        endpoint.create!.form.setValue("voice", voice ?? TtsVoice.FEMALE);
+        endpoint.create!.form.setValue("voice", voicePreference);
 
         // Submit form
         void endpoint.create!.submitForm({
@@ -206,7 +209,7 @@ export function useTTSAudio({
         });
       });
     },
-    [endpoint, logger, t, onError, deductCredits, voice],
+    [endpoint, logger, t, onError, deductCredits, voicePreference],
   );
 
   // Play next chunk in the queue

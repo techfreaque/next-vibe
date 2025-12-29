@@ -18,7 +18,7 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
 /**
  * Displays code with syntax highlighting and optional line numbers.
  */
-export function CodeOutputWidget<TKey extends string>({
+export function CodeOutputWidget<const TKey extends string>({
   value,
   context,
   className,

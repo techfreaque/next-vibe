@@ -10,7 +10,7 @@ import { z } from "zod";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { leadId } from "../../types";
-import { leadTrackingRepository } from "../repository";
+import { LeadTrackingRepository } from "../repository";
 
 const pixelTrackingRequestSchema = z.object({
   leadId: leadId,
@@ -30,16 +30,20 @@ export class PixelTrackingRepository {
    * Handle pixel tracking request
    * Returns a 1x1 transparent GIF and records engagement asynchronously
    */
-  handlePixelRequest(request: NextRequest, logger: EndpointLogger): Response {
+  static handlePixelRequest(
+    request: NextRequest,
+    logger: EndpointLogger,
+  ): Response {
     try {
       const { searchParams } = new URL(request.url);
 
       // Validate tracking parameters
-      const validationResult = this.validateTrackingParams(searchParams);
+      const validationResult =
+        PixelTrackingRepository.validateTrackingParams(searchParams);
 
       // Always return pixel first to avoid broken images, even on errors
       const pixelResponse =
-        leadTrackingRepository.createTrackingPixelResponse();
+        LeadTrackingRepository.createTrackingPixelResponse();
 
       if (!validationResult.success || !validationResult.data?.leadId) {
         logger.warn("tracking.pixel.request.invalid", {
@@ -63,13 +67,13 @@ export class PixelTrackingRepository {
         });
       }
 
-      const clientInfo = leadTrackingRepository.extractClientInfo(request);
+      const clientInfo = LeadTrackingRepository.extractClientInfo(request);
 
       // Record engagement asynchronously to avoid blocking pixel response
       // This ensures the pixel loads quickly even if database is slow
       setImmediate(async () => {
         try {
-          const result = await leadTrackingRepository.handleTrackingPixel(
+          const result = await LeadTrackingRepository.handleTrackingPixel(
             leadId,
             campaignId,
             clientInfo,
@@ -111,14 +115,14 @@ export class PixelTrackingRepository {
       return pixelResponse;
     } catch (error) {
       logger.error("tracking.pixel.serve.error", parseError(error));
-      return leadTrackingRepository.createTrackingPixelResponse(); // Always return pixel to avoid broken images
+      return LeadTrackingRepository.createTrackingPixelResponse(); // Always return pixel to avoid broken images
     }
   }
 
   /**
    * Validate tracking parameters from URL search params
    */
-  private validateTrackingParams(searchParams: URLSearchParams): {
+  private static validateTrackingParams(searchParams: URLSearchParams): {
     success: boolean;
     data?: PixelTrackingRequestType;
     error?: string;
@@ -169,5 +173,3 @@ export class PixelTrackingRepository {
     );
   }
 }
-
-export const pixelTrackingRepository = new PixelTrackingRepository();

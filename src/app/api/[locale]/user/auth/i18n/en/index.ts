@@ -85,6 +85,7 @@ export const translations = {
     },
     not_implemented_native:
       "This feature is not yet implemented for React Native",
+    unknownError: "An unknown error occurred during authentication",
   },
   post: {
     title: "Auth",

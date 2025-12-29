@@ -39,7 +39,7 @@ export interface CLIWidgetRenderContext extends SharedWidgetRenderContext {
   options: CLIRenderingOptions;
   depth: number;
   t: TFunction;
-  formatValue: <TKey extends string>(
+  formatValue: <const TKey extends string>(
     field: UnifiedField<TKey>,
     value: WidgetData,
   ) => string;
@@ -50,7 +50,7 @@ export interface CLIWidgetRenderContext extends SharedWidgetRenderContext {
    * Render a widget with proper type dispatch.
    * Use this instead of getRenderer().render() to avoid union type issues.
    */
-  renderWidget: <TKey extends string>(
+  renderWidget: <const TKey extends string>(
     widgetType: WidgetType,
     field: UnifiedField<TKey>,
     value: WidgetData,

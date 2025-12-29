@@ -694,8 +694,8 @@ export class PaymentRepository {
         }
 
         if (creditsAmount > 0) {
-          const { referralRepository } = await import("../referral/repository");
-          await referralRepository.applyReferralPayoutOnPayment(
+          const { ReferralRepository } = await import("../referral/repository");
+          await ReferralRepository.applyReferralPayoutOnPayment(
             transaction.id,
             transaction.userId,
             creditsAmount,

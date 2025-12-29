@@ -1,4 +1,6 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   category: "Pomoc i Dokumentacja",
   tag: "Pomoc",
   interactive: {
@@ -25,6 +27,10 @@ export const translations = {
       started: "Tryb interaktywny uruchomiony pomyślnie",
     },
     errors: {
+      cliOnly: {
+        title: "Tylko CLI",
+        description: "Tryb interaktywny jest dostępny tylko z CLI",
+      },
       unauthorized: {
         title: "Nieautoryzowany",
         description: "Wymagana autentykacja dla trybu interaktywnego",
@@ -99,6 +105,7 @@ export const translations = {
     },
     header: {
       title: "Nagłówek",
+      description: "Opis nagłówka",
     },
     title: {
       label: "Tytuł",
@@ -108,7 +115,9 @@ export const translations = {
     },
     usage: {
       title: "Użycie",
-      patterns: "Wzorce użycia",
+      patterns: {
+        item: "Wzorzec",
+      },
     },
     commonCommands: {
       title: "Popularne polecenia",
@@ -130,10 +139,18 @@ export const translations = {
     },
     details: {
       title: "Szczegóły",
-      category: "Kategoria",
-      path: "Ścieżka",
-      method: "Metoda",
-      aliases: "Aliasy",
+      category: {
+        content: "Kategoria",
+      },
+      path: {
+        content: "Ścieżka",
+      },
+      method: {
+        content: "Metoda",
+      },
+      aliases: {
+        content: "Aliasy",
+      },
     },
   },
   list: {
@@ -220,6 +237,14 @@ export const translations = {
       commandsText: {
         label: "Dostępne polecenia",
         description: "Sformatowana lista wszystkich dostępnych poleceń",
+      },
+      commands: {
+        alias: "Alias polecenia",
+        message: "Komunikat polecenia",
+        description: "Opis polecenia",
+        category: "Kategoria polecenia",
+        aliases: "Aliasy polecenia",
+        rule: "Reguła polecenia",
       },
     },
     response: {

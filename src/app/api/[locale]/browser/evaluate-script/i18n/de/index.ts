@@ -18,12 +18,21 @@ export const translations: typeof enTranslations = {
         description:
           "Optionale Liste von Argumenten (Element-UIDs) zur Übergabe an die Funktion",
         placeholder: '[{"uid": "element-uid"}]',
+        uid: {
+          label: "Element-UID",
+          description: "Die eindeutige Kennung eines Elements auf der Seite",
+        },
       },
     },
   },
   response: {
     success: "Skript-Auswertung erfolgreich",
-    result: "Ergebnis der Skript-Auswertung",
+    result: {
+      title: "Ergebnis",
+      description: "Ergebnis der Skript-Auswertung",
+      executed: "Ausgeführt",
+      result: "Rückgabewert",
+    },
     error: "Fehlermeldung",
     executionId: "Ausführungs-ID zur Verfolgung",
   },

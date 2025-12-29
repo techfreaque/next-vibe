@@ -1,4 +1,6 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   title: "Utwórz konto IMAP",
   description: "Utwórz nowe konto IMAP do zarządzania e-mailami",
   category: "Zarządzanie IMAP",

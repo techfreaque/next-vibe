@@ -175,9 +175,19 @@ export const translations: typeof enTranslations = {
         label: "Przesunięcie",
         description: "Liczba transakcji do pominięcia dla stronicowania",
       },
+      id: "ID transakcji",
+      amount: "Kwota",
+      type: "Typ",
+      modelId: "Model",
+      messageId: "ID wiadomości",
+      createdAt: "Data",
       transactions: {
         title: "Transakcje",
         description: "Lista transakcji kredytowych",
+      },
+      paginationInfo: {
+        total: "Łączne transakcje",
+        totalPages: "Łączne strony",
       },
       totalCount: {
         content: "Łączna liczba",

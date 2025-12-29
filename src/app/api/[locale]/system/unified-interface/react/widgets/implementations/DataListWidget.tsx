@@ -33,7 +33,7 @@ import { WidgetRenderer } from "../renderers/WidgetRenderer";
 /**
  * Displays data in either list view (table) or grid view with toggle.
  */
-export function DataListWidget<TKey extends string>({
+export function DataListWidget<const TKey extends string>({
   value,
   field,
   context,

@@ -25,7 +25,7 @@ import {
 } from "@/i18n/core/language-utils";
 
 import { emails } from "../../emails/messages/db";
-import { referralRepository } from "../../referral/repository";
+import { ReferralRepository } from "../../referral/repository";
 import type { JwtPayloadType } from "../../user/auth/types";
 import { LeadAuthRepository } from "../auth/repository";
 import { leads } from "../db";
@@ -68,12 +68,6 @@ export interface TrackingPixelResult {
 }
 
 /**
- * Click tracking result - use definition type
- * Type is exported from ./engagement/definition.ts
- */
-export type ClickTrackingResult = ClickTrackingResponseOutput;
-
-/**
  * Helper to safely extract number from metadata
  */
 const getMetadataNumber = (
@@ -88,145 +82,22 @@ const getMetadataNumber = (
 };
 
 /**
- * Lead Tracking Repository Interface
- */
-export interface ILeadTrackingRepository {
-  extractClientInfo(request: NextRequest | undefined): ClientInfo;
-
-  validateTrackingParams(searchParams: URLSearchParams): {
-    leadId?: string;
-    campaignId?: string;
-    error?: string;
-  };
-
-  recordEngagement(
-    data: {
-      leadId: string;
-      engagementType: EngagementType;
-      campaignId?: string;
-      metadata?: Record<string, string | number | boolean>;
-    },
-    clientInfo: ClientInfo | undefined,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadEngagementResponseOutput>>;
-
-  handleTrackingPixel(
-    leadId: string,
-    campaignId: string | undefined,
-    clientInfo: ClientInfo,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<TrackingPixelResult>>;
-
-  handleClickTracking(
-    data: ClickTrackingRequestOutput,
-    user: JwtPayloadType,
-    locale: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ClickTrackingResult>>;
-
-  handleEngagementWithRelationship(
-    data: LeadEngagementRequestOutput,
-    clientInfo: ClientInfo,
-    locale: CountryLanguage,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadEngagementResponseOutput>>;
-
-  trackConsultationBooking(
-    leadId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ leadStatusUpdated: boolean }>>;
-
-  trackSubscriptionConfirmation(
-    leadId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ leadStatusUpdated: boolean }>>;
-
-  createAnonymousLead(
-    clientInfo: ClientInfo,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ leadId: string }>>;
-
-  createTrackingPixelResponse(): Response;
-
-  transitionLeadStatus(
-    leadId: string,
-    action:
-      | "website_visit"
-      | "email_open"
-      | "email_click"
-      | "form_submit"
-      | "signup"
-      | "contact"
-      | "newsletter",
-    logger: EndpointLogger,
-    metadata?: Record<string, string | number | boolean>,
-  ): Promise<
-    ResponseType<{
-      statusChanged: boolean;
-      newStatus: (typeof LeadStatus)[keyof typeof LeadStatus];
-      previousStatus: (typeof LeadStatus)[keyof typeof LeadStatus];
-    }>
-  >;
-
-  generateTrackingPixelUrl(
-    leadId: string | undefined,
-    userId: string | undefined,
-    campaignId: string | undefined,
-    baseUrl: string,
-    locale: CountryLanguage,
-  ): string;
-
-  generateTrackingLinkUrl(
-    originalUrl: string,
-    leadId: string | undefined,
-    userId: string | undefined,
-    campaignId: string | undefined,
-    baseUrl: string,
-    locale: CountryLanguage,
-    source?: string,
-  ): string;
-
-  generateCampaignTrackingUrl(
-    baseUrl: string,
-    leadId: string,
-    campaignId: string,
-    stage: string,
-    locale: CountryLanguage,
-    destinationUrl?: string,
-  ): string;
-
-  isTrackingUrl(url: string, locale: CountryLanguage): boolean;
-
-  ensureFullUrl(url: string, baseUrl: string): string;
-
-  generateEngagementTrackingApiUrl(
-    baseUrl: string,
-    locale: CountryLanguage,
-    params: {
-      id: string;
-      campaignId?: string;
-      stage?: string;
-      source?: string;
-      url: string;
-    },
-  ): string;
-}
-
-/**
- * Lead Tracking Repository
  * Handles all server-side tracking operations
  */
-export class LeadTrackingRepository implements ILeadTrackingRepository {
-  private readonly UUID_REGEX =
+export class LeadTrackingRepository {
+  private static readonly UUID_REGEX =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  private readonly VALID_SOURCES = ["email", "social", "website", "referral"];
+  private static readonly VALID_SOURCES = [
+    "email",
+    "social",
+    "website",
+    "referral",
+  ];
 
   /**
    * Extract client information from request
    */
-  extractClientInfo(request: NextRequest | undefined): ClientInfo {
+  static extractClientInfo(request: NextRequest | undefined): ClientInfo {
     if (!request) {
       return {
         userAgent: "cli",
@@ -254,7 +125,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Validate tracking parameters from URL
    */
-  validateTrackingParams(searchParams: URLSearchParams): {
+  static validateTrackingParams(searchParams: URLSearchParams): {
     leadId?: string;
     campaignId?: string;
     error?: string;
@@ -283,7 +154,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Record engagement event
    * Returns LeadEngagementResponseOutput from definition
    */
-  async recordEngagement(
+  static async recordEngagement(
     data: {
       leadId: string;
       engagementType: EngagementType;
@@ -400,7 +271,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Update email engagement record in the emails table
    */
-  private async updateEmailEngagementRecord(
+  private static async updateEmailEngagementRecord(
     campaignId: string,
     engagementType: EngagementType,
     logger: EndpointLogger,
@@ -468,7 +339,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Track consultation booking
    */
-  async trackConsultationBooking(
+  static async trackConsultationBooking(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ leadStatusUpdated: boolean }>> {
@@ -509,7 +380,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Track subscription confirmation (true conversion)
    */
-  async trackSubscriptionConfirmation(
+  static async trackSubscriptionConfirmation(
     leadId: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ leadStatusUpdated: boolean }>> {
@@ -550,7 +421,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Create anonymous lead for website visitors
    */
-  async createAnonymousLead(
+  static async createAnonymousLead(
     clientInfo: ClientInfo,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -653,7 +524,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Create tracking pixel response (1x1 transparent GIF)
    */
-  createTrackingPixelResponse(): Response {
+  static createTrackingPixelResponse(): Response {
     // 1x1 transparent GIF in base64
     const pixel = Buffer.from(
       "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
@@ -677,7 +548,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Transition lead status based on user actions
    * Implements proper lead lifecycle management
    */
-  async transitionLeadStatus(
+  static async transitionLeadStatus(
     leadId: string,
     action:
       | "website_visit"
@@ -860,7 +731,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Handle engagement with relationship establishment
    * Combines engagement recording with lead-user relationship handling
    */
-  async handleEngagementWithRelationship(
+  static async handleEngagementWithRelationship(
     data: LeadEngagementRequestOutput,
     clientInfo: ClientInfo,
     locale: CountryLanguage,
@@ -1073,7 +944,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
   /**
    * Handle tracking pixel request
    */
-  async handleTrackingPixel(
+  static async handleTrackingPixel(
     leadId: string,
     campaignId: string | undefined,
     clientInfo: ClientInfo,
@@ -1131,12 +1002,12 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * 1. With tracking id: Link tracking lead to current user's lead from JWT
    * 2. Without tracking id (ref only): Link referral code to current user's lead from JWT
    */
-  async handleClickTracking(
+  static async handleClickTracking(
     data: ClickTrackingRequestOutput,
     user: JwtPayloadType,
     locale: string,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ClickTrackingResult>> {
+  ): Promise<ResponseType<ClickTrackingResponseOutput>> {
     try {
       const { id: trackingLeadId, campaignId, url, ref } = data;
       const isLoggedIn = !user.isPublic;
@@ -1148,7 +1019,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
       // Handle referral code linking to current user's lead
       if (ref && currentLeadId) {
         try {
-          const referralResult = await referralRepository.linkReferralToLead(
+          const referralResult = await ReferralRepository.linkReferralToLead(
             currentLeadId,
             ref,
             logger,
@@ -1294,7 +1165,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Generate tracking pixel URL for email opens
    * Migrated from utils.ts
    */
-  generateTrackingPixelUrl(
+  static generateTrackingPixelUrl(
     leadId: string | undefined,
     userId: string | undefined,
     campaignId: string | undefined,
@@ -1323,7 +1194,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Generate tracking link URL for click tracking
    * Migrated from utils.ts
    */
-  generateTrackingLinkUrl(
+  static generateTrackingLinkUrl(
     originalUrl: string,
     leadId: string | undefined,
     userId: string | undefined,
@@ -1364,7 +1235,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Generate campaign tracking URL for email campaigns
    * Migrated from utils.ts
    */
-  generateCampaignTrackingUrl(
+  static generateCampaignTrackingUrl(
     baseUrl: string,
     leadId: string,
     campaignId: string,
@@ -1397,7 +1268,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Check if URL is already a tracking URL
    * Migrated from utils.ts
    */
-  isTrackingUrl(url: string, locale: CountryLanguage): boolean {
+  static isTrackingUrl(url: string, locale: CountryLanguage): boolean {
     if (url.includes("/track?")) {
       return true;
     }
@@ -1417,7 +1288,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Ensure URL has proper base URL
    * Migrated from utils.ts
    */
-  ensureFullUrl(url: string, baseUrl: string): string {
+  static ensureFullUrl(url: string, baseUrl: string): string {
     // Skip mailto, tel, and anchor links
     const mailtoPrefix = "mailto:";
     const telPrefix = "tel:";
@@ -1452,7 +1323,7 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
    * Generate engagement tracking API URL
    * Migrated from utils.ts
    */
-  generateEngagementTrackingApiUrl(
+  static generateEngagementTrackingApiUrl(
     baseUrl: string,
     locale: CountryLanguage,
     params: {
@@ -1481,8 +1352,3 @@ export class LeadTrackingRepository implements ILeadTrackingRepository {
     return apiUrl.toString();
   }
 }
-
-/**
- * Default repository instance
- */
-export const leadTrackingRepository = new LeadTrackingRepository();

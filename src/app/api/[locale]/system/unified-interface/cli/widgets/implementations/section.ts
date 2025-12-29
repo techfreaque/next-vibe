@@ -5,6 +5,7 @@
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import { getTranslator } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
@@ -32,13 +33,14 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer<
     const result: string[] = [];
     const { field } = props;
     const { title: titleKey } = field.ui;
+    const { t } = getTranslator(context);
 
     if (this.isSectionEmpty(value)) {
       return "";
     }
 
     if (titleKey) {
-      const title = context.t(titleKey);
+      const title = t(titleKey);
       result.push("");
       result.push(this.styleText(title.toUpperCase(), "bold", context));
       result.push(this.styleText("─".repeat(50), "dim", context));

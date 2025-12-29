@@ -8,7 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
+  objectOptionalField,
+  requestDataArrayField,
   requestDataField,
+  responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -50,7 +53,7 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      elements: requestDataField(
+      elements: requestDataArrayField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -61,14 +64,40 @@ const { POST } = createEndpoint({
             "app.api.browser.fill-form.form.fields.elements.placeholder",
           columns: 12,
         },
-        z
-          .array(
-            z.object({
-              uid: z.string().describe("The uid of the element to fill out"),
-              value: z.string().describe("Value for the element"),
-            }),
-          )
-          .describe("Elements from snapshot to fill out"),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 2,
+          },
+          { request: "data" },
+          {
+            uid: requestDataField(
+              {
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.TEXT,
+                label:
+                  "app.api.browser.fill-form.form.fields.elements.uid.label",
+                description:
+                  "app.api.browser.fill-form.form.fields.elements.uid.description",
+                columns: 6,
+              },
+              z.string().describe("The uid of the element to fill out"),
+            ),
+            value: requestDataField(
+              {
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.TEXT,
+                label:
+                  "app.api.browser.fill-form.form.fields.elements.value.label",
+                description:
+                  "app.api.browser.fill-form.form.fields.elements.value.description",
+                columns: 6,
+              },
+              z.string().describe("Value for the element"),
+            ),
+          },
+        ),
       ),
 
       // Response fields
@@ -79,31 +108,61 @@ const { POST } = createEndpoint({
         },
         z.boolean().describe("Whether the form fill operation succeeded"),
       ),
-      result: responseField(
+      result: objectOptionalField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.fill-form.response.result",
+          type: WidgetType.CONTAINER,
+          title: "app.api.browser.fill-form.response.result.title",
+          description: "app.api.browser.fill-form.response.result.description",
+          layoutType: LayoutType.STACKED,
         },
-        z
-          .object({
-            filled: z
-              .boolean()
-              .describe("Whether all form elements were filled"),
-            filledCount: z.coerce
-              .number()
-              .describe("Number of elements filled"),
-            elements: z
-              .array(
-                z.object({
-                  uid: z.string(),
-                  filled: z.boolean(),
-                }),
-              )
-              .optional()
-              .describe("Details of filled elements"),
-          })
-          .optional()
-          .describe("Result of the form fill operation"),
+        { response: true },
+        {
+          filled: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.browser.fill-form.response.result.filled",
+            },
+            z.boolean().describe("Whether all form elements were filled"),
+          ),
+          filledCount: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.browser.fill-form.response.result.filledCount",
+            },
+            z.coerce.number().describe("Number of elements filled"),
+          ),
+          elements: responseArrayOptionalField(
+            {
+              type: WidgetType.DATA_TABLE,
+            },
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+                layoutType: LayoutType.GRID,
+                columns: 2,
+              },
+              { response: true },
+              {
+                uid: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.fill-form.response.result.elements.uid",
+                  },
+                  z.string(),
+                ),
+                filled: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.fill-form.response.result.elements.filled",
+                  },
+                  z.boolean(),
+                ),
+              },
+            ),
+          ),
+        },
       ),
       error: responseField(
         {

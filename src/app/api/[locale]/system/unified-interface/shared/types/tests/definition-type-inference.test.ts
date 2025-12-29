@@ -380,7 +380,7 @@ type Test10g_MatchesWithScopedKey =
     infer _TChildren,
     FieldUsageConfig,
     Test10g_ScopedKey,
-    WidgetConfig<string>
+    WidgetConfig<Test10g_ScopedKey>
   >
     ? true
     : false;

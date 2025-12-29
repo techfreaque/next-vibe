@@ -14,7 +14,7 @@ import type {
   UserListResponseOutput,
 } from "./definition";
 import definitions from "./definition";
-import { userListRepository } from "./repository";
+import { UserListRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
@@ -27,7 +27,7 @@ export const { GET, tools } = endpointsHandler({
         typeof definitions.GET.allowedRoles
       >,
     ): Promise<ResponseType<UserListResponseOutput>> => {
-      return await userListRepository.listUsers(
+      return await UserListRepository.listUsers(
         props.data,
         props.user,
         props.logger,

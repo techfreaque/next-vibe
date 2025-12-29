@@ -9,7 +9,6 @@ import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { BaseExecutionContext } from "../shared/endpoints/route/executor";
 import type { JsonValue } from "../shared/utils/error-types";
@@ -203,14 +202,15 @@ export interface MCPExecutionContext<TData = { [key: string]: ParameterValue }>
 /**
  * MCP Tool Metadata extends shared SerializableToolMetadata
  * Uses same field names for consistency
+ * Note: description, category, and tags are already translated strings
  */
 export interface MCPToolMetadata {
   id: string; // Unique identifier
   toolName: string; // Tool name for serialization
   name: string;
-  description: TranslationKey;
-  category?: TranslationKey;
-  tags: readonly (TranslationKey | undefined)[];
+  description: string;
+  category?: string;
+  tags: readonly string[];
   path: string; // API path
   routePath: string;
   definitionPath: string;

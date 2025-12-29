@@ -18,7 +18,7 @@ import { WidgetRenderer } from "../renderers/WidgetRenderer";
  * Renders a list of credit transactions using CREDIT_TRANSACTION_CARD for each item
  * Data-driven - child field definition controls how each transaction is rendered
  */
-export function CreditTransactionListWidget<TKey extends string>({
+export function CreditTransactionListWidget<const TKey extends string>({
   value,
   field,
   context,

@@ -13,7 +13,9 @@ import {
 import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";
+import type { TParams } from "@/i18n/core/static-types";
 
 import type { WidgetData } from "../../../shared/widgets/types";
 import type { WidgetRegistry } from "../core/registry";
@@ -56,10 +58,13 @@ export class ModularCLIResponseRenderer {
   /**
    * Render response data using endpoint definition metadata
    */
-  render<TKey extends string>(
+  render<const TKey extends string>(
     data: DataRecord,
     fields: Array<[string, UnifiedField<TKey>]>,
     locale: CountryLanguage,
+    scopedT: (locale: CountryLanguage) => {
+      t: (key: string, params?: TParams) => TranslatedKeyType;
+    },
   ): string {
     this.options.locale = locale;
     const { t } = simpleT(locale);
@@ -77,6 +82,7 @@ export class ModularCLIResponseRenderer {
       locale,
       isInteractive: false,
       permissions: [],
+      scopedT,
     };
 
     return this.renderFields(data, fields, context);
@@ -85,7 +91,7 @@ export class ModularCLIResponseRenderer {
   /**
    * Render multiple fields
    */
-  private renderFields<TKey extends string>(
+  private renderFields<const TKey extends string>(
     data: DataRecord,
     fields: Array<[string, UnifiedField<TKey>]>,
     context: WidgetRenderContext,
@@ -189,7 +195,7 @@ export class ModularCLIResponseRenderer {
   /**
    * Format field value based on type and configuration
    */
-  private formatFieldValue<TKey extends string>(
+  private formatFieldValue<const TKey extends string>(
     field: UnifiedField<TKey>,
     value: WidgetData,
   ): string {

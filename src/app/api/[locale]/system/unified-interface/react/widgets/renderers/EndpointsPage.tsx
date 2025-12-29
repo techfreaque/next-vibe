@@ -108,7 +108,8 @@ export function EndpointsPage<
     !endpoint.PUT &&
     !endpoint.PATCH;
 
-  // Get the active endpoint definition
+  // Get the active endpoint definition for rendering response data
+  // Priority: GET (for response rendering) > POST/PUT/PATCH (for form) > DELETE
   const activeEndpoint =
     endpoint.GET ??
     endpoint.POST ??
@@ -154,6 +155,48 @@ export function EndpointsPage<
     isLoading = deleteOp.isSubmitting;
   }
 
+  // Build endpoint mutations for context - widgets can call these directly
+  const endpointMutations = {
+    create: endpointState.create
+      ? {
+          submit: async (): Promise<void> => {
+            await endpointState.create?.onSubmit();
+          },
+          isSubmitting: endpointState.create.isSubmitting,
+        }
+      : undefined,
+    update: endpointState.update
+      ? {
+          submit: async (data: Record<string, WidgetData>): Promise<void> => {
+            await endpointState.update?.submit(data);
+            if (endpointState.read) {
+              await endpointState.read.refetch();
+            }
+          },
+          isSubmitting: endpointState.update.isSubmitting,
+        }
+      : undefined,
+    delete: endpointState.delete
+      ? {
+          submit: async (data: Record<string, WidgetData>): Promise<void> => {
+            await endpointState.delete?.submit(data);
+            if (endpointState.read) {
+              await endpointState.read.refetch();
+            }
+          },
+          isSubmitting: endpointState.delete.isSubmitting,
+        }
+      : undefined,
+    read: endpointState.read
+      ? {
+          refetch: async (): Promise<void> => {
+            await endpointState.read?.refetch();
+          },
+          isLoading: endpointState.read.isLoading,
+        }
+      : undefined,
+  };
+
   return (
     <Div className={className}>
       {description && (
@@ -167,15 +210,22 @@ export function EndpointsPage<
           {isGetEndpoint && endpointState.read && (
             <EndpointRenderer
               endpoint={activeEndpoint}
-              form={endpointState.read.form}
-              onSubmit={(): void => {
-                void endpointState.read?.submitForm();
-              }}
+              form={endpointState.create?.form ?? endpointState.read.form}
+              onSubmit={
+                endpointState.create
+                  ? (): void => {
+                      void endpointState.create?.onSubmit();
+                    }
+                  : (): void => {
+                      void endpointState.read?.submitForm();
+                    }
+              }
               locale={locale}
-              isSubmitting={isLoading}
+              isSubmitting={endpointState.create?.isSubmitting ?? isLoading}
               data={responseData}
               submitButton={submitButton}
               response={response}
+              endpointMutations={endpointMutations}
             />
           )}
           {isMutationEndpoint && endpointState.create && (
@@ -190,6 +240,7 @@ export function EndpointsPage<
               data={responseData}
               submitButton={submitButton}
               response={response}
+              endpointMutations={endpointMutations}
             />
           )}
           {isDeleteEndpoint && endpointState.delete && (
@@ -201,6 +252,7 @@ export function EndpointsPage<
               data={responseData}
               submitButton={submitButton}
               response={response}
+              endpointMutations={endpointMutations}
             />
           )}
         </>

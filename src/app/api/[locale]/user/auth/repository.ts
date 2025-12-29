@@ -95,7 +95,6 @@ function createPrivateUser<TRoles extends readonly UserRoleValue[]>(
 const SECRET_KEY: Uint8Array = new TextEncoder().encode(env.JWT_SECRET_KEY);
 
 /**
- * Unified Auth Repository - Static class pattern
  * Contains all authentication business logic consolidated from handlers and core
  * Platform-agnostic - delegates to platform handlers for storage
  */

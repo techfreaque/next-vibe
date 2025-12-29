@@ -14,11 +14,11 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { definitionsRegistry } from "../../unified-interface/shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { Platform } from "../../unified-interface/shared/types/platform";
+import { getTranslatorFromEndpoint } from "../../unified-interface/shared/widgets/utils/field-helpers";
 import type {
   HelpListRequestOutput,
   HelpListResponseOutput,
@@ -62,8 +62,9 @@ class HelpListRepository {
       });
 
       // Format commands for API response
-      const { t } = simpleT(locale);
       const formattedCommands = sortedEndpoints.map((ep) => {
+        const { t } = getTranslatorFromEndpoint(ep)(locale);
+
         const toolName = ep.path.join("_");
         const translatedDescription =
           data.showDescriptions && ep.description

@@ -8,6 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
+  objectOptionalField,
+  requestDataArrayOptionalField,
   requestDataField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -238,7 +240,7 @@ const { POST } = createEndpoint({
         },
         z.coerce.number().min(1).max(10000).default(1000),
       ),
-      tools: requestDataField(
+      tools: requestDataArrayOptionalField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -246,38 +248,93 @@ const { POST } = createEndpoint({
           description: "app.api.agent.chat.aiStream.post.tools.description",
           columns: 12,
         },
-        z
-          .array(
-            z.object({
-              toolId: z.string(),
-              requiresConfirmation: z.boolean().default(false),
-            }),
-          )
-          .nullable()
-          .optional(),
+        objectField(
+          {
+            type: WidgetType.CONTAINER,
+            layoutType: LayoutType.GRID,
+            columns: 2,
+          },
+          { request: "data" },
+          {
+            toolId: requestDataField(
+              {
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.TEXT,
+                label: "app.api.agent.chat.aiStream.post.tools.toolId.label",
+                description:
+                  "app.api.agent.chat.aiStream.post.tools.toolId.description",
+                columns: 6,
+              },
+              z.string(),
+            ),
+            requiresConfirmation: requestDataField(
+              {
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.BOOLEAN,
+                label:
+                  "app.api.agent.chat.aiStream.post.tools.requiresConfirmation.label",
+                description:
+                  "app.api.agent.chat.aiStream.post.tools.requiresConfirmation.description",
+                columns: 6,
+              },
+              z.boolean().default(false),
+            ),
+          },
+        ),
       ),
-      toolConfirmation: requestDataField(
+      toolConfirmation: objectOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.aiStream.post.toolConfirmation.label",
+          type: WidgetType.CONTAINER,
+          title: "app.api.agent.chat.aiStream.post.toolConfirmation.label",
           description:
             "app.api.agent.chat.aiStream.post.toolConfirmation.description",
+          layoutType: LayoutType.GRID,
           columns: 12,
         },
-        z
-          .object({
-            messageId: z.string().uuid(),
-            confirmed: z.boolean(),
-            updatedArgs: z
+        { request: "data" },
+        {
+          messageId: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.UUID,
+              label:
+                "app.api.agent.chat.aiStream.post.toolConfirmation.messageId.label",
+              description:
+                "app.api.agent.chat.aiStream.post.toolConfirmation.messageId.description",
+              columns: 6,
+            },
+            z.string().uuid(),
+          ),
+          confirmed: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label:
+                "app.api.agent.chat.aiStream.post.toolConfirmation.confirmed.label",
+              description:
+                "app.api.agent.chat.aiStream.post.toolConfirmation.confirmed.description",
+              columns: 6,
+            },
+            z.boolean(),
+          ),
+          updatedArgs: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.JSON,
+              label:
+                "app.api.agent.chat.aiStream.post.toolConfirmation.updatedArgs.label",
+              description:
+                "app.api.agent.chat.aiStream.post.toolConfirmation.updatedArgs.description",
+              columns: 12,
+            },
+            z
               .record(
                 z.string(),
                 z.union([z.string(), z.coerce.number(), z.boolean(), z.null()]),
               )
               .optional(),
-          })
-          .nullable()
-          .optional(),
+          ),
+        },
       ),
 
       // === MESSAGE HISTORY (for incognito mode) ===
@@ -316,26 +373,64 @@ const { POST } = createEndpoint({
       ),
 
       // === VOICE MODE ===
-      voiceMode: requestDataField(
+      voiceMode: objectOptionalField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.JSON,
-          label: "app.api.agent.chat.aiStream.post.voiceMode.label",
+          type: WidgetType.CONTAINER,
+          title: "app.api.agent.chat.aiStream.post.voiceMode.label",
           description: "app.api.agent.chat.aiStream.post.voiceMode.description",
-          columns: 6,
-          optional: true,
+          layoutType: LayoutType.GRID,
+          columns: 3,
         },
-        z
-          .object({
-            /** Enable streaming TTS - emit AUDIO_CHUNK events */
-            streamTTS: z.boolean().default(false),
-            /** Use call mode system prompt (short responses) */
-            callMode: z.boolean().default(false),
-            /** TTS voice preference */
-            voice: z.enum(["MALE", "FEMALE"]).default("MALE"),
-          })
-          .nullable()
-          .optional(),
+        { request: "data" },
+        {
+          streamTTS: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label:
+                "app.api.agent.chat.aiStream.post.voiceMode.streamTTS.label",
+              description:
+                "app.api.agent.chat.aiStream.post.voiceMode.streamTTS.description",
+              columns: 4,
+            },
+            z.boolean().default(false),
+          ),
+          callMode: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label:
+                "app.api.agent.chat.aiStream.post.voiceMode.callMode.label",
+              description:
+                "app.api.agent.chat.aiStream.post.voiceMode.callMode.description",
+              columns: 4,
+            },
+            z.boolean().default(false),
+          ),
+          voice: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.SELECT,
+              label: "app.api.agent.chat.aiStream.post.voiceMode.voice.label",
+              description:
+                "app.api.agent.chat.aiStream.post.voiceMode.voice.description",
+              options: [
+                {
+                  value: "MALE",
+                  label:
+                    "app.api.agent.chat.aiStream.post.voiceMode.voice.male",
+                },
+                {
+                  value: "FEMALE",
+                  label:
+                    "app.api.agent.chat.aiStream.post.voiceMode.voice.female",
+                },
+              ],
+              columns: 4,
+            },
+            z.enum(["MALE", "FEMALE"]).default("MALE"),
+          ),
+        },
       ),
 
       // === AUDIO INPUT (for voice-to-voice mode) ===
@@ -483,7 +578,10 @@ const { POST } = createEndpoint({
         character: "default",
         temperature: 0.7,
         maxTokens: 1000,
+        tools: null,
+        toolConfirmation: null,
         messageHistory: [],
+        resumeToken: null,
         voiceMode: null,
         audioInput: { file: null },
       },
@@ -499,7 +597,10 @@ const { POST } = createEndpoint({
         character: "professional",
         temperature: 0.8,
         maxTokens: 1500,
+        tools: null,
+        toolConfirmation: null,
         messageHistory: [],
+        resumeToken: null,
         voiceMode: null,
         audioInput: { file: null },
       },
@@ -515,7 +616,10 @@ const { POST } = createEndpoint({
         character: "default",
         temperature: 0.7,
         maxTokens: 1200,
+        tools: null,
+        toolConfirmation: null,
         messageHistory: [],
+        resumeToken: null,
         voiceMode: null,
         audioInput: { file: null },
       },

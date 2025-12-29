@@ -44,6 +44,7 @@ export const translations: typeof enTranslations = {
     enableTTSAutoplay: "Włącz automatyczne odtwarzanie TTS",
     disableTTSAutoplay: "Wyłącz automatyczne odtwarzanie TTS",
     closeSidebar: "Zamknij pasek boczny",
+    close: "Zamknij",
     showMore: "Pokaż więcej",
     showLess: "Pokaż mniej",
     viewFullThread: "Zobacz pełny wątek",
@@ -256,6 +257,8 @@ export const translations: typeof enTranslations = {
     noFoldersAvailable: "Brak dostępnych folderów",
     stopGeneration: "Zatrzymaj generowanie",
     sendMessage: "Wyślij wiadomość",
+    shareThread: "Udostępnij wątek",
+    manageSharing: "Zarządzaj udostępnianiem",
   },
   chatInterface: {
     chatPrefix: "czat",
@@ -474,6 +477,7 @@ export const translations: typeof enTranslations = {
   },
   selector: {
     loading: "Ładowanie...",
+    noResults: "Nie znaleziono wyników",
     tabs: {
       quick: "Szybki",
       characters: "Persony",
@@ -489,7 +493,8 @@ export const translations: typeof enTranslations = {
       smart: "3-8cr",
       best: "10-20cr",
     },
-    content: {
+    content: "Treść",
+    contentLevels: {
       safe: "Bezpieczny",
       open: "Otwarty",
       unlim: "Bez limitu",
@@ -588,6 +593,10 @@ export const translations: typeof enTranslations = {
     showMore: "Pokaż {{count}} więcej",
     applyOnce: "Zastosuj raz",
     saveChanges: "Zapisz zmiany",
+    useOnce: "Użyj raz",
+    saveAsDefault: "Dodaj do ulubionych",
+    deleteSetup: "Usuń konfigurację",
+    characterSetup: "Konfiguracja persony",
     separator: " • ",
     // UX improvements v21
     mySetups: "Moje konfiguracje",
@@ -615,6 +624,11 @@ export const translations: typeof enTranslations = {
     editCharacterBtn: "Edytuj personę",
     // Character requirements
     requirements: {
+      characterConflict: "Konflikt postaci",
+      max: "Maksimum",
+      min: "Minimum",
+      tooHigh: "Zbyt wysoki",
+      tooLow: "Zbyt niski",
       intelligenceTooLow: "Inteligencja zbyt niska (min: {{min}})",
       intelligenceTooHigh: "Inteligencja zbyt wysoka (max: {{max}})",
       contentTooLow: "Poziom treści zbyt niski (min: {{min}})",
@@ -636,6 +650,7 @@ export const translations: typeof enTranslations = {
     },
   },
   onboarding: {
+    back: "Wstecz",
     // Screen 1: Story
     story: {
       title: "Pomyśl o nas jak o swoim zespole.",
@@ -661,21 +676,16 @@ export const translations: typeof enTranslations = {
       tagline: "Odważny & bezpośredni",
       description: "Jak trener, który popycha cię do bycia najlepszym.",
     },
-    // Screen 3: Specialists peek
+    // Screen 3: Specialists - add to team
     specialists: {
-      title: "Twój zespół ma też specjalistów",
+      title: "Dodaj specjalistów do określonych zadań",
+      subtitle:
+        "Każdy ekspert jest zoptymalizowany dla swojej specjalności. Dodaj tyle, ile chcesz.",
       chosen: "{{name}} jest gotowy",
-      intro: "Jest gotowa do rozmowy. Ale najpierw...",
-      technical: "Techniczny",
-      technicalDesc: "Kod i debugowanie",
-      creative: "Kreatywny",
-      creativeDesc: "Pisanie i pomysły",
-      teacher: "Nauczyciel",
-      teacherDesc: "Naucz się czegokolwiek",
-      challenger: "Challenger",
-      challengerDesc: "Przetestuj swoje pomysły",
+      add: "Dodaj",
+      added: "Dodano",
       switchTip:
-        "Przełączaj się w dowolnym momencie z selektora. Ustawienia też możesz dostosować później.",
+        "Przełączaj się między członkami zespołu w dowolnym momencie. Możesz dostosować lub dodać więcej później.",
       start: "Rozpocznij czat",
       browseAll: "Przeglądaj wszystkie postacie",
     },
@@ -1001,6 +1011,20 @@ export const translations: typeof enTranslations = {
     education: "Edukacja",
     controversial: "Kontrowersyjne",
     lifestyle: "Styl Życia",
+    // Model capabilities/utilities
+    reasoning: "Zaawansowane Rozumowanie",
+    roleplay: "Odgrywanie Ról",
+    roleplayDark: "Ciemne Odgrywanie Ról",
+    adultImplied: "Treści Dorosłe/Sugerowane",
+    adultExplicit: "Treści Dorosłe/Eksplicytne",
+    violence: "Przemoc",
+    harmful: "Potencjalnie Szkodliwe Treści",
+    illegalInfo: "Nielegalne Informacje",
+    medicalAdvice: "Porady Medyczne",
+    offensiveLanguage: "Obraźliwy Język",
+    politicalLeft: "Lewe Poglądy Polityczne",
+    politicalRight: "Prawe Poglądy Polityczne",
+    conspiracy: "Teorie Spiskowe",
   },
   models: {
     descriptions: {
@@ -1057,6 +1081,12 @@ export const translations: typeof enTranslations = {
         "GPT 5.2 - model najnowszej generacji z ulepszoną wydajnością i efektywnością",
       gpt52_chat:
         "GPT 5.2 Chat - wariant konwersacyjny zoptymalizowany pod kątem dialogu i interakcji",
+      veniceUncensored:
+        "Venice Uncensored - Niecenzurowany model AI do nieograniczonych rozmów",
+      dolphinLlama3_70B:
+        "Dolphin Llama 3 70B - Niecenzurowany duży model językowy oparty na Llama 3",
+      dolphin3_0_r1_mistral_24b:
+        "Dolphin 3.0 R1 Mistral 24B - Niecenzurowany duży model językowy oparty na Mistral",
     },
   },
   tones: {
@@ -1241,6 +1271,8 @@ export const translations: typeof enTranslations = {
     newSubfolder: "Nowy podfolder",
     deleteFolder: "Usuń folder",
     managePermissions: "Zarządzaj uprawnieniami",
+    manageSharing: "Zarządzaj udostępnianiem",
+    shareThread: "Udostępnij wątek",
     deleteDialog: {
       title: "Usuń folder",
       description: 'Czy na pewno chcesz usunąć "{{folderName}}"?',
@@ -1475,6 +1507,58 @@ export const translations: typeof enTranslations = {
       title: "Usuń wątek",
       description:
         'Czy na pewno chcesz usunąć "{{title}}"? Ta akcja jest nieodwracalna i wszystkie wiadomości w tym wątku zostaną trwale usunięte.',
+    },
+  },
+  shareDialog: {
+    title: "Udostępnij wątek",
+    description: "Twórz i zarządzaj linkami udostępniającymi dla tego wątku",
+    createLink: "Utwórz link udostępniający",
+    linkCreated: "Link udostępniający utworzony pomyślnie!",
+    linkCopied: "Link skopiowany do schowka!",
+    copyLink: "Kopiuj link",
+    shareViaEmail: "Udostępnij przez e-mail",
+    revokeLink: "Unieważnij",
+    revoke: "Unieważnij",
+    linkRevoked: "Link udostępniający unieważniony",
+    revoked: "Unieważniony",
+    noLinksYet:
+      "Brak linków udostępniających. Utwórz jeden, aby zacząć udostępniać.",
+    activeLinks: "Aktywne linki udostępniające",
+    existingLinks: "Istniejące linki",
+    linkSettings: "Ustawienia linku",
+    newLinkSettings: "Ustawienia nowego linku",
+    linkLabel: "Etykieta linku (opcjonalnie)",
+    linkLabelPlaceholder: "np. Udostępnij zespołowi",
+    allowPosting: "Zezwalaj na publikowanie",
+    allowPostingDescription:
+      "Odbiorcy mogą odpowiadać i wchodzić w interakcje w wątku",
+    requireAuth: "Wymagaj logowania",
+    requireAuthDescription:
+      "Tylko uwierzytelnieni użytkownicy mogą uzyskać dostęp do tego linku",
+    viewOnly: "Tylko podgląd",
+    accessCount: "{{count}} dostęp",
+    accessCount_other: "{{count}} dostępów",
+    createdAt: "Utworzono {{date}}",
+    lastAccessed: "Ostatni dostęp {{date}}",
+    neverAccessed: "Nigdy nie otwierano",
+    emailSubject: "Sprawdź ten wątek: {{title}}",
+    emailBody:
+      "Pomyślałem, że ta rozmowa może Cię zainteresować: {{url}}\n\nWątek: {{title}}",
+    emailPlaceholder: "Wprowadź adresy e-mail (rozdzielone przecinkami)",
+    sendEmail: "E-mail",
+    emailSent: "E-mail wysłany pomyślnie!",
+    create: "Utwórz",
+    creating: "Tworzenie...",
+    copied: "Skopiowano!",
+    close: "Zamknij",
+    shareThread: "Udostępnij wątek",
+  },
+  shared: {
+    error: {
+      title: "Błąd linku udostępniającego",
+      userError: "Nie można zweryfikować sesji. Spróbuj ponownie.",
+      invalidToken:
+        "Ten link udostępniający jest nieprawidłowy lub został unieważniony. Skontaktuj się z osobą, która udostępniła Ci ten link.",
     },
   },
   welcomeTour: {

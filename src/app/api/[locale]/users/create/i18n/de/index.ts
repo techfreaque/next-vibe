@@ -153,6 +153,12 @@ export const translations = {
       },
       userRoles: {
         content: "Benutzerrollen",
+        id: {
+          content: "Rollen-ID",
+        },
+        role: {
+          content: "Rolle",
+        },
       },
       createdAt: {
         content: "Erstellt am",

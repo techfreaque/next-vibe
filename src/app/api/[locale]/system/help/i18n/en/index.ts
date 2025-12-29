@@ -25,6 +25,10 @@ export const translations = {
       started: "Interactive mode started successfully",
     },
     errors: {
+      cliOnly: {
+        title: "CLI Only",
+        description: "Interactive mode is only available from CLI",
+      },
       unauthorized: {
         title: "Unauthorized",
         description: "Authentication required for interactive mode",

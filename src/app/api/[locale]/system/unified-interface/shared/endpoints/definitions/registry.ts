@@ -2,13 +2,13 @@ import { endpoints } from "@/app/api/[locale]/system/generated/endpoints";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint";
 import { Methods } from "../../types/enums";
 import type { Platform } from "../../types/platform";
 import { endpointToToolName } from "../../utils/path";
+import { getTranslatorFromEndpoint } from "../../widgets/utils/field-helpers";
 import { permissionsRegistry } from "../permissions/registry";
 
 type EndpointNode =
@@ -169,9 +169,9 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     endpoints: CreateApiEndpointAny[],
     locale: CountryLanguage,
   ): SerializableToolMetadata[] {
-    const { t } = simpleT(locale);
-
     return endpoints.map((definition) => {
+      const { t } = getTranslatorFromEndpoint(definition)(locale);
+
       const method = definition.method;
       const toolName = endpointToToolName(definition);
 

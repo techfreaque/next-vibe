@@ -15,7 +15,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { campaignStarterConfigRepository } from "./repository";
+import { CampaignStarterConfigRepository } from "./repository";
 
 /**
  * Export handlers using endpointsHandler
@@ -25,7 +25,7 @@ export const { GET, PUT, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
     handler: async ({ user, logger }) => {
-      const result = await campaignStarterConfigRepository.getConfig(
+      const result = await CampaignStarterConfigRepository.getConfig(
         user,
         logger,
       );
@@ -44,7 +44,7 @@ export const { GET, PUT, tools } = endpointsHandler({
   [Methods.PUT]: {
     email: undefined,
     handler: async ({ data, user, locale, logger }) => {
-      const result = await campaignStarterConfigRepository.updateConfig(
+      const result = await CampaignStarterConfigRepository.updateConfig(
         data,
         user,
         locale,

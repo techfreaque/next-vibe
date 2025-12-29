@@ -184,7 +184,7 @@ function extractChartData<TTranslationKey extends string>(
  * - showGrid: Whether to show grid lines (default: true)
  * - animate: Whether to animate (default: true)
  */
-export function ChartWidget<TKey extends string>({
+export function ChartWidget<const TKey extends string>({
   value,
   field,
   context,

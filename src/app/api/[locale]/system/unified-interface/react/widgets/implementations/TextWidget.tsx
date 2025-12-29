@@ -40,7 +40,7 @@ function formatDate(value: string | Date, locale: string): string {
 /**
  * Displays text data with optional label, formatting, and link support.
  */
-export function TextWidget<TKey extends string>({
+export function TextWidget<const TKey extends string>({
   value,
   field,
   context,

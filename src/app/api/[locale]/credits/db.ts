@@ -24,7 +24,7 @@ import type { z } from "zod";
 
 import { leads } from "../leads/db";
 import { users } from "../user/db";
-import { CreditTransactionTypeDB } from "./enum";
+import { CreditPackTypeDB, CreditTransactionTypeDB } from "./enum";
 
 /**
  * Custom numeric type that returns numbers instead of strings
@@ -241,9 +241,7 @@ export const creditPacks = pgTable(
     // Pack details
     originalAmount: numericNumber("original_amount").notNull(), // Initial amount purchased
     remaining: numericNumber("remaining").notNull(), // Current remaining credits
-    type: text("type", {
-      enum: ["subscription", "permanent", "bonus", "earned"],
-    }).notNull(),
+    type: text("type", { enum: CreditPackTypeDB }).notNull(),
 
     // Expiration (NULL = never expires)
     expiresAt: timestamp("expires_at"),

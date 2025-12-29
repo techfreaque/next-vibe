@@ -22,40 +22,11 @@ import { users } from "@/app/api/[locale]/user/db";
 import { SortOrder, UserSortField, UserStatusFilter } from "../enum";
 import type { UserListRequestOutput } from "./definition";
 
-export interface UserListRepository {
-  listUsers(
-    data: UserListRequestOutput,
-    user: JwtPrivatePayloadType,
-    logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      response: {
-        users: Array<{
-          id: string;
-          email: string;
-          privateName: string;
-          publicName: string;
-          isActive: boolean;
-          emailVerified: boolean;
-          createdAt: Date;
-          updatedAt: Date;
-        }>;
-      };
-      paginationInfo: {
-        totalCount: number;
-        pageCount: number;
-        page: number;
-        limit: number;
-      };
-    }>
-  >;
-}
-
-export class UserListRepositoryImpl implements UserListRepository {
+export class UserListRepository {
   /**
    * Convert status filter to database conditions
    */
-  private convertStatusFilter(status: string | undefined): SQL | null {
+  private static convertStatusFilter(status: string | undefined): SQL | null {
     if (!status || status === UserStatusFilter.ALL) {
       return null;
     }
@@ -78,7 +49,7 @@ export class UserListRepositoryImpl implements UserListRepository {
    * Convert role filter to database conditions
    * Note: Role filtering is disabled due to complex enum type mapping
    */
-  private convertRoleFilter(): SQL | null {
+  private static convertRoleFilter(): SQL | null {
     // Role filtering disabled for now due to enum type complexity
     // TODO: Implement proper role filtering with correct type mapping
     return null;
@@ -87,7 +58,7 @@ export class UserListRepositoryImpl implements UserListRepository {
   /**
    * Get sort column based on sort field
    */
-  private getSortColumn(
+  private static getSortColumn(
     field: string,
   ):
     | typeof users.createdAt
@@ -111,7 +82,7 @@ export class UserListRepositoryImpl implements UserListRepository {
     }
   }
 
-  async listUsers(
+  static async listUsers(
     data: UserListRequestOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
@@ -168,7 +139,7 @@ export class UserListRepositoryImpl implements UserListRepository {
       const conditions: SQL[] = [];
 
       // Status filter
-      const statusCondition = this.convertStatusFilter(
+      const statusCondition = UserListRepository.convertStatusFilter(
         requestData.searchFilters?.status?.[0],
       );
       if (statusCondition) {
@@ -176,7 +147,7 @@ export class UserListRepositoryImpl implements UserListRepository {
       }
 
       // Role filter
-      const roleCondition = this.convertRoleFilter();
+      const roleCondition = UserListRepository.convertRoleFilter();
       if (roleCondition) {
         conditions.push(roleCondition);
       }
@@ -201,7 +172,7 @@ export class UserListRepositoryImpl implements UserListRepository {
       const sortField =
         requestData.sortingOptions?.sortBy || UserSortField.CREATED_AT;
       const sortOrder = requestData.sortingOptions?.sortOrder || SortOrder.DESC;
-      const sortColumn = this.getSortColumn(sortField);
+      const sortColumn = UserListRepository.getSortColumn(sortField);
 
       // Execute queries
       const [usersList, [{ total }]] = await Promise.all([
@@ -254,5 +225,3 @@ export class UserListRepositoryImpl implements UserListRepository {
     }
   }
 }
-
-export const userListRepository = new UserListRepositoryImpl();

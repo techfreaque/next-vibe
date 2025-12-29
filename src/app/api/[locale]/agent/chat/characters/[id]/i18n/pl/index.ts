@@ -156,4 +156,34 @@ export const translations: typeof enTranslations = {
         "Twoja niestandardowa postać została pomyślnie zaktualizowana",
     },
   },
+  delete: {
+    title: "Usuń postać",
+    description: "Usuń niestandardową postać",
+    container: {
+      title: "Usuń postać",
+      description: "Trwale usuń tę niestandardową postać",
+    },
+    id: {
+      label: "ID postaci",
+      description: "Unikalny identyfikator postaci do usunięcia",
+    },
+    errors: {
+      unauthorized: {
+        title: "Brak autoryzacji",
+        description: "Nie masz uprawnień do usunięcia tej postaci",
+      },
+      notFound: {
+        title: "Postać nie znaleziona",
+        description: "Postać, którą próbujesz usunąć, nie istnieje",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Wystąpił błąd podczas usuwania postaci",
+      },
+    },
+    success: {
+      title: "Postać usunięta",
+      description: "Postać została pomyślnie usunięta",
+    },
+  },
 };

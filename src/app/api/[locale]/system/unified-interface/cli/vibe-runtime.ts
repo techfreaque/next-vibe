@@ -293,7 +293,11 @@ program
           options.locale,
           {
             success: false,
-            error: handled.message,
+            error:
+              "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+            errorParams: {
+              error: handled.message,
+            },
           },
         );
         process.exit(handled.exitCode);

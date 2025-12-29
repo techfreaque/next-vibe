@@ -1,5 +1,5 @@
 import { translations as enTranslations } from "../en";
 
-export const translations = {
+export const translations: typeof enTranslations = {
   ...enTranslations,
 };

@@ -256,10 +256,10 @@ function FavoriteRow({
 
       {/* Info - Full Width */}
       <Div className="flex-1 min-w-0">
-        <Div className="flex items-center gap-2 pr-2">
+        <Div className="flex items-center gap-2 pr-20">
           <Div
             className={cn(
-              "font-medium text-base flex-1",
+              "font-medium text-base",
               favorite.isActive && "text-primary",
             )}
           >
@@ -318,35 +318,6 @@ export function FavoritesBar({
   className,
 }: FavoritesBarProps): JSX.Element {
   const { t } = simpleT(locale);
-
-  // Empty state
-  if (favorites.length === 0) {
-    return (
-      <Div className={cn("flex flex-col gap-2", className)}>
-        <Div className="flex flex-col items-center justify-center py-10 text-center">
-          <Div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-            <Zap className="h-7 w-7 text-primary" />
-          </Div>
-          <Span className="text-base font-medium mb-1">
-            {t("app.chat.selector.noSetupsTitle")}
-          </Span>
-          <Span className="text-sm text-muted-foreground mb-5 max-w-70">
-            {t("app.chat.selector.noSetupsDescription")}
-          </Span>
-          <Button
-            type="button"
-            variant="default"
-            size="default"
-            onClick={onAddClick}
-            className="gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            {t("app.chat.selector.getStarted")}
-          </Button>
-        </Div>
-      </Div>
-    );
-  }
 
   return (
     <Div className={cn("flex flex-col gap-3", className)}>

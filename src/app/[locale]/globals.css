@@ -6,6 +6,10 @@
 @custom-variant light (&:where(html:not(.dark), html:not(.dark) *));
 
 @theme {
+  /* Container query breakpoints */
+  --container-2xl: 48rem;
+  --container-3xl: 56rem;
+
   /* Tailwind v4 uses color-mix() automatically for opacity modifiers */
   /* IMPORTANT: Expose final color values directly (no nested hsl(var(...)))
      so production minifiers don't mangle color-mix() with custom properties. */

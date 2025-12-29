@@ -513,30 +513,10 @@ Use this when:
 });
 
 /**
- * Export search service for use in other parts of the application
- */
-export { getBraveSearchService };
-
-/**
- * Brave Search Repository Interface
- */
-export interface IBraveSearchRepository {
-  search(
-    query: string,
-    options: {
-      maxResults?: number;
-      includeNews?: boolean;
-      freshness?: "past_day" | "past_week" | "past_month" | "past_year";
-    },
-    logger: EndpointLogger,
-  ): Promise<ResponseType<BraveSearchGetResponseOutput>>;
-}
-
-/**
  * Brave Search Repository Implementation
  */
-class BraveSearchRepository implements IBraveSearchRepository {
-  async search(
+export class BraveSearchRepository {
+  static async search(
     query: string,
     options: {
       maxResults?: number;
@@ -604,5 +584,3 @@ class BraveSearchRepository implements IBraveSearchRepository {
     }
   }
 }
-
-export const braveSearchRepository = new BraveSearchRepository();

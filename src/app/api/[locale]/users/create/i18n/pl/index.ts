@@ -1,4 +1,6 @@
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   category: "Użytkownicy",
   tags: {
     create: "Utwórz",
@@ -98,14 +100,6 @@ export const translations = {
       leadId: {
         content: "Powiązane ID leada",
       },
-      country: {
-        label: "Kraj",
-        description: "Kraj zamieszkania użytkownika",
-      },
-      language: {
-        label: "Język",
-        description: "Preferowany język użytkownika",
-      },
       email: {
         content: "Adres e-mail",
       },
@@ -153,6 +147,12 @@ export const translations = {
       },
       userRoles: {
         content: "Role użytkownika",
+        id: {
+          content: "ID roli",
+        },
+        role: {
+          content: "Rola",
+        },
       },
       createdAt: {
         content: "Utworzono",

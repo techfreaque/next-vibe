@@ -30,38 +30,13 @@ import {
 import type { CampaignStarterConfigType as CampaignStarterConfigWithCronType } from "./definition";
 
 /**
- * Campaign Starter Configuration Repository Interface
- */
-export interface ICampaignStarterConfigRepository {
-  getConfig(
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CampaignStarterConfigWithCronType>>;
-
-  updateConfig(
-    data: CampaignStarterConfigWithCronType,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CampaignStarterConfigWithCronType>>;
-
-  ensureConfigExists(
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CampaignStarterConfigWithCronType>>;
-}
-
-/**
  * Campaign Starter Configuration Repository Implementation
  */
-class CampaignStarterConfigRepositoryImpl
-  implements ICampaignStarterConfigRepository
-{
+export class CampaignStarterConfigRepository {
   /**
    * Get current environment
    */
-  private getCurrentEnvironment(): Environment {
+  private static getCurrentEnvironment(): Environment {
     return env.NODE_ENV === Environment.PRODUCTION
       ? Environment.PRODUCTION
       : Environment.DEVELOPMENT;
@@ -70,7 +45,7 @@ class CampaignStarterConfigRepositoryImpl
   /**
    * Validate and get priority value from database string
    */
-  private isValidPriority(
+  private static isValidPriority(
     value: string,
   ): value is (typeof CronTaskPriority)[keyof typeof CronTaskPriority] {
     return (
@@ -85,7 +60,7 @@ class CampaignStarterConfigRepositoryImpl
   /**
    * Get cron task settings for campaign starter
    */
-  private async getCronTaskSettings(): Promise<CronSettings> {
+  private static async getCronTaskSettings(): Promise<CronSettings> {
     const [cronTask] = await db
       .select()
       .from(cronTasks)
@@ -103,7 +78,8 @@ class CampaignStarterConfigRepositoryImpl
     // The database constraint ensures this, but TypeScript doesn't know that
     const priorityValue = cronTask.priority;
     const priority =
-      priorityValue && this.isValidPriority(priorityValue)
+      priorityValue &&
+      CampaignStarterConfigRepository.isValidPriority(priorityValue)
         ? priorityValue
         : defaults.priority;
 
@@ -121,11 +97,12 @@ class CampaignStarterConfigRepositoryImpl
    * Convert database config to API format
    * Combines campaign config with cron settings
    */
-  private async formatConfigResponse(
+  private static async formatConfigResponse(
     dbConfig: CampaignStarterConfig,
   ): Promise<CampaignStarterConfigWithCronType> {
     // Get cron task settings
-    const cronTask = await this.getCronTaskSettings();
+    const cronTask =
+      await CampaignStarterConfigRepository.getCronTaskSettings();
 
     return {
       // Campaign-specific settings
@@ -148,7 +125,7 @@ class CampaignStarterConfigRepositoryImpl
   /**
    * Save cron task settings for campaign starter
    */
-  private async saveCronTaskSettings(
+  private static async saveCronTaskSettings(
     cronSettings: CronSettings,
   ): Promise<void> {
     const [existingCronTask] = await db
@@ -190,7 +167,7 @@ class CampaignStarterConfigRepositoryImpl
   /**
    * Convert API config to database format (campaign settings only)
    */
-  private formatConfigForDb(
+  private static formatConfigForDb(
     config: CampaignStarterConfigWithCronType,
     environment: string,
   ): CampaignStarterConfig {
@@ -211,12 +188,13 @@ class CampaignStarterConfigRepositoryImpl
   /**
    * Get campaign starter configuration
    */
-  async getConfig(
+  static async getConfig(
     user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigWithCronType>> {
     try {
-      const environment = this.getCurrentEnvironment();
+      const environment =
+        CampaignStarterConfigRepository.getCurrentEnvironment();
 
       logger.info("Fetching campaign starter config", {
         environment,
@@ -231,7 +209,10 @@ class CampaignStarterConfigRepositoryImpl
         .limit(1);
 
       if (existingConfig) {
-        const config = await this.formatConfigResponse(existingConfig);
+        const config =
+          await CampaignStarterConfigRepository.formatConfigResponse(
+            existingConfig,
+          );
         logger.debug("Found existing config in database", { environment });
         return success(config);
       }
@@ -253,14 +234,15 @@ class CampaignStarterConfigRepositoryImpl
    * Update campaign starter configuration
    * Handles both campaign settings and cron settings
    */
-  async updateConfig(
+  static async updateConfig(
     data: CampaignStarterConfigWithCronType,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigWithCronType>> {
     try {
-      const environment = this.getCurrentEnvironment();
+      const environment =
+        CampaignStarterConfigRepository.getCurrentEnvironment();
 
       logger.info("Updating campaign starter config", {
         environment,
@@ -271,7 +253,10 @@ class CampaignStarterConfigRepositoryImpl
       });
 
       // Save campaign settings
-      const dbConfig = this.formatConfigForDb(data, environment);
+      const dbConfig = CampaignStarterConfigRepository.formatConfigForDb(
+        data,
+        environment,
+      );
 
       // Check if config already exists
       const [existingConfig] = await db
@@ -308,7 +293,7 @@ class CampaignStarterConfigRepositoryImpl
         retries: data.retries ?? defaults.retries,
         retryDelay: data.retryDelay ?? defaults.retryDelay,
       };
-      await this.saveCronTaskSettings(cronSettings);
+      await CampaignStarterConfigRepository.saveCronTaskSettings(cronSettings);
 
       return success(data);
     } catch (error) {
@@ -324,13 +309,14 @@ class CampaignStarterConfigRepositoryImpl
    * Ensure configuration exists in database (for cron job)
    * Creates default configuration if it doesn't exist
    */
-  async ensureConfigExists(
+  static async ensureConfigExists(
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigWithCronType>> {
     try {
-      const environment = this.getCurrentEnvironment();
+      const environment =
+        CampaignStarterConfigRepository.getCurrentEnvironment();
 
       logger.info("Ensuring config exists", {
         environment,
@@ -346,13 +332,16 @@ class CampaignStarterConfigRepositoryImpl
         .limit(1);
 
       if (existingConfig) {
-        const config = await this.formatConfigResponse(existingConfig);
+        const config =
+          await CampaignStarterConfigRepository.formatConfigResponse(
+            existingConfig,
+          );
         return success(config);
       }
 
       // Config doesn't exist, create it with default values
       const defaultConfigWithCron = getDefaultConfigWithCron();
-      const dbConfig = this.formatConfigForDb(
+      const dbConfig = CampaignStarterConfigRepository.formatConfigForDb(
         defaultConfigWithCron,
         environment,
       );
@@ -374,9 +363,3 @@ class CampaignStarterConfigRepositoryImpl
     }
   }
 }
-
-/**
- * Singleton instance
- */
-export const campaignStarterConfigRepository =
-  new CampaignStarterConfigRepositoryImpl();

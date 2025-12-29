@@ -71,5 +71,13 @@ export const translations = {
   errors: {
     invalid_request_data: "Invalid request data",
     invalid_url_parameters: "Invalid URL parameters",
+    validationFailed: {
+      title: "Validation Failed",
+      description: "The request data failed validation",
+    },
+    serverError: {
+      title: "Server Error",
+      description: "An internal server error occurred",
+    },
   },
 };

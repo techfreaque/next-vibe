@@ -12,7 +12,7 @@ import { MetricCardWidget } from "./MetricCardWidget";
 /**
  * Displays a grid of metric cards for statistical overviews.
  */
-export function StatsGridWidget<TKey extends string>({
+export function StatsGridWidget<const TKey extends string>({
   value,
   context,
   className,

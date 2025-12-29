@@ -197,4 +197,4 @@ export const translations: typeof enTranslations = {
       description: "Folder utworzony pomyślnie",
     },
   },
-} as const;
+};

@@ -1,7 +1,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { referralRepository } from "../repository";
+import { ReferralRepository } from "../repository";
 import definitions from "./definition";
 
 export const { POST, tools } = endpointsHandler({
@@ -9,7 +9,7 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: async ({ data, user, logger }) => {
-      return await referralRepository.linkReferralToLead(
+      return await ReferralRepository.linkReferralToLead(
         user.leadId,
         data.referralCode,
         logger,

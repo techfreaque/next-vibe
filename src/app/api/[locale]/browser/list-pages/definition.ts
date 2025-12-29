@@ -8,6 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
+  objectOptionalField,
+  responseArrayField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -56,31 +58,70 @@ const { POST } = createEndpoint({
         },
         z.boolean().describe("Whether the pages listing operation succeeded"),
       ),
-      result: responseField(
+      result: objectOptionalField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.browser.list-pages.response.result",
+          type: WidgetType.CONTAINER,
+          title: "app.api.browser.list-pages.response.result.title",
+          description: "app.api.browser.list-pages.response.result.description",
+          layoutType: LayoutType.STACKED,
         },
-        z
-          .object({
-            pages: z
-              .array(
-                z.object({
-                  idx: z.coerce.number().describe("Page index"),
-                  title: z.string().describe("Page title"),
-                  url: z.string().describe("Page URL"),
-                  active: z
-                    .boolean()
-                    .describe("Whether this is the active page"),
-                }),
-              )
-              .describe("List of open pages"),
-            totalCount: z.coerce
-              .number()
-              .describe("Total number of open pages"),
-          })
-          .optional()
-          .describe("Result of pages listing"),
+        { response: true },
+        {
+          pages: responseArrayField(
+            {
+              type: WidgetType.DATA_TABLE,
+            },
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+                layoutType: LayoutType.GRID,
+                columns: 12,
+              },
+              { response: true },
+              {
+                idx: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-pages.response.result.pages.idx",
+                  },
+                  z.coerce.number().describe("Page index"),
+                ),
+                title: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-pages.response.result.pages.title",
+                  },
+                  z.string().describe("Page title"),
+                ),
+                url: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-pages.response.result.pages.url",
+                  },
+                  z.string().describe("Page URL"),
+                ),
+                active: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.browser.list-pages.response.result.pages.active",
+                  },
+                  z.boolean().describe("Whether this is the active page"),
+                ),
+              },
+            ),
+          ),
+          totalCount: responseField(
+            {
+              type: WidgetType.TEXT,
+              content: "app.api.browser.list-pages.response.result.totalCount",
+            },
+            z.coerce.number().describe("Total number of open pages"),
+          ),
+        },
       ),
       error: responseField(
         {

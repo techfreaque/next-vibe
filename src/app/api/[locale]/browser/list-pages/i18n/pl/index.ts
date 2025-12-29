@@ -10,7 +10,17 @@ export const translations: typeof enTranslations = {
   },
   response: {
     success: "Operacja listowania stron pomyślna",
-    result: "Wynik listowania stron",
+    result: {
+      title: "Wynik",
+      description: "Wynik listowania stron",
+      pages: {
+        idx: "Indeks",
+        title: "Tytuł",
+        url: "URL",
+        active: "Aktywny",
+      },
+      totalCount: "Łączna liczba",
+    },
     error: "Komunikat błędu",
     executionId: "ID wykonania do śledzenia",
   },

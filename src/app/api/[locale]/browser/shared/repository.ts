@@ -166,11 +166,11 @@ export function executeFillForm(
     result?: {
       filled: boolean;
       filledCount: number;
-      elements?: Array<{
+      elements: Array<{
         uid: string;
         filled: boolean;
-      }>;
-    };
+      }> | null;
+    } | null;
     error?: string;
     executionId?: string;
   }>

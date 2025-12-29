@@ -143,6 +143,12 @@ export const translations = {
       },
       userRoles: {
         content: "User Roles",
+        id: {
+          content: "Role ID",
+        },
+        role: {
+          content: "Role",
+        },
       },
       createdAt: {
         content: "Created At",

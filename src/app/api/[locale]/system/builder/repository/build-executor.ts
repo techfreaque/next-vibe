@@ -14,6 +14,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TFunction } from "@/i18n/core/static-types";
 
 import type {
   BuilderRequest,
@@ -136,7 +137,7 @@ export class BuildExecutor implements IBuildExecutor {
           output.push(outputFormatter.formatError(error));
         }
         return fail({
-          message: t("app.api.system.builder.errors.invalidBuildConfig"),
+          message: "app.api.system.builder.errors.invalidBuildConfig",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -407,7 +408,7 @@ export class BuildExecutor implements IBuildExecutor {
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,
-    t: (key: string, params?: Record<string, string | number>) => string,
+    t: TFunction,
     dryRun?: boolean,
     verbose?: boolean,
     profile: BuildProfile = "development",
@@ -520,7 +521,7 @@ export class BuildExecutor implements IBuildExecutor {
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,
-    t: (key: string, params?: Record<string, string | number>) => string,
+    t: TFunction,
     dryRun?: boolean,
     verbose?: boolean,
     profile: BuildProfile = "development",

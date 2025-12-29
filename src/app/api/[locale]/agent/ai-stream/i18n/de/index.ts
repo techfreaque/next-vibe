@@ -114,10 +114,45 @@ export const translations: typeof enTranslations = {
       label: "KI-Tools",
       description:
         "Liste der KI-Tool-IDs, die für diese Konversation aktiviert werden sollen",
+      toolId: {
+        label: "Tool-ID",
+        description: "Eindeutige Kennung für das KI-Tool",
+      },
+      requiresConfirmation: {
+        label: "Benötigt Bestätigung",
+        description:
+          "Ob dieses Tool eine Benutzerbestätigung vor der Ausführung benötigt",
+      },
     },
     resumeToken: {
       label: "Wiederaufnahme-Token",
       description: "Token zum Fortsetzen unterbrochener Streams",
+    },
+    voiceMode: {
+      label: "Sprachmodus",
+      description: "Konfiguration für sprachbasierte Interaktion",
+      streamTTS: {
+        label: "Stream-TTS",
+        description: "Streaming-Text-zu-Sprache für Antworten aktivieren",
+      },
+      callMode: {
+        label: "Anruf-Modus",
+        description: "Echtzeit-Sprachanruf-Modus aktivieren",
+      },
+      voice: {
+        label: "Stimme",
+        description: "Stimmtyp für Text-zu-Sprache auswählen",
+        male: "Männliche Stimme",
+        female: "Weibliche Stimme",
+      },
+    },
+    audioInput: {
+      title: "Audio-Eingabe",
+      description: "Audio-Datei für Voice-to-Voice-Modus hochladen",
+      file: {
+        label: "Audio-Datei",
+        description: "Audio-Datei zum Transkribieren und Verarbeiten",
+      },
     },
     enabledToolIds: {
       label: "Aktivierte Tool-IDs",
@@ -128,6 +163,18 @@ export const translations: typeof enTranslations = {
       label: "Tool-Bestätigung",
       description: "Tool-Bestätigungsantwort vom Benutzer",
       success: "Tool-Bestätigung erfolgreich verarbeitet",
+      messageId: {
+        label: "Nachrichten-ID",
+        description: "ID der Nachricht, die den Tool-Aufruf enthält",
+      },
+      confirmed: {
+        label: "Bestätigt",
+        description: "Ob der Benutzer die Tool-Ausführung bestätigt hat",
+      },
+      updatedArgs: {
+        label: "Aktualisierte Argumente",
+        description: "Optional aktualisierte Argumente für den Tool-Aufruf",
+      },
       errors: {
         messageNotFound: "Tool-Nachricht nicht gefunden",
         toolCallMissing: "ToolCall-Metadaten fehlen",

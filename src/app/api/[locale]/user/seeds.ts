@@ -293,10 +293,10 @@ export async function dev(
   if (createdUsers.length > 0 && createdUsers[0]) {
     const adminUserId = createdUsers[0].id;
     try {
-      const { referralRepository } = await import("../referral/repository");
+      const { ReferralRepository } = await import("../referral/repository");
 
       // Create a test referral code
-      const referralResult = await referralRepository.createReferralCode(
+      const referralResult = await ReferralRepository.createReferralCode(
         adminUserId,
         {
           code: "FRIEND2024",

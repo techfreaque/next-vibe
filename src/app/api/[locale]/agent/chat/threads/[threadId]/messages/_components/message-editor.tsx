@@ -96,6 +96,7 @@ export function MessageEditor({
       <Form
         onSubmit={editor.handleBranch}
         className={cn(
+          "@container",
           "p-4 backdrop-blur",
           "border border-border rounded-lg shadow-lg",
           "w-full",

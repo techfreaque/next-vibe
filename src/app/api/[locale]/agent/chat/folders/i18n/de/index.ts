@@ -199,4 +199,4 @@ export const translations: typeof enTranslations = {
       description: "Ordner erfolgreich erstellt",
     },
   },
-} as const;
+};

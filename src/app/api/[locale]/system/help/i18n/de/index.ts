@@ -28,6 +28,10 @@ export const translations: typeof enTranslations = {
       started: "Interaktiver Modus erfolgreich gestartet",
     },
     errors: {
+      cliOnly: {
+        title: "Nur CLI",
+        description: "Interaktiver Modus ist nur über CLI verfügbar",
+      },
       unauthorized: {
         title: "Nicht autorisiert",
         description: "Authentifizierung für interaktiven Modus erforderlich",

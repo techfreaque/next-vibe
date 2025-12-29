@@ -73,7 +73,7 @@ const accordionRenderer = new AccordionWidgetRenderer();
  * Render a widget using switch-based dispatch
  * Matches React's renderWidget pattern
  */
-function renderWidget<TKey extends string>(
+function renderWidget<const TKey extends string>(
   widgetType: WidgetType,
   baseProps: {
     field: UnifiedField<TKey>;
@@ -248,7 +248,7 @@ export class WidgetRegistry {
   /**
    * Render a field using the appropriate widget renderer
    */
-  render<TKey extends string>(
+  render<const TKey extends string>(
     input: WidgetInput<TKey>,
     context: WidgetRenderContext,
   ): string {
@@ -262,7 +262,7 @@ export class WidgetRegistry {
   /**
    * Render a widget with proper type dispatch
    */
-  renderWidget<TKey extends string>(
+  renderWidget<const TKey extends string>(
     widgetType: WidgetType,
     field: UnifiedField<TKey>,
     value: WidgetData,

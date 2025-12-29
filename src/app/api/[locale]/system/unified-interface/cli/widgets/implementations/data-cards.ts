@@ -95,7 +95,7 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<
     }
   }
 
-  private getCardsConfig<TKey extends string>(
+  private getCardsConfig<const TKey extends string>(
     field: UnifiedField<TKey>,
   ): CardConfig {
     if (field.ui.type !== WidgetType.DATA_CARDS) {

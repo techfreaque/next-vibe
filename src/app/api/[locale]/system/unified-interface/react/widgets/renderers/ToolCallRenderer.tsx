@@ -39,7 +39,7 @@ import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/sh
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { WidgetRenderContext } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import { getTranslatorFromEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -48,7 +48,6 @@ import { EndpointRenderer } from "./EndpointRenderer";
 interface ToolCallRendererProps {
   toolCall: ToolCall;
   locale: CountryLanguage;
-  context: WidgetRenderContext;
   defaultOpen?: boolean;
   threadId: string;
   messageId: string;
@@ -233,7 +232,7 @@ export function ToolCallRenderer({
   };
 
   const displayName = definition?.title
-    ? t(definition.title)
+    ? getTranslatorFromEndpoint(definition)(locale).t(definition.title)
     : toolCall.toolName;
   const icon = definition?.icon;
   const credits = definition?.credits ?? toolCall.creditsUsed ?? 0;

@@ -807,6 +807,5 @@ export type ThreadCreateRequestOutput = typeof POST.types.RequestOutput;
 export type ThreadCreateResponseInput = typeof POST.types.ResponseInput;
 export type ThreadCreateResponseOutput = typeof POST.types.ResponseOutput;
 
-const definitions = { GET, POST };
-export { GET, POST };
+const definitions = { GET, POST } as const;
 export default definitions;

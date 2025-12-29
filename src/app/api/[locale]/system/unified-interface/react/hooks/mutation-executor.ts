@@ -9,15 +9,13 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
-import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { Methods as MethodsEnum } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { EndpointErrorTypes } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import { callApi, containsFile, objectToFormData } from "./api-utils";
 
 /**
@@ -55,11 +53,7 @@ export interface MutationExecutorOptions<TRequest, TResponse, TUrlVariables> {
  * - Retry logic (handled by React Query)
  * - Loading states (handled by React Query)
  */
-export async function executeMutation<
-  TUserRoleValue extends readonly UserRoleValue[],
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Infrastructure: Generic endpoint type requires 'any' for TFields parameter to accept all endpoint field configurations
-  TEndpoint extends CreateApiEndpoint<string, Methods, TUserRoleValue, any>,
->({
+export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
   logger,
   requestData: initialRequestData,
@@ -197,7 +191,8 @@ export async function executeMutation<
     // Use endpoint's SERVER_ERROR error type if available
     const serverErrorConfig =
       endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
-    const errorMessage = serverErrorConfig?.description;
+    const { t } = endpoint.scopedTranslation.scopedT(locale);
+    const errorMessage = t(serverErrorConfig?.description);
 
     const errorResponse: ErrorResponseType = fail({
       message: errorMessage,

@@ -7,7 +7,7 @@ import "server-only";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { leadTrackingRepository } from "../repository";
+import { LeadTrackingRepository } from "../repository";
 import definitions from "./definition";
 
 /**
@@ -17,8 +17,8 @@ export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: async ({ data, request, locale, user, logger }) => {
-      const clientInfo = leadTrackingRepository.extractClientInfo(request);
-      return await leadTrackingRepository.handleEngagementWithRelationship(
+      const clientInfo = LeadTrackingRepository.extractClientInfo(request);
+      return await LeadTrackingRepository.handleEngagementWithRelationship(
         data,
         clientInfo,
         locale,
@@ -29,7 +29,7 @@ export const { GET, POST, tools } = endpointsHandler({
   },
   [Methods.GET]: {
     handler: async ({ data, user, locale, logger }) => {
-      return await leadTrackingRepository.handleClickTracking(
+      return await LeadTrackingRepository.handleClickTracking(
         data,
         user,
         locale,
