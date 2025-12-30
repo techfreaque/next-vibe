@@ -3,7 +3,6 @@
  * Provides full type inference from definition.POST.fields to form components
  */
 
-import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type { Countries } from "@/i18n/core/config";
 
 import type { PrefillDisplayConfig } from "./field-config-types";
@@ -41,7 +40,7 @@ export interface EndpointFieldStructure<TKey extends string> {
       label: TKey;
       labelParams?: Record<string, string | number>;
       disabled?: boolean;
-      icon?: IconKey;
+      icon?: string;
     }>;
     maxTags?: number;
     // Readonly and prefill display options

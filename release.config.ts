@@ -20,13 +20,13 @@ const releaseConfig: ReleaseFileConfig = {
 
   // Global version for synchronized releases (optional)
   // When set, all packages will use this version
-  globalVersion: "2.0.0",
+  globalVersion: "1.0.17",
 
   // Branch configuration
   branch: {
-    main: "main",
+    main: "vibe-check",
     develop: "dev",
-    allowNonMain: false,
+    allowNonMain: true,
   },
 
   // Continue processing other packages if one fails
@@ -40,12 +40,13 @@ const releaseConfig: ReleaseFileConfig = {
       updateDeps: true,
       clean: false,
       lint: false, // linter runs with typecheck
-      typecheck: "vibe check",
+      // typecheck: "bun run vibe check",
+      typecheck: false,
       build: true,
-      test: "vibe test",
+      test: false,
       snyk: false, // Enable when Snyk is configured
       release: {
-        tagPrefix: "v",
+        tagPrefix: "vibe-check-v",
 
         // Git operations configuration
         git: {

@@ -5,10 +5,6 @@
 
 import "server-only";
 
-import {
-  createNextHandler,
-  type NextHandlerReturnType,
-} from "../../../next-api/handler";
 import type { CreateApiEndpointAny } from "../../types/endpoint";
 import {
   type ApiHandlerOptions,
@@ -20,10 +16,7 @@ import {
  * API handler return type that supports both Next.js and tRPC
  */
 type EndpointHandlerReturn<TEndpoint extends CreateApiEndpointAny> = {
-  [K in TEndpoint["method"]]: NextHandlerReturnType<
-    TEndpoint["types"]["ResponseOutput"],
-    TEndpoint["types"]["UrlVariablesOutput"]
-  >;
+  [K in TEndpoint["method"]]: undefined;
 } & {
   tools: {
     [K in TEndpoint["method"]]: GenericHandlerReturnType<
@@ -52,12 +45,11 @@ export function endpointHandler<T extends CreateApiEndpointAny>(
     T
   >,
 ): EndpointHandlerReturn<T> {
-  const nextHandler = createNextHandler(options);
   const genericHandler = createGenericHandler(options);
   const method = options.endpoint.method;
 
   return {
-    [method]: nextHandler,
+    [method]: undefined!,
     tools: {
       [method]: genericHandler,
     },

@@ -8,8 +8,6 @@
 import type { Route } from "next";
 import type { z } from "zod";
 
-import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
-
 import type {
   FieldUsageConfig,
   InferSchemaFromField,
@@ -146,7 +144,7 @@ export interface FilterPillsFieldWidgetConfig<TKey extends string>
   options: Array<{
     label: NoInfer<TKey>;
     value: string | number;
-    icon?: IconKey;
+    icon?: string;
     description?: NoInfer<TKey>;
   }>;
 }

@@ -29,8 +29,6 @@ cd next-vibe
 
 ```bash
 bun install
-cp .env.example .env
-# Edit .env with your values
 ```
 
 ### 3. Start Development

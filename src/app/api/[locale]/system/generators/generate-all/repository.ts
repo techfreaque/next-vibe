@@ -181,136 +181,14 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         );
       }
 
-      // 2. Seeds Generator - Generate seed index
-      if (!data.skipSeeds) {
-        generatorPromises.push(
-          (async (): Promise<string | null> => {
-            try {
-              outputLines.push("🌱 Generating seeds...");
-              const { seedsGeneratorRepository } = await import(
-                "../seeds/repository"
-              );
+      // Seeds generator removed - folder deleted
+      generatorsSkipped++;
 
-              const result = await seedsGeneratorRepository.generateSeeds(
-                {
-                  outputDir: "src/app/api/[locale]/system/generated",
-                  includeTestData: true,
-                  includeProdData: true,
-                  dryRun: false,
-                },
-                logger,
-              );
+      // Task index generator removed - folder deleted
+      generatorsSkipped++;
 
-              if (result.success) {
-                outputLines.push("✅ Seeds generated successfully");
-                generatorsRun++;
-                return "seeds";
-              }
-              outputLines.push(
-                `❌ Seeds generator failed: ${result.message || "Unknown error"}`,
-              );
-              return null;
-            } catch (error) {
-              outputLines.push(
-                `❌ Seeds generator failed: ${parseError(error).message}`,
-              );
-              return null;
-            }
-          })(),
-        );
-      } else {
-        generatorsSkipped++;
-      }
-
-      // 3. Task Index Generator - Enhanced with better error handling
-      if (!data.skipTaskIndex) {
-        generatorPromises.push(
-          (async (): Promise<string | null> => {
-            try {
-              outputLines.push("📋 Generating task index...");
-              const { taskIndexGeneratorRepository } = await import(
-                "../task-index/repository"
-              );
-
-              const result =
-                await taskIndexGeneratorRepository.generateTaskIndex(
-                  {
-                    outputFile:
-                      "src/app/api/[locale]/system/generated/tasks-index.ts",
-                    dryRun: false,
-                  },
-                  logger,
-                );
-
-              if (result.success) {
-                outputLines.push(
-                  `✅ Task index generated successfully: ${result.data.message}`,
-                );
-                generatorsRun++;
-                return "task-index";
-              }
-              outputLines.push(
-                `❌ Task index generation failed: ${result.message || "Unknown error"}`,
-              );
-              return null;
-            } catch (error) {
-              outputLines.push(
-                `❌ Task index generator failed: ${parseError(error).message}`,
-              );
-              return null;
-            }
-          })(),
-        );
-      } else {
-        outputLines.push("⏭️  Task index generation skipped");
-        generatorsSkipped++;
-      }
-
-      // 4. tRPC Router Generator
-      if (!data.skipTrpc) {
-        generatorPromises.push(
-          (async (): Promise<string | null> => {
-            try {
-              outputLines.push("🔌 Generating tRPC router...");
-              const { generateTrpcRouterRepository } = await import(
-                "../generate-trpc-router/repository"
-              );
-
-              const result =
-                await generateTrpcRouterRepository.generateTrpcRouter(
-                  {
-                    apiDir: "src/app/api",
-                    outputFile:
-                      "src/app/api/[locale]/system/unified-interface/trpc/[...trpc]/router.ts",
-                    includeWarnings: false,
-                    excludePatterns: [],
-                  },
-                  logger,
-                );
-
-              if (result.success && result.data) {
-                outputLines.push(
-                  `✅ tRPC router generated successfully: ${result.data.output}`,
-                );
-                generatorsRun++;
-                return "trpc-router";
-              }
-              outputLines.push(
-                `❌ tRPC router generation failed: ${result.errorType?.errorKey || "Unknown error"}`,
-              );
-              return null;
-            } catch (error) {
-              outputLines.push(
-                `❌ tRPC router generator failed: ${parseError(error).message}`,
-              );
-              return null;
-            }
-          })(),
-        );
-      } else {
-        outputLines.push("⏭️  tRPC router generation skipped");
-        generatorsSkipped++;
-      }
+      // tRPC router generator removed - folder deleted
+      generatorsSkipped++;
 
       // Wait for all generators to complete
       const results = await Promise.allSettled(generatorPromises);

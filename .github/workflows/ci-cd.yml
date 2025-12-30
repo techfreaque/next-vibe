@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop, "feature/*", "fix/*"]
+    branches: [vibe-check]
   pull_request:
-    branches: [main, develop]
+    branches: [vibe-check]
   workflow_dispatch:
 
 jobs:
@@ -50,7 +50,7 @@ jobs:
   # For all other branches: just check and build (skip migrations/seeding)
   other-check:
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
+    if: github.ref != 'refs/heads/vibe-check'
     steps:
       - uses: actions/checkout@v4
 

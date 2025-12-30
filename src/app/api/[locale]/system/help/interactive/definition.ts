@@ -35,6 +35,7 @@ const { POST } = createEndpoint({
   allowedRoles: [
     UserRole.PRODUCTION_OFF,
     UserRole.AI_TOOL_OFF,
+    UserRole.MCP_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
   aliases: [INTERACTIVE_MODE_ALIAS, "i"],

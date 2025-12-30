@@ -5,27 +5,7 @@
  * This is the shared version - platform-specific code should import from here
  */
 
-import type { Control, FieldPath, FieldValues } from "react-hook-form";
-
-import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import type { Countries, CountryLanguage } from "@/i18n/core/config";
-
-import type { CreateApiEndpointAny } from "../types/endpoint";
-
-export interface EndpointFormFieldProps<
-  TEndpoint extends CreateApiEndpointAny,
-  TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>,
-  TKey extends string,
-> {
-  name: TName;
-  config?: FieldConfig<TKey>; // Optional - override of endpoint-based field settings
-  control: Control<TFieldValues>; // Properly typed form control from useEndpoint
-  endpoint: TEndpoint; // Required - provides schema, scopedT, and endpointFields
-  theme?: RequiredFieldTheme;
-  className?: string;
-  locale: CountryLanguage; // Required for scoped translations
-}
+import type { Countries } from "@/i18n/core/config";
 
 /**
  * Prefill display configuration for form fields
@@ -212,7 +192,7 @@ export interface FilterPillsFieldConfig<TTranslationKey extends string>
   options: Array<{
     value: string;
     label: NoInfer<TTranslationKey>;
-    icon?: IconKey;
+    icon?: string;
     disabled?: boolean;
   }>;
 }
