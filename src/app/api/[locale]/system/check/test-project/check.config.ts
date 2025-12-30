@@ -14,6 +14,8 @@
 import type {
   CheckConfig,
   EslintFlatConfigItem,
+  EslintParser,
+  EslintPluginLike,
 } from "@next-vibe/checker/system/check/config/types";
 
 // --------------------------------------------------------
@@ -723,10 +725,10 @@ const config = (): CheckConfig => {
     ignores: oxlintIgnores,
     // Build flatConfig with plugins (called from eslint.config.mjs which loads plugins)
     buildFlatConfig(
-      reactCompilerPlugin: unknown,
-      reactHooksPlugin: unknown,
-      simpleImportSortPlugin: unknown,
-      tseslint: unknown,
+      reactCompilerPlugin: EslintPluginLike,
+      reactHooksPlugin: EslintPluginLike,
+      simpleImportSortPlugin: EslintPluginLike,
+      tseslint: { parser: EslintParser },
     ): EslintFlatConfigItem[] {
       if (cachedEslintFlatConfig) {
         return cachedEslintFlatConfig;
@@ -867,7 +869,7 @@ const config = (): CheckConfig => {
         },
       ];
 
-      return cachedEslintFlatConfig;
+      return cachedEslintFlatConfig!;
     },
   };
 

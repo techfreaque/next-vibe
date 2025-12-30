@@ -66,6 +66,10 @@ export interface ConfigRepositoryInterface {
   createDefaultCheckConfig(
     logger: EndpointLogger,
   ): Promise<{ success: boolean; configPath: string; error?: string }>;
+
+  createDefaultMcpConfig(
+    logger: EndpointLogger,
+  ): Promise<{ success: boolean; mcpConfigPath: string; error?: string }>;
 }
 
 // ============================================================
@@ -659,11 +663,56 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         source: templatePath,
       });
 
+      // Also create .mcp.json
+      const mcpResult = await this.createDefaultMcpConfig(logger);
+      if (!mcpResult.success) {
+        logger.warn("Failed to create .mcp.json", {
+          error: mcpResult.error,
+        });
+      }
+
       return { success: true, configPath };
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Failed to create check.config.ts", { error: errorMessage });
       return { success: false, configPath, error: errorMessage };
+    }
+  }
+
+  async createDefaultMcpConfig(
+    logger: EndpointLogger,
+  ): Promise<{ success: boolean; mcpConfigPath: string; error?: string }> {
+    const mcpConfigPath = resolve(process.cwd(), ".mcp.json");
+
+    try {
+      const mcpConfig = {
+        mcpServers: {
+          vibe: {
+            command: "npx",
+            args: ["@next-vibe/checker", "mcp"],
+            env: {
+              PROJECT_ROOT: process.cwd(),
+            },
+          },
+        },
+      };
+
+      await fs.writeFile(
+        mcpConfigPath,
+        JSON.stringify(mcpConfig, null, 2),
+        "utf8",
+      );
+
+      logger.info("Created .mcp.json", {
+        path: mcpConfigPath,
+        projectRoot: process.cwd(),
+      });
+
+      return { success: true, mcpConfigPath };
+    } catch (error) {
+      const errorMessage = parseError(error).message;
+      logger.error("Failed to create .mcp.json", { error: errorMessage });
+      return { success: false, mcpConfigPath, error: errorMessage };
     }
   }
 
