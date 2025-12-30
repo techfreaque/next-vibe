@@ -1,1 +1,0 @@
-ALTER TABLE "chat_messages" DROP COLUMN "sequence_index";
