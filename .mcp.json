@@ -1,9 +1,14 @@
 {
   "mcpServers": {
     "vibe": {
-      "command": "vibe",
-      "args": ["mcp"],
-      "env": {}
+      "command": "npx",
+      "args": [
+        "@next-vibe/checker",
+        "mcp"
+      ],
+      "env": {
+        "PROJECT_ROOT": "/home/max/projects/vibe-check"
+      }
     }
   }
 }
