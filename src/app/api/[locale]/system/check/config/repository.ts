@@ -156,7 +156,7 @@ export class ConfigRepositoryImpl implements ConfigRepositoryInterface {
   private static generateEslintConfigContent(): string {
     return `/**
  * ESLint Flat Config (Auto-generated)
- * Imports eslint configuration directly from check.config.ts
+ * Loads plugins and builds config from check.config.ts
  */
 
 import { createRequire } from "node:module";
@@ -167,12 +167,23 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "..");
 const require = createRequire(resolve(projectRoot, "package.json"));
 
-// Direct import from check.config.ts (supports both object and function exports)
-const exported = require("./check.config.ts").default;
+// Load ESLint plugins
+const reactCompilerPlugin = require("eslint-plugin-react-compiler");
+const reactHooksPlugin = require("eslint-plugin-react-hooks");
+const simpleImportSortPlugin = require("eslint-plugin-simple-import-sort");
+const tseslint = require("typescript-eslint");
+
+// Load check.config.ts and build flatConfig with plugins
+const exported = require(resolve(projectRoot, "check.config.ts")).default;
 const checkConfig = typeof exported === "function" ? exported() : exported;
 
-// Re-export the eslint config directly
-export default checkConfig.eslint?.flatConfig || [];
+// Build flatConfig by calling buildFlatConfig with loaded plugins
+export default checkConfig.eslint?.buildFlatConfig?.(
+  reactCompilerPlugin,
+  reactHooksPlugin,
+  simpleImportSortPlugin,
+  tseslint
+) || checkConfig.eslint?.flatConfig || [];
 `;
   }
 
@@ -357,7 +368,7 @@ export default checkConfig.eslint?.flatConfig || [];
     const configExists = existsSync(configPath);
 
     if (createConfig && configExists) {
-      logger.warn("check.config.ts already exists", { path: configPath });
+      logger.debug("check.config.ts already exists", { path: configPath });
       return {
         ready: false,
         error: "exists",
@@ -383,7 +394,7 @@ export default checkConfig.eslint?.flatConfig || [];
         }
         logger.info("Created check.config.ts successfully");
       } else {
-        logger.warn("check.config.ts not found", { path: configPath });
+        logger.debug("check.config.ts not found", { path: configPath });
         return {
           ready: false,
           error: "missing",

@@ -49,8 +49,30 @@ export const translations = {
       label: "Create Config",
       description: "Automatically create configuration file if missing",
     },
+    limit: {
+      label: "Limit",
+      description: "Maximum number of issues to display",
+    },
+    page: {
+      label: "Page",
+      description: "Page number for pagination",
+    },
+    maxFilesInSummary: {
+      label: "Max Files in Summary",
+      description: "Maximum number of files to show in summary",
+    },
+    skipSorting: {
+      label: "Skip Sorting",
+      description: "Skip sorting issues (for performance)",
+    },
   },
   response: {
+    issues: {
+      title: "Issues",
+      emptyState: {
+        description: "No issues found",
+      },
+    },
     success: "Lint completed successfully",
     errors: {
       item: {

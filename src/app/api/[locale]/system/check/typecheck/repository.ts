@@ -24,6 +24,7 @@ import { parseError } from "../../../shared/utils/parse-error";
 import { parseJsonWithComments } from "../../../shared/utils/parse-json";
 import { ensureConfigReady } from "../config/repository";
 import type {
+  TypecheckIssue,
   TypecheckRequestOutput,
   TypecheckResponseOutput,
 } from "./definition";
@@ -478,15 +479,33 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
       if (!configResult.ready) {
         return success({
-          success: false,
-          issues: [
-            {
-              file: configResult.configPath,
-              severity: "error" as const,
-              message: configResult.message,
-              type: "type" as const,
+          issues: {
+            items: [
+              {
+                file: configResult.configPath,
+                severity: "error" as const,
+                message: configResult.message,
+                type: "type" as const,
+              },
+            ],
+            files: [
+              {
+                file: configResult.configPath,
+                errors: 1,
+                warnings: 0,
+                total: 1,
+              },
+            ],
+            summary: {
+              totalIssues: 1,
+              totalFiles: 1,
+              totalErrors: 1,
+              displayedIssues: 1,
+              displayedFiles: 1,
+              currentPage: 1,
+              totalPages: 1,
             },
-          ],
+          },
         });
       }
 
@@ -496,8 +515,19 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       if (!checkConfig.typecheck.enabled) {
         logger.info("Typecheck is disabled in check.config.ts");
         return success({
-          success: true,
-          issues: [],
+          issues: {
+            items: [],
+            files: [],
+            summary: {
+              totalIssues: 0,
+              totalFiles: 0,
+              totalErrors: 0,
+              displayedIssues: 0,
+              displayedFiles: 0,
+              currentPage: 1,
+              totalPages: 1,
+            },
+          },
         });
       }
 
@@ -558,16 +588,26 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         data.disableFilter,
       );
 
-      // Build response
-      const issues = [
+      // Build response with optional sorting
+      const allIssues = [
         ...errors.map((e) => ({ ...e, type: "type" as const })),
         ...warnings.map((w) => ({ ...w, type: "type" as const })),
       ];
 
-      return success({
-        success: errors.length === 0,
-        issues,
-      });
+      // Skip sorting if requested (when vibe-check already sorted)
+      const issues = data.skipSorting
+        ? allIssues
+        : allIssues.toSorted((a, b) => {
+            const fileCompare = a.file.localeCompare(b.file);
+            if (fileCompare !== 0) {
+              return fileCompare;
+            }
+            const lineA = a.line || 0;
+            const lineB = b.line || 0;
+            return lineA - lineB;
+          });
+
+      return success(this.buildResponse(issues, data));
     } catch (error) {
       return this.handleError(
         error as Error,
@@ -583,6 +623,103 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   // --------------------------------------------------------
   // Private Methods
   // --------------------------------------------------------
+
+  /**
+   * Build file statistics from issues
+   */
+  private static buildFileStats(
+    issues: TypecheckIssue[],
+  ): Map<string, { errors: number; warnings: number; total: number }> {
+    const fileStats = new Map<
+      string,
+      { errors: number; warnings: number; total: number }
+    >();
+
+    for (const issue of issues) {
+      const stats = fileStats.get(issue.file) || {
+        errors: 0,
+        warnings: 0,
+        total: 0,
+      };
+      stats.total++;
+      if (issue.severity === "error") {
+        stats.errors++;
+      }
+      if (issue.severity === "warning") {
+        stats.warnings++;
+      }
+      fileStats.set(issue.file, stats);
+    }
+
+    return fileStats;
+  }
+
+  /**
+   * Format file statistics for response
+   */
+  private static formatFileStats(
+    fileStats: Map<string, { errors: number; warnings: number; total: number }>,
+  ): Array<{ file: string; errors: number; warnings: number; total: number }> {
+    return [...fileStats.entries()]
+      .map(([file, stats]) => ({
+        file,
+        errors: stats.errors,
+        warnings: stats.warnings,
+        total: stats.total,
+      }))
+      .toSorted((a, b) => a.file.localeCompare(b.file));
+  }
+
+  /**
+   * Build response with pagination and statistics
+   */
+  private buildResponse(
+    allIssues: TypecheckIssue[],
+    data: TypecheckRequestOutput,
+  ): TypecheckResponseOutput {
+    const totalIssues = allIssues.length;
+    const totalFiles = new Set(allIssues.map((issue) => issue.file)).size;
+    const totalErrors = allIssues.filter(
+      (issue) => issue.severity === "error",
+    ).length;
+
+    const fileStats = TypecheckRepositoryImpl.buildFileStats(allIssues);
+    const allFiles = TypecheckRepositoryImpl.formatFileStats(fileStats);
+    const limitedFiles = data.maxFilesInSummary
+      ? allFiles.slice(0, data.maxFilesInSummary)
+      : allFiles;
+
+    const limit = data.limit;
+    const currentPage = data.page;
+    const totalPages = Math.ceil(totalIssues / limit);
+    const startIndex = (currentPage - 1) * limit;
+    const endIndex = startIndex + limit;
+    const limitedIssues = allIssues.slice(startIndex, endIndex);
+
+    const displayedIssues = limitedIssues.length;
+    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file))
+      .size;
+
+    return {
+      issues: {
+        items: limitedIssues,
+        files: limitedFiles,
+        summary: {
+          totalIssues,
+          totalFiles,
+          totalErrors,
+          displayedIssues,
+          displayedFiles,
+          truncatedMessage:
+            displayedIssues < totalIssues || displayedFiles < totalFiles
+              ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
+              : "",
+          currentPage,
+          totalPages,
+        },
+      },
+    };
+  }
 
   /**
    * Build the typecheck command based on path type.
@@ -761,10 +898,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     const errorCode =
       hasCode && typeof error.code === "number" ? error.code : 0;
     if (errorCode === 2 || issues.length > 0) {
-      return success({
-        success: false,
-        issues,
-      });
+      return success(this.buildResponse(issues, data));
     }
 
     return fail({

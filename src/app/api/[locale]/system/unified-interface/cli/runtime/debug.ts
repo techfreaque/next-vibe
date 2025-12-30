@@ -25,7 +25,6 @@ interface ProcessWithInternals {
 }
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { binaryStartTime } from "../vibe-runtime";
 import type { RouteExecutionResult } from "./route-executor";
@@ -350,7 +349,6 @@ function formatActiveHandles(handles: ActiveHandle[]): string {
  */
 function formatExecutionSummary(
   breakdown: PerformanceBreakdown,
-  locale: CountryLanguage,
   performanceMetadata?: Partial<Record<string, number>>,
 ): string {
   // Check if we have detailed performance metadata (e.g., oxlint, eslint, typecheck timings)
@@ -408,15 +406,6 @@ function formatExecutionSummary(
 
   return `\nExecution: ${executionSeconds}s | Total: ${totalSeconds}s`;
 }
-
-/**
- * Debug output formatter
- */
-export const DebugFormatter = {
-  formatPerformanceBreakdown,
-  formatActiveHandles,
-  formatExecutionSummary,
-};
 
 /**
  * CLI resource manager for proper cleanup
@@ -501,7 +490,6 @@ export class CliResourceManager {
   async cleanupAndExit(
     logger: EndpointLogger,
     verbose = false,
-    locale: CountryLanguage,
     result: RouteExecutionResult,
   ): Promise<void> {
     try {
@@ -520,18 +508,12 @@ export class CliResourceManager {
           logger.info(
             "app.api.system.unifiedInterface.cli.vibe.utils.debug.performanceBreakdown",
           );
-          logger.info(DebugFormatter.formatPerformanceBreakdown(breakdown));
+          logger.info(formatPerformanceBreakdown(breakdown));
         } else {
           // Use console.log directly to avoid duplicate timestamp from logger
           // The execution summary is already formatted and translated
           // oxlint-disable-next-line no-console
-          console.log(
-            DebugFormatter.formatExecutionSummary(
-              breakdown,
-              locale,
-              result.performance,
-            ),
-          );
+          console.log(formatExecutionSummary(breakdown, result.performance));
         }
       }
 
@@ -558,7 +540,7 @@ export class CliResourceManager {
           logger.info(
             "app.api.system.unifiedInterface.cli.vibe.utils.debug.activeHandles",
             {
-              handles: DebugFormatter.formatActiveHandles(handles),
+              handles: formatActiveHandles(handles),
             },
           );
           logger.info(

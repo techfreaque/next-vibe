@@ -565,6 +565,30 @@ export interface FeatureSwitches {
 }
 
 // ============================================================
+// Vibe Check Configuration
+// ============================================================
+
+/** Vibe Check defaults */
+export interface VibeCheckConfig {
+  /** Auto-fix issues (default: false) */
+  fix?: boolean;
+  /** Skip all linting checks (default: false) */
+  skipLint?: boolean;
+  /** Skip ESLint checks (default: false) */
+  skipEslint?: boolean;
+  /** Skip Oxlint checks (default: false) */
+  skipOxlint?: boolean;
+  /** Skip TypeScript checks (default: false) */
+  skipTypecheck?: boolean;
+  /** Timeout in seconds (default: 3600) */
+  timeout?: number;
+  /** Max issues to display per page (default: 200) */
+  limit?: number;
+  /** Max files to show in summary (default: 50) */
+  maxFilesInSummary?: number;
+}
+
+// ============================================================
 // Unified Check Configuration
 // ============================================================
 
@@ -586,4 +610,7 @@ export interface CheckConfig {
 
   /** VSCode integration settings */
   vscode: VSCodeConfig;
+
+  /** Vibe Check defaults */
+  vibeCheck?: VibeCheckConfig;
 }

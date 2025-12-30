@@ -13,7 +13,6 @@ import {
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
-  ComponentVariant,
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
@@ -103,16 +102,56 @@ const { POST } = createEndpoint({
         z.coerce.number().min(1).max(3600).default(900),
       ),
 
-      // === RESPONSE FIELDS ===
-      success: responseField(
+      limit: requestDataField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.system.check.typecheck.response.successMessage",
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.system.check.typecheck.fields.limit.label",
+          description:
+            "app.api.system.check.typecheck.fields.limit.description",
+          columns: 4,
         },
-        z.boolean(),
+        z.coerce.number().min(1).optional().default(200),
       ),
 
-      issues: responseArrayField(
+      page: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label: "app.api.system.check.typecheck.fields.page.label",
+          description: "app.api.system.check.typecheck.fields.page.description",
+          columns: 4,
+        },
+        z.coerce.number().min(1).optional().default(1),
+      ),
+
+      maxFilesInSummary: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label:
+            "app.api.system.check.typecheck.fields.maxFilesInSummary.label",
+          description:
+            "app.api.system.check.typecheck.fields.maxFilesInSummary.description",
+          columns: 4,
+        },
+        z.coerce.number().min(1).default(50),
+      ),
+
+      skipSorting: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.check.typecheck.fields.skipSorting.label",
+          description:
+            "app.api.system.check.typecheck.fields.skipSorting.description",
+          columns: 3,
+        },
+        z.boolean().default(false),
+      ),
+
+      // === RESPONSE FIELDS ===
+      issues: objectField(
         {
           type: WidgetType.CODE_QUALITY_LIST,
           groupBy: "file",
@@ -121,74 +160,126 @@ const { POST } = createEndpoint({
           layoutType: LayoutType.GRID,
           columns: 1,
         },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            title: "app.api.system.check.typecheck.response.issue.title",
-            description:
-              "app.api.system.check.typecheck.response.issue.description",
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            file: responseField(
+        { response: true },
+        {
+          items: responseArrayField(
+            {
+              type: WidgetType.CONTAINER,
+              title: "app.api.system.check.typecheck.response.issues.title",
+              description:
+                "app.api.system.check.typecheck.response.issues.emptyState.description",
+              layoutType: LayoutType.GRID,
+              columns: 12,
+            },
+            objectField(
               {
-                type: WidgetType.TEXT,
-                content: "app.api.system.check.typecheck.response.issue.file",
+                type: WidgetType.CONTAINER,
+                title: "app.api.system.check.typecheck.response.issues.title",
+                description:
+                  "app.api.system.check.typecheck.response.issues.emptyState.description",
+                layoutType: LayoutType.GRID,
+                columns: 12,
               },
-              z.string(),
-            ),
-            line: responseField(
+              { response: true },
               {
-                type: WidgetType.TEXT,
-                content: "app.api.system.check.typecheck.response.issue.line",
+                file: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.typecheck.response.issues.title",
+                  },
+                  z.string(),
+                ),
+                line: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.typecheck.response.issues.title",
+                  },
+                  z.coerce.number().optional(),
+                ),
+                column: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.typecheck.response.issues.title",
+                  },
+                  z.coerce.number().optional(),
+                ),
+                rule: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.typecheck.response.issues.title",
+                  },
+                  z.string().optional(),
+                ),
+                code: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.typecheck.response.issues.title",
+                  },
+                  z.string().optional(),
+                ),
+                severity: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.typecheck.response.issues.title",
+                  },
+                  z.enum(["error", "warning", "info"]),
+                ),
+                message: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.system.check.typecheck.response.success",
+                  },
+                  z.string(),
+                ),
+                type: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.typecheck.response.issues.title",
+                  },
+                  z.enum(["oxlint", "lint", "type"]),
+                ),
               },
-              z.coerce.number().optional(),
             ),
-            column: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.check.typecheck.response.issue.column",
-              },
-              z.coerce.number().optional(),
-            ),
-            code: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.check.typecheck.response.issue.code",
-              },
-              z.string().optional(),
-            ),
-            severity: responseField(
-              {
-                type: WidgetType.BADGE,
-                variant: ComponentVariant.WARNING,
-                text: "app.api.system.check.typecheck.response.issue.severity",
-              },
-              z.enum(["error", "warning", "info"]),
-            ),
-            message: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.check.typecheck.response.issue.message",
-              },
-              z.string(),
-            ),
-            type: responseField(
-              {
-                type: WidgetType.BADGE,
-                variant: ComponentVariant.DEFAULT,
-                text: "app.api.system.check.typecheck.response.issue.type",
-              },
-              z.literal("type"),
-            ),
-          },
-        ),
-      ),
+          ),
 
-      // Summary is now handled by the grouped list widget - no separate container needed
+          files: responseField(
+            {
+              type: WidgetType.CODE_QUALITY_FILES,
+            },
+            z.array(
+              z.object({
+                file: z.string(),
+                errors: z.number(),
+                warnings: z.number(),
+                total: z.number(),
+              }),
+            ),
+          ),
+
+          summary: responseField(
+            {
+              type: WidgetType.CODE_QUALITY_SUMMARY,
+            },
+            z.object({
+              totalIssues: z.number(),
+              totalFiles: z.number(),
+              totalErrors: z.number(),
+              displayedIssues: z.number(),
+              displayedFiles: z.number(),
+              truncatedMessage: z.string().optional(),
+              currentPage: z.number(),
+              totalPages: z.number(),
+            }),
+          ),
+        },
+      ),
     },
   ),
 
@@ -241,12 +332,27 @@ const { POST } = createEndpoint({
 
   examples: {
     requests: {
-      default: {},
+      default: {
+        limit: 100,
+        page: 1,
+        maxFilesInSummary: 50,
+      },
     },
     responses: {
       default: {
-        success: true,
-        issues: [],
+        issues: {
+          items: [],
+          files: [],
+          summary: {
+            totalIssues: 0,
+            totalFiles: 0,
+            totalErrors: 0,
+            displayedIssues: 0,
+            displayedFiles: 0,
+            currentPage: 1,
+            totalPages: 1,
+          },
+        },
       },
     },
   },
@@ -256,6 +362,8 @@ export type TypecheckRequestInput = typeof POST.types.RequestInput;
 export type TypecheckRequestOutput = typeof POST.types.RequestOutput;
 export type TypecheckResponseInput = typeof POST.types.ResponseInput;
 export type TypecheckResponseOutput = typeof POST.types.ResponseOutput;
+
+export type TypecheckIssue = TypecheckResponseOutput["issues"]["items"][number];
 
 const endpoints = { POST };
 export default endpoints;

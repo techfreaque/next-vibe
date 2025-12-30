@@ -51,8 +51,30 @@ export const translations: typeof enTranslations = {
       label: "Konfiguration erstellen",
       description: "Konfigurationsdatei automatisch erstellen, falls vorhanden",
     },
+    limit: {
+      label: "Limit",
+      description: "Maximale Anzahl anzuzeigender Probleme",
+    },
+    page: {
+      label: "Seite",
+      description: "Seitenzahl für Paginierung",
+    },
+    maxFilesInSummary: {
+      label: "Max. Dateien in Zusammenfassung",
+      description: "Maximale Anzahl von Dateien in der Zusammenfassung",
+    },
+    skipSorting: {
+      label: "Sortierung überspringen",
+      description: "Sortierung von Problemen überspringen (für Leistung)",
+    },
   },
   response: {
+    issues: {
+      title: "Probleme",
+      emptyState: {
+        description: "Keine Probleme gefunden",
+      },
+    },
     success: "Lint erfolgreich abgeschlossen",
     errors: {
       item: {

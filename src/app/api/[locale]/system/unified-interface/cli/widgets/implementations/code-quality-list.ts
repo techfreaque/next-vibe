@@ -282,12 +282,12 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
         return `${errorIcon}${errorText}`;
       }
       case "warning": {
-        const warnIcon = icons ? "⚠️ " : "!  ";
+        const warnIcon = icons ? "⚠️  " : "!  ";
         const warnText = this.styleText("warn", "yellow", context);
         return `${warnIcon}${warnText}`;
       }
       case "info": {
-        const infoIcon = icons ? "ℹ️ " : "i ";
+        const infoIcon = icons ? "ℹ️  " : "i  ";
         const infoText = this.styleText("info", "blue", context);
         return `${infoIcon}${infoText}`;
       }

@@ -266,12 +266,7 @@ program
         performanceMonitor.mark("renderEnd");
 
         // Use the new resource manager for cleanup and exit
-        await cliResourceManager.cleanupAndExit(
-          logger,
-          debug ?? false,
-          options.locale,
-          result,
-        );
+        await cliResourceManager.cleanupAndExit(logger, debug ?? false, result);
       } catch (error) {
         const handled = ErrorHandler.handleError(parseError(error), logger);
 
@@ -287,19 +282,14 @@ program
         }
 
         // Cleanup and exit with error code
-        await cliResourceManager.cleanupAndExit(
-          logger,
-          debug ?? false,
-          options.locale,
-          {
-            success: false,
-            error:
-              "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
-            errorParams: {
-              error: handled.message,
-            },
+        await cliResourceManager.cleanupAndExit(logger, debug ?? false, {
+          success: false,
+          error:
+            "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+          errorParams: {
+            error: handled.message,
           },
-        );
+        });
         process.exit(handled.exitCode);
       }
     },

@@ -54,6 +54,7 @@ const { POST } = createEndpoint({
     { request: "data", response: true },
     {
       // === REQUEST FIELDS ===
+      // Default: check.config.ts vibeCheck.fix ?? false
       fix: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -62,9 +63,10 @@ const { POST } = createEndpoint({
           description: "app.api.system.check.vibeCheck.fields.fix.description",
           columns: 4,
         },
-        z.boolean().optional().default(false),
+        z.boolean().optional(),
       ),
 
+      // Default: check.config.ts vibeCheck.skipLint ?? false
       skipLint: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -74,9 +76,10 @@ const { POST } = createEndpoint({
             "app.api.system.check.vibeCheck.fields.skipLint.description",
           columns: 3,
         },
-        z.boolean().optional().default(false),
+        z.boolean().optional(),
       ),
 
+      // Default: check.config.ts vibeCheck.skipEslint ?? false
       skipEslint: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -86,9 +89,10 @@ const { POST } = createEndpoint({
             "app.api.system.check.vibeCheck.fields.skipEslint.description",
           columns: 3,
         },
-        z.boolean().optional().default(false),
+        z.boolean().optional(),
       ),
 
+      // Default: check.config.ts vibeCheck.skipOxlint ?? false
       skipOxlint: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -98,9 +102,10 @@ const { POST } = createEndpoint({
             "app.api.system.check.vibeCheck.fields.skipOxlint.description",
           columns: 3,
         },
-        z.boolean().optional().default(false),
+        z.boolean().optional(),
       ),
 
+      // Default: check.config.ts vibeCheck.skipTypecheck ?? false
       skipTypecheck: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -110,9 +115,10 @@ const { POST } = createEndpoint({
             "app.api.system.check.vibeCheck.fields.skipTypecheck.description",
           columns: 3,
         },
-        z.boolean().optional().default(false),
+        z.boolean().optional(),
       ),
 
+      // Default: false (not configurable in check.config.ts)
       createConfig: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -125,6 +131,7 @@ const { POST } = createEndpoint({
         z.boolean().optional().default(false),
       ),
 
+      // Default: check.config.ts vibeCheck.timeout ?? 3600
       timeout: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -134,13 +141,13 @@ const { POST } = createEndpoint({
             "app.api.system.check.vibeCheck.fields.timeoutSeconds.description",
           columns: 4,
         },
-        z.coerce.number().min(1).max(3600).default(3600),
+        z.coerce.number().min(1).max(36000).optional(),
       ),
 
       paths: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.MULTISELECT,
+          fieldType: FieldDataType.TAGS,
           label: "app.api.system.check.vibeCheck.fields.paths.label",
           description:
             "app.api.system.check.vibeCheck.fields.paths.description",
@@ -176,6 +183,7 @@ const { POST } = createEndpoint({
         z.union([z.string(), z.array(z.string())]).optional(),
       ),
 
+      // Default: check.config.ts vibeCheck.limit ?? 200
       limit: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -185,9 +193,10 @@ const { POST } = createEndpoint({
             "app.api.system.check.vibeCheck.fields.limit.description",
           columns: 4,
         },
-        z.coerce.number().min(1).optional().default(200),
+        z.coerce.number().min(1).optional(),
       ),
 
+      // Default: 1 (not configurable in check.config.ts)
       page: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -199,6 +208,7 @@ const { POST } = createEndpoint({
         z.coerce.number().min(1).optional().default(1),
       ),
 
+      // Default: check.config.ts vibeCheck.maxFilesInSummary ?? 50
       maxFilesInSummary: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -209,7 +219,7 @@ const { POST } = createEndpoint({
             "app.api.system.check.vibeCheck.fields.maxFilesInSummary.description",
           columns: 4,
         },
-        z.coerce.number().min(1).default(50),
+        z.coerce.number().min(1).optional(),
       ),
 
       // === RESPONSE FIELDS ===

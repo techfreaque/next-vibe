@@ -139,6 +139,13 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  performance: {
+    total: "Całość",
+    oxlint: "Oxlint",
+    eslint: "ESLint",
+    typecheck: "TypeScript",
+  },
+
   errors: {
     validation: {
       title: "Nieprawidłowe Parametry",

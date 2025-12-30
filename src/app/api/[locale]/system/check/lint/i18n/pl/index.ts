@@ -51,8 +51,30 @@ export const translations: typeof enTranslations = {
       label: "Utwórz konfigurację",
       description: "Automatycznie utwórz plik konfiguracyjny, jeśli brakuje",
     },
+    limit: {
+      label: "Limit",
+      description: "Maksymalna liczba problemów do wyświetlenia",
+    },
+    page: {
+      label: "Strona",
+      description: "Numer strony do paginacji",
+    },
+    maxFilesInSummary: {
+      label: "Maks. plików w podsumowaniu",
+      description: "Maksymalna liczba plików w podsumowaniu",
+    },
+    skipSorting: {
+      label: "Pomiń sortowanie",
+      description: "Pomiń sortowanie problemów (wydajność)",
+    },
   },
   response: {
+    issues: {
+      title: "Problemy",
+      emptyState: {
+        description: "Nie znaleziono problemów",
+      },
+    },
     success: "Lint zakończony pomyślnie",
     errors: {
       item: {

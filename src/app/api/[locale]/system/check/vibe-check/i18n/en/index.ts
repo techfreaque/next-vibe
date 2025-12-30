@@ -136,6 +136,13 @@ export const translations = {
     },
   },
 
+  performance: {
+    total: "Total",
+    oxlint: "Oxlint",
+    eslint: "ESLint",
+    typecheck: "TypeScript",
+  },
+
   errors: {
     validation: {
       title: "Invalid Parameters",

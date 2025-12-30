@@ -18,12 +18,15 @@ import {
   createWorkerTimeoutMessage,
   discoverFiles,
   distributeFilesAcrossWorkers,
-  generateIssueSummary,
   sortIssuesByLocation,
 } from "../config/shared";
 import type { CheckConfig, PrettierConfig } from "../config/types";
 import { getSystemResources } from "../config/utils";
-import type { OxlintRequestOutput, OxlintResponseOutput } from "./definition";
+import type {
+  OxlintIssue,
+  OxlintRequestOutput,
+  OxlintResponseOutput,
+} from "./definition";
 
 /**
  * Worker task for parallel processing
@@ -46,9 +49,10 @@ interface WorkerResult {
     line?: number;
     column?: number;
     rule?: string;
+    code?: string;
     severity: "error" | "warning" | "info";
     message: string;
-    type: "lint";
+    type: "oxlint" | "lint" | "type";
   }>;
   duration: number;
   error?: string;
@@ -74,12 +78,10 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     data: OxlintRequestOutput,
     logger: EndpointLogger,
   ): Promise<ApiResponseType<OxlintResponseOutput>> {
-    const startTime = Date.now();
     try {
       logger.debug("Starting parallel Oxlint execution", {
         path: data.path,
         fix: data.fix,
-        verbose: data.verbose,
       });
 
       // Use unified config management - checks, creates if needed, and regenerates
@@ -87,28 +89,33 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
 
       if (!configResult.ready) {
         return success({
-          success: false,
-          issues: [
-            {
-              file: configResult.configPath,
-              severity: "error" as const,
-              message: configResult.message,
-              type: "lint" as const,
+          issues: {
+            items: [
+              {
+                file: configResult.configPath,
+                severity: "error" as const,
+                message: configResult.message,
+                type: "oxlint" as const,
+              },
+            ],
+            files: [
+              {
+                file: configResult.configPath,
+                errors: 1,
+                warnings: 0,
+                total: 1,
+              },
+            ],
+            summary: {
+              totalIssues: 1,
+              totalFiles: 1,
+              totalErrors: 1,
+              displayedIssues: 1,
+              displayedFiles: 1,
+              currentPage: 1,
+              totalPages: 1,
             },
-          ],
-          duration: Date.now() - startTime,
-          totalIssues: 1,
-          totalErrors: 1,
-          totalWarnings: 0,
-          totalFiles: 0,
-          summary: {
-            totalIssues: 1,
-            totalErrors: 1,
-            totalWarnings: 0,
-            totalFiles: 0,
           },
-          configMissing: configResult.error === "missing",
-          configPath: configResult.configPath,
         });
       }
 
@@ -119,8 +126,19 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       if (!this.config.oxlint.enabled) {
         logger.info("Oxlint is disabled in check.config.ts");
         return success({
-          success: true,
-          issues: [],
+          issues: {
+            items: [],
+            files: [],
+            summary: {
+              totalIssues: 0,
+              totalFiles: 0,
+              totalErrors: 0,
+              displayedIssues: 0,
+              displayedFiles: 0,
+              currentPage: 1,
+              totalPages: 1,
+            },
+          },
         });
       }
 
@@ -158,18 +176,18 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
 
       if (filesToLint.length === 0) {
         return success({
-          success: true,
-          issues: [],
-          duration: Date.now() - startTime,
-          totalIssues: 0,
-          totalErrors: 0,
-          totalWarnings: 0,
-          totalFiles: 0,
-          summary: {
-            totalIssues: 0,
-            totalErrors: 0,
-            totalWarnings: 0,
-            totalFiles: 0,
+          issues: {
+            items: [],
+            files: [],
+            summary: {
+              totalIssues: 0,
+              totalFiles: 0,
+              totalErrors: 0,
+              displayedIssues: 0,
+              displayedFiles: 0,
+              currentPage: 1,
+              totalPages: 1,
+            },
           },
         });
       }
@@ -192,43 +210,44 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       );
 
       // Merge results from all workers
-      const mergedResult = this.mergeWorkerResults(workerResults, logger);
+      const mergedResult = this.mergeWorkerResults(workerResults, data, logger);
 
       logger.debug("Parallel Oxlint execution completed", {
-        totalIssues: mergedResult.issues.length,
-        success: mergedResult.success,
+        totalIssues: mergedResult.issues.items.length,
       });
 
       return success(mergedResult);
     } catch (error) {
-      const duration = Date.now() - startTime;
       const errorMessage = parseError(error).message;
       logger.error("Parallel Oxlint execution failed", { error: errorMessage });
 
-      const errorIssues = [
-        {
-          file: "unknown",
-          severity: "error" as const,
-          message: errorMessage,
-          type: "lint" as const,
-        },
-      ];
-
-      const errorSummary = generateIssueSummary(errorIssues);
-
       return success({
-        success: false,
-        issues: errorIssues,
-        duration,
-        totalIssues: errorSummary.total,
-        totalErrors: errorSummary.errors,
-        totalWarnings: errorSummary.warnings,
-        totalFiles: 1,
-        summary: {
-          totalIssues: errorSummary.total,
-          totalErrors: errorSummary.errors,
-          totalWarnings: errorSummary.warnings,
-          totalFiles: 1,
+        issues: {
+          items: [
+            {
+              file: "unknown",
+              severity: "error" as const,
+              message: errorMessage,
+              type: "oxlint" as const,
+            },
+          ],
+          files: [
+            {
+              file: "unknown",
+              errors: 1,
+              warnings: 0,
+              total: 1,
+            },
+          ],
+          summary: {
+            totalIssues: 1,
+            totalFiles: 1,
+            totalErrors: 1,
+            displayedIssues: 1,
+            displayedFiles: 1,
+            currentPage: 1,
+            totalPages: 1,
+          },
         },
       });
     }
@@ -309,7 +328,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
                 tasks[i].id,
                 String(result.reason),
               ),
-              type: "lint" as const,
+              type: "oxlint" as const,
             },
           ],
           duration: 0,
@@ -382,15 +401,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         ]);
 
         // Handle oxlint result
-        let issues: Array<{
-          file: string;
-          line?: number;
-          column?: number;
-          rule?: string;
-          severity: "error" | "warning" | "info";
-          message: string;
-          type: "lint";
-        }> = [];
+        let issues: OxlintIssue[] = [];
 
         if (fixResult.status === "fulfilled") {
           issues = fixResult.value.issues;
@@ -404,7 +415,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
               severity: "error" as const,
               // eslint-disable-next-line i18next/no-literal-string
               message: `Oxlint failed: ${String(fixResult.reason)}`,
-              type: "lint" as const,
+              type: "oxlint" as const,
             },
           ];
         }
@@ -444,7 +455,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
             file: "worker-error",
             severity: "error" as const,
             message: errorMessage,
-            type: "lint" as const,
+            type: "oxlint" as const,
           },
         ],
         duration: Date.now() - startTime,
@@ -454,49 +465,128 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   }
 
   /**
+   * Build file statistics from issues
+   */
+  private buildFileStats(
+    issues: OxlintIssue[],
+  ): Map<string, { errors: number; warnings: number; total: number }> {
+    const fileStats = new Map<
+      string,
+      { errors: number; warnings: number; total: number }
+    >();
+
+    for (const issue of issues) {
+      const stats = fileStats.get(issue.file) || {
+        errors: 0,
+        warnings: 0,
+        total: 0,
+      };
+      stats.total++;
+      if (issue.severity === "error") {
+        stats.errors++;
+      }
+      if (issue.severity === "warning") {
+        stats.warnings++;
+      }
+      fileStats.set(issue.file, stats);
+    }
+
+    return fileStats;
+  }
+
+  /**
+   * Format file statistics for response
+   */
+  private formatFileStats(
+    fileStats: Map<string, { errors: number; warnings: number; total: number }>,
+  ): Array<{ file: string; errors: number; warnings: number; total: number }> {
+    return [...fileStats.entries()]
+      .map(([file, stats]) => ({
+        file,
+        errors: stats.errors,
+        warnings: stats.warnings,
+        total: stats.total,
+      }))
+      .toSorted((a, b) => a.file.localeCompare(b.file));
+  }
+
+  /**
+   * Build response with pagination and statistics
+   */
+  private buildResponse(
+    allIssues: OxlintIssue[],
+    data: OxlintRequestOutput,
+  ): OxlintResponseOutput {
+    const totalIssues = allIssues.length;
+    const totalFiles = new Set(allIssues.map((issue) => issue.file)).size;
+    const totalErrors = allIssues.filter(
+      (issue) => issue.severity === "error",
+    ).length;
+
+    const fileStats = this.buildFileStats(allIssues);
+    const allFiles = this.formatFileStats(fileStats);
+    const limitedFiles = data.maxFilesInSummary
+      ? allFiles.slice(0, data.maxFilesInSummary)
+      : allFiles;
+
+    const limit = data.limit;
+    const currentPage = data.page;
+    const totalPages = Math.ceil(totalIssues / limit);
+    const startIndex = (currentPage - 1) * limit;
+    const endIndex = startIndex + limit;
+    const limitedIssues = allIssues.slice(startIndex, endIndex);
+
+    const displayedIssues = limitedIssues.length;
+    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file))
+      .size;
+
+    return {
+      issues: {
+        items: limitedIssues,
+        files: limitedFiles,
+        summary: {
+          totalIssues,
+          totalFiles,
+          totalErrors,
+          displayedIssues,
+          displayedFiles,
+          truncatedMessage:
+            displayedIssues < totalIssues || displayedFiles < totalFiles
+              ? `Showing ${displayedIssues} of ${totalIssues} issues from ${displayedFiles} of ${totalFiles} files`
+              : "",
+          currentPage,
+          totalPages,
+        },
+      },
+    };
+  }
+
+  /**
    * Merge results from all workers
    */
   private mergeWorkerResults(
     workerResults: WorkerResult[],
+    data: OxlintRequestOutput,
     logger: EndpointLogger,
   ): OxlintResponseOutput {
-    const allIssues: Array<{
-      file: string;
-      line?: number;
-      column?: number;
-      rule?: string;
-      severity: "error" | "warning" | "info";
-      message: string;
-      type: "lint";
-    }> = [];
-
-    let hasWorkerErrors = false;
+    const allIssues: OxlintIssue[] = [];
 
     // Collect all issues from workers
     for (const result of workerResults) {
       allIssues.push(...result.issues);
-
-      if (!result.success) {
-        hasWorkerErrors = true;
-      }
     }
 
-    // Sort issues by file, then by line number
-    const sortedIssues = sortIssuesByLocation(allIssues);
-
-    const hasErrors =
-      sortedIssues.some((i) => i.severity === "error") || hasWorkerErrors;
+    // Sort issues by file, then by line number (unless skipSorting is true)
+    const issues = data.skipSorting
+      ? allIssues
+      : sortIssuesByLocation(allIssues);
 
     logger.debug("Merged worker results", {
       totalWorkers: workerResults.length,
-      totalIssues: sortedIssues.length,
-      hasErrors,
+      totalIssues: issues.length,
     });
 
-    return {
-      success: !hasErrors,
-      issues: sortedIssues,
-    };
+    return this.buildResponse(issues, data);
   }
 
   /**
@@ -507,15 +597,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     task: WorkerTask,
     logger: EndpointLogger,
   ): Promise<{
-    issues: Array<{
-      file: string;
-      line?: number;
-      column?: number;
-      rule?: string;
-      severity: "error" | "warning" | "info";
-      message: string;
-      type: "lint";
-    }>;
+    issues: OxlintIssue[];
   }> {
     logger.debug(`Worker ${task.id} starting with ${task.files.length} files`);
 
@@ -588,25 +670,9 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     stdout: string,
     logger: EndpointLogger,
   ): Promise<{
-    issues: Array<{
-      file: string;
-      line?: number;
-      column?: number;
-      rule?: string;
-      severity: "error" | "warning" | "info";
-      message: string;
-      type: "lint";
-    }>;
+    issues: OxlintIssue[];
   }> {
-    const issues: Array<{
-      file: string;
-      line?: number;
-      column?: number;
-      rule?: string;
-      severity: "error" | "warning" | "info";
-      message: string;
-      type: "lint";
-    }> = [];
+    const issues: OxlintIssue[] = [];
 
     if (!stdout.trim()) {
       return { issues };
@@ -693,9 +759,10 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
           line,
           column,
           rule: diagnostic.code,
+          code: diagnostic.code,
           severity,
           message,
-          type: "lint",
+          type: "oxlint",
         });
       }
     } catch (error) {

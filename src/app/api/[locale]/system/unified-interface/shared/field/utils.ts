@@ -470,13 +470,19 @@ export function widgetField<
 
 /**
  * Create an object field containing other fields
- * Uses TranslationKey by default for automatic validation of translation keys
+ *
+ * Uses TranslationKey by default for automatic validation.
+ * For scoped translations, provide the scoped key type:
+ *   objectField<ScopedKeyType>({ ... }, usage, children)
  */
 export function objectField<
   TKey extends string = TranslationKey,
-  TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
-  const TUIConfig extends WidgetConfig<TKey>,
-  TUsage extends FieldUsageConfig,
+  TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>> = Record<
+    string,
+    UnifiedField<string, z.ZodTypeAny>
+  >,
+  TUsage extends FieldUsageConfig = FieldUsageConfig,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   usage: TUsage,

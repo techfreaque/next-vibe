@@ -4,9 +4,9 @@
  */
 
 // simple-import-sort/imports - Unsorted imports
-import { useState, useEffect } from "react";
-import React from "react";
 import type { ReactElement } from "react";
+import { useEffect,useState } from "react";
+import React from "react";
 
 // simple-import-sort/exports - Unsorted exports
 export { BadImportOrder };

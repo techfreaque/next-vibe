@@ -57,10 +57,33 @@ export const translations: typeof enTranslations = {
       label: "Limit czasu (sekundy)",
       description: "Maksymalny czas wykonania w sekundach",
     },
+    limit: {
+      label: "Limit",
+      description: "Maksymalna liczba problemów do wyświetlenia",
+    },
+    page: {
+      label: "Strona",
+      description: "Numer strony do paginacji",
+    },
+    maxFilesInSummary: {
+      label: "Maks. plików w podsumowaniu",
+      description: "Maksymalna liczba plików w podsumowaniu",
+    },
+    skipSorting: {
+      label: "Pomiń sortowanie",
+      description: "Pomiń sortowanie problemów (wydajność)",
+    },
   },
 
   // Response fields
   response: {
+    issues: {
+      title: "Problemy",
+      emptyState: {
+        description: "Nie znaleziono problemów",
+      },
+    },
+    success: "Sprawdzanie typów TypeScript zakończone pomyślnie",
     successMessage: "Sprawdzanie typów TypeScript zakończone pomyślnie",
     issue: {
       title: "Problem TypeScript",

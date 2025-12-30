@@ -59,10 +59,33 @@ export const translations: typeof enTranslations = {
       label: "Timeout (Sekunden)",
       description: "Maximale Ausführungszeit in Sekunden",
     },
+    limit: {
+      label: "Limit",
+      description: "Maximale Anzahl anzuzeigender Probleme",
+    },
+    page: {
+      label: "Seite",
+      description: "Seitenzahl für Paginierung",
+    },
+    maxFilesInSummary: {
+      label: "Max. Dateien in Zusammenfassung",
+      description: "Maximale Anzahl von Dateien in der Zusammenfassung",
+    },
+    skipSorting: {
+      label: "Sortierung überspringen",
+      description: "Sortierung von Problemen überspringen (für Leistung)",
+    },
   },
 
   // Response fields
   response: {
+    issues: {
+      title: "Probleme",
+      emptyState: {
+        description: "Keine Probleme gefunden",
+      },
+    },
+    success: "TypeScript-Typprüfung erfolgreich abgeschlossen",
     successMessage: "TypeScript-Typprüfung erfolgreich abgeschlossen",
     issue: {
       title: "TypeScript-Problem",

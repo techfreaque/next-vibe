@@ -16,6 +16,20 @@ import type {
   EslintFlatConfigItem,
 } from "next-vibe/system/check/config/types";
 
+// --------------------------------------------------------
+// Vibe Check Defaults
+// --------------------------------------------------------
+const vibeCheck: CheckConfig["vibeCheck"] = {
+  fix: false,
+  skipLint: false,
+  skipEslint: false,
+  skipOxlint: false,
+  skipTypecheck: false,
+  timeout: 3600,
+  limit: 200,
+  maxFilesInSummary: 50,
+};
+
 // ============================================================
 // Feature Flags (local to this file, not part of CheckConfig)
 // ============================================================
@@ -76,574 +90,637 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   "nativewind-env.d.ts",
   // Glob patterns
   "**/test-files/**",
-  "**/test-project/**",
 ]);
 
-const config = (): CheckConfig => {
-  // --------------------------------------------------------
-  // Typecheck Configuration
-  // --------------------------------------------------------
-  const typecheck = {
-    enabled: true as const,
-    cachePath: ".tmp/typecheck-cache",
-    useTsgo: features.tsgo,
-  };
+// --------------------------------------------------------
+// Typecheck Configuration
+// --------------------------------------------------------
+const typecheck = {
+  enabled: true as const,
+  cachePath: ".tmp/typecheck-cache",
+  useTsgo: features.tsgo,
+};
 
-  // --------------------------------------------------------
-  // Oxlint Configuration
-  // --------------------------------------------------------
-  const oxlint: CheckConfig["oxlint"] = {
-    enabled: true,
-    configPath: ".tmp/.oxlintrc.json",
-    cachePath: ".tmp/oxlint-cache",
-    lintableExtensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
-    $schema: "./node_modules/oxlint/configuration_schema.json",
-    ignorePatterns: oxlintIgnores,
-    plugins: [
-      "typescript",
-      "oxc",
-      ...(features.unicorn ? ["unicorn"] : []),
-      ...(features.react ? ["react"] : []),
-      ...(features.accessibility ? ["jsx-a11y"] : []),
-      ...(features.promise ? ["promise"] : []),
-      ...(features.node ? ["node"] : []),
-      ...(features.nextjs ? ["nextjs"] : []),
+// --------------------------------------------------------
+// Oxlint Configuration
+// --------------------------------------------------------
+const oxlint: CheckConfig["oxlint"] = {
+  enabled: true,
+  configPath: ".tmp/.oxlintrc.json",
+  cachePath: ".tmp/oxlint-cache",
+  lintableExtensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
+  $schema: "./node_modules/oxlint/configuration_schema.json",
+  ignorePatterns: oxlintIgnores,
+  plugins: [
+    "typescript",
+    "oxc",
+    ...(features.unicorn ? ["unicorn"] : []),
+    ...(features.react ? ["react"] : []),
+    ...(features.accessibility ? ["jsx-a11y"] : []),
+    ...(features.promise ? ["promise"] : []),
+    ...(features.node ? ["node"] : []),
+    ...(features.nextjs ? ["nextjs"] : []),
+  ],
+  jsPlugins: [
+    ...(features.restrictedSyntax
+      ? [
+          "next-vibe/src/app/api/[locale]/system/check/oxlint/plugins/restricted-syntax/src/index.ts",
+        ]
+      : []),
+    ...(features.jsxCapitalization
+      ? [
+          "next-vibe/src/app/api/[locale]/system/check/oxlint/plugins/jsx-capitalization/src/index.ts",
+        ]
+      : []),
+    ...(features.i18n
+      ? [
+          "next-vibe/src/app/api/[locale]/system/check/oxlint/plugins/i18n/src/index.ts",
+        ]
+      : []),
+  ],
+  categories: {
+    correctness: "error",
+    suspicious: "error",
+    pedantic: features.pedantic ? "warn" : "off",
+    style: "off",
+  },
+  rules: {
+    // ── Core ESLint (always enabled) ──────────────────────────
+    "no-debugger": "error",
+    "no-console": "error",
+    curly: "error",
+    eqeqeq: "error",
+    "no-undef": "off",
+    camelcase: "error",
+    "no-template-curly-in-string": "error",
+    "no-unsafe-optional-chaining": "error",
+    "array-callback-return": "error",
+    "no-constructor-return": "error",
+    "no-self-compare": "error",
+    "no-unreachable-loop": "error",
+    "no-unused-private-class-members": "error",
+    "prefer-template": "error",
+    "require-atomic-updates": "warn",
+    "no-promise-executor-return": "error",
+
+    // ── TypeScript (always enabled) ───────────────────────────
+    "typescript/no-explicit-any": "error",
+    "typescript/no-unused-vars": [
+      "error",
+      {
+        vars: "all",
+        args: "all",
+        caughtErrors: "none",
+        ignoreRestSiblings: false,
+        argsIgnorePattern: "^$",
+        varsIgnorePattern: "^$",
+      },
     ],
-    jsPlugins: [
-      ...(features.restrictedSyntax
-        ? [
-            "next-vibe/src/app/api/[locale]/system/check/oxlint/plugins/restricted-syntax/src/index.ts",
-          ]
-        : []),
-      ...(features.jsxCapitalization
-        ? [
-            "next-vibe/src/app/api/[locale]/system/check/oxlint/plugins/jsx-capitalization/src/index.ts",
-          ]
-        : []),
-      ...(features.i18n
-        ? [
-            "next-vibe/src/app/api/[locale]/system/check/oxlint/plugins/i18n/src/index.ts",
-          ]
-        : []),
-    ],
-    categories: {
-      correctness: "error",
-      suspicious: "error",
-      pedantic: features.pedantic ? "warn" : "off",
-      style: "off",
-    },
-    rules: {
-      // ── Core ESLint (always enabled) ──────────────────────────
-      "no-debugger": "error",
-      "no-console": "error",
-      curly: "error",
-      eqeqeq: "error",
-      "no-undef": "off",
-      camelcase: "error",
-      "no-template-curly-in-string": "error",
-      "no-unsafe-optional-chaining": "error",
-      "array-callback-return": "error",
-      "no-constructor-return": "error",
-      "no-self-compare": "error",
-      "no-unreachable-loop": "error",
-      "no-unused-private-class-members": "error",
-      "prefer-template": "error",
-      "require-atomic-updates": "warn",
-      "no-promise-executor-return": "error",
+    "typescript/no-inferrable-types": "error",
+    "typescript/consistent-type-imports": "error",
+    "typescript/no-empty-function": "error",
+    "typescript/prefer-includes": "error",
+    "typescript/prefer-string-starts-ends-with": "error",
+    "typescript/ban-ts-comment": "error",
+    "typescript/consistent-type-definitions": "error",
+    "typescript/no-empty-object-type": "error",
+    "typescript/no-unsafe-function-type": "error",
+    "typescript/no-wrapper-object-types": "error",
+    "typescript/no-duplicate-enum-values": "error",
+    "typescript/no-extra-non-null-assertion": "error",
+    "no-extraneous-class": "off",
+    // Strict type rules (enabled via strictTypes flag)
+    ...(features.strictTypes
+      ? {
+          "typescript/await-thenable": "error",
+          "typescript/no-floating-promises": "error",
+          "typescript/no-for-in-array": "error",
+          "typescript/no-misused-promises": "error",
+          "typescript/no-unsafe-assignment": "error",
+          "typescript/no-unnecessary-type-assertion": "error",
+          "typescript/explicit-function-return-type": "error",
+          "typescript/restrict-template-expressions": "error",
+        }
+      : {}),
 
-      // ── TypeScript (always enabled) ───────────────────────────
-      "typescript/no-explicit-any": "error",
-      "typescript/no-unused-vars": [
-        "error",
-        {
-          vars: "all",
-          args: "all",
-          caughtErrors: "none",
-          ignoreRestSiblings: false,
-          argsIgnorePattern: "^$",
-          varsIgnorePattern: "^$",
-        },
-      ],
-      "typescript/no-inferrable-types": "error",
-      "typescript/consistent-type-imports": "error",
-      "typescript/no-empty-function": "error",
-      "typescript/prefer-includes": "error",
-      "typescript/prefer-string-starts-ends-with": "error",
-      "typescript/ban-ts-comment": "error",
-      "typescript/consistent-type-definitions": "error",
-      "typescript/no-empty-object-type": "error",
-      "typescript/no-unsafe-function-type": "error",
-      "typescript/no-wrapper-object-types": "error",
-      "typescript/no-duplicate-enum-values": "error",
-      "typescript/no-extra-non-null-assertion": "error",
-      "no-extraneous-class": "off",
-      // Strict type rules (enabled via strictTypes flag)
-      ...(features.strictTypes
-        ? {
-            "typescript/await-thenable": "error",
-            "typescript/no-floating-promises": "error",
-            "typescript/no-for-in-array": "error",
-            "typescript/no-misused-promises": "error",
-            "typescript/no-unsafe-assignment": "error",
-            "typescript/no-unnecessary-type-assertion": "error",
-            "typescript/explicit-function-return-type": "error",
-            "typescript/restrict-template-expressions": "error",
-          }
-        : {}),
+    // ── React (enabled via react flag) ────────────────────────
+    ...(features.react
+      ? {
+          "react/jsx-key": "error",
+          "react/jsx-no-duplicate-props": "error",
+          "react/jsx-no-undef": "error",
+          "react/jsx-uses-react": "off",
+          "react/jsx-uses-vars": "error",
+          "react/no-children-prop": "error",
+          "react/no-deprecated": "error",
+          "react/no-direct-mutation-state": "error",
+          "react/no-unknown-property": "error",
+          "react/self-closing-comp": "error",
+          "react/react-in-jsx-scope": "off",
+        }
+      : {}),
 
-      // ── React (enabled via react flag) ────────────────────────
-      ...(features.react
-        ? {
-            "react/jsx-key": "error",
-            "react/jsx-no-duplicate-props": "error",
-            "react/jsx-no-undef": "error",
-            "react/jsx-uses-react": "off",
-            "react/jsx-uses-vars": "error",
-            "react/no-children-prop": "error",
-            "react/no-deprecated": "error",
-            "react/no-direct-mutation-state": "error",
-            "react/no-unknown-property": "error",
-            "react/self-closing-comp": "error",
-            "react/react-in-jsx-scope": "off",
-          }
-        : {}),
+    // ── Accessibility (enabled via accessibility flag) ────────
+    ...(features.accessibility
+      ? {
+          "jsx-a11y/alt-text": "error",
+          "jsx-a11y/aria-props": "error",
+          "jsx-a11y/aria-role": "error",
+          "jsx-a11y/anchor-has-content": "error",
+          "jsx-a11y/aria-proptypes": "error",
+          "jsx-a11y/aria-unsupported-elements": "error",
+          "jsx-a11y/click-events-have-key-events": "error",
+          "jsx-a11y/heading-has-content": "error",
+          "jsx-a11y/html-has-lang": "error",
+          "jsx-a11y/iframe-has-title": "error",
+          "jsx-a11y/img-redundant-alt": "error",
+          "jsx-a11y/no-access-key": "error",
+          "jsx-a11y/no-autofocus": "error",
+          "jsx-a11y/no-distracting-elements": "error",
+          "jsx-a11y/no-redundant-roles": "error",
+          "jsx-a11y/role-has-required-aria-props": "error",
+          "jsx-a11y/role-supports-aria-props": "error",
+          "jsx-a11y/scope": "error",
+          "jsx-a11y/tabindex-no-positive": "error",
+        }
+      : {}),
 
-      // ── Accessibility (enabled via accessibility flag) ────────
-      ...(features.accessibility
-        ? {
-            "jsx-a11y/alt-text": "error",
-            "jsx-a11y/aria-props": "error",
-            "jsx-a11y/aria-role": "error",
-            "jsx-a11y/anchor-has-content": "error",
-            "jsx-a11y/aria-proptypes": "error",
-            "jsx-a11y/aria-unsupported-elements": "error",
-            "jsx-a11y/click-events-have-key-events": "error",
-            "jsx-a11y/heading-has-content": "error",
-            "jsx-a11y/html-has-lang": "error",
-            "jsx-a11y/iframe-has-title": "error",
-            "jsx-a11y/img-redundant-alt": "error",
-            "jsx-a11y/no-access-key": "error",
-            "jsx-a11y/no-autofocus": "error",
-            "jsx-a11y/no-distracting-elements": "error",
-            "jsx-a11y/no-redundant-roles": "error",
-            "jsx-a11y/role-has-required-aria-props": "error",
-            "jsx-a11y/role-supports-aria-props": "error",
-            "jsx-a11y/scope": "error",
-            "jsx-a11y/tabindex-no-positive": "error",
-          }
-        : {}),
+    // ── Promise (enabled via promise flag) ────────────────────
+    ...(features.promise
+      ? {
+          "promise/param-names": "error",
+          "promise/always-return": "error",
+          "promise/catch-or-return": "error",
+        }
+      : {}),
 
-      // ── Promise (enabled via promise flag) ────────────────────
-      ...(features.promise
-        ? {
-            "promise/param-names": "error",
-            "promise/always-return": "error",
-            "promise/catch-or-return": "error",
-          }
-        : {}),
+    // ── Node (enabled via node flag) ──────────────────────────
+    ...(features.node
+      ? {
+          "node/no-missing-import": "off",
+          "node/no-unsupported-features/es-syntax": "off",
+        }
+      : {}),
 
-      // ── Node (enabled via node flag) ──────────────────────────
-      ...(features.node
-        ? {
-            "node/no-missing-import": "off",
-            "node/no-unsupported-features/es-syntax": "off",
-          }
-        : {}),
+    // ── Unicorn (enabled via unicorn flag) ────────────────────
+    ...(features.unicorn
+      ? {
+          "unicorn/prefer-string-starts-ends-with": "error",
+          "unicorn/no-empty-file": "error",
+          "unicorn/no-unnecessary-await": "error",
+          "unicorn/no-useless-spread": "error",
+          "unicorn/prefer-set-size": "error",
+          "unicorn/no-await-in-promise-methods": "error",
+          "unicorn/no-invalid-fetch-options": "error",
+          "unicorn/no-invalid-remove-event-listener": "error",
+          "unicorn/no-new-array": "error",
+          "unicorn/no-single-promise-in-promise-methods": "error",
+          "unicorn/no-thenable": "error",
+          "unicorn/no-useless-fallback-in-spread": "off",
+          "unicorn/no-useless-length-check": "error",
+          "unicorn/prefer-array-flat": "error",
+          "unicorn/prefer-array-flat-map": "error",
+          "unicorn/prefer-includes": "error",
+          "unicorn/prefer-modern-dom-apis": "error",
+          "unicorn/prefer-node-protocol": "error",
+          "unicorn/prefer-spread": "error",
+        }
+      : {}),
 
-      // ── Unicorn (enabled via unicorn flag) ────────────────────
-      ...(features.unicorn
-        ? {
-            "unicorn/prefer-string-starts-ends-with": "error",
-            "unicorn/no-empty-file": "error",
-            "unicorn/no-unnecessary-await": "error",
-            "unicorn/no-useless-spread": "error",
-            "unicorn/prefer-set-size": "error",
-            "unicorn/no-await-in-promise-methods": "error",
-            "unicorn/no-invalid-fetch-options": "error",
-            "unicorn/no-invalid-remove-event-listener": "error",
-            "unicorn/no-new-array": "error",
-            "unicorn/no-single-promise-in-promise-methods": "error",
-            "unicorn/no-thenable": "error",
-            "unicorn/no-useless-fallback-in-spread": "off",
-            "unicorn/no-useless-length-check": "error",
-            "unicorn/prefer-array-flat": "error",
-            "unicorn/prefer-array-flat-map": "error",
-            "unicorn/prefer-includes": "error",
-            "unicorn/prefer-modern-dom-apis": "error",
-            "unicorn/prefer-node-protocol": "error",
-            "unicorn/prefer-spread": "error",
-          }
-        : {}),
+    // ── OXC (always enabled) ──────────────────────────────────
+    "oxc/no-optional-chaining": "off",
+    "oxc/missing-throw": "error",
+    "oxc/number-arg-out-of-range": "error",
+    "oxc/only-used-in-recursion": "error",
+    "oxc/bad-array-method-on-arguments": "error",
+    "oxc/bad-comparison-sequence": "error",
+    "oxc/const-comparisons": "error",
+    "oxc/double-comparisons": "error",
+    "oxc/erasing-op": "error",
+    "oxc/bad-char-at-comparison": "error",
+    "oxc/bad-min-max-func": "error",
+    "oxc/bad-object-literal-comparison": "error",
+    "oxc/bad-replace-all-arg": "error",
+    "oxc/uninvoked-array-callback": "error",
 
-      // ── OXC (always enabled) ──────────────────────────────────
-      "oxc/no-optional-chaining": "off",
-      "oxc/missing-throw": "error",
-      "oxc/number-arg-out-of-range": "error",
-      "oxc/only-used-in-recursion": "error",
-      "oxc/bad-array-method-on-arguments": "error",
-      "oxc/bad-comparison-sequence": "error",
-      "oxc/const-comparisons": "error",
-      "oxc/double-comparisons": "error",
-      "oxc/erasing-op": "error",
-      "oxc/bad-char-at-comparison": "error",
-      "oxc/bad-min-max-func": "error",
-      "oxc/bad-object-literal-comparison": "error",
-      "oxc/bad-replace-all-arg": "error",
-      "oxc/uninvoked-array-callback": "error",
+    // ── Pedantic rule overrides ─────────────────────────────────
+    "max-lines": "off",
+    ...(features.pedantic
+      ? { "max-lines-per-function": ["warn", { max: 150 }] }
+      : {}),
+    // Disable rules that conflict with TypeScript strict null checks
+    // (.at() and .codePointAt() return T | undefined)
+    "unicorn/prefer-at": "off",
+    "unicorn/prefer-code-point": "off",
+    "unicorn/prefer-negative-index": "off",
+    // Conflicts with promise/always-return which requires returning something
+    "unicorn/no-useless-undefined": "off",
+    "unicorn/no-useless-switch-case": "off",
+    "unicorn/no-array-callback-reference": "off",
+    "unicorn/prefer-query-selector": "off",
 
-      // ── Pedantic rule overrides ─────────────────────────────────
-      "max-lines": "off",
-      ...(features.pedantic
-        ? { "max-lines-per-function": ["warn", { max: 150 }] }
-        : {}),
-      // Disable rules that conflict with TypeScript strict null checks
-      // (.at() and .codePointAt() return T | undefined)
-      "unicorn/prefer-at": "off",
-      "unicorn/prefer-code-point": "off",
-      "unicorn/prefer-negative-index": "off",
-      // Conflicts with promise/always-return which requires returning something
-      "unicorn/no-useless-undefined": "off",
-      "unicorn/no-useless-switch-case": "off",
-      "unicorn/no-array-callback-reference": "off",
-      "unicorn/prefer-query-selector": "off",
-
-      // ── Custom JS Plugins (enabled via feature flags) ────────
-      // Options defined inline, plugins read from config.oxlint.rules
-      ...(features.restrictedSyntax
-        ? {
-            "oxlint-plugin-restricted/restricted-syntax": [
-              "error",
-              {
-                jsxAllowedProperties: [
-                  "icon",
-                  "content",
+    // ── Custom JS Plugins (enabled via feature flags) ────────
+    // Options defined inline, plugins read from config.oxlint.rules
+    ...(features.restrictedSyntax
+      ? {
+          "oxlint-plugin-restricted/restricted-syntax": [
+            "error",
+            {
+              jsxAllowedProperties: [
+                "icon",
+                "content",
+                "title",
+                "description",
+                "children",
+                "header",
+                "footer",
+                "element",
+                "component",
+                "label",
+                "placeholder",
+                "tooltip",
+                "badge",
+                "prefix",
+                "suffix",
+                "startAdornment",
+                "endAdornment",
+                "emptyState",
+                "fallback",
+              ],
+            },
+          ],
+        }
+      : {}),
+    ...(features.jsxCapitalization
+      ? {
+          "oxlint-plugin-jsx-capitalization/jsx-capitalization": [
+            "error",
+            {
+              excludedPaths: ["/src/packages/next-vibe-ui/web/"],
+              excludedFilePatterns: [
+                "/email.tsx",
+                ".email.tsx",
+                "/test.tsx",
+                ".test.tsx",
+                ".spec.tsx",
+                "/__tests__/",
+              ],
+              typographyElements: [
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "p",
+                "blockquote",
+                "code",
+              ],
+              standaloneElements: ["span", "pre"],
+              svgElements: [
+                "svg",
+                "path",
+                "circle",
+                "rect",
+                "line",
+                "polyline",
+                "polygon",
+                "ellipse",
+                "g",
+                "text",
+                "tspan",
+                "defs",
+                "linearGradient",
+                "radialGradient",
+                "stop",
+                "clipPath",
+                "mask",
+                "pattern",
+                "use",
+                "symbol",
+                "marker",
+                "foreignObject",
+              ],
+              imageElements: ["img", "picture"],
+              commonUiElements: [
+                "div",
+                "section",
+                "article",
+                "aside",
+                "header",
+                "footer",
+                "main",
+                "nav",
+                "button",
+                "input",
+                "textarea",
+                "select",
+                "option",
+                "label",
+                "form",
+                "fieldset",
+                "legend",
+                "ul",
+                "ol",
+                "li",
+                "dl",
+                "dt",
+                "dd",
+                "table",
+                "thead",
+                "tbody",
+                "tfoot",
+                "tr",
+                "th",
+                "td",
+                "caption",
+                "video",
+                "audio",
+                "source",
+                "track",
+                "canvas",
+                "hr",
+                "br",
+                "iframe",
+                "embed",
+                "object",
+                "details",
+                "summary",
+                "dialog",
+                "menu",
+                "figure",
+                "figcaption",
+                "time",
+                "progress",
+                "meter",
+                "output",
+                "strong",
+                "em",
+                "b",
+                "i",
+                "u",
+                "s",
+              ],
+            },
+          ],
+        }
+      : {}),
+    ...(features.i18n
+      ? {
+          "oxlint-plugin-i18n/no-literal-string": [
+            "error",
+            {
+              words: {
+                exclude: [
+                  String.raw`^[\[\]{}—<>•+%#@.:_*;,/()\-]+$`,
+                  String.raw`^\s+$`,
+                  String.raw`^\d+$`,
+                  String.raw`^[^\s]+\.[^\s]+$`,
+                  String.raw`\.(?:jpe?g|png|svg|webp|gif|csv|json|xml|pdf)$`,
+                  String.raw`^(?:https?://|/)[^\s]*$`,
+                  String.raw`^[#@]\w+$`,
+                  String.raw`^[a-z]+$`,
+                  String.raw`^[a-z]+(?:[A-Z][a-zA-Z0-9]*)*$`,
+                  String.raw`^[^\s]+(?:-[^\s]+)+$`,
+                  String.raw`^[^\s]+\/(?:[^\s]*)$`,
+                  String.raw`^[A-Z]+(?:_[A-Z]+)*$`,
+                  String.raw`^use (?:client|server|custom)$`,
+                  String.raw`^&[a-z]+;$`,
+                  String.raw`^[MmLlHhVvCcSsQqTtAaZz0-9\s,.-]+$`,
+                  String.raw`^[▶◀▲▼►◄▴▾►◄✅✕✔✓🔧]+$`,
+                  String.raw`^[\d\s]+(?:px|em|rem|%|vh|vw|deg|rad)?(?:\s+[\d]+)*$`,
+                  String.raw`^url\([^)]+\)$`,
+                  String.raw`^(?:translate|rotate|scale|matrix|skew)\([^)]+\)$`,
+                  String.raw`^(?:Esc|Enter|Tab|Shift|Ctrl|Alt|Cmd|Space|Backspace|Delete|ArrowUp|ArrowDown|ArrowLeft|ArrowRight|F\d+)$`,
+                  String.raw`^[A-Z0-9]{1,2}$`,
+                ],
+              },
+              "jsx-attributes": {
+                exclude: [
+                  "className",
+                  "*ClassName",
+                  "id",
+                  "data-testid",
+                  "to",
+                  "href",
+                  "style",
+                  "target",
+                  "rel",
+                  "type",
+                  "src",
+                  "viewBox",
+                  "d",
+                  "fill",
+                  "stroke",
+                  "transform",
+                  "gradientTransform",
+                  "gradientUnits",
+                  "cn",
+                  "cx",
+                  "cy",
+                  "r",
+                  "fx",
+                  "fy",
+                  "offset",
+                  "stopColor",
+                  "stopOpacity",
+                  "width",
+                  "height",
+                  "x",
+                  "y",
+                  "x1",
+                  "x2",
+                  "y1",
+                  "y2",
+                  "strokeWidth",
+                  "strokeLinecap",
+                  "strokeLinejoin",
+                  "fillRule",
+                  "clipRule",
+                  "opacity",
+                  "xmlns",
+                  "xmlnsXlink",
+                  "aria-label",
+                  "aria-labelledby",
+                  "aria-describedby",
                   "title",
-                  "description",
-                  "children",
-                  "header",
-                  "footer",
-                  "element",
-                  "component",
-                  "label",
                   "placeholder",
-                  "tooltip",
-                  "badge",
-                  "prefix",
-                  "suffix",
-                  "startAdornment",
-                  "endAdornment",
-                  "emptyState",
-                  "fallback",
                 ],
               },
-            ],
-          }
-        : {}),
-      ...(features.jsxCapitalization
-        ? {
-            "oxlint-plugin-jsx-capitalization/jsx-capitalization": [
-              "error",
-              {
-                excludedPaths: ["/src/packages/next-vibe-ui/web/"],
-                excludedFilePatterns: [
-                  "/email.tsx",
-                  ".email.tsx",
-                  "/test.tsx",
-                  ".test.tsx",
-                  ".spec.tsx",
-                  "/__tests__/",
-                ],
-                typographyElements: [
-                  "h1",
-                  "h2",
-                  "h3",
-                  "h4",
-                  "p",
-                  "blockquote",
-                  "code",
-                ],
-                standaloneElements: ["span", "pre"],
-                svgElements: [
-                  "svg",
+              "object-properties": {
+                exclude: [
+                  "id",
+                  "key",
+                  "type",
+                  "className",
+                  "*ClassName",
+                  "imageUrl",
+                  "style",
                   "path",
-                  "circle",
-                  "rect",
-                  "line",
-                  "polyline",
-                  "polygon",
-                  "ellipse",
-                  "g",
-                  "text",
-                  "tspan",
-                  "defs",
-                  "linearGradient",
-                  "radialGradient",
-                  "stop",
-                  "clipPath",
-                  "mask",
-                  "pattern",
-                  "use",
-                  "symbol",
-                  "marker",
-                  "foreignObject",
-                ],
-                imageElements: ["img", "picture"],
-                commonUiElements: [
-                  "div",
-                  "section",
-                  "article",
-                  "aside",
-                  "header",
-                  "footer",
-                  "main",
-                  "nav",
-                  "button",
-                  "input",
-                  "textarea",
-                  "select",
-                  "option",
-                  "label",
-                  "form",
-                  "fieldset",
-                  "legend",
-                  "ul",
-                  "ol",
-                  "li",
-                  "dl",
-                  "dt",
-                  "dd",
-                  "table",
-                  "thead",
-                  "tbody",
-                  "tfoot",
-                  "tr",
-                  "th",
-                  "td",
-                  "caption",
-                  "video",
-                  "audio",
-                  "source",
-                  "track",
-                  "canvas",
-                  "hr",
-                  "br",
-                  "iframe",
-                  "embed",
-                  "object",
-                  "details",
-                  "summary",
-                  "dialog",
-                  "menu",
-                  "figure",
-                  "figcaption",
-                  "time",
-                  "progress",
-                  "meter",
-                  "output",
-                  "strong",
-                  "em",
-                  "b",
-                  "i",
-                  "u",
-                  "s",
+                  "href",
+                  "to",
+                  "data",
+                  "alg",
+                  "backgroundColor",
+                  "borderRadius",
+                  "color",
+                  "fontSize",
+                  "lineHeight",
+                  "padding",
+                  "textDecoration",
+                  "marginTop",
+                  "marginBottom",
+                  "margin",
+                  "value",
+                  "email",
+                  "displayName",
                 ],
               },
-            ],
-          }
-        : {}),
-      ...(features.i18n
-        ? {
-            "oxlint-plugin-i18n/no-literal-string": [
-              "error",
-              {
-                words: {
-                  exclude: [
-                    String.raw`^[\[\]{}—<>•+%#@.:_*;,/()\-]+$`,
-                    String.raw`^\s+$`,
-                    String.raw`^\d+$`,
-                    String.raw`^[^\s]+\.[^\s]+$`,
-                    String.raw`\.(?:jpe?g|png|svg|webp|gif|csv|json|xml|pdf)$`,
-                    String.raw`^(?:https?://|/)[^\s]*$`,
-                    String.raw`^[#@]\w+$`,
-                    String.raw`^[a-z]+$`,
-                    String.raw`^[a-z]+(?:[A-Z][a-zA-Z0-9]*)*$`,
-                    String.raw`^[^\s]+(?:-[^\s]+)+$`,
-                    String.raw`^[^\s]+\/(?:[^\s]*)$`,
-                    String.raw`^[A-Z]+(?:_[A-Z]+)*$`,
-                    String.raw`^use (?:client|server|custom)$`,
-                    String.raw`^&[a-z]+;$`,
-                    String.raw`^[MmLlHhVvCcSsQqTtAaZz0-9\s,.-]+$`,
-                    String.raw`^[▶◀▲▼►◄▴▾►◄✅✕✔✓🔧]+$`,
-                    String.raw`^[\d\s]+(?:px|em|rem|%|vh|vw|deg|rad)?(?:\s+[\d]+)*$`,
-                    String.raw`^url\([^)]+\)$`,
-                    String.raw`^(?:translate|rotate|scale|matrix|skew)\([^)]+\)$`,
-                    String.raw`^(?:Esc|Enter|Tab|Shift|Ctrl|Alt|Cmd|Space|Backspace|Delete|ArrowUp|ArrowDown|ArrowLeft|ArrowRight|F\d+)$`,
-                    String.raw`^[A-Z0-9]{1,2}$`,
-                  ],
-                },
-                "jsx-attributes": {
-                  exclude: [
-                    "className",
-                    "*ClassName",
-                    "id",
-                    "data-testid",
-                    "to",
-                    "href",
-                    "style",
-                    "target",
-                    "rel",
-                    "type",
-                    "src",
-                    "viewBox",
-                    "d",
-                    "fill",
-                    "stroke",
-                    "transform",
-                    "gradientTransform",
-                    "gradientUnits",
-                    "cn",
-                    "cx",
-                    "cy",
-                    "r",
-                    "fx",
-                    "fy",
-                    "offset",
-                    "stopColor",
-                    "stopOpacity",
-                    "width",
-                    "height",
-                    "x",
-                    "y",
-                    "x1",
-                    "x2",
-                    "y1",
-                    "y2",
-                    "strokeWidth",
-                    "strokeLinecap",
-                    "strokeLinejoin",
-                    "fillRule",
-                    "clipRule",
-                    "opacity",
-                    "xmlns",
-                    "xmlnsXlink",
-                    "aria-label",
-                    "aria-labelledby",
-                    "aria-describedby",
-                    "title",
-                    "placeholder",
-                  ],
-                },
-                "object-properties": {
-                  exclude: [
-                    "id",
-                    "key",
-                    "type",
-                    "className",
-                    "*ClassName",
-                    "imageUrl",
-                    "style",
-                    "path",
-                    "href",
-                    "to",
-                    "data",
-                    "alg",
-                    "backgroundColor",
-                    "borderRadius",
-                    "color",
-                    "fontSize",
-                    "lineHeight",
-                    "padding",
-                    "textDecoration",
-                    "marginTop",
-                    "marginBottom",
-                    "margin",
-                    "value",
-                    "email",
-                    "displayName",
-                  ],
-                },
-              },
-            ],
-          }
-        : {}),
+            },
+          ],
+        }
+      : {}),
 
-      // ── Next.js (enabled via nextjs flag) ─────────────────────
-      ...(features.nextjs
-        ? {
-            "nextjs/google-font-display": "error",
-            "nextjs/google-font-preconnect": "error",
-            "nextjs/inline-script-id": "error",
-            "nextjs/next-script-for-ga": "error",
-            "nextjs/no-assign-module-variable": "error",
-            "nextjs/no-before-interactive-script-outside-document": "error",
-            "nextjs/no-css-tags": "error",
-            "nextjs/no-document-import-in-page": "error",
-            "nextjs/no-duplicate-head": "error",
-            "nextjs/no-head-element": "error",
-            "nextjs/no-head-import-in-document": "error",
-            "nextjs/no-html-link-for-pages": "error",
-            "nextjs/no-img-element": "warn",
-            "nextjs/no-page-custom-font": "error",
-            "nextjs/no-script-component-in-head": "error",
-            "nextjs/no-styled-jsx-in-document": "error",
-            "nextjs/no-sync-scripts": "error",
-            "nextjs/no-title-in-document-head": "error",
-            "nextjs/no-typos": "error",
-            "nextjs/no-unwanted-polyfillio": "error",
-          }
-        : {}),
+    // ── Next.js (enabled via nextjs flag) ─────────────────────
+    ...(features.nextjs
+      ? {
+          "nextjs/google-font-display": "error",
+          "nextjs/google-font-preconnect": "error",
+          "nextjs/inline-script-id": "error",
+          "nextjs/next-script-for-ga": "error",
+          "nextjs/no-assign-module-variable": "error",
+          "nextjs/no-before-interactive-script-outside-document": "error",
+          "nextjs/no-css-tags": "error",
+          "nextjs/no-document-import-in-page": "error",
+          "nextjs/no-duplicate-head": "error",
+          "nextjs/no-head-element": "error",
+          "nextjs/no-head-import-in-document": "error",
+          "nextjs/no-html-link-for-pages": "error",
+          "nextjs/no-img-element": "warn",
+          "nextjs/no-page-custom-font": "error",
+          "nextjs/no-script-component-in-head": "error",
+          "nextjs/no-styled-jsx-in-document": "error",
+          "nextjs/no-sync-scripts": "error",
+          "nextjs/no-title-in-document-head": "error",
+          "nextjs/no-typos": "error",
+          "nextjs/no-unwanted-polyfillio": "error",
+        }
+      : {}),
+  },
+  settings: {
+    "jsx-a11y": {
+      polymorphicPropName: null,
+      components: {},
+      attributes: {},
     },
-    settings: {
-      "jsx-a11y": {
-        polymorphicPropName: null,
-        components: {},
-        attributes: {},
-      },
-      next: { rootDir: ["."] },
-      react: { formComponents: [], linkComponents: [] },
-      jsdoc: {
-        ignorePrivate: false,
-        ignoreInternal: false,
-        ignoreReplacesDocs: true,
-        overrideReplacesDocs: true,
-        augmentsExtendsReplacesDocs: false,
-        implementsReplacesDocs: false,
-        exemptDestructuredRootsFromChecks: false,
-        tagNamePreference: {},
+    next: { rootDir: ["."] },
+    react: { formComponents: [], linkComponents: [] },
+    jsdoc: {
+      ignorePrivate: false,
+      ignoreInternal: false,
+      ignoreReplacesDocs: true,
+      overrideReplacesDocs: true,
+      augmentsExtendsReplacesDocs: false,
+      implementsReplacesDocs: false,
+      exemptDestructuredRootsFromChecks: false,
+      tagNamePreference: {},
+    },
+  },
+  env: { builtin: true },
+  globals: {
+    React: "readonly",
+    JSX: "readonly",
+    NodeJS: "readonly",
+    __dirname: "readonly",
+    __filename: "readonly",
+    process: "readonly",
+    global: "readonly",
+  },
+};
+
+// --------------------------------------------------------
+// Prettier Configuration
+// --------------------------------------------------------
+const prettier: CheckConfig["prettier"] = {
+  enabled: true,
+  configPath: ".tmp/.oxfmtrc.json",
+  semi: true,
+  singleQuote: false,
+  trailingComma: "all",
+  tabWidth: 2,
+  useTabs: false,
+  printWidth: 80,
+  arrowParens: "always",
+  endOfLine: "lf",
+  bracketSpacing: true,
+  jsxSingleQuote: false,
+  jsxBracketSameLine: false,
+  proseWrap: "preserve",
+};
+
+// --------------------------------------------------------
+// Testing Configuration
+// --------------------------------------------------------
+const testing: CheckConfig["testing"] = {
+  enabled: true,
+  command: "bun test",
+  timeout: 300_000,
+  include: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
+  exclude: [...oxlintIgnores],
+  coverage: {
+    enabled: false,
+    provider: "v8",
+    thresholds: { lines: 80, branches: 80, functions: 80, statements: 80 },
+  },
+};
+
+// --------------------------------------------------------
+// VSCode Integration
+// --------------------------------------------------------
+const vscode: CheckConfig["vscode"] = {
+  enabled: true,
+  autoGenerateSettings: true,
+  settingsPath: "./.vscode/settings.json",
+  settings: {
+    oxc: {
+      enable: true,
+      lintRun: "onSave",
+      configPath: ".tmp/.oxlintrc.json",
+      fmtConfigPath: ".tmp/.oxfmtrc.json",
+      fmtExperimental: true,
+      typeAware: true,
+      traceServer: "verbose",
+    },
+    editor: {
+      formatOnSave: true,
+      defaultFormatter: "oxc.oxc-vscode",
+      codeActionsOnSave: {
+        "source.fixAll.eslint": "explicit",
+        "source.organizeImports": "explicit",
       },
     },
-    env: { builtin: true },
-    globals: {
-      React: "readonly",
-      JSX: "readonly",
-      NodeJS: "readonly",
-      __dirname: "readonly",
-      __filename: "readonly",
-      process: "readonly",
-      global: "readonly",
+    typescript: {
+      validateEnable: true,
+      suggestAutoImports: true,
+      preferTypeOnlyAutoImports: true,
+      experimentalUseTsgo: typecheck.enabled && typecheck.useTsgo,
     },
-  };
+    files: { eol: "\n" },
+    search: {
+      exclude: {
+        "**/node_modules": true,
+        "**/tsconfig.tsbuildinfo": true,
+        "**/*.tmp": true,
+        "**/*.next": true,
+      },
+    },
+  },
+};
 
-  // --------------------------------------------------------
-  // Prettier Configuration
-  // --------------------------------------------------------
-  const prettier: CheckConfig["prettier"] = {
-    enabled: true,
-    configPath: ".tmp/.oxfmtrc.json",
-    semi: true,
-    singleQuote: false,
-    trailingComma: "all",
-    tabWidth: 2,
-    useTabs: false,
-    printWidth: 80,
-    arrowParens: "always",
-    endOfLine: "lf",
-    bracketSpacing: true,
-    jsxSingleQuote: false,
-    jsxBracketSameLine: false,
-    proseWrap: "preserve",
-  };
+// ============================================================
+// ESLint FlatConfig Cache (lazy-loaded on first access)
+// ============================================================
+let cachedEslintFlatConfig: EslintFlatConfigItem[] | null = null;
 
+const config = (): CheckConfig => {
   // --------------------------------------------------------
   // ESLint Configuration (for rules oxlint doesn't support)
   // --------------------------------------------------------
@@ -653,19 +730,18 @@ const config = (): CheckConfig => {
     cachePath: ".tmp/eslint-cache",
     lintableExtensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
     ignores: oxlintIgnores,
-    // Lazy-load flatConfig to avoid loading heavy ESLint plugins until needed
-    get flatConfig(): EslintFlatConfigItem[] {
-      // Dynamic imports - only loaded when ESLint actually runs
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const reactCompilerPlugin = require("eslint-plugin-react-compiler");
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const reactHooksPlugin = require("eslint-plugin-react-hooks");
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const simpleImportSortPlugin = require("eslint-plugin-simple-import-sort");
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const tseslint = require("typescript-eslint");
+    // Build flatConfig with plugins (called from eslint.config.mjs which loads plugins)
+    buildFlatConfig(
+      reactCompilerPlugin: unknown,
+      reactHooksPlugin: unknown,
+      simpleImportSortPlugin: unknown,
+      tseslint: unknown,
+    ): EslintFlatConfigItem[] {
+      if (cachedEslintFlatConfig) {
+        return cachedEslintFlatConfig;
+      }
 
-      return [
+      cachedEslintFlatConfig = [
         { ignores: eslintIgnores },
         {
           files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
@@ -799,69 +875,13 @@ const config = (): CheckConfig => {
           },
         },
       ];
-    },
-  };
 
-  // --------------------------------------------------------
-  // Testing Configuration
-  // --------------------------------------------------------
-  const testing: CheckConfig["testing"] = {
-    enabled: true,
-    command: "bun test",
-    timeout: 300_000,
-    include: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
-    exclude: [...oxlintIgnores],
-    coverage: {
-      enabled: false,
-      provider: "v8",
-      thresholds: { lines: 80, branches: 80, functions: 80, statements: 80 },
-    },
-  };
-
-  // --------------------------------------------------------
-  // VSCode Integration
-  // --------------------------------------------------------
-  const vscode: CheckConfig["vscode"] = {
-    enabled: true,
-    autoGenerateSettings: true,
-    settingsPath: "./.vscode/settings.json",
-    settings: {
-      oxc: {
-        enable: true,
-        lintRun: "onSave",
-        configPath: ".tmp/.oxlintrc.json",
-        fmtConfigPath: ".tmp/.oxfmtrc.json",
-        fmtExperimental: true,
-        typeAware: true,
-        traceServer: "verbose",
-      },
-      editor: {
-        formatOnSave: true,
-        defaultFormatter: "oxc.oxc-vscode",
-        codeActionsOnSave: {
-          "source.fixAll.eslint": "explicit",
-          "source.organizeImports": "explicit",
-        },
-      },
-      typescript: {
-        validateEnable: true,
-        suggestAutoImports: true,
-        preferTypeOnlyAutoImports: true,
-        experimentalUseTsgo: typecheck.enabled && typecheck.useTsgo,
-      },
-      files: { eol: "\n" },
-      search: {
-        exclude: {
-          "**/node_modules": true,
-          "**/tsconfig.tsbuildinfo": true,
-          "**/*.tmp": true,
-          "**/*.next": true,
-        },
-      },
+      return cachedEslintFlatConfig;
     },
   };
 
   return {
+    vibeCheck,
     oxlint,
     prettier,
     eslint,
