@@ -11,11 +11,10 @@
  * - VSCode integration
  */
 
-import reactCompilerPlugin from "eslint-plugin-react-compiler";
-import reactHooksPlugin from "eslint-plugin-react-hooks";
-import simpleImportSortPlugin from "eslint-plugin-simple-import-sort";
-import type { CheckConfig } from "next-vibe/system/check/config/types";
-import tseslint from "typescript-eslint";
+import type {
+  CheckConfig,
+  EslintFlatConfigItem,
+} from "next-vibe/system/check/config/types";
 
 // ============================================================
 // Feature Flags (local to this file, not part of CheckConfig)
@@ -654,140 +653,153 @@ const config = (): CheckConfig => {
     cachePath: ".tmp/eslint-cache",
     lintableExtensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
     ignores: oxlintIgnores,
-    flatConfig: [
-      { ignores: eslintIgnores },
-      {
-        files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
-        languageOptions: {
-          parser: tseslint.parser,
-          parserOptions: {
-            ecmaVersion: "latest",
-            sourceType: "module",
-            ecmaFeatures: { jsx: true },
+    // Lazy-load flatConfig to avoid loading heavy ESLint plugins until needed
+    get flatConfig(): EslintFlatConfigItem[] {
+      // Dynamic imports - only loaded when ESLint actually runs
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const reactCompilerPlugin = require("eslint-plugin-react-compiler");
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const reactHooksPlugin = require("eslint-plugin-react-hooks");
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const simpleImportSortPlugin = require("eslint-plugin-simple-import-sort");
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const tseslint = require("typescript-eslint");
+
+      return [
+        { ignores: eslintIgnores },
+        {
+          files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+          languageOptions: {
+            parser: tseslint.parser,
+            parserOptions: {
+              ecmaVersion: "latest",
+              sourceType: "module",
+              ecmaFeatures: { jsx: true },
+            },
+          },
+          linterOptions: { reportUnusedDisableDirectives: "off" },
+          plugins: {
+            "simple-import-sort": simpleImportSortPlugin,
+            ...(features.react ? { "react-hooks": reactHooksPlugin } : {}),
+            ...(features.reactCompiler
+              ? { "react-compiler": reactCompilerPlugin }
+              : {}),
+            // Stubs for oxlint rules
+            i18next: createEslintStub(["no-literal-string"]),
+            "oxlint-plugin-restricted": createEslintStub(["restricted-syntax"]),
+            "oxlint-plugin-jsx-capitalization": createEslintStub([
+              "jsx-capitalization",
+            ]),
+            "oxlint-plugin-i18n": createEslintStub(["no-literal-string"]),
+            "@typescript-eslint": createEslintStub([
+              "no-explicit-any",
+              "no-unused-vars",
+              "no-empty-function",
+              "no-empty-object-type",
+              "no-floating-promises",
+              "require-await",
+              "only-throw-error",
+              "no-unsafe-assignment",
+              "triple-slash-reference",
+              "consistent-type-definitions",
+              "no-require-imports",
+              "no-unsafe-function-type",
+              "explicit-function-return-type",
+              "no-namespace",
+              "no-unsafe-enum-comparison",
+              "consistent-type-imports",
+              "no-unnecessary-condition",
+              "no-base-to-string",
+              "no-unsafe-member-access",
+              "no-implied-eval",
+            ]),
+            "typescript-eslint": createEslintStub([
+              "no-explicit-any",
+              "no-unused-vars",
+            ]),
+            "eslint-plugin-unicorn": createEslintStub([
+              "require-module-specifiers",
+            ]),
+            prettier: createEslintStub(["prettier"]),
+            "eslint-plugin-promise": createEslintStub(["no-multiple-resolved"]),
+            "eslint-plugin-next": createEslintStub([
+              "no-html-link-for-pages",
+              "no-img-element",
+              "no-assign-module-variable",
+            ]),
+            "@next/next": createEslintStub(["no-img-element"]),
+            eslint: createEslintStub(["no-template-curly-in-string"]),
+            "jsx-a11y": createEslintStub(["prefer-tag-over-role"]),
+            oxc: createEslintStub(["only-used-in-recursion"]),
+            "eslint-plugin-import": createEslintStub(["no-named-as-default"]),
+            i18n: createEslintStub(["no-literal-string"]),
+          },
+          rules: {
+            "simple-import-sort/imports": "error",
+            "simple-import-sort/exports": "error",
+            ...(features.react
+              ? {
+                  "react-hooks/rules-of-hooks": "error",
+                  "react-hooks/exhaustive-deps": "error",
+                }
+              : {}),
+            ...(features.reactCompiler
+              ? { "react-compiler/react-compiler": "error" }
+              : {}),
+            "no-unused-vars": "off",
+            "no-console": "off",
+            "no-template-curly-in-string": "off",
+            "no-control-regex": "off",
+            "prefer-template": "off",
           },
         },
-        linterOptions: { reportUnusedDisableDirectives: "off" },
-        plugins: {
-          "simple-import-sort": simpleImportSortPlugin,
-          ...(features.react ? { "react-hooks": reactHooksPlugin } : {}),
-          ...(features.reactCompiler
-            ? { "react-compiler": reactCompilerPlugin }
-            : {}),
-          // Stubs for oxlint rules
-          i18next: createEslintStub(["no-literal-string"]),
-          "oxlint-plugin-restricted": createEslintStub(["restricted-syntax"]),
-          "oxlint-plugin-jsx-capitalization": createEslintStub([
-            "jsx-capitalization",
-          ]),
-          "oxlint-plugin-i18n": createEslintStub(["no-literal-string"]),
-          "@typescript-eslint": createEslintStub([
-            "no-explicit-any",
-            "no-unused-vars",
-            "no-empty-function",
-            "no-empty-object-type",
-            "no-floating-promises",
-            "require-await",
-            "only-throw-error",
-            "no-unsafe-assignment",
-            "triple-slash-reference",
-            "consistent-type-definitions",
-            "no-require-imports",
-            "no-unsafe-function-type",
-            "explicit-function-return-type",
-            "no-namespace",
-            "no-unsafe-enum-comparison",
-            "consistent-type-imports",
-            "no-unnecessary-condition",
-            "no-base-to-string",
-            "no-unsafe-member-access",
-            "no-implied-eval",
-          ]),
-          "typescript-eslint": createEslintStub([
-            "no-explicit-any",
-            "no-unused-vars",
-          ]),
-          "eslint-plugin-unicorn": createEslintStub([
-            "require-module-specifiers",
-          ]),
-          prettier: createEslintStub(["prettier"]),
-          "eslint-plugin-promise": createEslintStub(["no-multiple-resolved"]),
-          "eslint-plugin-next": createEslintStub([
-            "no-html-link-for-pages",
-            "no-img-element",
-            "no-assign-module-variable",
-          ]),
-          "@next/next": createEslintStub(["no-img-element"]),
-          eslint: createEslintStub(["no-template-curly-in-string"]),
-          "jsx-a11y": createEslintStub(["prefer-tag-over-role"]),
-          oxc: createEslintStub(["only-used-in-recursion"]),
-          "eslint-plugin-import": createEslintStub(["no-named-as-default"]),
-          i18n: createEslintStub(["no-literal-string"]),
+        {
+          files: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"],
+          linterOptions: { reportUnusedDisableDirectives: "off" },
+          plugins: {
+            "simple-import-sort": simpleImportSortPlugin,
+            ...(features.react ? { "react-hooks": reactHooksPlugin } : {}),
+            i18next: createEslintStub(["no-literal-string"]),
+            "oxlint-plugin-restricted": createEslintStub(["restricted-syntax"]),
+            "@typescript-eslint": createEslintStub([
+              "no-explicit-any",
+              "no-unused-vars",
+            ]),
+            "eslint-plugin-unicorn": createEslintStub([
+              "require-module-specifiers",
+            ]),
+            prettier: createEslintStub(["prettier"]),
+            "eslint-plugin-promise": createEslintStub(["no-multiple-resolved"]),
+            "eslint-plugin-next": createEslintStub([
+              "no-html-link-for-pages",
+              "no-img-element",
+              "no-assign-module-variable",
+            ]),
+            "@next/next": createEslintStub(["no-img-element"]),
+            eslint: createEslintStub(["no-template-curly-in-string"]),
+            "jsx-a11y": createEslintStub(["prefer-tag-over-role"]),
+            oxc: createEslintStub(["only-used-in-recursion"]),
+            "eslint-plugin-import": createEslintStub(["no-named-as-default"]),
+            i18n: createEslintStub(["no-literal-string"]),
+          },
+          rules: {
+            "simple-import-sort/imports": "error",
+            "simple-import-sort/exports": "error",
+            ...(features.react
+              ? {
+                  "react-hooks/rules-of-hooks": "error",
+                  "react-hooks/exhaustive-deps": "error",
+                }
+              : {}),
+            "no-unused-vars": "off",
+            "no-console": "off",
+            "no-template-curly-in-string": "off",
+            "no-control-regex": "off",
+            "prefer-template": "off",
+          },
         },
-        rules: {
-          "simple-import-sort/imports": "error",
-          "simple-import-sort/exports": "error",
-          ...(features.react
-            ? {
-                "react-hooks/rules-of-hooks": "error",
-                "react-hooks/exhaustive-deps": "error",
-              }
-            : {}),
-          ...(features.reactCompiler
-            ? { "react-compiler/react-compiler": "error" }
-            : {}),
-          "no-unused-vars": "off",
-          "no-console": "off",
-          "no-template-curly-in-string": "off",
-          "no-control-regex": "off",
-          "prefer-template": "off",
-        },
-      },
-      {
-        files: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"],
-        linterOptions: { reportUnusedDisableDirectives: "off" },
-        plugins: {
-          "simple-import-sort": simpleImportSortPlugin,
-          ...(features.react ? { "react-hooks": reactHooksPlugin } : {}),
-          i18next: createEslintStub(["no-literal-string"]),
-          "oxlint-plugin-restricted": createEslintStub(["restricted-syntax"]),
-          "@typescript-eslint": createEslintStub([
-            "no-explicit-any",
-            "no-unused-vars",
-          ]),
-          "eslint-plugin-unicorn": createEslintStub([
-            "require-module-specifiers",
-          ]),
-          prettier: createEslintStub(["prettier"]),
-          "eslint-plugin-promise": createEslintStub(["no-multiple-resolved"]),
-          "eslint-plugin-next": createEslintStub([
-            "no-html-link-for-pages",
-            "no-img-element",
-            "no-assign-module-variable",
-          ]),
-          "@next/next": createEslintStub(["no-img-element"]),
-          eslint: createEslintStub(["no-template-curly-in-string"]),
-          "jsx-a11y": createEslintStub(["prefer-tag-over-role"]),
-          oxc: createEslintStub(["only-used-in-recursion"]),
-          "eslint-plugin-import": createEslintStub(["no-named-as-default"]),
-          i18n: createEslintStub(["no-literal-string"]),
-        },
-        rules: {
-          "simple-import-sort/imports": "error",
-          "simple-import-sort/exports": "error",
-          ...(features.react
-            ? {
-                "react-hooks/rules-of-hooks": "error",
-                "react-hooks/exhaustive-deps": "error",
-              }
-            : {}),
-          "no-unused-vars": "off",
-          "no-console": "off",
-          "no-template-curly-in-string": "off",
-          "no-control-regex": "off",
-          "prefer-template": "off",
-        },
-      },
-    ],
+      ];
+    },
   };
 
   // --------------------------------------------------------

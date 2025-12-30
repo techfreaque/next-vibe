@@ -56,7 +56,11 @@ export function HardcodedVariables(): React.ReactElement {
 }
 
 // Literal strings in conditional rendering
-export function ConditionalStrings({ isError }: { isError: boolean }): React.ReactElement {
+export function ConditionalStrings({
+  isError,
+}: {
+  isError: boolean;
+}): React.ReactElement {
   return (
     <div>
       {isError ? (
@@ -75,7 +79,9 @@ export function ArrayStrings(): React.ReactElement {
   return (
     <nav>
       {menuItems.map((item, index) => (
-        <a key={index} href="#">{item}</a>
+        <a key={index} href="#">
+          {item}
+        </a>
       ))}
     </nav>
   );
@@ -105,7 +111,11 @@ function CustomButton({ label }: { label: string }): React.ReactElement {
   return <button>{label}</button>;
 }
 
-function CustomInput({ errorMessage }: { errorMessage: string }): React.ReactElement {
+function CustomInput({
+  errorMessage,
+}: {
+  errorMessage: string;
+}): React.ReactElement {
   return (
     <div>
       <input />

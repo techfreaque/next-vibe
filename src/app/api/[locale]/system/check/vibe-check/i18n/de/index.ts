@@ -93,14 +93,18 @@ export const translations: typeof enTranslations = {
         app: "App-Verzeichnis (src/app)",
       },
     },
-    maxIssues: {
-      label: "Maximale Probleme",
-      description: "Maximale Anzahl von Problemen in der Ausgabe (1-10000)",
+    limit: {
+      label: "Limit",
+      description: "Anzahl der Probleme pro Seite (1-10000, Standard: 100)",
     },
-    maxFiles: {
-      label: "Maximale Dateien",
+    page: {
+      label: "Seite",
+      description: "Seitennummer für paginierte Ergebnisse (beginnt bei 1)",
+    },
+    maxFilesInSummary: {
+      label: "Max. Dateien in Zusammenfassung",
       description:
-        "Maximale Anzahl von Dateien in der Zusammenfassung (1-1000)",
+        "Maximale Anzahl der Dateien in der betroffenen Dateiliste (1-1000)",
     },
   },
 
@@ -121,6 +125,15 @@ export const translations: typeof enTranslations = {
       displayedIssues: "Angezeigte Probleme",
       displayedFiles: "Angezeigte Dateien",
       truncatedMessage: "Ausgabe gekürzt um Grenzwerte einzuhalten",
+      currentPage: "Aktuelle Seite",
+      totalPages: "Gesamtzahl Seiten",
+      files: {
+        title: "Betroffene Dateien",
+        file: "Dateipfad",
+        errors: "Fehler",
+        warnings: "Warnungen",
+        total: "Gesamtzahl Probleme",
+      },
     },
   },
 

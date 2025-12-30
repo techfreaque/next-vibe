@@ -86,6 +86,8 @@ export enum WidgetType {
   DATA_GRID = "data_grid",
   GROUPED_LIST = "grouped_list",
   CODE_QUALITY_LIST = "code_quality_list",
+  CODE_QUALITY_SUMMARY = "code_quality_summary",
+  CODE_QUALITY_FILES = "code_quality_files",
   METADATA_CARD = "metadata_card",
 
   // Layout widgets

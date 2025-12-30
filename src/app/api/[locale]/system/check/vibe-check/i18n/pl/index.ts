@@ -95,13 +95,18 @@ export const translations: typeof enTranslations = {
         app: "Katalog App (src/app)",
       },
     },
-    maxIssues: {
-      label: "Maksymalna Liczba Problemów",
-      description: "Maksymalna liczba problemów do wyświetlenia (1-10000)",
+    limit: {
+      label: "Limit",
+      description: "Liczba problemów na stronę (1-10000, domyślnie: 100)",
     },
-    maxFiles: {
-      label: "Maksymalna Liczba Plików",
-      description: "Maksymalna liczba plików w podsumowaniu (1-1000)",
+    page: {
+      label: "Strona",
+      description: "Numer strony dla paginowanych wyników (zaczyna się od 1)",
+    },
+    maxFilesInSummary: {
+      label: "Maks. Plików w Podsumowaniu",
+      description:
+        "Maksymalna liczba plików na liście dotkniętych plików (1-1000)",
     },
   },
 
@@ -122,6 +127,15 @@ export const translations: typeof enTranslations = {
       displayedIssues: "Pokazane Problemy",
       displayedFiles: "Pokazane Pliki",
       truncatedMessage: "Wynik skrócony do limitów",
+      currentPage: "Bieżąca Strona",
+      totalPages: "Wszystkie Strony",
+      files: {
+        title: "Dotknięte Pliki",
+        file: "Ścieżka Pliku",
+        errors: "Błędy",
+        warnings: "Ostrzeżenia",
+        total: "Wszystkie Problemy",
+      },
     },
   },
 

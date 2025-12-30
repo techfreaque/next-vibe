@@ -91,14 +91,19 @@ export const translations = {
         app: "App Directory (src/app)",
       },
     },
-    maxIssues: {
-      label: "Max Issues",
+    limit: {
+      label: "Limit",
       description:
-        "Maximum number of issues to display in the output (1-10000)",
+        "Number of issues to display per page (1-10000, default: 100)",
     },
-    maxFiles: {
-      label: "Max Files",
-      description: "Maximum number of files to show in summary (1-1000)",
+    page: {
+      label: "Page",
+      description: "Page number for paginated results (starts at 1)",
+    },
+    maxFilesInSummary: {
+      label: "Max Files in Summary",
+      description:
+        "Maximum number of files to show in the affected files list (1-1000)",
     },
   },
 
@@ -119,6 +124,15 @@ export const translations = {
       displayedIssues: "Showing Issues",
       displayedFiles: "Showing Files",
       truncatedMessage: "Output truncated to fit limits",
+      currentPage: "Current Page",
+      totalPages: "Total Pages",
+      files: {
+        title: "Affected Files",
+        file: "File Path",
+        errors: "Errors",
+        warnings: "Warnings",
+        total: "Total Issues",
+      },
     },
   },
 

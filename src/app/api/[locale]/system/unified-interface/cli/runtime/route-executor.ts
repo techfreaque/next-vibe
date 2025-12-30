@@ -143,6 +143,9 @@ export interface RouteExecutionResult {
     resolvedCommand?: string;
   };
 
+  /** Performance metadata from route execution (translation keys as keys) */
+  performance?: Partial<Record<TranslationKey, number>>;
+
   /** Error cause chain for debugging - reuses ErrorResponseType */
   cause?: ErrorResponseType;
 
@@ -270,6 +273,11 @@ export class RouteDelegationHandler {
         isErrorResponse:
           "isErrorResponse" in result && result.isErrorResponse
             ? true
+            : undefined,
+        // Pass through performance metadata from API response for execution summary
+        performance:
+          "performance" in result && result.performance
+            ? result.performance
             : undefined,
       };
 

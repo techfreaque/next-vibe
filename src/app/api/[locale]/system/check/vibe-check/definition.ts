@@ -176,40 +176,44 @@ const { POST } = createEndpoint({
         z.union([z.string(), z.array(z.string())]).optional(),
       ),
 
-      maxIssues: requestDataField(
+      limit: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.check.vibeCheck.fields.maxIssues.label",
+          label: "app.api.system.check.vibeCheck.fields.limit.label",
           description:
-            "app.api.system.check.vibeCheck.fields.maxIssues.description",
+            "app.api.system.check.vibeCheck.fields.limit.description",
           columns: 4,
         },
-        z.coerce.number().min(1).max(10000).optional().default(100),
+        z.coerce.number().min(1).optional().default(200),
       ),
 
-      maxFiles: requestDataField(
+      page: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.check.vibeCheck.fields.maxFiles.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.maxFiles.description",
+          label: "app.api.system.check.vibeCheck.fields.page.label",
+          description: "app.api.system.check.vibeCheck.fields.page.description",
           columns: 4,
         },
-        z.coerce.number().min(1).max(1000).optional().default(50),
+        z.coerce.number().min(1).optional().default(1),
+      ),
+
+      maxFilesInSummary: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.NUMBER,
+          label:
+            "app.api.system.check.vibeCheck.fields.maxFilesInSummary.label",
+          description:
+            "app.api.system.check.vibeCheck.fields.maxFilesInSummary.description",
+          columns: 4,
+        },
+        z.coerce.number().min(1).default(50),
       ),
 
       // === RESPONSE FIELDS ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.system.check.vibeCheck.response.success",
-        },
-        z.boolean(),
-      ),
-
-      issues: responseArrayField(
+      issues: objectField(
         {
           type: WidgetType.CODE_QUALITY_LIST,
           groupBy: "file",
@@ -218,147 +222,125 @@ const { POST } = createEndpoint({
           layoutType: LayoutType.GRID,
           columns: 1,
         },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            title: "app.api.system.check.vibeCheck.response.issues.title",
-            description:
-              "app.api.system.check.vibeCheck.response.issues.emptyState.description",
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            file: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.check.vibeCheck.response.issues.title",
-              },
-              z.string(),
-            ),
-            line: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.check.vibeCheck.response.issues.title",
-              },
-              z.coerce.number().optional(),
-            ),
-            column: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.check.vibeCheck.response.issues.title",
-              },
-              z.coerce.number().optional(),
-            ),
-            rule: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.check.vibeCheck.response.issues.title",
-              },
-              z.string().optional(),
-            ),
-            code: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.check.vibeCheck.response.issues.title",
-              },
-              z.string().optional(),
-            ),
-            severity: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.check.vibeCheck.response.issues.title",
-              },
-              z.enum(["error", "warning", "info"]),
-            ),
-            message: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.check.vibeCheck.response.success",
-              },
-              z.string(),
-            ),
-            type: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.system.check.vibeCheck.response.issues.title",
-              },
-              z.enum(["oxlint", "lint", "type"]),
-            ),
-          },
-        ),
-      ),
-
-      // === SUMMARY STATS ===
-      summary: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.check.vibeCheck.response.summary.title",
-          description:
-            "app.api.system.check.vibeCheck.response.summary.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
         { response: true },
         {
-          totalIssues: responseField(
+          items: responseArrayField(
             {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.check.vibeCheck.response.summary.totalIssues",
-              columns: 3,
-            },
-            z.number(),
-          ),
-
-          totalFiles: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.check.vibeCheck.response.summary.totalFiles",
-              columns: 3,
-            },
-            z.number(),
-          ),
-
-          totalErrors: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.check.vibeCheck.response.summary.totalErrors",
-              columns: 3,
-            },
-            z.number(),
-          ),
-
-          displayedIssues: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.check.vibeCheck.response.summary.displayedIssues",
-              columns: 3,
-            },
-            z.number(),
-          ),
-
-          displayedFiles: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.check.vibeCheck.response.summary.displayedFiles",
-              columns: 3,
-            },
-            z.number(),
-          ),
-
-          truncatedMessage: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.system.check.vibeCheck.response.summary.truncatedMessage",
+              type: WidgetType.CONTAINER,
+              title: "app.api.system.check.vibeCheck.response.issues.title",
+              description:
+                "app.api.system.check.vibeCheck.response.issues.emptyState.description",
+              layoutType: LayoutType.GRID,
               columns: 12,
             },
-            z.string(),
+            objectField(
+              {
+                type: WidgetType.CONTAINER,
+                title: "app.api.system.check.vibeCheck.response.issues.title",
+                description:
+                  "app.api.system.check.vibeCheck.response.issues.emptyState.description",
+                layoutType: LayoutType.GRID,
+                columns: 12,
+              },
+              { response: true },
+              {
+                file: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.vibeCheck.response.issues.title",
+                  },
+                  z.string(),
+                ),
+                line: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.vibeCheck.response.issues.title",
+                  },
+                  z.coerce.number().optional(),
+                ),
+                column: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.vibeCheck.response.issues.title",
+                  },
+                  z.coerce.number().optional(),
+                ),
+                rule: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.vibeCheck.response.issues.title",
+                  },
+                  z.string().optional(),
+                ),
+                code: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.vibeCheck.response.issues.title",
+                  },
+                  z.string().optional(),
+                ),
+                severity: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.vibeCheck.response.issues.title",
+                  },
+                  z.enum(["error", "warning", "info"]),
+                ),
+                message: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.system.check.vibeCheck.response.success",
+                  },
+                  z.string(),
+                ),
+                type: responseField(
+                  {
+                    type: WidgetType.TEXT,
+                    content:
+                      "app.api.system.check.vibeCheck.response.issues.title",
+                  },
+                  z.enum(["oxlint", "lint", "type"]),
+                ),
+              },
+            ),
+          ),
+
+          // === FILES LIST ===
+          files: responseField(
+            {
+              type: WidgetType.CODE_QUALITY_FILES,
+            },
+            z.array(
+              z.object({
+                file: z.string(),
+                errors: z.number(),
+                warnings: z.number(),
+                total: z.number(),
+              }),
+            ),
+          ),
+
+          // === SUMMARY STATS ===
+          summary: responseField(
+            {
+              type: WidgetType.CODE_QUALITY_SUMMARY,
+            },
+            z.object({
+              totalIssues: z.number(),
+              totalFiles: z.number(),
+              totalErrors: z.number(),
+              displayedIssues: z.number(),
+              displayedFiles: z.number(),
+              truncatedMessage: z.string().optional(),
+              currentPage: z.number(),
+              totalPages: z.number(),
+            }),
           ),
         },
       ),
@@ -423,8 +405,9 @@ const { POST } = createEndpoint({
         skipEslint: false,
         skipOxlint: false,
         skipTypecheck: false,
-        maxIssues: 100,
-        maxFiles: 50,
+        limit: 100,
+        page: 1,
+        maxFilesInSummary: 50,
       },
       success: {
         fix: false,
@@ -432,8 +415,9 @@ const { POST } = createEndpoint({
         skipEslint: false,
         skipOxlint: false,
         skipTypecheck: false,
-        maxIssues: 100,
-        maxFiles: 50,
+        limit: 100,
+        page: 1,
+        maxFilesInSummary: 50,
       },
       withErrors: {
         fix: true,
@@ -441,8 +425,9 @@ const { POST } = createEndpoint({
         skipEslint: false,
         skipOxlint: false,
         skipTypecheck: false,
-        maxIssues: 100,
-        maxFiles: 50,
+        limit: 100,
+        page: 1,
+        maxFilesInSummary: 50,
       },
       quickCheck: {
         fix: false,
@@ -450,8 +435,9 @@ const { POST } = createEndpoint({
         skipEslint: false,
         skipOxlint: false,
         skipTypecheck: false,
-        maxIssues: 100,
-        maxFiles: 50,
+        limit: 100,
+        page: 1,
+        maxFilesInSummary: 50,
       },
       specificPaths: {
         fix: true,
@@ -460,80 +446,103 @@ const { POST } = createEndpoint({
         skipOxlint: false,
         skipTypecheck: false,
         paths: ["src/components", "src/utils"],
-        maxIssues: 100,
-        maxFiles: 50,
+        limit: 100,
+        page: 1,
+        maxFilesInSummary: 50,
       },
     },
     responses: {
       default: {
-        success: true,
-        issues: [],
-        summary: {
-          totalIssues: 0,
-          totalFiles: 0,
-          totalErrors: 0,
-          displayedIssues: 0,
-          displayedFiles: 0,
-          truncatedMessage: "",
+        issues: {
+          items: [],
+          files: [],
+          summary: {
+            totalIssues: 0,
+            totalFiles: 0,
+            totalErrors: 0,
+            displayedIssues: 0,
+            displayedFiles: 0,
+            currentPage: 1,
+            totalPages: 1,
+          },
         },
       },
       success: {
-        success: true,
-        issues: [],
-        summary: {
-          totalIssues: 0,
-          totalFiles: 0,
-          totalErrors: 0,
-          displayedIssues: 0,
-          displayedFiles: 0,
-          truncatedMessage: "",
+        issues: {
+          items: [],
+          files: [],
+          summary: {
+            totalIssues: 0,
+            totalFiles: 0,
+            totalErrors: 0,
+            displayedIssues: 0,
+            displayedFiles: 0,
+            currentPage: 1,
+            totalPages: 1,
+          },
         },
       },
       withErrors: {
-        success: false,
-        issues: [
-          {
-            file: "src/components/example.tsx",
-            line: 42,
-            column: 10,
-            rule: "no-unused-vars",
-            code: "unused-variable",
-            severity: "error" as const,
-            message: "Variable 'example' is defined but never used",
-            type: "lint" as const,
+        issues: {
+          items: [
+            {
+              file: "src/components/example.tsx",
+              line: 42,
+              column: 10,
+              rule: "no-unused-vars",
+              code: "unused-variable",
+              severity: "error" as const,
+              message: "Variable 'example' is defined but never used",
+              type: "lint" as const,
+            },
+          ],
+          files: [
+            {
+              file: "src/components/example.tsx",
+              errors: 1,
+              warnings: 0,
+              total: 1,
+            },
+          ],
+          summary: {
+            totalIssues: 1,
+            totalFiles: 1,
+            totalErrors: 1,
+            displayedIssues: 1,
+            displayedFiles: 1,
+            currentPage: 1,
+            totalPages: 1,
           },
-        ],
-        summary: {
-          totalIssues: 1,
-          totalFiles: 1,
-          totalErrors: 1,
-          displayedIssues: 1,
-          displayedFiles: 1,
-          truncatedMessage: "",
         },
       },
       quickCheck: {
-        success: true,
-        issues: [],
-        summary: {
-          totalIssues: 0,
-          totalFiles: 0,
-          totalErrors: 0,
-          displayedIssues: 0,
-          displayedFiles: 0,
-          truncatedMessage: "",
+        issues: {
+          items: [],
+          files: [],
+          summary: {
+            totalIssues: 0,
+            totalFiles: 0,
+            totalErrors: 0,
+            displayedIssues: 0,
+            displayedFiles: 0,
+            currentPage: 1,
+            totalPages: 1,
+          },
         },
       },
       specificPaths: {
-        success: true,
-        issues: [],
-        summary: {
-          totalIssues: 0,
-          totalFiles: 0,
-          totalErrors: 0,
-          displayedIssues: 0,
-          displayedFiles: 0,
-          truncatedMessage: "",
+        issues: {
+          items: [],
+          files: [],
+          summary: {
+            totalIssues: 0,
+            totalFiles: 0,
+            totalErrors: 0,
+            displayedIssues: 0,
+            displayedFiles: 0,
+            currentPage: 1,
+            totalPages: 1,
+          },
         },
       },
     },

@@ -447,11 +447,12 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       });
     }
 
-    // Preserve isErrorResponse flag from handler result for CLI exit code handling
+    // Preserve isErrorResponse flag and performance metadata from handler result
     return {
       success: true,
       data: responseValidation.data as T["types"]["ResponseOutput"],
       ...(result.isErrorResponse && { isErrorResponse: true as const }),
+      ...(result.performance && { performance: result.performance }),
     };
   };
 }

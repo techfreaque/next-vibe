@@ -20,7 +20,7 @@ const inferrableBoolean: boolean = true;
 export function emptyFunction(): void {}
 
 // typescript/consistent-type-imports - Should use type import
-import { GreetOptions } from "../greet";
+import type { GreetOptions } from "../greet";
 
 // Function using the imported type to avoid unused import error
 export function greetWrapper(options: GreetOptions): string {
@@ -35,7 +35,9 @@ export enum Status {
 }
 
 // typescript/no-extra-non-null-assertion - Extra non-null assertion
-export function getNested(obj: { a?: { b?: string } } | null): string | undefined {
+export function getNested(
+  obj: { a?: { b?: string } } | null,
+): string | undefined {
   return obj!!?.a?.b;
 }
 

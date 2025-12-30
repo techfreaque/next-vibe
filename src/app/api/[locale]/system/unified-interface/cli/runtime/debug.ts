@@ -351,21 +351,62 @@ function formatActiveHandles(handles: ActiveHandle[]): string {
 function formatExecutionSummary(
   breakdown: PerformanceBreakdown,
   locale: CountryLanguage,
+  performanceMetadata?: Partial<Record<string, number>>,
 ): string {
-  const { t } = simpleT(locale);
-  const overhead = breakdown.totalDuration - breakdown.routeExecution;
+  // Check if we have detailed performance metadata (e.g., oxlint, eslint, typecheck timings)
+  if (performanceMetadata && Object.keys(performanceMetadata).length > 0) {
+    // Build detailed timing string
+    const timingParts: string[] = [];
+
+    // Sort keys to ensure consistent order: oxlint, eslint, typecheck (exclude total - we'll add it manually)
+    const sortedKeys = Object.keys(performanceMetadata)
+      .filter((key) => !key.includes(".total"))
+      .toSorted((a, b) => {
+        const order: Record<string, number> = {
+          oxlint: 1,
+          eslint: 2,
+          typecheck: 3,
+        };
+        const aKey = a.split(".").pop() || "";
+        const bKey = b.split(".").pop() || "";
+        return (order[aKey] || 99) - (order[bKey] || 99);
+      });
+
+    for (const key of sortedKeys) {
+      const value = performanceMetadata[key];
+      if (value !== undefined) {
+        // Extract the last part of the translation key (e.g., "oxlint" from "app.api.system.check.vibeCheck.performance.oxlint")
+        const label = key.split(".").pop() || key;
+
+        // Capitalize first letter for display
+        const displayLabel =
+          label === "oxlint"
+            ? "Oxlint"
+            : label === "eslint"
+              ? "ESLint"
+              : label === "typecheck"
+                ? "TypeScript"
+                : label.charAt(0).toUpperCase() + label.slice(1);
+
+        const seconds = (value / 1000).toFixed(2);
+        timingParts.push(`${displayLabel}: ${seconds}s`);
+      }
+    }
+
+    // Add total time from breakdown (complete time from first to last line of script)
+    const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
+    timingParts.push(`Total: ${totalSeconds}s`);
+
+    if (timingParts.length > 0) {
+      return `\n${timingParts.join(" | ")}`;
+    }
+  }
+
+  // Fallback to simple format if no performance metadata
   const executionSeconds = (breakdown.routeExecution / 1000).toFixed(2);
-  const overheadSeconds = (overhead / 1000).toFixed(2);
   const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
 
-  return `\n${t(
-    "app.api.system.unifiedInterface.cli.vibe.utils.debug.executionSummary",
-    {
-      executionSeconds,
-      overheadSeconds,
-      totalSeconds,
-    },
-  )}`;
+  return `\nExecution: ${executionSeconds}s | Total: ${totalSeconds}s`;
 }
 
 /**
@@ -481,7 +522,16 @@ export class CliResourceManager {
           );
           logger.info(DebugFormatter.formatPerformanceBreakdown(breakdown));
         } else {
-          logger.info(DebugFormatter.formatExecutionSummary(breakdown, locale));
+          // Use console.log directly to avoid duplicate timestamp from logger
+          // The execution summary is already formatted and translated
+          // oxlint-disable-next-line no-console
+          console.log(
+            DebugFormatter.formatExecutionSummary(
+              breakdown,
+              locale,
+              result.performance,
+            ),
+          );
         }
       }
 

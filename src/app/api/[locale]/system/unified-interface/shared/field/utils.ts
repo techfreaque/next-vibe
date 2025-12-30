@@ -7,6 +7,8 @@
 
 import { z } from "zod";
 
+import type { TranslationKey } from "@/i18n/core/static-types";
+
 import type { EndpointLogger } from "../logger/endpoint";
 import type {
   ArrayField,
@@ -299,7 +301,7 @@ export function extractSchemaDefaults<T>(
  * Create a primitive field (string, number, boolean, etc.)
  */
 export function field<
-  TKey extends string,
+  TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
   const TSchema extends z.ZodTypeAny,
   const TUsage extends FieldUsageConfig,
@@ -322,7 +324,7 @@ export function field<
  * Create a field that can be both request and response
  */
 export function requestResponseField<
-  TKey extends string,
+  TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
 >(
@@ -338,7 +340,7 @@ export function requestResponseField<
 >;
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<
-  TKey extends string,
+  TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
 >(
@@ -354,7 +356,7 @@ export function requestResponseField<
 >;
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<
-  TKey extends string,
+  TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
 >(
@@ -382,7 +384,7 @@ export function requestResponseField<
  * Create a request data field
  */
 export function requestDataField<
-  TKey extends string,
+  TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
   TSchema extends z.ZodTypeAny,
 >(
@@ -403,7 +405,7 @@ export function requestDataField<
  * Create a request URL params field
  */
 export function requestUrlPathParamsField<
-  TKey extends string,
+  TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
   TSchema extends z.ZodTypeAny,
 >(
@@ -429,7 +431,7 @@ export function requestUrlPathParamsField<
  * Create a response field
  */
 export function responseField<
-  TKey extends string,
+  TKey extends string = TranslationKey,
   TSchema extends z.ZodTypeAny,
   const TUIConfig extends WidgetConfig<TKey>,
 >(
@@ -450,7 +452,7 @@ export function responseField<
  * Create a widget-only field (buttons, alerts, static content)
  */
 export function widgetField<
-  TKey extends string,
+  TKey extends string = TranslationKey,
   TUsage extends FieldUsageConfig,
   const TUIConfig extends WidgetConfig<TKey>,
 >(
@@ -468,10 +470,10 @@ export function widgetField<
 
 /**
  * Create an object field containing other fields
- * TKey should be provided by FieldBuilder for type safety
+ * Uses TranslationKey by default for automatic validation of translation keys
  */
 export function objectField<
-  TKey extends string,
+  TKey extends string = TranslationKey,
   TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
   const TUIConfig extends WidgetConfig<TKey>,
   TUsage extends FieldUsageConfig,
@@ -495,7 +497,7 @@ export function objectField<
  */
 export function arrayField<
   Child,
-  const TKey extends string,
+  const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
 >(
   usage: FieldUsageConfig,
@@ -517,7 +519,7 @@ export function arrayField<
  */
 export function requestDataArrayField<
   Child,
-  const TKey extends string,
+  const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
@@ -538,7 +540,7 @@ export function requestDataArrayField<
  */
 export function responseArrayField<
   Child,
-  const TKey extends string,
+  const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
@@ -560,7 +562,7 @@ export function responseArrayField<
 export function objectOptionalField<
   C,
   U extends FieldUsageConfig,
-  const TKey extends string,
+  const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
@@ -597,7 +599,7 @@ export function objectUnionField<
     >[],
   ],
   TUsage extends FieldUsageConfig,
-  const TKey extends string,
+  const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
@@ -621,7 +623,7 @@ export function objectUnionField<
  */
 export function arrayOptionalField<
   Child,
-  const TKey extends string,
+  const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
 >(
   usage: FieldUsageConfig,
@@ -643,7 +645,7 @@ export function arrayOptionalField<
  */
 export function requestDataArrayOptionalField<
   Child,
-  const TKey extends string,
+  const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
@@ -664,7 +666,7 @@ export function requestDataArrayOptionalField<
  */
 export function responseArrayOptionalField<
   Child,
-  const TKey extends string,
+  const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey>,
 >(
   ui: TUIConfig,

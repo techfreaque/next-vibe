@@ -19,7 +19,11 @@ export function ListWithoutKeys(): React.ReactElement {
 
 // react/jsx-no-duplicate-props - Duplicate props
 export function DuplicateProps(): React.ReactElement {
-  return <div className="first" className="second">Content</div>;
+  return (
+    <div className="first" className="second">
+      Content
+    </div>
+  );
 }
 
 // react/no-children-prop - Children as prop
@@ -47,8 +51,8 @@ export class StateMutation extends React.Component<object, { count: number }> {
 export function NotSelfClosing(): React.ReactElement {
   return (
     <div>
-      <br></br>
-      <img src="test.png" alt="test"></img>
+      <br />
+      <img src="test.png" alt="test" />
     </div>
   );
 }
@@ -79,7 +83,12 @@ export function MissingDeps(): React.ReactElement {
   }, [name]);
 
   return (
-    <div onClick={() => { setCount(count + 1); setName("updated"); }}>
+    <div
+      onClick={() => {
+        setCount(count + 1);
+        setName("updated");
+      }}
+    >
       {count}
     </div>
   );

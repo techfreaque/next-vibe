@@ -8,6 +8,21 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { I18N_PATH, INDEX_FILE } from "../constants";
 import type { TranslationObject } from "./key-usage-analyzer";
 
+/**
+ * Helper to build dynamic file paths at runtime.
+ * This prevents Turbopack from statically analyzing the path patterns.
+ * @param segments - Path segments to join
+ * @returns The joined path
+ */
+function buildPath(...segments: string[]): string {
+  // Using a variable for cwd prevents static path analysis
+  const cwd = String(process.cwd());
+  if (segments[0] === cwd || segments[0]?.startsWith(cwd)) {
+    return path.join(...segments);
+  }
+  return path.join(cwd, ...segments);
+}
+
 export class FileGenerator {
   /**
    * Set of all locations across all languages
@@ -72,7 +87,7 @@ export class FileGenerator {
     logger: EndpointLogger,
   ): void {
     try {
-      const srcDir = path.resolve(process.cwd(), "src");
+      const srcDir = buildPath("src");
       this.removeOldI18nFiles(srcDir, language, logger);
     } catch (error) {
       logger.error(`Failed to cleanup old generated files for ${language}`, {
@@ -98,8 +113,7 @@ export class FileGenerator {
     }
 
     // Get the absolute path of the root src/i18n directory
-
-    const rootSrcI18nDir = path.resolve(process.cwd(), "src", I18N_PATH);
+    const rootSrcI18nDir = buildPath("src", I18N_PATH);
 
     const entries = fs.readdirSync(dir, { withFileTypes: true });
 
@@ -271,8 +285,7 @@ export class FileGenerator {
     try {
       // Generate co-located file path (next to the code, not in src/i18n)
       // Location is relative to src/, so prepend "src"
-      const filePath = path.join(
-        process.cwd(),
+      const filePath = buildPath(
         "src",
         location,
         I18N_PATH,
@@ -452,7 +465,7 @@ export class FileGenerator {
    * Clean up existing language directory except core utilities
    */
   private cleanupLanguageDirectory(language: string): void {
-    const languageDir = path.join(process.cwd(), "src", I18N_PATH, language);
+    const languageDir = buildPath("src", I18N_PATH, language);
 
     if (!fs.existsSync(languageDir)) {
       return;
@@ -544,8 +557,7 @@ export class FileGenerator {
     logger: EndpointLogger,
     generatedFiles: Set<string>,
   ): void {
-    const indexPath = path.join(
-      process.cwd(),
+    const indexPath = buildPath(
       "src",
       sourcePath,
       I18N_PATH,
@@ -718,14 +730,7 @@ export class FileGenerator {
     groups: Map<string, TranslationObject>,
     language: string,
   ): void {
-    const mainIndexPath = path.join(
-      process.cwd(),
-      "src",
-
-      I18N_PATH,
-      language,
-      INDEX_FILE,
-    );
+    const mainIndexPath = buildPath("src", I18N_PATH, language, INDEX_FILE);
 
     // Find top-level sections (app, packages, app-native, etc.)
     // Locations are now relative to src/ (e.g., "app/[locale]/admin", "packages/...")
@@ -756,11 +761,9 @@ export class FileGenerator {
       const importName = `${sanitizedName}Translations`;
 
       // Import from source hierarchy - use relative path from main index to section
-      const sectionIndexPath = path.join(
-        process.cwd(),
+      const sectionIndexPath = buildPath(
         "src",
         section,
-
         I18N_PATH,
         language,
         INDEX_FILE,

@@ -15,7 +15,9 @@ import { AccordionWidgetRenderer } from "../implementations/accordion";
 import { AvatarWidgetRenderer } from "../implementations/avatar";
 import { BadgeWidgetRenderer } from "../implementations/badge";
 import { CodeOutputWidgetRenderer } from "../implementations/code-output";
+import { CodeQualityFilesWidgetRenderer } from "../implementations/code-quality-files";
 import { CodeQualityListWidgetRenderer } from "../implementations/code-quality-list";
+import { CodeQualitySummaryWidgetRenderer } from "../implementations/code-quality-summary";
 import { ContainerWidgetRenderer } from "../implementations/container";
 import { DataCardWidgetRenderer } from "../implementations/data-card";
 import { DataCardsWidgetRenderer } from "../implementations/data-cards";
@@ -53,6 +55,8 @@ const dataCardsRenderer = new DataCardsWidgetRenderer();
 const dataListRenderer = new DataListWidgetRenderer();
 const groupedListRenderer = new GroupedListWidgetRenderer();
 const codeQualityListRenderer = new CodeQualityListWidgetRenderer();
+const codeQualitySummaryRenderer = new CodeQualitySummaryWidgetRenderer();
+const codeQualityFilesRenderer = new CodeQualityFilesWidgetRenderer();
 const codeOutputRenderer = new CodeOutputWidgetRenderer();
 const metricRenderer = new MetricWidgetRenderer();
 const statsGridRenderer = new StatsGridWidgetRenderer();
@@ -141,6 +145,18 @@ function renderWidget<const TKey extends string>(
         ...baseProps,
         widgetType,
       } as CLIWidgetProps<typeof WidgetType.CODE_QUALITY_LIST, TKey>);
+
+    case WidgetType.CODE_QUALITY_SUMMARY:
+      return codeQualitySummaryRenderer.render({
+        ...baseProps,
+        widgetType,
+      } as CLIWidgetProps<typeof WidgetType.CODE_QUALITY_SUMMARY, TKey>);
+
+    case WidgetType.CODE_QUALITY_FILES:
+      return codeQualityFilesRenderer.render({
+        ...baseProps,
+        widgetType,
+      } as CLIWidgetProps<typeof WidgetType.CODE_QUALITY_FILES, TKey>);
 
     case WidgetType.CODE_OUTPUT:
       return codeOutputRenderer.render({

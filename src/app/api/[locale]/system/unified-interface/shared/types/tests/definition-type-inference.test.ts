@@ -485,7 +485,7 @@ type Test11f_IsNotNever = Test11f_InferredSchema extends z.ZodNever
 
 // Test 12a: Create a simple field and check its TKey (using proper TextWidgetConfig with content)
 const simpleTestField = responseField(
-  { type: WidgetType.TEXT, content: "app.common.test" as const },
+  { type: WidgetType.TEXT, content: "app.common.active" as const },
   {} as z.ZodString,
 );
 type Test12a_SimpleField = typeof simpleTestField;
@@ -787,7 +787,7 @@ const fieldWithLabels = objectField(
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
-    title: "app.common.container" as const,
+    title: "app.common.active" as const,
   },
   { response: true },
   {

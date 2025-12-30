@@ -467,9 +467,6 @@ export type CreateEndpointReturnInMethod<
  * Translation key inference:
  * - TScopedTranslationKey is inferred from scopedTranslation.ScopedTranslationKey when provided
  * - Defaults to TranslationKey (global keys) when scopedTranslation is not provided
- * - NoInfer on title/description/category/tags ensures errors appear at property level
- *
- * Errors appear on the specific property with the invalid key, not as generic "no overload matches"
  */
 export function createEndpoint<
   const TExampleKey extends string,

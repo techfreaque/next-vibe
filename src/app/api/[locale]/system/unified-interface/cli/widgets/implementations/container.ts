@@ -26,18 +26,18 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
   render(props: CLIWidgetProps<typeof WidgetType.CONTAINER, string>): string {
     const { field, value, context } = props;
 
-    // Extract data using shared logic
+    // For container, we expect object values with children or named fields
+    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+      return this.renderContainerObject(value, field, context);
+    }
+
+    // Extract data using shared logic for array values
     const data = extractContainerData(value);
 
     // Handle null case
     if (!data) {
       const label = this.formatLabel(field, context);
       return `${label}: —`;
-    }
-
-    // For container, we expect object values with children
-    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      return this.renderContainerObject(value, field, context);
     }
 
     const label = this.formatLabel(field, context);

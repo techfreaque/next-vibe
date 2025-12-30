@@ -33,9 +33,5 @@ function HookIssues({ id }: { id: string }): ReactElement {
     setData(`Data for ${id}, count: ${count}`);
   }, []); // Missing dependencies
 
-  return (
-    <div onClick={() => setCount(count + 1)}>
-      {data}
-    </div>
-  );
+  return <div onClick={() => setCount(count + 1)}>{data}</div>;
 }

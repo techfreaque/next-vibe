@@ -70,6 +70,8 @@ export interface SuccessResponseOptions {
   isErrorResponse?: true;
   /** Custom headers to include in the HTTP response */
   headers?: Record<string, string>;
+  /** Performance metadata (translation keys as keys, duration in ms as values) */
+  performance?: Partial<Record<TranslationKey, number>>;
 }
 
 /**
@@ -92,6 +94,7 @@ export function success<TResponse>(
     data,
     ...(options?.isErrorResponse && { isErrorResponse: true }),
     ...(options?.headers && { headers: options.headers }),
+    ...(options?.performance && { performance: options.performance }),
   };
 }
 
@@ -169,6 +172,7 @@ export interface SuccessResponseType<TResponseData> {
   success: true;
   data: TResponseData;
   isErrorResponse?: true;
+  performance?: Partial<Record<TranslationKey, number>>;
   message?: never;
   messageParams?: never;
   errorType?: never;

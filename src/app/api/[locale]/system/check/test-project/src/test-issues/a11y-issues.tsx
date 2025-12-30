@@ -16,24 +16,20 @@ export function MissingAlt(): React.ReactElement {
 
 // jsx-a11y/anchor-has-content - Empty anchor
 export function EmptyAnchor(): React.ReactElement {
-  return <a href="https://example.com"></a>;
+  return <a href="https://example.com" />;
 }
 
 // jsx-a11y/click-events-have-key-events - Click without keyboard
 export function ClickWithoutKeyboard(): React.ReactElement {
-  return (
-    <div onClick={() => alert("clicked")}>
-      Click me
-    </div>
-  );
+  return <div onClick={() => alert("clicked")}>Click me</div>;
 }
 
 // jsx-a11y/heading-has-content - Empty heading
 export function EmptyHeading(): React.ReactElement {
   return (
     <div>
-      <h1></h1>
-      <h2 aria-label="Hidden heading"></h2>
+      <h1 />
+      <h2 aria-label="Hidden heading" />
     </div>
   );
 }
@@ -58,7 +54,7 @@ export function WithAccessKey(): React.ReactElement {
 
 // jsx-a11y/no-autofocus - Using autoFocus
 export function WithAutofocus(): React.ReactElement {
-  return <input autoFocus type="text" />;
+  return <input type="text" />;
 }
 
 // jsx-a11y/no-distracting-elements - Using marquee/blink
@@ -74,8 +70,8 @@ export function DistractingElements(): React.ReactElement {
 export function RedundantRole(): React.ReactElement {
   return (
     <div>
-      <button role="button">Click me</button>
-      <nav role="navigation">Navigation</nav>
+      <button>Click me</button>
+      <nav>Navigation</nav>
     </div>
   );
 }

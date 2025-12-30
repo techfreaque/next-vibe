@@ -5,7 +5,6 @@
 
 // no-debugger - Debugger statement
 export function withDebugger(): void {
-  debugger;
   console.log("debugging");
 }
 
@@ -19,8 +18,11 @@ export function withConsole(): void {
 
 // curly - Missing curly braces
 export function noCurly(x: number): number {
-  if (x > 0) return x;
-  else return -x;
+  if (x > 0) {
+    return x;
+  } else {
+    return -x;
+  }
 }
 
 // eqeqeq - Using == instead of ===
@@ -41,7 +43,9 @@ export function templateInString(): string {
 }
 
 // no-unsafe-optional-chaining - Unsafe optional chaining
-export function unsafeOptionalChaining(obj: { a?: { b: number } } | null): number {
+export function unsafeOptionalChaining(
+  obj: { a?: { b: number } } | null,
+): number {
   return 1 + obj?.a?.b;
 }
 

@@ -59,7 +59,7 @@ export interface PrefillDisplayConfig<TKey extends string> {
   /** Display variant when field is prefilled */
   variant: "badge" | "highlight" | "card";
   /** Translation key for the label shown with prefilled value */
-  labelKey?: TKey;
+  labelKey?: NoInfer<TKey>;
   /** Icon to show with prefilled value */
   icon?: string;
 }
@@ -67,7 +67,7 @@ export interface PrefillDisplayConfig<TKey extends string> {
 /**
  * Common properties for form field widgets
  * TKey allows using either global TranslationKey or scoped translation keys
- * NoInfer on translation properties forces validation against context-inferred TKey
+ * TKey is inferred from label/description values, then validated against expected type
  */
 interface BaseFormFieldWidgetConfig<TKey extends string>
   extends BaseWidgetConfig {
@@ -420,6 +420,20 @@ export interface CodeQualityListWidgetConfig<TKey extends string>
   showSummary?: boolean;
   columns?: number;
   layoutType?: LayoutType;
+}
+
+export interface CodeQualityFilesWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig {
+  type: WidgetType.CODE_QUALITY_FILES;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
+}
+
+export interface CodeQualitySummaryWidgetConfig<TKey extends string>
+  extends BaseWidgetConfig {
+  type: WidgetType.CODE_QUALITY_SUMMARY;
+  title?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
 }
 
 export interface MetadataCardWidgetConfig<TKey extends string>
@@ -1010,6 +1024,8 @@ export type WidgetConfig<TKey extends string> =
   | DataGridWidgetConfig<TKey>
   | GroupedListWidgetConfig<TKey>
   | CodeQualityListWidgetConfig<TKey>
+  | CodeQualityFilesWidgetConfig<TKey>
+  | CodeQualitySummaryWidgetConfig<TKey>
   | MetadataCardWidgetConfig<TKey>
   // Layout widgets
   | ContainerWidgetConfig<TKey>

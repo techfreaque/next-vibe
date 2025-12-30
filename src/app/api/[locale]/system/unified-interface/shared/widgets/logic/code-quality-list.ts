@@ -29,6 +29,8 @@ export interface CodeQualitySummary {
   displayedIssues: number;
   displayedFiles: number;
   truncatedMessage?: string;
+  currentPage: number;
+  totalPages: number;
 }
 
 /**
@@ -37,12 +39,12 @@ export interface CodeQualitySummary {
 export interface ProcessedCodeQualityList {
   items: CodeQualityItem[];
   groupBy?: "file" | "severity" | "rule";
-  showSummary: boolean;
-  summary?: CodeQualitySummary;
 }
 
 /**
  * Extract and validate code quality list data from WidgetData
+ * CODE_QUALITY_LIST widget only handles the items array
+ * Summary is rendered by separate CONTAINER widget
  */
 export function extractCodeQualityListData(
   value: WidgetData,
@@ -63,7 +65,6 @@ export function extractCodeQualityListData(
 
     return {
       items,
-      showSummary: true,
     };
   }
 
@@ -74,19 +75,6 @@ export function extractCodeQualityListData(
     const groupBy =
       "groupBy" in value && typeof value.groupBy === "string"
         ? value.groupBy
-        : undefined;
-    const showSummary =
-      "showSummary" in value && typeof value.showSummary === "boolean"
-        ? value.showSummary
-        : true;
-
-    // Extract summary object if present
-    const summary =
-      "summary" in value &&
-      typeof value.summary === "object" &&
-      value.summary !== null &&
-      !Array.isArray(value.summary)
-        ? validateSummary(value.summary)
         : undefined;
 
     const validItems = items
@@ -103,60 +91,10 @@ export function extractCodeQualityListData(
         groupBy === "file" || groupBy === "severity" || groupBy === "rule"
           ? groupBy
           : undefined,
-      showSummary,
-      summary,
     };
   }
 
   return null;
-}
-
-/**
- * Validate summary object
- */
-function validateSummary(summary: WidgetData): CodeQualitySummary | undefined {
-  if (
-    typeof summary !== "object" ||
-    summary === null ||
-    Array.isArray(summary)
-  ) {
-    return undefined;
-  }
-
-  const totalIssues =
-    "totalIssues" in summary && typeof summary.totalIssues === "number"
-      ? summary.totalIssues
-      : 0;
-  const totalFiles =
-    "totalFiles" in summary && typeof summary.totalFiles === "number"
-      ? summary.totalFiles
-      : 0;
-  const totalErrors =
-    "totalErrors" in summary && typeof summary.totalErrors === "number"
-      ? summary.totalErrors
-      : 0;
-  const displayedIssues =
-    "displayedIssues" in summary && typeof summary.displayedIssues === "number"
-      ? summary.displayedIssues
-      : 0;
-  const displayedFiles =
-    "displayedFiles" in summary && typeof summary.displayedFiles === "number"
-      ? summary.displayedFiles
-      : 0;
-  const truncatedMessage =
-    "truncatedMessage" in summary &&
-    typeof summary.truncatedMessage === "string"
-      ? summary.truncatedMessage
-      : undefined;
-
-  return {
-    totalIssues,
-    totalFiles,
-    totalErrors,
-    displayedIssues,
-    displayedFiles,
-    truncatedMessage,
-  };
 }
 
 /**
