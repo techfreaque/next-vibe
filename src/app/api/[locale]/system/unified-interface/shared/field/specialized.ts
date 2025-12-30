@@ -74,14 +74,7 @@ export const CURRENCY_OPTIONS = [
   value: string;
   label: TranslationKey;
   symbol: string;
-}> as const;
-
-// Separate options for form fields (without symbol)
-const CURRENCY_FORM_OPTIONS: Array<{ value: string; label: TranslationKey }> =
-  CURRENCY_OPTIONS.map(({ value, label }) => ({
-    value,
-    label,
-  }));
+}>;
 
 export type CurrencyCode = (typeof CURRENCY_OPTIONS)[number]["value"];
 
@@ -106,7 +99,7 @@ export function currencyField(
       label,
       description,
       placeholder,
-      options: CURRENCY_FORM_OPTIONS,
+      options: CURRENCY_OPTIONS,
       required,
     },
     required ? schema : schema.optional(),
