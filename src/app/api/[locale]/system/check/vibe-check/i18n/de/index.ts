@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Vibe Check",
   description:
-    "Umfassende Code-Qualitätsprüfungen durchführen einschließlich Linting und Typprüfung",
+    "Umfassende Code-Qualitätsprüfungen durchführen (Oxlint + ESLint + TypeScript). WICHTIG: Verwenden Sie dies anstelle von direktem 'eslint', 'tsc' oder 'oxlint' - vibe-check führt alle Prüfungen parallel aus und ist deutlich schneller. Das Ziel ist es, ALLE Probleme zu beheben, nicht nur einige. Konfigurieren Sie welche Prüfungen ausgeführt werden sollen in check.config.ts (skipLint, skipEslint, skipOxlint, skipTypecheck).",
   category: "Entwicklungstools",
   tag: "qualität",
 
@@ -45,45 +45,22 @@ export const translations: typeof enTranslations = {
   fields: {
     fix: {
       label: "Probleme automatisch beheben",
-      description: "Linting-Probleme automatisch beheben, die auto-fixbar sind",
-    },
-    skipLint: {
-      label: "Alle Linting überspringen",
-      description: "Sowohl ESLint als auch Oxlint Prüfungen überspringen",
-    },
-    skipEslint: {
-      label: "ESLint überspringen",
-      description: "ESLint-Prüfungen überspringen (Oxlint läuft weiter)",
-    },
-    skipOxlint: {
-      label: "Oxlint überspringen",
-      description: "Oxlint-Prüfungen überspringen (ESLint läuft weiter)",
-    },
-    skipTypecheck: {
-      label: "Typprüfung überspringen",
-      description: "TypeScript-Typprüfung überspringen",
+      description:
+        "Linting-Probleme automatisch beheben, die auto-fixbar sind. Verwenden Sie dies, wenn Sie Probleme automatisch beheben möchten.",
     },
     createConfig: {
       label: "Konfiguration erstellen",
       description:
-        "Standard check.config.ts Konfigurationsdatei erstellen falls nicht vorhanden",
+        "Standard check.config.ts Konfigurationsdatei erstellen falls nicht vorhanden. Verwenden Sie check.config.ts um Skip-Optionen zu konfigurieren (skipEslint, skipOxlint, skipTypecheck).",
     },
     timeoutSeconds: {
       label: "Timeout (Sekunden)",
       description: "Maximale Ausführungszeit in Sekunden (1-3600)",
     },
-    skipTrpcCheck: {
-      label: "tRPC Check überspringen",
-      description: "tRPC-Route-Validierung überspringen",
-    },
-    quiet: {
-      label: "Ruhiger Modus",
-      description: "Ausgabe-Ausführlichkeit reduzieren",
-    },
     paths: {
       label: "Zielpfade",
       description:
-        'Spezifische Dateipfade oder Verzeichnisse zum Prüfen (String oder Array von Strings, leer lassen um alle Dateien zu prüfen). Beispiele: "src/app" oder ["src/components", "src/utils"]',
+        'Spezifische Dateipfade oder Verzeichnisse zum Prüfen (String oder Array von Strings). Leer lassen um ALLE Dateien im Projekt zu prüfen (empfohlen für umfassende Qualitätsprüfungen). Beispiele: "src/app" oder ["src/components", "src/utils"]. Nur Pfade angeben wenn Sie sich auf eine Teilmenge konzentrieren müssen.',
       placeholder: "z.B. src/app oder src/components/Button.tsx",
       options: {
         src: "Quellverzeichnis (src/)",
@@ -95,7 +72,8 @@ export const translations: typeof enTranslations = {
     },
     limit: {
       label: "Limit",
-      description: "Anzahl der Probleme pro Seite (1-10000, Standard: 100)",
+      description:
+        "Anzahl der Probleme pro Seite (1-10000, Standard: 100). WICHTIG: Dies kontrolliert nur die Anzeige, nicht die Erkennung. Verwenden Sie hohe Werte (1000+) oder Paginierung um ALLE Probleme zu sehen - das Ziel ist es, alles zu beheben, nicht nur die erste Seite.",
     },
     page: {
       label: "Seite",

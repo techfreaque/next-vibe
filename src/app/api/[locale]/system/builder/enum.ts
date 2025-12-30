@@ -25,6 +25,7 @@ export enum ViteBuildTypeEnum {
 /** Bun build types */
 export enum BunBuildTypeEnum {
   EXECUTABLE = "executable",
+  MODULE = "module",
 }
 
 /** All build types combined */

@@ -70,7 +70,11 @@ export const CURRENCY_OPTIONS = [
     label: "app.currency.brl" as const,
     symbol: "R$",
   },
-];
+] satisfies Array<{
+  value: string;
+  label: TranslationKey;
+  symbol: string;
+}> as const;
 
 // Separate options for form fields (without symbol)
 const CURRENCY_FORM_OPTIONS: Array<{ value: string; label: TranslationKey }> =

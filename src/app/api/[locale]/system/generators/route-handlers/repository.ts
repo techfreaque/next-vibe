@@ -59,9 +59,7 @@ interface RouteHandlersGeneratorRepository {
 /**
  * Route Handlers Generator Repository Implementation
  */
-class RouteHandlersGeneratorRepositoryImpl
-  implements RouteHandlersGeneratorRepository
-{
+class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepository {
   async generateRouteHandlers(
     data: RouteHandlersRequestType,
     logger: EndpointLogger,

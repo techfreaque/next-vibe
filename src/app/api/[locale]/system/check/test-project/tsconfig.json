@@ -12,11 +12,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "paths": {
-      "next-vibe/*": [
-        "../../../*"
-      ],
-    },
+    "paths": {},
     "lib": [
       "ES2020",
       "DOM",

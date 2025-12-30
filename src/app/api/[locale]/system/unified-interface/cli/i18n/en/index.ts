@@ -7,6 +7,7 @@ export const translations = {
       userNotFound:
         "CLI user with email {{email}} not found in database. Please run 'vibe seed' first.",
       databaseError: "Database error while fetching CLI user: {{error}}",
+      authNotAvailable: "Authentication is not available",
     },
   },
   vibe: {

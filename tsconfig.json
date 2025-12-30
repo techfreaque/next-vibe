@@ -42,6 +42,12 @@
       "next-vibe/*": [
         "./src/app/api/[locale]/*"
       ],
+      "@next-vibe/checker/oxlint-plugins/*": [
+        "./src/app/api/[locale]/system/check/oxlint/plugins/*/src/index"
+      ],
+      "@next-vibe/checker/*": [
+        "./src/app/api/[locale]/*"
+      ],
       "next-vibe-ui/*": [
         "./src/packages/next-vibe-ui/web/*"
       ],

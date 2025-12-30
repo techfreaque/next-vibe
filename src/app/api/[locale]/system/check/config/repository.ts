@@ -81,29 +81,84 @@ export class ConfigRepositoryImpl implements ConfigRepositoryInterface {
     return resolve(process.cwd(), "check.config.ts");
   }
 
-  private static findNextVibeRoot(): string {
-    const currentDir = dirname(fileURLToPath(import.meta.url));
-    return resolve(currentDir, "../../../../../../..");
-  }
-
-  private static isLocalDev(): boolean {
-    const cwd = process.cwd();
-    const packageRoot = ConfigRepositoryImpl.findNextVibeRoot();
-    return cwd.startsWith(packageRoot);
-  }
-
   private static resolveJsPluginPath(pluginPath: string): string {
-    const packageRoot = ConfigRepositoryImpl.findNextVibeRoot();
-    const localDev = ConfigRepositoryImpl.isLocalDev();
+    // Pattern: @next-vibe/checker/oxlint-plugins/restricted-syntax.ts or .js
+    if (pluginPath.startsWith("@next-vibe/checker/oxlint-plugins/")) {
+      const fileName = pluginPath.slice(
+        "@next-vibe/checker/oxlint-plugins/".length,
+      );
+      const baseName = fileName.replace(/\.(ts|js)$/, "");
+      const extension = fileName.endsWith(".ts") ? "ts" : "js";
 
-    if (pluginPath.startsWith("next-vibe/")) {
-      const relativePath = pluginPath.slice("next-vibe/".length);
-      if (localDev) {
-        return resolve(packageRoot, relativePath);
+      if (extension === "ts") {
+        // Local development: .ts -> source files
+        const sourcePath = resolve(
+          process.cwd(),
+          "src",
+          "app",
+          "api",
+          "[locale]",
+          "system",
+          "check",
+          "oxlint",
+          "plugins",
+          baseName,
+          "src",
+          "index.ts",
+        );
+        if (existsSync(sourcePath)) {
+          return sourcePath;
+        }
+      } else {
+        // Installed package: .js -> compiled files
+        const compiledPath = resolve(
+          process.cwd(),
+          "node_modules",
+          "@next-vibe",
+          "checker",
+          ".dist",
+          "oxlint-plugins",
+          fileName,
+        );
+        if (existsSync(compiledPath)) {
+          return compiledPath;
+        }
       }
-      return resolve(process.cwd(), "node_modules", "next-vibe", relativePath);
+
+      // Fallback: return expected path
+      return extension === "ts"
+        ? resolve(
+            process.cwd(),
+            "src",
+            "app",
+            "api",
+            "[locale]",
+            "system",
+            "check",
+            "oxlint",
+            "plugins",
+            baseName,
+            "src",
+            "index.ts",
+          )
+        : resolve(
+            process.cwd(),
+            "node_modules",
+            "@next-vibe",
+            "checker",
+            ".dist",
+            "oxlint-plugins",
+            fileName,
+          );
     }
-    return pluginPath;
+
+    // If no prefix matched, return absolute path if it exists, otherwise as-is
+    if (pluginPath.startsWith("/")) {
+      return pluginPath;
+    }
+
+    const absolutePath = resolve(process.cwd(), pluginPath);
+    return existsSync(absolutePath) ? absolutePath : pluginPath;
   }
 
   private static resolveJsPlugins(
@@ -137,7 +192,7 @@ export class ConfigRepositoryImpl implements ConfigRepositoryInterface {
         try {
           const content = await fs.readFile(packageJsonPath, "utf8");
           const pkg = JSON.parse(content) as { name?: string };
-          if (pkg.name === "next-vibe") {
+          if (pkg.name === "@next-vibe/checker" || pkg.name === "next-vibe") {
             return currentDir;
           }
         } catch {
@@ -589,7 +644,14 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         };
       }
 
-      const templateContent = await fs.readFile(templatePath, "utf8");
+      let templateContent = await fs.readFile(templatePath, "utf8");
+
+      // Replace .ts extensions with .js for installed package usage
+      templateContent = templateContent.replace(
+        /@next-vibe\/checker\/oxlint-plugins\/([^"']+)\.ts/g,
+        "@next-vibe/checker/oxlint-plugins/$1.js",
+      );
+
       await fs.writeFile(configPath, templateContent, "utf8");
 
       logger.info("Created check.config.ts from template", {
@@ -767,7 +829,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
     if (resolvedJsPlugins.length > 0) {
       logger.debug("Resolved jsPlugins paths", {
-        isLocalDev: ConfigRepositoryImpl.isLocalDev(),
         paths: resolvedJsPlugins,
       });
     }

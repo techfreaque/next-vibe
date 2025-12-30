@@ -25,8 +25,7 @@ import type {
  */
 export abstract class BaseWidgetRenderer<
   TWidget extends WidgetType = WidgetType,
-> implements WidgetRenderer<TWidget>
-{
+> implements WidgetRenderer<TWidget> {
   abstract readonly widgetType: TWidget;
   protected formatter: DataFormatter;
 

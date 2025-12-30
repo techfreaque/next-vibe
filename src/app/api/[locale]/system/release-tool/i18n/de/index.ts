@@ -588,6 +588,11 @@ export const translations: typeof enTranslations = {
     packageNotFound:
       "Paket '{{targetPackage}}' nicht in Konfiguration gefunden",
     gitOperationFailed: "Git-Operation fehlgeschlagen: {{error}}",
+    gitAddFailed: "Git add fehlgeschlagen: {{error}}",
+    gitTagFailed: "Git-Tag '{{tag}}' fehlgeschlagen: {{error}}",
+    gitPushFailed: "Git push zu '{{remote}}' fehlgeschlagen: {{error}}",
+    gitPushTagFailed:
+      "Git push Tag '{{tag}}' zu '{{remote}}' fehlgeschlagen: {{error}}",
   },
   success: {
     title: "Release abgeschlossen",
