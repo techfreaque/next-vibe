@@ -19,6 +19,7 @@ import type React from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { UserGetResponseOutput } from "@/app/api/[locale]/users/user/[id]/definition";
+import userByIdEndpoints from "@/app/api/[locale]/users/user/[id]/definition";
 import { useUserByIdEndpoint } from "@/app/api/[locale]/users/user/[id]/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -92,13 +93,8 @@ export function UserEditForm({
             <FormFieldGroup>
               <EndpointFormField
                 name="basicInfo.email"
-                config={{
-                  type: "email",
-                  label: "app.api.users.user.id.id.put.email.label",
-                  description: "app.api.users.user.id.id.put.email.description",
-                  placeholder: "app.api.users.user.id.id.put.email.placeholder",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userByIdEndpoints.GET}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -108,13 +104,8 @@ export function UserEditForm({
 
               <EndpointFormField
                 name="basicInfo.privateName"
-                config={{
-                  type: "text",
-                  label: "app.api.users.user.id.id.put.privateName.label",
-                  description:
-                    "app.api.users.user.id.id.put.privateName.description",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userByIdEndpoints.GET}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -124,13 +115,8 @@ export function UserEditForm({
 
               <EndpointFormField
                 name="basicInfo.publicName"
-                config={{
-                  type: "text",
-                  label: "app.api.users.user.id.id.put.publicName.label",
-                  description:
-                    "app.api.users.user.id.id.put.publicName.description",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userByIdEndpoints.GET}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -140,13 +126,8 @@ export function UserEditForm({
 
               <EndpointFormField
                 name="adminSettings.isActive"
-                config={{
-                  type: "checkbox",
-                  label: "app.api.users.user.id.id.put.isActive.label",
-                  description:
-                    "app.api.users.user.id.id.put.isActive.description",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userByIdEndpoints.GET}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -156,13 +137,8 @@ export function UserEditForm({
 
               <EndpointFormField
                 name="adminSettings.emailVerified"
-                config={{
-                  type: "checkbox",
-                  label: "app.api.users.user.id.id.put.emailVerified.label",
-                  description:
-                    "app.api.users.user.id.id.put.emailVerified.description",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userByIdEndpoints.GET}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -172,13 +148,8 @@ export function UserEditForm({
 
               <EndpointFormField
                 name="adminSettings.leadId"
-                config={{
-                  type: "text",
-                  label: "app.api.users.user.id.id.put.leadId.label",
-                  description:
-                    "app.api.users.user.id.id.put.leadId.description",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userByIdEndpoints.GET}
                 theme={{
                   style: "none",
                   showAllRequired: false,

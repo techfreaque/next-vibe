@@ -21,7 +21,6 @@ import {
 } from "next-vibe-ui/ui/select";
 import { Slider } from "next-vibe-ui/ui/slider";
 import { Switch } from "next-vibe-ui/ui/switch";
-import { TagsField } from "next-vibe-ui/ui/tags-field";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import { H2 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -29,7 +28,6 @@ import { useState } from "react";
 
 export function FormsPreview(): JSX.Element {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [tags, setTags] = useState<string[]>(["react", "typescript"]);
 
   return (
     <Div className="space-y-8">
@@ -59,11 +57,6 @@ export function FormsPreview(): JSX.Element {
                 <SelectItem value="option3">Option 3</SelectItem>
               </SelectContent>
             </Select>
-          </Div>
-
-          <Div className="space-y-2 col-span-2">
-            <Label>Tags Field</Label>
-            <TagsField value={tags} onChange={setTags} />
           </Div>
         </Div>
 

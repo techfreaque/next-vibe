@@ -448,7 +448,8 @@ export function BuyCreditsTab({
                     <EndpointFormField
                       name="quantity"
                       control={creditPurchaseEndpoint.create.form.control}
-                      endpointFields={purchaseDefinitions.POST.fields}
+                      endpoint={purchaseDefinitions.POST}
+                      locale={locale}
                       theme={{
                         style: "none",
                         showAllRequired: false,

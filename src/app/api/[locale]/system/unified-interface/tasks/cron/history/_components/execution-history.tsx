@@ -32,6 +32,7 @@ import { H4, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import type { CronHistoryResponseOutput } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/definition";
+import cronHistoryDefinitions from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/definition";
 import type { CronHistoryEndpointReturn } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/hooks";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -201,69 +202,49 @@ export function ExecutionHistory({
               {/* Task Name Search */}
               <EndpointFormField
                 name="taskName"
-                config={{
-                  type: "text",
-                  label: undefined,
-                  placeholder:
-                    "app.admin.cron.cronErrors.admin.interface.executionHistory.searchPlaceholder",
-                }}
                 control={historyEndpoint.read.form.control}
+                endpoint={cronHistoryDefinitions.GET}
+                locale={locale}
                 theme={{
                   style: "none",
                   showAllRequired: false,
                 }}
-                locale={locale}
               />
 
               {/* Status Filter */}
               <EndpointFormField
                 name="status"
-                config={{
-                  type: "text",
-                  label: undefined,
-                  placeholder:
-                    "app.admin.cron.cronErrors.admin.interface.executionHistory.statusFilter",
-                }}
                 control={historyEndpoint.read.form.control}
+                endpoint={cronHistoryDefinitions.GET}
+                locale={locale}
                 theme={{
                   style: "none",
                   showAllRequired: false,
                 }}
-                locale={locale}
               />
 
               {/* Start Date */}
               <EndpointFormField
                 name="startDate"
-                config={{
-                  type: "date",
-                  label: undefined,
-                  placeholder:
-                    "app.admin.cron.cronErrors.admin.interface.executionHistory.startDate",
-                }}
                 control={historyEndpoint.read.form.control}
+                endpoint={cronHistoryDefinitions.GET}
+                locale={locale}
                 theme={{
                   style: "none",
                   showAllRequired: false,
                 }}
-                locale={locale}
               />
 
               {/* End Date */}
               <EndpointFormField
                 name="endDate"
-                config={{
-                  type: "date",
-                  label: undefined,
-                  placeholder:
-                    "app.admin.cron.cronErrors.admin.interface.executionHistory.endDate",
-                }}
                 control={historyEndpoint.read.form.control}
+                endpoint={cronHistoryDefinitions.GET}
+                locale={locale}
                 theme={{
                   style: "none",
                   showAllRequired: false,
                 }}
-                locale={locale}
               />
             </Div>
 

@@ -2,8 +2,6 @@
  * Endpoint Form Field Component
  * A comprehensive form field component that integrates with useEndpoint hook
  * Supports multiple field types, required field styling, and Zod validation
- *
- * ✅ NOW WITH 100% TYPE INFERENCE FROM DEFINITION.TS
  */
 
 "use client";
@@ -17,15 +15,12 @@ import type {
   ControllerRenderProps,
   FieldPath,
   FieldValues,
-  Path,
 } from "react-hook-form";
-import type { z } from "zod";
 
 import {
   getIconComponent,
   type IconKey,
 } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import type { EndpointFieldStructure } from "@/app/api/[locale]/system/unified-interface/shared/field-config/endpoint-field-types";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -34,6 +29,7 @@ import type {
   RequiredFieldTheme,
 } from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
 import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";
@@ -285,11 +281,11 @@ function getFieldStyleClassName(
  * Render prefilled readonly display
  * Shows the prefilled value with styled card/badge based on prefillDisplay config
  */
-function renderPrefillDisplay(
+function renderPrefillDisplay<TKey extends string>(
   value: string,
-  label: TranslationKey | undefined,
-  prefillDisplay: PrefillDisplayConfig,
-  t: TFunction,
+  label: TKey | undefined,
+  prefillDisplay: PrefillDisplayConfig<TKey>,
+  t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType,
 ): JSX.Element {
   const displayLabel = prefillDisplay.labelKey
     ? t(prefillDisplay.labelKey)
@@ -338,11 +334,12 @@ function renderPrefillDisplay(
 function renderFieldInput<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
+  TKey extends string,
 >(
-  config: FieldConfig,
+  config: FieldConfig<TKey>,
   field: ControllerRenderProps<TFieldValues, TName>,
   inputClassName: string,
-  t: TFunction, // Adapted translation for definition keys (uses scopedT when available)
+  t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType, // Adapted translation for definition keys (uses scopedT when available)
   globalT: TFunction, // Global translation for hardcoded framework keys
   disabled?: boolean,
 ): JSX.Element {
@@ -577,6 +574,7 @@ function renderFieldInput<
           disabled={disabled || config.disabled}
           className={inputClassName}
           name={field.name}
+          t={t}
         />
       );
 
@@ -594,6 +592,7 @@ function renderFieldInput<
           disabled={disabled || config.disabled}
           className={inputClassName}
           name={field.name}
+          t={t}
         />
       );
     }
@@ -719,30 +718,21 @@ function renderFieldInput<
 
 // Generic field props interface with full type inference from endpoint fields
 export interface EndpointFormFieldProps<
+  TKey extends string,
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
-  TFields = EndpointFieldStructure,
+  TEndpoint extends CreateApiEndpointAny,
 > {
   name: TName;
-  config?: FieldConfig; // Optional - auto-inferred from endpointFields if not provided
+  config?: FieldConfig<TKey>; // Optional - override of endpoint-based field settings
   control: Control<TFieldValues>; // Properly typed form control from useEndpoint
-  schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
-  endpointFields?: TFields; // Endpoint fields for auto-inference (from definition.POST.fields) - now fully typed
+  endpoint: TEndpoint; // Required - provides schema, scopedT, and endpointFields
   theme?: RequiredFieldTheme;
   className?: string;
   /**
-   * Optional scoped translation function for definition keys (label, placeholder, description, etc.)
-   * When provided, uses this for translating keys from the endpoint definition
-   * Falls back to global translation when not provided
-   * Note: Uses method syntax for bivariance - accepts both narrow (scoped) and broad (string) key types
-   */
-  scopedT?: (locale: CountryLanguage) => {
-    t(key: string, params?: TParams): TranslatedKeyType;
-  };
-  /**
    * Current locale for translations (defaults to "en-GLOBAL" if not provided)
    */
-  locale?: CountryLanguage;
+  locale: CountryLanguage;
 }
 
 /**
@@ -757,25 +747,30 @@ export interface EndpointFormFieldProps<
  * - TFields: The endpoint fields structure (inferred from definition.POST.fields)
  */
 export function EndpointFormField<
+  TKey extends string,
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
-  TFields = EndpointFieldStructure,
+  TEndpoint extends CreateApiEndpointAny,
 >({
   name,
   config: providedConfig,
   control,
-  schema,
+  endpoint,
   theme = DEFAULT_THEME,
   className,
-  endpointFields,
-  scopedT,
   locale,
-}: EndpointFormFieldProps<TFieldValues, TName, TFields>): JSX.Element {
-  // Use same pattern as getTranslator utility:
-  // - scopedT for definition keys when available (label, placeholder, description, option labels)
-  // - simpleT for fallback and hardcoded framework keys
-  const { t: globalT } = simpleT(locale ?? "en-GLOBAL");
-  const { t } = scopedT && locale ? scopedT(locale) : { t: globalT };
+}: EndpointFormFieldProps<TKey, TFieldValues, TName, TEndpoint>): JSX.Element {
+  // Extract from endpoint
+  const {
+    fields: endpointFields,
+    scopedTranslation,
+    requestSchema: schema,
+  } = endpoint;
+  const { scopedT } = scopedTranslation;
+
+  // Use scoped translation from endpoint.scopedTranslation.scopedT
+  const { t } = scopedT(locale);
+  const { t: globalT } = simpleT(locale); // For hardcoded framework keys
 
   // Auto-infer config from endpoint fields if not provided
   const config =
@@ -897,75 +892,5 @@ export function EndpointFormField<
         );
       }}
     />
-  );
-}
-
-/**
- * Convenience component for creating multiple form fields
- * Config is auto-inferred from endpointFields if not provided
- *
- * Type Parameters:
- * - TFieldValues: The form values type from react-hook-form
- * - TFields: The endpoint fields structure (inferred from definition.POST.fields)
- */
-export interface EndpointFormFieldsProps<
-  TFieldValues extends FieldValues,
-  TFields = EndpointFieldStructure,
-> {
-  fields: Array<{
-    name: Path<TFieldValues>;
-    config?: FieldConfig; // Optional - auto-inferred from endpointFields
-  }>;
-  control: Control<TFieldValues>;
-  requiredFields?: string[];
-  schema?: z.ZodTypeAny; // Optional Zod schema for automatic required field detection
-  endpointFields?: TFields; // Endpoint fields for auto-inference - now fully typed
-  theme?: RequiredFieldTheme;
-  className?: string;
-  fieldClassName?: string;
-  /**
-   * Optional scoped translation function for definition keys
-   * Note: Uses method syntax for bivariance - accepts both narrow (scoped) and broad (string) key types
-   */
-  scopedT?: (locale: CountryLanguage) => {
-    t(key: string, params?: TParams): TranslatedKeyType;
-  };
-  /**
-   * Current locale for translations (defaults to "en-GLOBAL" if not provided)
-   */
-  locale?: CountryLanguage;
-}
-
-export function EndpointFormFields<
-  TFieldValues extends FieldValues,
-  TFields = EndpointFieldStructure,
->({
-  fields,
-  control,
-  schema,
-  endpointFields,
-  theme = DEFAULT_THEME,
-  className,
-  fieldClassName,
-  scopedT,
-  locale,
-}: EndpointFormFieldsProps<TFieldValues, TFields>): JSX.Element {
-  return (
-    <div className={cn("space-y-6", className)}>
-      {fields.map((fieldDef) => (
-        <EndpointFormField<TFieldValues, Path<TFieldValues>, TFields>
-          key={fieldDef.name}
-          name={fieldDef.name}
-          config={fieldDef.config}
-          control={control}
-          schema={schema}
-          endpointFields={endpointFields}
-          theme={theme}
-          className={fieldClassName}
-          scopedT={scopedT}
-          locale={locale}
-        />
-      ))}
-    </div>
   );
 }

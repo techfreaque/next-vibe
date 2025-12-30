@@ -126,12 +126,7 @@ export function getTranslatorFromEndpoint<
 ): (locale: CountryLanguage) => {
   t: <K extends string>(key: K, params?: TParams) => string;
 } {
-  if (endpoint.scopedTranslation) {
-    return endpoint.scopedTranslation.scopedT as (locale: CountryLanguage) => {
-      t: <K extends string>(key: K, params?: TParams) => string;
-    };
-  }
-  return simpleT as (locale: CountryLanguage) => {
+  return endpoint.scopedTranslation.scopedT as (locale: CountryLanguage) => {
     t: <K extends string>(key: K, params?: TParams) => string;
   };
 }

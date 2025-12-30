@@ -74,25 +74,25 @@ export function CreateSmtpAccountForm({
               >
                 <EndpointFormField
                   name="accountInfo.name"
-                  endpointFields={createDefinition.POST.fields}
+                  endpoint={createDefinition.POST}
                   control={endpoint.create.form.control}
+                  locale={locale}
                   theme={{
                     style: "asterisk",
                     showAllRequired: true,
                     requiredColor: "red",
                   }}
-                  locale={locale}
                 />
 
                 <EndpointFormField
                   name="accountInfo.description"
-                  endpointFields={createDefinition.POST.fields}
+                  endpoint={createDefinition.POST}
                   control={endpoint.create.form.control}
+                  locale={locale}
                   theme={{
                     style: "none",
                     showAllRequired: false,
                   }}
-                  locale={locale}
                 />
               </FormFieldGroup>
 
@@ -104,38 +104,38 @@ export function CreateSmtpAccountForm({
                 <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <EndpointFormField
                     name="serverConfig.host"
-                    endpointFields={createDefinition.POST.fields}
+                    endpoint={createDefinition.POST}
                     control={endpoint.create.form.control}
+                    locale={locale}
                     theme={{
                       style: "asterisk",
                       showAllRequired: true,
                       requiredColor: "red",
                     }}
-                    locale={locale}
                   />
 
                   <EndpointFormField
                     name="serverConfig.port"
-                    endpointFields={createDefinition.POST.fields}
+                    endpoint={createDefinition.POST}
                     control={endpoint.create.form.control}
+                    locale={locale}
                     theme={{
                       style: "asterisk",
                       showAllRequired: true,
                       requiredColor: "red",
                     }}
-                    locale={locale}
                   />
 
                   <EndpointFormField
                     name="serverConfig.securityType"
-                    endpointFields={createDefinition.POST.fields}
+                    endpoint={createDefinition.POST}
                     control={endpoint.create.form.control}
+                    locale={locale}
                     theme={{
                       style: "asterisk",
                       showAllRequired: true,
                       requiredColor: "red",
                     }}
-                    locale={locale}
                   />
                 </Div>
               </FormFieldGroup>
@@ -148,26 +148,26 @@ export function CreateSmtpAccountForm({
                 <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EndpointFormField
                     name="authentication.username"
-                    endpointFields={createDefinition.POST.fields}
+                    endpoint={createDefinition.POST}
                     control={endpoint.create.form.control}
+                    locale={locale}
                     theme={{
                       style: "asterisk",
                       showAllRequired: true,
                       requiredColor: "red",
                     }}
-                    locale={locale}
                   />
 
                   <EndpointFormField
                     name="authentication.password"
-                    endpointFields={createDefinition.POST.fields}
+                    endpoint={createDefinition.POST}
                     control={endpoint.create.form.control}
+                    locale={locale}
                     theme={{
                       style: "asterisk",
                       showAllRequired: true,
                       requiredColor: "red",
                     }}
-                    locale={locale}
                   />
                 </Div>
               </FormFieldGroup>
@@ -179,70 +179,70 @@ export function CreateSmtpAccountForm({
               >
                 <EndpointFormField
                   name="emailConfig.fromEmail"
-                  endpointFields={createDefinition.POST.fields}
+                  endpoint={createDefinition.POST}
                   control={endpoint.create.form.control}
+                  locale={locale}
                   theme={{
                     style: "asterisk",
                     showAllRequired: true,
                     requiredColor: "red",
                   }}
-                  locale={locale}
                 />
 
                 <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EndpointFormField
                     name="emailConfig.campaignTypes"
-                    endpointFields={createDefinition.POST.fields}
+                    endpoint={createDefinition.POST}
                     control={endpoint.create.form.control}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,
                     }}
-                    locale={locale}
                   />
 
                   <EndpointFormField
                     name="emailConfig.emailJourneyVariants"
-                    endpointFields={createDefinition.POST.fields}
+                    endpoint={createDefinition.POST}
                     control={endpoint.create.form.control}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,
                     }}
-                    locale={locale}
                   />
 
                   <EndpointFormField
                     name="emailConfig.emailCampaignStages"
-                    endpointFields={createDefinition.POST.fields}
+                    endpoint={createDefinition.POST}
                     control={endpoint.create.form.control}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,
                     }}
-                    locale={locale}
                   />
 
                   <EndpointFormField
                     name="emailConfig.countries"
-                    endpointFields={createDefinition.POST.fields}
+                    endpoint={createDefinition.POST}
                     control={endpoint.create.form.control}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,
                     }}
-                    locale={locale}
                   />
 
                   <EndpointFormField
                     name="emailConfig.languages"
-                    endpointFields={createDefinition.POST.fields}
+                    endpoint={createDefinition.POST}
                     control={endpoint.create.form.control}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,
                     }}
-                    locale={locale}
                   />
                 </Div>
               </FormFieldGroup>

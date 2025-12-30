@@ -212,10 +212,7 @@ export {
 export { FormElement } from "./form-element";
 
 // form/endpoint-form-field
-export {
-  EndpointFormField,
-  EndpointFormFields,
-} from "./form/endpoint-form-field";
+export { EndpointFormField } from "./form/endpoint-form-field";
 
 // form/form
 export {

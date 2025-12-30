@@ -439,6 +439,13 @@ interface EslintConfigEnabled extends EslintConfigOptions {
   cachePath: string;
   /** File extensions to lint (e.g., [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]) */
   lintableExtensions: string[];
+  /** Build flat config with plugins (called from eslint.config.mjs) */
+  buildFlatConfig: (
+    reactCompilerPlugin: EslintPluginLike,
+    reactHooksPlugin: EslintPluginLike,
+    simpleImportSortPlugin: EslintPluginLike,
+    tseslint: { parser: EslintParser },
+  ) => EslintFlatConfigItem[];
 }
 
 export type EslintConfig = EslintConfigDisabled | EslintConfigEnabled;

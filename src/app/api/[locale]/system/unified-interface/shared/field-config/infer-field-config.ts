@@ -16,7 +16,9 @@ import type { FieldConfig } from "./field-config-types";
  * Extract FieldConfig from a UnifiedField's WidgetConfig
  * Converts FieldDataType to the appropriate FieldConfig type
  */
-function extractFieldConfig(field: EndpointFieldStructure): FieldConfig | null {
+function extractFieldConfig<TKey extends string>(
+  field: EndpointFieldStructure<TKey>,
+): FieldConfig<TKey> | null {
   if (!field?.ui) {
     return null;
   }
@@ -31,9 +33,9 @@ function extractFieldConfig(field: EndpointFieldStructure): FieldConfig | null {
   // Type assertion: widget properties are TranslationKeys at runtime
   // but typed as string due to the generic nature of EndpointFieldStructure
   const baseConfig = {
-    label: widget.label as FieldConfig["label"],
-    placeholder: widget.placeholder as FieldConfig["placeholder"],
-    description: widget.description as FieldConfig["description"],
+    label: widget.label,
+    placeholder: widget.placeholder,
+    description: widget.description,
     disabled: widget.disabled,
     className: widget.className,
     // Readonly and prefill display options
@@ -104,11 +106,11 @@ function extractFieldConfig(field: EndpointFieldStructure): FieldConfig | null {
         options:
           widget.options?.map((opt) => ({
             value: String(opt.value),
-            label: opt.label as FieldConfig["label"],
+            label: opt.label,
             labelParams: opt.labelParams,
             disabled: opt.disabled,
           })) || [],
-      } as FieldConfig;
+      };
 
     case FieldDataType.MULTISELECT:
       return {
@@ -117,11 +119,11 @@ function extractFieldConfig(field: EndpointFieldStructure): FieldConfig | null {
         options:
           widget.options?.map((opt) => ({
             value: String(opt.value),
-            label: opt.label as FieldConfig["label"],
+            label: opt.label,
             disabled: opt.disabled,
             icon: opt.icon,
           })) || [],
-      } as FieldConfig;
+      };
 
     case FieldDataType.COLOR:
       return { ...baseConfig, type: "color" as const };
@@ -168,10 +170,10 @@ function extractFieldConfig(field: EndpointFieldStructure): FieldConfig | null {
  * Get FieldConfig for a specific field path in endpoint fields
  * This is the main function used by EndpointFormField
  */
-export function getFieldConfig(
-  fields: EndpointFieldStructure,
+export function getFieldConfig<TKey extends string>(
+  fields: EndpointFieldStructure<TKey>,
   path: string,
-): FieldConfig | null {
+): FieldConfig<TKey> | null {
   const field = getFieldStructureByPath(fields, path);
   if (!field) {
     return null;

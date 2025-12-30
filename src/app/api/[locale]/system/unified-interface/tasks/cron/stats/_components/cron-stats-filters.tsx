@@ -5,10 +5,6 @@
 
 "use client";
 
-import {
-  DateRangePreset,
-  TimePeriod,
-} from "next-vibe/shared/types/stats-filtering.schema";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
@@ -18,12 +14,7 @@ import { RefreshCw } from "next-vibe-ui/ui/icons";
 import type { JSX, ReactNode } from "react";
 
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import type statsEndpoints from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/definition";
-import {
-  CronTaskPriorityFilter,
-  CronTaskStatusFilter,
-  PulseHealthStatus,
-} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import statsEndpoints from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -56,7 +47,6 @@ export function CronStatsFiltersContainer({
   form,
 }: CronStatsFiltersContainerProps): JSX.Element {
   const { t } = simpleT(locale);
-
   return (
     <Form form={form} onSubmit={noOpSubmit} className="flex flex-col gap-4">
       <Card>
@@ -92,70 +82,14 @@ export function CronStatsFilters({
       <EndpointFormField
         name="timePeriod"
         control={control}
-        config={{
-          type: "select",
-          label: "app.admin.cron.stats.filters.timePeriod",
-          placeholder: "app.admin.cron.stats.filters.selectTimePeriod",
-          options: [
-            {
-              value: TimePeriod.HOUR,
-              label: "app.admin.cron.stats.filters.timePeriods.hour",
-            },
-            {
-              value: TimePeriod.DAY,
-              label: "app.admin.cron.stats.filters.timePeriods.day",
-            },
-            {
-              value: TimePeriod.WEEK,
-              label: "app.admin.cron.stats.filters.timePeriods.week",
-            },
-            {
-              value: TimePeriod.MONTH,
-              label: "app.admin.cron.stats.filters.timePeriods.month",
-            },
-          ],
-        }}
+        endpoint={statsEndpoints.GET}
         locale={locale}
       />
 
       <EndpointFormField
         name="dateRangePreset"
         control={control}
-        config={{
-          type: "select",
-          label: "app.admin.cron.stats.filters.dateRange",
-          placeholder: "app.admin.cron.stats.filters.selectDateRange",
-          options: [
-            {
-              value: DateRangePreset.TODAY,
-              label: "app.admin.cron.stats.filters.dateRanges.today",
-            },
-            {
-              value: DateRangePreset.YESTERDAY,
-              label: "app.admin.cron.stats.filters.dateRanges.yesterday",
-            },
-            {
-              value: DateRangePreset.LAST_7_DAYS,
-              label: "app.admin.cron.stats.filters.dateRanges.last7Days",
-            },
-            {
-              value: DateRangePreset.LAST_30_DAYS,
-              label: "app.admin.cron.stats.filters.dateRanges.last30Days",
-            },
-            {
-              value: DateRangePreset.LAST_90_DAYS,
-              label: "app.admin.cron.stats.filters.dateRanges.last90Days",
-            },
-            {
-              value: DateRangePreset.THIS_MONTH,
-              label: "app.admin.cron.stats.filters.dateRanges.thisMonth",
-            },
-            {
-              value: DateRangePreset.LAST_MONTH,
-              label: "app.admin.cron.stats.filters.dateRanges.lastMonth",
-            },
-          ],
-        }}
+        endpoint={statsEndpoints.GET}
         locale={locale}
       />
 
@@ -163,56 +97,28 @@ export function CronStatsFilters({
       <EndpointFormField
         name="taskName"
         control={control}
-        config={{
-          type: "text",
-          label: "app.admin.cron.stats.filters.taskName",
-          placeholder: "app.admin.cron.stats.filters.enterTaskName",
-        }}
+        endpoint={statsEndpoints.GET}
         locale={locale}
       />
 
       <EndpointFormField
         name="taskStatus"
         control={control}
-        config={{
-          type: "select",
-          label: "app.admin.cron.stats.filters.taskStatus",
-          placeholder: "app.admin.cron.stats.filters.selectTaskStatus",
-          options: Object.values(CronTaskStatusFilter).map((status) => ({
-            value: status,
-            label: status,
-          })),
-        }}
+        endpoint={statsEndpoints.GET}
         locale={locale}
       />
 
       <EndpointFormField
         name="taskPriority"
         control={control}
-        config={{
-          type: "select",
-          label: "app.admin.cron.stats.filters.taskPriority",
-          placeholder: "app.admin.cron.stats.filters.selectTaskPriority",
-          options: Object.values(CronTaskPriorityFilter).map((priority) => ({
-            value: priority,
-            label: priority,
-          })),
-        }}
+        endpoint={statsEndpoints.GET}
         locale={locale}
       />
 
       <EndpointFormField
         name="healthStatus"
         control={control}
-        config={{
-          type: "select",
-          label: "app.admin.cron.stats.filters.healthStatus",
-          placeholder: "app.admin.cron.stats.filters.selectHealthStatus",
-          options: Object.values(PulseHealthStatus).map((status) => ({
-            value: status,
-            label: status,
-          })),
-        }}
+        endpoint={statsEndpoints.GET}
         locale={locale}
       />
 
@@ -220,22 +126,14 @@ export function CronStatsFilters({
       <EndpointFormField
         name="minDuration"
         control={control}
-        config={{
-          type: "number",
-          label: "app.admin.cron.stats.filters.minDuration",
-          placeholder: "app.admin.cron.stats.filters.enterMinDuration",
-        }}
+        endpoint={statsEndpoints.GET}
         locale={locale}
       />
 
       <EndpointFormField
         name="maxDuration"
         control={control}
-        config={{
-          type: "number",
-          label: "app.admin.cron.stats.filters.maxDuration",
-          placeholder: "app.admin.cron.stats.filters.enterMaxDuration",
-        }}
+        endpoint={statsEndpoints.GET}
         locale={locale}
       />
 
@@ -243,40 +141,28 @@ export function CronStatsFilters({
       <EndpointFormField
         name="includeDisabled"
         control={control}
-        config={{
-          type: "checkbox",
-          label: "app.admin.cron.stats.filters.includeDisabled",
-        }}
+        endpoint={statsEndpoints.GET}
         locale={locale}
       />
 
       <EndpointFormField
         name="includeSystemTasks"
         control={control}
-        config={{
-          type: "checkbox",
-          label: "app.admin.cron.stats.filters.includeSystemTasks",
-        }}
+        endpoint={statsEndpoints.GET}
         locale={locale}
       />
 
       <EndpointFormField
         name="hasRecentFailures"
         control={control}
-        config={{
-          type: "checkbox",
-          label: "app.admin.cron.stats.filters.hasRecentFailures",
-        }}
+        endpoint={statsEndpoints.GET}
         locale={locale}
       />
 
       <EndpointFormField
         name="hasTimeout"
         control={control}
-        config={{
-          type: "checkbox",
-          label: "app.admin.cron.stats.filters.hasTimeout",
-        }}
+        endpoint={statsEndpoints.GET}
         locale={locale}
       />
 
@@ -285,11 +171,7 @@ export function CronStatsFilters({
         <EndpointFormField
           name="search"
           control={control}
-          config={{
-            type: "text",
-            label: "app.admin.cron.stats.filters.search",
-            placeholder: "app.admin.cron.stats.filters.searchPlaceholder",
-          }}
+          endpoint={statsEndpoints.GET}
           locale={locale}
         />
       </Div>

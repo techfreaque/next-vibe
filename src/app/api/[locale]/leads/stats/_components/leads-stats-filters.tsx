@@ -5,11 +5,6 @@
 
 "use client";
 
-import {
-  ChartType,
-  DateRangePreset,
-  TimePeriod,
-} from "next-vibe/shared/types/stats-filtering.schema";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
@@ -19,14 +14,10 @@ import { RefreshCw } from "next-vibe-ui/ui/icons";
 import type { JSX, ReactNode } from "react";
 import type { Control } from "react-hook-form";
 
-import {
-  LeadSourceFilter,
-  LeadStatusFilter,
-} from "@/app/api/[locale]/leads/enum";
 import type { LeadsStatsRequestOutput } from "@/app/api/[locale]/leads/stats/definition";
-import type statsEndpoints from "@/app/api/[locale]/leads/stats/definition";
+import statsEndpoints from "@/app/api/[locale]/leads/stats/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
-import { CountryFilterOptions, type CountryLanguage } from "@/i18n/core/config";
+import { type CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface LeadsStatsFiltersContainerProps {
@@ -54,37 +45,7 @@ export function LeadsStatsFilters({
         <EndpointFormField
           control={control}
           name="timePeriod"
-          config={{
-            type: "select",
-            label: "app.admin.leads.leads.admin.filters.timePeriod",
-            options: [
-              {
-                value: TimePeriod.HOUR,
-                label: "app.admin.leads.leads.admin.filters.timePeriods.hour",
-              },
-              {
-                value: TimePeriod.DAY,
-                label: "app.admin.leads.leads.admin.filters.timePeriods.day",
-              },
-              {
-                value: TimePeriod.WEEK,
-                label: "app.admin.leads.leads.admin.filters.timePeriods.week",
-              },
-              {
-                value: TimePeriod.MONTH,
-                label: "app.admin.leads.leads.admin.filters.timePeriods.month",
-              },
-              {
-                value: TimePeriod.QUARTER,
-                label:
-                  "app.admin.leads.leads.admin.filters.timePeriods.quarter",
-              },
-              {
-                value: TimePeriod.YEAR,
-                label: "app.admin.leads.leads.admin.filters.timePeriods.year",
-              },
-            ],
-          }}
+          endpoint={statsEndpoints.GET}
           locale={locale}
         />
 
@@ -92,66 +53,7 @@ export function LeadsStatsFilters({
         <EndpointFormField
           control={control}
           name="dateRangePreset"
-          config={{
-            type: "select",
-            label: "app.admin.leads.leads.admin.filters.dateRange",
-            options: [
-              {
-                value: DateRangePreset.TODAY,
-                label: "app.admin.leads.leads.admin.filters.dateRanges.today",
-              },
-              {
-                value: DateRangePreset.YESTERDAY,
-                label:
-                  "app.admin.leads.leads.admin.filters.dateRanges.yesterday",
-              },
-              {
-                value: DateRangePreset.LAST_7_DAYS,
-                label:
-                  "app.admin.leads.leads.admin.filters.dateRanges.last7Days",
-              },
-              {
-                value: DateRangePreset.LAST_30_DAYS,
-                label:
-                  "app.admin.leads.leads.admin.filters.dateRanges.last30Days",
-              },
-              {
-                value: DateRangePreset.LAST_90_DAYS,
-                label:
-                  "app.admin.leads.leads.admin.filters.dateRanges.last90Days",
-              },
-              {
-                value: DateRangePreset.THIS_MONTH,
-                label:
-                  "app.admin.leads.leads.admin.filters.dateRanges.thisMonth",
-              },
-              {
-                value: DateRangePreset.LAST_MONTH,
-                label:
-                  "app.admin.leads.leads.admin.filters.dateRanges.lastMonth",
-              },
-              {
-                value: DateRangePreset.THIS_QUARTER,
-                label:
-                  "app.admin.leads.leads.admin.filters.dateRanges.thisQuarter",
-              },
-              {
-                value: DateRangePreset.LAST_QUARTER,
-                label:
-                  "app.admin.leads.leads.admin.filters.dateRanges.lastQuarter",
-              },
-              {
-                value: DateRangePreset.THIS_YEAR,
-                label:
-                  "app.admin.leads.leads.admin.filters.dateRanges.thisYear",
-              },
-              {
-                value: DateRangePreset.LAST_YEAR,
-                label:
-                  "app.admin.leads.leads.admin.filters.dateRanges.lastYear",
-              },
-            ],
-          }}
+          endpoint={statsEndpoints.GET}
           locale={locale}
         />
 
@@ -159,24 +61,7 @@ export function LeadsStatsFilters({
         <EndpointFormField
           control={control}
           name="chartType"
-          config={{
-            type: "select",
-            label: "app.admin.leads.leads.admin.filters.chartType",
-            options: [
-              {
-                value: ChartType.LINE,
-                label: "app.admin.leads.leads.admin.filters.chartTypes.line",
-              },
-              {
-                value: ChartType.BAR,
-                label: "app.admin.leads.leads.admin.filters.chartTypes.bar",
-              },
-              {
-                value: ChartType.AREA,
-                label: "app.admin.leads.leads.admin.filters.chartTypes.area",
-              },
-            ],
-          }}
+          endpoint={statsEndpoints.GET}
           locale={locale}
         />
 
@@ -184,62 +69,7 @@ export function LeadsStatsFilters({
         <EndpointFormField
           control={control}
           name="status"
-          config={{
-            type: "select",
-            label: "app.admin.leads.leads.admin.filters.statuses.title",
-            options: [
-              {
-                value: LeadStatusFilter.ALL,
-                label: "app.admin.leads.leads.admin.filters.statuses.all",
-              },
-              {
-                value: LeadStatusFilter.NEW,
-                label: "app.admin.leads.leads.admin.filters.statuses.new",
-              },
-              {
-                value: LeadStatusFilter.PENDING,
-                label: "app.admin.leads.leads.admin.filters.statuses.pending",
-              },
-              {
-                value: LeadStatusFilter.CAMPAIGN_RUNNING,
-                label:
-                  "app.admin.leads.leads.admin.filters.statuses.campaign_running",
-              },
-              {
-                value: LeadStatusFilter.WEBSITE_USER,
-                label:
-                  "app.admin.leads.leads.admin.filters.statuses.website_user",
-              },
-              {
-                value: LeadStatusFilter.NEWSLETTER_SUBSCRIBER,
-                label:
-                  "app.admin.leads.leads.admin.filters.statuses.newsletter_subscriber",
-              },
-              {
-                value: LeadStatusFilter.SIGNED_UP,
-                label: "app.admin.leads.leads.admin.filters.statuses.signed_up",
-              },
-              {
-                value: LeadStatusFilter.CONSULTATION_BOOKED,
-                label:
-                  "app.admin.leads.leads.admin.filters.statuses.consultation_booked",
-              },
-              {
-                value: LeadStatusFilter.SUBSCRIPTION_CONFIRMED,
-                label:
-                  "app.admin.leads.leads.admin.filters.statuses.subscription_confirmed",
-              },
-              {
-                value: LeadStatusFilter.UNSUBSCRIBED,
-                label:
-                  "app.admin.leads.leads.admin.filters.statuses.unsubscribed",
-              },
-              {
-                value: LeadStatusFilter.BOUNCED,
-                label: "app.admin.leads.leads.admin.filters.statuses.bounced",
-              },
-            ],
-          }}
+          endpoint={statsEndpoints.GET}
           locale={locale}
         />
 
@@ -247,11 +77,7 @@ export function LeadsStatsFilters({
         <EndpointFormField
           control={control}
           name="country"
-          config={{
-            type: "select",
-            label: "app.admin.leads.leads.admin.filters.countries.title",
-            options: CountryFilterOptions,
-          }}
+          endpoint={statsEndpoints.GET}
           locale={locale}
         />
 
@@ -259,38 +85,7 @@ export function LeadsStatsFilters({
         <EndpointFormField
           control={control}
           name="source"
-          config={{
-            type: "select",
-            label: "app.admin.leads.leads.admin.filters.sources.title",
-            options: [
-              {
-                value: LeadSourceFilter.ALL,
-                label: "app.admin.leads.leads.admin.filters.sources.all",
-              },
-              {
-                value: LeadSourceFilter.WEBSITE,
-                label: "app.admin.leads.leads.admin.filters.sources.website",
-              },
-              {
-                value: LeadSourceFilter.SOCIAL_MEDIA,
-                label:
-                  "app.admin.leads.leads.admin.filters.sources.socialMedia",
-              },
-              {
-                value: LeadSourceFilter.EMAIL_CAMPAIGN,
-                label:
-                  "app.admin.leads.leads.admin.filters.sources.emailCampaign",
-              },
-              {
-                value: LeadSourceFilter.REFERRAL,
-                label: "app.admin.leads.leads.admin.filters.sources.referral",
-              },
-              {
-                value: LeadSourceFilter.CSV_IMPORT,
-                label: "app.admin.leads.leads.admin.filters.sources.csvImport",
-              },
-            ],
-          }}
+          endpoint={statsEndpoints.GET}
           locale={locale}
         />
       </Div>

@@ -13,8 +13,8 @@ import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { H3 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import imapCreateDefinitions from "@/app/api/[locale]/emails/imap-client/accounts/create/definition";
 import { useImapAccountCreateEndpoint } from "@/app/api/[locale]/emails/imap-client/accounts/create/hooks";
-import { ImapAuthMethod } from "@/app/api/[locale]/emails/imap-client/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -56,12 +56,9 @@ export function ImapAccountCreateForm({
         <Div className="flex flex-col gap-4">
           <EndpointFormField
             name="basicInfo.name"
-            config={{
-              type: "text",
-              label: "app.admin.emails.imap.account.fields.name",
-              placeholder: "app.admin.emails.imap.account.placeholders.name",
-            }}
             control={endpoint.create.form.control}
+            endpoint={imapCreateDefinitions.POST}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -70,12 +67,9 @@ export function ImapAccountCreateForm({
 
           <EndpointFormField
             name="basicInfo.email"
-            config={{
-              type: "email",
-              label: "app.admin.emails.imap.account.fields.email",
-              placeholder: "app.admin.emails.imap.account.placeholders.email",
-            }}
             control={endpoint.create.form.control}
+            endpoint={imapCreateDefinitions.POST}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -84,12 +78,9 @@ export function ImapAccountCreateForm({
 
           <EndpointFormField
             name="serverConnection.host"
-            config={{
-              type: "text",
-              label: "app.admin.emails.imap.account.fields.host",
-              placeholder: "app.admin.emails.imap.account.fields.host",
-            }}
             control={endpoint.create.form.control}
+            endpoint={imapCreateDefinitions.POST}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -98,12 +89,9 @@ export function ImapAccountCreateForm({
 
           <EndpointFormField
             name="serverConnection.port"
-            config={{
-              type: "number",
-              label: "app.admin.emails.imap.account.fields.port",
-              placeholder: "app.admin.emails.imap.account.fields.port",
-            }}
             control={endpoint.create.form.control}
+            endpoint={imapCreateDefinitions.POST}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -115,12 +103,9 @@ export function ImapAccountCreateForm({
         <Div className="flex flex-col gap-4">
           <EndpointFormField
             name="authentication.username"
-            config={{
-              type: "text",
-              label: "app.admin.emails.imap.account.fields.username",
-              placeholder: "app.admin.emails.imap.account.fields.username",
-            }}
             control={endpoint.create.form.control}
+            endpoint={imapCreateDefinitions.POST}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -129,12 +114,9 @@ export function ImapAccountCreateForm({
 
           <EndpointFormField
             name="authentication.password"
-            config={{
-              type: "password",
-              label: "app.admin.emails.imap.account.fields.password",
-              placeholder: "app.admin.emails.imap.account.fields.password",
-            }}
             control={endpoint.create.form.control}
+            endpoint={imapCreateDefinitions.POST}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -143,22 +125,9 @@ export function ImapAccountCreateForm({
 
           <EndpointFormField
             name="authentication.authMethod"
-            config={{
-              type: "select",
-              label: "app.admin.emails.imap.account.fields.authMethod",
-              placeholder: "app.admin.emails.imap.account.fields.authMethod",
-              options: [
-                {
-                  value: ImapAuthMethod.PLAIN,
-                  label: "app.admin.emails.imap.auth.plain",
-                },
-                {
-                  value: ImapAuthMethod.OAUTH2,
-                  label: "app.admin.emails.imap.auth.oauth2",
-                },
-              ],
-            }}
             control={endpoint.create.form.control}
+            endpoint={imapCreateDefinitions.POST}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -167,11 +136,9 @@ export function ImapAccountCreateForm({
 
           <EndpointFormField
             name="serverConnection.secure"
-            config={{
-              type: "checkbox",
-              label: "app.admin.emails.imap.account.fields.secure",
-            }}
             control={endpoint.create.form.control}
+            endpoint={imapCreateDefinitions.POST}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -189,13 +156,9 @@ export function ImapAccountCreateForm({
         <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <EndpointFormField
             name="advancedSettings.connectionTimeout"
-            config={{
-              type: "number",
-              label: "app.admin.emails.imap.account.fields.connectionTimeout",
-              placeholder:
-                "app.admin.emails.imap.account.fields.connectionTimeout",
-            }}
             control={endpoint.create.form.control}
+            endpoint={imapCreateDefinitions.POST}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -204,12 +167,9 @@ export function ImapAccountCreateForm({
 
           <EndpointFormField
             name="syncConfiguration.syncInterval"
-            config={{
-              type: "number",
-              label: "app.admin.emails.imap.account.fields.syncInterval",
-              placeholder: "app.admin.emails.imap.account.fields.syncInterval",
-            }}
             control={endpoint.create.form.control}
+            endpoint={imapCreateDefinitions.POST}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -218,12 +178,9 @@ export function ImapAccountCreateForm({
 
           <EndpointFormField
             name="syncConfiguration.maxMessages"
-            config={{
-              type: "number",
-              label: "app.admin.emails.imap.account.fields.maxMessages",
-              placeholder: "app.admin.emails.imap.account.fields.maxMessages",
-            }}
             control={endpoint.create.form.control}
+            endpoint={imapCreateDefinitions.POST}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -233,11 +190,9 @@ export function ImapAccountCreateForm({
 
         <EndpointFormField
           name="syncConfiguration.enabled"
-          config={{
-            type: "checkbox",
-            label: "app.admin.emails.imap.account.fields.enabled",
-          }}
           control={endpoint.create.form.control}
+          endpoint={imapCreateDefinitions.POST}
+          locale={locale}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -246,11 +201,9 @@ export function ImapAccountCreateForm({
 
         <EndpointFormField
           name="advancedSettings.keepAlive"
-          config={{
-            type: "checkbox",
-            label: "app.admin.emails.imap.account.fields.keepAlive",
-          }}
           control={endpoint.create.form.control}
+          endpoint={imapCreateDefinitions.POST}
+          locale={locale}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -260,7 +213,7 @@ export function ImapAccountCreateForm({
       <FormAlert alert={endpoint.alert} />
 
       {/* Form Actions */}
-      <Div className="flex items-center justify-end flex flex-row gap-4">
+      <Div className="flex items-center justify-end flex-row gap-4">
         <Button type="button" variant="outline" onClick={onCancel}>
           {t("app.admin.emails.imap.common.cancel")}
         </Button>

@@ -277,7 +277,7 @@ export class GitService implements IGitService {
           : error.message || String(err);
         logger.error("git add failed", { stderr, cwd });
         return fail({
-          message: "app.api.system.releaseTool.errors.gitAddFailed",
+          message: "app.api.system.releaseTool.errors.gitOperationFailed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: stderr },
         });
@@ -337,7 +337,7 @@ export class GitService implements IGitService {
             : error.message || String(err);
           logger.error("git tag failed", { stderr, tag, cwd });
           return fail({
-            message: "app.api.system.releaseTool.errors.gitTagFailed",
+            message: "app.api.system.releaseTool.git.tagFailed",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { tag, error: stderr },
           });
@@ -363,7 +363,7 @@ export class GitService implements IGitService {
             : error.message || String(err);
           logger.error("git push failed", { stderr, remote, cwd });
           return fail({
-            message: "app.api.system.releaseTool.errors.gitPushFailed",
+            message: "app.api.system.releaseTool.git.pushFailed",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { remote, error: stderr },
           });
@@ -384,7 +384,7 @@ export class GitService implements IGitService {
               : error.message || String(err);
             logger.error("git push tag failed", { stderr, remote, tag, cwd });
             return fail({
-              message: "app.api.system.releaseTool.errors.gitPushTagFailed",
+              message: "app.api.system.releaseTool.git.pushFailed",
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
               messageParams: { tag, remote, error: stderr },
             });

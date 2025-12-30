@@ -8,7 +8,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
-import type { UnifiedField } from "../types/endpoint";
+import type { CreateApiEndpointAny, UnifiedField } from "../types/endpoint";
 import type { Platform } from "../types/platform";
 import type { ExtractWidgetConfig } from "./configs";
 
@@ -180,6 +180,7 @@ export interface ReactWidgetProps<
   form?: UseFormReturn<TFieldValues>;
   onSubmit?: () => void;
   isSubmitting?: boolean;
+  endpoint: CreateApiEndpointAny;
 }
 
 /**

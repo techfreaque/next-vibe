@@ -56,68 +56,20 @@ export function EmailsListFilters({
         {/* Search Field */}
         <EndpointFormField
           name="filters.search"
-          config={{
-            type: "text",
-            label: undefined,
-            placeholder: "app.admin.emails.list.admin.filters.search",
-          }}
           control={form.control}
-          schema={emailListEndpoint.GET.requestSchema}
+          endpoint={emailListEndpoint.GET}
+          locale={locale}
           theme={{
             style: "none",
             showAllRequired: false,
           }}
-          locale={locale}
         />
 
         {/* Status Filter */}
         <EndpointFormField
           name="filters.status"
-          config={{
-            type: "select",
-            label: undefined,
-            placeholder: "app.admin.emails.list.admin.filters.status",
-            options: [
-              {
-                value: EmailStatusFilter.ANY,
-                label: "app.admin.emails.list.admin.status.all",
-              },
-              {
-                value: EmailStatusFilter.PENDING,
-                label: "app.admin.emails.list.admin.status.pending",
-              },
-              {
-                value: EmailStatusFilter.SENT,
-                label: "app.admin.emails.list.admin.status.sent",
-              },
-              {
-                value: EmailStatusFilter.DELIVERED,
-                label: "app.admin.emails.list.admin.status.delivered",
-              },
-              {
-                value: EmailStatusFilter.OPENED,
-                label: "app.admin.emails.list.admin.status.opened",
-              },
-              {
-                value: EmailStatusFilter.CLICKED,
-                label: "app.admin.emails.list.admin.status.clicked",
-              },
-              {
-                value: EmailStatusFilter.BOUNCED,
-                label: "app.admin.emails.list.admin.status.bounced",
-              },
-              {
-                value: EmailStatusFilter.FAILED,
-                label: "app.admin.emails.list.admin.status.failed",
-              },
-              {
-                value: EmailStatusFilter.UNSUBSCRIBED,
-                label: "app.admin.emails.list.admin.status.unsubscribed",
-              },
-            ],
-          }}
           control={form.control}
-          schema={emailListEndpoint.GET.requestSchema}
+          endpoint={emailListEndpoint.GET}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -128,43 +80,8 @@ export function EmailsListFilters({
         {/* Type Filter */}
         <EndpointFormField
           name="filters.type"
-          config={{
-            type: "select",
-            label: undefined,
-            placeholder: "app.admin.emails.list.admin.filters.type",
-            options: [
-              {
-                value: EmailTypeFilter.ANY,
-                label: "app.admin.emails.list.admin.type.all",
-              },
-              {
-                value: EmailTypeFilter.TRANSACTIONAL,
-                label: "app.admin.emails.list.admin.type.transactional",
-              },
-              {
-                value: EmailTypeFilter.MARKETING,
-                label: "app.admin.emails.list.admin.type.marketing",
-              },
-              {
-                value: EmailTypeFilter.NOTIFICATION,
-                label: "app.admin.emails.list.admin.type.notification",
-              },
-              {
-                value: EmailTypeFilter.SYSTEM,
-                label: "app.admin.emails.list.admin.type.system",
-              },
-              {
-                value: EmailTypeFilter.LEAD_CAMPAIGN,
-                label: "app.admin.emails.list.admin.type.lead_campaign",
-              },
-              {
-                value: EmailTypeFilter.USER_COMMUNICATION,
-                label: "app.admin.emails.list.admin.type.user_communication",
-              },
-            ],
-          }}
           control={form.control}
-          schema={emailListEndpoint.GET.requestSchema}
+          endpoint={emailListEndpoint.GET}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -175,39 +92,8 @@ export function EmailsListFilters({
         {/* Sort By */}
         <EndpointFormField
           name="displayOptions.sortBy"
-          config={{
-            type: "select",
-            label: undefined,
-            placeholder: "app.admin.emails.list.admin.sort.field",
-            options: [
-              {
-                value: EmailSortField.CREATED_AT,
-                label: "app.admin.emails.list.admin.sort.created_at",
-              },
-              {
-                value: EmailSortField.SENT_AT,
-                label: "app.admin.emails.list.admin.sort.sent_at",
-              },
-              {
-                value: EmailSortField.SUBJECT,
-                label: "app.admin.emails.list.admin.sort.subject",
-              },
-              {
-                value: EmailSortField.RECIPIENT_EMAIL,
-                label: "app.admin.emails.list.admin.sort.recipient_email",
-              },
-              {
-                value: EmailSortField.STATUS,
-                label: "app.admin.emails.list.admin.sort.status",
-              },
-              {
-                value: EmailSortField.TYPE,
-                label: "app.admin.emails.list.admin.sort.type",
-              },
-            ],
-          }}
           control={form.control}
-          schema={emailListEndpoint.GET.requestSchema}
+          endpoint={emailListEndpoint.GET}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -221,23 +107,8 @@ export function EmailsListFilters({
         {/* Sort Order */}
         <EndpointFormField
           name="displayOptions.sortOrder"
-          config={{
-            type: "select",
-            label: undefined,
-            placeholder: "app.admin.emails.list.admin.sort.order",
-            options: [
-              {
-                value: SortOrder.DESC,
-                label: "app.admin.emails.list.admin.sort.desc",
-              },
-              {
-                value: SortOrder.ASC,
-                label: "app.admin.emails.list.admin.sort.asc",
-              },
-            ],
-          }}
           control={form.control}
-          schema={emailListEndpoint.GET.requestSchema}
+          endpoint={emailListEndpoint.GET}
           theme={{
             style: "none",
             showAllRequired: false,

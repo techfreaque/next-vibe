@@ -32,6 +32,7 @@ import {
   SmtpHealthStatusFilter,
 } from "@/app/api/[locale]/emails/smtp-client/enum";
 import type { SmtpAccountsListGETResponseOutput } from "@/app/api/[locale]/emails/smtp-client/list/definition";
+import smtpListDefinitions from "@/app/api/[locale]/emails/smtp-client/list/definition";
 import { useSmtpAccountsListEndpoint } from "@/app/api/[locale]/emails/smtp-client/list/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -148,144 +149,49 @@ export function SmtpAccountsClient({
                 {/* Search Field */}
                 <EndpointFormField
                   name="search"
-                  config={{
-                    type: "text",
-                    label: undefined,
-                    placeholder: "app.admin.emails.smtp.search.placeholder",
-                  }}
                   control={smtpAccountsEndpoint.read?.form.control}
+                  endpoint={smtpListDefinitions.GET}
+                  locale={locale}
                   theme={{
                     style: "none",
                     showAllRequired: false,
                   }}
-                  locale={locale}
                 />
 
                 {/* Purpose Filter */}
                 <EndpointFormField
                   name="campaignType"
-                  config={{
-                    type: "select",
-                    label: undefined,
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.campaignTypes" as const,
-                    options: [
-                      {
-                        value: CampaignTypeFilter.ANY,
-                        label:
-                          "app.admin.emails.smtp.filter.purpose.all" as const,
-                      },
-                      {
-                        value: CampaignTypeFilter.LEAD_CAMPAIGN,
-                        label:
-                          "app.admin.emails.smtp.admin.campaignTypes.leadCampaign" as const,
-                      },
-                      {
-                        value: CampaignTypeFilter.NEWSLETTER,
-                        label:
-                          "app.admin.emails.smtp.admin.campaignTypes.newsletter" as const,
-                      },
-                      {
-                        value: CampaignTypeFilter.TRANSACTIONAL,
-                        label:
-                          "app.admin.emails.smtp.admin.campaignTypes.transactional" as const,
-                      },
-                      {
-                        value: CampaignTypeFilter.NOTIFICATION,
-                        label:
-                          "app.admin.emails.smtp.admin.campaignTypes.notification" as const,
-                      },
-                      {
-                        value: CampaignTypeFilter.SYSTEM,
-                        label:
-                          "app.admin.emails.smtp.admin.campaignTypes.system" as const,
-                      },
-                    ],
-                  }}
                   control={smtpAccountsEndpoint.read?.form.control}
+                  endpoint={smtpListDefinitions.GET}
+                  locale={locale}
                   theme={{
                     style: "none",
                     showAllRequired: false,
                   }}
-                  locale={locale}
                 />
 
                 {/* Status Filter */}
                 <EndpointFormField
                   name="status"
-                  config={{
-                    type: "select",
-                    label: undefined,
-                    placeholder:
-                      "app.admin.emails.smtp.filter.status.placeholder",
-                    options: [
-                      {
-                        value: SmtpAccountStatusFilter.ANY,
-                        label: "app.admin.emails.smtp.filter.status.all",
-                      },
-                      {
-                        value: SmtpAccountStatusFilter.ACTIVE,
-                        label: "app.admin.emails.smtp.filter.status.active",
-                      },
-                      {
-                        value: SmtpAccountStatusFilter.INACTIVE,
-                        label: "app.admin.emails.smtp.filter.status.inactive",
-                      },
-                      {
-                        value: SmtpAccountStatusFilter.ERROR,
-                        label: "app.admin.emails.smtp.filter.status.error",
-                      },
-                      {
-                        value: SmtpAccountStatusFilter.TESTING,
-                        label: "app.admin.emails.smtp.filter.status.testing",
-                      },
-                    ],
-                  }}
                   control={smtpAccountsEndpoint.read?.form.control}
+                  endpoint={smtpListDefinitions.GET}
+                  locale={locale}
                   theme={{
                     style: "none",
                     showAllRequired: false,
                   }}
-                  locale={locale}
                 />
 
                 {/* Health Status Filter */}
                 <EndpointFormField
                   name="healthStatus"
-                  config={{
-                    type: "select",
-                    label: undefined,
-                    placeholder:
-                      "app.admin.emails.smtp.filter.health.placeholder",
-                    options: [
-                      {
-                        value: SmtpHealthStatusFilter.ANY,
-                        label: "app.admin.emails.smtp.filter.health.all",
-                      },
-                      {
-                        value: SmtpHealthStatusFilter.HEALTHY,
-                        label: "app.admin.emails.smtp.filter.health.healthy",
-                      },
-                      {
-                        value: SmtpHealthStatusFilter.DEGRADED,
-                        label: "app.admin.emails.smtp.filter.health.degraded",
-                      },
-                      {
-                        value: SmtpHealthStatusFilter.UNHEALTHY,
-                        label: "app.admin.emails.smtp.filter.health.unhealthy",
-                      },
-                      {
-                        value: SmtpHealthStatusFilter.UNKNOWN,
-                        label: "app.admin.emails.smtp.filter.health.unknown",
-                      },
-                    ],
-                  }}
                   control={smtpAccountsEndpoint.read?.form.control}
+                  endpoint={smtpListDefinitions.GET}
+                  locale={locale}
                   theme={{
                     style: "none",
                     showAllRequired: false,
                   }}
-                  locale={locale}
                 />
               </Div>
 

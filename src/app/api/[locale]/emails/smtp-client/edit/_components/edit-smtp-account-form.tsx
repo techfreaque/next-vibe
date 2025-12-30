@@ -20,11 +20,9 @@ import type React from "react";
 
 import editDefinition from "@/app/api/[locale]/emails/smtp-client/edit/[id]/definition";
 import { useSmtpAccountById } from "@/app/api/[locale]/emails/smtp-client/edit/[id]/hooks";
-import { SmtpSecurityType } from "@/app/api/[locale]/emails/smtp-client/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 interface EditSmtpAccountFormProps {
   locale: CountryLanguage;
@@ -49,30 +47,6 @@ export function EditSmtpAccountForm({
   const isLoading = endpoint.read.isLoading;
   const isSaving = endpoint.create.isSubmitting;
   const account = endpoint.read.data;
-
-  // Security type options for select field
-  const securityTypeOptions = [
-    {
-      value: SmtpSecurityType.NONE,
-      label:
-        "app.admin.emails.smtp.admin.security.none" as const satisfies TranslationKey,
-    },
-    {
-      value: SmtpSecurityType.TLS,
-      label:
-        "app.admin.emails.smtp.admin.security.tls" as const satisfies TranslationKey,
-    },
-    {
-      value: SmtpSecurityType.SSL,
-      label:
-        "app.admin.emails.smtp.admin.security.ssl" as const satisfies TranslationKey,
-    },
-    {
-      value: SmtpSecurityType.STARTTLS,
-      label:
-        "app.admin.emails.smtp.admin.security.starttls" as const satisfies TranslationKey,
-    },
-  ];
 
   const handleSubmit = endpoint.create.onSubmit;
 
@@ -135,12 +109,7 @@ export function EditSmtpAccountForm({
             >
               <EndpointFormField
                 name="name"
-                config={{
-                  type: "text",
-                  label: "app.admin.emails.smtp.admin.fields.name",
-                  placeholder:
-                    "app.admin.emails.smtp.admin.fields.namePlaceholder",
-                }}
+                endpoint={editDefinition.PUT}
                 control={endpoint.create.form.control}
                 theme={{
                   style: "none",
@@ -151,13 +120,7 @@ export function EditSmtpAccountForm({
 
               <EndpointFormField
                 name="description"
-                config={{
-                  type: "textarea",
-                  label: "app.admin.emails.smtp.admin.fields.description",
-                  placeholder:
-                    "app.admin.emails.smtp.admin.fields.descriptionPlaceholder",
-                  rows: 2,
-                }}
+                endpoint={editDefinition.PUT}
                 control={endpoint.create.form.control}
                 theme={{
                   style: "none",
@@ -177,12 +140,7 @@ export function EditSmtpAccountForm({
               <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <EndpointFormField
                   name="host"
-                  config={{
-                    type: "text",
-                    label: "app.admin.emails.smtp.admin.fields.host",
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.hostPlaceholder",
-                  }}
+                  endpoint={editDefinition.PUT}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -193,12 +151,7 @@ export function EditSmtpAccountForm({
 
                 <EndpointFormField
                   name="port"
-                  config={{
-                    type: "number",
-                    label: "app.admin.emails.smtp.admin.fields.port",
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.portPlaceholder",
-                  }}
+                  endpoint={editDefinition.PUT}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -209,13 +162,7 @@ export function EditSmtpAccountForm({
 
                 <EndpointFormField
                   name="securityType"
-                  config={{
-                    type: "select",
-                    label: "app.admin.emails.smtp.admin.fields.securityType",
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.securityTypePlaceholder",
-                    options: securityTypeOptions,
-                  }}
+                  endpoint={editDefinition.PUT}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -237,12 +184,7 @@ export function EditSmtpAccountForm({
             >
               <EndpointFormField
                 name="username"
-                config={{
-                  type: "text",
-                  label: "app.admin.emails.smtp.admin.fields.username" as const,
-                  placeholder:
-                    "app.admin.emails.smtp.admin.fields.usernamePlaceholder" as const,
-                }}
+                endpoint={editDefinition.PUT}
                 control={endpoint.create.form.control}
                 theme={{
                   style: "none",
@@ -253,15 +195,7 @@ export function EditSmtpAccountForm({
 
               <EndpointFormField
                 name="password"
-                config={{
-                  type: "password",
-                  label:
-                    "app.api.emails.smtpClient.edit.id.fields.password.label" as const,
-                  description:
-                    "app.api.emails.smtpClient.edit.id.fields.password.description" as const,
-                  placeholder:
-                    "app.api.emails.smtpClient.edit.id.fields.password.placeholder" as const,
-                }}
+                endpoint={editDefinition.PUT}
                 control={endpoint.create.form.control}
                 theme={{
                   style: "none",
@@ -280,12 +214,7 @@ export function EditSmtpAccountForm({
             >
               <EndpointFormField
                 name="fromEmail"
-                config={{
-                  type: "email",
-                  label: "app.admin.emails.smtp.admin.fields.fromEmail",
-                  placeholder:
-                    "app.admin.emails.smtp.admin.fields.fromEmailPlaceholder",
-                }}
+                endpoint={editDefinition.PUT}
                 control={endpoint.create.form.control}
                 theme={{
                   style: "none",
@@ -297,7 +226,7 @@ export function EditSmtpAccountForm({
               <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <EndpointFormField
                   name="campaignTypes"
-                  endpointFields={editDefinition.PUT.fields}
+                  endpoint={editDefinition.PUT}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -308,7 +237,7 @@ export function EditSmtpAccountForm({
 
                 <EndpointFormField
                   name="emailJourneyVariants"
-                  endpointFields={editDefinition.PUT.fields}
+                  endpoint={editDefinition.PUT}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -319,7 +248,7 @@ export function EditSmtpAccountForm({
 
                 <EndpointFormField
                   name="emailCampaignStages"
-                  endpointFields={editDefinition.PUT.fields}
+                  endpoint={editDefinition.PUT}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -330,7 +259,7 @@ export function EditSmtpAccountForm({
 
                 <EndpointFormField
                   name="countries"
-                  endpointFields={editDefinition.PUT.fields}
+                  endpoint={editDefinition.PUT}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -341,7 +270,7 @@ export function EditSmtpAccountForm({
 
                 <EndpointFormField
                   name="languages"
-                  endpointFields={editDefinition.PUT.fields}
+                  endpoint={editDefinition.PUT}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",
@@ -362,12 +291,7 @@ export function EditSmtpAccountForm({
 
                 <EndpointFormField
                   name="priority"
-                  config={{
-                    type: "number",
-                    label: "app.admin.emails.smtp.admin.fields.priority",
-                    placeholder:
-                      "app.admin.emails.smtp.admin.fields.priorityPlaceholder",
-                  }}
+                  endpoint={editDefinition.PUT}
                   control={endpoint.create.form.control}
                   theme={{
                     style: "none",

@@ -18,7 +18,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { UserRoleOptions } from "@/app/api/[locale]/user/user-roles/enum";
+import userCreateDefinitions from "@/app/api/[locale]/users/create/definition";
 import { useUsersCreateEndpoint } from "@/app/api/[locale]/users/create/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -58,7 +58,7 @@ export function UserCreateForm({
         <Button
           variant="outline"
           onClick={handleBack}
-          className="flex items-center flex flex-row gap-2"
+          className="flex items-center flex-row gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
           <Span>{t("app.admin.users.form.buttons.back")}</Span>
@@ -68,7 +68,7 @@ export function UserCreateForm({
       {/* Main Form Card */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center flex flex-row gap-2">
+          <CardTitle className="flex items-center flex-row gap-2">
             <Span>{t("app.admin.users.form.buttons.create")}</Span>
           </CardTitle>
         </CardHeader>
@@ -81,13 +81,8 @@ export function UserCreateForm({
             <FormFieldGroup>
               <EndpointFormField
                 name="basicInfo.email"
-                config={{
-                  type: "email",
-                  label: "app.api.users.create.post.email.label",
-                  description: "app.api.users.create.post.email.description",
-                  placeholder: "app.api.users.create.post.email.label",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userCreateDefinitions.POST}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -97,12 +92,8 @@ export function UserCreateForm({
 
               <EndpointFormField
                 name="basicInfo.password"
-                config={{
-                  type: "password",
-                  label: "app.api.users.create.post.password.label",
-                  description: "app.api.users.create.post.password.description",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userCreateDefinitions.POST}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -112,13 +103,8 @@ export function UserCreateForm({
 
               <EndpointFormField
                 name="basicInfo.privateName"
-                config={{
-                  type: "text",
-                  label: "app.api.users.create.post.privateName.label",
-                  description:
-                    "app.api.users.create.post.privateName.description",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userCreateDefinitions.POST}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -128,13 +114,8 @@ export function UserCreateForm({
 
               <EndpointFormField
                 name="basicInfo.publicName"
-                config={{
-                  type: "text",
-                  label: "app.api.users.create.post.publicName.label",
-                  description:
-                    "app.api.users.create.post.publicName.description",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userCreateDefinitions.POST}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -144,13 +125,8 @@ export function UserCreateForm({
 
               <EndpointFormField
                 name="adminSettings.roles"
-                config={{
-                  type: "multiselect",
-                  label: "app.api.users.create.post.roles.label",
-                  description: "app.api.users.create.post.roles.description",
-                  options: UserRoleOptions,
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userCreateDefinitions.POST}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -160,12 +136,8 @@ export function UserCreateForm({
 
               <EndpointFormField
                 name="adminSettings.isActive"
-                config={{
-                  type: "checkbox",
-                  label: "app.api.users.create.post.isActive.label",
-                  description: "app.api.users.create.post.isActive.description",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userCreateDefinitions.POST}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -175,13 +147,8 @@ export function UserCreateForm({
 
               <EndpointFormField
                 name="adminSettings.emailVerified"
-                config={{
-                  type: "checkbox",
-                  label: "app.api.users.create.post.emailVerified.label",
-                  description:
-                    "app.api.users.create.post.emailVerified.description",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userCreateDefinitions.POST}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -191,12 +158,8 @@ export function UserCreateForm({
 
               <EndpointFormField
                 name="adminSettings.leadId"
-                config={{
-                  type: "text",
-                  label: "app.api.users.create.post.leadId.label",
-                  description: "app.api.users.create.post.leadId.description",
-                }}
                 control={endpoint.create.form.control}
+                endpoint={userCreateDefinitions.POST}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -208,7 +171,7 @@ export function UserCreateForm({
             <FormAlert alert={endpoint.alert} />
 
             {/* Submit Button */}
-            <Div className="flex justify-end flex flex-row gap-4">
+            <Div className="flex justify-end flex-row gap-4">
               <Button
                 type="button"
                 variant="outline"

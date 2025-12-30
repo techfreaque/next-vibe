@@ -11,46 +11,48 @@ import type { JSX } from "react";
 import { useRef, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams } from "@/i18n/core/static-types";
 
-import type { StyleType } from "../utils/style-type";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import { Input, type InputKeyboardEvent } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
-export interface TagOption {
+export interface TagOption<TKey extends string> {
   value: string;
-  label: TranslationKey;
+  label: TKey;
   category?: string;
 }
 
-export type TagsFieldProps = {
+export interface TagsFieldProps<TKey extends string> {
   value?: string[];
   onChange: (value: string[]) => void;
   onBlur?: () => void;
-  suggestions?: TagOption[];
-  placeholder?: TranslationKey;
+  suggestions?: TagOption<TKey>[];
+  placeholder?: TKey;
   maxTags?: number;
   allowCustom?: boolean;
   disabled?: boolean;
   name?: string;
-} & StyleType;
+  t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType;
+  className?: string;
+}
 
-export function TagsField({
+export function TagsField<TKey extends string>({
   value = [],
   onChange,
   onBlur,
   suggestions = [],
-  placeholder = "packages.nextVibeUi.web.common.addTags",
+  placeholder,
   maxTags,
   allowCustom = true,
   disabled = false,
   className,
-  style,
   name,
-}: TagsFieldProps): JSX.Element {
-  const { t } = useTranslation();
+  t,
+}: TagsFieldProps<TKey>): JSX.Element {
+  const { t: globalT } = useTranslation();
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -74,7 +76,7 @@ export function TagsField({
       groups[category].push(suggestion);
       return groups;
     },
-    {} as Record<string, TagOption[]>,
+    {} as Record<string, TagOption<TKey>[]>,
   );
 
   const addTag = (tagValue: string): void => {
@@ -139,7 +141,7 @@ export function TagsField({
   const canAddMore = !maxTags || value.length < maxTags;
 
   return (
-    <div className={cn("relative", className)} style={style}>
+    <div className={cn("relative", className)}>
       <div
         className={cn(
           "min-h-[40px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm",
@@ -180,7 +182,9 @@ export function TagsField({
                   onKeyDown={handleKeyDown}
                   onFocus={handleInputFocus}
                   onBlur={handleInputBlur}
-                  placeholder={value.length === 0 ? t(placeholder) : ""}
+                  placeholder={
+                    value.length === 0 && placeholder ? t(placeholder) : ""
+                  }
                   className="border-0 p-0 h-6 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent w-full"
                 />
               </div>
@@ -228,9 +232,12 @@ export function TagsField({
                           onClick={() => addTag(inputValue)}
                         >
                           <Plus className="h-3 w-3 mr-2" />
-                          {t("packages.nextVibeUi.web.common.addCustomValue", {
-                            value: inputValue.trim(),
-                          })}
+                          {globalT(
+                            "packages.nextVibeUi.web.common.addCustomValue",
+                            {
+                              value: inputValue.trim(),
+                            },
+                          )}
                         </Button>
                       </div>
                     )}

@@ -9,12 +9,10 @@ import { Pressable, ScrollView, Text as RNText, View } from "react-native";
 import { useTranslation } from "@/i18n/core/client";
 import type {
   AutocompleteFieldProps,
-  AutocompleteFieldPropsBase,
+  AutocompleteOption,
   AutocompleteOptionBase,
 } from "@/packages/next-vibe-ui/web/ui/autocomplete-field";
 
-import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
 import { Badge } from "./badge";
 import { Check, ChevronDown, Search, X } from "./icons";
 import { Input } from "./input";
@@ -24,27 +22,26 @@ import { Text as UIText } from "./text";
 // Re-export enum for type parity with web
 export { FormFieldCategory } from "@/packages/next-vibe-ui/web/ui/autocomplete-field";
 
-export function AutocompleteField({
+export function AutocompleteField<TKey extends string>({
   value = "",
   onChange,
   onBlur,
   options,
-  placeholder = "app.common.selectOption",
-  searchPlaceholder = "app.common.searchOptions",
+  placeholder,
+  searchPlaceholder,
   allowCustom = true,
   disabled = false,
   className,
-  style,
-}: AutocompleteFieldProps): React.JSX.Element {
+  t,
+}: AutocompleteFieldProps<TKey>): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isCustomValue, setIsCustomValue] = useState(false);
-  const { t } = useTranslation();
-  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+  const { t: globalT } = useTranslation();
 
   // Group options by category
   const groupedOptions = useMemo(() => {
-    const groups: Record<string, AutocompleteOptionBase[]> = {};
+    const groups: Record<string, AutocompleteOption<TKey>[]> = {};
 
     options.forEach((option) => {
       const category = option.category || "other";
@@ -63,12 +60,12 @@ export function AutocompleteField({
       return groupedOptions;
     }
 
-    const filtered: Record<string, AutocompleteOptionBase[]> = {};
+    const filtered: Record<string, AutocompleteOption<TKey>[]> = {};
 
     Object.entries(groupedOptions).forEach(([category, categoryOptions]) => {
       const matchingOptions = categoryOptions.filter(
         (option) =>
-          option.label.toLowerCase().includes(searchValue.toLowerCase()) ||
+          t(option.label).toLowerCase().includes(searchValue.toLowerCase()) ||
           option.value.toLowerCase().includes(searchValue.toLowerCase()),
       );
 
@@ -78,11 +75,11 @@ export function AutocompleteField({
     });
 
     return filtered;
-  }, [groupedOptions, searchValue]);
+  }, [groupedOptions, searchValue, t]);
 
   // Check if current value is a custom value
   const selectedOption = options.find((option) => option.value === value);
-  const displayValue = selectedOption ? selectedOption.label : value;
+  const displayValue = selectedOption ? t(selectedOption.label) : value;
 
   React.useEffect(() => {
     setIsCustomValue(!selectedOption && value !== "");
@@ -119,12 +116,7 @@ export function AutocompleteField({
   };
 
   return (
-    <View
-      {...applyStyleType({
-        nativeStyle,
-        className: cn("relative", className),
-      })}
-    >
+    <View className={cn("relative", className)}>
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <Pressable
@@ -139,7 +131,7 @@ export function AutocompleteField({
               {isCustomValue && (
                 <Badge variant="secondary" className="text-xs">
                   <UIText>
-                    {t(
+                    {globalT(
                       "packages.nextVibeUi.native.ui.autocompleteField.custom",
                     )}
                   </UIText>
@@ -152,7 +144,7 @@ export function AutocompleteField({
                   !value && "text-muted-foreground",
                 )}
               >
-                {value ? displayValue : placeholder}
+                {value ? displayValue : placeholder ? t(placeholder) : ""}
               </RNText>
             </View>
             <View className="flex-row items-center gap-1">
@@ -180,7 +172,7 @@ export function AutocompleteField({
                 className="mr-2 text-muted-foreground opacity-50"
               />
               <Input
-                placeholder={searchPlaceholder}
+                placeholder={searchPlaceholder ? t(searchPlaceholder) : ""}
                 value={searchValue}
                 onChangeText={setSearchValue}
                 className="h-10 flex-1 border-0 bg-transparent"
@@ -192,7 +184,7 @@ export function AutocompleteField({
               {Object.keys(filteredGroups).length === 0 ? (
                 <View className="py-6 text-center">
                   <UIText className="text-sm text-muted-foreground text-center">
-                    {t(
+                    {globalT(
                       "packages.nextVibeUi.native.ui.autocompleteField.noOptionsFound",
                     )}
                   </UIText>
@@ -202,7 +194,7 @@ export function AutocompleteField({
                       className="mt-2 items-center"
                     >
                       <UIText className="text-sm text-primary">
-                        {t(
+                        {globalT(
                           "packages.nextVibeUi.native.ui.autocompleteField.use",
                           { value: searchValue },
                         )}
@@ -227,7 +219,9 @@ export function AutocompleteField({
                             "flex-row items-center justify-between rounded-sm px-2 py-2 active:bg-accent",
                           )}
                         >
-                          <UIText className="text-base">{option.label}</UIText>
+                          <UIText className="text-base">
+                            {t(option.label)}
+                          </UIText>
                           {value === option.value && (
                             <Check size={16} className="text-foreground" />
                           )}
@@ -247,7 +241,7 @@ export function AutocompleteField({
                       className="flex-row items-center rounded-sm px-2 py-2 active:bg-accent"
                     >
                       <UIText className="text-base">
-                        {t(
+                        {globalT(
                           "packages.nextVibeUi.native.ui.autocompleteField.use",
                           { value: searchValue },
                         )}
@@ -264,8 +258,4 @@ export function AutocompleteField({
 }
 
 // Re-export cross-platform types
-export type {
-  AutocompleteFieldProps,
-  AutocompleteFieldPropsBase,
-  AutocompleteOptionBase,
-};
+export type { AutocompleteFieldProps, AutocompleteOptionBase };

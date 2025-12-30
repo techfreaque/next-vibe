@@ -13,18 +13,18 @@ import type { PrefillDisplayConfig } from "./field-config-types";
  * This matches the structure created by objectField() in endpoint definitions
  */
 
-export interface EndpointFieldStructure {
+export interface EndpointFieldStructure<TKey extends string> {
   type?: string;
-  children?: Record<string, EndpointFieldStructure>;
+  children?: Record<string, EndpointFieldStructure<TKey>>;
   // Union-specific fields
   discriminator?: string;
-  variants?: readonly EndpointFieldStructure[];
+  variants?: readonly EndpointFieldStructure<TKey>[];
   ui?: {
     type: string;
     fieldType?: string;
-    label?: string;
-    placeholder?: string;
-    description?: string;
+    label?: TKey;
+    placeholder?: TKey;
+    description?: TKey;
     disabled?: boolean;
     className?: string;
     defaultCountry?: Countries;
@@ -38,7 +38,7 @@ export interface EndpointFieldStructure {
     maxLength?: number;
     options?: Array<{
       value: string | number;
-      label: string;
+      label: TKey;
       labelParams?: Record<string, string | number>;
       disabled?: boolean;
       icon?: IconKey;
@@ -46,17 +46,17 @@ export interface EndpointFieldStructure {
     maxTags?: number;
     // Readonly and prefill display options
     readonly?: boolean;
-    prefillDisplay?: PrefillDisplayConfig;
+    prefillDisplay?: PrefillDisplayConfig<TKey>;
   };
 }
 /**
  * Get runtime field structure by path
  * Supports object, object-optional, and object-union types
  */
-export function getFieldStructureByPath(
-  fields: EndpointFieldStructure,
+export function getFieldStructureByPath<TKey extends string>(
+  fields: EndpointFieldStructure<TKey>,
   path: string,
-): EndpointFieldStructure | null {
+): EndpointFieldStructure<TKey> | null {
   const parts = path.split(".");
   let current = fields;
 
@@ -67,8 +67,8 @@ export function getFieldStructureByPath(
 
     // Handle object-union types
     if (current.type === "object-union") {
-      const unionField = current as EndpointFieldStructure & {
-        variants?: readonly EndpointFieldStructure[];
+      const unionField = current as EndpointFieldStructure<TKey> & {
+        variants?: readonly EndpointFieldStructure<TKey>[];
       };
 
       // Look for the field in any variant (all variants should have the discriminator field)
@@ -77,7 +77,7 @@ export function getFieldStructureByPath(
         for (const variant of unionField.variants) {
           if (variant.type === "object" || variant.type === "object-optional") {
             const variantChildren = variant.children as
-              | Record<string, EndpointFieldStructure>
+              | Record<string, EndpointFieldStructure<TKey>>
               | undefined;
             if (variantChildren && part in variantChildren) {
               current = variantChildren[part];

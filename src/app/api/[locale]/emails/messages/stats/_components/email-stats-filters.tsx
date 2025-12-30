@@ -5,11 +5,6 @@
 
 "use client";
 
-import {
-  ChartType,
-  DateRangePreset,
-  TimePeriod,
-} from "next-vibe/shared/types/stats-filtering.schema";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
@@ -19,14 +14,8 @@ import { RefreshCw } from "next-vibe-ui/ui/icons";
 import type { JSX, ReactNode } from "react";
 import type { Control } from "react-hook-form";
 
-import {
-  EmailSortField,
-  EmailStatusFilter,
-  EmailTypeFilter,
-} from "@/app/api/[locale]/emails/messages/enum";
 import type { EmailStatsGetRequestTypeOutput } from "@/app/api/[locale]/emails/messages/stats/definition";
-import type emailStatsEndpoint from "@/app/api/[locale]/emails/messages/stats/definition";
-import { SortOrder } from "@/app/api/[locale]/leads/enum";
+import emailStatsEndpoint from "@/app/api/[locale]/emails/messages/stats/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -98,139 +87,24 @@ export function EmailStatsFilters({
         <EndpointFormField
           control={control}
           name="timePeriod"
+          endpoint={emailStatsEndpoint.GET}
           locale={locale}
-          config={{
-            type: "select",
-            label: "app.admin.emails.stats.admin.stats.filters.timePeriod",
-            options: [
-              {
-                value: TimePeriod.HOUR,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.timePeriods.hour",
-              },
-              {
-                value: TimePeriod.DAY,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.timePeriods.day",
-              },
-              {
-                value: TimePeriod.WEEK,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.timePeriods.week",
-              },
-              {
-                value: TimePeriod.MONTH,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.timePeriods.month",
-              },
-              {
-                value: TimePeriod.QUARTER,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.timePeriods.quarter",
-              },
-              {
-                value: TimePeriod.YEAR,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.timePeriods.year",
-              },
-            ],
-          }}
         />
 
         {/* Date Range Preset */}
         <EndpointFormField
           control={control}
           name="dateRangePreset"
+          endpoint={emailStatsEndpoint.GET}
           locale={locale}
-          config={{
-            type: "select",
-            label: "app.admin.emails.stats.admin.stats.filters.dateRange",
-            options: [
-              {
-                value: DateRangePreset.TODAY,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.dateRanges.today",
-              },
-              {
-                value: DateRangePreset.YESTERDAY,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.dateRanges.yesterday",
-              },
-              {
-                value: DateRangePreset.LAST_7_DAYS,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.dateRanges.last7Days",
-              },
-              {
-                value: DateRangePreset.LAST_30_DAYS,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.dateRanges.last30Days",
-              },
-              {
-                value: DateRangePreset.LAST_90_DAYS,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.dateRanges.last90Days",
-              },
-              {
-                value: DateRangePreset.THIS_MONTH,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.dateRanges.thisMonth",
-              },
-              {
-                value: DateRangePreset.LAST_MONTH,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.dateRanges.lastMonth",
-              },
-              {
-                value: DateRangePreset.THIS_QUARTER,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.dateRanges.thisQuarter",
-              },
-              {
-                value: DateRangePreset.LAST_QUARTER,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.dateRanges.lastQuarter",
-              },
-              {
-                value: DateRangePreset.THIS_YEAR,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.dateRanges.thisYear",
-              },
-              {
-                value: DateRangePreset.LAST_YEAR,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.dateRanges.lastYear",
-              },
-            ],
-          }}
         />
 
         {/* Chart Type */}
         <EndpointFormField
           control={control}
           name="chartType"
+          endpoint={emailStatsEndpoint.GET}
           locale={locale}
-          config={{
-            type: "select",
-            label: "app.admin.emails.stats.admin.stats.filters.chartType",
-            options: [
-              {
-                value: ChartType.LINE,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.chartTypes.line",
-              },
-              {
-                value: ChartType.BAR,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.chartTypes.bar",
-              },
-              {
-                value: ChartType.AREA,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.chartTypes.area",
-              },
-            ],
-          }}
         />
       </Div>
 
@@ -240,127 +114,24 @@ export function EmailStatsFilters({
         <EndpointFormField
           control={control}
           name="status"
+          endpoint={emailStatsEndpoint.GET}
           locale={locale}
-          config={{
-            type: "select",
-            label: "app.admin.emails.stats.admin.stats.filters.statuses.title",
-            options: [
-              {
-                value: EmailStatusFilter.ANY,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.statuses.all",
-              },
-              {
-                value: EmailStatusFilter.SENT,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.statuses.sent",
-              },
-              {
-                value: EmailStatusFilter.DELIVERED,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.statuses.delivered",
-              },
-              {
-                value: EmailStatusFilter.OPENED,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.statuses.opened",
-              },
-              {
-                value: EmailStatusFilter.CLICKED,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.statuses.clicked",
-              },
-              {
-                value: EmailStatusFilter.BOUNCED,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.statuses.bounced",
-              },
-              {
-                value: EmailStatusFilter.FAILED,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.statuses.failed",
-              },
-              {
-                value: EmailStatusFilter.UNSUBSCRIBED,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.statuses.unsubscribed",
-              },
-            ],
-          }}
         />
 
         {/* Email Type Filter */}
         <EndpointFormField
           control={control}
           name="type"
+          endpoint={emailStatsEndpoint.GET}
           locale={locale}
-          config={{
-            type: "select",
-            label: "app.admin.emails.stats.admin.stats.filters.types.title",
-            options: [
-              {
-                value: EmailTypeFilter.ANY,
-                label: "app.admin.emails.stats.admin.stats.filters.types.all",
-              },
-              {
-                value: EmailTypeFilter.LEAD_CAMPAIGN,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.types.leadCampaign",
-              },
-              {
-                value: EmailTypeFilter.TRANSACTIONAL,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.types.transactional",
-              },
-              {
-                value: EmailTypeFilter.MARKETING,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.types.marketing",
-              },
-              {
-                value: EmailTypeFilter.NOTIFICATION,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.types.notification",
-              },
-              {
-                value: EmailTypeFilter.SYSTEM,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.types.system",
-              },
-            ],
-          }}
         />
 
         {/* Sort By */}
         <EndpointFormField
           control={control}
           name="sortBy"
+          endpoint={emailStatsEndpoint.GET}
           locale={locale}
-          config={{
-            type: "select",
-            label: "app.admin.emails.stats.admin.stats.filters.sortBy.title",
-            options: [
-              {
-                value: EmailSortField.CREATED_AT,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.sortBy.createdAt",
-              },
-              {
-                value: EmailSortField.SENT_AT,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.sortBy.sentAt",
-              },
-              {
-                value: EmailSortField.STATUS,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.sortBy.status",
-              },
-              {
-                value: EmailSortField.TYPE,
-                label: "app.admin.emails.stats.admin.stats.filters.sortBy.type",
-              },
-            ],
-          }}
         />
       </Div>
 
@@ -370,37 +141,16 @@ export function EmailStatsFilters({
         <EndpointFormField
           control={control}
           name="sortOrder"
+          endpoint={emailStatsEndpoint.GET}
           locale={locale}
-          config={{
-            type: "select",
-            label: "app.admin.emails.stats.admin.stats.filters.sortOrder.title",
-            options: [
-              {
-                value: SortOrder.DESC,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.sortOrder.desc",
-              },
-              {
-                value: SortOrder.ASC,
-                label:
-                  "app.admin.emails.stats.admin.stats.filters.sortOrder.asc",
-              },
-            ],
-          }}
         />
 
         {/* Include Comparison Toggle */}
         <EndpointFormField
           control={control}
           name="includeComparison"
+          endpoint={emailStatsEndpoint.GET}
           locale={locale}
-          config={{
-            type: "checkbox",
-            label:
-              "app.admin.emails.stats.admin.stats.filters.includeComparison",
-            description:
-              "app.admin.emails.stats.admin.stats.filters.includeComparisonDescription",
-          }}
         />
       </Div>
 
@@ -409,12 +159,7 @@ export function EmailStatsFilters({
         control={control}
         name="search"
         locale={locale}
-        config={{
-          type: "text",
-          label: "app.admin.emails.stats.admin.stats.filters.search",
-          placeholder:
-            "app.admin.emails.stats.admin.stats.filters.searchPlaceholder",
-        }}
+        endpoint={emailStatsEndpoint.GET}
       />
     </Div>
   );

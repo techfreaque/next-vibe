@@ -14,6 +14,7 @@ import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { JSX } from "react";
 
+import imapConfigDefinitions from "@/app/api/[locale]/emails/imap-client/config/definition";
 import { useImapConfig } from "@/app/api/[locale]/emails/imap-client/config/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
@@ -161,32 +162,20 @@ export function ImapConfigurationManagement({
                     <Div className="flex flex-col gap-4">
                       <EndpointFormField
                         name="maxRetries"
-                        config={{
-                          type: "number",
-                          label:
-                            "app.admin.emails.imap.config.resilience.maxRetries",
-                        }}
                         control={configEndpoint.create.form.control}
+                        endpoint={imapConfigDefinitions.POST}
                         locale={locale}
                       />
                       <EndpointFormField
                         name="retryDelay"
-                        config={{
-                          type: "number",
-                          label:
-                            "app.admin.emails.imap.config.resilience.retryDelay",
-                        }}
                         control={configEndpoint.create.form.control}
+                        endpoint={imapConfigDefinitions.POST}
                         locale={locale}
                       />
                       <EndpointFormField
                         name="circuitBreakerThreshold"
-                        config={{
-                          type: "number",
-                          label:
-                            "app.admin.emails.imap.config.resilience.circuitBreakerThreshold",
-                        }}
                         control={configEndpoint.create.form.control}
+                        endpoint={imapConfigDefinitions.POST}
                         locale={locale}
                       />
                     </Div>
@@ -205,51 +194,20 @@ export function ImapConfigurationManagement({
                     <Div className="flex flex-col gap-4">
                       <EndpointFormField
                         name="healthCheckInterval"
-                        config={{
-                          type: "number",
-                          label:
-                            "app.admin.emails.imap.config.monitoring.healthCheckInterval",
-                        }}
                         control={configEndpoint.create.form.control}
+                        endpoint={imapConfigDefinitions.POST}
                         locale={locale}
                       />
                       <EndpointFormField
                         name="metricsEnabled"
-                        config={{
-                          type: "switch",
-                          label:
-                            "app.admin.emails.imap.config.monitoring.metricsEnabled",
-                        }}
                         control={configEndpoint.create.form.control}
+                        endpoint={imapConfigDefinitions.POST}
                         locale={locale}
                       />
                       <EndpointFormField
                         name="loggingLevel"
-                        config={{
-                          type: "select",
-                          label:
-                            "app.admin.emails.imap.config.monitoring.loggingLevel",
-                          options: [
-                            {
-                              value: "error",
-                              label: "app.admin.emails.imap.common.error",
-                            },
-                            {
-                              value: "warn",
-                              label: "app.admin.emails.imap.common.warning",
-                            },
-                            {
-                              value: "info",
-                              label: "app.admin.emails.imap.common.info",
-                            },
-                            {
-                              value: "debug",
-                              label:
-                                "app.admin.emails.imap.config.development.debugMode",
-                            },
-                          ],
-                        }}
                         control={configEndpoint.create.form.control}
+                        endpoint={imapConfigDefinitions.POST}
                         locale={locale}
                       />
                     </Div>
@@ -270,22 +228,14 @@ export function ImapConfigurationManagement({
                     <Div className="flex flex-col gap-4">
                       <EndpointFormField
                         name="debugMode"
-                        config={{
-                          type: "switch",
-                          label:
-                            "app.admin.emails.imap.config.development.debugMode",
-                        }}
                         control={configEndpoint.create.form.control}
+                        endpoint={imapConfigDefinitions.POST}
                         locale={locale}
                       />
                       <EndpointFormField
                         name="testMode"
-                        config={{
-                          type: "switch",
-                          label:
-                            "app.admin.emails.imap.config.development.testMode",
-                        }}
                         control={configEndpoint.create.form.control}
+                        endpoint={imapConfigDefinitions.POST}
                         locale={locale}
                       />
                     </Div>

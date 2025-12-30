@@ -20,6 +20,7 @@ export function FormFieldWidget<const TKey extends string>({
   className,
   form,
   context,
+  endpoint,
 }: ReactWidgetProps<typeof WidgetType.FORM_FIELD, TKey>): JSX.Element {
   // Global translation for hardcoded widget keys
   const { t } = simpleT(context.locale);
@@ -42,11 +43,9 @@ export function FormFieldWidget<const TKey extends string>({
     <EndpointFormField
       name={fieldName as FieldPath<FieldValues>}
       control={formControl.control}
-      endpointFields={context.endpointFields ?? {}}
-      className={className}
-      // Pass scoped translation from context for definition keys
-      scopedT={context.scopedT}
+      endpoint={endpoint}
       locale={context.locale}
+      className={className}
     />
   );
 }

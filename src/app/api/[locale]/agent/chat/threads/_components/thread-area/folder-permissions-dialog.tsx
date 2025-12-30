@@ -15,9 +15,9 @@ import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import type { JSX } from "react";
 import React, { useEffect } from "react";
 
+import folderPermissionsDefinitions from "@/app/api/[locale]/agent/chat/folders/[id]/permissions/definition";
 import { useFolderPermissions } from "@/app/api/[locale]/agent/chat/folders/[id]/permissions/hooks";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { UserRoleOptions } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -65,7 +65,7 @@ export function FolderPermissionsDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
-        <DialogHeader className="flex-shrink-0">
+        <DialogHeader className="shrink-0">
           <DialogTitle>{t("app.chat.permissions.folder.title")}</DialogTitle>
           <Div className="text-sm text-muted-foreground mt-2">{folderName}</Div>
         </DialogHeader>
@@ -88,85 +88,61 @@ export function FolderPermissionsDialog({
               {/* View Permissions */}
               <EndpointFormField
                 name="rolesView"
-                config={{
-                  type: "multiselect",
-                  label: "app.chat.permissions.view.label",
-                  description: "app.chat.permissions.view.description",
-                  options: UserRoleOptions,
-                }}
                 control={endpoint.create.form.control}
+                endpoint={folderPermissionsDefinitions.PATCH}
+                locale={locale}
                 theme={{ style: "none", showAllRequired: false }}
               />
 
               {/* Manage Permissions */}
               <EndpointFormField
                 name="rolesManage"
-                config={{
-                  type: "multiselect",
-                  label: "app.chat.permissions.manage.label",
-                  description: "app.chat.permissions.manage.description",
-                  options: UserRoleOptions,
-                }}
                 control={endpoint.create.form.control}
+                endpoint={folderPermissionsDefinitions.PATCH}
+                locale={locale}
                 theme={{ style: "none", showAllRequired: false }}
               />
 
               {/* Create Thread Permissions */}
               <EndpointFormField
                 name="rolesCreateThread"
-                config={{
-                  type: "multiselect",
-                  label: "app.chat.permissions.createThread.label",
-                  description: "app.chat.permissions.createThread.description",
-                  options: UserRoleOptions,
-                }}
                 control={endpoint.create.form.control}
+                endpoint={folderPermissionsDefinitions.PATCH}
+                locale={locale}
                 theme={{ style: "none", showAllRequired: false }}
               />
 
               {/* Post Permissions */}
               <EndpointFormField
                 name="rolesPost"
-                config={{
-                  type: "multiselect",
-                  label: "app.chat.permissions.post.label",
-                  description: "app.chat.permissions.post.description",
-                  options: UserRoleOptions,
-                }}
                 control={endpoint.create.form.control}
+                endpoint={folderPermissionsDefinitions.PATCH}
+                locale={locale}
                 theme={{ style: "none", showAllRequired: false }}
               />
 
               {/* Moderate Permissions */}
               <EndpointFormField
                 name="rolesModerate"
-                config={{
-                  type: "multiselect",
-                  label: "app.chat.permissions.moderate.label",
-                  description: "app.chat.permissions.moderate.description",
-                  options: UserRoleOptions,
-                }}
                 control={endpoint.create.form.control}
+                endpoint={folderPermissionsDefinitions.PATCH}
+                locale={locale}
                 theme={{ style: "none", showAllRequired: false }}
               />
 
               {/* Admin Permissions */}
               <EndpointFormField
                 name="rolesAdmin"
-                config={{
-                  type: "multiselect",
-                  label: "app.chat.permissions.admin.label",
-                  description: "app.chat.permissions.admin.description",
-                  options: UserRoleOptions,
-                }}
                 control={endpoint.create.form.control}
+                endpoint={folderPermissionsDefinitions.PATCH}
+                locale={locale}
                 theme={{ style: "none", showAllRequired: false }}
               />
             </Div>
           </ScrollArea>
 
           {/* Action buttons */}
-          <Div className="flex gap-2 justify-end pt-4 border-t flex-shrink-0 -mx-6 px-6">
+          <Div className="flex gap-2 justify-end pt-4 border-t shrink-0 -mx-6 px-6">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               {t("app.chat.common.cancel")}
             </Button>

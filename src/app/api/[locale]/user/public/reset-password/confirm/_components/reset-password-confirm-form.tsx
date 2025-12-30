@@ -27,6 +27,7 @@ import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { PasswordStrengthIndicator } from "../../../signup/_components/password-strength-indicator";
+import resetConfirmDefinitions from "@/app/api/[locale]/user/public/reset-password/confirm/definition";
 
 interface ResetPasswordConfirmFormProps {
   locale: CountryLanguage;
@@ -142,15 +143,8 @@ export default function ResetPasswordConfirmForm({
           >
             <EndpointFormField
               name="verification.email"
-              config={{
-                type: "email",
-                label:
-                  "app.user.other.resetPassword.auth.resetPassword.emailLabel",
-                placeholder:
-                  "app.user.other.resetPassword.auth.resetPassword.emailPlaceholder",
-                disabled: isSubmitting,
-              }}
               control={form.control}
+              endpoint={resetConfirmDefinitions.POST}
               theme={{
                 style: "none",
                 showAllRequired: false,
@@ -161,15 +155,8 @@ export default function ResetPasswordConfirmForm({
             <FormItem>
               <EndpointFormField
                 name="newPassword.password"
-                config={{
-                  type: "password",
-                  label:
-                    "app.user.other.resetPassword.auth.resetPassword.newPasswordLabel",
-                  placeholder:
-                    "app.user.other.resetPassword.auth.resetPassword.newPasswordPlaceholder",
-                  disabled: isSubmitting,
-                }}
                 control={form.control}
+                endpoint={resetConfirmDefinitions.POST}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -184,15 +171,8 @@ export default function ResetPasswordConfirmForm({
 
             <EndpointFormField
               name="newPassword.confirmPassword"
-              config={{
-                type: "password",
-                label:
-                  "app.user.other.resetPassword.auth.resetPassword.confirmPasswordLabel",
-                placeholder:
-                  "app.user.other.resetPassword.auth.resetPassword.confirmPasswordPlaceholder",
-                disabled: isSubmitting,
-              }}
               control={form.control}
+              endpoint={resetConfirmDefinitions.POST}
               theme={{
                 style: "none",
                 showAllRequired: false,

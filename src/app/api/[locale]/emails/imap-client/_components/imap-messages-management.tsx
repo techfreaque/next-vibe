@@ -23,6 +23,7 @@ import {
   ImapMessageStatusFilter,
   SortOrder,
 } from "@/app/api/[locale]/emails/imap-client/enum";
+import messagesListDefinitions from "@/app/api/[locale]/emails/imap-client/messages/list/definition";
 import { useImapMessagesListEndpoint } from "@/app/api/[locale]/emails/imap-client/messages/list/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
@@ -140,6 +141,7 @@ export function ImapMessagesManagement(): JSX.Element {
                     ],
                   }}
                   control={messagesEndpoint.read.form.control}
+                  endpoint={messagesListDefinitions.GET}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -150,33 +152,8 @@ export function ImapMessagesManagement(): JSX.Element {
                 {/* Status Filter */}
                 <EndpointFormField
                   name="status"
-                  config={{
-                    type: "select",
-                    label: "app.admin.emails.imap.common.status",
-                    options: [
-                      {
-                        value: ImapMessageStatusFilter.ALL,
-                        label: "app.admin.emails.imap.common.all",
-                      },
-                      {
-                        value: ImapMessageStatusFilter.UNREAD,
-                        label: "app.admin.emails.imap.messages.unread",
-                      },
-                      {
-                        value: ImapMessageStatusFilter.READ,
-                        label: "app.admin.emails.imap.messages.read",
-                      },
-                      {
-                        value: ImapMessageStatusFilter.FLAGGED,
-                        label: "app.admin.emails.imap.messages.flagged",
-                      },
-                      {
-                        value: ImapMessageStatusFilter.HAS_ATTACHMENTS,
-                        label: "app.admin.emails.imap.messages.withAttachments",
-                      },
-                    ],
-                  }}
                   control={messagesEndpoint.read.form.control}
+                  endpoint={messagesListDefinitions.GET}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -187,29 +164,8 @@ export function ImapMessagesManagement(): JSX.Element {
                 {/* Sort By */}
                 <EndpointFormField
                   name="sortBy"
-                  config={{
-                    type: "select",
-                    label: "app.admin.emails.imap.common.sortBy",
-                    options: [
-                      {
-                        value: ImapMessageSortField.SENT_AT,
-                        label: "app.admin.emails.imap.messages.sentAt",
-                      },
-                      {
-                        value: ImapMessageSortField.SUBJECT,
-                        label: "app.admin.emails.imap.messages.subject",
-                      },
-                      {
-                        value: ImapMessageSortField.SENDER_EMAIL,
-                        label: "app.admin.emails.imap.messages.sender",
-                      },
-                      {
-                        value: ImapMessageSortField.CREATED_AT,
-                        label: "app.admin.emails.imap.common.createdAt",
-                      },
-                    ],
-                  }}
                   control={messagesEndpoint.read.form.control}
+                  endpoint={messagesListDefinitions.GET}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -220,21 +176,8 @@ export function ImapMessagesManagement(): JSX.Element {
                 {/* Sort Order */}
                 <EndpointFormField
                   name="sortOrder"
-                  config={{
-                    type: "select",
-                    label: "app.admin.emails.imap.common.sortOrder",
-                    options: [
-                      {
-                        value: SortOrder.DESC,
-                        label: "app.admin.emails.imap.common.newest",
-                      },
-                      {
-                        value: SortOrder.ASC,
-                        label: "app.admin.emails.imap.common.oldest",
-                      },
-                    ],
-                  }}
                   control={messagesEndpoint.read.form.control}
+                  endpoint={messagesListDefinitions.GET}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -247,12 +190,8 @@ export function ImapMessagesManagement(): JSX.Element {
               <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <EndpointFormField
                   name="dateFrom"
-                  config={{
-                    type: "date",
-                    label: "app.admin.emails.imap.common.dateFrom",
-                    placeholder: "app.common.selectDate",
-                  }}
                   control={messagesEndpoint.read.form.control}
+                  endpoint={messagesListDefinitions.GET}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -262,12 +201,8 @@ export function ImapMessagesManagement(): JSX.Element {
 
                 <EndpointFormField
                   name="dateTo"
-                  config={{
-                    type: "date",
-                    label: "app.admin.emails.imap.common.dateTo",
-                    placeholder: "app.common.selectDate",
-                  }}
                   control={messagesEndpoint.read.form.control}
+                  endpoint={messagesListDefinitions.GET}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -281,13 +216,8 @@ export function ImapMessagesManagement(): JSX.Element {
                 <Div className="flex-1">
                   <EndpointFormField
                     name="search"
-                    config={{
-                      type: "text",
-                      label: undefined,
-                      placeholder:
-                        "app.admin.emails.imap.messages.searchPlaceholder",
-                    }}
                     control={messagesEndpoint.read.form.control}
+                    endpoint={messagesListDefinitions.GET}
                     theme={{
                       style: "none",
                       showAllRequired: false,

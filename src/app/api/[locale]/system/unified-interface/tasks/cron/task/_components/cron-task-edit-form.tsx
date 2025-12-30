@@ -22,8 +22,8 @@ import type {
   endpoints,
   IndividualCronTaskType,
 } from "@/app/api/[locale]/system/unified-interface/tasks/cron/task/[id]/definition";
+import cronTaskDefinitions from "@/app/api/[locale]/system/unified-interface/tasks/cron/task/[id]/definition";
 import { formatCronSchedule } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
-import { CronTaskPriorityOptions } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
@@ -138,19 +138,13 @@ export function CronTaskEditForm({
               <Div className="grid grid-cols-1 gap-4">
                 <EndpointFormField
                   name="name"
-                  config={{
-                    type: "text",
-                    label:
-                      "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.label",
-                    placeholder:
-                      "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.placeholder",
-                  }}
                   control={endpoint.create?.form.control}
+                  endpoint={cronTaskDefinitions.PUT}
+                  locale={locale}
                   theme={{
                     style: "none",
                     showAllRequired: false,
                   }}
-                  locale={locale}
                 />
 
                 <EndpointFormField
@@ -164,11 +158,12 @@ export function CronTaskEditForm({
                     rows: 3,
                   }}
                   control={endpoint.create?.form.control}
+                  endpoint={cronTaskDefinitions.PUT}
+                  locale={locale}
                   theme={{
                     style: "none",
                     showAllRequired: false,
                   }}
-                  locale={locale}
                 />
               </Div>
             </FormFieldGroup>
@@ -211,71 +206,46 @@ export function CronTaskEditForm({
               <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <EndpointFormField
                   name="enabled"
-                  config={{
-                    type: "switch",
-                    label:
-                      "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.enabled.label",
-                    description:
-                      "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.enabled.description",
-                  }}
                   control={endpoint.create?.form.control}
+                  endpoint={cronTaskDefinitions.PUT}
+                  locale={locale}
                   theme={{
                     style: "none",
                     showAllRequired: false,
                   }}
-                  locale={locale}
                 />
 
                 <EndpointFormField
                   name="priority"
-                  config={{
-                    type: "select",
-                    label:
-                      "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.label",
-                    placeholder:
-                      "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.priority.placeholder",
-                    options: CronTaskPriorityOptions,
-                  }}
                   control={endpoint.create?.form.control}
+                  endpoint={cronTaskDefinitions.PUT}
+                  locale={locale}
                   theme={{
                     style: "none",
                     showAllRequired: false,
                   }}
-                  locale={locale}
                 />
 
                 <EndpointFormField
                   name="timeout"
-                  config={{
-                    type: "text",
-                    label:
-                      "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.label",
-                    placeholder:
-                      "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.timeout.placeholder",
-                  }}
                   control={endpoint.create?.form.control}
+                  endpoint={cronTaskDefinitions.PUT}
+                  locale={locale}
                   theme={{
                     style: "none",
                     showAllRequired: false,
                   }}
-                  locale={locale}
                 />
 
                 <EndpointFormField
                   name="retries"
-                  config={{
-                    type: "text",
-                    label:
-                      "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.label",
-                    placeholder:
-                      "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.retries.placeholder",
-                  }}
                   control={endpoint.create?.form.control}
+                  endpoint={cronTaskDefinitions.PUT}
+                  locale={locale}
                   theme={{
                     style: "none",
                     showAllRequired: false,
                   }}
-                  locale={locale}
                 />
               </Div>
             </FormFieldGroup>

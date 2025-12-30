@@ -6,47 +6,45 @@
  */
 
 import type { Control, FieldPath, FieldValues } from "react-hook-form";
-import type { z } from "zod";
 
 import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import type { Countries } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { Countries, CountryLanguage } from "@/i18n/core/config";
 
-import type { UnifiedField } from "../types/endpoint";
+import type { CreateApiEndpointAny } from "../types/endpoint";
 
 export interface EndpointFormFieldProps<
+  TEndpoint extends CreateApiEndpointAny,
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
   TKey extends string,
 > {
   name: TName;
-  config?: FieldConfig; // Optional - auto-inferred from endpointFields if not provided
+  config?: FieldConfig<TKey>; // Optional - override of endpoint-based field settings
   control: Control<TFieldValues>; // Properly typed form control from useEndpoint
-  requiredFields?: string[]; // List of required field names
+  endpoint: TEndpoint; // Required - provides schema, scopedT, and endpointFields
   theme?: RequiredFieldTheme;
   className?: string;
-  endpointFields?: UnifiedField<TKey>; // Endpoint fields structure for auto-inference
-  schema?: z.ZodTypeAny; // Zod schema for validation
+  locale: CountryLanguage; // Required for scoped translations
 }
 
 /**
  * Prefill display configuration for form fields
  * When a field has a prefilled value from server/URL params, this controls how it's displayed
  */
-export interface PrefillDisplayConfig {
+export interface PrefillDisplayConfig<TKey extends string> {
   /** Display variant when field is prefilled */
   variant: "badge" | "highlight" | "card";
   /** Translation key for the label shown with prefilled value */
-  labelKey?: TranslationKey;
+  labelKey?: NoInfer<TKey>;
   /** Icon to show with prefilled value */
   icon?: string;
 }
 
 // Base field configuration
-export interface BaseFieldConfig {
-  label: TranslationKey | undefined;
-  placeholder?: TranslationKey;
-  description?: TranslationKey;
+export interface BaseFieldConfig<TKey extends string> {
+  label: NoInfer<TKey> | undefined;
+  placeholder?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
   disabled?: boolean;
   className?: string;
   /**
@@ -58,100 +56,115 @@ export interface BaseFieldConfig {
    * Configure how prefilled values are displayed when readonly
    * Only applies when field has a prefilled value and readonly is true
    */
-  prefillDisplay?: PrefillDisplayConfig;
+  prefillDisplay?: PrefillDisplayConfig<TKey>;
 }
 
 // Field type specific configurations
-export interface TextFieldConfig extends BaseFieldConfig {
+export interface TextFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "text" | "email" | "tel" | "url" | "password";
 }
 
-export interface NumberFieldConfig extends BaseFieldConfig {
+export interface NumberFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "number";
   min?: number;
   max?: number;
   step?: number;
 }
 
-export interface TextareaFieldConfig extends BaseFieldConfig {
+export interface TextareaFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "textarea";
   rows?: number;
   maxLength?: number;
 }
 
-export interface SelectFieldConfig<TValue = string> extends BaseFieldConfig {
+export interface SelectFieldConfig<
+  TTranslationKey extends string,
+  TValue = string,
+> extends BaseFieldConfig<TTranslationKey> {
   type: "select";
   options: Array<{
     value: TValue;
-    label: TranslationKey;
+    label: NoInfer<TTranslationKey>;
     labelParams?: Record<string, string | number>;
     disabled?: boolean;
   }>;
-  placeholder?: TranslationKey;
+  placeholder?: NoInfer<TTranslationKey>;
 }
 
-export interface CheckboxFieldConfig extends BaseFieldConfig {
+export interface CheckboxFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "checkbox";
-  checkboxLabel?: TranslationKey;
+  checkboxLabel?: NoInfer<TTranslationKey>;
 }
 
-export interface RadioFieldConfig extends BaseFieldConfig {
+export interface RadioFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "radio";
   options: Array<{
     value: string;
-    label: TranslationKey;
+    label: NoInfer<TTranslationKey>;
     labelParams?: Record<string, string | number>;
     disabled?: boolean;
   }>;
   orientation?: "horizontal" | "vertical";
 }
 
-export interface SwitchFieldConfig extends BaseFieldConfig {
+export interface SwitchFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "switch";
-  switchLabel?: TranslationKey; // Different from main label for switch-specific text
+  switchLabel?: NoInfer<TTranslationKey>;
 }
 
-export interface DateFieldConfig extends BaseFieldConfig {
+export interface DateFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "date";
   minDate?: Date;
   maxDate?: Date;
 }
 
-export interface AutocompleteFieldConfig extends BaseFieldConfig {
+export interface AutocompleteFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "autocomplete";
   options: Array<{
     value: string;
-    label: TranslationKey;
+    label: NoInfer<TTranslationKey>;
     category?: string;
   }>;
   allowCustom?: boolean;
-  searchPlaceholder?: TranslationKey;
+  searchPlaceholder?: NoInfer<TTranslationKey>;
 }
 
-export interface TagsFieldConfig extends BaseFieldConfig {
+export interface TagsFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "tags";
   suggestions?: Array<{
     value: string;
-    label: TranslationKey;
+    label: NoInfer<TTranslationKey>;
     category?: string;
   }>;
   maxTags?: number;
   allowCustom?: boolean;
 }
 
-export interface PhoneFieldConfig extends BaseFieldConfig {
+export interface PhoneFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "phone";
   defaultCountry: Countries;
   preferredCountries: Countries[];
 }
 
-export interface ColorPickerFieldConfig extends BaseFieldConfig {
+export interface ColorPickerFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "color";
   presetColors?: string[];
   allowCustom?: boolean;
 }
 
-export interface SliderFieldConfig extends BaseFieldConfig {
+export interface SliderFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "slider";
   min: number;
   max: number;
@@ -160,11 +173,12 @@ export interface SliderFieldConfig extends BaseFieldConfig {
   formatValue?: (value: number) => string;
 }
 
-export interface MultiSelectFieldConfig extends BaseFieldConfig {
+export interface MultiSelectFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "multiselect";
   options: Array<{
     value: string;
-    label: TranslationKey;
+    label: NoInfer<TTranslationKey>;
     labelParams?: Record<string, string | number>;
     disabled?: boolean;
     icon?: string;
@@ -173,52 +187,56 @@ export interface MultiSelectFieldConfig extends BaseFieldConfig {
   searchable?: boolean;
 }
 
-export interface LocationFieldConfig extends BaseFieldConfig {
+export interface LocationFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "location";
   types?: Array<"country" | "city" | "region">;
   multiple?: boolean;
 }
 
-export interface YearPickerFieldConfig extends BaseFieldConfig {
+export interface YearPickerFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "year";
   minYear?: number;
   maxYear?: number;
 }
 
-export interface IconFieldConfig extends BaseFieldConfig {
+export interface IconFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "icon";
 }
 
-export interface FilterPillsFieldConfig extends BaseFieldConfig {
+export interface FilterPillsFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "filter_pills";
   options: Array<{
     value: string;
-    label: TranslationKey;
+    label: NoInfer<TTranslationKey>;
     icon?: IconKey;
     disabled?: boolean;
   }>;
 }
 
 // Union type for all field configurations
-export type FieldConfig =
-  | TextFieldConfig
-  | NumberFieldConfig
-  | TextareaFieldConfig
-  | SelectFieldConfig<string>
-  | CheckboxFieldConfig
-  | RadioFieldConfig
-  | SwitchFieldConfig
-  | DateFieldConfig
-  | AutocompleteFieldConfig
-  | TagsFieldConfig
-  | PhoneFieldConfig
-  | ColorPickerFieldConfig
-  | SliderFieldConfig
-  | MultiSelectFieldConfig
-  | LocationFieldConfig
-  | YearPickerFieldConfig
-  | IconFieldConfig
-  | FilterPillsFieldConfig;
+export type FieldConfig<TTranslationKey extends string> =
+  | TextFieldConfig<TTranslationKey>
+  | NumberFieldConfig<TTranslationKey>
+  | TextareaFieldConfig<TTranslationKey>
+  | SelectFieldConfig<TTranslationKey, string>
+  | CheckboxFieldConfig<TTranslationKey>
+  | RadioFieldConfig<TTranslationKey>
+  | SwitchFieldConfig<TTranslationKey>
+  | DateFieldConfig<TTranslationKey>
+  | AutocompleteFieldConfig<TTranslationKey>
+  | TagsFieldConfig<TTranslationKey>
+  | PhoneFieldConfig<TTranslationKey>
+  | ColorPickerFieldConfig<TTranslationKey>
+  | SliderFieldConfig<TTranslationKey>
+  | MultiSelectFieldConfig<TTranslationKey>
+  | LocationFieldConfig<TTranslationKey>
+  | YearPickerFieldConfig<TTranslationKey>
+  | IconFieldConfig<TTranslationKey>
+  | FilterPillsFieldConfig<TTranslationKey>;
 
 // Required field styling options
 export type RequiredFieldStyle =

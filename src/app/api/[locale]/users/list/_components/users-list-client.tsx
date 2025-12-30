@@ -25,6 +25,7 @@ import {
   UserStatusFilter,
 } from "@/app/api/[locale]/users/enum";
 import type { UserListResponseOutput } from "@/app/api/[locale]/users/list/definition";
+import usersListDefinitions from "@/app/api/[locale]/users/list/definition";
 import type { UsersListEndpointReturn } from "@/app/api/[locale]/users/list/hooks";
 import { useUsersListEndpoint } from "@/app/api/[locale]/users/list/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -152,12 +153,8 @@ export function UsersListClient({
                 {/* Search Field */}
                 <EndpointFormField
                   name="searchFilters.search"
-                  config={{
-                    type: "text",
-                    label: undefined,
-                    placeholder: "app.admin.users.search.placeholder",
-                  }}
                   control={usersEndpoint.read.form.control}
+                  endpoint={usersListDefinitions.GET}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -168,34 +165,8 @@ export function UsersListClient({
                 {/* Status Filter */}
                 <EndpointFormField
                   name="searchFilters.status"
-                  config={{
-                    type: "select",
-                    label: undefined,
-                    placeholder: "app.admin.users.status.placeholder",
-                    options: [
-                      {
-                        value: UserStatusFilter.ALL,
-                        label: "app.admin.users.status.all",
-                      },
-                      {
-                        value: UserStatusFilter.ACTIVE,
-                        label: "app.admin.users.status.active",
-                      },
-                      {
-                        value: UserStatusFilter.INACTIVE,
-                        label: "app.admin.users.status.inactive",
-                      },
-                      {
-                        value: UserStatusFilter.EMAIL_VERIFIED,
-                        label: "app.admin.users.status.email_verified",
-                      },
-                      {
-                        value: UserStatusFilter.EMAIL_UNVERIFIED,
-                        label: "app.admin.users.status.email_unverified",
-                      },
-                    ],
-                  }}
                   control={usersEndpoint.read.form.control}
+                  endpoint={usersListDefinitions.GET}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -206,38 +177,8 @@ export function UsersListClient({
                 {/* Role Filter */}
                 <EndpointFormField
                   name="searchFilters.role"
-                  config={{
-                    type: "select",
-                    label: undefined,
-                    placeholder: "app.admin.users.role.placeholder",
-                    options: [
-                      {
-                        value: UserRoleFilter.ALL,
-                        label: "app.admin.users.role.all",
-                      },
-                      {
-                        value: UserRoleFilter.PUBLIC,
-                        label: "app.admin.users.role.public",
-                      },
-                      {
-                        value: UserRoleFilter.CUSTOMER,
-                        label: "app.admin.users.role.customer",
-                      },
-                      {
-                        value: UserRoleFilter.PARTNER_ADMIN,
-                        label: "app.admin.users.role.partner_admin",
-                      },
-                      {
-                        value: UserRoleFilter.PARTNER_EMPLOYEE,
-                        label: "app.admin.users.role.partner_employee",
-                      },
-                      {
-                        value: UserRoleFilter.ADMIN,
-                        label: "app.admin.users.role.admin",
-                      },
-                    ],
-                  }}
                   control={usersEndpoint.read.form.control}
+                  endpoint={usersListDefinitions.GET}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -248,34 +189,8 @@ export function UsersListClient({
                 {/* Sort By */}
                 <EndpointFormField
                   name="sortingOptions.sortBy"
-                  config={{
-                    type: "select",
-                    label: undefined,
-                    placeholder: "app.admin.users.sort.placeholder",
-                    options: [
-                      {
-                        value: UserSortField.CREATED_AT,
-                        label: "app.admin.users.sort.created",
-                      },
-                      {
-                        value: UserSortField.UPDATED_AT,
-                        label: "app.admin.users.sort.updated",
-                      },
-                      {
-                        value: UserSortField.EMAIL,
-                        label: "app.admin.users.sort.email",
-                      },
-                      {
-                        value: UserSortField.PRIVATE_NAME,
-                        label: "app.admin.users.sort.privateName",
-                      },
-                      {
-                        value: UserSortField.PUBLIC_NAME,
-                        label: "app.admin.users.sort.publicName",
-                      },
-                    ],
-                  }}
                   control={usersEndpoint.read.form.control}
+                  endpoint={usersListDefinitions.GET}
                   theme={{
                     style: "none",
                     showAllRequired: false,
@@ -289,22 +204,8 @@ export function UsersListClient({
                 <Div className="items-center flex flex-row gap-4">
                   <EndpointFormField
                     name="sortingOptions.sortOrder"
-                    config={{
-                      type: "select",
-                      label: undefined,
-                      placeholder: "app.admin.users.sortOrder.placeholder",
-                      options: [
-                        {
-                          value: SortOrder.ASC,
-                          label: "app.admin.users.sortOrder.asc",
-                        },
-                        {
-                          value: SortOrder.DESC,
-                          label: "app.admin.users.sortOrder.desc",
-                        },
-                      ],
-                    }}
                     control={usersEndpoint.read.form.control}
+                    endpoint={usersListDefinitions.GET}
                     theme={{
                       style: "none",
                       showAllRequired: false,

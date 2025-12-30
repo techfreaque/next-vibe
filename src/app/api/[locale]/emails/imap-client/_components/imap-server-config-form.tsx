@@ -11,6 +11,7 @@ import type { JSX } from "react";
 import type { Control } from "react-hook-form";
 
 import type { ImapConfigPostRequestOutput } from "@/app/api/[locale]/emails/imap-client/config/definition";
+import serverConfigDefinitions from "@/app/api/[locale]/emails/imap-client/config/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ImapServerConfigFormProps {
@@ -29,54 +30,36 @@ export function ImapServerConfigForm({
     <Div className="flex flex-col gap-4">
       <EndpointFormField
         name="serverEnabled"
-        config={{
-          type: "switch",
-          label: "app.admin.emails.imap.config.server.enabled",
-        }}
         control={control}
+        endpoint={serverConfigDefinitions.POST}
         locale={locale}
       />
 
       <EndpointFormField
         name="maxConnections"
-        config={{
-          type: "number",
-          label: "app.admin.emails.imap.config.server.maxConnections",
-          placeholder: undefined,
-        }}
         control={control}
+        endpoint={serverConfigDefinitions.POST}
         locale={locale}
       />
 
       <EndpointFormField
         name="connectionTimeout"
-        config={{
-          type: "number",
-          label: "app.admin.emails.imap.config.server.connectionTimeout",
-          placeholder: undefined,
-        }}
         control={control}
+        endpoint={serverConfigDefinitions.POST}
         locale={locale}
       />
 
       <EndpointFormField
         name="poolIdleTimeout"
-        config={{
-          type: "number",
-          label: "app.admin.emails.imap.config.server.poolIdleTimeout",
-          placeholder: undefined,
-        }}
         control={control}
+        endpoint={serverConfigDefinitions.POST}
         locale={locale}
       />
 
       <EndpointFormField
         name="keepAlive"
-        config={{
-          type: "switch",
-          label: "app.admin.emails.imap.config.server.keepAlive",
-        }}
         control={control}
+        endpoint={serverConfigDefinitions.POST}
         locale={locale}
       />
     </Div>

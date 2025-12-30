@@ -25,9 +25,9 @@ import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import taskDefinition from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
 import { useCreateCronTask } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/hooks";
 import { formatCronSchedule } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
-import { CronTaskPriority } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
@@ -94,12 +94,7 @@ export function CreateTaskDialog({
                 <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EndpointFormField
                     name="name"
-                    config={{
-                      type: "text",
-                      label: "app.admin.cron.createTask.form.taskName",
-                      placeholder:
-                        "app.admin.cron.createTask.form.taskNamePlaceholder",
-                    }}
+                    endpoint={taskDefinition.POST}
                     control={endpoint.create?.form.control}
                     theme={{
                       style: "asterisk",
@@ -111,30 +106,7 @@ export function CreateTaskDialog({
 
                   <EndpointFormField
                     name="priority"
-                    config={{
-                      type: "select",
-                      label: "app.admin.cron.createTask.form.priority",
-                      placeholder: "app.admin.cron.createTask.form.priority",
-                      options: [
-                        {
-                          value: CronTaskPriority.LOW,
-                          label: "app.admin.cron.createTask.priorities.low",
-                        },
-                        {
-                          value: CronTaskPriority.MEDIUM,
-                          label: "app.admin.cron.createTask.priorities.medium",
-                        },
-                        {
-                          value: CronTaskPriority.HIGH,
-                          label: "app.admin.cron.createTask.priorities.high",
-                        },
-                        {
-                          value: CronTaskPriority.CRITICAL,
-                          label:
-                            "app.admin.cron.createTask.priorities.critical",
-                        },
-                      ],
-                    }}
+                    endpoint={taskDefinition.POST}
                     control={endpoint.create?.form.control}
                     theme={{
                       style: "none",
@@ -147,13 +119,7 @@ export function CreateTaskDialog({
                 {/* Description */}
                 <EndpointFormField
                   name="description"
-                  config={{
-                    type: "textarea",
-                    label: "app.admin.cron.createTask.form.description",
-                    placeholder:
-                      "app.admin.cron.createTask.form.descriptionPlaceholder",
-                    rows: 3,
-                  }}
+                  endpoint={taskDefinition.POST}
                   control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
@@ -173,12 +139,7 @@ export function CreateTaskDialog({
                 <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EndpointFormField
                     name="schedule"
-                    config={{
-                      type: "text",
-                      label: "app.admin.cron.createTask.form.schedule",
-                      placeholder:
-                        "app.admin.cron.createTask.form.scheduleDescription",
-                    }}
+                    endpoint={taskDefinition.POST}
                     control={endpoint.create?.form.control}
                     theme={{
                       style: "asterisk",
@@ -206,12 +167,7 @@ export function CreateTaskDialog({
                 <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EndpointFormField
                     name="timeout"
-                    config={{
-                      type: "text",
-                      label: "app.admin.cron.createTask.form.timeout",
-                      placeholder:
-                        "app.admin.cron.createTask.form.taskNamePlaceholder",
-                    }}
+                    endpoint={taskDefinition.POST}
                     control={endpoint.create?.form.control}
                     theme={{
                       style: "none",
@@ -222,12 +178,7 @@ export function CreateTaskDialog({
 
                   <EndpointFormField
                     name="retries"
-                    config={{
-                      type: "text",
-                      label: "app.admin.cron.createTask.form.retries",
-                      placeholder:
-                        "app.admin.cron.createTask.form.taskNamePlaceholder",
-                    }}
+                    endpoint={taskDefinition.POST}
                     control={endpoint.create?.form.control}
                     theme={{
                       style: "none",
@@ -240,12 +191,7 @@ export function CreateTaskDialog({
                 {/* Retry Delay */}
                 <EndpointFormField
                   name="retryDelay"
-                  config={{
-                    type: "text",
-                    label: "app.admin.cron.createTask.form.retryDelay",
-                    placeholder:
-                      "app.admin.cron.createTask.form.taskNamePlaceholder",
-                  }}
+                  endpoint={taskDefinition.POST}
                   control={endpoint.create?.form.control}
                   theme={{
                     style: "none",
@@ -257,12 +203,7 @@ export function CreateTaskDialog({
                 {/* Enabled Switch */}
                 <EndpointFormField
                   name="enabled"
-                  config={{
-                    type: "switch",
-                    label: "app.admin.cron.createTask.form.enabled",
-                    description:
-                      "app.admin.cron.createTask.form.enabledDescription",
-                  }}
+                  endpoint={taskDefinition.POST}
                   control={endpoint.create?.form.control}
                   theme={{
                     style: "none",

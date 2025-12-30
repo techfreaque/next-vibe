@@ -33,6 +33,10 @@ import {
   UserRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import { simpleT } from "@/i18n/core/shared";
+import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 import { type CreateApiEndpoint } from "./create";
 
@@ -385,6 +389,14 @@ export interface CreateFormEndpointConfig<
   readonly examples: NoInfer<
     FormExamples<TScopedTranslationKey, TFields, TExampleKey, TMethods>
   >;
+
+  // Scoped translation
+  readonly scopedTranslation?: {
+    readonly ScopedTranslationKey: TScopedTranslationKey;
+    readonly scopedT: (locale: CountryLanguage) => {
+      t(key: TScopedTranslationKey, params?: TParams): TranslatedKeyType;
+    };
+  };
 }
 
 // ============================================================================
@@ -1012,12 +1024,9 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
   if (typedField.type === "primitive") {
     const methodUsage = getUsageForMethod(typedField.usage, method);
     if (methodUsage && hasTargetUsage(methodUsage)) {
-      return (
-        typedField.schema ??
-        (targetUsage === FieldUsage.RequestData ? z.undefined() : z.never())
-      );
+      return typedField.schema ?? z.never();
     }
-    return targetUsage === FieldUsage.RequestData ? z.undefined() : z.never();
+    return z.never();
   }
 
   if (typedField.type === "object") {
@@ -1046,7 +1055,7 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
     // No matching children - check if container itself should be included
     const objectMethodUsage = getUsageForMethod(typedField.usage, method);
     if (!objectMethodUsage || !hasTargetUsage(objectMethodUsage)) {
-      return targetUsage === FieldUsage.RequestData ? z.undefined() : z.never();
+      return z.never();
     }
 
     // Container matches but no children - return empty object
@@ -1062,15 +1071,13 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
         targetUsage,
       );
       return childSchema instanceof z.ZodNever
-        ? targetUsage === FieldUsage.RequestData
-          ? z.undefined()
-          : z.never()
+        ? z.never()
         : z.array(childSchema);
     }
-    return targetUsage === FieldUsage.RequestData ? z.undefined() : z.never();
+    return z.never();
   }
 
-  return targetUsage === FieldUsage.RequestData ? z.undefined() : z.never();
+  return z.never();
 }
 
 /**
@@ -1143,6 +1150,19 @@ export function createFormEndpoint<
   TMethods
 > {
   // Generate schemas directly from the original fields with method-specific filtering
+
+  // Default scopedTranslation when none provided - uses global TranslationKey with simpleT
+  const defaultScopedTranslation = {
+    ScopedTranslationKey: "" as TScopedTranslationKey,
+    scopedT: (
+      locale: CountryLanguage,
+    ): {
+      t: (key: TScopedTranslationKey, params?: TParams) => TranslatedKeyType;
+    } => ({
+      t: (key: TScopedTranslationKey, params?: TParams): TranslatedKeyType =>
+        simpleT(locale).t(key as TranslationKey, params) as TranslatedKeyType,
+    }),
+  };
 
   // Helper function for authentication check
   const requiresAuthentication = (): boolean => {
@@ -1271,6 +1291,7 @@ export function createFormEndpoint<
       responseSchema: responseSchema as never,
       requestUrlPathParamsSchema: urlSchema as never,
       requiresAuthentication,
+      scopedTranslation: config.scopedTranslation ?? defaultScopedTranslation,
       types: {
         RequestInput: undefined! as InferInputFromFieldForMethod<
           TScopedTranslationKey,

@@ -505,9 +505,13 @@ export function createEndpoint<
 
   // Default scopedTranslation when none provided - uses global TranslationKey with simpleT
   const defaultScopedTranslation = {
-    ScopedTranslationKey: undefined as unknown as TScopedTranslationKey,
-    scopedT: (locale: CountryLanguage) => ({
-      t: (key: TScopedTranslationKey, params?: TParams) =>
+    ScopedTranslationKey: "" as TScopedTranslationKey,
+    scopedT: (
+      locale: CountryLanguage,
+    ): {
+      t: (key: TScopedTranslationKey, params?: TParams) => TranslatedKeyType;
+    } => ({
+      t: (key: TScopedTranslationKey, params?: TParams): TranslatedKeyType =>
         simpleT(locale).t(key as TranslationKey, params) as TranslatedKeyType,
     }),
   };

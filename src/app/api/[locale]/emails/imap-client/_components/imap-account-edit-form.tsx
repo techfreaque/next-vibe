@@ -13,8 +13,8 @@ import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
 import { H3 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import imapAccountDefinitions from "@/app/api/[locale]/emails/imap-client/accounts/[id]/definition";
 import { useImapAccountByIdEndpoint } from "@/app/api/[locale]/emails/imap-client/accounts/[id]/hooks";
-import { ImapAuthMethod } from "@/app/api/[locale]/emails/imap-client/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -75,12 +75,9 @@ export function ImapAccountEditForm({
         <Div className="flex flex-col gap-4">
           <EndpointFormField
             name="name"
-            config={{
-              type: "text",
-              label: "app.admin.emails.imap.account.fields.name",
-              placeholder: "app.admin.emails.imap.account.fields.name",
-            }}
             control={form.control}
+            endpoint={imapAccountDefinitions.PUT}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -89,12 +86,9 @@ export function ImapAccountEditForm({
 
           <EndpointFormField
             name="email"
-            config={{
-              type: "email",
-              label: "app.admin.emails.imap.account.fields.email",
-              placeholder: "app.admin.emails.imap.account.fields.email",
-            }}
             control={form.control}
+            endpoint={imapAccountDefinitions.PUT}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -103,12 +97,9 @@ export function ImapAccountEditForm({
 
           <EndpointFormField
             name="host"
-            config={{
-              type: "text",
-              label: "app.admin.emails.imap.account.fields.host",
-              placeholder: "app.admin.emails.imap.account.fields.host",
-            }}
             control={form.control}
+            endpoint={imapAccountDefinitions.PUT}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -117,12 +108,9 @@ export function ImapAccountEditForm({
 
           <EndpointFormField
             name="port"
-            config={{
-              type: "number",
-              label: "app.admin.emails.imap.account.fields.port",
-              placeholder: "app.admin.emails.imap.account.fields.port",
-            }}
             control={form.control}
+            endpoint={imapAccountDefinitions.PUT}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -134,12 +122,9 @@ export function ImapAccountEditForm({
         <Div className="flex flex-col gap-4">
           <EndpointFormField
             name="username"
-            config={{
-              type: "text",
-              label: "app.admin.emails.imap.account.fields.username",
-              placeholder: "app.admin.emails.imap.account.fields.username",
-            }}
             control={form.control}
+            endpoint={imapAccountDefinitions.PUT}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -148,13 +133,9 @@ export function ImapAccountEditForm({
 
           <EndpointFormField
             name="password"
-            config={{
-              type: "password",
-              label: "app.admin.emails.imap.account.fields.password",
-              placeholder:
-                "app.admin.emails.imap.account.placeholders.password_update",
-            }}
             control={form.control}
+            endpoint={imapAccountDefinitions.PUT}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -163,26 +144,9 @@ export function ImapAccountEditForm({
 
           <EndpointFormField
             name="authMethod"
-            config={{
-              type: "select",
-              label: "app.admin.emails.imap.account.fields.authMethod",
-              placeholder: "app.admin.emails.imap.account.fields.authMethod",
-              options: [
-                {
-                  value: ImapAuthMethod.PLAIN,
-                  label: "app.admin.emails.imap.auth.plain",
-                },
-                {
-                  value: ImapAuthMethod.OAUTH2,
-                  label: "app.admin.emails.imap.auth.oauth2",
-                },
-                {
-                  value: ImapAuthMethod.XOAUTH2,
-                  label: "app.admin.emails.imap.auth.xoauth2",
-                },
-              ],
-            }}
             control={form.control}
+            endpoint={imapAccountDefinitions.PUT}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -191,11 +155,9 @@ export function ImapAccountEditForm({
 
           <EndpointFormField
             name="secure"
-            config={{
-              type: "checkbox",
-              label: "app.admin.emails.imap.account.fields.secure",
-            }}
             control={form.control}
+            endpoint={imapAccountDefinitions.PUT}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -213,13 +175,9 @@ export function ImapAccountEditForm({
         <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <EndpointFormField
             name="connectionTimeout"
-            config={{
-              type: "number",
-              label: "app.admin.emails.imap.account.fields.connectionTimeout",
-              placeholder:
-                "app.admin.emails.imap.account.fields.connectionTimeout",
-            }}
             control={form.control}
+            endpoint={imapAccountDefinitions.PUT}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -228,12 +186,9 @@ export function ImapAccountEditForm({
 
           <EndpointFormField
             name="syncInterval"
-            config={{
-              type: "number",
-              label: "app.admin.emails.imap.account.fields.syncInterval",
-              placeholder: "app.admin.emails.imap.account.fields.syncInterval",
-            }}
             control={form.control}
+            endpoint={imapAccountDefinitions.PUT}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -242,12 +197,9 @@ export function ImapAccountEditForm({
 
           <EndpointFormField
             name="maxMessages"
-            config={{
-              type: "number",
-              label: "app.admin.emails.imap.account.fields.maxMessages",
-              placeholder: "app.admin.emails.imap.account.fields.maxMessages",
-            }}
             control={form.control}
+            endpoint={imapAccountDefinitions.PUT}
+            locale={locale}
             theme={{
               style: "none",
               showAllRequired: false,
@@ -257,11 +209,9 @@ export function ImapAccountEditForm({
 
         <EndpointFormField
           name="enabled"
-          config={{
-            type: "checkbox",
-            label: "app.admin.emails.imap.account.fields.enabled",
-          }}
           control={form.control}
+          endpoint={imapAccountDefinitions.PUT}
+          locale={locale}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -270,11 +220,9 @@ export function ImapAccountEditForm({
 
         <EndpointFormField
           name="keepAlive"
-          config={{
-            type: "checkbox",
-            label: "app.admin.emails.imap.account.fields.keepAlive",
-          }}
           control={form.control}
+          endpoint={imapAccountDefinitions.PUT}
+          locale={locale}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -283,7 +231,7 @@ export function ImapAccountEditForm({
       </Div>
 
       {/* Form Actions */}
-      <Div className="flex items-center justify-end flex flex-row gap-4">
+      <Div className="flex items-center justify-end flex-row gap-4">
         <Button type="button" variant="outline" onClick={onCancel}>
           {t("app.admin.emails.imap.common.cancel")}
         </Button>

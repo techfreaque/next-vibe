@@ -18,7 +18,6 @@ import type {
 import { View } from "react-native";
 
 import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import type { EndpointFieldStructure } from "@/app/api/[locale]/system/unified-interface/shared/field-config/endpoint-field-types";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -26,12 +25,13 @@ import type {
   RequiredFieldTheme,
 } from "@/app/api/[locale]/system/unified-interface/shared/field-config/field-config-types";
 import { getFieldConfig } from "@/app/api/[locale]/system/unified-interface/shared/field-config/infer-field-config";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { TFunction, TParams } from "@/i18n/core/static-types";
 
 import type {
   EndpointFormFieldProps,
-  EndpointFormFieldsProps,
   FormFieldError,
 } from "../../../web/ui/form/endpoint-form-field";
 import { convertCSSToViewStyle } from "../../utils/style-converter";
@@ -74,7 +74,7 @@ import {
 } from "./form";
 
 // Re-export types for module compatibility with web version
-export type { EndpointFormFieldProps, EndpointFormFieldsProps, FormFieldError };
+export type { EndpointFormFieldProps, FormFieldError };
 
 // Styled View for proper NativeWind support
 const StyledView = styled(View, { className: "style" });
@@ -275,12 +275,12 @@ function getFieldStyleClassName(
 /**
  * Render label with required indicators and optional info tooltip
  */
-function renderLabel(
-  config: FieldConfig,
+function renderLabel<TKey extends string>(
+  config: FieldConfig<TKey>,
   isRequired: boolean,
   theme: RequiredFieldTheme,
   labelClassName: string,
-  t: TFunction, // Adapted translation for definition keys
+  t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType, // Adapted translation for definition keys
   globalT: TFunction, // Global translation for hardcoded framework keys
 ): JSX.Element | null {
   const { style } = theme;
@@ -323,13 +323,14 @@ function renderLabel(
  * Render field input based on type
  */
 function renderFieldInput<
+  TKey extends string,
   TFieldValues extends FieldValues,
   TName extends Path<TFieldValues>,
 >(
-  config: FieldConfig,
+  config: FieldConfig<TKey>,
   field: ControllerRenderProps<TFieldValues, TName>,
   inputClassName: string,
-  t: TFunction, // Adapted translation for definition keys (uses scopedT when available)
+  t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType, // Adapted translation for definition keys (uses scopedT when available)
   globalT: TFunction, // Global translation for hardcoded framework keys
   disabled?: boolean,
 ): JSX.Element {
@@ -560,6 +561,7 @@ function renderFieldInput<
           disabled={disabled || config.disabled}
           className={inputClassName}
           name={field.name}
+          t={t}
         />
       );
 
@@ -577,6 +579,7 @@ function renderFieldInput<
           disabled={disabled || config.disabled}
           className={inputClassName}
           name={field.name}
+          t={t}
         />
       );
     }
@@ -693,28 +696,32 @@ function renderFieldInput<
  * Config is auto-inferred from endpointFields if not provided
  */
 export function EndpointFormField<
+  TKey extends string,
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
-  TFields = EndpointFieldStructure,
+  TEndpoint extends CreateApiEndpointAny,
 >({
   name,
   config: providedConfig,
   control,
-  schema,
+  endpoint,
   theme = DEFAULT_THEME,
   className,
   style,
-  endpointFields,
-  scopedT,
   locale,
-}: EndpointFormFieldProps<TFieldValues, TName, TFields> & {
+}: EndpointFormFieldProps<TKey, TFieldValues, TName, TEndpoint> & {
   style?: React.CSSProperties;
 }): JSX.Element {
-  // Use same pattern as getTranslator utility:
-  // - scopedT for definition keys when available (label, placeholder, description, option labels)
-  // - simpleT for fallback and hardcoded framework keys
-  const { t: globalT } = simpleT(locale ?? "en-GLOBAL");
-  const { t } = scopedT && locale ? scopedT(locale) : { t: globalT };
+  // Extract from endpoint
+  const {
+    fields: endpointFields,
+    scopedTranslation,
+    requestSchema: schema,
+  } = endpoint;
+  const { scopedT } = scopedTranslation;
+
+  const { t } = scopedT(locale);
+  const { t: globalT } = simpleT(locale);
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Auto-infer config from endpoint fields if not provided
@@ -789,51 +796,5 @@ export function EndpointFormField<
         );
       }}
     />
-  );
-}
-
-/**
- * Convenience component for creating multiple form fields
- * Config is auto-inferred from endpointFields if not provided
- */
-export function EndpointFormFields<
-  TFieldValues extends FieldValues,
-  TFields = EndpointFieldStructure,
->({
-  fields,
-  control,
-  schema,
-  endpointFields,
-  theme = DEFAULT_THEME,
-  className,
-  style,
-  fieldClassName,
-  scopedT,
-  locale,
-}: EndpointFormFieldsProps<TFieldValues, TFields> & {
-  style?: React.CSSProperties;
-}): JSX.Element {
-  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
-
-  // Note: style prop is not passed to Div due to StyleType discriminated union
-  // Div uses className for styling via NativeWind (either style OR className, not both)
-  void nativeStyle; // Acknowledge nativeStyle is intentionally unused for Div
-  return (
-    <Div className={cn("space-y-6", className)}>
-      {fields.map((fieldDef) => (
-        <EndpointFormField
-          key={fieldDef.name}
-          name={fieldDef.name}
-          config={fieldDef.config}
-          control={control}
-          schema={schema}
-          endpointFields={endpointFields}
-          theme={theme}
-          className={fieldClassName}
-          scopedT={scopedT}
-          locale={locale}
-        />
-      ))}
-    </Div>
   );
 }

@@ -20,9 +20,9 @@ import { Label } from "next-vibe-ui/ui/label";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import type { JSX } from "react";
 
+import campaignStarterDefinitions from "@/app/api/[locale]/leads/campaigns/campaign-starter/campaign-starter-config/definition";
 import { useCampaignStarterConfigEndpoint } from "@/app/api/[locale]/leads/campaigns/campaign-starter/campaign-starter-config/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { CronTaskPriority } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { CountryLanguageValues } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -74,29 +74,16 @@ export function CampaignStarterForm({
                 {/* Dry Run Toggle */}
                 <EndpointFormField
                   name="dryRun"
-                  config={{
-                    type: "switch",
-                    label:
-                      "app.admin.leads.leads.admin.campaignStarter.form.dryRun.label",
-                  }}
                   control={endpoint.create.form.control}
+                  endpoint={campaignStarterDefinitions.PUT}
                   locale={locale}
                 />
 
                 {/* Minimum Age Hours */}
                 <EndpointFormField
                   name="minAgeHours"
-                  config={{
-                    type: "number",
-                    label:
-                      "app.admin.leads.leads.admin.campaignStarter.form.minAgeHours.label",
-                    placeholder:
-                      "app.admin.leads.leads.admin.campaignStarter.form.minAgeHours.placeholder",
-                    min: 0,
-                    max: 168,
-                    step: 1,
-                  }}
                   control={endpoint.create.form.control}
+                  endpoint={campaignStarterDefinitions.PUT}
                   locale={locale}
                 />
               </FormFieldGroup>
@@ -181,6 +168,7 @@ export function CampaignStarterForm({
                     step: 1,
                   }}
                   control={endpoint.create.form.control}
+                  endpoint={campaignStarterDefinitions.PUT}
                   locale={locale}
                 />
 
@@ -198,6 +186,7 @@ export function CampaignStarterForm({
                     step: 1,
                   }}
                   control={endpoint.create.form.control}
+                  endpoint={campaignStarterDefinitions.PUT}
                   locale={locale}
                 />
               </FormFieldGroup>
@@ -256,77 +245,32 @@ export function CampaignStarterForm({
                 {/* Schedule */}
                 <EndpointFormField
                   name="schedule"
-                  config={{
-                    type: "text",
-                    label:
-                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.schedule.label",
-                    placeholder:
-                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.schedule.placeholder",
-                  }}
                   control={endpoint.create.form.control}
+                  endpoint={campaignStarterDefinitions.PUT}
                   locale={locale}
                 />
 
                 {/* Enabled */}
                 <EndpointFormField
                   name="enabled"
-                  config={{
-                    type: "switch",
-                    label:
-                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.enabled.label",
-                  }}
                   control={endpoint.create.form.control}
+                  endpoint={campaignStarterDefinitions.PUT}
                   locale={locale}
                 />
 
                 {/* Priority */}
                 <EndpointFormField
                   name="priority"
-                  config={{
-                    type: "select",
-                    label:
-                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.priority.label",
-                    options: [
-                      {
-                        value: CronTaskPriority.LOW,
-                        label:
-                          "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.priority.options.low",
-                      },
-                      {
-                        value: CronTaskPriority.MEDIUM,
-                        label:
-                          "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.priority.options.normal",
-                      },
-                      {
-                        value: CronTaskPriority.HIGH,
-                        label:
-                          "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.priority.options.high",
-                      },
-                      {
-                        value: CronTaskPriority.CRITICAL,
-                        label:
-                          "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.priority.options.critical",
-                      },
-                    ],
-                  }}
                   control={endpoint.create.form.control}
+                  endpoint={campaignStarterDefinitions.PUT}
                   locale={locale}
                 />
 
                 {/* Timeout */}
                 <EndpointFormField
                   name="timeout"
-                  config={{
-                    type: "number",
-                    label:
-                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.timeout.label",
-                    placeholder:
-                      "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.timeout.placeholder",
-                    min: 1000,
-                    max: 3600000,
-                    step: 1000,
-                  }}
                   control={endpoint.create.form.control}
+                  endpoint={campaignStarterDefinitions.PUT}
                   locale={locale}
                 />
 
@@ -344,6 +288,7 @@ export function CampaignStarterForm({
                     step: 1,
                   }}
                   control={endpoint.create.form.control}
+                  endpoint={campaignStarterDefinitions.PUT}
                   locale={locale}
                 />
 
@@ -361,6 +306,7 @@ export function CampaignStarterForm({
                     step: 1000,
                   }}
                   control={endpoint.create.form.control}
+                  endpoint={campaignStarterDefinitions.PUT}
                   locale={locale}
                 />
               </FormFieldGroup>

@@ -24,6 +24,7 @@ import { useResetPasswordRequest } from "@/app/api/[locale]/user/public/reset-pa
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import resetRequestDefinitions from "@/app/api/[locale]/user/public/reset-password/request/definition";
 
 interface ResetPasswordFormProps {
   locale: CountryLanguage;
@@ -121,15 +122,8 @@ export default function ResetPasswordForm({
           >
             <EndpointFormField
               name="emailInput.email"
-              config={{
-                type: "email",
-                label:
-                  "app.user.other.resetPassword.auth.resetPassword.emailLabel",
-                placeholder:
-                  "app.user.other.resetPassword.auth.resetPassword.emailPlaceholder",
-                disabled: isSubmitting,
-              }}
               control={form.control}
+              endpoint={resetRequestDefinitions.POST}
               theme={{
                 style: "none",
                 showAllRequired: false,

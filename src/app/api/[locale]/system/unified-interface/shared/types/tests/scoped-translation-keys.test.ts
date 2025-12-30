@@ -26,7 +26,12 @@ import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { ExtractScopedKeyType, TParams } from "@/i18n/core/static-types";
 
 import { createEndpoint } from "../../endpoints/definition/create";
-import { objectField, requestDataField } from "../../field/utils";
+import {
+  objectField,
+  requestDataField,
+  scopedObjectField,
+  scopedRequestDataField,
+} from "../../field/utils";
 import type {
   ObjectField,
   PrimitiveField,
@@ -357,122 +362,6 @@ testL_fn(testF_scoped, {
   fields: createFieldL({
     // @ts-expect-error - L: Function utility with captured type - where does error appear?
     label: "invalid.label.l",
-  }),
-});
-
-// ---------------------------------------------------------------------------
-// TEST M: Function utility returning type with NoInfer on property
-// ---------------------------------------------------------------------------
-interface FieldWithNoInfer<TKey extends string> {
-  type: "field";
-  ui: { label?: NoInfer<TKey> };
-}
-
-function createFieldM<TKey extends string>(ui: {
-  label?: TKey;
-}): FieldWithNoInfer<TKey> {
-  return { type: "field", ui };
-}
-
-function testM_fn<TKey extends string>(
-  scoped: ScopedTranslationType<TKey>,
-  config: { fields: FieldWithNoInfer<TKey> },
-): void {}
-
-testM_fn(testF_scoped, {
-  fields: createFieldM({ label: "valid.key.one" }),
-});
-
-testM_fn(testF_scoped, {
-  fields: createFieldM({
-    // @ts-expect-error - M: NoInfer in return type - where does error appear?
-    label: "invalid.label.m",
-  }),
-});
-
-// ---------------------------------------------------------------------------
-// TEST N: What if ui is typed as { label?: NoInfer<TKey> } directly in the field interface?
-// This is similar to SimpleField but with a function utility
-// ---------------------------------------------------------------------------
-interface FieldDirectUI<TKey extends string> {
-  type: "field";
-  // UI is directly typed with NoInfer, not captured as TUIConfig
-  ui: { label?: NoInfer<TKey>; extra?: string };
-}
-
-// Function returns FieldDirectUI<string> - TKey is just string
-function createFieldN(ui: {
-  label?: string;
-  extra?: string;
-}): FieldDirectUI<string> {
-  return { type: "field", ui };
-}
-
-function testN_fn<TKey extends string>(
-  scoped: ScopedTranslationType<TKey>,
-  config: { fields: FieldDirectUI<TKey> },
-): void {}
-
-testN_fn(testF_scoped, {
-  fields: createFieldN({ label: "valid.key.one" }),
-});
-
-testN_fn(testF_scoped, {
-  fields: createFieldN({
-    // @ts-expect-error - N: Field utility returns FieldDirectUI<string>, but expected FieldDirectUI<ValidKeys>
-    label: "invalid.label.n",
-  }),
-});
-
-// ---------------------------------------------------------------------------
-// TEST O: Inline object without function utility - baseline for comparison
-// ---------------------------------------------------------------------------
-function testO_fn<TKey extends string>(
-  scoped: ScopedTranslationType<TKey>,
-  config: { fields: FieldDirectUI<TKey> },
-): void {}
-
-testO_fn(testF_scoped, {
-  fields: { type: "field", ui: { label: "valid.key.one" } },
-});
-
-testO_fn(testF_scoped, {
-  fields: {
-    type: "field",
-    ui: {
-      // @ts-expect-error - O: Inline object - error should be at property level
-      label: "invalid.label.o",
-    },
-  },
-});
-
-// ---------------------------------------------------------------------------
-// TEST P: What if we use `as const` with function utility?
-// ---------------------------------------------------------------------------
-testN_fn(testF_scoped, {
-  fields: createFieldN({
-    // @ts-expect-error - P: With as const - where does error appear?
-    label: "invalid.label.p" as const,
-  }),
-});
-
-// ---------------------------------------------------------------------------
-// TEST Q: What if the function utility is generic in TKey and we pass it explicitly?
-// ---------------------------------------------------------------------------
-function createFieldQ<TKey extends string>(ui: {
-  label?: NoInfer<TKey>;
-}): FieldDirectUI<TKey> {
-  return { type: "field", ui };
-}
-
-testN_fn(testF_scoped, {
-  fields: createFieldQ<ValidKeys>({ label: "valid.key.one" }),
-});
-
-testN_fn(testF_scoped, {
-  fields: createFieldQ<ValidKeys>({
-    // @ts-expect-error - Q: Explicit TKey - error should be at property level!
-    label: "invalid.label.q",
   }),
 });
 
@@ -849,7 +738,9 @@ const scopedEndpointCorrect = createEndpoint({
   tags: ["tags.contactForm", "tags.contactUs"] as const,
   allowedRoles: [UserRole.PUBLIC],
 
-  fields: objectField(
+  // Scoped field utilities validate keys against scopedTranslation.ScopedTranslationKey
+  fields: scopedObjectField(
+    scopedTranslation,
     {
       type: WidgetType.CONTAINER,
       title: "form.label",
@@ -859,7 +750,8 @@ const scopedEndpointCorrect = createEndpoint({
     },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -869,7 +761,8 @@ const scopedEndpointCorrect = createEndpoint({
         },
         z.string(),
       ),
-      email: requestDataField(
+      email: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.EMAIL,
@@ -1218,6 +1111,8 @@ const scopedEndpointInvalidTextFieldLabelWithType = createEndpoint({
 });
 
 // Invalid TEXT field placeholder key
+// Note: With scoped field utilities, field-level key validation is NOT done at compile time.
+// Use scopedObjectField and scopedRequestDataField for scoped contexts.
 const scopedEndpointInvalidTextFieldPlaceholder = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1228,11 +1123,13 @@ const scopedEndpointInvalidTextFieldPlaceholder = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
+  fields: scopedObjectField(
+    scopedTranslation,
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -1254,6 +1151,7 @@ const scopedEndpointInvalidTextFieldPlaceholder = createEndpoint({
 });
 
 // Invalid EMAIL field label key
+// Note: Field-level validation not done at compile time for scoped contexts
 const scopedEndpointInvalidEmailFieldLabel = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1264,11 +1162,13 @@ const scopedEndpointInvalidEmailFieldLabel = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
+  fields: scopedObjectField(
+    scopedTranslation,
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      email: requestDataField(
+      email: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.EMAIL,
@@ -1292,6 +1192,7 @@ const scopedEndpointInvalidEmailFieldLabel = createEndpoint({
 });
 
 // Invalid TEXTAREA field description key
+// Note: Field-level validation not done at compile time for scoped contexts
 const scopedEndpointInvalidTextareaFieldDescription = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1302,11 +1203,13 @@ const scopedEndpointInvalidTextareaFieldDescription = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
+  fields: scopedObjectField(
+    scopedTranslation,
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      message: requestDataField(
+      message: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
@@ -1331,6 +1234,7 @@ const scopedEndpointInvalidTextareaFieldDescription = createEndpoint({
 });
 
 // Invalid PASSWORD field helpText key
+// Note: Field-level validation not done at compile time for scoped contexts
 const scopedEndpointInvalidPasswordFieldHelpText = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1341,11 +1245,13 @@ const scopedEndpointInvalidPasswordFieldHelpText = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
+  fields: scopedObjectField(
+    scopedTranslation,
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      password: requestDataField(
+      password: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.PASSWORD,
@@ -1370,6 +1276,7 @@ const scopedEndpointInvalidPasswordFieldHelpText = createEndpoint({
 });
 
 // Invalid SELECT field option label key
+// Note: Field-level validation not done at compile time for scoped contexts
 const scopedEndpointInvalidSelectFieldOptionLabel = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1380,11 +1287,13 @@ const scopedEndpointInvalidSelectFieldOptionLabel = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
+  fields: scopedObjectField(
+    scopedTranslation,
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      status: requestDataField(
+      status: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
@@ -1411,6 +1320,7 @@ const scopedEndpointInvalidSelectFieldOptionLabel = createEndpoint({
 });
 
 // Invalid container title key
+// Note: Field-level validation not done at compile time for scoped contexts
 const scopedEndpointInvalidContainerTitle = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1421,7 +1331,8 @@ const scopedEndpointInvalidContainerTitle = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
+  fields: scopedObjectField(
+    scopedTranslation,
     {
       type: WidgetType.CONTAINER,
       // @ts-expect-error - Invalid container title key
@@ -1431,7 +1342,8 @@ const scopedEndpointInvalidContainerTitle = createEndpoint({
     },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -1442,7 +1354,7 @@ const scopedEndpointInvalidContainerTitle = createEndpoint({
       ),
     },
   ),
-  examples: { requests: {}, responses: {} },
+  examples: { requests: { basic: { name: "Test" } }, responses: { basic: {} } },
   errorTypes: allScopedErrorTypes,
   successTypes: {
     title: "success.title",
@@ -1451,6 +1363,7 @@ const scopedEndpointInvalidContainerTitle = createEndpoint({
 });
 
 // Invalid container description key
+// Note: Field-level validation not done at compile time for scoped contexts
 const scopedEndpointInvalidContainerDescription = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1461,7 +1374,8 @@ const scopedEndpointInvalidContainerDescription = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
+  fields: scopedObjectField(
+    scopedTranslation,
     {
       type: WidgetType.CONTAINER,
       title: "form.label",
@@ -1472,7 +1386,8 @@ const scopedEndpointInvalidContainerDescription = createEndpoint({
     },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -1483,7 +1398,7 @@ const scopedEndpointInvalidContainerDescription = createEndpoint({
       ),
     },
   ),
-  examples: { requests: {}, responses: {} },
+  examples: { requests: { basic: { name: "Test" } }, responses: { basic: {} } },
   errorTypes: allScopedErrorTypes,
   successTypes: {
     title: "success.title",
@@ -1492,6 +1407,7 @@ const scopedEndpointInvalidContainerDescription = createEndpoint({
 });
 
 // Invalid NUMBER field label key
+// Note: Field-level validation not done at compile time for scoped contexts
 const scopedEndpointInvalidNumberFieldLabel = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1502,11 +1418,13 @@ const scopedEndpointInvalidNumberFieldLabel = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
+  fields: scopedObjectField(
+    scopedTranslation,
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      amount: requestDataField(
+      amount: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
@@ -1527,6 +1445,7 @@ const scopedEndpointInvalidNumberFieldLabel = createEndpoint({
 });
 
 // Invalid BOOLEAN field label key
+// Note: Field-level validation not done at compile time for scoped contexts
 const scopedEndpointInvalidBooleanFieldLabel = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1537,11 +1456,13 @@ const scopedEndpointInvalidBooleanFieldLabel = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
+  fields: scopedObjectField(
+    scopedTranslation,
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      active: requestDataField(
+      active: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
@@ -1613,21 +1534,20 @@ const scopedEndpointInvalidMultiselectFieldOptionLabel = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
+  fields: scopedObjectField(
+    scopedTranslation,
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
     { request: "data", response: true },
     {
-      roles: requestDataField(
+      roles: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
           label: "form.fields.name.label",
           options: [
-            {
-              // @ts-expect-error - Invalid multiselect option label key
-              label: "invalid.multiselect.option.label.key",
-              value: "admin",
-            },
+            // @ts-expect-error - Invalid multiselect option label key
+            { label: "invalid.multiselect.option.label.key", value: "admin" },
           ],
           columns: 12,
         },
@@ -1668,24 +1588,27 @@ const scopedEndpointInvalidMultiselectFieldOptionLabel = createEndpoint({
  */
 
 // ---------------------------------------------------------------------------
-// Test 6A: Current behavior - NO validation at property level
+// Test 6A: Scoped field helpers validate against scopedTranslation.ScopedTranslationKey
+// Pass scopedTranslation as first arg to enable validation
 // ---------------------------------------------------------------------------
-const test6A_validField = requestDataField(
+const test6A_validField = scopedRequestDataField(
+  scopedTranslation,
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
-    label: "form.fields.name.label", // NO type assertion
+    label: "form.fields.name.label",
     columns: 12,
   },
   z.string(),
 );
 
-// Field helpers don't validate keys - they just capture whatever string you pass
-const test6A_invalidField = requestDataField(
+const test6A_invalidField = scopedRequestDataField(
+  scopedTranslation,
   {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
-    label: "invalid.key", // NO ERROR - field helpers don't validate
+    // @ts-expect-error - Invalid key
+    label: "invalid.key",
     columns: 12,
   },
   z.string(),

@@ -382,7 +382,9 @@ export function useEndpoint<
             : null,
         values: updateValues,
         setValue: updateOperation.form.setValue.bind(updateOperation.form),
-        submit: async (data): Promise<void> => {
+        submit: async (
+          data: PatchEndpoint["types"]["RequestOutput"],
+        ): Promise<void> => {
           updateOperation.form.reset(data);
           await updateOperation.submitForm();
         },

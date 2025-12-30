@@ -302,9 +302,9 @@ export function extractSchemaDefaults<T>(
  */
 export function field<
   TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
-  const TSchema extends z.ZodTypeAny,
-  const TUsage extends FieldUsageConfig,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  const TSchema extends z.ZodTypeAny = z.ZodTypeAny,
+  const TUsage extends FieldUsageConfig = FieldUsageConfig,
 >(
   schema: TSchema,
   usage: TUsage,
@@ -325,7 +325,7 @@ export function field<
  */
 export function requestResponseField<
   TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
 >(
   ui: TUIConfig,
@@ -341,7 +341,7 @@ export function requestResponseField<
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<
   TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
 >(
   ui: TUIConfig,
@@ -357,7 +357,7 @@ export function requestResponseField<
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<
   TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
 >(
   ui: TUIConfig,
@@ -385,8 +385,8 @@ export function requestResponseField<
  */
 export function requestDataField<
   TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
-  TSchema extends z.ZodTypeAny,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
 >(
   ui: TUIConfig,
   schema: TSchema,
@@ -406,8 +406,8 @@ export function requestDataField<
  */
 export function requestUrlPathParamsField<
   TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
-  TSchema extends z.ZodTypeAny,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
 >(
   ui: TUIConfig,
   schema: TSchema,
@@ -432,8 +432,8 @@ export function requestUrlPathParamsField<
  */
 export function responseField<
   TKey extends string = TranslationKey,
-  TSchema extends z.ZodTypeAny,
-  const TUIConfig extends WidgetConfig<TKey>,
+  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   schema: TSchema,
@@ -453,8 +453,8 @@ export function responseField<
  */
 export function widgetField<
   TKey extends string = TranslationKey,
-  TUsage extends FieldUsageConfig,
-  const TUIConfig extends WidgetConfig<TKey>,
+  TUsage extends FieldUsageConfig = FieldUsageConfig,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   usage: TUsage,
@@ -472,8 +472,7 @@ export function widgetField<
  * Create an object field containing other fields
  *
  * Uses TranslationKey by default for automatic validation.
- * For scoped translations, provide the scoped key type:
- *   objectField<ScopedKeyType>({ ... }, usage, children)
+ * For scoped translations, use scopedObjectField<ScopedKeyType> instead.
  */
 export function objectField<
   TKey extends string = TranslationKey,
@@ -499,12 +498,153 @@ export function objectField<
 }
 
 /**
+ * Scoped translation object type for type inference
+ */
+interface ScopedTranslationType<TKey extends string = string> {
+  ScopedTranslationKey: TKey;
+}
+
+/**
+ * Create an object field for scoped translations with full type checking.
+ * Pass the scopedTranslation object to infer the key type and enable validation.
+ *
+ * @example
+ * scopedObjectField(
+ *   scopedTranslation,
+ *   { type: WidgetType.CONTAINER, title: "form.label", ... },
+ *   { request: "data", response: true },
+ *   { name: scopedRequestDataField(scopedTranslation, { label: "form.name.label", ... }, z.string()) }
+ * )
+ */
+export function scopedObjectField<
+  TScopedTranslation extends ScopedTranslationType,
+  TChildren extends Record<
+    string,
+    UnifiedField<TScopedTranslation["ScopedTranslationKey"], z.ZodTypeAny>
+  >,
+  TUsage extends FieldUsageConfig,
+  const TUIConfig extends WidgetConfig<
+    TScopedTranslation["ScopedTranslationKey"]
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  ui: TUIConfig,
+  usage: TUsage,
+  children: TChildren,
+  cache?: CacheStrategy,
+): ObjectField<
+  TChildren,
+  TUsage,
+  TScopedTranslation["ScopedTranslationKey"],
+  TUIConfig
+> {
+  return {
+    type: "object" as const,
+    children,
+    usage,
+    ui,
+    cache,
+  };
+}
+
+/**
+ * Create a request data field for scoped translations with full type checking.
+ */
+export function scopedRequestDataField<
+  TScopedTranslation extends ScopedTranslationType,
+  const TUIConfig extends WidgetConfig<
+    TScopedTranslation["ScopedTranslationKey"]
+  >,
+  TSchema extends z.ZodTypeAny,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  ui: TUIConfig,
+  schema: TSchema,
+  cache?: CacheStrategy,
+): PrimitiveField<
+  TSchema,
+  { request: "data" },
+  TScopedTranslation["ScopedTranslationKey"],
+  TUIConfig
+> {
+  return {
+    type: "primitive" as const,
+    schema,
+    usage: { request: "data" },
+    ui,
+    cache,
+  };
+}
+
+/**
+ * Create a response field for scoped translations with full type checking.
+ */
+export function scopedResponseField<
+  TScopedTranslation extends ScopedTranslationType,
+  TSchema extends z.ZodTypeAny,
+  const TUIConfig extends WidgetConfig<
+    TScopedTranslation["ScopedTranslationKey"]
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  ui: TUIConfig,
+  schema: TSchema,
+  cache?: CacheStrategy,
+): PrimitiveField<
+  TSchema,
+  { response: true },
+  TScopedTranslation["ScopedTranslationKey"],
+  TUIConfig
+> {
+  return {
+    type: "primitive" as const,
+    schema,
+    usage: { response: true },
+    ui,
+    cache,
+  };
+}
+
+/**
+ * Create a response array optional field for scoped translations with full type checking.
+ */
+export function scopedResponseArrayOptionalField<
+  TScopedTranslation extends ScopedTranslationType,
+  Child,
+  const TUIConfig extends WidgetConfig<
+    TScopedTranslation["ScopedTranslationKey"]
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  ui: TUIConfig,
+  child: Child,
+  cache?: CacheStrategy,
+): ArrayOptionalField<
+  Child,
+  { response: true },
+  TScopedTranslation["ScopedTranslationKey"],
+  TUIConfig
+> {
+  return {
+    type: "array-optional" as const,
+    child,
+    usage: { response: true },
+    ui,
+    cache,
+  };
+}
+
+/**
  * Create an array field containing repeated items
  */
 export function arrayField<
   Child,
   const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
 >(
   usage: FieldUsageConfig,
   ui: TUIConfig,
@@ -526,7 +666,7 @@ export function arrayField<
 export function requestDataArrayField<
   Child,
   const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   child: Child,
@@ -547,7 +687,7 @@ export function requestDataArrayField<
 export function responseArrayField<
   Child,
   const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   child: Child,
@@ -567,9 +707,9 @@ export function responseArrayField<
  */
 export function objectOptionalField<
   C,
-  U extends FieldUsageConfig,
+  U extends FieldUsageConfig = FieldUsageConfig,
   const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   usage: U,
@@ -604,9 +744,9 @@ export function objectUnionField<
       WidgetConfig<TKey>
     >[],
   ],
-  TUsage extends FieldUsageConfig,
+  TUsage extends FieldUsageConfig = FieldUsageConfig,
   const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   usage: TUsage,
@@ -630,7 +770,7 @@ export function objectUnionField<
 export function arrayOptionalField<
   Child,
   const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
 >(
   usage: FieldUsageConfig,
   ui: TUIConfig,
@@ -652,7 +792,7 @@ export function arrayOptionalField<
 export function requestDataArrayOptionalField<
   Child,
   const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   child: Child,
@@ -673,7 +813,7 @@ export function requestDataArrayOptionalField<
 export function responseArrayOptionalField<
   Child,
   const TKey extends string = TranslationKey,
-  const TUIConfig extends WidgetConfig<TKey>,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
 >(
   ui: TUIConfig,
   child: Child,

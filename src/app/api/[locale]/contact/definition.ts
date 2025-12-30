@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestDataField,
-  responseArrayOptionalField,
-  responseField,
+  scopedObjectField,
+  scopedRequestDataField,
+  scopedResponseArrayOptionalField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -65,79 +65,87 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ],
 
-  fields: objectField(
+  // Scoped field utilities validate translation keys against scopedTranslation.ScopedTranslationKey
+  fields: scopedObjectField(
+    scopedTranslation,
     {
       type: WidgetType.CONTAINER,
-      title: "form.label" as const,
-      description: "form.description" as const,
+      title: "form.label",
+      description: "form.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "form.fields.name.label" as const,
-          description: "form.fields.name.description" as const,
-          placeholder: "form.fields.name.placeholder" as const,
+          label: "form.fields.name.label",
+          description: "form.fields.name.description",
+          placeholder: "form.fields.name.placeholder",
           columns: 6,
         },
         z.string().min(2),
       ),
-      email: requestDataField(
+      email: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.EMAIL,
-          label: "form.fields.email.label" as const,
-          description: "form.fields.email.description" as const,
-          placeholder: "form.fields.email.placeholder" as const,
+          label: "form.fields.email.label",
+          description: "form.fields.email.description",
+          placeholder: "form.fields.email.placeholder",
           columns: 6,
         },
         z.string().email(),
       ),
-      company: requestDataField(
+      company: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "form.fields.company.label" as const,
-          description: "form.fields.company.description" as const,
-          placeholder: "form.fields.company.placeholder" as const,
+          label: "form.fields.company.label",
+          description: "form.fields.company.description",
+          placeholder: "form.fields.company.placeholder",
           columns: 12,
         },
         z.string().optional(),
       ),
-      subject: requestDataField(
+      subject: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "form.fields.subject.label" as const,
-          description: "form.fields.subject.description" as const,
-          placeholder: "form.fields.subject.placeholder" as const,
+          label: "form.fields.subject.label",
+          description: "form.fields.subject.description",
+          placeholder: "form.fields.subject.placeholder",
           options: ContactSubjectOptions,
           columns: 12,
         },
         z.enum(ContactSubject),
       ),
-      message: requestDataField(
+      message: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
-          label: "form.fields.message.label" as const,
-          description: "form.fields.message.description" as const,
-          placeholder: "form.fields.message.placeholder" as const,
+          label: "form.fields.message.label",
+          description: "form.fields.message.description",
+          placeholder: "form.fields.message.placeholder",
           columns: 12,
         },
         z.string().min(10),
       ),
-      priority: requestDataField(
+      priority: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "form.fields.priority.label" as const,
-          description: "form.fields.priority.description" as const,
-          placeholder: "form.fields.priority.placeholder" as const,
+          label: "form.fields.priority.label",
+          description: "form.fields.priority.description",
+          placeholder: "form.fields.priority.placeholder",
           options: ContactPriorityOptions,
           columns: 12,
         },
@@ -146,30 +154,34 @@ const { POST } = createEndpoint({
 
       // === RESPONSE FIELDS ===
       // Note: leadId comes from JWT payload (user.leadId) on server-side
-      success: responseField(
+      success: scopedResponseField(
+        scopedTranslation,
         {
           type: WidgetType.TEXT,
-          content: "response.success" as const,
+          content: "response.success",
         },
         z.boolean(),
       ),
-      messageId: responseField(
+      messageId: scopedResponseField(
+        scopedTranslation,
         {
           type: WidgetType.TEXT,
-          content: "response.messageId" as const,
+          content: "response.messageId",
         },
         z.string().optional(),
       ),
-      status: responseArrayOptionalField(
+      status: scopedResponseArrayOptionalField(
+        scopedTranslation,
         {
           type: WidgetType.DATA_LIST,
-          title: "response.status" as const,
-          description: "response.description" as const,
+          title: "response.status",
+          description: "response.description",
         },
-        responseField(
+        scopedResponseField(
+          scopedTranslation,
           {
             type: WidgetType.TEXT,
-            content: "response.status" as const,
+            content: "response.status",
           },
           z.string(),
         ),

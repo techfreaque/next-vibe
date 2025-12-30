@@ -28,15 +28,10 @@ import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import React from "react";
 
-import {
-  EmailCampaignStageOptions,
-  LeadSource,
-  LeadStatus,
-} from "@/app/api/[locale]/leads/enum";
+import leadsImportDefinitions from "@/app/api/[locale]/leads/import/definition";
 import { useLeadsImportEndpoint } from "@/app/api/[locale]/leads/import/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { CountriesOptions, LanguagesOptions } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface ImportResult {
@@ -209,6 +204,8 @@ export function CsvImportDialog({
                 <EndpointFormField
                   name="file"
                   control={endpoint.create.form.control}
+                  endpoint={leadsImportDefinitions.POST}
+                  locale={locale}
                   theme={{
                     style: "none",
                   }}
@@ -216,6 +213,8 @@ export function CsvImportDialog({
                 <EndpointFormField
                   name="fileName"
                   control={endpoint.create.form.control}
+                  endpoint={leadsImportDefinitions.POST}
+                  locale={locale}
                   theme={{
                     style: "none",
                   }}
@@ -232,14 +231,9 @@ export function CsvImportDialog({
                   {/* Skip Duplicates */}
                   <EndpointFormField
                     name="skipDuplicates"
-                    config={{
-                      type: "switch",
-                      label:
-                        "app.admin.leads.leads.admin.import.options.skipDuplicates",
-                      description:
-                        "app.admin.leads.leads.admin.import.options.skipDuplicates",
-                    }}
                     control={endpoint.create.form.control}
+                    endpoint={leadsImportDefinitions.POST}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,
@@ -249,14 +243,9 @@ export function CsvImportDialog({
                   {/* Update Existing */}
                   <EndpointFormField
                     name="updateExisting"
-                    config={{
-                      type: "switch",
-                      label:
-                        "app.admin.leads.leads.admin.import.options.updateExisting",
-                      description:
-                        "app.admin.leads.leads.admin.import.options.updateExisting",
-                    }}
                     control={endpoint.create.form.control}
+                    endpoint={leadsImportDefinitions.POST}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,
@@ -275,14 +264,9 @@ export function CsvImportDialog({
                   {/* Use Chunked Processing */}
                   <EndpointFormField
                     name="useChunkedProcessing"
-                    config={{
-                      type: "switch",
-                      label:
-                        "app.admin.leads.leads.admin.import.batch.useChunkedProcessing",
-                      description:
-                        "app.admin.leads.leads.admin.import.batch.useChunkedProcessingDescription",
-                    }}
                     control={endpoint.create.form.control}
+                    endpoint={leadsImportDefinitions.POST}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,
@@ -293,18 +277,9 @@ export function CsvImportDialog({
                   {endpoint.create.form.watch("useChunkedProcessing") && (
                     <EndpointFormField
                       name="batchSize"
-                      config={{
-                        type: "number",
-                        label:
-                          "app.admin.leads.leads.admin.import.batch.batchSize",
-                        description:
-                          "app.admin.leads.leads.admin.import.batch.batchSizeDescription",
-                        placeholder:
-                          "app.admin.leads.leads.admin.import.batch.batchSizePlaceholder",
-                        min: 10,
-                        max: 10000,
-                      }}
                       control={endpoint.create.form.control}
+                      endpoint={leadsImportDefinitions.POST}
+                      locale={locale}
                       theme={{
                         style: "none",
                         showAllRequired: false,
@@ -324,17 +299,9 @@ export function CsvImportDialog({
                   {/* Default Country */}
                   <EndpointFormField
                     name="defaultCountry"
-                    config={{
-                      type: "select",
-                      label:
-                        "app.admin.leads.leads.admin.import.defaults.country",
-                      description:
-                        "app.admin.leads.leads.admin.import.defaults.countryDescription",
-                      placeholder:
-                        "app.admin.leads.leads.admin.import.defaults.countryPlaceholder",
-                      options: CountriesOptions,
-                    }}
                     control={endpoint.create.form.control}
+                    endpoint={leadsImportDefinitions.POST}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,
@@ -344,17 +311,9 @@ export function CsvImportDialog({
                   {/* Default Language */}
                   <EndpointFormField
                     name="defaultLanguage"
-                    config={{
-                      type: "select",
-                      label:
-                        "app.admin.leads.leads.admin.import.defaults.language",
-                      description:
-                        "app.admin.leads.leads.admin.import.defaults.languageDescription",
-                      placeholder:
-                        "app.admin.leads.leads.admin.import.defaults.languagePlaceholder",
-                      options: LanguagesOptions,
-                    }}
                     control={endpoint.create.form.control}
+                    endpoint={leadsImportDefinitions.POST}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,
@@ -364,78 +323,9 @@ export function CsvImportDialog({
                   {/* Default Status */}
                   <EndpointFormField
                     name="defaultStatus"
-                    config={{
-                      type: "select",
-                      label:
-                        "app.admin.leads.leads.admin.import.defaults.status",
-                      description:
-                        "app.admin.leads.leads.admin.import.defaults.statusDescription",
-                      placeholder:
-                        "app.admin.leads.leads.admin.import.defaults.statusPlaceholder",
-                      options: [
-                        {
-                          value: LeadStatus.NEW,
-                          label:
-                            "app.admin.leads.leads.admin.status.new" as const,
-                        },
-                        {
-                          value: LeadStatus.PENDING,
-                          label:
-                            "app.admin.leads.leads.admin.status.pending" as const,
-                        },
-                        {
-                          value: LeadStatus.CAMPAIGN_RUNNING,
-                          label:
-                            "app.admin.leads.leads.admin.status.campaign_running" as const,
-                        },
-                        {
-                          value: LeadStatus.WEBSITE_USER,
-                          label:
-                            "app.admin.leads.leads.admin.status.website_user" as const,
-                        },
-                        {
-                          value: LeadStatus.NEWSLETTER_SUBSCRIBER,
-                          label:
-                            "app.admin.leads.leads.admin.status.newsletter_subscriber" as const,
-                        },
-                        {
-                          value: LeadStatus.IN_CONTACT,
-                          label:
-                            "app.admin.leads.leads.admin.status.in_contact" as const,
-                        },
-                        {
-                          value: LeadStatus.SIGNED_UP,
-                          label:
-                            "app.admin.leads.leads.admin.status.signed_up" as const,
-                        },
-                        {
-                          value: LeadStatus.CONSULTATION_BOOKED,
-                          label:
-                            "app.admin.leads.leads.admin.status.consultation_booked" as const,
-                        },
-                        {
-                          value: LeadStatus.SUBSCRIPTION_CONFIRMED,
-                          label:
-                            "app.admin.leads.leads.admin.status.subscription_confirmed" as const,
-                        },
-                        {
-                          value: LeadStatus.UNSUBSCRIBED,
-                          label:
-                            "app.admin.leads.leads.admin.status.unsubscribed" as const,
-                        },
-                        {
-                          value: LeadStatus.BOUNCED,
-                          label:
-                            "app.admin.leads.leads.admin.status.bounced" as const,
-                        },
-                        {
-                          value: LeadStatus.INVALID,
-                          label:
-                            "app.admin.leads.leads.admin.status.invalid" as const,
-                        },
-                      ],
-                    }}
                     control={endpoint.create.form.control}
+                    endpoint={leadsImportDefinitions.POST}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,
@@ -445,17 +335,9 @@ export function CsvImportDialog({
                   {/* Default Campaign Stage */}
                   <EndpointFormField
                     name="defaultCampaignStage"
-                    config={{
-                      type: "select",
-                      label:
-                        "app.admin.leads.leads.admin.import.defaults.campaignStage",
-                      description:
-                        "app.admin.leads.leads.admin.import.defaults.campaignStageDescription",
-                      placeholder:
-                        "app.admin.leads.leads.admin.import.defaults.campaignStagePlaceholder",
-                      options: EmailCampaignStageOptions,
-                    }}
                     control={endpoint.create.form.control}
+                    endpoint={leadsImportDefinitions.POST}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,
@@ -465,48 +347,9 @@ export function CsvImportDialog({
                   {/* Default Source */}
                   <EndpointFormField
                     name="defaultSource"
-                    config={{
-                      type: "select",
-                      label:
-                        "app.admin.leads.leads.admin.import.defaults.source",
-                      description:
-                        "app.admin.leads.leads.admin.import.defaults.sourceDescription",
-                      placeholder:
-                        "app.admin.leads.leads.admin.import.defaults.sourcePlaceholder",
-                      options: [
-                        {
-                          value: LeadSource.WEBSITE,
-                          label:
-                            "app.admin.leads.leads.admin.source.website" as const,
-                        },
-                        {
-                          value: LeadSource.SOCIAL_MEDIA,
-                          label:
-                            "app.admin.leads.leads.admin.source.social_media" as const,
-                        },
-                        {
-                          value: LeadSource.EMAIL_CAMPAIGN,
-                          label:
-                            "app.admin.leads.leads.admin.source.email_campaign" as const,
-                        },
-                        {
-                          value: LeadSource.REFERRAL,
-                          label:
-                            "app.admin.leads.leads.admin.source.referral" as const,
-                        },
-                        {
-                          value: LeadSource.CSV_IMPORT,
-                          label:
-                            "app.admin.leads.leads.admin.source.csv_import" as const,
-                        },
-                        {
-                          value: LeadSource.API,
-                          label:
-                            "app.admin.leads.leads.admin.source.api" as const,
-                        },
-                      ],
-                    }}
                     control={endpoint.create.form.control}
+                    endpoint={leadsImportDefinitions.POST}
+                    locale={locale}
                     theme={{
                       style: "none",
                       showAllRequired: false,

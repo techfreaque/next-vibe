@@ -11,9 +11,9 @@ import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
-import type { StyleType } from "../utils/style-type";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import {
@@ -35,64 +35,53 @@ const CATEGORY_TRANSLATION_KEYS: Record<FormFieldCategory, TranslationKey> = {
 };
 
 // Cross-platform base interface (no TranslationKey dependency)
-export interface AutocompleteOptionBase {
+export interface AutocompleteOptionBase<TKey extends string> {
   value: string;
-  label: string;
+  label: TKey;
   category?: string;
 }
 
-export interface AutocompleteOption {
+export interface AutocompleteOption<TKey extends string> {
   value: string;
-  label: TranslationKey;
+  label: TKey;
   category?: string;
 }
 
-// Cross-platform props interface
-export interface AutocompleteFieldPropsBase {
+export interface AutocompleteFieldProps<TKey extends string> {
   value?: string;
   onChange: (value: string) => void;
   onBlur?: () => void;
-  options: AutocompleteOptionBase[];
-  placeholder?: string;
-  searchPlaceholder?: string;
+  options: AutocompleteOption<TKey>[];
+  placeholder?: TKey;
+  searchPlaceholder?: TKey;
   allowCustom?: boolean;
   disabled?: boolean;
   name?: string;
+  t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType;
+  className?: string;
 }
 
-export type AutocompleteFieldProps = {
-  value?: string;
-  onChange: (value: string) => void;
-  onBlur?: () => void;
-  options: AutocompleteOption[];
-  placeholder?: TranslationKey;
-  searchPlaceholder?: TranslationKey;
-  allowCustom?: boolean;
-  disabled?: boolean;
-  name?: string;
-} & StyleType;
-
-export function AutocompleteField({
+export function AutocompleteField<TKey extends string>({
   value = "",
   onChange,
   onBlur,
   options,
-  placeholder = "app.common.selectOption",
-  searchPlaceholder = "app.common.searchOptions",
+  placeholder,
+  searchPlaceholder,
   allowCustom = true,
   disabled = false,
   className,
-  style,
   name,
-}: AutocompleteFieldProps): JSX.Element {
-  const { t } = useTranslation();
+  t,
+}: AutocompleteFieldProps<TKey>): JSX.Element {
+  const { t: globalT } = useTranslation();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isCustomValue, setIsCustomValue] = useState(false);
 
   // Group options by category
   const groupedOptions = useMemo(() => {
-    const groups: Record<string, AutocompleteOption[]> = {};
+    const groups: Record<string, AutocompleteOption<TKey>[]> = {};
 
     options.forEach((option) => {
       const category = option.category || FormFieldCategory.OTHER;
@@ -111,7 +100,7 @@ export function AutocompleteField({
       return groupedOptions;
     }
 
-    const filtered: Record<string, AutocompleteOption[]> = {};
+    const filtered: Record<string, AutocompleteOption<TKey>[]> = {};
 
     Object.entries(groupedOptions).forEach(([category, categoryOptions]) => {
       const matchingOptions = categoryOptions.filter(
@@ -158,7 +147,7 @@ export function AutocompleteField({
   };
 
   return (
-    <div className={cn("relative", className)} style={style}>
+    <div className={cn("relative", className)}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -176,11 +165,11 @@ export function AutocompleteField({
             <div className="flex items-center gap-2 flex-1 min-w-0">
               {isCustomValue && (
                 <Badge variant="secondary" className="text-xs">
-                  {t("app.common.customValue")}
+                  {globalT("app.common.customValue")}
                 </Badge>
               )}
               <span className="truncate">
-                {value ? displayValue : t(placeholder)}
+                {value ? displayValue : placeholder ? t(placeholder) : ""}
               </span>
             </div>
             <div className="flex items-center gap-1">
@@ -206,7 +195,7 @@ export function AutocompleteField({
             <div className="flex items-center border-b px-3">
               <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
               <CommandInput
-                placeholder={t(searchPlaceholder)}
+                placeholder={searchPlaceholder ? t(searchPlaceholder) : ""}
                 value={searchValue}
                 onValueChange={setSearchValue}
                 className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
@@ -216,7 +205,7 @@ export function AutocompleteField({
               <CommandEmpty>
                 <div className="py-6 text-center text-sm">
                   <p className="text-muted-foreground">
-                    {t("app.common.noOptionsFound")}
+                    {globalT("app.common.noOptionsFound")}
                   </p>
                   {allowCustom && searchValue && (
                     <Button
@@ -225,7 +214,7 @@ export function AutocompleteField({
                       className="mt-2"
                       onClick={() => handleCustomValue(searchValue)}
                     >
-                      {t("app.common.useCustomValue", {
+                      {globalT("app.common.useCustomValue", {
                         value: searchValue,
                       })}
                     </Button>
@@ -239,7 +228,7 @@ export function AutocompleteField({
                     key={category}
                     heading={
                       category !== FormFieldCategory.OTHER.toString()
-                        ? t(
+                        ? globalT(
                             CATEGORY_TRANSLATION_KEYS[
                               category as FormFieldCategory
                             ] ||
@@ -276,7 +265,7 @@ export function AutocompleteField({
                       className="flex items-center justify-between"
                     >
                       <span>
-                        {t("app.common.useCustomValue", {
+                        {globalT("app.common.useCustomValue", {
                           value: searchValue,
                         })}
                       </span>

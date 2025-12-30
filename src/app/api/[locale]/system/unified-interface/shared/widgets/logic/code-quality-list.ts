@@ -39,6 +39,7 @@ export interface CodeQualitySummary {
 export interface ProcessedCodeQualityList {
   items: CodeQualityItem[];
   groupBy?: "file" | "severity" | "rule";
+  showSummary?: boolean;
 }
 
 /**
@@ -76,6 +77,10 @@ export function extractCodeQualityListData(
       "groupBy" in value && typeof value.groupBy === "string"
         ? value.groupBy
         : undefined;
+    const showSummary =
+      "showSummary" in value && typeof value.showSummary === "boolean"
+        ? value.showSummary
+        : undefined;
 
     const validItems = items
       .map((item: WidgetData) => validateCodeQualityItem(item))
@@ -91,6 +96,7 @@ export function extractCodeQualityListData(
         groupBy === "file" || groupBy === "severity" || groupBy === "rule"
           ? groupBy
           : undefined,
+      showSummary,
     };
   }
 

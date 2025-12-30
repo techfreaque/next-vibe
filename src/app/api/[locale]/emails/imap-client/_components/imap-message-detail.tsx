@@ -30,6 +30,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
+import messageDefinitions from "@/app/api/[locale]/emails/imap-client/messages/[id]/definition";
 import { useImapMessageById } from "@/app/api/[locale]/emails/imap-client/messages/[id]/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
@@ -201,12 +202,8 @@ export function ImapMessageDetail({
 
               <EndpointFormField
                 control={messageEndpoint.create?.form.control}
+                endpoint={messageDefinitions.GET}
                 name="subject"
-                config={{
-                  type: "text",
-                  label: "app.admin.emails.imap.messages.subject",
-                  placeholder: "app.admin.emails.imap.messages.subject",
-                }}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -216,11 +213,8 @@ export function ImapMessageDetail({
 
               <EndpointFormField
                 control={messageEndpoint.create?.form.control}
+                endpoint={messageDefinitions.GET}
                 name="isRead"
-                config={{
-                  type: "checkbox",
-                  label: "app.admin.emails.imap.messages.markAsRead",
-                }}
                 theme={{
                   style: "none",
                   showAllRequired: false,
@@ -230,11 +224,8 @@ export function ImapMessageDetail({
 
               <EndpointFormField
                 control={messageEndpoint.create?.form.control}
+                endpoint={messageDefinitions.GET}
                 name="isFlagged"
-                config={{
-                  type: "checkbox",
-                  label: "app.admin.emails.imap.messages.flagged",
-                }}
                 theme={{
                   style: "none",
                   showAllRequired: false,

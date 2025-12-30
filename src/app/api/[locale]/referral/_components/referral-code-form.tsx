@@ -38,7 +38,8 @@ export function ReferralCodeForm({
         <EndpointFormField
           name="code"
           control={form.control}
-          endpointFields={referralDefinitions.POST.fields}
+          endpoint={referralDefinitions.POST}
+          locale={locale}
           theme={{
             style: "none",
             showAllRequired: false,
@@ -48,7 +49,8 @@ export function ReferralCodeForm({
         <EndpointFormField
           name="label"
           control={form.control}
-          endpointFields={referralDefinitions.POST.fields}
+          endpoint={referralDefinitions.POST}
+          locale={locale}
           theme={{
             style: "none",
             showAllRequired: false,

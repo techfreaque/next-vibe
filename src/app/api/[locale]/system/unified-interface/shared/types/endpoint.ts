@@ -505,12 +505,8 @@ export type InferSchemaFromFieldForMethod<
     ? F extends { usage: infer TUsage }
       ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
         ? TFieldSchema
-        : Usage extends FieldUsage.RequestData
-          ? z.ZodUndefined
-          : z.ZodNever
-      : Usage extends FieldUsage.RequestData
-        ? z.ZodUndefined
         : z.ZodNever
+      : z.ZodNever
     : // Handle ObjectField - process children based on their own usage
       F extends ObjectField<
           infer TChildren,
@@ -561,12 +557,8 @@ export type InferSchemaFromFieldForMethod<
                       ? TChild
                       : z.ZodNever
                 >
-              : Usage extends FieldUsage.RequestData
-                ? z.ZodUndefined
-                : z.ZodNever
-            : Usage extends FieldUsage.RequestData
-              ? z.ZodUndefined
               : z.ZodNever
+            : z.ZodNever
           : // Handle ArrayOptionalField
             F extends ArrayOptionalField<
                 infer TChild,
@@ -591,12 +583,8 @@ export type InferSchemaFromFieldForMethod<
                           : z.ZodNever
                     >
                   >
-                : Usage extends FieldUsage.RequestData
-                  ? z.ZodUndefined
-                  : z.ZodNever
-              : Usage extends FieldUsage.RequestData
-                ? z.ZodUndefined
                 : z.ZodNever
+              : z.ZodNever
             : z.ZodNever;
 
 /**
