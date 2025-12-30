@@ -581,6 +581,11 @@ export const translations = {
     },
     packageNotFound: "Package '{{targetPackage}}' not found in configuration",
     gitOperationFailed: "Git operation failed: {{error}}",
+    gitAddFailed: "Git add failed: {{error}}",
+    gitTagFailed: "Git tag '{{tag}}' failed: {{error}}",
+    gitPushFailed: "Git push to '{{remote}}' failed: {{error}}",
+    gitPushTagFailed:
+      "Git push tag '{{tag}}' to '{{remote}}' failed: {{error}}",
   },
   success: {
     title: "Release Complete",

@@ -718,7 +718,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
             parseError instanceof Error
               ? parseError.message
               : String(parseError),
-          stdoutPreview: stdout.slice(0, 200),
+          stdout,
         });
         return { issues };
       }

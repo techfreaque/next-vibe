@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
         "Użytkownik CLI z adresem e-mail {{email}} nie został znaleziony w bazie danych. Proszę najpierw uruchomić 'vibe seed'.",
       databaseError:
         "Błąd bazy danych podczas pobierania użytkownika CLI: {{error}}",
+      authNotAvailable: "Uwierzytelnianie nie jest dostępne",
     },
   },
   vibe: {

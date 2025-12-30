@@ -585,6 +585,11 @@ export const translations: typeof enTranslations = {
     },
     packageNotFound: "Pakiet '{{targetPackage}}' nie znaleziony w konfiguracji",
     gitOperationFailed: "Operacja git nie powiodła się: {{error}}",
+    gitAddFailed: "Git add nie powiodło się: {{error}}",
+    gitTagFailed: "Git tag '{{tag}}' nie powiódł się: {{error}}",
+    gitPushFailed: "Git push do '{{remote}}' nie powiódł się: {{error}}",
+    gitPushTagFailed:
+      "Git push tag '{{tag}}' do '{{remote}}' nie powiódł się: {{error}}",
   },
   success: {
     title: "Wydanie zakończone",

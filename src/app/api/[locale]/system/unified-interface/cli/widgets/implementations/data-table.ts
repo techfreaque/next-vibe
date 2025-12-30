@@ -18,7 +18,6 @@ import {
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import { getTranslator } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
@@ -345,19 +344,19 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<
 
     const firstRowObj = firstRow as TableRow;
     const columns: TableColumn<string>[] = Object.keys(firstRowObj).map(
-      (key) => {
-        const fieldType = this.detectFieldType(firstRowObj[key]);
-        return {
-          key,
-          label: key,
-          type: fieldType,
-          align: "left" as const,
-          formatter: this.getColumnFormatter(fieldType, context.options.locale),
-        };
-      },
+      (key) => ({
+        key,
+        label: key,
+        type: this.detectFieldType(firstRowObj[key]),
+        align: "left" as const,
+        formatter: this.getColumnFormatter(
+          this.detectFieldType(firstRowObj[key]),
+          context.options.locale,
+        ),
+      }),
     );
 
-    const config: TableRenderConfig<string> = {
+    const config = {
       columns,
       pagination: { enabled: false, pageSize: 50 },
       sorting: { enabled: false },

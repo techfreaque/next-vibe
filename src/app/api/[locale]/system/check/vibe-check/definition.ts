@@ -66,58 +66,6 @@ const { POST } = createEndpoint({
         z.boolean().optional(),
       ),
 
-      // Default: check.config.ts vibeCheck.skipLint ?? false
-      skipLint: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.vibeCheck.fields.skipLint.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.skipLint.description",
-          columns: 3,
-        },
-        z.boolean().optional(),
-      ),
-
-      // Default: check.config.ts vibeCheck.skipEslint ?? false
-      skipEslint: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.vibeCheck.fields.skipEslint.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.skipEslint.description",
-          columns: 3,
-        },
-        z.boolean().optional(),
-      ),
-
-      // Default: check.config.ts vibeCheck.skipOxlint ?? false
-      skipOxlint: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.vibeCheck.fields.skipOxlint.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.skipOxlint.description",
-          columns: 3,
-        },
-        z.boolean().optional(),
-      ),
-
-      // Default: check.config.ts vibeCheck.skipTypecheck ?? false
-      skipTypecheck: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.vibeCheck.fields.skipTypecheck.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.skipTypecheck.description",
-          columns: 3,
-        },
-        z.boolean().optional(),
-      ),
-
       // Default: false (not configurable in check.config.ts)
       createConfig: requestDataField(
         {
@@ -411,50 +359,30 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         fix: true,
-        skipLint: false,
-        skipEslint: false,
-        skipOxlint: false,
-        skipTypecheck: false,
         limit: 100,
         page: 1,
         maxFilesInSummary: 50,
       },
       success: {
         fix: false,
-        skipLint: false,
-        skipEslint: false,
-        skipOxlint: false,
-        skipTypecheck: false,
         limit: 100,
         page: 1,
         maxFilesInSummary: 50,
       },
       withErrors: {
         fix: true,
-        skipLint: false,
-        skipEslint: false,
-        skipOxlint: false,
-        skipTypecheck: false,
         limit: 100,
         page: 1,
         maxFilesInSummary: 50,
       },
       quickCheck: {
         fix: false,
-        skipLint: false,
-        skipEslint: false,
-        skipOxlint: false,
-        skipTypecheck: false,
         limit: 100,
         page: 1,
         maxFilesInSummary: 50,
       },
       specificPaths: {
         fix: true,
-        skipLint: false,
-        skipEslint: false,
-        skipOxlint: false,
-        skipTypecheck: false,
         paths: ["src/components", "src/utils"],
         limit: 100,
         page: 1,

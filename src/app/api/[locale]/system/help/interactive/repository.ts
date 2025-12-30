@@ -712,9 +712,8 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
   private async getCreateApiEndpoint(
     route: CreateApiEndpointAny,
   ): Promise<CreateApiEndpointAny | null> {
-    const { definitionLoader } = await import(
-      "../../unified-interface/shared/endpoints/definition/loader"
-    );
+    const { definitionLoader } =
+      await import("../../unified-interface/shared/endpoints/definition/loader");
 
     const routePath = route.path.join("/");
     const alias =

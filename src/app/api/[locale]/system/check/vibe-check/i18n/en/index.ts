@@ -1,7 +1,7 @@
 export const translations = {
   title: "Vibe Check",
   description:
-    "Run comprehensive code quality checks including linting and type checking",
+    "Run comprehensive code quality checks (Oxlint + ESLint + TypeScript). IMPORTANT: Use this instead of running 'eslint', 'tsc', or 'oxlint' directly - vibe-check runs all checks in parallel and is significantly faster. The goal is to fix ALL issues, not just some. Configure which checks to run in check.config.ts (skipLint, skipEslint, skipOxlint, skipTypecheck).",
   category: "Development Tools",
   tag: "quality",
 
@@ -43,45 +43,22 @@ export const translations = {
   fields: {
     fix: {
       label: "Auto Fix Issues",
-      description: "Automatically fix linting issues that can be auto-fixed",
-    },
-    skipLint: {
-      label: "Skip All Linting",
-      description: "Skip both ESLint and Oxlint checks",
-    },
-    skipEslint: {
-      label: "Skip ESLint",
-      description: "Skip ESLint checks (Oxlint will still run)",
-    },
-    skipOxlint: {
-      label: "Skip Oxlint",
-      description: "Skip Oxlint checks (ESLint will still run)",
-    },
-    skipTypecheck: {
-      label: "Skip Type Check",
-      description: "Skip TypeScript type checking",
+      description:
+        "Automatically fix linting issues that can be auto-fixed. Use this when you want to fix issues automatically.",
     },
     createConfig: {
       label: "Create Config",
       description:
-        "Create default check.config.ts configuration file if missing",
+        "Create default check.config.ts configuration file if missing. Use check.config.ts to configure skip options (skipEslint, skipOxlint, skipTypecheck).",
     },
     timeoutSeconds: {
       label: "Timeout (seconds)",
       description: "Maximum execution time in seconds (1-3600)",
     },
-    skipTrpcCheck: {
-      label: "Skip tRPC Check",
-      description: "Skip tRPC route validation",
-    },
-    quiet: {
-      label: "Quiet Mode",
-      description: "Reduce output verbosity",
-    },
     paths: {
       label: "Target Paths",
       description:
-        'Specific file paths or directories to check (string or array of strings, leave empty to check all files). Examples: "src/app" or ["src/components", "src/utils"]',
+        'Specific file paths or directories to check (string or array of strings). Leave empty to check ALL files in the project (recommended for comprehensive quality checks). Examples: "src/app" or ["src/components", "src/utils"]. Only specify paths if you need to focus on a subset of files.',
       placeholder: "e.g., src/app or src/components/Button.tsx",
       options: {
         src: "Source Directory (src/)",
@@ -94,7 +71,7 @@ export const translations = {
     limit: {
       label: "Limit",
       description:
-        "Number of issues to display per page (1-10000, default: 100)",
+        "Number of issues to display per page (1-10000, default: 100). IMPORTANT: This only controls display, not detection. Use high values (1000+) or pagination to see ALL issues - the goal is to fix everything, not just the first page.",
     },
     page: {
       label: "Page",

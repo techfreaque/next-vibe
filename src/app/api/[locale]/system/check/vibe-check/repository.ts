@@ -239,10 +239,9 @@ export class VibeCheckRepository {
       const effectiveData = {
         ...data,
         fix: data.fix ?? defaults.fix ?? false,
-        skipLint: data.skipLint ?? defaults.skipLint ?? false,
-        skipEslint: data.skipEslint ?? defaults.skipEslint ?? false,
-        skipOxlint: data.skipOxlint ?? defaults.skipOxlint ?? false,
-        skipTypecheck: data.skipTypecheck ?? defaults.skipTypecheck ?? false,
+        skipEslint: defaults.skipEslint ?? false,
+        skipOxlint: defaults.skipOxlint ?? false,
+        skipTypecheck: defaults.skipTypecheck ?? false,
         timeout: data.timeout ?? defaults.timeout ?? 3600,
         limit: data.limit ?? defaults.limit ?? 200,
         page: data.page ?? 1,
@@ -260,11 +259,7 @@ export class VibeCheckRepository {
         pathsToCheck.map(async (path) => {
           const promises: Promise<CheckResult>[] = [];
 
-          if (
-            !effectiveData.skipLint &&
-            !effectiveData.skipOxlint &&
-            configResult.config.oxlint.enabled
-          ) {
+          if (!effectiveData.skipOxlint && configResult.config.oxlint.enabled) {
             logger.info("Starting Oxlint check...");
             promises.push(
               this.runOxlintCheck(
@@ -282,11 +277,7 @@ export class VibeCheckRepository {
             );
           }
 
-          if (
-            !effectiveData.skipLint &&
-            !effectiveData.skipEslint &&
-            configResult.config.eslint.enabled
-          ) {
+          if (!effectiveData.skipEslint && configResult.config.eslint.enabled) {
             logger.info("Starting ESLint check...");
             const cacheDir = configResult.config.eslint.cachePath || "";
             promises.push(

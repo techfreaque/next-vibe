@@ -579,8 +579,6 @@ export interface FeatureSwitches {
 export interface VibeCheckConfig {
   /** Auto-fix issues (default: false) */
   fix?: boolean;
-  /** Skip all linting checks (default: false) */
-  skipLint?: boolean;
   /** Skip ESLint checks (default: false) */
   skipEslint?: boolean;
   /** Skip Oxlint checks (default: false) */

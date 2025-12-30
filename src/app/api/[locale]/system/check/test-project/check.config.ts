@@ -14,14 +14,13 @@
 import type {
   CheckConfig,
   EslintFlatConfigItem,
-} from "next-vibe/system/check/config/types";
+} from "@next-vibe/checker/system/check/config/types";
 
 // --------------------------------------------------------
 // Vibe Check Defaults
 // --------------------------------------------------------
 const vibeCheck: CheckConfig["vibeCheck"] = {
   fix: false,
-  skipLint: false,
   skipEslint: false,
   skipOxlint: false,
   skipTypecheck: false,
@@ -123,20 +122,12 @@ const oxlint: CheckConfig["oxlint"] = {
   ],
   jsPlugins: [
     ...(features.restrictedSyntax
-      ? [
-          "next-vibe/src/app/api/[locale]/system/check/oxlint/plugins/restricted-syntax/src/index.ts",
-        ]
+      ? ["@next-vibe/checker/oxlint-plugins/restricted-syntax.js"]
       : []),
     ...(features.jsxCapitalization
-      ? [
-          "next-vibe/src/app/api/[locale]/system/check/oxlint/plugins/jsx-capitalization/src/index.ts",
-        ]
+      ? ["@next-vibe/checker/oxlint-plugins/jsx-capitalization.js"]
       : []),
-    ...(features.i18n
-      ? [
-          "next-vibe/src/app/api/[locale]/system/check/oxlint/plugins/i18n/src/index.ts",
-        ]
-      : []),
+    ...(features.i18n ? ["@next-vibe/checker/oxlint-plugins/i18n.js"] : []),
   ],
   categories: {
     correctness: "error",

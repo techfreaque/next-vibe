@@ -115,7 +115,7 @@ const { POST } = createEndpoint({
   path: ["system", "builder"],
   title: "app.api.system.builder.post.title",
   description: "app.api.system.builder.post.description",
-  category: "app.api.system.server.category",
+  category: "app.api.system.builder.category",
   tags: [
     "app.api.system.builder.tags.build",
     "app.api.system.builder.tags.npm",
@@ -1833,7 +1833,7 @@ export function isViteBuildType(type: BuildType): type is ViteBuildType {
 
 /** Type guard for Bun builds */
 export function isBunBuildType(type: BuildType): type is BunBuildType {
-  return type === BunBuildTypeEnum.EXECUTABLE;
+  return Object.values(BunBuildTypeEnum).includes(type as BunBuildTypeEnum);
 }
 
 // ============================================================================
@@ -1923,11 +1923,10 @@ export interface BuildHookContext {
 export type BuildHook = (context: BuildHookContext) => Promise<void> | void;
 
 /** Full BuildConfig type - API config + runtime-only fields (hooks, env, profiles) */
-export interface BuildConfig
-  extends Omit<
-    ApiConfigObject,
-    "filesToCompile" | "filesOrFoldersToCopy" | "npmPackage"
-  > {
+export interface BuildConfig extends Omit<
+  ApiConfigObject,
+  "filesToCompile" | "filesOrFoldersToCopy" | "npmPackage"
+> {
   foldersToClean?: string[];
   filesToCompile?: FileToCompile[];
   filesOrFoldersToCopy?: CopyConfig[];

@@ -677,9 +677,15 @@ export class ReleaseExecutor implements IReleaseExecutor {
             continue;
           }
 
-          // Check for new commits
+          // Check for new commits (only skip if we're also doing git operations)
+          // If skipGitTag is true, allow publishing even without new commits
           if (
-            !gitService.hasNewCommitsSinceTag(versionInfo.lastTag, cwd, logger)
+            !gitService.hasNewCommitsSinceTag(
+              versionInfo.lastTag,
+              cwd,
+              logger,
+            ) &&
+            !skipGitTag
           ) {
             packagesProcessed.push({
               name: packageJson.name,
