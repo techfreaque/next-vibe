@@ -23,6 +23,12 @@ class MCPServeRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<MCPServeResponseInput>> {
+    // Log current directory (chdir already happened in vibe-runtime)
+    logger.info("[MCP] Starting MCP server", {
+      cwd: process.cwd(),
+      projectRoot: process.env.PROJECT_ROOT,
+    });
+
     const mcpServer = new MCPServer();
 
     // This never returns - the MCP server takes over stdin/stdout

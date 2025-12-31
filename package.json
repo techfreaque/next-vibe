@@ -27,7 +27,7 @@
     "lint": "echo redirecting to check && vibe check",
     "studio": "vibe studio",
     "typecheck": "echo redirecting to check && vibe check",
-    "mcp:test": "bunx @modelcontextprotocol/inspector vibe mcp",
+    "mcp:test": "bunx @modelcontextprotocol/inspector -e PROJECT_ROOT=$PWD bun $PWD/src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts mcp",
     "native": "expo start",
     "native:android": "expo run:android",
     "native:ios": "expo run:ios",

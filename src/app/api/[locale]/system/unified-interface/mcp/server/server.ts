@@ -46,6 +46,7 @@ export class MCPServer {
         version: "1.0.0",
         locale: locale,
         debug: logger.isDebugEnabled,
+        projectRoot: process.env.PROJECT_ROOT || process.cwd(),
       });
 
       // Create protocol handler

@@ -45,7 +45,7 @@ interface CliOptions {
   data?: string;
   userType?: string;
   locale: CountryLanguage;
-  output?: string;
+  output?: "json" | "table" | "pretty";
   verbose?: boolean;
   debug?: boolean;
   interactive?: boolean;
@@ -146,6 +146,12 @@ program
       // Enable MCP silent mode FIRST if this is an MCP command
       if (command === "mcp") {
         enableMcpSilentMode();
+
+        // Change to PROJECT_ROOT immediately if set
+        const projectRoot = process.env.PROJECT_ROOT;
+        if (projectRoot) {
+          process.chdir(projectRoot);
+        }
       }
 
       const debug = options.debug || options.verbose;
@@ -180,19 +186,16 @@ program
 
         performanceMonitor.mark("initEnd");
 
-        // If no command provided, start interactive mode
+        // If no command provided, show help
         if (!command) {
-          logger.info(t("app.api.system.unifiedInterface.cli.vibe.startingUp"));
-          await cliEntryPoint.executeCommand(
-            "interactive",
+          performanceMonitor.mark("routeStart");
+          const helpResult = await cliEntryPoint.executeCommand(
+            "help",
             {
               user: undefined, // Let route executor handle authentication via getCliUser()
               locale: options.locale,
               platform: cliPlatform,
-              output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
-                | "table"
-                | "pretty"
-                | "json",
+              output: options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT,
               verbose: debug ?? false,
               interactive: options.interactive ?? false,
               dryRun: options.dryRun ?? false,
@@ -200,6 +203,19 @@ program
             logger,
             t,
             options.locale,
+          );
+          performanceMonitor.mark("routeEnd");
+
+          performanceMonitor.mark("renderStart");
+          if (helpResult.formattedOutput) {
+            process.stdout.write(`${helpResult.formattedOutput}\n`);
+          }
+          performanceMonitor.mark("renderEnd");
+
+          await cliResourceManager.cleanupAndExit(
+            logger,
+            debug ?? false,
+            helpResult,
           );
           return;
         }
@@ -297,8 +313,3 @@ program
 
 // Parse command line arguments
 program.parse();
-
-// If no arguments provided, show help
-if (process.argv.slice(2).length === 0) {
-  program.help();
-}

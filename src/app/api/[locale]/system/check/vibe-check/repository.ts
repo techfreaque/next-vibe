@@ -13,6 +13,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { env } from "@/config/env";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -190,7 +191,9 @@ export class VibeCheckRepository {
   static async execute(
     data: VibeCheckRequestOutput,
     logger: EndpointLogger,
+    platform?: Platform,
   ): Promise<ResponseType<VibeCheckResponseOutput>> {
+    const isMCP = platform === Platform.MCP;
     try {
       const configResult = await ensureConfigReady(logger, data.createConfig);
 
@@ -339,6 +342,7 @@ export class VibeCheckRepository {
         effectiveData.limit,
         effectiveData.page,
         effectiveData.maxFilesInSummary,
+        isMCP, // Skip files list for compact MCP responses
       );
 
       logger.debug("[Vibe Check] Response summary", {
@@ -453,16 +457,13 @@ export class VibeCheckRepository {
     limit: number,
     page: number,
     maxFilesInSummary: number,
+    skipFiles = false,
   ): VibeCheckResponseOutput {
     const totalIssues = allIssues.length;
     const totalFiles = new Set(allIssues.map((issue) => issue.file)).size;
     const totalErrors = allIssues.filter(
       (issue) => issue.severity === "error",
     ).length;
-
-    const fileStats = this.buildFileStats(allIssues);
-    const allFiles = this.formatFileStats(fileStats);
-    const limitedFiles = allFiles.slice(0, maxFilesInSummary);
 
     const totalPages = Math.ceil(totalIssues / limit);
     const startIndex = (page - 1) * limit;
@@ -473,10 +474,24 @@ export class VibeCheckRepository {
     const displayedFiles = new Set(limitedIssues.map((issue) => issue.file))
       .size;
 
+    // Build files list only if not skipped (for compact MCP responses)
+    let files: Array<{
+      file: string;
+      errors: number;
+      warnings: number;
+      total: number;
+    }> | undefined;
+
+    if (!skipFiles) {
+      const fileStats = this.buildFileStats(allIssues);
+      const allFiles = this.formatFileStats(fileStats);
+      files = allFiles.slice(0, maxFilesInSummary);
+    }
+
     return {
       issues: {
         items: limitedIssues,
-        files: limitedFiles,
+        files,
         summary: {
           totalIssues,
           totalFiles,
