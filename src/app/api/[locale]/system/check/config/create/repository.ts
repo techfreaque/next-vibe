@@ -18,7 +18,11 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type {
+  Platform} from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import {
+  isCliPlatform
+} from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -36,7 +40,7 @@ export class ConfigCreateRepository {
     platform?: Platform,
   ): Promise<ResponseType<ConfigCreateResponseOutput>> {
     const { t } = simpleT(locale);
-    const isCLI = platform === Platform.CLI;
+    const isCLI = platform ? isCliPlatform(platform) : false;
 
     logger.debug("[Config Create] Repository received data", {
       data,
