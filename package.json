@@ -1,6 +1,6 @@
 {
   "name": "@next-vibe/checker",
-  "version": "1.0.34",
+  "version": "1.0.35",
   "main": "./.dist/bin/vibe-runtime.js",
   "author": "Max Brandstätter",
   "description": "TypeScript code quality checker with CLI and MCP support",
