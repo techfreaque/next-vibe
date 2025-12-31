@@ -1,3 +1,4 @@
+import { translations as configCreateTranslations } from "../../config/create/i18n/pl";
 import { translations as lintTranslations } from "../../lint/i18n/pl";
 import { translations as oxlintTranslations } from "../../oxlint/i18n/pl";
 import { translations as typecheckTranslations } from "../../typecheck/i18n/pl";
@@ -9,6 +10,9 @@ export const translations: typeof enTranslations = {
   lint: lintTranslations,
   typecheck: typecheckTranslations,
   vibeCheck: vibeCheckTranslations,
+  config: {
+    create: configCreateTranslations,
+  },
   codeQuality: {
     noIssues: "Nie znaleziono problemów z jakością kodu",
   },

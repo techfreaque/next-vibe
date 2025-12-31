@@ -20,14 +20,15 @@ import { default as endpointDefinition_POST_7 } from "../unified-interface/cli/s
 import { default as endpointDefinition_POST_8 } from "../check/vibe-check/definition";
 import { default as endpointDefinition_POST_9 } from "../check/typecheck/definition";
 import { default as endpointDefinition_POST_10 } from "../check/lint/definition";
-import { default as endpointDefinition_POST_11 } from "../check/oxlint/definition";
-import { default as endpointDefinition_POST_12 } from "../release-tool/definition";
-import { default as endpointDefinition_POST_13 } from "../builder/definition";
-import { default as endpointDefinition_POST_14 } from "../generators/generate-all/definition";
-import { default as endpointDefinition_POST_15 } from "../generators/endpoint/definition";
-import { default as endpointDefinition_POST_16 } from "../generators/route-handlers/definition";
-import { default as endpointDefinition_POST_17 } from "../generators/endpoints/definition";
-import { default as endpointDefinition_POST_18 } from "../generators/endpoints-index/definition";
+import { default as endpointDefinition_POST_11 } from "../check/config/create/definition";
+import { default as endpointDefinition_POST_12 } from "../check/oxlint/definition";
+import { default as endpointDefinition_POST_13 } from "../release-tool/definition";
+import { default as endpointDefinition_POST_14 } from "../builder/definition";
+import { default as endpointDefinition_POST_15 } from "../generators/generate-all/definition";
+import { default as endpointDefinition_POST_16 } from "../generators/endpoint/definition";
+import { default as endpointDefinition_POST_17 } from "../generators/route-handlers/definition";
+import { default as endpointDefinition_POST_18 } from "../generators/endpoints/definition";
+import { default as endpointDefinition_POST_19 } from "../generators/endpoints-index/definition";
 
 /**
  * Singleton instance for endpoints registry
@@ -100,43 +101,48 @@ function initializeEndpoints(): Record<string, ApiSection> {
   );
   setNestedPath(
     endpoints,
-    ["system", "check", "oxlint", "POST"],
+    ["system", "check", "config", "create", "POST"],
     endpointDefinition_POST_11.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "release-tool", "POST"],
+    ["system", "check", "oxlint", "POST"],
     endpointDefinition_POST_12.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "builder", "POST"],
+    ["system", "release-tool", "POST"],
     endpointDefinition_POST_13.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "generators", "generate-all", "POST"],
+    ["system", "builder", "POST"],
     endpointDefinition_POST_14.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "generators", "endpoint", "POST"],
+    ["system", "generators", "generate-all", "POST"],
     endpointDefinition_POST_15.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "generators", "route-handlers", "POST"],
+    ["system", "generators", "endpoint", "POST"],
     endpointDefinition_POST_16.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "generators", "endpoints", "POST"],
+    ["system", "generators", "route-handlers", "POST"],
     endpointDefinition_POST_17.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "generators", "endpoints-index", "POST"],
+    ["system", "generators", "endpoints", "POST"],
     endpointDefinition_POST_18.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "generators", "endpoints-index", "POST"],
+    endpointDefinition_POST_19.POST,
   );
 
   endpointsInstance = endpoints;

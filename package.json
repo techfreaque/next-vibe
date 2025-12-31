@@ -110,12 +110,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/techfreaque/next-vibe.git"
+    "url": "git+https://github.com/techfreaque/next-vibe.git",
+    "directory": "vibe-check"
   },
   "bugs": {
     "url": "https://github.com/techfreaque/next-vibe/issues"
   },
-  "homepage": "https://github.com/techfreaque/next-vibe#readme",
+  "homepage": "https://github.com/techfreaque/next-vibe/tree/vibe-check#readme",
   "engines": {
     "node": ">=18.0.0"
   }

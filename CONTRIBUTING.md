@@ -1,16 +1,16 @@
-# Contributing to NextVibe
+# Contributing to vibe-check
 
-Thank you for your interest in contributing to NextVibe! This document provides essential guidelines for contributing to the framework.
+Thank you for your interest in contributing to vibe-check! This document provides guidelines for contributing to the code quality checker.
 
 ---
 
 ## 🎯 Ways to Contribute
 
 - **Bug Reports** - Report issues you encounter
-- **Feature Requests** - Suggest new features
+- **Feature Requests** - Suggest new checker features or rules
 - **Code Contributions** - Submit pull requests
 - **Documentation** - Improve docs
-- **Examples** - Share example implementations
+- **Plugin Development** - Create custom Oxlint plugins
 - **Community Support** - Help others in discussions
 
 ---
@@ -21,23 +21,34 @@ Thank you for your interest in contributing to NextVibe! This document provides 
 
 ```bash
 # Fork on GitHub, then clone your fork
-git clone https://github.com/YOUR_USERNAME/next-vibe
+git clone https://github.com/YOUR_USERNAME/next-vibe.git
 cd next-vibe
+
+# Checkout the vibe-check branch
+git checkout vibe-check
 ```
 
-### 2. Install and Setup
+### 2. Install Dependencies
 
 ```bash
 bun install
 ```
 
-### 3. Start Development
+### 3. Build the Project
 
 ```bash
-vibe dev
+bun vibe builder
 ```
 
-**📚 See [Quick Start Guide](docs/guides/quickstart.md) for detailed setup instructions.**
+### 4. Test Your Setup
+
+```bash
+# Run vibe-check on itself
+bun vibe check
+
+# Test MCP server
+bun run mcp:test
+```
 
 ---
 
@@ -45,84 +56,87 @@ vibe dev
 
 ### Before Making Changes
 
-1. **Create a feature branch**
+1. **Create a feature branch from `vibe-check`**
    ```bash
+   git checkout vibe-check
+   git pull origin vibe-check
    git checkout -b feature/my-feature
-   # or
-   git checkout -b fix/my-bugfix
    ```
 
 2. **Ensure everything works**
    ```bash
-   vibe check  # Must pass with 0 errors
-   vibe test   # All tests must pass
+   bun vibe check  # Must pass with 0 errors
    ```
 
 ### While Developing
 
-1. **Follow existing patterns** - Check similar implementations in the codebase
+1. **Follow existing patterns** - Check similar implementations in:
+   - `src/app/api/[locale]/system/check/` - Check endpoints
+   - `oxlint-plugins/` - Custom Oxlint plugins
+   - `check.config.ts` - Configuration format
+
 2. **Run vibe check frequently** - Catch issues early
-3. **Write tests for new features** - Maintain code quality
+   ```bash
+   bun vibe check
+   ```
+
+3. **Test MCP integration** - If changing MCP tools
+   ```bash
+   bun run mcp:test
+   ```
 
 ### Before Committing
 
 1. **Run full validation**
    ```bash
-   vibe check   # Must pass with 0 errors, 0 warnings
-   vibe test    # All tests must pass
+   bun vibe check --fix  # Auto-fix issues
+   bun vibe check        # Must pass with 0 errors, 0 warnings
    ```
 
-2. **Add translations** (if user-facing) - See [i18n Patterns](docs/patterns/i18n.md)
-3. **Update documentation** (if needed)
-4. **Commit with clear message** (see [Commit Format](#commit-message-format))
+2. **Test the build**
+   ```bash
+   bun vibe builder
+   ```
+
+3. **Commit with clear message** (see [Commit Format](#commit-message-format))
 
 ---
 
 ## 📏 Code Standards
 
-**CRITICAL**: Before contributing, read these pattern guides:
+### Key Areas to Know
 
-- **[Endpoint Definitions](docs/patterns/definition.md)** - How to define APIs
-- **[Database Patterns](docs/patterns/database.md)** - Drizzle ORM and schemas
-- **[i18n Patterns](docs/patterns/i18n.md)** - Type-safe translations
-- **[Logger Patterns](docs/patterns/logger.md)** - Proper logging
-- **[Email Patterns](docs/patterns/email.md)** - React Email templates
-- **[Enum Patterns](docs/patterns/enum.md)** - Enum best practices
-- **[Seed Patterns](docs/patterns/seeds.md)** - Database seeding
-- **[Task Patterns](docs/patterns/tasks.md)** - Cron jobs
+- **Check Endpoints** (`src/app/api/[locale]/system/check/`)
+  - Each checker has a `definition.ts`, `repository.ts`, and `route.ts`
+  - Follow the existing pattern for consistency
 
-### Quick Rules
+- **Custom Oxlint Plugins** (`oxlint-plugins/`)
+  - Written in TypeScript, compiled to JS
+  - Follow Oxlint plugin API patterns
 
-✅ **Required:**
-- Use types from `definition.ts` only (never manual type definitions)
-- Use translation keys everywhere (no hardcoded strings)
-- Pass logger as parameter to repositories
-- Return `ResponseType` from all repository methods
-- Add `"server-only"` import to repository files
+- **Configuration** (`check.config.ts`)
+  - Maintain backward compatibility
+  - Document all new options
 
-❌ **Forbidden:**
-- Type assertions (`as`, `!`, `<Type>`)
-- `@ts-ignore` or `@ts-expect-error`
-- `console.log` (use logger instead)
-- Hardcoded strings (use translation keys)
-- Type guards (fix schema instead)
+- **MCP Integration** (`src/app/api/[locale]/system/unified-interface/mcp/`)
+  - Ensure tools are properly exposed
+  - Test with MCP inspector
 
-### File Structure
+### Required Practices
 
-```
-my-endpoint/
-├── definition.ts    # API contract
-├── repository.ts    # Business logic
-├── route.ts         # Handler wiring
-├── hooks.ts         # React hooks (optional)
-├── db.ts            # Database schema (optional)
-├── enum.ts          # Enums (optional)
-├── route.test.ts    # Tests (optional)
-└── i18n/            # Translations (optional)
-    ├── en/index.ts
-    ├── de/index.ts
-    └── pl/index.ts
-```
+✅ **Do:**
+- Use TypeScript strictly (no `any` types)
+- Add translation keys for user-facing messages
+- Pass logger to repository methods
+- Return structured response types
+- Test your changes thoroughly
+
+❌ **Don't:**
+- Use `@ts-ignore` or type assertions
+- Add `console.log` (use logger instead)
+- Hardcode error messages
+- Break existing CLI commands
+- Change MCP tool signatures without versioning
 
 ---
 
@@ -130,9 +144,28 @@ my-endpoint/
 
 All contributions must:
 
-1. **Pass vibe check** - `vibe check` shows 0 errors, 0 warnings
-2. **Pass all tests** - `vibe test` passes
-3. **Include tests for new features** (if applicable)
+1. **Pass vibe check** - `bun vibe check` shows 0 errors, 0 warnings
+2. **Build successfully** - `bun vibe builder` completes without errors
+3. **Work via CLI** - Test relevant `vibe check` commands
+4. **Work via MCP** - Test with MCP inspector (if MCP-related)
+
+### Testing Checklist
+
+```bash
+# 1. Code quality
+bun vibe check
+
+# 2. Build
+bun vibe builder
+
+# 3. CLI functionality
+bun vibe check
+bun vibe check --fix
+bun vibe check src/
+
+# 4. MCP (if applicable)
+bun run mcp:test
+```
 
 ---
 
@@ -141,13 +174,22 @@ All contributions must:
 Use [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
-feat: Add user export functionality
-fix: Correct translation key in login form
-docs: Update endpoint anatomy guide
-refactor: Simplify repository interface
-test: Add tests for user creation
-chore: Update dependencies
+feat(oxlint): add new i18n rule for component props
+fix(typecheck): handle monorepo tsconfig correctly
+docs(readme): update MCP setup instructions
+refactor(vibe-check): improve error aggregation
+test(lint): add tests for import sorting
+chore: update oxlint dependency to 1.35.0
 ```
+
+**Scope examples:**
+- `oxlint` - Oxlint checker
+- `lint` - ESLint checker
+- `typecheck` - TypeScript checker
+- `vibe-check` - Main vibe-check command
+- `mcp` - MCP server integration
+- `config` - Configuration handling
+- `cli` - CLI interface
 
 ---
 
@@ -161,49 +203,117 @@ git push origin feature/my-feature
 
 ### 2. Create Pull Request
 
+**Target Branch:** `vibe-check`
+
 **Include in PR description:**
-- What changes were made
-- Why the changes were needed
-- How to test the changes
-- Screenshots (if UI changes)
-- Related issues (if any)
+- **What** - Summary of changes
+- **Why** - Problem being solved or feature being added
+- **How** - Technical approach taken
+- **Testing** - How you tested the changes
+- **Screenshots/Examples** - If applicable (CLI output, MCP responses)
+- **Breaking Changes** - If any
+
+**Example:**
+
+```markdown
+## What
+Adds support for checking specific file patterns in vibe-check
+
+## Why
+Users want to check only certain file types without creating config files
+
+## How
+- Added `--pattern` flag to CLI
+- Extended repository to accept glob patterns
+- Updated MCP tool signature
+
+## Testing
+- Tested with various glob patterns
+- Verified MCP integration
+- All checks pass
+
+## Breaking Changes
+None
+```
 
 ### 3. Review Process
 
 Your PR will be reviewed for:
-- **Code quality** - Follows framework patterns
-- **Type safety** - No workarounds or type assertions
-- **Testing** - Adequate test coverage
-- **Documentation** - Clear and complete
-- **Translations** - All languages included
+- **Code quality** - Follows TypeScript and framework patterns
+- **Performance** - No performance regressions
+- **Compatibility** - Works with existing configs
+- **MCP compliance** - MCP tools work correctly
+- **Documentation** - Changes are documented
+
+---
+
+## 🔌 Adding New Features
+
+### Adding a New Checker
+
+1. Create directory: `src/app/api/[locale]/system/check/my-checker/`
+2. Add `definition.ts` - Define endpoint contract
+3. Add `repository.ts` - Implement checker logic
+4. Add `route.ts` - Wire up HTTP handler
+5. Add translations in `i18n/` subdirectories
+6. Register in `src/app/api/[locale]/system/generated/endpoints.ts`
+7. Test via CLI and MCP
+
+### Adding an Oxlint Plugin
+
+1. Create `oxlint-plugins/my-plugin.ts`
+2. Follow existing plugin structure
+3. Add configuration to `check.config.ts`
+4. Document the rules
+5. Test thoroughly
+
+### Extending Configuration
+
+1. Update `CheckConfig` type
+2. Add to `check.config.ts` example
+3. Handle backward compatibility
+4. Document in README
 
 ---
 
 ## 📚 Resources
 
 **Essential Documentation:**
-- [Quick Start](docs/guides/quickstart.md) - Get up and running
-- [Debugging Guide](docs/guides/debugging.md) - Debugging tips
-- [All Patterns](docs/patterns/) - Complete pattern documentation
-- [Unbottled.ai Example](docs/examples/unbottled-ai/UNBOTTLED_AI.md) - Reference application
+- [README.md](README.md) - Main documentation
+- [check.config.ts](check.config.ts) - Configuration reference
+- [Oxlint Documentation](https://oxc.rs/docs/guide/usage/linter.html)
+- [MCP Specification](https://modelcontextprotocol.io/)
 
 **Community:**
-- [GitHub Discussions](https://github.com/techfreaque/next-vibe/discussions) - Ask questions
-- [GitHub Issues](https://github.com/techfreaque/next-vibe/issues) - Report bugs
+- [GitHub Discussions](https://github.com/techfreaque/next-vibe/discussions)
+- [GitHub Issues](https://github.com/techfreaque/next-vibe/issues)
 - **Email**: max@a42.ch
+
+---
+
+## 📦 Package Publishing
+
+Only maintainers can publish. The package is published as `@next-vibe/checker`:
+
+```bash
+# Build and test
+bun vibe builder
+bun vibe check
+
+# Publish (maintainers only)
+npm publish --access public
+```
 
 ---
 
 ## 📄 License
 
-By contributing, you agree that your contributions will be licensed under:
-- **GPL-3.0** for framework core (`src/app/api/[locale]/` and `src/packages/`)
-- **MIT** for everything else
+By contributing, you agree that your contributions will be licensed under GPL-3.0-only.
 
 See [LICENSE](LICENSE) for details.
 
 ---
 
-**Thank you for contributing to NextVibe!** 🎉
+**Thank you for contributing to vibe-check!** 🎉
 
-Every contribution, no matter how small, helps make NextVibe better for everyone.
+Every contribution helps make code quality checking better for the TypeScript ecosystem.

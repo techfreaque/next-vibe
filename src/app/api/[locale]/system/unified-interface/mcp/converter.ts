@@ -113,9 +113,10 @@ export function endpointToMCPTool(
   locale: CountryLanguage,
 ): MCPTool {
   // Use first alias if available, otherwise fall back to full tool name using shared utility
-  const toolName = endpoint.aliases && endpoint.aliases.length > 0
-    ? endpoint.aliases[0]
-    : endpointToToolName(endpoint);
+  const toolName =
+    endpoint.aliases && endpoint.aliases.length > 0
+      ? endpoint.aliases[0]
+      : endpointToToolName(endpoint);
 
   // Translate description - use description or title
   const { t } = endpoint.scopedTranslation.scopedT(locale);

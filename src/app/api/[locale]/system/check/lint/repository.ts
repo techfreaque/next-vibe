@@ -78,8 +78,8 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<ApiResponseType<LintResponseOutput>> {
     try {
-      // Use unified config management - checks, creates if needed, and regenerates
-      const configResult = await ensureConfigReady(logger, data.createConfig);
+      // Use unified config management
+      const configResult = await ensureConfigReady(logger, false);
 
       if (!configResult.ready) {
         return success({

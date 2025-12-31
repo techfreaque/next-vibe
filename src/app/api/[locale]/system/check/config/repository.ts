@@ -472,7 +472,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         error: "load_failed",
         // eslint-disable-next-line i18next/no-literal-string
         message:
-          "check.config.ts could not be loaded. Run with --create-config to create a default configuration.",
+          "check.config.ts could not be loaded. Run npx @next-vibe/checker config-create to create a default configuration.",
         configPath,
       };
     }
@@ -658,11 +658,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
       await fs.writeFile(configPath, templateContent, "utf8");
 
-      logger.info("Created check.config.ts from template", {
-        path: configPath,
-        source: templatePath,
-      });
-
       // Also create .mcp.json
       const mcpResult = await this.createDefaultMcpConfig(logger);
       if (!mcpResult.success) {
@@ -702,11 +697,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         JSON.stringify(mcpConfig, null, 2),
         "utf8",
       );
-
-      logger.info("Created .mcp.json", {
-        path: mcpConfigPath,
-        projectRoot: process.cwd(),
-      });
 
       return { success: true, mcpConfigPath };
     } catch (error) {

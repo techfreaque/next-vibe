@@ -66,19 +66,6 @@ const { POST } = createEndpoint({
         z.boolean().optional(),
       ),
 
-      // Default: false (not configurable in check.config.ts)
-      createConfig: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.vibeCheck.fields.createConfig.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.createConfig.description",
-          columns: 3,
-        },
-        z.boolean().optional().default(false),
-      ),
-
       // Default: check.config.ts vibeCheck.timeout ?? 3600
       timeout: requestDataField(
         {

@@ -93,18 +93,6 @@ const { POST } = createEndpoint({
         z.coerce.number().min(1).max(3600).default(3600),
       ),
 
-      createConfig: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.oxlint.fields.createConfig.label",
-          description:
-            "app.api.system.check.oxlint.fields.createConfig.description",
-          columns: 3,
-        },
-        z.boolean().default(false),
-      ),
-
       limit: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
