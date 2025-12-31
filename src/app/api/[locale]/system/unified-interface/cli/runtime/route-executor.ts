@@ -347,17 +347,18 @@ export class RouteDelegationHandler {
     // Merge CLI data with provided data using registry
     const contextData = context.data;
     if (contextData || (cliData && Object.keys(cliData).length > 0)) {
-      // Merge context options (interactive, dryRun) into data if not already set
+      // Merge context options (interactive, dryRun) into data only if explicitly set
+      // Don't merge if they're CLI defaults to allow schema defaults to apply
       const optionsData: Partial<InputData> = {};
-      if (context.options?.interactive !== undefined) {
-        optionsData.interactive = context.options.interactive;
+      if (context.options?.interactive === true) {
+        optionsData.interactive = true;
       }
-      if (context.options?.dryRun !== undefined) {
-        optionsData.dryRun = context.options.dryRun;
+      if (context.options?.dryRun === true) {
+        optionsData.dryRun = true;
       }
 
       const mergedData = routeExecutionExecutor.mergeData(
-        optionsData || {},
+        optionsData,
         contextData || {},
         cliData || {},
       );
@@ -402,27 +403,19 @@ export class RouteDelegationHandler {
       logger.info("📝 Request Data:");
       const formData = await this.generateFormFromEndpoint(endpoint, "request");
 
-      // Merge context options into form data
+      // Merge context options only if explicitly set
       const optionsData: Partial<InputData> = {};
-      if (context.options?.interactive !== undefined) {
-        optionsData.interactive = context.options.interactive;
+      if (context.options?.interactive === true) {
+        optionsData.interactive = true;
       }
-      if (context.options?.dryRun !== undefined) {
-        optionsData.dryRun = context.options.dryRun;
+      if (context.options?.dryRun === true) {
+        optionsData.dryRun = true;
       }
 
       inputData.data = routeExecutionExecutor.mergeData(optionsData, formData);
     } else {
-      // No CLI data and interactive mode disabled - use empty data
-      const optionsData: Partial<InputData> = {};
-      if (context.options?.interactive !== undefined) {
-        optionsData.interactive = context.options.interactive;
-      }
-      if (context.options?.dryRun !== undefined) {
-        optionsData.dryRun = context.options.dryRun;
-      }
-
-      inputData.data = optionsData;
+      // No CLI data - let schema defaults apply (don't force CLI defaults)
+      inputData.data = {};
     }
 
     // Collect URL parameters if needed

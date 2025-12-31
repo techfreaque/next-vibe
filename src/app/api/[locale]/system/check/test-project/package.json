@@ -5,6 +5,8 @@
   "scripts": {
     "check": "bun ../../unified-interface/cli/vibe-runtime.ts check",
     "cc": "bun ../../unified-interface/cli/vibe-runtime.ts config-create",
+    "check-b": "bun ../../../../../../../.dist/bin/vibe-runtime.js check",
+    "cc-b": "bun ../../../../../../../.dist/bin/vibe-runtime.js config-create",
     "check-r": "v check",
     "cc-r": "v config-create"
   },
