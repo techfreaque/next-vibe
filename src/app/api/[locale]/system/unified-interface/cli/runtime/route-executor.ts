@@ -844,7 +844,15 @@ export class RouteDelegationHandler {
     }
 
     // Map named arguments to data fields (convert kebab-case to camelCase)
+    // Skip CLI-level options that are already in context.options
+    const cliLevelOptions = ["interactive", "dryRun", "dry-run", "verbose", "debug", "output", "locale", "userType", "user-type"];
+
     for (const [key, value] of Object.entries(namedArgs)) {
+      // Skip CLI-level options
+      if (cliLevelOptions.includes(key)) {
+        continue;
+      }
+
       // Convert kebab-case to camelCase (e.g., skip-generation -> skipGeneration)
       const camelCaseKey = key.replaceAll(
         /-([a-z])/g,

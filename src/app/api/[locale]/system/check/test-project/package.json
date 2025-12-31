@@ -8,9 +8,10 @@
     "check-b": "bun ../../../../../../../.dist/bin/vibe-runtime.js check",
     "cc-b": "bun ../../../../../../../.dist/bin/vibe-runtime.js config-create",
     "check-r": "v check",
-    "cc-r": "v config-create"
+    "cc-r": "v config-create",
+    "r-version": "v --version"
   },
   "dependencies": {
-    "@next-vibe/checker": "^1.0.29"
+    "@next-vibe/checker": "^1.0.31"
   }
 }
