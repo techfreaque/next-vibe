@@ -269,19 +269,19 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<
       }
     } else {
       // Render as command or general item (simple mode)
-      // Message (description)
-      if (item.message) {
-        parts.push(item.message);
-      }
-
-      // Rule (command alias) in square brackets
+      // Rule (command name) first - styled and padded
       if (
         item.rule &&
         typeof item.rule === "string" &&
         item.rule !== "unknown"
       ) {
-        const ruleText = this.styleText(`[${item.rule}]`, "dim", context);
-        parts.push(ruleText);
+        const commandName = this.styleText(item.rule.padEnd(20), "bold", context);
+        parts.push(commandName);
+      }
+
+      // Message (description) second
+      if (item.message) {
+        parts.push(item.message);
       }
     }
 

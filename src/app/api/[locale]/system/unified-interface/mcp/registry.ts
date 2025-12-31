@@ -5,7 +5,10 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -13,7 +16,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { TParams } from "@/i18n/core/static-types";
 
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
 import { routeExecutionExecutor } from "../shared/endpoints/route/executor";
@@ -290,29 +292,13 @@ export class MCPRegistry implements IMCPRegistry {
       ? t(result.message, result.messageParams)
       : t("app.api.system.unifiedInterface.mcp.registry.toolExecutionFailed");
 
-    // Build detailed error information for debugging
     const errorDetails: {
-      toolName: string;
-      errorType?: string;
-      message?: string;
-      messageParams?: TParams;
-      cause?: string;
-      causeType?: string;
-      causeParams?: TParams;
+      tool: string;
+      error: ErrorResponseType;
     } = {
-      toolName,
-      errorType: result.errorType?.errorKey,
-      message: result.message,
-      messageParams: result.messageParams,
+      tool: toolName,
+      error: result,
     };
-
-    // Include full cause chain for better debugging
-    if (result.cause) {
-      errorDetails.cause = result.cause.message;
-      errorDetails.causeType = result.cause.errorType?.errorKey;
-      errorDetails.causeParams = result.cause.messageParams;
-    }
-
     return this.fail({
       error: errorMessage,
       code: MCPErrorCode.TOOL_EXECUTION_FAILED,

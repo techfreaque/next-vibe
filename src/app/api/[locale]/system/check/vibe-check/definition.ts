@@ -269,19 +269,21 @@ const { POST } = createEndpoint({
             ),
           ),
 
-          // === FILES LIST ===
+          // === FILES LIST (optional for compact MCP responses) ===
           files: responseField(
             {
               type: WidgetType.CODE_QUALITY_FILES,
             },
-            z.array(
-              z.object({
-                file: z.string(),
-                errors: z.number(),
-                warnings: z.number(),
-                total: z.number(),
-              }),
-            ),
+            z
+              .array(
+                z.object({
+                  file: z.string(),
+                  errors: z.number(),
+                  warnings: z.number(),
+                  total: z.number(),
+                }),
+              )
+              .optional(),
           ),
 
           // === SUMMARY STATS ===

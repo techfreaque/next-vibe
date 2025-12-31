@@ -14,12 +14,14 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { definitionsRegistry } from "../../system/unified-interface/shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "../../system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "../../system/unified-interface/shared/types/platform";
 import { endpointToToolName } from "../../system/unified-interface/shared/utils/path";
 import type { CreateApiEndpointAny } from "../unified-interface/shared/types/endpoint";
+import { getTranslatorFromEndpoint } from "../unified-interface/shared/widgets/utils/field-helpers";
 import type { HelpRequestOutput, HelpResponseOutput } from "./definition";
 
 /**
@@ -34,8 +36,9 @@ class HelpRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     platform: Platform,
+    locale: CountryLanguage,
   ): ResponseType<HelpResponseOutput> {
-    logger.info("Generating help information", {
+    logger.debug("Generating help information", {
       command: data.command || "all",
     });
 
@@ -66,13 +69,13 @@ class HelpRepository {
         }
 
         const response = this.formatCommandHelp(command);
-        logger.info("Command help generated successfully");
+        logger.debug("Command help generated successfully");
         return success(response);
       }
 
       // Show general help with usage information
-      const response = this.formatGeneralHelp();
-      logger.info("General help generated successfully");
+      const response = this.formatGeneralHelp(commands, locale);
+      logger.debug("General help generated successfully");
       return success(response);
     } catch (error) {
       const parsedError = parseError(error);
@@ -148,27 +151,74 @@ class HelpRepository {
   /**
    * Format general help with usage information
    */
-  private formatGeneralHelp(): HelpResponseOutput {
+  private formatGeneralHelp(
+    commands: CreateApiEndpointAny[],
+    locale: CountryLanguage,
+  ): HelpResponseOutput {
+    // Helper to get display name (first alias or tool name)
+    const getDisplayName = (cmd: CreateApiEndpointAny): string =>
+      cmd.aliases && cmd.aliases.length > 0
+        ? cmd.aliases[0]
+        : endpointToToolName(cmd);
+
+    // Prioritize important commands
+    const priorityCommands = ["check", "list", "help", "builder"];
+    const sortedCommands = commands.toSorted((a, b) => {
+      const aName = getDisplayName(a);
+      const bName = getDisplayName(b);
+      const aPriority = priorityCommands.indexOf(aName);
+      const bPriority = priorityCommands.indexOf(bName);
+
+      // If both are priority, sort by priority order
+      if (aPriority !== -1 && bPriority !== -1) {
+        return aPriority - bPriority;
+      }
+      // If only a is priority, put it first
+      if (aPriority !== -1) {
+        return -1;
+      }
+      // If only b is priority, put it first
+      if (bPriority !== -1) {
+        return 1;
+      }
+      // Otherwise sort alphabetically
+      return aName.localeCompare(bName);
+    });
+
+    // Get top 5 most common/important commands with translated descriptions
+    const commonCommands = sortedCommands.slice(0, 5).map((cmd) => {
+      const { t } = getTranslatorFromEndpoint(cmd)(locale);
+      return {
+        command: getDisplayName(cmd),
+        description: cmd.description
+          ? t(cmd.description)
+          : "No description available",
+      };
+    });
+
+    // Get example commands (first 3) with translated descriptions
+    const exampleCommands = sortedCommands.slice(0, 3).map((cmd) => {
+      const { t } = getTranslatorFromEndpoint(cmd)(locale);
+      const displayName = getDisplayName(cmd);
+      return {
+        command: `vibe ${displayName}`,
+        description: cmd.description
+          ? t(cmd.description)
+          : `Run ${displayName}`,
+      };
+    });
+
     return {
       header: {
-        title: "Vibe CLI - Next-generation API execution tool",
+        title: "Vibe CLI - Code Quality & Build Tool",
         description:
-          "Command-line interface for Next-Vibe API with real-time execution",
+          "Fast, parallel code quality checks (Oxlint + ESLint + TypeScript) and build tooling for TypeScript/React projects",
       },
       usage: {
         patterns: ["vibe <command> [options]", "vibe <command> --help"],
       },
       commonCommands: {
-        items: [
-          { command: "list", description: "List all available commands" },
-          {
-            command: "help <cmd>",
-            description: "Show help for a specific command",
-          },
-          { command: "check", description: "Run code quality checks" },
-          { command: "db:migrate", description: "Run database migrations" },
-          { command: "test", description: "Run test suite" },
-        ],
+        items: commonCommands,
       },
       details: {
         // Empty for general help
@@ -198,12 +248,7 @@ class HelpRepository {
         ],
       },
       examples: {
-        items: [
-          { command: "vibe list", description: "List all commands" },
-          { command: "vibe check src/", description: "Run checks" },
-          { command: "vibe db:migrate", description: "Run migrations" },
-          { command: "vibe help check", description: "Get command help" },
-        ],
+        items: exampleCommands,
       },
     };
   }

@@ -21,7 +21,7 @@
     "check": "bun run vibe check",
     "lint": "echo redirecting to check && vibe check",
     "typecheck": "echo redirecting to check && vibe check",
-    "mcp:test": "bunx @modelcontextprotocol/inspector bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts mcp"
+    "mcp:test": "bunx @modelcontextprotocol/inspector -e PROJECT_ROOT=$PWD bun $PWD/src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts mcp"
   },
   "contributors": [
     {

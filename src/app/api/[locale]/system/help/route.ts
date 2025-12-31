@@ -9,8 +9,8 @@ import { helpRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: helpEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, logger, platform }) => {
-      return helpRepository.execute(data, user, logger, platform);
+    handler: ({ data, user, logger, platform, locale }) => {
+      return helpRepository.execute(data, user, logger, platform, locale);
     },
   },
 });

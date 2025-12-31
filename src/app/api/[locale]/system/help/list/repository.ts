@@ -38,7 +38,7 @@ class HelpListRepository {
     logger: EndpointLogger,
     platform: Platform,
   ): ResponseType<HelpListResponseOutput> {
-    logger.info("Discovering available commands");
+    logger.debug("Discovering available commands");
 
     try {
       // Use unified endpoint listing service (filtered by user permissions from JWT)
@@ -65,13 +65,18 @@ class HelpListRepository {
       const formattedCommands = sortedEndpoints.map((ep) => {
         const { t } = getTranslatorFromEndpoint(ep)(locale);
 
-        const toolName = ep.path.join("_");
+        // Use first alias if available, otherwise use full tool name
+        const displayName = ep.aliases && ep.aliases.length > 0
+          ? ep.aliases[0]
+          : ep.path.join("_");
+
         const translatedDescription =
           data.showDescriptions && ep.description
             ? t(ep.description)
-            : toolName;
+            : displayName;
+
         return {
-          alias: toolName,
+          alias: displayName,
           message: translatedDescription,
           description:
             data.showDescriptions && ep.description
@@ -79,13 +84,15 @@ class HelpListRepository {
               : undefined,
           category: ep.category ? t(ep.category) : "",
           aliases:
-            data.showAliases && ep.aliases ? ep.aliases.join(", ") : undefined,
+            data.showAliases && ep.aliases && ep.aliases.length > 1
+              ? ep.aliases.slice(1).join(", ")
+              : undefined,
           // Add display name for GROUPED_LIST
-          rule: toolName,
+          rule: displayName,
         };
       });
 
-      logger.info("Command discovery completed", {
+      logger.debug("Command discovery completed", {
         totalCommands: formattedCommands.length,
         filteredBy: data.category || "none",
       });
