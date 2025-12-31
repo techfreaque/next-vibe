@@ -89,6 +89,18 @@ const { POST } = createEndpoint({
         z.boolean().optional(),
       ),
 
+      enableEslint: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.check.config.create.fields.enableEslint.label",
+          description:
+            "app.api.system.check.config.create.fields.enableEslint.description",
+          columns: 6,
+        },
+        z.boolean().optional(),
+      ),
+
       enableReactRules: requestDataField(
         {
           type: WidgetType.FORM_FIELD,

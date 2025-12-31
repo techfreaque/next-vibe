@@ -21,6 +21,11 @@ export const translations = {
       description:
         "Add/update package.json scripts for check, lint, and typecheck commands",
     },
+    enableEslint: {
+      label: "Enable ESLint",
+      description:
+        "Enable ESLint for rules not yet supported by Oxlint (import sorting, React hooks). Disable for maximum speed if you don't need these rules.",
+    },
     enableReactRules: {
       label: "Enable React Rules",
       description:
