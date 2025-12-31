@@ -254,7 +254,8 @@ export class ReleaseExecutor implements IReleaseExecutor {
         );
         const packages = config.packages ?? [];
         for (const pkg of packages) {
-          if (pkg.updateDeps === true || pkg.updateDeps === "force") {
+          // Skip dependency updates in CI mode
+          if ((pkg.updateDeps === true || pkg.updateDeps === "force") && !isCI) {
             const cwd = join(originalCwd, pkg.directory);
             const pkgJsonResult = packageService.getPackageJson(cwd, logger);
             if (pkgJsonResult.success) {
@@ -712,24 +713,28 @@ export class ReleaseExecutor implements IReleaseExecutor {
             }
           }
 
-          // Update version
-          const updateResult = packageService.updatePackageVersion(
-            pkg,
-            versionInfo.newVersion,
-            cwd,
-            originalCwd,
-            logger,
-          );
-          if (handleFailure(updateResult, "Version update")) {
-            continue;
-          }
+          // Update version (skip in CI mode - version should already be set)
+          if (!isCI) {
+            const updateResult = packageService.updatePackageVersion(
+              pkg,
+              versionInfo.newVersion,
+              cwd,
+              originalCwd,
+              logger,
+            );
+            if (handleFailure(updateResult, "Version update")) {
+              continue;
+            }
 
-          // Update version in other files
-          versionService.updateVariableStringValue(
-            logger,
-            versionInfo.newVersion,
-            releaseConfig,
-          );
+            // Update version in other files
+            versionService.updateVariableStringValue(
+              logger,
+              versionInfo.newVersion,
+              releaseConfig,
+            );
+          } else {
+            logger.vibe(formatSkip("Skipping version bump (CI mode - using existing version)"));
+          }
 
           // Zip folders
           if (releaseConfig.foldersToZip) {

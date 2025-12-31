@@ -20,7 +20,7 @@ const releaseConfig: ReleaseFileConfig = {
 
   // Global version for synchronized releases (optional)
   // When set, all packages will use this version
-  globalVersion: "1.0.28",
+  globalVersion: "1.0.29",
 
   // Branch configuration
   branch: {
