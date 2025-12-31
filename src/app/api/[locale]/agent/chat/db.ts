@@ -140,8 +140,10 @@ export interface MessageMetadata {
   // Attachments
   attachments?: {
     id: string;
-    type: string;
     url: string;
+    filename: string;
+    mimeType: string;
+    size: number;
   }[];
 
   // Voting

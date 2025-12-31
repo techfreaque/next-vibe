@@ -80,7 +80,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     startRetry: onStartRetry,
     startAnswer: onStartAnswer,
     cancelEditorAction: onCancelAction,
-    handleBranchEdit: onBranchEdit,
     setAnswerContent: onSetAnswerContent,
     // Collapse state
     collapseState,
@@ -131,14 +130,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
       });
     }
   }, [systemPrompt, logger]);
-
-  // Wrap handleBranchEdit to pass branchMessage as the third parameter
-  const handleBranch = useCallback(
-    async (messageId: string, content: string) => {
-      await onBranchEdit(messageId, content, branchMessage);
-    },
-    [onBranchEdit, branchMessage],
-  );
 
   // Group messages by sequence for proper display
   const messageGroups = groupMessagesBySequence(messages);
@@ -296,7 +287,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   <Div className="flex justify-end">
                     <MessageEditor
                       message={message}
-                      onBranch={handleBranch}
+                      onBranch={branchMessage}
                       onCancel={onCancelAction}
                       onModelChange={onModelChange}
                       onCharacterChange={onCharacterChange}
@@ -323,7 +314,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                       }
                       onConfirm={(): void => {
                         if (onRetryMessage) {
-                          void onRetryMessage(message.id);
+                          void onRetryMessage(message.id, undefined);
                         }
                         onCancelAction();
                       }}
@@ -436,7 +427,11 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   inputPlaceholderKey="app.chat.linearMessageView.answerModal.inputPlaceholder"
                   onConfirm={async (): Promise<void> => {
                     if (onAnswerAsModel) {
-                      await onAnswerAsModel(message.id, answerContent);
+                      await onAnswerAsModel(
+                        message.id,
+                        answerContent,
+                        undefined,
+                      );
                     }
                     onCancelAction();
                   }}

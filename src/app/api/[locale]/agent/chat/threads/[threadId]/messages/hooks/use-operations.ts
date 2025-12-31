@@ -39,6 +39,8 @@ export interface MessageOperations {
       };
       /** Audio input for voice-to-voice mode - bypasses text content */
       audioInput?: { file: File };
+      /** File attachments */
+      attachments: File[];
     },
     onThreadCreated?: (
       threadId: string,
@@ -46,14 +48,23 @@ export interface MessageOperations {
       subFolderId: string | null,
     ) => void,
   ) => Promise<void>;
-  retryMessage: (messageId: string) => Promise<void>;
+  retryMessage: (
+    messageId: string,
+    attachments: File[] | undefined,
+  ) => Promise<void>;
   branchMessage: (
     messageId: string,
     newContent: string,
     /** Optional audio input for voice-to-voice mode */
-    audioInput?: { file: File },
+    audioInput: { file: File } | undefined,
+    /** File attachments */
+    attachments: File[] | undefined,
   ) => Promise<void>;
-  answerAsAI: (messageId: string, content: string) => Promise<void>;
+  answerAsAI: (
+    messageId: string,
+    content: string,
+    attachments: File[] | undefined,
+  ) => Promise<void>;
   deleteMessage: (messageId: string) => Promise<void>;
   voteMessage: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
   stopGeneration: () => void;
@@ -131,6 +142,8 @@ export function useMessageOperations(
         };
         /** Audio input for voice-to-voice mode - bypasses text content */
         audioInput?: { file: File };
+        /** File attachments */
+        attachments: File[];
       },
       onThreadCreated?: (
         threadId: string,
@@ -266,6 +279,22 @@ export function useMessageOperations(
           );
         }
 
+        // Handle file attachments for incognito mode
+        if (
+          currentRootFolderId === DefaultFolderId.INCOGNITO &&
+          params.attachments.length > 0
+        ) {
+          await createIncognitoMessageWithAttachments(
+            threadIdToUse ?? "",
+            content,
+            parentMessageId,
+            settings.selectedModel,
+            settings.selectedCharacter,
+            params.attachments,
+            logger,
+          );
+        }
+
         // Get voice mode settings for streaming TTS
         // Call mode is stored per model+character combination
         const voiceModeSettings = useVoiceModeStore.getState().settings;
@@ -314,6 +343,12 @@ export function useMessageOperations(
               })) ?? null,
             toolConfirmation: params.toolConfirmation ?? null,
             messageHistory: messageHistory ?? null,
+            attachments:
+              currentRootFolderId === DefaultFolderId.INCOGNITO
+                ? null
+                : params.attachments.length > 0
+                  ? params.attachments
+                  : null,
             voiceMode: effectiveVoiceMode,
             audioInput: params.audioInput ?? { file: null },
           },
@@ -388,7 +423,10 @@ export function useMessageOperations(
   );
 
   const retryMessage = useCallback(
-    async (messageId: string): Promise<void> => {
+    async (
+      messageId: string,
+      attachments: File[] | undefined,
+    ): Promise<void> => {
       logger.debug("Message operations: Retrying message", { messageId });
 
       const message = chatStore.messages[messageId];
@@ -444,6 +482,8 @@ export function useMessageOperations(
             messageHistory: messageHistory ?? null,
             voiceMode: null,
             audioInput: { file: null },
+            attachments:
+              attachments && attachments.length > 0 ? attachments : null,
           },
           {
             onContentDone: createCreditUpdateCallback(
@@ -476,7 +516,8 @@ export function useMessageOperations(
     async (
       messageId: string,
       newContent: string,
-      audioInput?: { file: File },
+      audioInput: { file: File } | undefined,
+      attachments: File[] | undefined,
     ): Promise<void> => {
       logger.debug("Message operations: Branching message", {
         messageId,
@@ -567,6 +608,8 @@ export function useMessageOperations(
                 requiresConfirmation: REQUIRE_TOOL_CONFIRMATION,
               })) ?? null,
             messageHistory: messageHistory ?? null,
+            attachments:
+              attachments && attachments.length > 0 ? attachments : null,
             voiceMode: effectiveVoiceMode,
             audioInput: audioInput ?? { file: null },
           },
@@ -598,7 +641,11 @@ export function useMessageOperations(
   );
 
   const answerAsAI = useCallback(
-    async (messageId: string, content: string): Promise<void> => {
+    async (
+      messageId: string,
+      content: string,
+      attachments: File[] | undefined,
+    ): Promise<void> => {
       logger.debug("Message operations: Answering as AI", {
         messageId,
         content,
@@ -648,6 +695,8 @@ export function useMessageOperations(
                 requiresConfirmation: REQUIRE_TOOL_CONFIRMATION,
               })) ?? null,
             messageHistory: messageHistory ?? null,
+            attachments:
+              attachments && attachments.length > 0 ? attachments : null,
             voiceMode: null,
             audioInput: { file: null },
           },
@@ -915,4 +964,44 @@ export function useMessageOperations(
     voteMessage,
     stopGeneration,
   };
+}
+
+/**
+ * Helper: Create incognito message with attachments
+ */
+async function createIncognitoMessageWithAttachments(
+  threadId: string,
+  content: string,
+  parentId: string | null,
+  model: ModelId,
+  character: string,
+  attachments: File[],
+  logger: EndpointLogger,
+): Promise<ChatMessage> {
+  const { convertFilesToIncognitoAttachments } = await import(
+    "../../../../incognito/file-utils"
+  );
+  const { createIncognitoMessage } = await import(
+    "../../../../incognito/storage"
+  );
+
+  const incognitoAttachments =
+    await convertFilesToIncognitoAttachments(attachments);
+
+  const message = await createIncognitoMessage(
+    threadId,
+    ChatMessageRole.USER,
+    content,
+    parentId,
+    model,
+    character,
+    { attachments: incognitoAttachments },
+  );
+
+  logger.debug("Created incognito user message with attachments", {
+    messageId: message.id,
+    attachmentCount: incognitoAttachments.length,
+  });
+
+  return message;
 }

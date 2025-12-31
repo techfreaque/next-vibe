@@ -359,6 +359,19 @@ const { POST } = createEndpoint({
           .nullable(),
       ),
 
+      // === FILE ATTACHMENTS ===
+      attachments: requestDataArrayOptionalField(
+        {
+          type: WidgetType.DATA_LIST,
+          fieldType: FieldDataType.JSON,
+          label: "app.api.agent.chat.aiStream.post.attachments.label" as const,
+          description:
+            "app.api.agent.chat.aiStream.post.attachments.description" as const,
+          optional: true,
+        },
+        z.instanceof(File),
+      ),
+
       // === RESUMABLE STREAM SUPPORT ===
       resumeToken: requestDataField(
         {
@@ -581,6 +594,7 @@ const { POST } = createEndpoint({
         tools: null,
         toolConfirmation: null,
         messageHistory: [],
+        attachments: [],
         resumeToken: null,
         voiceMode: null,
         audioInput: { file: null },
@@ -600,6 +614,7 @@ const { POST } = createEndpoint({
         tools: null,
         toolConfirmation: null,
         messageHistory: [],
+        attachments: [],
         resumeToken: null,
         voiceMode: null,
         audioInput: { file: null },
@@ -619,6 +634,7 @@ const { POST } = createEndpoint({
         tools: null,
         toolConfirmation: null,
         messageHistory: [],
+        attachments: [],
         resumeToken: null,
         voiceMode: null,
         audioInput: { file: null },

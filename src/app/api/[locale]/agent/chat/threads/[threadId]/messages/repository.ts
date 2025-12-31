@@ -186,7 +186,19 @@ export async function createUserMessage(params: {
   userId: string | undefined;
   authorName: string | null;
   logger: EndpointLogger;
+  attachments?: Array<{
+    id: string;
+    url: string;
+    filename: string;
+    mimeType: string;
+    size: number;
+  }>;
 }): Promise<void> {
+  const metadata =
+    params.attachments && params.attachments.length > 0
+      ? { attachments: params.attachments }
+      : undefined;
+
   await db.insert(chatMessages).values({
     id: params.messageId,
     threadId: params.threadId,
@@ -197,6 +209,7 @@ export async function createUserMessage(params: {
     authorId: params.userId ?? null,
     authorName: params.authorName,
     isAI: false,
+    metadata,
   });
 
   params.logger.debug("Created user message", {
@@ -204,6 +217,7 @@ export async function createUserMessage(params: {
     threadId: params.threadId,
     userId: params.userId ?? "public",
     authorName: params.authorName,
+    attachmentCount: params.attachments?.length ?? 0,
   });
 }
 

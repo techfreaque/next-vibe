@@ -154,6 +154,10 @@ export const translations: typeof enTranslations = {
         description: "Plik audio do transkrypcji i przetwarzania",
       },
     },
+    attachments: {
+      label: "Załączniki",
+      description: "Pliki załączone do wiadomości (obrazy, dokumenty, itp.)",
+    },
     enabledToolIds: {
       label: "ID włączonych narzędzi",
       description: "Lista ID narzędzi AI do włączenia dla tej konwersacji",

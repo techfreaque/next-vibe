@@ -60,24 +60,21 @@ export interface BaseFieldConfig<TKey extends string> {
 }
 
 // Field type specific configurations
-export interface TextFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface TextFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "text" | "email" | "tel" | "url" | "password";
 }
 
-export interface NumberFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface NumberFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "number";
   min?: number;
   max?: number;
   step?: number;
 }
 
-export interface TextareaFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface TextareaFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "textarea";
   rows?: number;
   maxLength?: number;
@@ -97,16 +94,14 @@ export interface SelectFieldConfig<
   placeholder?: NoInfer<TTranslationKey>;
 }
 
-export interface CheckboxFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface CheckboxFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "checkbox";
   checkboxLabel?: NoInfer<TTranslationKey>;
 }
 
-export interface RadioFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface RadioFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "radio";
   options: Array<{
     value: string;
@@ -117,24 +112,21 @@ export interface RadioFieldConfig<
   orientation?: "horizontal" | "vertical";
 }
 
-export interface SwitchFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface SwitchFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "switch";
   switchLabel?: NoInfer<TTranslationKey>;
 }
 
-export interface DateFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface DateFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "date";
   minDate?: Date;
   maxDate?: Date;
 }
 
-export interface AutocompleteFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface AutocompleteFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "autocomplete";
   options: Array<{
     value: string;
@@ -145,9 +137,8 @@ export interface AutocompleteFieldConfig<
   searchPlaceholder?: NoInfer<TTranslationKey>;
 }
 
-export interface TagsFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface TagsFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "tags";
   suggestions?: Array<{
     value: string;
@@ -158,25 +149,22 @@ export interface TagsFieldConfig<
   allowCustom?: boolean;
 }
 
-export interface PhoneFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface PhoneFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "phone";
   defaultCountry: Countries;
   preferredCountries: Countries[];
 }
 
-export interface ColorPickerFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface ColorPickerFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "color";
   presetColors?: string[];
   allowCustom?: boolean;
 }
 
-export interface SliderFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface SliderFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "slider";
   min: number;
   max: number;
@@ -185,9 +173,8 @@ export interface SliderFieldConfig<
   formatValue?: (value: number) => string;
 }
 
-export interface MultiSelectFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface MultiSelectFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "multiselect";
   options: Array<{
     value: string;
@@ -200,31 +187,27 @@ export interface MultiSelectFieldConfig<
   searchable?: boolean;
 }
 
-export interface LocationFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface LocationFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "location";
   types?: Array<"country" | "city" | "region">;
   multiple?: boolean;
 }
 
-export interface YearPickerFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface YearPickerFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "year";
   minYear?: number;
   maxYear?: number;
 }
 
-export interface IconFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface IconFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "icon";
 }
 
-export interface FilterPillsFieldConfig<
-  TTranslationKey extends string,
-> extends BaseFieldConfig<TTranslationKey> {
+export interface FilterPillsFieldConfig<TTranslationKey extends string>
+  extends BaseFieldConfig<TTranslationKey> {
   type: "filter_pills";
   options: Array<{
     value: string;

@@ -16,6 +16,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { FileAttachments } from "../../../_components/message-display/file-attachments";
 import { AssistantMessageActions } from "./assistant-message-actions";
 import { MessageAuthorInfo } from "./message-author";
 import type { MessageGroup } from "./message-grouping";
@@ -190,6 +191,13 @@ export function GroupedAssistantMessage({
                     hasContentAfter={hasContentAfter}
                     collapseState={collapseState}
                   />
+                  {/* File Attachments */}
+                  {message.metadata?.attachments &&
+                    message.metadata.attachments.length > 0 && (
+                      <FileAttachments
+                        attachments={message.metadata.attachments}
+                      />
+                    )}
                 </Div>
               );
             }

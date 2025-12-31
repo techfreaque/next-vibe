@@ -422,6 +422,7 @@ export function ToolCallRenderer({
                   }
                   sendMessage({
                     content: "",
+                    attachments: [],
                     threadId,
                     parentId: messageId,
                     toolConfirmation: {
@@ -435,6 +436,7 @@ export function ToolCallRenderer({
                 const handleCancel = (): void => {
                   sendMessage({
                     content: "",
+                    attachments: [],
                     threadId,
                     parentId: messageId,
                     toolConfirmation: {

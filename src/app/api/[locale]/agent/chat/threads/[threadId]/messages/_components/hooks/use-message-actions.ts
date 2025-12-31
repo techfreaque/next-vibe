@@ -21,6 +21,7 @@ export interface UseMessageActionsReturn {
   answeringMessageId: string | null;
   deletingMessageId: string | null;
   answerContent: string;
+  editorAttachments: File[];
 
   // Check if a message is in a specific state
   isEditing: (messageId: string) => boolean;
@@ -35,6 +36,9 @@ export interface UseMessageActionsReturn {
   startDelete: (messageId: string) => void;
   cancelAction: () => void;
   setAnswerContent: (content: string) => void;
+  setEditorAttachments: (
+    attachments: File[] | ((prev: File[]) => File[]),
+  ) => void;
 
   // Combined handlers for save operations
   handleSaveEdit: (
@@ -45,15 +49,24 @@ export interface UseMessageActionsReturn {
   handleBranchEdit: (
     messageId: string,
     content: string,
-    onBranch?: (id: string, content: string) => Promise<void>,
+    onBranch?: (
+      id: string,
+      content: string,
+      audioInput: { file: File } | undefined,
+      attachments: File[] | undefined,
+    ) => Promise<void>,
   ) => Promise<void>;
   handleConfirmRetry: (
     messageId: string,
-    onRetry?: (id: string) => Promise<void>,
+    onRetry?: (id: string, attachments: File[] | undefined) => Promise<void>,
   ) => Promise<void>;
   handleConfirmAnswer: (
     messageId: string,
-    onAnswer?: (id: string, content: string) => Promise<void>,
+    onAnswer?: (
+      id: string,
+      content: string,
+      attachments: File[] | undefined,
+    ) => Promise<void>,
   ) => Promise<void>;
   handleConfirmDelete: (
     messageId: string,
@@ -78,6 +91,7 @@ export function useMessageActions(
     null,
   );
   const [answerContent, setAnswerContent] = useState<string>("");
+  const [editorAttachments, setEditorAttachments] = useState<File[]>([]);
 
   // Check functions
   const isEditing = useCallback(
@@ -104,6 +118,7 @@ export function useMessageActions(
     setAnsweringMessageId(null);
     setDeletingMessageId(null);
     setAnswerContent("");
+    setEditorAttachments([]);
   }, []);
 
   // Start action handlers
@@ -168,15 +183,26 @@ export function useMessageActions(
     async (
       messageId: string,
       content: string,
-      onBranch?: (id: string, content: string) => Promise<void>,
+      onBranch?: (
+        id: string,
+        content: string,
+        audioInput: { file: File } | undefined,
+        attachments: File[] | undefined,
+      ) => Promise<void>,
     ) => {
       if (!onBranch) {
         return;
       }
 
       try {
-        await onBranch(messageId, content);
+        await onBranch(
+          messageId,
+          content,
+          undefined,
+          editorAttachments.length > 0 ? editorAttachments : undefined,
+        );
         setEditingMessageId(null);
+        setEditorAttachments([]);
       } catch (error) {
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
@@ -186,18 +212,25 @@ export function useMessageActions(
         );
       }
     },
-    [logger],
+    [logger, editorAttachments],
   );
 
   const handleConfirmRetry = useCallback(
-    async (messageId: string, onRetry?: (id: string) => Promise<void>) => {
+    async (
+      messageId: string,
+      onRetry?: (id: string, attachments: File[] | undefined) => Promise<void>,
+    ) => {
       if (!onRetry) {
         return;
       }
 
       try {
-        await onRetry(messageId);
+        await onRetry(
+          messageId,
+          editorAttachments.length > 0 ? editorAttachments : undefined,
+        );
         setRetryingMessageId(null);
+        setEditorAttachments([]);
       } catch (error) {
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
@@ -207,22 +240,31 @@ export function useMessageActions(
         );
       }
     },
-    [logger],
+    [logger, editorAttachments],
   );
 
   const handleConfirmAnswer = useCallback(
     async (
       messageId: string,
-      onAnswer?: (id: string, content: string) => Promise<void>,
+      onAnswer?: (
+        id: string,
+        content: string,
+        attachments: File[] | undefined,
+      ) => Promise<void>,
     ) => {
       if (!onAnswer) {
         return;
       }
 
       try {
-        await onAnswer(messageId, answerContent);
+        await onAnswer(
+          messageId,
+          answerContent,
+          editorAttachments.length > 0 ? editorAttachments : undefined,
+        );
         setAnsweringMessageId(null);
         setAnswerContent("");
+        setEditorAttachments([]);
       } catch (error) {
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
@@ -232,7 +274,7 @@ export function useMessageActions(
         );
       }
     },
-    [logger, answerContent],
+    [logger, answerContent, editorAttachments],
   );
 
   const handleConfirmDelete = useCallback(
@@ -262,6 +304,7 @@ export function useMessageActions(
     answeringMessageId,
     deletingMessageId,
     answerContent,
+    editorAttachments,
     isEditing,
     isRetrying,
     isAnswering,
@@ -272,6 +315,7 @@ export function useMessageActions(
     startDelete,
     cancelAction,
     setAnswerContent,
+    setEditorAttachments,
     handleSaveEdit,
     handleBranchEdit,
     handleConfirmRetry,

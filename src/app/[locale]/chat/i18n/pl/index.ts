@@ -287,6 +287,13 @@ export const translations: typeof enTranslations = {
       recordingClickToStop: "Nagrywanie... Kliknij, aby zatrzymać",
       transcribing: "Transkrybuję...",
     },
+    attachments: {
+      uploadFile: "Dołącz plik",
+      removeFile: "Usuń plik",
+      fileTooLarge: "Plik jest za duży (max 10MB)",
+      invalidFileType: "Nieprawidłowy typ pliku",
+      uploadError: "Nie udało się przesłać pliku",
+    },
   },
   modelSelector: {
     placeholder: "Wybierz model",

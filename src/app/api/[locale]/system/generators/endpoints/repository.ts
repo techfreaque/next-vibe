@@ -53,7 +53,9 @@ export interface FunctionalGeneratorsRepository {
 /**
  * Functional Generators Repository Implementation
  */
-export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsRepository {
+export class FunctionalGeneratorsRepositoryImpl
+  implements FunctionalGeneratorsRepository
+{
   private readonly optionDefinitions =
     defineOptions<FunctionalGeneratorOptions>({
       skipEndpoints: {

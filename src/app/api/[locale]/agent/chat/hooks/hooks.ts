@@ -48,7 +48,9 @@ import { useFolderHandlers } from "./use-folder-handlers";
 import {
   getDraftKey,
   loadDraft,
+  loadDraftAttachments,
   saveDraft as saveDraftToStorage,
+  saveDraftAttachments,
 } from "./use-input-autosave";
 import { useInputHandlers } from "./use-input-handlers";
 import { useMessageActions } from "./use-message-actions";
@@ -93,6 +95,8 @@ export interface UseChatReturn {
   // Input
   input: string;
   setInput: (input: string) => void;
+  attachments: File[];
+  setAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;
 
   // Settings
   selectedCharacter: string;
@@ -123,6 +127,7 @@ export interface UseChatReturn {
   sendMessage: (
     params: {
       content: string;
+      attachments: File[];
       threadId?: string;
       parentId?: string;
       toolConfirmation?: {
@@ -139,9 +144,21 @@ export interface UseChatReturn {
       subFolderId: string | null,
     ) => void,
   ) => Promise<void>;
-  retryMessage: (messageId: string) => Promise<void>;
-  branchMessage: (messageId: string, newContent: string) => Promise<void>;
-  answerAsAI: (messageId: string, content: string) => Promise<void>;
+  retryMessage: (
+    messageId: string,
+    attachments: File[] | undefined,
+  ) => Promise<void>;
+  branchMessage: (
+    messageId: string,
+    newContent: string,
+    audioInput: { file: File } | undefined,
+    attachments: File[] | undefined,
+  ) => Promise<void>;
+  answerAsAI: (
+    messageId: string,
+    content: string,
+    attachments: File[] | undefined,
+  ) => Promise<void>;
   deleteMessage: (messageId: string) => Promise<void>;
   voteMessage: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
   stopGeneration: () => void;
@@ -205,11 +222,15 @@ export interface UseChatReturn {
   retryingMessageId: string | null;
   answeringMessageId: string | null;
   answerContent: string;
+  editorAttachments: File[];
   startEdit: (messageId: string) => void;
   startRetry: (messageId: string) => void;
   startAnswer: (messageId: string) => void;
   cancelEditorAction: () => void;
   setAnswerContent: (content: string) => void;
+  setEditorAttachments: (
+    attachments: File[] | ((prev: File[]) => File[]),
+  ) => void;
   handleBranchEdit: (
     messageId: string,
     content: string,
@@ -328,6 +349,7 @@ export function useChat(
 
   // Local state
   const [input, setInput] = useState("");
+  const [attachments, setAttachments] = useState<File[]>([]);
   const inputRef = useRef<TextareaRefObject>(null);
 
   // Generate draft key for current context
@@ -342,6 +364,8 @@ export function useChat(
   useEffect(() => {
     const loadDraftForContext = async (): Promise<void> => {
       const draft = await loadDraft(draftKey, logger);
+      const draftAttachments = await loadDraftAttachments(draftKey, logger);
+
       // Only update if draft is different from current input to prevent loops
       setInput((currentInput) => {
         if (currentInput !== draft) {
@@ -354,6 +378,17 @@ export function useChat(
         }
         return currentInput;
       });
+
+      // Load attachments
+      if (draftAttachments.length > 0) {
+        setAttachments(draftAttachments);
+        logger.debug("Chat: Loading draft attachments", {
+          draftKey,
+          attachmentCount: draftAttachments.length,
+        });
+      } else {
+        setAttachments([]);
+      }
     };
     void loadDraftForContext();
   }, [draftKey, logger]);
@@ -363,6 +398,21 @@ export function useChat(
     (newInput: string) => {
       setInput(newInput);
       void saveDraftToStorage(draftKey, newInput, logger);
+    },
+    [draftKey, logger],
+  );
+
+  // Wrapper function to save attachments and draft attachments together
+  const setAttachmentsAndSaveDraft = useCallback(
+    (newAttachments: File[] | ((prev: File[]) => File[])) => {
+      setAttachments((prev) => {
+        const updated =
+          typeof newAttachments === "function"
+            ? newAttachments(prev)
+            : newAttachments;
+        void saveDraftAttachments(draftKey, updated, logger);
+        return updated;
+      });
     },
     [draftKey, logger],
   );
@@ -544,6 +594,7 @@ export function useChat(
   // Input handlers
   const inputHandlers = useInputHandlers({
     input,
+    attachments,
     isLoading,
     enabledToolIds: settingsOps.settings.enabledToolIds,
     sendMessage: messageOps.sendMessage,
@@ -621,6 +672,8 @@ export function useChat(
     // Input
     input,
     setInput: setInputAndSaveDraft,
+    attachments,
+    setAttachments: setAttachmentsAndSaveDraft,
 
     // Settings
     selectedCharacter: settingsOps.settings.selectedCharacter,
@@ -702,11 +755,13 @@ export function useChat(
     retryingMessageId: editorActions.retryingMessageId,
     answeringMessageId: editorActions.answeringMessageId,
     answerContent: editorActions.answerContent,
+    editorAttachments: editorActions.editorAttachments,
     startEdit: editorActions.startEdit,
     startRetry: editorActions.startRetry,
     startAnswer: editorActions.startAnswer,
     cancelEditorAction: editorActions.cancelAction,
     setAnswerContent: editorActions.setAnswerContent,
+    setEditorAttachments: editorActions.setEditorAttachments,
     handleBranchEdit: editorActions.handleBranchEdit,
 
     // Thread navigation

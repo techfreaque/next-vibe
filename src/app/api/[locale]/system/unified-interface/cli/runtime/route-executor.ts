@@ -93,10 +93,8 @@ export type CliCompatiblePlatform =
  * Route execution context
  * Extends BaseExecutionContext with CLI-specific fields
  */
-export interface RouteExecutionContext extends Omit<
-  BaseExecutionContext<InputData>,
-  "user"
-> {
+export interface RouteExecutionContext
+  extends Omit<BaseExecutionContext<InputData>, "user"> {
   /** URL path parameters */
   urlPathParams?: CliUrlParams;
 

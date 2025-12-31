@@ -154,6 +154,8 @@ export async function deleteThread(threadId: string): Promise<void> {
     Object.entries(messages).filter(([, msg]) => msg.threadId !== threadId),
   );
   await setItem(STORAGE_KEYS.MESSAGES, updatedMessages);
+
+  // Files are stored in message metadata, no separate cleanup needed
 }
 
 /**
@@ -273,6 +275,7 @@ export async function clearIncognitoData(): Promise<void> {
     for (const key of Object.values(STORAGE_KEYS)) {
       await storage.removeItem(key);
     }
+    // Files are stored in message metadata and cleared with messages
   }
 }
 
@@ -337,6 +340,7 @@ export async function createIncognitoMessage(
   parentId: string | null = null,
   model: ChatMessage["model"] = null,
   character: string | null = null,
+  metadata: ChatMessage["metadata"] = {},
 ): Promise<ChatMessage> {
   const message: ChatMessage = {
     id: generateIncognitoId("msg"),
@@ -359,7 +363,7 @@ export async function createIncognitoMessage(
     edited: false,
     originalId: null,
     tokens: null,
-    metadata: {},
+    metadata,
     upvotes: 0,
     downvotes: 0,
     createdAt: new Date(),

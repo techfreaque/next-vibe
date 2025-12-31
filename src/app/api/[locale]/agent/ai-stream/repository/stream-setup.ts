@@ -89,6 +89,95 @@ export interface StreamSetupResult {
   } | null;
 }
 
+/**
+ * Process and upload file attachments to storage adapter
+ * Validates file types and uploads files in parallel
+ */
+async function processFileAttachments(params: {
+  attachments: File[];
+  threadId: string;
+  userMessageId: string;
+  userId: string | undefined;
+  logger: EndpointLogger;
+}): Promise<
+  | {
+      success: false;
+      error: ResponseType<never>;
+    }
+  | {
+      success: true;
+      data: Array<{
+        id: string;
+        url: string;
+        filename: string;
+        mimeType: string;
+        size: number;
+      }>;
+    }
+> {
+  const { attachments, threadId, userMessageId, userId, logger } = params;
+
+  const { getStorageAdapter } = await import("../../chat/storage");
+  const { isAllowedFileType } = await import("../../chat/incognito/file-utils");
+  const storage = getStorageAdapter();
+
+  logger.info("[File Processing] Uploading file attachments to storage", {
+    fileCount: attachments.length,
+  });
+
+  const processedAttachments: Array<{
+    id: string;
+    url: string;
+    filename: string;
+    mimeType: string;
+    size: number;
+  }> = [];
+
+  for (const file of attachments) {
+    // Validate file type
+    if (!isAllowedFileType(file.type)) {
+      logger.error("[File Processing] File type not allowed", {
+        filename: file.name,
+        mimeType: file.type,
+      });
+      return {
+        success: false,
+        error: fail({
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          message: "app.api.shared.errorTypes.validation_error",
+          messageParams: {
+            issue: `File type not allowed: ${file.type}`,
+          },
+        }),
+      };
+    }
+
+    const result = await storage.uploadFile(file, {
+      filename: file.name,
+      mimeType: file.type,
+      threadId,
+      messageId: userMessageId,
+      userId,
+    });
+    processedAttachments.push({
+      id: result.fileId,
+      url: result.url,
+      filename: result.metadata.originalFilename,
+      mimeType: result.metadata.mimeType,
+      size: result.metadata.size,
+    });
+  }
+
+  logger.info("[File Processing] File attachments uploaded successfully", {
+    uploadedCount: processedAttachments.length,
+  });
+
+  return {
+    success: true,
+    data: processedAttachments,
+  };
+}
+
 export async function setupAiStream(params: {
   data: AiStreamPostRequestOutput;
   locale: CountryLanguage;
@@ -462,6 +551,34 @@ export async function setupAiStream(params: {
     } else {
       const authorName = await UserRepository.getUserPublicName(userId, logger);
 
+      // Start file upload in background if there are attachments
+      let fileUploadPromise: Promise<
+        | {
+            success: false;
+            error: ResponseType<never>;
+          }
+        | {
+            success: true;
+            data: Array<{
+              id: string;
+              url: string;
+              filename: string;
+              mimeType: string;
+              size: number;
+            }>;
+          }
+      > | null = null;
+
+      if (data.attachments && data.attachments.length > 0) {
+        fileUploadPromise = processFileAttachments({
+          attachments: data.attachments,
+          threadId: threadResult.threadId,
+          userMessageId,
+          userId,
+          logger,
+        });
+      }
+
       await createUserMessage({
         messageId: userMessageId,
         threadId: threadResult.threadId,
@@ -472,7 +589,49 @@ export async function setupAiStream(params: {
         userId,
         authorName,
         logger,
+        attachments: undefined, // Will be updated by background process
       });
+
+      // Wait for file upload to complete in background and update message
+      if (fileUploadPromise) {
+        void fileUploadPromise.then(async (result) => {
+          try {
+            if (result.success) {
+              // Update message with attachments
+              await db
+                .update(chatMessages)
+                .set({
+                  metadata: {
+                    attachments: result.data,
+                  },
+                })
+                .where(eq(chatMessages.id, userMessageId));
+
+              logger.info(
+                "[File Processing] Message updated with attachments",
+                {
+                  messageId: userMessageId,
+                  attachmentCount: result.data.length,
+                },
+              );
+            } else {
+              logger.error(
+                "[File Processing] Failed to upload attachments, message created without files",
+                {
+                  messageId: userMessageId,
+                  errorMessage: result.error.message,
+                },
+              );
+            }
+          } catch (error) {
+            logger.error("[File Processing] Error updating message", {
+              messageId: userMessageId,
+              error: parseError(error),
+            });
+          }
+          return result;
+        });
+      }
     }
   } else if (data.toolConfirmation) {
     logger.info(

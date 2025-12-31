@@ -154,6 +154,11 @@ export const translations: typeof enTranslations = {
         description: "Audio-Datei zum Transkribieren und Verarbeiten",
       },
     },
+    attachments: {
+      label: "Dateianhänge",
+      description:
+        "An die Nachricht angehängte Dateien (Bilder, Dokumente, etc.)",
+    },
     enabledToolIds: {
       label: "Aktivierte Tool-IDs",
       description:

@@ -67,8 +67,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("📝 Generating endpoints index (singleton)...");
-              const { endpointsIndexGeneratorRepository } =
-                await import("../endpoints-index/repository");
+              const { endpointsIndexGeneratorRepository } = await import(
+                "../endpoints-index/repository"
+              );
 
               const result =
                 await endpointsIndexGeneratorRepository.generateEndpointsIndex(
@@ -107,8 +108,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("📝 Generating endpoint (dynamic imports)...");
-              const { endpointGeneratorRepository } =
-                await import("../endpoint/repository");
+              const { endpointGeneratorRepository } = await import(
+                "../endpoint/repository"
+              );
 
               const result = await endpointGeneratorRepository.generateEndpoint(
                 {
@@ -146,8 +148,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               outputLines.push(
                 "📝 Generating route handlers (dynamic imports)...",
               );
-              const { routeHandlersGeneratorRepository } =
-                await import("../route-handlers/repository");
+              const { routeHandlersGeneratorRepository } = await import(
+                "../route-handlers/repository"
+              );
 
               const result =
                 await routeHandlersGeneratorRepository.generateRouteHandlers(

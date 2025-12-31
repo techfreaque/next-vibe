@@ -7,18 +7,20 @@
 import "server-only";
 
 import type { NextRequest } from "next/server";
-import {
-  ErrorResponseTypes,
-  isStreamingResponse,
-  type ResponseType,
-  type StreamingResponse,
-} from "next-vibe/shared/types/response.schema";
 import type { z } from "zod";
 
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { emailHandlingRepository } from "@/app/api/[locale]/emails/smtp-client/email-handling/repository";
 import type { EmailHandleRequestOutput } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
+import {
+  ErrorResponseTypes,
+  type FileResponse,
+  isFileResponse,
+  isStreamingResponse,
+  type ResponseType,
+  type StreamingResponse,
+} from "@/app/api/[locale]/shared/types/response.schema";
 import { handleSms } from "@/app/api/[locale]/sms/handle-sms";
 import type { SmsFunctionType } from "@/app/api/[locale]/sms/utils";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
@@ -129,6 +131,7 @@ export interface ApiHandlerProps<
  * Can return either:
  * - ResponseType<TResponseOutput> for standard JSON responses
  * - StreamingResponse for streaming endpoints (e.g., AI chat)
+ * - FileResponse for binary file responses (e.g., file downloads)
  */
 export type ApiHandlerFunction<
   TRequestOutput,
@@ -144,9 +147,10 @@ export type ApiHandlerFunction<
     TPlatform
   >,
 ) =>
-  | Promise<ResponseType<TResponseOutput> | StreamingResponse>
+  | Promise<ResponseType<TResponseOutput> | StreamingResponse | FileResponse>
   | ResponseType<TResponseOutput>
-  | StreamingResponse;
+  | StreamingResponse
+  | FileResponse;
 
 /**
  * Handler configuration for a single method with proper typing
@@ -218,7 +222,7 @@ export type GenericHandlerReturnType<
   logger: EndpointLogger;
   platform: Platform;
   request?: NextRequest; // Optional NextRequest for Next.js platform
-}) => Promise<ResponseType<TResponseOutput> | StreamingResponse>;
+}) => Promise<ResponseType<TResponseOutput> | StreamingResponse | FileResponse>;
 
 /**
  * Base type for generic handlers when exact types are not known
@@ -264,7 +268,9 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     platform,
     request,
   }): Promise<
-    ResponseType<T["types"]["ResponseOutput"]> | StreamingResponse
+    | ResponseType<T["types"]["ResponseOutput"]>
+    | StreamingResponse
+    | FileResponse
   > => {
     const { t } = simpleT(locale);
 
@@ -383,13 +389,19 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       platform,
     });
 
-    // 5. Handle streaming responses - return immediately without email/SMS processing
+    // 5. Handle file responses - return immediately without email/SMS processing
+    if (isFileResponse(result)) {
+      logger.info("File response detected - returning immediately");
+      return result;
+    }
+
+    // 6. Handle streaming responses - return immediately without email/SMS processing
     if (isStreamingResponse(result)) {
       logger.info("Streaming response detected - returning immediately");
       return result;
     }
 
-    // 6. Return errors without validation (errors are already validated)
+    // 7. Return errors without validation (errors are already validated)
     if (!result.success) {
       return result;
     }

@@ -30,6 +30,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { CallModeIndicator } from "./call-mode-indicator";
+import { FileUploadButton } from "./file-upload-button";
 import { useCallMode } from "./hooks/use-call-mode";
 import { useVoiceRecording } from "./hooks/use-voice-recording";
 import { RecordingModal } from "./recording-modal";
@@ -54,6 +55,8 @@ export function ChatInput({
   const {
     input,
     setInput,
+    attachments,
+    setAttachments,
     handleSubmit,
     submitWithContent,
     submitWithAudio,
@@ -171,7 +174,7 @@ export function ChatInput({
 
       {/* Controls */}
       <Div className="flex flex-row items-center gap-1 @sm:gap-1.5 @md:gap-2 flex-nowrap">
-        {/* Left: Selector + Tools */}
+        {/* Left: Selector + Tools + File Upload */}
         <Div className="flex flex-row items-center gap-0.5 @sm:gap-1 @md:gap-1.5 flex-1 min-w-0">
           <Selector
             characterId={selectedCharacter}
@@ -190,6 +193,20 @@ export function ChatInput({
               <ToolsButton disabled={isLoading} locale={locale} />
             </>
           )}
+
+          <FileUploadButton
+            disabled={isInputDisabled}
+            locale={locale}
+            attachments={attachments}
+            onFilesSelected={setAttachments}
+            onRemoveFile={(index) => {
+              setAttachments((prev) => {
+                const updated = [...prev];
+                updated.splice(index, 1);
+                return updated;
+              });
+            }}
+          />
         </Div>
 
         {/* Right: Call Mode + Mic + Send/Stop */}

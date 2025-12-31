@@ -108,7 +108,9 @@ export interface InputRefObject {
   focus: () => void;
   blur?: () => void;
   select?: () => void;
+  click?: () => void;
   value?: string;
+  files?: FileList | null;
 }
 
 export type InputProps<
@@ -140,6 +142,7 @@ export type InputProps<
   autoCorrect?: string;
   spellCheck?: boolean;
   accept?: string;
+  multiple?: boolean;
   onChange?: (e: InputChangeEvent<T>) => void;
   onChangeText?: (text: string) => void;
   onBlur?: (e: InputFocusEvent<T>) => void;
@@ -187,6 +190,7 @@ function InputInner<
     autoComplete,
     spellCheck,
     accept,
+    multiple,
     onChange,
     onChangeText,
     onBlur,
@@ -220,6 +224,7 @@ function InputInner<
       autoComplete={autoComplete}
       spellCheck={spellCheck}
       accept={accept}
+      multiple={multiple}
       name={name}
       id={id}
       aria-label={ariaLabel}
