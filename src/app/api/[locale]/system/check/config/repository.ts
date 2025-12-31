@@ -684,7 +684,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         mcpServers: {
           vibe: {
             command: "npx",
-            args: ["@next-vibe/checker", "mcp"],
+            args: ["--yes", "@next-vibe/checker@latest", "mcp"],
             env: {
               PROJECT_ROOT: process.cwd(),
             },
