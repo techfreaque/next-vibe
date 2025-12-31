@@ -1,7 +1,7 @@
 export const translations = {
   title: "Vibe Check",
   description:
-    "Run comprehensive code quality checks (Oxlint + ESLint + TypeScript). IMPORTANT: Use this instead of running 'eslint', 'tsc', or 'oxlint' directly - vibe-check runs all checks in parallel and is significantly faster. The goal is to fix ALL issues, not just some. Configure which checks to run in check.config.ts (skipLint, skipEslint, skipOxlint, skipTypecheck).",
+    "Run comprehensive code quality checks (Oxlint + ESLint + TypeScript). IMPORTANT: Use this instead of running 'eslint', 'tsc', or 'oxlint' directly - vibe-check runs all checks in parallel and is significantly faster. The goal is to fix ALL issues, not just some.",
   category: "Development Tools",
   tag: "quality",
 

@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   title: "Vibe Check",
   description:
-    "Przeprowadź kompleksowe sprawdzenia jakości kodu (Oxlint + ESLint + TypeScript). WAŻNE: Użyj tego zamiast bezpośredniego uruchamiania 'eslint', 'tsc' lub 'oxlint' - vibe-check wykonuje wszystkie sprawdzenia równolegle i jest znacznie szybszy. Celem jest naprawienie WSZYSTKICH problemów, a nie tylko niektórych. Skonfiguruj które sprawdzenia mają być uruchomione w check.config.ts (skipLint, skipEslint, skipOxlint, skipTypecheck).",
+    "Przeprowadź kompleksowe sprawdzenia jakości kodu (Oxlint + ESLint + TypeScript). WAŻNE: Użyj tego zamiast bezpośredniego uruchamiania 'eslint', 'tsc' lub 'oxlint' - vibe-check wykonuje wszystkie sprawdzenia równolegle i jest znacznie szybszy. Celem jest naprawienie WSZYSTKICH problemów, a nie tylko niektórych.",
   category: "Narzędzia Deweloperskie",
   tag: "jakość",
 
