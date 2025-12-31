@@ -38,6 +38,14 @@ export class ConfigCreateRepository {
     const { t } = simpleT(locale);
     const isCLI = platform === Platform.CLI;
 
+    logger.debug("[Config Create] Repository received data", {
+      data,
+      interactive: data.interactive,
+      interactiveType: typeof data.interactive,
+      platform,
+      isCLI,
+    });
+
     try {
       // Check if config already exists
       const configPath = resolve(process.cwd(), "check.config.ts");

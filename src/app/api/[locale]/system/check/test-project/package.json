@@ -12,6 +12,6 @@
     "r-version": "v --version"
   },
   "dependencies": {
-    "@next-vibe/checker": "^1.0.31"
+    "@next-vibe/checker": "^1.0.32"
   }
 }

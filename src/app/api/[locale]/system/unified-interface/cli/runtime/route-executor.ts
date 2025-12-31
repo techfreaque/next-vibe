@@ -346,6 +346,13 @@ export class RouteDelegationHandler {
 
     // Merge CLI data with provided data using registry
     const contextData = context.data;
+
+    logger.debug("[Route Executor] Data collection details", {
+      contextData,
+      cliData,
+      interactiveOption: context.options?.interactive,
+    });
+
     if (contextData || (cliData && Object.keys(cliData).length > 0)) {
       // Merge context options (interactive, dryRun) into data only if explicitly set
       // Don't merge if they're CLI defaults to allow schema defaults to apply
@@ -357,11 +364,16 @@ export class RouteDelegationHandler {
         optionsData.dryRun = true;
       }
 
+      logger.debug("[Route Executor] Building options data", { optionsData });
+
       const mergedData = routeExecutionExecutor.mergeData(
         optionsData,
         contextData || {},
         cliData || {},
       );
+
+      logger.debug("[Route Executor] Final merged data", { mergedData });
+
       // mergedData is Partial<InputData>, which is compatible with InputData for our purposes
       inputData.data = mergedData;
 
@@ -845,7 +857,17 @@ export class RouteDelegationHandler {
 
     // Map named arguments to data fields (convert kebab-case to camelCase)
     // Skip CLI-level options that are already in context.options
-    const cliLevelOptions = ["interactive", "dryRun", "dry-run", "verbose", "debug", "output", "locale", "userType", "user-type"];
+    const cliLevelOptions = [
+      "interactive",
+      "dryRun",
+      "dry-run",
+      "verbose",
+      "debug",
+      "output",
+      "locale",
+      "userType",
+      "user-type",
+    ];
 
     for (const [key, value] of Object.entries(namedArgs)) {
       // Skip CLI-level options
