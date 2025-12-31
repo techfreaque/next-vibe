@@ -18,11 +18,8 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type {
-  Platform} from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import {
-  isCliPlatform
-} from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -81,77 +78,68 @@ export class ConfigCreateRepository {
         console.log(`${"═".repeat(60)}\n`);
 
         // Ask each question step by step
-        data.createMcpConfig =
-          data.createMcpConfig ??
-          (await confirm({
-            message: t(
-              "app.api.system.check.config.create.interactive.createMcpConfig",
-            ),
-            default: true,
-          }));
+        data.createMcpConfig = await confirm({
+          message: t(
+            "app.api.system.check.config.create.interactive.createMcpConfig",
+          ),
+          default: data.createMcpConfig,
+        });
 
-        data.updateVscodeSettings =
-          data.updateVscodeSettings ??
-          (await confirm({
-            message: t(
-              "app.api.system.check.config.create.interactive.updateVscodeSettings",
-            ),
-            default: true,
-          }));
+        data.updateVscodeSettings = await confirm({
+          message: t(
+            "app.api.system.check.config.create.interactive.updateVscodeSettings",
+          ),
+          default: data.updateVscodeSettings,
+        });
 
-        data.enableReactRules =
-          data.enableReactRules ??
-          (await confirm({
-            message: t(
-              "app.api.system.check.config.create.interactive.enableReactRules",
-            ),
-            default: true,
-          }));
+        data.enableReactRules = await confirm({
+          message: t(
+            "app.api.system.check.config.create.interactive.enableReactRules",
+          ),
+          default: data.enableReactRules,
+        });
 
-        data.enableNextjsRules =
-          data.enableNextjsRules ??
-          (await confirm({
-            message: t(
-              "app.api.system.check.config.create.interactive.enableNextjsRules",
-            ),
-            default: true,
-          }));
+        data.enableNextjsRules = await confirm({
+          message: t(
+            "app.api.system.check.config.create.interactive.enableNextjsRules",
+          ),
+          default: data.enableNextjsRules,
+        });
 
-        data.enableI18nRules =
-          data.enableI18nRules ??
-          (await confirm({
-            message: t(
-              "app.api.system.check.config.create.interactive.enableI18nRules",
-            ),
-            default: false,
-          }));
+        data.enableI18nRules = await confirm({
+          message: t(
+            "app.api.system.check.config.create.interactive.enableI18nRules",
+          ),
+          default: data.enableI18nRules,
+        });
 
-        data.jsxCapitalization =
-          data.jsxCapitalization ??
-          (await confirm({
-            message: t(
-              "app.api.system.check.config.create.interactive.jsxCapitalization",
-            ),
-            default: false,
-          }));
+        data.jsxCapitalization = await confirm({
+          message: t(
+            "app.api.system.check.config.create.interactive.jsxCapitalization",
+          ),
+          default: data.jsxCapitalization,
+        });
 
-        data.enablePedanticRules =
-          data.enablePedanticRules ??
-          (await confirm({
-            message: t(
-              "app.api.system.check.config.create.interactive.enablePedanticRules",
-            ),
-            default: false,
-          }));
+        data.enablePedanticRules = await confirm({
+          message: t(
+            "app.api.system.check.config.create.interactive.enablePedanticRules",
+          ),
+          default: data.enablePedanticRules,
+        });
 
-        data.enableRestrictedSyntax =
-          data.enableRestrictedSyntax ??
-          (await confirm({
-            message: t(
-              "app.api.system.check.config.create.interactive.enableRestrictedSyntax",
-            ),
-            default: true,
-          }));
+        data.enableRestrictedSyntax = await confirm({
+          message: t(
+            "app.api.system.check.config.create.interactive.enableRestrictedSyntax",
+          ),
+          default: data.enableRestrictedSyntax,
+        });
+
+        data.updatePackageJson = await confirm({
+          message: t(
+            "app.api.system.check.config.create.interactive.updatePackageJson",
+          ),
+          default: data.updatePackageJson,
+        });
       }
 
       // Create check.config.ts with user-selected options
@@ -264,6 +252,39 @@ export class ConfigCreateRepository {
         }
       }
 
+      let packageJsonPath: string | undefined;
+
+      // Update package.json scripts if requested
+      if (data.updatePackageJson) {
+        const pkgPath = resolve(process.cwd(), "package.json");
+        if (existsSync(pkgPath)) {
+          try {
+            const packageJson = JSON.parse(readFileSync(pkgPath, "utf-8"));
+            packageJson.scripts = {
+              ...packageJson.scripts,
+              check: "v c",
+              lint: "v c",
+              typecheck: "v c",
+            };
+            writeFileSync(pkgPath, `${JSON.stringify(packageJson, null, 2)}\n`);
+            packageJsonPath = pkgPath;
+          } catch (error) {
+            logger.warn(
+              t(
+                "app.api.system.check.config.create.warnings.packageJsonFailed",
+              ),
+              { error: parseError(error).message },
+            );
+          }
+        } else {
+          logger.warn(
+            t(
+              "app.api.system.check.config.create.warnings.packageJsonNotFound",
+            ),
+          );
+        }
+      }
+
       // Build success message
       const messages: string[] = [`✓ Created ${configResult.configPath}`];
 
@@ -273,6 +294,10 @@ export class ConfigCreateRepository {
 
       if (vscodeSettingsPath) {
         messages.push(`✓ Updated ${vscodeSettingsPath}`);
+      }
+
+      if (packageJsonPath) {
+        messages.push(`✓ Updated ${packageJsonPath}`);
       }
 
       return success({

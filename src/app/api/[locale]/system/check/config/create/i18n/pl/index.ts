@@ -123,6 +123,7 @@ export const translations = {
     mcpConfigFailed: "Nie udało się utworzyć konfiguracji MCP",
     vscodeFailed: "Nie udało się zaktualizować ustawień VSCode",
     packageJsonFailed: "Nie udało się zaktualizować package.json",
+    packageJsonNotFound: "package.json nie znaleziono w bieżącym katalogu",
   },
 
   response: {

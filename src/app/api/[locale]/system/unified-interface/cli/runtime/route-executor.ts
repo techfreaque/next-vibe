@@ -357,11 +357,11 @@ export class RouteDelegationHandler {
       // Merge context options (interactive, dryRun) into data only if explicitly set
       // Don't merge if they're CLI defaults to allow schema defaults to apply
       const optionsData: Partial<InputData> = {};
-      if (context.options?.interactive === true) {
-        optionsData.interactive = true;
+      if (context.options?.interactive !== undefined) {
+        optionsData.interactive = context.options.interactive;
       }
-      if (context.options?.dryRun === true) {
-        optionsData.dryRun = true;
+      if (context.options?.dryRun !== undefined) {
+        optionsData.dryRun = context.options.dryRun;
       }
 
       logger.debug("[Route Executor] Building options data", { optionsData });
