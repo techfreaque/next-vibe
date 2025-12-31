@@ -6,17 +6,10 @@ import { zodSchemaToJsonSchema } from "@/app/api/[locale]/system/unified-interfa
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { MCPTool } from "./types";
-
-function toolNameToApiPath(toolName: string): string {
-  const parts = toolName.split("_");
-  const method = parts.at(-1);
-  const pathParts = parts.slice(0, -1);
-  const apiPath = pathParts.join("/");
-  return `api/[locale]/${apiPath} (${method})`;
-}
 
 /**
  * Generate input schema from endpoint fields with descriptions
@@ -119,17 +112,18 @@ export function endpointToMCPTool(
   endpoint: CreateApiEndpointAny,
   locale: CountryLanguage,
 ): MCPTool {
-  const toolName = `${endpoint.path.join("_")}_${endpoint.method.toUpperCase()}`;
-  const apiPath = toolNameToApiPath(toolName);
+  // Use first alias if available, otherwise fall back to full tool name using shared utility
+  const toolName = endpoint.aliases && endpoint.aliases.length > 0
+    ? endpoint.aliases[0]
+    : endpointToToolName(endpoint);
 
-  // Translate description and title keys
+  // Translate description - use description or title
   const { t } = endpoint.scopedTranslation.scopedT(locale);
   const descriptionKey = endpoint.description || endpoint.title;
   const translatedDescription = descriptionKey ? t(descriptionKey) : "";
 
-  const description = translatedDescription
-    ? `${translatedDescription}\n📁 ${apiPath}`
-    : apiPath;
+  // Compact description - just the translated text, no verbose paths
+  const description = translatedDescription || toolName;
 
   // Generate Zod schema from endpoint fields with translated descriptions
   const zodSchema = generateInputSchema(endpoint, locale);
