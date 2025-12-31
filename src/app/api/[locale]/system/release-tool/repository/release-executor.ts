@@ -143,14 +143,12 @@ export class ReleaseExecutor implements IReleaseExecutor {
       const skipBuild = data.skipBuild ?? false;
       const skipTests = data.skipTests ?? false;
       const skipSnyk = data.skipSnyk ?? false;
-      const skipPublish = data.skipPublish ?? false;
       const skipChangelog = data.skipChangelog ?? false;
       const skipGitTag = data.skipGitTag ?? false;
       const skipGitPush = data.skipGitPush ?? false;
       const targetPackage = data.targetPackage;
       let versionIncrement = data.versionIncrement;
       const prereleaseId = data.prereleaseId;
-      const notifyWebhook = data.notifyWebhook;
       const packageManager = config.packageManager ?? "bun";
 
       // Show startup banner
@@ -174,7 +172,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
       );
       logger.vibe(`  ${formatConfig("Build", skipBuild ? "SKIP" : "ON")}`);
       logger.vibe(`  ${formatConfig("Tests", skipTests ? "SKIP" : "ON")}`);
-      logger.vibe(`  ${formatConfig("Publish", skipPublish ? "SKIP" : "ON")}`);
+      logger.vibe(`  ${formatConfig("Publish", isCI ? "CI ONLY" : "SKIP")}`);
       logger.vibe("");
 
       if (isVerbose) {
@@ -255,7 +253,10 @@ export class ReleaseExecutor implements IReleaseExecutor {
         const packages = config.packages ?? [];
         for (const pkg of packages) {
           // Skip dependency updates in CI mode
-          if ((pkg.updateDeps === true || pkg.updateDeps === "force") && !isCI) {
+          if (
+            (pkg.updateDeps === true || pkg.updateDeps === "force") &&
+            !isCI
+          ) {
             const cwd = join(originalCwd, pkg.directory);
             const pkgJsonResult = packageService.getPackageJson(cwd, logger);
             if (pkgJsonResult.success) {
@@ -733,7 +734,11 @@ export class ReleaseExecutor implements IReleaseExecutor {
               releaseConfig,
             );
           } else {
-            logger.vibe(formatSkip("Skipping version bump (CI mode - using existing version)"));
+            logger.vibe(
+              formatSkip(
+                "Skipping version bump (CI mode - using existing version)",
+              ),
+            );
           }
 
           // Zip folders
@@ -775,8 +780,8 @@ export class ReleaseExecutor implements IReleaseExecutor {
             }
           }
 
-          // Create git tag and publish
-          if (!skipPublish && !packageFailed) {
+          // Create git tag and publish (publish only in CI, git tags can be local)
+          if (!packageFailed) {
             // Branch check RIGHT BEFORE git operations (last chance to warn)
             const currentBranch =
               globalGitInfo?.currentBranch ?? gitService.getCurrentBranch();
@@ -878,79 +883,74 @@ export class ReleaseExecutor implements IReleaseExecutor {
               globalGitInfo.newTag = versionInfo.newTag;
             }
 
-            // Ask about npm publish in interactive mode
-            let shouldPublish = true;
-            if (
-              !isCI &&
-              !skipPublish &&
-              !dryRun &&
-              releaseConfig.npm?.enabled !== false
-            ) {
-              shouldPublish = await confirm({
-                message: `Publish ${packageJson.name}@${versionInfo.newVersion} to npm?`,
-                default: true,
-              });
+            // NPM publish only happens in CI mode
+            if (isCI && !dryRun) {
+              // Run CI release command or npm publish
+              if (releaseConfig.ciReleaseCommand) {
+                const ciResult = publisher.runCiReleaseCommand(
+                  releaseConfig,
+                  packageJson.name,
+                  logger,
+                  dryRun,
+                );
+                if (handleFailure(ciResult, "CI release command")) {
+                  continue;
+                }
+              } else if (releaseConfig.npm?.enabled !== false) {
+                const npmResult = publisher.publishToNpm(
+                  cwd,
+                  packageJson,
+                  releaseConfig,
+                  logger,
+                  dryRun,
+                  ciEnv,
+                );
+                if (handleFailure(npmResult, "NPM publish")) {
+                  continue;
+                }
 
-              if (!shouldPublish) {
-                logger.vibe(formatSkip("Skipping npm publish"));
+                // Track NPM publish
+                if (npmResult.success && !dryRun) {
+                  publishedPackages.push({
+                    name: packageJson.name,
+                    version: versionInfo.newVersion,
+                    registry: "npm",
+                    url: `${MESSAGES.NPM_REGISTRY_URL}/${packageJson.name}`,
+                  });
+                }
+
+                // Also publish to JSR if configured
+                const jsrResult = publisher.publishToJsr(
+                  cwd,
+                  packageJson,
+                  releaseConfig,
+                  logger,
+                  dryRun,
+                );
+                if (handleFailure(jsrResult, "JSR publish")) {
+                  continue;
+                }
+
+                // Track JSR publish
+                if (
+                  jsrResult.success &&
+                  releaseConfig.jsr?.enabled &&
+                  !dryRun
+                ) {
+                  publishedPackages.push({
+                    name: packageJson.name,
+                    version: versionInfo.newVersion,
+                    registry: "jsr",
+                    url: `${MESSAGES.JSR_REGISTRY_URL}/@${packageJson.name}`,
+                  });
+                }
               }
-            }
-
-            // Run CI release command or npm publish
-            if (isCI && releaseConfig.ciReleaseCommand && shouldPublish) {
-              const ciResult = publisher.runCiReleaseCommand(
-                releaseConfig,
-                packageJson.name,
-                logger,
-                dryRun,
+            } else if (!isCI) {
+              logger.vibe(
+                formatSkip(
+                  "Skipping npm publish (local mode - only CI publishes)",
+                ),
               );
-              if (handleFailure(ciResult, "CI release command")) {
-                continue;
-              }
-            } else if (releaseConfig.npm?.enabled !== false && shouldPublish) {
-              const npmResult = publisher.publishToNpm(
-                cwd,
-                packageJson,
-                releaseConfig,
-                logger,
-                dryRun,
-                ciEnv,
-              );
-              if (handleFailure(npmResult, "NPM publish")) {
-                continue;
-              }
-
-              // Track NPM publish
-              if (npmResult.success && !dryRun) {
-                publishedPackages.push({
-                  name: packageJson.name,
-                  version: versionInfo.newVersion,
-                  registry: "npm",
-                  url: `${MESSAGES.NPM_REGISTRY_URL}/${packageJson.name}`,
-                });
-              }
-
-              // Also publish to JSR if configured
-              const jsrResult = publisher.publishToJsr(
-                cwd,
-                packageJson,
-                releaseConfig,
-                logger,
-                dryRun,
-              );
-              if (handleFailure(jsrResult, "JSR publish")) {
-                continue;
-              }
-
-              // Track JSR publish
-              if (jsrResult.success && releaseConfig.jsr?.enabled && !dryRun) {
-                publishedPackages.push({
-                  name: packageJson.name,
-                  version: versionInfo.newVersion,
-                  registry: "jsr",
-                  url: `${MESSAGES.JSR_REGISTRY_URL}/@${packageJson.name}`,
-                });
-              }
             }
 
             // Create GitHub/GitLab release if configured
@@ -1089,16 +1089,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
       logger.debug(MESSAGES.TIMING_REPORT, { ...timings });
 
       // Send notifications if configured
-      const notifyConfig =
-        config.notifications ||
-        (notifyWebhook
-          ? {
-              enabled: true,
-              webhookUrl: notifyWebhook,
-              onSuccess: true,
-              onFailure: true,
-            }
-          : undefined);
+      const notifyConfig = config.notifications;
 
       if (notifyConfig?.enabled) {
         const notifyResult = await notificationService.sendNotification(
@@ -1156,16 +1147,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
       timings.total = Date.now() - startTime;
 
       // Send failure notification if configured
-      const notifyConfig =
-        config?.notifications ||
-        (data.notifyWebhook
-          ? {
-              enabled: true,
-              webhookUrl: data.notifyWebhook,
-              onSuccess: true,
-              onFailure: true,
-            }
-          : undefined);
+      const notifyConfig = config?.notifications;
 
       if (notifyConfig?.enabled) {
         const notifyResult = await notificationService.sendNotification(

@@ -237,17 +237,6 @@ const { POST } = createEndpoint({
         z.boolean().optional().default(false),
       ),
 
-      skipPublish: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.releaseTool.fields.skipPublish.title",
-          description:
-            "app.api.system.releaseTool.fields.skipPublish.description",
-        },
-        z.boolean().optional().default(false),
-      ),
-
       skipChangelog: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -381,18 +370,6 @@ const { POST } = createEndpoint({
           label: "app.api.system.releaseTool.fields.commitMessage.title",
           description:
             "app.api.system.releaseTool.fields.commitMessage.description",
-          optional: true,
-        },
-        z.string().optional(),
-      ),
-
-      notifyWebhook: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.system.releaseTool.fields.notifyWebhook.title",
-          description:
-            "app.api.system.releaseTool.fields.notifyWebhook.description",
           optional: true,
         },
         z.string().optional(),
