@@ -19,17 +19,40 @@ Run parallel code quality checks (Oxlint + ESLint + TypeScript) with auto-fix en
 
 ## Performance
 
-Times vary by project size and cache state:
+Times vary by project size and cache state. **tsgo is enabled by default** (2-3x faster than tsc).
+
+### With tsgo (default)
 
 **Small project:**
-- With cache: ~1s total
-- Without cache: ~1s total
+- With cache: ~1s total (Oxlint: 0.5s, ESLint: 1.1s, TypeScript: 0.2s)
+- Without cache: ~1s total (Oxlint: 0.5s, ESLint: 1.1s, TypeScript: 0.2s)
 
 **Medium project:**
 - With cache: ~3s total (Oxlint: 2.5s, ESLint: 2.8s, TypeScript: 0.6s)
 - Without cache: ~6s total (Oxlint: 3.2s, ESLint: 4.4s, TypeScript: 5.8s)
 
-Caching provides significant speedup on subsequent runs.
+**Large project:**
+- With cache: ~10s total (Oxlint: 9.8s, ESLint: 3.7s, TypeScript: 3.8s)
+- Without cache: ~51s total (Oxlint: 16.8s, ESLint: 23.9s, TypeScript: 51.3s)
+
+### With tsc (if tsgo disabled)
+
+**Small project:**
+- With cache: ~1s total (Oxlint: 0.4s, ESLint: 1.1s, TypeScript: 1.0s)
+- Without cache: ~2s total (Oxlint: 0.5s, ESLint: 1.4s, TypeScript: 1.5s)
+
+**Medium project:**
+- With cache: ~13s total (Oxlint: 2.8s, ESLint: 2.1s, TypeScript: 12.5s)
+- Without cache: ~14s total (Oxlint: 3.3s, ESLint: 4.8s, TypeScript: 13.9s)
+
+**Large project:**
+- With cache: ~13s total (Oxlint: 10.8s, ESLint: 2.9s, TypeScript: 12.7s)
+- Without cache: ~73s total (Oxlint: 16.3s, ESLint: 24.2s, TypeScript: 72.9s)
+
+**Key insights:**
+- **Caching provides 5x speedup on large projects**
+- **tsgo is 2-3x faster than tsc for TypeScript checking**
+- **ESLint can be disabled** if you only need Oxlint rules (saves ~3s on large projects)
 
 ## Installation
 
@@ -66,8 +89,9 @@ vibe config-create
 vibe check
 ```
 
-The `config-create` command sets up:
+The `config-create` command interactively sets up:
 - `check.config.ts` - Main configuration
+- ESLint enable/disable - Only needed for rules not in Oxlint (import sorting, React hooks)
 - `.mcp.json` - MCP server config (optional)
 - `.vscode/settings.json` - VSCode integration (optional)
 - `package.json` scripts - npm run check/lint/typecheck (optional)
@@ -135,11 +159,13 @@ See [check.config.ts](./check.config.ts) for complete example with all options.
 - Unicorn modern JS rules
 - **Uses cache** for faster subsequent runs
 
-### ESLint
+### ESLint (Optional)
 - Import/export sorting
 - React hooks validation
 - React compiler rules
 - **Uses cache** for faster subsequent runs
+- **Can be disabled** if you don't need these rules (Oxlint covers most cases)
+- Only needed for rules not yet supported by Oxlint
 
 ### TypeScript
 - Full type checking with tsgo or tsc
