@@ -97,7 +97,8 @@
     "vite-tsconfig-paths": "6.0.3"
   },
   "bin": {
-    "vibe": ".dist/bin/vibe-runtime.js"
+    "vibe": ".dist/bin/vibe-runtime.js",
+    "v": ".dist/bin/vibe-runtime.js"
   },
   "keywords": [
     "cli",

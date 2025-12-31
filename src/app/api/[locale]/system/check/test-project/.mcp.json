@@ -3,7 +3,8 @@
     "vibe": {
       "command": "npx",
       "args": [
-        "@next-vibe/checker",
+        "--yes",
+        "@next-vibe/checker@latest",
         "mcp"
       ],
       "env": {

@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
     UserRole.MCP_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
-  aliases: ["config-create"],
+  aliases: ["config-create", "create-config", "cc"],
 
   fields: objectField(
     {
