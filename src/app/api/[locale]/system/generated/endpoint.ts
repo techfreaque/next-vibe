@@ -313,6 +313,7 @@ export const aliasToPathMap = {
   "subscription-cancel": "subscription_DELETE",
   "subscription-update": "subscription_PUT",
   system_builder_POST: "system_builder_POST",
+  system_check_config_create_POST: "system_check_config_create_POST",
   system_check_lint_POST: "system_check_lint_POST",
   system_check_oxlint_POST: "system_check_oxlint_POST",
   system_check_test_POST: "system_check_test_POST",
@@ -1564,6 +1565,10 @@ export async function getEndpoint(
     case "system_builder_POST":
       return (await import("@/app/api/[locale]/system/builder/definition"))
         .default.POST;
+    case "system_check_config_create_POST":
+      return (
+        await import("@/app/api/[locale]/system/check/config/create/definition")
+      ).default.POST;
     case "system_check_lint_POST":
       return (await import("@/app/api/[locale]/system/check/lint/definition"))
         .default.POST;

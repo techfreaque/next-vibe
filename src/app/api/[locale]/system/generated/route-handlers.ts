@@ -1024,6 +1024,10 @@ export async function getRouteHandler(
     case "system_builder_POST":
       return (await import("@/app/api/[locale]/system/builder/route")).tools
         .POST as GenericHandlerBase;
+    case "system_check_config_create_POST":
+      return (
+        await import("@/app/api/[locale]/system/check/config/create/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_check_lint_POST":
       return (await import("@/app/api/[locale]/system/check/lint/route")).tools
         .POST as GenericHandlerBase;

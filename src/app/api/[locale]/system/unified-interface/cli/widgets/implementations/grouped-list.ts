@@ -275,7 +275,11 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<
         typeof item.rule === "string" &&
         item.rule !== "unknown"
       ) {
-        const commandName = this.styleText(item.rule.padEnd(20), "bold", context);
+        const commandName = this.styleText(
+          item.rule.padEnd(20),
+          "bold",
+          context,
+        );
         parts.push(commandName);
       }
 

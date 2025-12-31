@@ -66,9 +66,10 @@ class HelpListRepository {
         const { t } = getTranslatorFromEndpoint(ep)(locale);
 
         // Use first alias if available, otherwise use full tool name
-        const displayName = ep.aliases && ep.aliases.length > 0
-          ? ep.aliases[0]
-          : ep.path.join("_");
+        const displayName =
+          ep.aliases && ep.aliases.length > 0
+            ? ep.aliases[0]
+            : ep.path.join("_");
 
         const translatedDescription =
           data.showDescriptions && ep.description

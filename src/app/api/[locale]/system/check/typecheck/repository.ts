@@ -475,7 +475,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
     try {
       // Load and validate configuration
-      const configResult = await ensureConfigReady(logger, data.createConfig);
+      const configResult = await ensureConfigReady(logger, false);
 
       if (!configResult.ready) {
         return success({

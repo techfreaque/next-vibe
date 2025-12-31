@@ -1472,6 +1472,11 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["browser", "click", "POST"],
     endpointDefinition_POST_234.POST,
   );
+  setNestedPath(
+    endpoints,
+    ["system", "generators", "endpoints-index", "POST"],
+    endpointDefinition_POST_19.POST,
+  );
 
   endpointsInstance = endpoints;
   return endpoints;

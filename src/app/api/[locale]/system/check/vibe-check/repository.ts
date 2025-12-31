@@ -73,7 +73,6 @@ export class VibeCheckRepository {
         path,
         fix,
         timeout,
-        createConfig: false,
         skipSorting: true,
         limit: 999999,
         page: 1,
@@ -103,7 +102,6 @@ export class VibeCheckRepository {
         fix,
         timeout,
         cacheDir,
-        createConfig: false,
         skipSorting: true,
         limit: 999999,
         page: 1,
@@ -128,7 +126,6 @@ export class VibeCheckRepository {
     const result = await typecheckRepository.execute(
       {
         path,
-        createConfig: false,
         timeout,
         skipSorting: true,
         disableFilter: false,
@@ -191,11 +188,11 @@ export class VibeCheckRepository {
   static async execute(
     data: VibeCheckRequestOutput,
     logger: EndpointLogger,
-    platform?: Platform,
+    platform: Platform,
   ): Promise<ResponseType<VibeCheckResponseOutput>> {
     const isMCP = platform === Platform.MCP;
     try {
-      const configResult = await ensureConfigReady(logger, data.createConfig);
+      const configResult = await ensureConfigReady(logger, false);
 
       if (!configResult.ready) {
         return success(
@@ -475,12 +472,14 @@ export class VibeCheckRepository {
       .size;
 
     // Build files list only if not skipped (for compact MCP responses)
-    let files: Array<{
-      file: string;
-      errors: number;
-      warnings: number;
-      total: number;
-    }> | undefined;
+    let files:
+      | Array<{
+          file: string;
+          errors: number;
+          warnings: number;
+          total: number;
+        }>
+      | undefined;
 
     if (!skipFiles) {
       const fileStats = this.buildFileStats(allIssues);

@@ -101,18 +101,6 @@ const { POST } = createEndpoint({
         z.string().optional().default("./.tmp"),
       ),
 
-      createConfig: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.check.lint.fields.createConfig.label",
-          description:
-            "app.api.system.check.lint.fields.createConfig.description",
-          columns: 3,
-        },
-        z.boolean().default(false),
-      ),
-
       limit: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
