@@ -21,39 +21,20 @@ Run parallel code quality checks (Oxlint + ESLint + TypeScript) with auto-fix en
 
 Times vary by project size and cache state. **tsgo is enabled by default** (2-3x faster than tsc).
 
-### With tsgo (default)
-
 **Small project:**
-
-- With cache: ~1s total (Oxlint: 0.5s, ESLint: 1.1s, TypeScript: 0.2s)
-- Without cache: ~1s total (Oxlint: 0.5s, ESLint: 1.1s, TypeScript: 0.2s)
+- With cache: 1.1s total (Oxlint: 0.48s, ESLint: 1.06s, TypeScript: 0.20s)
+- Without cache: 1.1s total (Oxlint: 0.48s, ESLint: 1.06s, TypeScript: 0.20s)
+- *With tsc: 1.1s cached / 1.5s uncached*
 
 **Medium project:**
-
-- With cache: ~3s total (Oxlint: 2.5s, ESLint: 2.8s, TypeScript: 0.6s)
-- Without cache: ~6s total (Oxlint: 3.2s, ESLint: 4.4s, TypeScript: 5.8s)
-
-**Large project:**
-
-- With cache: ~10s total (Oxlint: 9.8s, ESLint: 3.7s, TypeScript: 3.8s)
-- Without cache: ~51s total (Oxlint: 16.8s, ESLint: 23.9s, TypeScript: 51.3s)
-
-### With tsc (if tsgo disabled)
-
-**Small project:**
-
-- With cache: ~1s total (Oxlint: 0.4s, ESLint: 1.1s, TypeScript: 1.0s)
-- Without cache: ~2s total (Oxlint: 0.5s, ESLint: 1.4s, TypeScript: 1.5s)
-
-**Medium project:**
-
-- With cache: ~13s total (Oxlint: 2.8s, ESLint: 2.1s, TypeScript: 12.5s)
-- Without cache: ~14s total (Oxlint: 3.3s, ESLint: 4.8s, TypeScript: 13.9s)
+- With cache: 2.8s total (Oxlint: 2.55s, ESLint: 2.76s, TypeScript: 0.62s)
+- Without cache: 5.9s total (Oxlint: 3.17s, ESLint: 4.37s, TypeScript: 5.81s)
+- *With tsc: 12.5s cached / 13.9s uncached*
 
 **Large project:**
-
-- With cache: ~13s total (Oxlint: 10.8s, ESLint: 2.9s, TypeScript: 12.7s)
-- Without cache: ~73s total (Oxlint: 16.3s, ESLint: 24.2s, TypeScript: 72.9s)
+- With cache: 9.8s total (Oxlint: 9.80s, ESLint: 3.71s, TypeScript: 3.83s)
+- Without cache: 51.3s total (Oxlint: 16.76s, ESLint: 23.87s, TypeScript: 51.30s)
+- *With tsc: 12.7s cached / 72.9s uncached*
 
 **Key insights:**
 

@@ -4,7 +4,7 @@
     "": {
       "name": "check-test-project",
       "dependencies": {
-        "@next-vibe/checker": "^1.0.25",
+        "@next-vibe/checker": "^1.0.27",
       },
     },
   },
@@ -183,7 +183,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@next-vibe/checker": ["@next-vibe/checker@1.0.25", "", { "dependencies": { "@inquirer/prompts": "8.1.0", "argon2": "0.44.0", "chalk": "5.6.2", "commander": "14.0.2", "date-fns": "4.1.0", "dotenv": "17.2.3", "eslint-plugin-i18next": "6.1.3", "eslint-plugin-react-compiler": "19.1.0-rc.2", "fs-extra": "^11.3.3", "glob": "13.0.0", "gradient-string": "3.0.0", "jose": "6.1.3", "jsonc-parser": "3.3.1", "server-only": "0.0.1", "typescript": "5.9.3", "vite": "7.3.0", "zod": "4.2.1" }, "bin": { "vibe": ".dist/bin/vibe-runtime.js" } }, "sha512-r3jRIOPYzdinrXaVkT5mgcVPN6IcftkMI8jQuCWgV6SL5awatwgCnHB8+4A3WZS3Uvyu7fUZ2a+avOg7riOtGQ=="],
+    "@next-vibe/checker": ["@next-vibe/checker@1.0.27", "", { "dependencies": { "@inquirer/prompts": "8.1.0", "argon2": "0.44.0", "chalk": "5.6.2", "commander": "14.0.2", "date-fns": "4.1.0", "dotenv": "17.2.3", "eslint-plugin-i18next": "6.1.3", "eslint-plugin-react-compiler": "19.1.0-rc.2", "fs-extra": "^11.3.3", "glob": "13.0.0", "gradient-string": "3.0.0", "jose": "6.1.3", "jsonc-parser": "3.3.1", "server-only": "0.0.1", "typescript": "5.9.3", "vite": "7.3.0", "zod": "4.2.1" }, "bin": { "vibe": ".dist/bin/vibe-runtime.js", "v": ".dist/bin/vibe-runtime.js" } }, "sha512-bVGDC6Pcd/NulUSaP2UI5L7xrdXnM7wPpOcTmoD/BaxxLn3BDHjfyGyV0AfPwhEREfG77z+q7tqgv+niDbCiAw=="],
 
     "@phc/format": ["@phc/format@1.0.0", "", {}, "sha512-m7X9U6BG2+J+R1lSOdCiITLLrxm+cWlNI3HUFA92oLO77ObGNzaKdh8pMLqdZcshtkKuV84olNNXDfMc4FezBQ=="],
 

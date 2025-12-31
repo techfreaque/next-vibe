@@ -9,6 +9,6 @@
     "cc-r": "v config-create"
   },
   "dependencies": {
-    "@next-vibe/checker": "^1.0.25"
+    "@next-vibe/checker": "^1.0.27"
   }
 }

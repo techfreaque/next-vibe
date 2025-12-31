@@ -347,7 +347,17 @@ export class RouteDelegationHandler {
     // Merge CLI data with provided data using registry
     const contextData = context.data;
     if (contextData || (cliData && Object.keys(cliData).length > 0)) {
+      // Merge context options (interactive, dryRun) into data if not already set
+      const optionsData: Partial<InputData> = {};
+      if (context.options?.interactive !== undefined) {
+        optionsData.interactive = context.options.interactive;
+      }
+      if (context.options?.dryRun !== undefined) {
+        optionsData.dryRun = context.options.dryRun;
+      }
+
       const mergedData = routeExecutionExecutor.mergeData(
+        optionsData || {},
         contextData || {},
         cliData || {},
       );
@@ -372,9 +382,16 @@ export class RouteDelegationHandler {
         logger.warn(
           `⚠️  Missing required fields: ${missingRequired.join(", ")}`,
         );
-        inputData.data = await this.generateFormFromEndpoint(
+        const formData = await this.generateFormFromEndpoint(
           endpoint,
           "request",
+        );
+
+        // Merge with existing data and options
+        inputData.data = routeExecutionExecutor.mergeData(
+          optionsData,
+          inputData.data || {},
+          formData,
         );
       }
     } else if (
@@ -383,10 +400,29 @@ export class RouteDelegationHandler {
     ) {
       // No data provided and interactive mode allowed
       logger.info("📝 Request Data:");
-      inputData.data = await this.generateFormFromEndpoint(endpoint, "request");
+      const formData = await this.generateFormFromEndpoint(endpoint, "request");
+
+      // Merge context options into form data
+      const optionsData: Partial<InputData> = {};
+      if (context.options?.interactive !== undefined) {
+        optionsData.interactive = context.options.interactive;
+      }
+      if (context.options?.dryRun !== undefined) {
+        optionsData.dryRun = context.options.dryRun;
+      }
+
+      inputData.data = routeExecutionExecutor.mergeData(optionsData, formData);
     } else {
       // No CLI data and interactive mode disabled - use empty data
-      inputData.data = {};
+      const optionsData: Partial<InputData> = {};
+      if (context.options?.interactive !== undefined) {
+        optionsData.interactive = context.options.interactive;
+      }
+      if (context.options?.dryRun !== undefined) {
+        optionsData.dryRun = context.options.dryRun;
+      }
+
+      inputData.data = optionsData;
     }
 
     // Collect URL parameters if needed
