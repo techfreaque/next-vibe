@@ -110,6 +110,7 @@ export function parseSearchParams(searchParams: URLSearchParams): ParsedObject {
 /**
  * Parse FormData and convert dot notation to nested objects
  * Example: fileUpload.file => { fileUpload: { file: File } }
+ * Handles multiple values with same key as arrays (e.g., multiple attachments)
  */
 function parseFormData(
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility between Next.js and web standards
@@ -121,6 +122,7 @@ function parseFormData(
   | boolean
   | null
   | File
+  | File[]
   | Record<string, string | number | boolean | null | File>
 > {
   const result: Record<
@@ -130,10 +132,26 @@ function parseFormData(
     | boolean
     | null
     | File
+    | File[]
     | Record<string, string | number | boolean | null | File>
   > = {};
 
+  // First pass: collect all values for each key
+  const keyValues: Map<string, Array<string | File>> = new Map();
   for (const [key, value] of formData.entries()) {
+    if (!keyValues.has(key)) {
+      keyValues.set(key, []);
+    }
+    keyValues.get(key)!.push(value);
+  }
+
+  // Second pass: process values
+  for (const [key, values] of keyValues.entries()) {
+    // Always keep arrays for keys that expect multiple values (like "attachments")
+    // Otherwise, unwrap single values
+    const value =
+      key === "attachments" ? values : values.length === 1 ? values[0] : values;
+
     if (key.includes(".")) {
       // Handle dot notation for nested objects
       const parts = key.split(".");
@@ -144,6 +162,7 @@ function parseFormData(
         | boolean
         | null
         | File
+        | File[]
         | Record<string, string | number | boolean | null | File>
       > = result;
 
@@ -183,6 +202,9 @@ function parseFormData(
         "size" in value
       ) {
         result[key] = value;
+      } else if (Array.isArray(value)) {
+        // Handle arrays (multiple values with same key)
+        result[key] = value;
       } else {
         result[key] = value;
       }
@@ -193,7 +215,7 @@ function parseFormData(
 }
 
 /**
- * Merged value type - extends ParsedValue to include File
+ * Merged value type - extends ParsedValue to include File and File[]
  */
 type MergedValue =
   | string
@@ -201,6 +223,7 @@ type MergedValue =
   | boolean
   | null
   | File
+  | File[]
   | MergedObject
   | readonly MergedValue[];
 interface MergedObject {
@@ -259,6 +282,7 @@ export async function parseRequestBody(
     | boolean
     | null
     | File
+    | File[]
     | Record<string, string | number | boolean | null | File>
   >
 > {
@@ -297,6 +321,7 @@ export async function parseRequestBody(
           | boolean
           | null
           | File
+          | File[]
           | Record<string, string | number | boolean | null | File>
         >;
       }

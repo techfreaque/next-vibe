@@ -196,6 +196,7 @@ class AiStreamRepository implements IAiStreamRepository {
       toolConfirmationResult,
       voiceMode,
       voiceTranscription,
+      userMessageMetadata,
     } = setupResult.data;
 
     let systemPrompt = initialSystemPrompt;
@@ -294,6 +295,7 @@ class AiStreamRepository implements IAiStreamRepository {
               effectiveContent,
               toolConfirmationResult,
               voiceTranscription,
+              userMessageMetadata,
               controller,
               encoder,
               logger,
@@ -977,6 +979,17 @@ class AiStreamRepository implements IAiStreamRepository {
       confidence: number | null;
       durationSeconds: number | null;
     } | null;
+    /** User message metadata (including attachments) */
+    userMessageMetadata?: {
+      attachments?: Array<{
+        id: string;
+        url: string;
+        filename: string;
+        mimeType: string;
+        size: number;
+        data?: string;
+      }>;
+    };
   }): void {
     const {
       isNewThread,
@@ -995,6 +1008,7 @@ class AiStreamRepository implements IAiStreamRepository {
       logger,
       toolConfirmationResult,
       voiceTranscription,
+      userMessageMetadata,
     } = params;
 
     // Emit thread-created event if new thread
@@ -1055,6 +1069,7 @@ class AiStreamRepository implements IAiStreamRepository {
         parentId: effectiveParentMessageId || null,
         depth: messageDepth,
         content: effectiveContent,
+        metadata: userMessageMetadata,
       });
       const userMessageEventString = formatSSEEvent(userMessageEvent);
       logger.debug("USER MESSAGE_CREATED event formatted", {

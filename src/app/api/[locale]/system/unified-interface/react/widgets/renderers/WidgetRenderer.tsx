@@ -3,7 +3,10 @@
 import type { JSX } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type {
+  CreateApiEndpointAny,
+  UnifiedField,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import type {
@@ -66,6 +69,8 @@ export interface WidgetRendererProps<TKey extends string> {
   onSubmit?: () => void;
   /** Whether the form is currently submitting/loading */
   isSubmitting?: boolean;
+  /** Endpoint definition (required for some widgets like FormFieldWidget) */
+  endpoint: CreateApiEndpointAny;
 }
 
 /**
@@ -105,6 +110,7 @@ export function WidgetRenderer<const TKey extends string>({
   form,
   onSubmit,
   isSubmitting,
+  endpoint,
 }: WidgetRendererProps<TKey>): JSX.Element {
   const baseProps = {
     field,
@@ -116,6 +122,7 @@ export function WidgetRenderer<const TKey extends string>({
     form,
     onSubmit,
     isSubmitting,
+    endpoint,
   };
 
   // Wrap widget in error boundary
@@ -131,7 +138,7 @@ export function WidgetRenderer<const TKey extends string>({
  * Maps widget types to their corresponding widget components
  *
  * @param widgetType - Type of widget to render
- * @param baseProps - Base props (field, value, context, className, style, form, onSubmit, isSubmitting)
+ * @param baseProps - Base props (field, value, context, className, style, form, onSubmit, isSubmitting, endpoint)
  * @returns Rendered widget component
  */
 function renderWidget<const TKey extends string>(
@@ -146,6 +153,7 @@ function renderWidget<const TKey extends string>(
     form?: UseFormReturn<FieldValues>;
     onSubmit?: () => void;
     isSubmitting?: boolean;
+    endpoint: CreateApiEndpointAny;
   },
 ): JSX.Element {
   switch (widgetType) {

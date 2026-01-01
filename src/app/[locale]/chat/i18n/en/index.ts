@@ -285,7 +285,9 @@ export const translations = {
       transcribing: "Transcribing...",
     },
     attachments: {
-      uploadFile: "Attach file",
+      uploadFile: "Attach files",
+      attachedFiles: "Attached Files",
+      addMore: "Add More",
       removeFile: "Remove file",
       fileTooLarge: "File is too large (max 10MB)",
       invalidFileType: "Invalid file type",

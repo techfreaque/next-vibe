@@ -86,35 +86,75 @@ class SetupInstallRepositoryImpl implements SetupInstallRepository {
 
   /**
    * Create the binary content for the current platform
+   *
+   * The global binary acts as a small dispatcher that resolves the correct
+   * vibe-runtime.ts **based on the current working directory** instead of a
+   * single hard-coded project path.
+   *
+   * It walks up from the CWD until it finds the expected relative path and
+   * then executes that file with Bun. This allows a single global "vibe"
+   * binary to work with multiple projects on the same machine.
    */
-  private createBinaryContent(vibeTsPath: string): string {
+  private createBinaryContent(vibeRelativePath: string): string {
     const platform = os.platform();
 
     if (platform === "win32") {
       // Windows batch file
+      // The script starts from %CD% and walks up the directory tree,
+      // searching for the configured relative path.
       // eslint-disable-next-line i18next/no-literal-string
       return `@echo off
 setlocal enabledelayedexpansion
 
 REM Vibe CLI Windows Binary
-REM Executes vibe.ts with Bun
+REM Searches for vibe-runtime.ts from current directory upwards and executes with Bun
 
-REM Execute with Bun
-bun "${vibeTsPath}" %*
+set "REL_PATH=${vibeRelativePath}"
+set "CURRENT_DIR=%CD%"
 
-REM Exit with the same code as the Bun process
-exit /b %errorlevel%
+:find_vibe
+if exist "%CURRENT_DIR%%REL_PATH%" (
+  bun "%CURRENT_DIR%%REL_PATH%" %*
+  exit /b %errorlevel%
+)
+
+for %%I in ("%CURRENT_DIR%") do set "PARENT_DIR=%%~dpI"
+REM If we reached the root (parent dir is same as current), stop searching
+if /I "%PARENT_DIR:~0,-1%"=="%CURRENT_DIR%" goto not_found
+
+set "CURRENT_DIR=%PARENT_DIR:~0,-1%"
+goto find_vibe
+
+:not_found
+echo vibe: could not find vibe-runtime.ts starting from %CD% 1>&2
+exit /b 1
 `;
     }
+
     // Unix shell script (Linux/macOS)
+    // The script starts from $(pwd) and walks up the directory tree,
+    // searching for the configured relative path.
     // eslint-disable-next-line i18next/no-literal-string
     return `#!/bin/bash
 
 # Vibe CLI Unix Binary
-# Executes vibe.ts with Bun
+# Searches for vibe-runtime.ts from current directory upwards and executes with Bun
 
-# Execute with Bun
-exec bun "${vibeTsPath}" "$@"
+REL_PATH="${vibeRelativePath}"
+
+current_dir="$(pwd)"
+root="/"
+
+while [ "$current_dir" != "$root" ]; do
+  candidate="$current_dir/$REL_PATH"
+  if [ -f "$candidate" ]; then
+    exec bun "$candidate" "$@"
+  fi
+  current_dir="$(dirname "$current_dir")"
+done
+
+echo "vibe: could not find vibe-runtime.ts (looked for $REL_PATH upwards from $(pwd))" 1>&2
+exit 1
 `;
   }
 
@@ -193,8 +233,7 @@ exec bun "${vibeTsPath}" "$@"
       // Get paths for Bun-based installation
 
       /* eslint-disable i18next/no-literal-string */
-      const vibeTsPath = path.join(
-        process.cwd(),
+      const vibeRelativePath = path.join(
         "src",
         "app",
         "api",
@@ -204,17 +243,18 @@ exec bun "${vibeTsPath}" "$@"
         "cli",
         "vibe-runtime.ts",
       );
+      const vibeTsAbsolutePath = path.join(process.cwd(), vibeRelativePath);
       /* eslint-enable i18next/no-literal-string */
 
       // Verify vibe-runtime.ts exists
-      if (!existsSync(vibeTsPath)) {
+      if (!existsSync(vibeTsAbsolutePath)) {
         return fail({
           message:
             "app.api.system.unifiedInterface.cli.setup.install.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             // eslint-disable-next-line i18next/no-literal-string
-            error: `vibe-runtime.ts not found at ${vibeTsPath}`,
+            error: `vibe-runtime.ts not found at ${vibeTsAbsolutePath}`,
 
             cwd: process.cwd(),
           },
@@ -256,8 +296,8 @@ exec bun "${vibeTsPath}" "$@"
         });
       }
 
-      // Create binary content
-      const binaryContent = this.createBinaryContent(vibeTsPath);
+      // Create binary content with the RELATIVE path so it can be found from any project
+      const binaryContent = this.createBinaryContent(vibeRelativePath);
 
       // Write binary file
       writeFileSync(targetPath, binaryContent, { mode: 0o755 });

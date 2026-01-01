@@ -289,7 +289,9 @@ export const translations: typeof enTranslations = {
       transcribing: "Transkribiere...",
     },
     attachments: {
-      uploadFile: "Datei anhängen",
+      uploadFile: "Dateien anhängen",
+      attachedFiles: "Angehängte Dateien",
+      addMore: "Mehr hinzufügen",
       removeFile: "Datei entfernen",
       fileTooLarge: "Datei ist zu groß (max 10MB)",
       invalidFileType: "Ungültiger Dateityp",

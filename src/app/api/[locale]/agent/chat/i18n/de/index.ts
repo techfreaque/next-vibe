@@ -3,6 +3,7 @@ import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/de
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/de";
 import { translations as charaktersTranslations } from "../../characters/i18n/de";
 import { translations as favoritesTranslations } from "../../favorites/i18n/de";
+import { translations as filesTranslations } from "../../files/[threadId]/[filename]/i18n/de";
 import { translations as foldersTranslations } from "../../folders/i18n/de";
 import { translations as memoriesTranslations } from "../../memories/i18n/de";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/de";
@@ -14,6 +15,7 @@ export const translations: typeof enTranslations = {
   tags: {
     threads: "Threads",
     folders: "Ordner",
+    files: "Dateien",
     messages: "Nachrichten",
     characters: "Charaktere",
     memories: "Erinnerungen",
@@ -301,6 +303,7 @@ export const translations: typeof enTranslations = {
   },
   aiStream: aiStreamTranslations,
   credits: creditsTranslations,
+  files: filesTranslations,
   folders: foldersTranslations,
   memories: memoriesTranslations,
   characters: charaktersTranslations,
@@ -351,5 +354,12 @@ export const translations: typeof enTranslations = {
     roleplay: "Rollenspiel",
     roleplayDark: "Dunkles Rollenspiel",
     violence: "Gewalt",
+  },
+  input: {
+    attachments: {
+      uploadFile: "Dateien anhängen",
+      attachedFiles: "Angehängte Dateien",
+      addMore: "Mehr hinzufügen",
+    },
   },
 };

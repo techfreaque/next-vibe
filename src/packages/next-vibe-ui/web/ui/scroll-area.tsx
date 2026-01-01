@@ -40,7 +40,7 @@ export function ScrollArea({
       <div
         className="h-full w-full rounded-[inherit]"
         data-radix-scroll-area-viewport=""
-        style={{ overflow: "hidden scroll" }}
+        style={{ overflow: "auto" }}
       >
         {children}
       </div>

@@ -52,6 +52,12 @@ export interface StorageAdapter {
    * Check if a file exists
    */
   fileExists(fileId: string): Promise<boolean>;
+
+  /**
+   * Read file contents as base64
+   * Used for passing file data to AI when processing message history
+   */
+  readFileAsBase64(fileId: string, threadId: string): Promise<string | null>;
 }
 
 export interface FileUploadResult {

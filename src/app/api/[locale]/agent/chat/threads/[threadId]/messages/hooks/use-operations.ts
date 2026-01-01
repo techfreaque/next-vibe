@@ -16,6 +16,7 @@ import { DefaultFolderId } from "../../../../config";
 import { createCreditUpdateCallback } from "../../../../credit-updater";
 import type { ChatMessage } from "../../../../db";
 import { ChatMessageRole, NEW_MESSAGE_ID } from "../../../../enum";
+import { useChatStore } from "../../../../hooks/store";
 import type { ModelId } from "../../../../model-access/models";
 import { useVoiceModeStore } from "../../../../voice-mode/store";
 import { getCallModeKey } from "../../../../voice-mode/types";
@@ -106,6 +107,7 @@ interface MessageOperationsDeps {
     enabledToolIds: string[];
   };
   setInput: (input: string) => void;
+  setAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;
   deductCredits: (creditCost: number, feature: string) => void;
 }
 
@@ -126,6 +128,7 @@ export function useMessageOperations(
     streamStore,
     settings,
     setInput,
+    setAttachments,
     deductCredits,
   } = deps;
 
@@ -344,11 +347,9 @@ export function useMessageOperations(
             toolConfirmation: params.toolConfirmation ?? null,
             messageHistory: messageHistory ?? null,
             attachments:
-              currentRootFolderId === DefaultFolderId.INCOGNITO
-                ? null
-                : params.attachments.length > 0
-                  ? params.attachments
-                  : null,
+              params.attachments.length > 0
+                ? params.attachments // Always pass attachments to AI (both for saving AND for AI to see them)
+                : null,
             voiceMode: effectiveVoiceMode,
             audioInput: params.audioInput ?? { file: null },
           },
@@ -389,8 +390,9 @@ export function useMessageOperations(
           });
         } else {
           setInput("");
+          setAttachments([]);
           logger.debug(
-            "Message operations: Input cleared after successful stream",
+            "Message operations: Input and attachments cleared after successful stream",
           );
         }
       } catch (error) {
@@ -415,6 +417,7 @@ export function useMessageOperations(
       aiStream,
       settings,
       setInput,
+      setAttachments,
       activeThreadId,
       currentRootFolderId,
       currentSubFolderId,

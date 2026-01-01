@@ -20,14 +20,14 @@ export const { GET, tools } = endpointsHandler({
     email: undefined,
     handler: async (props) => {
       const result = await ChatFileRepository.getFile(
-        props.data,
+        props.urlPathParams,
         props.user,
         props.logger,
       );
 
       if (result.buffer.length === 0) {
         return fail({
-          message: "app.api.agent.chat.files.errors.fileNotFound",
+          message: "app.api.agent.chat.files.get.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }

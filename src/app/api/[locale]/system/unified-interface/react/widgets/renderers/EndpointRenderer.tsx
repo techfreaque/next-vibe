@@ -263,6 +263,7 @@ export function EndpointRenderer<
         form={form as UseFormReturn<FieldValues>}
         onSubmit={handleWidgetSubmit}
         isSubmitting={isSubmitting}
+        endpoint={endpoint}
       />
     );
 
@@ -328,6 +329,7 @@ export function EndpointRenderer<
       form={form as UseFormReturn<FieldValues>}
       onSubmit={handleWidgetSubmit}
       isSubmitting={isSubmitting}
+      endpoint={endpoint}
     />
   ));
 

@@ -6,7 +6,7 @@
 import type { MessageResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 
 import type { DefaultFolderId } from "../chat/config";
-import type { ToolCall, ToolCallResult } from "../chat/db";
+import type { MessageMetadata, ToolCall, ToolCallResult } from "../chat/db";
 import type { ChatMessageRole } from "../chat/enum";
 import type { ModelId } from "../chat/model-access/models";
 
@@ -62,6 +62,7 @@ export interface MessageCreatedEventData {
   character?: string;
   sequenceId?: string | null; // Links messages in the same AI response sequence
   toolCall?: ToolCall; // Tool call for TOOL role messages (singular - each TOOL message has exactly one tool call)
+  metadata?: MessageMetadata; // Message metadata including attachments, tokens, etc.
 }
 
 /**

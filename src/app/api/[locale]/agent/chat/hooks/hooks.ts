@@ -379,19 +379,18 @@ export function useChat(
         return currentInput;
       });
 
-      // Load attachments
+      // Load attachments - only update if we have draft attachments
       if (draftAttachments.length > 0) {
         setAttachments(draftAttachments);
         logger.debug("Chat: Loading draft attachments", {
           draftKey,
           attachmentCount: draftAttachments.length,
         });
-      } else {
-        setAttachments([]);
       }
     };
     void loadDraftForContext();
-  }, [draftKey, logger]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftKey]);
 
   // Wrapper function to save input and draft together
   const setInputAndSaveDraft = useCallback(
@@ -539,6 +538,7 @@ export function useChat(
     },
     settings: settingsOps.settings,
     setInput: setInputAndSaveDraft,
+    setAttachments: setAttachmentsAndSaveDraft,
     deductCredits: creditsHook.deductCredits,
   });
 
