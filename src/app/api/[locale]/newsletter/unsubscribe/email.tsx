@@ -1,6 +1,6 @@
 /**
- * Newsletter Unsubscribe API Email Templates
- * React Email templates for newsletter unsubscription operations
+ * Newsletter Unsubscribe Email Templates
+ * Refactored to separate template from business logic
  */
 
 import { Button, Hr, Section } from "@react-email/components";
@@ -9,10 +9,12 @@ import {
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { JSX } from "react";
+import type { ReactElement } from "react";
 import React from "react";
+import { z } from "zod";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -25,22 +27,42 @@ import type {
   UnsubscribePostResponseOutput as NewsletterUnsubscribeResponseType,
 } from "./definition";
 
-/**
- * Unsubscribe Confirmation Email Template Component
- */
-function UnsubscribeConfirmationEmailContent({
-  requestData,
+// ============================================================================
+// TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
+// ============================================================================
+
+const newsletterUnsubscribePropsSchema = z.object({
+  email: z.string().email(),
+});
+
+type NewsletterUnsubscribeProps = z.infer<
+  typeof newsletterUnsubscribePropsSchema
+>;
+
+function NewsletterUnsubscribeEmail({
+  props,
   t,
   locale,
+  tracking,
 }: {
-  requestData: NewsletterUnsubscribeType;
+  props: NewsletterUnsubscribeProps;
   t: TFunction;
   locale: CountryLanguage;
-}): JSX.Element {
-  // Create tracking context for unsubscribe emails
-  const tracking = createTrackingContext(
-    locale, // no campaignId for transactional emails
-  );
+  tracking?: {
+    userId?: string;
+    leadId?: string;
+    sessionId?: string;
+  };
+}): ReactElement {
+  const trackingContext = tracking
+    ? createTrackingContext(
+        locale,
+        tracking.leadId,
+        tracking.userId,
+        undefined,
+        undefined,
+      )
+    : createTrackingContext(locale);
 
   return (
     <EmailTemplate
@@ -48,7 +70,7 @@ function UnsubscribeConfirmationEmailContent({
       locale={locale}
       title={t("app.api.newsletter.email.unsubscribe.title")}
       previewText={t("app.api.newsletter.email.unsubscribe.preview")}
-      tracking={tracking}
+      tracking={trackingContext}
     >
       <div
         style={{
@@ -70,7 +92,7 @@ function UnsubscribeConfirmationEmailContent({
         }}
       >
         {t("app.api.newsletter.email.unsubscribe.confirmation", {
-          email: requestData.email,
+          email: props.email,
         })}
       </div>
 
@@ -117,9 +139,29 @@ function UnsubscribeConfirmationEmailContent({
   );
 }
 
-/**
- * Admin Notification Email Template Component
- */
+// Template Definition Export
+const newsletterUnsubscribeTemplate: EmailTemplateDefinition<NewsletterUnsubscribeProps> =
+  {
+    meta: {
+      id: "newsletter-unsubscribe",
+      version: "1.0.0",
+      name: "app.api.emails.templates.newsletter.unsubscribe.meta.name",
+      description:
+        "app.api.emails.templates.newsletter.unsubscribe.meta.description",
+      category: "newsletter",
+      path: "/newsletter/unsubscribe/email.tsx",
+      defaultSubject: (t) => t("app.api.newsletter.email.unsubscribe.subject"),
+    },
+    schema: newsletterUnsubscribePropsSchema,
+    component: NewsletterUnsubscribeEmail,
+  };
+
+export default newsletterUnsubscribeTemplate;
+
+// ============================================================================
+// ADMIN NOTIFICATION TEMPLATE (Component - Not Registered)
+// ============================================================================
+
 function AdminUnsubscribeNotificationEmailContent({
   requestData,
   t,
@@ -128,11 +170,8 @@ function AdminUnsubscribeNotificationEmailContent({
   requestData: NewsletterUnsubscribeType;
   t: TFunction;
   locale: CountryLanguage;
-}): JSX.Element {
-  // Create tracking context for admin emails
-  const tracking = createTrackingContext(
-    locale, // no campaignId for transactional emails
-  );
+}): ReactElement {
+  const tracking = createTrackingContext(locale);
 
   return (
     <EmailTemplate
@@ -219,9 +258,13 @@ function AdminUnsubscribeNotificationEmailContent({
   );
 }
 
+// ============================================================================
+// ADAPTERS (Business Logic - Maps endpoint data to template props)
+// ============================================================================
+
 /**
- * Unsubscribe Confirmation Email for Users
- * Renders a confirmation email when users unsubscribe from newsletter
+ * Unsubscribe Confirmation Email Adapter
+ * Maps unsubscribe request to confirmation template props
  */
 export const renderUnsubscribeConfirmationMail: EmailFunctionType<
   NewsletterUnsubscribeType,
@@ -229,12 +272,16 @@ export const renderUnsubscribeConfirmationMail: EmailFunctionType<
   never
 > = ({ requestData, locale, t }) => {
   try {
+    const templateProps: NewsletterUnsubscribeProps = {
+      email: requestData.email,
+    };
+
     return success({
       toEmail: requestData.email,
       toName: requestData.email,
       subject: t("app.api.newsletter.email.unsubscribe.subject"),
-      jsx: UnsubscribeConfirmationEmailContent({
-        requestData,
+      jsx: newsletterUnsubscribeTemplate.component({
+        props: templateProps,
         t,
         locale,
       }),
@@ -248,8 +295,8 @@ export const renderUnsubscribeConfirmationMail: EmailFunctionType<
 };
 
 /**
- * Admin Notification Email for Unsubscribe
- * Sends a notification to the admin when a user unsubscribes
+ * Admin Unsubscribe Notification Email Adapter
+ * Sends notification to admin when user unsubscribes
  */
 export const renderAdminUnsubscribeNotificationMail: EmailFunctionType<
   NewsletterUnsubscribeType,

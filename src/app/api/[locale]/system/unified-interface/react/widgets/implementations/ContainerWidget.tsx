@@ -60,6 +60,7 @@ export function ContainerWidget<const TKey extends string>({
   fieldName,
   onSubmit,
   isSubmitting,
+  endpoint,
 }: ReactWidgetProps<typeof WidgetTypeEnum.CONTAINER, TKey>): JSX.Element {
   const { t } = getTranslator(context);
   const { t: globalT } = simpleT(context.locale);
@@ -508,6 +509,7 @@ export function ContainerWidget<const TKey extends string>({
                 onSubmit={onSubmit}
                 isSubmitting={isSubmitting}
                 className={colSpanClass}
+                endpoint={endpoint}
               />
             );
           })}
@@ -680,6 +682,7 @@ export function ContainerWidget<const TKey extends string>({
                 onSubmit={onSubmit}
                 isSubmitting={isSubmitting}
                 className={colSpanClass}
+                endpoint={endpoint}
               />
             );
           })}

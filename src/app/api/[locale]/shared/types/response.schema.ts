@@ -148,13 +148,58 @@ export function createStreamingResponse(response: Response): StreamingResponse {
  * Type guard to check if a response is a streaming response
  */
 export function isStreamingResponse<T>(
-  value: ResponseType<T> | StreamingResponse,
+  value: ResponseType<T> | StreamingResponse | FileResponse,
 ): value is StreamingResponse {
   return (
     typeof value === "object" &&
     value !== null &&
     "__isStreamingResponse" in value &&
     value.__isStreamingResponse === true
+  );
+}
+
+/**
+ * File response marker
+ * When a handler returns this, the Next.js handler will return a NextResponse with binary data
+ * without wrapping it in NextResponse.json()
+ *
+ * NOTE: This is NOT part of ResponseType - it's a separate return type for file handlers
+ */
+export interface FileResponse {
+  __isFileResponse: true;
+  buffer: Buffer | ReadableStream | Blob;
+  contentType: string;
+  headers?: Record<string, string>;
+}
+
+/**
+ * Create a file response marker
+ * Use this in handlers that need to return binary file responses
+ */
+export function createFileResponse(
+  buffer: Buffer | ReadableStream | Blob,
+  contentType: string,
+  headers?: Record<string, string>,
+): FileResponse {
+  return {
+    __isFileResponse: true,
+    buffer,
+    contentType,
+    headers,
+  };
+}
+
+/**
+ * Type guard to check if a response is a file response
+ */
+export function isFileResponse<T>(
+  value: ResponseType<T> | StreamingResponse | FileResponse,
+): value is FileResponse {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "__isFileResponse" in value &&
+    value.__isFileResponse === true
   );
 }
 

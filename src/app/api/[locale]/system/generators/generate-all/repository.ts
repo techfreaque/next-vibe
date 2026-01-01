@@ -67,8 +67,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("📝 Generating endpoints index (singleton)...");
-              const { endpointsIndexGeneratorRepository } =
-                await import("../endpoints-index/repository");
+              const { endpointsIndexGeneratorRepository } = await import(
+                "../endpoints-index/repository"
+              );
 
               const result =
                 await endpointsIndexGeneratorRepository.generateEndpointsIndex(
@@ -107,8 +108,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("📝 Generating endpoint (dynamic imports)...");
-              const { endpointGeneratorRepository } =
-                await import("../endpoint/repository");
+              const { endpointGeneratorRepository } = await import(
+                "../endpoint/repository"
+              );
 
               const result = await endpointGeneratorRepository.generateEndpoint(
                 {
@@ -146,8 +148,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               outputLines.push(
                 "📝 Generating route handlers (dynamic imports)...",
               );
-              const { routeHandlersGeneratorRepository } =
-                await import("../route-handlers/repository");
+              const { routeHandlersGeneratorRepository } = await import(
+                "../route-handlers/repository"
+              );
 
               const result =
                 await routeHandlersGeneratorRepository.generateRouteHandlers(
@@ -309,6 +312,45 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorsSkipped++;
       }
 
+      // 5. Email Templates Generator
+      generatorPromises.push(
+        (async (): Promise<string | null> => {
+          try {
+            outputLines.push("📧 Generating email templates registry...");
+            const { emailTemplateGeneratorRepository } = await import(
+              "../email-templates/repository"
+            );
+
+            const result =
+              await emailTemplateGeneratorRepository.generateEmailTemplates(
+                {
+                  outputFile:
+                    "src/app/api/[locale]/emails/registry/generated.ts",
+                  dryRun: false,
+                },
+                logger,
+              );
+
+            if (result.success) {
+              outputLines.push(
+                "✅ Email templates registry generated successfully",
+              );
+              generatorsRun++;
+              return "email-templates";
+            }
+            outputLines.push(
+              `❌ Email templates generation failed: ${result.message || "Unknown error"}`,
+            );
+            return null;
+          } catch (error) {
+            outputLines.push(
+              `❌ Email templates generator failed: ${parseError(error).message}`,
+            );
+            return null;
+          }
+        })(),
+      );
+
       // Wait for all generators to complete
       const results = await Promise.allSettled(generatorPromises);
       const completedGenerators: string[] = [];
@@ -328,7 +370,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generationCompleted: true,
         output: outputLines.join("\n"),
         generationStats: {
-          totalGenerators: 6,
+          totalGenerators: 7,
           generatorsRun,
           generatorsSkipped,
           outputDirectory:

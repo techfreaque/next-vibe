@@ -1,3 +1,8 @@
+/**
+ * Password Reset Request Email Templates
+ * Refactored to separate template from business logic
+ */
+
 import { Button, Section, Text } from "@react-email/components";
 import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
@@ -6,12 +11,16 @@ import {
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import type React from "react";
+import type { ReactElement } from "react";
+import React from "react";
+import { z } from "zod";
 
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
+
 import { UserDetailLevel } from "../../../enum";
 import { UserRepository } from "../../../repository";
 import { PasswordRepository } from "../repository";
@@ -22,20 +31,44 @@ import type {
 import { createTrackingContext } from "@/app/api/[locale]/emails/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "@/app/api/[locale]/emails/smtp-client/components/template.email";
 
-function renderPasswordResetRequestEmailContent(
-  t: TFunction,
-  locale: CountryLanguage,
-  user: { publicName: string; id: string },
-  translatedAppName: string,
-  passwordResetUrl: string,
-): React.ReactElement {
-  // Create tracking context for password reset emails
-  const tracking = createTrackingContext(
-    locale,
-    undefined, // no leadId for password reset emails
-    user.id, // userId for password reset emails
-    undefined, // no campaignId for transactional emails
-  );
+// ============================================================================
+// TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
+// ============================================================================
+
+const passwordResetRequestPropsSchema = z.object({
+  publicName: z.string(),
+  userId: z.string(),
+  passwordResetUrl: z.string().url(),
+});
+
+type PasswordResetRequestProps = z.infer<typeof passwordResetRequestPropsSchema>;
+
+function PasswordResetRequestEmail({
+  props,
+  t,
+  locale,
+  tracking,
+}: {
+  props: PasswordResetRequestProps;
+  t: TFunction;
+  locale: CountryLanguage;
+  tracking?: {
+    userId?: string;
+    leadId?: string;
+    sessionId?: string;
+  };
+}): ReactElement {
+  const trackingContext = tracking
+    ? createTrackingContext(
+        locale,
+        tracking.leadId,
+        tracking.userId,
+        undefined,
+        undefined,
+      )
+    : createTrackingContext(locale, undefined, props.userId);
+
+  const translatedAppName = t("config.appName");
 
   return (
     <EmailTemplate
@@ -50,7 +83,7 @@ function renderPasswordResetRequestEmailContent(
           appName: translatedAppName,
         },
       )}
-      tracking={tracking}
+      tracking={trackingContext}
     >
       <Text
         style={{
@@ -61,7 +94,7 @@ function renderPasswordResetRequestEmailContent(
         }}
       >
         {t("app.api.user.public.resetPassword.request.email.greeting", {
-          name: user.publicName,
+          name: props.publicName,
         })}
       </Text>
 
@@ -91,7 +124,7 @@ function renderPasswordResetRequestEmailContent(
 
       <Section style={{ textAlign: "center", marginTop: "32px" }}>
         <Button
-          href={passwordResetUrl}
+          href={props.passwordResetUrl}
           style={{
             backgroundColor: "#4f46e5",
             borderRadius: "6px",
@@ -119,22 +152,37 @@ function renderPasswordResetRequestEmailContent(
   );
 }
 
+// Template Definition Export
+const passwordResetRequestTemplate: EmailTemplateDefinition<PasswordResetRequestProps> = {
+  meta: {
+    id: "password-reset-request",
+    version: "1.0.0",
+    name: "app.api.emails.templates.password.reset.request.meta.name",
+    description: "app.api.emails.templates.password.reset.request.meta.description",
+    category: "auth",
+    path: "/user/public/reset-password/request/email.tsx",
+    defaultSubject: (t) =>
+      t("app.api.user.public.resetPassword.request.email.subject", { appName: "" }),
+  },
+  schema: passwordResetRequestPropsSchema,
+  component: PasswordResetRequestEmail,
+};
+
+export default passwordResetRequestTemplate;
+
+// ============================================================================
+// ADAPTERS (Business Logic - Maps endpoint data to template props)
+// ============================================================================
+
 /**
- * Password Reset Email Template
+ * Password Reset Email Adapter
+ * Maps password reset request to template props
  *
- * This function renders an email template for password reset requests.
- * It's used to send a password reset link to the user's email address.
- *
- * The function:
+ * This function:
  * 1. Verifies the user exists in the database
  * 2. Creates a password reset token
  * 3. Constructs a personalized email with a reset link
  * 4. Returns the email content and recipient information
- *
- * @param requestData - The validated request data from the client
- * @param t - The translation function
- * @param locale - The current locale
- * @returns A promise resolving to either a success or error response
  */
 export const renderResetPasswordMail: EmailFunctionType<
   ResetPasswordRequestPostRequestOutput,
@@ -182,6 +230,12 @@ export const renderResetPasswordMail: EmailFunctionType<
     const token = tokenResponse.data;
     const passwordResetUrl = `${env.NEXT_PUBLIC_APP_URL}/${locale}/user/reset-password/${token}`;
 
+    const templateProps: PasswordResetRequestProps = {
+      publicName: user.publicName,
+      userId: user.id,
+      passwordResetUrl,
+    };
+
     const translatedAppName = t("config.appName");
 
     return success({
@@ -190,16 +244,16 @@ export const renderResetPasswordMail: EmailFunctionType<
       subject: t("app.api.user.public.resetPassword.request.email.subject", {
         appName: translatedAppName,
       }),
-      jsx: renderPasswordResetRequestEmailContent(
+      jsx: passwordResetRequestTemplate.component({
+        props: templateProps,
         t,
         locale,
-        user,
-        translatedAppName,
-        passwordResetUrl,
-      ),
+        tracking: {
+          userId: user.id,
+        },
+      }),
     });
   } catch (error) {
-    // TODO: Replace with proper logger when email function interface supports it
     logger.error("Error generating password reset email", parseError(error));
     const parsedError = parseError(error);
     return fail({

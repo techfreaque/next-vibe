@@ -494,4 +494,254 @@ export const translations: typeof enTranslations = {
     visitWebsite: "Website besuchen",
     allRightsReserved: "Alle Rechte vorbehalten",
   },
+
+  // Email Templates
+  templates: {
+    leads: {
+      batch: {
+        update: {
+          meta: {
+            name: "Lead-Massenaktualisierungs-E-Mail",
+            description:
+              "E-Mail, die bei Massenaktualisierung von Leads gesendet wird",
+          },
+        },
+      },
+      welcome: {
+        meta: {
+          name: "Lead-Willkommens-E-Mail",
+          description: "Willkommens-E-Mail für neue Leads",
+        },
+      },
+    },
+    contact: {
+      form: {
+        meta: {
+          name: "Kontaktformular-Einreichung",
+          description: "E-Mail bei Kontaktformular-Einreichung",
+        },
+      },
+    },
+    newsletter: {
+      unsubscribe: {
+        meta: {
+          name: "Newsletter-Abmeldebestätigung",
+          description: "Bestätigungs-E-Mail bei Newsletter-Abmeldung",
+        },
+      },
+      welcome: {
+        meta: {
+          name: "Newsletter-Willkommens-E-Mail",
+          description: "Willkommens-E-Mail für neue Newsletter-Abonnenten",
+        },
+      },
+    },
+    password: {
+      reset: {
+        confirm: {
+          meta: {
+            name: "Passwort-Zurücksetzungsbestätigung",
+            description: "Bestätigungs-E-Mail nach Passwortzurücksetzung",
+          },
+        },
+        request: {
+          meta: {
+            name: "Passwort-Zurücksetzungsanfrage",
+            description: "E-Mail mit Link zur Passwortzurücksetzung",
+          },
+        },
+      },
+    },
+    signup: {
+      welcome: {
+        meta: {
+          name: "Benutzer-Registrierungs-Willkommen",
+          description: "Willkommens-E-Mail für neue Benutzerregistrierungen",
+        },
+      },
+    },
+    users: {
+      welcome: {
+        meta: {
+          name: "Benutzer-Willkommens-E-Mail",
+          description: "Willkommens-E-Mail für neue Benutzer",
+        },
+      },
+    },
+    subscription: {
+      success: {
+        meta: {
+          name: "Abonnement erfolgreich",
+          description: "Bestätigungs-E-Mail für erfolgreiches Abonnement",
+        },
+      },
+    },
+  },
+
+  // Email Preview System
+  preview: {
+    render: {
+      post: {
+        title: "E-Mail-Vorschau rendern",
+        description: "Serverseitiges Rendern von E-Mail-Vorlagen",
+        container: {
+          title: "E-Mail-Vorschau-Konfiguration",
+        },
+        success: {
+          title: "Vorschau gerendert",
+          description: "E-Mail-Vorschau erfolgreich gerendert",
+        },
+        fields: {
+          templateId: {
+            label: "Vorlagen-ID",
+            description: "ID der zu rendernden E-Mail-Vorlage",
+          },
+          language: {
+            label: "Sprache",
+            description: "Sprache für E-Mail-Rendering",
+          },
+          country: {
+            label: "Land",
+            description: "Land für E-Mail-Rendering",
+          },
+          props: {
+            label: "Vorlagen-Props",
+            description: "An die E-Mail-Vorlage zu übergebende Eigenschaften",
+          },
+          html: {
+            title: "Gerendertes HTML",
+          },
+          subject: {
+            title: "E-Mail-Betreff",
+          },
+          templateVersion: {
+            title: "Vorlagenversion",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Validierungsfehler",
+            description: "Ungültige Vorschau-Anfragedaten",
+          },
+          network: {
+            title: "Netzwerkfehler",
+            description: "Netzwerkfehler beim Rendern der Vorschau",
+          },
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description: "Sie sind nicht berechtigt, Vorschauen zu rendern",
+          },
+          forbidden: {
+            title: "Verboten",
+            description: "Vorschau-Rendering ist verboten",
+          },
+          notFound: {
+            title: "Nicht gefunden",
+            description: "E-Mail-Vorlage nicht gefunden",
+          },
+          server: {
+            title: "Serverfehler",
+            description: "E-Mail-Vorschau konnte nicht gerendert werden",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description: "Ein unbekannter Fehler ist aufgetreten",
+          },
+          unsavedChanges: {
+            title: "Nicht gespeicherte Änderungen",
+            description: "Sie haben nicht gespeicherte Änderungen",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Ein Konflikt ist beim Rendern aufgetreten",
+          },
+        },
+      },
+    },
+    sendTest: {
+      post: {
+        title: "Test-E-Mail senden",
+        description: "Test-E-Mail mit benutzerdefinierten Vorlagendaten senden",
+        container: {
+          title: "Test-E-Mail-Konfiguration",
+        },
+        success: {
+          title: "Test-E-Mail gesendet",
+          description: "Test-E-Mail erfolgreich gesendet",
+        },
+        fields: {
+          templateId: {
+            label: "Vorlagen-ID",
+            description: "ID der zu sendenden E-Mail-Vorlage",
+          },
+          recipientEmail: {
+            label: "Empfänger-E-Mail",
+            description: "E-Mail-Adresse für Testversand",
+          },
+          language: {
+            label: "Sprache",
+            description: "Sprache für E-Mail-Rendering",
+          },
+          country: {
+            label: "Land",
+            description: "Land für E-Mail-Rendering",
+          },
+          props: {
+            label: "Vorlagen-Props",
+            description: "An die E-Mail-Vorlage zu übergebende Eigenschaften",
+          },
+          success: {
+            title: "Erfolg",
+          },
+          message: {
+            title: "Ergebnisnachricht",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Validierungsfehler",
+            description: "Ungültige Test-E-Mail-Anfragedaten",
+          },
+          network: {
+            title: "Netzwerkfehler",
+            description: "Netzwerkfehler beim Senden der Test-E-Mail",
+          },
+          unauthorized: {
+            title: "Nicht autorisiert",
+            description: "Sie sind nicht berechtigt, Test-E-Mails zu senden",
+          },
+          forbidden: {
+            title: "Verboten",
+            description: "Senden von Test-E-Mails ist verboten",
+          },
+          notFound: {
+            title: "Nicht gefunden",
+            description: "E-Mail-Vorlage nicht gefunden",
+          },
+          server: {
+            title: "Serverfehler",
+            description: "Test-E-Mail konnte nicht gesendet werden",
+          },
+          unknown: {
+            title: "Unbekannter Fehler",
+            description: "Ein unbekannter Fehler ist aufgetreten",
+          },
+          unsavedChanges: {
+            title: "Nicht gespeicherte Änderungen",
+            description: "Sie haben nicht gespeicherte Änderungen",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Ein Konflikt ist beim Senden aufgetreten",
+          },
+        },
+      },
+      error: {
+        templateNotFound: "E-Mail-Vorlage nicht gefunden",
+        invalidProps: "Ungültige Vorlagen-Props",
+        sendFailed: "Test-E-Mail konnte nicht gesendet werden",
+      },
+      success: "Test-E-Mail erfolgreich an {email} gesendet",
+    },
+  },
 };

@@ -1,3 +1,8 @@
+/**
+ * Password Reset Confirmation Email Templates
+ * Refactored to separate template from business logic
+ */
+
 import { Section, Text } from "@react-email/components";
 import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
@@ -5,14 +10,17 @@ import {
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import type React from "react";
+import type { ReactElement } from "react";
+import React from "react";
+import { z } from "zod";
+
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { UserDetailLevel } from "../../../enum";
 import { UserRepository } from "../../../repository";
-import type { StandardUserType } from "../../../types";
 import type {
   ResetPasswordConfirmPostRequestOutput,
   ResetPasswordConfirmPostResponseOutput,
@@ -20,19 +28,44 @@ import type {
 import { createTrackingContext } from "@/app/api/[locale]/emails/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "@/app/api/[locale]/emails/smtp-client/components/template.email";
 
-function renderPasswordResetConfirmEmailContent(
-  t: TFunction,
-  locale: CountryLanguage,
-  user: StandardUserType,
-  appName: string,
-): React.ReactElement {
-  // Create tracking context for user emails (no lead, but may have user ID)
-  const tracking = createTrackingContext(
-    locale,
-    undefined, // no leadId for user emails
-    user.id, // userId if available
-    undefined, // no campaignId for transactional emails
-  );
+// ============================================================================
+// TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
+// ============================================================================
+
+const passwordResetConfirmPropsSchema = z.object({
+  publicName: z.string(),
+  userId: z.string(),
+});
+
+type PasswordResetConfirmProps = z.infer<typeof passwordResetConfirmPropsSchema>;
+
+function PasswordResetConfirmEmail({
+  props,
+  t,
+  locale,
+  tracking,
+}: {
+  props: PasswordResetConfirmProps;
+  t: TFunction;
+  locale: CountryLanguage;
+  tracking?: {
+    userId?: string;
+    leadId?: string;
+    sessionId?: string;
+  };
+}): ReactElement {
+  const trackingContext = tracking
+    ? createTrackingContext(
+        locale,
+        tracking.leadId,
+        tracking.userId,
+        undefined,
+        undefined,
+      )
+    : createTrackingContext(locale, undefined, props.userId);
+
+  const appName = t("config.appName");
+
   return (
     <EmailTemplate
       t={t}
@@ -46,7 +79,7 @@ function renderPasswordResetConfirmEmailContent(
           appName,
         },
       )}
-      tracking={tracking}
+      tracking={trackingContext}
     >
       <Text
         style={{
@@ -57,7 +90,7 @@ function renderPasswordResetConfirmEmailContent(
         }}
       >
         {t("app.api.user.public.resetPassword.confirm.email.greeting", {
-          name: user.publicName,
+          name: props.publicName,
         })}
       </Text>
 
@@ -112,21 +145,36 @@ function renderPasswordResetConfirmEmailContent(
   );
 }
 
+// Template Definition Export
+const passwordResetConfirmTemplate: EmailTemplateDefinition<PasswordResetConfirmProps> = {
+  meta: {
+    id: "password-reset-confirm",
+    version: "1.0.0",
+    name: "app.api.emails.templates.password.reset.confirm.meta.name",
+    description: "app.api.emails.templates.password.reset.confirm.meta.description",
+    category: "auth",
+    path: "/user/public/reset-password/confirm/email.tsx",
+    defaultSubject: (t) =>
+      t("app.api.user.public.resetPassword.confirm.email.subject", { appName: "" }),
+  },
+  schema: passwordResetConfirmPropsSchema,
+  component: PasswordResetConfirmEmail,
+};
+
+export default passwordResetConfirmTemplate;
+
+// ============================================================================
+// ADAPTERS (Business Logic - Maps endpoint data to template props)
+// ============================================================================
+
 /**
- * Password Reset Confirmation Email Template
+ * Password Reset Confirmation Email Adapter
+ * Maps password reset confirmation to template props
  *
- * This function renders an email template for password reset confirmations.
- * It's used to notify users that their password has been successfully reset.
- *
- * The function:
+ * This function:
  * 1. Verifies the user exists in the database
  * 2. Constructs a personalized confirmation email
  * 3. Returns the email content and recipient information
- *
- * @param requestData - The validated request data from the client
- * @param t - The translation function
- * @param locale - The current locale
- * @returns A promise resolving to either a success or error response
  */
 export const renderResetPasswordConfirmMail: EmailFunctionType<
   ResetPasswordConfirmPostRequestOutput,
@@ -150,19 +198,28 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
       cause: userResponse,
     });
   }
+
   const user = userResponse.data;
   const appName = t("config.appName");
+
+  const templateProps: PasswordResetConfirmProps = {
+    publicName: user.publicName,
+    userId: user.id,
+  };
+
   return success({
     toEmail: requestData.verification.email,
     toName: user.publicName,
     subject: t("app.api.user.public.resetPassword.confirm.email.subject", {
       appName,
     }),
-    jsx: renderPasswordResetConfirmEmailContent(
+    jsx: passwordResetConfirmTemplate.component({
+      props: templateProps,
       t,
       locale,
-      userResponse.data,
-      appName,
-    ),
+      tracking: {
+        userId: user.id,
+      },
+    }),
   });
 };

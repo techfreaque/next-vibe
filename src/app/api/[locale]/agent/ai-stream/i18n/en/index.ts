@@ -196,6 +196,10 @@ export const translations = {
         description: "Audio file to transcribe and process",
       },
     },
+    attachments: {
+      label: "File Attachments",
+      description: "Files attached to the message (images, documents, etc.)",
+    },
     response: {
       title: "Stream Response",
       description: "AI-generated streaming response",

@@ -5,6 +5,7 @@ import { translations as imapTranslations } from "../../imap/i18n/de";
 import { translations as listTranslations } from "../../list/i18n/de";
 import { translations as smtpTranslations } from "../../smtp/i18n/de";
 import { translations as statsTranslations } from "../../stats/i18n/de";
+import { translations as templatesTranslations } from "../../templates/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -13,4 +14,5 @@ export const translations: typeof enTranslations = {
   smtp: smtpTranslations,
   list: listTranslations,
   stats: statsTranslations,
+  templates: templatesTranslations,
 };

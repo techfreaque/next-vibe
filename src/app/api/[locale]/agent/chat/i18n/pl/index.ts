@@ -3,6 +3,7 @@ import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/pl
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/pl";
 import { translations as postaćsTranslations } from "../../characters/i18n/pl";
 import { translations as favoritesTranslations } from "../../favorites/i18n/pl";
+import { translations as filesTranslations } from "../../files/[threadId]/[filename]/i18n/pl";
 import { translations as foldersTranslations } from "../../folders/i18n/pl";
 import { translations as memoriesTranslations } from "../../memories/i18n/pl";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/pl";
@@ -14,6 +15,7 @@ export const translations: typeof enTranslations = {
   tags: {
     threads: "Wątki",
     folders: "Foldery",
+    files: "Pliki",
     messages: "Wiadomości",
     characters: "Persony",
     memories: "Wspomnienia",
@@ -301,6 +303,7 @@ export const translations: typeof enTranslations = {
   },
   aiStream: aiStreamTranslations,
   credits: creditsTranslations,
+  files: filesTranslations,
   folders: foldersTranslations,
   memories: memoriesTranslations,
   characters: postaćsTranslations,
@@ -351,5 +354,12 @@ export const translations: typeof enTranslations = {
     roleplay: "Odgrywanie ról",
     roleplayDark: "Mroczne odgrywanie ról",
     violence: "Przemoc",
+  },
+  input: {
+    attachments: {
+      uploadFile: "Załącz pliki",
+      attachedFiles: "Załączone pliki",
+      addMore: "Dodaj więcej",
+    },
   },
 };

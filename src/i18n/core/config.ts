@@ -25,13 +25,13 @@ export interface CountryInfo {
 // Enum-like objects to replace the enums
 
 export const Countries = languageConfig.countries;
-export const CountriesArr = languageConfig.countriesArr;
+export const CountriesArr = ["DE", "PL", "US", "GLOBAL"] as const;
 
 export const Currencies = languageConfig.currencies;
-export const CurrenciesArr = languageConfig.currenciesArr;
+export const CurrenciesArr = ["EUR", "USD", "PLN"] as const;
 
 export const Languages = languageConfig.languages;
-export const LanguagesArr = languageConfig.languagesArr;
+export const LanguagesArr = ["de", "pl", "en"] as const;
 
 /**
  * Countries Options for select fields
@@ -190,15 +190,15 @@ export interface LanguageConfig {
   countries: {
     [key: string]: string;
   };
-  countriesArr: string[];
+  countriesArr: readonly string[];
   currencies: {
     [key: string]: string;
   };
-  currenciesArr: string[];
+  currenciesArr: readonly string[];
   languages: {
     [key: string]: string;
   };
-  languagesArr: string[];
+  languagesArr: readonly string[];
   mappings: {
     currencyByCountry: {
       [key: string]: string;

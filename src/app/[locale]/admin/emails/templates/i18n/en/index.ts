@@ -1,0 +1,32 @@
+export const translations = {
+  overview: {
+    description: "View and preview email templates",
+    template: "template",
+    templates: "templates",
+    version: "Version",
+    id: "ID",
+    view_preview: "View Preview",
+    total: "Total Templates",
+  },
+  preview: {
+    back_to_templates: "Back to Templates",
+    previous: "Previous Template",
+    next: "Next Template",
+    id: "Template ID",
+    version: "Version",
+    category: "Category",
+    path: "Template Path",
+    send_test: "Send Test Email",
+    loading: "Loading preview...",
+    error_loading: "Failed to load email preview",
+  },
+  test: {
+    title: "Test Email",
+    description: "Send a test email to verify the template",
+    recipient: "Recipient Email",
+    template: "Template",
+    success: "Test email sent successfully",
+    send: "Send Test Email",
+    sending: "Sending...",
+  },
+};

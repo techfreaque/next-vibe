@@ -69,17 +69,25 @@ export type ToolsObject<T extends EndpointDefinitionsConstraint> = {
  * CLI handlers receive RAW input data (TRequestOutput, TUrlVariablesOutput)
  * tRPC handlers receive RAW input data (TRequestOutput, TUrlVariablesOutput)
  * Next.js handlers work with raw request objects
- * All return VALIDATED response data (TResponseOutput)
+ * All return VALIDATED response data (TResponseOutput) or streaming/file responses
  */
 type EndpointsHandlerReturn<T extends EndpointDefinitionsConstraint> = {
-  [K in keyof T]: (
-    request: NextRequest,
-    context: {
-      params: Promise<Record<string, string> & { locale: CountryLanguage }>;
-    },
-  ) => Promise<
-    NextResponse<ResponseType<Record<string, string | number | boolean>>>
-  >;
+  [K in keyof T]: T[K] extends CreateApiEndpointAny
+    ? (
+        request: NextRequest,
+        context: {
+          params: Promise<Record<string, string> & { locale: CountryLanguage }>;
+        },
+      ) => Promise<
+        | NextResponse<
+            | ResponseType<T[K]["types"]["ResponseOutput"]>
+            | Buffer
+            | ReadableStream
+            | Blob
+          >
+        | Response
+      >
+    : never;
 } & {
   tools: ToolsObject<T>;
 };

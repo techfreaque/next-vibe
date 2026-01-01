@@ -10,7 +10,13 @@ import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { BarChart3, Database, List, Settings } from "next-vibe-ui/ui/icons";
+import {
+  BarChart3,
+  Database,
+  FileText,
+  List,
+  Settings,
+} from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, P } from "next-vibe-ui/ui/typography";
@@ -48,6 +54,14 @@ export function EmailsAdminLayoutClient({
       label: t("app.admin.emails.components.nav.overview"),
       description: t("app.admin.emails.components.admin.stats.title"),
       pattern: new RegExp(`^/${locale}/admin/emails/stats`),
+    },
+    {
+      key: "templates",
+      href: `/${locale}/admin/emails/templates`,
+      icon: FileText,
+      label: t("app.admin.emails.components.nav.templates"),
+      description: t("app.admin.emails.templates.overview.description"),
+      pattern: new RegExp(`^/${locale}/admin/emails/templates`),
     },
     {
       key: "list",

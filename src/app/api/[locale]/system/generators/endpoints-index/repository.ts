@@ -58,7 +58,9 @@ interface EndpointsIndexGeneratorRepository {
 /**
  * Endpoints Index Generator Repository Implementation
  */
-class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRepository {
+class EndpointsIndexGeneratorRepositoryImpl
+  implements EndpointsIndexGeneratorRepository
+{
   async generateEndpointsIndex(
     data: EndpointsRequestType,
     logger: EndpointLogger,

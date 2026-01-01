@@ -41,7 +41,7 @@ import { WidgetRenderer } from "./WidgetRenderer";
 
 interface ResponseFieldsRendererProps {
   result: ToolCallResult | undefined;
-  definition: CreateApiEndpointAny | null;
+  definition: CreateApiEndpointAny;
   locale: CountryLanguage;
   context: WidgetRenderContext;
 }
@@ -97,6 +97,7 @@ function renderResponseField<const TKey extends string>(
   field: UnifiedField<TKey>,
   result: ToolCallResult | null,
   context: WidgetRenderContext,
+  endpoint: CreateApiEndpointAny,
 ): JSX.Element | null {
   // Handle null result
   if (!result) {
@@ -133,6 +134,7 @@ function renderResponseField<const TKey extends string>(
           data={transformedData as WidgetData}
           field={field}
           context={context}
+          endpoint={endpoint}
         />
       </Div>
     </Div>
@@ -235,7 +237,7 @@ export function ResponseFieldsRenderer({
   return (
     <Div className="flex flex-col gap-3">
       {responseFields.map(({ key, field }) =>
-        renderResponseField(key, field, result, context),
+        renderResponseField(key, field, result, context, definition),
       )}
     </Div>
   );

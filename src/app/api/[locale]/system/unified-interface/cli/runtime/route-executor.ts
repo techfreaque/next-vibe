@@ -93,10 +93,8 @@ export type CliCompatiblePlatform =
  * Route execution context
  * Extends BaseExecutionContext with CLI-specific fields
  */
-export interface RouteExecutionContext extends Omit<
-  BaseExecutionContext<InputData>,
-  "user"
-> {
+export interface RouteExecutionContext
+  extends Omit<BaseExecutionContext<InputData>, "user"> {
   /** URL path parameters */
   urlPathParams?: CliUrlParams;
 
@@ -346,11 +344,34 @@ export class RouteDelegationHandler {
 
     // Merge CLI data with provided data using registry
     const contextData = context.data;
+
+    logger.debug("[Route Executor] Data collection details", {
+      contextData,
+      cliData,
+      interactiveOption: context.options?.interactive,
+    });
+
     if (contextData || (cliData && Object.keys(cliData).length > 0)) {
+      // Merge context options (interactive, dryRun) into data only if explicitly set
+      // Don't merge if they're CLI defaults to allow schema defaults to apply
+      const optionsData: Partial<InputData> = {};
+      if (context.options?.interactive !== undefined) {
+        optionsData.interactive = context.options.interactive;
+      }
+      if (context.options?.dryRun !== undefined) {
+        optionsData.dryRun = context.options.dryRun;
+      }
+
+      logger.debug("[Route Executor] Building options data", { optionsData });
+
       const mergedData = routeExecutionExecutor.mergeData(
+        optionsData,
         contextData || {},
         cliData || {},
       );
+
+      logger.debug("[Route Executor] Final merged data", { mergedData });
+
       // mergedData is Partial<InputData>, which is compatible with InputData for our purposes
       inputData.data = mergedData;
 
@@ -372,9 +393,16 @@ export class RouteDelegationHandler {
         logger.warn(
           `⚠️  Missing required fields: ${missingRequired.join(", ")}`,
         );
-        inputData.data = await this.generateFormFromEndpoint(
+        const formData = await this.generateFormFromEndpoint(
           endpoint,
           "request",
+        );
+
+        // Merge with existing data and options
+        inputData.data = routeExecutionExecutor.mergeData(
+          optionsData,
+          inputData.data || {},
+          formData,
         );
       }
     } else if (
@@ -383,9 +411,20 @@ export class RouteDelegationHandler {
     ) {
       // No data provided and interactive mode allowed
       logger.info("📝 Request Data:");
-      inputData.data = await this.generateFormFromEndpoint(endpoint, "request");
+      const formData = await this.generateFormFromEndpoint(endpoint, "request");
+
+      // Merge context options only if explicitly set
+      const optionsData: Partial<InputData> = {};
+      if (context.options?.interactive === true) {
+        optionsData.interactive = true;
+      }
+      if (context.options?.dryRun === true) {
+        optionsData.dryRun = true;
+      }
+
+      inputData.data = routeExecutionExecutor.mergeData(optionsData, formData);
     } else {
-      // No CLI data and interactive mode disabled - use empty data
+      // No CLI data - let schema defaults apply (don't force CLI defaults)
       inputData.data = {};
     }
 
@@ -815,7 +854,25 @@ export class RouteDelegationHandler {
     }
 
     // Map named arguments to data fields (convert kebab-case to camelCase)
+    // Skip CLI-level options that are already in context.options
+    const cliLevelOptions = [
+      "interactive",
+      "dryRun",
+      "dry-run",
+      "verbose",
+      "debug",
+      "output",
+      "locale",
+      "userType",
+      "user-type",
+    ];
+
     for (const [key, value] of Object.entries(namedArgs)) {
+      // Skip CLI-level options
+      if (cliLevelOptions.includes(key)) {
+        continue;
+      }
+
       // Convert kebab-case to camelCase (e.g., skip-generation -> skipGeneration)
       const camelCaseKey = key.replaceAll(
         /-([a-z])/g,

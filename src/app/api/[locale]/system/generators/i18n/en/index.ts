@@ -1,3 +1,4 @@
+import { translations as emailTemplatesTranslations } from "../../email-templates/i18n/en";
 import { translations as endpointTranslations } from "../../endpoint/i18n/en";
 import { translations as endpointsTranslations } from "../../endpoints/i18n/en";
 import { translations as endpointsIndexTranslations } from "../../endpoints-index/i18n/en";
@@ -10,6 +11,7 @@ import { translations as taskIndexTranslations } from "../../task-index/i18n/en"
 
 export const translations = {
   category: "Generators",
+  emailTemplates: emailTemplatesTranslations,
   endpoint: endpointTranslations,
   endpoints: endpointsTranslations,
   endpointsIndex: endpointsIndexTranslations,

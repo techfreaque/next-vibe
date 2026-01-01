@@ -55,15 +55,9 @@ interface CliOptions {
 /**
  * CLI Constants to avoid literal strings
  */
-const CLI_CONSTANTS = {
-  CLI_NAME: "vibe" as const,
-  CLI_VERSION: "2.0.0" as const,
-  ADMIN_USER_TYPE: "ADMIN" as const,
-  DEFAULT_OUTPUT: "pretty" as const,
-  JSON_OUTPUT: "json" as const,
-  COLON_CHAR: ":" as const,
-  QUOTED_COLON_PATTERN: '"":' as const,
-} as const;
+const CLI_NAME = "vibe" as const;
+const CLI_VERSION = "2.0.0" as const;
+const DEFAULT_OUTPUT = "pretty" as const;
 
 import { cliEnv } from "./env";
 import { cliEntryPoint } from "./runtime/entry-point";
@@ -73,11 +67,11 @@ const program = new Command();
 const { t: earlyT } = simpleT(cliEnv.VIBE_CLI_LOCALE);
 
 program
-  .name(CLI_CONSTANTS.CLI_NAME)
+  .name(CLI_NAME)
   .description(
     earlyT("app.api.system.unifiedInterface.cli.vibe.help.description"),
   )
-  .version(CLI_CONSTANTS.CLI_VERSION);
+  .version(CLI_VERSION);
 
 // Main command - execute any route with schema-driven UI
 
@@ -111,7 +105,7 @@ program
     // eslint-disable-next-line i18next/no-literal-string
     "-o, --output <format>",
     earlyT("app.api.system.unifiedInterface.cli.vibe.output"),
-    CLI_CONSTANTS.DEFAULT_OUTPUT,
+    DEFAULT_OUTPUT,
   )
 
   .option(
@@ -195,7 +189,7 @@ program
               user: undefined, // Let route executor handle authentication via getCliUser()
               locale: options.locale,
               platform: cliPlatform,
-              output: options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT,
+              output: options.output ?? DEFAULT_OUTPUT,
               verbose: debug ?? false,
               interactive: options.interactive ?? false,
               dryRun: options.dryRun ?? false,
@@ -261,7 +255,7 @@ program
             user: undefined, // Let route executor handle authentication via getCliUser()
             locale: options.locale,
             platform: cliPlatform,
-            output: (options.output ?? CLI_CONSTANTS.DEFAULT_OUTPUT) as
+            output: (options.output ?? DEFAULT_OUTPUT) as
               | "table"
               | "pretty"
               | "json",

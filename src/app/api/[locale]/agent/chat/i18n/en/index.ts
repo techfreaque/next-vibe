@@ -3,6 +3,7 @@ import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/en
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/en";
 import { translations as charactersTranslations } from "../../characters/i18n/en";
 import { translations as favoritesTranslations } from "../../favorites/i18n/en";
+import { translations as filesTranslations } from "../../files/[threadId]/[filename]/i18n/en";
 import { translations as foldersTranslations } from "../../folders/i18n/en";
 import { translations as memoriesTranslations } from "../../memories/i18n/en";
 import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/en";
@@ -13,6 +14,7 @@ export const translations = {
   tags: {
     threads: "Threads",
     folders: "Folders",
+    files: "Files",
     messages: "Messages",
     characters: "Characters",
     memories: "Memories",
@@ -294,6 +296,7 @@ export const translations = {
   },
   aiStream: aiStreamTranslations,
   credits: creditsTranslations,
+  files: filesTranslations,
   folders: foldersTranslations,
   memories: memoriesTranslations,
   characters: charactersTranslations,
@@ -347,5 +350,12 @@ export const translations = {
     roleplay: "Roleplay",
     roleplayDark: "Dark Roleplay",
     violence: "Violence",
+  },
+  input: {
+    attachments: {
+      uploadFile: "Attach files",
+      attachedFiles: "Attached Files",
+      addMore: "Add More",
+    },
   },
 };

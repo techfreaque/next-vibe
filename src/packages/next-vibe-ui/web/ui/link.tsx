@@ -8,6 +8,8 @@ export interface LinkProps {
   rel?: string;
   onClick?: () => void;
   className?: string;
+  download?: string | boolean;
+  title?: string;
 }
 
 /**
@@ -21,6 +23,8 @@ export function Link({
   target,
   rel,
   onClick,
+  download,
+  title,
 }: LinkProps): React.JSX.Element {
   return (
     <NextLink
@@ -29,6 +33,8 @@ export function Link({
       target={target}
       rel={rel}
       onClick={onClick}
+      download={download}
+      title={title}
     >
       {children}
     </NextLink>

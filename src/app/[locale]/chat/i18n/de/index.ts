@@ -288,6 +288,15 @@ export const translations: typeof enTranslations = {
       recordingClickToStop: "Aufnahme läuft... Zum Stoppen klicken",
       transcribing: "Transkribiere...",
     },
+    attachments: {
+      uploadFile: "Dateien anhängen",
+      attachedFiles: "Angehängte Dateien",
+      addMore: "Mehr hinzufügen",
+      removeFile: "Datei entfernen",
+      fileTooLarge: "Datei ist zu groß (max 10MB)",
+      invalidFileType: "Ungültiger Dateityp",
+      uploadError: "Fehler beim Hochladen der Datei",
+    },
   },
   modelSelector: {
     placeholder: "Modell auswählen",

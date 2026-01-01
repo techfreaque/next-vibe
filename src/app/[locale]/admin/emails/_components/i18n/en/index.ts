@@ -5,6 +5,7 @@ export const translations = {
     imap: "IMAP Server",
     smtp: "SMTP Accounts",
     smtpDescription: "Manage SMTP email accounts and configurations",
+    templates: "Email Templates",
   },
   admin: {
     title: "Email Management",

@@ -1,6 +1,33 @@
 {
   "permissions": {
-    "allow": ["Bash(find:*)", "Bash(vibe check:*)"],
-    "deny": ["Bash(git:*)", "Bash(rm:*)", "Bash(rmdir:*)"]
+    "allow": [
+      "Bash(find:*)",
+      "Bash(vibe check:*)",
+      "Bash(git diff:*)"
+    ],
+    "deny": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(git reset:*)",
+      "Bash(git checkout:*)",
+      "Bash(git branch:*)",
+      "Bash(git tag:*)",
+      "Bash(git stash:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git revert:*)",
+      "Bash(git clean:*)",
+      "Bash(git rm:*)",
+      "Bash(git mv:*)",
+      "Bash(git remote:*)",
+      "Bash(git submodule:*)",
+      "Bash(git config:*)",
+      "Bash(rm:*)",
+      "Bash(rmdir:*)"
+    ]
   }
 }

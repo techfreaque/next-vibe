@@ -718,7 +718,7 @@ const config = (): CheckConfig => {
   // ESLint Configuration (for rules oxlint doesn't support)
   // --------------------------------------------------------
   const eslint: CheckConfig["eslint"] = {
-    enabled: true,
+    enabled: vibeCheck.skipEslint ?? false,
     configPath: ".tmp/eslint.config.mjs",
     cachePath: ".tmp/eslint-cache",
     lintableExtensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],

@@ -494,4 +494,254 @@ export const translations: typeof enTranslations = {
     visitWebsite: "Odwiedź stronę",
     allRightsReserved: "Wszelkie prawa zastrzeżone",
   },
+
+  // Email Templates
+  templates: {
+    leads: {
+      batch: {
+        update: {
+          meta: {
+            name: "E-mail aktualizacji zbiorczej leadów",
+            description: "E-mail wysyłany przy zbiorczej aktualizacji leadów",
+          },
+        },
+      },
+      welcome: {
+        meta: {
+          name: "E-mail powitalny dla leadów",
+          description: "E-mail powitalny dla nowych leadów",
+        },
+      },
+    },
+    contact: {
+      form: {
+        meta: {
+          name: "Przesłanie formularza kontaktowego",
+          description:
+            "E-mail wysyłany przy przesłaniu formularza kontaktowego",
+        },
+      },
+    },
+    newsletter: {
+      unsubscribe: {
+        meta: {
+          name: "Potwierdzenie rezygnacji z newslettera",
+          description: "E-mail potwierdzający rezygnację z newslettera",
+        },
+      },
+      welcome: {
+        meta: {
+          name: "E-mail powitalny newslettera",
+          description: "E-mail powitalny dla nowych subskrybentów newslettera",
+        },
+      },
+    },
+    password: {
+      reset: {
+        confirm: {
+          meta: {
+            name: "Potwierdzenie resetowania hasła",
+            description: "E-mail potwierdzający zresetowanie hasła",
+          },
+        },
+        request: {
+          meta: {
+            name: "Prośba o reset hasła",
+            description: "E-mail z linkiem do resetowania hasła",
+          },
+        },
+      },
+    },
+    signup: {
+      welcome: {
+        meta: {
+          name: "Powitanie po rejestracji użytkownika",
+          description: "E-mail powitalny dla nowych rejestracji użytkowników",
+        },
+      },
+    },
+    users: {
+      welcome: {
+        meta: {
+          name: "E-mail powitalny użytkownika",
+          description: "E-mail powitalny dla nowych użytkowników",
+        },
+      },
+    },
+    subscription: {
+      success: {
+        meta: {
+          name: "Subskrypcja udana",
+          description: "E-mail potwierdzający udaną subskrypcję",
+        },
+      },
+    },
+  },
+
+  // Email Preview System (EN for now, can be translated later)
+  preview: {
+    render: {
+      post: {
+        title: "Render Email Preview",
+        description: "Server-side rendering of email templates for preview",
+        container: {
+          title: "Email Preview Configuration",
+        },
+        success: {
+          title: "Preview Rendered",
+          description: "Email preview rendered successfully",
+        },
+        fields: {
+          templateId: {
+            label: "Template ID",
+            description: "ID of the email template to render",
+          },
+          language: {
+            label: "Language",
+            description: "Language for email rendering",
+          },
+          country: {
+            label: "Country",
+            description: "Country for email rendering",
+          },
+          props: {
+            label: "Template Props",
+            description: "Properties to pass to the email template",
+          },
+          html: {
+            title: "Rendered HTML",
+          },
+          subject: {
+            title: "Email Subject",
+          },
+          templateVersion: {
+            title: "Template Version",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description: "Nieprawidłowe dane żądania podglądu",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Błąd sieci podczas renderowania podglądu",
+          },
+          unauthorized: {
+            title: "Brak autoryzacji",
+            description: "Nie masz uprawnień do renderowania podglądów",
+          },
+          forbidden: {
+            title: "Zabronione",
+            description: "Renderowanie podglądu jest zabronione",
+          },
+          notFound: {
+            title: "Nie znaleziono",
+            description: "Nie znaleziono szablonu e-mail",
+          },
+          server: {
+            title: "Błąd serwera",
+            description: "Nie udało się wyrenderować podglądu e-mail",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieznany błąd",
+          },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Masz niezapisane zmiany",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Wystąpił konflikt podczas renderowania",
+          },
+        },
+      },
+    },
+    sendTest: {
+      post: {
+        title: "Send Test Email",
+        description: "Send test email with custom template data",
+        container: {
+          title: "Test Email Configuration",
+        },
+        success: {
+          title: "Test Email Sent",
+          description: "Test email sent successfully",
+        },
+        fields: {
+          templateId: {
+            label: "Template ID",
+            description: "ID of the email template to send",
+          },
+          recipientEmail: {
+            label: "Recipient Email",
+            description: "Email address to send test to",
+          },
+          language: {
+            label: "Language",
+            description: "Language for email rendering",
+          },
+          country: {
+            label: "Country",
+            description: "Country for email rendering",
+          },
+          props: {
+            label: "Template Props",
+            description: "Properties to pass to the email template",
+          },
+          success: {
+            title: "Success",
+          },
+          message: {
+            title: "Result Message",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description: "Nieprawidłowe dane żądania testowego e-mail",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Błąd sieci podczas wysyłania testowego e-mail",
+          },
+          unauthorized: {
+            title: "Brak autoryzacji",
+            description: "Nie masz uprawnień do wysyłania testowych e-maili",
+          },
+          forbidden: {
+            title: "Zabronione",
+            description: "Wysyłanie testowych e-maili jest zabronione",
+          },
+          notFound: {
+            title: "Nie znaleziono",
+            description: "Nie znaleziono szablonu e-mail",
+          },
+          server: {
+            title: "Błąd serwera",
+            description: "Nie udało się wysłać testowego e-mail",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieznany błąd",
+          },
+          unsavedChanges: {
+            title: "Niezapisane zmiany",
+            description: "Masz niezapisane zmiany",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Wystąpił konflikt podczas wysyłania",
+          },
+        },
+      },
+      error: {
+        templateNotFound: "Email template not found",
+        invalidProps: "Invalid template props",
+        sendFailed: "Failed to send test email",
+      },
+      success: "Test email sent successfully to {email}",
+    },
+  },
 };

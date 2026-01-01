@@ -1,6 +1,6 @@
 /**
  * Lead Batch Operations Email Templates
- * React Email templates for batch update and delete operations
+ * Refactored to separate template from business logic
  */
 
 import { Button, Section } from "@react-email/components";
@@ -9,10 +9,12 @@ import {
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { JSX } from "react";
+import type { ReactElement } from "react";
 import React from "react";
+import { z } from "zod";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -25,33 +27,48 @@ import type {
   BatchDeleteResponseData,
   BatchDeleteResponseOutput,
   BatchUpdateRequestOutput,
-  BatchUpdateResponseData,
   BatchUpdateResponseOutput,
 } from "./definition";
 
-/**
- * Batch Update Completion Email Template Component
- * Notifies admin team when batch update operation is completed
- */
-function BatchUpdateCompletionEmailContent({
-  data,
-  responseData,
+// ============================================================================
+// TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
+// ============================================================================
+
+const batchUpdatePropsSchema = z.object({
+  totalMatched: z.number(),
+  totalProcessed: z.number(),
+  totalUpdated: z.number().optional(),
+  errorsCount: z.number(),
+  dryRun: z.boolean().optional(),
+  userId: z.string().optional(),
+});
+
+type BatchUpdateProps = z.infer<typeof batchUpdatePropsSchema>;
+
+function BatchUpdateEmail({
+  props,
   t,
   locale,
-  userId,
+  tracking,
 }: {
-  data: BatchUpdateRequestOutput;
-  responseData: BatchUpdateResponseData;
+  props: BatchUpdateProps;
   t: TFunction;
   locale: CountryLanguage;
-  userId?: string;
-}): JSX.Element {
-  // Create tracking context for admin notification emails
-  const tracking = createTrackingContext(
-    locale,
-    undefined, // no specific leadId for batch operations
-    userId, // no campaignId for transactional emails
-  );
+  tracking?: {
+    userId?: string;
+    leadId?: string;
+    sessionId?: string;
+  };
+}): ReactElement {
+  const trackingContext = tracking
+    ? createTrackingContext(
+        locale,
+        tracking.leadId,
+        tracking.userId,
+        undefined,
+        undefined,
+      )
+    : createTrackingContext(locale, undefined, props.userId);
 
   return (
     <EmailTemplate
@@ -59,9 +76,9 @@ function BatchUpdateCompletionEmailContent({
       locale={locale}
       title={t("app.api.leads.batch.email.admin.batchUpdate.title")}
       previewText={t("app.api.leads.batch.email.admin.batchUpdate.preview", {
-        totalProcessed: responseData?.totalProcessed || 0,
+        totalProcessed: props.totalProcessed,
       })}
-      tracking={tracking}
+      tracking={trackingContext}
     >
       <div
         style={{
@@ -72,11 +89,10 @@ function BatchUpdateCompletionEmailContent({
         }}
       >
         {t("app.api.leads.batch.email.admin.batchUpdate.message", {
-          totalProcessed: responseData?.totalProcessed || 0,
+          totalProcessed: props.totalProcessed,
         })}
       </div>
 
-      {/* Operation Summary Section */}
       <Section
         style={{
           backgroundColor: "#f9fafb",
@@ -106,7 +122,7 @@ function BatchUpdateCompletionEmailContent({
           <div style={{ fontWeight: "700" }}>
             {t("app.api.leads.batch.email.admin.batchUpdate.totalMatched")}:
           </div>{" "}
-          {responseData?.totalMatched || 0}
+          {props.totalMatched}
         </div>
 
         <div
@@ -119,10 +135,10 @@ function BatchUpdateCompletionEmailContent({
           <div style={{ fontWeight: "700" }}>
             {t("app.api.leads.batch.email.admin.batchUpdate.totalProcessed")}:
           </div>{" "}
-          {responseData?.totalProcessed || 0}
+          {props.totalProcessed}
         </div>
 
-        {responseData?.totalUpdated && (
+        {props.totalUpdated && (
           <div
             style={{
               fontSize: "14px",
@@ -133,28 +149,26 @@ function BatchUpdateCompletionEmailContent({
             <div style={{ fontWeight: "700" }}>
               {t("app.api.leads.batch.email.admin.batchUpdate.totalUpdated")}:
             </div>{" "}
-            {responseData.totalUpdated}
+            {props.totalUpdated}
           </div>
         )}
 
-        {responseData.errors.length > 0 && (
-          <>
-            <div
-              style={{
-                fontSize: "14px",
-                marginBottom: "8px",
-                color: "#dc2626",
-              }}
-            >
-              <div style={{ fontWeight: "700" }}>
-                {t("app.api.leads.batch.email.admin.batchUpdate.errors")}:
-              </div>{" "}
-              {responseData.errors.length}
-            </div>
-          </>
+        {props.errorsCount > 0 && (
+          <div
+            style={{
+              fontSize: "14px",
+              marginBottom: "8px",
+              color: "#dc2626",
+            }}
+          >
+            <div style={{ fontWeight: "700" }}>
+              {t("app.api.leads.batch.email.admin.batchUpdate.errors")}:
+            </div>{" "}
+            {props.errorsCount}
+          </div>
         )}
 
-        {data?.dryRun && (
+        {props.dryRun && (
           <div
             style={{
               fontSize: "14px",
@@ -168,7 +182,6 @@ function BatchUpdateCompletionEmailContent({
         )}
       </Section>
 
-      {/* Admin Actions */}
       <Section style={{ textAlign: "center", marginTop: "24px" }}>
         <Button
           href={`${env.NEXT_PUBLIC_APP_URL}/admin/leads`}
@@ -190,10 +203,29 @@ function BatchUpdateCompletionEmailContent({
   );
 }
 
-/**
- * Batch Delete Completion Email Template Component
- * Notifies admin team when batch delete operation is completed
- */
+const batchUpdateTemplate: EmailTemplateDefinition<BatchUpdateProps> = {
+  meta: {
+    id: "batch-update",
+    version: "1.0.0",
+    name: "app.api.emails.templates.leads.batch.update.meta.name",
+    description: "app.api.emails.templates.leads.batch.update.meta.description",
+    category: "leads",
+    path: "/leads/batch/email.tsx",
+    defaultSubject: (t) =>
+      t("app.api.leads.batch.email.admin.batchUpdate.subject", {
+        totalProcessed: 0,
+      }),
+  },
+  schema: batchUpdatePropsSchema,
+  component: BatchUpdateEmail,
+};
+
+export default batchUpdateTemplate;
+
+// ============================================================================
+// BATCH DELETE TEMPLATE (Component - Not Registered)
+// ============================================================================
+
 function BatchDeleteCompletionEmailContent({
   data,
   responseData,
@@ -206,13 +238,8 @@ function BatchDeleteCompletionEmailContent({
   t: TFunction;
   locale: CountryLanguage;
   userId?: string;
-}): JSX.Element {
-  // Create tracking context for admin notification emails
-  const tracking = createTrackingContext(
-    locale,
-    undefined, // no specific leadId for batch operations
-    userId, // no campaignId for transactional emails
-  );
+}): ReactElement {
+  const tracking = createTrackingContext(locale, undefined, userId);
 
   return (
     <EmailTemplate
@@ -237,7 +264,6 @@ function BatchDeleteCompletionEmailContent({
         })}
       </div>
 
-      {/* Operation Summary Section */}
       <Section
         style={{
           backgroundColor: "#f9fafb",
@@ -299,20 +325,18 @@ function BatchDeleteCompletionEmailContent({
         )}
 
         {responseData.errors.length > 0 && (
-          <>
-            <div
-              style={{
-                fontSize: "14px",
-                marginBottom: "8px",
-                color: "#dc2626",
-              }}
-            >
-              <div style={{ fontWeight: "700" }}>
-                {t("app.api.leads.batch.email.admin.batchDelete.errors")}:
-              </div>{" "}
-              {responseData.errors.length}
-            </div>
-          </>
+          <div
+            style={{
+              fontSize: "14px",
+              marginBottom: "8px",
+              color: "#dc2626",
+            }}
+          >
+            <div style={{ fontWeight: "700" }}>
+              {t("app.api.leads.batch.email.admin.batchDelete.errors")}:
+            </div>{" "}
+            {responseData.errors.length}
+          </div>
         )}
 
         {data?.dryRun && (
@@ -329,7 +353,6 @@ function BatchDeleteCompletionEmailContent({
         )}
       </Section>
 
-      {/* Admin Actions */}
       <Section style={{ textAlign: "center", marginTop: "24px" }}>
         <Button
           href={`${env.NEXT_PUBLIC_APP_URL}/admin/leads`}
@@ -351,10 +374,10 @@ function BatchDeleteCompletionEmailContent({
   );
 }
 
-/**
- * Batch Update Admin Notification Email Function
- * Notifies admin team when a batch update operation is completed
- */
+// ============================================================================
+// ADAPTERS (Business Logic - Maps endpoint data to template props)
+// ============================================================================
+
 export const renderBatchUpdateNotificationMail: EmailFunctionType<
   BatchUpdateRequestOutput,
   BatchUpdateResponseOutput,
@@ -368,6 +391,15 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
       });
     }
 
+    const templateProps: BatchUpdateProps = {
+      totalMatched: responseData.response.totalMatched || 0,
+      totalProcessed: responseData.response.totalProcessed || 0,
+      totalUpdated: responseData.response.totalUpdated,
+      errorsCount: responseData.response.errors.length,
+      dryRun: requestData.dryRun,
+      userId: user?.id,
+    };
+
     return success({
       toEmail: contactClientRepository.getSupportEmail(locale),
       toName: t("config.appName"),
@@ -376,13 +408,13 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
       }),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
       replyToName: t("config.appName"),
-
-      jsx: BatchUpdateCompletionEmailContent({
-        data: requestData,
-        responseData: responseData.response,
+      jsx: batchUpdateTemplate.component({
+        props: templateProps,
         t,
         locale,
-        userId: user?.id,
+        tracking: {
+          userId: user?.id,
+        },
       }),
     });
   } catch {
@@ -393,10 +425,6 @@ export const renderBatchUpdateNotificationMail: EmailFunctionType<
   }
 };
 
-/**
- * Batch Delete Admin Notification Email Function
- * Notifies admin team when a batch delete operation is completed
- */
 export const renderBatchDeleteNotificationMail: EmailFunctionType<
   BatchDeleteRequestOutput,
   BatchDeleteResponseOutput,
@@ -418,7 +446,6 @@ export const renderBatchDeleteNotificationMail: EmailFunctionType<
       }),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
       replyToName: t("config.appName"),
-
       jsx: BatchDeleteCompletionEmailContent({
         data: requestData,
         responseData: responseData.response,

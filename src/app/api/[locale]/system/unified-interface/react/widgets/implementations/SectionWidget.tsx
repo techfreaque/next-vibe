@@ -52,6 +52,7 @@ export function SectionWidget<const TKey extends string>({
   context,
   className,
   form,
+  endpoint,
 }: ReactWidgetProps<typeof WidgetType.SECTION, TKey>): JSX.Element {
   const { t } = simpleT(context.locale);
 
@@ -111,6 +112,7 @@ export function SectionWidget<const TKey extends string>({
           field={contentField}
           context={context}
           form={form}
+          endpoint={endpoint}
         />
       );
     }
@@ -121,6 +123,7 @@ export function SectionWidget<const TKey extends string>({
         widgetType={WidgetType.TEXT}
         data={content}
         field={field}
+        endpoint={endpoint}
         context={context}
         form={form}
       />

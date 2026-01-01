@@ -14,6 +14,7 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { FileAttachments } from "../../../_components/message-display/file-attachments";
 import { MessageAuthorInfo } from "./message-author";
 import { UserMessageActions } from "./user-message-actions";
 
@@ -78,6 +79,12 @@ export function UserMessageBubble({
           <Div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap break-words">
             {message.content}
           </Div>
+
+          {/* File Attachments */}
+          {message.metadata?.attachments &&
+            message.metadata.attachments.length > 0 && (
+              <FileAttachments attachments={message.metadata.attachments} />
+            )}
         </Div>
 
         {/* Actions - Fixed height container to maintain consistent spacing */}

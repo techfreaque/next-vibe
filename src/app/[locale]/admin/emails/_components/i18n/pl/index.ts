@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
     imap: "Serwer IMAP",
     smtp: "Konta SMTP",
     smtpDescription: "Zarządzaj kontami e-mail SMTP i konfiguracjami",
+    templates: "Szablony e-mail",
   },
   admin: {
     title: "Zarządzanie pocztą e-mail",

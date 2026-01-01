@@ -26,6 +26,7 @@ const isSubmitKeyPress = (e: TextareaKeyboardEvent): boolean =>
 
 interface UseInputHandlersProps {
   input: string;
+  attachments: File[];
   isLoading: boolean;
   enabledToolIds: string[];
   sendMessage: (
@@ -40,6 +41,8 @@ interface UseInputHandlersProps {
       };
       /** Audio input for voice-to-voice mode */
       audioInput?: { file: File };
+      /** File attachments */
+      attachments: File[];
     },
     onNewThread?: (
       threadId: string,
@@ -76,6 +79,7 @@ interface UseInputHandlersReturn {
 
 export function useInputHandlers({
   input,
+  attachments,
   isLoading,
   enabledToolIds,
   sendMessage,
@@ -95,12 +99,13 @@ export function useInputHandlers({
       hasInput: Boolean(input),
       isValidInput: isValidInput(input),
       isLoading,
+      attachmentsCount: attachments?.length || 0,
     });
 
     if (isValidInput(input) && !isLoading) {
       logger.debug("Chat", "submitMessage calling sendMessage");
       await sendMessage(
-        { content: input },
+        { content: input, attachments },
         (threadId, rootFolderId, subFolderId) => {
           // Navigate to the newly created thread
           logger.debug("Chat", "Navigating to newly created thread", {
@@ -122,7 +127,16 @@ export function useInputHandlers({
     } else {
       logger.debug("Chat", "submitMessage blocked");
     }
-  }, [input, isLoading, sendMessage, logger, locale, router, draftKey]);
+  }, [
+    input,
+    attachments,
+    isLoading,
+    sendMessage,
+    logger,
+    locale,
+    router,
+    draftKey,
+  ]);
 
   /**
    * Submit with explicit content - bypasses async state issues
@@ -133,6 +147,7 @@ export function useInputHandlers({
       logger.debug("Chat", "submitWithContent called", {
         contentLength: content.length,
         isLoading,
+        attachmentsCount: attachments?.length || 0,
       });
 
       if (isValidInput(content) && !isLoading) {
@@ -140,7 +155,7 @@ export function useInputHandlers({
         // Also update the input state for UI consistency
         setInput(content);
         await sendMessage(
-          { content },
+          { content, attachments },
           (threadId, rootFolderId, subFolderId) => {
             logger.debug("Chat", "Navigating to newly created thread", {
               threadId,
@@ -160,7 +175,16 @@ export function useInputHandlers({
         logger.debug("Chat", "submitWithContent blocked", { isLoading });
       }
     },
-    [isLoading, sendMessage, setInput, logger, locale, router, draftKey],
+    [
+      isLoading,
+      attachments,
+      sendMessage,
+      setInput,
+      logger,
+      locale,
+      router,
+      draftKey,
+    ],
   );
 
   /**
@@ -185,6 +209,7 @@ export function useInputHandlers({
         {
           content: "", // Server will use transcribed audio as content
           audioInput: { file: audioFile },
+          attachments,
         },
         (threadId, rootFolderId, subFolderId) => {
           logger.debug("Chat", "Navigating to newly created thread", {
@@ -201,7 +226,7 @@ export function useInputHandlers({
       );
       await clearDraft(draftKey, logger);
     },
-    [isLoading, sendMessage, logger, locale, router, draftKey],
+    [isLoading, attachments, sendMessage, logger, locale, router, draftKey],
   );
 
   const handleKeyDown = useCallback(

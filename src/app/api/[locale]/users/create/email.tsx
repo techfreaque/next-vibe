@@ -1,6 +1,6 @@
 /**
  * Users Create Email Templates
- * React Email templates for new user notifications
+ * Refactored to separate template from business logic
  */
 
 import { Button, Hr, Section, Text } from "@react-email/components";
@@ -9,8 +9,11 @@ import {
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import React, { type JSX } from "react";
+import type { JSX } from "react";
+import React from "react";
+import { z } from "zod";
 
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -23,35 +26,54 @@ import type {
   UserCreateResponseOutput,
 } from "./definition";
 
-/**
- * Welcome Email Template Component
- * Renders welcome email for newly created users
- */
-function WelcomeEmailContent({
-  userData,
+// ============================================================================
+// TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
+// ============================================================================
+
+const userWelcomePropsSchema = z.object({
+  userId: z.string(),
+  email: z.string().email(),
+  privateName: z.string(),
+  publicName: z.string(),
+  leadId: z.string().optional(),
+});
+
+type UserWelcomeProps = z.infer<typeof userWelcomePropsSchema>;
+
+function UserWelcomeEmail({
+  props,
   t,
   locale,
+  tracking,
 }: {
-  userData: UserCreateResponseOutput;
+  props: UserWelcomeProps;
   t: TFunction;
   locale: CountryLanguage;
+  tracking?: {
+    userId?: string;
+    leadId?: string;
+    sessionId?: string;
+  };
 }): JSX.Element {
-  // Create tracking context for user emails
-  const tracking = createTrackingContext(
-    locale,
-    userData.responseLeadId ?? undefined, // leadId if available
-    userData.responseId, // no campaignId for transactional emails
-  );
+  const trackingContext = tracking
+    ? createTrackingContext(
+        locale,
+        tracking.leadId,
+        tracking.userId,
+        undefined,
+        undefined,
+      )
+    : createTrackingContext(locale, props.leadId, props.userId);
 
   return (
     <EmailTemplate
       t={t}
       locale={locale}
       title={t("app.api.users.create.email.users.welcome.greeting", {
-        name: userData.responsePrivateName,
+        name: props.privateName,
       })}
       previewText={t("app.api.users.create.email.users.welcome.preview")}
-      tracking={tracking}
+      tracking={trackingContext}
     >
       <Text
         style={{
@@ -62,7 +84,7 @@ function WelcomeEmailContent({
         }}
       >
         {t("app.api.users.create.email.users.welcome.introduction", {
-          name: userData.responsePrivateName,
+          name: props.privateName,
           appName: t("config.appName"),
         })}
       </Text>
@@ -97,7 +119,7 @@ function WelcomeEmailContent({
           <Text style={{ fontWeight: "700" }}>
             {t("app.api.users.create.email.users.welcome.email")}:
           </Text>{" "}
-          {userData.responseEmail}
+          {props.email}
         </Text>
 
         <Text
@@ -110,7 +132,7 @@ function WelcomeEmailContent({
           <Text style={{ fontWeight: "700" }}>
             {t("app.api.users.create.email.users.welcome.name")}:
           </Text>{" "}
-          {userData.responsePrivateName}
+          {props.privateName}
         </Text>
 
         <Text
@@ -123,7 +145,7 @@ function WelcomeEmailContent({
           <Text style={{ fontWeight: "700" }}>
             {t("app.api.users.create.email.users.welcome.publicName")}:
           </Text>{" "}
-          {userData.responsePublicName}
+          {props.publicName}
         </Text>
       </Section>
 
@@ -175,6 +197,28 @@ function WelcomeEmailContent({
     </EmailTemplate>
   );
 }
+
+// Template Definition Export
+const userWelcomeTemplate: EmailTemplateDefinition<UserWelcomeProps> = {
+  meta: {
+    id: "user-welcome",
+    version: "1.0.0",
+    name: "app.api.emails.templates.users.welcome.meta.name",
+    description: "app.api.emails.templates.users.welcome.meta.description",
+    category: "users",
+    path: "/users/create/email.tsx",
+    defaultSubject: (t) =>
+      t("app.api.users.create.email.users.welcome.subject", { appName: "" }),
+  },
+  schema: userWelcomePropsSchema,
+  component: UserWelcomeEmail,
+};
+
+export default userWelcomeTemplate;
+
+// ============================================================================
+// ADMIN NOTIFICATION TEMPLATE (Component - Not Registered)
+// ============================================================================
 
 /**
  * Admin Notification Email Template Component
@@ -348,9 +392,13 @@ function AdminNotificationEmailContent({
   );
 }
 
+// ============================================================================
+// ADAPTERS (Business Logic - Maps endpoint data to template props)
+// ============================================================================
+
 /**
- * Welcome Email Function
- * Renders welcome email for newly created user
+ * Welcome Email Adapter
+ * Maps user creation response to welcome template props
  */
 export const renderWelcomeEmail: EmailFunctionType<
   UserCreateRequestOutput,
@@ -365,16 +413,28 @@ export const renderWelcomeEmail: EmailFunctionType<
       });
     }
 
+    const templateProps: UserWelcomeProps = {
+      userId: responseData.responseId,
+      email: responseData.responseEmail,
+      privateName: responseData.responsePrivateName,
+      publicName: responseData.responsePublicName,
+      leadId: responseData.responseLeadId ?? undefined,
+    };
+
     return success({
       toEmail: responseData.responseEmail,
       toName: responseData.responsePrivateName,
       subject: t("app.api.users.create.email.users.welcome.subject", {
         appName: t("config.appName"),
       }),
-      jsx: WelcomeEmailContent({
-        userData: responseData,
+      jsx: userWelcomeTemplate.component({
+        props: templateProps,
         t,
         locale,
+        tracking: {
+          userId: responseData.responseId,
+          leadId: responseData.responseLeadId ?? undefined,
+        },
       }),
     });
   } catch {

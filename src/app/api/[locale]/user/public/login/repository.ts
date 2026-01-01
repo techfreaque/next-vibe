@@ -37,9 +37,13 @@ import type {
   LoginPostRequestOutput,
   LoginPostResponseOutput,
 } from "./definition";
-import type { LoginOptionsGetRequestOutput, LoginOptionsGetResponseOutput } from "./options/definition";
+import type {
+  LoginOptionsGetRequestOutput,
+  LoginOptionsGetResponseOutput,
+} from "./options/definition";
 import { SocialProviders } from "./options/enum";
 import type { Platform } from "../../../system/unified-interface/shared/types/platform";
+import { simpleT } from "@/i18n/core/shared";
 
 export interface SocialProvidersOptions {
   enabled: boolean;
@@ -480,11 +484,8 @@ export class LoginRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<LoginOptionsGetResponseOutput>> {
-    const { getLanguageFromLocale } = await import("@/i18n/core/language-utils");
-    const { translateKey } = await import("@/i18n/core/translation-utils");
-
     const email = data.email;
-    const language = getLanguageFromLocale(locale);
+    const { t } = simpleT(locale);
     const optionsResult = await this.getLoginOptions(logger, locale, email);
 
     if (!optionsResult.success) {
@@ -496,34 +497,28 @@ export class LoginRepository {
     return success({
       response: {
         success: true,
-        message: translateKey(
-          "app.api.user.public.login.options.messages.successMessage",
-          language,
-        ),
+        message: t("app.api.user.public.login.options.messages.successMessage"),
         forUser: email,
         loginMethods: {
           password: {
             enabled: options.allowPasswordAuth,
-            passwordDescription: translateKey(
+            passwordDescription: t(
               "app.api.user.public.login.options.messages.passwordAuthDescription",
-              language,
             ),
           },
           social: {
             enabled: options.allowSocialAuth,
-            socialDescription: translateKey(
+            socialDescription: t(
               "app.api.user.public.login.options.messages.socialAuthDescription",
-              language,
             ),
             providers:
               options.socialProviders?.map((provider) => ({
                 name: provider.name,
                 id: provider.providers[0] || "unknown",
                 enabled: provider.enabled,
-                description: translateKey(
+                description: t(
                   "app.api.user.public.login.options.messages.continueWithProvider",
-                  language,
-                  { provider: translateKey(provider.name, language) },
+                  { provider: t(provider.name) },
                 ),
               })) || [],
           },
@@ -532,28 +527,15 @@ export class LoginRepository {
           maxAttempts: options.maxAttempts,
           requireTwoFactor: options.requireTwoFactor,
           securityDescription: options.requireTwoFactor
-            ? translateKey(
-                "app.api.user.public.login.options.messages.twoFactorRequired",
-                language,
-              )
-            : translateKey(
-                "app.api.user.public.login.options.messages.standardSecurity",
-                language,
-              ),
+            ? t("app.api.user.public.login.options.messages.twoFactorRequired")
+            : t("app.api.user.public.login.options.messages.standardSecurity"),
         },
         recommendations: [
           options.allowPasswordAuth
-            ? translateKey(
-                "app.api.user.public.login.options.messages.tryPasswordFirst",
-                language,
-              )
-            : translateKey(
-                "app.api.user.public.login.options.messages.useSocialLogin",
-                language,
-              ),
-          translateKey(
+            ? t("app.api.user.public.login.options.messages.tryPasswordFirst")
+            : t("app.api.user.public.login.options.messages.useSocialLogin"),
+          t(
             "app.api.user.public.login.options.messages.socialLoginFaster",
-            language,
           ),
         ],
       },

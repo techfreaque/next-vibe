@@ -140,8 +140,11 @@ export interface MessageMetadata {
   // Attachments
   attachments?: {
     id: string;
-    type: string;
     url: string;
+    filename: string;
+    mimeType: string;
+    size: number;
+    data?: string; // base64 data for incognito mode
   }[];
 
   // Voting

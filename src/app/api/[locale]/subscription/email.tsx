@@ -1,7 +1,14 @@
-import { Button, Link, Section, Text as Span } from "@react-email/components";
-import type React from "react";
-import type { JSX } from "react";
+/**
+ * Subscription Email Templates
+ * Refactored to separate template from business logic
+ */
 
+import { Button, Link, Section, Text as Span } from "@react-email/components";
+import type { ReactElement } from "react";
+import React from "react";
+import { z } from "zod";
+
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -11,87 +18,50 @@ import { EmailTemplate } from "../emails/smtp-client/components/template.email";
 import { createTrackingContext } from "../emails/smtp-client/components/tracking_context.email";
 import { SubscriptionPlan, SubscriptionStatus } from "./enum";
 
-/**
- * Email function type for subscription success notifications
- * This is a mock type since we don't have a specific endpoint for this
- */
-interface SubscriptionSuccessEmailParams {
-  user: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    leadId: string;
-  };
-  subscription: {
-    id: string;
-    planId: (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan];
-    status: (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus];
-    stripeSubscriptionId: string | null;
-  };
-  locale: CountryLanguage;
+// ============================================================================
+// TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
+// ============================================================================
+
+const subscriptionSuccessPropsSchema = z.object({
+  firstName: z.string(),
+  userId: z.string(),
+  leadId: z.string(),
+  planName: z.string(),
+});
+
+type SubscriptionSuccessProps = z.infer<typeof subscriptionSuccessPropsSchema>;
+
+function SubscriptionSuccessEmail({
+  props,
+  t,
+  locale,
+  tracking,
+}: {
+  props: SubscriptionSuccessProps;
   t: TFunction;
-}
-
-/**
- * Helper function to get plan name from subscription plan ID
- */
-function getPlanName(
-  planId: (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan],
-  t: TFunction,
-): string {
-  switch (planId) {
-    case SubscriptionPlan.SUBSCRIPTION:
-      return t("app.api.products.subscription.name");
-    default:
-      return t("app.api.products.subscription.name");
-  }
-}
-
-/**
- * Helper function to get status name from subscription status
- */
-function getStatusName(
-  status: (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus],
-  t: TFunction,
-): string {
-  switch (status) {
-    case SubscriptionStatus.ACTIVE:
-      return t("app.api.subscription.status.active");
-    case SubscriptionStatus.TRIALING:
-      return t("app.api.subscription.status.trialing");
-    case SubscriptionStatus.PAST_DUE:
-      return t("app.api.subscription.status.pastDue");
-    case SubscriptionStatus.CANCELED:
-      return t("app.api.subscription.status.canceled");
-    case SubscriptionStatus.INCOMPLETE:
-      return t("app.api.subscription.status.incomplete");
-    case SubscriptionStatus.INCOMPLETE_EXPIRED:
-      return t("app.api.subscription.status.incomplete_expired");
-    case SubscriptionStatus.UNPAID:
-      return t("app.api.subscription.status.unpaid");
-    case SubscriptionStatus.PAUSED:
-      return t("app.api.subscription.status.paused");
-    default:
-      return t("app.api.subscription.status.incomplete");
-  }
-}
-
-function renderSubscriptionSuccessEmailContent(
-  t: TFunction,
-  locale: CountryLanguage,
-  user: { firstName: string; id: string; leadId: string },
-  planName: string,
-  baseUrl: string,
-): React.ReactElement {
-  // Create tracking context for subscription emails (transactional)
-  const tracking = createTrackingContext(
-    locale,
-    user.leadId, // leadId from user
-    user.id, // userId for subscription emails
-    undefined, // no campaignId for transactional emails
-    baseUrl,
-  );
+  locale: CountryLanguage;
+  tracking?: {
+    userId?: string;
+    leadId?: string;
+    sessionId?: string;
+  };
+}): ReactElement {
+  const baseUrl = env.NEXT_PUBLIC_APP_URL;
+  const trackingContext = tracking
+    ? createTrackingContext(
+        locale,
+        tracking.leadId,
+        tracking.userId,
+        undefined,
+        baseUrl,
+      )
+    : createTrackingContext(
+        locale,
+        props.leadId,
+        props.userId,
+        undefined,
+        baseUrl,
+      );
 
   return (
     <EmailTemplate
@@ -99,13 +69,13 @@ function renderSubscriptionSuccessEmailContent(
       locale={locale}
       title={t("app.api.subscription.email.success.title", {
         appName: t("config.appName"),
-        firstName: user.firstName,
+        firstName: props.firstName,
       })}
       previewText={t("app.api.subscription.email.success.previewText", {
         appName: t("config.appName"),
-        planName,
+        planName: props.planName,
       })}
-      tracking={tracking}
+      tracking={trackingContext}
     >
       {/* Welcome Message */}
       <Span
@@ -118,7 +88,7 @@ function renderSubscriptionSuccessEmailContent(
         }}
       >
         {t("app.api.subscription.email.success.welcomeMessage", {
-          planName,
+          planName: props.planName,
         })}
       </Span>
 
@@ -269,17 +239,47 @@ function renderSubscriptionSuccessEmailContent(
   );
 }
 
-function renderAdminSubscriptionNotificationEmailContent(
-  t: TFunction,
-  locale: CountryLanguage,
-  user: { firstName: string; lastName: string; email: string },
-  planName: string,
-  statusName: string,
-): React.ReactElement {
-  // Create tracking context for admin subscription emails (transactional)
-  const tracking = createTrackingContext(
-    locale, // no campaignId for transactional emails
-  );
+// Template Definition Export
+const subscriptionSuccessTemplate: EmailTemplateDefinition<SubscriptionSuccessProps> =
+  {
+    meta: {
+      id: "subscription-success",
+      version: "1.0.0",
+      name: "app.api.emails.templates.subscription.success.meta.name",
+      description:
+        "app.api.emails.templates.subscription.success.meta.description",
+      category: "subscription",
+      path: "/subscription/email.tsx",
+      defaultSubject: (t) =>
+        t("app.api.subscription.email.success.subject", {
+          appName: "",
+          planName: "",
+        }),
+    },
+    schema: subscriptionSuccessPropsSchema,
+    component: SubscriptionSuccessEmail,
+  };
+
+export default subscriptionSuccessTemplate;
+
+// ============================================================================
+// ADMIN NOTIFICATION TEMPLATE (Component - Not Registered)
+// ============================================================================
+
+function AdminSubscriptionNotificationEmailContent({
+  user,
+  planName,
+  statusName,
+  t,
+  locale,
+}: {
+  user: { firstName: string; lastName: string; email: string };
+  planName: string;
+  statusName: string;
+  t: TFunction;
+  locale: CountryLanguage;
+}): ReactElement {
+  const tracking = createTrackingContext(locale);
 
   return (
     <EmailTemplate
@@ -466,8 +466,78 @@ function renderAdminSubscriptionNotificationEmailContent(
   );
 }
 
+// ============================================================================
+// ADAPTERS (Business Logic - Maps custom data to template props)
+// ============================================================================
+
 /**
- * Render subscription success email for user
+ * Email function type for subscription success notifications
+ */
+interface SubscriptionSuccessEmailParams {
+  user: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    leadId: string;
+  };
+  subscription: {
+    id: string;
+    planId: (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan];
+    status: (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus];
+    stripeSubscriptionId: string | null;
+  };
+  locale: CountryLanguage;
+  t: TFunction;
+}
+
+/**
+ * Helper function to get plan name from subscription plan ID
+ */
+function getPlanName(
+  planId: (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan],
+  t: TFunction,
+): string {
+  switch (planId) {
+    case SubscriptionPlan.SUBSCRIPTION:
+      return t("app.api.products.subscription.name");
+    default:
+      return t("app.api.products.subscription.name");
+  }
+}
+
+/**
+ * Helper function to get status name from subscription status
+ */
+function getStatusName(
+  status: (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus],
+  t: TFunction,
+): string {
+  switch (status) {
+    case SubscriptionStatus.ACTIVE:
+      return t("app.api.subscription.status.active");
+    case SubscriptionStatus.TRIALING:
+      return t("app.api.subscription.status.trialing");
+    case SubscriptionStatus.PAST_DUE:
+      return t("app.api.subscription.status.pastDue");
+    case SubscriptionStatus.CANCELED:
+      return t("app.api.subscription.status.canceled");
+    case SubscriptionStatus.INCOMPLETE:
+      return t("app.api.subscription.status.incomplete");
+    case SubscriptionStatus.INCOMPLETE_EXPIRED:
+      return t("app.api.subscription.status.incomplete_expired");
+    case SubscriptionStatus.UNPAID:
+      return t("app.api.subscription.status.unpaid");
+    case SubscriptionStatus.PAUSED:
+      return t("app.api.subscription.status.paused");
+    default:
+      return t("app.api.subscription.status.incomplete");
+  }
+}
+
+/**
+ * Subscription Success Email Adapter
+ * Maps subscription data to success template props
  */
 export const renderSubscriptionSuccessEmail = ({
   user,
@@ -480,11 +550,17 @@ export const renderSubscriptionSuccessEmail = ({
     toEmail: string;
     toName: string;
     subject: string;
-    jsx: JSX.Element;
+    jsx: ReactElement;
   };
 } => {
-  const baseUrl = env.NEXT_PUBLIC_APP_URL;
   const planName = getPlanName(subscription.planId, t);
+
+  const templateProps: SubscriptionSuccessProps = {
+    firstName: user.firstName,
+    userId: user.id,
+    leadId: user.leadId,
+    planName,
+  };
 
   return {
     success: true,
@@ -495,23 +571,22 @@ export const renderSubscriptionSuccessEmail = ({
         appName: t("config.appName"),
         planName,
       }),
-      jsx: renderSubscriptionSuccessEmailContent(
+      jsx: subscriptionSuccessTemplate.component({
+        props: templateProps,
         t,
         locale,
-        {
-          firstName: user.firstName,
-          id: user.id,
+        tracking: {
+          userId: user.id,
           leadId: user.leadId,
         },
-        planName,
-        baseUrl,
-      ),
+      }),
     },
   };
 };
 
 /**
- * Render admin notification email for subscription success
+ * Admin Subscription Notification Adapter
+ * Sends admin notification when subscription is created
  */
 export const renderAdminSubscriptionNotification = ({
   user,
@@ -524,7 +599,7 @@ export const renderAdminSubscriptionNotification = ({
     toEmail: string;
     toName: string;
     subject: string;
-    jsx: JSX.Element;
+    jsx: ReactElement;
   };
 } => {
   const planName = getPlanName(subscription.planId, t);
@@ -539,13 +614,13 @@ export const renderAdminSubscriptionNotification = ({
         userName: user.firstName,
         planName,
       }),
-      jsx: renderAdminSubscriptionNotificationEmailContent(
-        t,
-        locale,
+      jsx: AdminSubscriptionNotificationEmailContent({
         user,
         planName,
         statusName,
-      ),
+        t,
+        locale,
+      }),
     },
   };
 };

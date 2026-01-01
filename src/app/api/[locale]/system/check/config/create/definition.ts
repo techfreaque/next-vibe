@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
     UserRole.MCP_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
-  aliases: ["config-create"],
+  aliases: ["config-create", "create-config", "cc"],
 
   fields: objectField(
     {
@@ -84,6 +84,18 @@ const { POST } = createEndpoint({
             "app.api.system.check.config.create.fields.updatePackageJson.label",
           description:
             "app.api.system.check.config.create.fields.updatePackageJson.description",
+          columns: 6,
+        },
+        z.boolean().optional().default(true),
+      ),
+
+      enableEslint: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.BOOLEAN,
+          label: "app.api.system.check.config.create.fields.enableEslint.label",
+          description:
+            "app.api.system.check.config.create.fields.enableEslint.description",
           columns: 6,
         },
         z.boolean().optional(),

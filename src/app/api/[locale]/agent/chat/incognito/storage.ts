@@ -273,14 +273,17 @@ export async function clearIncognitoData(): Promise<void> {
     for (const key of Object.values(STORAGE_KEYS)) {
       await storage.removeItem(key);
     }
+    // Files are stored in message metadata and cleared with messages
   }
 }
 
 /**
  * Generate unique ID for incognito mode
  */
-export function generateIncognitoId(prefix: string): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+export function generateIncognitoId(): string {
+  // Generate a valid UUID for compatibility with server validation
+  // The prefix is not used anymore since we need proper UUIDs
+  return crypto.randomUUID();
 }
 
 /**
@@ -292,7 +295,7 @@ export async function createIncognitoThread(
   subFolderId: string | null,
 ): Promise<ChatThread> {
   const thread: ChatThread = {
-    id: generateIncognitoId("thread"),
+    id: generateIncognitoId(),
     userId: "incognito",
     leadId: null,
     title,
@@ -337,9 +340,10 @@ export async function createIncognitoMessage(
   parentId: string | null = null,
   model: ChatMessage["model"] = null,
   character: string | null = null,
+  metadata: ChatMessage["metadata"] = {},
 ): Promise<ChatMessage> {
   const message: ChatMessage = {
-    id: generateIncognitoId("msg"),
+    id: generateIncognitoId(),
     threadId,
     role,
     content,
@@ -359,7 +363,7 @@ export async function createIncognitoMessage(
     edited: false,
     originalId: null,
     tokens: null,
-    metadata: {},
+    metadata,
     upvotes: 0,
     downvotes: 0,
     createdAt: new Date(),

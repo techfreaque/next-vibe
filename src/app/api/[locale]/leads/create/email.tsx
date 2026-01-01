@@ -1,7 +1,7 @@
 // oxlint-disable no-html-link-for-pages
 /**
  * Lead Creation Email Templates
- * React Email templates for lead creation operations
+ * Refactored to separate template from business logic
  */
 
 import {
@@ -9,10 +9,12 @@ import {
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { JSX } from "react";
+import type { ReactElement } from "react";
 import React from "react";
+import { z } from "zod";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -26,30 +28,43 @@ import type {
   LeadCreateRequestTypeOutput,
 } from "./definition";
 
-/**
- * Welcome Email Template Component for New Leads
- * Sends a welcome message to leads when they are created in the system
- */
-// Type for the lead data from create response
-type LeadData = LeadCreatePostResponseOutput["lead"];
+// ============================================================================
+// TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
+// ============================================================================
 
-function WelcomeEmailContent({
-  lead,
+const leadWelcomePropsSchema = z.object({
+  leadId: z.string(),
+  businessName: z.string().optional(),
+  email: z.string().email(),
+  userId: z.string().optional(),
+});
+
+type LeadWelcomeProps = z.infer<typeof leadWelcomePropsSchema>;
+
+function LeadWelcomeEmail({
+  props,
   t,
   locale,
-  userId,
+  tracking,
 }: {
-  lead: LeadData;
+  props: LeadWelcomeProps;
   t: TFunction;
   locale: CountryLanguage;
-  userId?: string;
-}): JSX.Element {
-  // Create tracking context for welcome emails with leadId
-  const tracking = createTrackingContext(
-    locale,
-    lead.summary.id, // leadId for tracking engagement
-    userId, // no campaignId for transactional emails
-  );
+  tracking?: {
+    userId?: string;
+    leadId?: string;
+    sessionId?: string;
+  };
+}): ReactElement {
+  const trackingContext = tracking
+    ? createTrackingContext(
+        locale,
+        tracking.leadId,
+        tracking.userId,
+        undefined,
+        undefined,
+      )
+    : createTrackingContext(locale, props.leadId, props.userId);
 
   return (
     <EmailTemplate
@@ -57,12 +72,12 @@ function WelcomeEmailContent({
       locale={locale}
       title={t("app.api.leads.create.email.welcome.title", {
         businessName:
-          lead.summary.businessName ||
-          lead.summary.email ||
+          props.businessName ||
+          props.email ||
           t("app.api.leads.create.email.welcome.defaultName"),
       })}
       previewText={t("app.api.leads.create.email.welcome.preview")}
-      tracking={tracking}
+      tracking={trackingContext}
     >
       <span
         style={{
@@ -74,7 +89,7 @@ function WelcomeEmailContent({
       >
         {t("app.api.leads.create.email.welcome.greeting", {
           businessName:
-            lead.summary.businessName ||
+            props.businessName ||
             t("app.api.leads.create.email.welcome.defaultName"),
         })}
       </span>
@@ -190,10 +205,30 @@ function WelcomeEmailContent({
   );
 }
 
-/**
- * Admin Notification Email Template Component for New Leads
- * Notifies admin team when a new lead is created
- */
+// Template Definition Export
+const leadWelcomeTemplate: EmailTemplateDefinition<LeadWelcomeProps> = {
+  meta: {
+    id: "lead-welcome",
+    version: "1.0.0",
+    name: "app.api.emails.templates.leads.welcome.meta.name",
+    description: "app.api.emails.templates.leads.welcome.meta.description",
+    category: "leads",
+    path: "/leads/create/email.tsx",
+    defaultSubject: (t) =>
+      t("app.api.leads.create.email.welcome.subject", { companyName: "" }),
+  },
+  schema: leadWelcomePropsSchema,
+  component: LeadWelcomeEmail,
+};
+
+export default leadWelcomeTemplate;
+
+// ============================================================================
+// ADMIN NOTIFICATION TEMPLATE (Component - Not Registered)
+// ============================================================================
+
+type LeadData = LeadCreatePostResponseOutput["lead"];
+
 function AdminNotificationEmailContent({
   lead,
   t,
@@ -204,13 +239,8 @@ function AdminNotificationEmailContent({
   t: TFunction;
   locale: CountryLanguage;
   userId?: string;
-}): JSX.Element {
-  // Create tracking context for admin notification emails
-  const tracking = createTrackingContext(
-    locale,
-    lead.summary.id, // leadId for tracking
-    userId, // no campaignId for transactional emails
-  );
+}): ReactElement {
+  const tracking = createTrackingContext(locale, lead.summary.id, userId);
 
   return (
     <EmailTemplate
@@ -424,9 +454,13 @@ function AdminNotificationEmailContent({
   );
 }
 
+// ============================================================================
+// ADAPTERS (Business Logic - Maps endpoint data to template props)
+// ============================================================================
+
 /**
- * Welcome Email Function for New Leads
- * Sends welcome email to leads when they are created (if email provided)
+ * Welcome Email Adapter for New Leads
+ * Maps lead creation response to welcome template props
  */
 export const renderWelcomeMail: EmailFunctionType<
   LeadCreateRequestTypeOutput,
@@ -434,13 +468,19 @@ export const renderWelcomeMail: EmailFunctionType<
   never
 > = ({ responseData, locale, t, user }) => {
   try {
-    // Only send welcome email if lead has email and the creation was successful
     if (!responseData?.lead?.summary?.email) {
       return fail({
         message: "app.api.leads.create.email.welcome.error.noEmail",
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
+
+    const templateProps: LeadWelcomeProps = {
+      leadId: responseData.lead.summary.id,
+      businessName: responseData.lead.summary.businessName,
+      email: responseData.lead.summary.email,
+      userId: user?.id,
+    };
 
     return success({
       toEmail: responseData.lead.summary.email,
@@ -452,12 +492,14 @@ export const renderWelcomeMail: EmailFunctionType<
       }),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
       replyToName: t("config.appName"),
-
-      jsx: WelcomeEmailContent({
-        lead: responseData.lead,
+      jsx: leadWelcomeTemplate.component({
+        props: templateProps,
         t,
         locale,
-        userId: user?.id,
+        tracking: {
+          userId: user?.id,
+          leadId: responseData.lead.summary.id,
+        },
       }),
     });
   } catch {
@@ -469,8 +511,8 @@ export const renderWelcomeMail: EmailFunctionType<
 };
 
 /**
- * Admin Notification Email Function for New Leads
- * Notifies admin team when a new lead is created
+ * Admin Notification Email Adapter for New Leads
+ * Sends admin notification when lead is created
  */
 export const renderAdminNotificationMail: EmailFunctionType<
   LeadCreateRequestTypeOutput,
@@ -500,7 +542,6 @@ export const renderAdminNotificationMail: EmailFunctionType<
       replyToName:
         responseData.lead.summary.businessName ||
         t("app.api.leads.create.email.admin.newLead.defaultName"),
-
       jsx: AdminNotificationEmailContent({
         lead: responseData.lead,
         t,

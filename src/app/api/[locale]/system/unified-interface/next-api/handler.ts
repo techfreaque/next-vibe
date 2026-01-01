@@ -4,14 +4,16 @@
  * Handles ONLY Next.js-specific concerns: NextRequest parsing, NextResponse wrapping, streaming
  */
 
-import type { NextRequest, NextResponse } from "next/server";
-import {
-  ErrorResponseError,
-  isStreamingResponse,
-  type ResponseType,
-} from "next-vibe/shared/types/response.schema";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import {
+  ErrorResponseError,
+  isFileResponse,
+  isStreamingResponse,
+  type ResponseType,
+} from "@/app/api/[locale]/shared/types/response.schema";
 import {
   parseRequestBody,
   parseSearchParams,
@@ -33,14 +35,20 @@ import { Platform } from "../shared/types/platform";
 
 /**
  * API handler return type
- * Supports both standard JSON responses (NextResponse) and streaming responses (Response)
+ * Supports:
+ * - Standard JSON responses (NextResponse<ResponseType<TResponseOutput>>)
+ * - Streaming responses (Response)
+ * - File responses (NextResponse<Buffer | ReadableStream | Blob>)
  */
 export type NextHandlerReturnType<TResponseOutput, TUrlVariablesInput> = (
   request: NextRequest,
   {
     params,
   }: { params: Promise<TUrlVariablesInput & { locale: CountryLanguage }> },
-) => Promise<NextResponse<ResponseType<TResponseOutput>> | Response>;
+) => Promise<
+  | NextResponse<ResponseType<TResponseOutput> | Buffer | ReadableStream | Blob>
+  | Response
+>;
 
 /**
  * Create a Next.js route handler
@@ -97,6 +105,21 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         platform: Platform.NEXT_API,
         request, // Pass NextRequest for auth context
       });
+
+      // Handle file responses - return immediately
+      if (isFileResponse(result)) {
+        logger.info("Returning file response");
+        const body = Buffer.isBuffer(result.buffer)
+          ? new Blob([new Uint8Array(result.buffer)])
+          : result.buffer;
+        return new NextResponse(body, {
+          status: 200,
+          headers: {
+            "Content-Type": result.contentType,
+            ...result.headers,
+          },
+        });
+      }
 
       // Handle streaming responses (Next.js-specific)
       if (isStreamingResponse(result)) {

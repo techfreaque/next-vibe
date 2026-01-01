@@ -782,7 +782,7 @@ export function Selector({
           <Span
             className={cn(
               "max-w-[80px] @xl:max-w-[100px] truncate",
-              modelSupportsTools ? "hidden @md:inline" : "inline",
+              modelSupportsTools ? "hidden @md:inline" : "hidden @xs:inline",
             )}
           >
             {currentCharacter ? t(currentCharacter.name) : ""}

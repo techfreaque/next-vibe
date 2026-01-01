@@ -103,7 +103,7 @@ export function useFolderOperations(
         );
 
         const folder: ChatFolder = {
-          id: generateIncognitoId("folder"),
+          id: generateIncognitoId(),
           userId: "incognito",
           leadId: null,
           rootFolderId,

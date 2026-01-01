@@ -11,6 +11,7 @@ export type ImageProps = {
   width?: number;
   height?: number;
   fill?: boolean;
+  unoptimized?: boolean;
   onLoad?: () => void;
   onError?: () => void;
 } & StyleType;
@@ -25,6 +26,7 @@ export function Image({
   width,
   height,
   fill,
+  unoptimized,
   className,
   style,
   onLoad,
@@ -36,6 +38,7 @@ export function Image({
       width={width}
       height={height}
       fill={fill}
+      unoptimized={unoptimized}
       className={className}
       style={style}
       onLoad={onLoad}

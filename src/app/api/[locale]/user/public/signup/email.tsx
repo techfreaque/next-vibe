@@ -1,11 +1,19 @@
+/**
+ * User Public Signup Email Templates
+ * Refactored to separate template from business logic
+ */
+
 import { Button, Section, Text } from "@react-email/components";
 import {
   fail,
   success,
   ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
-import type React from "react";
+import type { ReactElement } from "react";
+import React from "react";
+import { z } from "zod";
 
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -21,21 +29,43 @@ import {
 import { createTrackingContext } from "../../../emails/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "../../../emails/smtp-client/components/template.email";
 
-function renderWelcomeEmailContent(
-  t: TFunction,
-  locale: CountryLanguage,
-  user: { privateName: string; id: string },
-  baseUrl: string,
-  leadId: string,
-): React.ReactElement {
-  // Create tracking context for user signup emails with leadId and userId
-  const tracking = createTrackingContext(
-    locale,
-    leadId,
-    user.id,
-    undefined, // no campaignId for transactional emails
-    baseUrl,
-  );
+// ============================================================================
+// TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
+// ============================================================================
+
+const signupWelcomePropsSchema = z.object({
+  privateName: z.string(),
+  userId: z.string(),
+  leadId: z.string(),
+});
+
+type SignupWelcomeProps = z.infer<typeof signupWelcomePropsSchema>;
+
+function SignupWelcomeEmail({
+  props,
+  t,
+  locale,
+  tracking,
+}: {
+  props: SignupWelcomeProps;
+  t: TFunction;
+  locale: CountryLanguage;
+  tracking?: {
+    userId?: string;
+    leadId?: string;
+    sessionId?: string;
+  };
+}): ReactElement {
+  const baseUrl = env.NEXT_PUBLIC_APP_URL;
+  const trackingContext = tracking
+    ? createTrackingContext(
+        locale,
+        tracking.leadId,
+        tracking.userId,
+        undefined,
+        baseUrl,
+      )
+    : createTrackingContext(locale, props.leadId, props.userId, undefined, baseUrl);
 
   return (
     <EmailTemplate
@@ -43,12 +73,12 @@ function renderWelcomeEmailContent(
       locale={locale}
       title={t("app.api.user.public.signup.email.title", {
         appName: t("config.appName"),
-        privateName: user.privateName,
+        privateName: props.privateName,
       })}
       previewText={t("app.api.user.public.signup.email.previewText", {
         appName: t("config.appName"),
       })}
-      tracking={tracking}
+      tracking={trackingContext}
     >
       <Text
         style={{
@@ -137,12 +167,41 @@ function renderWelcomeEmailContent(
   );
 }
 
+// Template Definition Export
+const signupWelcomeTemplate: EmailTemplateDefinition<SignupWelcomeProps> = {
+  meta: {
+    id: "signup-welcome",
+    version: "1.0.0",
+    name: "app.api.emails.templates.signup.welcome.meta.name",
+    description: "app.api.emails.templates.signup.welcome.meta.description",
+    category: "auth",
+    path: "/user/public/signup/email.tsx",
+    defaultSubject: (t) =>
+      t("app.api.user.public.signup.email.subject", { appName: "" }),
+  },
+  schema: signupWelcomePropsSchema,
+  component: SignupWelcomeEmail,
+};
+
+export default signupWelcomeTemplate;
+
+// ============================================================================
+// ADMIN NOTIFICATION TEMPLATE (Component - Not Registered)
+// ============================================================================
+
+// ============================================================================
+// ADAPTERS (Business Logic - Maps endpoint data to template props)
+// ============================================================================
+
+/**
+ * Signup Welcome Email Adapter
+ * Maps signup request to welcome template props
+ */
 export const renderRegisterMail: EmailFunctionType<
   SignupPostRequestOutput,
   SignupPostResponseOutput,
   Record<string, string>
 > = async ({ requestData, locale, t, logger }) => {
-  const baseUrl = env.NEXT_PUBLIC_APP_URL;
   const userResponse = await UserRepository.getUserByEmail(
     requestData.formCard.email,
     UserDetailLevel.STANDARD,
@@ -159,13 +218,27 @@ export const renderRegisterMail: EmailFunctionType<
   }
   const user = userResponse.data;
 
+  const templateProps: SignupWelcomeProps = {
+    privateName: user.privateName,
+    userId: user.id,
+    leadId: user.leadId,
+  };
+
   return success({
     toEmail: user.email,
     toName: user.privateName,
     subject: t("app.api.user.public.signup.email.subject", {
       appName: t("config.appName"),
     }),
-    jsx: renderWelcomeEmailContent(t, locale, user, baseUrl, user.leadId),
+    jsx: signupWelcomeTemplate.component({
+      props: templateProps,
+      t,
+      locale,
+      tracking: {
+        userId: user.id,
+        leadId: user.leadId,
+      },
+    }),
   });
 };
 

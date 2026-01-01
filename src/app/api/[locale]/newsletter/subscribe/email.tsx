@@ -1,6 +1,6 @@
 /**
- * Newsletter Subscribe API Email Templates
- * React Email templates for newsletter subscription operations
+ * Newsletter Subscribe Email Templates
+ * Refactored to separate template from business logic
  */
 
 import { Button, Hr, Link, Section } from "@react-email/components";
@@ -9,10 +9,12 @@ import {
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { JSX } from "react";
+import type { ReactElement } from "react";
 import React from "react";
+import { z } from "zod";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -25,28 +27,43 @@ import type {
   SubscribePostResponseOutput as NewsletterSubscriptionResponseType,
 } from "./definition";
 
-/**
- * Welcome Email Template Component
- */
-function WelcomeEmailContent({
-  requestData,
+// ============================================================================
+// TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
+// ============================================================================
+
+const newsletterWelcomePropsSchema = z.object({
+  email: z.string().email(),
+  name: z.string().optional(),
+  leadId: z.string().optional(),
+  userId: z.string().optional(),
+});
+
+type NewsletterWelcomeProps = z.infer<typeof newsletterWelcomePropsSchema>;
+
+function NewsletterWelcomeEmail({
+  props,
   t,
   locale,
-  leadId,
-  userId,
+  tracking,
 }: {
-  requestData: NewsletterSubscriptionType;
+  props: NewsletterWelcomeProps;
   t: TFunction;
   locale: CountryLanguage;
-  leadId?: string;
-  userId?: string;
-}): JSX.Element {
-  // Create tracking context for newsletter emails with leadId
-  const tracking = createTrackingContext(
-    locale,
-    leadId, // leadId from newsletter subscription
-    userId, // no campaignId for transactional emails
-  );
+  tracking?: {
+    userId?: string;
+    leadId?: string;
+    sessionId?: string;
+  };
+}): ReactElement {
+  const trackingContext = tracking
+    ? createTrackingContext(
+        locale,
+        tracking.leadId,
+        tracking.userId,
+        undefined,
+        undefined,
+      )
+    : createTrackingContext(locale, props.leadId, props.userId);
 
   const appName = t("config.appName");
 
@@ -56,7 +73,7 @@ function WelcomeEmailContent({
       locale={locale}
       title={t("app.api.newsletter.email.welcome.title")}
       previewText={t("app.api.newsletter.email.welcome.preview")}
-      tracking={tracking}
+      tracking={trackingContext}
     >
       {/* Greeting */}
       <div
@@ -67,9 +84,9 @@ function WelcomeEmailContent({
           marginBottom: "16px",
         }}
       >
-        {requestData.name
+        {props.name
           ? t("app.api.newsletter.email.welcome.greeting_with_name", {
-              name: requestData.name,
+              name: props.name,
             })
           : t("app.api.newsletter.email.welcome.greeting")}
       </div>
@@ -143,7 +160,7 @@ function WelcomeEmailContent({
         {t("app.api.newsletter.email.welcome.unsubscribe_text")}{" "}
         <Link
           href={`${env.NEXT_PUBLIC_APP_URL}/${locale}/newsletter/unsubscribe/${encodeURIComponent(
-            requestData.email,
+            props.email,
           )}`}
           style={{ color: "#4f46e5" }}
         >
@@ -154,9 +171,29 @@ function WelcomeEmailContent({
   );
 }
 
-/**
- * Admin Notification Email Template Component
- */
+// Template Definition Export
+const newsletterWelcomeTemplate: EmailTemplateDefinition<NewsletterWelcomeProps> =
+  {
+    meta: {
+      id: "newsletter-welcome",
+      version: "1.0.0",
+      name: "app.api.emails.templates.newsletter.welcome.meta.name",
+      description:
+        "app.api.emails.templates.newsletter.welcome.meta.description",
+      category: "newsletter",
+      path: "/newsletter/subscribe/email.tsx",
+      defaultSubject: (t) => t("app.api.newsletter.email.welcome.subject"),
+    },
+    schema: newsletterWelcomePropsSchema,
+    component: NewsletterWelcomeEmail,
+  };
+
+export default newsletterWelcomeTemplate;
+
+// ============================================================================
+// ADMIN NOTIFICATION TEMPLATE (Component - Not Registered)
+// ============================================================================
+
 function AdminNotificationEmailContent({
   requestData,
   t,
@@ -165,11 +202,8 @@ function AdminNotificationEmailContent({
   requestData: NewsletterSubscriptionType;
   t: TFunction;
   locale: CountryLanguage;
-}): JSX.Element {
-  // Create tracking context for newsletter admin emails
-  const tracking = createTrackingContext(
-    locale, // no campaignId for transactional emails
-  );
+}): ReactElement {
+  const tracking = createTrackingContext(locale);
 
   return (
     <EmailTemplate
@@ -280,9 +314,13 @@ function AdminNotificationEmailContent({
   );
 }
 
+// ============================================================================
+// ADAPTERS (Business Logic - Maps endpoint data to template props)
+// ============================================================================
+
 /**
- * Welcome Email for New Subscribers
- * Renders a welcome email for new newsletter subscribers
+ * Newsletter Welcome Email Adapter
+ * Maps newsletter subscription to welcome template props
  */
 export const renderWelcomeMail: EmailFunctionType<
   NewsletterSubscriptionType,
@@ -290,16 +328,25 @@ export const renderWelcomeMail: EmailFunctionType<
   never
 > = ({ requestData, responseData, locale, t }) => {
   try {
+    const templateProps: NewsletterWelcomeProps = {
+      email: requestData.email,
+      name: requestData.name,
+      leadId: responseData.leadId,
+      userId: responseData.userId,
+    };
+
     return success({
       toEmail: requestData.email,
       toName: requestData.name || requestData.email,
       subject: t("app.api.newsletter.email.welcome.subject"),
-      jsx: WelcomeEmailContent({
-        requestData,
+      jsx: newsletterWelcomeTemplate.component({
+        props: templateProps,
         t,
         locale,
-        leadId: responseData.leadId,
-        userId: responseData.userId,
+        tracking: {
+          leadId: responseData.leadId,
+          userId: responseData.userId,
+        },
       }),
     });
   } catch {
@@ -311,8 +358,8 @@ export const renderWelcomeMail: EmailFunctionType<
 };
 
 /**
- * Notification Email for Admin
- * Sends a notification to the admin when a new subscriber joins
+ * Admin Newsletter Subscription Notification Adapter
+ * Sends notification to admin when new subscriber joins
  */
 export const renderAdminNotificationMail: EmailFunctionType<
   NewsletterSubscriptionType,

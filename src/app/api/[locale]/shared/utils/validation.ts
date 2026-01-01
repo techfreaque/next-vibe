@@ -35,7 +35,7 @@ export function validateData<TSchema extends z.ZodType>(
     if (!result.success) {
       const formattedErrors = formatZodErrors(result.error);
       const errorCount = result.error.issues?.length || 0;
-      logger.error("Validation error details", {
+      logger.error("Validation error details", undefined, {
         errorCount,
         errors: result.error.issues?.slice(0, 3).map((e: ZodIssue) => ({
           path: e.path.join("."),

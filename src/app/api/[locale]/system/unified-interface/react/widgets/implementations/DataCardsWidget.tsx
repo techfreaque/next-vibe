@@ -23,6 +23,7 @@ export const DataCardsWidget = <const TKey extends string>({
   field,
   context,
   className = "",
+  endpoint,
 }: ReactWidgetProps<typeof WidgetType.DATA_CARDS, TKey>): JSX.Element => {
   const { t } = getTranslator(context);
   const data = extractDataCardsData(value);
@@ -92,6 +93,7 @@ export const DataCardsWidget = <const TKey extends string>({
                               data={cardValue as WidgetData}
                               field={fieldDef}
                               context={context}
+                              endpoint={endpoint}
                             />
                           ) : (
                             <Span className="text-gray-600 dark:text-gray-400">

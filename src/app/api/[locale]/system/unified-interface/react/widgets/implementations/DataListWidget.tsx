@@ -38,6 +38,7 @@ export function DataListWidget<const TKey extends string>({
   field,
   context,
   className,
+  endpoint,
 }: ReactWidgetProps<typeof WidgetType.DATA_LIST, TKey>): JSX.Element {
   const { t } = getTranslator(context);
   const { t: globalT } = simpleT(context.locale);
@@ -185,6 +186,7 @@ export function DataListWidget<const TKey extends string>({
                               data={cellValue}
                               field={fieldDef}
                               context={context}
+                              endpoint={endpoint}
                             />
                           ) : (
                             <Span className="text-gray-600 dark:text-gray-400">
@@ -257,6 +259,7 @@ export function DataListWidget<const TKey extends string>({
                                 data={cardValue}
                                 field={fieldDef}
                                 context={context}
+                                endpoint={endpoint}
                               />
                             ) : (
                               <Span className="text-gray-600 dark:text-gray-400">

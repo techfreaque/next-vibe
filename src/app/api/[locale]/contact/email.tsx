@@ -1,6 +1,6 @@
 /**
- * Contact Form Email Templates
- * React Email templates for contact form submissions
+ * Contact Form Email Template
+ * Refactored to separate template from business logic
  */
 
 import {
@@ -15,9 +15,11 @@ import {
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { JSX } from "react";
+import type { ReactElement } from "react";
 import React from "react";
+import { z } from "zod";
 
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -28,41 +30,57 @@ import { createTrackingContext } from "../emails/smtp-client/components/tracking
 import type { ContactRequestOutput, ContactResponseOutput } from "./definition";
 import { contactClientRepository } from "./repository-client";
 
-/**
- * Shared Contact Email Template Component
- * Renders a consistent email template for both company and partner emails
- */
-function ContactEmailContent({
-  requestData,
+// ============================================================================
+// TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
+// ============================================================================
+
+const contactFormPropsSchema = z.object({
+  name: z.string(),
+  email: z.string().email(),
+  company: z.string().optional(),
+  subject: z.string(),
+  message: z.string(),
+  isForCompany: z.boolean(),
+  userId: z.string().optional(),
+  leadId: z.string().optional(),
+});
+
+type ContactFormProps = z.infer<typeof contactFormPropsSchema>;
+
+function ContactFormEmail({
+  props,
   t,
   locale,
-  isForCompany,
-  userId,
-  leadId,
+  tracking,
 }: {
-  requestData: ContactRequestOutput;
+  props: ContactFormProps;
   t: TFunction;
   locale: CountryLanguage;
-  isForCompany: boolean;
-  userId?: string;
-  leadId?: string;
-}): JSX.Element {
-  // Create tracking context for contact emails with leadId and userId
-  const tracking = createTrackingContext(
-    locale,
-    leadId, // leadId from contact form submission
-    userId, // no campaignId for transactional emails
-  );
+  tracking?: {
+    userId?: string;
+    leadId?: string;
+    sessionId?: string;
+  };
+}): ReactElement {
+  const trackingContext = tracking
+    ? createTrackingContext(
+        locale,
+        tracking.leadId,
+        tracking.userId,
+        undefined,
+        undefined,
+      )
+    : createTrackingContext(locale, props.leadId, props.userId);
 
   return (
     <EmailTemplate
       t={t}
       locale={locale}
       title={t("app.api.contact.email.partner.greeting", {
-        name: requestData.name,
+        name: props.name,
       })}
-      previewText={requestData.subject}
-      tracking={tracking}
+      previewText={props.subject}
+      tracking={trackingContext}
     >
       <Span
         style={{
@@ -105,7 +123,7 @@ function ContactEmailContent({
           <Span style={{ fontWeight: "700" }}>
             {t("app.api.contact.email.company.name")}:
           </Span>{" "}
-          {requestData.name}
+          {props.name}
         </Span>
 
         <Span
@@ -118,15 +136,12 @@ function ContactEmailContent({
           <Span style={{ fontWeight: "700" }}>
             {t("app.api.contact.email.company.email")}:
           </Span>{" "}
-          <Link
-            href={`mailto:${requestData.email}`}
-            style={{ color: "#4f46e5" }}
-          >
-            {requestData.email}
+          <Link href={`mailto:${props.email}`} style={{ color: "#4f46e5" }}>
+            {props.email}
           </Link>
         </Span>
 
-        {requestData.company && (
+        {props.company && (
           <Span
             style={{
               fontSize: "14px",
@@ -137,7 +152,7 @@ function ContactEmailContent({
             <Span style={{ fontWeight: "700" }}>
               {t("app.api.contact.email.company.company")}:
             </Span>{" "}
-            {requestData.company}
+            {props.company}
           </Span>
         )}
 
@@ -151,7 +166,7 @@ function ContactEmailContent({
           <Span style={{ fontWeight: "700" }}>
             {t("app.api.contact.email.company.contactSubject")}:
           </Span>{" "}
-          {requestData.subject}
+          {props.subject}
         </Span>
 
         <Hr style={{ borderColor: "#e5e7eb", margin: "12px 0" }} />
@@ -178,7 +193,7 @@ function ContactEmailContent({
             border: "1px solid #e5e7eb",
           }}
         >
-          {requestData.message}
+          {props.message}
         </Span>
       </Section>
 
@@ -195,7 +210,7 @@ function ContactEmailContent({
       </Span>
 
       {/* Admin Button for Company Emails */}
-      {isForCompany && (
+      {props.isForCompany && (
         <Section style={{ textAlign: "center", marginTop: "24px" }}>
           <Button
             href={`${env.NEXT_PUBLIC_APP_URL}/admin/contacts`}
@@ -216,9 +231,31 @@ function ContactEmailContent({
   );
 }
 
+// Template Definition Export
+const contactFormTemplate: EmailTemplateDefinition<ContactFormProps> = {
+  meta: {
+    id: "contact-form",
+    version: "1.0.0",
+    name: "app.api.emails.templates.contact.form.meta.name",
+    description: "app.api.emails.templates.contact.form.meta.description",
+    category: "contact",
+    path: "/contact/email.tsx",
+    defaultSubject: (t) =>
+      t("app.api.contact.email.partner.subject", { subject: "" }),
+  },
+  schema: contactFormPropsSchema,
+  component: ContactFormEmail,
+};
+
+export default contactFormTemplate;
+
+// ============================================================================
+// ADAPTERS (Business Logic - Maps endpoint data to template props)
+// ============================================================================
+
 /**
- * Company Team Email Function
- * Renders email template for contact form submissions to company team
+ * Company Team Email Adapter
+ * Maps contact form data to template props for company email
  */
 export const renderCompanyMail: EmailFunctionType<
   ContactRequestOutput,
@@ -226,6 +263,15 @@ export const renderCompanyMail: EmailFunctionType<
   never
 > = ({ requestData, locale, t }) => {
   try {
+    const templateProps: ContactFormProps = {
+      name: requestData.name,
+      email: requestData.email,
+      company: requestData.company,
+      subject: requestData.subject,
+      message: requestData.message,
+      isForCompany: true,
+    };
+
     return success({
       toEmail: contactClientRepository.getSupportEmail(locale),
       toName: t("config.appName"),
@@ -234,12 +280,10 @@ export const renderCompanyMail: EmailFunctionType<
       }),
       replyToEmail: requestData.email,
       replyToName: requestData.name,
-
-      jsx: ContactEmailContent({
-        requestData,
+      jsx: contactFormTemplate.component({
+        props: templateProps,
         t,
-        locale: locale,
-        isForCompany: true,
+        locale,
       }),
     });
   } catch {
@@ -251,8 +295,8 @@ export const renderCompanyMail: EmailFunctionType<
 };
 
 /**
- * Partner/Customer Email Function
- * Renders email template for contact form confirmation to partner/customer
+ * Partner/Customer Email Adapter
+ * Maps contact form data to template props for customer confirmation email
  */
 export const renderPartnerMail: EmailFunctionType<
   ContactRequestOutput,
@@ -260,6 +304,17 @@ export const renderPartnerMail: EmailFunctionType<
   never
 > = ({ requestData, locale, t, user }) => {
   try {
+    const templateProps: ContactFormProps = {
+      name: requestData.name,
+      email: requestData.email,
+      company: requestData.company,
+      subject: requestData.subject,
+      message: requestData.message,
+      isForCompany: false,
+      userId: user?.id,
+      leadId: user?.leadId,
+    };
+
     return success({
       toEmail: requestData.email,
       toName: requestData.name,
@@ -268,14 +323,14 @@ export const renderPartnerMail: EmailFunctionType<
       }),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
       replyToName: t("config.appName"),
-
-      jsx: ContactEmailContent({
-        requestData,
+      jsx: contactFormTemplate.component({
+        props: templateProps,
         t,
-        locale: locale,
-        isForCompany: false,
-        userId: user?.id, // Pass user ID if available
-        leadId: user.leadId, // Pass lead ID from JWT payload
+        locale,
+        tracking: {
+          userId: user?.id,
+          leadId: user?.leadId,
+        },
       }),
     });
   } catch {

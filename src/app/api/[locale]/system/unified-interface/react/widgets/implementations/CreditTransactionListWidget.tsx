@@ -23,6 +23,7 @@ export function CreditTransactionListWidget<const TKey extends string>({
   field,
   context,
   className,
+  endpoint,
 }: ReactWidgetProps<
   typeof WidgetType.CREDIT_TRANSACTION_LIST,
   TKey
@@ -69,6 +70,7 @@ export function CreditTransactionListWidget<const TKey extends string>({
           data={transaction}
           field={childField}
           context={context}
+          endpoint={endpoint}
         />
       ))}
     </Div>

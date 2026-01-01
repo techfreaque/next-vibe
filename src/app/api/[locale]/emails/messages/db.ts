@@ -48,6 +48,13 @@ export const emails = pgTable(
     type: text("type", { enum: EmailTypeDB }).notNull(),
     templateName: text("template_name"),
 
+    // Template versioning (for audit trail and compliance)
+    templateId: text("template_id"), // Template ID (e.g., "leads-welcome")
+    templateVersion: text("template_version"), // Semantic version (e.g., "1.2.3")
+    propsSnapshot:
+      json("props_snapshot").$type<Record<string, string | number | boolean>>(), // Props used to render
+    locale: text("locale"), // Locale used for rendering (e.g., "en-US")
+
     // Status and tracking
     status: text("status", { enum: EmailStatusDB })
       .notNull()
@@ -131,6 +138,11 @@ export const emails = pgTable(
     statusIdx: index("emails_status_idx").on(table.status),
     typeIdx: index("emails_type_idx").on(table.type),
     sentAtIdx: index("emails_sent_at_idx").on(table.sentAt),
+    templateIdIdx: index("emails_template_id_idx").on(table.templateId),
+    templateVersionIdx: index("emails_template_version_idx").on(
+      table.templateVersion,
+    ),
+    localeIdx: index("emails_locale_idx").on(table.locale),
     userIdIdx: index("emails_user_id_idx").on(table.userId),
     leadIdIdx: index("emails_lead_id_idx").on(table.leadId),
     createdAtIdx: index("emails_created_at_idx").on(table.createdAt),

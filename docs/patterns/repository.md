@@ -149,7 +149,7 @@ export class UserRepository {
     return success({
       response: {
         success: true,
-        message: translateKey("some.key", language),
+        message: t("some.key", language),
         data: {
           transformed: options.someField,
           nested: {

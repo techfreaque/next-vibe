@@ -144,7 +144,10 @@ function handleMessageCreatedEvent(params: {
           edited: false,
           originalId: null,
           tokens: null,
-          metadata: toolCall ? { toolCall } : {},
+          metadata: {
+            ...(eventData.metadata || {}),
+            ...(toolCall ? { toolCall } : {}),
+          },
           upvotes: 0,
           downvotes: 0,
           createdAt: new Date(),
@@ -189,7 +192,11 @@ function handleMessageCreatedEvent(params: {
               edited: false,
               originalId: null,
               tokens: null,
-              metadata: toolCall ? { toolCall } : {},
+              metadata: eventData.metadata
+                ? { ...eventData.metadata, ...(toolCall ? { toolCall } : {}) }
+                : toolCall
+                  ? { toolCall }
+                  : {},
               upvotes: 0,
               downvotes: 0,
               createdAt: new Date(),
@@ -258,7 +265,9 @@ export function useAIStream(
         });
 
         // Determine if we need FormData (when there's a file to upload)
-        const hasFileUpload = data.audioInput?.file instanceof File;
+        const hasAudioFile = data.audioInput?.file instanceof File;
+        const hasAttachments = data.attachments && data.attachments.length > 0;
+        const hasFileUpload = hasAudioFile || hasAttachments;
 
         let requestBody: BodyInit;
         let headers: HeadersInit;
@@ -268,10 +277,14 @@ export function useAIStream(
           const formData = new FormData();
 
           // Add all non-file fields as JSON in a 'data' field
-          const { audioInput, ...restData } = data;
+          const { audioInput, attachments, ...restData } = data;
           formData.append(
             "data",
-            JSON.stringify({ ...restData, audioInput: { file: null } }),
+            JSON.stringify({
+              ...restData,
+              audioInput: { file: null },
+              attachments: null,
+            }),
           );
 
           // Add the audio file
@@ -281,6 +294,15 @@ export function useAIStream(
               audioInput.file,
               audioInput.file.name,
             );
+          }
+
+          // Add attachment files
+          if (attachments) {
+            for (const attachment of attachments) {
+              if (attachment instanceof File) {
+                formData.append("attachments", attachment, attachment.name);
+              }
+            }
           }
 
           requestBody = formData;

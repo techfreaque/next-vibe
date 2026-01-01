@@ -493,4 +493,253 @@ export const translations = {
     visitWebsite: "Visit Website",
     allRightsReserved: "All rights reserved",
   },
+
+  // Email Templates
+  templates: {
+    leads: {
+      batch: {
+        update: {
+          meta: {
+            name: "Lead Batch Update Email",
+            description: "Email sent when leads are updated in batch",
+          },
+        },
+      },
+      welcome: {
+        meta: {
+          name: "Lead Welcome Email",
+          description: "Welcome email sent to new leads",
+        },
+      },
+    },
+    contact: {
+      form: {
+        meta: {
+          name: "Contact Form Submission",
+          description: "Email sent when contact form is submitted",
+        },
+      },
+    },
+    newsletter: {
+      unsubscribe: {
+        meta: {
+          name: "Newsletter Unsubscribe Confirmation",
+          description: "Confirmation email when unsubscribing from newsletter",
+        },
+      },
+      welcome: {
+        meta: {
+          name: "Newsletter Welcome Email",
+          description: "Welcome email for new newsletter subscribers",
+        },
+      },
+    },
+    password: {
+      reset: {
+        confirm: {
+          meta: {
+            name: "Password Reset Confirmation",
+            description: "Confirmation email after password reset",
+          },
+        },
+        request: {
+          meta: {
+            name: "Password Reset Request",
+            description: "Email with password reset link",
+          },
+        },
+      },
+    },
+    signup: {
+      welcome: {
+        meta: {
+          name: "User Signup Welcome",
+          description: "Welcome email for new user signups",
+        },
+      },
+    },
+    users: {
+      welcome: {
+        meta: {
+          name: "User Welcome Email",
+          description: "Welcome email sent to new users",
+        },
+      },
+    },
+    subscription: {
+      success: {
+        meta: {
+          name: "Subscription Success",
+          description: "Confirmation email for successful subscription",
+        },
+      },
+    },
+  },
+
+  // Email Preview System
+  preview: {
+    render: {
+      post: {
+        title: "Render Email Preview",
+        description: "Server-side rendering of email templates for preview",
+        container: {
+          title: "Email Preview Configuration",
+        },
+        success: {
+          title: "Preview Rendered",
+          description: "Email preview rendered successfully",
+        },
+        fields: {
+          templateId: {
+            label: "Template ID",
+            description: "ID of the email template to render",
+          },
+          language: {
+            label: "Language",
+            description: "Language for email rendering",
+          },
+          country: {
+            label: "Country",
+            description: "Country for email rendering",
+          },
+          props: {
+            label: "Template Props",
+            description: "Properties to pass to the email template",
+          },
+          html: {
+            title: "Rendered HTML",
+          },
+          subject: {
+            title: "Email Subject",
+          },
+          templateVersion: {
+            title: "Template Version",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Validation Error",
+            description: "Invalid preview request data",
+          },
+          network: {
+            title: "Network Error",
+            description: "Network error while rendering preview",
+          },
+          unauthorized: {
+            title: "Unauthorized",
+            description: "You are not authorized to render previews",
+          },
+          forbidden: {
+            title: "Forbidden",
+            description: "Preview rendering is forbidden",
+          },
+          notFound: {
+            title: "Not Found",
+            description: "Email template not found",
+          },
+          server: {
+            title: "Server Error",
+            description: "Failed to render email preview",
+          },
+          unknown: {
+            title: "Unknown Error",
+            description: "An unknown error occurred",
+          },
+          unsavedChanges: {
+            title: "Unsaved Changes",
+            description: "You have unsaved changes",
+          },
+          conflict: {
+            title: "Conflict",
+            description: "A conflict occurred while rendering",
+          },
+        },
+      },
+    },
+    sendTest: {
+      post: {
+        title: "Send Test Email",
+        description: "Send test email with custom template data",
+        container: {
+          title: "Test Email Configuration",
+        },
+        success: {
+          title: "Test Email Sent",
+          description: "Test email sent successfully",
+        },
+        fields: {
+          templateId: {
+            label: "Template ID",
+            description: "ID of the email template to send",
+          },
+          recipientEmail: {
+            label: "Recipient Email",
+            description: "Email address to send test to",
+          },
+          language: {
+            label: "Language",
+            description: "Language for email rendering",
+          },
+          country: {
+            label: "Country",
+            description: "Country for email rendering",
+          },
+          props: {
+            label: "Template Props",
+            description: "Properties to pass to the email template",
+          },
+          success: {
+            title: "Success",
+          },
+          message: {
+            title: "Result Message",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Validation Error",
+            description: "Invalid test email request data",
+          },
+          network: {
+            title: "Network Error",
+            description: "Network error while sending test email",
+          },
+          unauthorized: {
+            title: "Unauthorized",
+            description: "You are not authorized to send test emails",
+          },
+          forbidden: {
+            title: "Forbidden",
+            description: "Sending test emails is forbidden",
+          },
+          notFound: {
+            title: "Not Found",
+            description: "Email template not found",
+          },
+          server: {
+            title: "Server Error",
+            description: "Failed to send test email",
+          },
+          unknown: {
+            title: "Unknown Error",
+            description: "An unknown error occurred",
+          },
+          unsavedChanges: {
+            title: "Unsaved Changes",
+            description: "You have unsaved changes",
+          },
+          conflict: {
+            title: "Conflict",
+            description: "A conflict occurred while sending",
+          },
+        },
+      },
+      error: {
+        templateNotFound: "Email template not found",
+        invalidProps: "Invalid template props",
+        sendFailed: "Failed to send test email",
+      },
+      success: "Test email sent successfully to {email}",
+    },
+  },
 };

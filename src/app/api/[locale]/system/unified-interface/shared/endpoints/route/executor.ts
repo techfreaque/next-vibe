@@ -7,16 +7,17 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  fail,
-  isStreamingResponse,
-  success,
-} from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
+import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  isFileResponse,
+  isStreamingResponse,
+  success,
+} from "@/app/api/[locale]/shared/types/response.schema";
 import { getRouteHandler } from "@/app/api/[locale]/system/generated/route-handlers";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -180,6 +181,15 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
 
       // Streaming responses are not supported in CLI/AI/MCP platforms
       if (isStreamingResponse(result)) {
+        return fail({
+          message:
+            "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+
+      // File responses are not supported in CLI/AI/MCP platforms
+      if (isFileResponse(result)) {
         return fail({
           message:
             "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",

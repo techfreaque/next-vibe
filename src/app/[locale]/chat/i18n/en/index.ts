@@ -284,6 +284,15 @@ export const translations = {
       recordingClickToStop: "Recording... Click to stop",
       transcribing: "Transcribing...",
     },
+    attachments: {
+      uploadFile: "Attach files",
+      attachedFiles: "Attached Files",
+      addMore: "Add More",
+      removeFile: "Remove file",
+      fileTooLarge: "File is too large (max 10MB)",
+      invalidFileType: "Invalid file type",
+      uploadError: "Failed to upload file",
+    },
   },
   modelSelector: {
     placeholder: "Select Model",
