@@ -431,9 +431,8 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       return {
         ready: false,
         error: "exists",
-        // eslint-disable-next-line i18next/no-literal-string
         message:
-          "check.config.ts already exists. To restore the default configuration, delete the existing file first and run again with --create-config.",
+          "check.config.ts already exists. To restore the default configuration, delete the existing file first and run 'npx @next-vibe/checker config-create' to create a new one.",
         configPath,
       };
     }
@@ -446,7 +445,6 @@ export default checkConfig.eslint?.buildFlatConfig?.(
           return {
             ready: false,
             error: "creation_failed",
-            // eslint-disable-next-line i18next/no-literal-string
             message: `Failed to create check.config.ts: ${createResult.error}`,
             configPath,
           };
@@ -457,9 +455,8 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         return {
           ready: false,
           error: "missing",
-          // eslint-disable-next-line i18next/no-literal-string
           message:
-            "check.config.ts not found. Run with --create-config to create a default configuration.",
+            "check.config.ts not found. Run 'npx @next-vibe/checker config-create' to create a default configuration.",
           configPath,
         };
       }
@@ -470,9 +467,8 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       return {
         ready: false,
         error: "load_failed",
-        // eslint-disable-next-line i18next/no-literal-string
         message:
-          "check.config.ts could not be loaded. Run npx @next-vibe/checker config-create to create a default configuration.",
+          "check.config.ts could not be loaded. Run 'npx @next-vibe/checker config-create' to create a default configuration.",
         configPath,
       };
     }

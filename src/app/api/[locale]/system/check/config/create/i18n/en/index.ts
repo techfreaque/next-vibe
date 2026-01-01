@@ -21,6 +21,11 @@ export const translations = {
       description:
         "Add/update package.json scripts for check, lint, and typecheck commands",
     },
+    enableEslint: {
+      label: "Enable ESLint",
+      description:
+        "Enable ESLint for rules not yet supported by Oxlint (import sorting, React hooks). Disable for maximum speed if you don't need these rules.",
+    },
     enableReactRules: {
       label: "Enable React Rules",
       description:
@@ -115,7 +120,7 @@ export const translations = {
     mcpConfigFailed: "Failed to create MCP config",
     vscodeFailed: "Failed to update VSCode settings",
     packageJsonFailed: "Failed to update package.json",
-    packageJsonNotFound: "package.json not found",
+    packageJsonNotFound: "package.json not found in current directory",
   },
 
   response: {
