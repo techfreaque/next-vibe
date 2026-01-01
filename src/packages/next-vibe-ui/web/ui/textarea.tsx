@@ -37,6 +37,25 @@ export interface TextareaFocusEvent {
   type: string;
 }
 
+export interface TextareaClipboardEvent {
+  target: InputGenericTarget;
+  currentTarget: InputGenericTarget;
+  preventDefault: () => void;
+  stopPropagation: () => void;
+  bubbles: boolean;
+  cancelable: boolean;
+  defaultPrevented: boolean;
+  eventPhase: number;
+  isTrusted: boolean;
+  timeStamp: number;
+  type: string;
+  clipboardData: {
+    getData: (format: string) => string;
+    setData: (format: string, data: string) => void;
+    types: readonly string[];
+  };
+}
+
 export interface TextareaKeyboardEvent {
   key: string;
   code: string;
@@ -80,6 +99,7 @@ export type TextareaProps = {
   onChange?: (e: TextareaChangeEvent) => void;
   onBlur?: (e: TextareaFocusEvent) => void;
   onFocus?: (e: TextareaFocusEvent) => void;
+  onPaste?: (e: TextareaClipboardEvent) => void;
   minRows?: number;
   maxRows?: number;
   onKeyDown?: (e: TextareaKeyboardEvent) => void;
@@ -114,6 +134,7 @@ const TextareaInner = (
     onChangeText,
     onBlur,
     onFocus,
+    onPaste,
     defaultValue,
     disabled,
     id,
@@ -207,6 +228,24 @@ const TextareaInner = (
     onChangeText?.(e.target.value);
   };
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>): void => {
+    const pasteEvent: TextareaClipboardEvent = {
+      target: e.target,
+      currentTarget: e.currentTarget,
+      preventDefault: (): void => e.preventDefault(),
+      stopPropagation: (): void => e.stopPropagation(),
+      bubbles: e.bubbles,
+      cancelable: e.cancelable,
+      defaultPrevented: e.defaultPrevented,
+      eventPhase: e.eventPhase,
+      isTrusted: e.isTrusted,
+      timeStamp: e.timeStamp,
+      type: e.type,
+      clipboardData: e.clipboardData,
+    };
+    onPaste?.(pasteEvent);
+  };
+
   const content = (
     <textarea
       className={cn(textareaVariants({ variant }), className)}
@@ -215,6 +254,7 @@ const TextareaInner = (
       onChange={handleChange}
       onBlur={onBlur}
       onFocus={onFocus}
+      onPaste={handlePaste}
       defaultValue={defaultValue}
       disabled={disabled}
       id={id}

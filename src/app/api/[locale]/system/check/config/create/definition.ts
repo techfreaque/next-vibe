@@ -86,7 +86,7 @@ const { POST } = createEndpoint({
             "app.api.system.check.config.create.fields.updatePackageJson.description",
           columns: 6,
         },
-        z.boolean().optional(),
+        z.boolean().optional().default(true),
       ),
 
       enableReactRules: requestDataField(

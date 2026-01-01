@@ -88,6 +88,8 @@ export const translations = {
       "MCP-Konfiguration (.mcp.json) für KI-Tool-Integration erstellen?",
     updateVscodeSettings:
       "VSCode-Einstellungen (.vscode/settings.json) mit empfohlenen Formatter-Einstellungen aktualisieren?",
+    updatePackageJson:
+      "package.json-Skripte aktualisieren (check, lint, typecheck)?",
     enableReactRules: "React-spezifische Linting-Regeln aktivieren?",
     enableNextjsRules: "Next.js-spezifische Linting-Regeln aktivieren?",
     enableI18nRules: "Internationalisierungs (i18n) Linting-Regeln aktivieren?",
@@ -110,11 +112,15 @@ export const translations = {
     mcpConfigCreated: ".mcp.json erfolgreich erstellt",
     updatingVscode: "VSCode-Einstellungen werden aktualisiert...",
     vscodeUpdated: "VSCode-Einstellungen erfolgreich aktualisiert",
+    updatingPackageJson: "package.json-Skripte werden aktualisiert...",
+    packageJsonUpdated: "package.json-Skripte erfolgreich aktualisiert",
   },
 
   warnings: {
     mcpConfigFailed: "MCP-Konfiguration konnte nicht erstellt werden",
     vscodeFailed: "VSCode-Einstellungen konnten nicht aktualisiert werden",
+    packageJsonFailed: "package.json konnte nicht aktualisiert werden",
+    packageJsonNotFound: "package.json nicht gefunden",
   },
 
   response: {
@@ -128,6 +134,7 @@ export const translations = {
     configCreated: "✓ Erstellt {{path}}",
     mcpConfigCreated: "✓ Erstellt {{path}}",
     vscodeUpdated: "✓ Aktualisiert {{path}}",
+    packageJsonUpdated: "✓ Aktualisiert {{path}}",
   },
 
   errors: {

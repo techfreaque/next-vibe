@@ -115,6 +115,7 @@ export const translations = {
     mcpConfigFailed: "Failed to create MCP config",
     vscodeFailed: "Failed to update VSCode settings",
     packageJsonFailed: "Failed to update package.json",
+    packageJsonNotFound: "package.json not found",
   },
 
   response: {
