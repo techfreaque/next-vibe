@@ -1,5 +1,15 @@
 {
   "mcpServers": {
+    "vibe-check-local": {
+      "command": "bun",
+      "args": [
+        "/home/max/projects/vibe-check/src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
+        "mcp"
+      ],
+      "env": {
+        "PROJECT_ROOT": "/home/max/projects/vibe-check"
+      }
+    },
     "vibe-check": {
       "command": "npx",
       "args": [
@@ -8,7 +18,7 @@
         "mcp"
       ],
       "env": {
-        "PROJECT_ROOT": "/home/max/projects/next-vibe"
+        "PROJECT_ROOT": "/home/max/projects/vibe-check"
       }
     }
   }

@@ -125,6 +125,7 @@ const { POST } = createEndpoint({
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,
+    UserRole.MCP_OFF,
     UserRole.WEB_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
@@ -1923,11 +1924,10 @@ export interface BuildHookContext {
 export type BuildHook = (context: BuildHookContext) => Promise<void> | void;
 
 /** Full BuildConfig type - API config + runtime-only fields (hooks, env, profiles) */
-export interface BuildConfig
-  extends Omit<
-    ApiConfigObject,
-    "filesToCompile" | "filesOrFoldersToCopy" | "npmPackage"
-  > {
+export interface BuildConfig extends Omit<
+  ApiConfigObject,
+  "filesToCompile" | "filesOrFoldersToCopy" | "npmPackage"
+> {
   foldersToClean?: string[];
   filesToCompile?: FileToCompile[];
   filesOrFoldersToCopy?: CopyConfig[];

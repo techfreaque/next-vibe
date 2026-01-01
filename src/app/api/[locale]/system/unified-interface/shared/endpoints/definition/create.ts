@@ -14,7 +14,6 @@
 
 import type { z } from "zod";
 
-import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { generateSchemaForUsage as generateSchemaFromUtils } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type {
   ExamplesList,
@@ -172,7 +171,7 @@ export interface ApiEndpoint<
    */
   readonly credits?: number;
   /** Icon identifier */
-  readonly icon: IconValue;
+  readonly icon: string;
 
   // Unified fields for schema generation
   readonly fields: TFields;

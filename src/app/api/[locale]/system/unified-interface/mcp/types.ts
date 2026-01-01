@@ -190,8 +190,9 @@ export interface MCPServerConfig {
  * MCP Execution Context
  * Extends BaseExecutionContext with MCP-specific fields
  */
-export interface MCPExecutionContext<TData = { [key: string]: ParameterValue }>
-  extends Omit<BaseExecutionContext<TData>, "user" | "requestId"> {
+export interface MCPExecutionContext<
+  TData = { [key: string]: ParameterValue },
+> extends Omit<BaseExecutionContext<TData>, "user" | "requestId"> {
   /** More specific user type for MCP */
   user: JwtPayloadType;
 

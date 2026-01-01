@@ -118,10 +118,7 @@ export const aliasToPathMap = {
   builder: "system_builder_POST",
   bundle: "system_builder_POST",
   c: "system_check_vibe-check_POST",
-  "cancel-subscription": "subscription_DELETE",
   check: "system_check_vibe-check_POST",
-  chrome: "browser_POST",
-  "click-tracking": "leads_tracking_engagement_GET",
   commands: "system_help_list_POST",
   "config-create": "system_check_config_create_POST",
   contact_POST: "contact_POST",
@@ -150,297 +147,61 @@ export const aliasToPathMap = {
   "docker-utils": "system_db_utils_docker-operations_POST",
   el: "system_check_lint_POST",
   elint: "system_check_lint_POST",
-  "emails_email-service_send_POST": "emails_email-service_send_POST",
-  "emails_imap-client_accounts_:id_DELETE":
-    "emails_imap-client_accounts_:id_DELETE",
-  "emails_imap-client_accounts_:id_GET": "emails_imap-client_accounts_:id_GET",
-  "emails_imap-client_accounts_:id_PUT": "emails_imap-client_accounts_:id_PUT",
-  "emails_imap-client_accounts_create_POST":
-    "emails_imap-client_accounts_create_POST",
-  "emails_imap-client_accounts_list_GET":
-    "emails_imap-client_accounts_list_GET",
-  "emails_imap-client_accounts_test_POST":
-    "emails_imap-client_accounts_test_POST",
-  "emails_imap-client_config_GET": "emails_imap-client_config_GET",
-  "emails_imap-client_config_POST": "emails_imap-client_config_POST",
-  "emails_imap-client_folders_list_GET": "emails_imap-client_folders_list_GET",
-  "emails_imap-client_folders_sync_POST":
-    "emails_imap-client_folders_sync_POST",
-  "emails_imap-client_health_GET": "emails_imap-client_health_GET",
-  "emails_imap-client_messages_id_GET": "emails_imap-client_messages_id_GET",
-  "emails_imap-client_messages_id_PATCH":
-    "emails_imap-client_messages_id_PATCH",
-  "emails_imap-client_messages_list_GET":
-    "emails_imap-client_messages_list_GET",
-  "emails_imap-client_messages_sync_POST":
-    "emails_imap-client_messages_sync_POST",
-  "emails_imap-client_sync_POST": "emails_imap-client_sync_POST",
-  emails_messages_id_GET: "emails_messages_id_GET",
-  emails_messages_list_GET: "emails_messages_list_GET",
-  emails_messages_stats_GET: "emails_messages_stats_GET",
-  emails_send_POST: "emails_send_POST",
-  "emails_sms-service_POST": "emails_sms-service_POST",
-  "emails_smtp-client_create_POST": "emails_smtp-client_create_POST",
-  "emails_smtp-client_edit_id_GET": "emails_smtp-client_edit_id_GET",
-  "emails_smtp-client_edit_id_PUT": "emails_smtp-client_edit_id_PUT",
-  "emails_smtp-client_list_GET": "emails_smtp-client_list_GET",
   eslint: "system_check_lint_POST",
   ga: "system_generators_generate-all_POST",
   "generate-all": "system_generators_generate-all_POST",
-  "generate:env": "system_generators_env_POST",
-  "generate:expo": "system_react-native_generate_POST",
-  guard: "system_guard_start_POST",
-  "guard-destroy": "system_guard_destroy_POST",
-  "guard-start": "system_guard_start_POST",
-  "guard-status": "system_guard_status_POST",
-  "guard-stop": "system_guard_stop_POST",
-  "guard:destroy": "system_guard_destroy_POST",
-  "guard:remove": "system_guard_destroy_POST",
-  "guard:start": "system_guard_start_POST",
-  "guard:status": "system_guard_status_POST",
-  "guard:stop": "system_guard_stop_POST",
   h: "system_help_POST",
-  health: "system_server_health_GET",
   help: "system_help_POST",
   i: "system_help_interactive_POST",
-  import_csv_POST: "import_csv_POST",
-  import_jobs_GET: "import_jobs_GET",
-  "import-jobs-list": "import_jobs_GET",
-  "import-leads": "leads_import_POST",
-  "import:csv": "import_csv_POST",
-  "import:jobs": "import_jobs_GET",
   install: "system_unified-interface_cli_setup_install_POST",
   interactive: "system_help_interactive_POST",
   l: "system_check_oxlint_POST",
-  leads_batch_DELETE: "leads_batch_DELETE",
-  leads_batch_PATCH: "leads_batch_PATCH",
-  "leads_campaigns_campaign-starter_campaign-starter-config_GET":
-    "leads_campaigns_campaign-starter_campaign-starter-config_GET",
-  "leads_campaigns_campaign-starter_campaign-starter-config_PUT":
-    "leads_campaigns_campaign-starter_campaign-starter-config_PUT",
-  "leads_campaigns_emails_test-mail_POST":
-    "leads_campaigns_emails_test-mail_POST",
-  leads_create_POST: "leads_create_POST",
-  leads_export_GET: "leads_export_GET",
-  "leads_import_jobs_:jobId_DELETE": "leads_import_jobs_:jobId_DELETE",
-  "leads_import_jobs_:jobId_PATCH": "leads_import_jobs_:jobId_PATCH",
-  "leads_import_jobs_:jobId_retry_POST": "leads_import_jobs_:jobId_retry_POST",
-  "leads_import_jobs_:jobId_stop_POST": "leads_import_jobs_:jobId_stop_POST",
-  leads_import_POST: "leads_import_POST",
-  leads_import_status_GET: "leads_import_status_GET",
-  "leads_lead_:id_GET": "leads_lead_:id_GET",
-  "leads_lead_:id_PATCH": "leads_lead_:id_PATCH",
-  leads_list_GET: "leads_list_GET",
-  leads_search_GET: "leads_search_GET",
-  leads_stats_GET: "leads_stats_GET",
-  leads_tracking_engagement_GET: "leads_tracking_engagement_GET",
-  leads_tracking_engagement_POST: "leads_tracking_engagement_POST",
-  "leads-import": "leads_import_POST",
   lint: "system_check_oxlint_POST",
   list: "system_help_list_POST",
   ls: "system_help_list_POST",
-  manifest_GET: "manifest_GET",
   mcp: "system_unified-interface_mcp_serve_POST",
   "mcp:serve": "system_unified-interface_mcp_serve_POST",
   "mcp:start": "system_unified-interface_mcp_serve_POST",
-  "memories:add": "agent_chat_memories_POST",
-  "memories:delete": "agent_chat_memories_id_DELETE",
-  "memories:list": "agent_chat_memories_GET",
-  "memories:update": "agent_chat_memories_id_PATCH",
-  migrate: "system_db_migrate_POST",
-  "migrate-prod": "system_db_migrate-prod_POST",
-  "migrate-repair": "system_db_migrate-repair_POST",
-  "migrate-sync": "system_db_migrate-sync_POST",
-  "migrate-tasks": "system_db_migrate_task-management_POST",
-  "native:generate": "system_react-native_generate_POST",
-  newsletter_status_GET: "newsletter_status_GET",
-  newsletter_subscribe_POST: "newsletter_subscribe_POST",
-  newsletter_unsubscribe_POST: "newsletter_unsubscribe_POST",
-  "newsletter-status": "newsletter_status_GET",
-  "newsletter-subscribe": "newsletter_subscribe_POST",
-  "newsletter-unsubscribe": "newsletter_unsubscribe_POST",
-  "newsletter:status": "newsletter_status_GET",
-  nowpayments: "payment_providers_nowpayments_cli_POST",
-  "nowpayments-cli": "payment_providers_nowpayments_cli_POST",
-  "nowpayments-tunnel": "payment_providers_nowpayments_cli_POST",
   ox: "system_check_oxlint_POST",
   oxlint: "system_check_oxlint_POST",
   package: "system_builder_POST",
-  payment_checkout_POST: "payment_checkout_POST",
-  payment_GET: "payment_GET",
-  payment_invoice_POST: "payment_invoice_POST",
-  payment_portal_POST: "payment_portal_POST",
-  payment_POST: "payment_POST",
-  payment_providers_nowpayments_cli_POST:
-    "payment_providers_nowpayments_cli_POST",
-  payment_providers_stripe_cli_POST: "payment_providers_stripe_cli_POST",
-  payment_refund_POST: "payment_refund_POST",
-  ping: "system_db_ping_POST",
   pub: "system_release-tool_POST",
   publish: "system_release-tool_POST",
-  "pulse:execute": "system_tasks_pulse_execute_POST",
-  "pulse:status": "system_tasks_pulse_status_GET",
-  "record-engagement": "leads_tracking_engagement_POST",
-  referral_codes_list_GET: "referral_codes_list_GET",
-  referral_earnings_list_GET: "referral_earnings_list_GET",
-  "referral_link-to-lead_POST": "referral_link-to-lead_POST",
-  referral_POST: "referral_POST",
-  referral_stats_GET: "referral_stats_GET",
   release: "system_release-tool_POST",
-  reset: "system_db_reset_POST",
-  "reset-tasks": "system_db_reset_task-management_POST",
-  runner: "system_tasks_unified-runner_POST",
-  "schema-verify": "system_db_schema-verify_POST",
-  search: "agent_brave-search_GET",
-  seed: "system_db_seed_POST",
-  "server:dev": "system_server_dev_POST",
-  "server:start": "system_server_start_POST",
   setup: "system_unified-interface_cli_setup_install_POST",
   "setup:status": "system_setup_status_POST",
   "setup:uninstall": "system_setup_uninstall_POST",
   "setup:update": "system_setup_update_POST",
-  "side-tasks": "system_tasks_side-tasks_POST",
-  sql: "system_db_sql_POST",
-  start: "system_server_start_POST",
   "start-mcp": "system_unified-interface_mcp_serve_POST",
-  status: "system_server_health_GET",
-  stripe: "payment_providers_stripe_cli_POST",
-  "stripe-cli": "payment_providers_stripe_cli_POST",
-  stt: "agent_speech-to-text_hotkey_POST",
-  studio: "system_db_studio_POST",
-  subscribe: "newsletter_subscribe_POST",
-  subscription_DELETE: "subscription_DELETE",
-  subscription_GET: "subscription_GET",
-  subscription_POST: "subscription_POST",
-  subscription_PUT: "subscription_PUT",
-  "subscription-cancel": "subscription_DELETE",
-  "subscription-update": "subscription_PUT",
+  status: "system_setup_status_POST",
   system_builder_POST: "system_builder_POST",
   system_check_config_create_POST: "system_check_config_create_POST",
   system_check_lint_POST: "system_check_lint_POST",
   system_check_oxlint_POST: "system_check_oxlint_POST",
-  system_check_test_POST: "system_check_test_POST",
   system_check_typecheck_POST: "system_check_typecheck_POST",
   "system_check_vibe-check_POST": "system_check_vibe-check_POST",
-  system_db_migrate_POST: "system_db_migrate_POST",
-  "system_db_migrate_task-management_POST":
-    "system_db_migrate_task-management_POST",
-  "system_db_migrate-prod_POST": "system_db_migrate-prod_POST",
-  "system_db_migrate-repair_POST": "system_db_migrate-repair_POST",
-  "system_db_migrate-sync_POST": "system_db_migrate-sync_POST",
-  system_db_ping_POST: "system_db_ping_POST",
-  system_db_reset_POST: "system_db_reset_POST",
-  "system_db_reset_task-management_POST":
-    "system_db_reset_task-management_POST",
-  "system_db_schema-verify_POST": "system_db_schema-verify_POST",
-  system_db_seed_POST: "system_db_seed_POST",
-  system_db_sql_POST: "system_db_sql_POST",
-  system_db_studio_POST: "system_db_studio_POST",
-  "system_db_utils_docker-operations_POST":
-    "system_db_utils_docker-operations_POST",
-  system_db_utils_GET: "system_db_utils_GET",
   system_generators_endpoint_POST: "system_generators_endpoint_POST",
   system_generators_endpoints_POST: "system_generators_endpoints_POST",
   "system_generators_endpoints-index_POST":
     "system_generators_endpoints-index_POST",
-  system_generators_env_POST: "system_generators_env_POST",
   "system_generators_generate-all_POST": "system_generators_generate-all_POST",
-  "system_generators_generate-trpc-router_validation_POST":
-    "system_generators_generate-trpc-router_validation_POST",
   "system_generators_route-handlers_POST":
     "system_generators_route-handlers_POST",
-  system_generators_seeds_POST: "system_generators_seeds_POST",
-  "system_generators_task-index_POST": "system_generators_task-index_POST",
-  system_guard_destroy_POST: "system_guard_destroy_POST",
-  system_guard_start_POST: "system_guard_start_POST",
-  system_guard_status_POST: "system_guard_status_POST",
-  system_guard_stop_POST: "system_guard_stop_POST",
   system_help_interactive_POST: "system_help_interactive_POST",
   system_help_list_POST: "system_help_list_POST",
   system_help_POST: "system_help_POST",
-  "system_react-native_generate_POST": "system_react-native_generate_POST",
   "system_release-tool_POST": "system_release-tool_POST",
-  system_server_build_POST: "system_server_build_POST",
-  system_server_dev_POST: "system_server_dev_POST",
-  system_server_health_GET: "system_server_health_GET",
-  system_server_start_POST: "system_server_start_POST",
   system_setup_status_POST: "system_setup_status_POST",
   system_setup_uninstall_POST: "system_setup_uninstall_POST",
   system_setup_update_POST: "system_setup_update_POST",
-  "system_side-tasks_generators_generate-trpc-router_POST":
-    "system_side-tasks_generators_generate-trpc-router_POST",
-  system_tasks_cron_history_GET: "system_tasks_cron_history_GET",
-  system_tasks_cron_stats_GET: "system_tasks_cron_stats_GET",
-  system_tasks_cron_status_GET: "system_tasks_cron_status_GET",
-  system_tasks_cron_task_id_DELETE: "system_tasks_cron_task_id_DELETE",
-  system_tasks_cron_task_id_GET: "system_tasks_cron_task_id_GET",
-  system_tasks_cron_task_id_PUT: "system_tasks_cron_task_id_PUT",
-  system_tasks_cron_tasks_GET: "system_tasks_cron_tasks_GET",
-  system_tasks_cron_tasks_POST: "system_tasks_cron_tasks_POST",
-  system_tasks_pulse_execute_POST: "system_tasks_pulse_execute_POST",
-  system_tasks_pulse_status_GET: "system_tasks_pulse_status_GET",
-  "system_tasks_side-tasks_GET": "system_tasks_side-tasks_GET",
-  "system_tasks_side-tasks_POST": "system_tasks_side-tasks_POST",
-  system_tasks_types_GET: "system_tasks_types_GET",
-  "system_tasks_unified-runner_POST": "system_tasks_unified-runner_POST",
-  system_translations_reorganize_POST: "system_translations_reorganize_POST",
-  "system_translations_restore-backup_POST":
-    "system_translations_restore-backup_POST",
-  system_translations_stats_GET: "system_translations_stats_GET",
-  "system_unified-interface_ai_tools_GET":
-    "system_unified-interface_ai_tools_GET",
   "system_unified-interface_cli_setup_install_POST":
     "system_unified-interface_cli_setup_install_POST",
   "system_unified-interface_mcp_serve_POST":
     "system_unified-interface_mcp_serve_POST",
-  t: "system_check_test_POST",
-  "task-runner": "system_tasks_unified-runner_POST",
-  "tasks:cron:stats": "system_tasks_cron_stats_GET",
-  "tasks:cron:status": "system_tasks_cron_status_GET",
-  "tasks:side": "system_tasks_side-tasks_POST",
-  "tasks:side:status": "system_tasks_side-tasks_GET",
-  "tasks:types": "system_tasks_types_GET",
   tc: "system_check_typecheck_POST",
-  test: "system_check_test_POST",
-  "tools:list": "system_unified-interface_ai_tools_GET",
-  "track-click": "leads_tracking_engagement_GET",
-  "track-engagement": "leads_tracking_engagement_POST",
-  "translations:reorganize": "system_translations_reorganize_POST",
-  "translations:restore": "system_translations_restore-backup_POST",
-  "translations:stats": "system_translations_stats_GET",
-  "trpc-validate": "system_generators_generate-trpc-router_validation_POST",
-  ts: "system_translations_stats_GET",
   typecheck: "system_check_typecheck_POST",
-  "unified-runner": "system_tasks_unified-runner_POST",
   uninstall: "system_setup_uninstall_POST",
-  unsubscribe: "newsletter_unsubscribe_POST",
   update: "system_setup_update_POST",
-  "update-subscription": "subscription_PUT",
-  user_auth_check_GET: "user_auth_check_GET",
-  user_private_logout_POST: "user_private_logout_POST",
-  user_private_me_avatar_DELETE: "user_private_me_avatar_DELETE",
-  user_private_me_avatar_POST: "user_private_me_avatar_POST",
-  user_private_me_DELETE: "user_private_me_DELETE",
-  user_private_me_GET: "user_private_me_GET",
-  user_private_me_password_POST: "user_private_me_password_POST",
-  user_private_me_POST: "user_private_me_POST",
-  user_public_login_options_GET: "user_public_login_options_GET",
-  user_public_login_POST: "user_public_login_POST",
-  "user_public_reset-password_confirm_POST":
-    "user_public_reset-password_confirm_POST",
-  "user_public_reset-password_request_POST":
-    "user_public_reset-password_request_POST",
-  "user_public_reset-password_validate_GET":
-    "user_public_reset-password_validate_GET",
-  user_public_signup_POST: "user_public_signup_POST",
-  user_search_GET: "user_search_GET",
-  users_create_POST: "users_create_POST",
-  users_list_GET: "users_list_GET",
-  users_stats_GET: "users_stats_GET",
-  users_user_id_DELETE: "users_user_id_DELETE",
-  users_user_id_GET: "users_user_id_GET",
-  users_user_id_PUT: "users_user_id_PUT",
-  "validate-trpc": "system_generators_generate-trpc-router_validation_POST",
 } as const;
 
 /**
@@ -812,7 +573,7 @@ export async function getEndpoint(
       return (await import("@/app/api/[locale]/browser/wait-for/definition"))
         .default.POST;
     case "build":
-      return (await import("@/app/api/[locale]/system/server/build/definition"))
+      return (await import("@/app/api/[locale]/system/builder/definition"))
         .default.POST;
     case "builder":
       return (await import("@/app/api/[locale]/system/builder/definition"))
@@ -824,20 +585,10 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/system/check/vibe-check/definition")
       ).default.POST;
-    case "cancel-subscription":
-      return (await import("@/app/api/[locale]/subscription/definition"))
-        .default.DELETE;
     case "check":
       return (
         await import("@/app/api/[locale]/system/check/vibe-check/definition")
       ).default.POST;
-    case "chrome":
-      return (await import("@/app/api/[locale]/browser/definition")).default
-        .POST;
-    case "click-tracking":
-      return (
-        await import("@/app/api/[locale]/leads/tracking/engagement/definition")
-      ).default.GET;
     case "commands":
       return (await import("@/app/api/[locale]/system/help/list/definition"))
         .default.POST;
@@ -945,201 +696,20 @@ export async function getEndpoint(
     case "elint":
       return (await import("@/app/api/[locale]/system/check/lint/definition"))
         .default.POST;
-    case "emails_email-service_send_POST":
-      return (
-        await import("@/app/api/[locale]/emails/email-service/definition")
-      ).default.POST;
-    case "emails_imap-client_accounts_:id_DELETE":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/imap-client/accounts/[id]/definition"
-        )
-      ).default.DELETE;
-    case "emails_imap-client_accounts_:id_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/imap-client/accounts/[id]/definition"
-        )
-      ).default.GET;
-    case "emails_imap-client_accounts_:id_PUT":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/imap-client/accounts/[id]/definition"
-        )
-      ).default.PUT;
-    case "emails_imap-client_accounts_create_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/imap-client/accounts/create/definition"
-        )
-      ).default.POST;
-    case "emails_imap-client_accounts_list_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/imap-client/accounts/list/definition"
-        )
-      ).default.GET;
-    case "emails_imap-client_accounts_test_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/imap-client/accounts/test/definition"
-        )
-      ).default.POST;
-    case "emails_imap-client_config_GET":
-      return (
-        await import("@/app/api/[locale]/emails/imap-client/config/definition")
-      ).default.GET;
-    case "emails_imap-client_config_POST":
-      return (
-        await import("@/app/api/[locale]/emails/imap-client/config/definition")
-      ).default.POST;
-    case "emails_imap-client_folders_list_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/imap-client/folders/list/definition"
-        )
-      ).default.GET;
-    case "emails_imap-client_folders_sync_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/imap-client/folders/sync/definition"
-        )
-      ).default.POST;
-    case "emails_imap-client_health_GET":
-      return (
-        await import("@/app/api/[locale]/emails/imap-client/health/definition")
-      ).default.GET;
-    case "emails_imap-client_messages_id_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/imap-client/messages/[id]/definition"
-        )
-      ).default.GET;
-    case "emails_imap-client_messages_id_PATCH":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/imap-client/messages/[id]/definition"
-        )
-      ).default.PATCH;
-    case "emails_imap-client_messages_list_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/imap-client/messages/list/definition"
-        )
-      ).default.GET;
-    case "emails_imap-client_messages_sync_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/imap-client/messages/sync/definition"
-        )
-      ).default.POST;
-    case "emails_imap-client_sync_POST":
-      return (
-        await import("@/app/api/[locale]/emails/imap-client/sync/definition")
-      ).default.POST;
-    case "emails_messages_id_GET":
-      return (
-        await import("@/app/api/[locale]/emails/messages/[id]/definition")
-      ).default.GET;
-    case "emails_messages_list_GET":
-      return (
-        await import("@/app/api/[locale]/emails/messages/list/definition")
-      ).default.GET;
-    case "emails_messages_stats_GET":
-      return (
-        await import("@/app/api/[locale]/emails/messages/stats/definition")
-      ).default.GET;
-    case "emails_send_POST":
-      return (await import("@/app/api/[locale]/emails/send/definition")).default
-        .POST;
-    case "emails_sms-service_POST":
-      return (await import("@/app/api/[locale]/emails/sms-service/definition"))
-        .default.POST;
-    case "emails_smtp-client_create_POST":
-      return (
-        await import("@/app/api/[locale]/emails/smtp-client/create/definition")
-      ).default.POST;
-    case "emails_smtp-client_edit_id_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/smtp-client/edit/[id]/definition"
-        )
-      ).default.GET;
-    case "emails_smtp-client_edit_id_PUT":
-      return (
-        await import(
-          "@/app/api/[locale]/emails/smtp-client/edit/[id]/definition"
-        )
-      ).default.PUT;
-    case "emails_smtp-client_list_GET":
-      return (
-        await import("@/app/api/[locale]/emails/smtp-client/list/definition")
-      ).default.GET;
     case "eslint":
       return (await import("@/app/api/[locale]/system/check/lint/definition"))
         .default.POST;
     case "ga":
       return (
-        await import(
-          "@/app/api/[locale]/system/generators/generate-all/definition"
-        )
+        await import("@/app/api/[locale]/system/generators/generate-all/definition")
       ).default.POST;
     case "generate-all":
       return (
-        await import(
-          "@/app/api/[locale]/system/generators/generate-all/definition"
-        )
+        await import("@/app/api/[locale]/system/generators/generate-all/definition")
       ).default.POST;
-    case "generate:env":
-      return (
-        await import("@/app/api/[locale]/system/generators/env/definition")
-      ).default.POST;
-    case "generate:expo":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/react-native/generate/definition"
-        )
-      ).default.POST;
-    case "guard":
-      return (await import("@/app/api/[locale]/system/guard/start/definition"))
-        .default.POST;
-    case "guard-destroy":
-      return (
-        await import("@/app/api/[locale]/system/guard/destroy/definition")
-      ).default.POST;
-    case "guard-start":
-      return (await import("@/app/api/[locale]/system/guard/start/definition"))
-        .default.POST;
-    case "guard-status":
-      return (await import("@/app/api/[locale]/system/guard/status/definition"))
-        .default.POST;
-    case "guard-stop":
-      return (await import("@/app/api/[locale]/system/guard/stop/definition"))
-        .default.POST;
-    case "guard:destroy":
-      return (
-        await import("@/app/api/[locale]/system/guard/destroy/definition")
-      ).default.POST;
-    case "guard:remove":
-      return (
-        await import("@/app/api/[locale]/system/guard/destroy/definition")
-      ).default.POST;
-    case "guard:start":
-      return (await import("@/app/api/[locale]/system/guard/start/definition"))
-        .default.POST;
-    case "guard:status":
-      return (await import("@/app/api/[locale]/system/guard/status/definition"))
-        .default.POST;
-    case "guard:stop":
-      return (await import("@/app/api/[locale]/system/guard/stop/definition"))
-        .default.POST;
     case "h":
       return (await import("@/app/api/[locale]/system/help/definition")).default
         .POST;
-    case "health":
-      return (
-        await import("@/app/api/[locale]/system/server/health/definition")
-      ).default.GET;
     case "help":
       return (await import("@/app/api/[locale]/system/help/definition")).default
         .POST;
@@ -1147,26 +717,9 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/system/help/interactive/definition")
       ).default.POST;
-    case "import-jobs-list":
-      return (await import("@/app/api/[locale]/import/definition")).default.GET;
-    case "import-leads":
-      return (await import("@/app/api/[locale]/leads/import/definition"))
-        .default.POST;
-    case "import:csv":
-      return (await import("@/app/api/[locale]/import/definition")).default
-        .POST;
-    case "import:jobs":
-      return (await import("@/app/api/[locale]/import/definition")).default.GET;
-    case "import_csv_POST":
-      return (await import("@/app/api/[locale]/import/definition")).default
-        .POST;
-    case "import_jobs_GET":
-      return (await import("@/app/api/[locale]/import/definition")).default.GET;
     case "install":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/cli/setup/install/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
       ).default.POST;
     case "interactive":
       return (
@@ -1175,88 +728,6 @@ export async function getEndpoint(
     case "l":
       return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
         .default.POST;
-    case "leads-import":
-      return (await import("@/app/api/[locale]/leads/import/definition"))
-        .default.POST;
-    case "leads_batch_DELETE":
-      return (await import("@/app/api/[locale]/leads/batch/definition")).default
-        .DELETE;
-    case "leads_batch_PATCH":
-      return (await import("@/app/api/[locale]/leads/batch/definition")).default
-        .PATCH;
-    case "leads_campaigns_campaign-starter_campaign-starter-config_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/leads/campaigns/campaign-starter/campaign-starter-config/definition"
-        )
-      ).default.GET;
-    case "leads_campaigns_campaign-starter_campaign-starter-config_PUT":
-      return (
-        await import(
-          "@/app/api/[locale]/leads/campaigns/campaign-starter/campaign-starter-config/definition"
-        )
-      ).default.PUT;
-    case "leads_campaigns_emails_test-mail_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/leads/campaigns/emails/test-mail/definition"
-        )
-      ).default.POST;
-    case "leads_create_POST":
-      return (await import("@/app/api/[locale]/leads/create/definition"))
-        .default.POST;
-    case "leads_export_GET":
-      return (await import("@/app/api/[locale]/leads/export/definition"))
-        .default.GET;
-    case "leads_import_POST":
-      return (await import("@/app/api/[locale]/leads/import/definition"))
-        .default.POST;
-    case "leads_import_jobs_:jobId_DELETE":
-      return (
-        await import("@/app/api/[locale]/leads/import/jobs/[jobId]/definition")
-      ).default.DELETE;
-    case "leads_import_jobs_:jobId_PATCH":
-      return (
-        await import("@/app/api/[locale]/leads/import/jobs/[jobId]/definition")
-      ).default.PATCH;
-    case "leads_import_jobs_:jobId_retry_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/leads/import/jobs/[jobId]/retry/definition"
-        )
-      ).default.POST;
-    case "leads_import_jobs_:jobId_stop_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/leads/import/jobs/[jobId]/stop/definition"
-        )
-      ).default.POST;
-    case "leads_import_status_GET":
-      return (await import("@/app/api/[locale]/leads/import/status/definition"))
-        .default.GET;
-    case "leads_lead_:id_GET":
-      return (await import("@/app/api/[locale]/leads/lead/[id]/definition"))
-        .default.GET;
-    case "leads_lead_:id_PATCH":
-      return (await import("@/app/api/[locale]/leads/lead/[id]/definition"))
-        .default.PATCH;
-    case "leads_list_GET":
-      return (await import("@/app/api/[locale]/leads/list/definition")).default
-        .GET;
-    case "leads_search_GET":
-      return (await import("@/app/api/[locale]/leads/search/definition"))
-        .default.GET;
-    case "leads_stats_GET":
-      return (await import("@/app/api/[locale]/leads/stats/definition")).default
-        .GET;
-    case "leads_tracking_engagement_GET":
-      return (
-        await import("@/app/api/[locale]/leads/tracking/engagement/definition")
-      ).default.GET;
-    case "leads_tracking_engagement_POST":
-      return (
-        await import("@/app/api/[locale]/leads/tracking/engagement/definition")
-      ).default.POST;
     case "lint":
       return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
         .default.POST;
@@ -1266,110 +737,17 @@ export async function getEndpoint(
     case "ls":
       return (await import("@/app/api/[locale]/system/help/list/definition"))
         .default.POST;
-    case "manifest_GET":
-      return (await import("@/app/api/[locale]/manifest/definition")).default
-        .GET;
     case "mcp":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/mcp/serve/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
       ).default.POST;
     case "mcp:serve":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/mcp/serve/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
       ).default.POST;
     case "mcp:start":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/mcp/serve/definition"
-        )
-      ).default.POST;
-    case "memories:add":
-      return (await import("@/app/api/[locale]/agent/chat/memories/definition"))
-        .default.POST;
-    case "memories:delete":
-      return (
-        await import("@/app/api/[locale]/agent/chat/memories/[id]/definition")
-      ).default.DELETE;
-    case "memories:list":
-      return (await import("@/app/api/[locale]/agent/chat/memories/definition"))
-        .default.GET;
-    case "memories:update":
-      return (
-        await import("@/app/api/[locale]/agent/chat/memories/[id]/definition")
-      ).default.PATCH;
-    case "migrate":
-      return (await import("@/app/api/[locale]/system/db/migrate/definition"))
-        .default.POST;
-    case "migrate-prod":
-      return (
-        await import("@/app/api/[locale]/system/db/migrate-prod/definition")
-      ).default.POST;
-    case "migrate-repair":
-      return (
-        await import("@/app/api/[locale]/system/db/migrate-repair/definition")
-      ).default.POST;
-    case "migrate-sync":
-      return (
-        await import("@/app/api/[locale]/system/db/migrate-sync/definition")
-      ).default.POST;
-    case "migrate-tasks":
-      return (
-        await import(
-          "@/app/api/[locale]/system/db/migrate/task-management/definition"
-        )
-      ).default.POST;
-    case "native:generate":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/react-native/generate/definition"
-        )
-      ).default.POST;
-    case "newsletter-status":
-      return (await import("@/app/api/[locale]/newsletter/status/definition"))
-        .default.GET;
-    case "newsletter-subscribe":
-      return (
-        await import("@/app/api/[locale]/newsletter/subscribe/definition")
-      ).default.POST;
-    case "newsletter-unsubscribe":
-      return (
-        await import("@/app/api/[locale]/newsletter/unsubscribe/definition")
-      ).default.POST;
-    case "newsletter:status":
-      return (await import("@/app/api/[locale]/newsletter/status/definition"))
-        .default.GET;
-    case "newsletter_status_GET":
-      return (await import("@/app/api/[locale]/newsletter/status/definition"))
-        .default.GET;
-    case "newsletter_subscribe_POST":
-      return (
-        await import("@/app/api/[locale]/newsletter/subscribe/definition")
-      ).default.POST;
-    case "newsletter_unsubscribe_POST":
-      return (
-        await import("@/app/api/[locale]/newsletter/unsubscribe/definition")
-      ).default.POST;
-    case "nowpayments":
-      return (
-        await import(
-          "@/app/api/[locale]/payment/providers/nowpayments/cli/definition"
-        )
-      ).default.POST;
-    case "nowpayments-cli":
-      return (
-        await import(
-          "@/app/api/[locale]/payment/providers/nowpayments/cli/definition"
-        )
-      ).default.POST;
-    case "nowpayments-tunnel":
-      return (
-        await import(
-          "@/app/api/[locale]/payment/providers/nowpayments/cli/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
       ).default.POST;
     case "ox":
       return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
@@ -1380,201 +758,39 @@ export async function getEndpoint(
     case "package":
       return (await import("@/app/api/[locale]/system/builder/definition"))
         .default.POST;
-    case "payment_GET":
-      return (await import("@/app/api/[locale]/payment/definition")).default
-        .GET;
-    case "payment_POST":
-      return (await import("@/app/api/[locale]/payment/definition")).default
-        .POST;
-    case "payment_checkout_POST":
-      return (await import("@/app/api/[locale]/payment/checkout/definition"))
-        .default.POST;
-    case "payment_invoice_POST":
-      return (await import("@/app/api/[locale]/payment/invoice/definition"))
-        .default.POST;
-    case "payment_portal_POST":
-      return (await import("@/app/api/[locale]/payment/portal/definition"))
-        .default.POST;
-    case "payment_providers_nowpayments_cli_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/payment/providers/nowpayments/cli/definition"
-        )
-      ).default.POST;
-    case "payment_providers_stripe_cli_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/payment/providers/stripe/cli/definition"
-        )
-      ).default.POST;
-    case "payment_refund_POST":
-      return (await import("@/app/api/[locale]/payment/refund/definition"))
-        .default.POST;
-    case "ping":
-      return (await import("@/app/api/[locale]/system/db/ping/definition"))
-        .default.POST;
     case "pub":
       return (await import("@/app/api/[locale]/system/release-tool/definition"))
         .default.POST;
     case "publish":
       return (await import("@/app/api/[locale]/system/release-tool/definition"))
         .default.POST;
-    case "pulse:execute":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/pulse/definition"
-        )
-      ).default.POST;
-    case "pulse:status":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/pulse/status/definition"
-        )
-      ).default.GET;
-    case "record-engagement":
-      return (
-        await import("@/app/api/[locale]/leads/tracking/engagement/definition")
-      ).default.POST;
-    case "referral_POST":
-      return (await import("@/app/api/[locale]/referral/definition")).default
-        .POST;
-    case "referral_codes_list_GET":
-      return (await import("@/app/api/[locale]/referral/codes/list/definition"))
-        .default.GET;
-    case "referral_earnings_list_GET":
-      return (
-        await import("@/app/api/[locale]/referral/earnings/list/definition")
-      ).default.GET;
-    case "referral_link-to-lead_POST":
-      return (
-        await import("@/app/api/[locale]/referral/link-to-lead/definition")
-      ).default.POST;
-    case "referral_stats_GET":
-      return (await import("@/app/api/[locale]/referral/stats/definition"))
-        .default.GET;
     case "release":
       return (await import("@/app/api/[locale]/system/release-tool/definition"))
         .default.POST;
-    case "reset":
-      return (await import("@/app/api/[locale]/system/db/reset/definition"))
-        .default.POST;
-    case "reset-tasks":
-      return (
-        await import(
-          "@/app/api/[locale]/system/db/reset/task-management/definition"
-        )
-      ).default.POST;
-    case "runner":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/definition"
-        )
-      ).default.POST;
-    case "schema-verify":
-      return (
-        await import("@/app/api/[locale]/system/db/schema-verify/definition")
-      ).default.POST;
-    case "search":
-      return (await import("@/app/api/[locale]/agent/brave-search/definition"))
-        .default.GET;
-    case "seed":
-      return (await import("@/app/api/[locale]/system/db/seed/definition"))
-        .default.POST;
-    case "server:dev":
-      return (await import("@/app/api/[locale]/system/server/dev/definition"))
-        .default.POST;
-    case "server:start":
-      return (await import("@/app/api/[locale]/system/server/start/definition"))
-        .default.POST;
     case "setup":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/cli/setup/install/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
       ).default.POST;
     case "setup:status":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/cli/setup/status/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/status/definition")
       ).default.POST;
     case "setup:uninstall":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/definition")
       ).default.POST;
     case "setup:update":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/cli/setup/update/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/definition")
       ).default.POST;
-    case "side-tasks":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/side-tasks/definition"
-        )
-      ).default.POST;
-    case "sql":
-      return (await import("@/app/api/[locale]/system/db/sql/definition"))
-        .default.POST;
-    case "start":
-      return (await import("@/app/api/[locale]/system/server/start/definition"))
-        .default.POST;
     case "start-mcp":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/mcp/serve/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
       ).default.POST;
     case "status":
       return (
-        await import("@/app/api/[locale]/system/server/health/definition")
-      ).default.GET;
-    case "stripe":
-      return (
-        await import(
-          "@/app/api/[locale]/payment/providers/stripe/cli/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/status/definition")
       ).default.POST;
-    case "stripe-cli":
-      return (
-        await import(
-          "@/app/api/[locale]/payment/providers/stripe/cli/definition"
-        )
-      ).default.POST;
-    case "stt":
-      return (
-        await import(
-          "@/app/api/[locale]/agent/speech-to-text/hotkey/definition"
-        )
-      ).default.POST;
-    case "studio":
-      return (await import("@/app/api/[locale]/system/db/studio/definition"))
-        .default.POST;
-    case "subscribe":
-      return (
-        await import("@/app/api/[locale]/newsletter/subscribe/definition")
-      ).default.POST;
-    case "subscription-cancel":
-      return (await import("@/app/api/[locale]/subscription/definition"))
-        .default.DELETE;
-    case "subscription-update":
-      return (await import("@/app/api/[locale]/subscription/definition"))
-        .default.PUT;
-    case "subscription_DELETE":
-      return (await import("@/app/api/[locale]/subscription/definition"))
-        .default.DELETE;
-    case "subscription_GET":
-      return (await import("@/app/api/[locale]/subscription/definition"))
-        .default.GET;
-    case "subscription_POST":
-      return (await import("@/app/api/[locale]/subscription/definition"))
-        .default.POST;
-    case "subscription_PUT":
-      return (await import("@/app/api/[locale]/subscription/definition"))
-        .default.PUT;
     case "system_builder_POST":
       return (await import("@/app/api/[locale]/system/builder/definition"))
         .default.POST;
@@ -1588,10 +804,6 @@ export async function getEndpoint(
     case "system_check_oxlint_POST":
       return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
         .default.POST;
-    case "system_check_test_POST":
-      return (
-        await import("@/app/api/[locale]/system/check/testing/test/definition")
-      ).default.POST;
     case "system_check_typecheck_POST":
       return (
         await import("@/app/api/[locale]/system/check/typecheck/definition")
@@ -1600,122 +812,26 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/system/check/vibe-check/definition")
       ).default.POST;
-    case "system_db_migrate-prod_POST":
-      return (
-        await import("@/app/api/[locale]/system/db/migrate-prod/definition")
-      ).default.POST;
-    case "system_db_migrate-repair_POST":
-      return (
-        await import("@/app/api/[locale]/system/db/migrate-repair/definition")
-      ).default.POST;
-    case "system_db_migrate-sync_POST":
-      return (
-        await import("@/app/api/[locale]/system/db/migrate-sync/definition")
-      ).default.POST;
-    case "system_db_migrate_POST":
-      return (await import("@/app/api/[locale]/system/db/migrate/definition"))
-        .default.POST;
-    case "system_db_migrate_task-management_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/db/migrate/task-management/definition"
-        )
-      ).default.POST;
-    case "system_db_ping_POST":
-      return (await import("@/app/api/[locale]/system/db/ping/definition"))
-        .default.POST;
-    case "system_db_reset_POST":
-      return (await import("@/app/api/[locale]/system/db/reset/definition"))
-        .default.POST;
-    case "system_db_reset_task-management_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/db/reset/task-management/definition"
-        )
-      ).default.POST;
-    case "system_db_schema-verify_POST":
-      return (
-        await import("@/app/api/[locale]/system/db/schema-verify/definition")
-      ).default.POST;
-    case "system_db_seed_POST":
-      return (await import("@/app/api/[locale]/system/db/seed/definition"))
-        .default.POST;
-    case "system_db_sql_POST":
-      return (await import("@/app/api/[locale]/system/db/sql/definition"))
-        .default.POST;
-    case "system_db_studio_POST":
-      return (await import("@/app/api/[locale]/system/db/studio/definition"))
-        .default.POST;
-    case "system_db_utils_GET":
-      return (await import("@/app/api/[locale]/system/db/utils/definition"))
-        .default.GET;
-    case "system_db_utils_docker-operations_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/db/utils/docker-operations/definition"
-        )
-      ).default.POST;
     case "system_generators_endpoint_POST":
       return (
         await import("@/app/api/[locale]/system/generators/endpoint/definition")
       ).default.POST;
     case "system_generators_endpoints-index_POST":
       return (
-        await import(
-          "@/app/api/[locale]/system/generators/endpoints-index/definition"
-        )
+        await import("@/app/api/[locale]/system/generators/endpoints-index/definition")
       ).default.POST;
     case "system_generators_endpoints_POST":
       return (
-        await import(
-          "@/app/api/[locale]/system/generators/endpoints/definition"
-        )
-      ).default.POST;
-    case "system_generators_env_POST":
-      return (
-        await import("@/app/api/[locale]/system/generators/env/definition")
+        await import("@/app/api/[locale]/system/generators/endpoints/definition")
       ).default.POST;
     case "system_generators_generate-all_POST":
       return (
-        await import(
-          "@/app/api/[locale]/system/generators/generate-all/definition"
-        )
-      ).default.POST;
-    case "system_generators_generate-trpc-router_validation_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/generators/generate-trpc-router/validation/definition"
-        )
+        await import("@/app/api/[locale]/system/generators/generate-all/definition")
       ).default.POST;
     case "system_generators_route-handlers_POST":
       return (
-        await import(
-          "@/app/api/[locale]/system/generators/route-handlers/definition"
-        )
+        await import("@/app/api/[locale]/system/generators/route-handlers/definition")
       ).default.POST;
-    case "system_generators_seeds_POST":
-      return (
-        await import("@/app/api/[locale]/system/generators/seeds/definition")
-      ).default.POST;
-    case "system_generators_task-index_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/generators/task-index/definition"
-        )
-      ).default.POST;
-    case "system_guard_destroy_POST":
-      return (
-        await import("@/app/api/[locale]/system/guard/destroy/definition")
-      ).default.POST;
-    case "system_guard_start_POST":
-      return (await import("@/app/api/[locale]/system/guard/start/definition"))
-        .default.POST;
-    case "system_guard_status_POST":
-      return (await import("@/app/api/[locale]/system/guard/status/definition"))
-        .default.POST;
-    case "system_guard_stop_POST":
-      return (await import("@/app/api/[locale]/system/guard/stop/definition"))
-        .default.POST;
     case "system_help_POST":
       return (await import("@/app/api/[locale]/system/help/definition")).default
         .POST;
@@ -1726,368 +842,44 @@ export async function getEndpoint(
     case "system_help_list_POST":
       return (await import("@/app/api/[locale]/system/help/list/definition"))
         .default.POST;
-    case "system_react-native_generate_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/react-native/generate/definition"
-        )
-      ).default.POST;
     case "system_release-tool_POST":
       return (await import("@/app/api/[locale]/system/release-tool/definition"))
         .default.POST;
-    case "system_server_build_POST":
-      return (await import("@/app/api/[locale]/system/server/build/definition"))
-        .default.POST;
-    case "system_server_dev_POST":
-      return (await import("@/app/api/[locale]/system/server/dev/definition"))
-        .default.POST;
-    case "system_server_health_GET":
-      return (
-        await import("@/app/api/[locale]/system/server/health/definition")
-      ).default.GET;
-    case "system_server_start_POST":
-      return (await import("@/app/api/[locale]/system/server/start/definition"))
-        .default.POST;
     case "system_setup_status_POST":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/cli/setup/status/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/status/definition")
       ).default.POST;
     case "system_setup_uninstall_POST":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/definition")
       ).default.POST;
     case "system_setup_update_POST":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/cli/setup/update/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/definition")
       ).default.POST;
-    case "system_side-tasks_generators_generate-trpc-router_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/generators/generate-trpc-router/definition"
-        )
-      ).default.POST;
-    case "system_tasks_cron_history_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/cron/history/definition"
-        )
-      ).default.GET;
-    case "system_tasks_cron_stats_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/definition"
-        )
-      ).default.GET;
-    case "system_tasks_cron_status_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/cron/status/definition"
-        )
-      ).default.GET;
-    case "system_tasks_cron_task_id_DELETE":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/cron/task/[id]/definition"
-        )
-      ).default.DELETE;
-    case "system_tasks_cron_task_id_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/cron/task/[id]/definition"
-        )
-      ).default.GET;
-    case "system_tasks_cron_task_id_PUT":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/cron/task/[id]/definition"
-        )
-      ).default.PUT;
-    case "system_tasks_cron_tasks_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition"
-        )
-      ).default.GET;
-    case "system_tasks_cron_tasks_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition"
-        )
-      ).default.POST;
-    case "system_tasks_pulse_execute_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/pulse/definition"
-        )
-      ).default.POST;
-    case "system_tasks_pulse_status_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/pulse/status/definition"
-        )
-      ).default.GET;
-    case "system_tasks_side-tasks_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/side-tasks/definition"
-        )
-      ).default.GET;
-    case "system_tasks_side-tasks_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/side-tasks/definition"
-        )
-      ).default.POST;
-    case "system_tasks_types_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/types/definition"
-        )
-      ).default.GET;
-    case "system_tasks_unified-runner_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/definition"
-        )
-      ).default.POST;
-    case "system_translations_reorganize_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/translations/reorganize/definition"
-        )
-      ).default.POST;
-    case "system_translations_restore-backup_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/system/translations/restore-backup/definition"
-        )
-      ).default.POST;
-    case "system_translations_stats_GET":
-      return (
-        await import("@/app/api/[locale]/system/translations/stats/definition")
-      ).default.GET;
-    case "system_unified-interface_ai_tools_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/ai/tools/definition"
-        )
-      ).default.GET;
     case "system_unified-interface_cli_setup_install_POST":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/cli/setup/install/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
       ).default.POST;
     case "system_unified-interface_mcp_serve_POST":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/mcp/serve/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
       ).default.POST;
-    case "t":
-      return (
-        await import("@/app/api/[locale]/system/check/testing/test/definition")
-      ).default.POST;
-    case "task-runner":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/definition"
-        )
-      ).default.POST;
-    case "tasks:cron:stats":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/definition"
-        )
-      ).default.GET;
-    case "tasks:cron:status":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/cron/status/definition"
-        )
-      ).default.GET;
-    case "tasks:side":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/side-tasks/definition"
-        )
-      ).default.POST;
-    case "tasks:side:status":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/side-tasks/definition"
-        )
-      ).default.GET;
-    case "tasks:types":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/types/definition"
-        )
-      ).default.GET;
     case "tc":
       return (
         await import("@/app/api/[locale]/system/check/typecheck/definition")
       ).default.POST;
-    case "test":
-      return (
-        await import("@/app/api/[locale]/system/check/testing/test/definition")
-      ).default.POST;
-    case "tools:list":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/ai/tools/definition"
-        )
-      ).default.GET;
-    case "track-click":
-      return (
-        await import("@/app/api/[locale]/leads/tracking/engagement/definition")
-      ).default.GET;
-    case "track-engagement":
-      return (
-        await import("@/app/api/[locale]/leads/tracking/engagement/definition")
-      ).default.POST;
-    case "translations:reorganize":
-      return (
-        await import(
-          "@/app/api/[locale]/system/translations/reorganize/definition"
-        )
-      ).default.POST;
-    case "translations:restore":
-      return (
-        await import(
-          "@/app/api/[locale]/system/translations/restore-backup/definition"
-        )
-      ).default.POST;
-    case "translations:stats":
-      return (
-        await import("@/app/api/[locale]/system/translations/stats/definition")
-      ).default.GET;
-    case "trpc-validate":
-      return (
-        await import(
-          "@/app/api/[locale]/system/generators/generate-trpc-router/validation/definition"
-        )
-      ).default.POST;
-    case "ts":
-      return (
-        await import("@/app/api/[locale]/system/translations/stats/definition")
-      ).default.GET;
     case "typecheck":
       return (
         await import("@/app/api/[locale]/system/check/typecheck/definition")
       ).default.POST;
-    case "unified-runner":
-      return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/definition"
-        )
-      ).default.POST;
     case "uninstall":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/definition"
-        )
-      ).default.POST;
-    case "unsubscribe":
-      return (
-        await import("@/app/api/[locale]/newsletter/unsubscribe/definition")
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/definition")
       ).default.POST;
     case "update":
       return (
-        await import(
-          "@/app/api/[locale]/system/unified-interface/cli/setup/update/definition"
-        )
-      ).default.POST;
-    case "update-subscription":
-      return (await import("@/app/api/[locale]/subscription/definition"))
-        .default.PUT;
-    case "user_auth_check_GET":
-      return (await import("@/app/api/[locale]/user/auth/check/definition"))
-        .default.GET;
-    case "user_private_logout_POST":
-      return (await import("@/app/api/[locale]/user/private/logout/definition"))
-        .default.POST;
-    case "user_private_me_DELETE":
-      return (await import("@/app/api/[locale]/user/private/me/definition"))
-        .default.DELETE;
-    case "user_private_me_GET":
-      return (await import("@/app/api/[locale]/user/private/me/definition"))
-        .default.GET;
-    case "user_private_me_POST":
-      return (await import("@/app/api/[locale]/user/private/me/definition"))
-        .default.POST;
-    case "user_private_me_avatar_DELETE":
-      return (
-        await import("@/app/api/[locale]/user/private/me/avatar/definition")
-      ).default.DELETE;
-    case "user_private_me_avatar_POST":
-      return (
-        await import("@/app/api/[locale]/user/private/me/avatar/definition")
-      ).default.POST;
-    case "user_private_me_password_POST":
-      return (
-        await import("@/app/api/[locale]/user/private/me/password/definition")
-      ).default.POST;
-    case "user_public_login_POST":
-      return (await import("@/app/api/[locale]/user/public/login/definition"))
-        .default.POST;
-    case "user_public_login_options_GET":
-      return (
-        await import("@/app/api/[locale]/user/public/login/options/definition")
-      ).default.GET;
-    case "user_public_reset-password_confirm_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/user/public/reset-password/confirm/definition"
-        )
-      ).default.POST;
-    case "user_public_reset-password_request_POST":
-      return (
-        await import(
-          "@/app/api/[locale]/user/public/reset-password/request/definition"
-        )
-      ).default.POST;
-    case "user_public_reset-password_validate_GET":
-      return (
-        await import(
-          "@/app/api/[locale]/user/public/reset-password/validate/definition"
-        )
-      ).default.GET;
-    case "user_public_signup_POST":
-      return (await import("@/app/api/[locale]/user/public/signup/definition"))
-        .default.POST;
-    case "user_search_GET":
-      return (await import("@/app/api/[locale]/user/search/definition")).default
-        .GET;
-    case "users_create_POST":
-      return (await import("@/app/api/[locale]/users/create/definition"))
-        .default.POST;
-    case "users_list_GET":
-      return (await import("@/app/api/[locale]/users/list/definition")).default
-        .GET;
-    case "users_stats_GET":
-      return (await import("@/app/api/[locale]/users/stats/definition")).default
-        .GET;
-    case "users_user_id_DELETE":
-      return (await import("@/app/api/[locale]/users/user/[id]/definition"))
-        .default.DELETE;
-    case "users_user_id_GET":
-      return (await import("@/app/api/[locale]/users/user/[id]/definition"))
-        .default.GET;
-    case "users_user_id_PUT":
-      return (await import("@/app/api/[locale]/users/user/[id]/definition"))
-        .default.PUT;
-    case "validate-trpc":
-      return (
-        await import(
-          "@/app/api/[locale]/system/generators/generate-trpc-router/validation/definition"
-        )
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/definition")
       ).default.POST;
     default:
       return null;

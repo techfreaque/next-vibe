@@ -1,7 +1,6 @@
 import "server-only";
 
 import { cliAuthHandler } from "../../../cli/auth/cli-handler";
-import { webAuthHandler } from "../../../next-api/auth-handler";
 import { Platform } from "../../types/platform";
 import type { BaseAuthHandler } from "./base-auth-handler";
 
@@ -15,16 +14,16 @@ import type { BaseAuthHandler } from "./base-auth-handler";
  */
 export function getPlatformAuthHandler(platform: Platform): BaseAuthHandler {
   switch (platform) {
-    case Platform.TRPC:
-    case Platform.NEXT_PAGE:
-    case Platform.NEXT_API:
-    case Platform.AI:
-      return webAuthHandler;
-
     case Platform.CLI:
     case Platform.CLI_PACKAGE:
     case Platform.MCP:
       return cliAuthHandler;
+    case Platform.TRPC:
+    case Platform.NEXT_PAGE:
+    case Platform.NEXT_API:
+    case Platform.AI:
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Auth factory requires throwing for unsupported platforms
+      throw new Error("WebAuthHandler not implemented");
 
     default: {
       const _exhaustiveCheck: never = platform;

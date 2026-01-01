@@ -6,13 +6,8 @@
 
 import "server-only";
 
-import type { NextRequest } from "next/server";
 import type { z } from "zod";
 
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { emailHandlingRepository } from "@/app/api/[locale]/emails/smtp-client/email-handling/repository";
-import type { EmailHandleRequestOutput } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
-import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import {
   ErrorResponseTypes,
   type FileResponse,
@@ -21,9 +16,6 @@ import {
   type ResponseType,
   type StreamingResponse,
 } from "@/app/api/[locale]/shared/types/response.schema";
-import { handleSms } from "@/app/api/[locale]/sms/handle-sms";
-import type { SmsFunctionType } from "@/app/api/[locale]/sms/utils";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -74,22 +66,6 @@ export type InferJwtPayloadTypeFromRoles<
       : JwtPayloadType;
 
 /**
- * Email handler configuration
- */
-export interface EmailHandler<TRequest, TResponse, TUrlVariables> {
-  readonly ignoreErrors?: boolean;
-  readonly render: EmailFunctionType<TRequest, TResponse, TUrlVariables>;
-}
-
-/**
- * SMS handler configuration
- */
-export interface SMSHandler<TRequest, TResponse, TUrlVariables> {
-  readonly ignoreErrors?: boolean;
-  readonly render: SmsFunctionType<TRequest, TResponse, TUrlVariables>;
-}
-
-/**
  * API handler props - handlers receive OUTPUT types (validated data)
  */
 export interface ApiHandlerProps<
@@ -118,9 +94,6 @@ export interface ApiHandlerProps<
 
   /** Logger instance */
   logger: EndpointLogger;
-
-  /** Original request (optional, platform-specific) */
-  request?: NextRequest;
 }
 
 /**
@@ -171,8 +144,6 @@ export interface MethodHandlerConfig<
     TUserRoleValue,
     TPlatform
   >;
-  email?: EmailHandler<TRequestOutput, TResponseOutput, TUrlVariablesOutput>[];
-  sms?: SMSHandler<TRequestOutput, TResponseOutput, TUrlVariablesOutput>[];
 }
 
 export interface ApiHandlerOptions<
@@ -191,22 +162,6 @@ export interface ApiHandlerOptions<
     TUserRoleValue,
     TPlatform
   >;
-  email?:
-    | {
-        afterHandlerEmails?: EmailHandler<
-          TRequestOutput,
-          TResponseOutput,
-          TUrlVariablesOutput
-        >[];
-      }
-    | undefined;
-  sms?: {
-    afterHandlerSms?: SMSHandler<
-      TRequestOutput,
-      TResponseOutput,
-      TUrlVariablesOutput
-    >[];
-  };
 }
 
 export type GenericHandlerReturnType<
@@ -221,7 +176,6 @@ export type GenericHandlerReturnType<
   locale: CountryLanguage;
   logger: EndpointLogger;
   platform: Platform;
-  request?: NextRequest; // Optional NextRequest for Next.js platform
 }) => Promise<ResponseType<TResponseOutput> | StreamingResponse | FileResponse>;
 
 /**
@@ -257,7 +211,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
   T["types"]["UrlVariablesOutput"],
   T["allowedRoles"]
 > {
-  const { endpoint, handler, email, sms } = options;
+  const { endpoint, handler } = options;
 
   return async ({
     data,
@@ -266,7 +220,6 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     locale,
     logger,
     platform,
-    request,
   }): Promise<
     | ResponseType<T["types"]["ResponseOutput"]>
     | StreamingResponse
@@ -279,11 +232,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     if (providedUser) {
       user = providedUser as InferJwtPayloadTypeFromRoles<T["allowedRoles"]>;
     } else {
-      const authUser = await AuthRepository.getAuthMinimalUser(
-        endpoint.allowedRoles,
-        { platform, locale, request },
-        logger,
-      );
+      const authUser = null;
 
       if (!authUser) {
         return {
@@ -331,51 +280,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       return validationResult;
     }
 
-    // 4. Check and deduct credits if endpoint has credit cost
-    if (endpoint.credits && endpoint.credits > 0) {
-      const hasSufficient = await CreditRepository.hasSufficientCredits(
-        user.id
-          ? { userId: user.id, leadId: user.leadId }
-          : { leadId: user.leadId },
-        endpoint.credits,
-        logger,
-      );
-
-      if (!hasSufficient) {
-        logger.warn("Insufficient credits for endpoint", {
-          routePath: `${endpoint.path.join("/")}/${endpoint.method}`,
-          userId: user.isPublic ? "public" : user.id,
-          cost: endpoint.credits,
-        });
-        return {
-          success: false,
-          message: "app.api.credits.errors.insufficientCredits",
-          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
-          messageParams: { cost: endpoint.credits },
-        };
-      }
-
-      const deductResult = await CreditRepository.deductCreditsForFeature(
-        user,
-        endpoint.credits,
-        `${endpoint.path.join("/")}/${endpoint.method}`,
-        logger,
-      );
-
-      if (!deductResult.success) {
-        logger.error("Failed to deduct credits for endpoint", {
-          routePath: `${endpoint.path.join("/")}/${endpoint.method}`,
-          userId: user.isPublic ? "public" : user.id,
-          cost: endpoint.credits,
-        });
-        return {
-          success: false,
-          message: "app.api.credits.errors.deductionFailed",
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { cost: endpoint.credits },
-        };
-      }
-    }
+    // Credit checking disabled in minimal checker package
 
     const result = await handler({
       data: validationResult.data.requestData as T["types"]["RequestOutput"],
@@ -385,7 +290,6 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       t,
       locale: validationResult.data.locale,
       logger,
-      request,
       platform,
     });
 
@@ -415,49 +319,9 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       return responseValidation;
     }
 
-    if (email?.afterHandlerEmails) {
-      await emailHandlingRepository.handleEmails<
-        T["types"]["RequestOutput"],
-        T["types"]["ResponseOutput"],
-        T["types"]["UrlVariablesOutput"]
-      >(
-        {
-          email,
-          responseData: responseValidation.data as T["types"]["ResponseOutput"],
-          urlPathParams: validationResult.data
-            .urlPathParams as T["types"]["UrlVariablesOutput"],
-          requestData: validationResult.data
-            .requestData as T["types"]["RequestOutput"],
-          t,
-          locale: validationResult.data.locale,
-          user,
-        } satisfies EmailHandleRequestOutput<
-          T["types"]["RequestOutput"],
-          T["types"]["ResponseOutput"],
-          T["types"]["UrlVariablesOutput"]
-        >,
-        logger,
-      );
-    }
+    // Email handling disabled in minimal checker package
 
-    if (sms?.afterHandlerSms) {
-      await handleSms<
-        T["types"]["RequestOutput"],
-        T["types"]["ResponseOutput"],
-        T["types"]["UrlVariablesOutput"]
-      >({
-        sms,
-        user,
-        responseData: responseValidation.data as T["types"]["ResponseOutput"],
-        urlPathParams: validationResult.data
-          .urlPathParams as T["types"]["UrlVariablesOutput"],
-        requestData: validationResult.data
-          .requestData as T["types"]["RequestOutput"],
-        t,
-        locale: validationResult.data.locale,
-        logger,
-      });
-    }
+    // SMS handling disabled in minimal checker package
 
     // Preserve isErrorResponse flag and performance metadata from handler result
     return {

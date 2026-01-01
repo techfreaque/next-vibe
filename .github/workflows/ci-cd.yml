@@ -2,15 +2,15 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop, "feature/*", "fix/*"]
+    branches: [vibe-check]
   pull_request:
-    branches: [main, develop]
+    branches: [vibe-check]
   workflow_dispatch:
 
 jobs:
   other-check:
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
+    if: github.ref != 'refs/heads/vibe-check'
     steps:
       - uses: actions/checkout@v4
 
@@ -28,9 +28,6 @@ jobs:
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
-
-      - name: Setup environment variables
-        run: cp .env.example .env
 
       - name: Install dependencies
         run: bun install

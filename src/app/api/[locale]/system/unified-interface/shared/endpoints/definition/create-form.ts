@@ -10,7 +10,6 @@
 
 import { z } from "zod";
 
-import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type {
   ExamplesList,
   ExtractInput,
@@ -47,7 +46,7 @@ export interface FormMethodConfig<TScopedTranslationKey extends string> {
   readonly title: TScopedTranslationKey;
   readonly description: TScopedTranslationKey;
   readonly tags: TScopedTranslationKey[];
-  readonly icon: IconKey;
+  readonly icon: string;
   readonly aliases?: string[];
 }
 

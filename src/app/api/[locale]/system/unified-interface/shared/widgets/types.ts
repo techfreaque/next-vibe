@@ -1,5 +1,4 @@
 import type React from "react";
-import type { FieldValues, UseFormReturn } from "react-hook-form";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -113,16 +112,12 @@ export interface WidgetRenderContext {
 /**
  * Base widget component props.
  */
-export interface WidgetComponentProps<
-  TKey extends string,
-  TFieldValues extends FieldValues = FieldValues,
-> {
+export interface WidgetComponentProps<TKey extends string> {
   field: UnifiedField<TKey>;
   fieldName?: string;
   value: WidgetData;
   context: WidgetRenderContext;
   className?: string;
-  form?: UseFormReturn<TFieldValues>;
   onSubmit?: () => void;
   isSubmitting?: boolean;
 }
@@ -171,13 +166,11 @@ export type WidgetPropsUnion<TKey extends string> =
 export interface ReactWidgetProps<
   T extends WidgetType,
   TKey extends string,
-  TFieldValues extends FieldValues = FieldValues,
 > extends BaseWidgetProps<TKey, T> {
   context: WidgetRenderContext;
   fieldName?: string;
   onAction?: (action: WidgetAction) => void | Promise<void>;
   className?: string;
-  form?: UseFormReturn<TFieldValues>;
   onSubmit?: () => void;
   isSubmitting?: boolean;
   endpoint: CreateApiEndpointAny;
@@ -197,36 +190,25 @@ export interface ValueOnlyReactWidgetProps<T extends WidgetType> {
 /**
  * Maps each WidgetType to React-specific props.
  */
-export type ReactWidgetPropsMap<
-  TKey extends string,
-  TFieldValues extends FieldValues = FieldValues,
-> = {
-  [T in WidgetType]: ReactWidgetProps<T, TKey, TFieldValues>;
+export type ReactWidgetPropsMap<TKey extends string> = {
+  [T in WidgetType]: ReactWidgetProps<T, TKey>;
 };
 
 /**
  * Union of all React widget props.
  */
-export type ReactWidgetPropsUnion<
-  TKey extends string,
-  TFieldValues extends FieldValues = FieldValues,
-> = ReactWidgetPropsMap<TKey, TFieldValues>[WidgetType];
+export type ReactWidgetPropsUnion<TKey extends string> =
+  ReactWidgetPropsMap<TKey>[WidgetType];
 
-export type WidgetRenderer<
-  TKey extends string,
-  TFieldValues extends FieldValues = FieldValues,
-> = (
-  props: WidgetComponentProps<TKey, TFieldValues>,
+export type WidgetRenderer<TKey extends string> = (
+  props: WidgetComponentProps<TKey>,
 ) => React.ReactElement | string | null;
 
-export interface WidgetRegistryEntry<
-  TKey extends string,
-  TFieldValues extends FieldValues = FieldValues,
-> {
+export interface WidgetRegistryEntry<TKey extends string> {
   type: WidgetType;
   component:
-    | React.ComponentType<WidgetComponentProps<TKey, TFieldValues>>
-    | WidgetRenderer<TKey, TFieldValues>;
+    | React.ComponentType<WidgetComponentProps<TKey>>
+    | WidgetRenderer<TKey>;
   platforms?: Array<
     | typeof Platform.TRPC
     | typeof Platform.NEXT_PAGE

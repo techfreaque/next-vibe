@@ -4,13 +4,11 @@ import "server-only";
  * Endpoint Handler Implementation
  * Main function for creating type-safe multi-method handlers
  */
-import type { NextRequest, NextResponse } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { NextHandlerReturnType } from "../../../next-api/handler";
 import type { CreateApiEndpointAny } from "../../types/endpoint";
 import { Methods } from "../../types/enums";
 import type {
@@ -72,22 +70,7 @@ export type ToolsObject<T extends EndpointDefinitionsConstraint> = {
  * All return VALIDATED response data (TResponseOutput) or streaming/file responses
  */
 type EndpointsHandlerReturn<T extends EndpointDefinitionsConstraint> = {
-  [K in keyof T]: T[K] extends CreateApiEndpointAny
-    ? (
-        request: NextRequest,
-        context: {
-          params: Promise<Record<string, string> & { locale: CountryLanguage }>;
-        },
-      ) => Promise<
-        | NextResponse<
-            | ResponseType<T[K]["types"]["ResponseOutput"]>
-            | Buffer
-            | ReadableStream
-            | Blob
-          >
-        | Response
-      >
-    : never;
+  [K in keyof T]: undefined;
 } & {
   tools: ToolsObject<T>;
 };
@@ -111,22 +94,7 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
   // We construct the result object gradually and assert the final type at return
   // This pattern is necessary because TypeScript cannot properly track conditional
   // types during dynamic object construction
-  type FlexibleResult = Record<
-    string,
-    | NextHandlerReturnType<
-        ResponseType<Record<string, string | number | boolean>>,
-        Record<string, string> & { locale: CountryLanguage }
-      >
-    | Record<
-        string,
-        GenericHandlerReturnTypeImport<
-          Record<string, string | number | boolean>,
-          ResponseType<Record<string, string | number | boolean>>,
-          Record<string, string> & { locale: CountryLanguage },
-          readonly UserRoleValue[]
-        >
-      >
-  > & {
+  type FlexibleResult = Record<string, undefined> & {
     tools: Record<
       string,
       GenericHandlerReturnTypeImport<
@@ -150,14 +118,8 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
       });
-      result[Methods.GET] = handler[Methods.GET];
+      result[Methods.GET] = undefined;
       result.tools[Methods.GET] = handler.tools[Methods.GET];
     }
   }
@@ -170,14 +132,8 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
       });
-      result[Methods.POST] = handler[Methods.POST];
+      result[Methods.POST] = undefined;
       result.tools[Methods.POST] = handler.tools[Methods.POST];
     }
   }
@@ -190,12 +146,6 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
       });
       result[Methods.PUT] = handler[Methods.PUT];
       result.tools[Methods.PUT] = handler.tools[Methods.PUT];
@@ -210,12 +160,6 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
       });
       result[Methods.PATCH] = handler[Methods.PATCH];
       result.tools[Methods.PATCH] = handler.tools[Methods.PATCH];
@@ -230,12 +174,6 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
       });
       result[Methods.DELETE] = handler[Methods.DELETE];
       result.tools[Methods.DELETE] = handler.tools[Methods.DELETE];

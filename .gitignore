@@ -28,3 +28,4 @@ code-server
 # react native
 .expo
 .vibe.session
+.vibe-cleanup
